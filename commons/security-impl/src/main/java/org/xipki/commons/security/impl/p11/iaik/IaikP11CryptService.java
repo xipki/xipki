@@ -191,7 +191,7 @@ public final class IaikP11CryptService implements P11CryptService {
         try {
             return getNonNullIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
         } catch (PKCS11RuntimeException ex) {
-            final String message = "error while calling identity.CKM_RSA_PKCS()";
+            final String message = "could not call identity.CKM_RSA_PKCS()";
             if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                         ex.getMessage());
@@ -225,7 +225,7 @@ public final class IaikP11CryptService implements P11CryptService {
         try {
             return getNonNullIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
         } catch (PKCS11RuntimeException ex) {
-            final String message = "error while calling identity.CKM_RSA_X_509()";
+            final String message = "could not call identity.CKM_RSA_X_509()";
             if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                         ex.getMessage());
@@ -269,7 +269,7 @@ public final class IaikP11CryptService implements P11CryptService {
         try {
             return getNonNullIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
         } catch (PKCS11RuntimeException ex) {
-            final String message = "error while calling identity.CKM_ECDSA()";
+            final String message = "could not call identity.CKM_ECDSA()";
             if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                         ex.getMessage());
@@ -313,7 +313,7 @@ public final class IaikP11CryptService implements P11CryptService {
         try {
             return getNonNullIdentity(slotId, keyId).CKM_DSA(extModule, hash);
         } catch (PKCS11RuntimeException ex) {
-            final String message = "error while calling identity.CKM_DSA()";
+            final String message = "could not call identity.CKM_DSA()";
             if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                         ex.getMessage());

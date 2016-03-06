@@ -115,7 +115,7 @@ public class X509CertificateInfo {
             }
         } catch (IllegalArgumentException | IOException | NoSuchAlgorithmException ex) {
             throw new CertificateEncodingException(
-                    "error while retrieving hash algorithm used to sign the certifiate: "
+                    "could not retrieve hash algorithm used to sign the certifiate: "
                             + ex.getMessage(), ex);
         }
     }

@@ -212,8 +212,8 @@ public class FileDigestReader implements DigestReader {
         try {
             reader.close();
         } catch (Exception ex) {
-            LOG.warn("error while closing reader: {}", ex.getMessage());
-            LOG.debug("error while closing reader", ex);
+            LOG.warn("could not close reader: {}", ex.getMessage());
+            LOG.debug("could not close reader", ex);
         }
     }
 

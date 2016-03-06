@@ -204,7 +204,7 @@ class RequestOption {
             }
         } catch (Exception ex) {
             throw new InvalidConfException(
-                    "error while initializing the trustAnchors: " + ex.getMessage(), ex);
+                    "could not initialize the trustAnchors: " + ex.getMessage(), ex);
         }
 
         CertCollectionType certsType = certpathConf.getCerts();
@@ -215,7 +215,7 @@ class RequestOption {
                 this.certs = doGetCerts(certsType);
             } catch (Exception ex) {
                 throw new InvalidConfException(
-                        "error while initializing the certs: " + ex.getMessage(), ex);
+                        "could not initialize the certs: " + ex.getMessage(), ex);
             }
         } // end if
     } // constructor

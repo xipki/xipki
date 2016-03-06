@@ -191,7 +191,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 throw XmlUtil.convert(ex);
             }
         } catch (Exception ex) {
-            System.err.println("error while exporting CA certstore from database");
+            System.err.println("could not export CA certstore from database");
             exception = ex;
         }
 

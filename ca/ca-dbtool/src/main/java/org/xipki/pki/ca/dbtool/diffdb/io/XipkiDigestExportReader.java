@@ -219,7 +219,7 @@ public class XipkiDigestExportReader {
             if (result.getException() != null) {
                 throw new DataAccessException(
                         String.format(
-                                "error while reading from ID %d: %s", result.getStartId(),
+                                "could not read from ID %d: %s", result.getStartId(),
                                 result.getException().getMessage()),
                         result.getException());
             }

@@ -174,7 +174,7 @@ public class IaikP11ModulePool {
             try {
                 modules.get(pk11Lib).close();
             } catch (Throwable th) {
-                LOG.error("error while closing PKCS11 Module " + pk11Lib + ":" + th.getMessage(),
+                LOG.error("could not close PKCS11 Module " + pk11Lib + ":" + th.getMessage(),
                         th);
             }
         }
@@ -201,7 +201,7 @@ public class IaikP11ModulePool {
             try {
                 module.finalize(null);
             } catch (Throwable th) {
-                final String message = "error while module.finalize()";
+                final String message = "could not module.finalize()";
                 if (LOG.isErrorEnabled()) {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
                             th.getMessage());

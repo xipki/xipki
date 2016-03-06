@@ -225,8 +225,8 @@ public class DbDigestReporter {
         try {
             writer.close();
         } catch (Exception ex) {
-            LOG.warn("error while closing writer: {}", ex.getMessage());
-            LOG.debug("error while closing writer", ex);
+            LOG.warn("could not close writer: {}", ex.getMessage());
+            LOG.debug("could not close writer", ex);
         }
     }
 

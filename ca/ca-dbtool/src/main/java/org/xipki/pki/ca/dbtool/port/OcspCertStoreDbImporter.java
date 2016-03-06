@@ -139,7 +139,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             recoverIndexes();
             processLogFile.delete();
         } catch (Exception ex) {
-            System.err.println("error while importing OCSP certstore to database");
+            System.err.println("could not import OCSP certstore to database");
             throw ex;
         }
         System.out.println(" imported OCSP certstore to database");
@@ -213,10 +213,10 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
             ps.execute();
         } catch (SQLException ex) {
-            System.err.println("error while importing issuer with id=" + issuer.getId());
+            System.err.println("could not import issuer with id=" + issuer.getId());
             throw translate(SQL_ADD_ISSUER, ex);
         } catch (CertificateException ex) {
-            System.err.println("error while importing issuer with id=" + issuer.getId());
+            System.err.println("could not import issuer with id=" + issuer.getId());
             throw ex;
         }
     } // method doImportIssuer
@@ -281,7 +281,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                             processLogFile, processLog, numProcessedBefore);
                     minId = lastId + 1;
                 } catch (Exception ex) {
-                    System.err.println("\nerror while importing certificates from file "
+                    System.err.println("\ncould not import certificates from file "
                             + certsFile + ".\nplease continue with the option '--resume'");
                     LOG.error("Exception", ex);
                     throw ex;

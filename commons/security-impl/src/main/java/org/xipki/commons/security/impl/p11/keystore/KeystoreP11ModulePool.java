@@ -118,7 +118,7 @@ public class KeystoreP11ModulePool {
             try {
                 modules.get(pk11Lib).close();
             } catch (Throwable th) {
-                LOG.error("error while closing PKCS11 Module " + pk11Lib + ":" + th.getMessage(),
+                LOG.error("could not close PKCS11 Module " + pk11Lib + ":" + th.getMessage(),
                         th);
             }
         }
