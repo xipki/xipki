@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -220,7 +219,7 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public String getCaName(
+    public String getCaNameForAlias(
             final String aliasName) {
         return caManager.getCaNameForAlias(aliasName);
     }
@@ -734,26 +733,22 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public byte[] generateCertificate(
+    public X509Certificate generateCertificate(
             final String caName,
             final String profileName,
             final String user,
             final byte[] encodedPkcs10Request)
     throws HessianCaMgmtException {
         try {
-            X509Certificate cert = caManager.generateCertificate(caName, profileName, user,
+            return caManager.generateCertificate(caName, profileName, user,
                     encodedPkcs10Request);
-            return cert.getEncoded();
         } catch (CaMgmtException ex) {
             throw new HessianCaMgmtException(ex.getMessage());
-        } catch (CertificateEncodingException ex) {
-            throw new HessianCaMgmtException("could not encode generated certificate: "
-                    + ex.getMessage());
         }
     }
 
     @Override
-    public X509Certificate generateSelfSignedCa(
+    public X509Certificate generateRootCa(
             final X509CaEntry caEntry,
             final String certprofileName,
             final byte[] p10Req)

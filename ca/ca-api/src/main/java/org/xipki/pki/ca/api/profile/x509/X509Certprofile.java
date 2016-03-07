@@ -42,6 +42,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -98,7 +101,7 @@ public abstract class X509Certprofile {
     }
 
     public String incSerialNumber(
-            final String currentSerialNumber)
+            @Nullable final String currentSerialNumber)
     throws BadFormatException {
         try {
             int currentSn = (currentSerialNumber == null)
@@ -129,7 +132,7 @@ public abstract class X509Certprofile {
     }
 
     public String getParameter(
-            final String paramName) {
+            @Nonnull final String paramName) {
         return null;
     }
 
@@ -159,7 +162,7 @@ public abstract class X509Certprofile {
     public abstract Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls();
 
     public abstract void initialize(
-            String data)
+            @Nullable String data)
     throws CertprofileException;
 
     public abstract boolean isCa();
@@ -169,26 +172,27 @@ public abstract class X509Certprofile {
     public abstract Integer getPathLenBasicConstraint();
 
     public abstract void setEnvParameterResolver(
-            EnvParameterResolver parameterResolver);
+            @Nullable EnvParameterResolver parameterResolver);
 
-    public abstract Date getNotBefore(Date notBefore);
+    public abstract Date getNotBefore(
+            @Nullable Date notBefore);
 
     public abstract CertValidity getValidity();
 
     public abstract SubjectPublicKeyInfo checkPublicKey(
-            SubjectPublicKeyInfo publicKey)
+            @Nonnull SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException;
 
     public abstract SubjectInfo getSubject(
-            X500Name requestedSubject)
+            @Nonnull X500Name requestedSubject)
     throws CertprofileException, BadCertTemplateException;
 
     public abstract ExtensionValues getExtensions(
-            Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
-            X500Name requestedSubject,
-            Extensions requestExtensions,
-            Date notBefore,
-            Date notAfter)
+            @Nonnull Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
+            @Nonnull X500Name requestedSubject,
+            @Nullable Extensions requestExtensions,
+            @Nonnull Date notBefore,
+            @Nonnull Date notAfter)
     throws CertprofileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();

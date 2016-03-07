@@ -38,6 +38,9 @@ package org.xipki.pki.scep.message;
 
 import java.security.cert.X509Certificate;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -46,7 +49,7 @@ import java.security.cert.X509Certificate;
 public interface CertificateValidator {
 
     boolean trustCertificate(
-            X509Certificate target,
-            X509Certificate[] otherCerts);
+            @Nonnull X509Certificate target,
+            @Nullable X509Certificate[] otherCerts);
 
 }

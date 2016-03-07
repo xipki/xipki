@@ -36,6 +36,8 @@
 
 package org.xipki.commons.audit.api;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -44,9 +46,9 @@ package org.xipki.commons.audit.api;
 public interface AuditService {
 
     void logEvent(
-            AuditEvent event);
+            @Nonnull AuditEvent event);
 
     void logEvent(
-            PciAuditEvent event);
+            @Nonnull PciAuditEvent event);
 
 }

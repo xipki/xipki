@@ -134,7 +134,8 @@ public class DbDigestDiffWorker extends DbPortWorker {
 
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.datasource = datasourceFactory.createDataSource(null, props, passwordResolver);
+        this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
+                passwordResolver);
 
         this.revokedOnly = revokedOnly;
         if (refDirname != null) {
@@ -145,7 +146,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
             Properties refProps = DbPorter.getDbConfProperties(
                     new FileInputStream(IoUtil.expandFilepath(refDbConfFile)));
             this.refDatasource = datasourceFactory.createDataSource(
-                    null, refProps, passwordResolver);
+                    "ds-" + refDbConfFile, refProps, passwordResolver);
         }
     } // constructor DbDigestDiffWorker
 

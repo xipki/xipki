@@ -36,6 +36,8 @@
 
 package org.xipki.commons.password.api;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -44,10 +46,10 @@ package org.xipki.commons.password.api;
 public interface SinglePasswordResolver {
 
     boolean canResolveProtocol(
-            String protocol);
+            @Nonnull String protocol);
 
     char[] resolvePassword(
-            String passwordHint)
+            @Nonnull String passwordHint)
     throws PasswordResolverException;
 
 }

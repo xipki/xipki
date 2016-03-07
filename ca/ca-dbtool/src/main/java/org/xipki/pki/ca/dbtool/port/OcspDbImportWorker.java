@@ -87,10 +87,12 @@ public class OcspDbImportWorker extends DbPortWorker {
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
+        ParamUtil.requireNonNull("dbConfFile", dbConfFile);
 
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.datasource = datasourceFactory.createDataSource(null, props, passwordResolver);
+        this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
+                passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));

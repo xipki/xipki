@@ -49,6 +49,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
+
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
@@ -116,7 +118,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
     }
 
     protected abstract byte[] send(
-            byte[] request)
+            @Nonnull byte[] request)
     throws IOException;
 
     private ASN1Encodable send(

@@ -44,6 +44,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.CrlReason;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
@@ -71,49 +74,50 @@ import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
 public interface HessianCaManager {
 
     String getAttribute(
-            String attributeKey);
+            @Nonnull String attributeKey);
 
     CaSystemStatus getCaSystemStatus();
 
     boolean unlockCa();
 
+    boolean notifyCaChange()
+    throws HessianCaMgmtException;
+
     boolean publishRootCa(
-            String caName,
-            String certprofile)
+            @Nonnull String caName,
+            @Nonnull String certprofile)
     throws HessianCaMgmtException;
 
     boolean republishCertificates(
-            String caName,
-            List<String> publisherNames)
+            @Nonnull String caName,
+            @Nullable List<String> publisherNames)
     throws HessianCaMgmtException;
 
     boolean clearPublishQueue(
-            String caName,
-            List<String> publisherNames)
+            @Nonnull String caName,
+            @Nullable List<String> publisherNames)
     throws HessianCaMgmtException;
 
-    boolean removeCa(String caName)
+    boolean removeCa(
+            @Nonnull String caName)
     throws HessianCaMgmtException;
 
     boolean restartCaSystem();
 
-    boolean notifyCaChange()
-    throws HessianCaMgmtException;
-
     boolean addCaAlias(
-            String aliasName,
-            String caName)
+            @Nonnull String aliasName,
+            @Nonnull String caName)
     throws HessianCaMgmtException;
 
     boolean removeCaAlias(
-            String aliasName)
+            @Nonnull String aliasName)
     throws HessianCaMgmtException;
 
     Set<String> getAliasesForCa(
-            String caName);
+            @Nonnull String caName);
 
-    String getCaName(
-            String aliasName);
+    String getCaNameForAlias(
+            @Nonnull String aliasName);
 
     Set<String> getCaAliasNames();
 
@@ -132,259 +136,260 @@ public interface HessianCaManager {
     Set<String> getCaNames();
 
     boolean addCa(
-            CaEntry newCaDbEntry)
+            @Nonnull CaEntry caEntry)
     throws HessianCaMgmtException;
 
-    CaEntry getCa(String caName);
+    CaEntry getCa(
+            @Nonnull String caName);
 
     boolean changeCa(
-            ChangeCaEntry changeCaEntry)
+            @Nonnull ChangeCaEntry changeCAentry)
     throws HessianCaMgmtException;
 
     boolean removeCertprofileFromCa(
-            String profileName,
-            String caName)
+            @Nonnull String profileLocalname,
+            @Nonnull String caName)
     throws HessianCaMgmtException;
 
     boolean addCertprofileToCa(
-            String profileName,
-            String profileLocalname,
-            String caName)
+            @Nonnull String profileName,
+            @Nullable String profileLocalname,
+            @Nonnull String caName)
     throws HessianCaMgmtException;
 
     boolean removePublisherFromCa(
-            String publisherName,
-            String caName)
+            @Nonnull String publisherName,
+            @Nonnull String caName)
     throws HessianCaMgmtException;
 
     boolean addPublisherToCa(
-            String publisherName,
-            String caName)
+            @Nonnull String publisherName,
+            @Nonnull String caName)
     throws HessianCaMgmtException;
 
     Map<String, String> getCertprofilesForCa(
-            String caName);
+            @Nonnull String caName);
 
     Set<CaHasRequestorEntry> getCmpRequestorsForCa(
-            String caName);
+            @Nonnull String caName);
 
     CmpRequestorEntry getCmpRequestor(
-            String name);
+            @Nonnull String name);
 
     boolean addCmpRequestor(
-            CmpRequestorEntry dbEntry)
+            @Nonnull CmpRequestorEntry dbEntry)
     throws HessianCaMgmtException;
 
     boolean removeCmpRequestor(
-            String requestorName)
+            @Nonnull String requestorName)
     throws HessianCaMgmtException;
 
     boolean changeCmpRequestor(
-            String name,
-            String base64Cert)
+            @Nonnull String name,
+            @Nonnull String base64Cert)
     throws HessianCaMgmtException;
 
     boolean removeCmpRequestorFromCa(
-            String requestorName,
-            String caName)
+            @Nonnull String requestorName,
+            @Nonnull String caName)
     throws HessianCaMgmtException;
 
     boolean addCmpRequestorToCa(
-            CaHasRequestorEntry requestor,
-            String caName)
+            @Nonnull CaHasRequestorEntry requestor,
+            @Nonnull String caName)
     throws HessianCaMgmtException;
 
     CertprofileEntry getCertprofile(
-            String profileName);
+            @Nonnull String profileName);
 
     boolean removeCertprofile(
-            String profileName)
+            @Nonnull String profileName)
     throws HessianCaMgmtException;
 
     boolean changeCertprofile(
-            String name,
-            String type,
-            String conf)
+            @Nonnull String name,
+            @Nullable String type,
+            @Nullable String conf)
     throws HessianCaMgmtException;
 
     boolean addCertprofile(
-            CertprofileEntry dbEntry)
+            @Nonnull CertprofileEntry dbEntry)
     throws HessianCaMgmtException;
 
     boolean addCmpResponder(
-            CmpResponderEntry dbEntry)
+            @Nonnull CmpResponderEntry dbEntry)
     throws HessianCaMgmtException;
 
     boolean removeCmpResponder(
-            String name)
-    throws HessianCaMgmtException;
-
-    boolean changeCmpResponder(
-            String name,
-            String type,
-            String conf,
-            String base64Cert)
+            @Nonnull String name)
     throws HessianCaMgmtException;
 
     CmpResponderEntry getCmpResponder(
-            String name);
+            @Nonnull String name);
+
+    boolean changeCmpResponder(
+            @Nonnull String name,
+            @Nullable String type,
+            @Nullable String conf,
+            @Nullable String base64Cert)
+    throws HessianCaMgmtException;
 
     boolean addCrlSigner(
-            X509CrlSignerEntry dbEntry)
+            @Nonnull X509CrlSignerEntry dbEntry)
     throws HessianCaMgmtException;
 
     boolean removeCrlSigner(
-            String crlSignerName)
+            @Nonnull String crlSignerName)
     throws HessianCaMgmtException;
 
     boolean changeCrlSigner(
-            X509ChangeCrlSignerEntry dbEntry)
+            @Nonnull X509ChangeCrlSignerEntry dbEntry)
     throws HessianCaMgmtException;
 
     X509CrlSignerEntry getCrlSigner(
-            String name);
+            @Nonnull String name);
 
     boolean addPublisher(
-            PublisherEntry dbEntry)
+            @Nonnull PublisherEntry dbEntry)
     throws HessianCaMgmtException;
 
     List<PublisherEntry> getPublishersForCa(
-            String caName);
+            @Nonnull String caName);
 
     PublisherEntry getPublisher(
-            String publisherName);
+            @Nonnull String publisherName);
 
     boolean removePublisher(
-            String publisherName)
+            @Nonnull String publisherName)
     throws HessianCaMgmtException;
 
     boolean changePublisher(
-            String name,
-            String type,
-            String conf)
+            @Nonnull String name,
+            @Nullable String type,
+            @Nullable String conf)
     throws HessianCaMgmtException;
 
     CmpControlEntry getCmpControl(
-            String name);
+            @Nonnull String name);
 
     boolean addCmpControl(
-            CmpControlEntry dbEntry)
+            @Nonnull CmpControlEntry dbEntry)
     throws HessianCaMgmtException;
 
     boolean removeCmpControl(
-            String name)
+            @Nonnull String name)
     throws HessianCaMgmtException;
 
     boolean changeCmpControl(
-            String name,
-            String conf)
+            @Nonnull String name,
+            @Nullable String conf)
     throws HessianCaMgmtException;
 
     Set<String> getEnvParamNames();
 
     String getEnvParam(
-            String name);
+            @Nonnull String name);
 
     boolean addEnvParam(
-            String name,
-            String value)
+            @Nonnull String name,
+            @Nonnull String value)
     throws HessianCaMgmtException;
 
     boolean removeEnvParam(
-            String envParamName)
+            @Nonnull String envParamName)
     throws HessianCaMgmtException;
 
     boolean changeEnvParam(
-            String name,
+            @Nonnull String name,
             String value)
     throws HessianCaMgmtException;
 
     boolean revokeCa(
-            String caName,
-            CertRevocationInfo revocationInfo)
+            @Nonnull String caName,
+            @Nonnull CertRevocationInfo revocationInfo)
     throws HessianCaMgmtException;
 
     boolean unrevokeCa(
-            String caName)
+            @Nonnull String caName)
     throws HessianCaMgmtException;
 
     boolean revokeCertificate(
-            String caName,
-            BigInteger serialNumber,
-            CrlReason reason,
-            Date invalidityTime)
+            @Nonnull String caName,
+            @Nonnull BigInteger serialNumber,
+            @Nonnull CrlReason reason,
+            @Nullable Date invalidityTime)
     throws HessianCaMgmtException;
 
     boolean unrevokeCertificate(
-            String caName,
-            BigInteger serialNumber)
+            @Nonnull String caName,
+            @Nonnull BigInteger serialNumber)
     throws HessianCaMgmtException;
 
     boolean removeCertificate(
-            String caName,
-            BigInteger serialNumber)
+            @Nonnull String caName,
+            @Nonnull BigInteger serialNumber)
     throws HessianCaMgmtException;
 
-    byte[] generateCertificate(
-            String caName,
-            String profileName,
-            String user,
-            byte[] encodedPkcs10Request)
+    X509Certificate generateCertificate(
+            @Nonnull String caName,
+            @Nonnull String profileName,
+            @Nullable String user,
+            @Nonnull byte[] encodedPkcs10Request)
     throws HessianCaMgmtException;
 
-    X509Certificate generateSelfSignedCa(
-            X509CaEntry caEntry,
-            String certprofileName,
-            byte[] p10Req)
+    X509Certificate generateRootCa(
+            @Nonnull X509CaEntry caEntry,
+            @Nonnull String certprofileName,
+            @Nonnull byte[] p10Req)
     throws HessianCaMgmtException;
 
     boolean addUser(
-            AddUserEntry userEntry)
+            @Nonnull AddUserEntry userEntry)
     throws HessianCaMgmtException;
 
     boolean changeUser(
-            String username,
-            String password,
-            String cnRegex)
+            @Nonnull String username,
+            @Nullable String password,
+            @Nullable String cnRegex)
     throws HessianCaMgmtException;
 
     boolean removeUser(
-            final String username)
+            @Nonnull String username)
     throws HessianCaMgmtException;
 
     UserEntry getUser(
-            String username)
+            @Nonnull String username)
     throws HessianCaMgmtException;
 
     X509CRL generateCrlOnDemand(
-            String caName)
+            @Nonnull String caName)
     throws HessianCaMgmtException;
 
     X509CRL getCrl(
-            String caName,
+            @Nonnull String caName,
             BigInteger crlNumber)
     throws HessianCaMgmtException;
 
     X509CRL getCurrentCrl(
-            String caName)
+            @Nonnull String caName)
     throws HessianCaMgmtException;
 
     boolean addScep(
-            ScepEntry scepEntry)
+            @Nonnull ScepEntry scepEntry)
     throws HessianCaMgmtException;
 
     boolean removeScep(
-            String name)
+            @Nonnull String name)
     throws HessianCaMgmtException;
 
     boolean changeScep(
-            ChangeScepEntry scepEntry)
+            @Nonnull ChangeScepEntry scepEntry)
     throws HessianCaMgmtException;
 
     Set<String> getScepNames();
 
     ScepEntry getScepEntry(
-            String name)
+            @Nonnull String name)
     throws HessianCaMgmtException;
 
 }

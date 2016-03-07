@@ -132,7 +132,6 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
             final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts)
     throws Exception {
-        ParamUtil.requireNonNull("respIssuer", respIssuer);
         ParamUtil.requireNonEmpty("serialNunmbers", serialNumbers);
 
         if (isBlank(errorText) && isEmpty(statusTexts)) {

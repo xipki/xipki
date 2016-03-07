@@ -43,6 +43,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
@@ -63,116 +66,116 @@ public interface CaClient {
     Set<String> getCaNames();
 
     Set<CertprofileInfo> getCertprofiles(
-            String caName);
+            @Nonnull String caName);
 
     EnrollCertResult requestCert(
-            CertificationRequest p10Request,
-            String profile,
-            String caName,
-            String username,
-            RequestResponseDebug debug)
+            @Nonnull CertificationRequest p10Request,
+            @Nonnull String profile,
+            @Nullable String caName,
+            @Nullable String username,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     EnrollCertResult requestCerts(
-            EnrollCertRequestType request,
-            String caName,
-            String username,
-            RequestResponseDebug debug)
+            @Nonnull EnrollCertRequestType request,
+            @Nullable String caName,
+            @Nullable String username,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     CertIdOrError revokeCert(
-            X500Name issuer,
-            BigInteger serial,
+            @Nonnull X500Name issuer,
+            @Nonnull BigInteger serial,
             int reason,
-            Date invalidityTime,
-            RequestResponseDebug debug)
+            @Nullable Date invalidityTime,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     CertIdOrError revokeCert(
-            X509Certificate cert,
+            @Nonnull X509Certificate cert,
             int reason,
-            Date invalidityTime,
-            RequestResponseDebug debug)
+            @Nullable Date invalidityTime,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     Map<String, CertIdOrError> revokeCerts(
-            RevokeCertRequestType request,
-            RequestResponseDebug debug)
+            @Nonnull RevokeCertRequestType request,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     X509CRL downloadCrl(
-            String caName,
-            RequestResponseDebug debug)
+            @Nonnull String caName,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     X509CRL downloadCrl(
-            String caName,
-            BigInteger crlNumber,
-            RequestResponseDebug debug)
+            @Nonnull String caName,
+            @Nullable BigInteger crlNumber,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     X509CRL generateCrl(
-            String caName,
-            RequestResponseDebug debug)
+            @Nonnull String caName,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     String getCaNameByIssuer(
-            X500Name issuer)
+            @Nonnull X500Name issuer)
     throws CaClientException;
 
     byte[] envelope(
-            CertRequest certRequest,
-            ProofOfPossession popo,
-            String profileName,
-            String caName,
-            String username)
+            @Nonnull CertRequest certRequest,
+            @Nonnull ProofOfPossession popo,
+            @Nonnull String profileName,
+            @Nullable String caName,
+            @Nullable String username)
     throws CaClientException;
 
     byte[] envelopeRevocation(
-            X500Name issuer,
-            BigInteger serial,
+            @Nonnull X500Name issuer,
+            @Nonnull BigInteger serial,
             int reason)
     throws CaClientException;
 
     byte[] envelopeRevocation(
-            X509Certificate cert,
+            @Nonnull X509Certificate cert,
             int reason)
     throws CaClientException;
 
     CertIdOrError unrevokeCert(
-            X500Name issuer,
-            BigInteger serial,
-            RequestResponseDebug debug)
+            @Nonnull X500Name issuer,
+            @Nonnull BigInteger serial,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     CertIdOrError unrevokeCert(
-            X509Certificate cert,
-            RequestResponseDebug debug)
+            @Nonnull X509Certificate cert,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     Map<String, CertIdOrError> unrevokeCerts(
-            UnrevokeOrRemoveCertRequestType request,
-            RequestResponseDebug debug)
+            @Nonnull UnrevokeOrRemoveCertRequestType request,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     CertIdOrError removeCert(
-            X500Name issuer,
-            BigInteger serial,
-            RequestResponseDebug debug)
+            @Nonnull X500Name issuer,
+            @Nonnull BigInteger serial,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     CertIdOrError removeCert(
-            X509Certificate cert,
-            RequestResponseDebug debug)
+            @Nonnull X509Certificate cert,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     Map<String, CertIdOrError> removeCerts(
-            UnrevokeOrRemoveCertRequestType request,
-            RequestResponseDebug debug)
+            @Nonnull UnrevokeOrRemoveCertRequestType request,
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     HealthCheckResult getHealthCheckResult(
-            String caName)
+            @Nonnull String caName)
     throws CaClientException;
 
 }

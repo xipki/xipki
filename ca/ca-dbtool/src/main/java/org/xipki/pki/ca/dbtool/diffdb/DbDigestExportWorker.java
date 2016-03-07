@@ -107,7 +107,8 @@ public class DbDigestExportWorker extends DbPortWorker {
 
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.datasource = datasourceFactory.createDataSource(null, props, passwordResolver);
+        this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
+                passwordResolver);
         this.numCertsPerSelect = numCertsPerSelect;
         this.numThreads = numThreads;
     } // constructor

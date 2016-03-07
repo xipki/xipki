@@ -42,6 +42,9 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CRLHolder;
@@ -79,7 +82,7 @@ public interface ConcurrentContentSigner {
     PrivateKey getPrivateKey();
 
     void setPublicKey(
-            PublicKey publicKey);
+            @Nonnull PublicKey publicKey);
 
     PublicKey getPublicKey();
 
@@ -88,50 +91,50 @@ public interface ConcurrentContentSigner {
     X509CertificateHolder getCertificateAsBcObject();
 
     void setCertificateChain(
-            X509Certificate[] certchain);
+            @Nullable X509Certificate[] certchain);
 
     X509Certificate[] getCertificateChain();
 
     X509CertificateHolder[] getCertificateChainAsBcObjects();
 
     void initialize(
-            String conf,
-            PasswordResolver passwordResolver)
+            @Nullable String conf,
+            @Nullable PasswordResolver passwordResolver)
     throws SignerException;
 
     POPOSigningKey build(
-            ProofOfPossessionSigningKeyBuilder builder)
+            @Nonnull ProofOfPossessionSigningKeyBuilder builder)
     throws NoIdleSignerException;
 
     ProtectedPKIMessage build(
-            ProtectedPKIMessageBuilder builder)
+            @Nonnull ProtectedPKIMessageBuilder builder)
     throws NoIdleSignerException, CMPException;
 
     X509CRLHolder build(
-            X509v2CRLBuilder builder)
+            @Nonnull X509v2CRLBuilder builder)
     throws NoIdleSignerException;
 
     X509CertificateHolder build(
-            X509v3CertificateBuilder builder)
+            @Nonnull X509v3CertificateBuilder builder)
     throws NoIdleSignerException;
 
     OCSPReq build(
-            OCSPReqBuilder builder,
+            @Nonnull OCSPReqBuilder builder,
             X509CertificateHolder[] chain)
     throws NoIdleSignerException, OCSPException;
 
     BasicOCSPResp build(
-            BasicOCSPRespBuilder builder,
-            X509CertificateHolder[] chain,
-            Date producedAt)
+            @Nonnull BasicOCSPRespBuilder builder,
+            @Nullable X509CertificateHolder[] chain,
+            @Nonnull Date producedAt)
     throws NoIdleSignerException, OCSPException;
 
     PKCS10CertificationRequest build(
-            PKCS10CertificationRequestBuilder builder)
+            @Nonnull PKCS10CertificationRequestBuilder builder)
     throws NoIdleSignerException;
 
     byte[] sign(
-            byte[] data)
+            @Nonnull byte[] data)
     throws NoIdleSignerException, IOException;
 
     boolean isHealthy();

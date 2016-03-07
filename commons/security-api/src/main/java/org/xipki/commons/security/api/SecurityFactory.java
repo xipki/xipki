@@ -43,6 +43,9 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -69,88 +72,88 @@ public interface SecurityFactory {
     String getDefaultPkcs11ModuleName();
 
     P11Module getP11Module(
-            String moduleName)
+            @Nonnull String moduleName)
     throws SignerException;
 
     P11WritableSlot getP11WritablSlot(
-            String moduleName,
+            @Nonnull String moduleName,
             int slotIndex)
     throws SignerException;
 
     PasswordResolver getPasswordResolver();
 
     KeyCertPair createPrivateKeyAndCert(
-            String type,
-            String conf,
-            X509Certificate cert)
+            @Nonnull String type,
+            @Nullable String conf,
+            @Nullable X509Certificate cert)
     throws SignerException;
 
     ConcurrentContentSigner createSigner(
-            String type,
-            String conf,
-            X509Certificate cert)
+            @Nonnull String type,
+            @Nullable String conf,
+            @Nullable X509Certificate cert)
     throws SignerException;
 
     ConcurrentContentSigner createSigner(
-            String type,
-            String conf,
-            X509Certificate[] certs)
+            @Nonnull String type,
+            @Nullable String conf,
+            @Nullable X509Certificate[] certs)
     throws SignerException;
 
     ConcurrentContentSigner createSigner(
-            String type,
-            String confWithoutAlgo,
-            String hashAlgo,
-            SignatureAlgoControl sigAlgoControl,
-            X509Certificate cert)
+            @Nonnull String type,
+            @Nonnull String confWithoutAlgo,
+            @Nonnull String hashAlgo,
+            @Nullable SignatureAlgoControl sigAlgoControl,
+            @Nullable X509Certificate cert)
     throws SignerException;
 
     ConcurrentContentSigner createSigner(
-            String type,
-            String confWithoutAlgo,
-            String hashAlgo,
-            SignatureAlgoControl sigAlgoControl,
-            X509Certificate[] certs)
+            @Nonnull String type,
+            @Nonnull String confWithoutAlgo,
+            @Nonnull String hashAlgo,
+            @Nonnull SignatureAlgoControl sigAlgoControl,
+            @Nullable X509Certificate[] certs)
     throws SignerException;
 
     ContentVerifierProvider getContentVerifierProvider(
-            PublicKey publicKey)
+            @Nonnull PublicKey publicKey)
     throws InvalidKeyException;
 
     ContentVerifierProvider getContentVerifierProvider(
-            X509Certificate cert)
+            @Nonnull X509Certificate cert)
     throws InvalidKeyException;
 
     ContentVerifierProvider getContentVerifierProvider(
-            X509CertificateHolder cert)
+            @Nonnull X509CertificateHolder cert)
     throws InvalidKeyException;
 
     boolean verifyPopo(
-            final PKCS10CertificationRequest p10Request);
+            @Nonnull PKCS10CertificationRequest p10Request);
 
     boolean verifyPopo(
-            CertificationRequest p10Req);
+            @Nonnull CertificationRequest p10Req);
 
     PublicKey generatePublicKey(
-            SubjectPublicKeyInfo subjectPublicKeyInfo)
+            @Nonnull SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException;
 
     P11CryptService getP11CryptService(
-            String moduleName)
+            @Nonnull String moduleName)
     throws SignerException;
 
     PublicKey getPkcs11PublicKey(
-            String moduleName,
-            P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId)
+            @Nonnull String moduleName,
+            @Nonnull P11SlotIdentifier slotId,
+            @Nonnull P11KeyIdentifier keyId)
     throws InvalidKeyException;
 
     byte[] extractMinimalKeyStore(
-            String keystoreType,
-            byte[] keystoreBytes,
-            String keyname,
-            char[] password,
-            X509Certificate[] newCertChain)
+            @Nonnull String keystoreType,
+            @Nonnull byte[] keystoreBytes,
+            @Nullable String keyname,
+            @Nonnull char[] password,
+            @Nullable X509Certificate[] newCertChain)
     throws KeyStoreException;
 
     SecureRandom getRandom4Sign();

@@ -41,6 +41,9 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.commons.common.qa.ValidationResult;
 
@@ -52,12 +55,12 @@ import org.xipki.commons.common.qa.ValidationResult;
 public interface OcspQa {
 
     ValidationResult checkOcsp(
-            OCSPResp response,
-            X509Certificate issuer,
-            List<BigInteger> serialNumbers,
-            Map<BigInteger, byte[]> encodedCerts,
-            OcspError expectedOcspError,
-            Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
-            OcspResponseOption responseOption);
+            @Nonnull OCSPResp response,
+            @Nonnull X509Certificate issuer,
+            @Nonnull List<BigInteger> serialNumbers,
+            @Nullable Map<BigInteger, byte[]> encodedCerts,
+            @Nullable OcspError expectedOcspError,
+            @Nonnull Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
+            @Nonnull OcspResponseOption responseOption);
 
 }
