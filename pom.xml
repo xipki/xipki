@@ -48,7 +48,8 @@
     <hessian.version>4.0.38</hessian.version>
     <hikaricp.version>2.4.3</hikaricp.version>
     <syslog-java-client.version>1.0.8</syslog-java-client.version>
-    <jsr305.version>3.0.0_1</jsr305.version>
+    <jsr305.version>3.0.0</jsr305.version>
+    <jsr305.bundle.version>3.0.0_1</jsr305.bundle.version>
   </properties>
   <modules>
     <module>commons</module>
@@ -103,6 +104,11 @@
         <groupId>javax.servlet</groupId>
         <artifactId>servlet-api</artifactId>
         <version>${servlet-api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>jsr305</artifactId>
+        <version>${jsr305.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.karaf.shell</groupId>

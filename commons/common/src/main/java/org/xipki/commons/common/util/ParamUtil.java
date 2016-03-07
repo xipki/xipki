@@ -41,6 +41,8 @@ import java.util.Dictionary;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -52,7 +54,7 @@ public class ParamUtil {
     }
 
     public static int requireMin(
-            final String objName,
+            @Nonnull final String objName,
             final int obj,
             final int min) {
         if (obj < min) {
@@ -63,7 +65,7 @@ public class ParamUtil {
     }
 
     public static long requireMin(
-            final String objName,
+            @Nonnull final String objName,
             final long obj,
             final long min) {
         if (obj < min) {
@@ -74,7 +76,7 @@ public class ParamUtil {
     }
 
     public static int requireMax(
-            final String objName,
+            @Nonnull final String objName,
             final int obj,
             final int max) {
         if (obj > max) {
@@ -85,7 +87,7 @@ public class ParamUtil {
     }
 
     public static long requireMax(
-            final String objName,
+            @Nonnull final String objName,
             final long obj,
             final long max) {
         if (obj > max) {
@@ -96,7 +98,7 @@ public class ParamUtil {
     }
 
     public static int requireRange(
-            final String objName,
+            @Nonnull final String objName,
             final int obj,
             final int min,
             final int max) {
@@ -108,7 +110,7 @@ public class ParamUtil {
     }
 
     public static long requireRange(
-            final String objName,
+            @Nonnull final String objName,
             final long obj,
             final long min,
             final long max) {
@@ -120,15 +122,15 @@ public class ParamUtil {
     }
 
     public static <T> T requireNonNull(
-            final String objName,
-            final T obj) {
+            @Nonnull final String objName,
+            @Nonnull final T obj) {
         return Objects.requireNonNull(obj, objName + " must not be null");
     }
 
     public static String requireNonBlank(
-            final String objName,
-            final String obj) {
-        requireNonNull(objName, obj);
+            @Nonnull final String objName,
+            @Nonnull final String obj) {
+        Objects.requireNonNull(obj, objName + " must not be null");
         if (obj.isEmpty()) {
             throw new IllegalArgumentException(objName + " must not be blank");
         }
@@ -136,9 +138,9 @@ public class ParamUtil {
     }
 
     public static <T> T requireNonEmpty(
-            final String objName,
-            final T obj) {
-        requireNonNull(objName, obj);
+            @Nonnull final String objName,
+            @Nonnull final T obj) {
+        Objects.requireNonNull(obj, objName + " must not be null");
         if (obj instanceof Collection<?>) {
             if (((Collection<?>) obj).isEmpty()) {
                 throw new IllegalArgumentException(objName + " must not be empty");

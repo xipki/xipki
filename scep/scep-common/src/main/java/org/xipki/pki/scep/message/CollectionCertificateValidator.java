@@ -88,7 +88,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
     @Override
     public boolean trustCertificate(
             final X509Certificate signerCert,
-            final X509Certificate[] signerCaCerts) {
+            final X509Certificate[] otherCerts) {
         ParamUtil.requireNonNull("signerCert", signerCert);
 
         String hash;

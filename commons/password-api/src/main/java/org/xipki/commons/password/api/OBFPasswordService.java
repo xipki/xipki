@@ -36,6 +36,8 @@
 
 package org.xipki.commons.password.api;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -44,9 +46,9 @@ package org.xipki.commons.password.api;
 public interface OBFPasswordService {
 
     String obfuscate(
-            String str);
+            @Nonnull String str);
 
     String deobfuscate(
-            String str);
+            @Nonnull String str);
 
 }

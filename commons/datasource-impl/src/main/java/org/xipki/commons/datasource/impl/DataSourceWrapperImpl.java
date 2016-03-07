@@ -890,7 +890,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final Connection conn,
             final String table)
     throws DataAccessException {
-        ParamUtil.requireNonNull("conn", conn);
         ParamUtil.requireNonBlank("table", table);
 
         StringBuilder sqlBuilder = new StringBuilder(table.length() + 21);
@@ -933,7 +932,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String column,
             final String condition)
     throws DataAccessException {
-        ParamUtil.requireNonNull("conn", conn);
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
         int size = column.length() + table.length() + 20;
@@ -974,7 +972,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String table,
             final String idColumn,
             final int id) {
-        ParamUtil.requireNonNull("conn", conn);
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("idColumn", idColumn);
         final StringBuilder sb = new StringBuilder(table.length() + idColumn.length() + 35);
@@ -1028,7 +1025,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String column,
             final Object value)
     throws DataAccessException {
-        ParamUtil.requireNonNull("conn", conn);
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
         ParamUtil.requireNonNull("value", value);
@@ -1108,7 +1104,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final Connection conn,
             final String table)
     throws DataAccessException {
-        ParamUtil.requireNonNull("conn", conn);
         ParamUtil.requireNonBlank("table", table);
 
         Statement stmt;

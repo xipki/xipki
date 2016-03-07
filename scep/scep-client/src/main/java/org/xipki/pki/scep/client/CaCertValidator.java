@@ -38,6 +38,8 @@ package org.xipki.pki.scep.client;
 
 import java.security.cert.X509Certificate;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -46,6 +48,6 @@ import java.security.cert.X509Certificate;
 public interface CaCertValidator {
 
     boolean isTrusted(
-            X509Certificate cert);
+            @Nonnull X509Certificate cert);
 
 }

@@ -36,6 +36,8 @@
 
 package org.xipki.commons.password.api;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -44,14 +46,14 @@ package org.xipki.commons.password.api;
 public interface PBEPasswordService {
 
     char[] decryptPassword(
-            final char[] masterPassword,
-            final String passwordHint)
+            @Nonnull final char[] masterPassword,
+            @Nonnull final String passwordHint)
     throws PasswordResolverException;
 
     String encryptPassword(
             int iterationCount,
-            char[] masterPassword,
-            char[] password)
+            @Nonnull char[] masterPassword,
+            @Nonnull char[] password)
     throws PasswordResolverException;
 
 }

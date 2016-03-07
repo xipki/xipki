@@ -36,6 +36,8 @@
 
 package org.xipki.commons.security.impl.p11;
 
+import javax.annotation.Nonnull;
+
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.DataLengthException;
@@ -63,7 +65,7 @@ abstract class AbstractP11DSASigner implements Signer {
     }
 
     protected abstract byte[] sign(
-            final byte[] hashValue)
+            @Nonnull final byte[] hashValue)
     throws SignerException;
 
     @Override
