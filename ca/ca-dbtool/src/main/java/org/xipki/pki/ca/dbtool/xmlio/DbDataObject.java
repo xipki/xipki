@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.dbtool.xmlio;
 
+import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
 
 import org.xipki.commons.common.util.StringUtil;
@@ -95,7 +96,7 @@ public abstract class DbDataObject {
     throws InvalidDataObjectException;
 
     public abstract void writeTo(
-            DbiXmlWriter os)
+            @Nonnull DbiXmlWriter os)
     throws InvalidDataObjectException, XMLStreamException;
 
 }

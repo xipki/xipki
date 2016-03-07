@@ -36,6 +36,8 @@
 
 package org.xipki.commons.security.api.p11;
 
+import javax.annotation.Nonnull;
+
 import org.xipki.commons.security.api.SignerException;
 
 /**
@@ -46,10 +48,10 @@ import org.xipki.commons.security.api.SignerException;
 public interface P11CryptServiceFactory {
 
     void init(
-            P11Control p11Control);
+            @Nonnull P11Control p11Control);
 
     P11CryptService createP11CryptService(
-            String moduleName)
+            @Nonnull String moduleName)
     throws SignerException;
 
 }

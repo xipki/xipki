@@ -249,7 +249,6 @@ public class DbToolBase {
     protected DataAccessException translate(
             final String sql,
             final SQLException ex) {
-        ParamUtil.requireNonBlank("sql", sql);
         ParamUtil.requireNonNull("ex", ex);
         return datasource.translate(sql, ex);
     }

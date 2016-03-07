@@ -48,6 +48,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -111,9 +113,9 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     }
 
     protected abstract byte[] send(
-            byte[] request,
-            URL responderUrl,
-            RequestOptions requestOptions)
+            @Nonnull byte[] request,
+            @Nonnull URL responderUrl,
+            @Nonnull RequestOptions requestOptions)
     throws IOException;
 
     @Override

@@ -39,6 +39,9 @@ package org.xipki.pki.ocsp.api;
 import java.math.BigInteger;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.common.util.ParamUtil;
@@ -75,29 +78,29 @@ public abstract class CertStatusStore {
     public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
 
     public abstract boolean canResolveIssuer(
-            HashAlgoType hashAlgo,
-            byte[] issuerNameHash,
-            byte[] issuerKeyHash);
+            @Nonnull HashAlgoType hashAlgo,
+            @Nonnull byte[] issuerNameHash,
+            @Nonnull byte[] issuerKeyHash);
 
     public abstract CertStatusInfo getCertStatus(
-            HashAlgoType hashAlgo,
-            byte[] issuerNameHash,
-            byte[] issuerKeyHash,
-            BigInteger serialNumber,
+            @Nonnull HashAlgoType hashAlgo,
+            @Nonnull byte[] issuerNameHash,
+            @Nonnull byte[] issuerKeyHash,
+            @Nonnull BigInteger serialNumber,
             boolean includeCertHash,
-            HashAlgoType certHashAlg,
-            CertprofileOption certprofileOption)
+            @Nullable HashAlgoType certHashAlg,
+            @Nullable CertprofileOption certprofileOption)
     throws CertStatusStoreException;
 
     public abstract void init(
-            String conf,
-            DataSourceWrapper datasource)
+            @Nullable String conf,
+            @Nullable DataSourceWrapper datasource)
     throws CertStatusStoreException;
 
     public abstract CertRevocationInfo getCaRevocationInfo(
-            HashAlgoType hashAlgo,
-            byte[] issuerNameHash,
-            byte[] issuerKeyHash);
+            @Nonnull HashAlgoType hashAlgo,
+            @Nonnull byte[] issuerNameHash,
+            @Nonnull byte[] issuerKeyHash);
 
     public abstract void shutdown()
     throws CertStatusStoreException;

@@ -259,7 +259,6 @@ public class XmlX509CertprofileUtil {
     private static GeneralSubtree[] buildGeneralSubtrees(
             final GeneralSubtreesType subtrees)
     throws CertprofileException {
-        ParamUtil.requireNonNull("subtrees", subtrees);
         if (subtrees == null || CollectionUtil.isEmpty(subtrees.getBase())) {
             return null;
         }

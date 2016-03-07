@@ -125,7 +125,8 @@ public class CaDbImportWorker extends DbPortWorker {
 
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
-        this.datasource = datasourceFactory.createDataSource(null, props, passwordResolver);
+        this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
+                passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));

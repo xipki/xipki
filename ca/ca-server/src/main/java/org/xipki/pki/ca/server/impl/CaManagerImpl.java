@@ -2251,7 +2251,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             final String caName,
             final List<String> publisherNames)
     throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonEmpty("publisherNames", publisherNames);
         asssertMasterMode();
 

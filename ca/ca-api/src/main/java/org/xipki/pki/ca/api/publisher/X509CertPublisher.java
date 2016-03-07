@@ -39,6 +39,9 @@ package org.xipki.pki.ca.api.publisher;
 import java.security.cert.X509CRL;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.password.api.PasswordResolver;
@@ -56,9 +59,9 @@ import org.xipki.pki.ca.api.X509CertWithDbId;
 public abstract class X509CertPublisher {
 
     public abstract void initialize(
-            String conf,
-            PasswordResolver passwordResolver,
-            Map<String, DataSourceWrapper> datasources)
+            @Nullable String conf,
+            @Nullable PasswordResolver passwordResolver,
+            @Nonnull Map<String, DataSourceWrapper> datasources)
     throws CertPublisherException;
 
     public void shutdown() {
@@ -69,38 +72,38 @@ public abstract class X509CertPublisher {
     public abstract boolean isAsyn();
 
     public abstract void setEnvParameterResolver(
-            EnvParameterResolver parameterResolver);
+            @Nullable EnvParameterResolver parameterResolver);
 
     public abstract boolean issuerAdded(
-            X509Cert issuerCert);
+            @Nonnull X509Cert issuerCert);
 
     public abstract boolean certificateAdded(
-            X509CertificateInfo certInfo);
+            @Nonnull X509CertificateInfo certInfo);
 
     public abstract boolean certificateRevoked(
-            X509Cert issuerCert,
-            X509CertWithDbId cert,
-            String certprofile,
-            CertRevocationInfo revInfo);
+            @Nonnull X509Cert issuerCert,
+            @Nonnull X509CertWithDbId cert,
+            @Nullable String certprofile,
+            @Nonnull CertRevocationInfo revInfo);
 
     public abstract boolean certificateUnrevoked(
-            X509Cert issuerCert,
-            X509CertWithDbId cert);
+            @Nonnull X509Cert issuerCert,
+            @Nonnull X509CertWithDbId cert);
 
     public abstract boolean certificateRemoved(
-            X509Cert issuerCert,
-            X509CertWithDbId cert);
+            @Nonnull X509Cert issuerCert,
+            @Nonnull X509CertWithDbId cert);
 
     public abstract boolean crlAdded(
-            X509Cert issuerCert,
-            X509CRL crl);
+            @Nonnull X509Cert issuerCert,
+            @Nonnull X509CRL crl);
 
     public abstract boolean caRevoked(
-            X509Cert caCert,
-            CertRevocationInfo revocationInfo);
+            @Nonnull X509Cert caCert,
+            @Nonnull CertRevocationInfo revocationInfo);
 
     public abstract boolean caUnrevoked(
-            X509Cert caCert);
+            @Nonnull X509Cert caCert);
 
     public abstract boolean isHealthy();
 

@@ -50,6 +50,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -264,13 +267,13 @@ class IdentifiedX509Certprofile {
     }
 
     public ExtensionValues getExtensions(
-            final X500Name requestedSubject,
-            final Extensions requestExtensions,
-            final SubjectPublicKeyInfo publicKeyInfo,
-            final PublicCaInfo publicCaInfo,
-            final X509Certificate crlSignerCert,
-            final Date notBefore,
-            final Date notAfter)
+            @Nonnull final X500Name requestedSubject,
+            @Nullable final Extensions requestExtensions,
+            @Nonnull final SubjectPublicKeyInfo publicKeyInfo,
+            @Nonnull final PublicCaInfo publicCaInfo,
+            @Nullable final X509Certificate crlSignerCert,
+            @Nonnull final Date notBefore,
+            @Nonnull final Date notAfter)
     throws CertprofileException, BadCertTemplateException {
         ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
         ExtensionValues values = new ExtensionValues();

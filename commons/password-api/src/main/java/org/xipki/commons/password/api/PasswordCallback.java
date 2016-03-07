@@ -36,6 +36,8 @@
 
 package org.xipki.commons.password.api;
 
+import javax.annotation.Nullable;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -44,11 +46,11 @@ package org.xipki.commons.password.api;
 public interface PasswordCallback {
 
     void init(
-            String conf)
+            @Nullable String conf)
     throws PasswordResolverException;
 
     char[] getPassword(
-            String prompt)
+            @Nullable String prompt)
     throws PasswordResolverException;
 
 }

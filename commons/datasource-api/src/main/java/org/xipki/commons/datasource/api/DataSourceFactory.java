@@ -40,6 +40,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.password.api.PasswordResolverException;
@@ -52,21 +55,21 @@ import org.xipki.commons.password.api.PasswordResolverException;
 public interface DataSourceFactory {
 
     DataSourceWrapper createDataSource(
-            String name,
-            InputStream conf,
-            PasswordResolver passwordResolver)
+            @Nonnull String name,
+            @Nonnull InputStream conf,
+            @Nullable PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException;
 
     DataSourceWrapper createDataSource(
-            String name,
-            Properties conf,
-            PasswordResolver passwordResolver)
+            @Nonnull String name,
+            @Nonnull Properties conf,
+            @Nullable PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException;
 
     DataSourceWrapper createDataSourceForFile(
-            String name,
-            String confFile,
-            PasswordResolver passwordResolver)
+            @Nonnull String name,
+            @Nonnull String confFile,
+            @Nullable PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException;
 
 }

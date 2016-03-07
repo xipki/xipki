@@ -42,6 +42,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
@@ -125,11 +127,7 @@ public class SyslogAuditServiceImpl implements AuditService {
 
     @Override
     public void logEvent(
-            final AuditEvent event) {
-        if (event == null) {
-            return;
-        }
-
+            @Nonnull final AuditEvent event) {
         if (!initialized) {
             LOG.error("Syslog audit not initialiazed");
             return;
@@ -193,11 +191,7 @@ public class SyslogAuditServiceImpl implements AuditService {
 
     @Override
     public void logEvent(
-            final PciAuditEvent event) {
-        if (event == null) {
-            return;
-        }
-
+            @Nonnull final PciAuditEvent event) {
         if (!initialized) {
             LOG.error("Syslog audit not initialiazed");
             return;

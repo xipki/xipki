@@ -38,6 +38,9 @@ package org.xipki.commons.audit.api;
 
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -49,8 +52,9 @@ public enum AuditStatus {
     FAILED,
     UNDEFINED;
 
+    @Nullable
     public static final AuditStatus getAuditStatus(
-            final String name) {
+            @Nonnull final String name) {
         Objects.requireNonNull(name, "name must not be null");
 
         for (AuditStatus v : values()) {

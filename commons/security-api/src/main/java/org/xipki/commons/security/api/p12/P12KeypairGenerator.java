@@ -38,6 +38,8 @@ package org.xipki.commons.security.api.p12;
 
 import java.math.BigInteger;
 
+import javax.annotation.Nullable;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -48,21 +50,21 @@ public interface P12KeypairGenerator {
     // CHECKSTYLE:SKIP
     P12KeypairGenerationResult generateRSAKeypair(
             int keysize,
-            BigInteger publicExponent,
-            P12KeystoreGenerationParameters params)
+            @Nullable BigInteger publicExponent,
+            @Nullable P12KeystoreGenerationParameters params)
     throws Exception;
 
     // CHECKSTYLE:SKIP
     P12KeypairGenerationResult generateDSAKeypair(
             int plength,
             int qlength,
-            P12KeystoreGenerationParameters params)
+            @Nullable P12KeystoreGenerationParameters params)
     throws Exception;
 
     // CHECKSTYLE:SKIP
     P12KeypairGenerationResult generateECKeypair(
-            String curveNameOrOid,
-            P12KeystoreGenerationParameters params)
+            @Nullable String curveNameOrOid,
+            @Nullable P12KeystoreGenerationParameters params)
     throws Exception;
 
 }

@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ca.qa.api;
 
+import javax.annotation.Nonnull;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -49,10 +51,10 @@ import org.xipki.commons.common.qa.ValidationResult;
 public interface X509CertprofileQa {
 
     ValidationResult checkCert(
-            byte[] certBytes,
-            X509IssuerInfo issuerInfo,
-            X500Name requestedSubject,
-            SubjectPublicKeyInfo requestedPublicKey,
-            Extensions requestedExtensions);
+            @Nonnull byte[] certBytes,
+            @Nonnull X509IssuerInfo issuerInfo,
+            @Nonnull X500Name requestedSubject,
+            @Nonnull SubjectPublicKeyInfo requestedPublicKey,
+            @Nonnull Extensions requestedExtensions);
 
 }

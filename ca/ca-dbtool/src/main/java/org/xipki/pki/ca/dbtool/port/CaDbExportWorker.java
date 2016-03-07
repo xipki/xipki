@@ -87,18 +87,21 @@ public class CaDbExportWorker extends DbPortWorker {
     public CaDbExportWorker(
             final DataSourceFactory datasourceFactory,
             final PasswordResolver passwordResolver,
-            final InputStream dbConfStream,
+            final String dbConfFile,
             final String destFolder,
             final boolean resume,
             final int numCertsInBundle,
             final int numCertsPerSelect,
             final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+        ParamUtil.requireNonBlank("dbConfFile", dbConfFile);
         ParamUtil.requireNonBlank("destFolder", destFolder);
         ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
 
-        Properties props = DbPorter.getDbConfProperties(dbConfStream);
-        this.datasource = datasourceFactory.createDataSource(null, props, passwordResolver);
+        Properties props = DbPorter.getDbConfProperties(
+                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
+        this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props,
+                passwordResolver);
         this.marshaller = getMarshaller();
         this.unmarshaller = getUnmarshaller();
         this.destFolder = IoUtil.expandFilepath(destFolder);
@@ -107,21 +110,6 @@ public class CaDbExportWorker extends DbPortWorker {
         this.numCertsPerSelect = numCertsPerSelect;
         this.evaluateOnly = evaluateOnly;
         checkDestFolder();
-    }
-
-    public CaDbExportWorker(
-            final DataSourceFactory datasourceFactory,
-            final PasswordResolver passwordResolver,
-            final String dbConfFile,
-            final String destFolder,
-            final boolean destFolderEmpty,
-            final int numCertsInBundle,
-            final int numCertsPerSelect,
-            final boolean evaluateOnly)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
-        this(datasourceFactory, passwordResolver,
-                new FileInputStream(IoUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty,
-                    numCertsInBundle, numCertsPerSelect, evaluateOnly);
     }
 
     private void checkDestFolder()

@@ -169,7 +169,6 @@ class OcspStoreQueryExecutor {
             final CertRevocationInfo revInfo)
     throws DataAccessException, CertificateEncodingException, OperationException {
         ParamUtil.requireNonNull("issuer", issuer);
-        ParamUtil.requireNonNull("revInfo", revInfo);
 
         boolean revoked = (revInfo != null);
         int issuerId = getIssuerId(issuer);
@@ -316,7 +315,9 @@ class OcspStoreQueryExecutor {
                 }
 
             }
-            datasource.returnConnection(conn);
+            if (conn != null) {
+                datasource.returnConnection(conn);
+            }
         }
     } // method addOrUpdateCert
 

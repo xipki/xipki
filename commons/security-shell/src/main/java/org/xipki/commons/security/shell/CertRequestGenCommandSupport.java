@@ -47,6 +47,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.annotation.Nonnull;
+
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
@@ -200,7 +202,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     private P10RequestGenerator p10Gen;
 
     protected abstract ConcurrentContentSigner getSigner(
-            SignatureAlgoControl signatureAlgoControl)
+            @Nonnull SignatureAlgoControl signatureAlgoControl)
     throws Exception;
 
     @Override

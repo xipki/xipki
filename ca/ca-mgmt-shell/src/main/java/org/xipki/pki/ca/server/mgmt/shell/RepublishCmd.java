@@ -72,6 +72,9 @@ public class RepublishCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
+        if (publisherNames == null) {
+            throw new RuntimeException("should not reach here");
+        }
         boolean allPublishers = false;
         for (String publisherName : publisherNames) {
             if ("all".equalsIgnoreCase(publisherName)) {

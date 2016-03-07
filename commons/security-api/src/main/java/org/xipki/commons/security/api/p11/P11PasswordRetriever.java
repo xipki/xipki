@@ -38,6 +38,8 @@ package org.xipki.commons.security.api.p11;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.xipki.commons.password.api.PasswordResolverException;
 
 /**
@@ -48,7 +50,7 @@ import org.xipki.commons.password.api.PasswordResolverException;
 public interface P11PasswordRetriever {
 
     List<char[]> getPassword(
-            P11SlotIdentifier slotId)
+            @Nonnull P11SlotIdentifier slotId)
     throws PasswordResolverException;
 
 }

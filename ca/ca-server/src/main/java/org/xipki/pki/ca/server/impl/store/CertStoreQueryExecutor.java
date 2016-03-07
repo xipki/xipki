@@ -283,7 +283,6 @@ class CertStoreQueryExecutor {
     throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("certificate", certificate);
         ParamUtil.requireNonNull("certprofileName", certprofileName);
-        ParamUtil.requireNonNull("requestor", requestor);
 
         int certId = nextCertId();
         int caId = getCaId(issuer);
@@ -434,7 +433,9 @@ class CertStoreQueryExecutor {
                     releaseStatement(ps);
                 }
             } finally {
-                datasource.returnConnection(conn);
+            	if (conn != null) {
+                    datasource.returnConnection(conn);
+            	}
             }
         }
     } // method addCert

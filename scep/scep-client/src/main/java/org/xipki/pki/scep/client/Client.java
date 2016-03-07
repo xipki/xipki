@@ -51,6 +51,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
@@ -119,13 +121,13 @@ public abstract class Client {
     }
 
     protected abstract ScepHttpResponse httpPost(
-            final String url,
-            final String requestContentType,
-            final byte[] request)
+            @Nonnull final String url,
+            @Nonnull final String requestContentType,
+            @Nonnull final byte[] request)
     throws ScepClientException;
 
     protected abstract ScepHttpResponse httpGet(
-            final String url)
+            @Nonnull final String url)
     throws ScepClientException;
 
     public boolean isHttpGetOnly() {

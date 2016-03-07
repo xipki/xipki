@@ -39,6 +39,8 @@ package org.xipki.pki.scep.client;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
+import javax.annotation.Nonnull;
+
 import org.xipki.pki.scep.crypto.HashAlgoType;
 
 /**
@@ -78,7 +80,7 @@ public abstract class FingerprintCertificateValidator implements CaCertValidator
     }
 
     protected abstract boolean isCertTrusted(
-            HashAlgoType hashAlgo,
-            byte[] hashValue);
+            @Nonnull HashAlgoType hashAlgo,
+            @Nonnull byte[] hashValue);
 
 }
