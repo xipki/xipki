@@ -43,6 +43,9 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 
@@ -58,56 +61,56 @@ public interface P11WritableSlot {
     P11SlotIdentifier getSlotIdentifier();
 
     void updateCertificate(
-            P11KeyIdentifier keyIdentifier,
-            X509Certificate newCert,
-            Set<X509Certificate> caCerts,
-            SecurityFactory securityFactory)
+            @Nonnull P11KeyIdentifier keyIdentifier,
+            @Nonnull X509Certificate newCert,
+            @Nullable Set<X509Certificate> caCerts,
+            @Nonnull SecurityFactory securityFactory)
     throws Exception;
 
     boolean removeKeyAndCerts(
-            P11KeyIdentifier keyIdentifier)
+            @Nonnull P11KeyIdentifier keyIdentifier)
     throws Exception;
 
     boolean removeKey(
-            P11KeyIdentifier keyIdentifier)
+            @Nonnull P11KeyIdentifier keyIdentifier)
     throws Exception;
 
     void removeCerts(
-            P11KeyIdentifier keyIdentifier)
+            @Nonnull P11KeyIdentifier keyIdentifier)
     throws Exception;
 
     P11KeyIdentifier addCert(
-            X509Certificate cert)
+            @Nonnull X509Certificate cert)
     throws Exception;
 
     // CHECKSTYLE:SKIP
     P11KeyIdentifier generateRSAKeypair(
             int keySize,
-            BigInteger publicExponent,
-            String label)
+            @Nonnull BigInteger publicExponent,
+            @Nonnull String label)
     throws Exception;
 
     // CHECKSTYLE:SKIP
     P11KeyIdentifier generateDSAKeypair(
             int plength,
             int qlength,
-            String label)
+            @Nonnull String label)
     throws Exception;
 
     // CHECKSTYLE:SKIP
     P11KeyIdentifier generateECKeypair(
-            String curveNameOrOid,
-            String label)
+            @Nonnull String curveNameOrOid,
+            @Nonnull String label)
     throws Exception;
 
     X509Certificate exportCert(
-            P11KeyIdentifier keyIdentifier)
+            @Nonnull P11KeyIdentifier keyIdentifier)
     throws Exception;
 
     List<? extends P11Identity> getP11Identities();
 
     void showDetails(
-            OutputStream stream,
+            @Nonnull OutputStream stream,
             boolean verbose)
     throws IOException, SignerException;
 

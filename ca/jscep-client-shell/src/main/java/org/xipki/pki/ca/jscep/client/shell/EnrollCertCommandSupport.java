@@ -40,6 +40,8 @@ import java.io.File;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
+import javax.annotation.Nonnull;
+
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -73,10 +75,10 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     private String outputFile;
 
     protected abstract EnrollmentResponse requestCertificate(
-            Client client,
-            PKCS10CertificationRequest csr,
-            PrivateKey identityKey,
-            X509Certificate identityCert)
+            @Nonnull Client client,
+            @Nonnull PKCS10CertificationRequest csr,
+            @Nonnull PrivateKey identityKey,
+            @Nonnull X509Certificate identityCert)
     throws ClientException, TransactionException;
 
     @Override

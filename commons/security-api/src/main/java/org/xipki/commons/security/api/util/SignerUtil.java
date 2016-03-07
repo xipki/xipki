@@ -112,7 +112,6 @@ public class SignerUtil {
             final AsymmetricBlockCipher cipher)
     throws OperatorCreationException {
         ParamUtil.requireNonNull("sigAlgId", sigAlgId);
-        ParamUtil.requireNonNull("cipher", cipher);
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
             throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm()
                 + " is not allowed");

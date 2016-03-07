@@ -134,7 +134,8 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
         props.setProperty("minimumIdle", "1");
 
         DataSourceWrapper caDataSource = datasourceFactory.createDataSource(
-                null, props, securityFactory.getPasswordResolver());
+                "ds-" + caDbConfFile, props,
+                securityFactory.getPasswordResolver());
         try {
             CaLoadTestRevoke loadTest = new CaLoadTestRevoke(
                     caClient, caCert, caDataSource, maxCerts, num, description.toString());

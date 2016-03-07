@@ -36,9 +36,7 @@
 
 package org.xipki.pki.ca.ncm.client.impl;
 
-import java.io.IOException;
 import java.math.BigInteger;
-import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -51,7 +49,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.CrlReason;
-import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.ncm.common.HessianCaManager;
 import org.xipki.pki.ca.ncm.common.HessianCaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
@@ -206,7 +203,7 @@ public class CaManagerClient implements CaManager {
     @Override
     public String getCaNameForAlias(
             final String aliasName) {
-        return client.getCaName(aliasName);
+        return client.getCaNameForAlias(aliasName);
     }
 
     @Override
@@ -589,13 +586,8 @@ public class CaManagerClient implements CaManager {
             final String user,
             final byte[] encodedPkcs10Request)
     throws CaMgmtException {
-        byte[] encodedCert = client.generateCertificate(caName, profileName, user,
+        return client.generateCertificate(caName, profileName, user,
                 encodedPkcs10Request);
-        try {
-            return X509Util.parseCert(encodedCert);
-        } catch (CertificateException | IOException ex) {
-            throw new CaMgmtException("could not parse the certificate: " + ex.getMessage(), ex);
-        }
     }
 
     @Override
@@ -604,7 +596,7 @@ public class CaManagerClient implements CaManager {
             final String certprofileName,
             final byte[] p10Req)
     throws CaMgmtException {
-        return client.generateSelfSignedCa(caEntry, certprofileName, p10Req);
+        return client.generateRootCa(caEntry, certprofileName, p10Req);
     }
 
     @Override

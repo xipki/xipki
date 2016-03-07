@@ -38,6 +38,9 @@ package org.xipki.commons.security.api;
 
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -53,28 +56,28 @@ import org.xipki.commons.password.api.PasswordResolverException;
 public interface P10RequestGenerator {
 
     PKCS10CertificationRequest generateRequest(
-            final SecurityFactory securityFactory,
-            final String signerType,
-            final String signerConf,
-            final SubjectPublicKeyInfo subjectPublicKeyInfo,
-            final String subject,
-            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+            @Nonnull final SecurityFactory securityFactory,
+            @Nonnull final String signerType,
+            @Nullable final String signerConf,
+            @Nonnull final SubjectPublicKeyInfo subjectPublicKeyInfo,
+            @Nonnull final String subject,
+            @Nullable final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws PasswordResolverException, SignerException;
 
     PKCS10CertificationRequest generateRequest(
-            final SecurityFactory securityFactory,
-            final String signerType,
-            final String signerConf,
-            final SubjectPublicKeyInfo subjectPublicKeyInfo,
-            final X500Name subjectDn,
-            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+            @Nonnull final SecurityFactory securityFactory,
+            @Nonnull final String signerType,
+            @Nullable final String signerConf,
+            @Nonnull final SubjectPublicKeyInfo subjectPublicKeyInfo,
+            @Nonnull final X500Name subjectDn,
+            @Nullable final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws PasswordResolverException, SignerException;
 
     PKCS10CertificationRequest generateRequest(
-            final ConcurrentContentSigner signer,
-            final SubjectPublicKeyInfo subjectPublicKeyInfo,
-            final X500Name subjectDn,
-            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+            @Nonnull final ConcurrentContentSigner signer,
+            @Nonnull final SubjectPublicKeyInfo subjectPublicKeyInfo,
+            @Nonnull final X500Name subjectDn,
+            @Nullable final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws SignerException;
 
 }

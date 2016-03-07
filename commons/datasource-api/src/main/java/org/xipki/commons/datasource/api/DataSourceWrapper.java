@@ -42,6 +42,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 
 /**
@@ -59,170 +62,170 @@ public interface DataSourceWrapper {
     throws DataAccessException;
 
     void returnConnection(
-            Connection conn);
+            @Nonnull Connection conn);
 
     void shutdown();
 
     DatabaseType getDatabaseType();
 
     Statement createStatement(
-            Connection conn)
+            @Nonnull Connection conn)
     throws DataAccessException;
 
     PreparedStatement prepareStatement(
-            Connection conn,
-            String sqlQuery)
+            @Nonnull Connection conn,
+            @Nonnull String sqlQuery)
     throws DataAccessException;
 
     void releaseResources(
-            Statement ps,
-            ResultSet rs);
+            @Nullable Statement ps,
+            @Nullable ResultSet rs);
 
     String createFetchFirstSelectSql(
-            String coreSql,
+            @Nonnull String coreSql,
             int rows,
-            String orderBy);
+            @Nullable String orderBy);
 
     String createFetchFirstSelectSql(
-            String coreSql,
+            @Nonnull String coreSql,
             int rows);
 
     long getMin(
-            Connection conn,
-            String table,
-            String column,
-            String condition)
+            @Nullable Connection conn,
+            @Nonnull String table,
+            @Nonnull String column,
+            @Nullable String condition)
     throws DataAccessException;
 
     long getMin(
-            Connection conn,
-            String table,
-            String column)
+            @Nullable Connection conn,
+            @Nonnull String table,
+            @Nonnull String column)
     throws DataAccessException;
 
     long getMax(
-            Connection conn,
-            String table,
-            String column)
+            @Nullable Connection conn,
+            @Nonnull String table,
+            @Nonnull String column)
     throws DataAccessException;
 
     long getMax(
-            Connection conn,
-            String table,
-            String column,
-            String condition)
+            @Nullable Connection conn,
+            @Nonnull String table,
+            @Nonnull String column,
+            @Nullable String condition)
     throws DataAccessException;
 
     int getCount(
-            Connection conn,
-            String table)
+            @Nullable Connection conn,
+            @Nonnull String table)
     throws DataAccessException;
 
     boolean columnExists(
-            Connection conn,
-            String table,
-            String column,
-            Object value)
+            @Nullable Connection conn,
+            @Nonnull String table,
+            @Nonnull String column,
+            @Nonnull Object value)
     throws DataAccessException;
 
     boolean tableHasColumn(
-            Connection conn,
-            String table,
-            String column)
+            @Nullable Connection conn,
+            @Nonnull String table,
+            @Nonnull String column)
     throws DataAccessException;
 
     boolean tableExists(
-            Connection conn,
-            String table)
+            @Nullable Connection conn,
+            @Nonnull String table)
     throws DataAccessException;
 
     void dropAndCreateSequence(
-            String sequenceName,
+            @Nonnull String sequenceName,
             long startValue)
     throws DataAccessException;
 
     void createSequence(
-            String sequenceName,
+            @Nonnull String sequenceName,
             long startValue)
     throws DataAccessException;
 
     void dropSequence(
-            String sequenceName)
+            @Nonnull String sequenceName)
     throws DataAccessException;
 
     void setLastUsedSeqValue(
-            String sequenceName,
+            @Nonnull String sequenceName,
             long sequenceValue);
 
     long nextSeqValue(
-            Connection conn,
-            String sequenceName)
+            @Nullable Connection conn,
+            @Nonnull String sequenceName)
     throws DataAccessException;
 
     DataAccessException translate(
-            String sql,
-            SQLException ex);
+            @Nullable String sql,
+            @Nonnull SQLException ex);
 
     boolean deleteFromTable(
-            Connection conn,
-            String table,
-            String idColumn,
+            @Nullable Connection conn,
+            @Nonnull String table,
+            @Nonnull String idColumn,
             int id);
 
     void dropPrimaryKey(
-            Connection conn,
-            String primaryKeyName,
-            String table)
+            @Nullable Connection conn,
+            @Nonnull String primaryKeyName,
+            @Nonnull String table)
     throws DataAccessException;
 
     void addPrimaryKey(
-            Connection conn,
-            String primaryKeyName,
-            String table,
-            String... columns)
+            @Nullable Connection conn,
+            @Nonnull String primaryKeyName,
+            @Nonnull String table,
+            @Nonnull String... columns)
     throws DataAccessException;
 
     void dropForeignKeyConstraint(
-            Connection conn,
-            String constraintName,
-            String baseTable)
+            @Nullable Connection conn,
+            @Nonnull String constraintName,
+            @Nonnull String baseTable)
     throws DataAccessException;
 
     void addForeignKeyConstraint(
-            Connection conn,
-            String constraintName,
-            String baseTable,
-            String baseColumn,
-            String referencedTable,
-            String referencedColumn,
-            String onDeleteAction,
-            String onUpdateAction)
+            @Nullable Connection conn,
+            @Nonnull String constraintName,
+            @Nonnull String baseTable,
+            @Nonnull String baseColumn,
+            @Nonnull String referencedTable,
+            @Nonnull String referencedColumn,
+            @Nonnull String onDeleteAction,
+            @Nonnull String onUpdateAction)
     throws DataAccessException;
 
     void dropIndex(
-            Connection conn,
-            String indexName,
-            String table)
+            @Nullable Connection conn,
+            @Nonnull String indexName,
+            @Nonnull String table)
     throws DataAccessException;
 
     void createIndex(
-            Connection conn,
-            String indexName,
-            String table,
-            String column)
+            @Nullable Connection conn,
+            @Nonnull String indexName,
+            @Nonnull String table,
+            @Nonnull String column)
     throws DataAccessException;
 
     void dropUniqueConstrain(
-            Connection conn,
-            String constraintName,
-            String table)
+            @Nullable Connection conn,
+            @Nonnull String constraintName,
+            @Nonnull String table)
     throws DataAccessException;
 
     void addUniqueConstrain(
-            Connection conn,
-            String constraintName,
-            String table,
-            String... columns)
+            @Nullable Connection conn,
+            @Nonnull String constraintName,
+            @Nonnull String table,
+            @Nonnull String... columns)
     throws DataAccessException;
 
 }

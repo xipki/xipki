@@ -47,6 +47,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -123,17 +126,17 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     }
 
     protected abstract void checkParameters(
-            X509Certificate respIssuer,
-            List<BigInteger> serialNumbers,
-            Map<BigInteger, byte[]> encodedCerts)
+    		@Nullable X509Certificate respIssuer,
+            @Nonnull List<BigInteger> serialNumbers,
+            @Nullable Map<BigInteger, byte[]> encodedCerts)
     throws Exception;
 
     protected abstract Object processResponse(
-            OCSPResp response,
-            X509Certificate respIssuer,
-            X509Certificate issuer,
-            List<BigInteger> serialNumbers,
-            Map<BigInteger, byte[]> encodedCerts)
+            @Nonnull OCSPResp response,
+            @Nullable X509Certificate respIssuer,
+            @Nonnull X509Certificate issuer,
+            @Nonnull List<BigInteger> serialNumbers,
+            @Nullable Map<BigInteger, byte[]> encodedCerts)
     throws Exception;
 
     @Override
