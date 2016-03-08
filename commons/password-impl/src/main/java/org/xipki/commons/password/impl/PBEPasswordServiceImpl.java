@@ -117,7 +117,7 @@ public class PBEPasswordServiceImpl implements PBEPasswordService {
         }
 
         byte[] encryptedWithSalt = new byte[2 + salt.length + encrypted.length];
-        System.arraycopy(salt, 0, iterationCountBytes, 0, 2);
+        System.arraycopy(iterationCountBytes, 0, encryptedWithSalt, 0, 2);
         System.arraycopy(salt, 0, encryptedWithSalt, 2, salt.length);
         System.arraycopy(encrypted, 0, encryptedWithSalt, 2 + salt.length, encrypted.length);
         String pbeText = "PBE:" + Base64.getEncoder().encodeToString(encryptedWithSalt);
