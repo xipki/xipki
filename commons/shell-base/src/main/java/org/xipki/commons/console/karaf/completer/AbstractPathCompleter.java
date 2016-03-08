@@ -53,6 +53,8 @@ import org.xipki.commons.console.karaf.intern.Configuration;
  */
 
 abstract class AbstractPathCompleter implements Completer {
+    private static final String SEP = File.separator;
+    private static final int SEP_LEN = SEP.length();
 
     private static class MyFilenameFilter implements FilenameFilter {
 
@@ -116,19 +118,19 @@ abstract class AbstractPathCompleter implements Completer {
         File homeDir = getUserHome();
 
         // Special character: ~ maps to the user's home directory
-        if (translated.startsWith("~" + separator())) {
+        if (translated.startsWith("~" + SEP)) {
             translated = homeDir.getPath() + translated.substring(1);
         } else if (translated.startsWith("~")) {
             translated = homeDir.getParentFile().getAbsolutePath();
         } else if (!(new File(translated).isAbsolute())) {
             String cwd = getUserDir().getAbsolutePath();
-            translated = cwd + separator() + translated;
+            translated = cwd + SEP + translated;
         }
 
         File file = new File(translated);
         final File dir;
 
-        if (translated.endsWith(separator())) {
+        if (translated.endsWith(SEP)) {
             dir = file;
         } else {
             dir = file.getParentFile();
@@ -149,13 +151,11 @@ abstract class AbstractPathCompleter implements Completer {
             entries = list.toArray(new File[0]);
         }
 
-        return matchFiles(buffer, translated, entries, candidates)
-                + commandLine.getBufferPosition()
-                - commandLine.getArgumentPosition();
-    }
-
-    protected String separator() {
-        return File.separator;
+        final int idx = matchFiles(buffer, translated, entries, candidates);
+        final int bufferPos = commandLine.getBufferPosition();
+        final int argPos = commandLine.getArgumentPosition();
+        int ret = idx + bufferPos - argPos;
+        return ret;
     }
 
     protected File getUserHome() {
@@ -184,30 +184,24 @@ abstract class AbstractPathCompleter implements Completer {
             }
         }
 
-        String sep = separator();
         for (File file : files) {
             if (file.getAbsolutePath().startsWith(translated)) {
                 String name = file.getName();
                 if (matches == 1 && file.isDirectory()) {
-                    name += sep;
+                    name += SEP;
                     // this line prevent from appending whitespace
-                    candidates.add(render(file, name).toString());
+                    candidates.add(name);
                 } else {
                     name += " ";
                 }
-                candidates.add(render(file, name).toString());
+                candidates.add(name);
             }
         }
 
-        final int index = buffer.lastIndexOf(sep);
-
-        return index + sep.length();
-    }
-
-    protected CharSequence render(
-            final File file,
-            final CharSequence name) {
-        return name;
+        int index = buffer.lastIndexOf(SEP);
+        return index == -1
+                ? 0
+                : index + SEP_LEN;
     }
 
 }

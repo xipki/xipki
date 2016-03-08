@@ -212,28 +212,36 @@ public abstract class XipkiCommandSupport implements Action {
             return password.toCharArray();
         }
 
-        return readPassword("Enter the password");
+        return readPassword(null);
     }
 
     protected char[] readPassword() {
-        return readPassword("Enter the password");
+        return readPassword(null);
     }
 
     protected char[] readPassword(
             final String prompt) {
+        String tmpPrompt = (prompt == null)
+                ? "Password:"
+                : prompt.trim();
+
+        if (!tmpPrompt.endsWith(":")) {
+            tmpPrompt += ":";
+        }
+
         String passwordUi = System.getProperty("org.xipki.console.passwordui");
         if ("gui".equalsIgnoreCase(passwordUi)) {
-            return SecurePasswordInputPanel.readPassword(prompt);
+            return SecurePasswordInputPanel.readPassword(tmpPrompt);
         } else {
-            String tmpPrompt = prompt;
-            if (prompt != null && !prompt.endsWith("\n")) {
-                tmpPrompt += "\n";
-            }
+            Object oldIgnoreInterrupts = session.get(Session.IGNORE_INTERRUPTS);
+            session.put(Session.IGNORE_INTERRUPTS, Boolean.TRUE);
             try {
                 String pwd = session.readLine(tmpPrompt, '*');
                 return pwd.toCharArray();
             } catch (IOException ex) {
                 return new char[0];
+            } finally {
+                session.put(Session.IGNORE_INTERRUPTS, oldIgnoreInterrupts);
             }
         }
     }
