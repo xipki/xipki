@@ -8,22 +8,24 @@
     <artifactId>dist-group</artifactId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>ncmclient</artifactId>
+  <artifactId>dbtool</artifactId>
   <packaging>pom</packaging>
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
-    <app.name>NCM client</app.name>
-    <features.artifactId>ncmclient</features.artifactId>
-    <assembly.finalName>xipki-ncmclient</assembly.finalName>
-    <boot.features>xipki-ncm-shell</boot.features>
-    <output.directory>${project.build.directory}/classes</output.directory>
+    <app.name>DB-Tool</app.name>
+    <features.artifactId>dbtool</features.artifactId>
+    <boot.features>xipki-database-tool</boot.features>
+    <postgresql.version>9.3-1100-jdbc41</postgresql.version>
+    <h2-jdbc.version>1.4.185</h2-jdbc.version>
+    <hsqldb.version>2.3.2</hsqldb.version>
     <shared.dir>${project.basedir}/../shared</shared.dir>
+    <output.directory>${project.build.directory}/classes</output.directory>
   </properties>
   <dependencies>
     <dependency>
       <!-- project base features -->
       <groupId>org.xipki.features</groupId>
-      <artifactId>ncmclient</artifactId>
+      <artifactId>dbtool</artifactId>
       <version>${project.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -38,7 +40,7 @@
     </dependency>
   </dependencies>
   <build>
-      <resources>
+    <resources>
       <resource>
         <directory>src/main/filtered</directory>
         <filtering>true</filtering>
@@ -83,7 +85,7 @@
         </executions>
       </plugin>
       <plugin>
-        <!-- include additional artifacts -->
+        <!--  include additional artifacts -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -130,19 +132,11 @@
             <configuration>
               <!-- where to put the artifacts -->
               <repository>${output.directory}/system</repository>
-              <!--
-                 Feature Descriptors (Karaf core features are available by default)
-                 NOTE: Remember to add the feature descriptors to the 'org.apache.karaf.features.cfg' config file
-                 to make them visible after deployment.
-               -->
               <descriptors>
-                <descriptor>mvn:org.xipki.features/ncmclient/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.features/dbtool/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
-                <feature>http-whiteboard</feature>
-                <!-- project-core features -->
-                <feature>xipki-ncm-shell</feature>
-                <feature>xipki-security-shell</feature>
+                <feature>xipki-database-tool</feature>
               </features>
             </configuration>
           </execution>
@@ -152,9 +146,8 @@
   </build>
   <profiles>
     <profile>
-      <id>unix-bin</id>
+      <id>unix</id>
       <activation>
-        <!-- use OS specific builds. Opt-in for release -->
         <os>
           <family>unix</family>
         </os>
@@ -172,7 +165,6 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>${assembly.finalName}-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/unix-bin.xml</descriptor>
                   </descriptors>
@@ -205,7 +197,6 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>${assembly.finalName}-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/windows-bin.xml</descriptor>
                   </descriptors>

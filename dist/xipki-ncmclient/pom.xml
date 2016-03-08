@@ -8,14 +8,13 @@
     <artifactId>dist-group</artifactId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>pkcs11proxy</artifactId>
+  <artifactId>ncmclient</artifactId>
   <packaging>pom</packaging>
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
-    <app.name>PKCS#11 proxy</app.name>
-    <features.artifactId>pkcs11proxy</features.artifactId>
-    <assembly.finalName>xipki-pkcs11proxy</assembly.finalName>
-    <boot.features>http-whiteboard, xipki-pkcs11-proxy</boot.features>
+    <app.name>NCM client</app.name>
+    <features.artifactId>ncmclient</features.artifactId>
+    <boot.features>xipki-ncm-shell</boot.features>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
   </properties>
@@ -23,7 +22,7 @@
     <dependency>
       <!-- project base features -->
       <groupId>org.xipki.features</groupId>
-      <artifactId>pkcs11proxy</artifactId>
+      <artifactId>ncmclient</artifactId>
       <version>${project.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -38,7 +37,7 @@
     </dependency>
   </dependencies>
   <build>
-    <resources>
+      <resources>
       <resource>
         <directory>src/main/filtered</directory>
         <filtering>true</filtering>
@@ -113,25 +112,6 @@
               </artifactItems>
             </configuration>
           </execution>
-          <execution>
-            <!-- Uncompress the IAIK PKCS#11 native libraries -->
-            <id>unpack-iaik</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>at.tugraz.iaik</groupId>
-                  <artifactId>pkcs11-wrapper-native</artifactId>
-                  <version>${pkcs11-wrapper.version}</version>
-                  <type>zip</type>
-                  <outputDirectory>${output.directory}/xipki/native-lib</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -149,13 +129,18 @@
             <configuration>
               <!-- where to put the artifacts -->
               <repository>${output.directory}/system</repository>
+              <!--
+                 Feature Descriptors (Karaf core features are available by default)
+                 NOTE: Remember to add the feature descriptors to the 'org.apache.karaf.features.cfg' config file
+                 to make them visible after deployment.
+               -->
               <descriptors>
-                <descriptor>mvn:org.xipki.features/pkcs11proxy/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.features/ncmclient/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
                 <feature>http-whiteboard</feature>
                 <!-- project-core features -->
-                <feature>xipki-pkcs11-proxy</feature>
+                <feature>xipki-ncm-shell</feature>
                 <feature>xipki-security-shell</feature>
               </features>
             </configuration>
@@ -168,6 +153,7 @@
     <profile>
       <id>unix-bin</id>
       <activation>
+        <!-- use OS specific builds. Opt-in for release -->
         <os>
           <family>unix</family>
         </os>
@@ -185,7 +171,6 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>${assembly.finalName}-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/unix-bin.xml</descriptor>
                   </descriptors>
@@ -218,7 +203,6 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>${assembly.finalName}-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/windows-bin.xml</descriptor>
                   </descriptors>

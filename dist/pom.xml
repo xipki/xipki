@@ -13,9 +13,9 @@
   <name>${project.groupId}.${project.artifactId}</name>
   <packaging>pom</packaging>
   <modules>
-    <module>pki</module>
-    <module>ncmclient</module>
-    <module>pkcs11proxy</module>
-    <module>dbtool</module>
+    <module>xipki-pki</module>
+    <module>xipki-ncmclient</module>
+    <module>xipki-pkcs11proxy</module>
+    <module>xipki-dbtool</module>
   </modules>
 </project>

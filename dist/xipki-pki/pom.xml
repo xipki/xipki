@@ -14,7 +14,6 @@
   <properties>
     <app.name>PKI</app.name>
     <features.artifactId>pki</features.artifactId>
-    <assembly.finalName>xipki-pki</assembly.finalName>
     <boot.features>http-whiteboard, xipki-caserver</boot.features>
     <postgresql.version>9.4.1207.jre7</postgresql.version>
     <h2-jdbc.version>1.4.191</h2-jdbc.version>
@@ -335,7 +334,6 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>${assembly.finalName}-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/unix-bin.xml</descriptor>
                   </descriptors>
@@ -368,7 +366,6 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>${assembly.finalName}-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/windows-bin.xml</descriptor>
                   </descriptors>
