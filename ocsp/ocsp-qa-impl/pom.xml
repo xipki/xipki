@@ -17,10 +17,5 @@
       <artifactId>ocsp-qa-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xipki.commons</groupId>
-      <artifactId>security-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
 </project>

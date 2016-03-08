@@ -59,6 +59,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
+import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
@@ -70,6 +71,8 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.security.api.CrlReason;
+import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.IssuerHash;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
@@ -95,17 +98,19 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
             final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts)
     throws Exception {
+        ParamUtil.requireNonEmpty("serialNunmbers", serialNumbers);
     }
 
     @Override
     protected Object processResponse(
             final OCSPResp response,
             final X509Certificate respIssuer,
-            final X509Certificate issuer, //TODO: consider issuer
+            final IssuerHash issuerHash,
             final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts)
     throws Exception {
         ParamUtil.requireNonNull("response", response);
+        ParamUtil.requireNonNull("issuerHash", issuerHash);
         ParamUtil.requireNonNull("serialNumbers", serialNumbers);
 
         BasicOCSPResp basicResp = OcspUtils.extractBasicOcspResp(response);
@@ -194,8 +199,6 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
                 out("---------------------------- " + i + "----------------------------");
             }
             SingleResp singleResp = singleResponses[i];
-            BigInteger serialNumber = singleResp.getCertID().getSerialNumber();
-
             CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
             String status;
@@ -237,6 +240,14 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
             }
 
             StringBuilder msg = new StringBuilder();
+
+            CertificateID certId = singleResp.getCertID();
+            HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(certId.getHashAlgOID());
+            boolean issuerMatch = issuerHash.match(hashAlgo, certId.getIssuerNameHash(),
+                    certId.getIssuerNameHash());
+            BigInteger serialNumber = certId.getSerialNumber();
+
+            msg.append("issuer matched: ").append(issuerMatch);
             msg.append("serialNumber: ").append(serialNumber);
             msg.append("\nCertificate status: ").append(status);
 

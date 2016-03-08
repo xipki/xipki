@@ -37,7 +37,6 @@
 package org.xipki.pki.ocsp.qa.api;
 
 import java.math.BigInteger;
-import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +45,7 @@ import javax.annotation.Nullable;
 
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.commons.common.qa.ValidationResult;
+import org.xipki.commons.security.api.IssuerHash;
 
 /**
  * @author Lijun Liao
@@ -56,7 +56,7 @@ public interface OcspQa {
 
     ValidationResult checkOcsp(
             @Nonnull OCSPResp response,
-            @Nonnull X509Certificate issuer,
+            @Nonnull IssuerHash issuerHash,
             @Nonnull List<BigInteger> serialNumbers,
             @Nullable Map<BigInteger, byte[]> encodedCerts,
             @Nullable OcspError expectedOcspError,

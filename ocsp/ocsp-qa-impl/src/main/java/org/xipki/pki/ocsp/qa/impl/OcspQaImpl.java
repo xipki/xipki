@@ -56,6 +56,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
+import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
@@ -68,6 +69,8 @@ import org.xipki.commons.common.qa.ValidationIssue;
 import org.xipki.commons.common.qa.ValidationResult;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CrlReason;
+import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.IssuerHash;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
@@ -105,7 +108,7 @@ public class OcspQaImpl implements OcspQa {
     @Override
     public ValidationResult checkOcsp(
             final OCSPResp response,
-            final X509Certificate issuer, // TODO: consider issuer
+            final IssuerHash issuerHash,
             final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts,
             final OcspError expectedOcspError,
@@ -277,7 +280,7 @@ public class OcspQaImpl implements OcspQa {
             }
 
             List<ValidationIssue> issues = checkSingleCert(
-                    i, singleResp,
+                    i, singleResp, issuerHash,
                     expectedStatus, encodedCert, extendedRevoke,
                     responseOption.getNextUpdateOccurrence(),
                     responseOption.getCerthashOccurrence(),
@@ -291,6 +294,7 @@ public class OcspQaImpl implements OcspQa {
     private List<ValidationIssue> checkSingleCert(
             final int index,
             final SingleResp singleResp,
+            final IssuerHash issuerHash,
             final OcspCertStatus expectedStatus,
             final byte[] encodedCert,
             final boolean extendedRevoke,
@@ -299,8 +303,24 @@ public class OcspQaImpl implements OcspQa {
             final ASN1ObjectIdentifier certhashAlg) {
         List<ValidationIssue> issues = new LinkedList<>();
 
+        // issuer hash
+        ValidationIssue issue = new ValidationIssue("OCSP.RESPONSE." + index + ".ISSUER",
+                "certificate issuer");
+        issues.add(issue);
+
+        CertificateID certId = singleResp.getCertID();
+        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(certId.getHashAlgOID());
+        if (hashAlgo == null) {
+            issue.setFailureMessage("unknown hash algorithm " + certId.getHashAlgOID().getId());
+        } else {
+            if (!issuerHash.match(hashAlgo, certId.getIssuerNameHash(),
+                    certId.getIssuerKeyHash())) {
+                issue.setFailureMessage("issuer not match");
+            }
+        }
+
         // status
-        ValidationIssue issue = new ValidationIssue("OCSP.RESPONSE." + index + ".STATUS",
+        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".STATUS",
                 "certificate status");
         issues.add(issue);
 

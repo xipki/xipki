@@ -55,6 +55,7 @@ import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.SigAlgCompleter;
+import org.xipki.commons.security.api.IssuerHash;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.pki.ocsp.client.shell.BaseOcspStatusCommandSupport;
 import org.xipki.pki.ocsp.qa.api.Occurrence;
@@ -181,7 +182,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
     protected Object processResponse(
             final OCSPResp response,
             final X509Certificate respIssuer,
-            final X509Certificate issuer,
+            final IssuerHash issuerHash,
             final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts)
     throws Exception {
@@ -196,7 +197,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
         }
 
         ValidationResult result = ocspQa.checkOcsp(response,
-                issuer,
+                issuerHash,
                 serialNumbers,
                 encodedCerts,
                 expectedOcspError,

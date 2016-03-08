@@ -36,6 +36,9 @@
 
 package org.xipki.commons.security.api;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -85,8 +88,19 @@ public enum HashAlgoType {
     }
 
     public static HashAlgoType getHashAlgoType(
+            final ASN1ObjectIdentifier oid) {
+        String oidStr = ParamUtil.requireNonNull("oid", oid).getId();
+        for (HashAlgoType hashAlgo : values()) {
+            if (hashAlgo.oid.equals(oidStr)) {
+                return hashAlgo;
+            }
+        }
+        return null;
+    }
+
+    public static HashAlgoType getHashAlgoType(
             final String nameOrOid) {
-        String tmpNameOrOid = nameOrOid;
+        String tmpNameOrOid = ParamUtil.requireNonBlank("nameOrOid", nameOrOid);
         for (HashAlgoType hashAlgo : values()) {
             if (hashAlgo.oid.equals(tmpNameOrOid)) {
                 return hashAlgo;
