@@ -57,6 +57,7 @@ import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
@@ -66,6 +67,8 @@ import org.xipki.commons.common.RequestResponsePair;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.IssuerHash;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
@@ -126,7 +129,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     }
 
     protected abstract void checkParameters(
-    		@Nullable X509Certificate respIssuer,
+            @Nullable X509Certificate respIssuer,
             @Nonnull List<BigInteger> serialNumbers,
             @Nullable Map<BigInteger, byte[]> encodedCerts)
     throws Exception;
@@ -134,7 +137,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     protected abstract Object processResponse(
             @Nonnull OCSPResp response,
             @Nullable X509Certificate respIssuer,
-            @Nonnull X509Certificate issuer,
+            @Nonnull IssuerHash issuerHash,
             @Nonnull List<BigInteger> serialNumbers,
             @Nullable Map<BigInteger, byte[]> encodedCerts)
     throws Exception;
@@ -214,6 +217,9 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             debug = new RequestResponseDebug();
         }
 
+        IssuerHash issuerHash = new IssuerHash(
+                HashAlgoType.getHashAlgoType(options.getHashAlgorithmId()),
+                Certificate.getInstance(issuerCert.getEncoded()));
         OCSPResp response;
         try {
             response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrlObj,
@@ -237,7 +243,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             } // end if
         } // end finally
 
-        return processResponse(response, respIssuer, issuerCert, sns, encodedCerts);
+        return processResponse(response, respIssuer, issuerHash, sns, encodedCerts);
     } // method doExecute
 
     public static List<String> extractOcspUrls(
