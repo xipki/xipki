@@ -72,7 +72,7 @@ public class PBEDecryptCmd extends SecurityCommandSupport {
                     + "' does not start with PBE:");
         }
 
-        char[] masterPassword = readPassword("please enter the master password");
+        char[] masterPassword = readPassword("Master password");
         char[] password = pbePasswordService.decryptPassword(masterPassword, passwordHint);
         out("the decrypted password is: '" + new String(password) + "'");
         return null;
