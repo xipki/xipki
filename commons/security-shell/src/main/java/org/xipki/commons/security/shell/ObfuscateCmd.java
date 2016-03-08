@@ -57,7 +57,7 @@ public class ObfuscateCmd extends SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        char[] password = readPassword("Please enter the password");
+        char[] password = readPassword("Password");
 
         String passwordHint = obfPasswordService.obfuscate(new String(password));
         out("the obfuscated password is: '" + passwordHint + "'");
