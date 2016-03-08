@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PKCS11Conf xmlns="http://xipki.org/commons/security/pkcs11/conf/v2">
-  <modules defaultModule="cknfast">
-    <module name="cknfast">
+  <modules defaultModule="softhsm">
+    <module name="softhsm">
+      <nativeLibraries>
+        <nativeLibrary>
+          <path>/usr/local/lib/softhsm/libsofthsm2.so</path>
+        </nativeLibrary>
+      </nativeLibraries>
+      <includeSlots>
+        <slot>
+          <index>0</index>
+        </slot>
+      </includeSlots>
+      <passwords>
+        <password>
+          <singlePassword>123456</singlePassword>
+        </password>
+      </passwords>
+    </module>
+    <!--module name="cknfast">
       <nativeLibraries>
         <nativeLibrary>
           <os>nix</os>
@@ -11,11 +28,10 @@
         </nativeLibrary>
       </nativeLibraries>
       <excludeSlots>
-        <!-- Slot 0 is the management slot -->
         <slot>
           <index>0</index>
         </slot>
       </excludeSlots>
-    </module>
+    </module-->
   </modules>
 </PKCS11Conf>

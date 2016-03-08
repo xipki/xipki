@@ -53,10 +53,13 @@
 # XiPKI configuration
 #
 
-UNAME=`uname -s`_`uname -m`
-UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
-
-NATIVE_LIB="xipki/native-lib/unix/$UNAME"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  NATIVE_LIB="xipki/native-lib/unix/macosx_universal"
+else
+  UNAME=`uname -s`_`uname -m`
+  UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
+  NATIVE_LIB="xipki/native-lib/unix/$UNAME"
+fi
 
 KARAF_OPTS="$KARAF_OPTS -Djava.library.path=$NATIVE_LIB"
 

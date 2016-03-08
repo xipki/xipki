@@ -144,7 +144,7 @@ Tested Platforms
  * Thales nCipher Solo (PCI Card)
  * Thales nCipher Connect (network)
  * Utimaco Se
- * Utimaco CSe
+ * [Softhsm](https://www.opendnssec.org/softhsm/)
 
 * JVM
  * OpenJDK 8
