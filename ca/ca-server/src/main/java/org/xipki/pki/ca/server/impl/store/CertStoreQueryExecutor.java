@@ -433,9 +433,9 @@ class CertStoreQueryExecutor {
                     releaseStatement(ps);
                 }
             } finally {
-            	if (conn != null) {
+                if (conn != null) {
                     datasource.returnConnection(conn);
-            	}
+                }
             }
         }
     } // method addCert
