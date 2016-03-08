@@ -73,8 +73,8 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
             throw new IllegalCmdParamException("iterationCount is not between 1 and 65535");
         }
 
-        char[] masterPassword = readPassword("Please enter the master password");
-        char[] password = readPassword("Please enter the password");
+        char[] masterPassword = readPassword("Master password");
+        char[] password = readPassword("Password");
 
         String passwordHint = pbePasswordService.encryptPassword(iterationCount, masterPassword,
                 password);
