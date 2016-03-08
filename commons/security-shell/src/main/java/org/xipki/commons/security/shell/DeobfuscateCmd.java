@@ -66,7 +66,7 @@ public class DeobfuscateCmd extends SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
+        if (!StringUtil.startsWithIgnoreCase(passwordHint, "OBF:")) {
             throw new IllegalCmdParamException("encrypted password '" + passwordHint
                     + "' does not start with OBF:");
         }
