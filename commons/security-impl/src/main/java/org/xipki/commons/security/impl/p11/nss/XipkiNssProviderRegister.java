@@ -34,4 +34,43 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl.p11.sun.nss;
+package org.xipki.commons.security.impl.p11.nss;
+
+import java.security.Security;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
+
+/**
+ * @author Lijun Liao
+ * @since 2.0.0
+ */
+
+public class XipkiNssProviderRegister {
+
+    private static final Logger LOG = LoggerFactory.getLogger(XipkiNssProviderRegister.class);
+
+    public void regist() {
+        if (Security.getProvider(XipkiNssProvider.PROVIDER_NAME) == null) {
+            try {
+                XipkiNssProvider provider = new XipkiNssProvider();
+                Security.addProvider(provider);
+            } catch (Throwable th) {
+                final String message = "could not add provider " + XipkiNssProvider.PROVIDER_NAME;
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
+                }
+                LOG.debug(message, th);
+            }
+        }
+    }
+
+    public void unregist() {
+        if (Security.getProperty(XipkiNssProvider.PROVIDER_NAME) != null) {
+            Security.removeProvider(XipkiNssProvider.PROVIDER_NAME);
+        }
+    }
+
+}

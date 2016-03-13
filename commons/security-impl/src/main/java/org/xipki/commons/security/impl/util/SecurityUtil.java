@@ -36,7 +36,15 @@
 
 package org.xipki.commons.security.impl.util;
 
+import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bouncycastle.crypto.digests.SHA224Digest;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA384Digest;
+import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.impl.p11.DigestOutputStream;
 
 /**
  * @author Lijun Liao
@@ -81,6 +89,29 @@ public class SecurityUtil {
         return (singleByte >= 0)
                 ? singleByte
                 : 256 + singleByte;
+    }
+
+    public static Digest getDigest(
+            final HashAlgoType hashAlgo) {
+        switch (hashAlgo) {
+        case SHA1:
+            return new SHA1Digest();
+        case SHA224:
+            return new SHA224Digest();
+        case SHA256:
+            return new SHA256Digest();
+        case SHA384:
+            return new SHA384Digest();
+        case SHA512:
+            return new SHA512Digest();
+        default:
+            throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
+        }
+    }
+
+    public static DigestOutputStream getDigestOutputStream(
+            final HashAlgoType hashAlgo) {
+        return new DigestOutputStream(getDigest(hashAlgo));
     }
 
 }

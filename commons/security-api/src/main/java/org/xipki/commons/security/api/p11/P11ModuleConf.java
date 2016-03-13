@@ -61,20 +61,25 @@ public class P11ModuleConf {
 
     private final P11PasswordRetriever passwordRetriever;
 
+    private final P11MechanismRetriever mechanismRetriever;
+
     private final SecurityFactory securityFactory;
 
     public P11ModuleConf(
             final String name,
             final String nativeLibrary,
             final P11PasswordRetriever passwordRetriever,
+            final P11MechanismRetriever mechanismRetriever,
             final SecurityFactory securityFactory) {
-        this(name, nativeLibrary, passwordRetriever, null, null, securityFactory);
+        this(name, nativeLibrary, passwordRetriever, mechanismRetriever, null, null,
+                securityFactory);
     }
 
     public P11ModuleConf(
             final String name,
             final String nativeLibrary,
             final P11PasswordRetriever passwordRetriever,
+            P11MechanismRetriever mechanismRetriever,
             final Set<P11SlotIdentifier> includeSlots,
             final Set<P11SlotIdentifier> excludeSlots,
             final SecurityFactory securityFactory) {
@@ -84,6 +89,9 @@ public class P11ModuleConf {
         this.passwordRetriever = (passwordRetriever == null)
                 ? P11NullPasswordRetriever.INSTANCE
                 : passwordRetriever;
+        this.mechanismRetriever = (mechanismRetriever == null)
+                ? P11PermitAllMechanimRetriever.INSTANCE
+                : mechanismRetriever;
 
         Set<P11SlotIdentifier> set = new HashSet<>();
         if (includeSlots != null) {
@@ -153,6 +161,10 @@ public class P11ModuleConf {
         }
 
         return true;
+    }
+
+    public P11MechanismRetriever getP11MechanismRetriever() {
+        return mechanismRetriever;
     }
 
 }

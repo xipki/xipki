@@ -43,6 +43,7 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
  * @author Lijun Liao
@@ -51,9 +52,7 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class P11Identity implements Comparable<P11Identity> {
 
-    protected final P11SlotIdentifier slotId;
-
-    protected final P11KeyIdentifier keyId;
+    protected final P11EntityIdentifier entityId;
 
     protected final X509Certificate[] certificateChain;
 
@@ -62,12 +61,10 @@ public class P11Identity implements Comparable<P11Identity> {
     private final int signatureKeyBitLength;
 
     public P11Identity(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId,
+            final P11EntityIdentifier entityId,
             final X509Certificate[] certificateChain,
             final PublicKey publicKey) {
-        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
+        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
         if ((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
                 && publicKey == null) {
             throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
@@ -97,8 +94,8 @@ public class P11Identity implements Comparable<P11Identity> {
         }
     } // constructor
 
-    public P11KeyIdentifier getKeyId() {
-        return keyId;
+    public P11EntityIdentifier getEntityId() {
+        return entityId;
     }
 
     public X509Certificate getCertificate() {
@@ -119,28 +116,15 @@ public class P11Identity implements Comparable<P11Identity> {
                 : publicKey;
     }
 
-    public P11SlotIdentifier getSlotId() {
-        return slotId;
-    }
-
     public boolean match(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId) {
-        if (!this.slotId.equals(slotId)) {
-            return false;
-        }
-
-        return this.keyId.equals(keyId);
+            final P11EntityIdentifier entityId) {
+        return this.entityId.equals(entityId);
     }
 
     public boolean match(
             final P11SlotIdentifier slotId,
             final String keyLabel) {
-        if (keyLabel == null) {
-            return false;
-        }
-
-        return this.slotId.equals(slotId) && keyLabel.equals(keyId.getKeyLabel());
+        return entityId.match(slotId, keyLabel);
     }
 
     public int getSignatureKeyBitLength() {
@@ -149,7 +133,14 @@ public class P11Identity implements Comparable<P11Identity> {
 
     @Override
     public int compareTo(P11Identity obj) {
-        return keyId.compareTo(obj.keyId);
+        return entityId.compareTo(obj.entityId);
+    }
+
+    public boolean supportsMechanism(
+            final long mechanism,
+            final P11Params parameters) {
+        // FIXME
+        return true;
     }
 
 }

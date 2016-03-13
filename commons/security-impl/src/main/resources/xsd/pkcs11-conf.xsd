@@ -43,6 +43,7 @@
         </xs:annotation>
       </xs:element>
       <xs:element name="passwords" type="passwordsType" minOccurs="0"/>
+      <xs:element name="permittedMechanisms" type="permittedMechanismsType" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
@@ -79,6 +80,24 @@
         </xs:annotation>
       </xs:element>
       <xs:element name="singlePassword" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="permittedMechanismsType">
+    <xs:sequence>
+      <xs:element name="mechanisms" type="mechanismsType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="mechanismsType">
+    <xs:sequence>
+      <xs:element name="slots" type="slotsType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            To which slots the mechanism should be applied.
+            Absent for all slots.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="mechanism" type="xs:string" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

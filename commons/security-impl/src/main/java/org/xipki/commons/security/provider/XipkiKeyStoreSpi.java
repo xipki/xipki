@@ -62,6 +62,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11CryptService;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
@@ -167,9 +168,10 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
                     }
 
                     P11KeyIdentifier keyId = new P11KeyIdentifier(keyLabel);
-                    X509Certificate[] chain = p11Servcie.getCertificates(slotId, keyId);
+                    P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, keyId);
+                    X509Certificate[] chain = p11Servcie.getCertificates(entityId);
                     if (chain != null && chain.length > 0) {
-                        P11PrivateKey key = new P11PrivateKey(p11Servcie, slotId, keyId);
+                        P11PrivateKey key = new P11PrivateKey(p11Servcie, entityId);
 
                         KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
                         keyCerts.put(alias, keyCertEntry);

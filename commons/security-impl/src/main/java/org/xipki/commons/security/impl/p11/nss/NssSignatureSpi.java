@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl.p11.sun.nss;
+package org.xipki.commons.security.impl.p11.nss;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -66,8 +66,9 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -374,8 +375,9 @@ public class NssSignatureSpi extends SignatureSpi {
 
         try {
             AlgorithmIdentifier hashAlgId = new AlgorithmIdentifier(hashAlgOid, DERNull.INSTANCE);
-            tbsHash = pkcs1padding(derEncode(hashAlgId, hash), blockSize);
-        } catch (IOException ex) {
+            tbsHash = SignerUtil.EMSA_PKCS1_v1_5_encoding(derEncode(hashAlgId, hash),
+                    blockSize * 8 - 1);
+        } catch (IOException | SignerException ex) {
             throw new SignatureException(ex.getMessage(), ex);
         }
 
@@ -522,26 +524,6 @@ public class NssSignatureSpi extends SignatureSpi {
         }
 
         return service;
-    }
-
-    private static byte[] pkcs1padding(
-            final byte[] in,
-            final int blockSize) {
-        int inLen = in.length;
-        ParamUtil.requireMax("in.length", inLen, blockSize);
-
-        byte[] block = new byte[blockSize];
-
-        // type code 1
-        block[0] = 0x01;
-        for (int i = 1; i != block.length - inLen - 1; i++) {
-            block[i] = (byte) 0xFF;
-        }
-
-        // mark the end of the padding
-        block[block.length - inLen - 1] = 0x00;
-        System.arraycopy(in, 0, block, block.length - inLen, inLen);
-        return block;
     }
 
     private static byte[] decodePkcs11Block(

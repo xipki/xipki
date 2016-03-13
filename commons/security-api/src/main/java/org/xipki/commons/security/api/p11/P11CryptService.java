@@ -40,8 +40,10 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
  * @author Lijun Liao
@@ -53,61 +55,27 @@ public interface P11CryptService {
     void refresh()
     throws SignerException;
 
-    // CHECKSTYLE:SKIP
-    byte[] CKM_RSA_PKCS(
-            @Nonnull byte[] encodedDigestInfo,
+    boolean supportsMechanism(
             @Nonnull P11SlotIdentifier slotId,
-            @Nonnull P11KeyIdentifier keyId)
-    throws SignerException;
+            long mechanism);
 
-    // CHECKSTYLE:SKIP
-    byte[] CKM_RSA_X509(
-            @Nonnull byte[] hash,
-            @Nonnull P11SlotIdentifier slotId,
-            @Nonnull P11KeyIdentifier keyId)
-    throws SignerException;
-
-    // CHECKSTYLE:SKIP
-    byte[] CKM_ECDSA_Plain(
-            @Nonnull byte[] hash,
-            @Nonnull P11SlotIdentifier slotId,
-            @Nonnull P11KeyIdentifier keyId)
-    throws SignerException;
-
-    // CHECKSTYLE:SKIP
-    byte[] CKM_ECDSA_X962(
-            @Nonnull byte[] hash,
-            @Nonnull P11SlotIdentifier slotId,
-            @Nonnull P11KeyIdentifier keyId)
-    throws SignerException;
-
-    // CHECKSTYLE:SKIP
-    byte[] CKM_DSA_Plain(
-            @Nonnull byte[] hash,
-            @Nonnull P11SlotIdentifier slotId,
-            @Nonnull P11KeyIdentifier keyId)
-    throws SignerException;
-
-    // CHECKSTYLE:SKIP
-    byte[] CKM_DSA_X962(
-            @Nonnull byte[] hash,
-            @Nonnull P11SlotIdentifier slotId,
-            @Nonnull P11KeyIdentifier keyId)
+    byte[] sign(
+            @Nonnull P11EntityIdentifier entityId,
+            long mechanism,
+            @Nullable P11Params parameters,
+            byte[] content)
     throws SignerException;
 
     PublicKey getPublicKey(
-            @Nonnull P11SlotIdentifier slotId,
-            @Nonnull P11KeyIdentifier keyId)
+            @Nonnull P11EntityIdentifier entityId)
     throws SignerException;
 
     X509Certificate getCertificate(
-            @Nonnull P11SlotIdentifier slotId,
-            @Nonnull P11KeyIdentifier keyId)
+            @Nonnull P11EntityIdentifier entityId)
     throws SignerException;
 
     X509Certificate[] getCertificates(
-            @Nonnull P11SlotIdentifier slotId,
-            @Nonnull P11KeyIdentifier keyId)
+            @Nonnull P11EntityIdentifier entityId)
     throws SignerException;
 
     P11SlotIdentifier[] getSlotIdentifiers()

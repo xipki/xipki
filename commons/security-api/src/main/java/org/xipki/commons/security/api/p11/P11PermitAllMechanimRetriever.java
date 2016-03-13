@@ -34,29 +34,23 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl.p11;
-
-import org.bouncycastle.crypto.Digest;
-import org.xipki.commons.security.api.SignerException;
+package org.xipki.commons.security.api.p11;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
-//CHECKSTYLE:SKIP
-public class P11ECDSAX962Signer extends AbstractP11DSASigner {
 
-    public P11ECDSAX962Signer(
-            final Digest digest) {
-        super(digest);
-    }
+public class P11PermitAllMechanimRetriever implements P11MechanismRetriever {
+
+    public static final P11PermitAllMechanimRetriever INSTANCE
+            = new P11PermitAllMechanimRetriever();
 
     @Override
-    protected byte[] sign(
-            final byte[] hashValue)
-    throws SignerException {
-        return param.getP11CryptService().CKM_ECDSA_X962(hashValue, param.getSlot(),
-                param.getKeyId());
+    public boolean isMechanismPermitted(
+            final P11SlotIdentifier slotId,
+            final long mechanism) {
+        return true;
     }
 
 }

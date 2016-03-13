@@ -34,34 +34,19 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl.p11.sun;
+package org.xipki.commons.security.api.p11;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.Provider;
+import javax.annotation.Nonnull;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
-public class XipkiSunECProvider extends Provider {
 
-    public static final String NAME = "XiPKI-SunEC";
+public interface P11MechanismRetriever {
 
-    public static final double VERSION = 1.0;
-
-    private static final long serialVersionUID = 1L;
-
-    public XipkiSunECProvider() {
-        super(NAME, VERSION, NAME + " (version " + VERSION + ")");
-
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            public Object run() {
-                put("AlgorithmParameters.EC", ECParameters.class.getName());
-                return null;
-            }
-        });
-    }
+    boolean isMechanismPermitted(
+            @Nonnull P11SlotIdentifier slotId,
+            final long mechanism);
 
 }

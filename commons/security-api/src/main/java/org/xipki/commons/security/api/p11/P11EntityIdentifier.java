@@ -34,38 +34,64 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl.p11;
+package org.xipki.commons.security.api.p11;
 
-import java.security.NoSuchAlgorithmException;
+import javax.annotation.Nonnull;
 
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.xipki.commons.security.api.SignerException;
-import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
-//CHECKSTYLE:SKIP
-public class P11DSAX962ContentSigner extends AbstractP11DSAContentSigner {
 
-    public P11DSAX962ContentSigner(
-            final P11CryptService cryptService,
-            final P11SlotIdentifier slot,
-            final P11KeyIdentifier keyId,
-            final AlgorithmIdentifier signatureAlgId)
-    throws NoSuchAlgorithmException, OperatorCreationException {
-        super(cryptService, slot, keyId, signatureAlgId);
+public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
+
+    private final P11SlotIdentifier slotId;
+
+    private final P11KeyIdentifier keyId;
+
+    public P11EntityIdentifier(
+            @Nonnull final P11SlotIdentifier slotId,
+            @Nonnull final P11KeyIdentifier keyId) {
+        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
+    }
+
+    public P11SlotIdentifier getSlotId() {
+        return slotId;
+    }
+
+    public P11KeyIdentifier getKeyId() {
+        return keyId;
     }
 
     @Override
-    protected byte[] CKM_SIGN(
-            final byte[] hashValue)
-    throws SignerException {
-        return cryptService.CKM_DSA_X962(hashValue, slot, keyId);
+    public int compareTo(
+            final P11EntityIdentifier obj) {
+        // FIXME: implement me
+        return 0;
+    }
+
+    @Override
+    public boolean equals(
+            final Object obj) {
+        // FIXME: implement me
+        return super.equals(obj);
+    }
+
+    public boolean match(
+            final P11SlotIdentifier slotId,
+            final String keyLabel) {
+        ParamUtil.requireNonNull("keyLabel", keyLabel);
+        return this.slotId.equals(slotId)
+                && keyLabel.equals(this.keyId.getKeyLabel());
+    }
+
+    @Override
+    public String toString() {
+        // FIMXE: implement me
+        return super.toString();
     }
 
 }

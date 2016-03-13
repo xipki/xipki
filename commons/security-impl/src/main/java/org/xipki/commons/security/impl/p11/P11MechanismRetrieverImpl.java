@@ -36,16 +36,14 @@
 
 package org.xipki.commons.security.impl.p11;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.password.api.PasswordResolver;
-import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.security.api.p11.P11PasswordRetriever;
+import org.xipki.commons.security.api.p11.P11MechanismRetriever;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
@@ -53,22 +51,22 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
  * @since 2.0.0
  */
 
-public class P11PasswordRetrieverImpl implements P11PasswordRetriever {
+public class P11MechanismRetrieverImpl implements P11MechanismRetriever {
 
     private static final class SingleRetriever {
 
         private final Set<P11SlotIdentifier> slots;
 
-        private final List<String> singlePasswords;
+        private final Collection<Long> mechanisms;
 
         private SingleRetriever(
                 final Set<P11SlotIdentifier> slots,
-                final List<String> singlePasswords) {
+                final Collection<Long> mechanisms) {
             this.slots = slots;
-            if (CollectionUtil.isEmpty(singlePasswords)) {
-                this.singlePasswords = null;
+            if (CollectionUtil.isEmpty(mechanisms)) {
+                this.mechanisms = null;
             } else {
-                this.singlePasswords = singlePasswords;
+                this.mechanisms = mechanisms;
             }
         }
 
@@ -86,65 +84,45 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever {
             return false;
         }
 
-        public List<char[]> getPasswords(
-                final PasswordResolver passwordResolver)
-        throws PasswordResolverException {
-            if (singlePasswords == null) {
-                return null;
+        public boolean isMechanismSupported(
+            final long mechanism) {
+            if (mechanisms == null) {
+                return true;
             }
 
-            List<char[]> ret = new ArrayList<char[]>(singlePasswords.size());
-            for (String singlePassword : singlePasswords) {
-                if (passwordResolver == null) {
-                    ret.add(singlePassword.toCharArray());
-                } else {
-                    ret.add(passwordResolver.resolvePassword(singlePassword));
-                }
-            }
-
-            return ret;
+            return mechanisms.contains(mechanism);
         }
 
     } // class SingleRetriever
 
     private final List<SingleRetriever> singleRetrievers;
-    private PasswordResolver passwordResolver;
 
-    public P11PasswordRetrieverImpl() {
+    public P11MechanismRetrieverImpl() {
         singleRetrievers = new LinkedList<>();
     }
 
-    public void addPasswordEntry(
+    public void addEntry(
             final Set<P11SlotIdentifier> slots,
-            final List<String> singlePasswords) {
-        singleRetrievers.add(new SingleRetriever(slots, singlePasswords));
+            final Collection<Long> mechanisms) {
+        singleRetrievers.add(new SingleRetriever(slots, mechanisms));
     }
 
     @Override
-    public List<char[]> getPassword(
-            final P11SlotIdentifier slotId)
-    throws PasswordResolverException {
+    public boolean isMechanismPermitted(
+            final P11SlotIdentifier slotId,
+            final long mechanism) {
         ParamUtil.requireNonNull("slotId", slotId);
         if (CollectionUtil.isEmpty(singleRetrievers)) {
-            return null;
+            return true;
         }
 
         for (SingleRetriever sr : singleRetrievers) {
             if (sr.match(slotId)) {
-                return sr.getPasswords(passwordResolver);
+                return sr.isMechanismSupported(mechanism);
             }
         }
 
-        return null;
-    }
-
-    public PasswordResolver getPasswordResolver() {
-        return passwordResolver;
-    }
-
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
-        this.passwordResolver = passwordResolver;
+        return true;
     }
 
 }

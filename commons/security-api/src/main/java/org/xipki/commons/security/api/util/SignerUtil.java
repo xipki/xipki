@@ -39,9 +39,12 @@ package org.xipki.commons.security.api.util;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -59,7 +62,10 @@ import org.bouncycastle.crypto.signers.PSSSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.bouncycastle.operator.bc.BcDigestProvider;
+import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.SignerException;
 
 /**
@@ -71,6 +77,21 @@ import org.xipki.commons.security.api.SignerException;
  */
 
 public class SignerUtil {
+
+    private static final Map<HashAlgoType, byte[]> digestPkcsPrefix = new HashMap<>();
+
+    static {
+        digestPkcsPrefix.put(HashAlgoType.SHA1,
+                Hex.decode("3021300906052b0e03021a05000414"));
+        digestPkcsPrefix.put(HashAlgoType.SHA224,
+                Hex.decode("302d300d06096086480165030402040500041c"));
+        digestPkcsPrefix.put(HashAlgoType.SHA256,
+                Hex.decode("3031300d060960864801650304020105000420"));
+        digestPkcsPrefix.put(HashAlgoType.SHA384,
+                Hex.decode("3041300d060960864801650304020205000430"));
+        digestPkcsPrefix.put(HashAlgoType.SHA512,
+                Hex.decode("3051300d060960864801650304020305000440"));
+    }
 
     private SignerUtil() {
     }
@@ -151,16 +172,24 @@ public class SignerUtil {
         throw new IllegalArgumentException("unknown trailer field");
     }
 
-    public static byte[] pkcs1padding(
-            final byte[] in,
-            final int blockSize)
+    // CHECKSTYLE:SKIP
+    public static byte[] EMSA_PKCS1_v1_5_encoding(
+            final byte[] hashValue,
+            final int modulusBigLength,
+            final HashAlgoType hashAlgo)
     throws SignerException {
-        ParamUtil.requireNonNull("in", in);
-        int inLen = in.length;
+        ParamUtil.requireNonNull("hashValue", hashValue);
+        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
-        if (inLen + 3 > blockSize) {
+        final int hashLen = hashAlgo.getLength();
+        ParamUtil.requireRange("hashValue.length", hashValue.length, hashLen, hashLen);
+
+        int blockSize = (modulusBigLength + 7) / 8;
+        byte[] prefix = digestPkcsPrefix.get(hashAlgo);
+
+        if (prefix.length + hashLen + 3 > blockSize) {
             throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): "
-                    + inLen);
+                    + (prefix.length + hashLen));
         }
 
         byte[] block = new byte[blockSize];
@@ -169,18 +198,145 @@ public class SignerUtil {
         // type code 1
         block[1] = 0x01;
 
-        for (int i = 2; i != block.length - inLen - 1; i++) {
-            block[i] = (byte) 0xFF;
+        int offset = 2;
+        while (offset < block.length - prefix.length - hashLen - 1) {
+            block[offset++] = (byte) 0xFF;
         }
-
         // mark the end of the padding
-        block[block.length - inLen - 1] = 0x00;
-        System.arraycopy(in, 0, block, block.length - inLen, inLen);
+        block[offset] = 0x00;
+
+        System.arraycopy(prefix, 0, block, offset, prefix.length);
+        offset += prefix.length;
+        System.arraycopy(hashValue, 0, block, offset, hashValue.length);
         return block;
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] convertPlainDSASigX962(
+    public static byte[] EMSA_PKCS1_v1_5_encoding(
+            final byte[] encodedDigestInfo,
+            final int modulusBigLength)
+    throws SignerException {
+        ParamUtil.requireNonNull("encodedDigestInfo", encodedDigestInfo);
+
+        int msgLen = encodedDigestInfo.length;
+        int blockSize = (modulusBigLength + 7) / 8;
+
+        if (msgLen + 3 > blockSize) {
+            throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): "
+                    + msgLen);
+        }
+
+        byte[] block = new byte[blockSize];
+
+        block[0] = 0x00;
+        // type code 1
+        block[1] = 0x01;
+
+        int offset = 2;
+        while (offset < block.length - msgLen - 1) {
+            block[offset++] = (byte) 0xFF;
+        }
+        // mark the end of the padding
+        block[offset] = 0x00;
+
+        System.arraycopy(encodedDigestInfo, 0, block, offset, encodedDigestInfo.length);
+        return block;
+    }
+
+    // CHECKSTYLE:SKIP
+    public static byte[] EMSA_PSS_ENCODE(
+            final HashAlgoType contentDigest,
+            final byte[] hashValue,
+            final HashAlgoType mgfDigest,
+            final int saltLen,
+            final int modulusBigLength,
+            final SecureRandom random)
+    throws SignerException {
+        final int hLen = contentDigest.getLength();
+        final byte[] salt = new byte[saltLen];
+        final byte[] mDash = new byte[8 + saltLen + hLen];
+        final byte trailer = (byte)0xBC;
+
+        if (hashValue.length != hLen) {
+            throw new SignerException("hashValue.length is incorrect: "
+                    + hashValue.length + " != " + hLen);
+        }
+
+        int emBits = modulusBigLength - 1;
+        if (emBits < (8 * hLen + 8 * saltLen + 9)) {
+            throw new IllegalArgumentException("key too small for specified hash and salt lengths");
+        }
+
+        System.arraycopy(hashValue, 0, mDash, mDash.length - hLen - saltLen, hLen);
+
+        random.nextBytes(salt);
+        System.arraycopy(salt, 0, mDash, mDash.length - saltLen, saltLen);
+
+        byte[] hv = HashCalculator.hash(contentDigest, mDash);
+
+        byte[] block = new byte[(emBits + 7) / 8];
+        block[block.length - saltLen - 1 - hLen - 1] = 0x01;
+        System.arraycopy(salt, 0, block, block.length - saltLen - hLen - 1, saltLen);
+
+        byte[] dbMask = maskGeneratorFunction1(mgfDigest, hv, block.length - hLen - 1);
+        for (int i = 0; i != dbMask.length; i++) {
+            block[i] ^= dbMask[i];
+        }
+
+        block[0] &= (0xff >> ((block.length * 8) - emBits));
+
+        System.arraycopy(hv, 0, block, block.length - hLen - 1, hLen);
+
+        block[block.length - 1] = trailer;
+        return block;
+    }
+
+    /**
+     * int to octet string.
+     */
+    private static void ItoOSP( // CHECKSTYLE:SKIP
+        final int i, // CHECKSTYLE:SKIP
+        final byte[] sp,
+        final int spOffset) {
+        sp[spOffset + 0] = (byte)(i >>> 24);
+        sp[spOffset + 1] = (byte)(i >>> 16);
+        sp[spOffset + 2] = (byte)(i >>> 8);
+        sp[spOffset + 3] = (byte)(i >>> 0);
+    }
+
+    /**
+     * mask generator function, as described in PKCS1v2.
+     */
+    private static byte[] maskGeneratorFunction1(
+        final HashAlgoType mgfDigest,
+        final byte[] Z, // CHECKSTYLE:SKIP
+        final int length) {
+        int mgfhLen = mgfDigest.getLength();
+        byte[] mask = new byte[length];
+        int counter = 0;
+
+        byte[] all = new byte[Z.length + 4];
+        System.arraycopy(Z, 0, all, 0, Z.length);
+
+        while (counter < (length / mgfhLen)) {
+            ItoOSP(counter, all, Z.length);
+            byte[] hashBuf = HashCalculator.hash(mgfDigest, all);
+            System.arraycopy(hashBuf, 0, mask, counter * mgfhLen, mgfhLen);
+            counter++;
+        }
+
+        if ((counter * mgfhLen) < length) {
+            ItoOSP(counter, all, Z.length);
+            byte[] hashBuf = HashCalculator.hash(mgfDigest, all);
+            System.arraycopy(hashBuf, 0, mask, counter * mgfhLen,
+                    mask.length - (counter * mgfhLen));
+        }
+
+        return mask;
+    }
+
+    // CHECKSTYLE:SKIP
+    public static byte[] convertPlainDSASigToX962(
             final byte[] signature)
     throws SignerException {
         ParamUtil.requireNonNull("signature", signature);
