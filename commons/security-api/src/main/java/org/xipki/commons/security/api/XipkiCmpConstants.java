@@ -71,17 +71,7 @@ public class XipkiCmpConstants {
 
     public static final int ACTION_RP11_LIST_KEYLABELS = 84;
 
-    public static final int ACTION_RP11_PSO_RSA_X509 = 90;
-
-    public static final int ACTION_RP11_PSO_RSA_PKCS = 91;
-
-    public static final int ACTION_RP11_PSO_ECDSA_PLAIN = 92;
-
-    public static final int ACTION_RP11_PSO_ECDSA_X962 = 93;
-
-    public static final int ACTION_RP11_PSO_DSA_PLAIN = 94;
-
-    public static final int ACTION_RP11_PSO_DSA_X962 = 95;
+    public static final int ACTION_RP11_SIGN = 90;
 
     private XipkiCmpConstants() {
     }

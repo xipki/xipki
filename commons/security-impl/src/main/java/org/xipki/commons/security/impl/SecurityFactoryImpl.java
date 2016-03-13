@@ -109,20 +109,25 @@ import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11Control;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11MechanismRetriever;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11NullPasswordRetriever;
 import org.xipki.commons.security.api.p11.P11PasswordRetriever;
+import org.xipki.commons.security.api.p11.P11PermitAllMechanimRetriever;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.commons.security.impl.p11.P11ContentSignerBuilder;
+import org.xipki.commons.security.impl.p11.P11MechanismRetrieverImpl;
 import org.xipki.commons.security.impl.p11.P11PasswordRetrieverImpl;
 import org.xipki.commons.security.impl.p11.iaik.IaikP11CryptServiceFactory;
 import org.xipki.commons.security.impl.p11.iaik.IaikP11ModulePool;
@@ -130,6 +135,7 @@ import org.xipki.commons.security.impl.p11.keystore.KeystoreP11CryptServiceFacto
 import org.xipki.commons.security.impl.p11.keystore.KeystoreP11ModulePool;
 import org.xipki.commons.security.impl.p11.remote.RemoteP11CryptServiceFactory;
 import org.xipki.commons.security.impl.p12.SoftTokenContentSignerBuilder;
+import org.xipki.commons.security.p11.conf.jaxb.MechanismsType;
 import org.xipki.commons.security.p11.conf.jaxb.ModuleType;
 import org.xipki.commons.security.p11.conf.jaxb.ModulesType;
 import org.xipki.commons.security.p11.conf.jaxb.NativeLibraryType;
@@ -137,6 +143,7 @@ import org.xipki.commons.security.p11.conf.jaxb.ObjectFactory;
 import org.xipki.commons.security.p11.conf.jaxb.PKCS11ConfType;
 import org.xipki.commons.security.p11.conf.jaxb.PasswordType;
 import org.xipki.commons.security.p11.conf.jaxb.PasswordsType;
+import org.xipki.commons.security.p11.conf.jaxb.PermittedMechanismsType;
 import org.xipki.commons.security.p11.conf.jaxb.SlotType;
 import org.xipki.commons.security.p11.conf.jaxb.SlotsType;
 import org.xml.sax.SAXException;
@@ -296,19 +303,16 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                             "exactly one of key-id and key-label must be specified");
                 }
 
-                P11KeyIdentifier keyIdentifier;
-                if (keyId != null) {
-                    keyIdentifier = new P11KeyIdentifier(keyId);
-                } else {
-                    keyIdentifier = new P11KeyIdentifier(keyLabel);
-                }
+                P11KeyIdentifier p11KeyId = (keyId != null)
+                        ? new P11KeyIdentifier(keyId)
+                        : new P11KeyIdentifier(keyLabel);
 
                 P11CryptService p11CryptService = getP11CryptService(pkcs11Module);
-                P11SlotIdentifier slot = new P11SlotIdentifier(slotIndex, slotId);
+                P11SlotIdentifier p11SlotId = new P11SlotIdentifier(slotIndex, slotId);
+                P11EntityIdentifier entityId = new P11EntityIdentifier(p11SlotId, p11KeyId);
 
                 P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
-                        p11CryptService, (SecurityFactory) this,
-                        slot, keyIdentifier, certificateChain);
+                        p11CryptService, (SecurityFactory) this, entityId, certificateChain);
 
                 try {
                     AlgorithmIdentifier signatureAlgId;
@@ -317,7 +321,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     } else {
                         PublicKey pubKey;
                         try {
-                            pubKey = getPkcs11PublicKey(pkcs11Module, slot, keyIdentifier);
+                            pubKey = getPkcs11PublicKey(pkcs11Module, entityId);
                         } catch (InvalidKeyException ex) {
                             throw new SignerException("invalid key: " + ex.getMessage(), ex);
                         }
@@ -326,8 +330,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                                 sigAlgoControl);
                     }
                     return signerBuilder.createSigner(signatureAlgId, parallelism);
-                } catch (OperatorCreationException | NoSuchPaddingException
-                        | NoSuchAlgorithmException ex) {
+                } catch (OperatorCreationException | NoSuchAlgorithmException ex) {
                     throw new SignerException(ex.getMessage(), ex);
                 }
             } else {
@@ -519,8 +522,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final String moduleName)
     throws SignerException {
         initP11CryptServiceFactory();
-        return p11CryptServiceFactory.createP11CryptService(
-                getRealPkcs11ModuleName(moduleName));
+        return p11CryptServiceFactory.createP11CryptService(getRealPkcs11ModuleName(moduleName));
     }
 
     @Override
@@ -612,6 +614,38 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                             "multiple modules with the same module name is not permitted");
                 }
 
+                // Mechanism retriever
+                P11MechanismRetriever mechRetriever;
+                PermittedMechanismsType mechsType = moduleType.getPermittedMechanisms();
+                if (mechsType == null || CollectionUtil.isEmpty(mechsType.getMechanisms())) {
+                    mechRetriever = P11PermitAllMechanimRetriever.INSTANCE;
+                } else {
+                    mechRetriever = new P11MechanismRetrieverImpl();
+                    for (MechanismsType mechType : mechsType.getMechanisms()) {
+                        Set<P11SlotIdentifier> slots = getSlots(mechType.getSlots());
+                        Set<Long> mechanisms = new HashSet<>();
+                        for (String mechStr : mechType.getMechanism()) {
+                            Long mech = null;
+                            if (mechStr.startsWith("0x") || mechStr.startsWith("0X")) {
+                                try {
+                                    mech = Long.parseLong(mechStr.substring(2, 16));
+                                } catch (NumberFormatException ex) {// CHECKSTYLE:SKIP
+                                }
+                            } else if (mechStr.startsWith("CKM_")) {
+                                mech = P11Constants.getMechanism(mechStr);
+                            }
+
+                            if (mech == null) {
+                                LOG.warn("skipped unknown mechanism '" + mechStr + "'");
+                            } else {
+                                mechanisms.add(mech);
+                            }
+                        }
+                        ((P11MechanismRetrieverImpl) mechRetriever).addEntry(slots, mechanisms);
+                    }
+                }
+
+                // Password retriever
                 P11PasswordRetriever pwdRetriever;
 
                 PasswordsType passwordsType = moduleType.getPasswords();
@@ -658,9 +692,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                             + osName);
                 }
 
-                P11ModuleConf conf = new P11ModuleConf(name,
-                        nativeLibraryPath, pwdRetriever, includeSlots, excludeSlots,
-                        (SecurityFactory) this);
+                P11ModuleConf conf = new P11ModuleConf(name, nativeLibraryPath, pwdRetriever,
+                        mechRetriever, includeSlots, excludeSlots, (SecurityFactory) this);
                 confs.put(name, conf);
             } // end for (ModuleType moduleType
 
@@ -728,14 +761,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     @Override
     public PublicKey getPkcs11PublicKey(
             final String moduleName,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final P11EntityIdentifier entityId)
     throws InvalidKeyException {
         try {
             P11CryptService p11 = getP11CryptService(moduleName);
             return (p11 == null)
                     ? null
-                    : p11.getPublicKey(slotId, keyId);
+                    : p11.getPublicKey(entityId);
         } catch (SignerException ex) {
             throw new InvalidKeyException(ex.getMessage(), ex);
         }

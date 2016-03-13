@@ -61,11 +61,12 @@ import org.xipki.commons.security.api.p11.P11KeyIdentifier;
  * @since 2.0.0
  */
 
-public class KeyIdentifier extends ASN1Object {
+// CHECKSTYLE:SKIP
+public class ASN1KeyIdentifier extends ASN1Object {
 
     private P11KeyIdentifier keyId;
 
-    public KeyIdentifier(
+    public ASN1KeyIdentifier(
             final P11KeyIdentifier keyId) {
         this.keyId = ParamUtil.requireNonNull("keyId", keyId);
     }
@@ -83,22 +84,22 @@ public class KeyIdentifier extends ASN1Object {
         return keyId;
     }
 
-    public static KeyIdentifier getInstance(
+    public static ASN1KeyIdentifier getInstance(
             final Object obj)
     throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof KeyIdentifier) {
-            return (KeyIdentifier) obj;
+        if (obj == null || obj instanceof ASN1KeyIdentifier) {
+            return (ASN1KeyIdentifier) obj;
         }
 
         try {
             if (obj instanceof ASN1OctetString) {
                 byte[] keyIdBytes = ((ASN1OctetString) obj).getOctets();
                 P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyIdBytes);
-                return new KeyIdentifier(keyIdentifier);
+                return new ASN1KeyIdentifier(keyIdentifier);
             } else if (obj instanceof ASN1String) {
                 String keyLabel = ((ASN1String) obj).getString();
                 P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyLabel);
-                return new KeyIdentifier(keyIdentifier);
+                return new ASN1KeyIdentifier(keyIdentifier);
             }
 
             if (obj instanceof byte[]) {

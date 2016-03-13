@@ -36,8 +36,6 @@
 
 package org.xipki.commons.security.api.p11;
 
-import java.util.Arrays;
-
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.KeypairGenerationResult;
 
@@ -48,23 +46,15 @@ import org.xipki.commons.security.api.KeypairGenerationResult;
 
 public class P11KeypairGenerationResult extends KeypairGenerationResult {
 
-    private final byte[] id;
-
-    private final String label;
+    private final P11EntityIdentifier entityId;
 
     public P11KeypairGenerationResult(
-            final byte[] id,
-            final String label) {
-        this.id = ParamUtil.requireNonNull("id", id);
-        this.label = ParamUtil.requireNonBlank("label", label);
+            final P11EntityIdentifier entityId) {
+        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
     }
 
-    public byte[] getId() {
-        return Arrays.copyOf(id, id.length);
-    }
-
-    public String getLabel() {
-        return label;
+    public P11EntityIdentifier getEntityId() {
+        return entityId;
     }
 
 }

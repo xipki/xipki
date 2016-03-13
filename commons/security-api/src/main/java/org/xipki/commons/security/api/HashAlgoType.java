@@ -38,6 +38,7 @@ package org.xipki.commons.security.api;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.p11.P11Constants;
 
 /**
  * @author Lijun Liao
@@ -119,4 +120,37 @@ public enum HashAlgoType {
         return null;
     }
 
+    public static HashAlgoType getInstanceForPkcs11HashMech(
+            long hashMech) {
+        if (hashMech == P11Constants.CKM_SHA_1) {
+            return HashAlgoType.SHA1;
+        } else if (hashMech == P11Constants.CKM_SHA224) {
+            return HashAlgoType.SHA224;
+        } else if (hashMech == P11Constants.CKM_SHA256) {
+            return HashAlgoType.SHA256;
+        } else if (hashMech == P11Constants.CKM_SHA384) {
+            return HashAlgoType.SHA384;
+        } else if (hashMech == P11Constants.CKM_SHA512) {
+            return HashAlgoType.SHA512;
+        } else {
+            return null;
+        }
+    }
+
+    public static HashAlgoType getInstanceForPkcs11MgfMech(
+            long hashMech) {
+        if (hashMech == P11Constants.CKG_MGF1_SHA1) {
+            return HashAlgoType.SHA1;
+        } else if (hashMech == P11Constants.CKG_MGF1_SHA224) {
+            return HashAlgoType.SHA224;
+        } else if (hashMech == P11Constants.CKG_MGF1_SHA256) {
+            return HashAlgoType.SHA256;
+        } else if (hashMech == P11Constants.CKG_MGF1_SHA384) {
+            return HashAlgoType.SHA384;
+        } else if (hashMech == P11Constants.CKG_MGF1_SHA512) {
+            return HashAlgoType.SHA512;
+        } else {
+            return null;
+        }
+    }
 }

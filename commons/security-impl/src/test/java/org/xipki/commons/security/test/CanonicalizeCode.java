@@ -274,7 +274,7 @@ public class CanonicalizeCode {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (lineNumber == 0 && line.startsWith("// #THIRDPARTY")) {
-                    thirdparty = true;
+                    return;
                 }
 
                 if (!authorsLineAvailable && line.contains("* @author")) {

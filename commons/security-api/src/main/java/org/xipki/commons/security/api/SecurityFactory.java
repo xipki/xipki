@@ -53,9 +53,8 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Module;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
@@ -144,8 +143,7 @@ public interface SecurityFactory {
 
     PublicKey getPkcs11PublicKey(
             @Nonnull String moduleName,
-            @Nonnull P11SlotIdentifier slotId,
-            @Nonnull P11KeyIdentifier keyId)
+            @Nonnull P11EntityIdentifier entityId)
     throws InvalidKeyException;
 
     byte[] extractMinimalKeyStore(
