@@ -44,11 +44,13 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
+import javax.annotation.Nullable;
+
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
  * @author Lijun Liao
@@ -61,9 +63,7 @@ public class P11PrivateKey implements PrivateKey {
 
     private final P11CryptService p11CryptService;
 
-    private final P11SlotIdentifier slotId;
-
-    private final P11KeyIdentifier keyId;
+    private final P11EntityIdentifier entityId;
 
     private final String algorithm;
 
@@ -71,16 +71,14 @@ public class P11PrivateKey implements PrivateKey {
 
     public P11PrivateKey(
             final P11CryptService p11CryptService,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final P11EntityIdentifier entityId)
     throws InvalidKeyException {
         this.p11CryptService = ParamUtil.requireNonNull("p11CryptService", p11CryptService);
-        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
+        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
 
         PublicKey publicKey;
         try {
-            publicKey = p11CryptService.getPublicKey(slotId, keyId);
+            publicKey = p11CryptService.getPublicKey(entityId);
         } catch (SignerException ex) {
             throw new InvalidKeyException(ex.getMessage(), ex);
         }
@@ -97,6 +95,11 @@ public class P11PrivateKey implements PrivateKey {
         } else {
             throw new InvalidKeyException("unknown public key: " + publicKey);
         }
+    }
+
+    boolean supportsMechanism(
+            final long mechanism) {
+        return p11CryptService.supportsMechanism(entityId.getSlotId(), mechanism);
     }
 
     @Override
@@ -118,97 +121,13 @@ public class P11PrivateKey implements PrivateKey {
         return keysize;
     }
 
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_RSA_PKCS(
-            final byte[] encodedDigestInfo)
+    public byte[] sign(
+            long mechanism,
+            @Nullable P11Params parameters,
+            byte[] content)
     throws SignatureException {
-        if (!"RSA".equals(algorithm)) {
-            throw new SignatureException("could not compute RSA signature with " + algorithm
-                    + " key");
-        }
-
         try {
-            return p11CryptService.CKM_RSA_PKCS(encodedDigestInfo, slotId, keyId);
-        } catch (SignerException ex) {
-            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
-        }
-    }
-
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_RSA_X509(
-            final byte[] hash)
-    throws SignatureException {
-        if (!"RSA".equals(algorithm)) {
-            throw new SignatureException("could not compute RSA signature with " + algorithm
-                    + " key");
-        }
-
-        try {
-            return p11CryptService.CKM_RSA_X509(hash, slotId, keyId);
-        } catch (SignerException ex) {
-            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
-        }
-    }
-
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_ECDSA_X962(
-            final byte[] hash)
-    throws SignatureException {
-        if (!"EC".equals(algorithm)) {
-            throw new SignatureException("could not compute ECDSA signature with " + algorithm
-                    + " key");
-        }
-
-        try {
-            return p11CryptService.CKM_ECDSA_X962(hash, slotId, keyId);
-        } catch (SignerException ex) {
-            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
-        }
-    }
-
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_ECDSA_Plain(
-            final byte[] hash)
-    throws SignatureException {
-        if (!"EC".equals(algorithm)) {
-            throw new SignatureException("could not compute ECDSA signature with " + algorithm
-                    + " key");
-        }
-
-        try {
-            return p11CryptService.CKM_ECDSA_Plain(hash, slotId, keyId);
-        } catch (SignerException ex) {
-            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
-        }
-    }
-
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_DSA_X962(
-            final byte[] hash)
-    throws SignatureException {
-        if (!"DSA".equals(algorithm)) {
-            throw new SignatureException("could not compute DSA signature with " + algorithm
-                    + " key");
-        }
-
-        try {
-            return p11CryptService.CKM_DSA_X962(hash, slotId, keyId);
-        } catch (SignerException ex) {
-            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
-        }
-    }
-
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_DSA_Plain(
-            final byte[] hash)
-    throws SignatureException {
-        if (!"DSA".equals(algorithm)) {
-            throw new SignatureException("could not compute DSA signature with " + algorithm
-                    + " key");
-        }
-
-        try {
-            return p11CryptService.CKM_DSA_Plain(hash, slotId, keyId);
+            return p11CryptService.sign(entityId, mechanism, parameters, content);
         } catch (SignerException ex) {
             throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
         }
@@ -218,12 +137,8 @@ public class P11PrivateKey implements PrivateKey {
         return p11CryptService;
     }
 
-    P11SlotIdentifier getSlotId() {
-        return slotId;
-    }
-
-    P11KeyIdentifier getKeyId() {
-        return keyId;
+    P11EntityIdentifier getEntityId() {
+        return entityId;
     }
 
 }

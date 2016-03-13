@@ -65,16 +65,17 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
  * @since 2.0.0
  */
 
-public class SlotIdentifier extends ASN1Object {
+// CHECKSTYLE:SKIP
+public class ASN1SlotIdentifier extends ASN1Object {
 
     private P11SlotIdentifier slotId;
 
-    public SlotIdentifier(
+    public ASN1SlotIdentifier(
             final P11SlotIdentifier slotId) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
     }
 
-    private SlotIdentifier(
+    private ASN1SlotIdentifier(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         int size = seq.size();
@@ -134,16 +135,16 @@ public class SlotIdentifier extends ASN1Object {
         return slotId;
     }
 
-    public static SlotIdentifier getInstance(
+    public static ASN1SlotIdentifier getInstance(
             final Object obj)
     throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof SlotIdentifier) {
-            return (SlotIdentifier) obj;
+        if (obj == null || obj instanceof ASN1SlotIdentifier) {
+            return (ASN1SlotIdentifier) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new SlotIdentifier((ASN1Sequence) obj);
+                return new ASN1SlotIdentifier((ASN1Sequence) obj);
             }
 
             if (obj instanceof byte[]) {

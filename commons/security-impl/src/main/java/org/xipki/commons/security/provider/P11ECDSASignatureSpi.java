@@ -36,14 +36,7 @@
 
 package org.xipki.commons.security.provider;
 
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.NullDigest;
-import org.bouncycastle.crypto.digests.RIPEMD160Digest;
-import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.crypto.digests.SHA224Digest;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.digests.SHA384Digest;
-import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.xipki.commons.security.api.HashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -51,74 +44,65 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
  */
 
 // CHECKSTYLE:SKIP
-class ECDSASignatureSpi extends AbstractECDSASignatureSpi {
+class P11ECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
 
     // CHECKSTYLE:SKIP
-    static class SHA1 extends ECDSASignatureSpi {
+    static class SHA1 extends P11ECDSASignatureSpi {
 
         SHA1() {
-            super(new SHA1Digest());
+            super(HashAlgoType.SHA1);
         }
 
     } // class SHA1
 
     // CHECKSTYLE:SKIP
-    static class NONE extends ECDSASignatureSpi {
+    static class NONE extends P11ECDSASignatureSpi {
 
         NONE() {
-            super(new NullDigest());
+            super(null);
         }
 
     } // class NONE
 
     // CHECKSTYLE:SKIP
-    static class SHA224 extends ECDSASignatureSpi {
+    static class SHA224 extends P11ECDSASignatureSpi {
 
         SHA224() {
-            super(new SHA224Digest());
+            super(HashAlgoType.SHA224);
         }
 
     } // class SHA224
 
     // CHECKSTYLE:SKIP
-    static class SHA256 extends ECDSASignatureSpi {
+    static class SHA256 extends P11ECDSASignatureSpi {
 
         SHA256() {
-            super(new SHA256Digest());
+            super(HashAlgoType.SHA256);
         }
 
     } // class SHA256
 
     // CHECKSTYLE:SKIP
-    static class SHA384 extends ECDSASignatureSpi {
+    static class SHA384 extends P11ECDSASignatureSpi {
 
         SHA384() {
-            super(new SHA384Digest());
+            super(HashAlgoType.SHA384);
         }
 
     } // class SHA384
 
     // CHECKSTYLE:SKIP
-    static class SHA512 extends ECDSASignatureSpi {
+    static class SHA512 extends P11ECDSASignatureSpi {
 
         SHA512() {
-            super(new SHA512Digest());
+            super(HashAlgoType.SHA512);
         }
 
     } // class SHA512
 
-    // CHECKSTYLE:SKIP
-    static class RIPEMD160 extends ECDSASignatureSpi {
-
-        RIPEMD160() {
-            super(new RIPEMD160Digest());
-        }
-
-    } // class RIPEMD160
-
-    ECDSASignatureSpi(
-            final Digest digest) {
-        super(digest, true);
+    P11ECDSASignatureSpi(
+            final HashAlgoType hashAlgo) {
+        super(hashAlgo, false);
     }
 
 }

@@ -40,13 +40,14 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
+import java.security.Provider.Service;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -54,8 +55,14 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.SignerException;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11Constants;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.parameters.P11Params;
+import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.impl.util.SecurityUtil;
 
@@ -64,222 +71,312 @@ import org.xipki.commons.security.impl.util.SecurityUtil;
  * @since 2.0.0
  */
 
-class SunP11Identity implements Comparable<SunP11Identity> {
+class SunP11Identity extends P11Identity {
 
-    private final Cipher rsaCipher;
+    // CHECKSTYLE:OFF
+    private static final String RSA_ECB_NoPadding = "RSA/ECB/NoPadding";
 
-    private final Signature dsaSignature;
+    private static final String SHA1withRSA = "SHA1withRSA";
 
-    private final P11SlotIdentifier slotId;
+    private static final String SHA224withRSA = "SHA224withRSA";
 
-    private final String keyLabel;
+    private static final String SHA256withRSA = "SHA256withRSA";
+
+    private static final String SHA384withRSA = "SHA384withRSA";
+
+    private static final String SHA512withRSA = "SHA512withRSA";
+
+    private static final String SHA1withDSA = "SHA1withDSA";
+
+    private static final String NONEwithDSA = "NONEwithDSA";
+
+    private static final String SHA1withECDSA = "SHA1withECDSA";
+
+    private static final String NONEwithECDSA = "NONEwithECDSA";
+
+    private final Provider provider;
+    // CHECKSTYLE:ON
 
     private final PrivateKey privateKey;
 
-    private final X509Certificate[] certificateChain;
+    private final Set<String> cipherAlgos = new HashSet<>();
 
-    private final PublicKey publicKey;
+    private final Set<String> sigAlgos = new HashSet<>();
 
-    private final int signatureKeyBitLength;
+    private final SecureRandom random;
 
     SunP11Identity(
-            final Provider p11Provider,
-            final P11SlotIdentifier slotId,
-            final String keyLabel,
+            final Provider provider,
+            final P11EntityIdentifier entityId,
             final PrivateKey privateKey,
             final X509Certificate[] certificateChain,
-            final PublicKey publicKey)
+            final PublicKey publicKey,
+            final SecureRandom random)
     throws SignerException {
-        super();
-
-        ParamUtil.requireNonNull("p11Provider", p11Provider);
-        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        super(entityId, certificateChain, publicKey);
+        this.provider = ParamUtil.requireNonNull("p11Provider", provider);
         this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
-        this.keyLabel = ParamUtil.requireNonNull("keyLabel", keyLabel);
+        this.random = ParamUtil.requireNonNull("random", random);
 
-        if ((certificateChain == null
-                || certificateChain.length == 0
-                || certificateChain[0] == null)
-                && publicKey == null) {
-            throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
-        }
+        Set<Service> services = provider.getServices();
+        for (Service service : services) {
+            String type = service.getType();
+            String algo = service.getAlgorithm().toLowerCase();
 
-        this.publicKey = (publicKey == null)
-                ? certificateChain[0].getPublicKey()
-                : publicKey;
-        this.certificateChain = certificateChain;
-
-        if (this.publicKey instanceof RSAPublicKey) {
-            signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
-            String algorithm = "RSA/ECB/NoPadding";
-            this.dsaSignature = null;
-            try {
-                this.rsaCipher = Cipher.getInstance(algorithm, p11Provider);
-            } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
-                throw new SignerException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+            if ("Cipher".equalsIgnoreCase(type)) {
+                if ("RSA/ECB/NoPadding".equalsIgnoreCase(algo)) {
+                    cipherAlgos.add(algo.toLowerCase());
+                }
+                continue;
+            } else if ("Signature".equalsIgnoreCase(type)) {
+                sigAlgos.add(algo.toLowerCase());
             }
-            try {
-                this.rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
-            } catch (InvalidKeyException ex) {
-                throw new SignerException("InvalidKeyException: " + ex.getMessage(), ex);
-            }
-        } else if (this.publicKey instanceof ECPublicKey
-                || this.publicKey instanceof DSAPublicKey) {
-            String algorithm;
-            if (this.publicKey instanceof ECPublicKey) {
-                signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve()
-                        .getField().getFieldSize();
-                algorithm = "NONEwithECDSA";
-            } else if (this.publicKey instanceof DSAPublicKey) {
-                signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getP()
-                        .bitLength();
-                algorithm = "NONEwithDSA";
-            } else {
-                throw new RuntimeException("should not reach here");
-            }
-
-            try {
-                this.dsaSignature = Signature.getInstance(algorithm, p11Provider);
-            } catch (NoSuchAlgorithmException ex) {
-                throw new SignerException("NoSuchAlgorithmException: " + ex.getMessage(), ex);
-            }
-            try {
-                this.dsaSignature.initSign(privateKey);
-            } catch (InvalidKeyException ex) {
-                throw new SignerException("InvalidKeyException: " + ex.getMessage(), ex);
-            }
-            this.rsaCipher = null;
-        } else {
-            throw new IllegalArgumentException(
-                    "currently only RSA, EC and DSA public key are supported, but not "
-                    + this.publicKey.getAlgorithm()
-                    + " (class: " + this.publicKey.getClass().getName() + ")");
         }
     } // constructor
 
-    public String getKeyLabel() {
-        return keyLabel;
-    }
-
-    public PrivateKey getPrivateKey() {
+    PrivateKey getPrivateKey() {
         return privateKey;
     }
 
-    public X509Certificate getCertificate() {
-        return (certificateChain != null && certificateChain.length > 0)
-                ? certificateChain[0]
-                : null;
-    }
-
-    public X509Certificate[] getCertificateChain() {
-        return certificateChain;
-    }
-
-    public PublicKey getPublicKey() {
-        return (publicKey == null)
-                ? certificateChain[0].getPublicKey()
-                : publicKey;
-    }
-
-    public P11SlotIdentifier getSlotId() {
-        return slotId;
-    }
-
-    public boolean match(
-            final P11SlotIdentifier slotId,
-            final String keyLabel) {
-        return this.slotId.equals(slotId) && this.keyLabel.equals(keyLabel);
-    }
-
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_RSA_PKCS(
-            final byte[] encodedDigestInfo)
+    byte[] sign(
+            final long mechanism,
+            final P11Params parameters,
+            final byte[] content)
     throws SignerException {
-        byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo,
-                (signatureKeyBitLength + 7) / 8);
-        return CKM_RSA_X509(padded);
-    }
+        ParamUtil.requireNonNull("content", content);
 
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_RSA_X509(
-            final byte[] hash)
-    throws SignerException {
-        if (!(publicKey instanceof RSAPublicKey)) {
-            throw new SignerException("operation CKM_RSA_X509 is not allowed for "
+        if (!supportsMechanism(mechanism, parameters)) {
+            throw new SignerException("mechanism " + mechanism + " is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
-        synchronized (rsaCipher) {
-            try {
-                rsaCipher.update(hash);
-                return rsaCipher.doFinal();
-            } catch (IllegalBlockSizeException | BadPaddingException ex) {
-                throw new SignerException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        if (P11Constants.CKM_ECDSA == mechanism) {
+            return ecdsaSign(content, null);
+        } else if (P11Constants.CKM_ECDSA_SHA1 == mechanism) {
+            return ecdsaSign(content, HashAlgoType.SHA1);
+        } else if (P11Constants.CKM_DSA == mechanism) {
+            return dsaSign(content, null);
+        } else if (P11Constants.CKM_DSA_SHA1 == mechanism) {
+            return dsaSign(content, HashAlgoType.SHA1);
+        } else if (P11Constants.CKM_DSA_SHA224 == mechanism) {
+            return dsaSign(content, HashAlgoType.SHA224);
+        } else if (P11Constants.CKM_DSA_SHA256 == mechanism) {
+            return dsaSign(content, HashAlgoType.SHA256);
+        } else if (P11Constants.CKM_DSA_SHA384 == mechanism) {
+            return dsaSign(content, HashAlgoType.SHA384);
+        } else if (P11Constants.CKM_DSA_SHA512 == mechanism) {
+            return dsaSign(content, HashAlgoType.SHA512);
+        } else if (P11Constants.CKM_RSA_X_509 == mechanism) {
+            return rsaX509Sign(content);
+        } else if (P11Constants.CKM_RSA_PKCS == mechanism) {
+            return rsaPkcsSign(content, null);
+        } else if (P11Constants.CKM_SHA1_RSA_PKCS == mechanism) {
+            return rsaPkcsSign(content, HashAlgoType.SHA1);
+        } else if (P11Constants.CKM_SHA224_RSA_PKCS == mechanism) {
+            return rsaPkcsSign(content, HashAlgoType.SHA224);
+        } else if (P11Constants.CKM_SHA256_RSA_PKCS == mechanism) {
+            return rsaPkcsSign(content, HashAlgoType.SHA256);
+        } else if (P11Constants.CKM_SHA384_RSA_PKCS == mechanism) {
+            return rsaPkcsSign(content, HashAlgoType.SHA384);
+        } else if (P11Constants.CKM_SHA512_RSA_PKCS == mechanism) {
+            return rsaPkcsSign(content, HashAlgoType.SHA512);
+        } else if (P11Constants.CKM_RSA_PKCS_PSS == mechanism) {
+            return rsaPkcsPssSign(parameters, content, null);
+        } else if (P11Constants.CKM_SHA1_RSA_PKCS_PSS == mechanism) {
+            return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA1);
+        } else if (P11Constants.CKM_SHA224_RSA_PKCS_PSS == mechanism) {
+            return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA224);
+        } else if (P11Constants.CKM_SHA256_RSA_PKCS_PSS == mechanism) {
+            return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA256);
+        } else if (P11Constants.CKM_SHA384_RSA_PKCS_PSS == mechanism) {
+            return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA384);
+        } else if (P11Constants.CKM_SHA512_RSA_PKCS_PSS == mechanism) {
+            return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA512);
+        } else {
+            throw new SignerException("unsupported mechanism " + mechanism);
+        }
+    }
+
+    private byte[] rsaPkcsPssSign(
+            P11Params parameters,
+            final byte[] contentToSign,
+            HashAlgoType hashAlgo)
+    throws SignerException {
+        if (!(parameters instanceof P11RSAPkcsPssParams)) {
+            throw new SignerException("the parameters is not of "
+                    + P11RSAPkcsPssParams.class.getName());
+        }
+
+        P11RSAPkcsPssParams pssParam = (P11RSAPkcsPssParams) parameters;
+        HashAlgoType contentHash = HashAlgoType.getInstanceForPkcs11HashMech(
+                pssParam.getHashAlgorithm());
+        if (contentHash == null) {
+            throw new SignerException("unsupported HashAlgorithm " + pssParam.getHashAlgorithm());
+        } else if (contentHash != hashAlgo) {
+            throw new SignerException("Invalid parameters: invalid hash algorithm");
+        }
+
+        HashAlgoType mgfHash = HashAlgoType.getInstanceForPkcs11MgfMech(
+                pssParam.getMaskGenerationFunction());
+        if (mgfHash == null) {
+            throw new SignerException(
+                    "unsupported MaskGenerationFunction " + pssParam.getHashAlgorithm());
+        }
+
+        byte[] hashValue;
+        if (hashAlgo == null) {
+            hashValue = contentToSign;
+        } else {
+            hashValue = HashCalculator.hash(hashAlgo, contentToSign);
+        }
+
+        byte[] encodedHashValue = SignerUtil.EMSA_PSS_ENCODE(contentHash, hashValue, mgfHash,
+                (int) pssParam.getSaltLength(), getSignatureKeyBitLength(), random);
+        return rsaX509Sign(encodedHashValue);
+    }
+
+    private byte[] rsaPkcsSign(
+            final byte[] contentToSign,
+            final HashAlgoType hashAlgo)
+    throws SignerException {
+        if (cipherAlgos.contains(RSA_ECB_NoPadding)) {
+            int modulusBitLen = getSignatureKeyBitLength();
+            byte[] paddedHash;
+            if (hashAlgo == null) {
+                paddedHash = SignerUtil.EMSA_PKCS1_v1_5_encoding(contentToSign, modulusBitLen);
+            } else {
+                byte[] hash = HashCalculator.hash(hashAlgo, contentToSign);
+                paddedHash = SignerUtil.EMSA_PKCS1_v1_5_encoding(hash, modulusBitLen, hashAlgo);
             }
+            return rsaX509Sign(paddedHash);
+        }
+
+        String sigAlgo;
+        if (hashAlgo == HashAlgoType.SHA1 && sigAlgos.contains(SHA1withRSA.toLowerCase())) {
+            sigAlgo = SHA1withRSA;
+        } else if (hashAlgo == HashAlgoType.SHA224
+                && sigAlgos.contains(SHA224withRSA.toLowerCase())) {
+            sigAlgo = SHA224withRSA;
+        } else if (hashAlgo == HashAlgoType.SHA256
+                && sigAlgos.contains(SHA256withRSA.toLowerCase())) {
+            sigAlgo = SHA256withRSA;
+        } else if (hashAlgo == HashAlgoType.SHA384
+                && sigAlgos.contains(SHA384withRSA.toLowerCase())) {
+            sigAlgo = SHA384withRSA;
+        } else if (hashAlgo == HashAlgoType.SHA512
+                && sigAlgos.contains(SHA512withRSA.toLowerCase())) {
+            sigAlgo = SHA512withRSA;
+        } else {
+            throw new SignerException("unsupported signature algorithm RSA_PKCS with " + hashAlgo);
+        }
+
+        try {
+            Signature sig = Signature.getInstance(sigAlgo, provider);
+            updateData(sig, contentToSign);
+            return sig.sign();
+        } catch (SignatureException | NoSuchAlgorithmException ex) {
+            throw new SignerException(ex.getMessage(), ex);
         }
     }
 
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_ECDSA(
-            final byte[] hash)
+    private byte[] rsaX509Sign(
+            final byte[] dataToSign)
     throws SignerException {
-        byte[] x962Sig = CKM_ECDSA_X962(hash);
-        return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
-    }
-
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_ECDSA_X962(
-            final byte[] hash)
-    throws SignerException {
-        if (!(publicKey instanceof ECPublicKey)) {
-            throw new SignerException("operation CKM_ECDSA is not allowed for "
-                    + publicKey.getAlgorithm() + " public key");
+        Cipher cipher;
+        try {
+            cipher = Cipher.getInstance(RSA_ECB_NoPadding, provider);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
+            throw new SignerException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        }
+        try {
+            cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+        } catch (InvalidKeyException ex) {
+            throw new SignerException("InvalidKeyException: " + ex.getMessage(), ex);
         }
 
-        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
+        try {
+            return cipher.doFinal(dataToSign);
+        } catch (BadPaddingException | IllegalBlockSizeException ex) {
+            throw new SignerException("SignatureException: " + ex.getMessage(), ex);
+        }
+    }
 
-        synchronized (dsaSignature) {
-            try {
-                dsaSignature.update(truncatedDigest);
-                return dsaSignature.sign();
-            } catch (SignatureException ex) {
-                throw new SignerException(ex.getMessage(), ex);
+    private byte[] dsaSign(
+            final byte[] dataToSign,
+            final HashAlgoType hashAlgo)
+    throws SignerException {
+        byte[] input;
+
+        String signatureAlgorithm;
+        if (sigAlgos.contains(NONEwithDSA.toLowerCase())) {
+            byte[] hash;
+            if (hashAlgo == null) {
+                hash = dataToSign;
+            } else {
+                hash = HashCalculator.hash(hashAlgo, dataToSign);
             }
+            input = SecurityUtil.leftmost(hash, getSignatureKeyBitLength());
+            signatureAlgorithm = NONEwithDSA;
+        } else if (hashAlgo == HashAlgoType.SHA1 && sigAlgos.contains(SHA1withDSA.toLowerCase())) {
+            input = dataToSign;
+            signatureAlgorithm = SHA1withDSA;
+        } else {
+            throw new SignerException("unsupported mechanism");
+        }
+
+        try {
+            Signature sig = Signature.getInstance(signatureAlgorithm, provider);
+            updateData(sig, input);
+            byte[] x962Signature = sig.sign();
+            return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
+        } catch (NoSuchAlgorithmException ex) {
+            throw new SignerException("could not find signature algorithm " + ex.getMessage(), ex);
+        } catch (SignatureException ex) {
+            throw new SignerException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_DSA(
-            final byte[] hash)
+    private byte[] ecdsaSign(
+            final byte[] dataToSign,
+            final HashAlgoType hashAlgo)
     throws SignerException {
-        byte[] x962Sig = CKM_DSA_X962(hash);
-        return SignerUtil.convertX962DSASigToPlain(x962Sig, signatureKeyBitLength);
-    }
+        byte[] input;
 
-    // CHECKSTYLE:SKIP
-    public byte[] CKM_DSA_X962(
-            final byte[] hash)
-    throws SignerException {
-        if (!(publicKey instanceof DSAPublicKey)) {
-            throw new SignerException("operation CKM_DSA is not allowed for "
-                    + publicKey.getAlgorithm() + " public key");
-        }
-
-        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
-        synchronized (dsaSignature) {
-            try {
-                dsaSignature.update(truncatedDigest);
-                return dsaSignature.sign();
-            } catch (SignatureException ex) {
-                throw new SignerException(ex.getMessage(), ex);
+        String signatureAlgorithm;
+        if (sigAlgos.contains(NONEwithECDSA.toLowerCase())) {
+            byte[] hash;
+            if (hashAlgo == null) {
+                hash = dataToSign;
+            } else {
+                hash = HashCalculator.hash(hashAlgo, dataToSign);
             }
+            input = SecurityUtil.leftmost(hash, getSignatureKeyBitLength());
+            signatureAlgorithm = NONEwithECDSA;
+        } else if (hashAlgo == HashAlgoType.SHA1
+                && sigAlgos.contains(SHA1withECDSA.toLowerCase())) {
+            input = dataToSign;
+            signatureAlgorithm = SHA1withECDSA;
+        } else {
+            throw new SignerException("unsupported mechanism");
+        }
+
+        try {
+            Signature sig = Signature.getInstance(signatureAlgorithm, provider);
+            updateData(sig, input);
+            byte[] x962Signature = sig.sign();
+            return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
+        } catch (NoSuchAlgorithmException ex) {
+            throw new SignerException("could not find signature algorithm " + ex.getMessage(), ex);
+        } catch (SignatureException ex) {
+            throw new SignerException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
-    @Override
-    public int compareTo(
-            final SunP11Identity obj) {
-        return this.keyLabel.compareTo(obj.keyLabel);
+    private void updateData(
+            final Signature sig,
+            final byte[] data)
+    throws SignatureException {
+        sig.update(data); // FIXME: consider the maximal length of one message sent to HSM
     }
 
 }

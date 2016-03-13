@@ -90,6 +90,8 @@ import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.p11.P11Constants;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -168,6 +170,8 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
     private final SecurityFactory securityFactory;
 
+    private final Set<Long> supportedMechanisms = new HashSet<>();
+
     public KeystoreP11Slot(
             final String moduleName,
             final File slotDir,
@@ -210,13 +214,43 @@ public class KeystoreP11Slot implements P11WritableSlot {
             this.namedCurveSupported = true;
         }
 
+        supportedMechanisms.add(P11Constants.CKM_DSA_KEY_PAIR_GEN);
+        supportedMechanisms.add(P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
+        supportedMechanisms.add(P11Constants.CKM_EC_KEY_PAIR_GEN);
+
+        supportedMechanisms.add(P11Constants.CKM_RSA_X_509);
+
+        supportedMechanisms.add(P11Constants.CKM_RSA_PKCS);
+        supportedMechanisms.add(P11Constants.CKM_SHA1_RSA_PKCS);
+        supportedMechanisms.add(P11Constants.CKM_SHA224_RSA_PKCS);
+        supportedMechanisms.add(P11Constants.CKM_SHA256_RSA_PKCS);
+        supportedMechanisms.add(P11Constants.CKM_SHA384_RSA_PKCS);
+        supportedMechanisms.add(P11Constants.CKM_SHA512_RSA_PKCS);
+
+        supportedMechanisms.add(P11Constants.CKM_RSA_PKCS_PSS);
+        supportedMechanisms.add(P11Constants.CKM_SHA1_RSA_PKCS_PSS);
+        supportedMechanisms.add(P11Constants.CKM_SHA224_RSA_PKCS_PSS);
+        supportedMechanisms.add(P11Constants.CKM_SHA256_RSA_PKCS_PSS);
+        supportedMechanisms.add(P11Constants.CKM_SHA384_RSA_PKCS_PSS);
+        supportedMechanisms.add(P11Constants.CKM_SHA512_RSA_PKCS_PSS);
+
+        supportedMechanisms.add(P11Constants.CKM_DSA);
+        supportedMechanisms.add(P11Constants.CKM_DSA_SHA1);
+        supportedMechanisms.add(P11Constants.CKM_DSA_SHA224);
+        supportedMechanisms.add(P11Constants.CKM_DSA_SHA256);
+        supportedMechanisms.add(P11Constants.CKM_DSA_SHA384);
+        supportedMechanisms.add(P11Constants.CKM_DSA_SHA512);
+
+        supportedMechanisms.add(P11Constants.CKM_ECDSA);
+        supportedMechanisms.add(P11Constants.CKM_ECDSA_SHA1);
         refresh();
     }
 
-    public void refresh() {
+    void refresh() {
         File[] privKeyInfoFiles = privKeyDir.listFiles(INFO_FILENAME_FILTER);
         if (privKeyInfoFiles == null || privKeyInfoFiles.length == 0) {
             this.identities.clear();
+            this.supportedMechanisms.clear();
             return;
         }
 
@@ -276,8 +310,9 @@ public class KeystoreP11Slot implements P11WritableSlot {
                 PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(encodedValue);
                 PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
 
-                KeystoreP11Identity identity = new KeystoreP11Identity(slotId, p11KeyId, privateKey,
-                        publicKey, certChain.toArray(new X509Certificate[0]), 20,
+                KeystoreP11Identity identity = new KeystoreP11Identity(
+                        new P11EntityIdentifier(slotId, p11KeyId), privateKey, publicKey,
+                        certChain.toArray(new X509Certificate[0]), 20,
                         securityFactory.getRandom4Sign());
                 LOG.info("added PKCS#11 key {}", p11KeyId);
                 currentIdentifies.add(identity);
@@ -307,12 +342,16 @@ public class KeystoreP11Slot implements P11WritableSlot {
         currentIdentifies.clear();
     } // method refresh
 
-    public File getSlotDir() {
+    File getSlotDir() {
         return slotDir;
     }
 
-    public P11SlotIdentifier getSlotId() {
+    P11SlotIdentifier getSlotId() {
         return slotId;
+    }
+
+    Set<Long> getSupportedMechanisms() {
+        return supportedMechanisms;
     }
 
     @Override
@@ -322,7 +361,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
     private boolean privKeyLabelExists(String label) {
         for (KeystoreP11Identity id : identities) {
-            if (id.getKeyId().getKeyLabel().equals(label)) {
+            if (id.getEntityId().getKeyId().getKeyLabel().equals(label)) {
                 return true;
             }
         }
@@ -380,7 +419,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
 
-        P11KeyIdentifier certKeyId = identity.getKeyId();
+        P11KeyIdentifier certKeyId = identity.getEntityId().getKeyId();
         savePkcs11Cert(certKeyId.getKeyId(), certKeyId.getKeyLabel(), newCert);
         if (certChain.length < 2) {
             return;
@@ -519,20 +558,20 @@ public class KeystoreP11Slot implements P11WritableSlot {
 
         if (keyId == null) {
             for (KeystoreP11Identity p11Identity : identities) {
-                if (p11Identity.getKeyId().getKeyLabel().equals(keyLabel)) {
+                if (p11Identity.getEntityId().getKeyId().getKeyLabel().equals(keyLabel)) {
                     return p11Identity;
                 }
             }
         } else if (keyLabel == null) {
             for (KeystoreP11Identity p11Identity : identities) {
-                if (Arrays.equals(p11Identity.getKeyId().getKeyId(), keyId)) {
+                if (Arrays.equals(p11Identity.getEntityId().getKeyId().getKeyId(), keyId)) {
                     return p11Identity;
                 }
             }
         } else {
             for (KeystoreP11Identity p11Identity : identities) {
-                if (p11Identity.getKeyId().getKeyLabel().equals(keyLabel)) {
-                    if (Arrays.equals(p11Identity.getKeyId().getKeyId(), keyId)) {
+                if (p11Identity.getEntityId().getKeyId().getKeyLabel().equals(keyLabel)) {
+                    if (Arrays.equals(p11Identity.getEntityId().getKeyId().getKeyId(), keyId)) {
                         return p11Identity;
                     }
                 }
@@ -590,7 +629,7 @@ public class KeystoreP11Slot implements P11WritableSlot {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < p11Identities.size(); i++) {
             P11Identity identity = p11Identities.get(i);
-            P11KeyIdentifier p11KeyId = identity.getKeyId();
+            P11KeyIdentifier p11KeyId = identity.getEntityId().getKeyId();
 
             sb.append("\t")
                 .append(i + 1)
@@ -1014,4 +1053,5 @@ public class KeystoreP11Slot implements P11WritableSlot {
             final String fileName) {
         return Hex.decode(fileName.substring(0, fileName.length() - INFO_FILE_SUFFIX.length()));
     }
+
 }

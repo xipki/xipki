@@ -80,18 +80,20 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.XipkiCmpConstants;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.p11.remote.KeyIdentifier;
-import org.xipki.commons.security.api.p11.remote.PsoTemplate;
-import org.xipki.commons.security.api.p11.remote.SlotAndKeyIdentifer;
-import org.xipki.commons.security.api.p11.remote.SlotIdentifier;
+import org.xipki.commons.security.api.p11.parameters.P11Params;
+import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
+import org.xipki.commons.security.api.p11.remote.ASN1EntityIdentifer;
+import org.xipki.commons.security.api.p11.remote.ASN1P11Params;
+import org.xipki.commons.security.api.p11.remote.ASN1RSAPkcsPssParams;
+import org.xipki.commons.security.api.p11.remote.ASN1SignTemplate;
+import org.xipki.commons.security.api.p11.remote.ASN1SlotIdentifier;
 import org.xipki.commons.security.api.util.CmpFailureUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
@@ -190,72 +192,51 @@ public abstract class RemoteP11CryptService implements P11CryptService {
     }
 
     @Override
-    public byte[] CKM_RSA_PKCS(
-            final byte[] encodedDigestInfo,
+    public boolean supportsMechanism(
             final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkSlotId(slotId);
-        return pso(XipkiCmpConstants.ACTION_RP11_PSO_RSA_PKCS, encodedDigestInfo, slotId, keyId);
+            final long mechanism) {
+        // FIXME: get a list of supported mechanisms at start
+        return false;
     }
 
     @Override
-    public byte[] CKM_RSA_X509(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+    public byte[] sign(
+            final P11EntityIdentifier entityId,
+            final long mechanism,
+            final P11Params parameters,
+            final byte[] content)
     throws SignerException {
-        checkSlotId(slotId);
-        return pso(XipkiCmpConstants.ACTION_RP11_PSO_RSA_X509, hash, slotId, keyId);
-    }
+        ParamUtil.requireNonNull("entityId", entityId);
+        ParamUtil.requireNonNull("content", content);
+        checkSlotId(entityId);
 
-    @Override
-    public byte[] CKM_ECDSA_Plain(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkSlotId(slotId);
-        return pso(XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_PLAIN, hash, slotId, keyId);
-    }
+        ASN1EntityIdentifer asn1EntityId = new ASN1EntityIdentifer(entityId);
+        ASN1Encodable asn1Param = null;
+        if (parameters instanceof P11RSAPkcsPssParams) {
+            asn1Param = new ASN1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters);
+        }
+        ASN1SignTemplate signTemplate = new ASN1SignTemplate(asn1EntityId, mechanism,
+                new ASN1P11Params(asn1Param), content);
+        ASN1Encodable result = send(XipkiCmpConstants.ACTION_RP11_SIGN, signTemplate);
 
-    @Override
-    public byte[] CKM_ECDSA_X962(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkSlotId(slotId);
-        return pso(XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_X962, hash, slotId, keyId);
-    }
+        ASN1OctetString octetString;
+        try {
+            octetString = DEROctetString.getInstance(result);
+        } catch (IllegalArgumentException ex) {
+            throw new SignerException("the returned result is not OCTETSTRING");
+        }
 
-    @Override
-    public byte[] CKM_DSA_Plain(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkSlotId(slotId);
-        return pso(XipkiCmpConstants.ACTION_RP11_PSO_DSA_PLAIN, hash, slotId, keyId);
-    }
-
-    @Override
-    public byte[] CKM_DSA_X962(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkSlotId(slotId);
-        return pso(XipkiCmpConstants.ACTION_RP11_PSO_DSA_X962, hash, slotId, keyId);
+        return (octetString == null)
+                ? null
+                : octetString.getOctets();
     }
 
     @Override
     public PublicKey getPublicKey(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final P11EntityIdentifier entityId)
     throws SignerException {
-        checkSlotId(slotId);
-        byte[] keyBytes = getCertOrKey(XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY, slotId, keyId);
+        checkSlotId(entityId);
+        byte[] keyBytes = getCertOrKey(XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY, entityId);
         if (keyBytes == null) {
             return null;
         }
@@ -265,12 +246,10 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
     @Override
     public X509Certificate getCertificate(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final P11EntityIdentifier entityId)
     throws SignerException {
-        checkSlotId(slotId);
-        byte[] certBytes = getCertOrKey(XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE, slotId,
-                keyId);
+        checkSlotId(entityId);
+        byte[] certBytes = getCertOrKey(XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE, entityId);
         if (certBytes == null) {
             return null;
         }
@@ -284,11 +263,10 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
     @Override
     public X509Certificate[] getCertificates(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final P11EntityIdentifier entityId)
     throws SignerException {
-        checkSlotId(slotId);
-        X509Certificate cert = getCertificate(slotId, keyId);
+        checkSlotId(entityId);
+        X509Certificate cert = getCertificate(entityId);
         if (cert == null) {
             return null;
         }
@@ -296,49 +274,12 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         return new X509Certificate[]{cert};
     }
 
-    private byte[] pso(
-            final int action,
-            final byte[] message,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        ParamUtil.requireNonNull("message", message);
-
-        PsoTemplate psoTemplate;
-        try {
-            SlotAndKeyIdentifer slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
-            psoTemplate = new PsoTemplate(slotAndKeyIdentifier, message);
-        } catch (BadAsn1ObjectException ex) {
-            throw new SignerException("BadASN1ObjectException: " + ex.getMessage(), ex);
-        }
-
-        ASN1Encodable result = send(action, psoTemplate);
-
-        ASN1OctetString octetString;
-        try {
-            octetString = DEROctetString.getInstance(result);
-        } catch (IllegalArgumentException ex) {
-            throw new SignerException("the returned result is not OCTETSTRING");
-        }
-
-        return (octetString == null)
-                ? null
-                : octetString.getOctets();
-    } // method pso
-
     private byte[] getCertOrKey(
             final int action,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final P11EntityIdentifier entityId)
     throws SignerException {
-        SlotAndKeyIdentifer slotAndKeyIdentifier;
-        try {
-            slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
-        } catch (BadAsn1ObjectException ex) {
-            throw new SignerException("BadASN1ObjectException: " + ex.getMessage(), ex);
-        }
-
-        ASN1Encodable result = send(action, slotAndKeyIdentifier);
+        ASN1EntityIdentifer asn1EntityId = new ASN1EntityIdentifer(entityId);
+        ASN1Encodable result = send(action, asn1EntityId);
 
         ASN1OctetString octetString;
         try {
@@ -350,18 +291,6 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         return (octetString == null)
                 ? null
                 : octetString.getOctets();
-    }
-
-    private SlotAndKeyIdentifer buildSlotAndKeyIdentifier(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws BadAsn1ObjectException {
-        ParamUtil.requireNonNull("slotId", slotId);
-        ParamUtil.requireNonNull("keyId", keyId);
-
-        SlotIdentifier slotIdentifier = new SlotIdentifier(slotId);
-        KeyIdentifier keyIdentifier = new KeyIdentifier(keyId);
-        return new SlotAndKeyIdentifer(slotIdentifier, keyIdentifier);
     }
 
     private static ASN1Encodable extractItvInfoValue(
@@ -462,10 +391,10 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
         List<P11SlotIdentifier> slotIds = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
-            SlotIdentifier asn1SlotId;
+            ASN1SlotIdentifier asn1SlotId;
             try {
                 ASN1Encodable obj = seq.getObjectAt(i);
-                asn1SlotId = SlotIdentifier.getInstance(obj);
+                asn1SlotId = ASN1SlotIdentifier.getInstance(obj);
             } catch (Exception ex) {
                 throw new SignerException(ex.getMessage(), ex);
             }
@@ -482,8 +411,12 @@ public abstract class RemoteP11CryptService implements P11CryptService {
     public String[] getKeyLabels(
             final P11SlotIdentifier slotId)
     throws SignerException {
-        checkSlotId(slotId);
-        SlotIdentifier tmpSlotId = new SlotIdentifier(slotId);
+        ParamUtil.requireNonNull("slotId", slotId);
+        if (!moduleConf.isSlotIncluded(slotId)) {
+            throw new SignerException("cound not find slot (" + slotId + ")");
+        }
+
+        ASN1SlotIdentifier tmpSlotId = new ASN1SlotIdentifier(slotId);
 
         ASN1Encodable resp = send(XipkiCmpConstants.ACTION_RP11_LIST_KEYLABELS,
                 tmpSlotId);
@@ -509,11 +442,11 @@ public abstract class RemoteP11CryptService implements P11CryptService {
     }
 
     private void checkSlotId(
-            final P11SlotIdentifier slotId)
+            final P11EntityIdentifier entityId)
     throws SignerException {
-        ParamUtil.requireNonNull("slotId", slotId);
-        if (!moduleConf.isSlotIncluded(slotId)) {
-            throw new SignerException("cound not find slot (" + slotId.toString() + ")");
+        ParamUtil.requireNonNull("entityId", entityId);
+        if (!moduleConf.isSlotIncluded(entityId.getSlotId())) {
+            throw new SignerException("cound not find slot (" + entityId.getSlotId() + ")");
         }
     }
 

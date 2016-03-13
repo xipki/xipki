@@ -41,6 +41,7 @@ import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.p11.P11Constants;
 
 /**
  * @author Lijun Liao
@@ -89,10 +90,8 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher {
         System.arraycopy(in, inOff, content, content.length - len, len);
 
         try {
-            return param.getP11CryptService().CKM_RSA_X509(
-                    content,
-                    param.getSlot(),
-                    param.getKeyId());
+            return param.getP11CryptService().sign(param.getEntityId(), P11Constants.CKM_RSA_X_509,
+                    null, content);
         } catch (SignerException ex) {
             throw new InvalidCipherTextException(ex.getMessage(), ex);
         }

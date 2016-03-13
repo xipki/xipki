@@ -61,8 +61,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.commons.security.impl.DefaultConcurrentContentSigner;
@@ -83,32 +82,28 @@ public class P11ContentSignerBuilder {
 
     private final SecurityFactory securityFactory;
 
-    private final P11SlotIdentifier slot;
-
-    private final P11KeyIdentifier keyId;
+    private final P11EntityIdentifier entityId;
 
     public P11ContentSignerBuilder(
             final P11CryptService cryptService,
             final SecurityFactory securityFactory,
-            final P11SlotIdentifier slot,
-            final P11KeyIdentifier keyId,
+            final P11EntityIdentifier entityId,
             final X509Certificate[] certificateChain)
     throws SignerException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
-        this.slot = ParamUtil.requireNonNull("slot", slot);
-        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
+        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
 
-        X509Certificate signerCertInP11 = cryptService.getCertificate(slot, keyId);
+        X509Certificate signerCertInP11 = cryptService.getCertificate(entityId);
         PublicKey publicKeyInP11;
         if (signerCertInP11 != null) {
             publicKeyInP11 = signerCertInP11.getPublicKey();
         } else {
-            publicKeyInP11 = cryptService.getPublicKey(slot, keyId);
+            publicKeyInP11 = cryptService.getPublicKey(entityId);
         }
 
         if (publicKeyInP11 == null) {
-            throw new SignerException("public key with " + keyId + " does not exist");
+            throw new SignerException("public key with " + entityId + " does not exist");
         }
 
         Set<Certificate> caCerts = new HashSet<>();
@@ -132,7 +127,7 @@ public class P11ContentSignerBuilder {
         }
 
         if (cert != null) {
-            Certificate[] certsInKeystore = cryptService.getCertificates(slot, keyId);
+            Certificate[] certsInKeystore = cryptService.getCertificates(entityId);
             if (certsInKeystore != null && certsInKeystore.length > 1) {
                 for (int i = 1; i < certsInKeystore.length; i++) {
                     caCerts.add(certsInKeystore[i]);
@@ -148,7 +143,7 @@ public class P11ContentSignerBuilder {
     public ConcurrentContentSigner createSigner(
             final AlgorithmIdentifier signatureAlgId,
             final int parallelism)
-    throws OperatorCreationException, NoSuchPaddingException {
+    throws OperatorCreationException {
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
         if (publicKey instanceof RSAPublicKey) {
@@ -175,47 +170,24 @@ public class P11ContentSignerBuilder {
         }
 
         List<ContentSigner> signers = new ArrayList<>(parallelism);
-
-        try {
-            for (int i = 0; i < parallelism; i++) {
-                ContentSigner signer;
-                if (publicKey instanceof RSAPublicKey) {
-                    if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
-                        signer = new P11RSAPSSContentSigner(cryptService, slot, keyId,
-                                signatureAlgId, securityFactory.getRandom4Sign());
-                    } else {
-                        signer = new P11RSAContentSigner(cryptService, slot, keyId,
-                                signatureAlgId);
-                    }
-                } else if (publicKey instanceof ECPublicKey) {
-                    if (AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId)) {
-                        signer = new P11ECDSAPlainContentSigner(cryptService, slot, keyId,
-                                signatureAlgId);
-                    } else {
-                        signer = new P11ECDSAX962ContentSigner(cryptService, slot, keyId,
-                                signatureAlgId);
-                    }
-                } else if (publicKey instanceof DSAPublicKey) {
-                    if (AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId)) {
-                        signer = new P11DSAPlainContentSigner(cryptService, slot, keyId,
-                                signatureAlgId);
-                    } else {
-                        signer = new P11DSAX962ContentSigner(cryptService, slot, keyId,
-                                signatureAlgId);
-                    }
-                } else {
-                    throw new OperatorCreationException("unsupported key "
-                            + publicKey.getClass().getName());
-                }
-                signers.add(signer);
-            } // end for
-        } catch (NoSuchAlgorithmException ex) {
-            throw new OperatorCreationException("no such algorithm", ex);
-        }
+        for (int i = 0; i < parallelism; i++) {
+            ContentSigner signer;
+            if (publicKey instanceof RSAPublicKey) {
+                signer = createRSAContentSigner(signatureAlgId);
+            } else if (publicKey instanceof ECPublicKey) {
+                signer = createECContentSigner(signatureAlgId);
+            } else if (publicKey instanceof DSAPublicKey) {
+                signer = createDSAContentSigner(signatureAlgId);
+            } else {
+                throw new OperatorCreationException("unsupported key "
+                        + publicKey.getClass().getName());
+            }
+            signers.add(signer);
+        } // end for
 
         PrivateKey privateKey;
         try {
-            privateKey = new P11PrivateKey(cryptService, slot, keyId);
+            privateKey = new P11PrivateKey(cryptService, entityId);
         } catch (InvalidKeyException ex) {
             throw new OperatorCreationException(
                     "could not construct P11PrivateKey: " + ex.getMessage(), ex);
@@ -231,5 +203,46 @@ public class P11ContentSignerBuilder {
 
         return concurrentSigner;
     } // method createSigner
+
+    // CHECKSTYLE:SKIP
+    private ContentSigner createRSAContentSigner(AlgorithmIdentifier signatureAlgId)
+    throws OperatorCreationException {
+        ContentSigner signer;
+        try {
+            if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
+                signer = new P11RSAPSSContentSigner(cryptService, entityId, signatureAlgId,
+                        securityFactory.getRandom4Sign());
+            } else {
+                signer = new P11RSAContentSigner(cryptService, entityId, signatureAlgId);
+            }
+        } catch (NoSuchAlgorithmException ex) {
+            throw new OperatorCreationException("no such algorithm: " + ex.getMessage(), ex);
+        } catch (NoSuchPaddingException ex) {
+            throw new OperatorCreationException("no such padding: " + ex.getMessage(), ex);
+        }
+        return signer;
+    }
+
+    // CHECKSTYLE:SKIP
+    private ContentSigner createECContentSigner(AlgorithmIdentifier signatureAlgId)
+    throws OperatorCreationException {
+        try {
+            return new P11ECDSAContentSigner(cryptService, entityId, signatureAlgId,
+                    AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
+        } catch (NoSuchAlgorithmException ex) {
+            throw new OperatorCreationException("no such algorithm: " + ex.getMessage(), ex);
+        }
+    }
+
+    // CHECKSTYLE:SKIP
+    private ContentSigner createDSAContentSigner(AlgorithmIdentifier signatureAlgId)
+    throws OperatorCreationException {
+        try {
+            return new P11DSAContentSigner(cryptService, entityId, signatureAlgId,
+                    AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
+        } catch (NoSuchAlgorithmException ex) {
+            throw new OperatorCreationException("no such algorithm: " + ex.getMessage(), ex);
+        }
+    }
 
 }

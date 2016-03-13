@@ -44,8 +44,7 @@ import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 
 /**
  * @author Lijun Liao
@@ -56,16 +55,13 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
 
     private final P11CryptService p11CryptService;
 
-    private final P11SlotIdentifier slot;
-
-    private final P11KeyIdentifier keyId;
+    private final P11EntityIdentifier entityId;
 
     private final int keysize;
 
     private P11RSAKeyParameter(
             final P11CryptService p11CryptService,
-            final P11SlotIdentifier slot,
-            final P11KeyIdentifier keyId,
+            final P11EntityIdentifier entityId,
             final BigInteger modulus,
             final BigInteger publicExponent) {
         super(true, modulus, publicExponent);
@@ -73,44 +69,39 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
         ParamUtil.requireNonNull("modulus", modulus);
         ParamUtil.requireNonNull("publicExponent", publicExponent);
         this.p11CryptService = ParamUtil.requireNonNull("p11CryptService", p11CryptService);
-        this.slot = ParamUtil.requireNonNull("slot", slot);
-        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
+        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
         this.keysize = modulus.bitLength();
     }
 
-    public int getKeysize() {
+    int getKeysize() {
         return keysize;
     }
 
-    public P11CryptService getP11CryptService() {
+    P11CryptService getP11CryptService() {
         return p11CryptService;
     }
 
-    public P11SlotIdentifier getSlot() {
-        return slot;
-    }
-
-    public P11KeyIdentifier getKeyId() {
-        return keyId;
+    P11EntityIdentifier getEntityId() {
+        return entityId;
     }
 
     public static P11RSAKeyParameter getInstance(
             final P11CryptService p11CryptService,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final P11EntityIdentifier entityId)
     throws InvalidKeyException {
         ParamUtil.requireNonNull("p11CryptService", p11CryptService);
+        ParamUtil.requireNonNull("entityId", entityId);
 
         RSAPublicKey key;
         try {
-            key = (RSAPublicKey) p11CryptService.getPublicKey(slotId, keyId);
+            key = (RSAPublicKey) p11CryptService.getPublicKey(entityId);
         } catch (SignerException ex) {
             throw new InvalidKeyException(ex.getMessage(), ex);
         }
 
         BigInteger modulus = key.getModulus();
         BigInteger publicExponent = key.getPublicExponent();
-        return new P11RSAKeyParameter(p11CryptService, slotId, keyId, modulus, publicExponent);
+        return new P11RSAKeyParameter(p11CryptService, entityId, modulus, publicExponent);
     }
 
 }

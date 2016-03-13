@@ -36,6 +36,7 @@
 
 package org.xipki.commons.security.impl.p11;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.InvalidKeyException;
@@ -44,21 +45,31 @@ import java.security.SecureRandom;
 
 import javax.crypto.NoSuchPaddingException;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.CryptoException;
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.signers.PSSSigner;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
@@ -66,9 +77,15 @@ import org.xipki.commons.security.api.util.SignerUtil;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-public class P11RSAPSSContentSigner implements ContentSigner {
+class P11RSAPSSContentSigner implements ContentSigner {
     // CHECKSTYLE:SKIP
-    private class PSSSignerOutputStream extends OutputStream {
+    private static class PSSSignerOutputStream extends OutputStream {
+
+        private PSSSigner pssSigner;
+
+        PSSSignerOutputStream(PSSSigner pssSigner) {
+            this.pssSigner = pssSigner;
+        }
 
         @Override
         public void write(
@@ -93,6 +110,10 @@ public class P11RSAPSSContentSigner implements ContentSigner {
             pssSigner.update(bytes, off, len);
         }
 
+        public void reset() {
+            pssSigner.reset();
+        }
+
         @Override
         public void flush()
         throws IOException {
@@ -103,45 +124,96 @@ public class P11RSAPSSContentSigner implements ContentSigner {
         throws IOException {
         }
 
+        byte[] generateSignature()
+        throws DataLengthException, CryptoException {
+            byte[] signature = pssSigner.generateSignature();
+            pssSigner.reset();
+            return signature;
+        }
+
     } // class PSSSignerOutputStream
 
     private static final Logger LOG = LoggerFactory.getLogger(P11RSAPSSContentSigner.class);
 
     private final AlgorithmIdentifier algorithmIdentifier;
 
-    private final PSSSigner pssSigner;
+    private final P11CryptService cryptService;
+
+    private final P11EntityIdentifier entityId;
+
+    private final long mechanism;
+
+    private final P11RSAPkcsPssParams parameters;
 
     private final OutputStream outputStream;
 
-    public P11RSAPSSContentSigner(
+    P11RSAPSSContentSigner(
             final P11CryptService cryptService,
-            final P11SlotIdentifier slot,
-            final P11KeyIdentifier keyId,
+            final P11EntityIdentifier entityId,
             final AlgorithmIdentifier signatureAlgId,
             final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException {
+        this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
+        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         ParamUtil.requireNonNull("random", random);
 
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
-            throw new IllegalArgumentException("unsupported signature algorithm "
+            throw new NoSuchAlgorithmException("unsupported signature algorithm "
                     + signatureAlgId.getAlgorithm());
         }
 
-        AsymmetricBlockCipher cipher = new P11PlainRSASigner();
-
-        P11RSAKeyParameter keyParam;
-        try {
-            keyParam = P11RSAKeyParameter.getInstance(
-                    cryptService, slot, keyId);
-        } catch (InvalidKeyException ex) {
-            throw new OperatorCreationException(ex.getMessage(), ex);
+        RSASSAPSSparams asn1Params = RSASSAPSSparams.getInstance(signatureAlgId.getParameters());
+        ASN1ObjectIdentifier digestAlgOid = asn1Params.getHashAlgorithm().getAlgorithm();
+        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(digestAlgOid);
+        if (hashAlgo == null) {
+            throw new NoSuchAlgorithmException(
+                    "unsupported hash algorithm " + digestAlgOid.getId());
         }
 
-        this.pssSigner = SignerUtil.createPSSRSASigner(signatureAlgId, cipher);
-        this.pssSigner.init(true, new ParametersWithRandom(keyParam, random));
+        long tmpMechanism;
+        if (HashAlgoType.SHA1 == hashAlgo) {
+            tmpMechanism = P11Constants.CKM_SHA1_RSA_PKCS_PSS;
+        } else if (HashAlgoType.SHA224 == hashAlgo) {
+            tmpMechanism = P11Constants.CKM_SHA224_RSA_PKCS_PSS;
+        } else if (HashAlgoType.SHA256 == hashAlgo) {
+            tmpMechanism = P11Constants.CKM_SHA256_RSA_PKCS_PSS;
+        } else if (HashAlgoType.SHA384 == hashAlgo) {
+            tmpMechanism = P11Constants.CKM_SHA384_RSA_PKCS_PSS;
+        } else if (HashAlgoType.SHA512 == hashAlgo) {
+            tmpMechanism = P11Constants.CKM_SHA512_RSA_PKCS_PSS;
+        } else {
+            throw new RuntimeException("should not reach here, unknown HashAlgoType " + hashAlgo);
+        }
 
-        this.outputStream = new PSSSignerOutputStream();
+        P11SlotIdentifier slotId = entityId.getSlotId();
+        if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_PKCS_PSS)) {
+            this.parameters = new P11RSAPkcsPssParams(asn1Params);
+            AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
+                    new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
+            Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
+            this.outputStream = new DigestOutputStream(digest);
+        } else if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_X_509)) {
+            this.parameters = null;
+            AsymmetricBlockCipher cipher = new P11PlainRSASigner();
+            P11RSAKeyParameter keyParam;
+            try {
+                keyParam = P11RSAKeyParameter.getInstance(cryptService, entityId);
+            } catch (InvalidKeyException ex) {
+                throw new OperatorCreationException(ex.getMessage(), ex);
+            }
+            PSSSigner pssSigner = SignerUtil.createPSSRSASigner(signatureAlgId, cipher);
+            pssSigner.init(true, new ParametersWithRandom(keyParam, random));
+            this.outputStream = new PSSSignerOutputStream(pssSigner);
+        } else if (cryptService.supportsMechanism(slotId, tmpMechanism)) {
+            this.parameters = new P11RSAPkcsPssParams(asn1Params);
+            this.outputStream = new ByteArrayOutputStream();
+        } else {
+            throw new NoSuchAlgorithmException("unsupported signature algorithm "
+                    + PKCSObjectIdentifiers.id_RSASSA_PSS.getId() + " with " + hashAlgo);
+        }
+
+        this.mechanism = tmpMechanism;
     }
 
     @Override
@@ -151,19 +223,44 @@ public class P11RSAPSSContentSigner implements ContentSigner {
 
     @Override
     public OutputStream getOutputStream() {
-        pssSigner.reset();
+        if (outputStream instanceof ByteArrayOutputStream) {
+            ((ByteArrayOutputStream) outputStream).reset();
+        } else if (outputStream instanceof DigestOutputStream) {
+            ((DigestOutputStream) outputStream).reset();
+        } else {
+            ((PSSSignerOutputStream) outputStream).reset();
+        }
+
         return outputStream;
     }
 
     @Override
     public byte[] getSignature() {
+        if (mechanism == P11Constants.CKM_RSA_X_509) {
+            try {
+                return ((PSSSignerOutputStream) outputStream).generateSignature();
+            } catch (CryptoException ex) {
+                LOG.warn("CryptoException: {}", ex.getMessage());
+                LOG.debug("CryptoException", ex);
+                throw new RuntimeCryptoException("CryptoException: " + ex.getMessage());
+            }
+        }
+
+        byte[] dataToSign;
+        if (mechanism == P11Constants.CKM_RSA_PKCS_PSS) {
+            dataToSign = ((DigestOutputStream) outputStream).digest();
+        } else {
+            dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
+        }
+
         try {
-            return pssSigner.generateSignature();
-        } catch (CryptoException ex) {
+            return cryptService.sign(entityId, mechanism, parameters, dataToSign);
+        } catch (SignerException ex) {
             LOG.warn("SignerException: {}", ex.getMessage());
             LOG.debug("SignerException", ex);
             throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
         }
+
     }
 
 }
