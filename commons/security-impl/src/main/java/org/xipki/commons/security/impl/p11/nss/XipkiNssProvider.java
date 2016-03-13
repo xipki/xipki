@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl.p11.sun.nss;
+package org.xipki.commons.security.impl.p11.nss;
 
 import java.io.ByteArrayInputStream;
 import java.security.AccessController;

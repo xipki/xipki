@@ -63,10 +63,10 @@ import org.xipki.commons.security.impl.p11.P11RSAKeyParameter;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-class RSAPSSSignatureSpi extends SignatureSpi {
+class P11RSAPSSSignatureSpi extends SignatureSpi {
 
     // CHECKSTYLE:SKIP
-    class NonePSS extends RSAPSSSignatureSpi {
+    class NonePSS extends P11RSAPSSSignatureSpi {
 
         NonePSS() {
             super(null, true);
@@ -75,7 +75,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
     } // class nonePSS
 
     // CHECKSTYLE:SKIP
-    class PSSwithRSA extends RSAPSSSignatureSpi {
+    class PSSwithRSA extends P11RSAPSSSignatureSpi {
 
         PSSwithRSA() {
             super(null);
@@ -84,7 +84,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
     } // class PSSwithRSA
 
     // CHECKSTYLE:SKIP
-    class SHA1withRSA extends RSAPSSSignatureSpi {
+    class SHA1withRSA extends P11RSAPSSSignatureSpi {
 
         SHA1withRSA() {
             super(PSSParameterSpec.DEFAULT);
@@ -93,7 +93,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
     } // class SHA1withRSA
 
     // CHECKSTYLE:SKIP
-    class SHA224withRSA extends RSAPSSSignatureSpi {
+    class SHA224withRSA extends P11RSAPSSSignatureSpi {
 
         SHA224withRSA() {
             super(new PSSParameterSpec("SHA-224", "MGF1",
@@ -103,7 +103,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
     } // class SHA224withRSA
 
     // CHECKSTYLE:SKIP
-    class SHA256withRSA extends RSAPSSSignatureSpi {
+    class SHA256withRSA extends P11RSAPSSSignatureSpi {
 
         SHA256withRSA() {
             super(new PSSParameterSpec("SHA-256", "MGF1",
@@ -113,7 +113,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
     } // class SHA256withRSA
 
     // CHECKSTYLE:SKIP
-    class SHA384withRSA extends RSAPSSSignatureSpi {
+    class SHA384withRSA extends P11RSAPSSSignatureSpi {
 
         SHA384withRSA() {
             super(new PSSParameterSpec("SHA-384", "MGF1",
@@ -123,7 +123,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
     } // class SHA384withRSA
 
     // CHECKSTYLE:SKIP
-    class SHA512withRSA extends RSAPSSSignatureSpi {
+    class SHA512withRSA extends P11RSAPSSSignatureSpi {
 
         SHA512withRSA() {
             super(new PSSParameterSpec("SHA-512", "MGF1",
@@ -214,12 +214,12 @@ class RSAPSSSignatureSpi extends SignatureSpi {
 
     private org.bouncycastle.crypto.signers.PSSSigner pss;
 
-    protected RSAPSSSignatureSpi(
+    protected P11RSAPSSSignatureSpi(
             final PSSParameterSpec paramSpecArg) {
         this(paramSpecArg, false);
     }
 
-    protected RSAPSSSignatureSpi(
+    protected P11RSAPSSSignatureSpi(
             final PSSParameterSpec baseParamSpec,
             final boolean isRaw) {
         this.originalSpec = baseParamSpec;
@@ -264,8 +264,7 @@ class RSAPSSSignatureSpi extends SignatureSpi {
                 signer, contentDigest, mgfDigest, saltLength, trailer);
 
         P11RSAKeyParameter p11KeyParam = P11RSAKeyParameter.getInstance(
-                signingKey.getP11CryptService(),
-                signingKey.getSlotId(), signingKey.getKeyId());
+                signingKey.getP11CryptService(), signingKey.getEntityId());
         if (random == null) {
             pss.init(true, p11KeyParam);
         } else {

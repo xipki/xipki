@@ -38,12 +38,14 @@ package org.xipki.commons.security.impl.p11.iaik;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.slf4j.Logger;
@@ -52,11 +54,12 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11CryptService;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11MechanismRetriever;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.util.SignerUtil;
+import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 import iaik.pkcs.pkcs11.wrapper.PKCS11RuntimeException;
 
@@ -76,9 +79,11 @@ public final class IaikP11CryptService implements P11CryptService {
     private final ConcurrentSkipListSet<IaikP11Identity> identities =
             new ConcurrentSkipListSet<>();
 
-    private IaikP11Module extModule;
-
     private final P11ModuleConf moduleConf;
+
+    private final Map<Integer, Set<Long>> slotIndexMechanismsMap = new ConcurrentHashMap<>();
+
+    private final Map<Long, Set<Long>> slotIdMechanismsMap = new ConcurrentHashMap<>();
 
     private boolean lastRefreshSuccessful;
 
@@ -99,8 +104,8 @@ public final class IaikP11CryptService implements P11CryptService {
         }
 
         lastRefresh = System.currentTimeMillis();
-
         IaikP11ModulePool.getInstance().removeModule(moduleConf.getName());
+
         refresh();
         return lastRefreshSuccessful;
     }
@@ -108,10 +113,12 @@ public final class IaikP11CryptService implements P11CryptService {
     @Override
     public synchronized void refresh()
     throws SignerException {
+        IaikP11Module module;
+
         LOG.info("refreshing PKCS#11 module {}", moduleConf.getName());
         lastRefreshSuccessful = false;
         try {
-            this.extModule = IaikP11ModulePool.getInstance().getModule(moduleConf);
+            module = IaikP11ModulePool.getInstance().getModule(moduleConf);
         } catch (SignerException ex) {
             final String message = "could not initialize the PKCS#11 Module for "
                     + moduleConf.getName();
@@ -124,12 +131,14 @@ public final class IaikP11CryptService implements P11CryptService {
         }
 
         Set<IaikP11Identity> currentIdentifies = new HashSet<>();
+        Map<P11SlotIdentifier, Set<Long>> currentSupportedMechanisms = new HashMap<>();
+        P11MechanismRetriever mechRetriever = moduleConf.getP11MechanismRetriever();
 
-        List<P11SlotIdentifier> slotIds = extModule.getSlotIdentifiers();
+        List<P11SlotIdentifier> slotIds = module.getSlotIdentifiers();
         for (P11SlotIdentifier slotId : slotIds) {
             IaikP11Slot slot;
             try {
-                slot = extModule.getSlot(slotId);
+                slot = module.getSlot(slotId);
                 if (slot == null) {
                     LOG.warn("could not initialize slot " + slotId);
                     continue;
@@ -153,6 +162,17 @@ public final class IaikP11CryptService implements P11CryptService {
             }
 
             slot.refresh();
+            Set<Long> mechs = slot.getSupportedMechanisms();
+            Set<Long> mechs2 = new HashSet<>();
+            for (Long mech : mechs) {
+                if (mechRetriever.isMechanismPermitted(slotId, mech)) {
+                    mechs2.add(mech);
+                }
+            }
+
+            LOG.info("slot {} in module {} supports following mechanisms: {}", slotId,
+                    moduleConf.getName(), mechs2);
+            currentSupportedMechanisms.put(slotId, mechs2);
             for (P11Identity identity : slot.getP11Identities()) {
                 currentIdentifies.add((IaikP11Identity) identity);
             }
@@ -163,15 +183,23 @@ public final class IaikP11CryptService implements P11CryptService {
         currentIdentifies.clear();
         currentIdentifies = null;
 
+        this.slotIndexMechanismsMap.clear();
+        this.slotIdMechanismsMap.clear();
+        for (P11SlotIdentifier slotId : currentSupportedMechanisms.keySet()) {
+            Set<Long> mechs = Collections.unmodifiableSet(currentSupportedMechanisms.get(slotId));
+            this.slotIdMechanismsMap.put(slotId.getSlotId(), mechs);
+            this.slotIndexMechanismsMap.put(slotId.getSlotIndex(), mechs);
+        }
+        currentSupportedMechanisms = null;
+
         lastRefreshSuccessful = true;
 
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
             for (IaikP11Identity identity : this.identities) {
-                sb.append("\t(slot ").append(identity.getSlotId());
-                sb.append(", algo=").append(identity.getPublicKey().getAlgorithm());
-                sb.append(", key=").append(identity.getKeyId()).append(")\n");
+                sb.append("\t(").append(identity.getEntityId());
+                sb.append(", algo=").append(identity.getPublicKey().getAlgorithm()).append(")\n");
             }
 
             LOG.info(sb.toString());
@@ -181,167 +209,65 @@ public final class IaikP11CryptService implements P11CryptService {
     } // method refresh
 
     @Override
-    public byte[] CKM_RSA_PKCS(
-            final byte[] encodedDigestInfo,
+    public boolean supportsMechanism(
             final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final long mechanism) {
+        Set<Long> mechs = null;
+        if (slotId.getSlotId() != null) {
+            mechs = slotIdMechanismsMap.get(slotId.getSlotId());
+        } else if (slotId.getSlotIndex() != null) {
+            mechs = slotIndexMechanismsMap.get(slotId.getSlotIndex());
+        }
+        return mechs == null
+                ? false
+                : mechs.contains(mechanism);
+    }
+
+    @Override
+    public byte[] sign(
+            final P11EntityIdentifier entityId,
+            final long mechanism,
+            final P11Params parameters,
+            final byte[] content)
     throws SignerException {
+        if (!supportsMechanism(entityId.getSlotId(), mechanism)) {
+            throw new SignerException("mechanism " + mechanism + " is not supported by slot "
+                    + entityId.getSlotId());
+        }
+
         checkState();
 
         try {
-            return getNonNullIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
+            return getNonNullIdentity(entityId).sign(mechanism, parameters, content);
         } catch (PKCS11RuntimeException ex) {
-            final String message = "could not call identity.CKM_RSA_PKCS()";
+            final String message = "could not call identity.sign()";
             if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                         ex.getMessage());
             }
             LOG.debug(message, ex);
             if (reconnect()) {
-                return CKM_RSA_PKCS_noReconnect(encodedDigestInfo, slotId, keyId);
+                return sign_noReconnect(mechanism, parameters, content, entityId);
             } else {
                 throw new SignerException("PKCS11RuntimeException: " + ex.getMessage(), ex);
             }
         }
     }
 
-    // CHECKSTYLE:SKIP
-    private byte[] CKM_RSA_PKCS_noReconnect(
-            final byte[] encodedDigestInfo,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+    private byte[] sign_noReconnect(
+            final long mechanism,
+            final P11Params parameters,
+            final byte[] content,
+            final P11EntityIdentifier entityId)
     throws SignerException {
-        return getNonNullIdentity(slotId, keyId).CKM_RSA_PKCS(extModule, encodedDigestInfo);
-    }
-
-    @Override
-    public byte[] CKM_RSA_X509(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkState();
-
-        try {
-            return getNonNullIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
-        } catch (PKCS11RuntimeException ex) {
-            final String message = "could not call identity.CKM_RSA_X_509()";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
-            LOG.debug(message, ex);
-            if (reconnect()) {
-                return CKM_RSA_X509_noReconnect(hash, slotId, keyId);
-            } else {
-                throw new SignerException("PKCS11RuntimeException: " + ex.getMessage(), ex);
-            }
-        }
-    }
-
-    // CHECKSTYLE:SKIP
-    private byte[] CKM_RSA_X509_noReconnect(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        return getNonNullIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
-    }
-
-    @Override
-    public byte[] CKM_ECDSA_X962(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        byte[] plainSignature = CKM_ECDSA_Plain(hash, slotId, keyId);
-        return SignerUtil.convertPlainDSASigX962(plainSignature);
-    }
-
-    @Override
-    public byte[] CKM_ECDSA_Plain(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkState();
-
-        try {
-            return getNonNullIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
-        } catch (PKCS11RuntimeException ex) {
-            final String message = "could not call identity.CKM_ECDSA()";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
-            LOG.debug(message, ex);
-            if (reconnect()) {
-                return CKM_ECDSAPlain_noReconnect(hash, slotId, keyId);
-            } else {
-                throw new SignerException("PKCS11RuntimeException: " + ex.getMessage());
-            }
-        }
-    }
-
-    // CHECKSTYLE:SKIP
-    private byte[] CKM_ECDSAPlain_noReconnect(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        return getNonNullIdentity(slotId, keyId).CKM_ECDSA(extModule, hash);
-    }
-
-    @Override
-    public byte[] CKM_DSA_X962(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        byte[] plainSignature = CKM_DSA_Plain(hash, slotId, keyId);
-        return SignerUtil.convertPlainDSASigX962(plainSignature);
-    }
-
-    @Override
-    public byte[] CKM_DSA_Plain(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        checkState();
-
-        try {
-            return getNonNullIdentity(slotId, keyId).CKM_DSA(extModule, hash);
-        } catch (PKCS11RuntimeException ex) {
-            final String message = "could not call identity.CKM_DSA()";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
-            LOG.debug(message, ex);
-            if (reconnect()) {
-                return CKM_DSA_noReconnect(hash, slotId, keyId);
-            } else {
-                throw new SignerException("PKCS11RuntimeException: " + ex.getMessage());
-            }
-        }
-    }
-
-    // CHECKSTYLE:SKIP
-    private byte[] CKM_DSA_noReconnect(
-            final byte[] hash,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
-    throws SignerException {
-        return getNonNullIdentity(slotId, keyId).CKM_DSA(extModule, hash);
+        return getNonNullIdentity(entityId).sign(mechanism, parameters, content);
     }
 
     @Override
     public PublicKey getPublicKey(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final P11EntityIdentifier entityId)
     throws SignerException {
-        IaikP11Identity identity = getIdentity(slotId, keyId);
+        IaikP11Identity identity = getIdentity(entityId);
         return (identity == null)
                 ? null
                 : identity.getPublicKey();
@@ -349,34 +275,30 @@ public final class IaikP11CryptService implements P11CryptService {
 
     @Override
     public X509Certificate getCertificate(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final P11EntityIdentifier entityId)
     throws SignerException {
-        IaikP11Identity identity = getIdentity(slotId, keyId);
+        IaikP11Identity identity = getIdentity(entityId);
         return (identity == null)
                 ? null
                 : identity.getCertificate();
     }
 
     private IaikP11Identity getNonNullIdentity(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final P11EntityIdentifier entityId)
     throws SignerException {
-        IaikP11Identity identity = getIdentity(slotId, keyId);
+        IaikP11Identity identity = getIdentity(entityId);
         if (identity == null) {
-            throw new SignerException("found no identity with " + keyId + " in slot " + slotId);
+            throw new SignerException("found no identity " + entityId);
         }
         return identity;
     }
 
     private IaikP11Identity getIdentity(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId) {
-        ParamUtil.requireNonNull("slotId", slotId);
-        ParamUtil.requireNonNull("keyId", keyId);
+            final P11EntityIdentifier entityId) {
+        ParamUtil.requireNonNull("entityId", entityId);
 
         for (IaikP11Identity identity : identities) {
-            if (identity.match(slotId, keyId)) {
+            if (identity.match(entityId)) {
                 return identity;
             }
         }
@@ -404,10 +326,9 @@ public final class IaikP11CryptService implements P11CryptService {
 
     @Override
     public X509Certificate[] getCertificates(
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId)
+            final P11EntityIdentifier entityId)
     throws SignerException {
-        IaikP11Identity identity = getIdentity(slotId, keyId);
+        IaikP11Identity identity = getIdentity(entityId);
         return (identity == null)
                 ? null
                 : identity.getCertificateChain();
@@ -418,7 +339,7 @@ public final class IaikP11CryptService implements P11CryptService {
     throws SignerException {
         List<P11SlotIdentifier> slotIds = new LinkedList<>();
         for (IaikP11Identity identity : identities) {
-            P11SlotIdentifier slotId = identity.getSlotId();
+            P11SlotIdentifier slotId = identity.getEntityId().getSlotId();
             if (!slotIds.contains(slotId)) {
                 slotIds.add(slotId);
             }
@@ -433,8 +354,8 @@ public final class IaikP11CryptService implements P11CryptService {
     throws SignerException {
         List<String> keyLabels = new LinkedList<>();
         for (IaikP11Identity identity : identities) {
-            if (slotId.equals(identity.getSlotId())) {
-                keyLabels.add(identity.getKeyId().getKeyLabel());
+            if (slotId.equals(identity.getEntityId().getSlotId())) {
+                keyLabels.add(identity.getEntityId().getKeyId().getKeyLabel());
             }
         }
 

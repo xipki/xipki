@@ -34,29 +34,4 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl.p11;
-
-import org.bouncycastle.crypto.Digest;
-import org.xipki.commons.security.api.SignerException;
-
-/**
- * @author Lijun Liao
- * @since 2.0.0
- */
-//CHECKSTYLE:SKIP
-public class P11DSAX962Signer extends AbstractP11DSASigner {
-
-    public P11DSAX962Signer(
-            final Digest digest) {
-        super(digest);
-    }
-
-    @Override
-    protected byte[] sign(
-            final byte[] hashValue)
-    throws SignerException {
-        return param.getP11CryptService().CKM_DSA_X962(hashValue, param.getSlot(),
-                param.getKeyId());
-    }
-
-}
+package org.xipki.commons.security.impl.p11.nss;

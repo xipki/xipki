@@ -38,97 +38,93 @@ package org.xipki.commons.security.api.p11.remote;
 
 import java.io.IOException;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.DERTaggedObject;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
+import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 
 /**
  *
  * <pre>
- * PSOTemplate ::= SEQUENCE {
- *     slotAndKeyIdentifier     SlotAndKeyIdentifer
- *     message                OCTET STRING,
- *     }
+ * ASN1P11Params ::= CHOICE {
+ *     rsaPkcsPssParams   [0]  RSA-PKCS-PSS-Parameters }
  * </pre>
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class PsoTemplate extends ASN1Object {
+// CHECKSTYLE:SKIP
+public class ASN1P11Params extends ASN1Object {
 
-    private SlotAndKeyIdentifer slotAndKeyIdentifier;
+    private ASN1Encodable p11Params;
 
-    private byte[] message;
+    public ASN1P11Params(
+            final ASN1Encodable p11Params) {
+        this.p11Params = ParamUtil.requireNonNull("p11Params", p11Params);
+    }
 
-    private PsoTemplate(
-            final ASN1Sequence seq)
+    private ASN1P11Params(
+            final ASN1TaggedObject taggedObject)
     throws BadAsn1ObjectException {
-        final int n = seq.size();
-        if (n != 2) {
-            StringBuilder sb = new StringBuilder(100);
-            sb.append("wrong number of elements in sequence 'PSOTemplate'");
-            sb.append(", is '").append(n).append("'");
-            sb.append(", but expected '").append(2).append("'");
-            throw new BadAsn1ObjectException(sb.toString());
+        int tagNo = taggedObject.getTagNo();
+        if (tagNo == 0) {
+            this.p11Params = ASN1RSAPkcsPssParams.getInstance(taggedObject.getObject());
+        } else {
+            throw new BadAsn1ObjectException("invalid tag " + tagNo);
+        }
+    }
+
+    @Override
+    public ASN1Primitive toASN1Primitive() {
+        int tagNo;
+        if (p11Params instanceof P11RSAPkcsPssParams) {
+            tagNo = 0;
+        } else {
+            throw new RuntimeException("invalid P11Param type "
+                    + p11Params.getClass().getName());
         }
 
-        this.slotAndKeyIdentifier = SlotAndKeyIdentifer.getInstance(seq.getObjectAt(0));
-        DEROctetString octetString = (DEROctetString) DEROctetString.getInstance(
-                seq.getObjectAt(1));
-        this.message = octetString.getOctets();
+        ASN1Encodable value;
+        if (tagNo == 0) {
+            value = new ASN1RSAPkcsPssParams((P11RSAPkcsPssParams) p11Params);
+        } else {
+            throw new RuntimeException("should not reach here");
+        }
+
+        return new DERTaggedObject(tagNo, value);
     }
 
-    public PsoTemplate(
-            final SlotAndKeyIdentifer slotAndKeyIdentifier,
-            final byte[] message) {
-        this.slotAndKeyIdentifier = ParamUtil.requireNonNull("slotAndKeyIdentifier",
-                slotAndKeyIdentifier);
-        this.message = ParamUtil.requireNonNull("message", message);
+    public ASN1Encodable getP11Params() {
+        return p11Params;
     }
 
-    public static PsoTemplate getInstance(
+    public static ASN1P11Params getInstance(
             final Object obj)
     throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof PsoTemplate) {
-            return (PsoTemplate) obj;
+        if (obj == null || obj instanceof ASN1P11Params) {
+            return (ASN1P11Params) obj;
         }
 
         try {
-            if (obj instanceof ASN1Sequence) {
-                return new PsoTemplate((ASN1Sequence) obj);
+            if (obj instanceof ASN1TaggedObject) {
+                return new ASN1P11Params((ASN1TaggedObject) obj);
             }
 
             if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded PSOTemplate");
+            throw new BadAsn1ObjectException("unable to parse encoded ASN1P11Params");
         }
 
-        throw new BadAsn1ObjectException("unknown object in PSOTemplate.getInstance(): "
+        throw new BadAsn1ObjectException(
+                "unknown object in ASN1P11Params.getInstance(): "
                 + obj.getClass().getName());
-    }
-
-    @Override
-    public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(slotAndKeyIdentifier.toASN1Primitive());
-        vector.add(new DEROctetString(message));
-        return new DERSequence(vector);
-    }
-
-    public byte[] getMessage() {
-        return message;
-    }
-
-    public SlotAndKeyIdentifer getSlotAndKeyIdentifer() {
-        return slotAndKeyIdentifier;
     }
 
 }

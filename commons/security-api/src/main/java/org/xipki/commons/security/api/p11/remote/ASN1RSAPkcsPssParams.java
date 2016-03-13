@@ -38,93 +38,100 @@ package org.xipki.commons.security.api.p11.remote;
 
 import java.io.IOException;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERTaggedObject;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
+import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 
 /**
- *
- * <pre>
- * SlotAndKeyIdentifer ::= SEQUENCE {
- *     slotIdentifier     SlotIdentifier,
- *     keyIdentifier    KeyIdentifier
- *     }
- * </pre>
- *
- * @author Lijun Liao
- * @since 2.0.0
- */
+*
+* <pre>
+* RSAPkcsPssParams ::= SEQUENCE {
+*     contentHash       INTEGER,
+*     mgfHash           INTEGER,
+*     saltLength        INTEGER
+*     }
+* </pre>
+*
+* @author Lijun Liao
+* @since 2.0.0
+*/
 
-public class SlotAndKeyIdentifer extends ASN1Object {
+// CHECKSTYLE:SKIP
+public class ASN1RSAPkcsPssParams extends ASN1Object {
 
-    private SlotIdentifier slotIdentifier;
+    private final P11RSAPkcsPssParams pkcsPssParams;
 
-    private KeyIdentifier keyIdentifier;
-
-    public SlotAndKeyIdentifer(
-            final SlotIdentifier slotIdentifier,
-            final KeyIdentifier keyIdentifier) {
-        this.slotIdentifier = ParamUtil.requireNonNull("slotIdentifier", slotIdentifier);
-        this.keyIdentifier = ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
+    public ASN1RSAPkcsPssParams(
+            P11RSAPkcsPssParams pkcsPssParams) {
+        this.pkcsPssParams = ParamUtil.requireNonNull("pkcsPssParams", pkcsPssParams);
     }
 
-    private SlotAndKeyIdentifer(
+    public P11RSAPkcsPssParams getPkcsPssParams() {
+        return pkcsPssParams;
+    }
+
+    private ASN1RSAPkcsPssParams(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
-        final int n = seq.size();
-        if (n != 2) {
-            StringBuilder sb = new StringBuilder(100);
-            sb.append("wrong number of elements in sequence 'SlotAndKeyIdentifier'");
-            sb.append(", is '").append(n).append("'");
-            sb.append(", but expected '").append(2).append("'");
-            throw new BadAsn1ObjectException(sb.toString());
-        }
+        int size = seq.size();
+        ParamUtil.requireRange("seq.size()", size, 3, 3);
 
-        this.slotIdentifier = SlotIdentifier.getInstance(seq.getObjectAt(0));
-        this.keyIdentifier = KeyIdentifier.getInstance(seq.getObjectAt(1));
-    }
+        try {
+            long contentHash = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue().longValue();
+            long mgfHash = ASN1Integer.getInstance(seq.getObjectAt(1)).getValue().longValue();
+            int saltLength = ASN1Integer.getInstance(seq.getObjectAt(2)).getValue().intValue();
+
+            this.pkcsPssParams = new P11RSAPkcsPssParams(contentHash, mgfHash, saltLength);
+        } catch (IllegalArgumentException ex) {
+            throw new BadAsn1ObjectException(ex.getMessage(), ex);
+        }
+    } // constructor
 
     @Override
     public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(slotIdentifier.toASN1Primitive());
-        vector.add(keyIdentifier.toASN1Primitive());
-        return new DERSequence(vector);
+        int tagNo;
+        if (pkcsPssParams != null) {
+            tagNo = 0;
+        } else {
+            throw new RuntimeException("should not reach here");
+        }
+
+        ASN1Encodable value;
+        if (tagNo == 0) {
+            value = new ASN1RSAPkcsPssParams(pkcsPssParams);
+        } else {
+            throw new RuntimeException("should not reach here");
+        }
+
+        return new DERTaggedObject(tagNo, value);
     }
 
-    public SlotIdentifier getSlotIdentifier() {
-        return slotIdentifier;
-    }
-
-    public KeyIdentifier getKeyIdentifier() {
-        return keyIdentifier;
-    }
-
-    public static SlotAndKeyIdentifer getInstance(
+    public static ASN1RSAPkcsPssParams getInstance(
             final Object obj)
     throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof SlotAndKeyIdentifer) {
-            return (SlotAndKeyIdentifer) obj;
+        if (obj == null || obj instanceof ASN1RSAPkcsPssParams) {
+            return (ASN1RSAPkcsPssParams) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new SlotAndKeyIdentifer((ASN1Sequence) obj);
+                return new ASN1RSAPkcsPssParams((ASN1Sequence) obj);
             }
 
             if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded SlotAndKeyIdentifier");
+            throw new BadAsn1ObjectException("unable to parse encoded RSAPkcsPssParams");
         }
 
-        throw new BadAsn1ObjectException(
-                "unknown object in SlotAndKeyIdentifier.getInstance(): "
+        throw new BadAsn1ObjectException("unknown object in RSAPkcsPssParams.getInstance(): "
                 + obj.getClass().getName());
     }
 

@@ -36,6 +36,8 @@
 
 package org.xipki.commons.security.provider;
 
+import java.io.IOException;
+import java.security.AlgorithmParameters;
 import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -43,34 +45,109 @@ import java.security.SignatureException;
 import java.security.SignatureSpi;
 import java.security.spec.AlgorithmParameterSpec;
 
+import org.bouncycastle.asn1.ASN1Encoding;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.crypto.Digest;
-import org.xipki.commons.common.util.ParamUtil;
+import org.bouncycastle.crypto.digests.NullDigest;
+import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bouncycastle.crypto.digests.SHA224Digest;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA384Digest;
+import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.xipki.commons.security.api.p11.P11Constants;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-abstract class AbstractECDSASignatureSpi extends SignatureSpi {
+class P11RSADigestSignatureSpi extends SignatureSpi {
+
+    // CHECKSTYLE:SKIP
+    class SHA1 extends P11RSADigestSignatureSpi {
+
+        SHA1() {
+            super(OIWObjectIdentifiers.idSHA1, new SHA1Digest());
+        }
+
+    } // class SHA1
+
+    // CHECKSTYLE:SKIP
+    class SHA224 extends P11RSADigestSignatureSpi {
+
+        SHA224() {
+            super(NISTObjectIdentifiers.id_sha224, new SHA224Digest());
+        }
+
+    } // class SHA224
+
+    // CHECKSTYLE:SKIP
+    class SHA256 extends P11RSADigestSignatureSpi {
+
+        SHA256() {
+            super(NISTObjectIdentifiers.id_sha256, new SHA256Digest());
+        }
+
+    } // class SHA256
+
+    // CHECKSTYLE:SKIP
+    class SHA384 extends P11RSADigestSignatureSpi {
+
+        SHA384() {
+            super(NISTObjectIdentifiers.id_sha384, new SHA384Digest());
+        }
+
+    } // class SHA384
+
+    // CHECKSTYLE:SKIP
+    class SHA512 extends P11RSADigestSignatureSpi {
+
+        SHA512() {
+            super(NISTObjectIdentifiers.id_sha512, new SHA512Digest());
+        }
+
+    } // class SHA512
+
+    // CHECKSTYLE:SKIP
+    class NoneRSA extends P11RSADigestSignatureSpi {
+
+        NoneRSA() {
+            super(new NullDigest());
+        }
+
+    } // class NoneRSA
 
     private Digest digest;
 
+    private AlgorithmIdentifier algId;
+
     private P11PrivateKey signingKey;
 
-    private boolean x962;
+    // care - this constructor is actually used by outside organisations
+    protected P11RSADigestSignatureSpi(
+            final Digest digest) {
+        this.digest = digest;
+        this.algId = null;
+    }
 
-    AbstractECDSASignatureSpi(
-            final Digest digest,
-            final boolean x962) {
-        this.digest = ParamUtil.requireNonNull("digest", digest);
-        this.x962 = x962;
+    // care - this constructor is actually used by outside organisations
+    protected P11RSADigestSignatureSpi(
+            final ASN1ObjectIdentifier objId,
+            final Digest digest) {
+        this.digest = digest;
+        this.algId = new AlgorithmIdentifier(objId, DERNull.INSTANCE);
     }
 
     @Override
     protected void engineInitVerify(
             final PublicKey publicKey)
     throws InvalidKeyException {
-        throw new UnsupportedOperationException("engineInitVerify unsupported");
+        throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     @Override
@@ -83,8 +160,8 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
         }
 
         String algo = privateKey.getAlgorithm();
-        if (!("EC".equals(algo) || "ECDSA".equals(algo))) {
-            throw new InvalidKeyException("privateKey is not a EC private key: " + algo);
+        if (!"RSA".equals(algo)) {
+            throw new InvalidKeyException("privateKey is not an RSA private key: " + algo);
         }
 
         digest.reset();
@@ -111,20 +188,23 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
     protected byte[] engineSign()
     throws SignatureException {
         byte[] hash = new byte[digest.getDigestSize()];
-
         digest.doFinal(hash, 0);
 
         try {
-            if (x962) {
-                return signingKey.CKM_ECDSA_X962(hash);
-            } else {
-                return signingKey.CKM_ECDSA_Plain(hash);
-            }
-        } catch (SignatureException ex) {
-            throw ex;
+            byte[] bytes = derEncode(hash);
+            return signingKey.sign(P11Constants.CKM_RSA_PKCS, null, bytes);
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            throw new SignatureException("key too small for signature type");
         } catch (Exception ex) {
             throw new SignatureException(ex.getMessage(), ex);
         }
+    }
+
+    @Override
+    protected boolean engineVerify(
+            final byte[] sigBytes)
+    throws SignatureException {
+        throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     @Override
@@ -143,14 +223,25 @@ abstract class AbstractECDSASignatureSpi extends SignatureSpi {
     @Override
     protected Object engineGetParameter(
             final String param) {
-        throw new UnsupportedOperationException("engineSetParameter unsupported");
+        return null;
     }
 
     @Override
-    protected boolean engineVerify(
-            final byte[] sigBytes)
-    throws SignatureException {
-        throw new UnsupportedOperationException("engineVerify unsupported");
+    protected AlgorithmParameters engineGetParameters() {
+        return null;
+    }
+
+    private byte[] derEncode(
+            final byte[] hash)
+    throws IOException {
+        if (algId == null) {
+            // For raw RSA, the DigestInfo must be prepared externally
+            return hash;
+        }
+
+        DigestInfo digestInfo = new DigestInfo(algId, hash);
+
+        return digestInfo.getEncoded(ASN1Encoding.DER);
     }
 
 }

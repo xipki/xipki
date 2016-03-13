@@ -69,12 +69,13 @@ import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.XipkiCmpConstants;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.p11.remote.KeyIdentifier;
-import org.xipki.commons.security.api.p11.remote.PsoTemplate;
-import org.xipki.commons.security.api.p11.remote.SlotAndKeyIdentifer;
-import org.xipki.commons.security.api.p11.remote.SlotIdentifier;
+import org.xipki.commons.security.api.p11.parameters.P11Params;
+import org.xipki.commons.security.api.p11.remote.ASN1EntityIdentifer;
+import org.xipki.commons.security.api.p11.remote.ASN1RSAPkcsPssParams;
+import org.xipki.commons.security.api.p11.remote.ASN1SignTemplate;
+import org.xipki.commons.security.api.p11.remote.ASN1SlotIdentifier;
 
 /**
  * @author Lijun Liao
@@ -92,6 +93,7 @@ class CmpResponder {
     CmpResponder() {
     }
 
+    // FIXME: consider the case if entityId does not exists
     PKIMessage processPkiMessage(
             final LocalP11CryptServicePool localP11CryptServicePool,
             final String moduleName,
@@ -180,70 +182,50 @@ class CmpResponder {
             case XipkiCmpConstants.ACTION_RP11_VERSION:
                 respItvInfoValue = new ASN1Integer(localP11CryptServicePool.getVersion());
                 break;
-            case XipkiCmpConstants.ACTION_RP11_PSO_DSA_PLAIN:
-            case XipkiCmpConstants.ACTION_RP11_PSO_DSA_X962:
-            case XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_PLAIN:
-            case XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_X962:
-            case XipkiCmpConstants.ACTION_RP11_PSO_RSA_PKCS:
-            case XipkiCmpConstants.ACTION_RP11_PSO_RSA_X509:
-                byte[] psoMessage = null;
-                P11SlotIdentifier slot = null;
-                P11KeyIdentifier keyId = null;
+            case XipkiCmpConstants.ACTION_RP11_SIGN:
+                byte[] signature;
                 try {
-                    PsoTemplate psoTemplate = PsoTemplate.getInstance(reqValue);
-                    psoMessage = psoTemplate.getMessage();
-                    SlotAndKeyIdentifer slotAndKeyIdentifier =
-                            psoTemplate.getSlotAndKeyIdentifer();
-                    slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
-                    KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
-                    keyId = keyIdentifier.getKeyId();
+                    ASN1SignTemplate signTemplate = ASN1SignTemplate.getInstance(reqValue);
+                    long mechanism = signTemplate.getMechanism().getMechanism();
+                    ASN1Encodable asn1Params =
+                            signTemplate.getMechanism().getParams().getP11Params();
+                    P11Params params = null;
+                    if (asn1Params instanceof ASN1RSAPkcsPssParams) {
+                        params = ((ASN1RSAPkcsPssParams) asn1Params).getPkcsPssParams();
+                    } else if (asn1Params != null) {
+                        throw new IllegalArgumentException("unknown SignTemplate.params");
+                    }
+
+                    byte[] content = signTemplate.getMessage();
+                    ASN1EntityIdentifer entityId = signTemplate.getEntityId();
+                    signature = p11CryptService.sign(entityId.getEntityId(), mechanism, params,
+                            content);
                 } catch (IllegalArgumentException ex) {
                     final String statusMessage = "invalid PSOTemplate";
                     return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                             statusMessage);
                 }
 
-                byte[] signature;
-
-                if (XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_PLAIN == action) {
-                    signature = p11CryptService.CKM_ECDSA_Plain(psoMessage, slot, keyId);
-                } else if (XipkiCmpConstants.ACTION_RP11_PSO_ECDSA_X962 == action) {
-                    signature = p11CryptService.CKM_ECDSA_X962(psoMessage, slot, keyId);
-                } else if (XipkiCmpConstants.ACTION_RP11_PSO_DSA_PLAIN == action) {
-                    signature = p11CryptService.CKM_DSA_Plain(psoMessage, slot, keyId);
-                } else if (XipkiCmpConstants.ACTION_RP11_PSO_DSA_X962 == action) {
-                    signature = p11CryptService.CKM_DSA_X962(psoMessage, slot, keyId);
-                } else if (XipkiCmpConstants.ACTION_RP11_PSO_RSA_X509 == action) {
-                    signature = p11CryptService.CKM_RSA_X509(psoMessage, slot, keyId);
-                } else if (XipkiCmpConstants.ACTION_RP11_PSO_RSA_PKCS == action) {
-                    signature = p11CryptService.CKM_RSA_PKCS(psoMessage, slot, keyId);
-                } else {
-                    throw new RuntimeException("should not reach here");
-                }
-
                 respItvInfoValue = new DEROctetString(signature);
                 break;
             case XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE:
             case XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY:
-                slot = null;
-                keyId = null;
+                P11EntityIdentifier entityId = null;
                 try {
-                    SlotAndKeyIdentifer slotAndKeyIdentifier =
-                            SlotAndKeyIdentifer.getInstance(reqValue);
-                    slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
-                    KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
-                    keyId = keyIdentifier.getKeyId();
+                    ASN1EntityIdentifer asn1EntityId = ASN1EntityIdentifer.getInstance(reqValue);
+                    entityId = asn1EntityId.getEntityId();
                 } catch (IllegalArgumentException ex) {
-                    final String statusMessage = "invalid SlotAndKeyIdentifier";
+                    final String statusMessage = "invalid EntityIdentifer";
                     return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                             statusMessage);
                 }
 
                 byte[] encodeCertOrKey;
                 if (XipkiCmpConstants.ACTION_RP11_GET_CERTIFICATE == action) {
-                    encodeCertOrKey = p11CryptService.getCertificate(slot, keyId).getEncoded();
+                    // FIXME: certificate may be null
+                    encodeCertOrKey = p11CryptService.getCertificate(entityId).getEncoded();
                 } else if (XipkiCmpConstants.ACTION_RP11_GET_PUBLICKEY == action) {
-                    encodeCertOrKey = p11CryptService.getPublicKey(slot, keyId).getEncoded();
+                    encodeCertOrKey = p11CryptService.getPublicKey(entityId).getEncoded();
                 } else {
                     throw new RuntimeException("should not reach here");
                 }
@@ -255,12 +237,12 @@ class CmpResponder {
 
                 ASN1EncodableVector vector = new ASN1EncodableVector();
                 for (P11SlotIdentifier slotId : slotIds) {
-                    vector.add(new SlotIdentifier(slotId));
+                    vector.add(new ASN1SlotIdentifier(slotId));
                 }
                 respItvInfoValue = new DERSequence(vector);
                 break;
             case XipkiCmpConstants.ACTION_RP11_LIST_KEYLABELS:
-                SlotIdentifier slotId = SlotIdentifier.getInstance(reqValue);
+                ASN1SlotIdentifier slotId = ASN1SlotIdentifier.getInstance(reqValue);
                 String[] keyLabels = p11CryptService.getKeyLabels(slotId.getSlotId());
 
                 vector = new ASN1EncodableVector();
