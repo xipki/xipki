@@ -1934,7 +1934,7 @@ class IaikP11Slot implements P11WritableSlot {
                 throw new XiSecurityException(ex.getMessage(), ex);
             }
         } else {
-            throw new XiSecurityException("unknown public key class " + p11Key.getClass().getName());
+            throw new XiSecurityException("unknown publicKey class " + p11Key.getClass().getName());
         }
     } // method generatePublicKey
 
