@@ -43,7 +43,7 @@ import javax.annotation.Nonnull;
  * @since 2.0.0
  */
 
-public interface P11MechanismRetriever {
+public interface P11MechanismFilter {
 
     boolean isMechanismPermitted(
             @Nonnull P11SlotIdentifier slotId,

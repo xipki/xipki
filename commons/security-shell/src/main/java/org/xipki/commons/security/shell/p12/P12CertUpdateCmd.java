@@ -50,7 +50,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**
@@ -97,7 +97,7 @@ public class P12CertUpdateCmd extends P12SecurityCommandSupport {
         }
 
         if (keyname == null) {
-            throw new SignerException("could not find private key");
+            throw new XiSecurityException("could not find private key");
         }
 
         Key key = ks.getKey(keyname, pwd);
@@ -120,7 +120,7 @@ public class P12CertUpdateCmd extends P12SecurityCommandSupport {
     private void assertMatch(
             final X509Certificate cert,
             final String password)
-    throws SignerException {
+    throws XiSecurityException {
         ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
         if (password != null) {
             pairs.putPair("password", new String(password));

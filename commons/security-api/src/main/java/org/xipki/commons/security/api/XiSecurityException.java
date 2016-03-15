@@ -36,44 +36,33 @@
 
 package org.xipki.commons.security.api;
 
-import org.bouncycastle.asn1.x509.GeneralName;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class XipkiCmpConstants {
+public class XiSecurityException extends Exception {
 
-    public static final int CRL_REASON_REMOVE = -1;
+    private static final long serialVersionUID = 1L;
 
-    public static final GeneralName REMOTE_P11_CMP_SERVER =
-            new GeneralName(GeneralName.uniformResourceIdentifier,
-                    "http://xipki.org/remotep11/server");
+    public XiSecurityException() {
+        super();
+    }
 
-    public static final GeneralName REMOTE_P11_CMP_CLIENT =
-            new GeneralName(GeneralName.uniformResourceIdentifier,
-                    "http://xipki.org/remotep11/client");
+    public XiSecurityException(
+            final String message,
+            final Throwable cause) {
+        super(message, cause);
+    }
 
-    public static final int ACTION_GEN_CRL = 1;
+    public XiSecurityException(
+            final String message) {
+        super(message);
+    }
 
-    public static final int ACTION_GET_CRL_WITH_SN = 2;
-
-    public static final int ACTION_GET_CAINFO = 3;
-
-    public static final int ACTION_RP11_VERSION = 80;
-
-    public static final int ACTION_RP11_GET_PUBLICKEY = 81;
-
-    public static final int ACTION_RP11_GET_CERTIFICATE = 82;
-
-    public static final int ACTION_RP11_LIST_SLOTS = 83;
-
-    public static final int ACTION_RP11_LIST_KEYLABELS = 84;
-
-    public static final int ACTION_RP11_SIGN = 90;
-
-    private XipkiCmpConstants() {
+    public XiSecurityException(
+            final Throwable cause) {
+        super(cause);
     }
 
 }

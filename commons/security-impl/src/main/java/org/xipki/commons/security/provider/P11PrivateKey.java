@@ -36,10 +36,8 @@
 
 package org.xipki.commons.security.provider;
 
-import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SignatureException;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -47,9 +45,10 @@ import java.security.interfaces.RSAPublicKey;
 import javax.annotation.Nullable;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
@@ -72,16 +71,11 @@ public class P11PrivateKey implements PrivateKey {
     public P11PrivateKey(
             final P11CryptService p11CryptService,
             final P11EntityIdentifier entityId)
-    throws InvalidKeyException {
+    throws P11TokenException {
         this.p11CryptService = ParamUtil.requireNonNull("p11CryptService", p11CryptService);
         this.entityId = ParamUtil.requireNonNull("entityId", entityId);
 
-        PublicKey publicKey;
-        try {
-            publicKey = p11CryptService.getPublicKey(entityId);
-        } catch (SignerException ex) {
-            throw new InvalidKeyException(ex.getMessage(), ex);
-        }
+        PublicKey publicKey = p11CryptService.getPublicKey(entityId);
 
         if (publicKey instanceof RSAPublicKey) {
             algorithm = "RSA";
@@ -93,13 +87,17 @@ public class P11PrivateKey implements PrivateKey {
             algorithm = "EC";
             keysize = ((ECPublicKey) publicKey).getParams().getCurve().getField().getFieldSize();
         } else {
-            throw new InvalidKeyException("unknown public key: " + publicKey);
+            throw new P11TokenException("unknown public key: " + publicKey);
         }
     }
 
     boolean supportsMechanism(
             final long mechanism) {
-        return p11CryptService.supportsMechanism(entityId.getSlotId(), mechanism);
+        try {
+            return p11CryptService.supportsMechanism(entityId.getSlotId(), mechanism);
+        } catch (P11TokenException ex) {
+            return false;
+        }
     }
 
     @Override
@@ -125,12 +123,8 @@ public class P11PrivateKey implements PrivateKey {
             long mechanism,
             @Nullable P11Params parameters,
             byte[] content)
-    throws SignatureException {
-        try {
-            return p11CryptService.sign(entityId, mechanism, parameters, content);
-        } catch (SignerException ex) {
-            throw new SignatureException("SignatureException: " + ex.getMessage(), ex);
-        }
+    throws XiSecurityException, P11TokenException {
+        return p11CryptService.sign(entityId, mechanism, parameters, content);
     }
 
     P11CryptService getP11CryptService() {

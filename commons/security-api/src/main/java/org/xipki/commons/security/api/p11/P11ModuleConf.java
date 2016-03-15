@@ -61,37 +61,47 @@ public class P11ModuleConf {
 
     private final P11PasswordRetriever passwordRetriever;
 
-    private final P11MechanismRetriever mechanismRetriever;
+    private final P11MechanismFilter mechanismFilter;
 
     private final SecurityFactory securityFactory;
+
+    private final int maxMessageSize;
+
+    private final long userType;
 
     public P11ModuleConf(
             final String name,
             final String nativeLibrary,
+            final long userType,
+            final int maxMessageSize,
             final P11PasswordRetriever passwordRetriever,
-            final P11MechanismRetriever mechanismRetriever,
+            final P11MechanismFilter mechanismFilter,
             final SecurityFactory securityFactory) {
-        this(name, nativeLibrary, passwordRetriever, mechanismRetriever, null, null,
-                securityFactory);
+        this(name, nativeLibrary, userType, maxMessageSize, passwordRetriever, mechanismFilter,
+                null, null, securityFactory);
     }
 
     public P11ModuleConf(
             final String name,
             final String nativeLibrary,
+            final long userType,
+            final int maxMessageSize,
             final P11PasswordRetriever passwordRetriever,
-            P11MechanismRetriever mechanismRetriever,
+            final P11MechanismFilter mechanismFilter,
             final Set<P11SlotIdentifier> includeSlots,
             final Set<P11SlotIdentifier> excludeSlots,
             final SecurityFactory securityFactory) {
         this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
         this.nativeLibrary = ParamUtil.requireNonBlank("nativeLibrary", nativeLibrary);
+        this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 128);
+        this.userType = userType;
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.passwordRetriever = (passwordRetriever == null)
                 ? P11NullPasswordRetriever.INSTANCE
                 : passwordRetriever;
-        this.mechanismRetriever = (mechanismRetriever == null)
-                ? P11PermitAllMechanimRetriever.INSTANCE
-                : mechanismRetriever;
+        this.mechanismFilter = (mechanismFilter == null)
+                ? P11PermitAllMechanimFilter.INSTANCE
+                : mechanismFilter;
 
         Set<P11SlotIdentifier> set = new HashSet<>();
         if (includeSlots != null) {
@@ -112,6 +122,14 @@ public class P11ModuleConf {
 
     public String getNativeLibrary() {
         return nativeLibrary;
+    }
+
+    public int getMaxMessageSize() {
+        return maxMessageSize;
+    }
+
+    public long getUserType() {
+        return userType;
     }
 
     public SecurityFactory getSecurityFactory() {
@@ -163,8 +181,8 @@ public class P11ModuleConf {
         return true;
     }
 
-    public P11MechanismRetriever getP11MechanismRetriever() {
-        return mechanismRetriever;
+    public P11MechanismFilter getP11MechanismFilter() {
+        return mechanismFilter;
     }
 
 }

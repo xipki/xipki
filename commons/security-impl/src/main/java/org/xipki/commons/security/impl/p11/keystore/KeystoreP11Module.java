@@ -51,17 +51,17 @@ import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class KeystoreP11Module implements P11Module {
+class KeystoreP11Module implements P11Module {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Module.class);
 
@@ -71,7 +71,7 @@ public class KeystoreP11Module implements P11Module {
 
     private List<P11SlotIdentifier> slotIds;
 
-    public KeystoreP11Module(
+    KeystoreP11Module(
             final P11ModuleConf moduleConf) {
         this.moduleConf = ParamUtil.requireNonNull("moduleConf", moduleConf);
         final String nativeLib = moduleConf.getNativeLibrary();
@@ -143,7 +143,7 @@ public class KeystoreP11Module implements P11Module {
     @Override
     public KeystoreP11Slot getSlot(
             final P11SlotIdentifier slotId)
-    throws SignerException {
+    throws P11TokenException {
         ParamUtil.requireNonNull("slotId", slotId);
         KeystoreP11Slot extSlot = slots.get(slotId);
         if (extSlot != null) {
@@ -160,37 +160,38 @@ public class KeystoreP11Module implements P11Module {
         }
 
         if (tmpSlotId == null) {
-            throw new SignerException("could not find slot identified by " + slotId);
+            throw new P11TokenException("could not find slot identified by " + slotId);
         }
 
         List<char[]> pwd;
         try {
             pwd = moduleConf.getPasswordRetriever().getPassword(tmpSlotId);
         } catch (PasswordResolverException ex) {
-            throw new SignerException("PasswordResolverException: " + ex.getMessage(), ex);
+            throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
         }
 
         File slotDir = new File(moduleConf.getNativeLibrary(), tmpSlotId.getSlotIndex() + "-"
                 + tmpSlotId.getSlotId());
 
         if (pwd == null) {
-            throw new SignerException("no password is configured");
+            throw new P11TokenException("no password is configured");
         }
 
         if (pwd.size() != 1) {
-            throw new SignerException(pwd.size() + " passwords are configured, but 1 is permitted");
+            throw new P11TokenException(pwd.size()
+                    + " passwords are configured, but 1 is permitted");
         }
 
         PrivateKeyCryptor privateKeyCryptor = new PrivateKeyCryptor(pwd.get(0));
 
         extSlot = new KeystoreP11Slot(moduleConf.getName(), slotDir, tmpSlotId, privateKeyCryptor,
-                moduleConf.getSecurityFactory());
+                moduleConf.getSecurityFactory(), moduleConf.getP11MechanismFilter());
 
         slots.put(tmpSlotId, extSlot);
         return extSlot;
     } // method getSlot
 
-    public void destroySlot(
+    void destroySlot(
             final long slotId) {
         P11SlotIdentifier p11SlotId = null;
         for (P11SlotIdentifier si : slots.keySet()) {
@@ -204,7 +205,7 @@ public class KeystoreP11Module implements P11Module {
         }
     }
 
-    public void close() {
+    void close() {
         slots.clear();
         LOG.info("close", "close pkcs11 module: {}", moduleConf.getName());
     }

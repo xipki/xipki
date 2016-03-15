@@ -85,8 +85,27 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
         }
 
         P11SlotIdentifier another = (P11SlotIdentifier) obj;
-        return CompareUtil.equalsObject(this.slotIndex, another.slotIndex)
-                || CompareUtil.equalsObject(this.slotId, another.slotId);
+        if (this.slotId != null && another.slotId != null) {
+            if (!CompareUtil.equalsObject(this.slotId, another.slotId)) {
+                return false;
+            }
+            
+            if (this.slotIndex == null || another.slotIndex == null) {
+                return true;
+            }
+        }
+        
+        if (this.slotIndex != null && another.slotIndex != null) {
+            if (!CompareUtil.equalsObject(this.slotIndex, another.slotIndex)) {
+                return false;
+            }
+            
+            if (this.slotId == null || another.slotId == null) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     @Override

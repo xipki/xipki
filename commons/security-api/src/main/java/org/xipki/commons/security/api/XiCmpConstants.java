@@ -34,24 +34,46 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.api.p11;
+package org.xipki.commons.security.api;
 
-import javax.annotation.Nonnull;
-
-import org.xipki.commons.security.api.XiSecurityException;
+import org.bouncycastle.asn1.x509.GeneralName;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface P11CryptServiceFactory {
+public class XiCmpConstants {
 
-    void init(
-            @Nonnull P11Control p11Control);
+    public static final int CRL_REASON_REMOVE = -1;
 
-    P11CryptService createP11CryptService(
-            @Nonnull String moduleName)
-    throws P11TokenException, XiSecurityException;
+    public static final GeneralName REMOTE_P11_CMP_SERVER =
+            new GeneralName(GeneralName.uniformResourceIdentifier,
+                    "http://xipki.org/remotep11/server");
+
+    public static final GeneralName REMOTE_P11_CMP_CLIENT =
+            new GeneralName(GeneralName.uniformResourceIdentifier,
+                    "http://xipki.org/remotep11/client");
+
+    public static final int ACTION_GEN_CRL = 1;
+
+    public static final int ACTION_GET_CRL_WITH_SN = 2;
+
+    public static final int ACTION_GET_CAINFO = 3;
+
+    public static final int ACTION_RP11_VERSION = 80;
+
+    public static final int ACTION_RP11_GET_PUBLICKEY = 81;
+
+    public static final int ACTION_RP11_GET_CERTIFICATE = 82;
+
+    public static final int ACTION_RP11_LIST_SLOTS = 83;
+
+    public static final int ACTION_RP11_LIST_KEYLABELS = 84;
+
+    public static final int ACTION_RP11_SIGN = 90;
+
+    private XiCmpConstants() {
+    }
 
 }

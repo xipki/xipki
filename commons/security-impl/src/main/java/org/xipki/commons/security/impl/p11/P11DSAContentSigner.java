@@ -38,7 +38,6 @@ package org.xipki.commons.security.impl.p11;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,18 +49,17 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
@@ -108,7 +106,7 @@ class P11DSAContentSigner implements ContentSigner {
             final P11EntityIdentifier entityId,
             final AlgorithmIdentifier signatureAlgId,
             final boolean plain)
-    throws NoSuchAlgorithmException, OperatorCreationException {
+    throws XiSecurityException, P11TokenException {
         this.entityId = ParamUtil.requireNonNull("entityId", entityId);
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
@@ -117,7 +115,7 @@ class P11DSAContentSigner implements ContentSigner {
         String algOid = signatureAlgId.getAlgorithm().getId();
         HashAlgoType hashAlgo = sigAlgHashMap.get(algOid);
         if (hashAlgo == null) {
-            throw new NoSuchAlgorithmException("unsupported signature algorithm " + algOid);
+            throw new XiSecurityException("unsupported signature algorithm " + algOid);
         }
         long tmpMechanism = hashMechMap.get(hashAlgo).longValue();
 
@@ -126,12 +124,12 @@ class P11DSAContentSigner implements ContentSigner {
             tmpMechanism = P11Constants.CKM_DSA;
             AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
                     new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
-            Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
+            Digest digest = SignerUtil.getDigest(digAlgId);
             this.outputStream = new DigestOutputStream(digest);
         } else if (cryptService.supportsMechanism(slotId, this.mechanism)) {
             this.outputStream = new ByteArrayOutputStream();
         } else {
-            throw new NoSuchAlgorithmException("unsupported signature algorithm " + algOid);
+            throw new XiSecurityException("unsupported signature algorithm " + algOid);
         }
         this.mechanism = tmpMechanism;
     }
@@ -160,7 +158,7 @@ class P11DSAContentSigner implements ContentSigner {
             } else {
                 return SignerUtil.convertPlainDSASigToX962(plainSignature);
             }
-        } catch (SignerException ex) {
+        } catch (XiSecurityException ex) {
             LOG.warn("SignerException: {}", ex.getMessage());
             LOG.debug("SignerException", ex);
             throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
@@ -176,7 +174,7 @@ class P11DSAContentSigner implements ContentSigner {
     }
 
     private byte[] getPlainSignature()
-    throws SignerException {
+    throws XiSecurityException, P11TokenException {
         byte[] dataToSign;
         if (mechanism == P11Constants.CKM_DSA) {
             dataToSign = ((DigestOutputStream) outputStream).digest();

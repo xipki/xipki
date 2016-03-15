@@ -37,9 +37,9 @@
 package org.xipki.commons.security.api.p11;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -134,14 +134,28 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
         if (!(obj instanceof P11KeyIdentifier)) {
             return false;
         }
-
-        P11KeyIdentifier o2 = (P11KeyIdentifier) obj;
-        if (keyId != null && o2.keyId != null) {
-            return Arrays.equals(keyId, o2.keyId);
+        
+        P11KeyIdentifier another = (P11KeyIdentifier) obj;
+        if (this.keyId != null && another.keyId != null) {
+            if (!CompareUtil.equalsObject(this.keyId, another.keyId)) {
+                return false;
+            }
+            
+            if (this.keyLabel == null || another.keyLabel == null) {
+                return true;
+            }
         }
-        if (keyLabel != null && o2.keyLabel != null) {
-            return keyLabel.equals(o2.keyLabel);
+        
+        if (this.keyLabel != null && another.keyLabel != null) {
+            if (!CompareUtil.equalsObject(this.keyLabel, another.keyLabel)) {
+                return false;
+            }
+            
+            if (this.keyId == null || another.keyId == null) {
+                return true;
+            }
         }
+        
         return false;
     }
 

@@ -61,12 +61,11 @@ import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
-import org.bouncycastle.operator.bc.BcDigestProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.HashCalculator;
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.XiSecurityException;
 
 /**
  * utility class for converting java.security RSA objects into their
@@ -123,7 +122,7 @@ public class SignerUtil {
     // CHECKSTYLE:SKIP
     public static PSSSigner createPSSRSASigner(
             final AlgorithmIdentifier sigAlgId)
-    throws OperatorCreationException {
+    throws XiSecurityException {
         return createPSSRSASigner(sigAlgId, null);
     }
 
@@ -131,27 +130,27 @@ public class SignerUtil {
     public static PSSSigner createPSSRSASigner(
             final AlgorithmIdentifier sigAlgId,
             final AsymmetricBlockCipher cipher)
-    throws OperatorCreationException {
+    throws XiSecurityException {
         ParamUtil.requireNonNull("sigAlgId", sigAlgId);
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
-            throw new OperatorCreationException("signature algorithm " + sigAlgId.getAlgorithm()
+            throw new XiSecurityException("signature algorithm " + sigAlgId.getAlgorithm()
                 + " is not allowed");
         }
 
-        BcDigestProvider digestProvider = BcDefaultDigestProvider.INSTANCE;
         AlgorithmIdentifier digAlgId;
         try {
             digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(sigAlgId);
         } catch (NoSuchAlgorithmException ex) {
-            throw new OperatorCreationException(ex.getMessage(), ex);
+            throw new XiSecurityException(ex.getMessage(), ex);
         }
-        Digest dig = digestProvider.get(digAlgId);
 
         RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
 
         AlgorithmIdentifier mfgDigAlgId = AlgorithmIdentifier.getInstance(
                 param.getMaskGenAlgorithm().getParameters());
-        Digest mfgDig = digestProvider.get(mfgDigAlgId);
+
+        Digest dig = getDigest(digAlgId);
+        Digest mfgDig = getDigest(mfgDigAlgId);
 
         int saltSize = param.getSaltLength().intValue();
         int trailerField = param.getTrailerField().intValue();
@@ -177,7 +176,7 @@ public class SignerUtil {
             final byte[] hashValue,
             final int modulusBigLength,
             final HashAlgoType hashAlgo)
-    throws SignerException {
+    throws XiSecurityException {
         ParamUtil.requireNonNull("hashValue", hashValue);
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
@@ -188,7 +187,7 @@ public class SignerUtil {
         byte[] prefix = digestPkcsPrefix.get(hashAlgo);
 
         if (prefix.length + hashLen + 3 > blockSize) {
-            throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): "
+            throw new XiSecurityException("data too long (maximal " + (blockSize - 3) + " allowed): "
                     + (prefix.length + hashLen));
         }
 
@@ -215,14 +214,14 @@ public class SignerUtil {
     public static byte[] EMSA_PKCS1_v1_5_encoding(
             final byte[] encodedDigestInfo,
             final int modulusBigLength)
-    throws SignerException {
+    throws XiSecurityException {
         ParamUtil.requireNonNull("encodedDigestInfo", encodedDigestInfo);
 
         int msgLen = encodedDigestInfo.length;
         int blockSize = (modulusBigLength + 7) / 8;
 
         if (msgLen + 3 > blockSize) {
-            throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): "
+            throw new XiSecurityException("data too long (maximal " + (blockSize - 3) + " allowed): "
                     + msgLen);
         }
 
@@ -251,14 +250,14 @@ public class SignerUtil {
             final int saltLen,
             final int modulusBigLength,
             final SecureRandom random)
-    throws SignerException {
+    throws XiSecurityException {
         final int hLen = contentDigest.getLength();
         final byte[] salt = new byte[saltLen];
         final byte[] mDash = new byte[8 + saltLen + hLen];
         final byte trailer = (byte)0xBC;
 
         if (hashValue.length != hLen) {
-            throw new SignerException("hashValue.length is incorrect: "
+            throw new XiSecurityException("hashValue.length is incorrect: "
                     + hashValue.length + " != " + hLen);
         }
 
@@ -338,7 +337,7 @@ public class SignerUtil {
     // CHECKSTYLE:SKIP
     public static byte[] convertPlainDSASigToX962(
             final byte[] signature)
-    throws SignerException {
+    throws XiSecurityException {
         ParamUtil.requireNonNull("signature", signature);
         byte[] ba = new byte[signature.length / 2];
         ASN1EncodableVector sigder = new ASN1EncodableVector();
@@ -353,7 +352,7 @@ public class SignerUtil {
         try {
             return seq.getEncoded();
         } catch (IOException ex) {
-            throw new SignerException("IOException, message: " + ex.getMessage(), ex);
+            throw new XiSecurityException("IOException, message: " + ex.getMessage(), ex);
         }
     }
 
@@ -361,7 +360,7 @@ public class SignerUtil {
     public static byte[] convertX962DSASigToPlain(
             final byte[] x962Signature,
             final int keyBitLen)
-    throws SignerException {
+    throws XiSecurityException {
         ParamUtil.requireNonNull("x962Signature", x962Signature);
         final int blockSize = (keyBitLen + 7) / 8;
         ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
@@ -374,7 +373,7 @@ public class SignerUtil {
         int bitLenOfS = sigS.bitLength();
         int bitLen = Math.max(bitLenOfR, bitLenOfS);
         if ((bitLen + 7) / 8 > blockSize) {
-            throw new SignerException("signature is too large");
+            throw new XiSecurityException("signature is too large");
         }
 
         byte[] plainSignature = new byte[2 * blockSize];
@@ -387,6 +386,17 @@ public class SignerUtil {
         srcOffset = Math.max(0, bytes.length - blockSize);
         System.arraycopy(bytes, srcOffset, plainSignature, blockSize, bytes.length - srcOffset);
         return plainSignature;
+    }
+
+    public static Digest getDigest(
+            final AlgorithmIdentifier digestAlgId)
+    throws XiSecurityException {
+        try {
+            return BcDefaultDigestProvider.INSTANCE.get(digestAlgId);
+        } catch (OperatorCreationException ex) {
+            throw new XiSecurityException(
+                    "could not get digest for " + digestAlgId.getAlgorithm().getId());
+        }
     }
 
 }

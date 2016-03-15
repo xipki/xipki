@@ -48,10 +48,11 @@ import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11TokenException;
+import org.xipki.commons.security.api.p11.P11UnknownEntityException;
 
 import iaik.pkcs.pkcs11.Module;
 import iaik.pkcs.pkcs11.Slot;
@@ -62,7 +63,7 @@ import iaik.pkcs.pkcs11.TokenException;
  * @since 2.0.0
  */
 
-public class IaikP11Module implements P11Module {
+class IaikP11Module implements P11Module {
 
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
 
@@ -76,10 +77,10 @@ public class IaikP11Module implements P11Module {
 
     private List<P11SlotIdentifier> slotIds;
 
-    public IaikP11Module(
+    IaikP11Module(
             final Module module,
             final P11ModuleConf moduleConf)
-    throws SignerException {
+    throws P11TokenException {
         this.module = ParamUtil.requireNonNull("module", module);
         this.moduleConf = ParamUtil.requireNonNull("moduleConf", moduleConf);
 
@@ -90,11 +91,11 @@ public class IaikP11Module implements P11Module {
         } catch (Throwable th) {
             LOG.error("module.getSlotList(). {}: {}", th.getClass().getName(), th.getMessage());
             LOG.debug("module.getSlotList()", th);
-            throw new SignerException("TokenException in module.getSlotList(): " + th.getMessage());
+            throw new P11TokenException("could not call module.getSlotList(): " + th.getMessage());
         }
 
         if (slotList == null || slotList.length == 0) {
-            throw new SignerException("no slot with present card could be found");
+            throw new P11TokenException("no slot with present card could be found");
         }
 
         List<P11SlotIdentifier> tmpSlotIds = new LinkedList<>();
@@ -139,7 +140,7 @@ public class IaikP11Module implements P11Module {
     @Override
     public IaikP11Slot getSlot(
             final P11SlotIdentifier slotId)
-    throws SignerException {
+    throws P11TokenException {
         ParamUtil.requireNonNull("slotId", slotId);
         IaikP11Slot extSlot = slots.get(slotId);
         if (extSlot != null) {
@@ -158,22 +159,23 @@ public class IaikP11Module implements P11Module {
         }
 
         if (slot == null) {
-            throw new SignerException("could not find slot identified by " + slotId);
+            throw new P11UnknownEntityException(slotId);
         }
 
         List<char[]> pwd;
         try {
             pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
         } catch (PasswordResolverException ex) {
-            throw new SignerException("PasswordResolverException: " + ex.getMessage(), ex);
+            throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
         }
-        extSlot = new IaikP11Slot(moduleConf.getName(), tmpSlotId, slot, pwd);
+        extSlot = new IaikP11Slot(moduleConf.getName(), tmpSlotId, slot, moduleConf.getUserType(),
+                pwd, moduleConf.getMaxMessageSize(), moduleConf.getP11MechanismFilter());
 
         slots.put(tmpSlotId, extSlot);
         return extSlot;
     } // method gestSlot
 
-    public void destroySlot(
+    void destroySlot(
             final long slotId) {
         P11SlotIdentifier p11SlotId = null;
         for (P11SlotIdentifier si : slots.keySet()) {
@@ -187,7 +189,7 @@ public class IaikP11Module implements P11Module {
         }
     }
 
-    public void close() {
+    void close() {
         for (P11SlotIdentifier slotId : slots.keySet()) {
             try {
                 slots.get(slotId).close();

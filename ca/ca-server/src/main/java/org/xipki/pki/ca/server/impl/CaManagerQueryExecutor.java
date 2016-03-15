@@ -71,8 +71,8 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.CertRevocationInfo;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.util.SignerConfUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
@@ -1241,7 +1241,7 @@ class CaManagerQueryExecutor {
                     for (String[] m : signerConfs) {
                         securityFactory.createSigner(tmpSignerType, m[1], tmpCert);
                     }
-                } catch (SignerException ex) {
+                } catch (XiSecurityException ex) {
                     throw new CaMgmtException(
                             "could not create signer for CA '" + name + "'" + ex.getMessage(), ex);
                 }

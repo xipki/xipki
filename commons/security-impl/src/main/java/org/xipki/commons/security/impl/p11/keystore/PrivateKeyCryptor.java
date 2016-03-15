@@ -59,7 +59,7 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEInputDecryptorProviderBuilder;
 import org.bouncycastle.pkcs.jcajce.JcePKCSPBEOutputEncryptorBuilder;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -76,14 +76,14 @@ class PrivateKeyCryptor {
 
     PrivateKeyCryptor(
             final char[] password)
-    throws SignerException {
+    throws P11TokenException {
         ParamUtil.requireNonNull("password", password);
         JcePKCSPBEOutputEncryptorBuilder eb = new JcePKCSPBEOutputEncryptorBuilder(ALGO);
         eb.setIterationCount(ITERATION_COUNT);
         try {
             encryptor = eb.build(password);
         } catch (OperatorCreationException ex) {
-            throw new SignerException(ex.getMessage(), ex);
+            throw new P11TokenException(ex.getMessage(), ex);
         }
 
         JcePKCSPBEInputDecryptorProviderBuilder db = new JcePKCSPBEInputDecryptorProviderBuilder();
@@ -92,7 +92,7 @@ class PrivateKeyCryptor {
 
     PrivateKey decrypt(
             PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo)
-    throws SignerException {
+    throws P11TokenException {
         ParamUtil.requireNonNull("encryptedPrivateKeyInfo", encryptedPrivateKeyInfo);
         PrivateKeyInfo privateKeyInfo;
         synchronized (decryptorProvider) {
@@ -100,7 +100,7 @@ class PrivateKeyCryptor {
                 privateKeyInfo = encryptedPrivateKeyInfo.decryptPrivateKeyInfo(
                         decryptorProvider);
             } catch (PKCSException ex) {
-                throw new SignerException(ex.getMessage(), ex);
+                throw new P11TokenException(ex.getMessage(), ex);
             }
         }
 
@@ -115,7 +115,7 @@ class PrivateKeyCryptor {
         } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(keyAlgOid)) {
             algoName = "EC";
         } else {
-            throw new SignerException("unkown private key algorithm " + keyAlgOid.getId());
+            throw new P11TokenException("unkown private key algorithm " + keyAlgOid.getId());
         }
 
         try {
@@ -124,7 +124,7 @@ class PrivateKeyCryptor {
             return keyFactory.generatePrivate(keySpec);
         } catch (IOException | NoSuchAlgorithmException | NoSuchProviderException
                 | InvalidKeySpecException ex) {
-            throw new SignerException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+            throw new P11TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
     }
 
