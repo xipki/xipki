@@ -226,7 +226,8 @@ class KeystoreP11Identity extends P11Identity {
         HashAlgoType contentHash = HashAlgoType.getInstanceForPkcs11HashMech(
                 pssParam.getHashAlgorithm());
         if (contentHash == null) {
-            throw new XiSecurityException("unsupported HashAlgorithm " + pssParam.getHashAlgorithm());
+            throw new XiSecurityException("unsupported HashAlgorithm "
+                    + pssParam.getHashAlgorithm());
         } else if (contentHash != hashAlgo) {
             throw new XiSecurityException("Invalid parameters: invalid hash algorithm");
         }
