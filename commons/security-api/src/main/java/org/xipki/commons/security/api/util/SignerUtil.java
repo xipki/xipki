@@ -187,8 +187,8 @@ public class SignerUtil {
         byte[] prefix = digestPkcsPrefix.get(hashAlgo);
 
         if (prefix.length + hashLen + 3 > blockSize) {
-            throw new XiSecurityException("data too long (maximal " + (blockSize - 3) + " allowed): "
-                    + (prefix.length + hashLen));
+            throw new XiSecurityException("data too long (maximal " + (blockSize - 3) 
+                    + " allowed): " + (prefix.length + hashLen));
         }
 
         byte[] block = new byte[blockSize];
@@ -221,8 +221,8 @@ public class SignerUtil {
         int blockSize = (modulusBigLength + 7) / 8;
 
         if (msgLen + 3 > blockSize) {
-            throw new XiSecurityException("data too long (maximal " + (blockSize - 3) + " allowed): "
-                    + msgLen);
+            throw new XiSecurityException("data too long (maximal " + (blockSize - 3)
+                    + " allowed): " + msgLen);
         }
 
         byte[] block = new byte[blockSize];

@@ -1277,7 +1277,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         // biometricData
         type = Extension.biometricInfo;
-        if (requestedExtensions != null && biometricDataOption != null && occurences.remove(type) != null) {
+        if (requestedExtensions != null && biometricDataOption != null
+                && occurences.remove(type) != null) {
             Extension extension = requestedExtensions.getExtension(type);
             if (extension == null) {
                 throw new BadCertTemplateException(
