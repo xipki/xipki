@@ -39,7 +39,6 @@ package org.xipki.commons.security.provider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.KeyStoreSpi;
@@ -59,12 +58,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -178,7 +178,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
                     }
                 } // end for
             } // end for
-        } catch (SignerException | InvalidKeyException ex) {
+        } catch (XiSecurityException | P11TokenException ex) {
             throw new IllegalArgumentException(ex.getClass().getName() + ": " + ex.getMessage(),
                     ex);
         }

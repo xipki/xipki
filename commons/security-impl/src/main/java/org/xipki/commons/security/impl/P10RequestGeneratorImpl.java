@@ -51,8 +51,8 @@ import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.P10RequestGenerator;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerException;
 
 /**
  * @author Lijun Liao
@@ -69,7 +69,7 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final String subject,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    throws PasswordResolverException, SignerException {
+    throws PasswordResolverException, XiSecurityException {
         ParamUtil.requireNonNull("subject", subject);
         X500Name subjectDn = new X500Name(subject);
         return generateRequest(securityFactory, signerType, signerConf, subjectPublicKeyInfo,
@@ -84,7 +84,7 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final X500Name subjectDn,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    throws PasswordResolverException, SignerException {
+    throws PasswordResolverException, XiSecurityException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         ParamUtil.requireNonNull("signerType", signerType);
         ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf,
@@ -98,7 +98,7 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final X500Name subjectDn,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    throws SignerException {
+    throws XiSecurityException {
         ParamUtil.requireNonNull("signer", signer);
         ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
         ParamUtil.requireNonNull("subjectDn", subjectDn);
@@ -113,7 +113,7 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
         try {
             return signer.build(p10ReqBuilder);
         } catch (NoIdleSignerException ex) {
-            throw new SignerException(ex.getMessage(), ex);
+            throw new XiSecurityException(ex.getMessage(), ex);
         }
     }
 

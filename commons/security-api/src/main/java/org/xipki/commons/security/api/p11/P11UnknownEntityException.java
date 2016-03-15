@@ -36,22 +36,28 @@
 
 package org.xipki.commons.security.api.p11;
 
-import javax.annotation.Nonnull;
-
-import org.xipki.commons.security.api.XiSecurityException;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface P11CryptServiceFactory {
+public class P11UnknownEntityException extends P11TokenException {
 
-    void init(
-            @Nonnull P11Control p11Control);
+    private static final long serialVersionUID = 1L;
 
-    P11CryptService createP11CryptService(
-            @Nonnull String moduleName)
-    throws P11TokenException, XiSecurityException;
+    public P11UnknownEntityException(
+            final P11EntityIdentifier entityId) {
+        super("unknown entity " + entityId);
+    }
+
+    public P11UnknownEntityException(
+            final P11SlotIdentifier slotId) {
+        super("unknown slot " + slotId);
+    }
+
+    public P11UnknownEntityException(
+            final String message) {
+        super(message);
+    }
 
 }

@@ -97,8 +97,8 @@ import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.CrlReason;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.CertprofileException;
@@ -753,7 +753,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 crlSignerEntry.getDbEntry().setConfFaulty(true);
                 crlSignerEntry.initSigner(securityFactory);
                 crlSignerEntry.getDbEntry().setConfFaulty(false);
-            } catch (SignerException | OperationException | InvalidConfException ex) {
+            } catch (XiSecurityException | OperationException | InvalidConfException ex) {
                 final String message = "X09CrlSignerEntryWrapper.initSigner (name="
                         + crlSignerName + ")";
                 if (LOG.isErrorEnabled()) {
@@ -1248,7 +1248,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                         tmpCaEntry.setCertificate(signer.getCertificate());
                     }
                 }
-            } catch (SignerException ex) {
+            } catch (XiSecurityException ex) {
                 throw new CaMgmtException(
                         "could not create signer for new CA " + name + ": " + ex.getMessage(), ex);
             }
@@ -2723,7 +2723,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ret.setDbEntry(dbEntry);
         try {
             ret.initSigner(securityFactory);
-        } catch (SignerException ex) {
+        } catch (XiSecurityException ex) {
             final String message = "createCmpResponder";
             LOG.debug(message, ex);
             throw new CaMgmtException(ex.getMessage());
@@ -2743,7 +2743,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
         try {
             signer.initSigner(securityFactory);
-        } catch (SignerException | OperationException | InvalidConfException ex) {
+        } catch (XiSecurityException | OperationException | InvalidConfException ex) {
             final String message = "could not creat CRL signer " + dbEntry.getName();
             if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
@@ -3085,12 +3085,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     static List<String[]> splitCaSignerConfs(
             final String conf)
-    throws SignerException {
+    throws XiSecurityException {
         ConfPairs pairs = new ConfPairs(conf);
         String str = pairs.getValue("algo");
         List<String> list = StringUtil.split(str, ":");
         if (list == null) {
-            throw new SignerException("no algo is defined in CA signerConf");
+            throw new XiSecurityException("no algo is defined in CA signerConf");
         }
 
         List<String[]> signerConfs = new ArrayList<>(list.size());
@@ -3099,7 +3099,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             try {
                 c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(n);
             } catch (NoSuchAlgorithmException ex) {
-                throw new SignerException(ex.getMessage(), ex);
+                throw new XiSecurityException(ex.getMessage(), ex);
             }
             pairs.putPair("algo", c14nAlgo);
             signerConfs.add(new String[]{c14nAlgo, pairs.getEncoded()});

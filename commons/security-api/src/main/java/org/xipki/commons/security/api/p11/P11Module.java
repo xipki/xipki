@@ -40,8 +40,6 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import org.xipki.commons.security.api.SignerException;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -53,6 +51,6 @@ public interface P11Module {
 
     P11WritableSlot getSlot(
             @Nonnull P11SlotIdentifier slotId)
-    throws SignerException;
+    throws P11TokenException;
 
 }

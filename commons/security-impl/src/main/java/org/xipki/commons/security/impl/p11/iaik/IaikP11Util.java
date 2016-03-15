@@ -39,8 +39,10 @@ package org.xipki.commons.security.impl.p11.iaik;
 import java.security.SecureRandom;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 import iaik.pkcs.pkcs11.Session;
+import iaik.pkcs.pkcs11.TokenException;
 import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
@@ -49,14 +51,14 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
  * @since 2.0.0
  */
 
-public class IaikP11Util {
+class IaikP11Util {
 
     private IaikP11Util() {
     }
 
-    public static byte[] generateKeyId(
+    static byte[] generateKeyId(
             final Session session)
-    throws Exception {
+    throws P11TokenException {
         SecureRandom random = new SecureRandom();
         byte[] keyId = null;
         do {
@@ -67,54 +69,64 @@ public class IaikP11Util {
         return keyId;
     }
 
-    public static boolean idExists(
+    static boolean idExists(
             final Session session, final byte[] keyId)
-    throws Exception {
+    throws P11TokenException {
         ParamUtil.requireNonNull("session", session);
         ParamUtil.requireNonNull("keyId", keyId);
 
         Key key = new Key();
         key.getId().setByteArrayValue(keyId);
 
-        session.findObjectsInit(key);
-        Object[] objects = session.findObjects(1);
-        session.findObjectsFinal();
-        if (objects.length > 0) {
-            return true;
+        Object[] objects;
+        try {
+            session.findObjectsInit(key);
+            objects = session.findObjects(1);
+            session.findObjectsFinal();
+            if (objects.length > 0) {
+                return true;
+            }
+
+            X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
+            cert.getId().setByteArrayValue(keyId);
+
+            session.findObjectsInit(cert);
+            objects = session.findObjects(1);
+            session.findObjectsFinal();
+        } catch (TokenException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
         }
-
-        X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
-        cert.getId().setByteArrayValue(keyId);
-
-        session.findObjectsInit(cert);
-        objects = session.findObjects(1);
-        session.findObjectsFinal();
 
         return objects.length > 0;
     }
 
-    public static boolean labelExists(
+    static boolean labelExists(
             final Session session,
             final String keyLabel)
-    throws Exception {
+    throws P11TokenException {
         ParamUtil.requireNonNull("session", session);
         ParamUtil.requireNonBlank("keyLabel", keyLabel);
         Key key = new Key();
         key.getLabel().setCharArrayValue(keyLabel.toCharArray());
 
-        session.findObjectsInit(key);
-        Object[] objects = session.findObjects(1);
-        session.findObjectsFinal();
-        if (objects.length > 0) {
-            return true;
+        Object[] objects;
+        try {
+            session.findObjectsInit(key);
+            objects = session.findObjects(1);
+            session.findObjectsFinal();
+            if (objects.length > 0) {
+                return true;
+            }
+
+            X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
+            cert.getLabel().setCharArrayValue(keyLabel.toCharArray());
+
+            session.findObjectsInit(cert);
+            objects = session.findObjects(1);
+            session.findObjectsFinal();
+        } catch (TokenException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
         }
-
-        X509PublicKeyCertificate cert = new X509PublicKeyCertificate();
-        cert.getLabel().setCharArrayValue(keyLabel.toCharArray());
-
-        session.findObjectsInit(cert);
-        objects = session.findObjects(1);
-        session.findObjectsFinal();
 
         return objects.length > 0;
     }

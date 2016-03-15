@@ -64,7 +64,7 @@ import org.xipki.commons.security.api.BadAsn1ObjectException;
 // CHECKSTYLE:SKIP
 public class ASN1SignTemplate extends ASN1Object {
 
-    private ASN1EntityIdentifer entityId;
+    private ASN1EntityIdentifier entityId;
 
     private ASN1Mechanism mechanism;
 
@@ -82,7 +82,7 @@ public class ASN1SignTemplate extends ASN1Object {
             throw new BadAsn1ObjectException(sb.toString());
         }
 
-        this.entityId = ASN1EntityIdentifer.getInstance(seq.getObjectAt(0));
+        this.entityId = ASN1EntityIdentifier.getInstance(seq.getObjectAt(0));
         this.mechanism = ASN1Mechanism.getInstance(seq.getObjectAt(1));
         DEROctetString octetString = (DEROctetString) DEROctetString.getInstance(
                 seq.getObjectAt(2));
@@ -90,7 +90,7 @@ public class ASN1SignTemplate extends ASN1Object {
     }
 
     public ASN1SignTemplate(
-            final ASN1EntityIdentifer entityId,
+            final ASN1EntityIdentifier entityId,
             final long mechanism,
             final ASN1P11Params parameter,
             final byte[] message) {
@@ -133,7 +133,7 @@ public class ASN1SignTemplate extends ASN1Object {
         return message;
     }
 
-    public ASN1EntityIdentifer getEntityId() {
+    public ASN1EntityIdentifier getEntityId() {
         return entityId;
     }
 

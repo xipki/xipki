@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PKCS11Conf xmlns="http://xipki.org/commons/security/pkcs11/conf/v2">
-  <modules defaultModule="softhsm">
-    <module name="softhsm">
+  <modules>
+    <!-- exactly one module must be named 'default' -->
+    <module name="default">
       <nativeLibraries>
         <nativeLibrary>
           <path>/usr/local/lib/softhsm/libsofthsm2.so</path>
@@ -12,6 +13,9 @@
           <index>0</index>
         </slot>
       </includeSlots>
+      <!-- 1 for CKU_USER -->
+      <user>1</user>
+      <maxMessageSize>65536</maxMessageSize>
       <passwords>
         <password>
           <singlePassword>123456</singlePassword>
@@ -32,6 +36,8 @@
           <index>0</index>
         </slot>
       </excludeSlots>
+      <user>1</user>
+      <maxMessageSize>65536</maxMessageSize>
     </module-->
   </modules>
 </PKCS11Conf>

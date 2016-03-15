@@ -43,7 +43,7 @@ import java.util.Set;
 
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.p11.P11MechanismRetriever;
+import org.xipki.commons.security.api.p11.P11MechanismFilter;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
@@ -51,15 +51,15 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
  * @since 2.0.0
  */
 
-public class P11MechanismRetrieverImpl implements P11MechanismRetriever {
+public class P11MechanismFilterImpl implements P11MechanismFilter {
 
-    private static final class SingleRetriever {
+    private static final class SingleFilter {
 
         private final Set<P11SlotIdentifier> slots;
 
         private final Collection<Long> mechanisms;
 
-        private SingleRetriever(
+        private SingleFilter(
                 final Set<P11SlotIdentifier> slots,
                 final Collection<Long> mechanisms) {
             this.slots = slots;
@@ -95,16 +95,16 @@ public class P11MechanismRetrieverImpl implements P11MechanismRetriever {
 
     } // class SingleRetriever
 
-    private final List<SingleRetriever> singleRetrievers;
+    private final List<SingleFilter> singleFilters;
 
-    public P11MechanismRetrieverImpl() {
-        singleRetrievers = new LinkedList<>();
+    public P11MechanismFilterImpl() {
+        singleFilters = new LinkedList<>();
     }
 
     public void addEntry(
             final Set<P11SlotIdentifier> slots,
             final Collection<Long> mechanisms) {
-        singleRetrievers.add(new SingleRetriever(slots, mechanisms));
+        singleFilters.add(new SingleFilter(slots, mechanisms));
     }
 
     @Override
@@ -112,11 +112,11 @@ public class P11MechanismRetrieverImpl implements P11MechanismRetriever {
             final P11SlotIdentifier slotId,
             final long mechanism) {
         ParamUtil.requireNonNull("slotId", slotId);
-        if (CollectionUtil.isEmpty(singleRetrievers)) {
+        if (CollectionUtil.isEmpty(singleFilters)) {
             return true;
         }
 
-        for (SingleRetriever sr : singleRetrievers) {
+        for (SingleFilter sr : singleFilters) {
             if (sr.match(slotId)) {
                 return sr.isMechanismSupported(mechanism);
             }

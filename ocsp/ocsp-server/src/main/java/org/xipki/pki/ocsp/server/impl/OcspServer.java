@@ -127,8 +127,8 @@ import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.api.CertStatus;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
@@ -1202,7 +1202,7 @@ public class OcspServer {
                         "algo=" + sigAlgo + "," + responderKeyConf,
                         explicitCertificateChain);
                 singleSigners.add(requestorSigner);
-            } catch (SignerException ex) {
+            } catch (XiSecurityException ex) {
                 throw new InvalidConfException("SignerException: " + ex.getMessage(), ex);
             }
         }

@@ -36,22 +36,35 @@
 
 package org.xipki.commons.security.api.p11;
 
-import javax.annotation.Nonnull;
-
-import org.xipki.commons.security.api.XiSecurityException;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface P11CryptServiceFactory {
+public class P11UnsupportedMechanismException extends P11TokenException {
 
-    void init(
-            @Nonnull P11Control p11Control);
+    private static final long serialVersionUID = 1L;
 
-    P11CryptService createP11CryptService(
-            @Nonnull String moduleName)
-    throws P11TokenException, XiSecurityException;
+    public P11UnsupportedMechanismException(
+            final long mechanism,
+            final P11SlotIdentifier slotId) {
+        super("mechanism " + getMechanismDesc(mechanism) + " is not supported by PKCS11 slot "
+            + slotId);
+    }
+
+    public P11UnsupportedMechanismException(
+            final long mechanism,
+            final P11EntityIdentifier entityId) {
+        super("mechanism " + getMechanismDesc(mechanism) + " is not supported by PKCS11 entitiy "
+            + entityId);
+    }
+
+    private static String getMechanismDesc(
+            final long mechanism) {
+        String name = P11Constants.getMechanismName(mechanism);
+        return (name == null)
+                ? Long.toString(mechanism)
+                : name + " (" + mechanism + ")";
+    }
 
 }

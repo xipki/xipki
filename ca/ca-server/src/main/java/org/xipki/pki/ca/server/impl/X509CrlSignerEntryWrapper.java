@@ -47,8 +47,8 @@ import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.KeyUsage;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
@@ -86,14 +86,14 @@ class X509CrlSignerEntryWrapper {
 
     public void initSigner(
             final SecurityFactory securityFactory)
-    throws SignerException, OperationException, InvalidConfException {
+    throws XiSecurityException, OperationException, InvalidConfException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         if (signer != null) {
             return;
         }
 
         if (dbEntry == null) {
-            throw new SignerException("dbEntry is null");
+            throw new XiSecurityException("dbEntry is null");
         }
 
         if ("CA".equals(dbEntry.getType())) {
@@ -108,7 +108,7 @@ class X509CrlSignerEntryWrapper {
 
         X509Certificate signerCert = signer.getCertificate();
         if (signerCert == null) {
-            throw new SignerException("signer without certificate is not allowed");
+            throw new XiSecurityException("signer without certificate is not allowed");
         }
 
         if (dbEntry.getBase64Cert() == null) {

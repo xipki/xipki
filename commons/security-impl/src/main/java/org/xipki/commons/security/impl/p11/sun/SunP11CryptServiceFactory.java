@@ -37,12 +37,12 @@
 package org.xipki.commons.security.impl.p11.sun;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11Control;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -62,19 +62,15 @@ public class SunP11CryptServiceFactory implements P11CryptServiceFactory {
     @Override
     public P11CryptService createP11CryptService(
             final String moduleName)
-    throws SignerException {
-        String tmpModuleName = ParamUtil.requireNonNull("moduleName", moduleName);
+    throws XiSecurityException, P11TokenException {
+        ParamUtil.requireNonBlank("moduleName", moduleName);
         if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
         }
 
-        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(tmpModuleName)) {
-            tmpModuleName = p11Control.getDefaultModuleName();
-        }
-
-        P11ModuleConf conf = p11Control.getModuleConf(tmpModuleName);
+        P11ModuleConf conf = p11Control.getModuleConf(moduleName);
         if (conf == null) {
-            throw new SignerException("PKCS#11 module " + tmpModuleName + " is not defined");
+            throw new XiSecurityException("PKCS#11 module " + moduleName + " is not defined");
         }
 
         return SunP11CryptService.getInstance(conf);

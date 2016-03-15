@@ -41,16 +41,24 @@ package org.xipki.commons.security.api.p11;
  * @since 2.0.0
  */
 
-public class P11PermitAllMechanimRetriever implements P11MechanismRetriever {
+public class P11TokenException extends Exception {
 
-    public static final P11PermitAllMechanimRetriever INSTANCE
-            = new P11PermitAllMechanimRetriever();
+    private static final long serialVersionUID = 1L;
 
-    @Override
-    public boolean isMechanismPermitted(
-            final P11SlotIdentifier slotId,
-            final long mechanism) {
-        return true;
+    public P11TokenException(
+            final String message,
+            final Throwable cause) {
+        super(message, cause);
+    }
+
+    public P11TokenException(
+            final String message) {
+        super(message);
+    }
+
+    public P11TokenException(
+            final Throwable cause) {
+        super(cause);
     }
 
 }

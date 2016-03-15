@@ -40,10 +40,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-
-import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
@@ -58,17 +55,16 @@ import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.signers.PSSSigner;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 import org.xipki.commons.security.api.util.SignerUtil;
 
@@ -152,14 +148,14 @@ class P11RSAPSSContentSigner implements ContentSigner {
             final P11EntityIdentifier entityId,
             final AlgorithmIdentifier signatureAlgId,
             final SecureRandom random)
-    throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException {
+    throws XiSecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.entityId = ParamUtil.requireNonNull("entityId", entityId);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         ParamUtil.requireNonNull("random", random);
 
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
-            throw new NoSuchAlgorithmException("unsupported signature algorithm "
+            throw new XiSecurityException("unsupported signature algorithm "
                     + signatureAlgId.getAlgorithm());
         }
 
@@ -167,8 +163,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
         ASN1ObjectIdentifier digestAlgOid = asn1Params.getHashAlgorithm().getAlgorithm();
         HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(digestAlgOid);
         if (hashAlgo == null) {
-            throw new NoSuchAlgorithmException(
-                    "unsupported hash algorithm " + digestAlgOid.getId());
+            throw new XiSecurityException("unsupported hash algorithm " + digestAlgOid.getId());
         }
 
         long tmpMechanism;
@@ -191,7 +186,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
             this.parameters = new P11RSAPkcsPssParams(asn1Params);
             AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
                     new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
-            Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
+            Digest digest = SignerUtil.getDigest(digAlgId);
             this.outputStream = new DigestOutputStream(digest);
         } else if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_X_509)) {
             this.parameters = null;
@@ -200,7 +195,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
             try {
                 keyParam = P11RSAKeyParameter.getInstance(cryptService, entityId);
             } catch (InvalidKeyException ex) {
-                throw new OperatorCreationException(ex.getMessage(), ex);
+                throw new XiSecurityException(ex.getMessage(), ex);
             }
             PSSSigner pssSigner = SignerUtil.createPSSRSASigner(signatureAlgId, cipher);
             pssSigner.init(true, new ParametersWithRandom(keyParam, random));
@@ -209,7 +204,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
             this.parameters = new P11RSAPkcsPssParams(asn1Params);
             this.outputStream = new ByteArrayOutputStream();
         } else {
-            throw new NoSuchAlgorithmException("unsupported signature algorithm "
+            throw new XiSecurityException("unsupported signature algorithm "
                     + PKCSObjectIdentifiers.id_RSASSA_PSS.getId() + " with " + hashAlgo);
         }
 
@@ -255,9 +250,9 @@ class P11RSAPSSContentSigner implements ContentSigner {
 
         try {
             return cryptService.sign(entityId, mechanism, parameters, dataToSign);
-        } catch (SignerException ex) {
-            LOG.warn("SignerException: {}", ex.getMessage());
-            LOG.debug("SignerException", ex);
+        } catch (XiSecurityException | P11TokenException ex) {
+            LOG.warn("could not sign: {}", ex.getMessage());
+            LOG.debug("could not sign", ex);
             throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
         }
 

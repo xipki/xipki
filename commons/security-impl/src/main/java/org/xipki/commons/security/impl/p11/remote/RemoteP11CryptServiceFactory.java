@@ -42,13 +42,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11Control;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -72,25 +72,19 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
     @Override
     public P11CryptService createP11CryptService(
             final String moduleName)
-    throws SignerException {
+    throws XiSecurityException {
         ParamUtil.requireNonBlank("moduleName", moduleName);
         if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
         }
 
-        String tmpModuleName = moduleName;
-
-        if (SecurityFactory.DEFAULT_P11MODULE_NAME.equals(tmpModuleName)) {
-            tmpModuleName = p11Control.getDefaultModuleName();
-        }
-
-        P11ModuleConf moduleConf = p11Control.getModuleConf(tmpModuleName);
+        P11ModuleConf moduleConf = p11Control.getModuleConf(moduleName);
         if (moduleConf == null) {
-            throw new SignerException("PKCS#11 module " + tmpModuleName + " is not defined");
+            throw new XiSecurityException("PKCS#11 module " + moduleName + " is not defined");
         }
 
         synchronized (services) {
-            RemoteP11CryptService service = services.get(tmpModuleName);
+            RemoteP11CryptService service = services.get(moduleName);
             if (service == null) {
                 try {
                     service = new DefaultRemoteP11CryptService(moduleConf);
@@ -100,7 +94,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
                 } catch (Exception ex) {
                     LOG.error("could not createP11CryptService: {}", ex.getMessage());
                     LOG.debug("could not createP11CryptService", ex);
-                    throw new SignerException(ex.getMessage(), ex);
+                    throw new XiSecurityException(ex.getMessage(), ex);
                 }
             }
 
@@ -117,7 +111,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
         P11SlotIdentifier[] slotIds;
         try {
             slotIds = service.getSlotIdentifiers();
-        } catch (SignerException ex) {
+        } catch (P11TokenException ex) {
             LOG.warn("RemoteP11CryptService.getSlotIdentifiers(); SignerException: "
                     + "url={}, message={}",
                     url, ex.getMessage());
@@ -135,7 +129,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
             String[] keyLabels;
             try {
                 keyLabels = service.getKeyLabels(slotId);
-            } catch (SignerException ex) {
+            } catch (P11TokenException ex) {
                 LOG.warn("RemoteP11CryptService.getKeyLabels(); SignerException: "
                         + "url={}, slot={}, message={}",
                         new Object[]{url, slotId, ex.getMessage()});
