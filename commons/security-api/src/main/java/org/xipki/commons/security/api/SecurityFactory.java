@@ -55,6 +55,7 @@ import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Module;
+import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
@@ -68,16 +69,14 @@ public interface SecurityFactory {
 
     Set<String> getPkcs11ModuleNames();
 
-    String getDefaultPkcs11ModuleName();
-
     P11Module getP11Module(
             @Nonnull String moduleName)
-    throws SignerException;
+    throws XiSecurityException, P11TokenException;
 
     P11WritableSlot getP11WritablSlot(
             @Nonnull String moduleName,
             int slotIndex)
-    throws SignerException;
+    throws XiSecurityException, P11TokenException;
 
     PasswordResolver getPasswordResolver();
 
@@ -85,19 +84,19 @@ public interface SecurityFactory {
             @Nonnull String type,
             @Nullable String conf,
             @Nullable X509Certificate cert)
-    throws SignerException;
+    throws XiSecurityException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
             @Nullable String conf,
             @Nullable X509Certificate cert)
-    throws SignerException;
+    throws XiSecurityException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
             @Nullable String conf,
             @Nullable X509Certificate[] certs)
-    throws SignerException;
+    throws XiSecurityException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
@@ -105,7 +104,7 @@ public interface SecurityFactory {
             @Nonnull String hashAlgo,
             @Nullable SignatureAlgoControl sigAlgoControl,
             @Nullable X509Certificate cert)
-    throws SignerException;
+    throws XiSecurityException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
@@ -113,7 +112,7 @@ public interface SecurityFactory {
             @Nonnull String hashAlgo,
             @Nonnull SignatureAlgoControl sigAlgoControl,
             @Nullable X509Certificate[] certs)
-    throws SignerException;
+    throws XiSecurityException;
 
     ContentVerifierProvider getContentVerifierProvider(
             @Nonnull PublicKey publicKey)
@@ -139,12 +138,12 @@ public interface SecurityFactory {
 
     P11CryptService getP11CryptService(
             @Nonnull String moduleName)
-    throws SignerException;
+    throws XiSecurityException, P11TokenException;
 
     PublicKey getPkcs11PublicKey(
             @Nonnull String moduleName,
             @Nonnull P11EntityIdentifier entityId)
-    throws InvalidKeyException;
+    throws InvalidKeyException, P11TokenException;
 
     byte[] extractMinimalKeyStore(
             @Nonnull String keystoreType,

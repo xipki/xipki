@@ -53,7 +53,6 @@ import org.xipki.commons.security.api.util.X509Util;
  * @author Lijun Liao
  * @since 2.0.0
  */
-//FIXME: use different label if CA key label already exists.
 @Command(scope = "xipki-tk", name = "update-cert",
         description = "update certificate in PKCS#11 device")
 @Service

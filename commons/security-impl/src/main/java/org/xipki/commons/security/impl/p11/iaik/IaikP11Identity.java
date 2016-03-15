@@ -40,9 +40,10 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.P11TokenException;
+import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
@@ -63,10 +64,10 @@ class IaikP11Identity extends P11Identity {
     }
 
     private IaikP11Module getModule()
-    throws SignerException {
+    throws P11TokenException {
         IaikP11Module module = IaikP11ModulePool.getInstance().getModule(moduleName);
         if (module == null) {
-            throw new SignerException("could not find IaikP11Module '" + moduleName + "'");
+            throw new P11TokenException("could not find IaikP11Module '" + moduleName + "'");
         }
         return module;
     }
@@ -75,20 +76,15 @@ class IaikP11Identity extends P11Identity {
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
-    throws SignerException {
+    throws P11TokenException {
         ParamUtil.requireNonNull("content", content);
 
         if (!supportsMechanism(mechanism, parameters)) {
-            throw new SignerException("mechanism " + mechanism + " is not allowed for "
-                    + publicKey.getAlgorithm() + " public key");
+            throw new P11UnsupportedMechanismException(mechanism, entityId);
         }
 
         IaikP11Module module = getModule();
         IaikP11Slot slot = module.getSlot(entityId.getSlotId());
-        if (slot == null) {
-            throw new SignerException("could not find slot " + entityId.getSlotId());
-        }
-
         return slot.sign(mechanism, parameters, content, entityId.getKeyId());
     }
 

@@ -57,7 +57,7 @@ import javax.crypto.NoSuchPaddingException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.HashCalculator;
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
@@ -93,9 +93,11 @@ class SunP11Identity extends P11Identity {
     private static final String SHA1withECDSA = "SHA1withECDSA";
 
     private static final String NONEwithECDSA = "NONEwithECDSA";
+    // CHECKSTYLE:ON
 
     private final Provider provider;
-    // CHECKSTYLE:ON
+
+    private final int maxMessageSize;
 
     private final PrivateKey privateKey;
 
@@ -108,13 +110,15 @@ class SunP11Identity extends P11Identity {
     SunP11Identity(
             final Provider provider,
             final P11EntityIdentifier entityId,
+            final int maxMessageSize,
             final PrivateKey privateKey,
             final X509Certificate[] certificateChain,
             final PublicKey publicKey,
             final SecureRandom random)
-    throws SignerException {
+    throws XiSecurityException {
         super(entityId, certificateChain, publicKey);
         this.provider = ParamUtil.requireNonNull("p11Provider", provider);
+        this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 128);
         this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
         this.random = ParamUtil.requireNonNull("random", random);
 
@@ -142,11 +146,11 @@ class SunP11Identity extends P11Identity {
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
-    throws SignerException {
+    throws XiSecurityException {
         ParamUtil.requireNonNull("content", content);
 
         if (!supportsMechanism(mechanism, parameters)) {
-            throw new SignerException("mechanism " + mechanism + " is not allowed for "
+            throw new XiSecurityException("mechanism " + mechanism + " is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
@@ -193,7 +197,7 @@ class SunP11Identity extends P11Identity {
         } else if (P11Constants.CKM_SHA512_RSA_PKCS_PSS == mechanism) {
             return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA512);
         } else {
-            throw new SignerException("unsupported mechanism " + mechanism);
+            throw new XiSecurityException("unsupported mechanism " + mechanism);
         }
     }
 
@@ -201,9 +205,9 @@ class SunP11Identity extends P11Identity {
             P11Params parameters,
             final byte[] contentToSign,
             HashAlgoType hashAlgo)
-    throws SignerException {
+    throws XiSecurityException {
         if (!(parameters instanceof P11RSAPkcsPssParams)) {
-            throw new SignerException("the parameters is not of "
+            throw new XiSecurityException("the parameters is not of "
                     + P11RSAPkcsPssParams.class.getName());
         }
 
@@ -211,15 +215,15 @@ class SunP11Identity extends P11Identity {
         HashAlgoType contentHash = HashAlgoType.getInstanceForPkcs11HashMech(
                 pssParam.getHashAlgorithm());
         if (contentHash == null) {
-            throw new SignerException("unsupported HashAlgorithm " + pssParam.getHashAlgorithm());
+            throw new XiSecurityException("unsupported HashAlgorithm " + pssParam.getHashAlgorithm());
         } else if (contentHash != hashAlgo) {
-            throw new SignerException("Invalid parameters: invalid hash algorithm");
+            throw new XiSecurityException("Invalid parameters: invalid hash algorithm");
         }
 
         HashAlgoType mgfHash = HashAlgoType.getInstanceForPkcs11MgfMech(
                 pssParam.getMaskGenerationFunction());
         if (mgfHash == null) {
-            throw new SignerException(
+            throw new XiSecurityException(
                     "unsupported MaskGenerationFunction " + pssParam.getHashAlgorithm());
         }
 
@@ -238,7 +242,7 @@ class SunP11Identity extends P11Identity {
     private byte[] rsaPkcsSign(
             final byte[] contentToSign,
             final HashAlgoType hashAlgo)
-    throws SignerException {
+    throws XiSecurityException {
         if (cipherAlgos.contains(RSA_ECB_NoPadding)) {
             int modulusBitLen = getSignatureKeyBitLength();
             byte[] paddedHash;
@@ -267,7 +271,8 @@ class SunP11Identity extends P11Identity {
                 && sigAlgos.contains(SHA512withRSA.toLowerCase())) {
             sigAlgo = SHA512withRSA;
         } else {
-            throw new SignerException("unsupported signature algorithm RSA_PKCS with " + hashAlgo);
+            throw new XiSecurityException(
+                    "unsupported signature algorithm RSA_PKCS with " + hashAlgo);
         }
 
         try {
@@ -275,36 +280,36 @@ class SunP11Identity extends P11Identity {
             updateData(sig, contentToSign);
             return sig.sign();
         } catch (SignatureException | NoSuchAlgorithmException ex) {
-            throw new SignerException(ex.getMessage(), ex);
+            throw new XiSecurityException(ex.getMessage(), ex);
         }
     }
 
     private byte[] rsaX509Sign(
             final byte[] dataToSign)
-    throws SignerException {
+    throws XiSecurityException {
         Cipher cipher;
         try {
             cipher = Cipher.getInstance(RSA_ECB_NoPadding, provider);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
-            throw new SignerException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+            throw new XiSecurityException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
         try {
             cipher.init(Cipher.ENCRYPT_MODE, privateKey);
         } catch (InvalidKeyException ex) {
-            throw new SignerException("InvalidKeyException: " + ex.getMessage(), ex);
+            throw new XiSecurityException("InvalidKeyException: " + ex.getMessage(), ex);
         }
 
         try {
             return cipher.doFinal(dataToSign);
         } catch (BadPaddingException | IllegalBlockSizeException ex) {
-            throw new SignerException("SignatureException: " + ex.getMessage(), ex);
+            throw new XiSecurityException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
     private byte[] dsaSign(
             final byte[] dataToSign,
             final HashAlgoType hashAlgo)
-    throws SignerException {
+    throws XiSecurityException {
         byte[] input;
 
         String signatureAlgorithm;
@@ -321,7 +326,7 @@ class SunP11Identity extends P11Identity {
             input = dataToSign;
             signatureAlgorithm = SHA1withDSA;
         } else {
-            throw new SignerException("unsupported mechanism");
+            throw new XiSecurityException("unsupported mechanism");
         }
 
         try {
@@ -330,16 +335,17 @@ class SunP11Identity extends P11Identity {
             byte[] x962Signature = sig.sign();
             return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
         } catch (NoSuchAlgorithmException ex) {
-            throw new SignerException("could not find signature algorithm " + ex.getMessage(), ex);
+            throw new XiSecurityException("could not find signature algorithm " + ex.getMessage(),
+                    ex);
         } catch (SignatureException ex) {
-            throw new SignerException("SignatureException: " + ex.getMessage(), ex);
+            throw new XiSecurityException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
     private byte[] ecdsaSign(
             final byte[] dataToSign,
             final HashAlgoType hashAlgo)
-    throws SignerException {
+    throws XiSecurityException {
         byte[] input;
 
         String signatureAlgorithm;
@@ -357,7 +363,7 @@ class SunP11Identity extends P11Identity {
             input = dataToSign;
             signatureAlgorithm = SHA1withECDSA;
         } else {
-            throw new SignerException("unsupported mechanism");
+            throw new XiSecurityException("unsupported mechanism");
         }
 
         try {
@@ -366,9 +372,10 @@ class SunP11Identity extends P11Identity {
             byte[] x962Signature = sig.sign();
             return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
         } catch (NoSuchAlgorithmException ex) {
-            throw new SignerException("could not find signature algorithm " + ex.getMessage(), ex);
+            throw new XiSecurityException("could not find signature algorithm " + ex.getMessage(),
+                    ex);
         } catch (SignatureException ex) {
-            throw new SignerException("SignatureException: " + ex.getMessage(), ex);
+            throw new XiSecurityException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
@@ -376,7 +383,18 @@ class SunP11Identity extends P11Identity {
             final Signature sig,
             final byte[] data)
     throws SignatureException {
-        sig.update(data); // FIXME: consider the maximal length of one message sent to HSM
+        final int len = data.length;
+        if (len <= maxMessageSize) {
+            sig.update(data);
+            return;
+        }
+
+        for (int i = 0; i < len; i += maxMessageSize) {
+            int blockLen = Math.min(maxMessageSize, len - i);
+            byte[] block = new byte[blockLen];
+            System.arraycopy(data, i, block, 0, blockLen);
+            sig.update(block);
+        }
     }
 
 }

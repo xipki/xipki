@@ -44,9 +44,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 import iaik.pkcs.pkcs11.DefaultInitializeArgs;
 import iaik.pkcs.pkcs11.Module;
@@ -66,17 +65,10 @@ public class IaikP11ModulePool {
 
     private final Map<String, IaikP11Module> modules = new HashMap<>();
 
-    private String defaultModuleName;
-
     public synchronized void removeModule(
             final String moduleName) {
         ParamUtil.requireNonNull("moduleName", moduleName);
         IaikP11Module module = modules.remove(moduleName);
-        if (module == null && defaultModuleName != null
-                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
-            module = modules.remove(defaultModuleName);
-        }
-
         if (module == null) {
             return;
         }
@@ -96,20 +88,14 @@ public class IaikP11ModulePool {
     }
 
     public IaikP11Module getModule(
-            final String moduleName)
-    throws SignerException {
+            final String moduleName) {
         ParamUtil.requireNonNull("moduleName", moduleName);
-        IaikP11Module module = modules.get(moduleName);
-        if (module == null && defaultModuleName != null
-                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
-            module = modules.get(defaultModuleName);
-        }
-        return module;
+        return modules.get(moduleName);
     }
 
     public synchronized IaikP11Module getModule(
             final P11ModuleConf moduleConf)
-    throws SignerException {
+    throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
         IaikP11Module extModule = modules.get(moduleConf.getName());
         if (extModule != null) {
@@ -127,7 +113,7 @@ public class IaikP11ModulePool {
                         ex.getMessage());
             }
             LOG.debug(msg, ex);
-            throw new SignerException(msg);
+            throw new P11TokenException(msg, ex);
         }
 
         try {
@@ -141,7 +127,7 @@ public class IaikP11ModulePool {
                 }
                 LOG.debug(message, ex);
                 close(module);
-                throw new SignerException(ex.getMessage());
+                throw new P11TokenException(ex.getMessage(), ex);
             } else {
                 LOG.info("PKCS#11 module already initialized");
                 if (LOG.isInfoEnabled()) {
@@ -160,7 +146,7 @@ public class IaikP11ModulePool {
             }
             LOG.debug(message, th);
             close(module);
-            throw new SignerException(th.getMessage());
+            throw new P11TokenException(th.getMessage());
         }
 
         extModule = new IaikP11Module(module, moduleConf);
@@ -179,15 +165,6 @@ public class IaikP11ModulePool {
             }
         }
         modules.clear();
-    }
-
-    public String getDefaultModuleName() {
-        return defaultModuleName;
-    }
-
-    public void setDefaultModuleName(
-            final String defaultModuleName) {
-        this.defaultModuleName = ParamUtil.requireNonBlank("defaultModuleName", defaultModuleName);
     }
 
     public static IaikP11ModulePool getInstance() {

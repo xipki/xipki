@@ -47,8 +47,8 @@ import java.net.URL;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -143,7 +143,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
 
     @Override
     public void refresh()
-    throws SignerException {
+    throws P11TokenException {
     }
 
     public String getServerUrl() {

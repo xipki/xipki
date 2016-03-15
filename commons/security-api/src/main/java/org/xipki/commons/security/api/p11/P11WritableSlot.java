@@ -46,8 +46,8 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerException;
 
 /**
  * @author Lijun Liao
@@ -65,53 +65,53 @@ public interface P11WritableSlot {
             @Nonnull X509Certificate newCert,
             @Nullable Set<X509Certificate> caCerts,
             @Nonnull SecurityFactory securityFactory)
-    throws Exception;
+    throws P11TokenException, XiSecurityException;
 
     boolean removeKeyAndCerts(
             @Nonnull P11KeyIdentifier keyIdentifier)
-    throws Exception;
+    throws P11TokenException, XiSecurityException;
 
     boolean removeKey(
             @Nonnull P11KeyIdentifier keyIdentifier)
-    throws Exception;
+    throws P11TokenException, XiSecurityException;
 
     void removeCerts(
             @Nonnull P11KeyIdentifier keyIdentifier)
-    throws Exception;
+    throws P11TokenException, XiSecurityException;
 
     P11KeyIdentifier addCert(
             @Nonnull X509Certificate cert)
-    throws Exception;
+    throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:SKIP
     P11KeyIdentifier generateRSAKeypair(
             int keySize,
             @Nonnull BigInteger publicExponent,
             @Nonnull String label)
-    throws Exception;
+    throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:SKIP
     P11KeyIdentifier generateDSAKeypair(
             int plength,
             int qlength,
             @Nonnull String label)
-    throws Exception;
+    throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:SKIP
     P11KeyIdentifier generateECKeypair(
             @Nonnull String curveNameOrOid,
             @Nonnull String label)
-    throws Exception;
+    throws P11TokenException, XiSecurityException;
 
     X509Certificate exportCert(
             @Nonnull P11KeyIdentifier keyIdentifier)
-    throws Exception;
+    throws P11TokenException, XiSecurityException;
 
     List<? extends P11Identity> getP11Identities();
 
     void showDetails(
             @Nonnull OutputStream stream,
             boolean verbose)
-    throws IOException, SignerException;
+    throws P11TokenException, XiSecurityException, IOException;
 
 }

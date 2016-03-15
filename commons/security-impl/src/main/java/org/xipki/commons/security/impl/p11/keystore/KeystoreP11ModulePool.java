@@ -43,9 +43,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -60,17 +60,10 @@ public class KeystoreP11ModulePool {
 
     private final Map<String, KeystoreP11Module> modules = new HashMap<>();
 
-    private String defaultModuleName;
-
-    public synchronized void removeModule(
+    synchronized void removeModule(
             final String moduleName) {
         ParamUtil.requireNonBlank("moduleName", moduleName);
         KeystoreP11Module module = modules.remove(moduleName);
-        if (module == null && defaultModuleName != null
-                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
-            module = modules.remove(defaultModuleName);
-        }
-
         if (module == null) {
             return;
         }
@@ -91,18 +84,13 @@ public class KeystoreP11ModulePool {
 
     public KeystoreP11Module getModule(
             final String moduleName)
-    throws SignerException {
-        KeystoreP11Module module = modules.get(moduleName);
-        if (module == null && defaultModuleName != null
-                && SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName)) {
-            module = modules.get(defaultModuleName);
-        }
-        return module;
+    throws XiSecurityException {
+        return modules.get(moduleName);
     }
 
     public synchronized KeystoreP11Module getModule(
             final P11ModuleConf moduleConf)
-    throws SignerException {
+    throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
         KeystoreP11Module extModule = modules.get(moduleConf.getName());
         if (extModule == null) {
@@ -123,16 +111,6 @@ public class KeystoreP11ModulePool {
             }
         }
         modules.clear();
-    }
-
-    public String getDefaultModuleName() {
-        return defaultModuleName;
-    }
-
-    public void setDefaultModuleName(
-            final String defaultModuleName) {
-        ParamUtil.requireNonBlank("defaultModuleName", defaultModuleName);
-        this.defaultModuleName = defaultModuleName;
     }
 
     public static KeystoreP11ModulePool getInstance() {

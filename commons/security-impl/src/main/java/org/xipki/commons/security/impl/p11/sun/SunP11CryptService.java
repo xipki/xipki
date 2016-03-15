@@ -43,14 +43,12 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Provider;
-import java.security.Provider.Service;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,16 +62,19 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11MechanismRetriever;
+import org.xipki.commons.security.api.p11.P11MechanismFilter;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11TokenException;
+import org.xipki.commons.security.api.p11.P11UnknownEntityException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 // CHECKSTYLE:OFF
@@ -97,20 +98,22 @@ public final class SunP11CryptService implements P11CryptService {
 
     private final P11ModuleConf moduleConf;
 
-    private final Map<Integer, Set<Long>> slotIndexMechanismsMap = new ConcurrentHashMap<>();
-
-    private final Map<Long, Set<Long>> slotIdMechanismsMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<P11SlotIdentifier, SunP11Slot> slotMap
+            = new ConcurrentHashMap<>();
 
     private SunP11CryptService(
             final P11ModuleConf moduleConf)
-    throws SignerException {
+    throws P11TokenException {
         this.moduleConf = ParamUtil.requireNonNull("moduleConf", moduleConf);
+        if (moduleConf.getUserType() != P11Constants.CKU_USER) {
+            throw new P11TokenException("unsupported userType " + moduleConf.getUserType());
+        }
         refresh();
     } // constructor
 
     @Override
     public synchronized void refresh()
-    throws SignerException {
+    throws P11TokenException {
         final String nativeLib = moduleConf.getNativeLibrary();
 
         Set<SunP11Identity> currentIdentifies = new HashSet<>();
@@ -120,8 +123,7 @@ public final class SunP11CryptService implements P11CryptService {
 
         long[] slotList = allSlots(nativeLib);
 
-        Map<P11SlotIdentifier, Set<Long>> currentSupportedMechanisms = new HashMap<>();
-        P11MechanismRetriever mechRetriever = moduleConf.getP11MechanismRetriever();
+        P11MechanismFilter mechanismFilter = moduleConf.getP11MechanismFilter();
 
         for (int i = 0; i < slotList.length; i++) {
             P11SlotIdentifier slotId = new P11SlotIdentifier(i, slotList[i]);
@@ -138,58 +140,11 @@ public final class SunP11CryptService implements P11CryptService {
                     provider = getPkcs11Provider(nativeLib, i);
                 }
 
-                Set<Long> mechs = new HashSet<>();
-                Set<Service> services = provider.getServices();
-                for (Service service : services) {
-                    String type = service.getType();
-                    String algo = service.getAlgorithm();
-
-                    if ("Cipher".equalsIgnoreCase(type)) {
-                        if ("RSA/ECB/NoPadding".equals(algo)) {
-                            mechs.add(P11Constants.CKM_RSA_X_509);
-                            mechs.add(P11Constants.CKM_RSA_PKCS);
-                            mechs.add(P11Constants.CKM_SHA1_RSA_PKCS);
-                            mechs.add(P11Constants.CKM_SHA224_RSA_PKCS);
-                            mechs.add(P11Constants.CKM_SHA256_RSA_PKCS);
-                            mechs.add(P11Constants.CKM_SHA384_RSA_PKCS);
-                            mechs.add(P11Constants.CKM_SHA512_RSA_PKCS);
-                        }
-                        continue;
-                    } else if ("Signature".equalsIgnoreCase(type)) {
-                        if ("SHA1withRSA".equalsIgnoreCase(algo)) {
-                            mechs.add(P11Constants.CKM_SHA1_RSA_PKCS);
-                        } else if ("SHA224withRSA".equalsIgnoreCase(algo)) {
-                            mechs.add(P11Constants.CKM_SHA224_RSA_PKCS);
-                        } else if ("SHA256withRSA".equalsIgnoreCase(algo)) {
-                            mechs.add(P11Constants.CKM_SHA256_RSA_PKCS);
-                        } else if ("SHA384withRSA".equalsIgnoreCase(algo)) {
-                            mechs.add(P11Constants.CKM_SHA384_RSA_PKCS);
-                        } else if ("SHA512withRSA".equalsIgnoreCase(algo)) {
-                            mechs.add(P11Constants.CKM_SHA512_RSA_PKCS);
-                        } else if ("SHA1withDSA".equalsIgnoreCase(algo)) {
-                            mechs.add(P11Constants.CKM_DSA_SHA1);
-                        } else if ("NONEwithDSA".equalsIgnoreCase(algo)) {
-                            mechs.add(P11Constants.CKM_DSA);
-                        } else if ("SHA1withECDSA".equalsIgnoreCase(algo)) {
-                            mechs.add(P11Constants.CKM_ECDSA_SHA1);
-                        } else if ("NONEwithECDSA".equalsIgnoreCase(algo)) {
-                            mechs.add(P11Constants.CKM_ECDSA);
-                        }
-                    }
-                }
-
-                Set<Long> mechs2 = new HashSet<>();
-                for (Long mech : mechs) {
-                    if (mechRetriever.isMechanismPermitted(slotId, mech)) {
-                        mechs2.add(mech);
-                    }
-                }
-                LOG.info("slot {} in module {} supports following mechanisms: {}", slotId,
-                        moduleConf.getName(), mechs2);
-                currentSupportedMechanisms.put(slotId, mechs2);
+                SunP11Slot slot = new SunP11Slot(moduleConf.getName(), slotId, mechanismFilter,
+                        provider);
+                this.slotMap.put(slotId, slot);
 
                 KeyStore keystore = KeyStore.getInstance("PKCS11", provider);
-
                 List<char[]> password = moduleConf.getPasswordRetriever().getPassword(slotId);
 
                 for (char[] singlePassword : password) {
@@ -199,7 +154,7 @@ public final class SunP11CryptService implements P11CryptService {
                                 ? "dummy".toCharArray() // keystore does not allow empty password
                                 : singlePassword);
                     } catch (Exception ex) {
-                        throw new SignerException(ex.getMessage(), ex);
+                        throw new XiSecurityException(ex.getMessage(), ex);
                     }
                 }
 
@@ -253,9 +208,10 @@ public final class SunP11CryptService implements P11CryptService {
 
                         SecureRandom random4Sign = moduleConf.getSecurityFactory().getRandom4Sign();
                         SunP11Identity p11Identity = new SunP11Identity(provider, entityId,
-                                signatureKey, x509Certchain, pubKey, random4Sign);
+                                moduleConf.getMaxMessageSize(), signatureKey, x509Certchain, pubKey,
+                                random4Sign);
                         currentIdentifies.add(p11Identity);
-                    } catch (SignerException ex) {
+                    } catch (XiSecurityException ex) {
                         String msg = "SignerException while constructing SunP11Identity for alias "
                                 + alias + " (slot: " + i + ", module: " + moduleConf.getName()
                                 + ")";
@@ -276,15 +232,6 @@ public final class SunP11CryptService implements P11CryptService {
             }
         } // end for(i)
 
-        this.slotIndexMechanismsMap.clear();
-        this.slotIdMechanismsMap.clear();
-        for (P11SlotIdentifier slotId : currentSupportedMechanisms.keySet()) {
-            Set<Long> mechs = Collections.unmodifiableSet(currentSupportedMechanisms.get(slotId));
-            this.slotIdMechanismsMap.put(slotId.getSlotId(), mechs);
-            this.slotIndexMechanismsMap.put(slotId.getSlotIndex(), mechs);
-        }
-        currentSupportedMechanisms = null;
-
         this.identities.clear();
         this.identities.addAll(currentIdentifies);
         currentIdentifies.clear();
@@ -303,18 +250,36 @@ public final class SunP11CryptService implements P11CryptService {
     } // method refresh
 
     @Override
+    public Set<Long> getSupportedMechanisms(
+            final P11SlotIdentifier slotId)
+    throws P11TokenException {
+        return getNonnullSlot(slotId).getSupportedMechanisms();
+    }
+
+    @Override
     public boolean supportsMechanism(
             final P11SlotIdentifier slotId,
-            final long mechanism) {
-        Set<Long> mechs = null;
-        if (slotId.getSlotId() != null) {
-            mechs = slotIdMechanismsMap.get(slotId.getSlotId());
-        } else if (slotId.getSlotIndex() != null) {
-            mechs = slotIndexMechanismsMap.get(slotId.getSlotIndex());
+            final long mechanism)
+    throws P11UnknownEntityException {
+        return getNonnullSlot(slotId).supportsMechanism(mechanism);
+    }
+
+    private SunP11Slot getNonnullSlot(
+            final P11SlotIdentifier slotId)
+    throws P11UnknownEntityException {
+        SunP11Slot slot = null;
+        for (P11SlotIdentifier id : slotMap.keySet()) {
+            if (CompareUtil.equalsObject(id.getSlotIndex(), slotId.getSlotIndex())
+                    || CompareUtil.equalsObject(id.getSlotId(), slotId.getSlotId())) {
+                slot = slotMap.get(id);
+                break;
+            }
         }
-        return mechs == null
-                ? false
-                : mechs.contains(mechanism);
+
+        if (slot == null) {
+            throw new P11UnknownEntityException(slotId);
+        }
+        return slot;
     }
 
     @Override
@@ -323,60 +288,49 @@ public final class SunP11CryptService implements P11CryptService {
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
-    throws SignerException {
+    throws P11TokenException, XiSecurityException {
         if (!supportsMechanism(entityId.getSlotId(), mechanism)) {
-            throw new SignerException("mechanism " + mechanism + " is not supported by slot"
+            throw new XiSecurityException("mechanism " + mechanism + " is not supported by slot"
                     + entityId.getSlotId());
         }
 
         ensureResource();
-        return getNonNullIdentity(entityId).sign(mechanism, parameters, content);
+        return getNonnullIdentity(entityId).sign(mechanism, parameters, content);
     }
 
     @Override
     public PublicKey getPublicKey(
             final P11EntityIdentifier entityId)
-    throws SignerException {
-        SunP11Identity identity = getIdentity(entityId);
-        return (identity == null)
-                ? null
-                : identity.getPublicKey();
+    throws P11TokenException {
+        return getNonnullIdentity(entityId).getPublicKey();
     }
 
     @Override
     public X509Certificate getCertificate(
             final P11EntityIdentifier entityId)
-    throws SignerException {
-        SunP11Identity identity = getIdentity(entityId);
-        return (identity == null)
-                ? null
-                : identity.getCertificate();
+    throws P11TokenException {
+        return getNonnullIdentity(entityId).getCertificate();
     }
 
-    private SunP11Identity getNonNullIdentity(
+    private SunP11Identity getNonnullIdentity(
             final P11EntityIdentifier entityId)
-    throws SignerException {
+    throws P11UnknownEntityException {
         SunP11Identity identity = getIdentity(entityId);
         if (identity == null) {
-            throw new SignerException("found no key " + entityId);
+            throw new P11UnknownEntityException(entityId);
         }
         return identity;
     }
 
     private SunP11Identity getIdentity(
             final P11EntityIdentifier entityId)
-    throws SignerException {
+    throws P11UnknownEntityException {
         ParamUtil.requireNonNull("entityId", entityId);
-        if (entityId.getKeyId().getKeyLabel() == null) {
-            throw new SignerException("only key referencing by key-label is supported");
-        }
-
-        for (SunP11Identity identity : identities) {
-            if (identity.match(entityId)) {
-                return identity;
+        for (SunP11Identity id : identities) {
+            if (id.match(entityId)) {
+                return id;
             }
         }
-
         return null;
     }
 
@@ -388,16 +342,13 @@ public final class SunP11CryptService implements P11CryptService {
     @Override
     public X509Certificate[] getCertificates(
             final P11EntityIdentifier entityId)
-    throws SignerException {
-        SunP11Identity identity = getIdentity(entityId);
-        return (identity == null)
-                ? null
-                : identity.getCertificateChain();
+    throws P11TokenException {
+        return getNonnullIdentity(entityId).getCertificateChain();
     }
 
     @Override
     public P11SlotIdentifier[] getSlotIdentifiers()
-    throws SignerException {
+    throws P11TokenException {
         List<P11SlotIdentifier> slotIds = new LinkedList<>();
         for (SunP11Identity identity : identities) {
             P11SlotIdentifier slotId = identity.getEntityId().getSlotId();
@@ -412,7 +363,7 @@ public final class SunP11CryptService implements P11CryptService {
     @Override
     public String[] getKeyLabels(
             final P11SlotIdentifier slotId)
-    throws SignerException {
+    throws P11TokenException {
         List<String> keyLabels = new LinkedList<>();
         for (SunP11Identity identity : identities) {
             if (slotId.equals(identity.getEntityId().getSlotId())) {
@@ -459,7 +410,7 @@ public final class SunP11CryptService implements P11CryptService {
 
     private static long[] allSlots(
             final String pkcs11Module)
-    throws SignerException {
+    throws P11TokenException {
         String functionList = null;
         sun.security.pkcs11.wrapper.CK_C_INITIALIZE_ARGS initArgs = null;
         boolean omitInitialize = true;
@@ -469,31 +420,33 @@ public final class SunP11CryptService implements P11CryptService {
             pkcs11 = sun.security.pkcs11.wrapper.PKCS11.getInstance(
                     pkcs11Module, functionList, initArgs, omitInitialize);
         } catch (IOException | PKCS11Exception ex) {
-            throw new SignerException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+            throw new P11TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
 
         long[] slotList;
         try {
             slotList = pkcs11.C_GetSlotList(false);
         } catch (PKCS11Exception ex) {
-            throw new SignerException("PKCS11Exception: " + ex.getMessage(), ex);
+            throw new P11TokenException("PKCS11Exception: " + ex.getMessage(), ex);
         }
         return slotList;
     }
 
     public static SunP11CryptService getInstance(
             final P11ModuleConf moduleConf)
-    throws SignerException {
+    throws P11TokenException {
+        final String name = moduleConf.getName();
+        SunP11CryptService instance;
+
         synchronized (INSTANCES) {
-            final String name = moduleConf.getName();
-            SunP11CryptService instance = INSTANCES.get(name);
+            instance = INSTANCES.get(name);
             if (instance == null) {
                 instance = new SunP11CryptService(moduleConf);
                 INSTANCES.put(name, instance);
             }
-
-            return instance;
         }
+
+        return instance;
     }
 
 }

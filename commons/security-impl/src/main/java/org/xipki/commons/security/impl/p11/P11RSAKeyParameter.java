@@ -42,9 +42,9 @@ import java.security.interfaces.RSAPublicKey;
 
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SignerException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -95,7 +95,7 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
         RSAPublicKey key;
         try {
             key = (RSAPublicKey) p11CryptService.getPublicKey(entityId);
-        } catch (SignerException ex) {
+        } catch (P11TokenException ex) {
             throw new InvalidKeyException(ex.getMessage(), ex);
         }
 
