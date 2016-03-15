@@ -38,11 +38,12 @@ package org.xipki.commons.security.api.p11;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.xipki.commons.security.api.SignerException;
+import org.xipki.commons.security.api.XiSecurityException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
@@ -53,36 +54,41 @@ import org.xipki.commons.security.api.p11.parameters.P11Params;
 public interface P11CryptService {
 
     void refresh()
-    throws SignerException;
+    throws P11TokenException;
+
+    Set<Long> getSupportedMechanisms(
+            @Nonnull P11SlotIdentifier slotId)
+    throws P11TokenException;
 
     boolean supportsMechanism(
             @Nonnull P11SlotIdentifier slotId,
-            long mechanism);
+            long mechanism)
+    throws P11TokenException;
 
     byte[] sign(
             @Nonnull P11EntityIdentifier entityId,
             long mechanism,
             @Nullable P11Params parameters,
             byte[] content)
-    throws SignerException;
+    throws P11TokenException, XiSecurityException;
 
     PublicKey getPublicKey(
             @Nonnull P11EntityIdentifier entityId)
-    throws SignerException;
+    throws P11TokenException;
 
     X509Certificate getCertificate(
             @Nonnull P11EntityIdentifier entityId)
-    throws SignerException;
+    throws P11TokenException;
 
     X509Certificate[] getCertificates(
             @Nonnull P11EntityIdentifier entityId)
-    throws SignerException;
+    throws P11TokenException;
 
     P11SlotIdentifier[] getSlotIdentifiers()
-    throws SignerException;
+    throws P11TokenException;
 
     String[] getKeyLabels(
             @Nonnull P11SlotIdentifier slotId)
-    throws SignerException;
+    throws P11TokenException;
 
 }

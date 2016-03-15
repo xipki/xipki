@@ -48,6 +48,20 @@ import javax.annotation.Nonnull;
  */
 
 public class P11Constants {
+    /* Security Officer */
+    public static final long CKU_SO = 0L;
+
+    /* Normal user */
+    public static final long CKU_USER = 1L;
+
+    /* Context specific (added in v2.20) */
+    public static final long CKU_CONTEXT_SPECIFIC = 2L;
+
+    /* key types */
+    public static final long CKK_RSA = 0x00000000L;
+    public static final long CKK_DSA = 0x00000001L;
+    public static final long CKK_EC = 0x00000003L;
+
     /* key pair generation */
     public static final long CKM_RSA_PKCS_KEY_PAIR_GEN = 0x00000000L;
 

@@ -69,15 +69,22 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
     @Override
     public int compareTo(
             final P11EntityIdentifier obj) {
-        // FIXME: implement me
-        return 0;
+        int ct = slotId.compareTo(obj.slotId);
+        if (ct != 0) {
+            return ct;
+        }
+        return keyId.compareTo(obj.keyId);
     }
 
     @Override
     public boolean equals(
             final Object obj) {
-        // FIXME: implement me
-        return super.equals(obj);
+        if (!(obj instanceof P11EntityIdentifier)) {
+            return false;
+        }
+
+        P11EntityIdentifier ei = (P11EntityIdentifier) obj;
+        return this.slotId.equals(ei.slotId) && this.keyId.equals(ei.getSlotId());
     }
 
     public boolean match(
@@ -92,6 +99,12 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
     public String toString() {
         // FIMXE: implement me
         return super.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        // FIXME: implement me
+        return 0;
     }
 
 }

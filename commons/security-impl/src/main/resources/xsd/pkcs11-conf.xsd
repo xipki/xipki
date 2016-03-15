@@ -15,9 +15,14 @@
   </xs:complexType>
   <xs:complexType name="modulesType">
     <xs:sequence>
-      <xs:element name="module" type="moduleType" maxOccurs="unbounded"/>
+      <xs:element name="module" type="moduleType" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            exactly one module must have the name 'default'
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
-    <xs:attribute name="defaultModule" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:complexType name="moduleType">
     <xs:all>
@@ -39,6 +44,20 @@
         <xs:annotation>
           <xs:documentation>
             Which slots should be considered. Absent for no slot.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="user" type="xs:long" minOccurs="0" default="1">
+        <xs:annotation>
+          <xs:documentation>
+            specify the user type, default to be 1 (CKU_USER)
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="maxMessageSize" type="xs:int" minOccurs="0" default="16384">
+        <xs:annotation>
+          <xs:documentation>
+            maximal size of the message sent to the PKCS#11 device, default to 16KByte
           </xs:documentation>
         </xs:annotation>
       </xs:element>

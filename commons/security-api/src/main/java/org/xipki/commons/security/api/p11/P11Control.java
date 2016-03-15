@@ -52,16 +52,12 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class P11Control {
 
-    private final String defaultModuleName;
-
     private final Map<String, P11ModuleConf> moduleConfs;
 
     private final Set<String> moduleNames;
 
     public P11Control(
-            final String defaultModuleName,
             final Set<P11ModuleConf> moduleConfs) {
-        this.defaultModuleName = ParamUtil.requireNonBlank("defaultModuleName", defaultModuleName);
         if (CollectionUtil.isEmpty(moduleConfs)) {
             this.moduleConfs = Collections.emptyMap();
             this.moduleNames = Collections.emptySet();
@@ -74,10 +70,6 @@ public class P11Control {
             }
             this.moduleNames = Collections.unmodifiableSet(tmpModuleNames);
         }
-    }
-
-    public String getDefaultModuleName() {
-        return defaultModuleName;
     }
 
     public P11ModuleConf getModuleConf(

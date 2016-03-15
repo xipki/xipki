@@ -44,6 +44,7 @@ import java.util.Set;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11CryptService;
 
@@ -59,8 +60,6 @@ public class LocalP11CryptServicePool {
     private static final Logger LOG = LoggerFactory.getLogger(LocalP11CryptServicePool.class);
 
     private SecurityFactory securityFactory;
-
-    private String defaultPkcs11ModuleName;
 
     private Map<String, P11CryptService> p11CryptServices = new HashMap<>();
 
@@ -89,7 +88,6 @@ public class LocalP11CryptServicePool {
                 throw new IllegalStateException("securityFactory is not configured");
             }
 
-            this.defaultPkcs11ModuleName = securityFactory.getDefaultPkcs11ModuleName();
             Set<String> moduleNames = securityFactory.getPkcs11ModuleNames();
             for (String moduleName : moduleNames) {
                 P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
@@ -108,12 +106,8 @@ public class LocalP11CryptServicePool {
 
     public P11CryptService getP11CryptService(
             final String moduleName) {
-        String tmpModuleName = moduleName;
-        if (tmpModuleName == null
-                || SecurityFactory.DEFAULT_P11MODULE_NAME.equalsIgnoreCase(tmpModuleName)) {
-            tmpModuleName = defaultPkcs11ModuleName;
-        }
-        return p11CryptServices.get(tmpModuleName);
+        ParamUtil.requireNonBlank("moduleName", moduleName);
+        return p11CryptServices.get(moduleName);
     }
 
     public int getVersion() {

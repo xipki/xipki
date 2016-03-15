@@ -61,7 +61,7 @@ import org.xipki.commons.security.api.p11.P11EntityIdentifier;
  */
 
 // CHECKSTYLE:SKIP
-public class ASN1EntityIdentifer extends ASN1Object {
+public class ASN1EntityIdentifier extends ASN1Object {
 
     private ASN1SlotIdentifier slotId;
 
@@ -69,7 +69,7 @@ public class ASN1EntityIdentifer extends ASN1Object {
 
     private P11EntityIdentifier entityId;
 
-    public ASN1EntityIdentifer(
+    public ASN1EntityIdentifier(
             final ASN1SlotIdentifier slotId,
             final ASN1KeyIdentifier keyId) {
         ParamUtil.requireNonNull("slotId", slotId);
@@ -77,13 +77,13 @@ public class ASN1EntityIdentifer extends ASN1Object {
         init(null, slotId, keyId);
     }
 
-    public ASN1EntityIdentifer(
+    public ASN1EntityIdentifier(
             final P11EntityIdentifier entityId) {
         ParamUtil.requireNonNull("entityId", entityId);
         init(entityId, null, null);
     }
 
-    private ASN1EntityIdentifer(
+    private ASN1EntityIdentifier(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         final int n = seq.size();
@@ -135,16 +135,16 @@ public class ASN1EntityIdentifer extends ASN1Object {
         return entityId;
     }
 
-    public static ASN1EntityIdentifer getInstance(
+    public static ASN1EntityIdentifier getInstance(
             final Object obj)
     throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof ASN1EntityIdentifer) {
-            return (ASN1EntityIdentifer) obj;
+        if (obj == null || obj instanceof ASN1EntityIdentifier) {
+            return (ASN1EntityIdentifier) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new ASN1EntityIdentifer((ASN1Sequence) obj);
+                return new ASN1EntityIdentifier((ASN1Sequence) obj);
             }
 
             if (obj instanceof byte[]) {

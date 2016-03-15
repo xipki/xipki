@@ -36,22 +36,21 @@
 
 package org.xipki.commons.security.api.p11;
 
-import javax.annotation.Nonnull;
-
-import org.xipki.commons.security.api.XiSecurityException;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface P11CryptServiceFactory {
+public class P11PermitAllMechanimFilter implements P11MechanismFilter {
 
-    void init(
-            @Nonnull P11Control p11Control);
+    public static final P11PermitAllMechanimFilter INSTANCE
+            = new P11PermitAllMechanimFilter();
 
-    P11CryptService createP11CryptService(
-            @Nonnull String moduleName)
-    throws P11TokenException, XiSecurityException;
+    @Override
+    public boolean isMechanismPermitted(
+            final P11SlotIdentifier slotId,
+            final long mechanism) {
+        return true;
+    }
 
 }

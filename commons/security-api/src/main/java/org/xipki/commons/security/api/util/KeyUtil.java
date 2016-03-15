@@ -38,6 +38,7 @@ package org.xipki.commons.security.api.util;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -133,7 +134,7 @@ public class KeyUtil {
     public static KeyPair generateRSAKeypair(
             final int keysize,
             final SecureRandom random)
-    throws Exception {
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         return generateRSAKeypair(keysize, (BigInteger) null, random);
     }
 
@@ -142,7 +143,7 @@ public class KeyUtil {
             final int keysize,
             final BigInteger publicExponent,
             final SecureRandom random)
-    throws Exception {
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
 
         BigInteger tmpPublicExponent = publicExponent;
@@ -163,7 +164,7 @@ public class KeyUtil {
             final int plength,
             final int qlength,
             final SecureRandom random)
-    throws Exception {
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         return generateDSAKeypair(plength, qlength, 80, random);
     }
 
@@ -173,7 +174,7 @@ public class KeyUtil {
             final int qlength,
             final int certainty,
             final SecureRandom random)
-    throws Exception {
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
         DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
                 plength, qlength, certainty, random);
@@ -191,7 +192,7 @@ public class KeyUtil {
     public static KeyPair generateECKeypairForCurveNameOrOid(
             final String curveNameOrOid,
             final SecureRandom random)
-    throws Exception {
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         ASN1ObjectIdentifier oid = getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (oid == null) {
             throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
@@ -203,7 +204,7 @@ public class KeyUtil {
     public static KeyPair generateECKeypair(
             final ASN1ObjectIdentifier curveId,
             final SecureRandom random)
-    throws Exception {
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         ParamUtil.requireNonNull("curveId", curveId);
 
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveId.getId());

@@ -115,7 +115,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.XipkiCmpConstants;
+import org.xipki.commons.security.api.XiCmpConstants;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
 import org.xipki.pki.ca.client.api.PkiErrorException;
@@ -176,7 +176,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     public CrlResultType generateCrl(
             final RequestResponseDebug debug)
     throws CmpRequestorException, PkiErrorException {
-        int action = XipkiCmpConstants.ACTION_GEN_CRL;
+        int action = XiCmpConstants.ACTION_GEN_CRL;
         PKIMessage request = buildMessageWithXipkAction(action, null);
         PkiResponse response = signAndSend(request, debug);
         return evaluateCrlResponse(response, action);
@@ -198,7 +198,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             ASN1ObjectIdentifier type = CMPObjectIdentifiers.it_currentCRL;
             request = buildMessageWithGeneralMsgContent(type, null);
         } else {
-            action = XipkiCmpConstants.ACTION_GET_CRL_WITH_SN;
+            action = XiCmpConstants.ACTION_GET_CRL_WITH_SN;
             request = buildMessageWithXipkAction(action, new ASN1Integer(crlNumber));
         }
 
@@ -299,7 +299,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         ParamUtil.requireNonNull("request", request);
 
         PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request,
-                XipkiCmpConstants.CRL_REASON_REMOVE);
+                XiCmpConstants.CRL_REASON_REMOVE);
         PkiResponse response = signAndSend(reqMessage, debug);
         return parse(response, request.getRequestEntries());
     }
@@ -742,7 +742,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         vec.add(new ASN1Integer(2));
         ASN1Sequence acceptVersions = new DERSequence(vec);
 
-        int action = XipkiCmpConstants.ACTION_GET_CAINFO;
+        int action = XiCmpConstants.ACTION_GET_CAINFO;
         PKIMessage request = buildMessageWithXipkAction(action, acceptVersions);
         PkiResponse response = signAndSend(request, debug);
         ASN1Encodable itvValue = extractXipkiActionRepContent(response, action);
