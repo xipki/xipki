@@ -50,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
@@ -165,7 +165,7 @@ class KeystoreP11CryptService implements P11CryptService {
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         if (!supportsMechanism(entityId.getSlotId(), mechanism)) {
             throw new P11TokenException("mechanism " + mechanism + " is not supported by slot"
                     + entityId.getSlotId());

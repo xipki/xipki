@@ -100,7 +100,7 @@ public interface ConcurrentContentSigner {
     void initialize(
             @Nullable String conf,
             @Nullable PasswordResolver passwordResolver)
-    throws XiSecurityException;
+    throws SecurityException;
 
     POPOSigningKey build(
             @Nonnull ProofOfPossessionSigningKeyBuilder builder)

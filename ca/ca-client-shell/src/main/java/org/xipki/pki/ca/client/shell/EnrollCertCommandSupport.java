@@ -87,7 +87,7 @@ import org.xipki.commons.security.api.ExtensionExistence;
 import org.xipki.commons.security.api.InvalidOidOrNameException;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
@@ -218,7 +218,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
     protected abstract ConcurrentContentSigner getSigner(
             @Nonnull SignatureAlgoControl signatureAlgoControl)
-    throws XiSecurityException;
+    throws SecurityException;
 
     @Override
     protected Object doExecute()

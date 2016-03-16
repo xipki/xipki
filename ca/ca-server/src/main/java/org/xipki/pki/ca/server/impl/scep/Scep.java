@@ -79,7 +79,7 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.KeyCertPair;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
@@ -196,7 +196,7 @@ public class Scep {
             privKeyAndCert = caManager.getSecurityFactory().createPrivateKeyAndCert(
                     dbEntry.getResponderType(), dbEntry.getResponderConf(),
                     dbEntry.getCertificate());
-        } catch (XiSecurityException ex) {
+        } catch (SecurityException ex) {
             throw new CaMgmtException(ex);
         }
 

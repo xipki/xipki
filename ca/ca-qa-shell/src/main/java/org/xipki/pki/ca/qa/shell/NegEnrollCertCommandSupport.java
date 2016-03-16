@@ -54,7 +54,7 @@ import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.pki.ca.client.api.CertOrError;
@@ -112,7 +112,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
 
     protected abstract ConcurrentContentSigner getSigner(
             @Nonnull SignatureAlgoControl signatureAlgoControl)
-    throws XiSecurityException;
+    throws SecurityException;
 
     @Override
     protected Object doExecute()
