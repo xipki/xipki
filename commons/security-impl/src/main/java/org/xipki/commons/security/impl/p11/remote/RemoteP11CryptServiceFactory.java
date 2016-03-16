@@ -42,7 +42,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Control;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
@@ -72,7 +72,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
     @Override
     public P11CryptService createP11CryptService(
             final String moduleName)
-    throws XiSecurityException {
+    throws SecurityException {
         ParamUtil.requireNonBlank("moduleName", moduleName);
         if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
@@ -80,7 +80,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
 
         P11ModuleConf moduleConf = p11Control.getModuleConf(moduleName);
         if (moduleConf == null) {
-            throw new XiSecurityException("PKCS#11 module " + moduleName + " is not defined");
+            throw new SecurityException("PKCS#11 module " + moduleName + " is not defined");
         }
 
         synchronized (services) {
@@ -94,7 +94,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
                 } catch (Exception ex) {
                     LOG.error("could not createP11CryptService: {}", ex.getMessage());
                     LOG.debug("could not createP11CryptService", ex);
-                    throw new XiSecurityException(ex.getMessage(), ex);
+                    throw new SecurityException(ex.getMessage(), ex);
                 }
             }
 

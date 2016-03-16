@@ -116,7 +116,7 @@ import org.xipki.commons.security.api.FpIdCalculator;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
@@ -488,7 +488,7 @@ public class X509Ca {
         if (caInfo.isSignerRequired()) {
             try {
                 caInfo.initSigner(securityFactory);
-            } catch (XiSecurityException ex) {
+            } catch (SecurityException ex) {
                 final String message =
                         "security.createSigner caSigner (ca=" + caInfo.getName() + ")";
                 if (LOG.isErrorEnabled()) {

@@ -58,7 +58,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -178,7 +178,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
                     }
                 } // end for
             } // end for
-        } catch (XiSecurityException | P11TokenException ex) {
+        } catch (SecurityException | P11TokenException ex) {
             throw new IllegalArgumentException(ex.getClass().getName() + ": " + ex.getMessage(),
                     ex);
         }

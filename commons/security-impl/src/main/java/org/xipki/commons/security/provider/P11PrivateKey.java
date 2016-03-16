@@ -45,7 +45,7 @@ import java.security.interfaces.RSAPublicKey;
 import javax.annotation.Nullable;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
@@ -123,7 +123,7 @@ public class P11PrivateKey implements PrivateKey {
             long mechanism,
             @Nullable P11Params parameters,
             byte[] content)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         return p11CryptService.sign(entityId, mechanism, parameters, content);
     }
 

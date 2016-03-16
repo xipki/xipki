@@ -86,7 +86,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashCalculator;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -365,7 +365,7 @@ class IaikP11Slot implements P11WritableSlot {
                         new P11EntityIdentifier(slotId, tmpKeyId),
                         certChain.toArray(new X509Certificate[0]), signaturePublicKey);
                 currentIdentifies.add(identity);
-            } catch (XiSecurityException ex) {
+            } catch (SecurityException ex) {
                 String keyIdStr = hex(keyId);
                 final String message = "SignerException while initializing key with key-id "
                         + keyIdStr;
@@ -1159,7 +1159,7 @@ class IaikP11Slot implements P11WritableSlot {
             final X509Certificate newCert,
             final Set<X509Certificate> caCerts,
             final SecurityFactory securityFactory)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
         ParamUtil.requireNonNull("newCert", newCert);
 
@@ -1203,7 +1203,7 @@ class IaikP11Slot implements P11WritableSlot {
                     try {
                         encodedCaCert = caCert.getEncoded();
                     } catch (CertificateEncodingException ex) {
-                        throw new XiSecurityException(
+                        throw new SecurityException(
                                 "could not encode certificate: " + ex.getMessage(), ex);
                     }
 
@@ -1255,20 +1255,20 @@ class IaikP11Slot implements P11WritableSlot {
     @Override
     public boolean removeKey(
             final P11KeyIdentifier keyIdentifier)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         return doRemoveKeyAndCerts(keyIdentifier, false);
     }
 
     @Override
     public boolean removeKeyAndCerts(
             final P11KeyIdentifier keyIdentifier)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         return doRemoveKeyAndCerts(keyIdentifier, true);
     }
 
     private boolean doRemoveKeyAndCerts(
             final P11KeyIdentifier keyIdentifier, boolean removeCerts)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
 
         PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
@@ -1316,7 +1316,7 @@ class IaikP11Slot implements P11WritableSlot {
 
         final int n = msgBuilder.length();
         if (n > 2) {
-            throw new XiSecurityException(msgBuilder.substring(0, n - 2));
+            throw new SecurityException(msgBuilder.substring(0, n - 2));
         }
 
         return true;
@@ -1325,7 +1325,7 @@ class IaikP11Slot implements P11WritableSlot {
     @Override
     public void removeCerts(
             final P11KeyIdentifier keyIdentifier)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
 
         String keyLabel = keyIdentifier.getKeyLabel();
@@ -1337,7 +1337,7 @@ class IaikP11Slot implements P11WritableSlot {
                 keyIdentifier.getKeyId(), keyLabelChars);
 
         if (existingCerts == null || existingCerts.length == 0) {
-            throw new XiSecurityException("could not find certificates with id " + keyIdentifier);
+            throw new SecurityException("could not find certificates with id " + keyIdentifier);
         }
 
         Session session = borrowWritableSession();
@@ -1409,7 +1409,7 @@ class IaikP11Slot implements P11WritableSlot {
             final X509Certificate cert,
             final P11KeyIdentifier keyId,
             final SecurityFactory securityFactory)
-    throws XiSecurityException {
+    throws SecurityException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         ConfPairs pairs = new ConfPairs("slot-id", Long.toString(slot.getSlotID()));
         if (keyId.getKeyId() != null) {
@@ -1425,7 +1425,7 @@ class IaikP11Slot implements P11WritableSlot {
     @Override
     public P11KeyIdentifier addCert(
             final X509Certificate cert)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         ParamUtil.requireNonNull("cert", cert);
         Session session = borrowWritableSession();
         try {
@@ -1439,7 +1439,7 @@ class IaikP11Slot implements P11WritableSlot {
                         P11KeyIdentifier p11KeyId = new P11KeyIdentifier(
                                 certObj.getId().getByteArrayValue(),
                                 new String(certObj.getLabel().getCharArrayValue()));
-                        throw new XiSecurityException(
+                        throw new SecurityException(
                                 "given certificate already exists under " + p11KeyId);
                     }
                 }
@@ -1469,7 +1469,7 @@ class IaikP11Slot implements P11WritableSlot {
         } catch (TokenException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
         } catch (CertificateEncodingException ex) {
-            throw new XiSecurityException(ex.getMessage(), ex);
+            throw new SecurityException(ex.getMessage(), ex);
         } finally {
             returnWritableSession(session);
         }
@@ -1539,7 +1539,7 @@ class IaikP11Slot implements P11WritableSlot {
     public P11KeyIdentifier generateECKeypair(
             final String curveNameOrOid,
             final String label)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
         ParamUtil.requireNonBlank("label", label);
 
@@ -1642,7 +1642,7 @@ class IaikP11Slot implements P11WritableSlot {
             final X9ECParameters ecParams,
             final byte[] id,
             final String label)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         long mech = P11Constants.CKM_EC_KEY_PAIR_GEN;
         assertMechanismSupported(mech);
 
@@ -1654,7 +1654,7 @@ class IaikP11Slot implements P11WritableSlot {
         try {
             encodedCurveId = curveId.getEncoded();
         } catch (IOException ex) {
-            throw new XiSecurityException(ex.getMessage(), ex);
+            throw new SecurityException(ex.getMessage(), ex);
         }
         try {
             publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
@@ -1663,7 +1663,7 @@ class IaikP11Slot implements P11WritableSlot {
             try {
                 publicKey.getEcdsaParams().setByteArrayValue(ecParams.getEncoded());
             } catch (IOException ex2) {
-                throw new XiSecurityException(ex.getMessage(), ex);
+                throw new SecurityException(ex.getMessage(), ex);
             }
             try {
                 session.generateKeyPair(Mechanism.get(mech), publicKey, privateKey);
@@ -1681,7 +1681,7 @@ class IaikP11Slot implements P11WritableSlot {
     @Override
     public X509Certificate exportCert(
             final P11KeyIdentifier keyIdentifier)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
         PrivateKey privKey = getPrivateObject(null, null, keyIdentifier);
         if (privKey == null) {
@@ -1693,7 +1693,7 @@ class IaikP11Slot implements P11WritableSlot {
         try {
             return X509Util.parseCert(cert.getValue().getByteArrayValue());
         } catch (CertificateException | IOException ex) {
-            throw new XiSecurityException(ex.getMessage(), ex);
+            throw new SecurityException(ex.getMessage(), ex);
         }
     }
 
@@ -1801,7 +1801,7 @@ class IaikP11Slot implements P11WritableSlot {
             final byte[] encodedCert,
             final byte[] keyId,
             final char[] label)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         if (label == null || label.length == 0) {
             throw new IllegalArgumentException("label must not be null or empty");
         }
@@ -1811,7 +1811,7 @@ class IaikP11Slot implements P11WritableSlot {
             try {
                 tmpEncodedCert = cert.getEncoded();
             } catch (CertificateEncodingException ex) {
-                throw new XiSecurityException(ex.getMessage(), ex);
+                throw new SecurityException(ex.getMessage(), ex);
             }
         }
 
@@ -1889,7 +1889,7 @@ class IaikP11Slot implements P11WritableSlot {
 
     private static java.security.PublicKey generatePublicKey(
             final PublicKey p11Key)
-    throws XiSecurityException {
+    throws SecurityException {
         if (p11Key instanceof RSAPublicKey) {
             RSAPublicKey rsaP11Key = (RSAPublicKey) p11Key;
             byte[] expBytes = rsaP11Key.getPublicExponent().getByteArrayValue();
@@ -1906,7 +1906,7 @@ class IaikP11Slot implements P11WritableSlot {
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                 return keyFactory.generatePublic(keySpec);
             } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-                throw new XiSecurityException(ex.getMessage(), ex);
+                throw new SecurityException(ex.getMessage(), ex);
             }
         } else if (p11Key instanceof DSAPublicKey) {
             DSAPublicKey dsaP11Key = (DSAPublicKey) p11Key;
@@ -1922,7 +1922,7 @@ class IaikP11Slot implements P11WritableSlot {
                 KeyFactory keyFactory = KeyFactory.getInstance("DSA");
                 return keyFactory.generatePublic(keySpec);
             } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-                throw new XiSecurityException(ex.getMessage(), ex);
+                throw new SecurityException(ex.getMessage(), ex);
             }
         } else if (p11Key instanceof ECDSAPublicKey) {
             ECDSAPublicKey ecP11Key = (ECDSAPublicKey) p11Key;
@@ -1931,10 +1931,10 @@ class IaikP11Slot implements P11WritableSlot {
             try {
                 return KeyUtil.createECPublicKey(encodedAlgorithmIdParameters, encodedPoint);
             } catch (InvalidKeySpecException ex) {
-                throw new XiSecurityException(ex.getMessage(), ex);
+                throw new SecurityException(ex.getMessage(), ex);
             }
         } else {
-            throw new XiSecurityException("unknown publicKey class " + p11Key.getClass().getName());
+            throw new SecurityException("unknown publicKey class " + p11Key.getClass().getName());
         }
     } // method generatePublicKey
 
@@ -1942,7 +1942,7 @@ class IaikP11Slot implements P11WritableSlot {
     public void showDetails(
             final OutputStream stream,
             final boolean verbose)
-    throws IOException, XiSecurityException, P11TokenException {
+    throws IOException, SecurityException, P11TokenException {
         ParamUtil.requireNonNull("stream", stream);
         List<PrivateKey> allPrivateObjects = getAllPrivateObjects(null, null);
         int size = allPrivateObjects.size();

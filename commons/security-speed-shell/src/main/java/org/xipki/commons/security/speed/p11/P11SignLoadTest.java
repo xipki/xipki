@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11WritableSlot;
@@ -90,7 +90,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
             final String signatureAlgorithm,
             final P11KeyIdentifier keyId,
             final String description)
-    throws XiSecurityException {
+    throws SecurityException {
         super(description + "\nsignature algorithm: " + signatureAlgorithm);
 
         ParamUtil.requireNonNull("securityFactory", securityFactory);

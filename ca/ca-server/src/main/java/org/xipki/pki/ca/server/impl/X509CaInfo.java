@@ -54,7 +54,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
@@ -422,7 +422,7 @@ public class X509CaInfo {
 
     public boolean initSigner(
             final SecurityFactory securityFactory)
-    throws XiSecurityException {
+    throws SecurityException {
         if (signers != null) {
             return true;
         }
@@ -447,7 +447,7 @@ public class X509CaInfo {
                     ccs.shutdown();
                 }
                 tmpSigners.clear();
-                throw new XiSecurityException("could not initialize the CA signer");
+                throw new SecurityException("could not initialize the CA signer");
             }
         }
 

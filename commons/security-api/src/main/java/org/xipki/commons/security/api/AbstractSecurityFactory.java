@@ -56,7 +56,7 @@ public abstract class AbstractSecurityFactory implements SecurityFactory {
             final String type,
             final String conf,
             final X509Certificate cert)
-    throws XiSecurityException {
+    throws SecurityException {
         X509Certificate[] certs = (cert == null)
                 ? null
                 : new X509Certificate[]{cert};
@@ -70,7 +70,7 @@ public abstract class AbstractSecurityFactory implements SecurityFactory {
             final String hashAlgo,
             final SignatureAlgoControl sigAlgoControl,
             final X509Certificate cert)
-    throws XiSecurityException {
+    throws SecurityException {
         X509Certificate[] certs = (cert == null)
                 ? null
                 : new X509Certificate[]{cert};

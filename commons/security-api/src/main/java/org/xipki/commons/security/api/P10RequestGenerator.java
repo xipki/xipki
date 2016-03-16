@@ -62,7 +62,7 @@ public interface P10RequestGenerator {
             @Nonnull final SubjectPublicKeyInfo subjectPublicKeyInfo,
             @Nonnull final String subject,
             @Nullable final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    throws PasswordResolverException, XiSecurityException;
+    throws PasswordResolverException, SecurityException;
 
     PKCS10CertificationRequest generateRequest(
             @Nonnull final SecurityFactory securityFactory,
@@ -71,13 +71,13 @@ public interface P10RequestGenerator {
             @Nonnull final SubjectPublicKeyInfo subjectPublicKeyInfo,
             @Nonnull final X500Name subjectDn,
             @Nullable final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    throws PasswordResolverException, XiSecurityException;
+    throws PasswordResolverException, SecurityException;
 
     PKCS10CertificationRequest generateRequest(
             @Nonnull final ConcurrentContentSigner signer,
             @Nonnull final SubjectPublicKeyInfo subjectPublicKeyInfo,
             @Nonnull final X500Name subjectDn,
             @Nullable final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    throws XiSecurityException;
+    throws SecurityException;
 
 }

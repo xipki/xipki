@@ -67,7 +67,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
@@ -377,7 +377,7 @@ public class NssSignatureSpi extends SignatureSpi {
             AlgorithmIdentifier hashAlgId = new AlgorithmIdentifier(hashAlgOid, DERNull.INSTANCE);
             tbsHash = SignerUtil.EMSA_PKCS1_v1_5_encoding(derEncode(hashAlgId, hash),
                     blockSize * 8 - 1);
-        } catch (IOException | XiSecurityException ex) {
+        } catch (IOException | SecurityException ex) {
             throw new SignatureException(ex.getMessage(), ex);
         }
 
