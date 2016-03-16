@@ -38,7 +38,7 @@ package org.xipki.commons.security.api.p11;
 
 import javax.annotation.Nonnull;
 
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 
 /**
  * @author Lijun Liao
@@ -52,6 +52,6 @@ public interface P11CryptServiceFactory {
 
     P11CryptService createP11CryptService(
             @Nonnull String moduleName)
-    throws P11TokenException, XiSecurityException;
+    throws P11TokenException, SecurityException;
 
 }

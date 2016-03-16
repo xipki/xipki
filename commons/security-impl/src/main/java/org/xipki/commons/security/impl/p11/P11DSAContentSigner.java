@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -106,7 +106,7 @@ class P11DSAContentSigner implements ContentSigner {
             final P11EntityIdentifier entityId,
             final AlgorithmIdentifier signatureAlgId,
             final boolean plain)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         this.entityId = ParamUtil.requireNonNull("entityId", entityId);
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
@@ -115,7 +115,7 @@ class P11DSAContentSigner implements ContentSigner {
         String algOid = signatureAlgId.getAlgorithm().getId();
         HashAlgoType hashAlgo = sigAlgHashMap.get(algOid);
         if (hashAlgo == null) {
-            throw new XiSecurityException("unsupported signature algorithm " + algOid);
+            throw new SecurityException("unsupported signature algorithm " + algOid);
         }
         long tmpMechanism = hashMechMap.get(hashAlgo).longValue();
 
@@ -129,7 +129,7 @@ class P11DSAContentSigner implements ContentSigner {
         } else if (cryptService.supportsMechanism(slotId, this.mechanism)) {
             this.outputStream = new ByteArrayOutputStream();
         } else {
-            throw new XiSecurityException("unsupported signature algorithm " + algOid);
+            throw new SecurityException("unsupported signature algorithm " + algOid);
         }
         this.mechanism = tmpMechanism;
     }
@@ -158,7 +158,7 @@ class P11DSAContentSigner implements ContentSigner {
             } else {
                 return SignerUtil.convertPlainDSASigToX962(plainSignature);
             }
-        } catch (XiSecurityException ex) {
+        } catch (SecurityException ex) {
             LOG.warn("SignerException: {}", ex.getMessage());
             LOG.debug("SignerException", ex);
             throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
@@ -174,7 +174,7 @@ class P11DSAContentSigner implements ContentSigner {
     }
 
     private byte[] getPlainSignature()
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         byte[] dataToSign;
         if (mechanism == P11Constants.CKM_DSA) {
             dataToSign = ((DigestOutputStream) outputStream).digest();

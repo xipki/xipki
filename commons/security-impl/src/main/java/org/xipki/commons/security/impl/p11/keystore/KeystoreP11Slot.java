@@ -88,7 +88,7 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.HashCalculator;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -390,7 +390,7 @@ class KeystoreP11Slot implements P11WritableSlot {
     @Override
     public boolean removeKey(
             final P11KeyIdentifier keyIdentifier)
-    throws P11TokenException, XiSecurityException {
+    throws P11TokenException, SecurityException {
         ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
 
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
@@ -405,7 +405,7 @@ class KeystoreP11Slot implements P11WritableSlot {
     @Override
     public boolean removeKeyAndCerts(
             final P11KeyIdentifier keyIdentifier)
-    throws P11TokenException, XiSecurityException {
+    throws P11TokenException, SecurityException {
         ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
 
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
@@ -425,13 +425,13 @@ class KeystoreP11Slot implements P11WritableSlot {
             final X509Certificate newCert,
             final Set<X509Certificate> caCerts,
             final SecurityFactory securityFactory)
-    throws P11TokenException, XiSecurityException {
+    throws P11TokenException, SecurityException {
         ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
         ParamUtil.requireNonNull("newCert", newCert);
 
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
         if (identity == null) {
-            throw new XiSecurityException("could not find identity " + keyIdentifier);
+            throw new SecurityException("could not find identity " + keyIdentifier);
         }
 
         assertMatch(newCert, keyIdentifier);
@@ -452,20 +452,20 @@ class KeystoreP11Slot implements P11WritableSlot {
     @Override
     public void removeCerts(
             final P11KeyIdentifier keyIdentifier)
-    throws P11TokenException, XiSecurityException {
+    throws P11TokenException, SecurityException {
         removePkcs11Cert(keyIdentifier);
     }
 
     @Override
     public P11KeyIdentifier addCert(
             final X509Certificate cert)
-    throws P11TokenException, XiSecurityException {
+    throws P11TokenException, SecurityException {
         ParamUtil.requireNonNull("cert", cert);
         byte[] encodedCert;
         try {
             encodedCert = cert.getEncoded();
         } catch (CertificateEncodingException ex) {
-            throw new XiSecurityException("could not encoded cert: " + ex.getMessage(), ex);
+            throw new SecurityException("could not encoded cert: " + ex.getMessage(), ex);
         }
         String sha1sum = HashCalculator.hexSha1(encodedCert);
 
@@ -503,7 +503,7 @@ class KeystoreP11Slot implements P11WritableSlot {
             final int keySize,
             final BigInteger publicExponent,
             final String label)
-    throws P11TokenException, XiSecurityException {
+    throws P11TokenException, SecurityException {
         ParamUtil.requireNonBlank("label", label);
         ParamUtil.requireMin("keySize", keySize, 1024);
 
@@ -537,7 +537,7 @@ class KeystoreP11Slot implements P11WritableSlot {
             final int plength,
             final int qlength,
             final String label)
-    throws P11TokenException, XiSecurityException {
+    throws P11TokenException, SecurityException {
         ParamUtil.requireNonBlank("label", label);
         ParamUtil.requireMax("pLength", plength, 1024);
 
@@ -569,7 +569,7 @@ class KeystoreP11Slot implements P11WritableSlot {
     public P11KeyIdentifier generateECKeypair(
             final String curveNameOrOid,
             final String label)
-    throws P11TokenException, XiSecurityException {
+    throws P11TokenException, SecurityException {
         ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
         ParamUtil.requireNonBlank("label", label);
 
@@ -629,7 +629,7 @@ class KeystoreP11Slot implements P11WritableSlot {
     private void assertMatch(
             final X509Certificate cert,
             final P11KeyIdentifier keyId)
-    throws XiSecurityException {
+    throws SecurityException {
         ConfPairs pairs = new ConfPairs("slot", Integer.toString(slotId.getSlotIndex()));
         if (keyId.getKeyId() != null) {
             pairs.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
@@ -644,7 +644,7 @@ class KeystoreP11Slot implements P11WritableSlot {
     @Override
     public X509Certificate exportCert(
             final P11KeyIdentifier keyIdentifier)
-    throws P11TokenException, XiSecurityException {
+    throws P11TokenException, SecurityException {
         KeystoreP11Identity identity = getIdentity(keyIdentifier);
         if (identity == null) {
             return null;
@@ -667,7 +667,7 @@ class KeystoreP11Slot implements P11WritableSlot {
     public void showDetails(
             final OutputStream stream,
             final boolean verbose)
-    throws P11TokenException, IOException, XiSecurityException {
+    throws P11TokenException, IOException, SecurityException {
         ParamUtil.requireNonNull("stream", stream);
         List<? extends P11Identity> p11Identities = getP11Identities();
 
@@ -823,13 +823,13 @@ class KeystoreP11Slot implements P11WritableSlot {
             final byte[] id,
             final String label,
             final PrivateKey privateKey)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         PKCS8EncryptedPrivateKeyInfo encryptedPrivKeyInfo = privateKeyCryptor.encrypt(privateKey);
         byte[] encoded;
         try {
             encoded = encryptedPrivKeyInfo.getEncoded();
         } catch (IOException ex) {
-            throw new XiSecurityException("could not encode PrivateKey");
+            throw new SecurityException("could not encode PrivateKey");
         }
         savePkcs11Entry(privKeyDir, id, label, encoded);
     }
@@ -838,7 +838,7 @@ class KeystoreP11Slot implements P11WritableSlot {
             final byte[] id,
             final String label,
             final PublicKey publicKey)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         String hexId = Hex.toHexString(id).toLowerCase();
 
         StringBuilder sb = new StringBuilder(100);
@@ -893,7 +893,7 @@ class KeystoreP11Slot implements P11WritableSlot {
                     EC5Util.convertSpec(paramSpec, false);
             ASN1ObjectIdentifier curveOid = ECUtil.getNamedCurveOid(bcParamSpec);
             if (curveOid == null) {
-                throw new XiSecurityException("EC public key is not of namedCurve");
+                throw new SecurityException("EC public key is not of namedCurve");
             }
 
             byte[] encodedParams;
@@ -904,7 +904,7 @@ class KeystoreP11Slot implements P11WritableSlot {
                     encodedParams = ECNamedCurveTable.getByOID(curveOid).getEncoded();
                 }
             } catch (IOException | NullPointerException ex) {
-                throw new XiSecurityException(ex.getMessage(), ex);
+                throw new SecurityException(ex.getMessage(), ex);
             }
 
             sb.append(PROP_EC_ECDSA_PARAMS).append('=');
@@ -915,12 +915,12 @@ class KeystoreP11Slot implements P11WritableSlot {
             java.security.spec.ECPoint pointW = ecKey.getW();
             BigInteger wx = pointW.getAffineX();
             if (wx.signum() != 1) {
-                throw new XiSecurityException("Wx is not positive");
+                throw new SecurityException("Wx is not positive");
             }
 
             BigInteger wy = pointW.getAffineY();
             if (wy.signum() != 1) {
-                throw new XiSecurityException("Wy is not positive");
+                throw new SecurityException("Wy is not positive");
             }
 
             int keysize = (paramSpec.getOrder().bitLength() + 7) / 8;
@@ -958,11 +958,11 @@ class KeystoreP11Slot implements P11WritableSlot {
             final byte[] id,
             final String label,
             final X509Certificate cert)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         try {
             savePkcs11Entry(certDir, id, label, cert.getEncoded());
         } catch (CertificateEncodingException ex) {
-            throw new XiSecurityException(ex.getMessage(), ex);
+            throw new SecurityException(ex.getMessage(), ex);
         }
     }
 

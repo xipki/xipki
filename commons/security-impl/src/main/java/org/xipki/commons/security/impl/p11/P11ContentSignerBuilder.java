@@ -53,7 +53,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -85,7 +85,7 @@ public class P11ContentSignerBuilder {
             final SecurityFactory securityFactory,
             final P11EntityIdentifier entityId,
             final X509Certificate[] certificateChain)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.entityId = ParamUtil.requireNonNull("entityId", entityId);
@@ -99,7 +99,7 @@ public class P11ContentSignerBuilder {
         }
 
         if (publicKeyInP11 == null) {
-            throw new XiSecurityException("public key with " + entityId + " does not exist");
+            throw new SecurityException("public key with " + entityId + " does not exist");
         }
 
         Set<Certificate> caCerts = new HashSet<>();
@@ -139,29 +139,29 @@ public class P11ContentSignerBuilder {
     public ConcurrentContentSigner createSigner(
             final AlgorithmIdentifier signatureAlgId,
             final int parallelism)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
         if (publicKey instanceof RSAPublicKey) {
             if (!AlgorithmUtil.isRSASignatureAlgoId(signatureAlgId)) {
-                throw new XiSecurityException(
+                throw new SecurityException(
                         "the given algorithm is not a valid RSA signature algorithm '"
                         + signatureAlgId.getAlgorithm().getId() + "'");
             }
         } else if (publicKey instanceof ECPublicKey) {
             if (!AlgorithmUtil.isECSigAlg(signatureAlgId)) {
-                throw new XiSecurityException(
+                throw new SecurityException(
                         "the given algorithm is not a valid EC signature algirthm '"
                         + signatureAlgId.getAlgorithm().getId() + "'");
             }
         } else if (publicKey instanceof DSAPublicKey) {
             if (!AlgorithmUtil.isDSASigAlg(signatureAlgId)) {
-                throw new XiSecurityException(
+                throw new SecurityException(
                         "the given algorithm is not a valid DSA signature algirthm '"
                         + signatureAlgId.getAlgorithm().getId() + "'");
             }
         } else {
-            throw new XiSecurityException("unsupported key " + publicKey.getClass().getName());
+            throw new SecurityException("unsupported key " + publicKey.getClass().getName());
         }
 
         List<ContentSigner> signers = new ArrayList<>(parallelism);
@@ -174,7 +174,7 @@ public class P11ContentSignerBuilder {
             } else if (publicKey instanceof DSAPublicKey) {
                 signer = createDSAContentSigner(signatureAlgId);
             } else {
-                throw new XiSecurityException("unsupported key " + publicKey.getClass().getName());
+                throw new SecurityException("unsupported key " + publicKey.getClass().getName());
             }
             signers.add(signer);
         } // end for
@@ -193,7 +193,7 @@ public class P11ContentSignerBuilder {
 
     // CHECKSTYLE:SKIP
     private ContentSigner createRSAContentSigner(AlgorithmIdentifier signatureAlgId)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
             return new P11RSAPSSContentSigner(cryptService, entityId, signatureAlgId,
                     securityFactory.getRandom4Sign());
@@ -204,14 +204,14 @@ public class P11ContentSignerBuilder {
 
     // CHECKSTYLE:SKIP
     private ContentSigner createECContentSigner(AlgorithmIdentifier signatureAlgId)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         return new P11ECDSAContentSigner(cryptService, entityId, signatureAlgId,
                 AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
     }
 
     // CHECKSTYLE:SKIP
     private ContentSigner createDSAContentSigner(AlgorithmIdentifier signatureAlgId)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         return new P11DSAContentSigner(cryptService, entityId, signatureAlgId,
                 AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
     }

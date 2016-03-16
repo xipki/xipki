@@ -43,7 +43,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
@@ -70,7 +70,7 @@ public interface P11CryptService {
             long mechanism,
             @Nullable P11Params parameters,
             byte[] content)
-    throws P11TokenException, XiSecurityException;
+    throws P11TokenException, SecurityException;
 
     PublicKey getPublicKey(
             @Nonnull P11EntityIdentifier entityId)

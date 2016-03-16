@@ -37,7 +37,7 @@
 package org.xipki.commons.security.impl.p11.sun;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Control;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
@@ -62,7 +62,7 @@ public class SunP11CryptServiceFactory implements P11CryptServiceFactory {
     @Override
     public P11CryptService createP11CryptService(
             final String moduleName)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         ParamUtil.requireNonBlank("moduleName", moduleName);
         if (p11Control == null) {
             throw new IllegalStateException("please call init() first");
@@ -70,7 +70,7 @@ public class SunP11CryptServiceFactory implements P11CryptServiceFactory {
 
         P11ModuleConf conf = p11Control.getModuleConf(moduleName);
         if (conf == null) {
-            throw new XiSecurityException("PKCS#11 module " + moduleName + " is not defined");
+            throw new SecurityException("PKCS#11 module " + moduleName + " is not defined");
         }
 
         return SunP11CryptService.getInstance(conf);

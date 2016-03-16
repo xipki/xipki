@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -105,7 +105,7 @@ class P11RSAContentSigner implements ContentSigner {
             final P11CryptService cryptService,
             final P11EntityIdentifier entityId,
             final AlgorithmIdentifier signatureAlgId)
-    throws XiSecurityException, P11TokenException {
+    throws SecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.entityId = ParamUtil.requireNonNull("entityId", entityId);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
@@ -129,7 +129,7 @@ class P11RSAContentSigner implements ContentSigner {
             hashAlgo = HashAlgoType.SHA512;
             tmpMechanism = P11Constants.CKM_SHA512_RSA_PKCS;
         } else {
-            throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
+            throw new SecurityException("unsupported signature algorithm " + algOid.getId());
         }
 
         P11SlotIdentifier slotId = entityId.getSlotId();
@@ -138,7 +138,7 @@ class P11RSAContentSigner implements ContentSigner {
         } else if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_X_509)) {
             tmpMechanism = P11Constants.CKM_RSA_X_509;
         } else if (!cryptService.supportsMechanism(slotId, tmpMechanism)) {
-            throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
+            throw new SecurityException("unsupported signature algorithm " + algOid.getId());
         }
 
         this.mechanism = tmpMechanism;
@@ -193,7 +193,7 @@ class P11RSAContentSigner implements ContentSigner {
             }
 
             return cryptService.sign(entityId, mechanism, null, dataToSign);
-        } catch (XiSecurityException | P11TokenException ex) {
+        } catch (SecurityException | P11TokenException ex) {
             final String message = "could not sign";
             if (LOG.isErrorEnabled()) {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),

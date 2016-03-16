@@ -44,7 +44,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
@@ -86,7 +86,7 @@ public class P11EnrollCertCmd extends EnrollCertCommandSupport {
     @Override
     protected ConcurrentContentSigner getSigner(
             final SignatureAlgoControl signatureAlgoControl)
-    throws XiSecurityException {
+    throws SecurityException {
         P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
 
@@ -97,14 +97,14 @@ public class P11EnrollCertCmd extends EnrollCertCommandSupport {
     }
 
     private P11KeyIdentifier getKeyIdentifier()
-    throws XiSecurityException {
+    throws SecurityException {
         P11KeyIdentifier keyIdentifier;
         if (keyId != null && keyLabel == null) {
             keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
         } else if (keyId == null && keyLabel != null) {
             keyIdentifier = new P11KeyIdentifier(keyLabel);
         } else {
-            throw new XiSecurityException("exactly one of keyId or keyLabel should be specified");
+            throw new SecurityException("exactly one of keyId or keyLabel should be specified");
         }
         return keyIdentifier;
     }

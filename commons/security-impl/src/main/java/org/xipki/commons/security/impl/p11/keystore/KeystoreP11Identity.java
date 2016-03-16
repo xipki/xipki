@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.HashCalculator;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
@@ -157,11 +157,11 @@ class KeystoreP11Identity extends P11Identity {
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
-    throws XiSecurityException {
+    throws SecurityException {
         ParamUtil.requireNonNull("content", content);
 
         if (!supportsMechanism(mechanism, parameters)) {
-            throw new XiSecurityException("mechanism " + mechanism + " is not allowed for "
+            throw new SecurityException("mechanism " + mechanism + " is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
@@ -208,7 +208,7 @@ class KeystoreP11Identity extends P11Identity {
         } else if (P11Constants.CKM_SHA512_RSA_PKCS_PSS == mechanism) {
             return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA512);
         } else {
-            throw new XiSecurityException("unsupported mechanism " + mechanism);
+            throw new SecurityException("unsupported mechanism " + mechanism);
         }
     }
 
@@ -216,9 +216,9 @@ class KeystoreP11Identity extends P11Identity {
             P11Params parameters,
             final byte[] contentToSign,
             HashAlgoType hashAlgo)
-    throws XiSecurityException {
+    throws SecurityException {
         if (!(parameters instanceof P11RSAPkcsPssParams)) {
-            throw new XiSecurityException("the parameters is not of "
+            throw new SecurityException("the parameters is not of "
                     + P11RSAPkcsPssParams.class.getName());
         }
 
@@ -226,16 +226,15 @@ class KeystoreP11Identity extends P11Identity {
         HashAlgoType contentHash = HashAlgoType.getInstanceForPkcs11HashMech(
                 pssParam.getHashAlgorithm());
         if (contentHash == null) {
-            throw new XiSecurityException("unsupported HashAlgorithm "
-                    + pssParam.getHashAlgorithm());
+            throw new SecurityException("unsupported HashAlgorithm " + pssParam.getHashAlgorithm());
         } else if (contentHash != hashAlgo) {
-            throw new XiSecurityException("Invalid parameters: invalid hash algorithm");
+            throw new SecurityException("Invalid parameters: invalid hash algorithm");
         }
 
         HashAlgoType mgfHash = HashAlgoType.getInstanceForPkcs11MgfMech(
                 pssParam.getMaskGenerationFunction());
         if (mgfHash == null) {
-            throw new XiSecurityException(
+            throw new SecurityException(
                     "unsupported MaskGenerationFunction " + pssParam.getHashAlgorithm());
         }
 
@@ -254,7 +253,7 @@ class KeystoreP11Identity extends P11Identity {
     private byte[] rsaPkcsSign(
             final byte[] contentToSign,
             final HashAlgoType hashAlgo)
-    throws XiSecurityException {
+    throws SecurityException {
         int modulusBitLen = getSignatureKeyBitLength();
         byte[] paddedHash;
         if (hashAlgo == null) {
@@ -268,19 +267,19 @@ class KeystoreP11Identity extends P11Identity {
 
     private byte[] rsaX509Sign(
             final byte[] dataToSign)
-    throws XiSecurityException {
+    throws SecurityException {
         Cipher cipher;
         try {
             cipher = rsaCiphers.takeFirst();
         } catch (InterruptedException ex) {
-            throw new XiSecurityException(
+            throw new SecurityException(
                     "could not take any idle signer");
         }
 
         try {
             return cipher.doFinal(dataToSign);
         } catch (BadPaddingException | IllegalBlockSizeException ex) {
-            throw new XiSecurityException("SignatureException: " + ex.getMessage(), ex);
+            throw new SecurityException("SignatureException: " + ex.getMessage(), ex);
         } finally {
             rsaCiphers.add(cipher);
         }
@@ -289,7 +288,7 @@ class KeystoreP11Identity extends P11Identity {
     private byte[] dsaAndEcdsaSign(
             final byte[] dataToSign,
             final HashAlgoType hashAlgo)
-    throws XiSecurityException {
+    throws SecurityException {
         byte[] hash;
         if (hashAlgo == null) {
             hash = dataToSign;
@@ -302,7 +301,7 @@ class KeystoreP11Identity extends P11Identity {
         try {
             sig = dsaSignatures.takeFirst();
         } catch (InterruptedException ex) {
-            throw new XiSecurityException(
+            throw new SecurityException(
                     "InterruptedException occurs while retrieving idle signature");
         }
 
@@ -311,7 +310,7 @@ class KeystoreP11Identity extends P11Identity {
             byte[] x962Signature = sig.sign();
             return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
         } catch (SignatureException ex) {
-            throw new XiSecurityException("SignatureException: " + ex.getMessage(), ex);
+            throw new SecurityException("SignatureException: " + ex.getMessage(), ex);
         } finally {
             dsaSignatures.add(sig);
         }

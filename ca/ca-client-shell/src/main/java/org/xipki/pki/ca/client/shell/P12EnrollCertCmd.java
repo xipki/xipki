@@ -44,7 +44,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.util.SignerConfUtil;
 
@@ -72,7 +72,7 @@ public class P12EnrollCertCmd extends EnrollCertCommandSupport {
     @Override
     protected ConcurrentContentSigner getSigner(
             final SignatureAlgoControl signatureAlgoControl)
-    throws XiSecurityException {
+    throws SecurityException {
         if (password == null) {
             password = new String(readPassword());
         }

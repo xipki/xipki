@@ -41,26 +41,26 @@ package org.xipki.commons.security.api;
  * @since 2.0.0
  */
 
-public class XiSecurityException extends Exception {
+public class SecurityException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public XiSecurityException() {
+    public SecurityException() {
         super();
     }
 
-    public XiSecurityException(
+    public SecurityException(
             final String message,
             final Throwable cause) {
         super(message, cause);
     }
 
-    public XiSecurityException(
+    public SecurityException(
             final String message) {
         super(message);
     }
 
-    public XiSecurityException(
+    public SecurityException(
             final Throwable cause) {
         super(cause);
     }

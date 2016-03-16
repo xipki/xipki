@@ -57,7 +57,7 @@ import javax.crypto.NoSuchPaddingException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.HashCalculator;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
@@ -115,7 +115,7 @@ class SunP11Identity extends P11Identity {
             final X509Certificate[] certificateChain,
             final PublicKey publicKey,
             final SecureRandom random)
-    throws XiSecurityException {
+    throws SecurityException {
         super(entityId, certificateChain, publicKey);
         this.provider = ParamUtil.requireNonNull("p11Provider", provider);
         this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 128);
@@ -146,11 +146,11 @@ class SunP11Identity extends P11Identity {
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
-    throws XiSecurityException {
+    throws SecurityException {
         ParamUtil.requireNonNull("content", content);
 
         if (!supportsMechanism(mechanism, parameters)) {
-            throw new XiSecurityException("mechanism " + mechanism + " is not allowed for "
+            throw new SecurityException("mechanism " + mechanism + " is not allowed for "
                     + publicKey.getAlgorithm() + " public key");
         }
 
@@ -197,7 +197,7 @@ class SunP11Identity extends P11Identity {
         } else if (P11Constants.CKM_SHA512_RSA_PKCS_PSS == mechanism) {
             return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA512);
         } else {
-            throw new XiSecurityException("unsupported mechanism " + mechanism);
+            throw new SecurityException("unsupported mechanism " + mechanism);
         }
     }
 
@@ -205,9 +205,9 @@ class SunP11Identity extends P11Identity {
             P11Params parameters,
             final byte[] contentToSign,
             HashAlgoType hashAlgo)
-    throws XiSecurityException {
+    throws SecurityException {
         if (!(parameters instanceof P11RSAPkcsPssParams)) {
-            throw new XiSecurityException("the parameters is not of "
+            throw new SecurityException("the parameters is not of "
                     + P11RSAPkcsPssParams.class.getName());
         }
 
@@ -215,16 +215,15 @@ class SunP11Identity extends P11Identity {
         HashAlgoType contentHash = HashAlgoType.getInstanceForPkcs11HashMech(
                 pssParam.getHashAlgorithm());
         if (contentHash == null) {
-            throw new XiSecurityException("unsupported HashAlgorithm "
-                    + pssParam.getHashAlgorithm());
+            throw new SecurityException("unsupported HashAlgorithm " + pssParam.getHashAlgorithm());
         } else if (contentHash != hashAlgo) {
-            throw new XiSecurityException("Invalid parameters: invalid hash algorithm");
+            throw new SecurityException("Invalid parameters: invalid hash algorithm");
         }
 
         HashAlgoType mgfHash = HashAlgoType.getInstanceForPkcs11MgfMech(
                 pssParam.getMaskGenerationFunction());
         if (mgfHash == null) {
-            throw new XiSecurityException(
+            throw new SecurityException(
                     "unsupported MaskGenerationFunction " + pssParam.getHashAlgorithm());
         }
 
@@ -243,7 +242,7 @@ class SunP11Identity extends P11Identity {
     private byte[] rsaPkcsSign(
             final byte[] contentToSign,
             final HashAlgoType hashAlgo)
-    throws XiSecurityException {
+    throws SecurityException {
         if (cipherAlgos.contains(RSA_ECB_NoPadding)) {
             int modulusBitLen = getSignatureKeyBitLength();
             byte[] paddedHash;
@@ -272,7 +271,7 @@ class SunP11Identity extends P11Identity {
                 && sigAlgos.contains(SHA512withRSA.toLowerCase())) {
             sigAlgo = SHA512withRSA;
         } else {
-            throw new XiSecurityException(
+            throw new SecurityException(
                     "unsupported signature algorithm RSA_PKCS with " + hashAlgo);
         }
 
@@ -281,36 +280,36 @@ class SunP11Identity extends P11Identity {
             updateData(sig, contentToSign);
             return sig.sign();
         } catch (SignatureException | NoSuchAlgorithmException ex) {
-            throw new XiSecurityException(ex.getMessage(), ex);
+            throw new SecurityException(ex.getMessage(), ex);
         }
     }
 
     private byte[] rsaX509Sign(
             final byte[] dataToSign)
-    throws XiSecurityException {
+    throws SecurityException {
         Cipher cipher;
         try {
             cipher = Cipher.getInstance(RSA_ECB_NoPadding, provider);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
-            throw new XiSecurityException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+            throw new SecurityException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
         try {
             cipher.init(Cipher.ENCRYPT_MODE, privateKey);
         } catch (InvalidKeyException ex) {
-            throw new XiSecurityException("InvalidKeyException: " + ex.getMessage(), ex);
+            throw new SecurityException("InvalidKeyException: " + ex.getMessage(), ex);
         }
 
         try {
             return cipher.doFinal(dataToSign);
         } catch (BadPaddingException | IllegalBlockSizeException ex) {
-            throw new XiSecurityException("SignatureException: " + ex.getMessage(), ex);
+            throw new SecurityException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
     private byte[] dsaSign(
             final byte[] dataToSign,
             final HashAlgoType hashAlgo)
-    throws XiSecurityException {
+    throws SecurityException {
         byte[] input;
 
         String signatureAlgorithm;
@@ -327,7 +326,7 @@ class SunP11Identity extends P11Identity {
             input = dataToSign;
             signatureAlgorithm = SHA1withDSA;
         } else {
-            throw new XiSecurityException("unsupported mechanism");
+            throw new SecurityException("unsupported mechanism");
         }
 
         try {
@@ -336,17 +335,17 @@ class SunP11Identity extends P11Identity {
             byte[] x962Signature = sig.sign();
             return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
         } catch (NoSuchAlgorithmException ex) {
-            throw new XiSecurityException("could not find signature algorithm " + ex.getMessage(),
+            throw new SecurityException("could not find signature algorithm " + ex.getMessage(),
                     ex);
         } catch (SignatureException ex) {
-            throw new XiSecurityException("SignatureException: " + ex.getMessage(), ex);
+            throw new SecurityException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
     private byte[] ecdsaSign(
             final byte[] dataToSign,
             final HashAlgoType hashAlgo)
-    throws XiSecurityException {
+    throws SecurityException {
         byte[] input;
 
         String signatureAlgorithm;
@@ -364,7 +363,7 @@ class SunP11Identity extends P11Identity {
             input = dataToSign;
             signatureAlgorithm = SHA1withECDSA;
         } else {
-            throw new XiSecurityException("unsupported mechanism");
+            throw new SecurityException("unsupported mechanism");
         }
 
         try {
@@ -373,10 +372,10 @@ class SunP11Identity extends P11Identity {
             byte[] x962Signature = sig.sign();
             return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
         } catch (NoSuchAlgorithmException ex) {
-            throw new XiSecurityException("could not find signature algorithm " + ex.getMessage(),
+            throw new SecurityException("could not find signature algorithm " + ex.getMessage(),
                     ex);
         } catch (SignatureException ex) {
-            throw new XiSecurityException("SignatureException: " + ex.getMessage(), ex);
+            throw new SecurityException("SignatureException: " + ex.getMessage(), ex);
         }
     }
 
