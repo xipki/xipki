@@ -65,7 +65,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -154,7 +154,7 @@ public final class SunP11CryptService implements P11CryptService {
                                 ? "dummy".toCharArray() // keystore does not allow empty password
                                 : singlePassword);
                     } catch (Exception ex) {
-                        throw new XiSecurityException(ex.getMessage(), ex);
+                        throw new SecurityException(ex.getMessage(), ex);
                     }
                 }
 
@@ -211,7 +211,7 @@ public final class SunP11CryptService implements P11CryptService {
                                 moduleConf.getMaxMessageSize(), signatureKey, x509Certchain, pubKey,
                                 random4Sign);
                         currentIdentifies.add(p11Identity);
-                    } catch (XiSecurityException ex) {
+                    } catch (SecurityException ex) {
                         String msg = "SignerException while constructing SunP11Identity for alias "
                                 + alias + " (slot: " + i + ", module: " + moduleConf.getName()
                                 + ")";
@@ -288,9 +288,9 @@ public final class SunP11CryptService implements P11CryptService {
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
-    throws P11TokenException, XiSecurityException {
+    throws P11TokenException, SecurityException {
         if (!supportsMechanism(entityId.getSlotId(), mechanism)) {
-            throw new XiSecurityException("mechanism " + mechanism + " is not supported by slot"
+            throw new SecurityException("mechanism " + mechanism + " is not supported by slot"
                     + entityId.getSlotId());
         }
 

@@ -71,12 +71,12 @@ public interface SecurityFactory {
 
     P11Module getP11Module(
             @Nonnull String moduleName)
-    throws XiSecurityException, P11TokenException;
+    throws SecurityException, P11TokenException;
 
     P11WritableSlot getP11WritablSlot(
             @Nonnull String moduleName,
             int slotIndex)
-    throws XiSecurityException, P11TokenException;
+    throws SecurityException, P11TokenException;
 
     PasswordResolver getPasswordResolver();
 
@@ -84,19 +84,19 @@ public interface SecurityFactory {
             @Nonnull String type,
             @Nullable String conf,
             @Nullable X509Certificate cert)
-    throws XiSecurityException;
+    throws SecurityException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
             @Nullable String conf,
             @Nullable X509Certificate cert)
-    throws XiSecurityException;
+    throws SecurityException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
             @Nullable String conf,
             @Nullable X509Certificate[] certs)
-    throws XiSecurityException;
+    throws SecurityException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
@@ -104,7 +104,7 @@ public interface SecurityFactory {
             @Nonnull String hashAlgo,
             @Nullable SignatureAlgoControl sigAlgoControl,
             @Nullable X509Certificate cert)
-    throws XiSecurityException;
+    throws SecurityException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
@@ -112,7 +112,7 @@ public interface SecurityFactory {
             @Nonnull String hashAlgo,
             @Nonnull SignatureAlgoControl sigAlgoControl,
             @Nullable X509Certificate[] certs)
-    throws XiSecurityException;
+    throws SecurityException;
 
     ContentVerifierProvider getContentVerifierProvider(
             @Nonnull PublicKey publicKey)
@@ -138,7 +138,7 @@ public interface SecurityFactory {
 
     P11CryptService getP11CryptService(
             @Nonnull String moduleName)
-    throws XiSecurityException, P11TokenException;
+    throws SecurityException, P11TokenException;
 
     PublicKey getPkcs11PublicKey(
             @Nonnull String moduleName,

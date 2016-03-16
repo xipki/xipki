@@ -50,7 +50,7 @@ import javax.annotation.Nullable;
 
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.SignerUtil;
@@ -165,7 +165,7 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
             } else {
                 return SignerUtil.convertPlainDSASigToX962(plainSignature);
             }
-        } catch (XiSecurityException | P11TokenException ex) {
+        } catch (SecurityException | P11TokenException ex) {
             throw new SignatureException(ex.getMessage(), ex);
         }
     }

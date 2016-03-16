@@ -41,7 +41,7 @@ package org.xipki.commons.security.api;
  * @since 2.0.0
  */
 
-public class SignerException extends XiSecurityException {
+public class SignerException extends SecurityException {
 
     private static final long serialVersionUID = 1L;
 

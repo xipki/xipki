@@ -43,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.XiSecurityException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11TokenException;
 
@@ -84,7 +84,7 @@ public class KeystoreP11ModulePool {
 
     public KeystoreP11Module getModule(
             final String moduleName)
-    throws XiSecurityException {
+    throws SecurityException {
         return modules.get(moduleName);
     }
 
