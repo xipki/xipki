@@ -44,12 +44,9 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.util.SignerConfUtil;
 import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
@@ -85,30 +82,19 @@ public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
     @Completion(P11ModuleNameCompleter.class)
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    private P11KeyIdentifier getKeyIdentifier()
-    throws Exception {
-        P11KeyIdentifier keyIdentifier;
-        if (keyId != null && keyLabel == null) {
-            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
-        } else if (keyId == null && keyLabel != null) {
-            keyIdentifier = new P11KeyIdentifier(keyLabel);
-        } else {
-            throw new IllegalCmdParamException(
-                    "exactly one of keyId or keyLabel should be specified");
-        }
-        return keyIdentifier;
-    }
-
     @Override
     protected ConcurrentContentSigner getSigner(
             final SignatureAlgoControl signatureAlgoControl)
     throws Exception {
         ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
-        P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
-        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
+
+        byte[] keyIdBytes = null;
+        if (keyId != null) {
+            keyIdBytes = Hex.decode(keyId);
+        }
 
         String signerConfWithoutAlgo = SignerConfUtil.getPkcs11SignerConfWithoutAlgo(
-                        moduleName, slotIdentifier, keyIdentifier, 1);
+                        moduleName, slotIndex, null, keyLabel, keyIdBytes, 1);
 
         return securityFactory.createSigner("PKCS11",
                 signerConfWithoutAlgo, hashAlgo, signatureAlgoControl,

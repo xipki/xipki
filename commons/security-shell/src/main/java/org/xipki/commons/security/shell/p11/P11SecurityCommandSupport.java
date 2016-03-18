@@ -40,8 +40,11 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
@@ -74,12 +77,13 @@ public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     public P11KeyIdentifier getKeyIdentifier()
-    throws IllegalCmdParamException {
+    throws IllegalCmdParamException, SecurityException, P11TokenException {
+        P11Slot slot = getP11Slot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier;
         if (keyId != null && keyLabel == null) {
-            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
+            keyIdentifier = slot.getKeyIdForId(Hex.decode(keyId));
         } else if (keyId == null && keyLabel != null) {
-            keyIdentifier = new P11KeyIdentifier(keyLabel);
+            keyIdentifier = slot.getKeyIdForLabel(keyLabel);
         } else {
             throw new IllegalCmdParamException(
                     "exactly one of keyId or keyLabel should be specified");

@@ -73,7 +73,7 @@ public class SpeedP11DSASignCmd extends SpeedP11SignCommandSupport {
             }
         }
 
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
         return new P11DSASignLoadTest(securityFactory, slot, sigAlgo, plen, qlen);
     }
 

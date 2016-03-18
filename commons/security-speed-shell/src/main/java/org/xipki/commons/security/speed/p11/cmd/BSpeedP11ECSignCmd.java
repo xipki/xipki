@@ -65,7 +65,7 @@ public class BSpeedP11ECSignCmd extends BSpeedP11SignCommandSupport {
         List<LoadExecutor> ret = new LinkedList<>();
         Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOidMap();
 
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
 
         for (String curveName : curveNameOidMap.keySet()) {
             ret.add(new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName));

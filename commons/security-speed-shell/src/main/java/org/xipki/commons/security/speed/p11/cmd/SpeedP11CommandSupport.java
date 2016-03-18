@@ -38,8 +38,15 @@ package org.xipki.commons.security.speed.p11.cmd;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.p11.P11CryptService;
+import org.xipki.commons.security.api.p11.P11Module;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11TokenException;
+import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.speed.cmd.SingleSpeedCommandSupport;
 
 /**
@@ -60,8 +67,20 @@ public abstract class SpeedP11CommandSupport extends SingleSpeedCommandSupport {
     @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    protected P11SlotIdentifier getSlotId() {
-        return new P11SlotIdentifier(slotIndex, null);
+    protected P11WritableSlot getP11WritableSlot(
+            final String moduleName,
+            final int slotIndex)
+    throws SecurityException, P11TokenException, IllegalCmdParamException {
+        P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
+        if (p11Service == null) {
+            throw new IllegalCmdParamException("undefined module " + moduleName);
+        }
+        P11Module module = p11Service.getModule();
+        P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
+        P11Slot slot = module.getSlot(slotId);
+        if (slot instanceof P11WritableSlot) {
+            return (P11WritableSlot) slot;
+        }
+        throw new P11TokenException("the slot is not writable");
     }
-
 }

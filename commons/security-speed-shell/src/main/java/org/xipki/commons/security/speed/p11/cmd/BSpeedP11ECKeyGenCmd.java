@@ -65,7 +65,7 @@ public class BSpeedP11ECKeyGenCmd extends BSpeedP11CommandSupport {
         List<LoadExecutor> ret = new LinkedList<>();
         Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOidMap();
 
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
 
         for (String curveName : curveNameOidMap.keySet()) {
             ret.add(new P11ECKeyGenLoadTest(slot, curveName));

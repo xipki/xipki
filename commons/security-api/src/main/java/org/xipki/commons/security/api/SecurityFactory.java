@@ -53,10 +53,7 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11EntityIdentifier;
-import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
@@ -67,15 +64,10 @@ public interface SecurityFactory {
 
     String DEFAULT_P11MODULE_NAME = "default";
 
-    Set<String> getPkcs11ModuleNames();
+    Set<String> getP11ModuleNames();
 
-    P11Module getP11Module(
+    P11CryptService getP11CryptService(
             @Nonnull String moduleName)
-    throws SecurityException, P11TokenException;
-
-    P11WritableSlot getP11WritablSlot(
-            @Nonnull String moduleName,
-            int slotIndex)
     throws SecurityException, P11TokenException;
 
     PasswordResolver getPasswordResolver();
@@ -135,15 +127,6 @@ public interface SecurityFactory {
     PublicKey generatePublicKey(
             @Nonnull SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException;
-
-    P11CryptService getP11CryptService(
-            @Nonnull String moduleName)
-    throws SecurityException, P11TokenException;
-
-    PublicKey getPkcs11PublicKey(
-            @Nonnull String moduleName,
-            @Nonnull P11EntityIdentifier entityId)
-    throws InvalidKeyException, P11TokenException;
 
     byte[] extractMinimalKeyStore(
             @Nonnull String keystoreType,

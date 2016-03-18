@@ -77,10 +77,9 @@ public class P11CertDeleteCmd extends SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId), null);
+        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
+        P11KeyIdentifier keyIdentifier = slot.getKeyIdForId(Hex.decode(keyId));
         slot.removeCerts(keyIdentifier);
-        securityFactory.getP11CryptService(moduleName).refresh();
         out("deleted certificates");
         return null;
     }

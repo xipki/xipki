@@ -38,6 +38,8 @@ package org.xipki.commons.security.api.p11;
 
 import java.math.BigInteger;
 
+import javax.annotation.Nonnull;
+
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -56,31 +58,11 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
     private final String keyLabel;
 
     public P11KeyIdentifier(
-            final byte[] keyId,
-            final String keyLabel) {
-        if (keyId == null && keyLabel == null) {
-            throw new IllegalArgumentException(
-                    "at least one of keyId an keyLabel must be non-null");
-        }
-        this.keyId = keyId;
-        this.keyIdHex = (keyId == null)
-                ? null
-                : new String(Hex.encode(keyId)).toUpperCase();
-        this.keyLabel = keyLabel;
-    }
-
-    public P11KeyIdentifier(
-            final byte[] keyId) {
+            @Nonnull final byte[] keyId,
+            @Nonnull final String keyLabel) {
         this.keyId = ParamUtil.requireNonNull("keyId", keyId);
-        this.keyIdHex = new String(Hex.encode(keyId)).toUpperCase();
-        this.keyLabel = null;
-    }
-
-    public P11KeyIdentifier(
-            final String keyLabel) {
         this.keyLabel = ParamUtil.requireNonBlank("keyLabel", keyLabel);
-        this.keyId = null;
-        this.keyIdHex = null;
+        this.keyIdHex = Hex.toHexString(keyId).toUpperCase();
     }
 
     public byte[] getKeyId() {
@@ -134,29 +116,13 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
         if (!(obj instanceof P11KeyIdentifier)) {
             return false;
         }
-        
+
         P11KeyIdentifier another = (P11KeyIdentifier) obj;
-        if (this.keyId != null && another.keyId != null) {
-            if (!CompareUtil.equalsObject(this.keyId, another.keyId)) {
-                return false;
-            }
-            
-            if (this.keyLabel == null || another.keyLabel == null) {
-                return true;
-            }
+        if (!CompareUtil.equalsObject(this.keyId, another.keyId)) {
+            return false;
         }
-        
-        if (this.keyLabel != null && another.keyLabel != null) {
-            if (!CompareUtil.equalsObject(this.keyLabel, another.keyLabel)) {
-                return false;
-            }
-            
-            if (this.keyId == null || another.keyId == null) {
-                return true;
-            }
-        }
-        
-        return false;
+
+        return this.keyLabel.equals(another.keyLabel);
     }
 
     @Override

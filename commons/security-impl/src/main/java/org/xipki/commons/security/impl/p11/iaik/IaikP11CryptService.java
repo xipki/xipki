@@ -39,12 +39,9 @@ package org.xipki.commons.security.impl.p11.iaik;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,14 +51,13 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11UnknownEntityException;
 import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
-
-import iaik.pkcs.pkcs11.wrapper.PKCS11RuntimeException;
 
 /**
  * @author Lijun Liao
@@ -72,20 +68,11 @@ final class IaikP11CryptService implements P11CryptService {
 
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11CryptService.class);
 
-    private static final long MIN_RECONNECT_INTERVAL = 60L * 1000;
-
     private static final Map<String, IaikP11CryptService> INSTANCES = new HashMap<>();
-
-    private final ConcurrentSkipListSet<IaikP11Identity> identities =
-            new ConcurrentSkipListSet<>();
 
     private final P11ModuleConf moduleConf;
 
     private IaikP11Module module;
-
-    private boolean lastRefreshSuccessful;
-
-    private long lastRefresh;
 
     private IaikP11CryptService(
             final P11ModuleConf moduleConf)
@@ -94,31 +81,15 @@ final class IaikP11CryptService implements P11CryptService {
         refresh();
     }
 
-    private synchronized boolean reconnect()
-    throws P11TokenException {
-        if (System.currentTimeMillis() - lastRefresh < MIN_RECONNECT_INTERVAL) {
-            LOG.info("just refreshed within one minute, skip this reconnect()");
-            return lastRefreshSuccessful;
-        }
-
-        lastRefresh = System.currentTimeMillis();
-        IaikP11ModulePool.getInstance().removeModule(moduleConf.getName());
-
-        refresh();
-        return lastRefreshSuccessful;
-    }
-
     @Override
     public synchronized void refresh()
     throws P11TokenException {
         LOG.info("refreshing PKCS#11 module {}", moduleConf.getName());
-        lastRefreshSuccessful = false;
         IaikP11Module module = IaikP11ModulePool.getInstance().getModule(moduleConf);
 
-        Set<IaikP11Identity> currentIdentifies = new HashSet<>();
         List<P11SlotIdentifier> slotIds = module.getSlotIdentifiers();
         for (P11SlotIdentifier slotId : slotIds) {
-            IaikP11Slot slot;
+            P11Slot slot;
             try {
                 slot = module.getSlot(slotId);
             } catch (P11TokenException ex) {
@@ -140,37 +111,16 @@ final class IaikP11CryptService implements P11CryptService {
             }
 
             slot.refresh();
-            for (P11Identity identity : slot.getP11Identities()) {
-                currentIdentifies.add((IaikP11Identity) identity);
-            }
-        }
-
-        this.identities.clear();
-        this.identities.addAll(currentIdentifies);
-        currentIdentifies.clear();
-        currentIdentifies = null;
-
-        lastRefreshSuccessful = true;
-
-        if (LOG.isInfoEnabled()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
-            for (IaikP11Identity identity : this.identities) {
-                sb.append("\t(").append(identity.getEntityId());
-                sb.append(", algo=").append(identity.getPublicKey().getAlgorithm()).append(")\n");
-            }
-
-            LOG.info(sb.toString());
         }
 
         LOG.info("refreshed PKCS#11 module {}", moduleConf.getName());
     } // method refresh
 
     @Override
-    public Set<Long> getSupportedMechanisms(
+    public Set<Long> getMechanisms(
             final P11SlotIdentifier slotId)
     throws P11TokenException {
-        return module.getSlot(slotId).getSupportedMechanisms();
+        return module.getSlot(slotId).getMechanisms();
     }
 
     @Override
@@ -191,39 +141,13 @@ final class IaikP11CryptService implements P11CryptService {
         if (!supportsMechanism(entityId.getSlotId(), mechanism)) {
             throw new P11UnsupportedMechanismException(mechanism, entityId.getSlotId());
         }
-
-        checkState();
-
-        try {
-            return getNonnullIdentity(entityId).sign(mechanism, parameters, content);
-        } catch (PKCS11RuntimeException ex) {
-            final String message = "could not call identity.sign()";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
-            LOG.debug(message, ex);
-            if (reconnect()) {
-                return sign_noReconnect(mechanism, parameters, content, entityId);
-            } else {
-                throw new P11TokenException("PKCS11RuntimeException: " + ex.getMessage(), ex);
-            }
-        }
-    }
-
-    private byte[] sign_noReconnect(
-            final long mechanism,
-            final P11Params parameters,
-            final byte[] content,
-            final P11EntityIdentifier entityId)
-    throws P11TokenException {
         return getNonnullIdentity(entityId).sign(mechanism, parameters, content);
     }
 
     @Override
     public PublicKey getPublicKey(
             final P11EntityIdentifier entityId)
-    throws P11UnknownEntityException {
+    throws P11TokenException {
         return getNonnullIdentity(entityId).getPublicKey();
     }
 
@@ -234,34 +158,11 @@ final class IaikP11CryptService implements P11CryptService {
         return getNonnullIdentity(entityId).getCertificate();
     }
 
-    private IaikP11Identity getNonnullIdentity(
+    private P11Identity getNonnullIdentity(
             final P11EntityIdentifier entityId)
-    throws P11UnknownEntityException {
-        ParamUtil.requireNonNull("entityId", entityId);
-
-        IaikP11Identity identity = null;
-        for (IaikP11Identity mi : identities) {
-            if (mi.match(entityId)) {
-                identity = mi;
-            }
-        }
-        if (identity == null) {
-            throw new P11UnknownEntityException(entityId);
-        }
-        return identity;
-    }
-
-    private synchronized void checkState()
     throws P11TokenException {
-        if (!lastRefreshSuccessful) {
-            if (System.currentTimeMillis() - lastRefresh >= MIN_RECONNECT_INTERVAL) {
-                reconnect();
-            }
-        }
-
-        if (!lastRefreshSuccessful) {
-            throw new P11TokenException("PKCS#11 module is not initialized");
-        }
+        ParamUtil.requireNonNull("entityId", entityId);
+        return module.getSlot(entityId.getSlotId()).getIdentity(entityId.getKeyId());
     }
 
     @Override
@@ -274,34 +175,6 @@ final class IaikP11CryptService implements P11CryptService {
             final P11EntityIdentifier entityId)
     throws P11TokenException {
         return getNonnullIdentity(entityId).getCertificateChain();
-    }
-
-    @Override
-    public P11SlotIdentifier[] getSlotIdentifiers()
-    throws P11TokenException {
-        List<P11SlotIdentifier> slotIds = new LinkedList<>();
-        for (IaikP11Identity identity : identities) {
-            P11SlotIdentifier slotId = identity.getEntityId().getSlotId();
-            if (!slotIds.contains(slotId)) {
-                slotIds.add(slotId);
-            }
-        }
-
-        return slotIds.toArray(new P11SlotIdentifier[0]);
-    }
-
-    @Override
-    public String[] getKeyLabels(
-            final P11SlotIdentifier slotId)
-    throws P11TokenException {
-        List<String> keyLabels = new LinkedList<>();
-        for (IaikP11Identity identity : identities) {
-            if (slotId.equals(identity.getEntityId().getSlotId())) {
-                keyLabels.add(identity.getEntityId().getKeyId().getKeyLabel());
-            }
-        }
-
-        return keyLabels.toArray(new String[0]);
     }
 
     public static synchronized IaikP11CryptService getInstance(
@@ -317,6 +190,12 @@ final class IaikP11CryptService implements P11CryptService {
 
             return instance;
         }
+    }
+
+    @Override
+    public P11Module getModule()
+    throws P11TokenException {
+        return module;
     }
 
 }
