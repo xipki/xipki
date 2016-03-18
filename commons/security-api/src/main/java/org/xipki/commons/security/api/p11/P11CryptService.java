@@ -56,13 +56,16 @@ public interface P11CryptService {
     void refresh()
     throws P11TokenException;
 
-    Set<Long> getSupportedMechanisms(
+    Set<Long> getMechanisms(
             @Nonnull P11SlotIdentifier slotId)
     throws P11TokenException;
 
     boolean supportsMechanism(
             @Nonnull P11SlotIdentifier slotId,
             long mechanism)
+    throws P11TokenException;
+
+    P11Module getModule()
     throws P11TokenException;
 
     byte[] sign(
@@ -82,13 +85,6 @@ public interface P11CryptService {
 
     X509Certificate[] getCertificates(
             @Nonnull P11EntityIdentifier entityId)
-    throws P11TokenException;
-
-    P11SlotIdentifier[] getSlotIdentifiers()
-    throws P11TokenException;
-
-    String[] getKeyLabels(
-            @Nonnull P11SlotIdentifier slotId)
     throws P11TokenException;
 
 }

@@ -45,8 +45,6 @@ import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
@@ -60,12 +58,20 @@ public class SignerConfUtil {
 
     public static String getPkcs11SignerConfWithoutAlgo(
             final String pkcs11ModuleName,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId,
+            final Integer slotIndex,
+            final Long slotId,
+            final String keyLabel,
+            final byte[] keyId,
             final int parallelism) {
-        ParamUtil.requireNonNull("slotId", slotId);
-        ParamUtil.requireNonNull("keyId", keyId);
         ParamUtil.requireMin("parallelism", parallelism, 1);
+        if (slotIndex == null && slotId == null) {
+            throw new IllegalArgumentException(
+                    "at least one of slotIndex and slotId must not be null");
+        }
+        if (keyId == null && keyLabel == null) {
+            throw new IllegalArgumentException(
+                    "at least one of keyId and keyLabel must not be null");
+        }
 
         ConfPairs conf = new ConfPairs();
         conf.putPair("parallelism", Integer.toString(parallelism));
@@ -74,18 +80,20 @@ public class SignerConfUtil {
             conf.putPair("module", pkcs11ModuleName);
         }
 
-        if (slotId.getSlotId() != null) {
-            conf.putPair("slot-id", slotId.getSlotId().toString());
-        } else {
-            conf.putPair("slot", slotId.getSlotIndex().toString());
+        if (slotId != null) {
+            conf.putPair("slot-id", slotId.toString());
         }
 
-        if (keyId.getKeyId() != null) {
-            conf.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
+        if (slotIndex != null) {
+            conf.putPair("slot", slotIndex.toString());
         }
 
-        if (keyId.getKeyLabel() != null) {
-            conf.putPair("key-label", keyId.getKeyLabel());
+        if (keyId != null) {
+            conf.putPair("key-id", Hex.toHexString(keyId));
+        }
+
+        if (keyLabel != null) {
+            conf.putPair("key-label", keyLabel);
         }
 
         return conf.getEncoded();
@@ -136,14 +144,22 @@ public class SignerConfUtil {
 
     public static String getPkcs11SignerConf(
             final String pkcs11ModuleName,
-            final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId,
+            final Integer slotIndex,
+            final Long slotId,
+            final String keyLabel,
+            final byte[] keyId,
             final String signatureAlgorithm,
             final int parallelism) {
-        ParamUtil.requireNonNull("algo", signatureAlgorithm);
-        ParamUtil.requireNonNull("slotId", slotId);
-        ParamUtil.requireNonNull("keyId", keyId);
         ParamUtil.requireMin("parallelism", parallelism, 1);
+        ParamUtil.requireNonNull("algo", signatureAlgorithm);
+        if (slotIndex == null && slotId == null) {
+            throw new IllegalArgumentException(
+                    "at least one of slotIndex and slotId must not be null");
+        }
+        if (keyId == null && keyLabel == null) {
+            throw new IllegalArgumentException(
+                    "at least one of keyId and keyLabel must not be null");
+        }
 
         ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
         conf.putPair("parallelism", Integer.toString(parallelism));
@@ -152,18 +168,20 @@ public class SignerConfUtil {
             conf.putPair("module", pkcs11ModuleName);
         }
 
-        if (slotId.getSlotId() != null) {
-            conf.putPair("slot-id", slotId.getSlotId().toString());
-        } else {
-            conf.putPair("slot", slotId.getSlotIndex().toString());
+        if (slotId != null) {
+            conf.putPair("slot-id", slotId.toString());
         }
 
-        if (keyId.getKeyId() != null) {
-            conf.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
+        if (slotIndex != null) {
+            conf.putPair("slot", slotIndex.toString());
         }
 
-        if (keyId.getKeyLabel() != null) {
-            conf.putPair("key-label", keyId.getKeyLabel());
+        if (keyId != null) {
+            conf.putPair("key-id", Hex.toHexString(keyId));
+        }
+
+        if (keyLabel != null) {
+            conf.putPair("key-label", keyLabel);
         }
 
         return conf.getEncoded();

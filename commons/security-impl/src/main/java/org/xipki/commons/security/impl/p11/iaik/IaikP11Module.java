@@ -36,23 +36,23 @@
 
 package org.xipki.commons.security.impl.p11.iaik;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.security.api.p11.P11Module;
+import org.xipki.commons.security.api.p11.AbstractP11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11UnknownEntityException;
+import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 import iaik.pkcs.pkcs11.Module;
 import iaik.pkcs.pkcs11.Slot;
@@ -63,26 +63,20 @@ import iaik.pkcs.pkcs11.TokenException;
  * @since 2.0.0
  */
 
-class IaikP11Module implements P11Module {
+class IaikP11Module extends AbstractP11Module {
 
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
 
     private Module module;
 
-    private P11ModuleConf moduleConf;
-
-    private Map<P11SlotIdentifier, IaikP11Slot> slots = new HashMap<>();
-
-    private Map<P11SlotIdentifier, Slot> availableSlots = new HashMap<>();
-
-    private List<P11SlotIdentifier> slotIds;
+    private final Map<P11SlotIdentifier, Slot> availableSlots = new HashMap<>();
 
     IaikP11Module(
             final Module module,
             final P11ModuleConf moduleConf)
     throws P11TokenException {
+        super(moduleConf);
         this.module = ParamUtil.requireNonNull("module", module);
-        this.moduleConf = ParamUtil.requireNonNull("moduleConf", moduleConf);
 
         Slot[] slotList;
         try {
@@ -98,17 +92,29 @@ class IaikP11Module implements P11Module {
             throw new P11TokenException("no slot with present card could be found");
         }
 
-        List<P11SlotIdentifier> tmpSlotIds = new LinkedList<>();
+        Set<P11Slot> slots = new HashSet<>();
         for (int i = 0; i < slotList.length; i++) {
             Slot slot = slotList[i];
             P11SlotIdentifier slotId = new P11SlotIdentifier(i, slot.getSlotID());
             availableSlots.put(slotId, slot);
-            if (moduleConf.isSlotIncluded(slotId)) {
-                tmpSlotIds.add(slotId);
+            if (!moduleConf.isSlotIncluded(slotId)) {
+                continue;
             }
+
+            List<char[]> pwd;
+            try {
+                pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
+            } catch (PasswordResolverException ex) {
+                throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
+            }
+            P11WritableSlot p11Slot = new IaikP11WritableSlot(moduleConf.getName(), slotId, slot,
+                    moduleConf.getUserType(), pwd, moduleConf.getMaxMessageSize(),
+                    moduleConf.getP11MechanismFilter());
+
+            slots.add(p11Slot);
         }
 
-        this.slotIds = Collections.unmodifiableList(tmpSlotIds);
+        setSlots(slots);
 
         if (LOG.isDebugEnabled()) {
             try {
@@ -135,64 +141,12 @@ class IaikP11Module implements P11Module {
                 LOG.debug(message, th);
             }
         } // end if(LOG.isDebugEnabled())
-    } // constructor
-
-    @Override
-    public IaikP11Slot getSlot(
-            final P11SlotIdentifier slotId)
-    throws P11TokenException {
-        ParamUtil.requireNonNull("slotId", slotId);
-        IaikP11Slot extSlot = slots.get(slotId);
-        if (extSlot != null) {
-            return extSlot;
-        }
-
-        Slot slot = null;
-        P11SlotIdentifier tmpSlotId = null;
-        for (P11SlotIdentifier s : availableSlots.keySet()) {
-            if (CompareUtil.equalsObject(s.getSlotIndex(), slotId.getSlotIndex())
-                    || CompareUtil.equalsObject(s.getSlotId(), slotId.getSlotId())) {
-                tmpSlotId = s;
-                slot = availableSlots.get(s);
-                break;
-            }
-        }
-
-        if (slot == null) {
-            throw new P11UnknownEntityException(slotId);
-        }
-
-        List<char[]> pwd;
-        try {
-            pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
-        } catch (PasswordResolverException ex) {
-            throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
-        }
-        extSlot = new IaikP11Slot(moduleConf.getName(), tmpSlotId, slot, moduleConf.getUserType(),
-                pwd, moduleConf.getMaxMessageSize(), moduleConf.getP11MechanismFilter());
-
-        slots.put(tmpSlotId, extSlot);
-        return extSlot;
-    } // method gestSlot
-
-    void destroySlot(
-            final long slotId) {
-        P11SlotIdentifier p11SlotId = null;
-        for (P11SlotIdentifier si : slots.keySet()) {
-            if (CompareUtil.equalsObject(si.getSlotId(), slotId)) {
-                p11SlotId = si;
-                break;
-            }
-        }
-        if (p11SlotId != null) {
-            slots.remove(p11SlotId);
-        }
     }
 
     void close() {
-        for (P11SlotIdentifier slotId : slots.keySet()) {
+        for (P11SlotIdentifier slotId : getSlotIdentifiers()) {
             try {
-                slots.get(slotId).close();
+                getSlot(slotId).close();
             } catch (Throwable th) {
                 LOG.error("could not close PKCS#11 slot {}: {}", slotId, th.getMessage());
                 LOG.debug("could not close PKCS#11 slot " + slotId, th);
@@ -200,8 +154,6 @@ class IaikP11Module implements P11Module {
 
             availableSlots.remove(slotId);
         }
-
-        slots = null;
 
         for (P11SlotIdentifier slotId : availableSlots.keySet()) {
             try {
@@ -212,7 +164,6 @@ class IaikP11Module implements P11Module {
             }
         }
         availableSlots.clear();
-        availableSlots = null;
 
         LOG.info("close", "close pkcs11 module: {}", module);
         try {
@@ -225,13 +176,6 @@ class IaikP11Module implements P11Module {
             }
             LOG.debug(message, th);
         }
-
-        module = null;
     } // method close
-
-    @Override
-    public List<P11SlotIdentifier> getSlotIdentifiers() {
-        return slotIds;
-    }
 
 }

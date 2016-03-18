@@ -66,6 +66,7 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 import org.xipki.commons.security.api.util.SignerUtil;
@@ -153,11 +154,12 @@ class KeystoreP11Identity extends P11Identity {
         }
     } // constructor
 
-    byte[] sign(
+    @Override
+    public byte[] sign(
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
-    throws SecurityException {
+    throws P11TokenException, SecurityException {
         ParamUtil.requireNonNull("content", content);
 
         if (!supportsMechanism(mechanism, parameters)) {
@@ -169,6 +171,14 @@ class KeystoreP11Identity extends P11Identity {
             return dsaAndEcdsaSign(content, null);
         } else if (P11Constants.CKM_ECDSA_SHA1 == mechanism) {
             return dsaAndEcdsaSign(content, HashAlgoType.SHA1);
+        } else if (P11Constants.CKM_ECDSA_SHA224 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA224);
+        } else if (P11Constants.CKM_ECDSA_SHA256 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA256);
+        } else if (P11Constants.CKM_ECDSA_SHA384 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA384);
+        } else if (P11Constants.CKM_ECDSA_SHA512 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA512);
         } else if (P11Constants.CKM_DSA == mechanism) {
             return dsaAndEcdsaSign(content, null);
         } else if (P11Constants.CKM_DSA_SHA1 == mechanism) {

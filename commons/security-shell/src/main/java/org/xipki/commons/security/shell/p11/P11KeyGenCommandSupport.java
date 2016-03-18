@@ -42,7 +42,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.shell.KeyGenCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
@@ -70,18 +69,13 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
     @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    protected P11SlotIdentifier getSlotId() {
-        return new P11SlotIdentifier(slotIndex, null);
-    }
-
     protected void finalize(
             final P11KeyIdentifier keyId)
     throws Exception {
         ParamUtil.requireNonNull("keyId", keyId);
-        out("generate PKCS#11 key");
+        out("generated PKCS#11 key");
         out("\tkey id: " + Hex.toHexString(keyId.getKeyId()));
         out("\tkey label: " + keyId.getKeyLabel());
-        securityFactory.getP11CryptService(moduleName).refresh();
     }
 
 }

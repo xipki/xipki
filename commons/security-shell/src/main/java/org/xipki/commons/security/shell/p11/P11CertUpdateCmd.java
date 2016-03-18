@@ -75,7 +75,7 @@ public class P11CertUpdateCmd extends P11SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         X509Certificate newCert = X509Util.parseCert(certFile);
         Set<X509Certificate> caCerts = new HashSet<>();
@@ -86,7 +86,6 @@ public class P11CertUpdateCmd extends P11SecurityCommandSupport {
         }
 
         slot.updateCertificate(keyIdentifier, newCert, caCerts, securityFactory);
-        securityFactory.getP11CryptService(moduleName).refresh();
         out("updated certificate");
         return null;
     }

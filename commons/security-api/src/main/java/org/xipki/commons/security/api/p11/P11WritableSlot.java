@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -54,11 +53,7 @@ import org.xipki.commons.security.api.SecurityFactory;
  * @since 2.0.0
  */
 
-public interface P11WritableSlot {
-
-    String getModuleName();
-
-    P11SlotIdentifier getSlotIdentifier();
+public interface P11WritableSlot extends P11Slot {
 
     void updateCertificate(
             @Nonnull P11KeyIdentifier keyIdentifier,
@@ -106,8 +101,6 @@ public interface P11WritableSlot {
     X509Certificate exportCert(
             @Nonnull P11KeyIdentifier keyIdentifier)
     throws P11TokenException, SecurityException;
-
-    List<? extends P11Identity> getP11Identities();
 
     void showDetails(
             @Nonnull OutputStream stream,

@@ -187,7 +187,7 @@ public class SignerUtil {
         byte[] prefix = digestPkcsPrefix.get(hashAlgo);
 
         if (prefix.length + hashLen + 3 > blockSize) {
-            throw new SecurityException("data too long (maximal " + (blockSize - 3) 
+            throw new SecurityException("data too long (maximal " + (blockSize - 3)
                     + " allowed): " + (prefix.length + hashLen));
         }
 

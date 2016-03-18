@@ -39,12 +39,9 @@ package org.xipki.commons.security.impl.p11.keystore;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +51,9 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
@@ -73,9 +72,6 @@ class KeystoreP11CryptService implements P11CryptService {
     private static final Map<String, KeystoreP11CryptService> INSTANCES = new HashMap<>();
 
     private final P11ModuleConf moduleConf;
-
-    private final ConcurrentSkipListSet<KeystoreP11Identity> identities
-            = new ConcurrentSkipListSet<>();
 
     private KeystoreP11Module module;
 
@@ -103,11 +99,9 @@ class KeystoreP11CryptService implements P11CryptService {
             throw ex;
         }
 
-        Set<KeystoreP11Identity> currentIdentifies = new HashSet<>();
-
         List<P11SlotIdentifier> slotIds = module.getSlotIdentifiers();
         for (P11SlotIdentifier slotId : slotIds) {
-            KeystoreP11Slot slot;
+            P11Slot slot;
             try {
                 slot = module.getSlot(slotId);
                 if (slot == null) {
@@ -132,32 +126,15 @@ class KeystoreP11CryptService implements P11CryptService {
                 LOG.debug(message, th);
                 continue;
             }
-
-            for (P11Identity identity : slot.getP11Identities()) {
-                currentIdentifies.add((KeystoreP11Identity) identity);
-            } // end for
         } // end for
-
-        this.identities.clear();
-        for (KeystoreP11Identity identity : currentIdentifies) {
-            this.identities.add(identity);
-        }
-        currentIdentifies.clear();
-        currentIdentifies = null;
-
-        if (LOG.isInfoEnabled()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
-            for (KeystoreP11Identity identity : this.identities) {
-                sb.append("\t(").append(identity.getEntityId());
-                sb.append(", algo=").append(identity.getPublicKey().getAlgorithm()).append(")\n");
-            }
-
-            LOG.info(sb.toString());
-        }
 
         LOG.info("refreshed PKCS#11 module {}", moduleConf.getName());
     } // method refresh
+
+    @Override
+    public P11Module getModule() {
+        return module;
+    }
 
     @Override
     public byte[] sign(
@@ -205,51 +182,11 @@ class KeystoreP11CryptService implements P11CryptService {
         return getNonnullIdentity(entityId).getCertificateChain();
     }
 
-    @Override
-    public P11SlotIdentifier[] getSlotIdentifiers()
-    throws P11TokenException {
-        List<P11SlotIdentifier> slotIds = new LinkedList<>();
-        for (KeystoreP11Identity identity : identities) {
-            P11SlotIdentifier slotId = identity.getEntityId().getSlotId();
-            if (!slotIds.contains(slotId)) {
-                slotIds.add(slotId);
-            }
-        }
-
-        return slotIds.toArray(new P11SlotIdentifier[0]);
-    }
-
-    @Override
-    public String[] getKeyLabels(
-            final P11SlotIdentifier slotId)
-    throws P11TokenException {
-        List<String> keyLabels = new LinkedList<>();
-        for (KeystoreP11Identity identity : identities) {
-            if (slotId.equals(identity.getEntityId().getSlotId())) {
-                keyLabels.add(identity.getEntityId().getKeyId().getKeyLabel());
-            }
-        }
-
-        return keyLabels.toArray(new String[0]);
-    }
-
-    private KeystoreP11Identity getNonnullIdentity(
+    private P11Identity getNonnullIdentity(
             final P11EntityIdentifier entityId)
     throws P11TokenException {
         ParamUtil.requireNonNull("entityId", entityId);
-
-        KeystoreP11Identity identity = null;
-        for (KeystoreP11Identity id : identities) {
-            if (id.match(entityId)) {
-                identity = id;
-                break;
-            }
-        }
-
-        if (identity == null) {
-            throw new P11TokenException("found no key with " + entityId);
-        }
-        return identity;
+        return module.getSlot(entityId.getSlotId()).getIdentity(entityId.getKeyId());
     }
 
     @Override
@@ -274,10 +211,10 @@ class KeystoreP11CryptService implements P11CryptService {
     }
 
     @Override
-    public Set<Long> getSupportedMechanisms(
+    public Set<Long> getMechanisms(
             final P11SlotIdentifier slotId)
     throws P11TokenException {
-        return module.getSlot(slotId).getSupportedMechanisms();
+        return module.getSlot(slotId).getMechanisms();
     }
 
     @Override

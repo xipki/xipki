@@ -36,7 +36,6 @@
 
 package org.xipki.commons.security.api.p11;
 
-import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -46,26 +45,22 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
 
-    private final Integer slotIndex;
+    private final int slotIndex;
 
-    private final Long slotId;
+    private final long slotId;
 
     public P11SlotIdentifier(
-            final Integer slotIndex,
-            final Long slotId) {
-        if (slotIndex == null && slotId == null) {
-            throw new IllegalArgumentException(
-                    "at least one of slotIndex an slotId must be non-null");
-        }
-        this.slotIndex = slotIndex;
-        this.slotId = slotId;
+            final int slotIndex,
+            final long slotId) {
+        this.slotIndex = ParamUtil.requireMin("slotIndex", slotIndex, 0);
+        this.slotId = ParamUtil.requireMin("slotId", slotId, 0);
     }
 
-    public Integer getSlotIndex() {
+    public int getSlotIndex() {
         return slotIndex;
     }
 
-    public Long getSlotId() {
+    public long getSlotId() {
         return slotId;
     }
 
@@ -80,60 +75,22 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
             return false;
         }
 
-        if (this == obj) {
-            return true;
-        }
-
         P11SlotIdentifier another = (P11SlotIdentifier) obj;
-        if (this.slotId != null && another.slotId != null) {
-            if (!CompareUtil.equalsObject(this.slotId, another.slotId)) {
-                return false;
-            }
-            
-            if (this.slotIndex == null || another.slotIndex == null) {
-                return true;
-            }
-        }
-        
-        if (this.slotIndex != null && another.slotIndex != null) {
-            if (!CompareUtil.equalsObject(this.slotIndex, another.slotIndex)) {
-                return false;
-            }
-            
-            if (this.slotId == null || another.slotId == null) {
-                return true;
-            }
-        }
-        
-        return false;
+        return this.slotId == another.slotId && this.slotIndex == another.slotIndex;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (slotIndex != null) {
-            sb.append("slot-index: ").append(slotIndex);
-            if (slotId != null) {
-                sb.append(", ");
-            }
-        }
-        if (slotId != null) {
-            sb.append("slot-id: ").append(slotId);
-        }
+        sb.append("slot-index: ").append(slotIndex);
+        sb.append("slot-id: ").append(slotId);
         return sb.toString();
     }
 
     @Override
     public int hashCode() {
-        int hashCode = 0;
-        if (slotId != null) {
-            hashCode = slotId.hashCode();
-        }
-
-        if (slotIndex != 0) {
-            hashCode += 31 * slotIndex.hashCode();
-        }
-
+        int hashCode = Long.hashCode(slotId);
+        hashCode += 31 * slotIndex;
         return hashCode;
     }
 
@@ -145,22 +102,14 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
             return 0;
         }
 
-        if (slotIndex != null) {
-            if (obj.slotIndex != null) {
-                int sign = slotIndex - obj.slotIndex;
-                if (sign > 0) {
-                    return 1;
-                } else if (sign < 0) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            } else {
-                return -1;
-            }
+        int sign = slotIndex - obj.slotIndex;
+        if (sign > 0) {
+            return 1;
+        } else if (sign < 0) {
+            return -1;
+        } else {
+            return 0;
         }
-
-        return 0;
     }
 
 }
