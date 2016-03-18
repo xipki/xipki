@@ -46,6 +46,8 @@ import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 
+import iaik.pkcs.pkcs11.objects.PrivateKey;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -54,13 +56,17 @@ import org.xipki.commons.security.api.p11.parameters.P11Params;
 class IaikP11Identity extends P11Identity {
     private final String moduleName;
 
+    private final PrivateKey privateKey;
+
     IaikP11Identity(
             final String moduleName,
             final P11EntityIdentifier entityId,
+            final PrivateKey privateKey,
             final X509Certificate[] certificateChain,
             final PublicKey publicKey) {
         super(entityId, certificateChain, publicKey);
         this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
+        this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
     }
 
     private IaikP11Module getModule()
@@ -72,7 +78,8 @@ class IaikP11Identity extends P11Identity {
         return module;
     }
 
-    byte[] sign(
+    @Override
+    public byte[] sign(
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
@@ -84,8 +91,12 @@ class IaikP11Identity extends P11Identity {
         }
 
         IaikP11Module module = getModule();
-        IaikP11Slot slot = module.getSlot(entityId.getSlotId());
+        IaikP11Slot slot = (IaikP11Slot) module.getSlot(entityId.getSlotId());
         return slot.sign(mechanism, parameters, content, entityId.getKeyId());
+    }
+
+    PrivateKey getPrivateKey() {
+        return privateKey;
     }
 
 }

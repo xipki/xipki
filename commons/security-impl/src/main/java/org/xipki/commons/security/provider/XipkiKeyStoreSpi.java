@@ -52,17 +52,22 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11Module;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 
@@ -72,6 +77,8 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  */
 
 public class XipkiKeyStoreSpi extends KeyStoreSpi {
+
+    private static final Logger LOG = LoggerFactory.getLogger(XipkiKeyStoreSpi.class);
 
     private static class MyEnumeration<E> implements Enumeration<E> {
 
@@ -137,50 +144,52 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     throws IOException, NoSuchAlgorithmException, CertificateException {
         this.creationDate = new Date();
 
-        try {
-            P11CryptService p11Servcie = securityFactory.getP11CryptService(
-                    SecurityFactory.DEFAULT_P11MODULE_NAME);
-            P11SlotIdentifier[] slotIds = p11Servcie.getSlotIdentifiers();
+        Set<String> moduleNames = securityFactory.getP11ModuleNames();
+        for (String moduleName : moduleNames) {
+            try {
+                engineLoad(securityFactory, moduleName);
+            } catch (SecurityException | P11TokenException ex) {
+                String msg = "could not load PKCS#11 module " + moduleName;
+                LOG.error(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
+                        ex.getMessage());
+                LOG.error("msg", ex);
+            }
+        }
 
-            Map<P11SlotIdentifier, String[]> keyLabelsMap = new HashMap<>();
+        if (LOG.isErrorEnabled()) {
+            LOG.info("loaded key entries {}", keyCerts.keySet());
+        }
+    }
 
-            Set<String> allKeyLabels = new HashSet<>();
-            Set<String> duplicatedKeyLabels = new HashSet<>();
+    private void engineLoad(
+            final SecurityFactory securityFactory,
+            final String moduleName)
+    throws P11TokenException, SecurityException {
+        P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
+        P11Module module = p11Service.getModule();
+        List<P11SlotIdentifier> slotIds = module.getSlotIdentifiers();
 
-            for (P11SlotIdentifier slotId: slotIds) {
-                String[] keyLabels = p11Servcie.getKeyLabels(slotId);
-                for (String keyLabel : keyLabels) {
-                    if (allKeyLabels.contains(keyLabel)) {
-                        duplicatedKeyLabels.add(keyLabel);
-                    }
-                    allKeyLabels.add(keyLabel);
+        for (P11SlotIdentifier slotId: slotIds) {
+            P11Slot slot = module.getSlot(slotId);
+            List<P11KeyIdentifier> keyIds = slot.getKeyIdentifiers();
+            for (P11KeyIdentifier keyId : keyIds) {
+                P11Identity identity = slot.getIdentity(keyId);
+                X509Certificate[] chain = identity.getCertificateChain();
+                if (chain == null || chain.length == 0) {
+                    continue;
                 }
 
-                keyLabelsMap.put(slotId, keyLabels);
-            } // end for
-
-            for (P11SlotIdentifier slotId: slotIds) {
-                String[] keyLabels = keyLabelsMap.get(slotId);
-                for (String keyLabel : keyLabels) {
-                    String alias = keyLabel;
-                    if (duplicatedKeyLabels.contains(keyLabel)) {
-                        alias += "-slot" + slotId.getSlotIndex();
-                    }
-
-                    P11KeyIdentifier keyId = new P11KeyIdentifier(keyLabel);
-                    P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, keyId);
-                    X509Certificate[] chain = p11Servcie.getCertificates(entityId);
-                    if (chain != null && chain.length > 0) {
-                        P11PrivateKey key = new P11PrivateKey(p11Servcie, entityId);
-
-                        KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
-                        keyCerts.put(alias, keyCertEntry);
-                    }
-                } // end for
-            } // end for
-        } catch (SecurityException | P11TokenException ex) {
-            throw new IllegalArgumentException(ex.getClass().getName() + ": " + ex.getMessage(),
-                    ex);
+                P11PrivateKey key = new P11PrivateKey(p11Service, identity.getEntityId());
+                KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
+                keyCerts.put(moduleName + "#slotid-" + slotId.getSlotId() + "#keyid-"
+                        + keyId.getKeyIdHex(), keyCertEntry);
+                keyCerts.put(moduleName + "#slotid-" + slotId.getSlotId() + "#keylabel-"
+                            + keyId.getKeyLabel(), keyCertEntry);
+                keyCerts.put(moduleName + "#slotindex-" + slotId.getSlotIndex() + "#keyid-"
+                            + keyId.getKeyIdHex(), keyCertEntry);
+                keyCerts.put(moduleName + "#slotindex-" + slotId.getSlotIndex() + "#keylabel-"
+                            + keyId.getKeyLabel(), keyCertEntry);
+            }
         }
     } // method engineLoad
 
