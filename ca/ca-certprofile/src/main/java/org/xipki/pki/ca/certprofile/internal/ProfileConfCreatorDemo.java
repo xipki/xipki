@@ -41,6 +41,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -69,7 +70,6 @@ import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.TlsExtensionType;
 import org.xipki.commons.security.api.util.KeyUtil;
-import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.certprofile.XmlX509Certprofile;
@@ -1287,7 +1287,7 @@ public class ProfileConfCreatorDemo {
         ExtendedKeyUsage extValue = new ExtendedKeyUsage();
         if (requiredUsages != null) {
             List<ASN1ObjectIdentifier> oids = Arrays.asList(requiredUsages);
-            oids = X509Util.sortOidList(oids);
+            oids = sortOidList(oids);
             for (ASN1ObjectIdentifier usage : oids) {
                 extValue.getUsage().add(createSingleExtKeyUsage(usage, true));
             }
@@ -1295,7 +1295,7 @@ public class ProfileConfCreatorDemo {
 
         if (optionalUsages != null) {
             List<ASN1ObjectIdentifier> oids = Arrays.asList(optionalUsages);
-            oids = X509Util.sortOidList(oids);
+            oids = sortOidList(oids);
             for (ASN1ObjectIdentifier usage : oids) {
                 extValue.getUsage().add(createSingleExtKeyUsage(usage, false));
             }
@@ -1806,6 +1806,26 @@ public class ProfileConfCreatorDemo {
         cap.getParameters().setBase64Binary(binary);
 
         return createExtensionValueType(caps);
+    }
+
+    private static List<ASN1ObjectIdentifier> sortOidList(
+            List<ASN1ObjectIdentifier> oids) {
+        ParamUtil.requireNonNull("oids", oids);
+        List<String> list = new ArrayList<>(oids.size());
+        for (ASN1ObjectIdentifier m : oids) {
+            list.add(m.getId());
+        }
+        Collections.sort(list);
+
+        List<ASN1ObjectIdentifier> sorted = new ArrayList<>(oids.size());
+        for (String m : list) {
+            for (ASN1ObjectIdentifier n : oids) {
+                if (m.equals(n.getId()) && !sorted.contains(n)) {
+                    sorted.add(n);
+                }
+            }
+        }
+        return sorted;
     }
 
 }

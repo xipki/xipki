@@ -47,8 +47,6 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.util.SignerConfUtil;
 import org.xipki.pki.ca.client.shell.completer.P11ModuleNameCompleter;
 
@@ -87,26 +85,15 @@ public class P11EnrollCertCmd extends EnrollCertCommandSupport {
     protected ConcurrentContentSigner getSigner(
             final SignatureAlgoControl signatureAlgoControl)
     throws SecurityException {
-        P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
-        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        byte[] keyIdBytes = null;
+        if (keyId != null) {
+            keyIdBytes = Hex.decode(keyId);
+        }
 
         String signerConfWithoutAlgo = SignerConfUtil.getPkcs11SignerConfWithoutAlgo(
-                moduleName, slotIdentifier, keyIdentifier, 1);
+                moduleName, slotIndex, null, keyIdBytes, keyLabel, 1);
         return securityFactory.createSigner("PKCS11", signerConfWithoutAlgo, hashAlgo,
                 signatureAlgoControl, (X509Certificate[]) null);
-    }
-
-    private P11KeyIdentifier getKeyIdentifier()
-    throws SecurityException {
-        P11KeyIdentifier keyIdentifier;
-        if (keyId != null && keyLabel == null) {
-            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
-        } else if (keyId == null && keyLabel != null) {
-            keyIdentifier = new P11KeyIdentifier(keyLabel);
-        } else {
-            throw new SecurityException("exactly one of keyId or keyLabel should be specified");
-        }
-        return keyIdentifier;
     }
 
 }

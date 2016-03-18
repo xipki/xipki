@@ -43,6 +43,7 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
@@ -50,7 +51,7 @@ import org.xipki.commons.security.api.p11.parameters.P11Params;
  * @since 2.0.0
  */
 
-public class P11Identity implements Comparable<P11Identity> {
+public abstract class P11Identity implements Comparable<P11Identity> {
 
     protected final P11EntityIdentifier entityId;
 
@@ -93,6 +94,12 @@ public class P11Identity implements Comparable<P11Identity> {
                     + " (class: " + this.publicKey.getClass().getName() + ")");
         }
     } // constructor
+
+    public abstract byte[] sign(
+            final long mechanism,
+            final P11Params parameters,
+            final byte[] content)
+    throws P11TokenException, SecurityException;
 
     public P11EntityIdentifier getEntityId() {
         return entityId;

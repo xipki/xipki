@@ -119,6 +119,14 @@ public class P11Constants {
 
     public static final long CKM_ECDSA_SHA1 = 0x00001042L;
 
+    public static final long CKM_ECDSA_SHA224 = 0x00001043L;
+
+    public static final long CKM_ECDSA_SHA256 = 0x00001044L;
+
+    public static final long CKM_ECDSA_SHA384 = 0x00001045L;
+
+    public static final long CKM_ECDSA_SHA512 = 0x00001046L;
+
     /* MGFs */
     public static final long CKG_MGF1_SHA1 = 0x00000001L;
 
@@ -161,6 +169,10 @@ public class P11Constants {
 
         mp.put(CKM_ECDSA, "CKM_ECDSA");
         mp.put(CKM_ECDSA_SHA1, "CKM_ECDSA_SHA1");
+        mp.put(CKM_ECDSA_SHA224, "CKM_ECDSA_SHA224");
+        mp.put(CKM_ECDSA_SHA256, "CKM_ECDSA_SHA256");
+        mp.put(CKM_ECDSA_SHA384, "CKM_ECDSA_SHA384");
+        mp.put(CKM_ECDSA_SHA512, "CKM_ECDSA_SHA512");
 
         mp.put(CKM_RSA_X_509, "CKM_RSA_X_509");
 

@@ -73,6 +73,8 @@ class P11ECDSAContentSigner implements ContentSigner {
 
     private static final Map<String, HashAlgoType> sigAlgHashMap = new HashMap<>();
 
+    private static final Map<HashAlgoType, Long> hashMechMap = new HashMap<>();
+
     private final P11CryptService cryptService;
 
     private final P11EntityIdentifier entityId;
@@ -97,6 +99,12 @@ class P11ECDSAContentSigner implements ContentSigner {
         sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA256.getId(), HashAlgoType.SHA256);
         sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA384.getId(), HashAlgoType.SHA384);
         sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA512.getId(), HashAlgoType.SHA512);
+
+        hashMechMap.put(HashAlgoType.SHA1, P11Constants.CKM_DSA_SHA1);
+        hashMechMap.put(HashAlgoType.SHA224, P11Constants.CKM_DSA_SHA224);
+        hashMechMap.put(HashAlgoType.SHA256, P11Constants.CKM_DSA_SHA256);
+        hashMechMap.put(HashAlgoType.SHA384, P11Constants.CKM_DSA_SHA384);
+        hashMechMap.put(HashAlgoType.SHA512, P11Constants.CKM_DSA_SHA512);
     }
 
     P11ECDSAContentSigner(
@@ -110,26 +118,24 @@ class P11ECDSAContentSigner implements ContentSigner {
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         this.plain = plain;
 
-        ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
+        String algOid = signatureAlgId.getAlgorithm().getId();
         HashAlgoType hashAlgo = sigAlgHashMap.get(algOid);
         if (hashAlgo == null) {
             throw new SecurityException("unsupported signature algorithm " + algOid);
         }
+        long tmpMechanism = hashMechMap.get(hashAlgo).longValue();
 
         P11SlotIdentifier slotId = entityId.getSlotId();
-        long tmpMechanism;
-        if (cryptService.supportsMechanism(slotId, P11Constants.CKM_ECDSA)) {
+        if (cryptService.supportsMechanism(slotId, P11Constants.CKM_DSA)) {
             tmpMechanism = P11Constants.CKM_DSA;
             AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
                     new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
             Digest digest = SignerUtil.getDigest(digAlgId);
             this.outputStream = new DigestOutputStream(digest);
-        } else if (hashAlgo == HashAlgoType.SHA1 && cryptService.supportsMechanism(slotId,
-                P11Constants.CKM_ECDSA_SHA1)) {
-            tmpMechanism = P11Constants.CKM_ECDSA_SHA1;
+        } else if (cryptService.supportsMechanism(slotId, this.mechanism)) {
             this.outputStream = new ByteArrayOutputStream();
         } else {
-            throw new SecurityException("unsupported signature algorithm " + algOid.getId());
+            throw new SecurityException("unsupported signature algorithm " + algOid);
         }
         this.mechanism = tmpMechanism;
     }

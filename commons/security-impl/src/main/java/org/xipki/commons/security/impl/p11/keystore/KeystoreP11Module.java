@@ -38,21 +38,18 @@ package org.xipki.commons.security.impl.p11.keystore;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.security.api.p11.P11Module;
+import org.xipki.commons.security.api.p11.AbstractP11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 
@@ -61,19 +58,14 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  * @since 2.0.0
  */
 
-class KeystoreP11Module implements P11Module {
+class KeystoreP11Module extends AbstractP11Module {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Module.class);
 
-    private final P11ModuleConf moduleConf;
-
-    private Map<P11SlotIdentifier, KeystoreP11Slot> slots = new HashMap<>();
-
-    private List<P11SlotIdentifier> slotIds;
-
     KeystoreP11Module(
-            final P11ModuleConf moduleConf) {
-        this.moduleConf = ParamUtil.requireNonNull("moduleConf", moduleConf);
+            final P11ModuleConf moduleConf)
+    throws P11TokenException {
+        super(moduleConf);
         final String nativeLib = moduleConf.getNativeLibrary();
 
         File baseDir = new File(IoUtil.expandFilepath(nativeLib));
@@ -81,7 +73,7 @@ class KeystoreP11Module implements P11Module {
 
         if (children == null || children.length == 0) {
             LOG.error("found no slots");
-            this.slotIds = Collections.emptyList();
+            setSlots(Collections.emptySet());
             return;
         }
 
@@ -130,89 +122,40 @@ class KeystoreP11Module implements P11Module {
             allSlotIds.add(new P11SlotIdentifier(slotIndex, slotId));
         } // end for
 
-        List<P11SlotIdentifier> tmpSlotIds = new LinkedList<>();
+        Set<P11Slot> slots = new HashSet<>();
         for (P11SlotIdentifier slotId : allSlotIds) {
-            if (moduleConf.isSlotIncluded(slotId)) {
-                tmpSlotIds.add(slotId);
+            List<char[]> pwd;
+            try {
+                pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
+            } catch (PasswordResolverException ex) {
+                throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
             }
+
+            File slotDir = new File(moduleConf.getNativeLibrary(), slotId.getSlotIndex() + "-"
+                    + slotId.getSlotId());
+
+            if (pwd == null) {
+                throw new P11TokenException("no password is configured");
+            }
+
+            if (pwd.size() != 1) {
+                throw new P11TokenException(pwd.size()
+                        + " passwords are configured, but 1 is permitted");
+            }
+
+            PrivateKeyCryptor privateKeyCryptor = new PrivateKeyCryptor(pwd.get(0));
+
+            P11Slot slot = new KeystoreP11WritableSlot(moduleConf.getName(), slotDir, slotId,
+                    privateKeyCryptor, moduleConf.getSecurityFactory(),
+                    moduleConf.getP11MechanismFilter());
+            slots.add(slot);
         }
 
-        this.slotIds = Collections.unmodifiableList(tmpSlotIds);
+        setSlots(slots);
     } // constructor
 
-    @Override
-    public KeystoreP11Slot getSlot(
-            final P11SlotIdentifier slotId)
-    throws P11TokenException {
-        ParamUtil.requireNonNull("slotId", slotId);
-        KeystoreP11Slot extSlot = slots.get(slotId);
-        if (extSlot != null) {
-            return extSlot;
-        }
-
-        P11SlotIdentifier tmpSlotId = null;
-        for (P11SlotIdentifier s : slotIds) {
-            if (CompareUtil.equalsObject(s.getSlotIndex(), slotId.getSlotIndex())
-                    || CompareUtil.equalsObject(s.getSlotId(), slotId.getSlotId())) {
-                tmpSlotId = s;
-                break;
-            }
-        }
-
-        if (tmpSlotId == null) {
-            throw new P11TokenException("could not find slot identified by " + slotId);
-        }
-
-        List<char[]> pwd;
-        try {
-            pwd = moduleConf.getPasswordRetriever().getPassword(tmpSlotId);
-        } catch (PasswordResolverException ex) {
-            throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
-        }
-
-        File slotDir = new File(moduleConf.getNativeLibrary(), tmpSlotId.getSlotIndex() + "-"
-                + tmpSlotId.getSlotId());
-
-        if (pwd == null) {
-            throw new P11TokenException("no password is configured");
-        }
-
-        if (pwd.size() != 1) {
-            throw new P11TokenException(pwd.size()
-                    + " passwords are configured, but 1 is permitted");
-        }
-
-        PrivateKeyCryptor privateKeyCryptor = new PrivateKeyCryptor(pwd.get(0));
-
-        extSlot = new KeystoreP11Slot(moduleConf.getName(), slotDir, tmpSlotId, privateKeyCryptor,
-                moduleConf.getSecurityFactory(), moduleConf.getP11MechanismFilter());
-
-        slots.put(tmpSlotId, extSlot);
-        return extSlot;
-    } // method getSlot
-
-    void destroySlot(
-            final long slotId) {
-        P11SlotIdentifier p11SlotId = null;
-        for (P11SlotIdentifier si : slots.keySet()) {
-            if (CompareUtil.equalsObject(si.getSlotId(), slotId)) {
-                p11SlotId = si;
-                break;
-            }
-        }
-        if (p11SlotId != null) {
-            slots.remove(p11SlotId);
-        }
-    }
-
     void close() {
-        slots.clear();
-        LOG.info("close", "close pkcs11 module: {}", moduleConf.getName());
-    }
-
-    @Override
-    public List<P11SlotIdentifier> getSlotIdentifiers() {
-        return slotIds;
+        LOG.info("close", "close pkcs11 module: {}", getName());
     }
 
 }

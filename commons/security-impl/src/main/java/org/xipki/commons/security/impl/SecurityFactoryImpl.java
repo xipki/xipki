@@ -121,9 +121,10 @@ import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11NullPasswordRetriever;
 import org.xipki.commons.security.api.p11.P11PasswordRetriever;
 import org.xipki.commons.security.api.p11.P11PermitAllMechanimFilter;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.p11.P11UnknownEntityException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
@@ -134,7 +135,6 @@ import org.xipki.commons.security.impl.p11.iaik.IaikP11CryptServiceFactory;
 import org.xipki.commons.security.impl.p11.iaik.IaikP11ModulePool;
 import org.xipki.commons.security.impl.p11.keystore.KeystoreP11CryptServiceFactory;
 import org.xipki.commons.security.impl.p11.keystore.KeystoreP11ModulePool;
-import org.xipki.commons.security.impl.p11.remote.RemoteP11CryptServiceFactory;
 import org.xipki.commons.security.impl.p12.SoftTokenContentSignerBuilder;
 import org.xipki.commons.security.p11.conf.jaxb.MechanismsType;
 import org.xipki.commons.security.p11.conf.jaxb.ModuleType;
@@ -166,7 +166,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     private String pkcs11Provider;
 
-    private int defaultParallelism = 20;
+    private int defaultParallelism = 32;
 
     private P11Control p11Control;
 
@@ -270,9 +270,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             }
 
             if ("PKCS11".equalsIgnoreCase(tmpType)) {
-                String pkcs11Module = keyValues.getValue("module");
-                if (pkcs11Module == null) {
-                    pkcs11Module = DEFAULT_P11MODULE_NAME;
+                String moduleName = keyValues.getValue("module");
+                if (moduleName == null) {
+                    moduleName = DEFAULT_P11MODULE_NAME;
                 }
 
                 str = keyValues.getValue("slot");
@@ -304,32 +304,42 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                             "exactly one of key-id and key-label must be specified");
                 }
 
-                P11KeyIdentifier p11KeyId = (keyId != null)
-                        ? new P11KeyIdentifier(keyId)
-                        : new P11KeyIdentifier(keyLabel);
+                P11CryptService p11Service;
+                P11Slot slot;
+                try {
+                    p11Service = getP11CryptService(moduleName);
+                    P11Module module = p11Service.getModule();
+                    P11SlotIdentifier p11SlotId = (slotId != null)
+                            ? module.getSlotIdForId(slotId)
+                            : module.getSlotIdForIndex(slotIndex);
+                    slot = module.getSlot(p11SlotId);
+                } catch (P11TokenException ex) {
+                    throw new SecurityException("P11TokenException: " + ex.getMessage(), ex);
+                }
 
-                P11SlotIdentifier p11SlotId = new P11SlotIdentifier(slotIndex, slotId);
-                P11EntityIdentifier entityId = new P11EntityIdentifier(p11SlotId, p11KeyId);
+                P11KeyIdentifier p11KeyId;
+                try {
+                    p11KeyId = (keyId != null)
+                        ? slot.getKeyIdForId(keyId)
+                        : slot.getKeyIdForLabel(keyLabel);
+                } catch (P11UnknownEntityException ex) {
+                    throw new SecurityException("unknown PKCS#11 entity: " + ex.getMessage(), ex);
+                }
+
+                P11EntityIdentifier entityId = new P11EntityIdentifier(slot.getSlotId(), p11KeyId);
 
                 try {
                     AlgorithmIdentifier signatureAlgId;
                     if (hashAlgo == null) {
                         signatureAlgId = getSignatureAlgoId(conf);
                     } else {
-                        PublicKey pubKey;
-                        try {
-                            pubKey = getPkcs11PublicKey(pkcs11Module, entityId);
-                        } catch (InvalidKeyException ex) {
-                            throw new SecurityException("invalid key: " + ex.getMessage(), ex);
-                        }
-
+                        PublicKey pubKey = slot.getIdentity(p11KeyId).getPublicKey();
                         signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo,
                                 sigAlgoControl);
                     }
 
-                    P11CryptService p11CryptService = getP11CryptService(pkcs11Module);
                     P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
-                            p11CryptService, (SecurityFactory) this, entityId, certificateChain);
+                            p11Service, (SecurityFactory) this, entityId, certificateChain);
                     return signerBuilder.createSigner(signatureAlgId, parallelism);
                 } catch (P11TokenException | NoSuchAlgorithmException ex) {
                     throw new SecurityException(ex.getMessage(), ex);
@@ -507,10 +517,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         this.pkcs11Provider = pkcs11Provider;
     }
 
-    public String getPkcs11Provider() {
-        return pkcs11Provider;
-    }
-
     public void setDefaultParallelism(
             final int defaultParallelism) {
         if (defaultParallelism > 0) {
@@ -527,7 +533,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     @Override
-    public Set<String> getPkcs11ModuleNames() {
+    public Set<String> getP11ModuleNames() {
         initPkcs11ModuleConf();
         return (p11Control == null)
                 ? null
@@ -554,8 +560,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 p11Provider = new IaikP11CryptServiceFactory();
             } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
                 p11Provider = new KeystoreP11CryptServiceFactory();
-            } else if (RemoteP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
-                p11Provider = new RemoteP11CryptServiceFactory();
             } else {
                 try {
                     Class<?> clazz = Class.forName(pkcs11Provider);
@@ -760,63 +764,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     @Override
     public PasswordResolver getPasswordResolver() {
         return passwordResolver;
-    }
-
-    @Override
-    public PublicKey getPkcs11PublicKey(
-            final String moduleName,
-            final P11EntityIdentifier entityId)
-    throws InvalidKeyException, P11TokenException {
-        try {
-            P11CryptService p11 = getP11CryptService(moduleName);
-            return (p11 == null)
-                    ? null
-                    : p11.getPublicKey(entityId);
-        } catch (SecurityException ex) {
-            throw new InvalidKeyException(ex.getMessage(), ex);
-        }
-    }
-
-    @Override
-    public P11Module getP11Module(
-            final String moduleName)
-    throws SecurityException, P11TokenException {
-        // this call initialization method
-        P11CryptService p11CryptService = getP11CryptService(moduleName);
-        if (p11CryptService == null) {
-            throw new SecurityException("could not initialize P11CryptService " + moduleName);
-        }
-
-        P11Module module;
-        if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
-            // the returned object must not be null
-            module = IaikP11ModulePool.getInstance().getModule(moduleName);
-        } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
-            module = KeystoreP11ModulePool.getInstance().getModule(moduleName);
-        } else {
-            throw new SecurityException("PKCS11 provider " + pkcs11Provider + " is not accepted");
-        }
-
-        return module;
-
-    }
-
-    @Override
-    public P11WritableSlot getP11WritablSlot(
-            final String moduleName,
-            final int slotIndex)
-    throws SecurityException, P11TokenException {
-        P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
-        P11Module module = getP11Module(moduleName);
-        if (module == null) {
-            throw new SecurityException("module " + moduleName + " does not exist");
-        }
-        P11WritableSlot slot = module.getSlot(slotId);
-        if (slot == null) {
-            throw new SecurityException("could not get slot " + slotIndex + " of module "
-                    + moduleName);
-        }
-        return slot;
     }
 
     public void setSignerTypeMap(

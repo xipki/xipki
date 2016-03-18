@@ -66,7 +66,7 @@ public class SpeedP11ECSignCmd extends SpeedP11SignCommandSupport {
     @Override
     protected LoadExecutor getTester()
     throws Exception {
-        P11WritableSlot slot = securityFactory.getP11WritablSlot(moduleName, slotIndex);
+        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
         return new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName);
     }
 
