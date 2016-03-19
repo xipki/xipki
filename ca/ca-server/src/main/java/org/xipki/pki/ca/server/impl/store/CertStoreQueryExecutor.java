@@ -975,14 +975,14 @@ class CertStoreQueryExecutor {
         }
 
         final String sql = datasource.createFetchFirstSelectSql(
-                "CID FROM PUBLISHQUEUE WHERE CA_ID=? AND PID=?", numEntries, "CID ASC");
+                "CID FROM PUBLISHQUEUE WHERE PID=? AND CA_ID=?", numEntries, "CID ASC");
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
             int idx = 1;
-            ps.setInt(idx++, caId);
             ps.setLong(idx++, publisherId);
+            ps.setInt(idx++, caId);
             rs = ps.executeQuery();
             List<Integer> ret = new ArrayList<>();
             while (rs.next() && ret.size() < numEntries) {
@@ -1621,15 +1621,15 @@ class CertStoreQueryExecutor {
         int caId = getCaId(caCert);
 
         final String sql = datasource.createFetchFirstSelectSql(
-                "UNAME FROM CERT WHERE CA_ID=? AND SN=?", 1);
+                "UNAME FROM CERT WHERE SN=? AND CA_ID=?", 1);
 
         String user = null;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
-            ps.setInt(1, caId);
-            ps.setLong(2, serial.longValue());
+            ps.setLong(1, serial.longValue());
+            ps.setInt(2, caId);
             rs = ps.executeQuery();
 
             if (!rs.next()) {
@@ -1744,7 +1744,7 @@ class CertStoreQueryExecutor {
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("REV, RR, RT, RIT");
-        sqlBuilder.append(" FROM CERT WHERE CA_ID=? AND SN=?");
+        sqlBuilder.append(" FROM CERT WHERE SN=? AND CA_ID=?");
         if (onlyCaCerts) {
             sqlBuilder.append(" AND EE=0");
         } else if (onlyUserCerts) {
@@ -1757,8 +1757,8 @@ class CertStoreQueryExecutor {
         List<CertRevInfoWithSerial> ret = new ArrayList<>();
         for (Long serial : serials) {
             try {
-                ps.setInt(1, caId);
-                ps.setLong(2, serial);
+                ps.setLong(1, serial);
+                ps.setInt(2, caId);
                 rs = ps.executeQuery();
 
                 if (!rs.next()) {

@@ -124,7 +124,7 @@ public class DbCertStatusStore extends CertStatusStore {
             "REV,RR,RT,RIT,PN FROM CERT WHERE SN=?";
 
     private static final String SQL_CS =
-            "REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
+            "REV,RR,RT,RIT,PN FROM CERT WHERE SN=? AND IID=?";
 
     private static final Map<HashAlgoType, String> SQL_CS_HASHMAP_SINGLE_ISSUER = new HashMap<>();
 
@@ -383,10 +383,10 @@ public class DbCertStatusStore extends CertStatusStore {
 
             try {
                 int idx = 1;
+                ps.setLong(idx++, serialNumber.longValue());
                 if (multiplCasContained) {
                     ps.setInt(idx++, issuer.getId());
                 }
-                ps.setLong(idx++, serialNumber.longValue());
 
                 rs = ps.executeQuery();
 
