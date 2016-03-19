@@ -36,6 +36,8 @@
 
 package org.xipki.commons.security.shell;
 
+import java.io.File;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -60,6 +62,7 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
             description = "iteration count, between 1 and 65535")
     private int iterationCount = 2000;
 
+    @Option(name = "--out", description = "where to save the encrypted password")
     @Completion(FilePathCompleter.class)
     private String outFile;
 
@@ -78,7 +81,12 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
 
         String passwordHint = pbePasswordService.encryptPassword(iterationCount, masterPassword,
                 password);
-        out("the encrypted password is: '" + passwordHint + "'");
+        if (outFile != null) {
+            saveVerbose("saved the encrypted password to file", new File(outFile),
+                    passwordHint.getBytes());
+        } else {
+            out("the encrypted password is: '" + passwordHint + "'");
+        }
         return null;
     }
 
