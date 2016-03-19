@@ -54,7 +54,7 @@ public class NegClearPublishQueueCmd extends ClearPublishQueueCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-clear-publishqueue");
+        println("neg-clear-publishqueue");
 
         try {
             super.doExecute();

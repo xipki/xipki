@@ -54,7 +54,7 @@ public class NegCaGenRootCaCmd extends CaGenRcaCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-gen-rca");
+        println("neg-gen-rca");
 
         try {
             super.doExecute();

@@ -54,7 +54,7 @@ public class NegPublisherAddCmd extends PublisherAddCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-publisher-add");
+        println("neg-publisher-add");
 
         try {
             super.doExecute();

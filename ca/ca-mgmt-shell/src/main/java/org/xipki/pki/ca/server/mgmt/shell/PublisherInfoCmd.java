@@ -96,7 +96,7 @@ public class PublisherInfoCmd extends CaCommandSupport {
             }
         }
 
-        out(sb.toString());
+        println(sb.toString());
         return null;
     } // method doExecute
 

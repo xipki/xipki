@@ -54,7 +54,7 @@ public class NegCaProfileAddCmd extends CaProfileAddCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-caprofile-add");
+        println("neg-caprofile-add");
 
         try {
             super.doExecute();

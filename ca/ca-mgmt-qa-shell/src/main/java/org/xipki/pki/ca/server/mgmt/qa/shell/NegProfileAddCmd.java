@@ -54,7 +54,7 @@ public class NegProfileAddCmd extends ProfileAddCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-profile-add");
+        println("neg-profile-add");
 
         try {
             super.doExecute();

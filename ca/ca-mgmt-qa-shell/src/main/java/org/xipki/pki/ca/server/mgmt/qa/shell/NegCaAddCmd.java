@@ -54,7 +54,7 @@ public class NegCaAddCmd extends CaAddCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-ca-add");
+        println("neg-ca-add");
 
         try {
             super.doExecute();

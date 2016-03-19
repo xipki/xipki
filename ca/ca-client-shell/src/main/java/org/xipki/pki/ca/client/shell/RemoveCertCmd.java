@@ -100,7 +100,7 @@ public class RemoveCertCmd extends UnRevRemoveCertCommandSupport {
             PkiStatusInfo error = certIdOrError.getError();
             throw new UnexpectedException("removing certificate failed: " + error);
         } else {
-            out("removed certificate");
+            println("removed certificate");
         }
         return null;
     } // method doExecute

@@ -57,7 +57,7 @@ public class CaSystemStatusCmd extends CaCommandSupport {
     throws Exception {
         CaSystemStatus status = caManager.getCaSystemStatus();
         if (status != null) {
-            out(status.toString());
+            println(status.toString());
         } else {
             throw new UnexpectedException("status is NULL");
         }

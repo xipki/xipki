@@ -54,7 +54,7 @@ public class NegCaAliasAddCmd extends CaAliasAddCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-caalias-add");
+        println("neg-caalias-add");
 
         try {
             super.doExecute();

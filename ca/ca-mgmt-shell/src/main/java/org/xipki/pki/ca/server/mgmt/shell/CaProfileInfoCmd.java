@@ -88,7 +88,7 @@ public class CaProfileInfoCmd extends CaCommandSupport {
             sb.append("\tno profile for CA " + caName + " is configured");
         }
 
-        out(sb.toString());
+        println(sb.toString());
         return null;
     }
 

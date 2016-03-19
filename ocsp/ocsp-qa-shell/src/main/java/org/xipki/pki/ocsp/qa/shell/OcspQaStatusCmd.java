@@ -218,7 +218,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
             }
         }
 
-        out(sb.toString());
+        println(sb.toString());
         if (!result.isAllSuccessful()) {
             throw new CmdFailure("OCSP response is invalid");
         }

@@ -76,7 +76,7 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
     protected Object doExecute()
     throws Exception {
         P11Module module = getP11Module(moduleName);
-        out("module: " + moduleName);
+        println("module: " + moduleName);
         List<P11SlotIdentifier> slots = module.getSlotIdentifiers();
         if (slotIndex == null) {
             output(slots);
@@ -98,13 +98,13 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
             String numText = (n == 0)
                     ? "no"
                     : "1";
-            out(numText + " slot is configured");
+            println(numText + " slot is configured");
         } else {
-            out(n + " slots are configured");
+            println(n + " slots are configured");
         }
 
         for (P11SlotIdentifier slotId : slots) {
-            out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
+            println("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
         }
     }
 

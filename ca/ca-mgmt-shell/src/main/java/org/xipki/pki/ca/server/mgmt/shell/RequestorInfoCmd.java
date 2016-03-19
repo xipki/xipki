@@ -101,7 +101,7 @@ public class RequestorInfoCmd extends CaCommandSupport {
             }
         }
 
-        out(sb.toString());
+        println(sb.toString());
         return null;
     } // method doExecute
 

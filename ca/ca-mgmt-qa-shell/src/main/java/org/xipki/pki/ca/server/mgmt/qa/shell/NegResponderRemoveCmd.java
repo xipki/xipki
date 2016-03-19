@@ -54,7 +54,7 @@ public class NegResponderRemoveCmd extends ResponderRemoveCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-responder-rm");
+        println("neg-responder-rm");
 
         try {
             super.doExecute();

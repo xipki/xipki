@@ -60,7 +60,7 @@ public class ResponderCheckCmd extends ResponderUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("checking responder " + name);
+        println("checking responder " + name);
 
         CmpResponderEntry cr = caManager.getCmpResponder(name);
         if (cr == null) {
@@ -86,7 +86,7 @@ public class ResponderCheckCmd extends ResponderUpdateCmd {
             MgmtQaShellUtil.assertEquals("conf", signerConf, cr.getConf());
         }
 
-        out(" checked responder " + name);
+        println(" checked responder " + name);
         return null;
     }
 

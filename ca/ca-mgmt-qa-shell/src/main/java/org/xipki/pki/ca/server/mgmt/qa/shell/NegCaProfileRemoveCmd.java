@@ -54,7 +54,7 @@ public class NegCaProfileRemoveCmd extends CaProfileRemoveCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-caprofile-rm");
+        println("neg-caprofile-rm");
 
         try {
             super.doExecute();

@@ -84,7 +84,7 @@ public class P11CertAddCmd extends SecurityCommandSupport {
         X509Certificate cert = X509Util.parseCert(certFile);
         P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
         P11KeyIdentifier p11KeyId = slot.addCert(cert);
-        out("added certificate under " + p11KeyId);
+        println("added certificate under " + p11KeyId);
         return null;
     }
 

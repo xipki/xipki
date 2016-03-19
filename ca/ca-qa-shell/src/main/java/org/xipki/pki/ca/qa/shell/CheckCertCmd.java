@@ -162,7 +162,7 @@ public class CheckCertCmd extends XipkiCommandSupport {
             }
         }
 
-        out(sb.toString());
+        println(sb.toString());
         if (!result.isAllSuccessful()) {
             throw new CmdFailure("certificate is invalid");
         }

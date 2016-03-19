@@ -54,7 +54,7 @@ public class NegCaAliasRemoveCmd extends CaAliasRemoveCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-caalias-rm");
+        println("neg-caalias-rm");
 
         try {
             super.doExecute();

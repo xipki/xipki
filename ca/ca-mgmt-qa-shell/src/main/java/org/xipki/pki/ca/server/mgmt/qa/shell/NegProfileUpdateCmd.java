@@ -54,7 +54,7 @@ public class NegProfileUpdateCmd extends ProfileUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-profile-up");
+        println("neg-profile-up");
 
         try {
             super.doExecute();

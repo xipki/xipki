@@ -85,7 +85,7 @@ public class CaGenRcaCmd extends CaAddOrGenCommandSupport {
             saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
                     rcaCert.getEncoded());
         }
-        out("generated root CA " + caEntry.getName());
+        println("generated root CA " + caEntry.getName());
         return null;
     }
 

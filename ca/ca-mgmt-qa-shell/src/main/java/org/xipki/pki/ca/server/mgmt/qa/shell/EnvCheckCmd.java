@@ -54,7 +54,7 @@ public class EnvCheckCmd extends EnvUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("checking environment " + name);
+        println("checking environment " + name);
 
         String is = caManager.getEnvParam(name);
         if (!value.equals(is)) {
@@ -62,7 +62,7 @@ public class EnvCheckCmd extends EnvUpdateCmd {
                     + "', but expected '" + value + "'");
         }
 
-        out(" checked environment " + name);
+        println(" checked environment " + name);
         return null;
     }
 

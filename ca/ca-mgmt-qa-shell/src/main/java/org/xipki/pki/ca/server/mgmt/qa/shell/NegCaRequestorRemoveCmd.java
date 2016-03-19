@@ -54,7 +54,7 @@ public class NegCaRequestorRemoveCmd extends CaRequestorRemoveCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-careq-rm");
+        println("neg-careq-rm");
 
         try {
             super.doExecute();

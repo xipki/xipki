@@ -54,7 +54,7 @@ public class NegCaPublisherRemoveCmd extends CaPublisherRemoveCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-capub-rm");
+        println("neg-capub-rm");
 
         try {
             super.doExecute();

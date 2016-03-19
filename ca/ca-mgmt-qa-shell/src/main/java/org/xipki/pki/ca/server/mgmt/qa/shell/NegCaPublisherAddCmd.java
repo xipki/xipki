@@ -54,7 +54,7 @@ public class NegCaPublisherAddCmd extends CaPublisherAddCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-capub-add");
+        println("neg-capub-add");
 
         try {
             super.doExecute();

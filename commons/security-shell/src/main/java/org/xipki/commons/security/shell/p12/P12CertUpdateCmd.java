@@ -112,7 +112,7 @@ public class P12CertUpdateCmd extends P12SecurityCommandSupport {
 
         try (FileOutputStream out = new FileOutputStream(p12File)) {
             ks.store(out, pwd);
-            out("updated certificate");
+            println("updated certificate");
             return null;
         }
     }

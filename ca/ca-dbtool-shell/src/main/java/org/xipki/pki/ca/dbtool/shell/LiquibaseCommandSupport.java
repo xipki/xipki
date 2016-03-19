@@ -102,7 +102,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
         printDatabaseInfo(dbConf, schemaFile);
         if (!quiet) {
             if (!confirm("reset and initialize")) {
-                out("cancelled");
+                println("cancelled");
                 return;
             }
         }
@@ -137,7 +137,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
         printDatabaseInfo(dbConf, schemaFile);
         if (!quiet) {
             if (!confirm("update")) {
-                out("cancelled");
+                println("cancelled");
                 return;
             }
         }
@@ -237,7 +237,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
             tmpPrompt = promptBuilder.toString();
         }
 
-        out(tmpPrompt);
+        print(tmpPrompt);
         while (true) {
             String answer = session.readLine(null, null);
             if (answer == null) {
@@ -252,7 +252,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
                     retryPromptBuilder.append(validValue).append("/");
                 }
                 retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);
-                out(retryPromptBuilder.toString());
+                print(retryPromptBuilder.toString());
             }
         }
     } // method read

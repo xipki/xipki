@@ -54,7 +54,7 @@ public class NegProfileRemoveCmd extends ProfileRemoveCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-profile-rm");
+        println("neg-profile-rm");
 
         try {
             super.doExecute();

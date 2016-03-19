@@ -98,7 +98,7 @@ public abstract class XipkiCommandSupport implements Action {
                 boolean bo = true;
                 while (saveTo.exists()) {
                     if (bo) {
-                        out("A file named '" + saveTo.getPath()
+                        print("A file named '" + saveTo.getPath()
                             + "' already exists. Do you want to replace it [yes/no]? ");
                     }
 
@@ -110,7 +110,7 @@ public abstract class XipkiCommandSupport implements Action {
                     if ("yes".equalsIgnoreCase(answer)) {
                         break;
                     } else if ("no".equalsIgnoreCase(answer)) {
-                        out("Enter name of file to save to ... ");
+                        print("Enter name of file to save to ... ");
                         String newFn = null;
                         while (true) {
                             newFn = session.readLine(null, null);
@@ -121,7 +121,7 @@ public abstract class XipkiCommandSupport implements Action {
 
                         saveTo = new File(newFn);
                     } else {
-                        out("Please answer with yes or no. ");
+                        print("Please answer with yes or no. ");
                         bo = false;
                     }
                 } // end while
@@ -150,7 +150,7 @@ public abstract class XipkiCommandSupport implements Action {
             tmpPromptPrefix = "saved to file";
         }
 
-        out(tmpPromptPrefix + " " + saveTo.getPath());
+        println(tmpPromptPrefix + " " + saveTo.getPath());
     } // method saveVerbose
 
     protected void save(
@@ -256,9 +256,14 @@ public abstract class XipkiCommandSupport implements Action {
         return IoUtil.expandFilepath(file);
     }
 
-    protected void out(
+    protected void println(
             final String message) {
         System.out.println(message);
+    }
+
+    protected void print(
+            final String message) {
+        System.out.print(message);
     }
 
     protected static boolean isBlank(

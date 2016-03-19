@@ -80,7 +80,7 @@ public class CaProfileCheckCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("checking CA profile CA='" + caName + "', profile='" + profileName + "'");
+        println("checking CA profile CA='" + caName + "', profile='" + profileName + "'");
 
         if (caManager.getCa(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
@@ -99,7 +99,7 @@ public class CaProfileCheckCmd extends CaCommandSupport {
             throw new CmdFailure(
                     "Profile name is '" + name + "', but expected '" + profileName + "'");
         }
-        out(" checked CA profile CA='" + caName + "', profile='" + profileName + "'");
+        println(" checked CA profile CA='" + caName + "', profile='" + profileName + "'");
         return null;
     }
 

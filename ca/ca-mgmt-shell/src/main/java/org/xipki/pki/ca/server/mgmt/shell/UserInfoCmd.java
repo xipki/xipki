@@ -68,7 +68,7 @@ public class UserInfoCmd extends CaCommandSupport {
             sb.append(name).append("\n\t").append(userEntry);
         }
 
-        out(sb.toString());
+        println(sb.toString());
         return null;
     }
 

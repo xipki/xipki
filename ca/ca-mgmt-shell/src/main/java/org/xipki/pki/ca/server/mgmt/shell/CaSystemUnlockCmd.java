@@ -57,7 +57,7 @@ public class CaSystemUnlockCmd extends CaCommandSupport {
         boolean unlocked = caManager.unlockCa();
 
         if (unlocked) {
-            out("unlocked CA system, calling xipki-ca:restart to restart CA system");
+            println("unlocked CA system, calling xipki-ca:restart to restart CA system");
         } else {
             throw new UnexpectedException("could not unlock CA system");
         }

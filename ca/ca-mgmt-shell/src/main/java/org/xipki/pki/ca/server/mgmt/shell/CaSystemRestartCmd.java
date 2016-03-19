@@ -84,7 +84,7 @@ public class CaSystemRestartCmd extends CaCommandSupport {
             sb.append(": no CA is configured");
         }
 
-        out(sb.toString());
+        println(sb.toString());
         return null;
     } // method doExecute
 

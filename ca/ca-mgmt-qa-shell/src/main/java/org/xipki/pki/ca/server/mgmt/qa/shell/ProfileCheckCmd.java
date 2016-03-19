@@ -56,7 +56,7 @@ public class ProfileCheckCmd extends ProfileUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("checking profile " + name);
+        println("checking profile " + name);
 
         if (type == null && conf == null && confFile == null) {
             System.out.println("nothing to update");
@@ -82,7 +82,7 @@ public class ProfileCheckCmd extends ProfileUpdateCmd {
         String is = cp.getConf();
         MgmtQaShellUtil.assertEquals("conf", ex, is);
 
-        out(" checked profile " + name);
+        println(" checked profile " + name);
         return null;
     }
 

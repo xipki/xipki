@@ -54,7 +54,7 @@ public class NegCaPublishRcaCertCmd extends CaPublishRcaCertCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-publish-self");
+        println("neg-publish-self");
 
         try {
             super.doExecute();

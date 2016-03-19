@@ -101,7 +101,7 @@ public class CrlSignerInfoCmd extends CaCommandSupport {
             }
         }
 
-        out(sb.toString());
+        println(sb.toString());
         return null;
     }
 
