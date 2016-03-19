@@ -88,7 +88,7 @@ import org.xipki.commons.pkcs11proxy.common.ASN1SignTemplate;
 import org.xipki.commons.pkcs11proxy.common.ASN1SlotIdentifier;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SignerException;
-import org.xipki.commons.security.api.XiCmpConstants;
+import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
@@ -112,9 +112,9 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
     private final Random random = new Random();
 
-    private final GeneralName sender = XiCmpConstants.REMOTE_P11_CMP_CLIENT;
+    private final GeneralName sender = XiSecurityConstants.REMOTE_P11_CMP_CLIENT;
 
-    private final GeneralName recipient = XiCmpConstants.REMOTE_P11_CMP_SERVER;
+    private final GeneralName recipient = XiSecurityConstants.REMOTE_P11_CMP_SERVER;
 
     private final P11ModuleConf moduleConf;
 
@@ -184,7 +184,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
     public int getServerVersion()
     throws P11TokenException {
-        ASN1Encodable result = send(XiCmpConstants.ACTION_RP11_VERSION, DERNull.INSTANCE);
+        ASN1Encodable result = send(XiSecurityConstants.ACTION_RP11_VERSION, DERNull.INSTANCE);
 
         ASN1Integer derInt;
         try {
@@ -233,7 +233,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
         }
         ASN1SignTemplate signTemplate = new ASN1SignTemplate(asn1EntityId, mechanism,
                 new ASN1P11Params(asn1Param), content);
-        ASN1Encodable result = send(XiCmpConstants.ACTION_RP11_SIGN, signTemplate);
+        ASN1Encodable result = send(XiSecurityConstants.ACTION_RP11_SIGN, signTemplate);
 
         ASN1OctetString octetString;
         try {
@@ -252,7 +252,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             final P11EntityIdentifier entityId)
     throws P11UnknownEntityException, P11TokenException {
         checkSlotId(entityId);
-        byte[] keyBytes = getCertOrKey(XiCmpConstants.ACTION_RP11_GET_PUBLICKEY, entityId);
+        byte[] keyBytes = getCertOrKey(XiSecurityConstants.ACTION_RP11_GET_PUBLICKEY, entityId);
         if (keyBytes == null) {
             return null;
         }
@@ -265,7 +265,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
             final P11EntityIdentifier entityId)
     throws P11UnknownEntityException, P11TokenException {
         checkSlotId(entityId);
-        byte[] certBytes = getCertOrKey(XiCmpConstants.ACTION_RP11_GET_CERTIFICATE, entityId);
+        byte[] certBytes = getCertOrKey(XiSecurityConstants.ACTION_RP11_GET_CERTIFICATE, entityId);
         if (certBytes == null) {
             return null;
         }
@@ -396,7 +396,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
     @Override
     public P11SlotIdentifier[] getSlotIdentifiers()
     throws P11TokenException {
-        ASN1Encodable resp = send(XiCmpConstants.ACTION_RP11_LIST_SLOTS, null);
+        ASN1Encodable resp = send(XiSecurityConstants.ACTION_RP11_LIST_SLOTS, null);
         if (!(resp instanceof ASN1Sequence)) {
             throw new P11TokenException("response is not ASN1Sequence, but "
                     + resp.getClass().getName());
@@ -434,7 +434,7 @@ public abstract class RemoteP11CryptService implements P11CryptService {
 
         ASN1SlotIdentifier tmpSlotId = new ASN1SlotIdentifier(slotId);
 
-        ASN1Encodable resp = send(XiCmpConstants.ACTION_RP11_LIST_KEYLABELS,
+        ASN1Encodable resp = send(XiSecurityConstants.ACTION_RP11_LIST_KEYLABELS,
                 tmpSlotId);
         if (!(resp instanceof ASN1Sequence)) {
             throw new P11TokenException("response is not ASN1Sequence, but "
