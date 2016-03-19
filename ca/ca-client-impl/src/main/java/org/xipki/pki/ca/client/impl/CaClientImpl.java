@@ -55,7 +55,6 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -99,6 +98,7 @@ import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.client.api.CaClient;
 import org.xipki.pki.ca.client.api.CaClientException;
@@ -184,7 +184,7 @@ public final class CaClientImpl implements CaClient {
 
     private String confFile;
 
-    private Map<X509Certificate, Boolean> tryXipkiNsstoVerifyMap = new ConcurrentHashMap<>();
+    private Map<X509Certificate, Boolean> tryNssToVerifyMap = new ConcurrentHashMap<>();
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
@@ -888,14 +888,14 @@ public final class CaClientImpl implements CaClient {
             return true;
         }
 
-        final String provider = "XipkiNSS";
-        Boolean tryXipkiNsstoVerify = tryXipkiNsstoVerifyMap.get(x509caCert);
+        final String provider = XiSecurityConstants.PROVIDER_NAME_NSS;
+        Boolean tryNssToVerify = tryNssToVerifyMap.get(x509caCert);
         PublicKey caPublicKey = x509caCert.getPublicKey();
         try {
-            if (tryXipkiNsstoVerify == null) {
-                if (caPublicKey instanceof ECPublicKey || Security.getProvider(provider) == null) {
-                    tryXipkiNsstoVerify = Boolean.FALSE;
-                    tryXipkiNsstoVerifyMap.put(x509caCert, tryXipkiNsstoVerify);
+            if (tryNssToVerify == null) {
+                if (Security.getProvider(provider) == null) {
+                    tryNssToVerify = Boolean.FALSE;
+                    tryNssToVerifyMap.put(x509caCert, tryNssToVerify);
                 } else {
                     byte[] tbs = x509cert.getTBSCertificate();
                     byte[] signatureValue = x509cert.getSignature();
@@ -906,18 +906,18 @@ public final class CaClientImpl implements CaClient {
                         verifier.update(tbs);
 
                         LOG.info("use {} to verify {} signature", provider, sigAlgName);
-                        tryXipkiNsstoVerify = Boolean.TRUE;
-                        tryXipkiNsstoVerifyMap.put(x509caCert, tryXipkiNsstoVerify);
+                        tryNssToVerify = Boolean.TRUE;
+                        tryNssToVerifyMap.put(x509caCert, tryNssToVerify);
                         return verifier.verify(signatureValue);
                     } catch (Exception ex) {
                         LOG.info("could not use {} to verify {} signature", provider, sigAlgName);
-                        tryXipkiNsstoVerify = Boolean.FALSE;
-                        tryXipkiNsstoVerifyMap.put(x509caCert, tryXipkiNsstoVerify);
+                        tryNssToVerify = Boolean.FALSE;
+                        tryNssToVerifyMap.put(x509caCert, tryNssToVerify);
                     }
                 }
             }
 
-            if (tryXipkiNsstoVerify) {
+            if (tryNssToVerify) {
                 byte[] tbs = x509cert.getTBSCertificate();
                 byte[] signatureValue = x509cert.getSignature();
                 String sigAlgName = x509cert.getSigAlgName();

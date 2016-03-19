@@ -34,42 +34,62 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl.p11.nss;
+package org.xipki.commons.security.provider;
 
+import java.io.ByteArrayInputStream;
+import java.security.Provider;
 import java.security.Security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.security.api.XiSecurityConstants;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class XipkiNssProviderRegister {
+public class NssProviderRegister {
+    public static final String PROVIDER_NAME = XiSecurityConstants.PROVIDER_NAME_NSS;
 
-    private static final Logger LOG = LoggerFactory.getLogger(XipkiNssProviderRegister.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NssProviderRegister.class);
 
+    @SuppressWarnings("restriction")
     public void regist() {
-        if (Security.getProvider(XipkiNssProvider.PROVIDER_NAME) == null) {
-            try {
-                XipkiNssProvider provider = new XipkiNssProvider();
-                Security.addProvider(provider);
-            } catch (Throwable th) {
-                final String message = "could not add provider " + XipkiNssProvider.PROVIDER_NAME;
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
-                            th.getMessage());
+        try {
+            // check whether there exists an NSS provider registered by OpenJDK
+            Provider nssProvider = Security.getProvider(PROVIDER_NAME);
+            if (nssProvider == null) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("name=").append(PROVIDER_NAME).append("\n");
+                sb.append("nssDbMode=noDb\n");
+                sb.append("attributes=compatibility\n");
+                String nssLib = System.getProperty("NSSLIB");
+                if (nssLib != null) {
+                    sb.append("\nnssLibraryDirectory=").append(nssLib);
                 }
-                LOG.debug(message, th);
+
+                nssProvider = new sun.security.pkcs11.SunPKCS11(
+                        new ByteArrayInputStream(sb.toString().getBytes()));
+                Security.addProvider(nssProvider);
+                LOG.info("added security provider {}", PROVIDER_NAME);
+            } else {
+                LOG.info("security provider {} already initialized by other service",
+                        PROVIDER_NAME);
             }
+        } catch (Throwable th) {
+            String msg = "could not initialize SunPKCS11 NSS provider";
+            LOG.info(LogUtil.buildExceptionLogFormat(msg), th.getClass().getName(),
+                    th.getMessage());
+            LOG.debug(msg, th);
         }
     }
 
     public void unregist() {
-        if (Security.getProperty(XipkiNssProvider.PROVIDER_NAME) != null) {
-            Security.removeProvider(XipkiNssProvider.PROVIDER_NAME);
+        if (Security.getProperty(PROVIDER_NAME) != null) {
+            Security.removeProvider(PROVIDER_NAME);
+            LOG.info("removed security provider {}", PROVIDER_NAME);
         }
     }
 

@@ -88,7 +88,7 @@ public class LocalP11CryptServicePool {
                 throw new IllegalStateException("securityFactory is not configured");
             }
 
-            Set<String> moduleNames = securityFactory.getPkcs11ModuleNames();
+            Set<String> moduleNames = securityFactory.getP11ModuleNames();
             for (String moduleName : moduleNames) {
                 P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
                 if (p11Service != null) {

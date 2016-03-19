@@ -119,7 +119,7 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.XiCmpConstants;
+import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.InsuffientPermissionException;
 import org.xipki.pki.ca.api.OperationException;
@@ -1337,7 +1337,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 }
             }
 
-            if (reasonCode == XiCmpConstants.CRL_REASON_REMOVE) {
+            if (reasonCode == XiSecurityConstants.CMP_CRL_REASON_REMOVE) {
                 if (requiredPermission == null) {
                     addAutitEventType(auditEvent, "CERT_REMOVE");
                     requiredPermission = Permission.REMOVE_CERT;
@@ -1457,7 +1457,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
                 int action = asn1Code.getPositiveValue().intValue();
                 switch (action) {
-                case XiCmpConstants.ACTION_GEN_CRL:
+                case XiSecurityConstants.CMP_ACTION_GEN_CRL:
                     addAutitEventType(auditEvent, "CRL_GEN_ONDEMAND");
                     checkPermission(requestor, Permission.GEN_CRL);
                     X509CRL tmpCrl = ca.generateCrlOnDemand(auditEvent);
@@ -1469,7 +1469,7 @@ public class X509CaCmpResponder extends CmpResponder {
                         respValue = CertificateList.getInstance(tmpCrl.getEncoded());
                     }
                     break;
-                case XiCmpConstants.ACTION_GET_CRL_WITH_SN:
+                case XiSecurityConstants.CMP_ACTION_GET_CRL_WITH_SN:
                     addAutitEventType(auditEvent, "CRL_DOWNLOAD_WITH_SN");
                     checkPermission(requestor, Permission.GET_CRL);
 
@@ -1481,7 +1481,7 @@ public class X509CaCmpResponder extends CmpResponder {
                                 PKIFailureInfo.systemFailure, statusMessage);
                     }
                     break;
-                case XiCmpConstants.ACTION_GET_CAINFO:
+                case XiSecurityConstants.CMP_ACTION_GET_CAINFO:
                     addAutitEventType(auditEvent, "GET_SYSTEMINFO");
                     Set<Integer> acceptVersions = new HashSet<>();
                     if (reqValue != null) {
