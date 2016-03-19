@@ -83,7 +83,6 @@ import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.util.CmpFailureUtil;
-import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.client.api.PkiErrorException;
 import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
@@ -114,7 +113,7 @@ public abstract class CmpRequestor {
 
     private final GeneralName recipient;
 
-    private final String c14nRecipientName;
+    private final X500Name recipientName;
 
     private boolean sendRequestorCert;
 
@@ -135,7 +134,7 @@ public abstract class CmpRequestor {
         X500Name subject = X500Name.getInstance(
                 responderCert.getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
-        this.c14nRecipientName = getSortedRfc4519Name(subject);
+        this.recipientName = subject;
     }
 
     public CmpRequestor(
@@ -164,7 +163,7 @@ public abstract class CmpRequestor {
         X500Name subject = X500Name.getInstance(
                 responderCert.getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
-        this.c14nRecipientName = getSortedRfc4519Name(subject);
+        this.recipientName = subject;
     }
 
     protected abstract byte[] send(
@@ -466,14 +465,13 @@ public abstract class CmpRequestor {
 
         PKIHeader header = protectedMsg.getHeader();
 
-        if (c14nRecipientName != null) {
+        if (recipientName != null) {
             boolean authorizedResponder = true;
             if (header.getSender().getTagNo() != GeneralName.directoryName) {
                 authorizedResponder = false;
             } else {
-                String c14nMsgSender =
-                        getSortedRfc4519Name((X500Name) header.getSender().getName());
-                authorizedResponder = c14nRecipientName.equalsIgnoreCase(c14nMsgSender);
+                X500Name msgSender = X500Name.getInstance(header.getSender().getName());
+                authorizedResponder = recipientName.equals(msgSender);
             }
 
             if (!authorizedResponder) {
@@ -563,11 +561,6 @@ public abstract class CmpRequestor {
     public void setSendRequestorCert(
             final boolean sendRequestorCert) {
         this.sendRequestorCert = sendRequestorCert;
-    }
-
-    private static String getSortedRfc4519Name(
-            final X500Name name) {
-        return X509Util.getRfc4519Name(X509Util.sortX509Name(name));
     }
 
 }

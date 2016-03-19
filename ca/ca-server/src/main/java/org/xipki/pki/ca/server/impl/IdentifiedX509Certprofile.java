@@ -64,7 +64,9 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.DirectoryString;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
@@ -98,6 +100,7 @@ import org.xipki.pki.ca.api.profile.x509.AuthorityInfoAccessControl;
 import org.xipki.pki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
+import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
 import org.xipki.pki.ca.api.profile.x509.SubjectInfo;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
@@ -263,7 +266,18 @@ class IdentifiedX509Certprofile {
     public SubjectInfo getSubject(
             final X500Name requestedSubject)
     throws CertprofileException, BadCertTemplateException {
-        return certprofile.getSubject(requestedSubject);
+        SubjectInfo subjectInfo = certprofile.getSubject(requestedSubject);
+        RDN[] countryRdns = subjectInfo.getGrantedSubject().getRDNs(ObjectIdentifiers.DN_C);
+        if (countryRdns != null) {
+            for (RDN rdn : countryRdns) {
+                String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
+                if (SubjectDnSpec.isValidCountryAreaCode(textValue)) {
+                    throw new BadCertTemplateException("invalid country/area code '" + textValue
+                            + "'");
+                }
+            }
+        }
+        return subjectInfo;
     }
 
     public ExtensionValues getExtensions(

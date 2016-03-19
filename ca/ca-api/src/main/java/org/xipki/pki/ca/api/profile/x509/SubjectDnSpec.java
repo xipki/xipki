@@ -36,14 +36,26 @@
 
 package org.xipki.pki.ca.api.profile.x509;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.pki.ca.api.CertprofileException;
@@ -56,6 +68,8 @@ import org.xipki.pki.ca.api.profile.StringType;
  * @since 2.0.0
  */
 public class SubjectDnSpec {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SubjectDnSpec.class);
 
     public static final Pattern PATTERN_DATE_OF_BIRTH =
             Pattern.compile("^(19|20)\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])000000Z");
@@ -107,7 +121,110 @@ public class SubjectDnSpec {
     private static final Map<ASN1ObjectIdentifier, Set<StringType>> STRING_TYPE_SET =
             new HashMap<>();
 
+    private static final List<ASN1ObjectIdentifier> forwardDNs;
+
+    private static final List<ASN1ObjectIdentifier> backwardDNs;
+
+    private static final Set<String> countryAreaCodes = new HashSet<>();
+
     static {
+        // ----- RDN order -----
+        BufferedReader reader = getReader("org.xipki.pki.ca.rdnorder.cfg", "/conf/rdnorder.cfg");
+        List<ASN1ObjectIdentifier> tmpForwardDNs = new ArrayList<>(25);
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#")) {
+                    continue;
+                }
+
+                ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(line);
+                tmpForwardDNs.add(oid);
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("could not load RDN order: " + ex.getMessage(), ex);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                // CHECKSTYLE:SKIP
+            }
+        }
+
+        forwardDNs = Collections.unmodifiableList(tmpForwardDNs);
+        if (LOG.isInfoEnabled()) {
+            StringBuilder sb = new StringBuilder(500);
+            sb.append("forward RDNs: ");
+            for (ASN1ObjectIdentifier oid : forwardDNs) {
+                sb.append(oid.getId()).append(", ");
+            }
+            if (!forwardDNs.isEmpty()) {
+                sb.delete(sb.length() - 2, sb.length());
+            }
+            LOG.info(sb.toString());
+        }
+
+        List<ASN1ObjectIdentifier> tmpBackwardDNs = new ArrayList<>(25);
+        int size = tmpForwardDNs.size();
+        for (int i = size - 1; i >= 0; i--) {
+            tmpBackwardDNs.add(tmpForwardDNs.get(i));
+        }
+
+        backwardDNs = Collections.unmodifiableList(tmpBackwardDNs);
+        if (LOG.isInfoEnabled()) {
+            StringBuilder sb = new StringBuilder(500);
+            sb.append("backward RDNs: ");
+            for (ASN1ObjectIdentifier oid : backwardDNs) {
+                sb.append(oid.getId()).append(", ");
+            }
+            if (!backwardDNs.isEmpty()) {
+                sb.delete(sb.length() - 2, sb.length());
+            }
+            LOG.info(sb.toString());
+        }
+
+        // ----- country/area code -----
+        reader = getReader("org.xipki.pki.ca.areacode.cfg", "/conf/areacode.cfg");
+        try {
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#")) {
+                    continue;
+                }
+
+                StringTokenizer st = new StringTokenizer(line, " \t");
+                final int n = st.countTokens();
+                // 1. country/area name
+                // 2. ISO ALPHA-2 code
+                // 3. ISO ALPHA-3 code
+                // 4. ISO numeric code
+                if (n < 4) {
+                    LOG.warn("invalid country/area line {}", line);
+                    continue;
+                }
+
+                final int alpha2CodeIndex = n - 3;
+                for (int i = 0; i < alpha2CodeIndex; i++) {
+                    st.nextToken();
+                }
+
+                String areaCode = st.nextToken();
+                countryAreaCodes.add(areaCode.toUpperCase());
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("could not load area code: " + ex.getMessage(), ex);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                // CHECKSTYLE:SKIP
+            }
+        }
+
+        LOG.info("country/area codess: {}", countryAreaCodes);
+
+        // ----- Type, Length -----
         ASN1ObjectIdentifier id;
 
         Set<ASN1ObjectIdentifier> ids = new HashSet<>();
@@ -450,5 +567,42 @@ public class SubjectDnSpec {
             isRange.setRange(min, max);
         } // isRange
     } // method fixRdnControl
+
+    public static List<ASN1ObjectIdentifier> getForwardDNs() {
+        return forwardDNs;
+    }
+
+    public static List<ASN1ObjectIdentifier> getBackwardDNs() {
+        return backwardDNs;
+    }
+
+    public static boolean isValidCountryAreaCode(String code) {
+        ParamUtil.requireNonBlank("code", code);
+        return countryAreaCodes.isEmpty()
+                ? true
+                : countryAreaCodes.contains(code.toUpperCase());
+    }
+
+    private static BufferedReader getReader(
+            String propKey,
+            String fallbackResource) {
+        String confFile = System.getProperty(propKey);
+        if (confFile != null) {
+            LOG.info("read from file " + confFile);
+            try {
+                return new BufferedReader(new FileReader(confFile));
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException("could not access non-existing file " + confFile);
+            }
+        } else {
+            InputStream confStream = SubjectDnSpec.class.getResourceAsStream(fallbackResource);
+            if (confStream == null) {
+                throw new RuntimeException("could not access non-existing resource "
+                        + fallbackResource);
+            }
+            LOG.info("read from resource " + fallbackResource);
+            return new BufferedReader(new InputStreamReader(confStream));
+        }
+    }
 
 }

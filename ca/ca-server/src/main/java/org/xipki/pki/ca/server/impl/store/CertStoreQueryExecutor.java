@@ -94,6 +94,7 @@ import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.pki.ca.server.impl.CertStatus;
 import org.xipki.pki.ca.server.impl.DbSchemaInfo;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
+import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.impl.util.PasswordHash;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 
@@ -307,7 +308,7 @@ class CertStoreQueryExecutor {
             if (fpSubject == fpReqSubject) {
                 fpReqSubject = null;
             } else {
-                reqSubjectText = X509Util.cutX500Name(X509Util.sortX509Name(reqSubject),
+                reqSubjectText = X509Util.cutX500Name(CaUtil.sortX509Name(reqSubject),
                         maxX500nameLen);
             }
         }
