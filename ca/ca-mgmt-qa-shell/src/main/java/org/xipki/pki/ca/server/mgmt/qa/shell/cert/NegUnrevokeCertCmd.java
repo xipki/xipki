@@ -54,7 +54,7 @@ public class NegUnrevokeCertCmd extends UnrevokeCertCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-unrevoke-cert");
+        println("neg-unrevoke-cert");
 
         try {
             super.doExecute();

@@ -88,7 +88,7 @@ public class ObfuscateCmd extends SecurityCommandSupport {
             saveVerbose("saved the obfuscated password to file", new File(outFile),
                     passwordHint.getBytes());
         } else {
-            out("the obfuscated password is: '" + passwordHint + "'");
+            println("the obfuscated password is: '" + passwordHint + "'");
         }
         return null;
     }

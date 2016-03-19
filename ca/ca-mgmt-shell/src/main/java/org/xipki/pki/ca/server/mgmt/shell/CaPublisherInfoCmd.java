@@ -82,7 +82,7 @@ public class CaPublisherInfoCmd extends CaCommandSupport {
             sb.append("\tno publisher for CA " + caName + " is configured");
         }
 
-        out(sb.toString());
+        println(sb.toString());
         return null;
     }
 

@@ -54,7 +54,7 @@ public class NegRepublishCmd extends RepublishCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-republish");
+        println("neg-republish");
 
         try {
             super.doExecute();

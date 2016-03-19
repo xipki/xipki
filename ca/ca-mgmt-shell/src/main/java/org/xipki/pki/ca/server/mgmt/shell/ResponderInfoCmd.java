@@ -101,7 +101,7 @@ public class ResponderInfoCmd extends CaCommandSupport {
             }
         }
 
-        out(sb.toString());
+        println(sb.toString());
         return null;
     } // method doExecute
 

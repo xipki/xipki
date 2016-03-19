@@ -54,7 +54,7 @@ public class NegCaRequestorAddCmd extends CaRequestorAddCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-careq-add");
+        println("neg-careq-add");
 
         try {
             super.doExecute();

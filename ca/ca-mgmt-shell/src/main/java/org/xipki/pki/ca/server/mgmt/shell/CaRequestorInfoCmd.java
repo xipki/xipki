@@ -81,7 +81,7 @@ public class CaRequestorInfoCmd extends CaCommandSupport {
         } else {
             sb.append("\tno requestor for CA " + caName + " is configured");
         }
-        out(sb.toString());
+        println(sb.toString());
         return null;
     }
 

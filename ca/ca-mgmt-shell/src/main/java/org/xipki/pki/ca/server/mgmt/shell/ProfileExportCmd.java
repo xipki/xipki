@@ -79,7 +79,7 @@ public class ProfileExportCmd extends CaCommandSupport {
         }
 
         if (StringUtil.isBlank(entry.getConf())) {
-            out("cert profile does not have conf");
+            println("cert profile does not have conf");
         } else {
             saveVerbose("saved cert profile configuration to", new File(confFile),
                     entry.getConf().getBytes("UTF-8"));

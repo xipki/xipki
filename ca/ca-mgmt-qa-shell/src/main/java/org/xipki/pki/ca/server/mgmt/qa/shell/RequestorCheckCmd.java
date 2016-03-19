@@ -59,7 +59,7 @@ public class RequestorCheckCmd extends RequestorUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("checking requestor " + name);
+        println("checking requestor " + name);
 
         CmpRequestorEntry cr = caManager.getCmpRequestor(name);
         if (cr == null) {
@@ -75,7 +75,7 @@ public class RequestorCheckCmd extends RequestorUpdateCmd {
             throw new CmdFailure("Cert: the expected one and the actual one differ");
         }
 
-        out(" checked requestor " + name);
+        println(" checked requestor " + name);
         return null;
     }
 

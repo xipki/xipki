@@ -70,14 +70,14 @@ public class CaAliasCheckCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("checking CA alias='" + aliasName + "', CA='" + caName + "'");
+        println("checking CA alias='" + aliasName + "', CA='" + caName + "'");
         String tmpCaName = caManager.getCaNameForAlias(aliasName);
         if (tmpCaName == null) {
             throw new CmdFailure("alias '" + aliasName + "' is not configured");
         }
 
         MgmtQaShellUtil.assertEquals("CA name", caName, tmpCaName);
-        out(" checked CA alias='" + aliasName + "', CA='" + caName + "'");
+        println(" checked CA alias='" + aliasName + "', CA='" + caName + "'");
         return null;
     }
 

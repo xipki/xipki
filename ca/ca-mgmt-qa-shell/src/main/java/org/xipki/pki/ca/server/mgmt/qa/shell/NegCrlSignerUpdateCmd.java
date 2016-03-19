@@ -54,7 +54,7 @@ public class NegCrlSignerUpdateCmd extends CrlSignerUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-crlsigner-up");
+        println("neg-crlsigner-up");
 
         try {
             super.doExecute();

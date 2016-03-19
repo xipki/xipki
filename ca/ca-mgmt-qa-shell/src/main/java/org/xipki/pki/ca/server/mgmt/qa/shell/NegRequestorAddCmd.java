@@ -54,7 +54,7 @@ public class NegRequestorAddCmd extends RequestorAddCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-requestor-add");
+        println("neg-requestor-add");
 
         try {
             super.doExecute();

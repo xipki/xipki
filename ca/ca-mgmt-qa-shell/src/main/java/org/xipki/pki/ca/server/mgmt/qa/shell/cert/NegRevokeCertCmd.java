@@ -54,7 +54,7 @@ public class NegRevokeCertCmd extends RevokeCertCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-remove-cert");
+        println("neg-remove-cert");
 
         try {
             super.doExecute();

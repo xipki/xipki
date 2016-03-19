@@ -54,7 +54,7 @@ public class NegRequestorUpdateCmd extends RequestorUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-requestor-up");
+        println("neg-requestor-up");
 
         try {
             super.doExecute();

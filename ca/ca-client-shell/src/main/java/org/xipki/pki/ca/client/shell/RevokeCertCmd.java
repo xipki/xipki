@@ -132,7 +132,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCommandSupport {
             PkiStatusInfo error = certIdOrError.getError();
             throw new CmdFailure("revocation failed: " + error);
         } else {
-            out("revoked certificate");
+            println("revoked certificate");
         }
         return null;
     } // method doExecute

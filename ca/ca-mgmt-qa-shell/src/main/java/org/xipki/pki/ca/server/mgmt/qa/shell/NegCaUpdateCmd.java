@@ -54,7 +54,7 @@ public class NegCaUpdateCmd extends CaUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-ca-up");
+        println("neg-ca-up");
 
         try {
             super.doExecute();

@@ -76,7 +76,7 @@ public class FileListCmd extends XipkiCommandSupport {
         }
 
         if (!target.isDirectory()) {
-            out(targetPath);
+            print(targetPath);
             return null;
         }
 
@@ -118,7 +118,7 @@ public class FileListCmd extends XipkiCommandSupport {
         final int n = width / (maxLen + 1);
         if (n == 0) {
             for (String s :l2) {
-                out(s);
+                print(s);
             }
         } else {
             for (int i = 0; i < l2.size(); i += n) {
@@ -126,7 +126,7 @@ public class FileListCmd extends XipkiCommandSupport {
                 for (int j = i; j < Math.min(l2.size(), i + n); j++) {
                     sb.append(l2.get(j)).append(" ");
                 }
-                out(sb.toString());
+                print(sb.toString());
             }
         }
 

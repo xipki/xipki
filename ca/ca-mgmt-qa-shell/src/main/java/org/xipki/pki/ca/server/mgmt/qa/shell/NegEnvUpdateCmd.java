@@ -54,7 +54,7 @@ public class NegEnvUpdateCmd extends EnvUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-env-up");
+        println("neg-env-up");
 
         try {
             super.doExecute();

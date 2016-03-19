@@ -54,7 +54,7 @@ public class NegRequestorRemoveCmd extends RequestorRemoveCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-requestor-rm");
+        println("neg-requestor-rm");
 
         try {
             super.doExecute();

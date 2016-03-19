@@ -54,7 +54,7 @@ public class NegResponderUpdateCmd extends ResponderUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-responder-up");
+        println("neg-responder-up");
 
         try {
             super.doExecute();

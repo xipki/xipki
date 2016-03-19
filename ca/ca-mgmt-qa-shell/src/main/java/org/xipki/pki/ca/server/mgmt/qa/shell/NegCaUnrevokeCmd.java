@@ -54,7 +54,7 @@ public class NegCaUnrevokeCmd extends CaUnrevokeCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-ca-unrevoke");
+        println("neg-ca-unrevoke");
 
         try {
             super.doExecute();

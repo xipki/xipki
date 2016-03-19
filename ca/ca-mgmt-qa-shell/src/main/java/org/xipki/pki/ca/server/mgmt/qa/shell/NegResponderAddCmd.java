@@ -54,7 +54,7 @@ public class NegResponderAddCmd extends ResponderAddCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-responder-add");
+        println("neg-responder-add");
 
         try {
             super.doExecute();

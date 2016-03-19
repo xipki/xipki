@@ -54,7 +54,7 @@ public class NegPublisherRemoveCmd extends PublisherRemoveCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-publisher-rm");
+        println("neg-publisher-rm");
 
         try {
             super.doExecute();

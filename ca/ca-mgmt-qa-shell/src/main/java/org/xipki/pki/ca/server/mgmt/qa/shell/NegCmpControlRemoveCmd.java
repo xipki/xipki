@@ -54,7 +54,7 @@ public class NegCmpControlRemoveCmd extends CmpControlRemoveCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-cmpcontrol-rm");
+        println("neg-cmpcontrol-rm");
 
         try {
             super.doExecute();

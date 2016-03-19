@@ -54,7 +54,7 @@ public class NegEnrollCertCmd extends EnrollCertCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-enroll-cert");
+        println("neg-enroll-cert");
 
         try {
             super.doExecute();

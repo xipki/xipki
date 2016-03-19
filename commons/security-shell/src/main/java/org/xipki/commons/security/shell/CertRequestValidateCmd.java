@@ -70,7 +70,7 @@ public class CertRequestValidateCmd extends SecurityCommandSupport {
         String txt = bo
                 ? "valid"
                 : "invalid";
-        out("The POP is " + txt);
+        println("The POP is " + txt);
         return null;
     }
 

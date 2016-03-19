@@ -69,7 +69,7 @@ public class CaCheckCmd extends CaUpdateCmd {
     throws Exception {
         X509ChangeCaEntry ey = getChangeCaEntry();
         String caName = ey.getName();
-        out("checking CA" + caName);
+        println("checking CA" + caName);
 
         CaEntry entry = caManager.getCa(caName);
         if (entry == null) {
@@ -249,7 +249,7 @@ public class CaCheckCmd extends CaUpdateCmd {
             }
         }
 
-        out(" checked CA" + caName);
+        println(" checked CA" + caName);
         return null;
     } // method doExecute
 

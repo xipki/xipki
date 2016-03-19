@@ -55,7 +55,7 @@ public class PublisherCheckCmd extends PublisherUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("checking publisher " + name);
+        println("checking publisher " + name);
 
         PublisherEntry cp = caManager.getPublisher(name);
         if (cp == null) {
@@ -74,7 +74,7 @@ public class PublisherCheckCmd extends PublisherUpdateCmd {
             MgmtQaShellUtil.assertEquals("signer conf", ex, is);
         }
 
-        out(" checked publisher " + name);
+        println(" checked publisher " + name);
         return null;
     }
 

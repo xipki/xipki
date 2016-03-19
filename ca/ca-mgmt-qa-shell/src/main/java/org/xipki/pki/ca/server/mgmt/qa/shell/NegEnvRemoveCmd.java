@@ -54,7 +54,7 @@ public class NegEnvRemoveCmd extends EnvRemoveCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-env-rm");
+        println("neg-env-rm");
 
         try {
             super.doExecute();

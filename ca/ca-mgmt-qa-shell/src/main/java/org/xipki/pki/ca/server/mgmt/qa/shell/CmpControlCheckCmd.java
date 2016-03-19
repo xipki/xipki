@@ -56,7 +56,7 @@ public class CmpControlCheckCmd extends CmpControlUpdateCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("checking CMP control " + name);
+        println("checking CMP control " + name);
 
         CmpControlEntry ce = caManager.getCmpControl(name);
         if (ce == null) {
@@ -67,7 +67,7 @@ public class CmpControlCheckCmd extends CmpControlUpdateCmd {
         String ex = new CmpControl(new CmpControlEntry(name, conf)).getDbEntry().getConf();
         MgmtQaShellUtil.assertEquals("CMP control", ex, is);
 
-        out(" checked CMP control " + name);
+        println(" checked CMP control " + name);
         return null;
     }
 

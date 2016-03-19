@@ -76,7 +76,7 @@ public class CaPublisherCheckCmd extends CaCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("checking CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
+        println("checking CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
 
         if (caManager.getCa(caName) == null) {
             throw new UnexpectedException("could not find CA '" + caName + "'");
@@ -85,7 +85,7 @@ public class CaPublisherCheckCmd extends CaCommandSupport {
         List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
         for (PublisherEntry m : entries) {
             if (m.getName().equals(publisherName)) {
-                out(" checked CA publisher CA='" + caName
+                println(" checked CA publisher CA='" + caName
                         + "', publisher='" + publisherName + "'");
                 return null;
             }

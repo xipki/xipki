@@ -81,7 +81,7 @@ public class PublisherExportCmd extends CaCommandSupport {
         }
 
         if (StringUtil.isBlank(entry.getConf())) {
-            out("publisher does not have conf");
+            println("publisher does not have conf");
         } else {
             saveVerbose("saved publisher configuration to", new File(confFile),
                     entry.getConf().getBytes("UTF-8"));

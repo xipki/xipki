@@ -54,7 +54,7 @@ public class NegCmpControlAddCmd extends CmpControlAddCmd {
     @Override
     protected Object doExecute()
     throws Exception {
-        out("neg-cmpcontrol-add");
+        println("neg-cmpcontrol-add");
 
         try {
             super.doExecute();

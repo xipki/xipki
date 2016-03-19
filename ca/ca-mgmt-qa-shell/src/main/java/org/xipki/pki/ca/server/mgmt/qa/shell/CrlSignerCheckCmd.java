@@ -59,7 +59,7 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
     throws Exception {
         X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
         String name = ey.getName();
-        out("checking CRL signer " + name);
+        println("checking CRL signer " + name);
 
         X509CrlSignerEntry cs = caManager.getCrlSigner(name);
         if (cs == null) {
@@ -94,7 +94,7 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
             MgmtQaShellUtil.assertEquals("certificate", ex, is);
         }
 
-        out(" checked CRL signer " + name);
+        println(" checked CRL signer " + name);
         return null;
     } // method doExecute
 
