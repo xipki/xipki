@@ -86,7 +86,7 @@ public class P11CertUpdateCmd extends P11SecurityCommandSupport {
         }
 
         slot.updateCertificate(keyIdentifier, newCert, caCerts, securityFactory);
-        out("updated certificate");
+        println("updated certificate");
         return null;
     }
 

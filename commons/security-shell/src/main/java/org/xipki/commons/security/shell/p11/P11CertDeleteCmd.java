@@ -80,7 +80,7 @@ public class P11CertDeleteCmd extends SecurityCommandSupport {
         P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = slot.getKeyIdForId(Hex.decode(keyId));
         slot.removeCerts(keyIdentifier);
-        out("deleted certificates");
+        println("deleted certificates");
         return null;
     }
 

@@ -140,7 +140,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
 
         // check the signature if available
         if (null == basicResp.getSignature()) {
-            out("response is not signed");
+            println("response is not signed");
         } else {
             X509CertificateHolder[] responderCerts = basicResp.getCerts();
             if (responderCerts == null || responderCerts.length < 1) {
@@ -185,18 +185,18 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
                                 + " OCSP signer is not trusted");
                     }
                 } else {
-                    out("response is equipped with valid signature");
+                    println("response is equipped with valid signature");
                 } // end if(respIssuer)
             } // end if(validOn)
 
             if (verbose.booleanValue()) {
-                out("responder is " + X509Util.getRfc4519Name(responderCerts[0].getSubject()));
+                println("responder is " + X509Util.getRfc4519Name(responderCerts[0].getSubject()));
             }
         } // end if
 
         for (int i = 0; i < n; i++) {
             if (n > 1) {
-                out("---------------------------- " + i + "----------------------------");
+                println("---------------------------- " + i + "----------------------------");
             }
             SingleResp singleResp = singleResponses[i];
             CertificateStatus singleCertStatus = singleResp.getCertStatus();
@@ -323,9 +323,9 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
                 } // end if(extensionOIDs)
             } // end if (verbose.booleanValue())
 
-            out(msg.toString());
+            println(msg.toString());
         } // end for
-        out("");
+        println("");
 
         return null;
     } // method processResponse

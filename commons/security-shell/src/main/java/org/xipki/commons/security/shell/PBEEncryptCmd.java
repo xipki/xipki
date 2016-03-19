@@ -120,7 +120,7 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
             saveVerbose("saved the encrypted password to file", new File(outFile),
                     passwordHint.getBytes());
         } else {
-            out("the encrypted password is: '" + passwordHint + "'");
+            println("the encrypted password is: '" + passwordHint + "'");
         }
         return null;
     }
