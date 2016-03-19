@@ -63,6 +63,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
@@ -70,7 +71,6 @@ import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 import org.xipki.commons.security.api.util.SignerUtil;
-import org.xipki.commons.security.impl.p12.SoftTokenContentSignerBuilder;
 import org.xipki.commons.security.impl.util.SecurityUtil;
 
 /**
@@ -104,9 +104,8 @@ class KeystoreP11Identity extends P11Identity {
 
         if (this.publicKey instanceof RSAPublicKey) {
             String providerName;
-            if (Security.getProvider(SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER)
-                    != null) {
-                providerName = SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER;
+            if (Security.getProvider(XiSecurityConstants.PROVIDER_NAME_NSS) != null) {
+                providerName = XiSecurityConstants.PROVIDER_NAME_NSS;
             } else {
                 providerName = "BC";
             }

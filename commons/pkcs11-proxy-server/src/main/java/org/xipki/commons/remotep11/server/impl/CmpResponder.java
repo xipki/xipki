@@ -39,6 +39,7 @@ package org.xipki.commons.remotep11.server.impl;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -73,7 +74,7 @@ import org.xipki.commons.pkcs11proxy.common.ASN1SignTemplate;
 import org.xipki.commons.pkcs11proxy.common.ASN1SlotIdentifier;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.XiCmpConstants;
+import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -92,7 +93,7 @@ class CmpResponder {
 
     private final SecureRandom random = new SecureRandom();
 
-    private final GeneralName sender = XiCmpConstants.REMOTE_P11_CMP_SERVER;
+    private final GeneralName sender = XiSecurityConstants.REMOTE_P11_CMP_SERVER;
 
     CmpResponder() {
     }
@@ -177,10 +178,10 @@ class CmpResponder {
             ASN1Encodable respItvInfoValue;
 
             switch (action) {
-            case XiCmpConstants.ACTION_RP11_VERSION:
+            case XiSecurityConstants.ACTION_RP11_VERSION:
                 respItvInfoValue = new ASN1Integer(p11CryptServicePool.getVersion());
                 break;
-            case XiCmpConstants.ACTION_RP11_SIGN:
+            case XiSecurityConstants.ACTION_RP11_SIGN:
                 ASN1SignTemplate signTemplate = ASN1SignTemplate.getInstance(reqValue);
                 long mechanism = signTemplate.getMechanism().getMechanism();
                 ASN1Encodable asn1Params = signTemplate.getMechanism().getParams().getP11Params();
@@ -196,12 +197,12 @@ class CmpResponder {
                         mechanism, params, content);
                 respItvInfoValue = new DEROctetString(signature);
                 break;
-            case XiCmpConstants.ACTION_RP11_GET_CERTIFICATE:
-            case XiCmpConstants.ACTION_RP11_GET_PUBLICKEY:
+            case XiSecurityConstants.ACTION_RP11_GET_CERTIFICATE:
+            case XiSecurityConstants.ACTION_RP11_GET_PUBLICKEY:
                 P11EntityIdentifier entityId =
                         ASN1EntityIdentifier.getInstance(reqValue).getEntityId();
                 byte[] encodedCertOrKey = null;
-                if (XiCmpConstants.ACTION_RP11_GET_CERTIFICATE == action) {
+                if (XiSecurityConstants.ACTION_RP11_GET_CERTIFICATE == action) {
                     X509Certificate cert = p11CryptService.getCertificate(entityId);
                     if (cert != null) {
                         encodedCertOrKey = cert.getEncoded();
@@ -219,8 +220,8 @@ class CmpResponder {
 
                 respItvInfoValue = new DEROctetString(encodedCertOrKey);
                 break;
-            case XiCmpConstants.ACTION_RP11_LIST_SLOTS:
-                P11SlotIdentifier[] slotIds = p11CryptService.getSlotIdentifiers();
+            case XiSecurityConstants.ACTION_RP11_LIST_SLOTS:
+                List<P11SlotIdentifier> slotIds = p11CryptService.getModule().getSlotIdentifiers();
 
                 ASN1EncodableVector vector = new ASN1EncodableVector();
                 for (P11SlotIdentifier slotId : slotIds) {
@@ -228,7 +229,7 @@ class CmpResponder {
                 }
                 respItvInfoValue = new DERSequence(vector);
                 break;
-            case XiCmpConstants.ACTION_RP11_LIST_KEYLABELS:
+            case XiSecurityConstants.ACTION_RP11_LIST_KEYLABELS:
                 ASN1SlotIdentifier slotId = ASN1SlotIdentifier.getInstance(reqValue);
                 String[] keyLabels = p11CryptService.getKeyLabels(slotId.getSlotId());
 

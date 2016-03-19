@@ -84,6 +84,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.api.util.X509Util;
@@ -121,7 +122,7 @@ public class SoftTokenContentSignerBuilder {
                 return new RSADigestSigner(dig);
             }
 
-            if (Security.getProvider(PROVIDER_XIPKI_NSS_CIPHER) == null) {
+            if (Security.getProvider(XiSecurityConstants.PROVIDER_NAME_NSS) == null) {
                 try {
                     return SignerUtil.createPSSRSASigner(sigAlgId);
                 } catch (SecurityException ex) {
@@ -216,10 +217,6 @@ public class SoftTokenContentSignerBuilder {
         }
 
     } // class ECDSAContentSignerBuilder
-
-    public static final String PROVIDER_XIPKI_NSS = "XipkiNSS";
-
-    public static final String PROVIDER_XIPKI_NSS_CIPHER = "SunPKCS11-XipkiNSS";
 
     private static final Logger LOG = LoggerFactory.getLogger(SoftTokenContentSignerBuilder.class);
 
@@ -330,7 +327,9 @@ public class SoftTokenContentSignerBuilder {
 
         ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
 
-        if (Security.getProvider(PROVIDER_XIPKI_NSS) != null
+        final String provName = XiSecurityConstants.PROVIDER_NAME_NSS;
+
+        if (Security.getProvider(provName) != null
                 && !algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS)
                 && !(key instanceof ECPrivateKey)) {
             String algoName;
@@ -343,7 +342,7 @@ public class SoftTokenContentSignerBuilder {
             boolean useGivenProvider = true;
             for (int i = 0; i < parallelism; i++) {
                 try {
-                    Signature signature = Signature.getInstance(algoName, PROVIDER_XIPKI_NSS);
+                    Signature signature = Signature.getInstance(algoName, provName);
                     signature.initSign(key);
                     if (i == 0) {
                         signature.update(new byte[]{1, 2, 3, 4});
@@ -359,9 +358,9 @@ public class SoftTokenContentSignerBuilder {
             }
 
             if (useGivenProvider) {
-                LOG.info("use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
+                LOG.info("use {} to sign {} signature", provName, algoName);
             } else {
-                LOG.info("could not use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
+                LOG.info("could not use {} to sign {} signature", provName, algoName);
             }
         }
 

@@ -57,6 +57,7 @@ import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
+import org.xipki.commons.security.api.XiSecurityConstants;
 
 /**
  * @author Lijun Liao
@@ -74,7 +75,7 @@ class NssPlainRSASigner implements AsymmetricBlockCipher {
 
     NssPlainRSASigner()
     throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
-        cipher = Cipher.getInstance(ALGORITHM, "SunPKCS11-XipkiNSS");
+        cipher = Cipher.getInstance(ALGORITHM, XiSecurityConstants.PROVIDER_NAME_NSS);
         rsaKeyFactory = KeyFactory.getInstance("RSA");
     }
 
