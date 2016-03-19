@@ -43,6 +43,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.password.api.OBFPasswordService;
 
@@ -60,13 +61,27 @@ public class ObfuscateCmd extends SecurityCommandSupport {
     @Completion(FilePathCompleter.class)
     private String outFile;
 
+    @Option(name = "-k", description = "quorum of the password parts")
+    private Integer quorum = 1;
+
     @Reference
     private OBFPasswordService obfPasswordService;
 
     @Override
     protected Object doExecute()
     throws Exception {
-        char[] password = readPassword("Password");
+        ParamUtil.requireRange("k", quorum, 1, 10);
+
+        char[] password;
+        if (quorum == 1) {
+            password = readPassword("Password");
+        } else {
+            char[][] parts = new char[quorum][];
+            for (int i = 0; i < quorum; i++) {
+                parts[i] = readPassword("Password " + (i + 1) + "/" + quorum);
+            }
+            password = merge(parts);
+        }
 
         String passwordHint = obfPasswordService.obfuscate(new String(password));
         if (outFile != null) {

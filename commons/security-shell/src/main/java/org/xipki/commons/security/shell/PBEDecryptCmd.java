@@ -44,6 +44,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
@@ -77,6 +78,9 @@ public class PBEDecryptCmd extends SecurityCommandSupport {
     @Completion(FilePathCompleter.class)
     private String masterPasswordFile;
 
+    @Option(name = "--mk", description = "quorum of the master password parts")
+    private Integer mquorum = 1;
+
     @Option(name = "--out", description = "where to save the password")
     @Completion(FilePathCompleter.class)
     private String outFile;
@@ -84,6 +88,7 @@ public class PBEDecryptCmd extends SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
+        ParamUtil.requireRange("mk", mquorum, 1, 10);
         if (!(passwordHint == null ^ passwordFile == null)) {
             throw new IllegalCmdParamException(
                     "exactly one of password and password-file must be specified");
@@ -102,7 +107,15 @@ public class PBEDecryptCmd extends SecurityCommandSupport {
         if (masterPasswordFile != null) {
             masterPassword = new String(IoUtil.read(masterPasswordFile)).toCharArray();
         } else {
-            masterPassword = readPassword("Master password");
+            if (mquorum == 1) {
+                masterPassword = readPassword("Master password");
+            } else {
+                char[][] parts = new char[mquorum][];
+                for (int i = 0; i < mquorum; i++) {
+                    parts[i] = readPassword("Master password " + (i + 1) + "/" + mquorum);
+                }
+                masterPassword = merge(parts);
+            }
         }
         char[] password = pbePasswordService.decryptPassword(masterPassword, passwordHint);
 
