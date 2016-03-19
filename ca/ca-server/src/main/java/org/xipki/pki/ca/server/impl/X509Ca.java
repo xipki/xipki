@@ -118,6 +118,7 @@ import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.BadFormatException;
@@ -461,7 +462,7 @@ public class X509Ca {
 
     private final CaManagerImpl caManager;
 
-    private Boolean tryXipkiNssToVerify;
+    private Boolean tryNssToVerify;
 
     private AtomicBoolean crlGenInProcess = new AtomicBoolean(false);
 
@@ -2396,15 +2397,15 @@ public class X509Ca {
         ParamUtil.requireNonNull("cert", cert);
         PublicKey caPublicKey = caInfo.getCertificate().getCert().getPublicKey();
         try {
-            final String provider = "XipkiNSS";
+            final String provider = XiSecurityConstants.PROVIDER_NAME_NSS;
 
-            if (tryXipkiNssToVerify == null) {
+            if (tryNssToVerify == null) {
                 // Not for ECDSA
                 if (caPublicKey instanceof ECPublicKey) {
-                    tryXipkiNssToVerify = Boolean.FALSE;
+                    tryNssToVerify = Boolean.FALSE;
                 } else if (Security.getProvider(provider) == null) {
                     LOG.info("security provider {} is not registered", provider);
-                    tryXipkiNssToVerify = Boolean.FALSE;
+                    tryNssToVerify = Boolean.FALSE;
                 } else {
                     byte[] tbs = cert.getTBSCertificate();
                     byte[] signatureValue = cert.getSignature();
@@ -2416,16 +2417,16 @@ public class X509Ca {
                         boolean sigValid = verifier.verify(signatureValue);
 
                         LOG.info("use {} to verify {} signature", provider, sigAlgName);
-                        tryXipkiNssToVerify = Boolean.TRUE;
+                        tryNssToVerify = Boolean.TRUE;
                         return sigValid;
                     } catch (Exception ex) {
                         LOG.info("could not use {} to verify {} signature", provider, sigAlgName);
-                        tryXipkiNssToVerify = Boolean.FALSE;
+                        tryNssToVerify = Boolean.FALSE;
                     }
                 }
-            } // end if(tryXipkiNssToVerify)
+            }
 
-            if (tryXipkiNssToVerify) {
+            if (tryNssToVerify) {
                 byte[] tbs = cert.getTBSCertificate();
                 byte[] signatureValue = cert.getSignature();
                 String sigAlgName = cert.getSigAlgName();

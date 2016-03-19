@@ -34,4 +34,50 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl.p11.nss;
+package org.xipki.commons.security.api;
+
+import org.bouncycastle.asn1.x509.GeneralName;
+
+/**
+ * @author Lijun Liao
+ * @since 2.0.0
+ */
+
+public class XiSecurityConstants {
+
+    public static final String PROVIDER_NAME_NSS = "SunPKCS11-NSS";
+
+    public static final String PROVIDER_NAME_XIPKI = "XiPKI";
+
+    public static final int CMP_CRL_REASON_REMOVE = -1;
+
+    public static final GeneralName REMOTE_P11_CMP_SERVER =
+            new GeneralName(GeneralName.uniformResourceIdentifier,
+                    "http://xipki.org/remotep11/server");
+
+    public static final GeneralName REMOTE_P11_CMP_CLIENT =
+            new GeneralName(GeneralName.uniformResourceIdentifier,
+                    "http://xipki.org/remotep11/client");
+
+    public static final int CMP_ACTION_GEN_CRL = 1;
+
+    public static final int CMP_ACTION_GET_CRL_WITH_SN = 2;
+
+    public static final int CMP_ACTION_GET_CAINFO = 3;
+
+    public static final int ACTION_RP11_VERSION = 80;
+
+    public static final int ACTION_RP11_GET_PUBLICKEY = 81;
+
+    public static final int ACTION_RP11_GET_CERTIFICATE = 82;
+
+    public static final int ACTION_RP11_LIST_SLOTS = 83;
+
+    public static final int ACTION_RP11_LIST_KEYLABELS = 84;
+
+    public static final int ACTION_RP11_SIGN = 90;
+
+    private XiSecurityConstants() {
+    }
+
+}
