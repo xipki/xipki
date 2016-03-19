@@ -36,12 +36,17 @@
 
 package org.xipki.commons.security.shell;
 
+import java.io.File;
+
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.password.api.PBEPasswordService;
 
 /**
@@ -59,22 +64,54 @@ public class PBEDecryptCmd extends SecurityCommandSupport {
     private PBEPasswordService pbePasswordService;
 
     @Option(name = "--password",
-            required = true,
             description = "encrypted password, starts with PBE:\n"
-                    + "(required)")
+                    + "exactly one of password and password-file must be specified")
     private String passwordHint;
+
+    @Option(name = "--password-file", description = "file containing the encrypted password")
+    @Completion(FilePathCompleter.class)
+    private String passwordFile;
+
+    @Option(name = "--mpassword-file",
+            description = "file containing the (obfuscated) master password")
+    @Completion(FilePathCompleter.class)
+    private String masterPasswordFile;
+
+    @Option(name = "--out", description = "where to save the password")
+    @Completion(FilePathCompleter.class)
+    private String outFile;
 
     @Override
     protected Object doExecute()
     throws Exception {
+        if (!(passwordHint == null ^ passwordFile == null)) {
+            throw new IllegalCmdParamException(
+                    "exactly one of password and password-file must be specified");
+        }
+
+        if (passwordHint == null) {
+            passwordHint = new String(IoUtil.read(passwordFile));
+        }
+
         if (!StringUtil.startsWithIgnoreCase(passwordHint, "PBE:")) {
             throw new IllegalCmdParamException("encrypted password '" + passwordHint
                     + "' does not start with PBE:");
         }
 
-        char[] masterPassword = readPassword("Master password");
+        char[] masterPassword;
+        if (masterPasswordFile != null) {
+            masterPassword = new String(IoUtil.read(masterPasswordFile)).toCharArray();
+        } else {
+            masterPassword = readPassword("Master password");
+        }
         char[] password = pbePasswordService.decryptPassword(masterPassword, passwordHint);
-        out("the decrypted password is: '" + new String(password) + "'");
+
+        if (outFile != null) {
+            saveVerbose("saved the password to file", new File(outFile),
+                    new String(password).getBytes());
+        } else {
+            out("the password is: '" + new String(password) + "'");
+        }
         return null;
     }
 
