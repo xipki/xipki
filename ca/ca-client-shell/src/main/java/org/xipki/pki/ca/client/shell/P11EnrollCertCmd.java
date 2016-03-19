@@ -91,7 +91,7 @@ public class P11EnrollCertCmd extends EnrollCertCommandSupport {
         }
 
         String signerConfWithoutAlgo = SignerConfUtil.getPkcs11SignerConfWithoutAlgo(
-                moduleName, slotIndex, null, keyIdBytes, keyLabel, 1);
+                moduleName, slotIndex, null, keyLabel, keyIdBytes, 1);
         return securityFactory.createSigner("PKCS11", signerConfWithoutAlgo, hashAlgo,
                 signatureAlgoControl, (X509Certificate[]) null);
     }

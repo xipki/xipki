@@ -160,53 +160,6 @@ public class X509Util {
         return new X500Name(newRdn);
     }
 
-    public static X500Name sortX509Name(
-            final X500Name name) {
-        ParamUtil.requireNonNull("name", name);
-        RDN[] requstedRdns = name.getRDNs();
-
-        List<RDN> rdns = new LinkedList<>();
-
-        List<ASN1ObjectIdentifier> sortedDNs = ObjectIdentifiers.getForwardDNs();
-        int size = sortedDNs.size();
-        for (int i = 0; i < size; i++) {
-            ASN1ObjectIdentifier type = sortedDNs.get(i);
-            RDN[] thisRdns = getRdns(requstedRdns, type);
-            int len = (thisRdns == null)
-                    ? 0
-                    : thisRdns.length;
-            if (len == 0) {
-                continue;
-            }
-
-            for (RDN m : thisRdns) {
-                rdns.add(m);
-            }
-        }
-
-        return new X500Name(rdns.toArray(new RDN[0]));
-    }
-
-    private static RDN[] getRdns(
-            final RDN[] rdns,
-            final ASN1ObjectIdentifier type) {
-        ParamUtil.requireNonNull("rdns", rdns);
-        ParamUtil.requireNonNull("type", type);
-        List<RDN> ret = new ArrayList<>(1);
-        for (int i = 0; i < rdns.length; i++) {
-            RDN rdn = rdns[i];
-            if (rdn.getFirst().getType().equals(type)) {
-                ret.add(rdn);
-            }
-        }
-
-        if (CollectionUtil.isEmpty(ret)) {
-            return null;
-        } else {
-            return ret.toArray(new RDN[0]);
-        }
-    }
-
     public static X509Certificate parseCert(
             final String fileName)
     throws IOException, CertificateException {

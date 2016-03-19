@@ -36,10 +36,7 @@
 
 package org.xipki.commons.security.api;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -57,6 +54,7 @@ import org.xipki.commons.common.util.StringUtil;
  */
 
 public class ObjectIdentifiers {
+
     /**
      * registered PEN for xipki.org: 45522
      */
@@ -422,10 +420,6 @@ public class ObjectIdentifiers {
 
     public static final ASN1ObjectIdentifier id_pe_tlsfeature = id_pe.branch("24");
 
-    private static final List<ASN1ObjectIdentifier> forwardDNs;
-
-    private static final List<ASN1ObjectIdentifier> backwardDNs;
-
     private static final Map<ASN1ObjectIdentifier, String> oidNameMap;
 
     // RFC 4262: SMIMECapatibilities
@@ -434,44 +428,6 @@ public class ObjectIdentifiers {
     // CHECKSTYLE:ON
 
     static {
-        List<ASN1ObjectIdentifier> tmpForwardDNs = new ArrayList<>(25);
-
-        tmpForwardDNs.add(DN_C);
-        tmpForwardDNs.add(DN_DC);
-        tmpForwardDNs.add(DN_ST);
-        tmpForwardDNs.add(DN_L);
-        tmpForwardDNs.add(DN_O);
-        tmpForwardDNs.add(DN_organizationIdentifier);
-        tmpForwardDNs.add(DN_OU);
-        tmpForwardDNs.add(DN_T);
-        tmpForwardDNs.add(DN_SURNAME);
-        tmpForwardDNs.add(DN_INITIALS);
-        tmpForwardDNs.add(DN_GIVENNAME);
-        tmpForwardDNs.add(DN_SERIALNUMBER);
-        tmpForwardDNs.add(DN_NAME);
-        tmpForwardDNs.add(DN_CN);
-        tmpForwardDNs.add(DN_LDAP_UID);
-        tmpForwardDNs.add(DN_DMD_NAME);
-        tmpForwardDNs.add(DN_EmailAddress);
-        tmpForwardDNs.add(DN_UnstructuredName);
-        tmpForwardDNs.add(DN_UnstructuredAddress);
-        tmpForwardDNs.add(DN_POSTAL_CODE);
-        tmpForwardDNs.add(DN_BUSINESS_CATEGORY);
-        tmpForwardDNs.add(DN_POSTAL_ADDRESS);
-        tmpForwardDNs.add(DN_TELEPHONE_NUMBER);
-        tmpForwardDNs.add(DN_PSEUDONYM);
-        tmpForwardDNs.add(DN_STREET);
-
-        forwardDNs = Collections.unmodifiableList(tmpForwardDNs);
-
-        List<ASN1ObjectIdentifier> tmpBackwardDNs = new ArrayList<>(25);
-        int size = tmpForwardDNs.size();
-        for (int i = size - 1; i >= 0; i--) {
-            tmpBackwardDNs.add(tmpForwardDNs.get(i));
-        }
-
-        backwardDNs = Collections.unmodifiableList(tmpBackwardDNs);
-
         oidNameMap = new HashMap<>();
 
         oidNameMap.put(DN_DATE_OF_BIRTH, "dateOfBirth");
@@ -480,6 +436,11 @@ public class ObjectIdentifiers {
         oidNameMap.put(DN_COUNTRY_OF_CITIZENSHIP, "countryOfCitizenship");
         oidNameMap.put(DN_COUNTRY_OF_RESIDENCE, "countryOfResidence");
         oidNameMap.put(DN_NAME_AT_BIRTH, "nameAtBirth");
+        oidNameMap.put(DN_PSEUDONYM, "pseudonym");
+        oidNameMap.put(DN_DMD_NAME, "dmdName");
+        oidNameMap.put(DN_EmailAddress, "emailAddress");
+        oidNameMap.put(DN_UnstructuredName, "unstructuredName");
+        oidNameMap.put(DN_UnstructuredAddress, "unstructuredAddress");
         oidNameMap.put(DN_organizationIdentifier, "organizationIdentifier");
 
         oidNameMap.put(id_xipki_ext_crlCertset, "xipki-crlCertset");
@@ -591,14 +552,6 @@ public class ObjectIdentifiers {
         } catch (IllegalArgumentException ex) {
             return null;
         }
-    }
-
-    public static List<ASN1ObjectIdentifier> getForwardDNs() {
-        return forwardDNs;
-    }
-
-    public static List<ASN1ObjectIdentifier> getBackwardDNs() {
-        return backwardDNs;
     }
 
 }
