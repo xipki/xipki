@@ -36,12 +36,17 @@
 
 package org.xipki.commons.security.shell;
 
+import java.io.File;
+
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.password.api.OBFPasswordService;
 
 /**
@@ -58,21 +63,42 @@ public class DeobfuscateCmd extends SecurityCommandSupport {
     private OBFPasswordService obfPasswordService;
 
     @Option(name = "--password",
-            required = true,
             description = "obfuscated password, starts with OBF:\n"
-                    + "(required)")
+                    + "exactly one of password and password-file must be specified")
     private String passwordHint;
+
+    @Option(name = "--password-file", description = "file containing the obfuscated password")
+    @Completion(FilePathCompleter.class)
+    private String passwordFile;
+
+    @Option(name = "--out", description = "where to save the password")
+    @Completion(FilePathCompleter.class)
+    private String outFile;
 
     @Override
     protected Object doExecute()
     throws Exception {
+        if (!(passwordHint == null ^ passwordFile == null)) {
+            throw new IllegalCmdParamException(
+                    "exactly one of password and password-file must be specified");
+        }
+
+        if (passwordHint == null) {
+            passwordHint = new String(IoUtil.read(passwordFile));
+        }
+
         if (!StringUtil.startsWithIgnoreCase(passwordHint, "OBF:")) {
             throw new IllegalCmdParamException("encrypted password '" + passwordHint
                     + "' does not start with OBF:");
         }
 
         String password = obfPasswordService.deobfuscate(passwordHint);
-        out("the deobfuscated password is: '" + new String(password) + "'");
+        if (outFile != null) {
+            saveVerbose("saved the password to file", new File(outFile),
+                    new String(password).getBytes());
+        } else {
+            out("the password is: '" + new String(password) + "'");
+        }
         return null;
     }
 

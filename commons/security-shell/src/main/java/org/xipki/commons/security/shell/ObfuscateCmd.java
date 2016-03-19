@@ -36,9 +36,14 @@
 
 package org.xipki.commons.security.shell;
 
+import java.io.File;
+
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.password.api.OBFPasswordService;
 
 /**
@@ -51,6 +56,10 @@ import org.xipki.commons.password.api.OBFPasswordService;
 @Service
 public class ObfuscateCmd extends SecurityCommandSupport {
 
+    @Option(name = "--out", description = "where to save the encrypted password")
+    @Completion(FilePathCompleter.class)
+    private String outFile;
+
     @Reference
     private OBFPasswordService obfPasswordService;
 
@@ -60,7 +69,12 @@ public class ObfuscateCmd extends SecurityCommandSupport {
         char[] password = readPassword("Password");
 
         String passwordHint = obfPasswordService.obfuscate(new String(password));
-        out("the obfuscated password is: '" + passwordHint + "'");
+        if (outFile != null) {
+            saveVerbose("saved the obfuscated password to file", new File(outFile),
+                    passwordHint.getBytes());
+        } else {
+            out("the obfuscated password is: '" + passwordHint + "'");
+        }
         return null;
     }
 
