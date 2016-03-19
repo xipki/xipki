@@ -657,14 +657,14 @@ class OcspStoreQueryExecutor {
             final BigInteger serialNumber)
     throws DataAccessException {
         final String sql = datasource.createFetchFirstSelectSql(
-                "ID FROM CERT WHERE IID=? AND SN=?", 1);
+                "ID FROM CERT WHERE SN=? AND IID=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
             int idx = 1;
-            ps.setInt(idx++, issuerId);
             ps.setLong(idx++, serialNumber.longValue());
+            ps.setInt(idx++, issuerId);
 
             rs = ps.executeQuery();
             return rs.next();
