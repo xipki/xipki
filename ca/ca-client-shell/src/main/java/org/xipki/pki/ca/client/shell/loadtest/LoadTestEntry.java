@@ -87,7 +87,7 @@ public class LoadTestEntry {
             ParamUtil.requireNonEmpty("subjectTemplate", subjectTemplate);
             ParamUtil.requireNonNull("randomDn", randomDn);
 
-            this.subjectTemplate = X509Util.sortX509Name(new X500Name(subjectTemplate));
+            this.subjectTemplate = new X500Name(subjectTemplate);
 
             switch (randomDn) {
             case GIVENNAME:

@@ -47,7 +47,6 @@ import java.util.Set;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.pki.ca.api.profile.RdnControl;
 
 /**
@@ -75,8 +74,8 @@ public class SubjectControl {
         Set<ASN1ObjectIdentifier> oidSet = controls.keySet();
         List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
         List<ASN1ObjectIdentifier> oids = backwardsSubject
-                ? ObjectIdentifiers.getBackwardDNs()
-                : ObjectIdentifiers.getForwardDNs();
+                ? SubjectDnSpec.getBackwardDNs()
+                : SubjectDnSpec.getForwardDNs();
         for (ASN1ObjectIdentifier oid : oids) {
             if (oidSet.contains(oid)) {
                 sortedOids.add(oid);
