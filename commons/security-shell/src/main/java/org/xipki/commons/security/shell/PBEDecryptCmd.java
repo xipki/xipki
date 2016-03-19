@@ -123,7 +123,7 @@ public class PBEDecryptCmd extends SecurityCommandSupport {
             saveVerbose("saved the password to file", new File(outFile),
                     new String(password).getBytes());
         } else {
-            out("the password is: '" + new String(password) + "'");
+            println("the password is: '" + new String(password) + "'");
         }
         return null;
     }
