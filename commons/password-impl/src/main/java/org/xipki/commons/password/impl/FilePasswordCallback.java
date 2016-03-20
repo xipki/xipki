@@ -43,6 +43,7 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordCallback;
@@ -61,7 +62,8 @@ public class FilePasswordCallback implements PasswordCallback {
 
     @Override
     public char[] getPassword(
-            final String prompt)
+            final String prompt,
+            final String testToken)
     throws PasswordResolverException {
         if (passwordFile == null) {
             throw new PasswordResolverException("please initialize me first");
@@ -107,7 +109,13 @@ public class FilePasswordCallback implements PasswordCallback {
             final String conf)
     throws PasswordResolverException {
         ParamUtil.requireNonBlank("conf", conf);
-        passwordFile = expandFilepath(conf);
+        ConfPairs pairs = new ConfPairs(conf);
+        passwordFile = pairs.getValue("file");
+        if (StringUtil.isBlank(passwordFile)) {
+            throw new PasswordResolverException("invalid configuration " + conf
+                    + ", no file is specified");
+        }
+        passwordFile = expandFilepath(passwordFile);
     }
 
     private static String expandFilepath(

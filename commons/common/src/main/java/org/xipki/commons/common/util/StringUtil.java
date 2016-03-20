@@ -246,4 +246,19 @@ public class StringUtil {
         return formatText(sb.toString(), minLen);
     }
 
+    public static char[] merge(char[][] parts) {
+        int sum = 0;
+        for (int i = 0; i < parts.length; i++) {
+            sum += parts[i].length;
+        }
+
+        char[] ret = new char[sum];
+        int destPos = 0;
+        for (int i = 0; i < parts.length; i++) {
+            char[] part = parts[i];
+            System.arraycopy(parts, 0, ret, destPos, part.length);
+            destPos += part.length;
+        }
+        return ret;
+    }
 }

@@ -36,6 +36,7 @@
 
 package org.xipki.commons.password.impl;
 
+import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordCallback;
 import org.xipki.commons.password.api.PasswordResolverException;
@@ -48,25 +49,67 @@ import org.xipki.commons.password.api.SecurePasswordInputPanel;
 
 public class GuiPasswordCallback implements PasswordCallback {
 
+    private int quorum = 1;
+
+    protected boolean isPasswordValid(
+            final char[] password,
+            final String testToken) {
+        return true;
+    }
+
     @Override
     public char[] getPassword(
-            final String prompt)
+            final String prompt,
+            final String testToken)
     throws PasswordResolverException {
         String tmpPrompt = prompt;
         if (StringUtil.isBlank(tmpPrompt)) {
             tmpPrompt = "Password required";
         }
-        char[] password = SecurePasswordInputPanel.readPassword(tmpPrompt);
-        if (password == null) {
-            throw new PasswordResolverException("user has cancelled");
+
+        final int tries = 3;
+        for (int i = 0; i < tries; i++) {
+            char[] password;
+            if (quorum == 1) {
+                password = SecurePasswordInputPanel.readPassword(tmpPrompt);
+                if (password == null) {
+                    throw new PasswordResolverException("user has cancelled");
+                }
+            } else {
+                char[][] passwordParts = new char[quorum][];
+                for (int j = 0; j < quorum; j++) {
+                    String promptPart = tmpPrompt + " (part " + (j + 1) + "/" + quorum + ")";
+                    passwordParts[j] = SecurePasswordInputPanel.readPassword(promptPart);
+                    if (passwordParts[j] == null) {
+                        throw new PasswordResolverException("user has cancelled");
+                    }
+                }
+                password = StringUtil.merge(passwordParts);
+            }
+
+            if (isPasswordValid(password, testToken)) {
+                return password;
+            }
         }
-        return password;
+
+        throw new PasswordResolverException("Could not get the password after " + tries + " tries");
     }
 
     @Override
     public void init(
             final String conf)
     throws PasswordResolverException {
+        if (StringUtil.isBlank(conf)) {
+            quorum = 1;
+            return;
+        }
+
+        ConfPairs pairs = new ConfPairs(conf);
+        String str = pairs.getValue("quorum");
+        quorum = Integer.valueOf(str);
+        if (quorum < 1 || quorum > 10) {
+            throw new PasswordResolverException("quorum " + quorum + " is not in [1,10]");
+        }
     }
 
 }
