@@ -76,19 +76,21 @@ public class PBEConsumerPasswordCallback implements PasswordCallback {
         if (passwordName == null) {
             throw new PasswordResolverException("please initialize me first");
         }
-        for (int i = 0; i < tries; i++) {
-            char[] password;
-            try {
-                password = PasswordProducer.takePassword(passwordName);
-            } catch (InterruptedException ex) {
-                throw new PasswordResolverException("interrupted");
+        try {
+            for (int i = 0; i < tries; i++) {
+                char[] password;
+                try {
+                    password = PasswordProducer.takePassword(passwordName);
+                } catch (InterruptedException ex) {
+                    throw new PasswordResolverException("interrupted");
+                }
+                if (isPasswordValid(password, testToken)) {
+                    return password;
+                }
             }
-            if (isPasswordValid(password, testToken)) {
-                PasswordProducer.unregisterPasswordConsumer(passwordName);
-                return password;
-            }
+        } finally {
+            PasswordProducer.unregisterPasswordConsumer(passwordName);
         }
-
         throw new PasswordResolverException("Could not get the password after " + tries + " tries");
     }
 
