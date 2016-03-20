@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.qa.shell;
 
+import java.io.IOException;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -72,7 +73,7 @@ public class NegP12EnrollCertCmd extends NegEnrollCertCommandSupport {
     @Override
     protected ConcurrentContentSigner getSigner(
             final SignatureAlgoControl signatureAlgoControl)
-    throws SecurityException {
+    throws SecurityException, IOException {
         if (password == null) {
             password = new String(readPassword());
         }

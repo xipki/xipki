@@ -237,13 +237,8 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
             tmpPrompt = promptBuilder.toString();
         }
 
-        print(tmpPrompt);
         while (true) {
-            String answer = session.readLine(null, null);
-            if (answer == null) {
-                throw new IOException("interrupted");
-            }
-
+            String answer = readPrompt(tmpPrompt);
             if (isEmpty(tmpValidValues) || tmpValidValues.contains(answer)) {
                 return answer;
             } else {
@@ -252,7 +247,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
                     retryPromptBuilder.append(validValue).append("/");
                 }
                 retryPromptBuilder.deleteCharAt(retryPromptBuilder.length() - 1);
-                print(retryPromptBuilder.toString());
+                tmpPrompt = retryPromptBuilder.toString();
             }
         }
     } // method read

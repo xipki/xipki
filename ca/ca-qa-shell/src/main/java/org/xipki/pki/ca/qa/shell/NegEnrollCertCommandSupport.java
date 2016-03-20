@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.qa.shell;
 
+import java.io.IOException;
 import java.security.cert.X509Certificate;
 
 import javax.annotation.Nonnull;
@@ -112,7 +113,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
 
     protected abstract ConcurrentContentSigner getSigner(
             @Nonnull SignatureAlgoControl signatureAlgoControl)
-    throws SecurityException;
+    throws SecurityException, IOException;
 
     @Override
     protected Object doExecute()

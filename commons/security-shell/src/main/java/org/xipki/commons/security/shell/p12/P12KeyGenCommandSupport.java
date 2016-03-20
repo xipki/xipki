@@ -79,7 +79,8 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
         saveVerbose("saved PKCS#12 keystore to file", p12File, keypair.getKeystore());
     }
 
-    protected P12KeystoreGenerationParameters getKeyGenParameters() {
+    protected P12KeystoreGenerationParameters getKeyGenParameters()
+    throws IOException {
         P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
                 getPassword());
 
@@ -91,7 +92,8 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
         return params;
     }
 
-    private char[] getPassword() {
+    private char[] getPassword()
+    throws IOException {
         char[] pwdInChar = readPasswordIfNotSet(password);
         if (pwdInChar != null) {
             password = new String(pwdInChar);

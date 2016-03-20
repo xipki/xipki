@@ -82,20 +82,20 @@ public class FileRmCmd extends XipkiCommandSupport {
 
         if (target.isDirectory()) {
             if (!recursive) {
-                print("Please use option--recursive to delete directory");
+                println("Please use option --recursive to delete directory");
                 return null;
             }
 
             if (force || confirm(
                     "Do you want to remove directory " + targetPath + " [yes/no]?", 3)) {
                 FileUtils.deleteDirectory(target);
-                print("removed directory " + targetPath);
+                println("removed directory " + targetPath);
             }
         } else {
             if (force || confirm(
                     "Do you want o remove file " + targetPath + " [yes/no]?", 3)) {
                 target.delete();
-                print("removed file " + targetPath);
+                println("removed file " + targetPath);
             }
         }
 

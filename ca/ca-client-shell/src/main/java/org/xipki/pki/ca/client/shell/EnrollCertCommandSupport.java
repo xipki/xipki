@@ -37,6 +37,7 @@
 package org.xipki.pki.ca.client.shell;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -218,7 +219,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
     protected abstract ConcurrentContentSigner getSigner(
             @Nonnull SignatureAlgoControl signatureAlgoControl)
-    throws SecurityException;
+    throws SecurityException, IOException;
 
     @Override
     protected Object doExecute()

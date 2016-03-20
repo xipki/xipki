@@ -37,7 +37,12 @@
 package org.xipki.commons.security.shell.p12;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,6 +64,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.util.SignerConfUtil;
 import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
@@ -84,7 +90,8 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
             description = "password of the PKCS#12 file")
     private String password;
 
-    private char[] getPassword() {
+    private char[] getPassword()
+    throws IOException {
         char[] pwdInChar = readPasswordIfNotSet(password);
         if (pwdInChar != null) {
             password = new String(pwdInChar);
@@ -93,7 +100,8 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
     }
 
     public KeyStore getKeyStore()
-    throws Exception {
+    throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException,
+    CertificateException {
         KeyStore ks;
         try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
             ks = KeyStore.getInstance("PKCS12", "BC");
@@ -105,7 +113,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
     @Override
     protected ConcurrentContentSigner getSigner(
             final SignatureAlgoControl signatureAlgoControl)
-    throws Exception {
+    throws IOException, SecurityException {
         ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
         char[] pwd = getPassword();
         String signerConf = SignerConfUtil.getKeystoreSignerConfWithoutAlgo(p12File,
