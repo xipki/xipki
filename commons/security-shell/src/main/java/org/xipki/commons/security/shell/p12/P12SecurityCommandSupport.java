@@ -37,7 +37,12 @@
 package org.xipki.commons.security.shell.p12;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -62,7 +67,8 @@ public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
             description = "password of the PKCS#12 file")
     protected String password;
 
-    protected char[] getPassword() {
+    protected char[] getPassword()
+    throws IOException {
         char[] pwdInChar = readPasswordIfNotSet(password);
         if (pwdInChar != null) {
             password = new String(pwdInChar);
@@ -71,7 +77,8 @@ public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
     }
 
     protected KeyStore getKeyStore()
-    throws Exception {
+    throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException,
+    NoSuchProviderException {
         KeyStore ks;
         try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
             ks = KeyStore.getInstance("PKCS12", "BC");
