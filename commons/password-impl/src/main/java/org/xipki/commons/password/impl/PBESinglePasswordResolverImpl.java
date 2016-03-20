@@ -57,7 +57,7 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
     public PBESinglePasswordResolverImpl() {
     }
 
-    protected char[] getMasterPassword()
+    protected char[] getMasterPassword(String encryptedPassword)
     throws PasswordResolverException {
         synchronized (masterPasswordLock) {
             if (masterPassword == null) {
@@ -66,7 +66,7 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
                             "masterPasswordCallback is not initialized");
                 }
                 this.masterPassword = masterPwdCallback.getPassword(
-                        "Please enter the master password");
+                        "Please enter the master password", encryptedPassword);
             }
             return masterPassword;
         }
@@ -86,7 +86,8 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
     public char[] resolvePassword(
             final String passwordHint)
     throws PasswordResolverException {
-        return PBEPasswordServiceImpl.doDecryptPassword(getMasterPassword(), passwordHint);
+        return PBEPasswordServiceImpl.doDecryptPassword(getMasterPassword(passwordHint),
+                passwordHint);
     }
 
     public void setMasterPasswordCallback(
