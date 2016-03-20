@@ -45,7 +45,9 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.password.api.OBFPasswordService;
 import org.xipki.commons.password.api.PBEPasswordService;
 
 /**
@@ -58,6 +60,12 @@ import org.xipki.commons.password.api.PBEPasswordService;
 @Service
 // CHECKSTYLE:SKIP
 public class PBEEncryptCmd extends SecurityCommandSupport {
+
+    @Reference
+    private OBFPasswordService obfPasswordService;
+
+    @Reference
+    private PBEPasswordService pbePasswordService;
 
     @Option(name = "--iteration-count", aliases = "-n",
             description = "iteration count, between 1 and 65535")
@@ -78,9 +86,6 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
     @Option(name = "--mk", description = "quorum of the master password parts")
     private Integer mquorum = 1;
 
-    @Reference
-    private PBEPasswordService pbePasswordService;
-
     @Override
     protected Object doExecute()
     throws Exception {
@@ -90,16 +95,21 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
 
         char[] masterPassword;
         if (masterPasswordFile != null) {
-            masterPassword = new String(IoUtil.read(masterPasswordFile)).toCharArray();
+            String str = new String(IoUtil.read(masterPasswordFile));
+            if (str.startsWith("OBF:") || str.startsWith("obf:")) {
+                str = obfPasswordService.deobfuscate(str);
+            }
+            masterPassword = str.toCharArray();
         } else {
             if (mquorum == 1) {
                 masterPassword = readPassword("Master password");
             } else {
                 char[][] parts = new char[mquorum][];
                 for (int i = 0; i < mquorum; i++) {
-                    parts[i] = readPassword("Master password " + (i + 1) + "/" + mquorum);
+                    parts[i] = readPassword("Master password (part " + (i + 1) + "/" + mquorum
+                            + ")");
                 }
-                masterPassword = merge(parts);
+                masterPassword = StringUtil.merge(parts);
             }
         }
 
@@ -109,9 +119,9 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
         } else {
             char[][] parts = new char[quorum][];
             for (int i = 0; i < quorum; i++) {
-                parts[i] = readPassword("Password " + (i + 1) + "/" + quorum);
+                parts[i] = readPassword("Password (part " + (i + 1) + "/" + quorum + ")");
             }
-            password = merge(parts);
+            password = StringUtil.merge(parts);
         }
 
         String passwordHint = pbePasswordService.encryptPassword(iterationCount, masterPassword,

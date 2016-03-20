@@ -114,7 +114,8 @@ public class PasswordResolverImpl implements PasswordResolver {
             }
         }
 
-        return passwordHint.toCharArray();
+        throw new PasswordResolverException("password of protocol '" + protocol
+                + "' could not be resolved");
     }
 
 }

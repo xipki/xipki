@@ -50,13 +50,13 @@ public class DummyPBESinglePasswordResolverImpl extends PBESinglePasswordResolve
     private char[] masterPassword;
 
     @Override
-    protected char[] getMasterPassword()
+    protected char[] getMasterPassword(
+            final String encryptedPassword)
     throws PasswordResolverException {
-        if (masterPassword != null) {
-            return masterPassword;
+        if (masterPassword == null) {
+            throw new PasswordResolverException("please call setMasterPassword() first");
         }
-
-        return super.getMasterPassword();
+        return masterPassword;
     }
 
     public void setMasterPassword(

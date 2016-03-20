@@ -34,24 +34,31 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.password.api;
+package org.xipki.commons.password.impl;
 
-import javax.annotation.Nullable;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.password.api.PasswordResolverException;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface PasswordCallback {
+// CHECKSTYLE:SKIP
+public class PBEGuiPasswordCallback extends GuiPasswordCallback {
 
-    void init(
-            @Nullable String conf)
-    throws PasswordResolverException;
-
-    char[] getPassword(
-            @Nullable String prompt,
-            String testToken)
-    throws PasswordResolverException;
+    protected boolean isPasswordValid(
+            final char[] password,
+            final String testToken) {
+        if (StringUtil.isBlank(testToken)) {
+            return true;
+        }
+        try {
+            PBEPasswordServiceImpl.doDecryptPassword(password, testToken);
+            return true;
+        } catch (PasswordResolverException ex) {
+            return false;
+        }
+    }
 
 }
