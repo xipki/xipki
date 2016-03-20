@@ -98,7 +98,7 @@ public abstract class XipkiCommandSupport implements Action {
                 boolean bo = true;
                 while (saveTo.exists()) {
                     if (bo) {
-                        print("A file named '" + saveTo.getPath()
+                        readPrompt("A file named '" + saveTo.getPath()
                             + "' already exists. Do you want to replace it [yes/no]? ");
                     }
 
@@ -110,7 +110,7 @@ public abstract class XipkiCommandSupport implements Action {
                     if ("yes".equalsIgnoreCase(answer)) {
                         break;
                     } else if ("no".equalsIgnoreCase(answer)) {
-                        print("Enter name of file to save to ... ");
+                        readPrompt("Enter name of file to save to ... ");
                         String newFn = null;
                         while (true) {
                             newFn = session.readLine(null, null);
@@ -121,7 +121,7 @@ public abstract class XipkiCommandSupport implements Action {
 
                         saveTo = new File(newFn);
                     } else {
-                        print("Please answer with yes or no. ");
+                        readPrompt("Please answer with yes or no. ");
                         bo = false;
                     }
                 } // end while
@@ -206,8 +206,21 @@ public abstract class XipkiCommandSupport implements Action {
         }
     }
 
+    protected String readPrompt(
+            final String prompt)
+    throws IOException {
+        String tmpPrompt = prompt;
+        if (StringUtil.isNotBlank(prompt)) {
+            if (!prompt.endsWith(" ")) {
+                tmpPrompt += " ";
+            }
+        }
+        return readLine(tmpPrompt, null);
+    }
+
     protected char[] readPasswordIfNotSet(
-            final String password) {
+            final String password)
+    throws IOException {
         if (password != null) {
             return password.toCharArray();
         }
@@ -215,12 +228,14 @@ public abstract class XipkiCommandSupport implements Action {
         return readPassword(null);
     }
 
-    protected char[] readPassword() {
+    protected char[] readPassword()
+    throws IOException {
         return readPassword(null);
     }
 
     protected char[] readPassword(
-            final String prompt) {
+            final String prompt)
+    throws IOException {
         String tmpPrompt = (prompt == null)
                 ? "Password:"
                 : prompt.trim();
@@ -233,16 +248,22 @@ public abstract class XipkiCommandSupport implements Action {
         if ("gui".equalsIgnoreCase(passwordUi)) {
             return SecurePasswordInputPanel.readPassword(tmpPrompt);
         } else {
-            Object oldIgnoreInterrupts = session.get(Session.IGNORE_INTERRUPTS);
-            session.put(Session.IGNORE_INTERRUPTS, Boolean.TRUE);
-            try {
-                String pwd = session.readLine(tmpPrompt, '*');
-                return pwd.toCharArray();
-            } catch (IOException ex) {
-                return new char[0];
-            } finally {
-                session.put(Session.IGNORE_INTERRUPTS, oldIgnoreInterrupts);
+            return readLine(tmpPrompt, '*').toCharArray();
+        }
+    }
+
+    private String readLine(String prompt, Character ch)
+    throws IOException {
+        Object oldIgnoreInterrupts = session.get(Session.IGNORE_INTERRUPTS);
+        session.put(Session.IGNORE_INTERRUPTS, Boolean.TRUE);
+        try {
+            String line = session.readLine(prompt, ch);
+            if (line == null) {
+                throw new IOException("interrupted");
             }
+            return line;
+        } finally {
+            session.put(Session.IGNORE_INTERRUPTS, oldIgnoreInterrupts);
         }
     }
 
