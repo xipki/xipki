@@ -37,26 +37,35 @@
 package org.xipki.commons.password.impl;
 
 import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordCallback;
+import org.xipki.commons.password.api.PasswordProducer;
 import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.password.api.SecurePasswordInputPanel;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class GuiPasswordCallback implements PasswordCallback {
+// CHECKSTYLE:SKIP
+public class PBEConsumerPasswordCallback implements PasswordCallback {
 
-    private int quorum = 1;
-
+    private String passwordName;
     private int tries = 3;
 
-    protected boolean isPasswordValid(
+    private boolean isPasswordValid(
             final char[] password,
             final String testToken) {
-        return true;
+        if (StringUtil.isBlank(testToken)) {
+            return true;
+        }
+        try {
+            PBEPasswordServiceImpl.doDecryptPassword(password, testToken);
+            return true;
+        } catch (PasswordResolverException ex) {
+            return false;
+        }
     }
 
     @Override
@@ -64,31 +73,18 @@ public class GuiPasswordCallback implements PasswordCallback {
             final String prompt,
             final String testToken)
     throws PasswordResolverException {
-        String tmpPrompt = prompt;
-        if (StringUtil.isBlank(tmpPrompt)) {
-            tmpPrompt = "Password required";
+        if (passwordName == null) {
+            throw new PasswordResolverException("please initialize me first");
         }
-
         for (int i = 0; i < tries; i++) {
             char[] password;
-            if (quorum == 1) {
-                password = SecurePasswordInputPanel.readPassword(tmpPrompt);
-                if (password == null) {
-                    throw new PasswordResolverException("user has cancelled");
-                }
-            } else {
-                char[][] passwordParts = new char[quorum][];
-                for (int j = 0; j < quorum; j++) {
-                    String promptPart = tmpPrompt + " (part " + (j + 1) + "/" + quorum + ")";
-                    passwordParts[j] = SecurePasswordInputPanel.readPassword(promptPart);
-                    if (passwordParts[j] == null) {
-                        throw new PasswordResolverException("user has cancelled");
-                    }
-                }
-                password = StringUtil.merge(passwordParts);
+            try {
+                password = PasswordProducer.takePassword(passwordName);
+            } catch (InterruptedException ex) {
+                throw new PasswordResolverException("interrupted");
             }
-
             if (isPasswordValid(password, testToken)) {
+                PasswordProducer.unregisterPasswordConsumer(passwordName);
                 return password;
             }
         }
@@ -100,17 +96,14 @@ public class GuiPasswordCallback implements PasswordCallback {
     public void init(
             final String conf)
     throws PasswordResolverException {
-        if (StringUtil.isBlank(conf)) {
-            quorum = 1;
-            return;
-        }
-
+        ParamUtil.requireNonBlank("conf", conf);
         ConfPairs pairs = new ConfPairs(conf);
-        String str = pairs.getValue("quorum");
-        quorum = Integer.valueOf(str);
-        if (quorum < 1 || quorum > 10) {
-            throw new PasswordResolverException("quorum " + quorum + " is not in [1,10]");
+        String str = pairs.getValue("name");
+        if (StringUtil.isBlank(str)) {
+            throw new PasswordResolverException("name must not be null");
         }
+        this.passwordName = str;
+        PasswordProducer.registerPasswordConsumer(this.passwordName);
 
         str = pairs.getValue("tries");
         if (StringUtil.isNotBlank(str)) {
