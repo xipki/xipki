@@ -21,7 +21,7 @@
   </feature>
   <feature name="xipki-pkcs11-proxy" version="${project.version}">
     <feature>xipki-security</feature>
-    <bundle>mvn:org.xipki.commons/pkcs11-proxy-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/pkcs11-proxy-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/pkcs11-proxy-server/${project.version}</bundle>
   </feature>
 </features>
