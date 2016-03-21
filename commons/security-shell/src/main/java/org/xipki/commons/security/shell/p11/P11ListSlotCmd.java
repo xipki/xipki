@@ -104,7 +104,7 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
         }
 
         for (P11SlotIdentifier slotId : slots) {
-            println("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
+            println("\tslot[" + slotId.getIndex() + "]: " + slotId.getId());
         }
     }
 

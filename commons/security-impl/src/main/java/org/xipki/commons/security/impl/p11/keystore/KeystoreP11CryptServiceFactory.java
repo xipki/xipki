@@ -60,7 +60,7 @@ public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory {
     }
 
     @Override
-    public P11CryptService createP11CryptService(
+    public P11CryptService getP11CryptService(
             final String moduleName)
     throws SecurityException, P11TokenException {
         ParamUtil.requireNonBlank("moduleName", moduleName);
@@ -76,4 +76,8 @@ public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory {
         return KeystoreP11CryptService.getInstance(conf);
     }
 
+    @Override
+    public void shutdown() {
+        KeystoreP11ModulePool.getInstance().shutdown();
+    }
 }

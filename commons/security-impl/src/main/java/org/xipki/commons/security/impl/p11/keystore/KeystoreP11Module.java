@@ -131,8 +131,8 @@ class KeystoreP11Module extends AbstractP11Module {
                 throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
             }
 
-            File slotDir = new File(moduleConf.getNativeLibrary(), slotId.getSlotIndex() + "-"
-                    + slotId.getSlotId());
+            File slotDir = new File(moduleConf.getNativeLibrary(), slotId.getIndex() + "-"
+                    + slotId.getId());
 
             if (pwd == null) {
                 throw new P11TokenException("no password is configured");

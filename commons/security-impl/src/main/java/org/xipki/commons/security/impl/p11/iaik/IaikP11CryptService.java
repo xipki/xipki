@@ -177,7 +177,7 @@ final class IaikP11CryptService implements P11CryptService {
         return getNonnullIdentity(entityId).getCertificateChain();
     }
 
-    public static synchronized IaikP11CryptService getInstance(
+    static synchronized IaikP11CryptService getInstance(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         synchronized (INSTANCES) {

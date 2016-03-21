@@ -69,14 +69,14 @@ public abstract class BSpeedP11CommandSupport extends BatchSpeedCommandSupport {
 
     protected P11WritableSlot getP11WritableSlot(
             final String moduleName,
-            final int slotIndex)
+            final int index)
     throws SecurityException, P11TokenException, IllegalCmdParamException {
         P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
         if (p11Service == null) {
             throw new IllegalCmdParamException("undefined module " + moduleName);
         }
         P11Module module = p11Service.getModule();
-        P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
+        P11SlotIdentifier slotId = module.getSlotIdForIndex(index);
         P11Slot slot = module.getSlot(slotId);
         if (slot instanceof P11WritableSlot) {
             return (P11WritableSlot) slot;

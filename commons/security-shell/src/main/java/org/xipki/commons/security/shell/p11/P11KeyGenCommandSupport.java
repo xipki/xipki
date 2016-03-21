@@ -74,8 +74,8 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
     throws Exception {
         ParamUtil.requireNonNull("keyId", keyId);
         println("generated PKCS#11 key");
-        println("\tkey id: " + Hex.toHexString(keyId.getKeyId()));
-        println("\tkey label: " + keyId.getKeyLabel());
+        println("\tkey id: " + Hex.toHexString(keyId.getId()));
+        println("\tkey label: " + keyId.getLabel());
     }
 
 }

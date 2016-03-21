@@ -50,8 +50,10 @@ public interface P11CryptServiceFactory {
     void init(
             @Nonnull P11Control p11Control);
 
-    P11CryptService createP11CryptService(
+    P11CryptService getP11CryptService(
             @Nonnull String moduleName)
     throws P11TokenException, SecurityException;
+
+    void shutdown();
 
 }
