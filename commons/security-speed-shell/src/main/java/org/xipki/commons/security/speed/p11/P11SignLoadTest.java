@@ -104,7 +104,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
 
         P11SlotIdentifier slotId = slot.getSlotId();
         String signerConf = SignerConfUtil.getPkcs11SignerConf(slot.getModuleName(),
-                slotId.getIndex(), slotId.getId(),  keyId.getLabel(), keyId.getId(),
+                slotId.getIndex(), slotId.getId(), keyId.getLabel(), keyId.getId(),
                 signatureAlgorithm, 20);
         this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate) null);
 

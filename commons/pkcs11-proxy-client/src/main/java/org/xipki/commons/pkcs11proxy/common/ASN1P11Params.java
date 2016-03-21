@@ -85,7 +85,7 @@ public class ASN1P11Params extends ASN1Object {
         if (p11Params instanceof P11RSAPkcsPssParams) {
             tagNo = 0;
         } else {
-            throw new RuntimeException("invalid P11Param type "
+            throw new RuntimeException("invalid ASN1P11Param type "
                     + p11Params.getClass().getName());
         }
 
