@@ -126,7 +126,7 @@ class P11DSAContentSigner implements ContentSigner {
                     new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
             Digest digest = SignerUtil.getDigest(digAlgId);
             this.outputStream = new DigestOutputStream(digest);
-        } else if (cryptService.supportsMechanism(slotId, this.mechanism)) {
+        } else if (cryptService.supportsMechanism(slotId, tmpMechanism)) {
             this.outputStream = new ByteArrayOutputStream();
         } else {
             throw new SecurityException("unsupported signature algorithm " + algOid);
