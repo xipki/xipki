@@ -34,51 +34,40 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.pkcs11proxy.client;
+package org.xipki.commons.pkcs11proxy.common;
 
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.p11.P11Control;
-import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
-import org.xipki.commons.security.api.p11.P11ModuleConf;
-import org.xipki.commons.security.api.p11.P11TokenException;
+import org.bouncycastle.asn1.x509.GeneralName;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
+public class P11ProxyConstants {
 
-    private P11Control p11Control;
+    public static final GeneralName REMOTE_P11_CMP_SERVER =
+            new GeneralName(GeneralName.uniformResourceIdentifier,
+                    "http://xipki.org/remotep11/server");
 
-    @Override
-    public void init(
-            final P11Control p11Control) {
-        this.p11Control = ParamUtil.requireNonNull("p11Control", p11Control);
-    }
+    public static final GeneralName REMOTE_P11_CMP_CLIENT =
+            new GeneralName(GeneralName.uniformResourceIdentifier,
+                    "http://xipki.org/remotep11/client");
 
-    @Override
-    public P11CryptService getP11CryptService(
-            final String moduleName)
-    throws P11TokenException, SecurityException {
-        if (p11Control == null) {
-            throw new IllegalStateException("please call init() first");
-        }
+    public static final int ACTION_getVersion = 80;
 
-        ParamUtil.requireNonBlank("moduleName", moduleName);
-        P11ModuleConf conf = p11Control.getModuleConf(moduleName);
-        if (conf == null) {
-            throw new SecurityException("PKCS#11 module " + moduleName + " is not defined");
-        }
+    public static final int ACTION_getPublicKey = 81;
 
-        final P11Communicator communicator = new P11Communicator(conf.getNativeLibrary());
-        return new RemoteP11CryptService(conf, communicator);
-    }
+    public static final int ACTION_getCertificates = 82;
 
-    @Override
-    public void shutdown() {
+    public static final int ACTION_getSlotIds = 83;
+
+    public static final int ACTION_getKeyIds = 84;
+
+    public static final int ACTION_getMechanisms = 85;
+
+    public static final int ACTION_sign = 90;
+
+    private P11ProxyConstants() {
     }
 
 }

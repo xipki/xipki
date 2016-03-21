@@ -88,7 +88,8 @@ public class ASN1Mechanism extends ASN1Object {
                 this.params = ASN1P11Params.getInstance(seq.getObjectAt(1));
             }
         } catch (IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException(ex.getMessage(), ex);
+            throw new BadAsn1ObjectException("invalid object ASN1Mechanism: " + ex.getMessage(),
+                    ex);
         }
     } // constructor
 
@@ -126,10 +127,10 @@ public class ASN1Mechanism extends ASN1Object {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded Mechanism");
+            throw new BadAsn1ObjectException("unable to parse encoded ASN1Mechanism");
         }
 
-        throw new BadAsn1ObjectException("unknown object in Mechanism.getInstance(): "
+        throw new BadAsn1ObjectException("unknown object in ASN1Mechanism.getInstance(): "
                 + obj.getClass().getName());
     }
 

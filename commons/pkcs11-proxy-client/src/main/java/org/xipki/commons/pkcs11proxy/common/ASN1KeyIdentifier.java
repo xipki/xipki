@@ -38,11 +38,12 @@ package org.xipki.commons.pkcs11proxy.common;
 
 import java.io.IOException;
 
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
-import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
@@ -51,9 +52,9 @@ import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 /**
  *
  * <pre>
- * SlotIdentifier ::= CHOICE {
- *     keyLabel     UTF8STRING,
- *     keyId        OCTET STRING
+ * SlotIdentifier ::= SEQUENCE {
+ *     id        OCTET STRING,
+ *     label     UTF8STRING
  *     }
  * </pre>
  *
@@ -71,13 +72,27 @@ public class ASN1KeyIdentifier extends ASN1Object {
         this.keyId = ParamUtil.requireNonNull("keyId", keyId);
     }
 
+    private ASN1KeyIdentifier(
+            final ASN1Sequence seq)
+    throws BadAsn1ObjectException {
+        int size = seq.size();
+        try {
+            ParamUtil.requireRange("seq.size()", size, 2, 2);
+            byte[] id = DEROctetString.getInstance(seq.getObjectAt(0)).getOctets();
+            String label = DERUTF8String.getInstance(seq.getObjectAt(1)).getString();
+            this.keyId = new P11KeyIdentifier(id, label);
+        } catch (IllegalArgumentException ex) {
+            throw new BadAsn1ObjectException(
+                    "invalid object ASN1KeyIdentifier: " + ex.getMessage(), ex);
+        }
+    }
+
     @Override
     public ASN1Primitive toASN1Primitive() {
-        if (keyId.getKeyLabel() != null) {
-            return new DERUTF8String(keyId.getKeyLabel());
-        } else {
-            return new DEROctetString(keyId.getKeyId());
-        }
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        vec.add(new DEROctetString(keyId.getId()));
+        vec.add(new DERUTF8String(keyId.getLabel()));
+        return new DERSequence(vec);
     }
 
     public P11KeyIdentifier getKeyId() {
@@ -92,24 +107,18 @@ public class ASN1KeyIdentifier extends ASN1Object {
         }
 
         try {
-            if (obj instanceof ASN1OctetString) {
-                byte[] keyIdBytes = ((ASN1OctetString) obj).getOctets();
-                P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyIdBytes);
-                return new ASN1KeyIdentifier(keyIdentifier);
-            } else if (obj instanceof ASN1String) {
-                String keyLabel = ((ASN1String) obj).getString();
-                P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyLabel);
-                return new ASN1KeyIdentifier(keyIdentifier);
+            if (obj instanceof ASN1Sequence) {
+                return new ASN1KeyIdentifier((ASN1Sequence) obj);
             }
 
             if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
-        } catch (IllegalArgumentException | IOException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded KeyIdentifier");
+        } catch (IOException | IllegalArgumentException ex) {
+            throw new BadAsn1ObjectException("unable to parse encoded ASN1KeyIdentifier");
         }
 
-        throw new BadAsn1ObjectException("unknown object in KeyIdentifier.getInstance(): "
+        throw new BadAsn1ObjectException("unknown object in ASN1KeyIdentifier.getInstance(): "
                 + obj.getClass().getName());
     }
 

@@ -149,15 +149,15 @@ public class P11ModuleConf {
     }
 
     public boolean isSlotIncluded(
-            final P11SlotIdentifier slot) {
-        ParamUtil.requireNonNull("slit", slot);
+            final P11SlotIdentifier slotId) {
+        ParamUtil.requireNonNull("slotId", slotId);
         boolean included;
         if (CollectionUtil.isEmpty(includeSlots)) {
             included = true;
         } else {
             included = false;
             for (P11SlotIdentifier entry : includeSlots) {
-                if (entry.equals(slot)) {
+                if (entry.equals(slotId)) {
                     included = true;
                     break;
                 }
@@ -173,7 +173,7 @@ public class P11ModuleConf {
         }
 
         for (P11SlotIdentifier entry : excludeSlots) {
-            if (entry.equals(slot)) {
+            if (entry.equals(slotId)) {
                 return false;
             }
         }
