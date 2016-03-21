@@ -930,11 +930,6 @@ class IaikP11Slot extends AbstractP11Slot {
         }
     } // method listCertificateObjects
 
-    @Override
-    public String getModuleName() {
-        return moduleName;
-    }
-
     private static boolean checkSessionLoggedIn(
             final Session session)
     throws P11TokenException {

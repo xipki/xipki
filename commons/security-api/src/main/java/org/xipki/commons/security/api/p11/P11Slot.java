@@ -76,11 +76,11 @@ public interface P11Slot {
     throws P11TokenException;
 
     P11KeyIdentifier getKeyIdForId(
-            byte[] keyId)
+            byte[] id)
     throws P11UnknownEntityException;
 
     P11KeyIdentifier getKeyIdForLabel(
-            String keyLabel)
+            String label)
     throws P11UnknownEntityException;
 
 }

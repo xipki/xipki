@@ -56,11 +56,11 @@ public interface P11Module {
     throws P11TokenException;
 
     P11SlotIdentifier getSlotIdForIndex(
-            int slotIndex)
+            int index)
     throws P11UnknownEntityException;
 
     P11SlotIdentifier getSlotIdForId(
-            long slotId)
+            long id)
     throws P11UnknownEntityException;
 
 }

@@ -194,7 +194,7 @@ class KeystoreP11CryptService implements P11CryptService {
         return moduleConf.toString();
     }
 
-    public static KeystoreP11CryptService getInstance(
+    static KeystoreP11CryptService getInstance(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
