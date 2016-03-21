@@ -37,11 +37,11 @@
 package org.xipki.commons.security.api.p11;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -51,58 +51,43 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
 
-    private final byte[] keyId;
+    private final byte[] id;
 
-    private final String keyIdHex;
+    private final String idHex;
 
-    private final String keyLabel;
+    private final String label;
 
     public P11KeyIdentifier(
-            @Nonnull final byte[] keyId,
-            @Nonnull final String keyLabel) {
-        this.keyId = ParamUtil.requireNonNull("keyId", keyId);
-        this.keyLabel = ParamUtil.requireNonBlank("keyLabel", keyLabel);
-        this.keyIdHex = Hex.toHexString(keyId).toUpperCase();
+            @Nonnull final byte[] id,
+            @Nonnull final String label) {
+        this.id = ParamUtil.requireNonNull("id", id);
+        this.label = ParamUtil.requireNonBlank("label", label);
+        this.idHex = Hex.toHexString(id).toUpperCase();
     }
 
-    public byte[] getKeyId() {
-        return keyId;
+    public byte[] getId() {
+        return id;
     }
 
-    public String getKeyIdHex() {
-        return keyIdHex;
+    public String getIdHex() {
+        return idHex;
     }
 
-    public String getKeyLabel() {
-        return keyLabel;
+    public String getLabel() {
+        return label;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        if (keyIdHex != null) {
-            sb.append("key-id: ").append(keyIdHex);
-            if (keyLabel != null) {
-                sb.append(", ");
-            }
-        }
-        if (keyLabel != null) {
-            sb.append("key-label: ").append(keyLabel);
-        }
+        StringBuilder sb = new StringBuilder(50);
+        sb.append("key (id = ").append(idHex).append(", label = ").append(label).append(")");
         return sb.toString();
     }
 
     @Override
     public int hashCode() {
-        int hashCode = 0;
-        if (keyId != null) {
-            hashCode = new BigInteger(1, keyId).hashCode();
-        }
-
-        if (keyLabel != null) {
-            hashCode += 31 * keyLabel.hashCode();
-        }
-
+        int hashCode = new BigInteger(1, id).hashCode();
+        hashCode += 31 * label.hashCode();
         return hashCode;
     }
 
@@ -118,11 +103,7 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
         }
 
         P11KeyIdentifier another = (P11KeyIdentifier) obj;
-        if (!CompareUtil.equalsObject(this.keyId, another.keyId)) {
-            return false;
-        }
-
-        return this.keyLabel.equals(another.keyLabel);
+        return Arrays.equals(id, another.id) && label.equals(another.label);
     }
 
     @Override
@@ -133,15 +114,7 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
             return 0;
         }
 
-        if (keyLabel == null) {
-            return (obj.keyLabel == null)
-                    ? 0
-                    : 1;
-        } else {
-            return (obj.keyLabel == null)
-                    ? -1
-                    : keyLabel.compareTo(obj.keyLabel);
-        }
+        return label.compareTo(obj.label);
     }
 
 }

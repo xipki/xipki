@@ -45,23 +45,23 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
 
-    private final int slotIndex;
+    private final int index;
 
-    private final long slotId;
+    private final long id;
 
     public P11SlotIdentifier(
-            final int slotIndex,
-            final long slotId) {
-        this.slotIndex = ParamUtil.requireMin("slotIndex", slotIndex, 0);
-        this.slotId = ParamUtil.requireMin("slotId", slotId, 0);
+            final int index,
+            final long id) {
+        this.index = ParamUtil.requireMin("index", index, 0);
+        this.id = ParamUtil.requireMin("id", id, 0);
     }
 
-    public int getSlotIndex() {
-        return slotIndex;
+    public int getIndex() {
+        return index;
     }
 
-    public long getSlotId() {
-        return slotId;
+    public long getId() {
+        return id;
     }
 
     @Override
@@ -76,21 +76,20 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
         }
 
         P11SlotIdentifier another = (P11SlotIdentifier) obj;
-        return this.slotId == another.slotId && this.slotIndex == another.slotIndex;
+        return this.id == another.id && this.index == another.index;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("slot-index: ").append(slotIndex);
-        sb.append("slot-id: ").append(slotId);
+        StringBuilder sb = new StringBuilder(30);
+        sb.append("slot (index = ").append(index).append(", id = ").append(id).append(")");
         return sb.toString();
     }
 
     @Override
     public int hashCode() {
-        int hashCode = Long.hashCode(slotId);
-        hashCode += 31 * slotIndex;
+        int hashCode = Long.hashCode(id);
+        hashCode += 31 * index;
         return hashCode;
     }
 
@@ -102,7 +101,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
             return 0;
         }
 
-        int sign = slotIndex - obj.slotIndex;
+        int sign = index - obj.index;
         if (sign > 0) {
             return 1;
         } else if (sign < 0) {

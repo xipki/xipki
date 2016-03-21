@@ -92,7 +92,7 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
             final String keyLabel) {
         ParamUtil.requireNonNull("keyLabel", keyLabel);
         return this.slotId.equals(slotId)
-                && keyLabel.equals(this.keyId.getKeyLabel());
+                && keyLabel.equals(this.keyId.getLabel());
     }
 
     @Override
