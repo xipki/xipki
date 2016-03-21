@@ -52,7 +52,7 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  * @since 2.0.0
  */
 
-public class KeystoreP11ModulePool {
+class KeystoreP11ModulePool {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11ModulePool.class);
 
@@ -82,13 +82,13 @@ public class KeystoreP11ModulePool {
         }
     }
 
-    public KeystoreP11Module getModule(
+    KeystoreP11Module getModule(
             final String moduleName)
     throws SecurityException {
         return modules.get(moduleName);
     }
 
-    public synchronized KeystoreP11Module getModule(
+    synchronized KeystoreP11Module getModule(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
@@ -101,7 +101,7 @@ public class KeystoreP11ModulePool {
         return extModule;
     }
 
-    public synchronized void shutdown() {
+    synchronized void shutdown() {
         for (String pk11Lib : modules.keySet()) {
             try {
                 modules.get(pk11Lib).close();
@@ -113,7 +113,7 @@ public class KeystoreP11ModulePool {
         modules.clear();
     }
 
-    public static KeystoreP11ModulePool getInstance() {
+    static KeystoreP11ModulePool getInstance() {
         return INSTANCE;
     }
 

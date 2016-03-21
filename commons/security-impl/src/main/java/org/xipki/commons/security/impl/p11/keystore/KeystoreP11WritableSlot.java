@@ -110,7 +110,7 @@ class KeystoreP11WritableSlot extends KeystoreP11Slot implements P11WritableSlot
     private boolean privKeyLabelExists(String label)
     throws P11TokenException {
         for (P11KeyIdentifier id : getKeyIdentifiers()) {
-            if (id.getKeyLabel().equals(label)) {
+            if (id.getLabel().equals(label)) {
                 return true;
             }
         }
@@ -160,7 +160,7 @@ class KeystoreP11WritableSlot extends KeystoreP11Slot implements P11WritableSlot
         X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
 
         P11KeyIdentifier certKeyId = identity.getEntityId().getKeyId();
-        savePkcs11Cert(certKeyId.getKeyId(), certKeyId.getKeyLabel(), newCert);
+        savePkcs11Cert(certKeyId.getId(), certKeyId.getLabel(), newCert);
         if (certChain.length < 2) {
             return;
         }
@@ -319,14 +319,9 @@ class KeystoreP11WritableSlot extends KeystoreP11Slot implements P11WritableSlot
             final X509Certificate cert,
             final P11KeyIdentifier keyId)
     throws SecurityException {
-        ConfPairs pairs = new ConfPairs("slot", Integer.toString(slotId.getSlotIndex()));
-        if (keyId.getKeyId() != null) {
-            pairs.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
-        }
-        if (keyId.getKeyLabel() != null) {
-            pairs.putPair("key-label", keyId.getKeyLabel());
-        }
-
+        ConfPairs pairs = new ConfPairs("slot", Integer.toString(slotId.getIndex()));
+        pairs.putPair("key-id", Hex.toHexString(keyId.getId()));
+        pairs.putPair("key-label", keyId.getLabel());
         securityFactory.createSigner("PKCS11", pairs.getEncoded(), "SHA1", null, cert);
     }
 
@@ -354,9 +349,9 @@ class KeystoreP11WritableSlot extends KeystoreP11Slot implements P11WritableSlot
             sb.append("\t")
                 .append(idx++)
                 .append(". ")
-                .append(p11KeyId.getKeyLabel())
+                .append(p11KeyId.getLabel())
                 .append(" (").append("id: ")
-                .append(Hex.toHexString(p11KeyId.getKeyId()).toLowerCase())
+                .append(Hex.toHexString(p11KeyId.getId()).toLowerCase())
                 .append(")\n");
 
             sb.append("\t\tAlgorithm: ")
@@ -432,8 +427,8 @@ class KeystoreP11WritableSlot extends KeystoreP11Slot implements P11WritableSlot
             final File dir,
             final P11KeyIdentifier keyId)
     throws P11TokenException {
-        byte[] id = keyId.getKeyId();
-        String label = keyId.getKeyLabel();
+        byte[] id = keyId.getId();
+        String label = keyId.getLabel();
         if (id != null) {
             String hextId = Hex.toHexString(id);
             File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);

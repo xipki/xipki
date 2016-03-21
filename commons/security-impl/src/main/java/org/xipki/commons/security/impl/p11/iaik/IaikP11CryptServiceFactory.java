@@ -60,7 +60,7 @@ public class IaikP11CryptServiceFactory implements P11CryptServiceFactory {
     }
 
     @Override
-    public P11CryptService createP11CryptService(
+    public P11CryptService getP11CryptService(
             final String moduleName)
     throws SecurityException, P11TokenException {
         if (p11Control == null) {
@@ -74,6 +74,11 @@ public class IaikP11CryptServiceFactory implements P11CryptServiceFactory {
         }
 
         return IaikP11CryptService.getInstance(conf);
+    }
+
+    @Override
+    public void shutdown() {
+        IaikP11ModulePool.getInstance().shutdown();
     }
 
 }

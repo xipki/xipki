@@ -132,9 +132,7 @@ import org.xipki.commons.security.impl.p11.P11ContentSignerBuilder;
 import org.xipki.commons.security.impl.p11.P11MechanismFilterImpl;
 import org.xipki.commons.security.impl.p11.P11PasswordRetrieverImpl;
 import org.xipki.commons.security.impl.p11.iaik.IaikP11CryptServiceFactory;
-import org.xipki.commons.security.impl.p11.iaik.IaikP11ModulePool;
 import org.xipki.commons.security.impl.p11.keystore.KeystoreP11CryptServiceFactory;
-import org.xipki.commons.security.impl.p11.keystore.KeystoreP11ModulePool;
 import org.xipki.commons.security.impl.p12.SoftTokenContentSignerBuilder;
 import org.xipki.commons.security.p11.conf.jaxb.MechanismsType;
 import org.xipki.commons.security.p11.conf.jaxb.ModuleType;
@@ -529,7 +527,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final String moduleName)
     throws SecurityException, P11TokenException {
         initP11CryptServiceFactory();
-        return p11CryptServiceFactory.createP11CryptService(getRealPkcs11ModuleName(moduleName));
+        return p11CryptServiceFactory.getP11CryptService(getRealPkcs11ModuleName(moduleName));
     }
 
     @Override
@@ -947,16 +945,14 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     } // method extractMinimalKeyStore
 
     public void shutdown() {
-        try {
-            KeystoreP11ModulePool.getInstance().shutdown();
-        } catch (Throwable th) {
-            LOG.error("could not shutdown KeyStoreP11ModulePool: " + th.getMessage(), th);
+        if (p11CryptServiceFactory == null) {
+            return;
         }
 
         try {
-            IaikP11ModulePool.getInstance().shutdown();
+            p11CryptServiceFactory.shutdown();
         } catch (Throwable th) {
-            LOG.error("could not shutdown IaikP11ModulePool: " + th.getMessage(), th);
+            LOG.error("could not shutdown KeyStoreP11ModulePool: " + th.getMessage(), th);
         }
     }
 

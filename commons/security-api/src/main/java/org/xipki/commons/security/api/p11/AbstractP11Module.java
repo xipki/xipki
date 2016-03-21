@@ -53,7 +53,7 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public abstract class AbstractP11Module implements P11Module {
 
-    private P11ModuleConf moduleConf;
+    protected final P11ModuleConf moduleConf;
 
     private final Map<P11SlotIdentifier, P11Slot> slots = new HashMap<>();
 
@@ -95,7 +95,7 @@ public abstract class AbstractP11Module implements P11Module {
             final long slotId) {
         P11SlotIdentifier p11SlotId = null;
         for (P11SlotIdentifier si : slots.keySet()) {
-            if (CompareUtil.equalsObject(si.getSlotId(), slotId)) {
+            if (CompareUtil.equalsObject(si.getId(), slotId)) {
                 p11SlotId = si;
                 break;
             }
@@ -112,26 +112,26 @@ public abstract class AbstractP11Module implements P11Module {
 
     @Override
     public P11SlotIdentifier getSlotIdForIndex(
-            final int slotIndex)
+            final int index)
     throws P11UnknownEntityException {
         for (P11SlotIdentifier id : slotIds) {
-            if (id.getSlotIndex() == slotIndex) {
+            if (id.getIndex() == index) {
                 return id;
             }
         }
-        throw new P11UnknownEntityException("could not find slot with index " + slotIndex);
+        throw new P11UnknownEntityException("could not find slot with index " + index);
     }
 
     @Override
     public P11SlotIdentifier getSlotIdForId(
-            final long slotId)
+            final long id)
     throws P11UnknownEntityException {
-        for (P11SlotIdentifier id : slotIds) {
-            if (id.getSlotId() == slotId) {
-                return id;
+        for (P11SlotIdentifier slotId : slotIds) {
+            if (slotId.getId() == id) {
+                return slotId;
             }
         }
-        throw new P11UnknownEntityException("could not find slot with id " + slotId);
+        throw new P11UnknownEntityException("could not find slot with id " + id);
     }
 
 }

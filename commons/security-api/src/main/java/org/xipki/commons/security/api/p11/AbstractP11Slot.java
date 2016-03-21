@@ -246,27 +246,27 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     public P11KeyIdentifier getKeyIdForId(
-            final byte[] keyId)
+            final byte[] id)
     throws P11UnknownEntityException {
-        for (P11KeyIdentifier id : keyIdentifiers) {
-            if (Arrays.equals(keyId, id.getKeyId())) {
-                return id;
+        for (P11KeyIdentifier keyId : keyIdentifiers) {
+            if (Arrays.equals(id, keyId.getId())) {
+                return keyId;
             }
         }
         throw new P11UnknownEntityException("unknown PKCS#11 key with id "
-                + Hex.toHexString(keyId));
+                + Hex.toHexString(id));
     }
 
     @Override
     public P11KeyIdentifier getKeyIdForLabel(
-            final String keyLabel)
+            final String label)
     throws P11UnknownEntityException {
-        for (P11KeyIdentifier id : keyIdentifiers) {
-            if (id.getKeyLabel().equals(keyLabel)) {
-                return id;
+        for (P11KeyIdentifier keyId : keyIdentifiers) {
+            if (keyId.getLabel().equals(label)) {
+                return keyId;
             }
         }
-        throw new P11UnknownEntityException("unknown PKCS#11 key with label " + keyLabel);
+        throw new P11UnknownEntityException("unknown PKCS#11 key with label " + label);
     }
 
 }

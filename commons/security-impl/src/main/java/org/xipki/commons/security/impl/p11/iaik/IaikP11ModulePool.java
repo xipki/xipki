@@ -57,7 +57,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
  * @since 2.0.0
  */
 
-public class IaikP11ModulePool {
+class IaikP11ModulePool {
 
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11ModulePool.class);
 
@@ -65,7 +65,7 @@ public class IaikP11ModulePool {
 
     private final Map<String, IaikP11Module> modules = new HashMap<>();
 
-    public synchronized void removeModule(
+    synchronized void removeModule(
             final String moduleName) {
         ParamUtil.requireNonNull("moduleName", moduleName);
         IaikP11Module module = modules.remove(moduleName);
@@ -87,13 +87,13 @@ public class IaikP11ModulePool {
         }
     }
 
-    public IaikP11Module getModule(
+    IaikP11Module getModule(
             final String moduleName) {
         ParamUtil.requireNonNull("moduleName", moduleName);
         return modules.get(moduleName);
     }
 
-    public synchronized IaikP11Module getModule(
+    synchronized IaikP11Module getModule(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
@@ -155,7 +155,7 @@ public class IaikP11ModulePool {
         return extModule;
     } // nmethod getModule
 
-    public synchronized void shutdown() {
+    synchronized void shutdown() {
         for (String pk11Lib : modules.keySet()) {
             try {
                 modules.get(pk11Lib).close();
@@ -167,7 +167,7 @@ public class IaikP11ModulePool {
         modules.clear();
     }
 
-    public static IaikP11ModulePool getInstance() {
+    static IaikP11ModulePool getInstance() {
         return INSTANCE;
     }
 

@@ -192,8 +192,8 @@ class IaikP11WritableSlot extends IaikP11Slot implements P11WritableSlot {
                 template.getDecrypt().setBooleanValue(forDecrypting);
             }
 
-            template.getId().setByteArrayValue(keyIdentifier.getKeyId());
-            template.getLabel().setCharArrayValue(keyIdentifier.getKeyLabel().toCharArray());
+            template.getId().setByteArrayValue(keyIdentifier.getId());
+            template.getLabel().setCharArrayValue(keyIdentifier.getLabel().toCharArray());
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
             if (CollectionUtil.isEmpty(tmpObjects)) {
@@ -413,13 +413,13 @@ class IaikP11WritableSlot extends IaikP11Slot implements P11WritableSlot {
     throws SecurityException, P11TokenException {
         ParamUtil.requireNonNull("keyIdentifier", keyIdentifier);
 
-        String keyLabel = keyIdentifier.getKeyLabel();
+        String keyLabel = keyIdentifier.getLabel();
         char[] keyLabelChars = (keyLabel == null)
                 ? null
                 : keyLabel.toCharArray();
 
         X509PublicKeyCertificate[] existingCerts = getCertificateObjects(
-                keyIdentifier.getKeyId(), keyLabelChars);
+                keyIdentifier.getId(), keyLabelChars);
 
         if (existingCerts == null || existingCerts.length == 0) {
             throw new SecurityException("could not find certificates with id " + keyIdentifier);
@@ -444,13 +444,7 @@ class IaikP11WritableSlot extends IaikP11Slot implements P11WritableSlot {
     throws SecurityException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         ConfPairs pairs = new ConfPairs("slot-id", Long.toString(slot.getSlotID()));
-        if (keyId.getKeyId() != null) {
-            pairs.putPair("key-id", Hex.toHexString(keyId.getKeyId()));
-        }
-        if (keyId.getKeyLabel() != null) {
-            pairs.putPair("key-label", keyId.getKeyLabel());
-        }
-
+        pairs.putPair("key-id", Hex.toHexString(keyId.getId()));
         securityFactory.createSigner("PKCS11", pairs.getEncoded(), "SHA1", null, cert);
     }
 
@@ -716,7 +710,7 @@ class IaikP11WritableSlot extends IaikP11Slot implements P11WritableSlot {
             // CHECKSTYLE:SKIP
         }
 
-        X509PublicKeyCertificate cert = getCertificateObject(keyId.getKeyId(), null);
+        X509PublicKeyCertificate cert = getCertificateObject(keyId.getId(), null);
         if (cert == null) {
             throw new P11UnknownEntityException(slotId, keyId);
         }
