@@ -14,7 +14,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>security-api</artifactId>
+      <artifactId>pkcs11-proxy-common</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

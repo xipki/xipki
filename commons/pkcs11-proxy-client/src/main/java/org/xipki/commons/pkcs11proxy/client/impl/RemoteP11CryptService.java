@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.pkcs11proxy.client;
+package org.xipki.commons.pkcs11proxy.client.impl;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -59,15 +59,15 @@ import org.xipki.commons.security.api.p11.parameters.P11Params;
  * @since 2.0.0
  */
 
-class RemoteP11CryptService implements P11CryptService {
+public class RemoteP11CryptService implements P11CryptService {
 
     private RemoteP11Module module;
 
-    RemoteP11CryptService(
-            final P11ModuleConf moduleConf,
-            final P11Communicator communicator)
+    public RemoteP11CryptService(
+            final P11ModuleConf moduleConf)
     throws P11TokenException {
-        this.module = new RemoteP11Module(moduleConf, communicator);
+        this.module = new RemoteP11Module(moduleConf,
+                new P11Communicator(moduleConf.getNativeLibrary()));
     }
 
     public int getServerVersion()

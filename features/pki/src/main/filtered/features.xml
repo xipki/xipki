@@ -43,6 +43,7 @@
     <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/pkcs11-wrapper/${pkcs11-wrapper.version}/$Bundle-SymbolicName=pkcs11-wrapper&Bundle-Version=${pkcs11-wrapper.version}]]></bundle>
     <bundle>mvn:org.xipki.commons/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/pkcs11-proxy-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/pkcs11-proxy-client/${project.version}</bundle>
   </feature>
   <feature name="xipki-security" version="${project.version}">

@@ -37,6 +37,7 @@
 package org.xipki.commons.pkcs11proxy.client;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.pkcs11proxy.client.impl.RemoteP11CryptService;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Control;
 import org.xipki.commons.security.api.p11.P11CryptService;
@@ -73,8 +74,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
             throw new SecurityException("PKCS#11 module " + moduleName + " is not defined");
         }
 
-        final P11Communicator communicator = new P11Communicator(conf.getNativeLibrary());
-        return new RemoteP11CryptService(conf, communicator);
+        return new RemoteP11CryptService(conf);
     }
 
     @Override
