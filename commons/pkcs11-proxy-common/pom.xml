@@ -8,19 +8,14 @@
     <groupId>org.xipki.commons</groupId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>pkcs11-proxy-server</artifactId>
+  <artifactId>pkcs11-proxy-common</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>pkcs11-proxy-common</artifactId>
+      <artifactId>security-api</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>
