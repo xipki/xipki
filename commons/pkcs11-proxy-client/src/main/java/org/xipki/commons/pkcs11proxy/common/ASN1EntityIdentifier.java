@@ -86,13 +86,10 @@ public class ASN1EntityIdentifier extends ASN1Object {
     private ASN1EntityIdentifier(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
-        final int n = seq.size();
-        if (n != 2) {
-            StringBuilder sb = new StringBuilder(100);
-            sb.append("wrong number of elements in sequence 'SlotAndKeyIdentifier'");
-            sb.append(", is '").append(n).append("'");
-            sb.append(", but expected '").append(2).append("'");
-            throw new BadAsn1ObjectException(sb.toString());
+        final int size = seq.size();
+        if (size != 2) {
+            throw new BadAsn1ObjectException("invalid object ASN1EntityIdentifier: seq.size() "
+                    + " expected 2, but is " + size);
         }
 
         ASN1SlotIdentifier slotId = ASN1SlotIdentifier.getInstance(seq.getObjectAt(0));
@@ -151,11 +148,10 @@ public class ASN1EntityIdentifier extends ASN1Object {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded SlotAndKeyIdentifier");
+            throw new BadAsn1ObjectException("unable to parse encoded ASN1EntityIdentifier");
         }
 
-        throw new BadAsn1ObjectException(
-                "unknown object in SlotAndKeyIdentifier.getInstance(): "
+        throw new BadAsn1ObjectException("unknown object in ASN1EntityIdentifier.getInstance(): "
                 + obj.getClass().getName());
     }
 
