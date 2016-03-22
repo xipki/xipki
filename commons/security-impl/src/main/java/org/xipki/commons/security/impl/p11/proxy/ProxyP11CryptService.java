@@ -40,10 +40,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DERNull;
-import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -59,37 +55,20 @@ import org.xipki.commons.security.api.p11.parameters.P11Params;
  * @since 2.0.0
  */
 
-public class ProxyP11CryptService implements P11CryptService {
+class ProxyP11CryptService implements P11CryptService {
 
     private ProxyP11Module module;
 
-    public ProxyP11CryptService(
+    ProxyP11CryptService(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         this.module = new ProxyP11Module(moduleConf);
     }
 
-    public int getServerVersion()
-    throws P11TokenException {
-        ASN1Encodable result = module.send(P11ProxyConstants.ACTION_getVersion,
-                DERNull.INSTANCE);
-
-        ASN1Integer derInt;
-        try {
-            derInt = ASN1Integer.getInstance(result);
-        } catch (IllegalArgumentException ex) {
-            throw new P11TokenException("the returned result is not INTEGER");
-        }
-
-        return (derInt == null)
-                ? 0
-                : derInt.getPositiveValue().intValue();
-    }
-
     @Override
     public void refresh()
     throws P11TokenException {
-        // FIXME
+        module.refresh();
     }
 
     @Override

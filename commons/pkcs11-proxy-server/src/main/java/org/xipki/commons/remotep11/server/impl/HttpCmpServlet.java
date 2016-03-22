@@ -79,6 +79,23 @@ public class HttpCmpServlet extends HttpServlet {
     }
 
     @Override
+    public void doGet(
+            final HttpServletRequest request,
+            final HttpServletResponse response)
+    throws ServletException, IOException {
+        String operation = request.getParameter("operation");
+        if (!"GetCaps".equalsIgnoreCase(operation)) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } else {
+            String respText = responder.getServerCaps().getCaps();
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getOutputStream().write(respText.getBytes());
+            response.getOutputStream().flush();
+        }
+        response.flushBuffer();
+    }
+
+    @Override
     public void doPost(
             final HttpServletRequest request,
             final HttpServletResponse response)

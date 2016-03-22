@@ -59,6 +59,11 @@ public class P11UnsupportedMechanismException extends P11TokenException {
             + entityId);
     }
 
+    public P11UnsupportedMechanismException(
+            final String message) {
+        super(message);
+    }
+
     private static String getMechanismDesc(
             final long mechanism) {
         String name = P11Constants.getMechanismName(mechanism);

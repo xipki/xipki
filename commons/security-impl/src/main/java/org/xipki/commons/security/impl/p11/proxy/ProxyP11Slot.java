@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -92,17 +93,29 @@ public class ProxyP11Slot extends AbstractP11Slot {
     public void refresh()
     throws P11TokenException {
         ASN1SlotIdentifier asn1SlotId = new ASN1SlotIdentifier(slotId);
-        ASN1Encodable resp = getModule().send(P11ProxyConstants.ACTION_getKeyIds, asn1SlotId);
+        ASN1Encodable resp = getModule().send(P11ProxyConstants.ACTION_getMechanisms, asn1SlotId);
+        if (!(resp instanceof ASN1Sequence)) {
+            throw new P11TokenException("response is not ASN1Sequence, but "
+                    + resp.getClass().getName());
+        }
+        ASN1Sequence seq = (ASN1Sequence) resp;
+        int count = seq.size();
+        for ( int i = 0; i < count; i++) {
+            long mech = ASN1Integer.getInstance(seq.getObjectAt(i)).getValue().longValue();
+            addMechanism(mech);
+        }
+
+        resp = getModule().send(P11ProxyConstants.ACTION_getKeyIds, asn1SlotId);
+
         if (!(resp instanceof ASN1Sequence)) {
             throw new P11TokenException("response is not ASN1Sequence, but "
                     + resp.getClass().getName());
         }
 
-        ASN1Sequence seq = (ASN1Sequence) resp;
-        final int n = seq.size();
-
+        seq = (ASN1Sequence) resp;
+        count = seq.size();
         List<P11KeyIdentifier> keyIds = new LinkedList<>();
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < count; i++) {
             ASN1KeyIdentifier asn1KeyId;
             try {
                 asn1KeyId = ASN1KeyIdentifier.getInstance(seq.getObjectAt(i));
@@ -113,8 +126,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
             keyIds.add(keyId);
         }
 
-        final int size = keyIds.size();
-        Set<P11Identity> currentIdentifies = new HashSet<>((int) (size + size / 2));
+        Set<P11Identity> currentIdentifies = new HashSet<>();
         for (P11KeyIdentifier keyId : keyIds) {
             P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, keyId);
             X509Certificate[] certs = getCertificates(entityId);
@@ -127,8 +139,6 @@ public class ProxyP11Slot extends AbstractP11Slot {
             currentIdentifies.add(identity);
         }
         setIdentities(currentIdentifies);
-
-        // FIXME: setMechanisms
     }
 
     @Override
