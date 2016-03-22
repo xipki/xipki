@@ -59,20 +59,19 @@ import org.xipki.commons.security.api.p11.parameters.P11Params;
  * @since 2.0.0
  */
 
-public class RemoteP11CryptService implements P11CryptService {
+public class ProxyP11CryptService implements P11CryptService {
 
-    private RemoteP11Module module;
+    private ProxyP11Module module;
 
-    public RemoteP11CryptService(
+    public ProxyP11CryptService(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
-        this.module = new RemoteP11Module(moduleConf,
-                new P11Communicator(moduleConf.getNativeLibrary()));
+        this.module = new ProxyP11Module(moduleConf);
     }
 
     public int getServerVersion()
     throws P11TokenException {
-        ASN1Encodable result = module.getCommunicator().send(P11ProxyConstants.ACTION_getVersion,
+        ASN1Encodable result = module.send(P11ProxyConstants.ACTION_getVersion,
                 DERNull.INSTANCE);
 
         ASN1Integer derInt;

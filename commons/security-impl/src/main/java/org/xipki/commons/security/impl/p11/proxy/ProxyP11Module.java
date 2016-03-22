@@ -44,7 +44,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -69,8 +71,13 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.pkcs11proxy.common.ASN1SlotIdentifier;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
 import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.p11.AbstractP11Module;
+import org.xipki.commons.security.api.p11.P11ModuleConf;
+import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.CmpFailureUtil;
 
@@ -79,9 +86,9 @@ import org.xipki.commons.security.api.util.CmpFailureUtil;
  * @since 2.0.0
  */
 
-class P11Communicator {
+class ProxyP11Module extends AbstractP11Module {
 
-    private static final Logger LOG = LoggerFactory.getLogger(P11Communicator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProxyP11Module.class);
 
     private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
 
@@ -93,22 +100,59 @@ class P11Communicator {
 
     private final Random random = new Random();
 
-    private final String serverUrl;
-
     private URL objServerUrl;
 
-    P11Communicator(
-            final String serverUrl) {
-        this.serverUrl = ParamUtil.requireNonBlank("serverUrl", serverUrl);
+    ProxyP11Module(
+            final P11ModuleConf moduleConf)
+    throws P11TokenException {
+        super(moduleConf);
         try {
-            objServerUrl = new URL(serverUrl);
+            objServerUrl = new URL(moduleConf.getNativeLibrary());
         } catch (MalformedURLException ex) {
-            throw new IllegalArgumentException("invalid url: " + serverUrl);
+            throw new IllegalArgumentException("invalid url: " + moduleConf.getNativeLibrary());
         }
+
+        ASN1Encodable resp = send(P11ProxyConstants.ACTION_getSlotIds, null);
+        if (!(resp instanceof ASN1Sequence)) {
+            throw new P11TokenException("response is not ASN1Sequence, but "
+                    + resp.getClass().getName());
+        }
+
+        ASN1Sequence seq = (ASN1Sequence) resp;
+        final int n = seq.size();
+
+        Set<P11Slot> slots = new HashSet<>();
+        for (int i = 0; i < n; i++) {
+            ASN1SlotIdentifier asn1SlotId;
+            try {
+                ASN1Encodable obj = seq.getObjectAt(i);
+                asn1SlotId = ASN1SlotIdentifier.getInstance(obj);
+            } catch (Exception ex) {
+                throw new P11TokenException(ex.getMessage(), ex);
+            }
+
+            P11SlotIdentifier slotId = asn1SlotId.getSlotId();
+            if (!moduleConf.isSlotIncluded(slotId)) {
+                continue;
+            }
+
+            P11Slot slot = new ProxyP11Slot(getName(), slotId, moduleConf.getP11MechanismFilter());
+            if (moduleConf.isSlotIncluded(slotId)) {
+                slots.add(slot);
+            }
+        }
+        setSlots(slots);
     }
 
-    String getServerUrl() {
-        return serverUrl;
+    void close() {
+        for (P11SlotIdentifier slotId : getSlotIdentifiers()) {
+            try {
+                getSlot(slotId).close();
+            } catch (Throwable th) {
+                LOG.error("could not close PKCS#11 slot {}: {}", slotId, th.getMessage());
+                LOG.debug("could not close PKCS#11 slot " + slotId, th);
+            }
+        }
     }
 
     byte[] send(
@@ -308,5 +352,4 @@ class P11Communicator {
                     + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "' is incorrect");
         }
     } // method extractItvInfoValue
-
 }

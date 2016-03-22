@@ -51,18 +51,18 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  * @since 2.0.0
  */
 
-class RemoteP11ModulePool {
+class ProxyP11ModulePool {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RemoteP11ModulePool.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProxyP11ModulePool.class);
 
-    private static final RemoteP11ModulePool INSTANCE = new RemoteP11ModulePool();
+    private static final ProxyP11ModulePool INSTANCE = new ProxyP11ModulePool();
 
-    private final Map<String, RemoteP11Module> modules = new HashMap<>();
+    private final Map<String, ProxyP11Module> modules = new HashMap<>();
 
     synchronized void removeModule(
             final String moduleName) {
         ParamUtil.requireNonNull("moduleName", moduleName);
-        RemoteP11Module module = modules.remove(moduleName);
+        ProxyP11Module module = modules.remove(moduleName);
         if (module == null) {
             return;
         }
@@ -81,20 +81,19 @@ class RemoteP11ModulePool {
         }
     }
 
-    public RemoteP11Module getModule(
+    public ProxyP11Module getModule(
             final String moduleName) {
         ParamUtil.requireNonNull("moduleName", moduleName);
         return modules.get(moduleName);
     }
 
-    public synchronized RemoteP11Module getModule(
+    public synchronized ProxyP11Module getModule(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
-        RemoteP11Module module = modules.get(moduleConf.getName());
+        ProxyP11Module module = modules.get(moduleConf.getName());
         if (module == null) {
-            P11Communicator communicator = new P11Communicator(moduleConf.getNativeLibrary());
-            module = new RemoteP11Module(moduleConf, communicator);
+            module = new ProxyP11Module(moduleConf);
             modules.put(moduleConf.getName(), module);
         }
 
@@ -113,7 +112,7 @@ class RemoteP11ModulePool {
         modules.clear();
     }
 
-    public static RemoteP11ModulePool getInstance() {
+    public static ProxyP11ModulePool getInstance() {
         return INSTANCE;
     }
 
