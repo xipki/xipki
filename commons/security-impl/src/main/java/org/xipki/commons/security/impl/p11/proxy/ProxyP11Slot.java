@@ -58,7 +58,6 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.jce.provider.X509CertificateObject;
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.pkcs11proxy.common.ASN1EntityIdentifier;
 import org.xipki.commons.pkcs11proxy.common.ASN1KeyIdentifier;
 import org.xipki.commons.pkcs11proxy.common.ASN1SlotIdentifier;
@@ -78,18 +77,14 @@ import org.xipki.commons.security.api.p11.P11UnknownEntityException;
  * @since 2.0.0
  */
 
-public class RemoteP11Slot extends AbstractP11Slot {
+public class ProxyP11Slot extends AbstractP11Slot {
 
-    private final P11Communicator communicator;
-
-    RemoteP11Slot(
+    ProxyP11Slot(
             final String moduleName,
             final P11SlotIdentifier slotId,
-            final P11MechanismFilter mechanismFilter,
-            final P11Communicator communicator)
+            final P11MechanismFilter mechanismFilter)
     throws P11TokenException {
         super(moduleName, slotId, mechanismFilter);
-        this.communicator = ParamUtil.requireNonNull("communicator", communicator);
         refresh();
     }
 
@@ -97,7 +92,7 @@ public class RemoteP11Slot extends AbstractP11Slot {
     public void refresh()
     throws P11TokenException {
         ASN1SlotIdentifier asn1SlotId = new ASN1SlotIdentifier(slotId);
-        ASN1Encodable resp = communicator.send(P11ProxyConstants.ACTION_getKeyIds, asn1SlotId);
+        ASN1Encodable resp = getModule().send(P11ProxyConstants.ACTION_getKeyIds, asn1SlotId);
         if (!(resp instanceof ASN1Sequence)) {
             throw new P11TokenException("response is not ASN1Sequence, but "
                     + resp.getClass().getName());
@@ -127,8 +122,8 @@ public class RemoteP11Slot extends AbstractP11Slot {
             if (certs == null || certs.length == 0) {
                 pubKey = getPublicKey(entityId);
             }
-            RemoteP11Identity identity = new RemoteP11Identity(
-                    new P11EntityIdentifier(slotId, keyId), certs, pubKey, communicator);
+            ProxyP11Identity identity = new ProxyP11Identity(moduleName,
+                    new P11EntityIdentifier(slotId, keyId), certs, pubKey);
             currentIdentifies.add(identity);
         }
         setIdentities(currentIdentifies);
@@ -143,7 +138,7 @@ public class RemoteP11Slot extends AbstractP11Slot {
     private PublicKey getPublicKey(
             final P11EntityIdentifier entityId)
     throws P11UnknownEntityException, P11TokenException {
-        ASN1Encodable result = communicator.send(P11ProxyConstants.ACTION_getPublicKey,
+        ASN1Encodable result = getModule().send(P11ProxyConstants.ACTION_getPublicKey,
                 new ASN1EntityIdentifier(entityId));
 
         ASN1OctetString octetString;
@@ -162,7 +157,7 @@ public class RemoteP11Slot extends AbstractP11Slot {
     private X509Certificate[] getCertificates(
             final P11EntityIdentifier entityId)
     throws P11TokenException {
-        ASN1Encodable result = communicator.send(P11ProxyConstants.ACTION_getCertificates,
+        ASN1Encodable result = getModule().send(P11ProxyConstants.ACTION_getCertificates,
                 new ASN1EntityIdentifier(entityId));
 
         ASN1Sequence seq = ASN1Sequence.getInstance(result);
@@ -214,4 +209,12 @@ public class RemoteP11Slot extends AbstractP11Slot {
         }
     }
 
+    private ProxyP11Module getModule()
+    throws P11TokenException {
+        ProxyP11Module module = ProxyP11ModulePool.getInstance().getModule(moduleName);
+        if (module == null) {
+            throw new P11TokenException("could not find RemoteP11Module '" + moduleName + "'");
+        }
+        return module;
+    }
 }

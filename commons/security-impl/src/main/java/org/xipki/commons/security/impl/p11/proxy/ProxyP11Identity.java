@@ -60,17 +60,17 @@ import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
  * @since 2.0.0
  */
 
-class RemoteP11Identity extends P11Identity {
+class ProxyP11Identity extends P11Identity {
 
-    private final P11Communicator communicator;
+    private final String moduleName;
 
-    RemoteP11Identity(
+    ProxyP11Identity(
+            final String moduleName,
             final P11EntityIdentifier entityId,
             final X509Certificate[] certificateChain,
-            final PublicKey publicKey,
-            final P11Communicator communicator) {
+            final PublicKey publicKey) {
         super(entityId, certificateChain, publicKey);
-        this.communicator = ParamUtil.requireNonNull("communicator", communicator);
+        this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
     }
 
     @Override
@@ -92,7 +92,11 @@ class RemoteP11Identity extends P11Identity {
         }
         ASN1SignTemplate signTemplate = new ASN1SignTemplate(asn1EntityId, mechanism,
                 new ASN1P11Params(asn1Param), content);
-        ASN1Encodable result = communicator.send(P11ProxyConstants.ACTION_sign, signTemplate);
+        ProxyP11Module module = ProxyP11ModulePool.getInstance().getModule(moduleName);
+        if (module == null) {
+            throw new P11TokenException("could not find RemoteP11Module '" + moduleName + "'");
+        }
+        ASN1Encodable result = module.send(P11ProxyConstants.ACTION_sign, signTemplate);
 
         ASN1OctetString octetString;
         try {
