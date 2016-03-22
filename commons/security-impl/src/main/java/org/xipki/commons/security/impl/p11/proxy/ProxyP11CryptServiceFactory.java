@@ -49,7 +49,7 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  * @since 2.0.0
  */
 
-public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
+public class ProxyP11CryptServiceFactory implements P11CryptServiceFactory {
 
     private P11Control p11Control;
 
@@ -73,7 +73,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory {
             throw new SecurityException("PKCS#11 module " + moduleName + " is not defined");
         }
 
-        return new RemoteP11CryptService(conf);
+        return new ProxyP11CryptService(conf);
     }
 
     @Override

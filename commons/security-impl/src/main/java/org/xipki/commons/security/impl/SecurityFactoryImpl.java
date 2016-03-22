@@ -133,7 +133,7 @@ import org.xipki.commons.security.impl.p11.P11MechanismFilterImpl;
 import org.xipki.commons.security.impl.p11.P11PasswordRetrieverImpl;
 import org.xipki.commons.security.impl.p11.iaik.IaikP11CryptServiceFactory;
 import org.xipki.commons.security.impl.p11.keystore.KeystoreP11CryptServiceFactory;
-import org.xipki.commons.security.impl.p11.proxy.RemoteP11CryptServiceFactory;
+import org.xipki.commons.security.impl.p11.proxy.ProxyP11CryptServiceFactory;
 import org.xipki.commons.security.impl.p12.SoftTokenContentSignerBuilder;
 import org.xipki.commons.security.p11.conf.jaxb.MechanismsType;
 import org.xipki.commons.security.p11.conf.jaxb.ModuleType;
@@ -559,8 +559,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 p11Provider = new IaikP11CryptServiceFactory();
             } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
                 p11Provider = new KeystoreP11CryptServiceFactory();
-            } else if (RemoteP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
-                p11Provider = new RemoteP11CryptServiceFactory();
+            } else if (ProxyP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
+                p11Provider = new ProxyP11CryptServiceFactory();
             } else {
                 try {
                     Class<?> clazz = Class.forName(pkcs11Provider);
