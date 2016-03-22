@@ -38,7 +38,10 @@ package org.xipki.commons.remotep11.server.impl;
 
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -60,25 +63,31 @@ import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.cmp.PKIStatusInfo;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.pkcs11proxy.common.ASN1EntityIdentifier;
 import org.xipki.commons.pkcs11proxy.common.ASN1KeyIdentifier;
 import org.xipki.commons.pkcs11proxy.common.ASN1RSAPkcsPssParams;
 import org.xipki.commons.pkcs11proxy.common.ASN1SignTemplate;
 import org.xipki.commons.pkcs11proxy.common.ASN1SlotIdentifier;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
+import org.xipki.commons.pkcs11proxy.common.ServerCaps;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.p11.P11CryptService;
+import org.xipki.commons.security.api.p11.P11DuplicateEntityException;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.P11UnknownEntityException;
 import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
@@ -89,14 +98,22 @@ import org.xipki.commons.security.api.p11.parameters.P11Params;
  */
 
 class CmpResponder {
-    // FIXME: extract the module name from the requested URL
     private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
 
     private final SecureRandom random = new SecureRandom();
 
     private final GeneralName sender = P11ProxyConstants.REMOTE_P11_CMP_SERVER;
 
+    private final ServerCaps serverCaps;
+
     CmpResponder() {
+        Set<Integer> versions = new HashSet<>(2);
+        versions.add(1);
+        this.serverCaps = new ServerCaps(versions);
+    }
+
+    ServerCaps getServerCaps() {
+        return serverCaps;
     }
 
     PKIMessage processPkiMessage(
@@ -178,11 +195,7 @@ class CmpResponder {
             P11CryptService p11CryptService = p11CryptServicePool.getP11CryptService(moduleName);
             ASN1Encodable respItvInfoValue;
 
-            switch (action) {
-            case P11ProxyConstants.ACTION_getVersion:
-                respItvInfoValue = new ASN1Integer(p11CryptServicePool.getVersion());
-                break;
-            case P11ProxyConstants.ACTION_sign:
+            if (P11ProxyConstants.ACTION_sign == action) {
                 ASN1SignTemplate signTemplate = ASN1SignTemplate.getInstance(reqValue);
                 long mechanism = signTemplate.getMechanism().getMechanism();
                 ASN1Encodable asn1Params = signTemplate.getMechanism().getParams().getP11Params();
@@ -197,12 +210,29 @@ class CmpResponder {
                 byte[] signature = p11CryptService.sign(signTemplate.getEntityId().getEntityId(),
                         mechanism, params, content);
                 respItvInfoValue = new DEROctetString(signature);
-                break;
-            case P11ProxyConstants.ACTION_getMechanisms:
-                // FIXME
-            case P11ProxyConstants.ACTION_getCertificates:
-                // FIXME
-            case P11ProxyConstants.ACTION_getPublicKey:
+            } else if (P11ProxyConstants.ACTION_getMechanisms == action) {
+                P11SlotIdentifier slotId = ASN1SlotIdentifier.getInstance(reqValue).getSlotId();
+                Set<Long> mechs = p11CryptService.getMechanisms(slotId);
+                ASN1EncodableVector vec = new ASN1EncodableVector();
+                for (Long mech : mechs) {
+                    vec.add(new ASN1Integer(mech));
+                }
+                respItvInfoValue = new DERSequence(vec);
+            } else if (P11ProxyConstants.ACTION_getCertificates == action) {
+                P11EntityIdentifier entityId =
+                        ASN1EntityIdentifier.getInstance(reqValue).getEntityId();
+                X509Certificate[] certs = p11CryptService.getCertificates(entityId);
+                if (certs == null || certs.length == 0) {
+                    throw new P11UnknownEntityException(entityId);
+                }
+
+                final int n = certs.length;
+                ASN1EncodableVector vec = new ASN1EncodableVector();
+                for (int i = 0; i < n; i++) {
+                    vec.add(Certificate.getInstance(certs[i].getEncoded()));
+                }
+                respItvInfoValue = new DERSequence(vec);
+            } else if (P11ProxyConstants.ACTION_getPublicKey == action) {
                 P11EntityIdentifier entityId =
                         ASN1EntityIdentifier.getInstance(reqValue).getEntityId();
                 PublicKey pubKey = p11CryptService.getPublicKey(entityId);
@@ -211,8 +241,7 @@ class CmpResponder {
                 }
 
                 respItvInfoValue = new DEROctetString(pubKey.getEncoded());
-                break;
-            case P11ProxyConstants.ACTION_getSlotIds:
+            } else if (P11ProxyConstants.ACTION_getSlotIds == action) {
                 List<P11SlotIdentifier> slotIds = p11CryptService.getModule().getSlotIdentifiers();
 
                 ASN1EncodableVector vector = new ASN1EncodableVector();
@@ -220,22 +249,20 @@ class CmpResponder {
                     vector.add(new ASN1SlotIdentifier(slotId));
                 }
                 respItvInfoValue = new DERSequence(vector);
-                break;
-            case P11ProxyConstants.ACTION_getKeyIds:
+            } else if (P11ProxyConstants.ACTION_getKeyIds == action) {
                 ASN1SlotIdentifier slotId = ASN1SlotIdentifier.getInstance(reqValue);
                 P11Slot slot = p11CryptService.getModule().getSlot(slotId.getSlotId());
                 List<P11KeyIdentifier> keyIds = slot.getKeyIdentifiers();
-                vector = new ASN1EncodableVector();
+                ASN1EncodableVector vec = new ASN1EncodableVector();
                 for (P11KeyIdentifier keyId : keyIds) {
-                    vector.add(new ASN1KeyIdentifier(keyId));
+                    vec.add(new ASN1KeyIdentifier(keyId));
                 }
-                respItvInfoValue = new DERSequence(vector);
-                break;
-            default:
+                respItvInfoValue = new DERSequence(vec);
+            } else {
                 final String statusMessage = "unsupported XiPKI action code '" + action + "'";
                 return createRejectionPkiMessage(respHeader,
                         PKIFailureInfo.badRequest, statusMessage);
-            } // end switch (code)
+            }
 
             ASN1EncodableVector vec = new ASN1EncodableVector();
             vec.add(new ASN1Integer(action));
@@ -251,12 +278,29 @@ class CmpResponder {
         } catch (BadAsn1ObjectException ex) {
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                     ex.getMessage());
-        } catch (P11UnknownEntityException ex) {
+        } catch (P11TokenException ex) {
+            String p11ErrorType;
+            if (ex instanceof P11UnknownEntityException) {
+                p11ErrorType = P11ProxyConstants.ERROR_UNKNOWN_ENTITY;
+            } else if (ex instanceof P11DuplicateEntityException) {
+                p11ErrorType = P11ProxyConstants.ERROR_DUPLICATE_ENTITY;
+            } else if (ex instanceof P11UnsupportedMechanismException) {
+                p11ErrorType = P11ProxyConstants.ERROR_UNSUPPORTED_MECHANISM;
+            } else {
+                p11ErrorType = P11ProxyConstants.ERROR_P11_TOKENERROR;
+            }
+
+            String errorMessage = ex.getMessage();
+
+            if (errorMessage == null) {
+                errorMessage = "NULL";
+            } else if (StringUtil.isBlank(errorMessage.trim())) {
+                errorMessage = "NULL";
+            }
+
+            ConfPairs confPairs = new ConfPairs(p11ErrorType, errorMessage);
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
-                    ex.getMessage());
-        } catch (P11UnsupportedMechanismException ex) {
-            return createRejectionPkiMessage(respHeader, PKIFailureInfo.badAlg,
-                    ex.getMessage());
+                    confPairs.getEncoded());
         } catch (Throwable th) {
             LOG.error("could not process CMP message {}, message: {}", tidStr,
                     th.getMessage());
