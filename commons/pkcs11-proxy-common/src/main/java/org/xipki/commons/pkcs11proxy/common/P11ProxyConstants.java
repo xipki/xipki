@@ -53,7 +53,7 @@ public class P11ProxyConstants {
             new GeneralName(GeneralName.uniformResourceIdentifier,
                     "http://xipki.org/remotep11/client");
 
-    public static final int ACTION_getVersion = 80;
+    public static final int VERSION_V1 = 0;
 
     public static final int ACTION_getPublicKey = 81;
 
@@ -66,6 +66,14 @@ public class P11ProxyConstants {
     public static final int ACTION_getMechanisms = 85;
 
     public static final int ACTION_sign = 90;
+
+    public static final String ERROR_UNKNOWN_ENTITY = "P11_UNKNOWN_ENTITY";
+
+    public static final String ERROR_DUPLICATE_ENTITY = "P11_DUPLICATE_ENTITY";
+
+    public static final String ERROR_UNSUPPORTED_MECHANISM = "P11_UNSUPPORTED_MECHANISM";
+
+    public static final String ERROR_P11_TOKENERROR = "P11_TOKEN_ERROR";
 
     private P11ProxyConstants() {
     }

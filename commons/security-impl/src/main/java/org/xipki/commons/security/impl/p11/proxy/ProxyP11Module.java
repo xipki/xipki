@@ -70,15 +70,21 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.pkcs11proxy.common.ASN1SlotIdentifier;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
+import org.xipki.commons.pkcs11proxy.common.ServerCaps;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.p11.AbstractP11Module;
+import org.xipki.commons.security.api.p11.P11DuplicateEntityException;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
+import org.xipki.commons.security.api.p11.P11UnknownEntityException;
+import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
 import org.xipki.commons.security.api.util.CmpFailureUtil;
 
 /**
@@ -100,16 +106,41 @@ class ProxyP11Module extends AbstractP11Module {
 
     private final Random random = new Random();
 
-    private URL objServerUrl;
+    private int version;
+
+    private URL serverUrl;
+
+    private URL getCapsUrl;
 
     ProxyP11Module(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         super(moduleConf);
+
+        String urlStr = moduleConf.getNativeLibrary();
         try {
-            objServerUrl = new URL(moduleConf.getNativeLibrary());
+            serverUrl = new URL(urlStr);
         } catch (MalformedURLException ex) {
-            throw new IllegalArgumentException("invalid url: " + moduleConf.getNativeLibrary());
+            throw new IllegalArgumentException("invalid url: " + urlStr);
+        }
+
+        urlStr = urlStr + "?operation=GetCaps";
+        try {
+            getCapsUrl = new URL(urlStr);
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException("invalid url: " + urlStr);
+        }
+        refresh();
+    }
+
+    void refresh()
+    throws P11TokenException {
+        ServerCaps caps = getServerCaps();
+        if (caps.getVersions().contains(1)) {
+            version = 1;
+        } else {
+            throw new P11TokenException(
+                    "Server does not support any version supported by the client");
         }
 
         ASN1Encodable resp = send(P11ProxyConstants.ACTION_getSlotIds, null);
@@ -159,7 +190,7 @@ class ProxyP11Module extends AbstractP11Module {
             final byte[] request)
     throws IOException {
         ParamUtil.requireNonNull("request", request);
-        HttpURLConnection httpUrlConnection = (HttpURLConnection) objServerUrl.openConnection();
+        HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
         httpUrlConnection.setDoOutput(true);
         httpUrlConnection.setUseCaches(false);
 
@@ -213,13 +244,12 @@ class ProxyP11Module extends AbstractP11Module {
         }
     } // method send
 
-    // FIXME: consider the exception PKIError/PKIFailureInfo
     ASN1Encodable send(
             final int action,
             final ASN1Encodable content)
     throws P11TokenException {
-        PKIHeader header = buildPkiHeader(null);
         ASN1EncodableVector vec = new ASN1EncodableVector();
+        vec.add(new ASN1Integer(version));
         vec.add(new ASN1Integer(action));
         if (content != null) {
             vec.add(content);
@@ -228,6 +258,7 @@ class ProxyP11Module extends AbstractP11Module {
                 new DERSequence(vec));
 
         GenMsgContent genMsgContent = new GenMsgContent(itvReq);
+        PKIHeader header = buildPkiHeader(null);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
         PKIMessage request = new PKIMessage(header, body);
 
@@ -296,6 +327,22 @@ class ProxyP11Module extends AbstractP11Module {
         return tid;
     }
 
+    private ServerCaps getServerCaps()
+    throws P11TokenException {
+        byte[] respBytes;
+        try {
+            HttpURLConnection conn = (HttpURLConnection) getCapsUrl.openConnection();
+            conn.setRequestMethod("GET");
+            checkResponseCode(conn);
+            InputStream respStream = conn.getInputStream();
+            respBytes = IoUtil.read(respStream);
+        } catch (IOException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
+        }
+
+        return new ServerCaps(respBytes);
+    }
+
     private static ASN1Encodable extractItvInfoValue(
             final int action,
             final GeneralPKIMessage response)
@@ -306,8 +353,39 @@ class ProxyP11Module extends AbstractP11Module {
         if (PKIBody.TYPE_ERROR == bodyType) {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             PKIStatusInfo statusInfo = content.getPKIStatusInfo();
-            throw new P11TokenException("server answered with ERROR: "
-                    + CmpFailureUtil.formatPkiStatusInfo(statusInfo));
+            String failureInfo = null;
+            if (statusInfo.getStatusString() != null) {
+                int size = statusInfo.getStatusString().size();
+                if (size > 0) {
+                    failureInfo = statusInfo.getStatusString().getStringAt(0).getString();
+                }
+            }
+
+            if (failureInfo == null) {
+                throw new P11TokenException("server answered with ERROR: "
+                        + CmpFailureUtil.formatPkiStatusInfo(statusInfo));
+            }
+
+            if (failureInfo.startsWith(P11ProxyConstants.ERROR_P11_TOKENERROR)) {
+                ConfPairs pairs = new ConfPairs(failureInfo);
+                String errorMesage = pairs.getValue(P11ProxyConstants.ERROR_P11_TOKENERROR);
+                throw new P11TokenException(errorMesage);
+            } else if (failureInfo.startsWith(P11ProxyConstants.ERROR_UNKNOWN_ENTITY)) {
+                ConfPairs pairs = new ConfPairs(failureInfo);
+                String errorMesage = pairs.getValue(P11ProxyConstants.ERROR_UNKNOWN_ENTITY);
+                throw new P11UnknownEntityException(errorMesage);
+            } else if (failureInfo.startsWith(P11ProxyConstants.ERROR_UNSUPPORTED_MECHANISM)) {
+                ConfPairs pairs = new ConfPairs(failureInfo);
+                String errorMesage = pairs.getValue(P11ProxyConstants.ERROR_UNSUPPORTED_MECHANISM);
+                throw new P11UnsupportedMechanismException(errorMesage);
+            } else if (failureInfo.startsWith(P11ProxyConstants.ERROR_DUPLICATE_ENTITY)) {
+                ConfPairs pairs = new ConfPairs(failureInfo);
+                String errorMesage = pairs.getValue(P11ProxyConstants.ERROR_UNSUPPORTED_MECHANISM);
+                throw new P11DuplicateEntityException(errorMesage);
+            } else {
+                throw new P11TokenException("server answered with ERROR: "
+                        + CmpFailureUtil.formatPkiStatusInfo(statusInfo));
+            }
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new P11TokenException("unknown PKI body type " + bodyType
                     + " instead the exceptected [" + PKIBody.TYPE_GEN_REP + ", "
@@ -352,4 +430,19 @@ class ProxyP11Module extends AbstractP11Module {
                     + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "' is incorrect");
         }
     } // method extractItvInfoValue
+
+    private void checkResponseCode(
+            final HttpURLConnection conn)
+    throws P11TokenException {
+        ParamUtil.requireNonNull("conn", conn);
+        try {
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                conn.getInputStream().close();
+                throw new P11TokenException("bad response: code=" + conn.getResponseCode()
+                        + ", message=" + conn.getResponseMessage());
+            }
+        } catch (IOException ex) {
+            throw new P11TokenException("IOException: " + ex.getMessage(), ex);
+        }
+    }
 }

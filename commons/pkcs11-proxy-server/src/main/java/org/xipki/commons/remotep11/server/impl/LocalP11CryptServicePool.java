@@ -55,8 +55,6 @@ import org.xipki.commons.security.api.p11.P11CryptService;
 
 public class LocalP11CryptServicePool {
 
-    public static final int VERSION = 2;
-
     private static final Logger LOG = LoggerFactory.getLogger(LocalP11CryptServicePool.class);
 
     private SecurityFactory securityFactory;
@@ -108,10 +106,6 @@ public class LocalP11CryptServicePool {
             final String moduleName) {
         ParamUtil.requireNonBlank("moduleName", moduleName);
         return p11CryptServices.get(moduleName);
-    }
-
-    public int getVersion() {
-        return VERSION;
     }
 
 }
