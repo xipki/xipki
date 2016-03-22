@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.pkcs11proxy.client.impl;
+package org.xipki.commons.security.impl.p11.proxy;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;

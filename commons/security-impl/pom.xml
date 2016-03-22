@@ -21,6 +21,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>pkcs11-proxy-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>at.tugraz.iaik</groupId>
       <artifactId>pkcs11-wrapper</artifactId>
     </dependency>
