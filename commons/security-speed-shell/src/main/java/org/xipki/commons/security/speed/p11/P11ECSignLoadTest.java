@@ -39,7 +39,7 @@ package org.xipki.commons.security.speed.p11;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
  * @author Lijun Liao
@@ -50,7 +50,7 @@ public class P11ECSignLoadTest extends P11SignLoadTest {
 
     public P11ECSignLoadTest(
             final SecurityFactory securityFactory,
-            final P11WritableSlot slot,
+            final P11Slot slot,
             final String signatureAlgorithm,
             final String curveNameOrOid)
     throws Exception {
@@ -61,7 +61,7 @@ public class P11ECSignLoadTest extends P11SignLoadTest {
     }
 
     private static P11KeyIdentifier generateKey(
-            final P11WritableSlot slot,
+            final P11Slot slot,
             final String curveNameOrOid)
     throws Exception {
         ParamUtil.requireNonNull("slot", slot);

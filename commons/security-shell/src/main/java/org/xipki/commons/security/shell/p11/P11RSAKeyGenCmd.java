@@ -41,7 +41,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
  * @author Lijun Liao
@@ -69,7 +69,7 @@ public class P11RSAKeyGenCmd extends P11KeyGenCommandSupport {
             throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
         }
 
-        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
+        P11Slot slot = getSlot();
         P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent), label);
         finalize(keyId);
         return null;

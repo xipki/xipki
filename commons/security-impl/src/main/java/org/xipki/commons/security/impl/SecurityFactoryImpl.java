@@ -1032,6 +1032,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
 
         Set<P11SlotIdentifier> slots = new HashSet<>();
+        // FIXME: slotId and slotIndex may be null.
         for (SlotType slotType : type.getSlot()) {
             Long slotId = null;
             if (slotType.getId() != null) {
