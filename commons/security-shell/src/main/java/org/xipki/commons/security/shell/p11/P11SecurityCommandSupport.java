@@ -78,7 +78,7 @@ public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
 
     public P11KeyIdentifier getKeyIdentifier()
     throws IllegalCmdParamException, SecurityException, P11TokenException {
-        P11Slot slot = getP11Slot(moduleName, slotIndex);
+        P11Slot slot = getSlot();
         P11KeyIdentifier keyIdentifier;
         if (keyId != null && keyLabel == null) {
             keyIdentifier = slot.getKeyIdForId(Hex.decode(keyId));
@@ -89,6 +89,11 @@ public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
                     "exactly one of keyId or keyLabel should be specified");
         }
         return keyIdentifier;
+    }
+
+    protected P11Slot getSlot()
+    throws SecurityException, P11TokenException, IllegalCmdParamException {
+        return getSlot(moduleName, slotIndex);
     }
 
 }

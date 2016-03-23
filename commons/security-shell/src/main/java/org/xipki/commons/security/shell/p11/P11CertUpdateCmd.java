@@ -45,8 +45,10 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**
@@ -72,10 +74,15 @@ public class P11CertUpdateCmd extends P11SecurityCommandSupport {
     @Completion(FilePathCompleter.class)
     private Set<String> caCertFiles;
 
+    @Option(name = "--hash",
+            description = "hash algorithm name")
+    @Completion(HashAlgCompleter.class)
+    protected String hashAlgo = "SHA256";
+
     @Override
     protected Object doExecute()
     throws Exception {
-        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
+        P11Slot slot = getSlot();
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         X509Certificate newCert = X509Util.parseCert(certFile);
         Set<X509Certificate> caCerts = new HashSet<>();
@@ -85,7 +92,8 @@ public class P11CertUpdateCmd extends P11SecurityCommandSupport {
             }
         }
 
-        slot.updateCertificate(keyIdentifier, newCert, caCerts, securityFactory);
+        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(hashAlgo);
+        slot.updateCertificate(keyIdentifier, newCert, caCerts, hashAlgoType);
         println("updated certificate");
         return null;
     }

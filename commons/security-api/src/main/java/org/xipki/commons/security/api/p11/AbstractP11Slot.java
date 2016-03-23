@@ -65,10 +65,12 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     protected final P11SlotIdentifier slotId;
 
-    private final CopyOnWriteArrayList<P11KeyIdentifier> keyIdentifiers =
-            new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<P11KeyIdentifier> keyIds = new CopyOnWriteArrayList<>();
 
     private final ConcurrentHashMap<P11KeyIdentifier, P11Identity> identities =
+            new ConcurrentHashMap<>();
+
+    private final ConcurrentHashMap<P11KeyIdentifier, X509Certificate> allCertificates =
             new ConcurrentHashMap<>();
 
     private final Set<Long> mechanisms = Collections.emptySet();
@@ -108,13 +110,30 @@ public abstract class AbstractP11Slot implements P11Slot {
         return Hex.toHexString(bytes).toUpperCase();
     }
 
-    protected void addCaCertificate(
-            @Nonnull final X509Certificate caCert) {
+    protected void certificateAdded(
+            @Nonnull final P11KeyIdentifier keyId,
+            @Nonnull final X509Certificate cert) {
         // FIXME: implement me
     }
 
-    protected void removeCaCertificate(
-            @Nonnull final X509Certificate caCert) {
+    protected void certificateRemoved(
+            @Nonnull final P11KeyIdentifier keyId) {
+        // FIXME: implement me
+    }
+
+    protected void certificateUpdated(
+            @Nonnull final P11KeyIdentifier keyId,
+            @Nonnull final X509Certificate cert) {
+        // FIXME: implement me
+    }
+
+    protected void keyAdded(
+            @Nonnull final P11Identity identity) {
+        // FIXME: implement me
+    }
+
+    protected void keyRemoved(
+            @Nonnull final P11KeyIdentifier keyId) {
         // FIXME: implement me
     }
 
@@ -149,7 +168,7 @@ public abstract class AbstractP11Slot implements P11Slot {
             StringBuilder sb = new StringBuilder();
             sb.append("slot ").append(slotId);
             sb.append(": initialized ").append(this.identities.size()).append(" PKCS#11 Keys:\n");
-            for (P11KeyIdentifier keyId : keyIdentifiers) {
+            for (P11KeyIdentifier keyId : keyIds) {
                 P11Identity identity = this.identities.get(keyId);
                 sb.append("\t(").append(keyId);
                 sb.append(", algo=").append(identity.getPublicKey().getAlgorithm()).append(")\n");
@@ -171,11 +190,11 @@ public abstract class AbstractP11Slot implements P11Slot {
             throw new P11DuplicateEntityException(slotId, keyId);
         }
 
-        List<P11KeyIdentifier> ids = new ArrayList<>(keyIdentifiers);
+        List<P11KeyIdentifier> ids = new ArrayList<>(keyIds);
         ids.add(keyId);
         Collections.sort(ids);
-        keyIdentifiers.clear();
-        keyIdentifiers.add(keyId);
+        keyIds.clear();
+        keyIds.add(keyId);
         identities.put(keyId, identity);
     }
 
@@ -186,7 +205,7 @@ public abstract class AbstractP11Slot implements P11Slot {
             LOG.warn("could not find key " + keyId);
             return;
         }
-        keyIdentifiers.remove(keyId);
+        keyIds.remove(keyId);
         identities.remove(keyId);
         LOG.info("deleted key " + keyId);
     }
@@ -194,7 +213,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     @Override
     public boolean hasIdentity(
             final P11KeyIdentifier keyId) {
-        return keyIdentifiers.contains(keyId);
+        return keyIds.contains(keyId);
     }
 
     @Override
@@ -220,7 +239,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     @Override
     public List<P11KeyIdentifier> getKeyIdentifiers()
     throws P11TokenException {
-        return Collections.unmodifiableList(keyIdentifiers);
+        return Collections.unmodifiableList(keyIds);
     }
 
     @Override
@@ -248,7 +267,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     public P11KeyIdentifier getKeyIdForId(
             final byte[] id)
     throws P11UnknownEntityException {
-        for (P11KeyIdentifier keyId : keyIdentifiers) {
+        for (P11KeyIdentifier keyId : keyIds) {
             if (Arrays.equals(id, keyId.getId())) {
                 return keyId;
             }
@@ -261,7 +280,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     public P11KeyIdentifier getKeyIdForLabel(
             final String label)
     throws P11UnknownEntityException {
-        for (P11KeyIdentifier keyId : keyIdentifiers) {
+        for (P11KeyIdentifier keyId : keyIds) {
             if (keyId.getLabel().equals(label)) {
                 return keyId;
             }

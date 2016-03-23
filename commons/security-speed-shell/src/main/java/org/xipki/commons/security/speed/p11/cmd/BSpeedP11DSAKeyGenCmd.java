@@ -42,7 +42,7 @@ import java.util.List;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.speed.p11.P11DSAKeyGenLoadTest;
 
 /**
@@ -62,8 +62,7 @@ public class BSpeedP11DSAKeyGenCmd extends BSpeedP11CommandSupport {
         List<LoadExecutor> ret = new LinkedList<>();
         int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
 
-        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
-
+        P11Slot slot = getSlot();
         for (int i = 0; i < pqLens.length; i += 2) {
             int plen = pqLens[i];
             int qlen = pqLens[i + 1];

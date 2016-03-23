@@ -84,7 +84,7 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
         }
 
         P11EntityIdentifier ei = (P11EntityIdentifier) obj;
-        return this.slotId.equals(ei.slotId) && this.keyId.equals(ei.getSlotId());
+        return this.slotId.equals(ei.slotId) && this.keyId.equals(ei.getKeyId());
     }
 
     public boolean match(

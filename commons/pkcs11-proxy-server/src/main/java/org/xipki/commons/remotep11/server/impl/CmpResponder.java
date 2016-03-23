@@ -43,12 +43,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
@@ -177,13 +180,15 @@ class CmpResponder {
 
         try {
             ASN1Encodable asn1 = itv.getInfoValue();
-            ASN1Integer asn1Code = null;
+            int protocolVersion;
+            int action;
             ASN1Encodable reqValue = null;
 
             try {
                 ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
-                asn1Code = ASN1Integer.getInstance(seq.getObjectAt(0));
-                if (seq.size() > 1) {
+                protocolVersion = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue().intValue();
+                action = ASN1Integer.getInstance(seq.getObjectAt(1)).getValue().intValue();
+                if (seq.size() > 2) {
                     reqValue = seq.getObjectAt(1);
                 }
             } catch (IllegalArgumentException ex) {
@@ -191,9 +196,8 @@ class CmpResponder {
                         + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId());
             }
 
-            int action = asn1Code.getPositiveValue().intValue();
             P11CryptService p11CryptService = p11CryptServicePool.getP11CryptService(moduleName);
-            ASN1Encodable respItvInfoValue;
+            ASN1Encodable respItvInfoValue = null;
 
             if (P11ProxyConstants.ACTION_sign == action) {
                 ASN1SignTemplate signTemplate = ASN1SignTemplate.getInstance(reqValue);
@@ -265,10 +269,14 @@ class CmpResponder {
             }
 
             ASN1EncodableVector vec = new ASN1EncodableVector();
+            vec.add(new ASN1Integer(protocolVersion));
             vec.add(new ASN1Integer(action));
             if (respItvInfoValue != null) {
                 vec.add(respItvInfoValue);
+            } else {
+                vec.add(DERNull.INSTANCE);
             }
+
             InfoTypeAndValue respItv = new InfoTypeAndValue(
                     ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
                     new DERSequence(vec));

@@ -38,7 +38,7 @@ package org.xipki.commons.security.speed.p11;
 
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
  * @author Lijun Liao
@@ -49,7 +49,7 @@ public class P11DSASignLoadTest extends P11SignLoadTest {
 
     public P11DSASignLoadTest(
             final SecurityFactory securityFactory,
-            final P11WritableSlot slot,
+            final P11Slot slot,
             final String signatureAlgorithm,
             final int plength,
             final int qlength)
@@ -62,7 +62,7 @@ public class P11DSASignLoadTest extends P11SignLoadTest {
     }
 
     private static P11KeyIdentifier generateKey(
-            final P11WritableSlot slot,
+            final P11Slot slot,
             final int plength,
             final int qlength)
     throws Exception {
