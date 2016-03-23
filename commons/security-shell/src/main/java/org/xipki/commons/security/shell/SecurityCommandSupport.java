@@ -46,7 +46,6 @@ import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
@@ -58,24 +57,13 @@ public abstract class SecurityCommandSupport extends XipkiCommandSupport {
     @Reference
     protected SecurityFactory securityFactory;
 
-    protected P11Slot getP11Slot(
+    protected P11Slot getSlot(
             final String moduleName,
             final int slotIndex)
     throws SecurityException, P11TokenException, IllegalCmdParamException {
         P11Module module = getP11Module(moduleName);
         P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
         return module.getSlot(slotId);
-    }
-
-    protected P11WritableSlot getP11WritableSlot(
-            final String moduleName,
-            final int slotIndex)
-    throws SecurityException, P11TokenException, IllegalCmdParamException {
-        P11Slot slot = getP11Slot(moduleName, slotIndex);
-        if (slot instanceof P11WritableSlot) {
-            return (P11WritableSlot) slot;
-        }
-        throw new P11TokenException("the slot is not writable");
     }
 
     protected P11Module getP11Module(

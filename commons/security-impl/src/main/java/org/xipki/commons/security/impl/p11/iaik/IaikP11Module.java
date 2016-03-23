@@ -52,7 +52,6 @@ import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
 
 import iaik.pkcs.pkcs11.Module;
 import iaik.pkcs.pkcs11.Slot;
@@ -107,9 +106,9 @@ class IaikP11Module extends AbstractP11Module {
             } catch (PasswordResolverException ex) {
                 throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
             }
-            P11WritableSlot p11Slot = new IaikP11WritableSlot(moduleConf.getName(), slotId, slot,
+            P11Slot p11Slot = new IaikP11Slot(moduleConf.getName(), slotId, slot,
                     moduleConf.getUserType(), pwd, moduleConf.getMaxMessageSize(),
-                    moduleConf.getP11MechanismFilter());
+                    moduleConf.getSecurityFactory(), moduleConf.getP11MechanismFilter());
 
             slots.add(p11Slot);
         }

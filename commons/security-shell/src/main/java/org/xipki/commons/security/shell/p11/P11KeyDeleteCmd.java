@@ -39,7 +39,7 @@ package org.xipki.commons.security.shell.p11;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
  * @author Lijun Liao
@@ -54,7 +54,7 @@ public class P11KeyDeleteCmd extends P11SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
+        P11Slot slot = getSlot();
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         boolean deleted = slot.removeKeyAndCerts(keyIdentifier);
         if (deleted) {

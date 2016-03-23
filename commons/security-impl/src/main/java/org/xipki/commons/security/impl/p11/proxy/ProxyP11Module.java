@@ -343,7 +343,7 @@ class ProxyP11Module extends AbstractP11Module {
         return new ServerCaps(respBytes);
     }
 
-    private static ASN1Encodable extractItvInfoValue(
+    private ASN1Encodable extractItvInfoValue(
             final int action,
             final GeneralPKIMessage response)
     throws P11TokenException {
@@ -416,17 +416,24 @@ class ProxyP11Module extends AbstractP11Module {
         }
         try {
             ASN1Sequence seq = ASN1Sequence.getInstance(itvValue);
-            int receivedAction = ASN1Integer.getInstance(seq.getObjectAt(0))
-                    .getPositiveValue().intValue();
+            if (seq.size() != 3) {
+                throw new P11TokenException("invalid response sequence.size != 3: " + seq.size());
+            }
+
+            int receivedversion = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue().intValue();
+            if (receivedversion != version) {
+                throw new P11TokenException("version '"
+                        + receivedversion + "' is not the expected '" + version + "'");
+            }
+            int receivedAction = ASN1Integer.getInstance(seq.getObjectAt(1)).getValue().intValue();
             if (receivedAction != action) {
-                throw new P11TokenException("xipki action '"
+                throw new P11TokenException("action '"
                         + receivedAction + "' is not the expected '" + action + "'");
             }
-            return seq.size() > 1
-                    ? seq.getObjectAt(1)
-                    : null;
-        } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
-            throw new P11TokenException("value of response (type nfoTypeAndValue) '"
+
+            return seq.getObjectAt(2);
+        } catch (IllegalArgumentException ex) {
+            throw new P11TokenException("value of response (type InfoTypeAndValue) '"
                     + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "' is incorrect");
         }
     } // method extractItvInfoValue

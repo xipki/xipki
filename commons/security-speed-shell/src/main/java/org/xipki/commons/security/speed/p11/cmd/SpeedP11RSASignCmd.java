@@ -40,7 +40,6 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.speed.p11.P11RSASignLoadTest;
 
 /**
@@ -65,8 +64,7 @@ public class SpeedP11RSASignCmd extends SpeedP11SignCommandSupport {
     @Override
     protected LoadExecutor getTester()
     throws Exception {
-        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
-        return new P11RSASignLoadTest(securityFactory, slot, sigAlgo, keysize,
+        return new P11RSASignLoadTest(securityFactory, getSlot(), sigAlgo, keysize,
                 toBigInt(publicExponent));
     }
 
