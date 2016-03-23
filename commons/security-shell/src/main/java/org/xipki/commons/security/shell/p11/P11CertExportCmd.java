@@ -46,7 +46,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
  * @author Lijun Liao
@@ -68,7 +68,7 @@ public class P11CertExportCmd extends P11SecurityCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        P11WritableSlot slot = getP11WritableSlot(moduleName, slotIndex);
+        P11Slot slot = getSlot();
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         X509Certificate cert = slot.exportCert(keyIdentifier);
         if (cert == null) {

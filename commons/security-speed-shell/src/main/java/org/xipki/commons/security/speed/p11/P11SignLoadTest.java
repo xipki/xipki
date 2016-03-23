@@ -46,8 +46,8 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
 import org.xipki.commons.security.api.util.SignerConfUtil;
 
 /**
@@ -79,7 +79,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(P11SignLoadTest.class);
 
-    private final P11WritableSlot slot;
+    private final P11Slot slot;
 
     private final ConcurrentContentSigner signer;
 
@@ -87,7 +87,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
 
     public P11SignLoadTest(
             final SecurityFactory securityFactory,
-            final P11WritableSlot slot,
+            final P11Slot slot,
             final String signatureAlgorithm,
             final P11KeyIdentifier keyId,
             final String description)

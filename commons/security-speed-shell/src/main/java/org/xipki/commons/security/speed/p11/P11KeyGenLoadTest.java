@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
  * @author Lijun Liao
@@ -65,12 +65,12 @@ public abstract class P11KeyGenLoadTest extends LoadExecutor {
 
     } // class Testor
 
-    protected final P11WritableSlot slot;
+    protected final P11Slot slot;
 
     private AtomicLong idx = new AtomicLong(System.currentTimeMillis());
 
     public P11KeyGenLoadTest(
-            final P11WritableSlot slot,
+            final P11Slot slot,
             final String description) {
         super(description);
         this.slot = ParamUtil.requireNonNull("slot", slot);

@@ -39,7 +39,7 @@ package org.xipki.commons.security.speed.p11;
 import java.math.BigInteger;
 
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
-import org.xipki.commons.security.api.p11.P11WritableSlot;
+import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
  * @author Lijun Liao
@@ -53,7 +53,7 @@ public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest {
     private final BigInteger publicExponent;
 
     public P11RSAKeyGenLoadTest(
-            final P11WritableSlot slot,
+            final P11Slot slot,
             final int keysize,
             final BigInteger publicExponent)
     throws Exception {
@@ -69,7 +69,7 @@ public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest {
     protected void genKeypair()
     throws Exception {
         P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, publicExponent, getDummyLabel());
-        slot.removeKey(keyId);
+        slot.removeKeyAndCerts(keyId);
     }
 
 }

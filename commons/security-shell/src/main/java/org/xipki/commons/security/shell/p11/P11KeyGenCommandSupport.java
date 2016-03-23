@@ -40,8 +40,12 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.shell.KeyGenCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
@@ -52,22 +56,22 @@ import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
 public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
 
-    @Option(name = "--slot",
-            required = true,
-            description = "slot index\n"
-                    + "(required)")
-    protected Integer slotIndex;
-
     @Option(name = "--key-label",
             required = true,
             description = "label of the PKCS#11 objects\n"
                     + "(required)")
     protected String label;
 
+    @Option(name = "--slot",
+            required = true,
+            description = "slot index\n"
+                    + "(required)")
+    private Integer slotIndex;
+
     @Option(name = "--module",
             description = "Name of the PKCS#11 module.")
     @Completion(P11ModuleNameCompleter.class)
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     protected void finalize(
             final P11KeyIdentifier keyId)
@@ -76,6 +80,11 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
         println("generated PKCS#11 key");
         println("\tkey id: " + Hex.toHexString(keyId.getId()));
         println("\tkey label: " + keyId.getLabel());
+    }
+
+    protected P11Slot getSlot()
+    throws SecurityException, P11TokenException, IllegalCmdParamException {
+        return getSlot(moduleName, slotIndex);
     }
 
 }
