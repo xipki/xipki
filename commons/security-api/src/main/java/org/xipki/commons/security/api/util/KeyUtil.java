@@ -189,6 +189,18 @@ public class KeyUtil {
     }
 
     // CHECKSTYLE:SKIP
+    public static KeyPair generateDSAKeypair(
+            final DSAParameters dsaParams,
+            final SecureRandom random)
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("DSA", "BC");
+        DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
+                dsaParams.getG());
+        kpGen.initialize(dsaParamSpec, random);
+        return kpGen.generateKeyPair();
+    }
+
+    // CHECKSTYLE:SKIP
     public static KeyPair generateECKeypairForCurveNameOrOid(
             final String curveNameOrOid,
             final SecureRandom random)

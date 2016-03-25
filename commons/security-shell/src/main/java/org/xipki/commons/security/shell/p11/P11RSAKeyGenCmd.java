@@ -40,7 +40,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
@@ -70,8 +70,9 @@ public class P11RSAKeyGenCmd extends P11KeyGenCommandSupport {
         }
 
         P11Slot slot = getSlot();
-        P11KeyIdentifier keyId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent), label);
-        finalize(keyId);
+        P11ObjectIdentifier objId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
+                label);
+        finalize(objId);
         return null;
     }
 

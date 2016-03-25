@@ -65,13 +65,13 @@ public class ASN1EntityIdentifier extends ASN1Object {
 
     private ASN1SlotIdentifier slotId;
 
-    private ASN1KeyIdentifier keyId;
+    private ASN1P11ObjectIdentifier keyId;
 
     private P11EntityIdentifier entityId;
 
     public ASN1EntityIdentifier(
             final ASN1SlotIdentifier slotId,
-            final ASN1KeyIdentifier keyId) {
+            final ASN1P11ObjectIdentifier keyId) {
         ParamUtil.requireNonNull("slotId", slotId);
         ParamUtil.requireNonNull("keyId", keyId);
         init(null, slotId, keyId);
@@ -93,20 +93,20 @@ public class ASN1EntityIdentifier extends ASN1Object {
         }
 
         ASN1SlotIdentifier slotId = ASN1SlotIdentifier.getInstance(seq.getObjectAt(0));
-        ASN1KeyIdentifier keyId = ASN1KeyIdentifier.getInstance(seq.getObjectAt(0));
-        init(null, slotId, keyId);
+        ASN1P11ObjectIdentifier objectId = ASN1P11ObjectIdentifier.getInstance(seq.getObjectAt(0));
+        init(null, slotId, objectId);
     }
 
     private void init(
             final P11EntityIdentifier entityId,
             final ASN1SlotIdentifier slotId,
-            final ASN1KeyIdentifier keyId) {
+            final ASN1P11ObjectIdentifier keyId) {
         if (entityId != null) {
             this.entityId = entityId;
             this.slotId = new ASN1SlotIdentifier(entityId.getSlotId());
-            this.keyId = new ASN1KeyIdentifier(entityId.getKeyId());
+            this.keyId = new ASN1P11ObjectIdentifier(entityId.getObjectId());
         } else {
-            this.entityId = new P11EntityIdentifier(slotId.getSlotId(), keyId.getKeyId());
+            this.entityId = new P11EntityIdentifier(slotId.getSlotId(), keyId.getObjectId());
             this.slotId = ParamUtil.requireNonNull("slotId", slotId);
             this.keyId = ParamUtil.requireNonNull("keyId", keyId);
         }
@@ -124,7 +124,7 @@ public class ASN1EntityIdentifier extends ASN1Object {
         return slotId;
     }
 
-    public ASN1KeyIdentifier getKeyId() {
+    public ASN1P11ObjectIdentifier getKeyId() {
         return keyId;
     }
 

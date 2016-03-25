@@ -37,11 +37,9 @@
 package org.xipki.commons.security.impl.p11.iaik;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -49,49 +47,35 @@ import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.security.auth.x500.X500Principal;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.crypto.generators.DSAParametersGenerator;
-import org.bouncycastle.crypto.params.DSAParameterGenerationParameters;
 import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.p11.AbstractP11Slot;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11MechanismFilter;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11SlotRefreshResult;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11UnknownEntityException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 import org.xipki.commons.security.api.util.KeyUtil;
@@ -104,7 +88,6 @@ import iaik.pkcs.pkcs11.Slot;
 import iaik.pkcs.pkcs11.State;
 import iaik.pkcs.pkcs11.Token;
 import iaik.pkcs.pkcs11.TokenException;
-import iaik.pkcs.pkcs11.objects.ByteArrayAttribute;
 import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.objects.CharArrayAttribute;
 import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
@@ -124,7 +107,6 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
 class IaikP11Slot extends AbstractP11Slot {
 
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11Slot.class);
@@ -147,8 +129,6 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private final BlockingQueue<Session> idleSessions = new LinkedBlockingDeque<>();
 
-    private final SecurityFactory securityFactory;
-
     private boolean writableSessionInUse;
 
     private Session writableSession;
@@ -160,14 +140,12 @@ class IaikP11Slot extends AbstractP11Slot {
             final long userType,
             final List<char[]> password,
             final int maxMessageSize,
-            final SecurityFactory securityFactory,
             final P11MechanismFilter mechanismFilter)
     throws P11TokenException {
         super(moduleName, slotId, mechanismFilter);
         this.slot = ParamUtil.requireNonNull("slot", slot);
         this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 1);
         this.userType = ParamUtil.requireMin("userType", userType, 0);
-        this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.password = password;
 
         Session session;
@@ -204,19 +182,6 @@ class IaikP11Slot extends AbstractP11Slot {
             throw new P11TokenException("could not getToken: " + ex.getMessage(), ex);
         }
 
-        Mechanism[] mechanisms;
-        try {
-            mechanisms = token.getMechanismList();
-        } catch (TokenException ex) {
-            throw new P11TokenException("could not getMechanismList: " + ex.getMessage(), ex);
-        }
-
-        if (mechanisms != null) {
-            for (Mechanism mech : mechanisms) {
-                addMechanism(mech.getMechanismCode());
-            }
-        }
-
         long maxSessionCount2;
         try {
             maxSessionCount2 = token.getTokenInfo().getMaxSessionCount();
@@ -240,23 +205,47 @@ class IaikP11Slot extends AbstractP11Slot {
     } // constructor
 
     @Override
-    public void refresh()
+    protected P11SlotRefreshResult doRefresh(
+            final P11MechanismFilter mechanismFilter)
     throws P11TokenException {
-        Set<P11Identity> currentIdentifies = new HashSet<>();
-        List<PrivateKey> signatureKeys = getAllPrivateObjects(Boolean.TRUE, null);
+        Mechanism[] mechanisms;
+        try {
+            mechanisms = slot.getToken().getMechanismList();
+        } catch (TokenException ex) {
+            throw new P11TokenException("could not getMechanismList: " + ex.getMessage(), ex);
+        }
 
-        for (PrivateKey signatureKey : signatureKeys) {
-            byte[] keyId = signatureKey.getId().getByteArrayValue();
+        P11SlotRefreshResult ret = new P11SlotRefreshResult();
+        if (mechanisms != null) {
+            for (Mechanism mech : mechanisms) {
+                long code = mech.getMechanismCode();
+                if (mechanismFilter.isMechanismPermitted(slotId, code)) {
+                    ret.addMechanism(code);
+                }
+            }
+        }
+
+        // first get the list of all CA certificates
+        List<X509PublicKeyCertificate> p11Certs = getAllCertificateObjects();
+        for (X509PublicKeyCertificate p11Cert : p11Certs) {
+            P11ObjectIdentifier objId = new P11ObjectIdentifier(p11Cert.getId().getByteArrayValue(),
+                    toString(p11Cert.getLabel()));
+            ret.addCertificate(objId, parseCert(p11Cert));
+        }
+
+        List<PrivateKey> privKeys = getAllPrivateObjects();
+
+        for (PrivateKey privKey : privKeys) {
+            byte[] keyId = privKey.getId().getByteArrayValue();
             if (keyId == null || keyId.length == 0) {
-                return;
+                break;
             }
 
             try {
-                analyseSingleKey(signatureKey, currentIdentifies);
+                analyseSingleKey(privKey, ret);
             } catch (SecurityException ex) {
-                String keyIdStr = hex(keyId);
-                final String message = "SignerException while initializing key with key-id "
-                        + keyIdStr;
+                final String message = "SecurityException while initializing key with id "
+                        + hex(keyId);
                 if (LOG.isWarnEnabled()) {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                             ex.getMessage());
@@ -264,9 +253,8 @@ class IaikP11Slot extends AbstractP11Slot {
                 LOG.debug(message, ex);
                 continue;
             } catch (Throwable th) {
-                String keyIdStr = hex(keyId);
                 final String message =
-                        "unexpected exception while initializing key with key-id " + keyIdStr;
+                        "unexpected exception while initializing key with id " + hex(keyId);
                 if (LOG.isWarnEnabled()) {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
                             th.getMessage());
@@ -276,7 +264,7 @@ class IaikP11Slot extends AbstractP11Slot {
             }
         } // end for (PrivateKey signatureKey : signatureKeys)
 
-        setIdentities(currentIdentifies);
+        return ret;
     } // method refresh
 
     @Override
@@ -303,108 +291,75 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     private void analyseSingleKey(
-            PrivateKey privKey,
-            Set<P11Identity> currentIdentifies)
-    throws P11TokenException, SecurityException, CertificateException, IOException {
-        byte[] keyId = privKey.getId().getByteArrayValue();
-        X509PublicKeyCertificate certificateObject = getCertificateObject(keyId, null);
-        X509Certificate signatureCert = null;
-        java.security.PublicKey signaturePublicKey = null;
-
-        if (certificateObject != null) {
-            try {
-                signatureCert = parseCert(certificateObject);
-            } catch (Exception ex) {
-                String keyIdStr = hex(keyId);
-                final String message = "could not parse certificate with id " + keyIdStr;
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
-                }
-                LOG.debug(message, ex);
-                return;
-            }
-            signaturePublicKey = signatureCert.getPublicKey();
+            final PrivateKey privKey,
+            final P11SlotRefreshResult refreshResult)
+    throws P11TokenException, SecurityException {
+        byte[] id = privKey.getId().getByteArrayValue();
+        java.security.PublicKey pubKey = null;
+        X509Cert cert = refreshResult.getCertForId(id);
+        if (cert != null) {
+            pubKey = cert.getCert().getPublicKey();
         } else {
-            signatureCert = null;
-            PublicKey publicKeyObject = getPublicKeyObject(Boolean.TRUE, null, keyId, null);
-            if (publicKeyObject == null) {
-                String msg = "neither certificate nor public key for signing is available";
-                LOG.info(msg);
+            cert = null;
+            PublicKey p11PublicKey = getPublicKeyObject(id, null);
+            if (p11PublicKey == null) {
+                LOG.info("neither certificate nor public key for the key (" + Hex.toHexString(id)
+                        + " is available");
                 return;
             }
 
-            signaturePublicKey = generatePublicKey(publicKeyObject);
+            pubKey = generatePublicKey(p11PublicKey);
         }
 
-        Map<String, Set<X509Certificate>> allCerts = new HashMap<>();
-        List<X509Certificate> certChain = new LinkedList<>();
+        List<X509Cert> certChain = new LinkedList<>();
 
-        if (signatureCert != null) {
-            certChain.add(signatureCert);
-            while (true) {
-                X509Certificate context = certChain.get(certChain.size() - 1);
-                if (X509Util.isSelfSigned(context)) {
-                    break;
-                }
+        if (cert != null) {
+            certChain.add(cert);
+            X509Cert context = cert;
 
-                String issuerSubject = signatureCert.getIssuerX500Principal().getName();
-                Set<X509Certificate> issuerCerts = allCerts.get(issuerSubject);
-                if (issuerCerts == null) {
-                    issuerCerts = new HashSet<>();
-                    X509PublicKeyCertificate[] certObjects = getCertificateObjects(
-                            signatureCert.getIssuerX500Principal());
-                    if (certObjects != null && certObjects.length > 0) {
-                        for (X509PublicKeyCertificate certObject : certObjects) {
-                            issuerCerts.add(parseCert(certObject));
-                        }
+            while (context != null) {
+                try {
+                    if (X509Util.isSelfSigned(context.getCert())) {
+                        break;
                     }
-
-                    if (CollectionUtil.isNonEmpty(issuerCerts)) {
-                        allCerts.put(issuerSubject, issuerCerts);
-                    }
+                } catch (CertificateEncodingException ex) {
+                    throw new SecurityException(ex.getMessage(), ex);
                 }
-
-                if (CollectionUtil.isEmpty(issuerCerts)) {
-                    break;
-                }
-
-                // find the certificate
-                for (X509Certificate issuerCert : issuerCerts) {
-                    try {
-                        context.verify(issuerCert.getPublicKey());
-                        certChain.add(issuerCert);
-                    } catch (Exception ex) { // CHECKSTYLE:SKIP
-                    }
+                X509Cert issuer = getIssuerForCert(context);
+                context = issuer;
+                if (issuer != null) {
+                    certChain.add(issuer);
                 }
             } // end while (true)
-        } // end if (signatureCert != null)
+        } // end if (cert != null)
 
-        P11KeyIdentifier keyIdObj = new P11KeyIdentifier(privKey.getId().getByteArrayValue(),
-                new String(privKey.getLabel().getCharArrayValue()));
+        P11ObjectIdentifier objectId = new P11ObjectIdentifier(privKey.getId().getByteArrayValue(),
+                toString(privKey.getLabel()));
 
+        X509Certificate[] certs = new X509Certificate[certChain.size()];
+        for (int i = 0; i < certs.length; i++) {
+            certs[i] = certChain.get(i).getCert();
+        }
         IaikP11Identity identity = new IaikP11Identity(moduleName,
-                new P11EntityIdentifier(slotId, keyIdObj), privKey,
-                certChain.toArray(new X509Certificate[0]), signaturePublicKey);
-        currentIdentifies.add(identity);
+                new P11EntityIdentifier(slotId, objectId), privKey, certs, pubKey);
+        refreshResult.addIdentity(identity);
     }
 
-    @Override
-    public byte[] sign(
+    byte[] sign(
             final long mechanism,
             final P11Params parameters,
             final byte[] content,
-            final P11KeyIdentifier keyId)
+            final IaikP11Identity identity)
     throws P11TokenException {
         ParamUtil.requireNonNull("content", content);
         assertMechanismSupported(mechanism);
 
         int len = content.length;
         if (len <= maxMessageSize) {
-            return singleSign(mechanism, parameters, content, keyId);
+            return singleSign(mechanism, parameters, content, identity);
         }
 
-        PrivateKey signingKey = ((IaikP11Identity) getIdentity(keyId)).getPrivateKey();
+        PrivateKey signingKey = identity.getPrivateKey();
         Mechanism mechanismObj = getMechanism(mechanism, parameters);
         if (LOG.isTraceEnabled()) {
             LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
@@ -443,9 +398,9 @@ class IaikP11Slot extends AbstractP11Slot {
             final long mechanism,
             final P11Params parameters,
             final byte[] hash,
-            final P11KeyIdentifier keyId)
+            final IaikP11Identity entity)
     throws P11TokenException {
-        PrivateKey signingKey = ((IaikP11Identity) getIdentity(keyId)).getPrivateKey();
+        PrivateKey signingKey = entity.getPrivateKey();
         Mechanism mechanismObj = getMechanism(mechanism, parameters);
         if (LOG.isTraceEnabled()) {
             LOG.debug("sign with private key:\n{}", signingKey);
@@ -655,26 +610,12 @@ class IaikP11Slot extends AbstractP11Slot {
         }
     }
 
-    private List<PrivateKey> getAllPrivateObjects(
-            final Boolean forSigning,
-            final Boolean forDecrypting)
+    private List<PrivateKey> getAllPrivateObjects()
     throws P11TokenException {
         Session session = borrowIdleSession();
 
         try {
-            if (LOG.isTraceEnabled()) {
-                String info = listPrivateKeyObjects(session, forSigning, forDecrypting);
-                LOG.debug(info);
-            }
-
             PrivateKey template = new PrivateKey();
-            if (forSigning != null) {
-                template.getSign().setBooleanValue(forSigning);
-            }
-            if (forDecrypting != null) {
-                template.getDecrypt().setBooleanValue(forDecrypting);
-            }
-
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
             if (CollectionUtil.isEmpty(tmpObjects)) {
                 return Collections.emptyList();
@@ -687,7 +628,6 @@ class IaikP11Slot extends AbstractP11Slot {
             for (iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects) {
                 PrivateKey privateKey = (PrivateKey) tmpObject;
                 privateKeys.add(privateKey);
-                cacheSigningKey(privateKey);
             }
 
             return privateKeys;
@@ -696,102 +636,19 @@ class IaikP11Slot extends AbstractP11Slot {
         }
     }
 
-    private PrivateKey cacheSigningKey(
-            final PrivateKey privateKey) {
-        Boolean bo = privateKey.getSign().getBooleanValue();
-        byte[] id = privateKey.getId().getByteArrayValue();
-        char[] tmpLabel = privateKey.getLabel().getCharArrayValue();
-        if (tmpLabel == null) {
-            LOG.warn("key (id = {}) does not have label", Hex.toHexString(id));
-            return null;
-        }
-
-        String label = new String(tmpLabel);
-        if (bo == null || !bo.booleanValue()) {
-            LOG.warn("key {} is not for signing", new P11KeyIdentifier(id, label));
-            return null;
-        }
-
-        return privateKey;
-    }
-
-    private String listPrivateKeyObjects(
-            final Session session,
-            final Boolean forSigning,
-            final Boolean forDecrypting) {
-        try {
-            StringBuilder msg = new StringBuilder();
-            msg.append("available private keys: ");
-            msg.append("forSigning: ").append(forSigning);
-            msg.append(", forDecrypting: ").append(forDecrypting).append("\n");
-
-            PrivateKey template = new PrivateKey();
-            if (forSigning != null) {
-                template.getSign().setBooleanValue(forSigning);
-            }
-            if (forDecrypting != null) {
-                template.getDecrypt().setBooleanValue(forDecrypting);
-            }
-            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if (CollectionUtil.isEmpty(tmpObjects)) {
-                msg.append(" empty");
-            }
-            for (int i = 0; i < tmpObjects.size(); i++) {
-                msg.append("------------------------PrivateKey ").append(i + 1);
-                msg.append("-------------------------\n");
-
-                msg.append("\tid(hex): ");
-                PrivateKey privKey = (PrivateKey) tmpObjects.get(i);
-                ByteArrayAttribute id = privKey.getId();
-
-                byte[] bytes = null;
-                if (id != null) {
-                    bytes = id.getByteArrayValue();
-                }
-                if (bytes == null) {
-                    msg.append("null");
-                } else {
-                    msg.append(Hex.toHexString(bytes));
-                }
-                msg.append("\n");
-
-                msg.append("\tlabel: ");
-                CharArrayAttribute label = privKey.getLabel();
-                msg.append(toString(label)).append("\n");
-            }
-            return msg.toString();
-        } catch (Throwable th) {
-            return "Exception while calling listPrivateKeyObjects(): " + th.getMessage();
-        }
-    } // method listPrivateKeyObjects
-
     private PublicKey getPublicKeyObject(
-            final Boolean forSignature,
-            final Boolean forCipher,
             final byte[] keyId,
             final char[] keyLabel)
     throws P11TokenException {
         Session session = borrowIdleSession();
 
         try {
-            if (LOG.isTraceEnabled()) {
-                String info = listPublicKeyObjects(session, forSignature, forCipher);
-                LOG.debug(info);
-            }
-
             PublicKey template = new PublicKey();
             if (keyId != null) {
                 template.getId().setByteArrayValue(keyId);
             }
             if (keyLabel != null) {
                 template.getLabel().setCharArrayValue(keyLabel);
-            }
-
-            if (forSignature != null) {
-                template.getVerify().setBooleanValue(forSignature);
-            }
-            if (forCipher != null) {
-                template.getEncrypt().setBooleanValue(forCipher);
             }
 
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
@@ -810,129 +667,6 @@ class IaikP11Slot extends AbstractP11Slot {
             returnIdleSession(session);
         }
     } // method getPublicKeyObject
-
-    private X509PublicKeyCertificate[] getCertificateObjects(
-            final X500Principal subject)
-    throws P11TokenException {
-        Session session = borrowIdleSession();
-
-        try {
-            if (LOG.isTraceEnabled()) {
-                String info = listCertificateObjects(session);
-                LOG.debug(info);
-            }
-
-            X509PublicKeyCertificate template = new X509PublicKeyCertificate();
-            template.getCertificateType().setLongValue(CertificateType.X_509_PUBLIC_KEY);
-            template.getSubject().setByteArrayValue(subject.getEncoded());
-
-            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            final int n = (tmpObjects == null)
-                    ? 0
-                    : tmpObjects.size();
-
-            if (n == 0) {
-                LOG.warn("found no certificate with subject {}", X509Util.getRfc4519Name(subject));
-                return null;
-            }
-
-            X509PublicKeyCertificate[] certs = new X509PublicKeyCertificate[n];
-            for (int i = 0; i < n; i++) {
-                certs[i] = (X509PublicKeyCertificate) tmpObjects.get(i);
-            }
-            return certs;
-        } finally {
-            returnIdleSession(session);
-        }
-    } // method getCertificateObjects
-
-    private X509PublicKeyCertificate[] getCertificateObjects(
-            final byte[] keyId,
-            final char[] keyLabel)
-    throws P11TokenException {
-        Session session = borrowIdleSession();
-
-        try {
-            if (LOG.isTraceEnabled()) {
-                String info = listCertificateObjects(session);
-                LOG.debug(info);
-            }
-
-            X509PublicKeyCertificate template = new X509PublicKeyCertificate();
-            if (keyId != null) {
-                template.getId().setByteArrayValue(keyId);
-            }
-            if (keyLabel != null) {
-                template.getLabel().setCharArrayValue(keyLabel);
-            }
-
-            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if (CollectionUtil.isEmpty(tmpObjects)) {
-                LOG.info("found no certificate identified by {}", getDescription(keyId, keyLabel));
-                return null;
-            }
-
-            int size = tmpObjects.size();
-            X509PublicKeyCertificate[] certs = new X509PublicKeyCertificate[size];
-            for (int i = 0; i < size; i++) {
-                certs[i] = (X509PublicKeyCertificate) tmpObjects.get(i);
-            }
-            return certs;
-        } finally {
-            returnIdleSession(session);
-        }
-    } // method getCertificateObjects
-
-    private X509PublicKeyCertificate getCertificateObject(
-            final byte[] keyId,
-            final char[] keyLabel)
-    throws P11TokenException {
-        X509PublicKeyCertificate[] certs = getCertificateObjects(keyId, keyLabel);
-        if (certs == null) {
-            return null;
-        }
-        if (certs.length > 1) {
-            LOG.warn("found {} public key identified by {}, use the first one",
-                    certs.length, getDescription(keyId, keyLabel));
-        }
-        return certs[0];
-    }
-
-    private String listCertificateObjects(
-            final Session session) {
-        try {
-            StringBuilder msg = new StringBuilder();
-            msg.append("available certificates: ");
-
-            X509PublicKeyCertificate template = new X509PublicKeyCertificate();
-
-            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if (CollectionUtil.isEmpty(tmpObjects)) {
-                msg.append(" empty");
-            }
-            for (int i = 0; i < tmpObjects.size(); i++) {
-                msg.append("------------------------Certificate ").append(i + 1);
-                msg.append("-------------------------\n");
-                msg.append("\tid(hex): ");
-                X509PublicKeyCertificate cert = (X509PublicKeyCertificate) tmpObjects.get(i);
-                ByteArrayAttribute id = cert.getId();
-                byte[] bytes = null;
-                if (id != null) {
-                    bytes = id.getByteArrayValue();
-                }
-
-                if (bytes == null) {
-                    msg.append("null");
-                } else {
-                    msg.append(Hex.toHexString(bytes));
-                }
-                msg.append("\n\tlabel: ").append(toString(cert.getLabel())).append("\n");
-            }
-            return msg.toString();
-        } catch (Throwable th) {
-            return "Exception while calling listCertificateObjects(): " + th.getMessage();
-        }
-    } // method listCertificateObjects
 
     private static boolean checkSessionLoggedIn(
             final Session session)
@@ -1056,7 +790,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private static String toString(
             final CharArrayAttribute charArrayAttr) {
-        String labelStr = null;
+        String labelStr = "";
         if (charArrayAttr != null) {
             char[] chars = charArrayAttr.getCharArrayValue();
             if (chars != null) {
@@ -1066,57 +800,18 @@ class IaikP11Slot extends AbstractP11Slot {
         return labelStr;
     }
 
-    private static X509Certificate parseCert(
+    private static X509Cert parseCert(
             final X509PublicKeyCertificate p11Cert)
-    throws CertificateException, IOException {
-        return X509Util.parseCert(p11Cert.getValue().getByteArrayValue());
-    }
-
-    private String listPublicKeyObjects(
-            final Session session,
-            final Boolean forSignature,
-            final Boolean forCipher) {
+    throws P11TokenException {
         try {
-            StringBuilder msg = new StringBuilder();
-            msg.append("available public keys: ");
-            msg.append("forSignature: ").append(forSignature);
-            msg.append(", forCipher: ").append(forCipher).append("\n");
-
-            PublicKey template = new PublicKey();
-            if (forSignature != null) {
-                template.getVerify().setBooleanValue(forSignature);
-            }
-            if (forCipher != null) {
-                template.getEncrypt().setBooleanValue(forCipher);
-            }
-
-            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if (CollectionUtil.isEmpty(tmpObjects)) {
-                msg.append(" empty");
-            }
-            for (int i = 0; i < tmpObjects.size(); i++) {
-                msg.append("------------------------Public Key ").append(i + 1);
-                msg.append("-------------------------\n");
-                msg.append("\tid(hex): ");
-                PublicKey pubKey = (PublicKey) tmpObjects.get(i);
-                ByteArrayAttribute id = pubKey.getId();
-                byte[] bytes = null;
-                if (id != null) {
-                    bytes = id.getByteArrayValue();
-                }
-
-                if (bytes == null) {
-                    msg.append("null");
-                } else {
-                    msg.append(Hex.toHexString(bytes));
-                }
-                msg.append("\n\tlabel: ").append(toString(pubKey.getLabel())).append("\n");
-            } // end for
-            return msg.toString();
-        } catch (Throwable th) {
-            return "Exception while calling listPublicKeyObjects(): " + th.getMessage();
+            byte[] encoded = p11Cert.getValue().getByteArrayValue();
+            X509Certificate cert = X509Util.parseCert(p11Cert.getValue().getByteArrayValue());
+            return new X509Cert(cert, encoded);
+        } catch (CertificateException | IOException ex) {
+            throw new P11TokenException("could not parse PKCS#11 certificate: " + ex.getMessage(),
+                    ex);
         }
-    } // method listPublicKeyObjects
+    }
 
     private synchronized Session borrowWritableSession()
     throws P11TokenException {
@@ -1145,10 +840,6 @@ class IaikP11Slot extends AbstractP11Slot {
     throws P11TokenException {
         Session session = borrowIdleSession();
         try {
-            if (LOG.isTraceEnabled()) {
-                String info = listCertificateObjects(session);
-                LOG.debug(info);
-            }
             X509PublicKeyCertificate template = new X509PublicKeyCertificate();
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
             final int n = tmpObjects.size();
@@ -1163,253 +854,19 @@ class IaikP11Slot extends AbstractP11Slot {
         }
     }
 
-    private PrivateKey getPrivateObject(
-            final Boolean forSigning,
-            final Boolean forDecrypting,
-            final P11KeyIdentifier keyId)
+    @Override
+    protected void doRemoveCerts(
+            final byte[] keyId)
     throws P11TokenException {
-        Session session = borrowIdleSession();
-
-        try {
-            if (LOG.isTraceEnabled()) {
-                String info = listPrivateKeyObjects(session, forSigning, forDecrypting);
-                LOG.debug(info);
-            }
-
-            PrivateKey template = new PrivateKey();
-            if (forSigning != null) {
-                template.getSign().setBooleanValue(forSigning);
-            }
-            if (forDecrypting != null) {
-                template.getDecrypt().setBooleanValue(forDecrypting);
-            }
-
-            template.getId().setByteArrayValue(keyId.getId());
-            template.getLabel().setCharArrayValue(keyId.getLabel().toCharArray());
-
-            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
-            if (CollectionUtil.isEmpty(tmpObjects)) {
-                return null;
-            }
-
-            int size = tmpObjects.size();
-            if (size > 1) {
-                LOG.warn("found {} private key identified by {}, use the first one", size, keyId);
-            }
-            return (PrivateKey) tmpObjects.get(0);
-        } finally {
-            returnIdleSession(session);
-        }
-    } // method getPrivateObject
-
-    private boolean existsCertificateObjects(
-            final byte[] keyId,
-            final char[] keyLabel)
-    throws P11TokenException {
-        Session session = borrowIdleSession();
-
-        try {
-            if (LOG.isTraceEnabled()) {
-                String info = listCertificateObjects(session);
-                LOG.debug(info);
-            }
-
-            X509PublicKeyCertificate template = new X509PublicKeyCertificate();
-            if (keyId != null) {
-                template.getId().setByteArrayValue(keyId);
-            }
-            if (keyLabel != null) {
-                template.getLabel().setCharArrayValue(keyLabel);
-            }
-
-            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template, 1);
-            return !CollectionUtil.isEmpty(tmpObjects);
-        } finally {
-            returnIdleSession(session);
-        }
-    }
-
-    @Override
-    public void updateCertificate(
-            final P11KeyIdentifier keyId,
-            final X509Certificate newCert,
-            final Set<X509Certificate> caCerts,
-            final HashAlgoType hashAlgoForVerification)
-    throws SecurityException, P11TokenException {
-        ParamUtil.requireNonNull("keyId", keyId);
-        ParamUtil.requireNonNull("newCert", newCert);
-        ParamUtil.requireNonNull("hashAlgoForVerification", hashAlgoForVerification);
-
-        PrivateKey privKey = getPrivateObject(null, null, keyId);
-
-        if (privKey == null) {
-            throw new P11UnknownEntityException("could not find private key " + keyId);
-        }
-
-        byte[] id = privKey.getId().getByteArrayValue();
-        X509PublicKeyCertificate[] existingCerts = getCertificateObjects(id, null);
-
-        assertMatch(newCert, keyId, hashAlgoForVerification);
-
-        X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
-
-        Session session = borrowWritableSession();
-        try {
-            X509PublicKeyCertificate newCertTemp = createPkcs11Template(newCert, null, id,
-                    privKey.getLabel().getCharArrayValue());
-            // delete existing signer certificate objects
-            if (existingCerts != null && existingCerts.length > 0) {
-                for (X509PublicKeyCertificate existingCert : existingCerts) {
-                    session.destroyObject(existingCert);
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    throw new P11TokenException("could not destroy object, interrupted");
-                }
-            }
-            // create new signer certificate object
-            session.createObject(newCertTemp);
-            certificateUpdated(keyId, newCert);
-
-            // create CA certificate objects
-            if (certChain.length > 1) {
-                for (int i = 1; i < certChain.length; i++) {
-                    X509Certificate caCert = certChain[i];
-                    byte[] encodedCaCert;
-                    try {
-                        encodedCaCert = caCert.getEncoded();
-                    } catch (CertificateEncodingException ex) {
-                        throw new SecurityException(
-                                "could not encode certificate: " + ex.getMessage(), ex);
-                    }
-
-                    boolean alreadyExists = false;
-                    X509PublicKeyCertificate[] certObjs = getCertificateObjects(
-                            caCert.getSubjectX500Principal());
-                    if (certObjs != null) {
-                        for (X509PublicKeyCertificate certObj : certObjs) {
-                            if (Arrays.equals(encodedCaCert,
-                                    certObj.getValue().getByteArrayValue())) {
-                                alreadyExists = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (alreadyExists) {
-                        continue;
-                    }
-
-                    byte[] caCertKeyId = IaikP11Util.generateKeyId(session);
-
-                    X500Name caX500Name = X500Name.getInstance(
-                            caCert.getSubjectX500Principal().getEncoded());
-                    String caCommonName = X509Util.getCommonName(caX500Name);
-
-                    String label = null;
-                    for (int j = 0;; j++) {
-                        label = (j == 0)
-                                ? caCommonName
-                                : caCommonName + "-" + j;
-                        if (!existsCertificateObjects(null, label.toCharArray())) {
-                            break;
-                        }
-                    }
-
-                    X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
-                            caCert, encodedCaCert, caCertKeyId, label.toCharArray());
-                    session.createObject(newCaCertTemp);
-                    certificateAdded(keyId, caCert);
-                }
-            } // end if(certChain.length)
-        } catch (TokenException ex) {
-            throw new P11TokenException(ex.getMessage(), ex);
-        } finally {
-            returnWritableSession(session);
-        }
-    } // method updateCertificate
-
-    @Override
-    public boolean removeKeyAndCerts(
-            final P11KeyIdentifier keyId)
-    throws SecurityException, P11TokenException {
-        ParamUtil.requireNonNull("keyId", keyId);
-
-        PrivateKey privKey = getPrivateObject(null, null, keyId);
-        if (privKey == null) {
-            return false;
-        }
-
-        StringBuilder msgBuilder = new StringBuilder();
-        Session session = borrowWritableSession();
-        try {
-            try {
-                session.destroyObject(privKey);
-            } catch (TokenException ex) {
-                msgBuilder.append("could not delete private key, ");
-            }
-
-            PublicKey pubKey = getPublicKeyObject(null, null,
-                    privKey.getId().getByteArrayValue(), null);
-            if (pubKey != null) {
-                try {
-                    session.destroyObject(pubKey);
-                } catch (TokenException ex) {
-                    msgBuilder.append("could not delete public key, ");
-                }
-            }
-
-            keyRemoved(keyId);
-            certificateRemoved(keyId);
-
-            X509PublicKeyCertificate[] certs = getCertificateObjects(
-                    privKey.getId().getByteArrayValue(), null);
-            if (certs != null && certs.length > 0) {
-                for (int i = 0; i < certs.length; i++) {
-                    try {
-                        session.destroyObject(certs[i]);
-                    } catch (TokenException ex) {
-                        msgBuilder.append("could not delete certificate at index ");
-                        msgBuilder.append(i).append(", ");
-                    }
-                } // end for
-            } // end if (certs)
-        } finally {
-            returnWritableSession(session);
-        }
-
-        final int n = msgBuilder.length();
-        if (n > 2) {
-            throw new SecurityException(msgBuilder.substring(0, n - 2));
-        }
-
-        return true;
-    } // method doRemoveKeyAndCerts
-
-    @Override
-    public void removeCerts(
-            final P11KeyIdentifier keyId)
-    throws SecurityException, P11TokenException {
-        ParamUtil.requireNonNull("keyId", keyId);
-
-        String keyLabel = keyId.getLabel();
-        char[] keyLabelChars = (keyLabel == null)
-                ? null
-                : keyLabel.toCharArray();
-
-        X509PublicKeyCertificate[] existingCerts = getCertificateObjects(keyId.getId(),
-                keyLabelChars);
-
+        X509PublicKeyCertificate[] existingCerts = getCertificateObjects(keyId, null);
         if (existingCerts == null || existingCerts.length == 0) {
-            throw new SecurityException("could not find certificates with id " + keyId);
+            LOG.warn("could not find certificates with id " + keyId);
         }
 
         Session session = borrowWritableSession();
         try {
             for (X509PublicKeyCertificate cert : existingCerts) {
                 session.destroyObject(cert);
-                certificateRemoved(keyId);
             }
         } catch (TokenException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
@@ -1418,122 +875,43 @@ class IaikP11Slot extends AbstractP11Slot {
         }
     }
 
-    private void assertMatch(
-            final X509Certificate cert,
-            final P11KeyIdentifier keyId,
-            final HashAlgoType hashAlgoForVerification)
-    throws SecurityException {
-        ConfPairs pairs = new ConfPairs("slot-id", Long.toString(slot.getSlotID()));
-        pairs.putPair("key-id", Hex.toHexString(keyId.getId()));
-        securityFactory.createSigner("PKCS11", pairs.getEncoded(),
-                hashAlgoForVerification.getName(), null, cert);
-    }
-
     @Override
-    public P11KeyIdentifier addCert(
+    protected void doAddCert(
+            final P11ObjectIdentifier objectId,
             final X509Certificate cert)
-    throws SecurityException, P11TokenException {
-        ParamUtil.requireNonNull("cert", cert);
+    throws P11TokenException, SecurityException {
         Session session = borrowWritableSession();
         try {
-            byte[] encodedCert = cert.getEncoded();
-
-            X509PublicKeyCertificate[] certObjs = getCertificateObjects(
-                    cert.getSubjectX500Principal());
-            if (certObjs != null) {
-                for (X509PublicKeyCertificate certObj : certObjs) {
-                    if (Arrays.equals(encodedCert, certObj.getValue().getByteArrayValue())) {
-                        P11KeyIdentifier p11KeyId = new P11KeyIdentifier(
-                                certObj.getId().getByteArrayValue(),
-                                new String(certObj.getLabel().getCharArrayValue()));
-                        throw new SecurityException(
-                                "given certificate already exists under " + p11KeyId);
-                    }
-                }
-            }
-
-            byte[] keyId = IaikP11Util.generateKeyId(session);
-
-            X500Name x500Name = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-            String cn = X509Util.getCommonName(x500Name);
-
-            String label = null;
-            for (int j = 0;; j++) {
-                label = (j == 0)
-                        ? cn
-                        : cn + "-" + j;
-                if (!existsCertificateObjects(null, label.toCharArray())) {
-                    break;
-                }
-            }
-
             X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
-                    cert, encodedCert, keyId, label.toCharArray());
+                    new X509Cert(cert), objectId.getId(), objectId.getLabelChars());
             session.createObject(newCaCertTemp);
-            P11KeyIdentifier p11KeyId = new P11KeyIdentifier(keyId,
-                    new String(newCaCertTemp.getLabel().getCharArrayValue()));
-            certificateAdded(p11KeyId, cert);
-            return p11KeyId;
         } catch (TokenException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
-        } catch (CertificateEncodingException ex) {
-            throw new SecurityException(ex.getMessage(), ex);
         } finally {
             returnWritableSession(session);
         }
     }
 
     @Override
-    public P11KeyIdentifier generateRSAKeypair(
-            final int keySize,
+    protected P11Identity doGenerateRSAKeypair(
+            final int keysize,
             final BigInteger publicExponent,
             final String label)
     throws P11TokenException {
-        ParamUtil.requireNonBlank("label", label);
-        ParamUtil.requireMin("keySize", keySize, 1024);
-        if (keySize % 1024 != 0) {
-            throw new IllegalArgumentException("key size is not multiple of 1024: " + keySize);
-        }
-
-        final long mech = P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN;
-        assertMechanismSupported(mech);
-
-        BigInteger tmpPublicExponent = publicExponent;
-        if (tmpPublicExponent == null) {
-            tmpPublicExponent = BigInteger.valueOf(65537);
-        }
-
         RSAPrivateKey privateKey = new RSAPrivateKey();
         RSAPublicKey publicKey = new RSAPublicKey();
         setKeyAttributes(label, P11Constants.CKK_RSA, publicKey, privateKey);
 
-        publicKey.getModulusBits().setLongValue((long) keySize);
-        publicKey.getPublicExponent().setByteArrayValue(tmpPublicExponent.toByteArray());
-        return generateKeyPair(mech, privateKey, publicKey);
-
+        publicKey.getModulusBits().setLongValue((long) keysize);
+        publicKey.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
+        return generateKeyPair(P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN, privateKey, publicKey);
     }
 
     @Override
-    public P11KeyIdentifier generateDSAKeypair(
-            final int plength,
-            final int qlength,
+    protected P11Identity doGenerateDSAKeypair(
+            DSAParameters dsaParams,
             final String label)
     throws P11TokenException {
-        ParamUtil.requireNonBlank("label", label);
-        ParamUtil.requireMin("pLength", plength, 1024);
-        if (plength % 1024 != 0) {
-            throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
-        }
-
-        final long mech = P11Constants.CKM_DSA_KEY_PAIR_GEN;
-        assertMechanismSupported(mech);
-
-        DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
-        DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
-                plength, qlength, 80, new SecureRandom());
-        paramGen.init(genParams);
-        DSAParameters dsaParams = paramGen.generateParameters();
-
         DSAPrivateKey privateKey = new DSAPrivateKey();
         DSAPublicKey publicKey = new DSAPublicKey();
         setKeyAttributes(label, P11Constants.CKK_DSA, publicKey, privateKey);
@@ -1541,30 +919,14 @@ class IaikP11Slot extends AbstractP11Slot {
         publicKey.getPrime().setByteArrayValue(dsaParams.getP().toByteArray());
         publicKey.getSubprime().setByteArrayValue(dsaParams.getQ().toByteArray());
         publicKey.getBase().setByteArrayValue(dsaParams.getG().toByteArray());
-        return generateKeyPair(mech, privateKey, publicKey);
+        return generateKeyPair(P11Constants.CKM_DSA_KEY_PAIR_GEN, privateKey, publicKey);
     }
 
     @Override
-    public P11KeyIdentifier generateECKeypair(
-            final String curveNameOrOid,
+    protected P11Identity doGenerateECKeypair(
+            final ASN1ObjectIdentifier curveId,
             final String label)
-    throws SecurityException, P11TokenException {
-        ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
-        ParamUtil.requireNonBlank("label", label);
-
-        ASN1ObjectIdentifier curveId = KeyUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
-        if (curveId == null) {
-            throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
-        }
-
-        X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
-        if (ecParams == null) {
-            throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
-        }
-
-        final long mech = P11Constants.CKM_EC_KEY_PAIR_GEN;
-        assertMechanismSupported(mech);
-
+    throws P11TokenException {
         ECDSAPrivateKey privateKey = new ECDSAPrivateKey();
         ECDSAPublicKey publicKey = new ECDSAPublicKey();
         setKeyAttributes(label, P11Constants.CKK_EC, publicKey, privateKey);
@@ -1573,27 +935,33 @@ class IaikP11Slot extends AbstractP11Slot {
         try {
             encodedCurveId = curveId.getEncoded();
         } catch (IOException ex) {
-            throw new SecurityException(ex.getMessage(), ex);
+            throw new P11TokenException(ex.getMessage(), ex);
         }
         try {
             publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
-            return generateKeyPair(mech, privateKey, publicKey);
+            return generateKeyPair(P11Constants.CKM_EC_KEY_PAIR_GEN, privateKey, publicKey);
         } catch (P11TokenException ex) {
+            X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
+            if (ecParams == null) {
+                throw new IllegalArgumentException("could not ge X9ECParameters for curve "
+                        + curveId.getId());
+            }
+
             try {
                 publicKey.getEcdsaParams().setByteArrayValue(ecParams.getEncoded());
             } catch (IOException ex2) {
-                throw new SecurityException(ex.getMessage(), ex);
+                throw new P11TokenException(ex.getMessage(), ex);
             }
-            return generateKeyPair(mech, privateKey, publicKey);
+            return generateKeyPair(P11Constants.CKM_EC_KEY_PAIR_GEN, privateKey, publicKey);
         }
-    } // method generateECKeypair
+    }
 
-    private P11KeyIdentifier generateKeyPair(
+    private P11Identity generateKeyPair(
             final long mech,
             final PrivateKey privateKey,
             final PublicKey publicKey)
     throws P11TokenException {
-        final String label = new String(privateKey.getLabel().getCharArrayValue());
+        final String label = toString(privateKey.getLabel());
         Session session = borrowWritableSession();
         try {
             if (IaikP11Util.labelExists(session, label)) {
@@ -1612,63 +980,27 @@ class IaikP11Slot extends AbstractP11Slot {
                         "could not generate keypair " + P11Constants.getMechanismName(mech), ex);
             }
 
-            P11KeyIdentifier keyId = new P11KeyIdentifier(id, label);
-            P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, keyId);
+            P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
+            P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId);
             java.security.PublicKey jcePublicKey;
             try {
                 jcePublicKey = generatePublicKey(keypair.getPublicKey());
             } catch (SecurityException ex) {
-                throw new P11TokenException("could not generate public key " + keyId, ex);
+                throw new P11TokenException("could not generate public key " + objId, ex);
             }
 
-            P11Identity identity = new IaikP11Identity(moduleName, entityId, privateKey, null,
-                    jcePublicKey);
-            keyAdded(identity);
-            return keyId;
+            return new IaikP11Identity(moduleName, entityId, privateKey, null, jcePublicKey);
         } finally {
             returnWritableSession(session);
         }
     }
 
-    @Override
-    public X509Certificate exportCert(
-            final P11KeyIdentifier keyId)
-    throws SecurityException, P11TokenException {
-        ParamUtil.requireNonNull("keyId", keyId);
-        try {
-            return getIdentity(keyId).getCertificate();
-        } catch (P11UnknownEntityException ex) {
-            // CHECKSTYLE:SKIP
-        }
-
-        X509PublicKeyCertificate cert = getCertificateObject(keyId.getId(), null);
-        if (cert == null) {
-            throw new P11UnknownEntityException(slotId, keyId);
-        }
-        try {
-            return parseCert(cert);
-        } catch (CertificateException | IOException ex) {
-            throw new SecurityException(ex.getMessage(), ex);
-        }
-    }
-
     private static X509PublicKeyCertificate createPkcs11Template(
-            final X509Certificate cert,
-            final byte[] encodedCert,
+            final X509Cert cert,
             final byte[] keyId,
-            final char[] label)
-    throws SecurityException, P11TokenException {
+            final char[] label) {
         if (label == null || label.length == 0) {
             throw new IllegalArgumentException("label must not be null or empty");
-        }
-
-        byte[] tmpEncodedCert = encodedCert;
-        if (tmpEncodedCert == null) {
-            try {
-                tmpEncodedCert = cert.getEncoded();
-            } catch (CertificateEncodingException ex) {
-                throw new SecurityException(ex.getMessage(), ex);
-            }
         }
 
         X509PublicKeyCertificate newCertTemp = new X509PublicKeyCertificate();
@@ -1679,12 +1011,12 @@ class IaikP11Slot extends AbstractP11Slot {
                 CertificateType.X_509_PUBLIC_KEY);
 
         newCertTemp.getSubject().setByteArrayValue(
-                cert.getSubjectX500Principal().getEncoded());
+                cert.getCert().getSubjectX500Principal().getEncoded());
         newCertTemp.getIssuer().setByteArrayValue(
-                cert.getIssuerX500Principal().getEncoded());
+                cert.getCert().getIssuerX500Principal().getEncoded());
         newCertTemp.getSerialNumber().setByteArrayValue(
-                cert.getSerialNumber().toByteArray());
-        newCertTemp.getValue().setByteArrayValue(tmpEncodedCert);
+                cert.getCert().getSerialNumber().toByteArray());
+        newCertTemp.getValue().setByteArrayValue(cert.getEncodedCert());
         return newCertTemp;
     }
 
@@ -1712,162 +1044,68 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    public void showDetails(
-            final OutputStream stream,
-            final boolean verbose)
-    throws IOException, SecurityException, P11TokenException {
-        ParamUtil.requireNonNull("stream", stream);
-        List<PrivateKey> allPrivateObjects = getAllPrivateObjects(null, null);
-        int size = allPrivateObjects.size();
-
-        List<ComparableIaikPrivateKey> privateKeys = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            PrivateKey key = allPrivateObjects.get(i);
-            byte[] id = key.getId().getByteArrayValue();
-            if (id != null) {
-                char[] label = key.getLabel().getCharArrayValue();
-                ComparableIaikPrivateKey privKey = new ComparableIaikPrivateKey(id, label);
-                privateKeys.add(privKey);
-            }
+    protected void doUpdateCertificate(
+            final P11ObjectIdentifier objectId,
+            final X509Certificate newCert)
+    throws SecurityException, P11TokenException {
+        removeCerts(objectId);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            // CHECKSTYLE:SKIP
         }
 
-        Collections.sort(privateKeys);
-        size = privateKeys.size();
+        X509PublicKeyCertificate newCertTemp = createPkcs11Template(new X509Cert(newCert),
+                objectId.getId(), objectId.getLabelChars());
 
-        List<X509PublicKeyCertificate> allCertObjects = getAllCertificateObjects();
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < size; i++) {
-            ComparableIaikPrivateKey privKey = privateKeys.get(i);
-            byte[] keyId = privKey.getKeyId();
-            char[] keyLabel = privKey.getKeyLabel();
-
-            PublicKey pubKey = getPublicKeyObject(null, null, keyId, keyLabel);
-            sb.append("\t").append(i + 1).append(". ").append(privKey.getKeyLabelAsText());
-            sb.append(" (").append("id: ");
-            sb.append(Hex.toHexString(privKey.getKeyId()).toUpperCase()).append(")\n");
-            sb.append("\t\tAlgorithm: ").append(getKeyAlgorithm(pubKey)).append("\n");
-
-            X509PublicKeyCertificate cert = removeCertificateObject(allCertObjects, keyId,
-                    keyLabel);
-            if (cert == null) {
-                sb.append("\t\tCertificate: NONE\n");
-            } else {
-                formatString(verbose, sb, cert);
-            }
-        }
-
-        for (int i = 0; i < allCertObjects.size(); i++) {
-            X509PublicKeyCertificate certObj = allCertObjects.get(i);
-            sb.append("\tCert-").append(i + 1).append(". ");
-            sb.append(certObj.getLabel().getCharArrayValue()).append(" (").append("id: ");
-            sb.append(Hex.toHexString(certObj.getId().getByteArrayValue()).toUpperCase());
-            sb.append(")\n");
-
-            formatString(verbose, sb, certObj);
-        }
-
-        if (sb.length() > 0) {
-            stream.write(sb.toString().getBytes());
+        Session session = borrowWritableSession();
+        try {
+            session.createObject(newCertTemp);
+        } catch (TokenException ex) {
+            throw new P11TokenException("could not createObject: " + ex.getMessage(), ex);
+        } finally {
+            returnWritableSession(session);
         }
     }
 
-    private static String getKeyAlgorithm(
-            final PublicKey key) {
-        if (key instanceof RSAPublicKey) {
-            return "RSA";
-        } else if (key instanceof ECDSAPublicKey) {
-            byte[] paramBytes = ((ECDSAPublicKey) key).getEcdsaParams().getByteArrayValue();
-            if (paramBytes.length < 50) {
-                try {
-                    ASN1ObjectIdentifier curveId =
-                            (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(paramBytes);
-                    String curveName = KeyUtil.getCurveName(curveId);
-                    return "EC (named curve " + curveName + ")";
-                } catch (Exception ex) {
-                    return "EC";
-                }
-            } else {
-                return "EC (specified curve)";
-            }
-        } else if (key instanceof DSAPublicKey) {
-            return "DSA";
-        } else {
-            return "UNKNOWN";
-        }
-    }
-
-    private static X509PublicKeyCertificate removeCertificateObject(
-            final List<X509PublicKeyCertificate> certificateObjects,
+    private X509PublicKeyCertificate[] getCertificateObjects(
             final byte[] keyId,
-            final char[] keyLabel) {
-        X509PublicKeyCertificate cert = null;
-        for (X509PublicKeyCertificate certObj : certificateObjects) {
-            if (keyId != null && !Arrays.equals(keyId, certObj.getId().getByteArrayValue())) {
-                continue;
+            final char[] keyLabel)
+    throws P11TokenException {
+        Session session = borrowIdleSession();
+
+        try {
+            X509PublicKeyCertificate template = new X509PublicKeyCertificate();
+            if (keyId != null) {
+                template.getId().setByteArrayValue(keyId);
+            }
+            if (keyLabel != null) {
+                template.getLabel().setCharArrayValue(keyLabel);
             }
 
-            if (keyLabel != null
-                    && !Arrays.equals(keyLabel, certObj.getLabel().getCharArrayValue())) {
-                continue;
+            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
+            if (CollectionUtil.isEmpty(tmpObjects)) {
+                LOG.info("found no certificate identified by {}", getDescription(keyId, keyLabel));
+                return null;
             }
 
-            cert = certObj;
-            break;
+            int size = tmpObjects.size();
+            X509PublicKeyCertificate[] certs = new X509PublicKeyCertificate[size];
+            for (int i = 0; i < size; i++) {
+                certs[i] = (X509PublicKeyCertificate) tmpObjects.get(i);
+            }
+            return certs;
+        } finally {
+            returnIdleSession(session);
         }
-
-        if (cert != null) {
-            certificateObjects.remove(cert);
-        }
-
-        return cert;
     }
 
-    private void formatString(
-            final boolean verbose,
-            final StringBuilder sb,
-            final X509PublicKeyCertificate cert) {
-        byte[] bytes = cert.getSubject().getByteArrayValue();
-        String subject;
-        try {
-            X500Principal x500Prin = new X500Principal(bytes);
-            subject = X509Util.getRfc4519Name(x500Prin);
-        } catch (Exception ex) {
-            subject = new String(bytes);
-        }
-
-        if (!verbose) {
-            sb.append("\t\tCertificate: ").append(subject).append("\n");
-            return;
-        }
-
-        sb.append("\t\tCertificate:\n");
-        sb.append("\t\t\tSubject: ").append(subject).append("\n");
-
-        bytes = cert.getIssuer().getByteArrayValue();
-        String issuer;
-        try {
-            X500Principal x500Prin = new X500Principal(bytes);
-            issuer = X509Util.getRfc4519Name(x500Prin);
-        } catch (Exception ex) {
-            issuer = new String(bytes);
-        }
-        sb.append("\t\t\tIssuer: ").append(issuer).append("\n");
-
-        byte[] certBytes = cert.getValue().getByteArrayValue();
-
-        X509Certificate x509Cert = null;
-        try {
-            x509Cert = X509Util.parseCert(certBytes);
-        } catch (Exception ex) {
-            sb.append("\t\t\tError: " + ex.getMessage());
-            return;
-        }
-
-        sb.append("\t\t\tSerial: ").append(x509Cert.getSerialNumber()).append("\n");
-        sb.append("\t\t\tStart time: ").append(x509Cert.getNotBefore()).append("\n");
-        sb.append("\t\t\tEnd time: ").append(x509Cert.getNotAfter()).append("\n");
-        sb.append("\t\t\tSHA1 Sum: ").append(HashCalculator.hexSha1(certBytes)).append("\n");
+    @Override
+    protected boolean doRemoveIdentity(
+            P11ObjectIdentifier objectId)
+    throws P11TokenException {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

@@ -145,9 +145,10 @@ class KeystoreP11Module extends AbstractP11Module {
 
             PrivateKeyCryptor privateKeyCryptor = new PrivateKeyCryptor(pwd.get(0));
 
+            int maxSessions = 20;
             P11Slot slot = new KeystoreP11Slot(moduleConf.getName(), slotDir, slotId,
                     privateKeyCryptor, moduleConf.getSecurityFactory(),
-                    moduleConf.getP11MechanismFilter());
+                    moduleConf.getP11MechanismFilter(), maxSessions);
             slots.add(slot);
         }
 

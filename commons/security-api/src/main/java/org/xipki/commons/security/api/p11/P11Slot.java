@@ -44,9 +44,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 
@@ -62,11 +60,11 @@ public interface P11Slot {
 
     P11SlotIdentifier getSlotId();
 
-    List<P11KeyIdentifier> getKeyIdentifiers()
+    List<P11ObjectIdentifier> getKeyIdentifiers()
     throws P11TokenException;
 
     boolean hasIdentity(
-            final P11KeyIdentifier keyId);
+            final P11ObjectIdentifier objectId);
 
     void close();
 
@@ -80,17 +78,17 @@ public interface P11Slot {
     throws P11UnsupportedMechanismException;
 
     P11Identity getIdentity(
-            final P11KeyIdentifier keyId)
+            final P11ObjectIdentifier objectId)
     throws P11UnknownEntityException;
 
     void refresh()
     throws P11TokenException;
 
-    P11KeyIdentifier getKeyIdForId(
+    P11ObjectIdentifier getObjectIdForId(
             byte[] id)
     throws P11UnknownEntityException;
 
-    P11KeyIdentifier getKeyIdForLabel(
+    P11ObjectIdentifier getObjectIdForLabel(
             String label)
     throws P11UnknownEntityException;
 
@@ -98,50 +96,48 @@ public interface P11Slot {
             final long mechanism,
             final P11Params parameters,
             final byte[] content,
-            final P11KeyIdentifier keyId)
-    throws P11TokenException;
+            final P11ObjectIdentifier objectId)
+    throws P11TokenException, SecurityException;
 
     void updateCertificate(
-            @Nonnull P11KeyIdentifier keyId,
-            @Nonnull X509Certificate newCert,
-            @Nullable Set<X509Certificate> caCerts,
-            @Nonnull HashAlgoType hashAlgoForVerification)
+            @Nonnull P11ObjectIdentifier objectId,
+            @Nonnull X509Certificate newCert)
     throws P11TokenException, SecurityException;
 
-    boolean removeKeyAndCerts(
-            @Nonnull P11KeyIdentifier keyId)
-    throws P11TokenException, SecurityException;
+    boolean removeIdentity(
+            @Nonnull P11ObjectIdentifier objectId)
+    throws P11TokenException;
 
     void removeCerts(
-            @Nonnull P11KeyIdentifier keyId)
-    throws P11TokenException, SecurityException;
+            @Nonnull P11ObjectIdentifier objectId)
+    throws P11TokenException;
 
-    P11KeyIdentifier addCert(
+    P11ObjectIdentifier addCert(
             @Nonnull X509Certificate cert)
     throws P11TokenException, SecurityException;
 
     // CHECKSTYLE:SKIP
-    P11KeyIdentifier generateRSAKeypair(
-            int keySize,
+    P11ObjectIdentifier generateRSAKeypair(
+            int keysize,
             @Nonnull BigInteger publicExponent,
             @Nonnull String label)
     throws P11TokenException, SecurityException;
 
     // CHECKSTYLE:SKIP
-    P11KeyIdentifier generateDSAKeypair(
+    P11ObjectIdentifier generateDSAKeypair(
             int plength,
             int qlength,
             @Nonnull String label)
     throws P11TokenException, SecurityException;
 
     // CHECKSTYLE:SKIP
-    P11KeyIdentifier generateECKeypair(
+    P11ObjectIdentifier generateECKeypair(
             @Nonnull String curveNameOrOid,
             @Nonnull String label)
     throws P11TokenException, SecurityException;
 
     X509Certificate exportCert(
-            @Nonnull P11KeyIdentifier keyId)
+            @Nonnull P11ObjectIdentifier objectId)
     throws P11TokenException, SecurityException;
 
     void showDetails(

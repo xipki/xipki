@@ -45,7 +45,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
@@ -69,10 +69,10 @@ public class P11CertExportCmd extends P11SecurityCommandSupport {
     protected Object doExecute()
     throws Exception {
         P11Slot slot = getSlot();
-        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        X509Certificate cert = slot.exportCert(keyIdentifier);
+        P11ObjectIdentifier objIdentifier = getObjectIdentifier();
+        X509Certificate cert = slot.exportCert(objIdentifier);
         if (cert == null) {
-            throw new CmdFailure("could not export certificate " + keyIdentifier);
+            throw new CmdFailure("could not export certificate " + objIdentifier);
         }
         saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
         return null;

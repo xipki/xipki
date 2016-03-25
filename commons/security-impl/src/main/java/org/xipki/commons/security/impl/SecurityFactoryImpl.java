@@ -114,11 +114,11 @@ import org.xipki.commons.security.api.p11.P11Control;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11MechanismFilter;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11NullPasswordRetriever;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11PasswordRetriever;
 import org.xipki.commons.security.api.p11.P11PermitAllMechanimFilter;
 import org.xipki.commons.security.api.p11.P11Slot;
@@ -316,23 +316,23 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     throw new SecurityException("P11TokenException: " + ex.getMessage(), ex);
                 }
 
-                P11KeyIdentifier p11KeyId;
+                P11ObjectIdentifier p11ObjId;
                 try {
-                    p11KeyId = (keyId != null)
-                        ? slot.getKeyIdForId(keyId)
-                        : slot.getKeyIdForLabel(keyLabel);
+                    p11ObjId = (keyId != null)
+                        ? slot.getObjectIdForId(keyId)
+                        : slot.getObjectIdForLabel(keyLabel);
                 } catch (P11UnknownEntityException ex) {
                     throw new SecurityException("unknown PKCS#11 entity: " + ex.getMessage(), ex);
                 }
 
-                P11EntityIdentifier entityId = new P11EntityIdentifier(slot.getSlotId(), p11KeyId);
+                P11EntityIdentifier entityId = new P11EntityIdentifier(slot.getSlotId(), p11ObjId);
 
                 try {
                     AlgorithmIdentifier signatureAlgId;
                     if (hashAlgo == null) {
                         signatureAlgId = getSignatureAlgoId(conf);
                     } else {
-                        PublicKey pubKey = slot.getIdentity(p11KeyId).getPublicKey();
+                        PublicKey pubKey = slot.getIdentity(p11ObjId).getPublicKey();
                         signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo,
                                 sigAlgoControl);
                     }
