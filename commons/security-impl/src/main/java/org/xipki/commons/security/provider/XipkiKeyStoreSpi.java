@@ -65,8 +65,8 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11Identity;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11Module;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
@@ -171,9 +171,9 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
         for (P11SlotIdentifier slotId: slotIds) {
             P11Slot slot = module.getSlot(slotId);
-            List<P11KeyIdentifier> keyIds = slot.getKeyIdentifiers();
-            for (P11KeyIdentifier keyId : keyIds) {
-                P11Identity identity = slot.getIdentity(keyId);
+            List<P11ObjectIdentifier> identityIds = slot.getKeyIdentifiers();
+            for (P11ObjectIdentifier objId : identityIds) {
+                P11Identity identity = slot.getIdentity(objId);
                 X509Certificate[] chain = identity.getCertificateChain();
                 if (chain == null || chain.length == 0) {
                     continue;
@@ -182,13 +182,13 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
                 P11PrivateKey key = new P11PrivateKey(p11Service, identity.getEntityId());
                 KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
                 keyCerts.put(moduleName + "#slotid-" + slotId.getId() + "#keyid-"
-                        + keyId.getIdHex(), keyCertEntry);
+                        + objId.getIdHex(), keyCertEntry);
                 keyCerts.put(moduleName + "#slotid-" + slotId.getId() + "#keylabel-"
-                            + keyId.getLabel(), keyCertEntry);
+                            + objId.getLabel(), keyCertEntry);
                 keyCerts.put(moduleName + "#slotindex-" + slotId.getIndex() + "#keyid-"
-                            + keyId.getIdHex(), keyCertEntry);
+                            + objId.getIdHex(), keyCertEntry);
                 keyCerts.put(moduleName + "#slotindex-" + slotId.getIndex() + "#keylabel-"
-                            + keyId.getLabel(), keyCertEntry);
+                            + objId.getLabel(), keyCertEntry);
             }
         }
     } // method engineLoad

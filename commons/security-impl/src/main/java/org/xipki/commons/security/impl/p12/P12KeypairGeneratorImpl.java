@@ -288,17 +288,17 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
             ASN1ObjectIdentifier hashOid;
             ASN1ObjectIdentifier sigOid;
 
-            int keySize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
-            if (keySize > 384) {
+            int keysize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
+            if (keysize > 384) {
                 hashOid = NISTObjectIdentifiers.id_sha512;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-            } else if (keySize > 256) {
+            } else if (keysize > 256) {
                 hashOid = NISTObjectIdentifiers.id_sha384;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-            } else if (keySize > 224) {
+            } else if (keysize > 224) {
                 hashOid = NISTObjectIdentifiers.id_sha224;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
-            } else if (keySize > 160) {
+            } else if (keysize > 160) {
                 hashOid = NISTObjectIdentifiers.id_sha256;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
             } else {

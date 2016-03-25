@@ -67,15 +67,15 @@ public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
                     + "(required)")
     private Integer slotIndex;
 
-    @Option(name = "--key-id",
+    @Option(name = "--id",
             description = "id of the private key in the PKCS#11 device\n"
                     + "either keyId or keyLabel must be specified")
-    private String keyId;
+    private String id;
 
-    @Option(name = "--key-label",
+    @Option(name = "--label",
             description = "label of the private key in the PKCS#11 device\n"
                     + "either keyId or keyLabel must be specified")
-    private String keyLabel;
+    private String label;
 
     @Option(name = "--module",
             description = "name of the PKCS#11 module")
@@ -88,13 +88,13 @@ public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
     throws Exception {
         ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
 
-        byte[] keyIdBytes = null;
-        if (keyId != null) {
-            keyIdBytes = Hex.decode(keyId);
+        byte[] idBytes = null;
+        if (id != null) {
+            idBytes = Hex.decode(id);
         }
 
         String signerConfWithoutAlgo = SignerConfUtil.getPkcs11SignerConfWithoutAlgo(
-                        moduleName, slotIndex, null, keyLabel, keyIdBytes, 1);
+                        moduleName, slotIndex, null,label, idBytes, 1);
 
         return securityFactory.createSigner("PKCS11",
                 signerConfWithoutAlgo, hashAlgo, signatureAlgoControl,

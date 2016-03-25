@@ -42,7 +42,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
@@ -61,34 +61,34 @@ public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
                     + "(required)")
     protected Integer slotIndex;
 
-    @Option(name = "--key-id",
+    @Option(name = "--id",
             description = "id of the private key in the PKCS#11 device\n"
                     + "either keyId or keyLabel must be specified")
-    protected String keyId;
+    protected String id;
 
-    @Option(name = "--key-label",
+    @Option(name = "--label",
             description = "label of the private key in the PKCS#11 device\n"
                     + "either keyId or keyLabel must be specified")
-    protected String keyLabel;
+    protected String label;
 
     @Option(name = "--module",
             description = "name of the PKCS#11 module")
     @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    public P11KeyIdentifier getKeyIdentifier()
+    public P11ObjectIdentifier getObjectIdentifier()
     throws IllegalCmdParamException, SecurityException, P11TokenException {
         P11Slot slot = getSlot();
-        P11KeyIdentifier keyIdentifier;
-        if (keyId != null && keyLabel == null) {
-            keyIdentifier = slot.getKeyIdForId(Hex.decode(keyId));
-        } else if (keyId == null && keyLabel != null) {
-            keyIdentifier = slot.getKeyIdForLabel(keyLabel);
+        P11ObjectIdentifier objIdentifier;
+        if (id != null && label == null) {
+            objIdentifier = slot.getObjectIdForId(Hex.decode(id));
+        } else if (id == null && label != null) {
+            objIdentifier = slot.getObjectIdForLabel(label);
         } else {
             throw new IllegalCmdParamException(
                     "exactly one of keyId or keyLabel should be specified");
         }
-        return keyIdentifier;
+        return objIdentifier;
     }
 
     protected P11Slot getSlot()

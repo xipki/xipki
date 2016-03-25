@@ -93,7 +93,7 @@ class IaikP11Identity extends P11Identity {
 
         IaikP11Module module = getModule();
         IaikP11Slot slot = (IaikP11Slot) module.getSlot(entityId.getSlotId());
-        return slot.sign(mechanism, parameters, content, entityId.getKeyId());
+        return slot.sign(mechanism, parameters, content, this);
     }
 
     PrivateKey getPrivateKey() {

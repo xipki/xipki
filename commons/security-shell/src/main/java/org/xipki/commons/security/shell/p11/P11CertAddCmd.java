@@ -44,7 +44,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
@@ -83,8 +83,8 @@ public class P11CertAddCmd extends SecurityCommandSupport {
     throws Exception {
         X509Certificate cert = X509Util.parseCert(certFile);
         P11Slot slot = getSlot(moduleName, slotIndex);
-        P11KeyIdentifier p11KeyId = slot.addCert(cert);
-        println("added certificate under " + p11KeyId);
+        P11ObjectIdentifier objectId = slot.addCert(cert);
+        println("added certificate under " + objectId);
         return null;
     }
 

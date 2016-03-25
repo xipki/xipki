@@ -36,6 +36,7 @@
 
 package org.xipki.commons.security.impl.p11.proxy;
 
+import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -58,20 +59,24 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.xipki.commons.pkcs11proxy.common.ASN1EntityIdentifier;
-import org.xipki.commons.pkcs11proxy.common.ASN1KeyIdentifier;
+import org.xipki.commons.pkcs11proxy.common.ASN1P11ObjectIdentifier;
 import org.xipki.commons.pkcs11proxy.common.ASN1SlotIdentifier;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.AbstractP11Slot;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11MechanismFilter;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11SlotRefreshResult;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.P11UnknownEntityException;
+import org.xipki.commons.security.api.util.KeyUtil;
 
 /**
  * @author Lijun Liao
@@ -90,8 +95,10 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    public void refresh()
+    protected P11SlotRefreshResult doRefresh()
     throws P11TokenException {
+        P11SlotRefreshResult ret = new P11SlotRefreshResult();
+
         ASN1SlotIdentifier asn1SlotId = new ASN1SlotIdentifier(slotId);
         ASN1Encodable resp = getModule().send(P11ProxyConstants.ACTION_getMechanisms, asn1SlotId);
         if (!(resp instanceof ASN1Sequence)) {
@@ -102,7 +109,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
         int count = seq.size();
         for ( int i = 0; i < count; i++) {
             long mech = ASN1Integer.getInstance(seq.getObjectAt(i)).getValue().longValue();
-            addMechanism(mech);
+            ret.addMechanism(mech);
         }
 
         resp = getModule().send(P11ProxyConstants.ACTION_getKeyIds, asn1SlotId);
@@ -116,9 +123,9 @@ public class ProxyP11Slot extends AbstractP11Slot {
         count = seq.size();
         List<P11KeyIdentifier> keyIds = new LinkedList<>();
         for (int i = 0; i < count; i++) {
-            ASN1KeyIdentifier asn1KeyId;
+            ASN1ObjectIdentifier asn1KeyId;
             try {
-                asn1KeyId = ASN1KeyIdentifier.getInstance(seq.getObjectAt(i));
+                asn1KeyId = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(i));
             } catch (BadAsn1ObjectException ex) {
                 throw new P11TokenException("invalid response: " + ex.getMessage(), ex);
             }
@@ -161,7 +168,15 @@ public class ProxyP11Slot extends AbstractP11Slot {
         if (octetString == null) {
             return null;
         }
-        return generatePublicKey(octetString.getOctets());
+
+        SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.getInstance(
+                octetString.getOctets());
+        try {
+            return KeyUtil.generatePublicKey(pkInfo);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+            throw new P11TokenException("could not generate Public Key from SubjectPublicKeyInfo:"
+                    + ex.getMessage(), ex);
+        }
     }
 
     private X509Certificate[] getCertificates(
@@ -187,44 +202,73 @@ public class ProxyP11Slot extends AbstractP11Slot {
         return certs;
     }
 
-    private static PublicKey generatePublicKey(
-            final byte[] encodedSubjectPublicKeyInfo)
+    @Override
+    protected P11SlotRefreshResult doRefresh(
+            final P11MechanismFilter mechanismFilter)
     throws P11TokenException {
-        SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.getInstance(
-                encodedSubjectPublicKeyInfo);
-
-        X509EncodedKeySpec keyspec = new X509EncodedKeySpec(encodedSubjectPublicKeyInfo);
-        ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
-
-        KeyFactory kf;
-
-        try {
-            if (PKCSObjectIdentifiers.rsaEncryption.equals(aid)) {
-                kf = KeyFactory.getInstance("RSA");
-            } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(aid)) {
-                kf = KeyFactory.getInstance("ECDSA");
-            } else if (X9ObjectIdentifiers.id_dsa.equals(aid)) {
-                kf = KeyFactory.getInstance("DSA");
-            } else {
-                throw new P11TokenException("unsupported key algorithm: " + aid);
-            }
-        } catch (NoSuchAlgorithmException ex) {
-            throw new P11TokenException("NoSuchAlgorithmException: " + ex.getMessage(), ex);
-        }
-
-        try {
-            return kf.generatePublic(keyspec);
-        } catch (InvalidKeySpecException ex) {
-            throw new P11TokenException("InvalidKeySpecException: " + ex.getMessage(), ex);
-        }
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    private ProxyP11Module getModule()
+    @Override
+    protected boolean doRemoveIdentity(
+            final P11ObjectIdentifier objectId)
     throws P11TokenException {
-        ProxyP11Module module = ProxyP11ModulePool.getInstance().getModule(moduleName);
-        if (module == null) {
-            throw new P11TokenException("could not find RemoteP11Module '" + moduleName + "'");
-        }
-        return module;
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    protected void doRemoveCerts(
+            final byte[] keyId)
+    throws P11TokenException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void doAddCert(
+            final P11ObjectIdentifier objectId,
+            final X509Certificate cert)
+    throws P11TokenException, SecurityException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected P11Identity doGenerateRSAKeypair(
+            final int keysize,
+            final BigInteger publicExponent,
+            final String label)
+    throws P11TokenException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected P11Identity doGenerateDSAKeypair(
+            final DSAParameters dsaParams,
+            final String label)
+    throws P11TokenException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected P11Identity doGenerateECKeypair(
+            final ASN1ObjectIdentifier curveId,
+            final String label)
+    throws P11TokenException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected void doUpdateCertificate(
+            final P11ObjectIdentifier objectId,
+            final X509Certificate newCert)
+    throws SecurityException, P11TokenException {
+        // TODO Auto-generated method stub
+
     }
 }

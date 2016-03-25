@@ -42,7 +42,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
@@ -63,11 +63,11 @@ public class P11CertDeleteCmd extends SecurityCommandSupport {
                     + "(required)")
     private Integer slotIndex;
 
-    @Option(name = "--key-id",
+    @Option(name = "--id",
             required = true,
             description = "id of the certificate in the PKCS#11 device\n"
                     + "(required)")
-    private String keyId;
+    private String id;
 
     @Option(name = "--module",
             description = "name of the PKCS#11 module.")
@@ -78,8 +78,8 @@ public class P11CertDeleteCmd extends SecurityCommandSupport {
     protected Object doExecute()
     throws Exception {
         P11Slot slot = getSlot(moduleName, slotIndex);
-        P11KeyIdentifier keyIdentifier = slot.getKeyIdForId(Hex.decode(keyId));
-        slot.removeCerts(keyIdentifier);
+        P11ObjectIdentifier objectId = slot.getObjectIdForId(Hex.decode(id));
+        slot.removeCerts(objectId);
         println("deleted certificates");
         return null;
     }
