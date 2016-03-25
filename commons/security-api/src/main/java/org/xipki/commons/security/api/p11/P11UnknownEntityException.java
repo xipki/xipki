@@ -57,8 +57,8 @@ public class P11UnknownEntityException extends P11TokenException {
 
     public P11UnknownEntityException(
             final P11SlotIdentifier slotId,
-            final P11KeyIdentifier keyId) {
-        super("unknown entity 'slot " + slotId + ", key " + keyId + "'");
+            final P11ObjectIdentifier objectId) {
+        super("unknown entity 'slot " + slotId + ", object " + objectId + "'");
     }
 
     public P11UnknownEntityException(

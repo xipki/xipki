@@ -41,7 +41,6 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -61,42 +60,39 @@ import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
-import java.util.Set;
+
+import javax.annotation.Nonnull;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.p11.AbstractP11Slot;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
 import org.xipki.commons.security.api.p11.P11MechanismFilter;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.api.p11.P11SlotRefreshResult;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
@@ -164,6 +160,8 @@ class KeystoreP11Slot extends AbstractP11Slot {
 
     private final SecurityFactory securityFactory;
 
+    private final int maxSessions;
+
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Slot.class);
 
     KeystoreP11Slot(
@@ -172,13 +170,15 @@ class KeystoreP11Slot extends AbstractP11Slot {
             final P11SlotIdentifier slotId,
             final PrivateKeyCryptor privateKeyCryptor,
             final SecurityFactory securityFactory,
-            final P11MechanismFilter mechanismFilter)
+            final P11MechanismFilter mechanismFilter,
+            final int maxSessions)
     throws P11TokenException {
         super(moduleName, slotId, mechanismFilter);
 
         this.slotDir = ParamUtil.requireNonNull("slotDir", slotDir);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.privateKeyCryptor = ParamUtil.requireNonNull("privateKeyCryptor", privateKeyCryptor);
+        this.maxSessions = ParamUtil.requireMin("maxSessions", maxSessions, 1);
 
         this.privKeyDir = new File(slotDir, DIR_PRIV_KEY);
         if (!this.privKeyDir.exists()) {
@@ -204,117 +204,118 @@ class KeystoreP11Slot extends AbstractP11Slot {
             this.namedCurveSupported = true;
         }
 
-        addMechanism(P11Constants.CKM_DSA_KEY_PAIR_GEN);
-        addMechanism(P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
-        addMechanism(P11Constants.CKM_EC_KEY_PAIR_GEN);
-
-        addMechanism(P11Constants.CKM_RSA_X_509);
-
-        addMechanism(P11Constants.CKM_RSA_PKCS);
-        addMechanism(P11Constants.CKM_SHA1_RSA_PKCS);
-        addMechanism(P11Constants.CKM_SHA224_RSA_PKCS);
-        addMechanism(P11Constants.CKM_SHA256_RSA_PKCS);
-        addMechanism(P11Constants.CKM_SHA384_RSA_PKCS);
-        addMechanism(P11Constants.CKM_SHA512_RSA_PKCS);
-
-        addMechanism(P11Constants.CKM_RSA_PKCS_PSS);
-        addMechanism(P11Constants.CKM_SHA1_RSA_PKCS_PSS);
-        addMechanism(P11Constants.CKM_SHA224_RSA_PKCS_PSS);
-        addMechanism(P11Constants.CKM_SHA256_RSA_PKCS_PSS);
-        addMechanism(P11Constants.CKM_SHA384_RSA_PKCS_PSS);
-        addMechanism(P11Constants.CKM_SHA512_RSA_PKCS_PSS);
-
-        addMechanism(P11Constants.CKM_DSA);
-        addMechanism(P11Constants.CKM_DSA_SHA1);
-        addMechanism(P11Constants.CKM_DSA_SHA224);
-        addMechanism(P11Constants.CKM_DSA_SHA256);
-        addMechanism(P11Constants.CKM_DSA_SHA384);
-        addMechanism(P11Constants.CKM_DSA_SHA512);
-
-        addMechanism(P11Constants.CKM_ECDSA);
-        addMechanism(P11Constants.CKM_ECDSA_SHA1);
-        addMechanism(P11Constants.CKM_ECDSA_SHA224);
-        addMechanism(P11Constants.CKM_ECDSA_SHA256);
-        addMechanism(P11Constants.CKM_ECDSA_SHA384);
-        addMechanism(P11Constants.CKM_ECDSA_SHA512);
-
         refresh();
     }
 
     @Override
-    public void refresh()
+    protected P11SlotRefreshResult doRefresh(
+            P11MechanismFilter mechanismFilter)
     throws P11TokenException {
-        File[] privKeyInfoFiles = privKeyDir.listFiles(INFO_FILENAME_FILTER);
-        if (privKeyInfoFiles == null || privKeyInfoFiles.length == 0) {
-            clearMechanisms();
-            setIdentities(Collections.emptySet());
-            return;
+        P11SlotRefreshResult ret = new P11SlotRefreshResult();
+
+        ret.addMechanism(P11Constants.CKM_DSA_KEY_PAIR_GEN);
+        ret.addMechanism(P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
+        ret. addMechanism(P11Constants.CKM_EC_KEY_PAIR_GEN);
+
+        ret.addMechanism(P11Constants.CKM_RSA_X_509);
+
+        ret.addMechanism(P11Constants.CKM_RSA_PKCS);
+        ret.addMechanism(P11Constants.CKM_SHA1_RSA_PKCS);
+        ret.addMechanism(P11Constants.CKM_SHA224_RSA_PKCS);
+        ret.addMechanism(P11Constants.CKM_SHA256_RSA_PKCS);
+        ret.addMechanism(P11Constants.CKM_SHA384_RSA_PKCS);
+        ret.addMechanism(P11Constants.CKM_SHA512_RSA_PKCS);
+
+        ret.addMechanism(P11Constants.CKM_RSA_PKCS_PSS);
+        ret.addMechanism(P11Constants.CKM_SHA1_RSA_PKCS_PSS);
+        ret.addMechanism(P11Constants.CKM_SHA224_RSA_PKCS_PSS);
+        ret.addMechanism(P11Constants.CKM_SHA256_RSA_PKCS_PSS);
+        ret.addMechanism(P11Constants.CKM_SHA384_RSA_PKCS_PSS);
+        ret.addMechanism(P11Constants.CKM_SHA512_RSA_PKCS_PSS);
+
+        ret.addMechanism(P11Constants.CKM_DSA);
+        ret.addMechanism(P11Constants.CKM_DSA_SHA1);
+        ret.addMechanism(P11Constants.CKM_DSA_SHA224);
+        ret.addMechanism(P11Constants.CKM_DSA_SHA256);
+        ret.addMechanism(P11Constants.CKM_DSA_SHA384);
+        ret.addMechanism(P11Constants.CKM_DSA_SHA512);
+
+        ret.addMechanism(P11Constants.CKM_ECDSA);
+        ret.addMechanism(P11Constants.CKM_ECDSA_SHA1);
+        ret.addMechanism(P11Constants.CKM_ECDSA_SHA224);
+        ret.addMechanism(P11Constants.CKM_ECDSA_SHA256);
+        ret.addMechanism(P11Constants.CKM_ECDSA_SHA384);
+        ret.addMechanism(P11Constants.CKM_ECDSA_SHA512);
+
+        // Certificates
+
+        File[] certInfoFiles = certDir.listFiles(INFO_FILENAME_FILTER);
+        if (certInfoFiles != null) {
+            for (File infoFile : certInfoFiles) {
+                byte[] id = getKeyIdFromInfoFilename(infoFile.getName());
+                Properties props = loadProperties(infoFile);
+                String label = props.getProperty(PROP_LABEL);
+                P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
+                try {
+                    X509Cert cert = readCertificate(id);
+                    ret.addCertificate(objId, cert);
+                } catch (CertificateException | IOException ex) {
+                    LOG.warn("could not parse certificate " + objId);
+                }
+            }
         }
 
-        Map<String, X509Certificate> certs = getAllCertificates();
-        Set<KeystoreP11Identity> currentIdentifies = new HashSet<>();
+        // Private / Public keys
+        File[] privKeyInfoFiles = privKeyDir.listFiles(INFO_FILENAME_FILTER);
+
+        if (privKeyInfoFiles == null || privKeyInfoFiles.length == 0) {
+            return ret;
+        }
 
         for (File privKeyInfoFile : privKeyInfoFiles) {
-            byte[] keyId = getKeyIdFromInfoFilename(privKeyInfoFile.getName());
-            String hexKeyId = Hex.toHexString(keyId);
+            byte[] id = getKeyIdFromInfoFilename(privKeyInfoFile.getName());
+            String hexId = Hex.toHexString(id);
 
             try {
                 Properties props = loadProperties(privKeyInfoFile);
-                String keyLabel = props.getProperty(PROP_LABEL);
+                String label = props.getProperty(PROP_LABEL);
 
-                P11KeyIdentifier p11KeyId = new P11KeyIdentifier(keyId, keyLabel);
-
-                X509Certificate cert = certs.get(hexKeyId);
+                P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
+                X509Cert cert = ret.getCertForId(id);
                 java.security.PublicKey publicKey = null;
 
                 if (cert != null) {
-                    publicKey = cert.getPublicKey();
+                    publicKey = cert.getCert().getPublicKey();
                 } else {
-                    publicKey = readPublicKey(keyId);
+                    publicKey = readPublicKey(id);
                 }
 
                 if (publicKey == null) {
                     LOG.warn("Neither public key nor certificate is associated with private key {}",
-                            p11KeyId);
+                            p11ObjId);
                     continue;
                 }
 
                 List<X509Certificate> certChain = new LinkedList<>();
                 if (cert != null) {
-                    certChain.add(cert);
-
-                    boolean changed = true;
-                    while (changed) {
-                        X509Certificate lastCert = certChain.get(certChain.size() - 1);
-
-                        changed = false;
-                        for (X509Certificate c : certs.values()) {
-                            if (c == lastCert) {
-                                continue;
-                            }
-                            if (X509Util.issues(c, cert)) {
-                                certChain.add(c);
-                                changed = true;
-                            }
-                        }
-                    }
+                    certChain.add(cert.getCert());
                 }
 
                 byte[] encodedValue = IoUtil.read(
-                        new File(privKeyDir, hexKeyId + VALUE_FILE_SUFFIX));
+                        new File(privKeyDir, hexId + VALUE_FILE_SUFFIX));
 
                 PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(encodedValue);
                 PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
 
                 KeystoreP11Identity identity = new KeystoreP11Identity(
-                        new P11EntityIdentifier(slotId, p11KeyId), privateKey, publicKey,
-                        certChain.toArray(new X509Certificate[0]), 20,
+                        new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey,
+                        certChain.toArray(new X509Certificate[0]), maxSessions,
                         securityFactory.getRandom4Sign());
-                LOG.info("added PKCS#11 key {}", p11KeyId);
-                currentIdentifies.add(identity);
+                LOG.info("added PKCS#11 key {}", p11ObjId);
+                ret.addIdentity(identity);
             } catch (InvalidKeyException ex) {
                 final String message = "InvalidKeyException while initializing key with key-id "
-                        + hexKeyId;
+                        + hexId;
                 if (LOG.isWarnEnabled()) {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                             ex.getMessage());
@@ -323,7 +324,7 @@ class KeystoreP11Slot extends AbstractP11Slot {
                 continue;
             } catch (Throwable th) {
                 final String message =
-                        "unexpected exception while initializing key with key-id " + hexKeyId;
+                        "unexpected exception while initializing key with key-id " + hexId;
                 if (LOG.isWarnEnabled()) {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
                             th.getMessage());
@@ -333,38 +334,11 @@ class KeystoreP11Slot extends AbstractP11Slot {
             }
         }
 
-        setIdentities(currentIdentifies);
+        return ret;
     } // method refresh
 
     File getSlotDir() {
         return slotDir;
-    }
-
-    private Map<String, X509Certificate> getAllCertificates() {
-        File[] infoFiles = certDir.listFiles(INFO_FILENAME_FILTER);
-        if (infoFiles == null) {
-            return Collections.emptyMap();
-        }
-
-        Map<String, X509Certificate> certs = new HashMap<>();
-        for (File infoFile : infoFiles) {
-            byte[] keyId = getKeyIdFromInfoFilename(infoFile.getName());
-
-            X509Certificate cert;
-            try {
-                cert = readCertificate(keyId);
-            } catch (CertificateException | IOException ex) {
-                continue;
-            }
-
-            if (cert == null) {
-                continue;
-            }
-
-            certs.put(Hex.toHexString(keyId), cert);
-        }
-
-        return certs;
     }
 
     private PublicKey readPublicKey(
@@ -415,10 +389,12 @@ class KeystoreP11Slot extends AbstractP11Slot {
         }
     }
 
-    private X509Certificate readCertificate(
+    private X509Cert readCertificate(
             final byte[] keyId)
     throws CertificateException, IOException {
-        return X509Util.parseCert(new File(certDir, Hex.toHexString(keyId) + VALUE_FILE_SUFFIX));
+        byte[] encoded = IoUtil.read(new File(certDir, Hex.toHexString(keyId) + VALUE_FILE_SUFFIX));
+        X509Certificate cert = X509Util.parseCert(encoded);
+        return new X509Cert(cert, encoded);
     }
 
     private Properties loadProperties(
@@ -446,331 +422,18 @@ class KeystoreP11Slot extends AbstractP11Slot {
         LOG.info("close slot " + slotId);
     }
 
-    private boolean privKeyLabelExists(String label)
-    throws P11TokenException {
-        for (P11KeyIdentifier id : getKeyIdentifiers()) {
-            if (id.getLabel().equals(label)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean removeKey(
-            final P11KeyIdentifier keyId)
-    throws P11TokenException, SecurityException {
-        ParamUtil.requireNonNull("keyId", keyId);
-        boolean b1 = removePkcs11PrivateKey(keyId);
-        boolean b2 = removePkcs11PublicKey(keyId);
-        deleteIdentity(keyId);
-        return b1 | b2;
-    }
-
-    @Override
-    public boolean removeKeyAndCerts(
-            final P11KeyIdentifier keyId)
-    throws P11TokenException, SecurityException {
-        ParamUtil.requireNonNull("keyId", keyId);
-        boolean b1 = removePkcs11PrivateKey(keyId);
-        boolean b2 = removePkcs11PublicKey(keyId);
-        boolean b3 = removePkcs11Cert(keyId);
-        deleteIdentity(keyId);
-        return b1 | b2 | b3;
-    }
-
-    @Override
-    public void updateCertificate(
-            final P11KeyIdentifier keyId,
-            final X509Certificate newCert,
-            final Set<X509Certificate> caCerts,
-            final HashAlgoType hashAlgoForVerification)
-    throws P11TokenException, SecurityException {
-        ParamUtil.requireNonNull("keyId", keyId);
-        ParamUtil.requireNonNull("newCert", newCert);
-        ParamUtil.requireNonNull("hashAlgoForVerification", hashAlgoForVerification);
-
-        P11Identity identity = getIdentity(keyId);
-        if (identity == null) {
-            throw new SecurityException("could not find identity " + keyId);
-        }
-
-        assertMatch(newCert, keyId, hashAlgoForVerification);
-
-        X509Certificate[] certChain = X509Util.buildCertPath(newCert, caCerts);
-
-        P11KeyIdentifier certKeyId = identity.getEntityId().getKeyId();
-        savePkcs11Cert(certKeyId.getId(), certKeyId.getLabel(), newCert);
-        if (certChain.length < 2) {
-            return;
-        }
-
-        for (int i = 1; i < certChain.length; i++) {
-            addCert(certChain[i]);
-        }
-    } // method updateCertificate
-
-    @Override
-    public void removeCerts(
-            final P11KeyIdentifier keyId)
-    throws P11TokenException, SecurityException {
-        removePkcs11Cert(keyId);
-    }
-
-    @Override
-    public P11KeyIdentifier addCert(
-            final X509Certificate cert)
-    throws P11TokenException, SecurityException {
-        ParamUtil.requireNonNull("cert", cert);
-        byte[] encodedCert;
-        try {
-            encodedCert = cert.getEncoded();
-        } catch (CertificateEncodingException ex) {
-            throw new SecurityException("could not encoded cert: " + ex.getMessage(), ex);
-        }
-        String sha1sum = HashCalculator.hexSha1(encodedCert);
-
-        // make sure that the certificate does not exist in the PKCS#11 module
-        File[] infoFiles = certDir.listFiles(INFO_FILENAME_FILTER);
-        if (infoFiles != null) {
-            for (File infoFile : infoFiles) {
-                Properties props = loadProperties(infoFile);
-                if (props == null) {
-                    continue;
-                }
-
-                if (sha1sum.equals(props.getProperty(PROP_SHA1SUM))) {
-                    String label = props.getProperty(PROP_LABEL);
-                    byte[] id = getKeyIdFromInfoFilename(infoFile.getName());
-                    return new P11KeyIdentifier(id, label);
-                }
-            }
-        }
-
-        byte[] keyId = generateKeyId();
-        String keyLabel;
-        String cn = X509Util.getCommonName(cert.getSubjectX500Principal());
-        if (StringUtil.isBlank(cn)) {
-            keyLabel = "NO-COMMON-NAME";
-        } else {
-            keyLabel = cn;
-        }
-        savePkcs11Cert(keyId, keyLabel, cert);
-        return new P11KeyIdentifier(keyId, keyLabel);
-    }
-
-    @Override
-    public P11KeyIdentifier generateRSAKeypair(
-            final int keySize,
-            final BigInteger publicExponent,
-            final String label)
-    throws P11TokenException, SecurityException {
-        ParamUtil.requireNonBlank("label", label);
-        ParamUtil.requireMin("keySize", keySize, 1024);
-
-        if (keySize % 1024 != 0) {
-            throw new IllegalArgumentException("key size is not multiple of 1024: " + keySize);
-        }
-
-        if (privKeyLabelExists(label)) {
-            throw new IllegalArgumentException("label " + label
-                    + " exists, please specify another one");
-        }
-
-        assertMechanismSupported(P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
-        KeyPair kp;
-        try {
-            kp = KeyUtil.generateRSAKeypair(keySize, publicExponent,
-                    securityFactory.getRandom4Key());
-        } catch (NoSuchAlgorithmException | NoSuchProviderException
-                | InvalidAlgorithmParameterException ex) {
-            throw new P11TokenException(ex.getMessage(), ex);
-        }
-
-        byte[] keyId = generateKeyId();
-        savePkcs11PrivateKey(keyId, label, kp.getPrivate());
-        savePkcs11PublicKey(keyId, label, kp.getPublic());
-        return new P11KeyIdentifier(keyId, label);
-    } // method generateRSAKeypairAndCert
-
-    @Override
-    public P11KeyIdentifier generateDSAKeypair(
-            final int plength,
-            final int qlength,
-            final String label)
-    throws P11TokenException, SecurityException {
-        ParamUtil.requireNonBlank("label", label);
-        ParamUtil.requireMax("pLength", plength, 1024);
-
-        if (plength % 1024 != 0) {
-            throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
-        }
-
-        if (privKeyLabelExists(label)) {
-            throw new IllegalArgumentException("label " + label
-                    + " exists, please specify another one");
-        }
-
-        assertMechanismSupported(P11Constants.CKM_DSA_KEY_PAIR_GEN);
-        KeyPair kp;
-        try {
-            kp = KeyUtil.generateDSAKeypair(plength, qlength, securityFactory.getRandom4Key());
-        } catch (NoSuchAlgorithmException | NoSuchProviderException
-                | InvalidAlgorithmParameterException ex) {
-            throw new P11TokenException(ex.getMessage(), ex);
-        }
-
-        byte[] keyId = generateKeyId();
-        savePkcs11PrivateKey(keyId, label, kp.getPrivate());
-        savePkcs11PublicKey(keyId, label, kp.getPublic());
-        return new P11KeyIdentifier(keyId, label);
-    } // method generateDSAKeypairAndCert
-
-    @Override
-    public P11KeyIdentifier generateECKeypair(
-            final String curveNameOrOid,
-            final String label)
-    throws P11TokenException, SecurityException {
-        ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
-        ParamUtil.requireNonBlank("label", label);
-
-        if (privKeyLabelExists(label)) {
-            throw new IllegalArgumentException("label " + label
-                    + " exists, please specify another one");
-        }
-
-        assertMechanismSupported(P11Constants.CKM_EC_KEY_PAIR_GEN);
-        KeyPair kp;
-        try {
-            kp = KeyUtil.generateECKeypairForCurveNameOrOid(curveNameOrOid,
-                    securityFactory.getRandom4Key());
-        } catch (NoSuchAlgorithmException | NoSuchProviderException
-                | InvalidAlgorithmParameterException ex) {
-            throw new P11TokenException(ex.getMessage(), ex);
-        }
-
-        byte[] keyId = generateKeyId();
-        savePkcs11PrivateKey(keyId, label, kp.getPrivate());
-        savePkcs11PublicKey(keyId, label, kp.getPublic());
-        return new P11KeyIdentifier(keyId, label);
-    } // method generateECDSAKeypairAndCert
-
-    private void assertMatch(
-            final X509Certificate cert,
-            final P11KeyIdentifier keyId,
-            final HashAlgoType hashAlgoForVerification)
-    throws SecurityException {
-        ConfPairs pairs = new ConfPairs("slot", Integer.toString(slotId.getIndex()));
-        pairs.putPair("key-id", Hex.toHexString(keyId.getId()));
-        pairs.putPair("key-label", keyId.getLabel());
-        securityFactory.createSigner("PKCS11", pairs.getEncoded(),
-                hashAlgoForVerification.getName(), null, cert);
-    }
-
-    @Override
-    public X509Certificate exportCert(
-            final P11KeyIdentifier keyId)
-    throws P11TokenException, SecurityException {
-        return getIdentity(keyId).getCertificate();
-    }
-
-    @Override
-    public void showDetails(
-            final OutputStream stream,
-            final boolean verbose)
-    throws P11TokenException, IOException, SecurityException {
-        ParamUtil.requireNonNull("stream", stream);
-        List<P11KeyIdentifier> keyIds = getKeyIdentifiers();
-
-        StringBuilder sb = new StringBuilder();
-        int idx = 1;
-        for (P11KeyIdentifier keyId : keyIds) {
-            P11Identity identity = getIdentity(keyId);
-            P11KeyIdentifier p11KeyId = identity.getEntityId().getKeyId();
-
-            sb.append("\t")
-                .append(idx++)
-                .append(". ")
-                .append(p11KeyId.getLabel())
-                .append(" (").append("id: ")
-                .append(Hex.toHexString(p11KeyId.getId()).toLowerCase())
-                .append(")\n");
-
-            sb.append("\t\tAlgorithm: ")
-                .append(identity.getPublicKey().getAlgorithm())
-                .append("\n");
-
-            formatString(sb, identity.getCertificate(), verbose);
-        }
-
-        if (sb.length() > 0) {
-            stream.write(sb.toString().getBytes());
-        }
-    }
-
-    private void formatString(
-            final StringBuilder sb,
-            final X509Certificate cert,
-            final boolean verbose) {
-        String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
-
-        if (!verbose) {
-            sb.append("\t\tCertificate: ").append(subject).append("\n");
-            return;
-        }
-
-        sb.append("\t\tCertificate:\n");
-        sb.append("\t\t\tSubject: ")
-            .append(subject)
-            .append("\n");
-
-        String issuer = X509Util.getRfc4519Name(cert.getIssuerX500Principal());
-        sb.append("\t\t\tIssuer: ")
-            .append(issuer)
-            .append("\n");
-
-        sb.append("\t\t\tSerial: ")
-            .append(cert.getSerialNumber())
-            .append("\n");
-        sb.append("\t\t\tStart time: ")
-            .append(cert.getNotBefore())
-            .append("\n");
-        sb.append("\t\t\tEnd time: ")
-            .append(cert.getNotAfter())
-            .append("\n");
-        sb.append("\t\t\tSHA1 Sum: ");
-        try {
-            sb.append(HashCalculator.hexSha1(cert.getEncoded()));
-        } catch (CertificateEncodingException ex) {
-            sb.append("ERROR");
-        }
-        sb.append("\n");
-    }
-
-    private boolean removePkcs11PrivateKey(
-            final P11KeyIdentifier keyId)
-    throws P11TokenException {
-        return removePkcs11Entry(privKeyDir, keyId);
-    }
-
-    private boolean removePkcs11PublicKey(
-            final P11KeyIdentifier keyId)
-    throws P11TokenException {
-        return removePkcs11Entry(pubKeyDir, keyId);
-    }
-
     private boolean removePkcs11Cert(
-            final P11KeyIdentifier keyId)
+            final P11ObjectIdentifier objectId)
     throws P11TokenException {
-        return removePkcs11Entry(certDir, keyId);
+        return removePkcs11Entry(certDir, objectId);
     }
 
     private boolean removePkcs11Entry(
             final File dir,
-            final P11KeyIdentifier keyId)
+            final P11ObjectIdentifier objectId)
     throws P11TokenException {
-        byte[] id = keyId.getId();
-        String label = keyId.getLabel();
+        byte[] id = objectId.getId();
+        String label = objectId.getLabel();
         if (id != null) {
             String hextId = Hex.toHexString(id);
             File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
@@ -835,13 +498,13 @@ class KeystoreP11Slot extends AbstractP11Slot {
             final byte[] id,
             final String label,
             final PrivateKey privateKey)
-    throws SecurityException, P11TokenException {
+    throws P11TokenException {
         PKCS8EncryptedPrivateKeyInfo encryptedPrivKeyInfo = privateKeyCryptor.encrypt(privateKey);
         byte[] encoded;
         try {
             encoded = encryptedPrivKeyInfo.getEncoded();
         } catch (IOException ex) {
-            throw new SecurityException("could not encode PrivateKey");
+            throw new P11TokenException("could not encode PrivateKey");
         }
         savePkcs11Entry(privKeyDir, id, label, encoded);
     }
@@ -850,7 +513,7 @@ class KeystoreP11Slot extends AbstractP11Slot {
             final byte[] id,
             final String label,
             final PublicKey publicKey)
-    throws SecurityException, P11TokenException {
+    throws P11TokenException {
         String hexId = Hex.toHexString(id).toLowerCase();
 
         StringBuilder sb = new StringBuilder(100);
@@ -905,7 +568,7 @@ class KeystoreP11Slot extends AbstractP11Slot {
                     EC5Util.convertSpec(paramSpec, false);
             ASN1ObjectIdentifier curveOid = ECUtil.getNamedCurveOid(bcParamSpec);
             if (curveOid == null) {
-                throw new SecurityException("EC public key is not of namedCurve");
+                throw new P11TokenException("EC public key is not of namedCurve");
             }
 
             byte[] encodedParams;
@@ -916,7 +579,7 @@ class KeystoreP11Slot extends AbstractP11Slot {
                     encodedParams = ECNamedCurveTable.getByOID(curveOid).getEncoded();
                 }
             } catch (IOException | NullPointerException ex) {
-                throw new SecurityException(ex.getMessage(), ex);
+                throw new P11TokenException(ex.getMessage(), ex);
             }
 
             sb.append(PROP_EC_ECDSA_PARAMS).append('=');
@@ -927,12 +590,12 @@ class KeystoreP11Slot extends AbstractP11Slot {
             java.security.spec.ECPoint pointW = ecKey.getW();
             BigInteger wx = pointW.getAffineX();
             if (wx.signum() != 1) {
-                throw new SecurityException("Wx is not positive");
+                throw new P11TokenException("Wx is not positive");
             }
 
             BigInteger wy = pointW.getAffineY();
             if (wy.signum() != 1) {
-                throw new SecurityException("Wy is not positive");
+                throw new P11TokenException("Wy is not positive");
             }
 
             int keysize = (paramSpec.getOrder().bitLength() + 7) / 8;
@@ -1004,34 +667,104 @@ class KeystoreP11Slot extends AbstractP11Slot {
         }
     }
 
-    private byte[] generateKeyId()
+    @Override
+    protected boolean doRemoveIdentity(
+            final P11ObjectIdentifier objectId)
     throws P11TokenException {
-        Random random = new Random();
-        byte[] keyId = null;
-        do {
-            keyId = new byte[8];
-            random.nextBytes(keyId);
-        } while (idExists(keyId));
-
-        return keyId;
+        boolean b1 = removePkcs11Entry(certDir, objectId);
+        boolean b2 = removePkcs11Entry(privKeyDir, objectId);
+        boolean b3 = removePkcs11Entry(pubKeyDir, objectId);
+        return b1 || b2 || b3;
     }
 
-    private boolean idExists(
-            final byte[] keyId) {
-        String hexId = Hex.toHexString(keyId).toLowerCase();
-        if (new File(privKeyDir, hexId + INFO_FILE_SUFFIX).exists()) {
-            return true;
-        }
+    @Override
+    protected void doRemoveCerts(
+            final byte[] id)
+    throws P11TokenException {
+        deletePkcs11Entry(certDir, id);
+    }
 
-        if (new File(pubKeyDir, hexId + INFO_FILE_SUFFIX).exists()) {
-            return true;
-        }
+    @Override
+    protected void doAddCert(
+            final P11ObjectIdentifier objectId,
+            final X509Certificate cert)
+    throws P11TokenException, SecurityException {
+        savePkcs11Cert(objectId.getId(), objectId.getLabel(), cert);
+    }
 
-        if (new File(certDir, hexId + INFO_FILE_SUFFIX).exists()) {
-            return true;
+    @Override
+    protected P11Identity doGenerateRSAKeypair(
+            final int keysize,
+            final BigInteger publicExponent,
+            final String label)
+    throws P11TokenException {
+        KeyPair keypair;
+        try {
+            keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent,
+                    securityFactory.getRandom4Key());
+        } catch (NoSuchAlgorithmException | NoSuchProviderException
+                | InvalidAlgorithmParameterException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
         }
+        return saveP11Identity(keypair, label);
+    }
 
-        return false;
+    @Override
+    protected P11Identity doGenerateDSAKeypair(
+            final DSAParameters dsaParams,
+            final String label)
+    throws P11TokenException {
+        KeyPair keypair;
+        try {
+            keypair = KeyUtil.generateDSAKeypair(dsaParams, securityFactory.getRandom4Key());
+        } catch (NoSuchAlgorithmException | NoSuchProviderException
+                | InvalidAlgorithmParameterException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
+        }
+        return saveP11Identity(keypair, label);
+    }
+
+    @Override
+    protected P11Identity doGenerateECKeypair(
+            final ASN1ObjectIdentifier curveId,
+            final String label)
+    throws P11TokenException {
+        KeyPair keypair;
+        try {
+            keypair = KeyUtil.generateECKeypairForCurveNameOrOid(curveId.getId(),
+                    securityFactory.getRandom4Key());
+        } catch (NoSuchAlgorithmException | NoSuchProviderException
+                | InvalidAlgorithmParameterException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
+        }
+        return saveP11Identity(keypair, label);
+    }
+
+    private P11Identity saveP11Identity(
+            @Nonnull final KeyPair keypair,
+            @Nonnull final String label)
+    throws P11TokenException {
+        byte[] id = generateId();
+        savePkcs11PrivateKey(id, label, keypair.getPrivate());
+        savePkcs11PublicKey(id, label, keypair.getPublic());
+        P11EntityIdentifier entityId = new P11EntityIdentifier(slotId,
+                new P11ObjectIdentifier(id, label));
+        try {
+            return new KeystoreP11Identity(entityId, keypair.getPrivate(), keypair.getPublic(),
+                    null, maxSessions, securityFactory.getRandom4Sign());
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
+            throw new P11TokenException(
+                    "could not counstruct KeyStoreP11Identity: " + ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    protected void doUpdateCertificate(
+            final P11ObjectIdentifier objectId,
+            final X509Certificate newCert)
+    throws SecurityException, P11TokenException {
+        removePkcs11Cert(objectId);
+        doAddCert(objectId, newCert);
     }
 
 }

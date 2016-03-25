@@ -38,7 +38,7 @@ package org.xipki.commons.security.shell.p11;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
@@ -47,7 +47,7 @@ import org.xipki.commons.security.api.p11.P11Slot;
  */
 
 @Command(scope = "xipki-tk", name = "delete-key",
-        description = "generate EC keypair in PKCS#11 device")
+        description = "delete key and cert in PKCS#11 device")
 @Service
 public class P11KeyDeleteCmd extends P11SecurityCommandSupport {
 
@@ -55,10 +55,10 @@ public class P11KeyDeleteCmd extends P11SecurityCommandSupport {
     protected Object doExecute()
     throws Exception {
         P11Slot slot = getSlot();
-        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        boolean deleted = slot.removeKeyAndCerts(keyIdentifier);
+        P11ObjectIdentifier objIdentifier = getObjectIdentifier();
+        boolean deleted = slot.removeIdentity(objIdentifier);
         if (deleted) {
-            println("deleted key and certificates");
+            println("deleted key and certificate");
         } else {
             println("could not delete key and certificate that do not exist");
         }

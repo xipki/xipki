@@ -49,7 +49,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
+public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
 
     private final byte[] id;
 
@@ -57,16 +57,21 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
 
     private final String label;
 
-    public P11KeyIdentifier(
+    public P11ObjectIdentifier(
             @Nonnull final byte[] id,
             @Nonnull final String label) {
         this.id = ParamUtil.requireNonNull("id", id);
-        this.label = ParamUtil.requireNonBlank("label", label);
+        this.label = ParamUtil.requireNonNull("label", label);
         this.idHex = Hex.toHexString(id).toUpperCase();
     }
 
     public byte[] getId() {
         return id;
+    }
+
+    public boolean matchesId(
+            final byte[] id) {
+        return Arrays.equals(id, this.id);
     }
 
     public String getIdHex() {
@@ -77,10 +82,14 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
         return label;
     }
 
+    public char[] getLabelChars() {
+        return label.toCharArray();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(50);
-        sb.append("key (id = ").append(idHex).append(", label = ").append(label).append(")");
+        sb.append("(id = ").append(idHex).append(", label = ").append(label).append(")");
         return sb.toString();
     }
 
@@ -98,17 +107,17 @@ public class P11KeyIdentifier implements Comparable<P11KeyIdentifier> {
             return true;
         }
 
-        if (!(obj instanceof P11KeyIdentifier)) {
+        if (!(obj instanceof P11ObjectIdentifier)) {
             return false;
         }
 
-        P11KeyIdentifier another = (P11KeyIdentifier) obj;
+        P11ObjectIdentifier another = (P11ObjectIdentifier) obj;
         return Arrays.equals(id, another.id) && label.equals(another.label);
     }
 
     @Override
     public int compareTo(
-            final P11KeyIdentifier obj) {
+            final P11ObjectIdentifier obj) {
         ParamUtil.requireNonNull("obj", obj);
         if (this == obj) {
             return 0;

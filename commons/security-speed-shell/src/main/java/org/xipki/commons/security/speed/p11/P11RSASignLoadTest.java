@@ -40,7 +40,7 @@ import java.math.BigInteger;
 
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
@@ -64,7 +64,7 @@ public class P11RSASignLoadTest extends P11SignLoadTest {
                         + "public exponent: " + publicExponent);
     }
 
-    private static P11KeyIdentifier generateKey(
+    private static P11ObjectIdentifier generateKey(
             final P11Slot slot,
             final int keysize,
             final BigInteger publicExponent)

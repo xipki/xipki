@@ -37,17 +37,13 @@
 package org.xipki.commons.security.shell.p11;
 
 import java.security.cert.X509Certificate;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
-import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.util.X509Util;
 
@@ -67,33 +63,13 @@ public class P11CertUpdateCmd extends P11SecurityCommandSupport {
     @Completion(FilePathCompleter.class)
     private String certFile;
 
-    @Option(name = "--ca-cert",
-            multiValued = true,
-            description = "CA Certificate files\n"
-                    + "(multi-valued)")
-    @Completion(FilePathCompleter.class)
-    private Set<String> caCertFiles;
-
-    @Option(name = "--hash",
-            description = "hash algorithm name")
-    @Completion(HashAlgCompleter.class)
-    protected String hashAlgo = "SHA256";
-
     @Override
     protected Object doExecute()
     throws Exception {
         P11Slot slot = getSlot();
-        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        P11ObjectIdentifier objIdentifier = getObjectIdentifier();
         X509Certificate newCert = X509Util.parseCert(certFile);
-        Set<X509Certificate> caCerts = new HashSet<>();
-        if (isNotEmpty(caCertFiles)) {
-            for (String caCertFile : caCertFiles) {
-                caCerts.add(X509Util.parseCert(caCertFile));
-            }
-        }
-
-        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(hashAlgo);
-        slot.updateCertificate(keyIdentifier, newCert, caCerts, hashAlgoType);
+        slot.updateCertificate(objIdentifier, newCert);
         println("updated certificate");
         return null;
     }
