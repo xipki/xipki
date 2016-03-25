@@ -36,7 +36,7 @@
 
 package org.xipki.commons.security.speed.p11;
 
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
@@ -66,8 +66,8 @@ public class P11DSAKeyGenLoadTest extends P11KeyGenLoadTest {
     @Override
     protected void genKeypair()
     throws Exception {
-        P11KeyIdentifier keyId = slot.generateDSAKeypair(plength, qlength, getDummyLabel());
-        slot.removeKeyAndCerts(keyId);
+        P11ObjectIdentifier objId = slot.generateDSAKeypair(plength, qlength, getDummyLabel());
+        slot.removeIdentity(objId);
     }
 
 }

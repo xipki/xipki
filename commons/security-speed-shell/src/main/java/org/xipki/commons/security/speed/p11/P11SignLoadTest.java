@@ -45,7 +45,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.util.SignerConfUtil;
@@ -83,13 +83,13 @@ public abstract class P11SignLoadTest extends LoadExecutor {
 
     private final ConcurrentContentSigner signer;
 
-    private final P11KeyIdentifier keyId;
+    private final P11ObjectIdentifier objectId;
 
     public P11SignLoadTest(
             final SecurityFactory securityFactory,
             final P11Slot slot,
             final String signatureAlgorithm,
-            final P11KeyIdentifier keyId,
+            final P11ObjectIdentifier objectId,
             final String description)
     throws SecurityException {
         super(description + "\nsignature algorithm: " + signatureAlgorithm);
@@ -97,14 +97,14 @@ public abstract class P11SignLoadTest extends LoadExecutor {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         ParamUtil.requireNonNull("slot", slot);
         ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
-        ParamUtil.requireNonNull("keyId", keyId);
+        ParamUtil.requireNonNull("objectId", objectId);
 
         this.slot = slot;
-        this.keyId = keyId;
+        this.objectId = objectId;
 
         P11SlotIdentifier slotId = slot.getSlotId();
         String signerConf = SignerConfUtil.getPkcs11SignerConf(slot.getModuleName(),
-                slotId.getIndex(), slotId.getId(), keyId.getLabel(), keyId.getId(),
+                slotId.getIndex(), slotId.getId(), objectId.getLabel(), objectId.getId(),
                 signatureAlgorithm, 20);
         this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate) null);
 
@@ -112,9 +112,9 @@ public abstract class P11SignLoadTest extends LoadExecutor {
 
     private void close() {
         try {
-            slot.removeKeyAndCerts(keyId);
+            slot.removeIdentity(objectId);
         } catch (Exception ex) {
-            LOG.error("could not delete PKCS#11 key {}", keyId);
+            LOG.error("could not delete PKCS#11 key {}", objectId);
         }
     }
 

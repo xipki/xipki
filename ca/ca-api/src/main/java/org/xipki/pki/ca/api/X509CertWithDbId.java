@@ -38,6 +38,8 @@ package org.xipki.pki.ca.api;
 
 import java.security.cert.X509Certificate;
 
+import org.xipki.commons.security.api.X509Cert;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0

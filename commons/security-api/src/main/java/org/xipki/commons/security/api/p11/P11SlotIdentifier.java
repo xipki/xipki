@@ -82,7 +82,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(30);
-        sb.append("slot (index = ").append(index).append(", id = ").append(id).append(")");
+        sb.append("(index = ").append(index).append(", id = ").append(id).append(")");
         return sb.toString();
     }
 

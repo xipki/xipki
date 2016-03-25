@@ -62,10 +62,10 @@ import org.xipki.commons.datasource.api.springframework.jdbc.DuplicateKeyExcepti
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
-import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.server.impl.DbSchemaInfo;
 

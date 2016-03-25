@@ -55,11 +55,11 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
     protected final P11EntityIdentifier entityId;
 
-    protected final X509Certificate[] certificateChain;
-
     protected final PublicKey publicKey;
 
     private final int signatureKeyBitLength;
+
+    protected X509Certificate[] certificateChain;
 
     public P11Identity(
             final P11EntityIdentifier entityId,
@@ -118,9 +118,21 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     }
 
     public PublicKey getPublicKey() {
-        return (publicKey == null)
-                ? certificateChain[0].getPublicKey()
-                : publicKey;
+        return publicKey;
+    }
+
+    public void setCertificates(
+            X509Certificate[] certificateChain)
+    throws P11TokenException {
+        if (certificateChain == null || certificateChain.length == 0) {
+            this.certificateChain = null;
+        } else {
+            PublicKey pk = certificateChain[0].getPublicKey();
+            if (!this.publicKey.equals(pk)) {
+                throw new P11TokenException("certificateChain is not for the key");
+            }
+            this.certificateChain = certificateChain;
+        }
     }
 
     public boolean match(

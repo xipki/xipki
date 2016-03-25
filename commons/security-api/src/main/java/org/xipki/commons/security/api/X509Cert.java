@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.api;
+package org.xipki.commons.security.api;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;

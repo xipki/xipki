@@ -37,7 +37,7 @@
 package org.xipki.commons.security.speed.p11;
 
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
@@ -61,7 +61,7 @@ public class P11DSASignLoadTest extends P11SignLoadTest {
                         + "qLength: " + qlength);
     }
 
-    private static P11KeyIdentifier generateKey(
+    private static P11ObjectIdentifier generateKey(
             final P11Slot slot,
             final int plength,
             final int qlength)

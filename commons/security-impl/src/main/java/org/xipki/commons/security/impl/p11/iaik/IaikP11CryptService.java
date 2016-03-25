@@ -162,7 +162,7 @@ final class IaikP11CryptService implements P11CryptService {
             final P11EntityIdentifier entityId)
     throws P11TokenException {
         ParamUtil.requireNonNull("entityId", entityId);
-        return module.getSlot(entityId.getSlotId()).getIdentity(entityId.getKeyId());
+        return module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
     }
 
     @Override

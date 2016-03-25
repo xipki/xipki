@@ -43,8 +43,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -76,7 +74,7 @@ import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.pkcs11proxy.common.ASN1EntityIdentifier;
-import org.xipki.commons.pkcs11proxy.common.ASN1KeyIdentifier;
+import org.xipki.commons.pkcs11proxy.common.ASN1P11ObjectIdentifier;
 import org.xipki.commons.pkcs11proxy.common.ASN1RSAPkcsPssParams;
 import org.xipki.commons.pkcs11proxy.common.ASN1SignTemplate;
 import org.xipki.commons.pkcs11proxy.common.ASN1SlotIdentifier;
@@ -87,7 +85,7 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11DuplicateEntityException;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
@@ -256,10 +254,10 @@ class CmpResponder {
             } else if (P11ProxyConstants.ACTION_getKeyIds == action) {
                 ASN1SlotIdentifier slotId = ASN1SlotIdentifier.getInstance(reqValue);
                 P11Slot slot = p11CryptService.getModule().getSlot(slotId.getSlotId());
-                List<P11KeyIdentifier> keyIds = slot.getKeyIdentifiers();
+                List<P11ObjectIdentifier> objectIds = slot.getKeyIdentifiers();
                 ASN1EncodableVector vec = new ASN1EncodableVector();
-                for (P11KeyIdentifier keyId : keyIds) {
-                    vec.add(new ASN1KeyIdentifier(keyId));
+                for (P11ObjectIdentifier objectId : objectIds) {
+                    vec.add(new ASN1P11ObjectIdentifier(objectId));
                 }
                 respItvInfoValue = new DERSequence(vec);
             } else {

@@ -100,7 +100,7 @@ class ProxyP11CryptService implements P11CryptService {
             final byte[] content)
     throws P11TokenException, SecurityException {
         P11Identity identity =
-                module.getSlot(entityId.getSlotId()).getIdentity(entityId.getKeyId());
+                module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
         return identity.sign(mechanism, parameters, content);
     }
 
@@ -109,7 +109,7 @@ class ProxyP11CryptService implements P11CryptService {
             final P11EntityIdentifier entityId)
     throws P11TokenException {
         P11Identity identity =
-                module.getSlot(entityId.getSlotId()).getIdentity(entityId.getKeyId());
+                module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
         return identity.getPublicKey();
     }
 
@@ -128,7 +128,7 @@ class ProxyP11CryptService implements P11CryptService {
             final P11EntityIdentifier entityId)
     throws P11TokenException {
         P11Identity identity =
-                module.getSlot(entityId.getSlotId()).getIdentity(entityId.getKeyId());
+                module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
         return identity.getCertificateChain();
     }
 

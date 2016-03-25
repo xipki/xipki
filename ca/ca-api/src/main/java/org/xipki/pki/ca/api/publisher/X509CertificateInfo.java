@@ -47,10 +47,10 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.RequestorInfo;
-import org.xipki.pki.ca.api.X509Cert;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 
 /**

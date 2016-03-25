@@ -38,7 +38,7 @@ package org.xipki.commons.security.speed.p11;
 
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.p11.P11KeyIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 
 /**
@@ -60,7 +60,7 @@ public class P11ECSignLoadTest extends P11SignLoadTest {
                         + "curve: " + curveNameOrOid);
     }
 
-    private static P11KeyIdentifier generateKey(
+    private static P11ObjectIdentifier generateKey(
             final P11Slot slot,
             final String curveNameOrOid)
     throws Exception {

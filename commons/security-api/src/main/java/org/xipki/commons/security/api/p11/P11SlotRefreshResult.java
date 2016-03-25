@@ -36,29 +36,70 @@
 
 package org.xipki.commons.security.api.p11;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Nonnull;
+
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.X509Cert;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class P11DuplicateEntityException extends P11TokenException {
+public class P11SlotRefreshResult {
 
-    private static final long serialVersionUID = 1L;
+    private final Map<P11ObjectIdentifier, P11Identity> identities = new HashMap<>();
 
-    public P11DuplicateEntityException(
-            final P11EntityIdentifier entityId) {
-        super("duplicate entity '" + entityId + "'");
+    private final Map<P11ObjectIdentifier, X509Cert> certificates = new HashMap<>();
+
+    private final Set<Long> mechanisms = new HashSet<>();
+
+    public P11SlotRefreshResult() {
     }
 
-    public P11DuplicateEntityException(
-            final P11SlotIdentifier slotId,
-            final P11ObjectIdentifier objectId) {
-        super("duplicate entity 'slot " + slotId + ", object " + objectId + "'");
+    public Map<P11ObjectIdentifier, P11Identity> getIdentities() {
+        return identities;
     }
 
-    public P11DuplicateEntityException(
-            final String message) {
-        super(message);
+    public Map<P11ObjectIdentifier, X509Cert> getCertificates() {
+        return certificates;
     }
 
+    public Set<Long> getMechanisms() {
+        return mechanisms;
+    }
+
+    public void addIdentity(
+            final P11Identity identity) {
+        ParamUtil.requireNonNull("identity", identity);
+        this.identities.put(identity.getEntityId().getObjectId(), identity);
+    }
+
+    public void addMechanism(
+            final long mechanism) {
+        this.mechanisms.add(mechanism);
+    }
+
+    public void addCertificate(
+            final P11ObjectIdentifier objectId,
+            final X509Cert certificate) {
+        ParamUtil.requireNonNull("objectId", objectId);
+        ParamUtil.requireNonNull("certificate", certificate);
+        this.certificates.put(objectId, certificate);
+    }
+
+    public X509Cert getCertForId(
+            @Nonnull final byte[] id) {
+        for (P11ObjectIdentifier objId : certificates.keySet()) {
+            if (objId.matchesId(id)) {
+                return certificates.get(objId);
+            }
+        }
+        return null;
+    }
 }
