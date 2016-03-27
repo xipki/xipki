@@ -171,15 +171,15 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
         for (P11SlotIdentifier slotId: slotIds) {
             P11Slot slot = module.getSlot(slotId);
-            List<P11ObjectIdentifier> identityIds = slot.getKeyIdentifiers();
-            for (P11ObjectIdentifier objId : identityIds) {
-                P11Identity identity = slot.getIdentity(objId);
-                X509Certificate[] chain = identity.getCertificateChain();
+            List<P11ObjectIdentifier> entityIds = slot.getIdentityIdentifiers();
+            for (P11ObjectIdentifier objId : entityIds) {
+                P11Identity entity = slot.getIdentity(objId);
+                X509Certificate[] chain = entity.getCertificateChain();
                 if (chain == null || chain.length == 0) {
                     continue;
                 }
 
-                P11PrivateKey key = new P11PrivateKey(p11Service, identity.getEntityId());
+                P11PrivateKey key = new P11PrivateKey(p11Service, entity.getEntityId());
                 KeyCertEntry keyCertEntry = new KeyCertEntry(key, chain);
                 keyCerts.put(moduleName + "#slotid-" + slotId.getId() + "#keyid-"
                         + objId.getIdHex(), keyCertEntry);

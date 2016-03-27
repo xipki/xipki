@@ -53,7 +53,7 @@ import org.xipki.commons.security.api.X509Cert;
 
 public class P11SlotRefreshResult {
 
-    private final Map<P11ObjectIdentifier, P11Identity> identities = new HashMap<>();
+    private final Map<P11ObjectIdentifier, P11Identity> entities = new HashMap<>();
 
     private final Map<P11ObjectIdentifier, X509Cert> certificates = new HashMap<>();
 
@@ -62,8 +62,8 @@ public class P11SlotRefreshResult {
     public P11SlotRefreshResult() {
     }
 
-    public Map<P11ObjectIdentifier, P11Identity> getIdentities() {
-        return identities;
+    public Map<P11ObjectIdentifier, P11Identity> getEntities() {
+        return entities;
     }
 
     public Map<P11ObjectIdentifier, X509Cert> getCertificates() {
@@ -74,10 +74,10 @@ public class P11SlotRefreshResult {
         return mechanisms;
     }
 
-    public void addIdentity(
-            final P11Identity identity) {
-        ParamUtil.requireNonNull("identity", identity);
-        this.identities.put(identity.getEntityId().getObjectId(), identity);
+    public void addEntity(
+            final P11Identity entity) {
+        ParamUtil.requireNonNull("entity", entity);
+        this.entities.put(entity.getEntityId().getObjectId(), entity);
     }
 
     public void addMechanism(

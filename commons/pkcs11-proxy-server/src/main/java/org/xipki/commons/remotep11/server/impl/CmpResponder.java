@@ -36,8 +36,12 @@
 
 package org.xipki.commons.remotep11.server.impl;
 
+import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +53,6 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
@@ -67,21 +70,28 @@ import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
+import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.pkcs11proxy.common.ASN1EntityIdentifier;
-import org.xipki.commons.pkcs11proxy.common.ASN1P11ObjectIdentifier;
-import org.xipki.commons.pkcs11proxy.common.ASN1RSAPkcsPssParams;
-import org.xipki.commons.pkcs11proxy.common.ASN1SignTemplate;
-import org.xipki.commons.pkcs11proxy.common.ASN1SlotIdentifier;
+import org.xipki.commons.pkcs11proxy.common.Asn1EntityIdAndCert;
+import org.xipki.commons.pkcs11proxy.common.Asn1GenDSAKeypairParams;
+import org.xipki.commons.pkcs11proxy.common.Asn1GenECKeypairParams;
+import org.xipki.commons.pkcs11proxy.common.Asn1GenRSAKeypairParams;
+import org.xipki.commons.pkcs11proxy.common.Asn1P11EntityIdentifier;
+import org.xipki.commons.pkcs11proxy.common.Asn1P11ObjectIdentifier;
+import org.xipki.commons.pkcs11proxy.common.Asn1RSAPkcsPssParams;
+import org.xipki.commons.pkcs11proxy.common.Asn1SignTemplate;
+import org.xipki.commons.pkcs11proxy.common.Asn1Util;
+import org.xipki.commons.pkcs11proxy.common.Asn1P11SlotIdentifier;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
 import org.xipki.commons.pkcs11proxy.common.ServerCaps;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11DuplicateEntityException;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -92,6 +102,7 @@ import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.P11UnknownEntityException;
 import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
+import org.xipki.commons.security.api.util.KeyUtil;
 
 /**
  * @author Lijun Liao
@@ -177,110 +188,7 @@ class CmpResponder {
         }
 
         try {
-            ASN1Encodable asn1 = itv.getInfoValue();
-            int protocolVersion;
-            int action;
-            ASN1Encodable reqValue = null;
-
-            try {
-                ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
-                protocolVersion = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue().intValue();
-                action = ASN1Integer.getInstance(seq.getObjectAt(1)).getValue().intValue();
-                if (seq.size() > 2) {
-                    reqValue = seq.getObjectAt(1);
-                }
-            } catch (IllegalArgumentException ex) {
-                throw new BadAsn1ObjectException("invalid value of the InfoTypeAndValue for "
-                        + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId());
-            }
-
-            P11CryptService p11CryptService = p11CryptServicePool.getP11CryptService(moduleName);
-            ASN1Encodable respItvInfoValue = null;
-
-            if (P11ProxyConstants.ACTION_sign == action) {
-                ASN1SignTemplate signTemplate = ASN1SignTemplate.getInstance(reqValue);
-                long mechanism = signTemplate.getMechanism().getMechanism();
-                ASN1Encodable asn1Params = signTemplate.getMechanism().getParams().getP11Params();
-                P11Params params = null;
-                if (asn1Params instanceof ASN1RSAPkcsPssParams) {
-                    params = ((ASN1RSAPkcsPssParams) asn1Params).getPkcsPssParams();
-                } else if (asn1Params != null) {
-                    throw new BadAsn1ObjectException("unknown SignTemplate.params");
-                }
-
-                byte[] content = signTemplate.getMessage();
-                byte[] signature = p11CryptService.sign(signTemplate.getEntityId().getEntityId(),
-                        mechanism, params, content);
-                respItvInfoValue = new DEROctetString(signature);
-            } else if (P11ProxyConstants.ACTION_getMechanisms == action) {
-                P11SlotIdentifier slotId = ASN1SlotIdentifier.getInstance(reqValue).getSlotId();
-                Set<Long> mechs = p11CryptService.getMechanisms(slotId);
-                ASN1EncodableVector vec = new ASN1EncodableVector();
-                for (Long mech : mechs) {
-                    vec.add(new ASN1Integer(mech));
-                }
-                respItvInfoValue = new DERSequence(vec);
-            } else if (P11ProxyConstants.ACTION_getCertificates == action) {
-                P11EntityIdentifier entityId =
-                        ASN1EntityIdentifier.getInstance(reqValue).getEntityId();
-                X509Certificate[] certs = p11CryptService.getCertificates(entityId);
-                if (certs == null || certs.length == 0) {
-                    throw new P11UnknownEntityException(entityId);
-                }
-
-                final int n = certs.length;
-                ASN1EncodableVector vec = new ASN1EncodableVector();
-                for (int i = 0; i < n; i++) {
-                    vec.add(Certificate.getInstance(certs[i].getEncoded()));
-                }
-                respItvInfoValue = new DERSequence(vec);
-            } else if (P11ProxyConstants.ACTION_getPublicKey == action) {
-                P11EntityIdentifier entityId =
-                        ASN1EntityIdentifier.getInstance(reqValue).getEntityId();
-                PublicKey pubKey = p11CryptService.getPublicKey(entityId);
-                if (pubKey == null) {
-                    throw new P11UnknownEntityException(entityId);
-                }
-
-                respItvInfoValue = new DEROctetString(pubKey.getEncoded());
-            } else if (P11ProxyConstants.ACTION_getSlotIds == action) {
-                List<P11SlotIdentifier> slotIds = p11CryptService.getModule().getSlotIdentifiers();
-
-                ASN1EncodableVector vector = new ASN1EncodableVector();
-                for (P11SlotIdentifier slotId : slotIds) {
-                    vector.add(new ASN1SlotIdentifier(slotId));
-                }
-                respItvInfoValue = new DERSequence(vector);
-            } else if (P11ProxyConstants.ACTION_getKeyIds == action) {
-                ASN1SlotIdentifier slotId = ASN1SlotIdentifier.getInstance(reqValue);
-                P11Slot slot = p11CryptService.getModule().getSlot(slotId.getSlotId());
-                List<P11ObjectIdentifier> objectIds = slot.getKeyIdentifiers();
-                ASN1EncodableVector vec = new ASN1EncodableVector();
-                for (P11ObjectIdentifier objectId : objectIds) {
-                    vec.add(new ASN1P11ObjectIdentifier(objectId));
-                }
-                respItvInfoValue = new DERSequence(vec);
-            } else {
-                final String statusMessage = "unsupported XiPKI action code '" + action + "'";
-                return createRejectionPkiMessage(respHeader,
-                        PKIFailureInfo.badRequest, statusMessage);
-            }
-
-            ASN1EncodableVector vec = new ASN1EncodableVector();
-            vec.add(new ASN1Integer(protocolVersion));
-            vec.add(new ASN1Integer(action));
-            if (respItvInfoValue != null) {
-                vec.add(respItvInfoValue);
-            } else {
-                vec.add(DERNull.INSTANCE);
-            }
-
-            InfoTypeAndValue respItv = new InfoTypeAndValue(
-                    ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
-                    new DERSequence(vec));
-            GenRepContent genRepContent = new GenRepContent(respItv);
-            PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
-            return new PKIMessage(respHeader, respBody);
+            return doProcessPkiMessage(p11CryptServicePool, moduleName, itv, respHeader);
         } catch (BadAsn1ObjectException ex) {
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                     ex.getMessage());
@@ -308,13 +216,139 @@ class CmpResponder {
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                     confPairs.getEncoded());
         } catch (Throwable th) {
-            LOG.error("could not process CMP message {}, message: {}", tidStr,
-                    th.getMessage());
+            LOG.error("could not process CMP message {}, message: {}", tidStr, th.getMessage());
             LOG.debug("could not process CMP message " + tidStr, th);
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.systemFailure,
                     th.getMessage());
         }
     } // method processPkiMessage
+
+    private PKIMessage doProcessPkiMessage(
+            final LocalP11CryptServicePool p11CryptServicePool,
+            final String moduleName,
+            final InfoTypeAndValue itv,
+            final PKIHeader respHeader)
+    throws BadAsn1ObjectException, P11TokenException, CertificateException, SecurityException,
+    InvalidKeyException {
+        ASN1Sequence seq = Asn1Util.getSequence(itv.getInfoValue());
+        Asn1Util.requireRange(seq, 3, 3);
+        int protocolVersion = Asn1Util.getInteger(seq.getObjectAt(0)).intValue();
+        int action = Asn1Util.getInteger(seq.getObjectAt(1)).intValue();
+        ASN1Encodable reqValue = seq.getObjectAt(2);
+
+        P11CryptService p11CryptService = p11CryptServicePool.getP11CryptService(moduleName);
+        ASN1Encodable respItvInfoValue = null;
+
+        if (P11ProxyConstants.ACTION_addCert == action) {
+            Asn1EntityIdAndCert asn1 = Asn1EntityIdAndCert.getInstance(reqValue);
+            P11Slot slot = getSlot(p11CryptService, asn1.getEntityId());
+            X509Certificate cert = new X509CertificateObject(asn1.getCertificate());
+            slot.addCert(cert);
+        } else if (P11ProxyConstants.ACTION_genKeypair_DSA == action) {
+            Asn1GenDSAKeypairParams asn1 = Asn1GenDSAKeypairParams.getInstance(reqValue);
+            P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+            slot.generateDSAKeypair(asn1.getP(), asn1.getQ(), asn1.getG(), asn1.getLabel());
+        } else if (P11ProxyConstants.ACTION_genKeypair_EC == action) {
+            Asn1GenECKeypairParams asn1 = Asn1GenECKeypairParams.getInstance(reqValue);
+            P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+            slot.generateECKeypair(asn1.getCurveId().getId(), asn1.getLabel());
+        } else if (P11ProxyConstants.ACTION_genKeypair_RSA == action) {
+            Asn1GenRSAKeypairParams asn1 = Asn1GenRSAKeypairParams.getInstance(reqValue);
+            P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+            slot.generateRSAKeypair(asn1.getKeysize(), asn1.getPublicExponent(), asn1.getLabel());
+        } else if (P11ProxyConstants.ACTION_getCertificate == action) {
+            P11EntityIdentifier entityId =
+                    Asn1P11EntityIdentifier.getInstance(reqValue).getEntityId();
+            X509Certificate cert = p11CryptService.getCertificate(entityId);
+            respItvInfoValue = Certificate.getInstance(cert.getEncoded());
+        } else if (P11ProxyConstants.ACTION_getCertIdentifiers == action
+                || P11ProxyConstants.ACTION_getIdentityIdentifiers == action) {
+            Asn1P11SlotIdentifier slotId = Asn1P11SlotIdentifier.getInstance(reqValue);
+            P11Slot slot = p11CryptService.getModule().getSlot(slotId.getSlotId());
+            List<P11ObjectIdentifier> objectIds;
+            if (P11ProxyConstants.ACTION_getCertIdentifiers == action) {
+                objectIds = slot.getCertIdentifiers();
+            } else {
+                objectIds = slot.getIdentityIdentifiers();
+            }
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            for (P11ObjectIdentifier objectId : objectIds) {
+                vec.add(new Asn1P11ObjectIdentifier(objectId));
+            }
+            respItvInfoValue = new DERSequence(vec);
+        } else if (P11ProxyConstants.ACTION_getMechanisms == action) {
+            P11SlotIdentifier slotId = Asn1P11SlotIdentifier.getInstance(reqValue).getSlotId();
+            Set<Long> mechs = p11CryptService.getMechanisms(slotId);
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            for (Long mech : mechs) {
+                vec.add(new ASN1Integer(mech));
+            }
+            respItvInfoValue = new DERSequence(vec);
+        } else if (P11ProxyConstants.ACTION_getPublicKey == action) {
+            P11EntityIdentifier entityId =
+                    Asn1P11EntityIdentifier.getInstance(reqValue).getEntityId();
+            PublicKey pubKey = p11CryptService.getPublicKey(entityId);
+            if (pubKey == null) {
+                throw new P11UnknownEntityException(entityId);
+            }
+
+            respItvInfoValue = KeyUtil.createSubjectPublicKeyInfo(pubKey);
+        } else if (P11ProxyConstants.ACTION_getSlotIds == action) {
+            List<P11SlotIdentifier> slotIds = p11CryptService.getModule().getSlotIdentifiers();
+
+            ASN1EncodableVector vector = new ASN1EncodableVector();
+            for (P11SlotIdentifier slotId : slotIds) {
+                vector.add(new Asn1P11SlotIdentifier(slotId));
+            }
+            respItvInfoValue = new DERSequence(vector);
+        } else if (P11ProxyConstants.ACTION_removeCerts == action) {
+            Asn1P11EntityIdentifier asn1 = Asn1P11EntityIdentifier.getInstance(reqValue);
+            P11Slot slot = getSlot(p11CryptService, asn1);
+            slot.removeCerts(asn1.getObjectId().getObjectId());
+        } else if (P11ProxyConstants.ACTION_removeIdentity == action) {
+            Asn1P11EntityIdentifier asn1 = Asn1P11EntityIdentifier.getInstance(reqValue);
+            P11Slot slot = getSlot(p11CryptService, asn1);
+            slot.removeIdentity(asn1.getObjectId().getObjectId());
+        } else if (P11ProxyConstants.ACTION_sign == action) {
+            Asn1SignTemplate signTemplate = Asn1SignTemplate.getInstance(reqValue);
+            long mechanism = signTemplate.getMechanism().getMechanism();
+            ASN1Encodable asn1Params = signTemplate.getMechanism().getParams().getP11Params();
+            P11Params params = null;
+            if (asn1Params instanceof Asn1RSAPkcsPssParams) {
+                params = ((Asn1RSAPkcsPssParams) asn1Params).getPkcsPssParams();
+            } else if (asn1Params != null) {
+                throw new BadAsn1ObjectException("unknown SignTemplate.params");
+            }
+
+            byte[] content = signTemplate.getMessage();
+            byte[] signature = p11CryptService.sign(signTemplate.getEntityId().getEntityId(),
+                    mechanism, params, content);
+            respItvInfoValue = new DEROctetString(signature);
+        } else if (P11ProxyConstants.ACTION_updateCerificate == action) {
+            Asn1EntityIdAndCert asn1 = Asn1EntityIdAndCert.getInstance(reqValue);
+            P11Slot slot = getSlot(p11CryptService, asn1.getEntityId());
+            slot.updateCertificate(asn1.getEntityId().getObjectId().getObjectId(),
+                    new X509CertificateObject(asn1.getCertificate()));
+        } else {
+            final String statusMessage = "unsupported XiPKI action code '" + action + "'";
+            return createRejectionPkiMessage(respHeader,
+                    PKIFailureInfo.badRequest, statusMessage);
+        }
+
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        vec.add(new ASN1Integer(protocolVersion));
+        vec.add(new ASN1Integer(action));
+        if (respItvInfoValue != null) {
+            vec.add(respItvInfoValue);
+        }
+
+        InfoTypeAndValue respItv = new InfoTypeAndValue(
+                ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
+                new DERSequence(vec));
+        GenRepContent genRepContent = new GenRepContent(respItv);
+        PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
+        return new PKIMessage(respHeader, respBody);
+    }
 
     private PKIMessage createRejectionPkiMessage(
             final PKIHeader header,
@@ -333,6 +367,20 @@ class CmpResponder {
             random.nextBytes(bytes);
         }
         return bytes;
+    }
+
+    private P11Slot getSlot(
+            final P11CryptService p11Service,
+            final Asn1P11EntityIdentifier entityId)
+    throws P11TokenException {
+        return p11Service.getModule().getSlot(entityId.getSlotId().getSlotId());
+    }
+
+    private P11Slot getSlot(
+            final P11CryptService p11Service,
+            final P11SlotIdentifier slotId)
+    throws P11TokenException {
+        return p11Service.getModule().getSlot(slotId);
     }
 
 }

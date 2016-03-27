@@ -41,57 +41,78 @@ import java.io.IOException;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1TaggedObject;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 
 /**
- *
- * <pre>
- * ASN1P11Params ::= CHOICE {
- *     rsaPkcsPssParams   [0]  RSA-PKCS-PSS-Parameters }
- * </pre>
- *
- * @author Lijun Liao
- * @since 2.0.0
- */
+*
+* <pre>
+* RSAPkcsPssParams ::= SEQUENCE {
+*     contentHash       INTEGER,
+*     mgfHash           INTEGER,
+*     saltLength        INTEGER
+*     }
+* </pre>
+*
+* @author Lijun Liao
+* @since 2.0.0
+*/
 
 // CHECKSTYLE:SKIP
-public class ASN1P11Params extends ASN1Object {
+public class Asn1RSAPkcsPssParams extends ASN1Object {
 
-    private ASN1Encodable p11Params;
+    private final P11RSAPkcsPssParams pkcsPssParams;
 
-    public ASN1P11Params(
-            final ASN1Encodable p11Params) {
-        this.p11Params = ParamUtil.requireNonNull("p11Params", p11Params);
+    public Asn1RSAPkcsPssParams(
+            P11RSAPkcsPssParams pkcsPssParams) {
+        this.pkcsPssParams = ParamUtil.requireNonNull("pkcsPssParams", pkcsPssParams);
     }
 
-    private ASN1P11Params(
-            final ASN1TaggedObject taggedObject)
+    private Asn1RSAPkcsPssParams(
+            final ASN1Sequence seq)
     throws BadAsn1ObjectException {
-        int tagNo = taggedObject.getTagNo();
-        if (tagNo == 0) {
-            this.p11Params = ASN1RSAPkcsPssParams.getInstance(taggedObject.getObject());
-        } else {
-            throw new BadAsn1ObjectException("invalid tag " + tagNo);
+        Asn1Util.requireRange(seq, 3, 3);
+        long contentHash = Asn1Util.getInteger(seq.getObjectAt(0)).longValue();
+        long mgfHash = Asn1Util.getInteger(seq.getObjectAt(1)).longValue();
+        int saltLength = Asn1Util.getInteger(seq.getObjectAt(2)).intValue();
+        this.pkcsPssParams = new P11RSAPkcsPssParams(contentHash, mgfHash, saltLength);
+    } // constructor
+
+    public static Asn1RSAPkcsPssParams getInstance(
+            final Object obj)
+    throws BadAsn1ObjectException {
+        if (obj == null || obj instanceof Asn1RSAPkcsPssParams) {
+            return (Asn1RSAPkcsPssParams) obj;
+        }
+
+        try {
+            if (obj instanceof ASN1Sequence) {
+                return new Asn1RSAPkcsPssParams((ASN1Sequence) obj);
+            } else if (obj instanceof byte[]) {
+                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+            } else {
+                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+            }
+        } catch (IOException | IllegalArgumentException ex) {
+            throw new BadAsn1ObjectException("unable to parse encoded object");
         }
     }
 
     @Override
     public ASN1Primitive toASN1Primitive() {
         int tagNo;
-        if (p11Params instanceof P11RSAPkcsPssParams) {
+        if (pkcsPssParams != null) {
             tagNo = 0;
         } else {
-            throw new RuntimeException("invalid ASN1P11Param type "
-                    + p11Params.getClass().getName());
+            throw new RuntimeException("should not reach here");
         }
 
         ASN1Encodable value;
         if (tagNo == 0) {
-            value = new ASN1RSAPkcsPssParams((P11RSAPkcsPssParams) p11Params);
+            value = new Asn1RSAPkcsPssParams(pkcsPssParams);
         } else {
             throw new RuntimeException("should not reach here");
         }
@@ -99,32 +120,8 @@ public class ASN1P11Params extends ASN1Object {
         return new DERTaggedObject(tagNo, value);
     }
 
-    public ASN1Encodable getP11Params() {
-        return p11Params;
-    }
-
-    public static ASN1P11Params getInstance(
-            final Object obj)
-    throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof ASN1P11Params) {
-            return (ASN1P11Params) obj;
-        }
-
-        try {
-            if (obj instanceof ASN1TaggedObject) {
-                return new ASN1P11Params((ASN1TaggedObject) obj);
-            }
-
-            if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded ASN1P11Params");
-        }
-
-        throw new BadAsn1ObjectException(
-                "unknown object in ASN1P11Params.getInstance(): "
-                + obj.getClass().getName());
+    public P11RSAPkcsPssParams getPkcsPssParams() {
+        return pkcsPssParams;
     }
 
 }

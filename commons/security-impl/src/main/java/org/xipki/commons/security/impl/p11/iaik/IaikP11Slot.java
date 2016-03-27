@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.DSAPublicKeySpec;
@@ -58,7 +57,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,8 +67,8 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.p11.AbstractP11Slot;
 import org.xipki.commons.security.api.p11.P11Constants;
-import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11MechanismFilter;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -311,55 +309,32 @@ class IaikP11Slot extends AbstractP11Slot {
             pubKey = generatePublicKey(p11PublicKey);
         }
 
-        List<X509Cert> certChain = new LinkedList<>();
-
-        if (cert != null) {
-            certChain.add(cert);
-            X509Cert context = cert;
-
-            while (context != null) {
-                try {
-                    if (X509Util.isSelfSigned(context.getCert())) {
-                        break;
-                    }
-                } catch (CertificateEncodingException ex) {
-                    throw new SecurityException(ex.getMessage(), ex);
-                }
-                X509Cert issuer = getIssuerForCert(context);
-                context = issuer;
-                if (issuer != null) {
-                    certChain.add(issuer);
-                }
-            } // end while (true)
-        } // end if (cert != null)
-
         P11ObjectIdentifier objectId = new P11ObjectIdentifier(privKey.getId().getByteArrayValue(),
                 toString(privKey.getLabel()));
 
-        X509Certificate[] certs = new X509Certificate[certChain.size()];
-        for (int i = 0; i < certs.length; i++) {
-            certs[i] = certChain.get(i).getCert();
-        }
-        IaikP11Identity identity = new IaikP11Identity(moduleName,
+        X509Certificate[] certs = (cert == null)
+                ? null
+                : new X509Certificate[]{cert.getCert()};
+        IaikP11Identity entity = new IaikP11Identity(moduleName,
                 new P11EntityIdentifier(slotId, objectId), privKey, certs, pubKey);
-        refreshResult.addIdentity(identity);
+        refreshResult.addEntity(entity);
     }
 
     byte[] sign(
             final long mechanism,
             final P11Params parameters,
             final byte[] content,
-            final IaikP11Identity identity)
+            final IaikP11Identity entity)
     throws P11TokenException {
         ParamUtil.requireNonNull("content", content);
         assertMechanismSupported(mechanism);
 
         int len = content.length;
         if (len <= maxMessageSize) {
-            return singleSign(mechanism, parameters, content, identity);
+            return singleSign(mechanism, parameters, content, entity);
         }
 
-        PrivateKey signingKey = identity.getPrivateKey();
+        PrivateKey signingKey = entity.getPrivateKey();
         Mechanism mechanismObj = getMechanism(mechanism, parameters);
         if (LOG.isTraceEnabled()) {
             LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
@@ -856,11 +831,12 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected void doRemoveCerts(
-            final byte[] keyId)
+            final P11ObjectIdentifier objectId)
     throws P11TokenException {
-        X509PublicKeyCertificate[] existingCerts = getCertificateObjects(keyId, null);
+        X509PublicKeyCertificate[] existingCerts = getCertificateObjects(objectId.getId(),
+                objectId.getLabelChars());
         if (existingCerts == null || existingCerts.length == 0) {
-            LOG.warn("could not find certificates with id " + keyId);
+            LOG.warn("could not find certificates " + objectId);
         }
 
         Session session = borrowWritableSession();
@@ -909,16 +885,18 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected P11Identity doGenerateDSAKeypair(
-            DSAParameters dsaParams,
+            final BigInteger p, // CHECKSTYLE:SKIP
+            final BigInteger q, // CHECKSTYLE:SKIP
+            final BigInteger g, // CHECKSTYLE:SKIP
             final String label)
     throws P11TokenException {
         DSAPrivateKey privateKey = new DSAPrivateKey();
         DSAPublicKey publicKey = new DSAPublicKey();
         setKeyAttributes(label, P11Constants.CKK_DSA, publicKey, privateKey);
 
-        publicKey.getPrime().setByteArrayValue(dsaParams.getP().toByteArray());
-        publicKey.getSubprime().setByteArrayValue(dsaParams.getQ().toByteArray());
-        publicKey.getBase().setByteArrayValue(dsaParams.getG().toByteArray());
+        publicKey.getPrime().setByteArrayValue(p.toByteArray());
+        publicKey.getSubprime().setByteArrayValue(q.toByteArray());
+        publicKey.getBase().setByteArrayValue(g.toByteArray());
         return generateKeyPair(P11Constants.CKM_DSA_KEY_PAIR_GEN, privateKey, publicKey);
     }
 
@@ -1101,11 +1079,10 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected boolean doRemoveIdentity(
+    protected void doRemoveIdentity(
             P11ObjectIdentifier objectId)
     throws P11TokenException {
         // TODO Auto-generated method stub
-        return false;
     }
 
 }
