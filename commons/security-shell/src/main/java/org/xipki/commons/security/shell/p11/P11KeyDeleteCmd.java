@@ -56,12 +56,8 @@ public class P11KeyDeleteCmd extends P11SecurityCommandSupport {
     throws Exception {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objIdentifier = getObjectIdentifier();
-        boolean deleted = slot.removeIdentity(objIdentifier);
-        if (deleted) {
-            println("deleted key and certificate");
-        } else {
-            println("could not delete key and certificate that do not exist");
-        }
+        slot.removeIdentity(objIdentifier);
+        println("deleted key and certificate");
         return null;
     }
 

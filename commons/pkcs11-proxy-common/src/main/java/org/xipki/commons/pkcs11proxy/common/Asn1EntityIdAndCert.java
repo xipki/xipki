@@ -37,107 +37,105 @@
 package org.xipki.commons.pkcs11proxy.common;
 
 import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 
 /**
- *
- * <pre>
- * SignTemplate ::= SEQUENCE {
- *     entityId       EntityIdentifier,
- *     mechanism      Mechanism,
- *     message        OCTET STRING
- *     }
- * </pre>
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-// CHECKSTYLE:SKIP
-public class ASN1SignTemplate extends ASN1Object {
+public class Asn1EntityIdAndCert extends ASN1Object {
 
-    private ASN1EntityIdentifier entityId;
+    private Asn1P11EntityIdentifier entityId;
 
-    private ASN1Mechanism mechanism;
+    private Certificate certificate;
 
-    private byte[] message;
+    public Asn1EntityIdAndCert(
+            final Asn1P11EntityIdentifier entityId,
+            final Certificate certificate) {
+        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
+        this.certificate = ParamUtil.requireNonNull("certificate", certificate);
+    }
 
-    private ASN1SignTemplate(
+    public Asn1EntityIdAndCert(
+            final P11EntityIdentifier entityId,
+            final X509Certificate certificate) {
+        ParamUtil.requireNonNull("entityId", entityId);
+        ParamUtil.requireNonNull("certificate", certificate);
+        this.entityId = new Asn1P11EntityIdentifier(entityId);
+        byte[] encoded;
+        try {
+            encoded = certificate.getEncoded();
+        } catch (CertificateEncodingException ex) {
+            throw new IllegalArgumentException("could not encode certificate");
+        }
+        this.certificate = Certificate.getInstance(encoded);
+    }
+
+    private Asn1EntityIdAndCert(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
-        final int n = seq.size();
-        if (n != 3) {
-            StringBuilder sb = new StringBuilder(100);
-            sb.append("wrong number of elements in sequence 'SignTemplate'");
-            sb.append(", is '").append(n).append("'");
-            sb.append(", but expected '3'");
-            throw new BadAsn1ObjectException(sb.toString());
-        }
-
-        this.entityId = ASN1EntityIdentifier.getInstance(seq.getObjectAt(0));
-        this.mechanism = ASN1Mechanism.getInstance(seq.getObjectAt(1));
-        DEROctetString octetString = (DEROctetString) DEROctetString.getInstance(
-                seq.getObjectAt(2));
-        this.message = octetString.getOctets();
+        Asn1Util.requireRange(seq, 2, 2);
+        this.entityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(0));
+        this.certificate = Asn1Util.getCertificate(seq.getObjectAt(1));
     }
 
-    public ASN1SignTemplate(
-            final ASN1EntityIdentifier entityId,
-            final long mechanism,
-            final ASN1P11Params parameter,
-            final byte[] message) {
-        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
-        this.message = ParamUtil.requireNonNull("message", message);
-    }
-
-    public static ASN1SignTemplate getInstance(
+    public static Asn1EntityIdAndCert getInstance(
             final Object obj)
     throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof ASN1SignTemplate) {
-            return (ASN1SignTemplate) obj;
+        if (obj == null || obj instanceof Asn1EntityIdAndCert) {
+            return (Asn1EntityIdAndCert) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new ASN1SignTemplate((ASN1Sequence) obj);
-            }
-
-            if (obj instanceof byte[]) {
+                return new Asn1EntityIdAndCert((ASN1Sequence) obj);
+            } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+            } else {
+                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded SignTemplate");
+            throw new BadAsn1ObjectException("unable to parse object");
         }
-
-        throw new BadAsn1ObjectException("unknown object in SignTemplate.getInstance(): "
-                + obj.getClass().getName());
     }
 
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(entityId.toASN1Primitive());
-        vector.add(new DEROctetString(message));
+        vector.add(entityId);
+        vector.add(certificate);
         return new DERSequence(vector);
     }
 
-    public byte[] getMessage() {
-        return message;
-    }
-
-    public ASN1EntityIdentifier getEntityId() {
+    public Asn1P11EntityIdentifier getEntityId() {
         return entityId;
     }
 
-    public ASN1Mechanism getMechanism() {
-        return mechanism;
+    public void setEntityId(
+            final Asn1P11EntityIdentifier entityId) {
+        this.entityId = entityId;
     }
+
+    public Certificate getCertificate() {
+        return certificate;
+    }
+
+    public void setCertificate(
+            final Certificate certificate) {
+        this.certificate = certificate;
+    }
+
 }

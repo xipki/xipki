@@ -43,13 +43,13 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.pkcs11proxy.common.ASN1EntityIdentifier;
-import org.xipki.commons.pkcs11proxy.common.ASN1P11Params;
-import org.xipki.commons.pkcs11proxy.common.ASN1RSAPkcsPssParams;
-import org.xipki.commons.pkcs11proxy.common.ASN1SignTemplate;
+import org.xipki.commons.pkcs11proxy.common.Asn1P11EntityIdentifier;
+import org.xipki.commons.pkcs11proxy.common.Asn1P11Params;
+import org.xipki.commons.pkcs11proxy.common.Asn1RSAPkcsPssParams;
+import org.xipki.commons.pkcs11proxy.common.Asn1SignTemplate;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
-import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
@@ -85,13 +85,13 @@ class ProxyP11Identity extends P11Identity {
             throw new P11UnsupportedMechanismException(mechanism, entityId);
         }
 
-        ASN1EntityIdentifier asn1EntityId = new ASN1EntityIdentifier(entityId);
+        Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(entityId);
         ASN1Encodable asn1Param = null;
         if (parameters instanceof P11RSAPkcsPssParams) {
-            asn1Param = new ASN1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters);
+            asn1Param = new Asn1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters);
         }
-        ASN1SignTemplate signTemplate = new ASN1SignTemplate(asn1EntityId, mechanism,
-                new ASN1P11Params(asn1Param), content);
+        Asn1SignTemplate signTemplate = new Asn1SignTemplate(asn1EntityId, mechanism,
+                new Asn1P11Params(asn1Param), content);
         ProxyP11Module module = ProxyP11ModulePool.getInstance().getModule(moduleName);
         if (module == null) {
             throw new P11TokenException("could not find RemoteP11Module '" + moduleName + "'");

@@ -316,14 +316,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     throw new SecurityException("P11TokenException: " + ex.getMessage(), ex);
                 }
 
-                P11ObjectIdentifier p11ObjId;
-                try {
-                    p11ObjId = (keyId != null)
+                P11ObjectIdentifier p11ObjId = (keyId != null)
                         ? slot.getObjectIdForId(keyId)
                         : slot.getObjectIdForLabel(keyLabel);
-                } catch (P11UnknownEntityException ex) {
-                    throw new SecurityException("unknown PKCS#11 entity: " + ex.getMessage(), ex);
-                }
 
                 P11EntityIdentifier entityId = new P11EntityIdentifier(slot.getSlotId(), p11ObjId);
 
