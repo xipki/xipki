@@ -8,11 +8,11 @@ xipki-cmd:rm -r -f output
 
 xipki-tk:delete-key \
   --slot 1 \
-  --key-label $RCA_KEY_LABEL
+  --label $RCA_KEY_LABEL
 
 xipki-tk:rsa \
   --slot 1 \
-  --key-label $RCA_KEY_LABEL
+  --label $RCA_KEY_LABEL
 
 source ./xipki/demo/demo.d/initdb.script
 

@@ -60,8 +60,6 @@ import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.Nonnull;
@@ -87,13 +85,14 @@ import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.p11.AbstractP11Slot;
 import org.xipki.commons.security.api.p11.P11Constants;
-import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11MechanismFilter;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotRefreshResult;
 import org.xipki.commons.security.api.p11.P11TokenException;
+import org.xipki.commons.security.api.p11.P11UnknownEntityException;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
@@ -282,23 +281,14 @@ class KeystoreP11Slot extends AbstractP11Slot {
 
                 P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
                 X509Cert cert = ret.getCertForId(id);
-                java.security.PublicKey publicKey = null;
-
-                if (cert != null) {
-                    publicKey = cert.getCert().getPublicKey();
-                } else {
-                    publicKey = readPublicKey(id);
-                }
+                java.security.PublicKey publicKey = (cert == null)
+                        ? readPublicKey(id)
+                        : cert.getCert().getPublicKey();
 
                 if (publicKey == null) {
                     LOG.warn("Neither public key nor certificate is associated with private key {}",
                             p11ObjId);
                     continue;
-                }
-
-                List<X509Certificate> certChain = new LinkedList<>();
-                if (cert != null) {
-                    certChain.add(cert.getCert());
                 }
 
                 byte[] encodedValue = IoUtil.read(
@@ -307,12 +297,15 @@ class KeystoreP11Slot extends AbstractP11Slot {
                 PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(encodedValue);
                 PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
 
-                KeystoreP11Identity identity = new KeystoreP11Identity(
+                X509Certificate[] certs = (cert == null)
+                        ? null
+                        : new X509Certificate[]{cert.getCert()};
+
+                KeystoreP11Identity entity = new KeystoreP11Identity(
                         new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey,
-                        certChain.toArray(new X509Certificate[0]), maxSessions,
-                        securityFactory.getRandom4Sign());
+                        certs, maxSessions, securityFactory.getRandom4Sign());
                 LOG.info("added PKCS#11 key {}", p11ObjId);
-                ret.addIdentity(identity);
+                ret.addEntity(entity);
             } catch (InvalidKeyException ex) {
                 final String message = "InvalidKeyException while initializing key with key-id "
                         + hexId;
@@ -668,20 +661,22 @@ class KeystoreP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected boolean doRemoveIdentity(
+    protected void doRemoveIdentity(
             final P11ObjectIdentifier objectId)
     throws P11TokenException {
         boolean b1 = removePkcs11Entry(certDir, objectId);
         boolean b2 = removePkcs11Entry(privKeyDir, objectId);
         boolean b3 = removePkcs11Entry(pubKeyDir, objectId);
-        return b1 || b2 || b3;
+        if (! (b1 || b2 || b3)) {
+            throw new P11UnknownEntityException(slotId, objectId);
+        }
     }
 
     @Override
     protected void doRemoveCerts(
-            final byte[] id)
+            final P11ObjectIdentifier objectId)
     throws P11TokenException {
-        deletePkcs11Entry(certDir, id);
+        deletePkcs11Entry(certDir, objectId.getId());
     }
 
     @Override
@@ -706,14 +701,17 @@ class KeystoreP11Slot extends AbstractP11Slot {
                 | InvalidAlgorithmParameterException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
         }
-        return saveP11Identity(keypair, label);
+        return saveP11Entity(keypair, label);
     }
 
     @Override
     protected P11Identity doGenerateDSAKeypair(
-            final DSAParameters dsaParams,
+            final BigInteger p, // CHECKSTYLE:SKIP
+            final BigInteger q, // CHECKSTYLE:SKIP
+            final BigInteger g, // CHECKSTYLE:SKIP
             final String label)
     throws P11TokenException {
+        DSAParameters dsaParams = new DSAParameters(p, q, g);
         KeyPair keypair;
         try {
             keypair = KeyUtil.generateDSAKeypair(dsaParams, securityFactory.getRandom4Key());
@@ -721,7 +719,7 @@ class KeystoreP11Slot extends AbstractP11Slot {
                 | InvalidAlgorithmParameterException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
         }
-        return saveP11Identity(keypair, label);
+        return saveP11Entity(keypair, label);
     }
 
     @Override
@@ -737,10 +735,10 @@ class KeystoreP11Slot extends AbstractP11Slot {
                 | InvalidAlgorithmParameterException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
         }
-        return saveP11Identity(keypair, label);
+        return saveP11Entity(keypair, label);
     }
 
-    private P11Identity saveP11Identity(
+    private P11Identity saveP11Entity(
             @Nonnull final KeyPair keypair,
             @Nonnull final String label)
     throws P11TokenException {

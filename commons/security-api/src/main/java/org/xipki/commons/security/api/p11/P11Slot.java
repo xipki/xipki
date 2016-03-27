@@ -60,8 +60,9 @@ public interface P11Slot {
 
     P11SlotIdentifier getSlotId();
 
-    List<P11ObjectIdentifier> getKeyIdentifiers()
-    throws P11TokenException;
+    List<P11ObjectIdentifier> getIdentityIdentifiers();
+
+    List<P11ObjectIdentifier> getCertIdentifiers();
 
     boolean hasIdentity(
             final P11ObjectIdentifier objectId);
@@ -85,12 +86,10 @@ public interface P11Slot {
     throws P11TokenException;
 
     P11ObjectIdentifier getObjectIdForId(
-            byte[] id)
-    throws P11UnknownEntityException;
+            byte[] id);
 
     P11ObjectIdentifier getObjectIdForLabel(
-            String label)
-    throws P11UnknownEntityException;
+            String label);
 
     byte[] sign(
             final long mechanism,
@@ -104,7 +103,7 @@ public interface P11Slot {
             @Nonnull X509Certificate newCert)
     throws P11TokenException, SecurityException;
 
-    boolean removeIdentity(
+    void removeIdentity(
             @Nonnull P11ObjectIdentifier objectId)
     throws P11TokenException;
 
@@ -127,6 +126,14 @@ public interface P11Slot {
     P11ObjectIdentifier generateDSAKeypair(
             int plength,
             int qlength,
+            @Nonnull String label)
+    throws P11TokenException, SecurityException;
+
+    // CHECKSTYLE:SKIP
+    P11ObjectIdentifier generateDSAKeypair(
+            BigInteger p, // CHECKSTYLE:SKIP
+            BigInteger q, // CHECKSTYLE:SKIP
+            BigInteger g, // CHECKSTYLE:SKIP
             @Nonnull String label)
     throws P11TokenException, SecurityException;
 

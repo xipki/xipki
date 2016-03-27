@@ -44,16 +44,14 @@ import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
  *
  * <pre>
- * SlotIdentifier ::= SEQUENCE {
- *     id         INTEGER OPTIONAL,
- *     index      INTEGER OPTIONAL
+ * Mechanism ::= SEQUENCE {
+ *     mechanism     INTEGER,
+ *     params        P11Params OPTIONAL,
  *     }
  * </pre>
  *
@@ -61,64 +59,66 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
  * @since 2.0.0
  */
 
-// CHECKSTYLE:SKIP
-public class ASN1SlotIdentifier extends ASN1Object {
+public class Asn1Mechanism extends ASN1Object {
 
-    private P11SlotIdentifier slotId;
+    private long mechanism;
 
-    public ASN1SlotIdentifier(
-            final P11SlotIdentifier slotId) {
-        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+    private Asn1P11Params params;
+
+    public Asn1Mechanism(
+            final long mechanism,
+            final Asn1P11Params params) {
+        this.mechanism = mechanism;
+        this.params = params;
     }
 
-    private ASN1SlotIdentifier(
+    private Asn1Mechanism(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
+        Asn1Util.requireRange(seq, 1, 2);
         int size = seq.size();
+        this.mechanism = Asn1Util.getInteger(seq.getObjectAt(0)).longValue();
+        if (size > 1) {
+            this.params = Asn1P11Params.getInstance(seq.getObjectAt(1));
+        }
+    }
+
+    public static Asn1Mechanism getInstance(
+            final Object obj)
+    throws BadAsn1ObjectException {
+        if (obj == null || obj instanceof Asn1Mechanism) {
+            return (Asn1Mechanism) obj;
+        }
+
         try {
-            ParamUtil.requireRange("seq.size()", size, 2, 2);
-            long id = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue().longValue();
-            int index = ASN1Integer.getInstance(seq.getObjectAt(1)).getValue().intValue();
-            this.slotId = new P11SlotIdentifier(index, id);
-        } catch (IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException(
-                    "invalid object ASN1SlotIdentifier: " + ex.getMessage(), ex);
+            if (obj instanceof ASN1Sequence) {
+                return new Asn1Mechanism((ASN1Sequence) obj);
+            } else if (obj instanceof byte[]) {
+                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+            } else {
+                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+            }
+        } catch (IOException | IllegalArgumentException ex) {
+            throw new BadAsn1ObjectException("unable to parse encoded object");
         }
     }
 
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(new ASN1Integer(slotId.getId()));
-        vector.add(new ASN1Integer(slotId.getIndex()));
+        vector.add(new ASN1Integer(mechanism));
+        if (params != null) {
+            vector.add(params);
+        }
         return new DERSequence(vector);
     }
 
-    public P11SlotIdentifier getSlotId() {
-        return slotId;
+    public long getMechanism() {
+        return mechanism;
     }
 
-    public static ASN1SlotIdentifier getInstance(
-            final Object obj)
-    throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof ASN1SlotIdentifier) {
-            return (ASN1SlotIdentifier) obj;
-        }
-
-        try {
-            if (obj instanceof ASN1Sequence) {
-                return new ASN1SlotIdentifier((ASN1Sequence) obj);
-            }
-
-            if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded ASN1SlotIdentifier");
-        }
-
-        throw new BadAsn1ObjectException("unknown object in ASN1SlotIdentifier.getInstance(): "
-                + obj.getClass().getName());
+    public Asn1P11Params getParams() {
+        return params;
     }
 
 }

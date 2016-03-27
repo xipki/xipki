@@ -73,9 +73,11 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.pkcs11proxy.common.ASN1SlotIdentifier;
+import org.xipki.commons.pkcs11proxy.common.Asn1P11SlotIdentifier;
+import org.xipki.commons.pkcs11proxy.common.Asn1Util;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
 import org.xipki.commons.pkcs11proxy.common.ServerCaps;
+import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.p11.AbstractP11Module;
 import org.xipki.commons.security.api.p11.P11DuplicateEntityException;
@@ -154,10 +156,10 @@ class ProxyP11Module extends AbstractP11Module {
 
         Set<P11Slot> slots = new HashSet<>();
         for (int i = 0; i < n; i++) {
-            ASN1SlotIdentifier asn1SlotId;
+            Asn1P11SlotIdentifier asn1SlotId;
             try {
                 ASN1Encodable obj = seq.getObjectAt(i);
-                asn1SlotId = ASN1SlotIdentifier.getInstance(obj);
+                asn1SlotId = Asn1P11SlotIdentifier.getInstance(obj);
             } catch (Exception ex) {
                 throw new P11TokenException(ex.getMessage(), ex);
             }
@@ -414,27 +416,30 @@ class ProxyP11Module extends AbstractP11Module {
             throw new P11TokenException("value of InfoTypeAndValue '"
                     + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "' is incorrect");
         }
-        try {
-            ASN1Sequence seq = ASN1Sequence.getInstance(itvValue);
-            if (seq.size() != 3) {
-                throw new P11TokenException("invalid response sequence.size != 3: " + seq.size());
-            }
 
-            int receivedversion = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue().intValue();
+        try {
+            ASN1Sequence seq = Asn1Util.getSequence(itvValue);
+            Asn1Util.requireRange(seq, 2, 3);
+
+            int receivedversion = Asn1Util.getInteger(seq.getObjectAt(0)).intValue();
             if (receivedversion != version) {
                 throw new P11TokenException("version '"
                         + receivedversion + "' is not the expected '" + version + "'");
             }
-            int receivedAction = ASN1Integer.getInstance(seq.getObjectAt(1)).getValue().intValue();
+
+            int receivedAction = Asn1Util.getInteger(seq.getObjectAt(1)).intValue();
             if (receivedAction != action) {
                 throw new P11TokenException("action '"
                         + receivedAction + "' is not the expected '" + action + "'");
             }
 
-            return seq.getObjectAt(2);
-        } catch (IllegalArgumentException ex) {
-            throw new P11TokenException("value of response (type InfoTypeAndValue) '"
-                    + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "' is incorrect");
+            if (seq.size() > 2) {
+                return seq.getObjectAt(2);
+            } else {
+                return null;
+            }
+        } catch (BadAsn1ObjectException ex) {
+            throw new P11TokenException("bad ASN1 object: " + ex.getMessage(), ex);
         }
     } // method extractItvInfoValue
 

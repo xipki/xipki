@@ -47,25 +47,13 @@ public class P11ProxyConstants {
 
     public static final GeneralName REMOTE_P11_CMP_SERVER =
             new GeneralName(GeneralName.uniformResourceIdentifier,
-                    "http://xipki.org/remotep11/server");
+                    "http://xipki.org/pkcs11proxy/server");
 
     public static final GeneralName REMOTE_P11_CMP_CLIENT =
             new GeneralName(GeneralName.uniformResourceIdentifier,
-                    "http://xipki.org/remotep11/client");
+                    "http://xipki.org/pkcs11proxy/client");
 
     public static final int VERSION_V1 = 0;
-
-    public static final int ACTION_getPublicKey = 81;
-
-    public static final int ACTION_getCertificates = 82;
-
-    public static final int ACTION_getSlotIds = 83;
-
-    public static final int ACTION_getKeyIds = 84;
-
-    public static final int ACTION_getMechanisms = 85;
-
-    public static final int ACTION_sign = 90;
 
     public static final String ERROR_UNKNOWN_ENTITY = "P11_UNKNOWN_ENTITY";
 
@@ -74,6 +62,34 @@ public class P11ProxyConstants {
     public static final String ERROR_UNSUPPORTED_MECHANISM = "P11_UNSUPPORTED_MECHANISM";
 
     public static final String ERROR_P11_TOKENERROR = "P11_TOKEN_ERROR";
+
+    public static final int ACTION_getPublicKey = 1;
+
+    public static final int ACTION_getCertificate = 2;
+
+    public static final int ACTION_getSlotIds = 3;
+
+    public static final int ACTION_getIdentityIdentifiers = 4;
+
+    public static final int ACTION_getCertIdentifiers = 5;
+
+    public static final int ACTION_getMechanisms = 6;
+
+    public static final int ACTION_sign = 20;
+
+    public static final int ACTION_genKeypair_RSA = 30;
+
+    public static final int ACTION_genKeypair_DSA = 31;
+
+    public static final int ACTION_genKeypair_EC = 33;
+
+    public static final int ACTION_addCert = 40;
+
+    public static final int ACTION_removeIdentity = 41;
+
+    public static final int ACTION_removeCerts = 42;
+
+    public static final int ACTION_updateCerificate = 43;
 
     private P11ProxyConstants() {
     }
