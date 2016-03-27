@@ -14,7 +14,7 @@ xipki-ca:profile-add \
 ## Create the PKCS#10 request for the command caqa:check-cert in QA
 xipki-tk:req \
   --slot 1 \
-  --key-label $RCA_KEY_LABEL \
+  --label $RCA_KEY_LABEL \
   --out output/RCA1.p10 \
   --subject "CN=RCA1,O=xipki,C=DE"
 
@@ -41,7 +41,7 @@ xipki-ca:gen-rca \
 ## Update the certificate in the device
 xipki-tk:update-cert \
   --slot 1 \
-  --key-label $RCA_KEY_LABEL \
+  --label $RCA_KEY_LABEL \
   --cert output/RCA1.der
 
 xipki-ca:caalias-add \
@@ -86,7 +86,7 @@ xipki-ca:publish-self \
 ## Generate keys and PKCS#10 request for SubCA1
 xipki-tk:req \
   --slot 1 \
-  --key-label $SubCA_KEY_LABEL \
+  --label $SubCA_KEY_LABEL \
   --out output/SubCA1.p10 \
   --subject "CN=SubCA1,O=xipki,C=DE"
 
@@ -98,14 +98,14 @@ xipki-ca:enroll-cert \
 
 xipki-tk:update-cert \
   --slot 1 \
-  --key-label $SubCA_KEY_LABEL \
+  --label $SubCA_KEY_LABEL \
   --cert output/SubCA1.der \
   --ca-cert output/RCA1.der
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
 xipki-tk:req \
   --slot 1 \
-  --key-label $SubCAwithCRL_KEY_LABEL --out output/SubCAwithCRL1.p10 \
+  --label $SubCAwithCRL_KEY_LABEL --out output/SubCAwithCRL1.p10 \
   --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
   --subject-alt-name "[1]info@xipki.org" \
   --subject-alt-name "[2]xipki.org" \
@@ -125,7 +125,7 @@ xipki-ca:enroll-cert \
 
 xipki-tk:update-cert \
   --slot 1 \
-  --key-label $SubCAwithCRL_KEY_LABEL \
+  --label $SubCAwithCRL_KEY_LABEL \
   --cert output/SubCAwithCRL1.der \
   --ca-cert output/RCA1.der
 

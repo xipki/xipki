@@ -46,6 +46,8 @@ import org.bouncycastle.asn1.DERSequence;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
+import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
  *
@@ -60,55 +62,77 @@ import org.xipki.commons.security.api.p11.P11EntityIdentifier;
  * @since 2.0.0
  */
 
-// CHECKSTYLE:SKIP
-public class ASN1EntityIdentifier extends ASN1Object {
+public class Asn1P11EntityIdentifier extends ASN1Object {
 
-    private ASN1SlotIdentifier slotId;
+    private Asn1P11SlotIdentifier slotId;
 
-    private ASN1P11ObjectIdentifier keyId;
+    private Asn1P11ObjectIdentifier objectId;
 
     private P11EntityIdentifier entityId;
 
-    public ASN1EntityIdentifier(
-            final ASN1SlotIdentifier slotId,
-            final ASN1P11ObjectIdentifier keyId) {
+    public Asn1P11EntityIdentifier(
+            final P11SlotIdentifier slotId,
+            final P11ObjectIdentifier objectId) {
         ParamUtil.requireNonNull("slotId", slotId);
-        ParamUtil.requireNonNull("keyId", keyId);
-        init(null, slotId, keyId);
+        ParamUtil.requireNonNull("objectId", objectId);
+        init(null, new Asn1P11SlotIdentifier(slotId), new Asn1P11ObjectIdentifier(objectId));
     }
 
-    public ASN1EntityIdentifier(
+    public Asn1P11EntityIdentifier(
+            final Asn1P11SlotIdentifier slotId,
+            final Asn1P11ObjectIdentifier objectId) {
+        ParamUtil.requireNonNull("slotId", slotId);
+        ParamUtil.requireNonNull("objectId", objectId);
+        init(null, slotId, objectId);
+    }
+
+    public Asn1P11EntityIdentifier(
             final P11EntityIdentifier entityId) {
         ParamUtil.requireNonNull("entityId", entityId);
         init(entityId, null, null);
     }
 
-    private ASN1EntityIdentifier(
+    private Asn1P11EntityIdentifier(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
-        final int size = seq.size();
-        if (size != 2) {
-            throw new BadAsn1ObjectException("invalid object ASN1EntityIdentifier: seq.size() "
-                    + " expected 2, but is " + size);
+        Asn1Util.requireRange(seq, 2, 2);
+        Asn1P11SlotIdentifier slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(0));
+        Asn1P11ObjectIdentifier objectId = Asn1P11ObjectIdentifier.getInstance(seq.getObjectAt(0));
+        init(null, slotId, objectId);
+    }
+
+    public static Asn1P11EntityIdentifier getInstance(
+            final Object obj)
+    throws BadAsn1ObjectException {
+        if (obj == null || obj instanceof Asn1P11EntityIdentifier) {
+            return (Asn1P11EntityIdentifier) obj;
         }
 
-        ASN1SlotIdentifier slotId = ASN1SlotIdentifier.getInstance(seq.getObjectAt(0));
-        ASN1P11ObjectIdentifier objectId = ASN1P11ObjectIdentifier.getInstance(seq.getObjectAt(0));
-        init(null, slotId, objectId);
+        try {
+            if (obj instanceof ASN1Sequence) {
+                return new Asn1P11EntityIdentifier((ASN1Sequence) obj);
+            } else if (obj instanceof byte[]) {
+                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
+            } else {
+                throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
+            }
+        } catch (IOException | IllegalArgumentException ex) {
+            throw new BadAsn1ObjectException("unable to parse encoded object");
+        }
     }
 
     private void init(
             final P11EntityIdentifier entityId,
-            final ASN1SlotIdentifier slotId,
-            final ASN1P11ObjectIdentifier keyId) {
+            final Asn1P11SlotIdentifier slotId,
+            final Asn1P11ObjectIdentifier objectId) {
         if (entityId != null) {
             this.entityId = entityId;
-            this.slotId = new ASN1SlotIdentifier(entityId.getSlotId());
-            this.keyId = new ASN1P11ObjectIdentifier(entityId.getObjectId());
+            this.slotId = new Asn1P11SlotIdentifier(entityId.getSlotId());
+            this.objectId = new Asn1P11ObjectIdentifier(entityId.getObjectId());
         } else {
-            this.entityId = new P11EntityIdentifier(slotId.getSlotId(), keyId.getObjectId());
+            this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
             this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-            this.keyId = ParamUtil.requireNonNull("keyId", keyId);
+            this.objectId = ParamUtil.requireNonNull("keyId", objectId);
         }
     }
 
@@ -116,43 +140,20 @@ public class ASN1EntityIdentifier extends ASN1Object {
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
         vector.add(slotId.toASN1Primitive());
-        vector.add(keyId.toASN1Primitive());
+        vector.add(objectId.toASN1Primitive());
         return new DERSequence(vector);
     }
 
-    public ASN1SlotIdentifier getSlotId() {
+    public Asn1P11SlotIdentifier getSlotId() {
         return slotId;
     }
 
-    public ASN1P11ObjectIdentifier getKeyId() {
-        return keyId;
+    public Asn1P11ObjectIdentifier getObjectId() {
+        return objectId;
     }
 
     public P11EntityIdentifier getEntityId() {
         return entityId;
-    }
-
-    public static ASN1EntityIdentifier getInstance(
-            final Object obj)
-    throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof ASN1EntityIdentifier) {
-            return (ASN1EntityIdentifier) obj;
-        }
-
-        try {
-            if (obj instanceof ASN1Sequence) {
-                return new ASN1EntityIdentifier((ASN1Sequence) obj);
-            }
-
-            if (obj instanceof byte[]) {
-                return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
-            }
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded ASN1EntityIdentifier");
-        }
-
-        throw new BadAsn1ObjectException("unknown object in ASN1EntityIdentifier.getInstance(): "
-                + obj.getClass().getName());
     }
 
 }

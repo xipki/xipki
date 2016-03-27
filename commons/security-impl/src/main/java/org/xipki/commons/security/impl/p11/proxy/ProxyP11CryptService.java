@@ -42,8 +42,8 @@ import java.util.Set;
 
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -99,18 +99,18 @@ class ProxyP11CryptService implements P11CryptService {
             final P11Params parameters,
             final byte[] content)
     throws P11TokenException, SecurityException {
-        P11Identity identity =
+        P11Identity entity =
                 module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
-        return identity.sign(mechanism, parameters, content);
+        return entity.sign(mechanism, parameters, content);
     }
 
     @Override
     public PublicKey getPublicKey(
             final P11EntityIdentifier entityId)
     throws P11TokenException {
-        P11Identity identity =
+        P11Identity entity =
                 module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
-        return identity.getPublicKey();
+        return entity.getPublicKey();
     }
 
     @Override
@@ -127,9 +127,9 @@ class ProxyP11CryptService implements P11CryptService {
     public X509Certificate[] getCertificates(
             final P11EntityIdentifier entityId)
     throws P11TokenException {
-        P11Identity identity =
+        P11Identity entity =
                 module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
-        return identity.getCertificateChain();
+        return entity.getCertificateChain();
     }
 
 }

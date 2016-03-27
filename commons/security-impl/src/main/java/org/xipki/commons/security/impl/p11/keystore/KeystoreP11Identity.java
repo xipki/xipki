@@ -65,8 +65,8 @@ import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.p11.P11Constants;
-import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
@@ -78,7 +78,7 @@ import org.xipki.commons.security.impl.util.SecurityUtil;
  * @since 2.0.0
  */
 
-class KeystoreP11Identity extends P11Identity {
+public class KeystoreP11Identity extends P11Identity {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Identity.class);
 

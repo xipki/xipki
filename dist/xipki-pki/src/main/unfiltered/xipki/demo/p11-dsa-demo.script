@@ -20,17 +20,17 @@ source ./xipki/demo/demo.d/p11-rm-keys.script
 xipki-tk:dsa \
   --plen $PLEN \
   --slot 1 \
-  --key-label $RCA_KEY_LABEL
+  --label $RCA_KEY_LABEL
 
 xipki-tk:dsa \
   --plen $PLEN \
   --slot 1 \
-  --key-label $SubCA_KEY_LABEL
+  --label $SubCA_KEY_LABEL
 
 xipki-tk:dsa \
   --plen $PLEN \
   --slot 1 \
-  --key-label $SubCAwithCRL_KEY_LABEL
+  --label $SubCAwithCRL_KEY_LABEL
 
 feature:uninstall xipki-security-shell
 
