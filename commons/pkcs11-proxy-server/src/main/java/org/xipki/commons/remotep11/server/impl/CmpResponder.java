@@ -283,11 +283,11 @@ class CmpResponder {
             }
             respItvInfoValue = new DERSequence(vec);
         } else if (P11ProxyConstants.ACTION_getPublicKey == action) {
-            P11EntityIdentifier entityId =
+            P11EntityIdentifier identityId =
                     Asn1P11EntityIdentifier.getInstance(reqValue).getEntityId();
-            PublicKey pubKey = p11CryptService.getPublicKey(entityId);
+            PublicKey pubKey = p11CryptService.getPublicKey(identityId);
             if (pubKey == null) {
-                throw new P11UnknownEntityException(entityId);
+                throw new P11UnknownEntityException(identityId);
             }
 
             respItvInfoValue = KeyUtil.createSubjectPublicKeyInfo(pubKey);
@@ -319,7 +319,7 @@ class CmpResponder {
             }
 
             byte[] content = signTemplate.getMessage();
-            byte[] signature = p11CryptService.sign(signTemplate.getEntityId().getEntityId(),
+            byte[] signature = p11CryptService.sign(signTemplate.getIdentityId().getEntityId(),
                     mechanism, params, content);
             respItvInfoValue = new DEROctetString(signature);
         } else if (P11ProxyConstants.ACTION_updateCerificate == action) {

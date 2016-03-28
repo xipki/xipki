@@ -69,22 +69,22 @@ public interface P11CryptService {
     throws P11TokenException;
 
     byte[] sign(
-            @Nonnull P11EntityIdentifier entityId,
+            @Nonnull P11EntityIdentifier identityId,
             long mechanism,
             @Nullable P11Params parameters,
             byte[] content)
     throws P11TokenException, SecurityException;
 
     PublicKey getPublicKey(
-            @Nonnull P11EntityIdentifier entityId)
+            @Nonnull P11EntityIdentifier identityId)
     throws P11TokenException;
 
     X509Certificate getCertificate(
-            @Nonnull P11EntityIdentifier entityId)
+            @Nonnull P11EntityIdentifier identityId)
     throws P11TokenException;
 
     X509Certificate[] getCertificates(
-            @Nonnull P11EntityIdentifier entityId)
+            @Nonnull P11EntityIdentifier identityId)
     throws P11TokenException;
 
 }

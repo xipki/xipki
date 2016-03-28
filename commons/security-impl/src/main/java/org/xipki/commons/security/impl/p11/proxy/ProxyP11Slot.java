@@ -141,9 +141,9 @@ public class ProxyP11Slot extends AbstractP11Slot {
                     ? null
                     : new X509Certificate[]{cert.getCert()};
 
-            ProxyP11Identity entity = new ProxyP11Identity(moduleName,
+            ProxyP11Identity identity = new ProxyP11Identity(moduleName,
                     new P11EntityIdentifier(slotId, keyId), certs, pubKey);
-            refreshResult.addEntity(entity);
+            refreshResult.addIdentity(identity);
         }
 
         return refreshResult;
@@ -263,7 +263,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
             throw new P11TokenException(
                     "invalid ASN1 object Asn1P11EntityIdentifier: " + ex.getMessage(), ex);
         }
-        if (!slotId.equals(ei.getSlotId())) {
+        if (!slotId.equals(ei.getSlotId().getSlotId())) {
             throw new P11TokenException("");
         }
         P11EntityIdentifier entityId = ei.getEntityId();

@@ -37,7 +37,6 @@
 package org.xipki.commons.security.api.p11;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -73,9 +72,9 @@ public class P11ModuleConf {
 
     private final boolean readOnly;
 
-    private final Set<P11SlotIdentifier> excludeSlots;
+    private final Set<P11SlotIdFilter> excludeSlots;
 
-    private final Set<P11SlotIdentifier> includeSlots;
+    private final Set<P11SlotIdFilter> includeSlots;
 
     private final P11PasswordRetriever passwordRetriever;
 
@@ -106,7 +105,7 @@ public class P11ModuleConf {
         PermittedMechanismsType mechsType = moduleType.getPermittedMechanisms();
         if (mechsType != null && CollectionUtil.isNonEmpty(mechsType.getMechanisms())) {
             for (MechanismsType mechType : mechsType.getMechanisms()) {
-                Set<P11SlotIdentifier> slots = getSlots(mechType.getSlots());
+                Set<P11SlotIdFilter> slots = getSlotIdFilters(mechType.getSlots());
                 Set<Long> mechanisms = new HashSet<>();
                 for (String mechStr : mechType.getMechanism()) {
                     Long mech = null;
@@ -146,14 +145,14 @@ public class P11ModuleConf {
         if (passwordsType != null && CollectionUtil.isNonEmpty(passwordsType.getPassword())) {
             passwordRetriever.setPasswordResolver(securityFactory.getPasswordResolver());
             for (PasswordType passwordType : passwordsType.getPassword()) {
-                Set<P11SlotIdentifier> slots = getSlots(passwordType.getSlots());
+                Set<P11SlotIdFilter> slots = getSlotIdFilters(passwordType.getSlots());
                 passwordRetriever.addPasswordEntry(slots,
                         new ArrayList<>(passwordType.getSinglePassword()));
             }
         }
 
-        includeSlots = Collections.unmodifiableSet(getSlots(moduleType.getIncludeSlots()));
-        excludeSlots = Collections.unmodifiableSet(getSlots(moduleType.getExcludeSlots()));
+        includeSlots = getSlotIdFilters(moduleType.getIncludeSlots());
+        excludeSlots = getSlotIdFilters(moduleType.getExcludeSlots());
 
         final String osName = System.getProperty("os.name").toLowerCase();
         String nativeLibraryPath = null;
@@ -207,14 +206,6 @@ public class P11ModuleConf {
         return securityFactory;
     }
 
-    public Set<P11SlotIdentifier> getExcludeSlots() {
-        return excludeSlots;
-    }
-
-    public Set<P11SlotIdentifier> getIncludeSlots() {
-        return includeSlots;
-    }
-
     public P11PasswordRetriever getPasswordRetriever() {
         return passwordRetriever;
     }
@@ -227,8 +218,8 @@ public class P11ModuleConf {
             included = true;
         } else {
             included = false;
-            for (P11SlotIdentifier entry : includeSlots) {
-                if (entry.equals(slotId)) {
+            for (P11SlotIdFilter entry : includeSlots) {
+                if (entry.match(slotId)) {
                     included = true;
                     break;
                 }
@@ -243,8 +234,8 @@ public class P11ModuleConf {
             return included;
         }
 
-        for (P11SlotIdentifier entry : excludeSlots) {
-            if (entry.equals(slotId)) {
+        for (P11SlotIdFilter entry : excludeSlots) {
+            if (entry.match(slotId)) {
                 return false;
             }
         }
@@ -256,15 +247,14 @@ public class P11ModuleConf {
         return mechanismFilter;
     }
 
-    private static Set<P11SlotIdentifier> getSlots(
+    private static Set<P11SlotIdFilter> getSlotIdFilters(
             final SlotsType type)
     throws InvalidConfException {
         if (type == null || CollectionUtil.isEmpty(type.getSlot())) {
             return null;
         }
 
-        Set<P11SlotIdentifier> slots = new HashSet<>();
-        // FIXME: slotId and slotIndex may be null.
+        Set<P11SlotIdFilter> filters = new HashSet<>();
         for (SlotType slotType : type.getSlot()) {
             Long slotId = null;
             if (slotType.getId() != null) {
@@ -281,10 +271,10 @@ public class P11ModuleConf {
                     throw new InvalidConfException(message);
                 }
             }
-            slots.add(new P11SlotIdentifier(slotType.getIndex(), slotId));
+            filters.add(new P11SlotIdFilter(slotType.getIndex(), slotId));
         }
 
-        return slots;
+        return filters;
     }
 
 }

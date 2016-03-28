@@ -77,7 +77,7 @@ class P11DSAContentSigner implements ContentSigner {
 
     private final P11CryptService cryptService;
 
-    private final P11EntityIdentifier entityId;
+    private final P11EntityIdentifier identityId;
 
     private final AlgorithmIdentifier algorithmIdentifier;
 
@@ -103,11 +103,11 @@ class P11DSAContentSigner implements ContentSigner {
 
     P11DSAContentSigner(
             final P11CryptService cryptService,
-            final P11EntityIdentifier entityId,
+            final P11EntityIdentifier identityId,
             final AlgorithmIdentifier signatureAlgId,
             final boolean plain)
     throws SecurityException, P11TokenException {
-        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
+        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         this.plain = plain;
@@ -119,7 +119,7 @@ class P11DSAContentSigner implements ContentSigner {
         }
         long tmpMechanism = hashMechMap.get(hashAlgo).longValue();
 
-        P11SlotIdentifier slotId = entityId.getSlotId();
+        P11SlotIdentifier slotId = identityId.getSlotId();
         if (cryptService.supportsMechanism(slotId, P11Constants.CKM_DSA)) {
             tmpMechanism = P11Constants.CKM_DSA;
             AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
@@ -184,7 +184,7 @@ class P11DSAContentSigner implements ContentSigner {
             ((ByteArrayOutputStream) outputStream).reset();
         }
 
-        return cryptService.sign(entityId, mechanism, null, dataToSign);
+        return cryptService.sign(identityId, mechanism, null, dataToSign);
     }
 
 }

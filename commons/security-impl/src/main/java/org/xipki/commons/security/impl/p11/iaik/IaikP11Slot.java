@@ -92,11 +92,13 @@ import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.DSAPublicKey;
 import iaik.pkcs.pkcs11.objects.ECDSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
+import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.objects.KeyPair;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.PublicKey;
 import iaik.pkcs.pkcs11.objects.RSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.RSAPublicKey;
+import iaik.pkcs.pkcs11.objects.Storage;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 import iaik.pkcs.pkcs11.parameters.RSAPkcsPssParameters;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
@@ -316,26 +318,26 @@ class IaikP11Slot extends AbstractP11Slot {
         X509Certificate[] certs = (cert == null)
                 ? null
                 : new X509Certificate[]{cert.getCert()};
-        IaikP11Identity entity = new IaikP11Identity(moduleName,
+        IaikP11Identity identity = new IaikP11Identity(moduleName,
                 new P11EntityIdentifier(slotId, objectId), privKey, certs, pubKey);
-        refreshResult.addEntity(entity);
+        refreshResult.addIdentity(identity);
     }
 
     byte[] sign(
             final long mechanism,
             final P11Params parameters,
             final byte[] content,
-            final IaikP11Identity entity)
+            final IaikP11Identity identity)
     throws P11TokenException {
         ParamUtil.requireNonNull("content", content);
         assertMechanismSupported(mechanism);
 
         int len = content.length;
         if (len <= maxMessageSize) {
-            return singleSign(mechanism, parameters, content, entity);
+            return singleSign(mechanism, parameters, content, identity);
         }
 
-        PrivateKey signingKey = entity.getPrivateKey();
+        PrivateKey signingKey = identity.getPrivateKey();
         Mechanism mechanismObj = getMechanism(mechanism, parameters);
         if (LOG.isTraceEnabled()) {
             LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
@@ -374,9 +376,9 @@ class IaikP11Slot extends AbstractP11Slot {
             final long mechanism,
             final P11Params parameters,
             final byte[] hash,
-            final IaikP11Identity entity)
+            final IaikP11Identity identity)
     throws P11TokenException {
-        PrivateKey signingKey = entity.getPrivateKey();
+        PrivateKey signingKey = identity.getPrivateKey();
         Mechanism mechanismObj = getMechanism(mechanism, parameters);
         if (LOG.isTraceEnabled()) {
             LOG.debug("sign with private key:\n{}", signingKey);
@@ -592,7 +594,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
         try {
             PrivateKey template = new PrivateKey();
-            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
+            List<Storage> tmpObjects = getObjects(session, template);
             if (CollectionUtil.isEmpty(tmpObjects)) {
                 return Collections.emptyList();
             }
@@ -601,7 +603,7 @@ class IaikP11Slot extends AbstractP11Slot {
             LOG.info("found {} private keys", n);
 
             List<PrivateKey> privateKeys = new ArrayList<>(n);
-            for (iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects) {
+            for (Storage tmpObject : tmpObjects) {
                 PrivateKey privateKey = (PrivateKey) tmpObject;
                 privateKeys.add(privateKey);
             }
@@ -612,14 +614,28 @@ class IaikP11Slot extends AbstractP11Slot {
         }
     }
 
+    private PrivateKey getPrivateKeyObject(
+            final byte[] keyId,
+            final char[] keyLabel)
+    throws P11TokenException {
+        return (PrivateKey) getKeyObject(new PublicKey(), keyId, keyLabel);
+    }
+
     private PublicKey getPublicKeyObject(
+            final byte[] keyId,
+            final char[] keyLabel)
+    throws P11TokenException {
+        return (PublicKey) getKeyObject(new PublicKey(), keyId, keyLabel);
+    }
+
+    private Key getKeyObject(
+            final Key template,
             final byte[] keyId,
             final char[] keyLabel)
     throws P11TokenException {
         Session session = borrowIdleSession();
 
         try {
-            PublicKey template = new PublicKey();
             if (keyId != null) {
                 template.getId().setByteArrayValue(keyId);
             }
@@ -627,22 +643,21 @@ class IaikP11Slot extends AbstractP11Slot {
                 template.getLabel().setCharArrayValue(keyLabel);
             }
 
-            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
+            List<Storage> tmpObjects = getObjects(session, template, 2);
             if (CollectionUtil.isEmpty(tmpObjects)) {
                 return null;
             }
-
             int size = tmpObjects.size();
             if (size > 1) {
                 LOG.warn("found {} public key identified by {}, use the first one",
                         size, getDescription(keyId, keyLabel));
             }
 
-            return (PublicKey) tmpObjects.get(0);
+            return (Key) tmpObjects.get(0);
         } finally {
             returnIdleSession(session);
         }
-    } // method getPublicKeyObject
+    }
 
     private static boolean checkSessionLoggedIn(
             final Session session)
@@ -671,19 +686,19 @@ class IaikP11Slot extends AbstractP11Slot {
         return sessionSessionLoggedIn;
     }
 
-    private static List<iaik.pkcs.pkcs11.objects.Object> getObjects(
+    private static List<Storage> getObjects(
             final Session session,
-            final iaik.pkcs.pkcs11.objects.Object template)
+            final Storage template)
     throws P11TokenException {
         return getObjects(session, template, 9999);
     }
 
-    private static List<iaik.pkcs.pkcs11.objects.Object> getObjects(
+    private static List<Storage> getObjects(
             final Session session,
-            final iaik.pkcs.pkcs11.objects.Object template,
+            final Storage template,
             final int maxNo)
     throws P11TokenException {
-        List<iaik.pkcs.pkcs11.objects.Object> objList = new LinkedList<>();
+        List<Storage> objList = new LinkedList<>();
 
         try {
             session.findObjectsInit(template);
@@ -698,7 +713,7 @@ class IaikP11Slot extends AbstractP11Slot {
                     if (LOG.isTraceEnabled()) {
                         LOG.debug("foundObject: {}", object);
                     }
-                    objList.add(object);
+                    objList.add((Storage) object);
                 }
             }
         } catch (TokenException ex) {
@@ -817,7 +832,7 @@ class IaikP11Slot extends AbstractP11Slot {
         Session session = borrowIdleSession();
         try {
             X509PublicKeyCertificate template = new X509PublicKeyCertificate();
-            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
+            List<Storage> tmpObjects = getObjects(session, template);
             final int n = tmpObjects.size();
             List<X509PublicKeyCertificate> certs = new ArrayList<>(n);
             for (iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects) {
@@ -838,6 +853,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 objectId.getLabelChars());
         if (existingCerts == null || existingCerts.length == 0) {
             LOG.warn("could not find certificates " + objectId);
+            return;
         }
 
         Session session = borrowWritableSession();
@@ -1062,7 +1078,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 template.getLabel().setCharArrayValue(keyLabel);
             }
 
-            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
+            List<Storage> tmpObjects = getObjects(session, template);
             if (CollectionUtil.isEmpty(tmpObjects)) {
                 LOG.info("found no certificate identified by {}", getDescription(keyId, keyLabel));
                 return null;
@@ -1083,7 +1099,42 @@ class IaikP11Slot extends AbstractP11Slot {
     protected void doRemoveIdentity(
             P11ObjectIdentifier objectId)
     throws P11TokenException {
-        // TODO Auto-generated method stub
+        PrivateKey privKey = getPrivateKeyObject(objectId.getId(), objectId.getLabelChars());
+        PrivateKey pubKey = getPrivateKeyObject(objectId.getId(), objectId.getLabelChars());
+        X509PublicKeyCertificate[] certs = getCertificateObjects(objectId.getId(),
+                objectId.getLabelChars());
+
+        Session session = borrowWritableSession();
+        try {
+
+            if (privKey != null) {
+                try {
+                    session.destroyObject(privKey);
+                } catch (TokenException ex) {
+                    throw new P11TokenException("could not delete private key " + objectId);
+                }
+            }
+
+            if (pubKey != null) {
+                try {
+                    session.destroyObject(pubKey);
+                } catch (TokenException ex) {
+                    throw new P11TokenException("could not delete public key " + objectId);
+                }
+            }
+
+            if (certs != null && certs.length > 0) {
+                for (int i = 0; i < certs.length; i++) {
+                    try {
+                        session.destroyObject(certs[i]);
+                    } catch (TokenException ex) {
+                        throw new P11TokenException("could not delete certificate " + objectId);
+                    }
+                }
+            }
+        } finally {
+            returnWritableSession(session);
+        }
     }
 
 }

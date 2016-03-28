@@ -97,14 +97,16 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
 
     @Override
     public String toString() {
-        // FIMXE: implement me
-        return super.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append("slot ").append(slotId);
+        sb.append(", object ").append(objectId);
+        return sb.toString();
     }
 
     @Override
     public int hashCode() {
-        // FIXME: implement me
-        return 0;
+        int hashCode = slotId.hashCode();
+        return hashCode + 31 * objectId.hashCode();
     }
 
 }

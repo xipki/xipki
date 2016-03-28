@@ -82,10 +82,10 @@ class ProxyP11Identity extends P11Identity {
         ParamUtil.requireNonNull("content", content);
 
         if (!supportsMechanism(mechanism, parameters)) {
-            throw new P11UnsupportedMechanismException(mechanism, entityId);
+            throw new P11UnsupportedMechanismException(mechanism, identityId);
         }
 
-        Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(entityId);
+        Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
         ASN1Encodable asn1Param = null;
         if (parameters instanceof P11RSAPkcsPssParams) {
             asn1Param = new Asn1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters);
