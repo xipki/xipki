@@ -36,21 +36,113 @@
 
 package org.xipki.commons.security.api.p11;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
-import javax.annotation.Nonnull;
-
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.password.api.PasswordResolverException;
+import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface P11PasswordRetriever {
+public class P11PasswordRetriever {
 
-    List<char[]> getPassword(
-            @Nonnull P11SlotIdentifier slotId)
-    throws PasswordResolverException;
+    private static final class SingleRetriever {
+
+        private final Set<P11SlotIdentifier> slots;
+
+        private final List<String> singlePasswords;
+
+        private SingleRetriever(
+                final Set<P11SlotIdentifier> slots,
+                final List<String> singlePasswords) {
+            this.slots = slots;
+            if (CollectionUtil.isEmpty(singlePasswords)) {
+                this.singlePasswords = null;
+            } else {
+                this.singlePasswords = singlePasswords;
+            }
+        }
+
+        public boolean match(
+                final P11SlotIdentifier slot) {
+            if (slots == null) {
+                return true;
+            }
+            for (P11SlotIdentifier m : slots) {
+                if (m.equals(slot)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public List<char[]> getPasswords(
+                final PasswordResolver passwordResolver)
+        throws PasswordResolverException {
+            if (singlePasswords == null) {
+                return null;
+            }
+
+            List<char[]> ret = new ArrayList<char[]>(singlePasswords.size());
+            for (String singlePassword : singlePasswords) {
+                if (passwordResolver == null) {
+                    ret.add(singlePassword.toCharArray());
+                } else {
+                    ret.add(passwordResolver.resolvePassword(singlePassword));
+                }
+            }
+
+            return ret;
+        }
+
+    } // class SingleRetriever
+
+    private final List<SingleRetriever> singleRetrievers;
+    private PasswordResolver passwordResolver;
+
+    P11PasswordRetriever() {
+        singleRetrievers = new LinkedList<>();
+    }
+
+    void addPasswordEntry(
+            final Set<P11SlotIdentifier> slots,
+            final List<String> singlePasswords) {
+        singleRetrievers.add(new SingleRetriever(slots, singlePasswords));
+    }
+
+    public List<char[]> getPassword(
+            final P11SlotIdentifier slotId)
+    throws PasswordResolverException {
+        ParamUtil.requireNonNull("slotId", slotId);
+        if (CollectionUtil.isEmpty(singleRetrievers)) {
+            return null;
+        }
+
+        for (SingleRetriever sr : singleRetrievers) {
+            if (sr.match(slotId)) {
+                return sr.getPasswords(passwordResolver);
+            }
+        }
+
+        return null;
+    }
+
+    public PasswordResolver getPasswordResolver() {
+        return passwordResolver;
+    }
+
+    public void setPasswordResolver(
+            final PasswordResolver passwordResolver) {
+        this.passwordResolver = passwordResolver;
+    }
 
 }

@@ -36,13 +36,27 @@
 
 package org.xipki.commons.security.api.p11;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.internal.p11.jaxb.MechanismsType;
+import org.xipki.commons.security.api.internal.p11.jaxb.ModuleType;
+import org.xipki.commons.security.api.internal.p11.jaxb.NativeLibraryType;
+import org.xipki.commons.security.api.internal.p11.jaxb.PasswordType;
+import org.xipki.commons.security.api.internal.p11.jaxb.PasswordsType;
+import org.xipki.commons.security.api.internal.p11.jaxb.PermittedMechanismsType;
+import org.xipki.commons.security.api.internal.p11.jaxb.SlotType;
+import org.xipki.commons.security.api.internal.p11.jaxb.SlotsType;
 
 /**
  * @author Lijun Liao
@@ -51,9 +65,13 @@ import org.xipki.commons.security.api.SecurityFactory;
 
 public class P11ModuleConf {
 
+    private static final Logger LOG = LoggerFactory.getLogger(P11ModuleConf.class);
+
     private final String name;
 
     private final String nativeLibrary;
+
+    private final boolean readOnly;
 
     private final Set<P11SlotIdentifier> excludeSlots;
 
@@ -70,50 +88,99 @@ public class P11ModuleConf {
     private final long userType;
 
     public P11ModuleConf(
-            final String name,
-            final String nativeLibrary,
-            final long userType,
-            final int maxMessageSize,
-            final P11PasswordRetriever passwordRetriever,
-            final P11MechanismFilter mechanismFilter,
-            final SecurityFactory securityFactory) {
-        this(name, nativeLibrary, userType, maxMessageSize, passwordRetriever, mechanismFilter,
-                null, null, securityFactory);
-    }
-
-    public P11ModuleConf(
-            final String name,
-            final String nativeLibrary,
-            final long userType,
-            final int maxMessageSize,
-            final P11PasswordRetriever passwordRetriever,
-            final P11MechanismFilter mechanismFilter,
-            final Set<P11SlotIdentifier> includeSlots,
-            final Set<P11SlotIdentifier> excludeSlots,
-            final SecurityFactory securityFactory) {
-        this.name = ParamUtil.requireNonBlank("name", name).toLowerCase();
-        this.nativeLibrary = ParamUtil.requireNonBlank("nativeLibrary", nativeLibrary);
-        this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 128);
-        this.userType = userType;
+            final ModuleType moduleType,
+            final SecurityFactory securityFactory)
+    throws InvalidConfException {
+        ParamUtil.requireNonNull("moduleType", moduleType);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
-        this.passwordRetriever = (passwordRetriever == null)
-                ? P11NullPasswordRetriever.INSTANCE
-                : passwordRetriever;
-        this.mechanismFilter = (mechanismFilter == null)
-                ? P11PermitAllMechanimFilter.INSTANCE
-                : mechanismFilter;
-
-        Set<P11SlotIdentifier> set = new HashSet<>();
-        if (includeSlots != null) {
-            set.addAll(includeSlots);
+        this.name = moduleType.getName();
+        this.readOnly = moduleType.isReadonly();
+        this.userType = moduleType.getUser().longValue();
+        this.maxMessageSize = moduleType.getMaxMessageSize().intValue();
+        if (maxMessageSize < 128) {
+            throw new InvalidConfException("invalid maxMessageSize (< 128): " + maxMessageSize);
         }
-        this.includeSlots = Collections.unmodifiableSet(set);
 
-        set = new HashSet<>();
-        if (excludeSlots != null) {
-            set.addAll(excludeSlots);
+        // Mechanism filter
+        mechanismFilter = new P11MechanismFilter();
+        PermittedMechanismsType mechsType = moduleType.getPermittedMechanisms();
+        if (mechsType != null && CollectionUtil.isNonEmpty(mechsType.getMechanisms())) {
+            for (MechanismsType mechType : mechsType.getMechanisms()) {
+                Set<P11SlotIdentifier> slots = getSlots(mechType.getSlots());
+                Set<Long> mechanisms = new HashSet<>();
+                for (String mechStr : mechType.getMechanism()) {
+                    Long mech = null;
+                    if (mechStr.startsWith("CKM_")) {
+                        mech = P11Constants.getMechanism(mechStr);
+                    } else {
+                        int radix = 10;
+                        String value = mechStr.toLowerCase();
+                        if (value.startsWith("0x")) {
+                            radix = 16;
+                            value = value.substring(2);
+                        }
+
+                        if (value.endsWith("l")) {
+                            value = value.substring(0, value.length() - 1);
+                        }
+
+                        try {
+                            mech = Long.parseLong(value, radix);
+                        } catch (NumberFormatException ex) {// CHECKSTYLE:SKIP
+                        }
+                    }
+
+                    if (mech == null) {
+                        LOG.warn("skipped unknown mechanism '" + mechStr + "'");
+                    } else {
+                        mechanisms.add(mech);
+                    }
+                }
+                mechanismFilter.addEntry(slots, mechanisms);
+            }
         }
-        this.excludeSlots = Collections.unmodifiableSet(set);
+
+        // Password retriever
+        passwordRetriever = new P11PasswordRetriever();
+        PasswordsType passwordsType = moduleType.getPasswords();
+        if (passwordsType != null && CollectionUtil.isNonEmpty(passwordsType.getPassword())) {
+            passwordRetriever.setPasswordResolver(securityFactory.getPasswordResolver());
+            for (PasswordType passwordType : passwordsType.getPassword()) {
+                Set<P11SlotIdentifier> slots = getSlots(passwordType.getSlots());
+                passwordRetriever.addPasswordEntry(slots,
+                        new ArrayList<>(passwordType.getSinglePassword()));
+            }
+        }
+
+        includeSlots = Collections.unmodifiableSet(getSlots(moduleType.getIncludeSlots()));
+        excludeSlots = Collections.unmodifiableSet(getSlots(moduleType.getExcludeSlots()));
+
+        final String osName = System.getProperty("os.name").toLowerCase();
+        String nativeLibraryPath = null;
+        for (NativeLibraryType library
+                : moduleType.getNativeLibraries().getNativeLibrary()) {
+            List<String> osNames = library.getOs();
+            if (CollectionUtil.isEmpty(osNames)) {
+                nativeLibraryPath = library.getPath();
+            } else {
+                for (String entry : osNames) {
+                    if (osName.contains(entry.toLowerCase())) {
+                        nativeLibraryPath = library.getPath();
+                        break;
+                    }
+                }
+            }
+
+            if (nativeLibraryPath != null) {
+                break;
+            }
+        } // end for (NativeLibraryType library)
+
+        if (nativeLibraryPath == null) {
+            throw new InvalidConfException("could not find PKCS#11 library for OS "
+                    + osName);
+        }
+        this.nativeLibrary = nativeLibraryPath;
     }
 
     public String getName() {
@@ -126,6 +193,10 @@ public class P11ModuleConf {
 
     public int getMaxMessageSize() {
         return maxMessageSize;
+    }
+
+    public boolean isReadOnly() {
+        return readOnly;
     }
 
     public long getUserType() {
@@ -183,6 +254,37 @@ public class P11ModuleConf {
 
     public P11MechanismFilter getP11MechanismFilter() {
         return mechanismFilter;
+    }
+
+    private static Set<P11SlotIdentifier> getSlots(
+            final SlotsType type)
+    throws InvalidConfException {
+        if (type == null || CollectionUtil.isEmpty(type.getSlot())) {
+            return null;
+        }
+
+        Set<P11SlotIdentifier> slots = new HashSet<>();
+        // FIXME: slotId and slotIndex may be null.
+        for (SlotType slotType : type.getSlot()) {
+            Long slotId = null;
+            if (slotType.getId() != null) {
+                String str = slotType.getId().trim();
+                try {
+                    if (StringUtil.startsWithIgnoreCase(str, "0X")) {
+                        slotId = Long.parseLong(str.substring(2), 16);
+                    } else {
+                        slotId = Long.parseLong(str);
+                    }
+                } catch (NumberFormatException ex) {
+                    String message = "invalid slotId '" + str + "'";
+                    LOG.error(message);
+                    throw new InvalidConfException(message);
+                }
+            }
+            slots.add(new P11SlotIdentifier(slotType.getIndex(), slotId));
+        }
+
+        return slots;
     }
 
 }

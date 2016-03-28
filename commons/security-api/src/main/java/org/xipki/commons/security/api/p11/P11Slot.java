@@ -54,9 +54,10 @@ import org.xipki.commons.security.api.p11.parameters.P11Params;
  */
 
 public interface P11Slot {
-    // FIXME: the implementation shall contain a complete map from id to label for all objects which
-    // are not considered already and consider them in the getP11KeyIdFor*().
+
     String getModuleName();
+
+    boolean isReadOnly();
 
     P11SlotIdentifier getSlotId();
 
