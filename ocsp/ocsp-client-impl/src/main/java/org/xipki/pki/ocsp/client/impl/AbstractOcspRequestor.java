@@ -460,8 +460,12 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
     public void setSignerCertFile(
             final String signerCertFile) {
+        if (StringUtil.isBlank(signerCertFile)) {
+            return;
+        }
+
         this.signer = null;
-        this.signerCertFile = ParamUtil.requireNonBlank("signerCertFile", signerCertFile);
+        this.signerCertFile = signerCertFile;
     }
 
     public String getSignerType() {

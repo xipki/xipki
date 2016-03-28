@@ -39,7 +39,9 @@ package org.xipki.commons.security.api.p11.parameters;
 import java.math.BigInteger;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.p11.P11Constants;
 
@@ -76,10 +78,16 @@ public class P11RSAPkcsPssParams implements P11Params {
             throw new IllegalArgumentException("unsupported hash algorithm " + asn1Oid.getId());
         }
 
-        asn1Oid = asn1Params.getMaskGenAlgorithm().getAlgorithm();
+        AlgorithmIdentifier mga = asn1Params.getMaskGenAlgorithm();
+        asn1Oid = mga.getAlgorithm();
+        if (!PKCSObjectIdentifiers.id_mgf1.equals(asn1Oid)) {
+            throw new IllegalArgumentException("unsupported MGF algorithm " + asn1Oid.getId());
+        }
+        
+        asn1Oid = AlgorithmIdentifier.getInstance(mga.getParameters()).getAlgorithm();
         HashAlgoType mgfHashAlgo = HashAlgoType.getHashAlgoType(asn1Oid);
         if (mgfHashAlgo == null) {
-            throw new IllegalArgumentException("unsupported MGF algorithm " + asn1Oid.getId());
+            throw new IllegalArgumentException("unsupported MGF hash algorithm " + asn1Oid.getId());
         }
         this.saltLength = asn1Params.getSaltLength().longValue();
         BigInteger trailerField = asn1Params.getTrailerField();

@@ -100,11 +100,11 @@ class P11ECDSAContentSigner implements ContentSigner {
         sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA384.getId(), HashAlgoType.SHA384);
         sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA512.getId(), HashAlgoType.SHA512);
 
-        hashMechMap.put(HashAlgoType.SHA1, P11Constants.CKM_DSA_SHA1);
-        hashMechMap.put(HashAlgoType.SHA224, P11Constants.CKM_DSA_SHA224);
-        hashMechMap.put(HashAlgoType.SHA256, P11Constants.CKM_DSA_SHA256);
-        hashMechMap.put(HashAlgoType.SHA384, P11Constants.CKM_DSA_SHA384);
-        hashMechMap.put(HashAlgoType.SHA512, P11Constants.CKM_DSA_SHA512);
+        hashMechMap.put(HashAlgoType.SHA1, P11Constants.CKM_ECDSA_SHA1);
+        hashMechMap.put(HashAlgoType.SHA224, P11Constants.CKM_ECDSA_SHA224);
+        hashMechMap.put(HashAlgoType.SHA256, P11Constants.CKM_ECDSA_SHA256);
+        hashMechMap.put(HashAlgoType.SHA384, P11Constants.CKM_ECDSA_SHA384);
+        hashMechMap.put(HashAlgoType.SHA512, P11Constants.CKM_ECDSA_SHA512);
     }
 
     P11ECDSAContentSigner(
@@ -126,8 +126,8 @@ class P11ECDSAContentSigner implements ContentSigner {
         long tmpMechanism = hashMechMap.get(hashAlgo).longValue();
 
         P11SlotIdentifier slotId = identityId.getSlotId();
-        if (cryptService.supportsMechanism(slotId, P11Constants.CKM_DSA)) {
-            tmpMechanism = P11Constants.CKM_DSA;
+        if (cryptService.supportsMechanism(slotId, P11Constants.CKM_ECDSA)) {
+            tmpMechanism = P11Constants.CKM_ECDSA;
             AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
                     new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
             Digest digest = SignerUtil.getDigest(digAlgId);
@@ -182,12 +182,12 @@ class P11ECDSAContentSigner implements ContentSigner {
     private byte[] getPlainSignature()
     throws SecurityException, P11TokenException {
         byte[] dataToSign;
-        if (mechanism == P11Constants.CKM_ECDSA) {
-            dataToSign = ((DigestOutputStream) outputStream).digest();
-            ((DigestOutputStream) outputStream).reset();
-        } else {
+        if (outputStream instanceof ByteArrayOutputStream) {
             dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
             ((ByteArrayOutputStream) outputStream).reset();
+        } else {
+            dataToSign = ((DigestOutputStream) outputStream).digest();
+            ((DigestOutputStream) outputStream).reset();
         }
 
         return cryptService.sign(identityId, mechanism, null, dataToSign);

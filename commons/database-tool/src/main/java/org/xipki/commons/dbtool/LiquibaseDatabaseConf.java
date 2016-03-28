@@ -104,61 +104,61 @@ public class LiquibaseDatabaseConf {
         String user;
         String password;
 
-        String datasourceClassName = dbProps.getProperty("datasourceClassName");
+        String datasourceClassName = dbProps.getProperty("dataSourceClassName");
         if (datasourceClassName != null) {
-            user = dbProps.getProperty("datasource.user");
-            password = dbProps.getProperty("datasource.password");
+            user = dbProps.getProperty("dataSource.user");
+            password = dbProps.getProperty("dataSource.password");
 
             StringBuilder urlBuilder = new StringBuilder();
 
             datasourceClassName = datasourceClassName.toLowerCase();
             if (datasourceClassName.contains("org.h2.")) {
                 driverClassName = "org.h2.Driver";
-                urlBuilder.append(dbProps.getProperty("datasource.url"));
+                urlBuilder.append(dbProps.getProperty("dataSource.url"));
             } else if (datasourceClassName.contains("mysql.")) {
                 driverClassName = "com.mysql.jdbc.Driver";
                 urlBuilder.append("jdbc:mysql://");
-                urlBuilder.append(dbProps.getProperty("datasource.serverName"));
+                urlBuilder.append(dbProps.getProperty("dataSource.serverName"));
                 urlBuilder.append(":");
-                urlBuilder.append(dbProps.getProperty("datasource.port"));
+                urlBuilder.append(dbProps.getProperty("dataSource.port"));
                 urlBuilder.append("/");
-                urlBuilder.append(dbProps.getProperty("datasource.databaseName"));
+                urlBuilder.append(dbProps.getProperty("dataSource.databaseName"));
             } else if (datasourceClassName.contains("oracle.")) {
                 driverClassName = "oracle.jdbc.driver.OracleDriver";
-                String str = dbProps.getProperty("datasource.URL");
+                String str = dbProps.getProperty("dataSource.URL");
                 if (str != null && !str.isEmpty()) {
                     urlBuilder.append(str);
                 } else {
                     urlBuilder.append("jdbc:oracle:thin:@");
-                    urlBuilder.append(dbProps.getProperty("datasource.serverName"));
+                    urlBuilder.append(dbProps.getProperty("dataSource.serverName"));
                     urlBuilder.append(":");
-                    urlBuilder.append(dbProps.getProperty("datasource.portNumber"));
+                    urlBuilder.append(dbProps.getProperty("dataSource.portNumber"));
                     urlBuilder.append(":");
-                    urlBuilder.append(dbProps.getProperty("datasource.databaseName"));
+                    urlBuilder.append(dbProps.getProperty("dataSource.databaseName"));
                 }
             } else if (datasourceClassName.contains("com.ibm.db2.")) {
                 driverClassName = "com.ibm.db2.jcc.DB2Driver";
-                schema = dbProps.getProperty("datasource.currentSchema");
+                schema = dbProps.getProperty("dataSource.currentSchema");
 
                 urlBuilder.append("jdbc:db2://");
-                urlBuilder.append(dbProps.getProperty("datasource.serverName"));
+                urlBuilder.append(dbProps.getProperty("dataSource.serverName"));
                 urlBuilder.append(":");
-                urlBuilder.append(dbProps.getProperty("datasource.portNumber"));
+                urlBuilder.append(dbProps.getProperty("dataSource.portNumber"));
                 urlBuilder.append("/");
-                urlBuilder.append(dbProps.getProperty("datasource.databaseName"));
+                urlBuilder.append(dbProps.getProperty("dataSource.databaseName"));
             } else if (datasourceClassName.contains("postgresql.")
                     || datasourceClassName.contains("impossibl.postgres.")) {
                 String serverName;
                 String portNumber;
                 String databaseName;
                 if (datasourceClassName.contains("postgresql.")) {
-                    serverName = dbProps.getProperty("datasource.serverName");
-                    portNumber = dbProps.getProperty("datasource.portNumber");
-                    databaseName = dbProps.getProperty("datasource.databaseName");
+                    serverName = dbProps.getProperty("dataSource.serverName");
+                    portNumber = dbProps.getProperty("dataSource.portNumber");
+                    databaseName = dbProps.getProperty("dataSource.databaseName");
                 } else {
-                    serverName = dbProps.getProperty("datasource.host");
-                    portNumber = dbProps.getProperty("datasource.port");
-                    databaseName = dbProps.getProperty("datasource.database");
+                    serverName = dbProps.getProperty("dataSource.host");
+                    portNumber = dbProps.getProperty("dataSource.port");
+                    databaseName = dbProps.getProperty("dataSource.database");
                 }
                 driverClassName = "org.postgresql.Driver";
                 urlBuilder.append("jdbc:postgresql://");
@@ -169,39 +169,13 @@ public class LiquibaseDatabaseConf {
                     .append(databaseName);
             } else if (datasourceClassName.contains("hsqldb.")) {
                 driverClassName = "org.hsqldb.jdbc.JDBCDriver";
-                urlBuilder.append(dbProps.getProperty("datasource.url"));
+                urlBuilder.append(dbProps.getProperty("dataSource.url"));
             } else {
                 throw new IllegalArgumentException(
                         "unsupported datasbase type " + datasourceClassName);
             }
 
             url = urlBuilder.toString();
-        } else if (dbProps.containsKey("driverClassName")
-                || dbProps.containsKey("db.driverClassName")) {
-            if (dbProps.containsKey("driverClassName")) {
-                driverClassName = dbProps.getProperty("driverClassName");
-                user = dbProps.getProperty("username");
-                password = dbProps.getProperty("password");
-                url = dbProps.getProperty("jdbcUrl");
-            } else {
-                driverClassName = dbProps.getProperty("db.driverClassName");
-                user = dbProps.getProperty("db.username");
-                password = dbProps.getProperty("db.password");
-                url = dbProps.getProperty("db.url");
-            }
-
-            if (startsWithIgnoreCase(url, "jdbc:db2:")) {
-                String sep = ":currentSchema=";
-                int idx = url.indexOf(sep);
-                if (idx != 1) {
-                    schema = url.substring(idx + sep.length());
-                    if (schema.endsWith(";")) {
-                        schema = schema.substring(0, schema.length() - 1);
-                    }
-                    schema = schema.toUpperCase();
-                    url = url.substring(0, idx);
-                }
-            }
         } else {
             throw new IllegalArgumentException("unsupported configuration");
         }
@@ -218,13 +192,4 @@ public class LiquibaseDatabaseConf {
         return str != null && !str.isEmpty();
     }
 
-    private static boolean startsWithIgnoreCase(
-            final String str,
-            final String prefix) {
-        if (str.length() < prefix.length()) {
-            return false;
-        }
-
-        return prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
-    }
 }

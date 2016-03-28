@@ -79,7 +79,7 @@ public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
 
         P11Slot slot = getSlot();
         P11ObjectIdentifier objId = slot.generateDSAKeypair(plen, qlen, label);
-        finalize(objId);
+        finalize("DSA", objId);
         return null;
     }
 
