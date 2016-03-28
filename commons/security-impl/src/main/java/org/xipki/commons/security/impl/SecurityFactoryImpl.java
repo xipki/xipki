@@ -750,19 +750,18 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 certs = newCertChain;
             }
 
-            ks = null;
-
+            KeyStore newKs;
             if ("JKS".equalsIgnoreCase(keystoreType)) {
-                ks = KeyStore.getInstance(keystoreType);
+                newKs = KeyStore.getInstance(keystoreType);
             } else {
-                ks = KeyStore.getInstance(keystoreType, "BC");
+                newKs = KeyStore.getInstance(keystoreType, "BC");
             }
-            ks.load(null, password);
+            newKs.load(null, password);
 
             PrivateKey key = (PrivateKey) ks.getKey(tmpKeyname, password);
-            ks.setKeyEntry(tmpKeyname, key, password, certs);
+            newKs.setKeyEntry(tmpKeyname, key, password, certs);
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            ks.store(bout, password);
+            newKs.store(bout, password);
             byte[] bytes = bout.toByteArray();
             bout.close();
             return bytes;

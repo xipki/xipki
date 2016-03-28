@@ -73,10 +73,11 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
     private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     protected void finalize(
+            final String keyType,
             final P11ObjectIdentifier objectId)
     throws Exception {
         ParamUtil.requireNonNull("objectId", objectId);
-        println("generated PKCS#11 key " + objectId);
+        println("generated " + keyType + " keypair " + objectId);
     }
 
     protected P11Slot getSlot()

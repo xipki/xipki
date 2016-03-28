@@ -1640,14 +1640,14 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final String name,
             final Properties props,
             final DatabaseType databaseType) {
-        ParamUtil.requireNonEmpty("props", props);
+        ParamUtil.requireNonNull("props", props);
         ParamUtil.requireNonNull("databaseType", databaseType);
 
         // The DB2 schema name is case-sensitive, and must be specified in uppercase characters
-        String datasourceClassName = props.getProperty("datasourceClassName");
+        String datasourceClassName = props.getProperty("dataSourceClassName");
         if (datasourceClassName != null) {
             if (datasourceClassName.contains(".db2.")) {
-                String propName = "datasource.currentSchema";
+                String propName = "dataSource.currentSchema";
                 String schema = props.getProperty(propName);
                 if (schema != null) {
                     String upperCaseSchema = schema.toUpperCase();

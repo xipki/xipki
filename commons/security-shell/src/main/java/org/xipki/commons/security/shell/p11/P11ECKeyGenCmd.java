@@ -67,7 +67,7 @@ public class P11ECKeyGenCmd extends P11KeyGenCommandSupport {
     throws Exception {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objId = slot.generateECKeypair(curveName, label);
-        finalize(objId);
+        finalize("EC", objId);
         return null;
     }
 

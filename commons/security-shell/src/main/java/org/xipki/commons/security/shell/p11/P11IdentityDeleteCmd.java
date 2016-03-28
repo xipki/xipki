@@ -49,15 +49,19 @@ import org.xipki.commons.security.api.p11.P11Slot;
 @Command(scope = "xipki-tk", name = "delete-key",
         description = "delete key and cert in PKCS#11 device")
 @Service
-public class P11KeyDeleteCmd extends P11SecurityCommandSupport {
+public class P11IdentityDeleteCmd extends P11SecurityCommandSupport {
 
     @Override
     protected Object doExecute()
     throws Exception {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objIdentifier = getObjectIdentifier();
+        if (objIdentifier == null) {
+            println("identity to be deleted does not exist");
+            return null;
+        }
         slot.removeIdentity(objIdentifier);
-        println("deleted key and certificate");
+        println("deleted identity " + objIdentifier);
         return null;
     }
 

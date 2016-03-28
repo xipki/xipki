@@ -72,7 +72,7 @@ public class P11RSAKeyGenCmd extends P11KeyGenCommandSupport {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objId = slot.generateRSAKeypair(keysize, toBigInt(publicExponent),
                 label);
-        finalize(objId);
+        finalize("RSA", objId);
         return null;
     }
 

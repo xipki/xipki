@@ -38,8 +38,10 @@ package org.xipki.commons.common.util;
 
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -137,27 +139,53 @@ public class ParamUtil {
         return obj;
     }
 
-    public static <T> T requireNonEmpty(
+    public static <T> Collection<T> requireNonEmpty(
             @Nonnull final String objName,
-            @Nonnull final T obj) {
+            @Nonnull final Collection<T> obj) {
         Objects.requireNonNull(obj, objName + " must not be null");
-        if (obj instanceof Collection<?>) {
-            if (((Collection<?>) obj).isEmpty()) {
-                throw new IllegalArgumentException(objName + " must not be empty");
-            }
-        } else if (obj instanceof Map<?, ?>) {
-            if (((Map<?, ?>) obj).isEmpty()) {
-                throw new IllegalArgumentException(objName + " must not be empty");
-            }
-        } else if (obj instanceof Dictionary<?, ?>) {
-            if (((Dictionary<?, ?>) obj).isEmpty()) {
-                throw new IllegalArgumentException(objName + " must not be empty");
-            }
-        } else {
-            throw new IllegalArgumentException("unknown parameter type "
-                    + obj.getClass().getName());
+        if (obj.isEmpty()) {
+            throw new IllegalArgumentException(objName + " must not be empty");
         }
+        return obj;
+    }
 
+    public static <T> Set<T> requireNonEmpty(
+            @Nonnull final String objName,
+            @Nonnull final Set<T> obj) {
+        Objects.requireNonNull(obj, objName + " must not be null");
+        if (obj.isEmpty()) {
+            throw new IllegalArgumentException(objName + " must not be empty");
+        }
+        return obj;
+    }
+
+    public static <T> List<T> requireNonEmpty(
+            @Nonnull final String objName,
+            @Nonnull final List<T> obj) {
+        Objects.requireNonNull(obj, objName + " must not be null");
+        if (obj.isEmpty()) {
+            throw new IllegalArgumentException(objName + " must not be empty");
+        }
+        return obj;
+    }
+
+    public static <K,V> Map<K,V> requireNonEmpty(
+            @Nonnull final String objName,
+            @Nonnull final Map<K,V> obj) {
+        Objects.requireNonNull(obj, objName + " must not be null");
+        if (obj.isEmpty()) {
+            throw new IllegalArgumentException(objName + " must not be empty");
+        }
+        return obj;
+    }
+
+    public static <K,V> Dictionary<K,V> requireNonEmpty(
+            @Nonnull final String objName,
+            @Nonnull final Dictionary<K,V> obj) {
+        Objects.requireNonNull(obj, objName + " must not be null");
+        if (obj.isEmpty()) {
+            throw new IllegalArgumentException(objName + " must not be empty");
+        }
         return obj;
     }
 
