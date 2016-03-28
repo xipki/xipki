@@ -56,12 +56,12 @@ public class P11PasswordRetriever {
 
     private static final class SingleRetriever {
 
-        private final Set<P11SlotIdentifier> slots;
+        private final Set<P11SlotIdFilter> slots;
 
         private final List<String> singlePasswords;
 
         private SingleRetriever(
-                final Set<P11SlotIdentifier> slots,
+                final Set<P11SlotIdFilter> slots,
                 final List<String> singlePasswords) {
             this.slots = slots;
             if (CollectionUtil.isEmpty(singlePasswords)) {
@@ -76,8 +76,8 @@ public class P11PasswordRetriever {
             if (slots == null) {
                 return true;
             }
-            for (P11SlotIdentifier m : slots) {
-                if (m.equals(slot)) {
+            for (P11SlotIdFilter m : slots) {
+                if (m.match(slot)) {
                     return true;
                 }
             }
@@ -114,7 +114,7 @@ public class P11PasswordRetriever {
     }
 
     void addPasswordEntry(
-            final Set<P11SlotIdentifier> slots,
+            final Set<P11SlotIdFilter> slots,
             final List<String> singlePasswords) {
         singleRetrievers.add(new SingleRetriever(slots, singlePasswords));
     }

@@ -62,7 +62,7 @@ public class P11PrivateKey implements PrivateKey {
 
     private final P11CryptService p11CryptService;
 
-    private final P11EntityIdentifier entityId;
+    private final P11EntityIdentifier identityId;
 
     private final String algorithm;
 
@@ -70,12 +70,12 @@ public class P11PrivateKey implements PrivateKey {
 
     public P11PrivateKey(
             final P11CryptService p11CryptService,
-            final P11EntityIdentifier entityId)
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        this.p11CryptService = ParamUtil.requireNonNull("p11CryptService", p11CryptService);
-        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
+        this.p11CryptService = ParamUtil.requireNonNull("identityId", p11CryptService);
+        this.identityId = ParamUtil.requireNonNull("entityId", identityId);
 
-        PublicKey publicKey = p11CryptService.getPublicKey(entityId);
+        PublicKey publicKey = p11CryptService.getPublicKey(identityId);
 
         if (publicKey instanceof RSAPublicKey) {
             algorithm = "RSA";
@@ -94,7 +94,7 @@ public class P11PrivateKey implements PrivateKey {
     boolean supportsMechanism(
             final long mechanism) {
         try {
-            return p11CryptService.supportsMechanism(entityId.getSlotId(), mechanism);
+            return p11CryptService.supportsMechanism(identityId.getSlotId(), mechanism);
         } catch (P11TokenException ex) {
             return false;
         }
@@ -124,15 +124,15 @@ public class P11PrivateKey implements PrivateKey {
             @Nullable P11Params parameters,
             byte[] content)
     throws SecurityException, P11TokenException {
-        return p11CryptService.sign(entityId, mechanism, parameters, content);
+        return p11CryptService.sign(identityId, mechanism, parameters, content);
     }
 
     P11CryptService getP11CryptService() {
         return p11CryptService;
     }
 
-    P11EntityIdentifier getEntityId() {
-        return entityId;
+    P11EntityIdentifier getIdentityId() {
+        return identityId;
     }
 
 }

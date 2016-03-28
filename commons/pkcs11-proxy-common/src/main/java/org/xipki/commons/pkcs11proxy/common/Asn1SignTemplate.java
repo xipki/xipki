@@ -63,7 +63,7 @@ import org.xipki.commons.security.api.BadAsn1ObjectException;
 
 public class Asn1SignTemplate extends ASN1Object {
 
-    private Asn1P11EntityIdentifier entityId;
+    private Asn1P11EntityIdentifier identityId;
 
     private Asn1Mechanism mechanism;
 
@@ -73,17 +73,17 @@ public class Asn1SignTemplate extends ASN1Object {
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 3, 3);
-        this.entityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(0));
+        this.identityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(0));
         this.mechanism = Asn1Mechanism.getInstance(seq.getObjectAt(1));
         this.message = Asn1Util.getOctetStringBytes(seq.getObjectAt(2));
     }
 
     public Asn1SignTemplate(
-            final Asn1P11EntityIdentifier entityId,
+            final Asn1P11EntityIdentifier identityId,
             final long mechanism,
             final Asn1P11Params parameter,
             final byte[] message) {
-        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
+        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.message = ParamUtil.requireNonNull("message", message);
     }
 
@@ -110,7 +110,7 @@ public class Asn1SignTemplate extends ASN1Object {
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(entityId.toASN1Primitive());
+        vector.add(identityId.toASN1Primitive());
         vector.add(new DEROctetString(message));
         return new DERSequence(vector);
     }
@@ -119,8 +119,8 @@ public class Asn1SignTemplate extends ASN1Object {
         return message;
     }
 
-    public Asn1P11EntityIdentifier getEntityId() {
-        return entityId;
+    public Asn1P11EntityIdentifier getIdentityId() {
+        return identityId;
     }
 
     public Asn1Mechanism getMechanism() {

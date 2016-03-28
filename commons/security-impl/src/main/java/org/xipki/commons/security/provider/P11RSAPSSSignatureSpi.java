@@ -264,7 +264,7 @@ class P11RSAPSSSignatureSpi extends SignatureSpi {
                 signer, contentDigest, mgfDigest, saltLength, trailer);
 
         P11RSAKeyParameter p11KeyParam = P11RSAKeyParameter.getInstance(
-                signingKey.getP11CryptService(), signingKey.getEntityId());
+                signingKey.getP11CryptService(), signingKey.getIdentityId());
         if (random == null) {
             pss.init(true, p11KeyParam);
         } else {

@@ -46,15 +46,15 @@ import org.xipki.commons.security.api.KeypairGenerationResult;
 
 public class P11KeypairGenerationResult extends KeypairGenerationResult {
 
-    private final P11EntityIdentifier entityId;
+    private final P11EntityIdentifier identityId;
 
     public P11KeypairGenerationResult(
-            final P11EntityIdentifier entityId) {
-        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
+            final P11EntityIdentifier identityId) {
+        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
     }
 
-    public P11EntityIdentifier getEntityId() {
-        return entityId;
+    public P11EntityIdentifier getIdntityId() {
+        return identityId;
     }
 
 }

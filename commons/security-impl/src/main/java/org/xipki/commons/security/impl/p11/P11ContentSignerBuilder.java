@@ -78,28 +78,28 @@ public class P11ContentSignerBuilder {
 
     private final SecurityFactory securityFactory;
 
-    private final P11EntityIdentifier entityId;
+    private final P11EntityIdentifier identityId;
 
     public P11ContentSignerBuilder(
             final P11CryptService cryptService,
             final SecurityFactory securityFactory,
-            final P11EntityIdentifier entityId,
+            final P11EntityIdentifier identityId,
             final X509Certificate[] certificateChain)
     throws SecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
-        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
+        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
 
-        X509Certificate signerCertInP11 = cryptService.getCertificate(entityId);
+        X509Certificate signerCertInP11 = cryptService.getCertificate(identityId);
         PublicKey publicKeyInP11;
         if (signerCertInP11 != null) {
             publicKeyInP11 = signerCertInP11.getPublicKey();
         } else {
-            publicKeyInP11 = cryptService.getPublicKey(entityId);
+            publicKeyInP11 = cryptService.getPublicKey(identityId);
         }
 
         if (publicKeyInP11 == null) {
-            throw new SecurityException("public key with " + entityId + " does not exist");
+            throw new SecurityException("public key with " + identityId + " does not exist");
         }
 
         Set<Certificate> caCerts = new HashSet<>();
@@ -123,7 +123,7 @@ public class P11ContentSignerBuilder {
         }
 
         if (cert != null) {
-            Certificate[] certsInKeystore = cryptService.getCertificates(entityId);
+            Certificate[] certsInKeystore = cryptService.getCertificates(identityId);
             if (certsInKeystore != null && certsInKeystore.length > 1) {
                 for (int i = 1; i < certsInKeystore.length; i++) {
                     caCerts.add(certsInKeystore[i]);
@@ -179,7 +179,7 @@ public class P11ContentSignerBuilder {
             signers.add(signer);
         } // end for
 
-        PrivateKey privateKey = new P11PrivateKey(cryptService, entityId);
+        PrivateKey privateKey = new P11PrivateKey(cryptService, identityId);
         DefaultConcurrentContentSigner concurrentSigner =
                 new DefaultConcurrentContentSigner(signers, privateKey);
         if (certificateChain != null) {
@@ -195,24 +195,24 @@ public class P11ContentSignerBuilder {
     private ContentSigner createRSAContentSigner(AlgorithmIdentifier signatureAlgId)
     throws SecurityException, P11TokenException {
         if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
-            return new P11RSAPSSContentSigner(cryptService, entityId, signatureAlgId,
+            return new P11RSAPSSContentSigner(cryptService, identityId, signatureAlgId,
                     securityFactory.getRandom4Sign());
         } else {
-            return new P11RSAContentSigner(cryptService, entityId, signatureAlgId);
+            return new P11RSAContentSigner(cryptService, identityId, signatureAlgId);
         }
     }
 
     // CHECKSTYLE:SKIP
     private ContentSigner createECContentSigner(AlgorithmIdentifier signatureAlgId)
     throws SecurityException, P11TokenException {
-        return new P11ECDSAContentSigner(cryptService, entityId, signatureAlgId,
+        return new P11ECDSAContentSigner(cryptService, identityId, signatureAlgId,
                 AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
     }
 
     // CHECKSTYLE:SKIP
     private ContentSigner createDSAContentSigner(AlgorithmIdentifier signatureAlgId)
     throws SecurityException, P11TokenException {
-        return new P11DSAContentSigner(cryptService, entityId, signatureAlgId,
+        return new P11DSAContentSigner(cryptService, identityId, signatureAlgId,
                 AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
     }
 
