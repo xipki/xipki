@@ -91,14 +91,14 @@ public class KeystoreP11Identity extends P11Identity {
     private final SecureRandom random;
 
     public KeystoreP11Identity(
-            final P11EntityIdentifier entityId,
+            final P11EntityIdentifier identityId,
             final PrivateKey privateKey,
             final PublicKey publicKey,
             final X509Certificate[] certificateChain,
             final int maxSessions,
             final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
-        super(entityId, certificateChain, publicKey);
+        super(identityId, certificateChain, publicKey);
         this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
         this.random = ParamUtil.requireNonNull("random", random);
 

@@ -82,7 +82,7 @@ class P11RSAContentSigner implements ContentSigner {
 
     private final P11CryptService cryptService;
 
-    private final P11EntityIdentifier entityId;
+    private final P11EntityIdentifier identityId;
 
     private final byte[] digestPkcsPrefix;
 
@@ -103,11 +103,11 @@ class P11RSAContentSigner implements ContentSigner {
 
     P11RSAContentSigner(
             final P11CryptService cryptService,
-            final P11EntityIdentifier entityId,
+            final P11EntityIdentifier identityId,
             final AlgorithmIdentifier signatureAlgId)
     throws SecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
-        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
+        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
 
         ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
@@ -132,7 +132,7 @@ class P11RSAContentSigner implements ContentSigner {
             throw new SecurityException("unsupported signature algorithm " + algOid.getId());
         }
 
-        P11SlotIdentifier slotId = entityId.getSlotId();
+        P11SlotIdentifier slotId = identityId.getSlotId();
         if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_PKCS)) {
             tmpMechanism = P11Constants.CKM_RSA_PKCS;
         } else if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_X_509)) {
@@ -154,7 +154,7 @@ class P11RSAContentSigner implements ContentSigner {
             this.outputStream = new ByteArrayOutputStream();
         }
 
-        RSAPublicKey rsaPubKey = (RSAPublicKey) cryptService.getPublicKey(entityId);
+        RSAPublicKey rsaPubKey = (RSAPublicKey) cryptService.getPublicKey(identityId);
         this.modulusBitLen = rsaPubKey.getModulus().bitLength();
     }
 
@@ -192,7 +192,7 @@ class P11RSAContentSigner implements ContentSigner {
                 dataToSign = SignerUtil.EMSA_PKCS1_v1_5_encoding(dataToSign, modulusBitLen);
             }
 
-            return cryptService.sign(entityId, mechanism, null, dataToSign);
+            return cryptService.sign(identityId, mechanism, null, dataToSign);
         } catch (SecurityException | P11TokenException ex) {
             final String message = "could not sign";
             if (LOG.isErrorEnabled()) {

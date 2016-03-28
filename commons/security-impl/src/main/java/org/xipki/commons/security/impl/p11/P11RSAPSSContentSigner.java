@@ -135,7 +135,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
 
     private final P11CryptService cryptService;
 
-    private final P11EntityIdentifier entityId;
+    private final P11EntityIdentifier identityId;
 
     private final long mechanism;
 
@@ -145,12 +145,12 @@ class P11RSAPSSContentSigner implements ContentSigner {
 
     P11RSAPSSContentSigner(
             final P11CryptService cryptService,
-            final P11EntityIdentifier entityId,
+            final P11EntityIdentifier identityId,
             final AlgorithmIdentifier signatureAlgId,
             final SecureRandom random)
     throws SecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
-        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
+        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         ParamUtil.requireNonNull("random", random);
 
@@ -181,7 +181,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
             throw new RuntimeException("should not reach here, unknown HashAlgoType " + hashAlgo);
         }
 
-        P11SlotIdentifier slotId = entityId.getSlotId();
+        P11SlotIdentifier slotId = identityId.getSlotId();
         if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_PKCS_PSS)) {
             this.parameters = new P11RSAPkcsPssParams(asn1Params);
             AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
@@ -193,7 +193,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
             AsymmetricBlockCipher cipher = new P11PlainRSASigner();
             P11RSAKeyParameter keyParam;
             try {
-                keyParam = P11RSAKeyParameter.getInstance(cryptService, entityId);
+                keyParam = P11RSAKeyParameter.getInstance(cryptService, identityId);
             } catch (InvalidKeyException ex) {
                 throw new SecurityException(ex.getMessage(), ex);
             }
@@ -249,7 +249,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
         }
 
         try {
-            return cryptService.sign(entityId, mechanism, parameters, dataToSign);
+            return cryptService.sign(identityId, mechanism, parameters, dataToSign);
         } catch (SecurityException | P11TokenException ex) {
             LOG.warn("could not sign: {}", ex.getMessage());
             LOG.debug("could not sign", ex);

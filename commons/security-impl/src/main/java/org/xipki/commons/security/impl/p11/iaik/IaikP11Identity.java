@@ -61,11 +61,11 @@ class IaikP11Identity extends P11Identity {
 
     IaikP11Identity(
             final String moduleName,
-            final P11EntityIdentifier entityId,
+            final P11EntityIdentifier identityId,
             final PrivateKey privateKey,
             final X509Certificate[] certificateChain,
             final PublicKey publicKey) {
-        super(entityId, certificateChain, publicKey);
+        super(identityId, certificateChain, publicKey);
         this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
         this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
     }
@@ -88,11 +88,11 @@ class IaikP11Identity extends P11Identity {
         ParamUtil.requireNonNull("content", content);
 
         if (!supportsMechanism(mechanism, parameters)) {
-            throw new P11UnsupportedMechanismException(mechanism, entityId);
+            throw new P11UnsupportedMechanismException(mechanism, identityId);
         }
 
         IaikP11Module module = getModule();
-        IaikP11Slot slot = (IaikP11Slot) module.getSlot(entityId.getSlotId());
+        IaikP11Slot slot = (IaikP11Slot) module.getSlot(identityId.getSlotId());
         return slot.sign(mechanism, parameters, content, this);
     }
 

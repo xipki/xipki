@@ -53,7 +53,7 @@ import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 public abstract class P11Identity implements Comparable<P11Identity> {
 
-    protected final P11EntityIdentifier entityId;
+    protected final P11EntityIdentifier identityId;
 
     protected final PublicKey publicKey;
 
@@ -62,10 +62,10 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     protected X509Certificate[] certificateChain;
 
     public P11Identity(
-            final P11EntityIdentifier entityId,
+            final P11EntityIdentifier identityId,
             final X509Certificate[] certificateChain,
             final PublicKey publicKey) {
-        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
+        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         if ((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
                 && publicKey == null) {
             throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
@@ -101,8 +101,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
             final byte[] content)
     throws P11TokenException, SecurityException;
 
-    public P11EntityIdentifier getEntityId() {
-        return entityId;
+    public P11EntityIdentifier getIdentityId() {
+        return identityId;
     }
 
     public X509Certificate getCertificate() {
@@ -136,14 +136,14 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     }
 
     public boolean match(
-            final P11EntityIdentifier entityId) {
-        return this.entityId.equals(entityId);
+            final P11EntityIdentifier identityId) {
+        return this.identityId.equals(identityId);
     }
 
     public boolean match(
             final P11SlotIdentifier slotId,
             final String keyLabel) {
-        return entityId.match(slotId, keyLabel);
+        return identityId.match(slotId, keyLabel);
     }
 
     public int getSignatureKeyBitLength() {
@@ -152,7 +152,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
     @Override
     public int compareTo(P11Identity obj) {
-        return entityId.compareTo(obj.entityId);
+        return identityId.compareTo(obj.identityId);
     }
 
     public boolean supportsMechanism(

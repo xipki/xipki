@@ -302,11 +302,11 @@ class KeystoreP11Slot extends AbstractP11Slot {
                         ? null
                         : new X509Certificate[]{cert.getCert()};
 
-                KeystoreP11Identity entity = new KeystoreP11Identity(
+                KeystoreP11Identity identity = new KeystoreP11Identity(
                         new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey,
                         certs, maxSessions, securityFactory.getRandom4Sign());
                 LOG.info("added PKCS#11 key {}", p11ObjId);
-                ret.addEntity(entity);
+                ret.addIdentity(identity);
             } catch (InvalidKeyException ex) {
                 final String message = "InvalidKeyException while initializing key with key-id "
                         + hexId;
@@ -746,10 +746,10 @@ class KeystoreP11Slot extends AbstractP11Slot {
         byte[] id = generateId();
         savePkcs11PrivateKey(id, label, keypair.getPrivate());
         savePkcs11PublicKey(id, label, keypair.getPublic());
-        P11EntityIdentifier entityId = new P11EntityIdentifier(slotId,
+        P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
                 new P11ObjectIdentifier(id, label));
         try {
-            return new KeystoreP11Identity(entityId, keypair.getPrivate(), keypair.getPublic(),
+            return new KeystoreP11Identity(identityId, keypair.getPrivate(), keypair.getPublic(),
                     null, maxSessions, securityFactory.getRandom4Sign());
         } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
             throw new P11TokenException(

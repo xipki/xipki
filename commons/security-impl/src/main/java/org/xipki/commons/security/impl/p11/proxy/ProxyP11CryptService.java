@@ -94,30 +94,30 @@ class ProxyP11CryptService implements P11CryptService {
 
     @Override
     public byte[] sign(
-            final P11EntityIdentifier entityId,
+            final P11EntityIdentifier identityId,
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
     throws P11TokenException, SecurityException {
-        P11Identity entity =
-                module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
-        return entity.sign(mechanism, parameters, content);
+        P11Identity identity =
+                module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
+        return identity.sign(mechanism, parameters, content);
     }
 
     @Override
     public PublicKey getPublicKey(
-            final P11EntityIdentifier entityId)
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        P11Identity entity =
-                module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
-        return entity.getPublicKey();
+        P11Identity identity =
+                module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
+        return identity.getPublicKey();
     }
 
     @Override
     public X509Certificate getCertificate(
-            final P11EntityIdentifier entityId)
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        X509Certificate[] certs = getCertificates(entityId);
+        X509Certificate[] certs = getCertificates(identityId);
         return (certs == null || certs.length < 1)
                 ? null
                 : certs[0];
@@ -125,11 +125,11 @@ class ProxyP11CryptService implements P11CryptService {
 
     @Override
     public X509Certificate[] getCertificates(
-            final P11EntityIdentifier entityId)
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        P11Identity entity =
-                module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
-        return entity.getCertificateChain();
+        P11Identity identity =
+                module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
+        return identity.getCertificateChain();
     }
 
 }
