@@ -135,12 +135,13 @@ class IaikP11Slot extends AbstractP11Slot {
             final String moduleName,
             final P11SlotIdentifier slotId,
             final Slot slot,
+            final boolean readOnly,
             final long userType,
             final List<char[]> password,
             final int maxMessageSize,
             final P11MechanismFilter mechanismFilter)
     throws P11TokenException {
-        super(moduleName, slotId, mechanismFilter);
+        super(moduleName, slotId, readOnly, mechanismFilter);
         this.slot = ParamUtil.requireNonNull("slot", slot);
         this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 1);
         this.userType = ParamUtil.requireMin("userType", userType, 0);

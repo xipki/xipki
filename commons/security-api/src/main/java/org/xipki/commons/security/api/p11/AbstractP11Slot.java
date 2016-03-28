@@ -81,6 +81,8 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     protected final P11SlotIdentifier slotId;
 
+    private final boolean readOnly;
+
     private final SecureRandom random = new SecureRandom();
 
     private final CopyOnWriteArrayList<P11ObjectIdentifier> entityIds =
@@ -103,11 +105,13 @@ public abstract class AbstractP11Slot implements P11Slot {
     protected AbstractP11Slot(
             final String moduleName,
             final P11SlotIdentifier slotId,
+            final boolean readOnly,
             final P11MechanismFilter mechanismFilter)
     throws P11TokenException {
         this.mechanismFilter = ParamUtil.requireNonNull("mechanismFilter", mechanismFilter);
         this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        this.readOnly = readOnly;
     }
 
     protected static String hex(
@@ -272,6 +276,11 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     @Override
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    @Override
     public P11Identity getIdentity(
             final P11ObjectIdentifier objectId)
     throws P11UnknownEntityException {
@@ -341,6 +350,7 @@ public abstract class AbstractP11Slot implements P11Slot {
             final P11ObjectIdentifier objectId)
     throws P11TokenException {
         ParamUtil.requireNonNull("objectId", objectId);
+        assertWritable("removeCerts");
 
         X509Certificate cert;
         if (entityIds.contains(objectId)) {
@@ -365,6 +375,8 @@ public abstract class AbstractP11Slot implements P11Slot {
     public void removeIdentity(
             P11ObjectIdentifier objectId)
     throws P11TokenException {
+        ParamUtil.requireNonNull("objectId", objectId);
+        assertWritable("removeIdentity");
         // TODO Auto-generated method stub
     }
 
@@ -386,6 +398,7 @@ public abstract class AbstractP11Slot implements P11Slot {
             final X509Certificate cert)
     throws P11TokenException, SecurityException {
         ParamUtil.requireNonNull("cert", cert);
+        assertWritable("addCert");
 
         X509Cert x509Cert = new X509Cert(cert);
         byte[] encodedCert = x509Cert.getEncodedCert();
@@ -499,6 +512,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         if (keysize % 1024 != 0) {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
         }
+        assertWritable("generateRSAKeypair");
         assertMechanismSupported(P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
 
         BigInteger tmpPublicExponent = publicExponent;
@@ -533,6 +547,8 @@ public abstract class AbstractP11Slot implements P11Slot {
         if (plength % 1024 != 0) {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
         }
+        assertWritable("generateDSAKeypair");
+        assertMechanismSupported(P11Constants.CKM_DSA_KEY_PAIR_GEN);
 
         DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
         DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
@@ -540,7 +556,6 @@ public abstract class AbstractP11Slot implements P11Slot {
         paramGen.init(genParams);
         DSAParameters dsaParams = paramGen.generateParameters();
 
-        assertMechanismSupported(P11Constants.CKM_DSA_KEY_PAIR_GEN);
         P11Identity entity = doGenerateDSAKeypair(dsaParams.getP(), dsaParams.getQ(),
                 dsaParams.getG(), label);
         entityAdded(entity);
@@ -558,8 +573,9 @@ public abstract class AbstractP11Slot implements P11Slot {
         ParamUtil.requireNonNull("p", p);
         ParamUtil.requireNonNull("q", q);
         ParamUtil.requireNonNull("g", g);
-
+        assertWritable("generateDSAKeypair");
         assertMechanismSupported(P11Constants.CKM_DSA_KEY_PAIR_GEN);
+
         P11Identity entity = doGenerateDSAKeypair(p, q, g, label);
         entityAdded(entity);
         return entity.getEntityId().getObjectId();
@@ -581,6 +597,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     throws SecurityException, P11TokenException {
         ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
         ParamUtil.requireNonBlank("label", label);
+        assertWritable("generateECKeypair");
         assertMechanismSupported(P11Constants.CKM_EC_KEY_PAIR_GEN);
 
         ASN1ObjectIdentifier curveId = KeyUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
@@ -605,6 +622,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     throws SecurityException, P11TokenException {
         ParamUtil.requireNonNull("objectId", objectId);
         ParamUtil.requireNonNull("newCert", newCert);
+        assertWritable("updateCertificate");
 
         P11Identity entity = entities.get(objectId);
         if (entity == null) {
@@ -677,6 +695,14 @@ public abstract class AbstractP11Slot implements P11Slot {
 
         if (sb.length() > 0) {
             stream.write(sb.toString().getBytes());
+        }
+    }
+
+    protected void assertWritable(
+            final String operationName)
+    throws P11PermissionException {
+        if (readOnly) {
+            throw new P11PermissionException("Operation " + operationName + " is not permitted");
         }
     }
 

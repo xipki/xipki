@@ -38,7 +38,6 @@ package org.xipki.commons.security.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,22 +56,13 @@ import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.crypto.NoSuchPaddingException;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -95,7 +85,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -109,44 +98,23 @@ import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.p11.P11Constants;
-import org.xipki.commons.security.api.p11.P11Control;
+import org.xipki.commons.security.api.p11.P11Conf;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
-import org.xipki.commons.security.api.p11.P11MechanismFilter;
 import org.xipki.commons.security.api.p11.P11Module;
-import org.xipki.commons.security.api.p11.P11ModuleConf;
-import org.xipki.commons.security.api.p11.P11NullPasswordRetriever;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
-import org.xipki.commons.security.api.p11.P11PasswordRetriever;
-import org.xipki.commons.security.api.p11.P11PermitAllMechanimFilter;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11UnknownEntityException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.commons.security.impl.p11.P11ContentSignerBuilder;
-import org.xipki.commons.security.impl.p11.P11MechanismFilterImpl;
-import org.xipki.commons.security.impl.p11.P11PasswordRetrieverImpl;
 import org.xipki.commons.security.impl.p11.iaik.IaikP11CryptServiceFactory;
 import org.xipki.commons.security.impl.p11.keystore.KeystoreP11CryptServiceFactory;
 import org.xipki.commons.security.impl.p11.proxy.ProxyP11CryptServiceFactory;
 import org.xipki.commons.security.impl.p12.SoftTokenContentSignerBuilder;
-import org.xipki.commons.security.p11.conf.jaxb.MechanismsType;
-import org.xipki.commons.security.p11.conf.jaxb.ModuleType;
-import org.xipki.commons.security.p11.conf.jaxb.ModulesType;
-import org.xipki.commons.security.p11.conf.jaxb.NativeLibraryType;
-import org.xipki.commons.security.p11.conf.jaxb.ObjectFactory;
-import org.xipki.commons.security.p11.conf.jaxb.PKCS11ConfType;
-import org.xipki.commons.security.p11.conf.jaxb.PasswordType;
-import org.xipki.commons.security.p11.conf.jaxb.PasswordsType;
-import org.xipki.commons.security.p11.conf.jaxb.PermittedMechanismsType;
-import org.xipki.commons.security.p11.conf.jaxb.SlotType;
-import org.xipki.commons.security.p11.conf.jaxb.SlotsType;
-import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
@@ -167,7 +135,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     private int defaultParallelism = 32;
 
-    private P11Control p11Control;
+    private P11Conf p11Conf;
 
     private P11CryptServiceFactory p11CryptServiceFactory;
 
@@ -529,9 +497,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     @Override
     public Set<String> getP11ModuleNames() {
         initPkcs11ModuleConf();
-        return (p11Control == null)
+        return (p11Conf == null)
                 ? null
-                : p11Control.getModuleNames();
+                : p11Conf.getModuleNames();
     }
 
     private synchronized void initP11CryptServiceFactory()
@@ -566,9 +534,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             }
 
             if (p11Provider instanceof P11CryptServiceFactory) {
-                P11CryptServiceFactory p11CryptServiceFact =
-                        (P11CryptServiceFactory) p11Provider;
-                p11CryptServiceFact.init(p11Control);
+                P11CryptServiceFactory p11CryptServiceFact = (P11CryptServiceFactory) p11Provider;
+                p11CryptServiceFact.init(p11Conf);
                 this.p11CryptServiceFactory = p11CryptServiceFact;
             } else {
                 throw new SecurityException(pkcs11Provider + " is not instanceof "
@@ -580,7 +547,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     } // method initP11CryptServiceFactory
 
     private void initPkcs11ModuleConf() {
-        if (p11Control != null) {
+        if (p11Conf != null) {
             return;
         }
 
@@ -589,146 +556,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
 
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            SchemaFactory schemaFact = SchemaFactory.newInstance(
-                    javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = schemaFact.newSchema(getClass().getResource(
-                    "/xsd/pkcs11-conf.xsd"));
-            unmarshaller.setSchema(schema);
-            @SuppressWarnings("unchecked")
-            JAXBElement<PKCS11ConfType> rootElement = (JAXBElement<PKCS11ConfType>)
-                    unmarshaller.unmarshal(new File(pkcs11ConfFile));
-            PKCS11ConfType pkcs11Conf = rootElement.getValue();
-            ModulesType modulesType = pkcs11Conf.getModules();
-
-            Map<String, P11ModuleConf> confs = new HashMap<>();
-            for (ModuleType moduleType : modulesType.getModule()) {
-                String name = moduleType.getName();
-                if (DEFAULT_P11MODULE_NAME.equals(name)) {
-                    throw new InvalidConfException("invald module name "
-                            + DEFAULT_P11MODULE_NAME + ", it is reserved");
-                }
-
-                if (confs.containsKey(name)) {
-                    throw new InvalidConfException(
-                            "multiple modules with the same module name is not permitted");
-                }
-
-                // Mechanism filter
-                P11MechanismFilter mechFilter;
-                PermittedMechanismsType mechsType = moduleType.getPermittedMechanisms();
-                if (mechsType == null || CollectionUtil.isEmpty(mechsType.getMechanisms())) {
-                    mechFilter = P11PermitAllMechanimFilter.INSTANCE;
-                } else {
-                    mechFilter = new P11MechanismFilterImpl();
-                    for (MechanismsType mechType : mechsType.getMechanisms()) {
-                        Set<P11SlotIdentifier> slots = getSlots(mechType.getSlots());
-                        Set<Long> mechanisms = new HashSet<>();
-                        for (String mechStr : mechType.getMechanism()) {
-                            Long mech = null;
-                            if (mechStr.startsWith("CKM_")) {
-                                mech = P11Constants.getMechanism(mechStr);
-                            } else {
-                                int radix = 10;
-                                String value = mechStr.toLowerCase();
-                                if (value.startsWith("0x")) {
-                                    radix = 16;
-                                    value = value.substring(2);
-                                }
-
-                                if (value.endsWith("l")) {
-                                    value = value.substring(0, value.length() - 1);
-                                }
-
-                                try {
-                                    mech = Long.parseLong(value, radix);
-                                } catch (NumberFormatException ex) {// CHECKSTYLE:SKIP
-                                }
-                            }
-
-                            if (mech == null) {
-                                LOG.warn("skipped unknown mechanism '" + mechStr + "'");
-                            } else {
-                                mechanisms.add(mech);
-                            }
-                        }
-                        ((P11MechanismFilterImpl) mechFilter).addEntry(slots, mechanisms);
-                    }
-                }
-
-                // Password retriever
-                P11PasswordRetriever pwdRetriever;
-
-                PasswordsType passwordsType = moduleType.getPasswords();
-                if (passwordsType == null || CollectionUtil.isEmpty(passwordsType.getPassword())) {
-                    pwdRetriever = P11NullPasswordRetriever.INSTANCE;
-                } else {
-                    pwdRetriever = new P11PasswordRetrieverImpl();
-                    ((P11PasswordRetrieverImpl) pwdRetriever).setPasswordResolver(
-                            passwordResolver);
-
-                    for (PasswordType passwordType : passwordsType.getPassword()) {
-                        Set<P11SlotIdentifier> slots = getSlots(passwordType.getSlots());
-                        ((P11PasswordRetrieverImpl) pwdRetriever).addPasswordEntry(
-                                slots, new ArrayList<>(passwordType.getSinglePassword()));
-                    }
-                }
-
-                Set<P11SlotIdentifier> includeSlots = getSlots(moduleType.getIncludeSlots());
-                Set<P11SlotIdentifier> excludeSlots = getSlots(moduleType.getExcludeSlots());
-
-                final String osName = System.getProperty("os.name").toLowerCase();
-                String nativeLibraryPath = null;
-                for (NativeLibraryType library
-                        : moduleType.getNativeLibraries().getNativeLibrary()) {
-                    List<String> osNames = library.getOs();
-                    if (CollectionUtil.isEmpty(osNames)) {
-                        nativeLibraryPath = library.getPath();
-                    } else {
-                        for (String entry : osNames) {
-                            if (osName.contains(entry.toLowerCase())) {
-                                nativeLibraryPath = library.getPath();
-                                break;
-                            }
-                        }
-                    }
-
-                    if (nativeLibraryPath != null) {
-                        break;
-                    }
-                } // end for (NativeLibraryType library)
-
-                if (nativeLibraryPath == null) {
-                    throw new InvalidConfException("could not find PKCS#11 library for OS "
-                            + osName);
-                }
-
-                long userType = moduleType.getUser().longValue();
-                int maxMsgSize = moduleType.getMaxMessageSize().intValue();
-                P11ModuleConf conf = new P11ModuleConf(name, nativeLibraryPath, userType,
-                        maxMsgSize, pwdRetriever, mechFilter, includeSlots, excludeSlots,
-                        (SecurityFactory) this);
-                confs.put(name, conf);
-            } // end for (ModuleType moduleType
-
-            if (!confs.containsKey(DEFAULT_P11MODULE_NAME)) {
-                throw new InvalidConfException("module '" + DEFAULT_P11MODULE_NAME
-                        + "' is not defined");
-            }
-
-            this.p11Control = new P11Control(new HashSet<>(confs.values()));
-        } catch (JAXBException | SAXException | InvalidConfException ex) {
+            this.p11Conf = new P11Conf(new FileInputStream(pkcs11ConfFile), (SecurityFactory) this);
+        } catch (InvalidConfException | IOException ex) {
             final String message = "invalid configuration file " + pkcs11ConfFile;
             if (LOG.isErrorEnabled()) {
-                final String exceptionMessage;
-                if (ex instanceof JAXBException) {
-                    exceptionMessage = getMessage((JAXBException) ex);
-                } else {
-                    exceptionMessage = ex.getMessage();
-                }
                 LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        exceptionMessage);
+                        ex.getMessage());
             }
             LOG.debug(message, ex);
 
@@ -1018,45 +851,5 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             throw new SecurityException(ex.getMessage(), ex);
         }
     } // method validateSigner
-
-    private static Set<P11SlotIdentifier> getSlots(
-            final SlotsType type)
-    throws InvalidConfException {
-        if (type == null || CollectionUtil.isEmpty(type.getSlot())) {
-            return null;
-        }
-
-        Set<P11SlotIdentifier> slots = new HashSet<>();
-        // FIXME: slotId and slotIndex may be null.
-        for (SlotType slotType : type.getSlot()) {
-            Long slotId = null;
-            if (slotType.getId() != null) {
-                String str = slotType.getId().trim();
-                try {
-                    if (StringUtil.startsWithIgnoreCase(str, "0X")) {
-                        slotId = Long.parseLong(str.substring(2), 16);
-                    } else {
-                        slotId = Long.parseLong(str);
-                    }
-                } catch (NumberFormatException ex) {
-                    String message = "invalid slotId '" + str + "'";
-                    LOG.error(message);
-                    throw new InvalidConfException(message);
-                }
-            }
-            slots.add(new P11SlotIdentifier(slotType.getIndex(), slotId));
-        }
-
-        return slots;
-    }
-
-    private static String getMessage(
-            final JAXBException ex) {
-        String ret = ex.getMessage();
-        if (ret == null && ex.getLinkedException() != null) {
-            ret = ex.getLinkedException().getMessage();
-        }
-        return ret;
-    }
 
 }

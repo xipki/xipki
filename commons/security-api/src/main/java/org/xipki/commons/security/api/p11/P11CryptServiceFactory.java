@@ -48,7 +48,7 @@ import org.xipki.commons.security.api.SecurityException;
 public interface P11CryptServiceFactory {
 
     void init(
-            @Nonnull P11Control p11Control);
+            @Nonnull P11Conf p11Conf);
 
     P11CryptService getP11CryptService(
             @Nonnull String moduleName)

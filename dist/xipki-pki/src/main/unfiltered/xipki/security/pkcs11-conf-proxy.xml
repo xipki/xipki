@@ -5,9 +5,10 @@
     <module name="default">
       <nativeLibraries>
         <nativeLibrary>
-          <path>url=https://localhost:9443/p11proxy</path>
+          <path>url=https://localhost:9443/p11proxy/default</path>
         </nativeLibrary>
       </nativeLibraries>
+      <readonly>false</readonly>
     </module>
   </modules>
 </PKCS11Conf>

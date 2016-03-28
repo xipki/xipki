@@ -89,9 +89,10 @@ public class ProxyP11Slot extends AbstractP11Slot {
     ProxyP11Slot(
             final String moduleName,
             final P11SlotIdentifier slotId,
+            final boolean readOnly,
             final P11MechanismFilter mechanismFilter)
     throws P11TokenException {
-        super(moduleName, slotId, mechanismFilter);
+        super(moduleName, slotId, readOnly, mechanismFilter);
         refresh();
     }
 

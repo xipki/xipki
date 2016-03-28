@@ -37,7 +37,6 @@
 package org.xipki.commons.security.shell.completer;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
@@ -62,11 +61,7 @@ public class P11ModuleNameCompleter extends AbstractDynamicEnumCompleter {
         if (CollectionUtil.isEmpty(names)) {
             return Collections.emptySet();
         }
-        Set<String> ret = new HashSet<>(names);
-        if (!ret.contains(SecurityFactory.DEFAULT_P11MODULE_NAME)) {
-            ret.add(SecurityFactory.DEFAULT_P11MODULE_NAME);
-        }
-        return ret;
+        return names;
     }
 
 }

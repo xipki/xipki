@@ -169,7 +169,8 @@ class ProxyP11Module extends AbstractP11Module {
                 continue;
             }
 
-            P11Slot slot = new ProxyP11Slot(getName(), slotId, moduleConf.getP11MechanismFilter());
+            P11Slot slot = new ProxyP11Slot(getName(), slotId, moduleConf.isReadOnly(),
+                    moduleConf.getP11MechanismFilter());
             if (moduleConf.isSlotIncluded(slotId)) {
                 slots.add(slot);
             }
