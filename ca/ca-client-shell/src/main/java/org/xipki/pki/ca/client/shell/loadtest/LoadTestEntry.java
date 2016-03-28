@@ -84,7 +84,7 @@ public class LoadTestEntry {
         private IncreasableSubject(
                 final String subjectTemplate,
                 final RandomDn randomDn) {
-            ParamUtil.requireNonEmpty("subjectTemplate", subjectTemplate);
+            ParamUtil.requireNonBlank("subjectTemplate", subjectTemplate);
             ParamUtil.requireNonNull("randomDn", randomDn);
 
             this.subjectTemplate = new X500Name(subjectTemplate);

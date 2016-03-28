@@ -202,7 +202,7 @@ public class SignerUtil {
             block[offset++] = (byte) 0xFF;
         }
         // mark the end of the padding
-        block[offset] = 0x00;
+        block[offset++] = 0x00;
 
         System.arraycopy(prefix, 0, block, offset, prefix.length);
         offset += prefix.length;
@@ -236,7 +236,7 @@ public class SignerUtil {
             block[offset++] = (byte) 0xFF;
         }
         // mark the end of the padding
-        block[offset] = 0x00;
+        block[offset++] = 0x00;
 
         System.arraycopy(encodedDigestInfo, 0, block, offset, encodedDigestInfo.length);
         return block;

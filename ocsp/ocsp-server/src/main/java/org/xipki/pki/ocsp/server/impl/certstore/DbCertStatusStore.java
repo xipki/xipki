@@ -145,7 +145,7 @@ public class DbCertStatusStore extends CertStatusStore {
             sb.append("ID,REV,RR,RT,RIT,PN,");
             sb.append(h.getShortName()).append(" ");
             sb.append(" FROM CERT INNER JOIN CHASH ON ");
-            sb.append(" CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID");
+            sb.append(" CERT.SN=? AND CERT.IID=? AND CERT.ID=CHASH.CID");
             SQL_CS_HASHMAP.put(h, sb.toString());
         }
     }

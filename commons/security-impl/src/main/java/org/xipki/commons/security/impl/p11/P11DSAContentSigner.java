@@ -176,12 +176,12 @@ class P11DSAContentSigner implements ContentSigner {
     private byte[] getPlainSignature()
     throws SecurityException, P11TokenException {
         byte[] dataToSign;
-        if (mechanism == P11Constants.CKM_DSA) {
-            dataToSign = ((DigestOutputStream) outputStream).digest();
-            ((DigestOutputStream) outputStream).reset();
-        } else {
+        if (outputStream instanceof ByteArrayOutputStream) {
             dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
             ((ByteArrayOutputStream) outputStream).reset();
+        } else {
+            dataToSign = ((DigestOutputStream) outputStream).digest();
+            ((DigestOutputStream) outputStream).reset();
         }
 
         return cryptService.sign(identityId, mechanism, null, dataToSign);
