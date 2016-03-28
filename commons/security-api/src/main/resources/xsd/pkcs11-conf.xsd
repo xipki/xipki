@@ -47,6 +47,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element name="readonly" type="xs:boolean"/> 
       <xs:element name="user" type="xs:long" minOccurs="0" default="1">
         <xs:annotation>
           <xs:documentation>

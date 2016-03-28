@@ -167,12 +167,13 @@ class KeystoreP11Slot extends AbstractP11Slot {
             final String moduleName,
             final File slotDir,
             final P11SlotIdentifier slotId,
+            final boolean readOnly,
             final PrivateKeyCryptor privateKeyCryptor,
             final SecurityFactory securityFactory,
             final P11MechanismFilter mechanismFilter,
             final int maxSessions)
     throws P11TokenException {
-        super(moduleName, slotId, mechanismFilter);
+        super(moduleName, slotId, readOnly, mechanismFilter);
 
         this.slotDir = ParamUtil.requireNonNull("slotDir", slotDir);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);

@@ -23,7 +23,7 @@
 
     <jxb:bindings schemaLocation="../resources/xsd/pkcs11-conf.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
-            <jxb:package name="org.xipki.commons.security.p11.conf.jaxb"/>
+            <jxb:package name="org.xipki.commons.security.api.internal.p11.jaxb"/>
         </jxb:schemaBindings>
     </jxb:bindings>
 

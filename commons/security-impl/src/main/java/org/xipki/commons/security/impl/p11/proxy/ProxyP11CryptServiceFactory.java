@@ -38,7 +38,7 @@ package org.xipki.commons.security.impl.p11.proxy;
 
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.p11.P11Control;
+import org.xipki.commons.security.api.p11.P11Conf;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
@@ -51,24 +51,24 @@ import org.xipki.commons.security.api.p11.P11TokenException;
 
 public class ProxyP11CryptServiceFactory implements P11CryptServiceFactory {
 
-    private P11Control p11Control;
+    private P11Conf p11Conf;
 
     @Override
     public void init(
-            final P11Control p11Control) {
-        this.p11Control = ParamUtil.requireNonNull("p11Control", p11Control);
+            final P11Conf p11Conf) {
+        this.p11Conf = ParamUtil.requireNonNull("p11Conf", p11Conf);
     }
 
     @Override
     public P11CryptService getP11CryptService(
             final String moduleName)
     throws P11TokenException, SecurityException {
-        if (p11Control == null) {
+        if (p11Conf == null) {
             throw new IllegalStateException("please call init() first");
         }
 
         ParamUtil.requireNonBlank("moduleName", moduleName);
-        P11ModuleConf conf = p11Control.getModuleConf(moduleName);
+        P11ModuleConf conf = p11Conf.getModuleConf(moduleName);
         if (conf == null) {
             throw new SecurityException("PKCS#11 module " + moduleName + " is not defined");
         }
