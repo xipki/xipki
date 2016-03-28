@@ -138,20 +138,20 @@ class KeystoreP11CryptService implements P11CryptService {
 
     @Override
     public byte[] sign(
-            final P11EntityIdentifier entityId,
+            final P11EntityIdentifier identityId,
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
     throws SecurityException, P11TokenException {
-        if (!supportsMechanism(entityId.getSlotId(), mechanism)) {
+        if (!supportsMechanism(identityId.getSlotId(), mechanism)) {
             throw new P11TokenException("mechanism " + mechanism + " is not supported by slot"
-                    + entityId.getSlotId());
+                    + identityId.getSlotId());
         }
 
         try {
-            return getNonnullEntity(entityId).sign(mechanism, parameters, content);
+            return getNonnullEntity(identityId).sign(mechanism, parameters, content);
         } catch (PKCS11RuntimeException ex) {
-            final String message = "could not call entity.sign()";
+            final String message = "could not sign";
             if (LOG.isWarnEnabled()) {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
                         ex.getMessage());
@@ -163,30 +163,30 @@ class KeystoreP11CryptService implements P11CryptService {
 
     @Override
     public PublicKey getPublicKey(
-            final P11EntityIdentifier entityId)
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        return getNonnullEntity(entityId).getPublicKey();
+        return getNonnullEntity(identityId).getPublicKey();
     }
 
     @Override
     public X509Certificate getCertificate(
-            final P11EntityIdentifier entityId)
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        return getNonnullEntity(entityId).getCertificate();
+        return getNonnullEntity(identityId).getCertificate();
     }
 
     @Override
     public X509Certificate[] getCertificates(
-            final P11EntityIdentifier entityId)
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        return getNonnullEntity(entityId).getCertificateChain();
+        return getNonnullEntity(identityId).getCertificateChain();
     }
 
     private P11Identity getNonnullEntity(
-            final P11EntityIdentifier entityId)
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        ParamUtil.requireNonNull("entityId", entityId);
-        return module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
+        ParamUtil.requireNonNull("identityId", identityId);
+        return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
     }
 
     @Override

@@ -36,70 +36,42 @@
 
 package org.xipki.commons.security.api.p11;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Nonnull;
-
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.X509Cert;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class P11SlotRefreshResult {
+class P11SlotIdFilter {
 
-    private final Map<P11ObjectIdentifier, P11Identity> identities = new HashMap<>();
+    private final Integer index;
 
-    private final Map<P11ObjectIdentifier, X509Cert> certificates = new HashMap<>();
+    private final Long id;
 
-    private final Set<Long> mechanisms = new HashSet<>();
-
-    public P11SlotRefreshResult() {
+    P11SlotIdFilter(
+            final Integer index,
+            final Long id) {
+        if (index == null && id == null) {
+            throw new IllegalArgumentException("at least one of index and id must not be null");
+        }
+        this.index = index;
+        this.id = id;
     }
 
-    public Map<P11ObjectIdentifier, P11Identity> getIdentities() {
-        return identities;
-    }
-
-    public Map<P11ObjectIdentifier, X509Cert> getCertificates() {
-        return certificates;
-    }
-
-    public Set<Long> getMechanisms() {
-        return mechanisms;
-    }
-
-    public void addIdentity(
-            final P11Identity identity) {
-        ParamUtil.requireNonNull("identity", identity);
-        this.identities.put(identity.getIdentityId().getObjectId(), identity);
-    }
-
-    public void addMechanism(
-            final long mechanism) {
-        this.mechanisms.add(mechanism);
-    }
-
-    public void addCertificate(
-            final P11ObjectIdentifier objectId,
-            final X509Cert certificate) {
-        ParamUtil.requireNonNull("objectId", objectId);
-        ParamUtil.requireNonNull("certificate", certificate);
-        this.certificates.put(objectId, certificate);
-    }
-
-    public X509Cert getCertForId(
-            @Nonnull final byte[] id) {
-        for (P11ObjectIdentifier objId : certificates.keySet()) {
-            if (objId.matchesId(id)) {
-                return certificates.get(objId);
+    boolean match(
+            P11SlotIdentifier slotId) {
+        if (index != null) {
+            if (index.intValue() != slotId.getIndex()) {
+                return false;
             }
         }
-        return null;
+
+        if (id != null) {
+            if (id.longValue() != slotId.getId()) {
+                return false;
+            }
+        }
+
+        return true;
     }
+
 }

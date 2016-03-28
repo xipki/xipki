@@ -133,36 +133,36 @@ final class IaikP11CryptService implements P11CryptService {
 
     @Override
     public byte[] sign(
-            final P11EntityIdentifier entityId,
+            final P11EntityIdentifier identityId,
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
     throws P11TokenException, SecurityException {
-        if (!supportsMechanism(entityId.getSlotId(), mechanism)) {
-            throw new P11UnsupportedMechanismException(mechanism, entityId.getSlotId());
+        if (!supportsMechanism(identityId.getSlotId(), mechanism)) {
+            throw new P11UnsupportedMechanismException(mechanism, identityId.getSlotId());
         }
-        return getNonnullEntity(entityId).sign(mechanism, parameters, content);
+        return getNonnullIdentity(identityId).sign(mechanism, parameters, content);
     }
 
     @Override
     public PublicKey getPublicKey(
-            final P11EntityIdentifier entityId)
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        return getNonnullEntity(entityId).getPublicKey();
+        return getNonnullIdentity(identityId).getPublicKey();
     }
 
     @Override
     public X509Certificate getCertificate(
-            final P11EntityIdentifier entityId)
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        return getNonnullEntity(entityId).getCertificate();
+        return getNonnullIdentity(identityId).getCertificate();
     }
 
-    private P11Identity getNonnullEntity(
-            final P11EntityIdentifier entityId)
+    private P11Identity getNonnullIdentity(
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        ParamUtil.requireNonNull("entityId", entityId);
-        return module.getSlot(entityId.getSlotId()).getIdentity(entityId.getObjectId());
+        ParamUtil.requireNonNull("identityId", identityId);
+        return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
     }
 
     @Override
@@ -172,9 +172,9 @@ final class IaikP11CryptService implements P11CryptService {
 
     @Override
     public X509Certificate[] getCertificates(
-            final P11EntityIdentifier entityId)
+            final P11EntityIdentifier identityId)
     throws P11TokenException {
-        return getNonnullEntity(entityId).getCertificateChain();
+        return getNonnullIdentity(identityId).getCertificateChain();
     }
 
     static synchronized IaikP11CryptService getInstance(

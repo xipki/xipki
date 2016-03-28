@@ -54,12 +54,12 @@ public class P11MechanismFilter {
 
     private static final class SingleFilter {
 
-        private final Set<P11SlotIdentifier> slots;
+        private final Set<P11SlotIdFilter> slots;
 
         private final Collection<Long> mechanisms;
 
         private SingleFilter(
-                final Set<P11SlotIdentifier> slots,
+                final Set<P11SlotIdFilter> slots,
                 final Collection<Long> mechanisms) {
             this.slots = slots;
             if (CollectionUtil.isEmpty(mechanisms)) {
@@ -74,8 +74,8 @@ public class P11MechanismFilter {
             if (slots == null) {
                 return true;
             }
-            for (P11SlotIdentifier m : slots) {
-                if (m.equals(slot)) {
+            for (P11SlotIdFilter m : slots) {
+                if (m.match(slot)) {
                     return true;
                 }
             }
@@ -101,7 +101,7 @@ public class P11MechanismFilter {
     }
 
     void addEntry(
-            final Set<P11SlotIdentifier> slots,
+            final Set<P11SlotIdFilter> slots,
             final Collection<Long> mechanisms) {
         singleFilters.add(new SingleFilter(slots, mechanisms));
     }

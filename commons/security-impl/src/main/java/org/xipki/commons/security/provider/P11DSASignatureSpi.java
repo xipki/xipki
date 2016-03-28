@@ -46,10 +46,8 @@ import java.security.SignatureException;
 import java.security.SignatureSpi;
 import java.security.spec.AlgorithmParameterSpec;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
@@ -128,8 +126,8 @@ abstract class P11DSASignatureSpi extends SignatureSpi {
     private P11PrivateKey signingKey;
 
     P11DSASignatureSpi(
-            @Nonnull final HashAlgoType hashAlgo) {
-        this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+            @Nullable final HashAlgoType hashAlgo) {
+        this.hashAlgo = hashAlgo;
     }
 
     @Override
