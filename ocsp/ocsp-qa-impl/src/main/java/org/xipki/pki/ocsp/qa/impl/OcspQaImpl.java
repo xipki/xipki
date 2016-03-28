@@ -117,7 +117,7 @@ public class OcspQaImpl implements OcspQa {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
         ParamUtil.requireNonEmpty("expectedOcspStatuses", expectedOcspStatuses);
-        ParamUtil.requireNonEmpty("responseOption", responseOption);
+        ParamUtil.requireNonNull("responseOption", responseOption);
 
         List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 

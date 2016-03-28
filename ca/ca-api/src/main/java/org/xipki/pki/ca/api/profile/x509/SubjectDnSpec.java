@@ -213,6 +213,12 @@ public class SubjectDnSpec {
                 String areaCode = st.nextToken();
                 countryAreaCodes.add(areaCode.toUpperCase());
             }
+
+            if (LOG.isInfoEnabled()) {
+                List<String> list = new ArrayList<>(countryAreaCodes);
+                Collections.sort(list);
+                LOG.info("area/country codes: {}", list);
+            }
         } catch (Exception ex) {
             throw new RuntimeException("could not load area code: " + ex.getMessage(), ex);
         } finally {

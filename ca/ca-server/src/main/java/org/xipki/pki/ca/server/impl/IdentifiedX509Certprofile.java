@@ -271,7 +271,7 @@ class IdentifiedX509Certprofile {
         if (countryRdns != null) {
             for (RDN rdn : countryRdns) {
                 String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
-                if (SubjectDnSpec.isValidCountryAreaCode(textValue)) {
+                if (!SubjectDnSpec.isValidCountryAreaCode(textValue)) {
                     throw new BadCertTemplateException("invalid country/area code '" + textValue
                             + "'");
                 }

@@ -91,7 +91,7 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher {
         System.arraycopy(in, inOff, content, content.length - len, len);
 
         try {
-            return param.getP11CryptService().sign(param.getIdentityId(), 
+            return param.getP11CryptService().sign(param.getIdentityId(),
                     P11Constants.CKM_RSA_X_509, null, content);
         } catch (SecurityException | P11TokenException ex) {
             throw new InvalidCipherTextException(ex.getMessage(), ex);

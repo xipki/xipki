@@ -176,15 +176,15 @@ class P11RSAContentSigner implements ContentSigner {
     @Override
     public byte[] getSignature() {
         byte[] dataToSign;
-        if (mechanism == P11Constants.CKM_RSA_PKCS || mechanism == P11Constants.CKM_RSA_X_509) {
+        if (outputStream instanceof ByteArrayOutputStream) {
+            dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
+            ((ByteArrayOutputStream) outputStream).reset();
+        } else {
             byte[] hashValue = ((DigestOutputStream) outputStream).digest();
             ((DigestOutputStream) outputStream).reset();
             dataToSign = new byte[digestPkcsPrefix.length + hashValue.length];
             System.arraycopy(digestPkcsPrefix, 0, dataToSign, 0, digestPkcsPrefix.length);
             System.arraycopy(hashValue, 0, dataToSign, digestPkcsPrefix.length, hashValue.length);
-        } else {
-            dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
-            ((ByteArrayOutputStream) outputStream).reset();
         }
 
         try {

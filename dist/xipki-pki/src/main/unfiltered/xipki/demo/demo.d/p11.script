@@ -100,7 +100,6 @@ xipki-tk:update-cert \
   --slot 1 \
   --label $SubCA_KEY_LABEL \
   --cert output/SubCA1.der \
-  --ca-cert output/RCA1.der
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
 xipki-tk:req \
@@ -127,7 +126,6 @@ xipki-tk:update-cert \
   --slot 1 \
   --label $SubCAwithCRL_KEY_LABEL \
   --cert output/SubCAwithCRL1.der \
-  --ca-cert output/RCA1.der
 
 #################################################################
 #                        ADD SubCA with OCSP                    #
