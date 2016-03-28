@@ -36,17 +36,91 @@
 
 package org.xipki.commons.security.api.p11;
 
-import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface P11MechanismFilter {
+public class P11MechanismFilter {
 
-    boolean isMechanismPermitted(
-            @Nonnull P11SlotIdentifier slotId,
-            final long mechanism);
+    private static final class SingleFilter {
+
+        private final Set<P11SlotIdentifier> slots;
+
+        private final Collection<Long> mechanisms;
+
+        private SingleFilter(
+                final Set<P11SlotIdentifier> slots,
+                final Collection<Long> mechanisms) {
+            this.slots = slots;
+            if (CollectionUtil.isEmpty(mechanisms)) {
+                this.mechanisms = null;
+            } else {
+                this.mechanisms = mechanisms;
+            }
+        }
+
+        public boolean match(
+                final P11SlotIdentifier slot) {
+            if (slots == null) {
+                return true;
+            }
+            for (P11SlotIdentifier m : slots) {
+                if (m.equals(slot)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public boolean isMechanismSupported(
+            final long mechanism) {
+            if (mechanisms == null) {
+                return true;
+            }
+
+            return mechanisms.contains(mechanism);
+        }
+
+    } // class SingleRetriever
+
+    private final List<SingleFilter> singleFilters;
+
+    P11MechanismFilter() {
+        singleFilters = new LinkedList<>();
+    }
+
+    void addEntry(
+            final Set<P11SlotIdentifier> slots,
+            final Collection<Long> mechanisms) {
+        singleFilters.add(new SingleFilter(slots, mechanisms));
+    }
+
+    public boolean isMechanismPermitted(
+            final P11SlotIdentifier slotId,
+            final long mechanism) {
+        ParamUtil.requireNonNull("slotId", slotId);
+        if (CollectionUtil.isEmpty(singleFilters)) {
+            return true;
+        }
+
+        for (SingleFilter sr : singleFilters) {
+            if (sr.match(slotId)) {
+                return sr.isMechanismSupported(mechanism);
+            }
+        }
+
+        return true;
+    }
 
 }

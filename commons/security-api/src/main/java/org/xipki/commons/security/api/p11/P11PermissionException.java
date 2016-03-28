@@ -36,52 +36,18 @@
 
 package org.xipki.commons.security.api.p11;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.ParamUtil;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class P11Control {
+public class P11PermissionException extends P11TokenException {
 
-    private final Map<String, P11ModuleConf> moduleConfs;
+    private static final long serialVersionUID = 1L;
 
-    private final Set<String> moduleNames;
-
-    public P11Control(
-            final Set<P11ModuleConf> moduleConfs) {
-        if (CollectionUtil.isEmpty(moduleConfs)) {
-            this.moduleConfs = Collections.emptyMap();
-            this.moduleNames = Collections.emptySet();
-        } else {
-            this.moduleConfs = new HashMap<>(moduleConfs.size());
-            Set<String> tmpModuleNames = new HashSet<>();
-            for (P11ModuleConf conf : moduleConfs) {
-                this.moduleConfs.put(conf.getName(), conf);
-                tmpModuleNames.add(conf.getName());
-            }
-            this.moduleNames = Collections.unmodifiableSet(tmpModuleNames);
-        }
-    }
-
-    public P11ModuleConf getModuleConf(
-            final String moduleName) {
-        ParamUtil.requireNonBlank("moduleName", moduleName);
-        return (moduleConfs == null)
-                ? null
-                : moduleConfs.get(moduleName);
-    }
-
-    public Set<String> getModuleNames() {
-        return moduleNames;
+    public P11PermissionException(
+            final String message) {
+        super(message);
     }
 
 }
