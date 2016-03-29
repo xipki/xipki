@@ -236,7 +236,7 @@ public class KeystoreP11Identity extends P11Identity {
                 pssParam.getHashAlgorithm());
         if (contentHash == null) {
             throw new SecurityException("unsupported HashAlgorithm " + pssParam.getHashAlgorithm());
-        } else if (contentHash != hashAlgo) {
+        } else if (hashAlgo != null && contentHash != hashAlgo) {
             throw new SecurityException("Invalid parameters: invalid hash algorithm");
         }
 

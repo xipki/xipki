@@ -38,11 +38,12 @@ package org.xipki.commons.pkcs11proxy.common;
 
 import java.io.IOException;
 
-import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.DERSequence;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
@@ -75,9 +76,10 @@ public class Asn1RSAPkcsPssParams extends ASN1Object {
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 3, 3);
-        long contentHash = Asn1Util.getInteger(seq.getObjectAt(0)).longValue();
-        long mgfHash = Asn1Util.getInteger(seq.getObjectAt(1)).longValue();
-        int saltLength = Asn1Util.getInteger(seq.getObjectAt(2)).intValue();
+        int idx = 0;
+        long contentHash = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
+        long mgfHash = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
+        int saltLength = Asn1Util.getInteger(seq.getObjectAt(idx++)).intValue();
         this.pkcsPssParams = new P11RSAPkcsPssParams(contentHash, mgfHash, saltLength);
     } // constructor
 
@@ -97,27 +99,18 @@ public class Asn1RSAPkcsPssParams extends ASN1Object {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object");
+            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+                    ex);
         }
     }
 
     @Override
     public ASN1Primitive toASN1Primitive() {
-        int tagNo;
-        if (pkcsPssParams != null) {
-            tagNo = 0;
-        } else {
-            throw new RuntimeException("should not reach here");
-        }
-
-        ASN1Encodable value;
-        if (tagNo == 0) {
-            value = new Asn1RSAPkcsPssParams(pkcsPssParams);
-        } else {
-            throw new RuntimeException("should not reach here");
-        }
-
-        return new DERTaggedObject(tagNo, value);
+        ASN1EncodableVector vector = new ASN1EncodableVector();
+        vector.add(new ASN1Integer(pkcsPssParams.getHashAlgorithm()));
+        vector.add(new ASN1Integer(pkcsPssParams.getMaskGenerationFunction()));
+        vector.add(new ASN1Integer(pkcsPssParams.getSaltLength()));
+        return new DERSequence(vector);
     }
 
     public P11RSAPkcsPssParams getPkcsPssParams() {

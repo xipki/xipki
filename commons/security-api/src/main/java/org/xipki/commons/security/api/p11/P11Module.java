@@ -49,6 +49,8 @@ public interface P11Module {
 
     String getName();
 
+    boolean isReadOnly();
+
     List<P11SlotIdentifier> getSlotIdentifiers();
 
     P11Slot getSlot(

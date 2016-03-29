@@ -61,9 +61,9 @@ import org.xipki.commons.security.api.BadAsn1ObjectException;
 
 public class Asn1Mechanism extends ASN1Object {
 
-    private long mechanism;
+    private final long mechanism;
 
-    private Asn1P11Params params;
+    private final Asn1P11Params params;
 
     public Asn1Mechanism(
             final long mechanism,
@@ -77,9 +77,12 @@ public class Asn1Mechanism extends ASN1Object {
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 1, 2);
         int size = seq.size();
-        this.mechanism = Asn1Util.getInteger(seq.getObjectAt(0)).longValue();
+        int idx = 0;
+        this.mechanism = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
         if (size > 1) {
-            this.params = Asn1P11Params.getInstance(seq.getObjectAt(1));
+            this.params = Asn1P11Params.getInstance(seq.getObjectAt(idx++));
+        } else {
+            this.params = null;
         }
     }
 
@@ -99,7 +102,8 @@ public class Asn1Mechanism extends ASN1Object {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object");
+            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+                    ex);
         }
     }
 

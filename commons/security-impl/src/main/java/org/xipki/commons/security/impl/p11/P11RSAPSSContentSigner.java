@@ -166,29 +166,16 @@ class P11RSAPSSContentSigner implements ContentSigner {
             throw new SecurityException("unsupported hash algorithm " + digestAlgOid.getId());
         }
 
-        long tmpMechanism;
-        if (HashAlgoType.SHA1 == hashAlgo) {
-            tmpMechanism = P11Constants.CKM_SHA1_RSA_PKCS_PSS;
-        } else if (HashAlgoType.SHA224 == hashAlgo) {
-            tmpMechanism = P11Constants.CKM_SHA224_RSA_PKCS_PSS;
-        } else if (HashAlgoType.SHA256 == hashAlgo) {
-            tmpMechanism = P11Constants.CKM_SHA256_RSA_PKCS_PSS;
-        } else if (HashAlgoType.SHA384 == hashAlgo) {
-            tmpMechanism = P11Constants.CKM_SHA384_RSA_PKCS_PSS;
-        } else if (HashAlgoType.SHA512 == hashAlgo) {
-            tmpMechanism = P11Constants.CKM_SHA512_RSA_PKCS_PSS;
-        } else {
-            throw new RuntimeException("should not reach here, unknown HashAlgoType " + hashAlgo);
-        }
-
         P11SlotIdentifier slotId = identityId.getSlotId();
         if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_PKCS_PSS)) {
+            this.mechanism = P11Constants.CKM_RSA_PKCS_PSS;
             this.parameters = new P11RSAPkcsPssParams(asn1Params);
             AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
                     new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
             Digest digest = SignerUtil.getDigest(digAlgId);
             this.outputStream = new DigestOutputStream(digest);
         } else if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_X_509)) {
+            this.mechanism = P11Constants.CKM_RSA_X_509;
             this.parameters = null;
             AsymmetricBlockCipher cipher = new P11PlainRSASigner();
             P11RSAKeyParameter keyParam;
@@ -200,15 +187,36 @@ class P11RSAPSSContentSigner implements ContentSigner {
             PSSSigner pssSigner = SignerUtil.createPSSRSASigner(signatureAlgId, cipher);
             pssSigner.init(true, new ParametersWithRandom(keyParam, random));
             this.outputStream = new PSSSignerOutputStream(pssSigner);
-        } else if (cryptService.supportsMechanism(slotId, tmpMechanism)) {
+        } else {
+            switch (hashAlgo) {
+            case SHA1:
+                this.mechanism = P11Constants.CKM_SHA1_RSA_PKCS_PSS;
+                break;
+            case SHA224:
+                this.mechanism = P11Constants.CKM_SHA224_RSA_PKCS_PSS;
+                break;
+            case SHA256:
+                this.mechanism = P11Constants.CKM_SHA256_RSA_PKCS_PSS;
+                break;
+            case SHA384:
+                this.mechanism = P11Constants.CKM_SHA384_RSA_PKCS_PSS;
+                break;
+            case SHA512:
+                this.mechanism = P11Constants.CKM_SHA512_RSA_PKCS_PSS;
+                break;
+            default:
+                throw new RuntimeException("should not reach here, unknown HashAlgoType "
+                        + hashAlgo);
+            }
+
+            if (!cryptService.supportsMechanism(slotId, this.mechanism)) {
+                throw new SecurityException("unsupported signature algorithm "
+                        + PKCSObjectIdentifiers.id_RSASSA_PSS.getId() + " with " + hashAlgo);
+            }
+
             this.parameters = new P11RSAPkcsPssParams(asn1Params);
             this.outputStream = new ByteArrayOutputStream();
-        } else {
-            throw new SecurityException("unsupported signature algorithm "
-                    + PKCSObjectIdentifiers.id_RSASSA_PSS.getId() + " with " + hashAlgo);
         }
-
-        this.mechanism = tmpMechanism;
     }
 
     @Override
@@ -231,7 +239,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
 
     @Override
     public byte[] getSignature() {
-        if (mechanism == P11Constants.CKM_RSA_X_509) {
+        if (outputStream instanceof PSSSignerOutputStream) {
             try {
                 return ((PSSSignerOutputStream) outputStream).generateSignature();
             } catch (CryptoException ex) {
@@ -242,10 +250,10 @@ class P11RSAPSSContentSigner implements ContentSigner {
         }
 
         byte[] dataToSign;
-        if (mechanism == P11Constants.CKM_RSA_PKCS_PSS) {
-            dataToSign = ((DigestOutputStream) outputStream).digest();
-        } else {
+        if (outputStream instanceof ByteArrayOutputStream) {
             dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
+        } else {
+            dataToSign = ((DigestOutputStream) outputStream).digest();
         }
 
         try {

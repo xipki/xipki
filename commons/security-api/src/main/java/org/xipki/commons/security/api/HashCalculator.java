@@ -131,7 +131,6 @@ public class HashCalculator {
     }
 
     public static byte[] sha256(
-            final HashAlgoType hashAlgoType,
             final byte[] data) {
         return hash(HashAlgoType.SHA256, data);
     }
