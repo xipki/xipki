@@ -248,7 +248,7 @@ public class SignerUtil {
             final byte[] hashValue,
             final HashAlgoType mgfDigest,
             final int saltLen,
-            final int modulusBigLength,
+            final int modulusBitLength,
             final SecureRandom random)
     throws SecurityException {
         final int hLen = contentDigest.getLength();
@@ -261,7 +261,7 @@ public class SignerUtil {
                     + hashValue.length + " != " + hLen);
         }
 
-        int emBits = modulusBigLength - 1;
+        int emBits = modulusBitLength - 1;
         if (emBits < (8 * hLen + 8 * saltLen + 9)) {
             throw new IllegalArgumentException("key too small for specified hash and salt lengths");
         }

@@ -58,9 +58,9 @@ import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 
 public class Asn1EntityIdAndCert extends ASN1Object {
 
-    private Asn1P11EntityIdentifier entityId;
+    private final Asn1P11EntityIdentifier entityId;
 
-    private Certificate certificate;
+    private final Certificate certificate;
 
     public Asn1EntityIdAndCert(
             final Asn1P11EntityIdentifier entityId,
@@ -79,7 +79,8 @@ public class Asn1EntityIdAndCert extends ASN1Object {
         try {
             encoded = certificate.getEncoded();
         } catch (CertificateEncodingException ex) {
-            throw new IllegalArgumentException("could not encode certificate");
+            throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(),
+                    ex);
         }
         this.certificate = Certificate.getInstance(encoded);
     }
@@ -88,8 +89,9 @@ public class Asn1EntityIdAndCert extends ASN1Object {
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
-        this.entityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(0));
-        this.certificate = Asn1Util.getCertificate(seq.getObjectAt(1));
+        int idx = 0;
+        this.entityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
+        this.certificate = Asn1Util.getCertificate(seq.getObjectAt(idx++));
     }
 
     public static Asn1EntityIdAndCert getInstance(
@@ -108,7 +110,7 @@ public class Asn1EntityIdAndCert extends ASN1Object {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse object");
+            throw new BadAsn1ObjectException("unable to parse object: " + ex.getMessage(), ex);
         }
     }
 
@@ -124,18 +126,8 @@ public class Asn1EntityIdAndCert extends ASN1Object {
         return entityId;
     }
 
-    public void setEntityId(
-            final Asn1P11EntityIdentifier entityId) {
-        this.entityId = entityId;
-    }
-
     public Certificate getCertificate() {
         return certificate;
-    }
-
-    public void setCertificate(
-            final Certificate certificate) {
-        this.certificate = certificate;
     }
 
 }

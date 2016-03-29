@@ -55,10 +55,16 @@ import org.xipki.commons.common.util.ParamUtil;
 public class ServerCaps {
     public static final String KEY_versions = "versions";
 
+    public static final String KEY_readOnly = "readOnly";
+
     private final Set<Integer> versions;
 
+    private final boolean readOnly;
+
     public ServerCaps(
+            final boolean readOnly,
             final Set<Integer> versions) {
+        this.readOnly = readOnly;
         this.versions = ParamUtil.requireNonEmpty("versions", versions);
     }
 
@@ -82,6 +88,17 @@ public class ServerCaps {
         if (versions.isEmpty()) {
             throw new IllegalArgumentException("property versions is not specified");
         }
+
+        str = props.getProperty(KEY_readOnly);
+        if ("true".equalsIgnoreCase(str)) {
+            this.readOnly = true;
+        } else if ("false".equalsIgnoreCase(str)) {
+            this.readOnly = false;
+        } else if (str == null){
+            throw new IllegalArgumentException("property readOnly is not specified");
+        } else {
+            throw new IllegalArgumentException("invalid property readOnly '" + str + "'");
+        }
     }
 
     @Override
@@ -93,14 +110,20 @@ public class ServerCaps {
         return Collections.unmodifiableSet(versions);
     }
 
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
     public String getCaps() {
         Properties props = new Properties();
+
+        props.put(KEY_readOnly, Boolean.toString(readOnly));
         StringBuilder sb = new StringBuilder();
         for (Integer version : versions) {
             sb.append(version).append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
-        props.put("version", sb.toString());
+        props.put(KEY_versions, sb.toString());
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         try {
             props.store(bout, null);

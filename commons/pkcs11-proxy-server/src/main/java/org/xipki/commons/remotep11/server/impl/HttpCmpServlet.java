@@ -39,6 +39,7 @@ package org.xipki.commons.remotep11.server.impl;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
@@ -52,8 +53,10 @@ import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.pkcs11proxy.common.ServerCaps;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -84,15 +87,41 @@ public class HttpCmpServlet extends HttpServlet {
             final HttpServletResponse response)
     throws ServletException, IOException {
         String operation = request.getParameter("operation");
-        if (!"GetCaps".equalsIgnoreCase(operation)) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        } else {
-            String respText = responder.getServerCaps().getCaps();
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getOutputStream().write(respText.getBytes());
-            response.getOutputStream().flush();
+        try {
+            if (!"GetCaps".equalsIgnoreCase(operation)) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            } else {
+                if (localP11CryptServicePool == null) {
+                    LOG.error("localP11CryptService in servlet not configured");
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.setContentLength(0);
+                    return;
+                }
+
+                String moduleName = extractModuleName(request);
+                if (moduleName == null) {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+
+                boolean readOnly;
+                try {
+                    readOnly = localP11CryptServicePool.getP11CryptService(moduleName).getModule()
+                            .isReadOnly();
+                } catch (P11TokenException ex) {
+                    LOG.error("localP11CryptService in servlet not configured");
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    return;
+                }
+                ServerCaps serverCaps = new ServerCaps(readOnly, CmpResponder.getVersions());
+                String respText = serverCaps.getCaps();
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getOutputStream().write(respText.getBytes());
+                response.getOutputStream().flush();
+            }
+        } finally {
+            response.flushBuffer();
         }
-        response.flushBuffer();
     }
 
     @Override
@@ -101,16 +130,22 @@ public class HttpCmpServlet extends HttpServlet {
             final HttpServletResponse response)
     throws ServletException, IOException {
         try {
+            String moduleName = extractModuleName(request);
+            if (moduleName == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
             if (localP11CryptServicePool == null) {
                 LOG.error("localP11CryptService in servlet not configured");
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);
                 return;
             }
 
             if (!CT_REQUEST.equalsIgnoreCase(request.getContentType())) {
                 response.setContentLength(0);
-                response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+                response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
                 response.flushBuffer();
                 return;
             }
@@ -120,7 +155,7 @@ public class HttpCmpServlet extends HttpServlet {
                 pkiReq = generatePkiMessage(request.getInputStream());
             } catch (Exception ex) {
                 response.setContentLength(0);
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 final String message = "could not parse the request (PKIMessage)";
                 if (LOG.isErrorEnabled()) {
                     LOG.error(message + ", class={}, message={}", ex.getClass().getName(),
@@ -129,33 +164,6 @@ public class HttpCmpServlet extends HttpServlet {
                 LOG.debug(message, ex);
 
                 return;
-            }
-
-            // extract the module name
-            String moduleName = null;
-            String encodedUrl = request.getRequestURI();
-            String constructedPath = null;
-            if (encodedUrl != null) {
-                constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
-                String servletPath = request.getServletPath();
-                if (!servletPath.endsWith("/")) {
-                    servletPath += "/";
-                    if (servletPath.startsWith(constructedPath)) {
-                        moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
-                    }
-                }
-
-                int indexOf = constructedPath.indexOf(servletPath);
-                if (indexOf >= 0) {
-                    constructedPath = constructedPath.substring(indexOf + servletPath.length());
-                }
-            }
-
-            if (moduleName == null) {
-                int moduleNameEndIndex = constructedPath.indexOf('/');
-                moduleName = (moduleNameEndIndex == -1)
-                        ? constructedPath
-                        : constructedPath.substring(0, moduleNameEndIndex);
             }
 
             PKIMessage pkiResp = responder.processPkiMessage(localP11CryptServicePool,
@@ -170,17 +178,17 @@ public class HttpCmpServlet extends HttpServlet {
             final String message = "connection reset by peer";
             LOG.error(message + ". {}: {}", ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } catch (Throwable th) {
             LOG.error("Throwable thrown, this should not happen. {}: {}",
                     th.getClass().getName(), th.getMessage());
             LOG.debug("Throwable thrown, this should not happen.", th);
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
+        } finally {
+            response.flushBuffer();
         }
-
-        response.flushBuffer();
     } // method doPost
 
     protected PKIMessage generatePkiMessage(
@@ -207,4 +215,35 @@ public class HttpCmpServlet extends HttpServlet {
         this.localP11CryptServicePool = localP11CryptServicePool;
     }
 
+    private static String extractModuleName(
+            final HttpServletRequest request)
+    throws UnsupportedEncodingException {
+        String moduleName = null;
+        String encodedUrl = request.getRequestURI();
+        String constructedPath = null;
+        if (encodedUrl != null) {
+            constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
+            String servletPath = request.getServletPath();
+            if (!servletPath.endsWith("/")) {
+                servletPath += "/";
+                if (servletPath.startsWith(constructedPath)) {
+                    moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+                }
+            }
+
+            int indexOf = constructedPath.indexOf(servletPath);
+            if (indexOf >= 0) {
+                constructedPath = constructedPath.substring(indexOf + servletPath.length());
+            }
+        }
+
+        if (moduleName == null) {
+            int moduleNameEndIndex = constructedPath.indexOf('/');
+            moduleName = (moduleNameEndIndex == -1)
+                    ? constructedPath
+                    : constructedPath.substring(0, moduleNameEndIndex);
+        }
+
+        return moduleName;
+    }
 }

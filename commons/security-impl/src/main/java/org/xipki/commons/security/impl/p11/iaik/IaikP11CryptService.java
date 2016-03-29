@@ -85,7 +85,7 @@ final class IaikP11CryptService implements P11CryptService {
     public synchronized void refresh()
     throws P11TokenException {
         LOG.info("refreshing PKCS#11 module {}", moduleConf.getName());
-        IaikP11Module module = IaikP11ModulePool.getInstance().getModule(moduleConf);
+        this.module = IaikP11ModulePool.getInstance().getModule(moduleConf);
 
         List<P11SlotIdentifier> slotIds = module.getSlotIdentifiers();
         for (P11SlotIdentifier slotId : slotIds) {

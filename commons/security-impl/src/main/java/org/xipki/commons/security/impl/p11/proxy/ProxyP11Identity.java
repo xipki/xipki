@@ -86,12 +86,13 @@ class ProxyP11Identity extends P11Identity {
         }
 
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
-        ASN1Encodable asn1Param = null;
+        Asn1P11Params p11Param = null;
         if (parameters instanceof P11RSAPkcsPssParams) {
-            asn1Param = new Asn1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters);
+            p11Param = new Asn1P11Params(
+                    new Asn1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters));
         }
         Asn1SignTemplate signTemplate = new Asn1SignTemplate(asn1EntityId, mechanism,
-                new Asn1P11Params(asn1Param), content);
+                p11Param, content);
         ProxyP11Module module = ProxyP11ModulePool.getInstance().getModule(moduleName);
         if (module == null) {
             throw new P11TokenException("could not find RemoteP11Module '" + moduleName + "'");
