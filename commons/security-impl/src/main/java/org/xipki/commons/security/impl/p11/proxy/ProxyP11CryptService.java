@@ -36,19 +36,16 @@
 
 package org.xipki.commons.security.impl.p11.proxy;
 
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.Set;
 
-import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
  * @author Lijun Liao
@@ -93,43 +90,11 @@ class ProxyP11CryptService implements P11CryptService {
     }
 
     @Override
-    public byte[] sign(
-            final P11EntityIdentifier identityId,
-            final long mechanism,
-            final P11Params parameters,
-            final byte[] content)
-    throws P11TokenException, SecurityException {
-        P11Identity identity =
-                module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
-        return identity.sign(mechanism, parameters, content);
-    }
-
-    @Override
-    public PublicKey getPublicKey(
+    public P11Identity getIdentity(
             final P11EntityIdentifier identityId)
     throws P11TokenException {
-        P11Identity identity =
-                module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
-        return identity.getPublicKey();
-    }
-
-    @Override
-    public X509Certificate getCertificate(
-            final P11EntityIdentifier identityId)
-    throws P11TokenException {
-        X509Certificate[] certs = getCertificates(identityId);
-        return (certs == null || certs.length < 1)
-                ? null
-                : certs[0];
-    }
-
-    @Override
-    public X509Certificate[] getCertificates(
-            final P11EntityIdentifier identityId)
-    throws P11TokenException {
-        P11Identity identity =
-                module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
-        return identity.getCertificateChain();
+        ParamUtil.requireNonNull("identityId", identityId);
+        return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
     }
 
 }

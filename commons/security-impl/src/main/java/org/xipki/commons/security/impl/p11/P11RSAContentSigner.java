@@ -169,7 +169,7 @@ class P11RSAContentSigner implements ContentSigner {
             this.outputStream = new ByteArrayOutputStream();
         }
 
-        RSAPublicKey rsaPubKey = (RSAPublicKey) cryptService.getPublicKey(identityId);
+        RSAPublicKey rsaPubKey = (RSAPublicKey) cryptService.getIdentity(identityId).getPublicKey();
         this.modulusBitLen = rsaPubKey.getModulus().bitLength();
     }
 
@@ -207,7 +207,7 @@ class P11RSAContentSigner implements ContentSigner {
                 dataToSign = SignerUtil.EMSA_PKCS1_v1_5_encoding(dataToSign, modulusBitLen);
             }
 
-            return cryptService.sign(identityId, mechanism, null, dataToSign);
+            return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
         } catch (SecurityException | P11TokenException ex) {
             final String message = "could not sign";
             if (LOG.isErrorEnabled()) {

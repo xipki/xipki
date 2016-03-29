@@ -36,8 +36,6 @@
 
 package org.xipki.commons.security.impl.p11.iaik;
 
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,17 +45,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
-import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
  * @author Lijun Liao
@@ -132,33 +127,7 @@ final class IaikP11CryptService implements P11CryptService {
     }
 
     @Override
-    public byte[] sign(
-            final P11EntityIdentifier identityId,
-            final long mechanism,
-            final P11Params parameters,
-            final byte[] content)
-    throws P11TokenException, SecurityException {
-        if (!supportsMechanism(identityId.getSlotId(), mechanism)) {
-            throw new P11UnsupportedMechanismException(mechanism, identityId.getSlotId());
-        }
-        return getNonnullIdentity(identityId).sign(mechanism, parameters, content);
-    }
-
-    @Override
-    public PublicKey getPublicKey(
-            final P11EntityIdentifier identityId)
-    throws P11TokenException {
-        return getNonnullIdentity(identityId).getPublicKey();
-    }
-
-    @Override
-    public X509Certificate getCertificate(
-            final P11EntityIdentifier identityId)
-    throws P11TokenException {
-        return getNonnullIdentity(identityId).getCertificate();
-    }
-
-    private P11Identity getNonnullIdentity(
+    public P11Identity getIdentity(
             final P11EntityIdentifier identityId)
     throws P11TokenException {
         ParamUtil.requireNonNull("identityId", identityId);
@@ -168,13 +137,6 @@ final class IaikP11CryptService implements P11CryptService {
     @Override
     public String toString() {
         return moduleConf.toString();
-    }
-
-    @Override
-    public X509Certificate[] getCertificates(
-            final P11EntityIdentifier identityId)
-    throws P11TokenException {
-        return getNonnullIdentity(identityId).getCertificateChain();
     }
 
     static synchronized IaikP11CryptService getInstance(
