@@ -54,6 +54,7 @@ import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
@@ -114,12 +115,15 @@ class ProxyP11Module extends AbstractP11Module {
 
     private URL getCapsUrl;
 
+    private boolean readOnly;
+
     ProxyP11Module(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         super(moduleConf);
 
-        String urlStr = moduleConf.getNativeLibrary();
+        ConfPairs confPairs = new ConfPairs(moduleConf.getNativeLibrary());
+        String urlStr = confPairs.getValue("url");
         try {
             serverUrl = new URL(urlStr);
         } catch (MalformedURLException ex) {
@@ -135,6 +139,11 @@ class ProxyP11Module extends AbstractP11Module {
         refresh();
     }
 
+    @Override
+    public boolean isReadOnly() {
+        return readOnly || super.isReadOnly();
+    }
+
     void refresh()
     throws P11TokenException {
         ServerCaps caps = getServerCaps();
@@ -144,6 +153,7 @@ class ProxyP11Module extends AbstractP11Module {
             throw new P11TokenException(
                     "Server does not support any version supported by the client");
         }
+        this.readOnly = caps.isReadOnly();
 
         ASN1Encodable resp = send(P11ProxyConstants.ACTION_getSlotIds, null);
         if (!(resp instanceof ASN1Sequence)) {
@@ -169,7 +179,7 @@ class ProxyP11Module extends AbstractP11Module {
                 continue;
             }
 
-            P11Slot slot = new ProxyP11Slot(getName(), slotId, moduleConf.isReadOnly(),
+            P11Slot slot = new ProxyP11Slot(this, slotId, moduleConf.isReadOnly(),
                     moduleConf.getP11MechanismFilter());
             if (moduleConf.isSlotIncluded(slotId)) {
                 slots.add(slot);
@@ -256,6 +266,8 @@ class ProxyP11Module extends AbstractP11Module {
         vec.add(new ASN1Integer(action));
         if (content != null) {
             vec.add(content);
+        } else {
+            vec.add(DERNull.INSTANCE);
         }
         InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
                 new DERSequence(vec));

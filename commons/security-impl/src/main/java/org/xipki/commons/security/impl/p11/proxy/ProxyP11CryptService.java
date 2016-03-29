@@ -62,7 +62,7 @@ class ProxyP11CryptService implements P11CryptService {
     ProxyP11CryptService(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
-        this.module = new ProxyP11Module(moduleConf);
+        this.module = ProxyP11ModulePool.getInstance().getModule(moduleConf);
     }
 
     @Override

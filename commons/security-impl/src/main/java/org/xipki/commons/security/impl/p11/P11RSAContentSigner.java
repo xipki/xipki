@@ -112,36 +112,51 @@ class P11RSAContentSigner implements ContentSigner {
 
         ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
         HashAlgoType hashAlgo;
-        long tmpMechanism;
         if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid)) {
             hashAlgo = HashAlgoType.SHA1;
-            tmpMechanism = P11Constants.CKM_SHA1_RSA_PKCS;
         } else if (PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid)) {
             hashAlgo = HashAlgoType.SHA224;
-            tmpMechanism = P11Constants.CKM_SHA224_RSA_PKCS;
         } else if (PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid)) {
             hashAlgo = HashAlgoType.SHA256;
-            tmpMechanism = P11Constants.CKM_SHA256_RSA_PKCS;
         } else if (PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid)) {
             hashAlgo = HashAlgoType.SHA384;
-            tmpMechanism = P11Constants.CKM_SHA384_RSA_PKCS;
         } else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid)) {
             hashAlgo = HashAlgoType.SHA512;
-            tmpMechanism = P11Constants.CKM_SHA512_RSA_PKCS;
         } else {
             throw new SecurityException("unsupported signature algorithm " + algOid.getId());
         }
 
         P11SlotIdentifier slotId = identityId.getSlotId();
         if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_PKCS)) {
-            tmpMechanism = P11Constants.CKM_RSA_PKCS;
+            this.mechanism = P11Constants.CKM_RSA_PKCS;
         } else if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_X_509)) {
-            tmpMechanism = P11Constants.CKM_RSA_X_509;
-        } else if (!cryptService.supportsMechanism(slotId, tmpMechanism)) {
-            throw new SecurityException("unsupported signature algorithm " + algOid.getId());
-        }
+            this.mechanism = P11Constants.CKM_RSA_X_509;
+        } else {
+            switch (hashAlgo) {
+            case SHA1:
+                this.mechanism = P11Constants.CKM_SHA1_RSA_PKCS_PSS;
+                break;
+            case SHA224:
+                this.mechanism = P11Constants.CKM_SHA224_RSA_PKCS_PSS;
+                break;
+            case SHA256:
+                this.mechanism = P11Constants.CKM_SHA256_RSA_PKCS_PSS;
+                break;
+            case SHA384:
+                this.mechanism = P11Constants.CKM_SHA384_RSA_PKCS_PSS;
+                break;
+            case SHA512:
+                this.mechanism = P11Constants.CKM_SHA512_RSA_PKCS_PSS;
+                break;
+            default:
+                throw new RuntimeException("should not reach here, unknown HashAlgoType "
+                        + hashAlgo);
+            }
 
-        this.mechanism = tmpMechanism;
+            if (!cryptService.supportsMechanism(slotId, this.mechanism)) {
+                throw new SecurityException("unsupported signature algorithm " + algOid.getId());
+            }
+        }
 
         if (mechanism == P11Constants.CKM_RSA_PKCS || mechanism == P11Constants.CKM_RSA_X_509) {
             this.digestPkcsPrefix = digestPkcsPrefixMap.get(hashAlgo);

@@ -37,6 +37,7 @@
 package org.xipki.commons.pkcs11proxy.common;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -59,7 +60,7 @@ import org.xipki.commons.security.api.BadAsn1ObjectException;
 
 public class Asn1P11ObjectIdentifiers extends ASN1Object {
 
-    private List<Asn1P11ObjectIdentifier> objectIds;
+    private final List<Asn1P11ObjectIdentifier> objectIds;
 
     public Asn1P11ObjectIdentifiers(
             final List<Asn1P11ObjectIdentifier> objectIds) {
@@ -69,6 +70,7 @@ public class Asn1P11ObjectIdentifiers extends ASN1Object {
     private Asn1P11ObjectIdentifiers(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
+        this.objectIds = new LinkedList<>();
         final int size = seq.size();
         for (int i = 0; i < size; i++) {
             objectIds.add(Asn1P11ObjectIdentifier.getInstance(seq.getObjectAt(i)));
@@ -91,7 +93,8 @@ public class Asn1P11ObjectIdentifiers extends ASN1Object {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object");
+            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+                    ex);
         }
     }
 

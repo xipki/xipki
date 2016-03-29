@@ -19,15 +19,15 @@ xipki-cmd:rm -r -f output
 source ./xipki/demo/demo.d/p11-rm-keys.script
 
 xipki-tk:rsa \
-  --slot 1 \
+  --slot 0 \
   --label $RCA_KEY_LABEL
 
 xipki-tk:rsa \
-  --slot 1 \
+  --slot 0 \
   --label $SubCA_KEY_LABEL
 
 xipki-tk:rsa \
-  --slot 1 \
+  --slot 0 \
   --label $SubCAwithCRL_KEY_LABEL
 
 feature:uninstall xipki-security-shell

@@ -53,8 +53,6 @@ import org.xipki.commons.security.api.p11.P11Constants;
 // CHECKSTYLE:SKIP
 public class P11RSAPkcsPssParams implements P11Params {
 
-    public static final BigInteger IMPLICIT_TRAILER = BigInteger.valueOf(0x00BC);
-
     private final long hashAlgorithm;
 
     private final long maskGenerationFunction;
@@ -83,7 +81,7 @@ public class P11RSAPkcsPssParams implements P11Params {
         if (!PKCSObjectIdentifiers.id_mgf1.equals(asn1Oid)) {
             throw new IllegalArgumentException("unsupported MGF algorithm " + asn1Oid.getId());
         }
-        
+
         asn1Oid = AlgorithmIdentifier.getInstance(mga.getParameters()).getAlgorithm();
         HashAlgoType mgfHashAlgo = HashAlgoType.getHashAlgoType(asn1Oid);
         if (mgfHashAlgo == null) {
@@ -91,7 +89,7 @@ public class P11RSAPkcsPssParams implements P11Params {
         }
         this.saltLength = asn1Params.getSaltLength().longValue();
         BigInteger trailerField = asn1Params.getTrailerField();
-        if (!IMPLICIT_TRAILER.equals(trailerField)) {
+        if (!RSASSAPSSparams.DEFAULT_TRAILER_FIELD.getValue().equals(trailerField)) {
             throw new IllegalArgumentException("unsupported trailerField " + trailerField);
         }
 

@@ -63,7 +63,7 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 public class Asn1P11SlotIdentifier extends ASN1Object {
 
-    private P11SlotIdentifier slotId;
+    private final P11SlotIdentifier slotId;
 
     public Asn1P11SlotIdentifier(
             final P11SlotIdentifier slotId) {
@@ -74,8 +74,9 @@ public class Asn1P11SlotIdentifier extends ASN1Object {
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
-        long id = Asn1Util.getInteger(seq.getObjectAt(0)).longValue();
-        int index = Asn1Util.getInteger(seq.getObjectAt(1)).intValue();
+        int idx = 0;
+        long id = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
+        int index = Asn1Util.getInteger(seq.getObjectAt(idx++)).intValue();
         this.slotId = new P11SlotIdentifier(index, id);
     }
 
@@ -95,7 +96,8 @@ public class Asn1P11SlotIdentifier extends ASN1Object {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object");
+            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+                    ex);
         }
     }
 

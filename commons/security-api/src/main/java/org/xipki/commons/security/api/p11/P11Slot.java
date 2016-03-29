@@ -116,6 +116,11 @@ public interface P11Slot {
             @Nonnull X509Certificate cert)
     throws P11TokenException, SecurityException;
 
+    void addCert(
+            @Nonnull P11ObjectIdentifier objectId,
+            @Nonnull X509Certificate cert)
+    throws P11TokenException, SecurityException;
+
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateRSAKeypair(
             int keysize,

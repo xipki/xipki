@@ -41,6 +41,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -81,12 +82,12 @@ import org.xipki.commons.pkcs11proxy.common.Asn1GenECKeypairParams;
 import org.xipki.commons.pkcs11proxy.common.Asn1GenRSAKeypairParams;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11EntityIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11ObjectIdentifier;
+import org.xipki.commons.pkcs11proxy.common.Asn1P11Params;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11SlotIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1RSAPkcsPssParams;
 import org.xipki.commons.pkcs11proxy.common.Asn1SignTemplate;
 import org.xipki.commons.pkcs11proxy.common.Asn1Util;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
-import org.xipki.commons.pkcs11proxy.common.ServerCaps;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityException;
@@ -110,20 +111,23 @@ import org.xipki.commons.security.api.util.KeyUtil;
 class CmpResponder {
     private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
 
+    private static Set<Integer> versions;
+
     private final SecureRandom random = new SecureRandom();
 
     private final GeneralName sender = P11ProxyConstants.REMOTE_P11_CMP_SERVER;
 
-    private final ServerCaps serverCaps;
-
-    CmpResponder() {
-        Set<Integer> versions = new HashSet<>(2);
-        versions.add(1);
-        this.serverCaps = new ServerCaps(versions);
+    static {
+        Set<Integer> vers = new HashSet<>(2);
+        vers.add(1);
+        versions = Collections.unmodifiableSet(vers);
     }
 
-    ServerCaps getServerCaps() {
-        return serverCaps;
+    CmpResponder() {
+    }
+
+    public static Set<Integer> getVersions() {
+        return versions;
     }
 
     PKIMessage processPkiMessage(
@@ -188,9 +192,15 @@ class CmpResponder {
         try {
             return doProcessPkiMessage(p11CryptServicePool, moduleName, itv, respHeader);
         } catch (BadAsn1ObjectException ex) {
+            LOG.error("could not process CMP message {}, message: {}", tidStr, ex.getMessage());
+            LOG.debug("could not process CMP message " + tidStr, ex);
+
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                     ex.getMessage());
         } catch (P11TokenException ex) {
+            LOG.error("could not process CMP message {}, message: {}", tidStr, ex.getMessage());
+            LOG.debug("could not process CMP message " + tidStr, ex);
+
             String p11ErrorType;
             if (ex instanceof P11UnknownEntityException) {
                 p11ErrorType = P11ProxyConstants.ERROR_UNKNOWN_ENTITY;
@@ -217,7 +227,7 @@ class CmpResponder {
             LOG.error("could not process CMP message {}, message: {}", tidStr, th.getMessage());
             LOG.debug("could not process CMP message " + tidStr, th);
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.systemFailure,
-                    th.getMessage());
+                    "SYSTEM_FAILURE");
         }
     } // method processPkiMessage
 
@@ -241,19 +251,25 @@ class CmpResponder {
             Asn1EntityIdAndCert asn1 = Asn1EntityIdAndCert.getInstance(reqValue);
             P11Slot slot = getSlot(p11CryptService, asn1.getEntityId());
             X509Certificate cert = new X509CertificateObject(asn1.getCertificate());
-            slot.addCert(cert);
+            slot.addCert(asn1.getEntityId().getObjectId().getObjectId(), cert);
         } else if (P11ProxyConstants.ACTION_genKeypair_DSA == action) {
             Asn1GenDSAKeypairParams asn1 = Asn1GenDSAKeypairParams.getInstance(reqValue);
             P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
-            slot.generateDSAKeypair(asn1.getP(), asn1.getQ(), asn1.getG(), asn1.getLabel());
+            P11ObjectIdentifier keyId = slot.generateDSAKeypair(asn1.getP(), asn1.getQ(),
+                    asn1.getG(), asn1.getLabel());
+            respItvInfoValue = new Asn1P11EntityIdentifier(asn1.getSlotId().getSlotId(), keyId);
         } else if (P11ProxyConstants.ACTION_genKeypair_EC == action) {
             Asn1GenECKeypairParams asn1 = Asn1GenECKeypairParams.getInstance(reqValue);
             P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
-            slot.generateECKeypair(asn1.getCurveId().getId(), asn1.getLabel());
+            P11ObjectIdentifier keyId = slot.generateECKeypair(asn1.getCurveId().getId(),
+                    asn1.getLabel());
+            respItvInfoValue = new Asn1P11EntityIdentifier(asn1.getSlotId().getSlotId(), keyId);
         } else if (P11ProxyConstants.ACTION_genKeypair_RSA == action) {
             Asn1GenRSAKeypairParams asn1 = Asn1GenRSAKeypairParams.getInstance(reqValue);
             P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
-            slot.generateRSAKeypair(asn1.getKeysize(), asn1.getPublicExponent(), asn1.getLabel());
+            P11ObjectIdentifier keyId = slot.generateRSAKeypair(asn1.getKeysize(),
+                    asn1.getPublicExponent(), asn1.getLabel());
+            respItvInfoValue = new Asn1P11EntityIdentifier(asn1.getSlotId().getSlotId(), keyId);
         } else if (P11ProxyConstants.ACTION_getCertificate == action) {
             P11EntityIdentifier entityId =
                     Asn1P11EntityIdentifier.getInstance(reqValue).getEntityId();
@@ -310,7 +326,11 @@ class CmpResponder {
         } else if (P11ProxyConstants.ACTION_sign == action) {
             Asn1SignTemplate signTemplate = Asn1SignTemplate.getInstance(reqValue);
             long mechanism = signTemplate.getMechanism().getMechanism();
-            ASN1Encodable asn1Params = signTemplate.getMechanism().getParams().getP11Params();
+            Asn1P11Params tmpParams = signTemplate.getMechanism().getParams();
+            ASN1Encodable asn1Params = null;
+            if (tmpParams != null) {
+                asn1Params = tmpParams.getP11Params();
+            }
             P11Params params = null;
             if (asn1Params instanceof Asn1RSAPkcsPssParams) {
                 params = ((Asn1RSAPkcsPssParams) asn1Params).getPkcsPssParams();
@@ -376,9 +396,9 @@ class CmpResponder {
 
     private P11Slot getSlot(
             final P11CryptService p11Service,
-            final P11SlotIdentifier slotId)
+            final Asn1P11SlotIdentifier slotId)
     throws P11TokenException {
-        return p11Service.getModule().getSlot(slotId);
+        return p11Service.getModule().getSlot(slotId.getSlotId());
     }
 
 }

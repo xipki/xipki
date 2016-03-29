@@ -8,6 +8,11 @@
           <path>url=https://localhost:9443/p11proxy/default</path>
         </nativeLibrary>
       </nativeLibraries>
+      <includeSlots>
+        <slot>
+          <index>0</index>
+        </slot>
+      </includeSlots>
       <readonly>false</readonly>
     </module>
   </modules>

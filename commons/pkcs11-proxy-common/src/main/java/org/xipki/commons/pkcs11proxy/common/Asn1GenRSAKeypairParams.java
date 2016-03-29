@@ -48,7 +48,6 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
  *
@@ -67,16 +66,16 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 // CHECKSTYLE:SKIP
 public class Asn1GenRSAKeypairParams extends ASN1Object {
 
-    private P11SlotIdentifier slotId;
+    private final Asn1P11SlotIdentifier slotId;
 
-    private String label;
+    private final String label;
 
-    private int keysize;
+    private final int keysize;
 
-    private BigInteger publicExponent;
+    private final BigInteger publicExponent;
 
     public Asn1GenRSAKeypairParams(
-            final P11SlotIdentifier slotId,
+            final Asn1P11SlotIdentifier slotId,
             final String label,
             final int keysize,
             final BigInteger publicExponent) {
@@ -92,7 +91,7 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
         Asn1Util.requireRange(seq, 3, 4);
         final int size = seq.size();
         int idx = 0;
-        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getSlotId();
+        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
         label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
         ParamUtil.requireNonBlank("label", label);
 
@@ -101,6 +100,8 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
 
         if (size > 3) {
             publicExponent = Asn1Util.getInteger(seq.getObjectAt(idx++));
+        } else {
+            publicExponent = null;
         }
     }
 
@@ -120,13 +121,15 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object");
+            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+                    ex);
         }
     }
 
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
+        vector.add(slotId);
         vector.add(new DERUTF8String(label));
         vector.add(new ASN1Integer(keysize));
         if (publicExponent != null) {
@@ -135,7 +138,7 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
         return new DERSequence(vector);
     }
 
-    public P11SlotIdentifier getSlotId() {
+    public Asn1P11SlotIdentifier getSlotId() {
         return slotId;
     }
 

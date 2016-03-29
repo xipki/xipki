@@ -7,11 +7,11 @@ sleep 1000
 xipki-cmd:rm -r -f output
 
 xipki-tk:delete-key \
-  --slot 1 \
+  --slot 0 \
   --label $RCA_KEY_LABEL
 
 xipki-tk:rsa \
-  --slot 1 \
+  --slot 0 \
   --label $RCA_KEY_LABEL
 
 source ./xipki/demo/demo.d/initdb.script

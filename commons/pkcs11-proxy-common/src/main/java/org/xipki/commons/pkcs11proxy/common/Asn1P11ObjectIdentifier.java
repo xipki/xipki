@@ -64,7 +64,7 @@ import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 
 public class Asn1P11ObjectIdentifier extends ASN1Object {
 
-    private P11ObjectIdentifier objectId;
+    private final P11ObjectIdentifier objectId;
 
     public Asn1P11ObjectIdentifier(
             final P11ObjectIdentifier objectId) {
@@ -75,8 +75,9 @@ public class Asn1P11ObjectIdentifier extends ASN1Object {
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
-        byte[] id = Asn1Util.getOctetStringBytes(seq.getObjectAt(0));
-        String label = Asn1Util.getUtf8String(seq.getObjectAt(1));
+        int idx = 0;
+        byte[] id = Asn1Util.getOctetStringBytes(seq.getObjectAt(idx++));
+        String label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
         this.objectId = new P11ObjectIdentifier(id, label);
     }
 
@@ -96,7 +97,8 @@ public class Asn1P11ObjectIdentifier extends ASN1Object {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object");
+            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+                    ex);
         }
     }
 
