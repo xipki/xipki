@@ -36,8 +36,6 @@
 
 package org.xipki.commons.security.impl.p11.keystore;
 
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,18 +45,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.parameters.P11Params;
-
-import iaik.pkcs.pkcs11.wrapper.PKCS11RuntimeException;
 
 /**
  * @author Lijun Liao
@@ -137,59 +131,6 @@ class KeystoreP11CryptService implements P11CryptService {
     }
 
     @Override
-    public byte[] sign(
-            final P11EntityIdentifier identityId,
-            final long mechanism,
-            final P11Params parameters,
-            final byte[] content)
-    throws SecurityException, P11TokenException {
-        if (!supportsMechanism(identityId.getSlotId(), mechanism)) {
-            throw new P11TokenException("mechanism " + mechanism + " is not supported by slot"
-                    + identityId.getSlotId());
-        }
-
-        try {
-            return getNonnullEntity(identityId).sign(mechanism, parameters, content);
-        } catch (PKCS11RuntimeException ex) {
-            final String message = "could not sign";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
-            LOG.debug(message, ex);
-            throw new P11TokenException("PKCS11RuntimeException: " + ex.getMessage(), ex);
-        }
-    }
-
-    @Override
-    public PublicKey getPublicKey(
-            final P11EntityIdentifier identityId)
-    throws P11TokenException {
-        return getNonnullEntity(identityId).getPublicKey();
-    }
-
-    @Override
-    public X509Certificate getCertificate(
-            final P11EntityIdentifier identityId)
-    throws P11TokenException {
-        return getNonnullEntity(identityId).getCertificate();
-    }
-
-    @Override
-    public X509Certificate[] getCertificates(
-            final P11EntityIdentifier identityId)
-    throws P11TokenException {
-        return getNonnullEntity(identityId).getCertificateChain();
-    }
-
-    private P11Identity getNonnullEntity(
-            final P11EntityIdentifier identityId)
-    throws P11TokenException {
-        ParamUtil.requireNonNull("identityId", identityId);
-        return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
-    }
-
-    @Override
     public String toString() {
         return moduleConf.toString();
     }
@@ -223,6 +164,14 @@ class KeystoreP11CryptService implements P11CryptService {
             final long mechanism)
     throws P11TokenException {
         return module.getSlot(slotId).supportsMechanism(mechanism);
+    }
+
+    @Override
+    public P11Identity getIdentity(
+            final P11EntityIdentifier identityId)
+    throws P11TokenException {
+        ParamUtil.requireNonNull("identityId", identityId);
+        return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
     }
 
 }

@@ -75,7 +75,7 @@ public class P11PrivateKey implements PrivateKey {
         this.p11CryptService = ParamUtil.requireNonNull("identityId", p11CryptService);
         this.identityId = ParamUtil.requireNonNull("entityId", identityId);
 
-        PublicKey publicKey = p11CryptService.getPublicKey(identityId);
+        PublicKey publicKey = p11CryptService.getIdentity(identityId).getPublicKey();
 
         if (publicKey instanceof RSAPublicKey) {
             algorithm = "RSA";
@@ -124,7 +124,7 @@ public class P11PrivateKey implements PrivateKey {
             @Nullable P11Params parameters,
             byte[] content)
     throws SecurityException, P11TokenException {
-        return p11CryptService.sign(identityId, mechanism, parameters, content);
+        return p11CryptService.getIdentity(identityId).sign(mechanism, parameters, content);
     }
 
     P11CryptService getP11CryptService() {

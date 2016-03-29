@@ -94,7 +94,7 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
 
         RSAPublicKey key;
         try {
-            key = (RSAPublicKey) p11CryptService.getPublicKey(identityId);
+            key = (RSAPublicKey) p11CryptService.getIdentity(identityId).getPublicKey();
         } catch (P11TokenException ex) {
             throw new InvalidKeyException(ex.getMessage(), ex);
         }
