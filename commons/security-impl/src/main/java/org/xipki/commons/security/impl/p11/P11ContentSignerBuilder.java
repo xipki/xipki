@@ -57,6 +57,7 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.X509Util;
@@ -90,12 +91,13 @@ public class P11ContentSignerBuilder {
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
 
-        X509Certificate signerCertInP11 = cryptService.getCertificate(identityId);
+        P11Identity identity = cryptService.getIdentity(identityId);
+        X509Certificate signerCertInP11 = identity.getCertificate();
         PublicKey publicKeyInP11;
         if (signerCertInP11 != null) {
             publicKeyInP11 = signerCertInP11.getPublicKey();
         } else {
-            publicKeyInP11 = cryptService.getPublicKey(identityId);
+            publicKeyInP11 = identity.getPublicKey();
         }
 
         if (publicKeyInP11 == null) {
@@ -123,7 +125,7 @@ public class P11ContentSignerBuilder {
         }
 
         if (cert != null) {
-            Certificate[] certsInKeystore = cryptService.getCertificates(identityId);
+            Certificate[] certsInKeystore = identity.getCertificateChain();
             if (certsInKeystore != null && certsInKeystore.length > 1) {
                 for (int i = 1; i < certsInKeystore.length; i++) {
                     caCerts.add(certsInKeystore[i]);

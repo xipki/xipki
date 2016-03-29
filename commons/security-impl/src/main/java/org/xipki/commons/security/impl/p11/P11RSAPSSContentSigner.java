@@ -257,7 +257,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
         }
 
         try {
-            return cryptService.sign(identityId, mechanism, parameters, dataToSign);
+            return cryptService.getIdentity(identityId).sign(mechanism, parameters, dataToSign);
         } catch (SecurityException | P11TokenException ex) {
             LOG.warn("could not sign: {}", ex.getMessage());
             LOG.debug("could not sign", ex);

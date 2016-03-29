@@ -94,6 +94,7 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11DuplicateEntityException;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -273,7 +274,7 @@ class CmpResponder {
         } else if (P11ProxyConstants.ACTION_getCertificate == action) {
             P11EntityIdentifier entityId =
                     Asn1P11EntityIdentifier.getInstance(reqValue).getEntityId();
-            X509Certificate cert = p11CryptService.getCertificate(entityId);
+            X509Certificate cert = p11CryptService.getIdentity(entityId).getCertificate();
             respItvInfoValue = Certificate.getInstance(cert.getEncoded());
         } else if (P11ProxyConstants.ACTION_getCertIdentifiers == action
                 || P11ProxyConstants.ACTION_getIdentityIdentifiers == action) {
@@ -301,7 +302,7 @@ class CmpResponder {
         } else if (P11ProxyConstants.ACTION_getPublicKey == action) {
             P11EntityIdentifier identityId =
                     Asn1P11EntityIdentifier.getInstance(reqValue).getEntityId();
-            PublicKey pubKey = p11CryptService.getPublicKey(identityId);
+            PublicKey pubKey = p11CryptService.getIdentity(identityId).getPublicKey();
             if (pubKey == null) {
                 throw new P11UnknownEntityException(identityId);
             }
@@ -339,8 +340,9 @@ class CmpResponder {
             }
 
             byte[] content = signTemplate.getMessage();
-            byte[] signature = p11CryptService.sign(signTemplate.getIdentityId().getEntityId(),
-                    mechanism, params, content);
+            P11Identity identity = p11CryptService.getIdentity(
+                    signTemplate.getIdentityId().getEntityId());
+            byte[] signature = identity.sign(mechanism, params, content);
             respItvInfoValue = new DEROctetString(signature);
         } else if (P11ProxyConstants.ACTION_updateCerificate == action) {
             Asn1EntityIdAndCert asn1 = Asn1EntityIdAndCert.getInstance(reqValue);

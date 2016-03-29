@@ -185,7 +185,7 @@ class P11DSAContentSigner implements ContentSigner {
             ((DigestOutputStream) outputStream).reset();
         }
 
-        return cryptService.sign(identityId, mechanism, null, dataToSign);
+        return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
     }
 
 }
