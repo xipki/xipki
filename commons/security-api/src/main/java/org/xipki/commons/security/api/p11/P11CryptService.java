@@ -36,15 +36,9 @@
 
 package org.xipki.commons.security.api.p11;
 
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
  * @author Lijun Liao
@@ -56,6 +50,9 @@ public interface P11CryptService {
     void refresh()
     throws P11TokenException;
 
+    P11Module getModule()
+    throws P11TokenException;
+
     Set<Long> getMechanisms(
             @Nonnull P11SlotIdentifier slotId)
     throws P11TokenException;
@@ -65,25 +62,7 @@ public interface P11CryptService {
             long mechanism)
     throws P11TokenException;
 
-    P11Module getModule()
-    throws P11TokenException;
-
-    byte[] sign(
-            @Nonnull P11EntityIdentifier identityId,
-            long mechanism,
-            @Nullable P11Params parameters,
-            byte[] content)
-    throws P11TokenException, SecurityException;
-
-    PublicKey getPublicKey(
-            @Nonnull P11EntityIdentifier identityId)
-    throws P11TokenException;
-
-    X509Certificate getCertificate(
-            @Nonnull P11EntityIdentifier identityId)
-    throws P11TokenException;
-
-    X509Certificate[] getCertificates(
+    P11Identity getIdentity(
             @Nonnull P11EntityIdentifier identityId)
     throws P11TokenException;
 
