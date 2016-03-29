@@ -68,6 +68,11 @@ public abstract class AbstractP11Module implements P11Module {
         return moduleConf.getName();
     }
 
+    @Override
+    public boolean isReadOnly() {
+        return moduleConf.isReadOnly();
+    }
+
     protected void setSlots(
             final Set<P11Slot> slots) {
         this.slots.clear();

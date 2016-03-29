@@ -45,9 +45,9 @@ import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 /**
  *
@@ -67,18 +67,18 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 // CHECKSTYLE:SKIP
 public class Asn1GenDSAKeypairParams extends ASN1Object {
 
-    private P11SlotIdentifier slotId;
+    private final Asn1P11SlotIdentifier slotId;
 
-    private String label;
+    private final String label;
 
-    private BigInteger p;
+    private final BigInteger p;
 
-    private BigInteger q;
+    private final BigInteger q;
 
-    private BigInteger g;
+    private final BigInteger g;
 
     public Asn1GenDSAKeypairParams(
-            final P11SlotIdentifier slotId,
+            final Asn1P11SlotIdentifier slotId,
             final String label,
             final BigInteger p,
             final BigInteger q,
@@ -93,9 +93,10 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
     private Asn1GenDSAKeypairParams(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 4, 4);
+        Asn1Util.requireRange(seq, 5, 5);
         int idx = 0;
-        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getSlotId();
+        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
+        label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
         p = Asn1Util.getInteger(seq.getObjectAt(idx++));
         q = Asn1Util.getInteger(seq.getObjectAt(idx++));
         g = Asn1Util.getInteger(seq.getObjectAt(idx++));
@@ -117,21 +118,23 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object");
+            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+                    ex);
         }
     }
 
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(new Asn1P11SlotIdentifier(slotId));
+        vector.add(slotId);
+        vector.add(new DERUTF8String(label));
         vector.add(new ASN1Integer(p));
         vector.add(new ASN1Integer(q));
         vector.add(new ASN1Integer(g));
         return new DERSequence(vector);
     }
 
-    public P11SlotIdentifier getSlotId() {
+    public Asn1P11SlotIdentifier getSlotId() {
         return slotId;
     }
 

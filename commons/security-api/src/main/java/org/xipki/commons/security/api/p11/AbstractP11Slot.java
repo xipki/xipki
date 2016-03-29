@@ -501,8 +501,12 @@ public abstract class AbstractP11Slot implements P11Slot {
         ParamUtil.requireNonNull("cert", cert);
         assertWritable("addCert");
 
-        X509Cert x509Cert = new X509Cert(cert);
-        byte[] encodedCert = x509Cert.getEncodedCert();
+        byte[] encodedCert;
+        try {
+            encodedCert = cert.getEncoded();
+        } catch (CertificateEncodingException ex) {
+            throw new SecurityException("could not encode certifiate: " + ex.getMessage(), ex);
+        }
         for (P11ObjectIdentifier objectId : certIds) {
             X509Cert tmpCert = certificates.get(objectId);
             if (Arrays.equals(encodedCert, tmpCert.getEncodedCert())) {
@@ -514,18 +518,28 @@ public abstract class AbstractP11Slot implements P11Slot {
         String cn = X509Util.getCommonName(cert.getSubjectX500Principal());
         String label = generateLabel(cn);
         P11ObjectIdentifier objectId = new P11ObjectIdentifier(id, label);
-        doAddCert(objectId, x509Cert.getCert());
+        addCert(objectId, cert);
+        return objectId;
+    }
+
+    @Override
+    public void addCert(
+            final P11ObjectIdentifier objectId,
+            final X509Certificate cert)
+    throws P11TokenException, SecurityException {
+        doAddCert(objectId, cert);
 
         List<P11ObjectIdentifier> ids = new ArrayList<>(certIds);
-        ids.add(objectId);
-        Collections.sort(ids);
-        certIds.clear();
-        certIds.addAll(ids);
-        certificates.put(objectId, x509Cert);
+        if (!certIds.contains(objectId)) {
+            ids.add(objectId);
+            Collections.sort(ids);
+            certIds.clear();
+            certIds.addAll(ids);
+        }
+        certificates.put(objectId, new X509Cert(cert));
 
         updateCaCertsOfIdentities();
         LOG.info("added certifiate {}", objectId);
-        return objectId;
     }
 
     protected byte[] generateId()

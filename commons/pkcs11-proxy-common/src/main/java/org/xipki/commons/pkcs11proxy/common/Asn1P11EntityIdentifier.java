@@ -64,41 +64,47 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 
 public class Asn1P11EntityIdentifier extends ASN1Object {
 
-    private Asn1P11SlotIdentifier slotId;
+    private final Asn1P11SlotIdentifier slotId;
 
-    private Asn1P11ObjectIdentifier objectId;
+    private final Asn1P11ObjectIdentifier objectId;
 
-    private P11EntityIdentifier entityId;
+    private final P11EntityIdentifier entityId;
 
     public Asn1P11EntityIdentifier(
             final P11SlotIdentifier slotId,
             final P11ObjectIdentifier objectId) {
         ParamUtil.requireNonNull("slotId", slotId);
         ParamUtil.requireNonNull("objectId", objectId);
-        init(null, new Asn1P11SlotIdentifier(slotId), new Asn1P11ObjectIdentifier(objectId));
+
+        this.slotId = new Asn1P11SlotIdentifier(slotId);
+        this.objectId = new Asn1P11ObjectIdentifier(objectId);
+        this.entityId = new P11EntityIdentifier(slotId, objectId);
     }
 
     public Asn1P11EntityIdentifier(
             final Asn1P11SlotIdentifier slotId,
             final Asn1P11ObjectIdentifier objectId) {
-        ParamUtil.requireNonNull("slotId", slotId);
-        ParamUtil.requireNonNull("objectId", objectId);
-        init(null, slotId, objectId);
+        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        this.objectId = ParamUtil.requireNonNull("objectId", objectId);
+        this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
     }
 
     public Asn1P11EntityIdentifier(
             final P11EntityIdentifier entityId) {
-        ParamUtil.requireNonNull("entityId", entityId);
-        init(entityId, null, null);
+        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
+        this.slotId = new Asn1P11SlotIdentifier(entityId.getSlotId());
+        this.objectId = new Asn1P11ObjectIdentifier(entityId.getObjectId());
     }
 
     private Asn1P11EntityIdentifier(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
-        Asn1P11SlotIdentifier slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(0));
-        Asn1P11ObjectIdentifier objectId = Asn1P11ObjectIdentifier.getInstance(seq.getObjectAt(0));
-        init(null, slotId, objectId);
+        int idx = 0;
+        this.slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
+        this.objectId = Asn1P11ObjectIdentifier.getInstance(
+                seq.getObjectAt(idx++));
+        this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
     }
 
     public static Asn1P11EntityIdentifier getInstance(
@@ -117,30 +123,16 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object");
-        }
-    }
-
-    private void init(
-            final P11EntityIdentifier entityId,
-            final Asn1P11SlotIdentifier slotId,
-            final Asn1P11ObjectIdentifier objectId) {
-        if (entityId != null) {
-            this.entityId = entityId;
-            this.slotId = new Asn1P11SlotIdentifier(entityId.getSlotId());
-            this.objectId = new Asn1P11ObjectIdentifier(entityId.getObjectId());
-        } else {
-            this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
-            this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-            this.objectId = ParamUtil.requireNonNull("keyId", objectId);
+            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+                    ex);
         }
     }
 
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(slotId.toASN1Primitive());
-        vector.add(objectId.toASN1Primitive());
+        vector.add(slotId);
+        vector.add(objectId);
         return new DERSequence(vector);
     }
 

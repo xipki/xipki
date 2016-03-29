@@ -123,21 +123,21 @@ class P11ECDSAContentSigner implements ContentSigner {
         if (hashAlgo == null) {
             throw new SecurityException("unsupported signature algorithm " + algOid);
         }
-        long tmpMechanism = hashMechMap.get(hashAlgo).longValue();
 
         P11SlotIdentifier slotId = identityId.getSlotId();
         if (cryptService.supportsMechanism(slotId, P11Constants.CKM_ECDSA)) {
-            tmpMechanism = P11Constants.CKM_ECDSA;
+            this.mechanism = P11Constants.CKM_ECDSA;
             AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
                     new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
             Digest digest = SignerUtil.getDigest(digAlgId);
             this.outputStream = new DigestOutputStream(digest);
-        } else if (cryptService.supportsMechanism(slotId, tmpMechanism)) {
-            this.outputStream = new ByteArrayOutputStream();
         } else {
-            throw new SecurityException("unsupported signature algorithm " + algOid);
+            this.mechanism = hashMechMap.get(hashAlgo).longValue();
+            if (!cryptService.supportsMechanism(slotId, this.mechanism)) {
+                throw new SecurityException("unsupported signature algorithm " + algOid);
+            }
+            this.outputStream = new ByteArrayOutputStream();
         }
-        this.mechanism = tmpMechanism;
     }
 
     @Override
