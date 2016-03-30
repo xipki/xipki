@@ -983,6 +983,9 @@ class IaikP11Slot extends AbstractP11Slot {
             final PublicKey publicKey)
     throws P11TokenException {
         final String label = toString(privateKey.getLabel());
+        KeyPair keypair;
+        byte[] id;
+
         Session session = borrowWritableSession();
         try {
             if (IaikP11Util.labelExists(session, label)) {
@@ -990,30 +993,33 @@ class IaikP11Slot extends AbstractP11Slot {
                         "label " + label + " exists, please specify another one");
             }
 
-            byte[] id = IaikP11Util.generateKeyId(session);
+            id = IaikP11Util.generateKeyId(session);
             privateKey.getId().setByteArrayValue(id);
             publicKey.getId().setByteArrayValue(id);
-            KeyPair keypair;
             try {
                 keypair = session.generateKeyPair(Mechanism.get(mech), publicKey, privateKey);
             } catch (TokenException ex) {
                 throw new P11TokenException(
                         "could not generate keypair " + P11Constants.getMechanismName(mech), ex);
             }
-
-            P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
-            P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId);
-            java.security.PublicKey jcePublicKey;
-            try {
-                jcePublicKey = generatePublicKey(keypair.getPublicKey());
-            } catch (SecurityException ex) {
-                throw new P11TokenException("could not generate public key " + objId, ex);
-            }
-
-            return new IaikP11Identity(module, entityId, privateKey, jcePublicKey, null);
         } finally {
             returnWritableSession(session);
         }
+
+        P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
+        P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId);
+        java.security.PublicKey jcePublicKey;
+        try {
+            jcePublicKey = generatePublicKey(keypair.getPublicKey());
+        } catch (SecurityException ex) {
+            throw new P11TokenException("could not generate public key " + objId, ex);
+        }
+
+        PrivateKey privateKey2 = getPrivateKeyObject(id, label.toCharArray());
+        if (privateKey2 == null) {
+            throw new P11TokenException("could not read the generated privateKey");
+        }
+        return new IaikP11Identity(module, entityId, privateKey2, jcePublicKey, null);
     }
 
     private static X509PublicKeyCertificate createPkcs11Template(
