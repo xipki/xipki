@@ -34,17 +34,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.impl.p11.proxy;
+package org.xipki.commons.security.api.p11;
 
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.p11.P11Conf;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11EntityIdentifier;
-import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
@@ -52,49 +55,45 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  * @since 2.0.0
  */
 
-class ProxyP11CryptService implements P11CryptService {
+public abstract class AbstractP11CryptServiceFactory implements P11CryptServiceFactory {
 
-    private ProxyP11Module module;
+    private static final Map<String, P11CryptService> SERVICES = new HashMap<>();
 
-    ProxyP11CryptService(
-            final P11ModuleConf moduleConf)
-    throws P11TokenException {
-        this.module = ProxyP11ModulePool.getInstance().getModule(moduleConf);
+    private P11Conf p11Conf;
+
+    @Override
+    public void init(
+            final P11Conf p11Conf) {
+        this.p11Conf = ParamUtil.requireNonNull("p11Conf", p11Conf);
     }
 
     @Override
-    public void refresh()
-    throws P11TokenException {
-        module.refresh();
+    public P11CryptService getP11CryptService(
+            final String moduleName)
+    throws SecurityException, P11TokenException {
+        if (p11Conf == null) {
+            throw new IllegalStateException("please call init() first");
+        }
+
+        ParamUtil.requireNonBlank("moduleName", moduleName);
+        P11ModuleConf conf = p11Conf.getModuleConf(moduleName);
+        if (conf == null) {
+            throw new SecurityException("PKCS#11 module " + moduleName + " is not defined");
+        }
+
+        synchronized (SERVICES) {
+            P11CryptService instance = SERVICES.get(moduleName);
+            if (instance == null) {
+                instance = new P11CryptService(getModule(conf));
+                SERVICES.put(moduleName, instance);
+            }
+
+            return instance;
+        }
     }
 
-    @Override
-    public Set<Long> getMechanisms(
-            final P11SlotIdentifier slotId)
-    throws P11TokenException {
-        return module.getSlot(slotId).getMechanisms();
-    }
-
-    @Override
-    public boolean supportsMechanism(
-            final P11SlotIdentifier slotId,
-            final long mechanism)
-    throws P11TokenException {
-        return module.getSlot(slotId).supportsMechanism(mechanism);
-    }
-
-    @Override
-    public P11Module getModule()
-    throws P11TokenException {
-        return module;
-    }
-
-    @Override
-    public P11Identity getIdentity(
-            final P11EntityIdentifier identityId)
-    throws P11TokenException {
-        ParamUtil.requireNonNull("identityId", identityId);
-        return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
-    }
+    protected abstract P11Module getModule(
+            @Nonnull P11ModuleConf moduleConf)
+    throws P11TokenException;
 
 }

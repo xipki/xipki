@@ -106,7 +106,7 @@ class IaikP11Module extends AbstractP11Module {
             } catch (PasswordResolverException ex) {
                 throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
             }
-            P11Slot p11Slot = new IaikP11Slot(moduleConf.getName(), slotId, slot,
+            P11Slot p11Slot = new IaikP11Slot(this, slotId, slot,
                     moduleConf.isReadOnly(), moduleConf.getUserType(), pwd,
                     moduleConf.getMaxMessageSize(), moduleConf.getP11MechanismFilter());
 

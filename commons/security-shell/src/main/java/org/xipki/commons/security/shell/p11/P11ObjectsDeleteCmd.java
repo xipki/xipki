@@ -34,37 +34,49 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.api.p11;
+package org.xipki.commons.security.shell.p11;
 
-import java.util.List;
-
-import javax.annotation.Nonnull;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.shell.SecurityCommandSupport;
+import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface P11Module {
+@Command(scope = "xipki-tk", name = "delete-objects",
+        description = "delete objects in PKCS#11 device")
+@Service
+public class P11ObjectsDeleteCmd extends SecurityCommandSupport {
 
-    String getName();
+    @Option(name = "--slot",
+            required = true,
+            description = "slot index\n"
+                    + "(required)")
+    protected Integer slotIndex;
 
-    P11ModuleConf getConf();
+    @Option(name = "--label",
+            description = "label of the objects in the PKCS#11 device")
+    protected String label;
 
-    boolean isReadOnly();
+    @Option(name = "--module",
+            description = "name of the PKCS#11 module")
+    @Completion(P11ModuleNameCompleter.class)
+    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    List<P11SlotIdentifier> getSlotIdentifiers();
-
-    P11Slot getSlot(
-            @Nonnull P11SlotIdentifier slotId)
-    throws P11TokenException;
-
-    P11SlotIdentifier getSlotIdForIndex(
-            int index)
-    throws P11UnknownEntityException;
-
-    P11SlotIdentifier getSlotIdForId(
-            long id)
-    throws P11UnknownEntityException;
+    @Override
+    protected Object doExecute()
+    throws Exception {
+        P11Slot slot = getSlot(moduleName, slotIndex);
+        int num = slot.removeObjects(label);
+        println("deleted " + num + " objects");
+        return null;
+    }
 
 }

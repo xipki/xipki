@@ -36,34 +36,85 @@
 
 package org.xipki.commons.security.api.p11;
 
-import java.util.Set;
+import java.util.List;
 
-import javax.annotation.Nonnull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface P11CryptService {
+public class P11CryptService {
 
-    void refresh()
-    throws P11TokenException;
+    private static final Logger LOG = LoggerFactory.getLogger(P11CryptService.class);
 
-    P11Module getModule()
-    throws P11TokenException;
+    private P11Module module;
 
-    Set<Long> getMechanisms(
-            @Nonnull P11SlotIdentifier slotId)
-    throws P11TokenException;
+    public P11CryptService(
+            final P11Module module)
+    throws P11TokenException {
+        this.module = ParamUtil.requireNonNull("module", module);
+        refresh();
+    }
 
-    boolean supportsMechanism(
-            @Nonnull P11SlotIdentifier slotId,
-            long mechanism)
-    throws P11TokenException;
+    public synchronized void refresh()
+    throws P11TokenException {
+        LOG.info("refreshing PKCS#11 module {}", module.getName());
 
-    P11Identity getIdentity(
-            @Nonnull P11EntityIdentifier identityId)
-    throws P11TokenException;
+        List<P11SlotIdentifier> slotIds = module.getSlotIdentifiers();
+        for (P11SlotIdentifier slotId : slotIds) {
+            P11Slot slot;
+            try {
+                slot = module.getSlot(slotId);
+            } catch (P11TokenException ex) {
+                final String message = "P11TokenException while initializing slot " + slotId;
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
+                            ex.getMessage());
+                }
+                LOG.debug(message, ex);
+                continue;
+            } catch (Throwable th) {
+                final String message = "unexpected error while initializing slot " + slotId;
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
+                            th.getMessage());
+                }
+                LOG.debug(message, th);
+                continue;
+            }
+
+            slot.refresh();
+        }
+
+        LOG.info("refreshed PKCS#11 module {}", module.getName());
+    } // method refresh
+
+    public P11Module getModule()
+    throws P11TokenException {
+        return module;
+    }
+
+    public P11Slot getSlot(
+            final P11SlotIdentifier slotId)
+    throws P11TokenException {
+        return module.getSlot(slotId);
+    }
+
+    public P11Identity getIdentity(
+            final P11EntityIdentifier identityId)
+    throws P11TokenException {
+        ParamUtil.requireNonNull("identityId", identityId);
+        return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());
+    }
+
+    @Override
+    public String toString() {
+        return module.toString();
+    }
 
 }

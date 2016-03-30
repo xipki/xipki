@@ -91,6 +91,8 @@ public class P11ProxyConstants {
 
     public static final int ACTION_updateCerificate = 43;
 
+    public static final int ACTION_removeObjects = 44;
+
     private P11ProxyConstants() {
     }
 

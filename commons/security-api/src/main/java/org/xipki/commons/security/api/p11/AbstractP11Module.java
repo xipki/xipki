@@ -53,24 +53,29 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public abstract class AbstractP11Module implements P11Module {
 
-    protected final P11ModuleConf moduleConf;
+    protected final P11ModuleConf conf;
 
     private final Map<P11SlotIdentifier, P11Slot> slots = new HashMap<>();
 
     private final List<P11SlotIdentifier> slotIds = new ArrayList<>();
 
-    public AbstractP11Module(P11ModuleConf moduleConf) {
-        this.moduleConf = ParamUtil.requireNonNull("moduleConf", moduleConf);
+    public AbstractP11Module(P11ModuleConf conf) {
+        this.conf = ParamUtil.requireNonNull("conf", conf);
     }
 
     @Override
     public String getName() {
-        return moduleConf.getName();
+        return conf.getName();
     }
 
     @Override
     public boolean isReadOnly() {
-        return moduleConf.isReadOnly();
+        return conf.isReadOnly();
+    }
+
+    @Override
+    public P11ModuleConf getConf() {
+        return conf;
     }
 
     protected void setSlots(

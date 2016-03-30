@@ -94,7 +94,7 @@ public class P11PrivateKey implements PrivateKey {
     boolean supportsMechanism(
             final long mechanism) {
         try {
-            return p11CryptService.supportsMechanism(identityId.getSlotId(), mechanism);
+            return p11CryptService.getSlot(identityId.getSlotId()).supportsMechanism(mechanism);
         } catch (P11TokenException ex) {
             return false;
         }
