@@ -85,6 +85,7 @@ import org.xipki.commons.pkcs11proxy.common.Asn1P11ObjectIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11Params;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11SlotIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1RSAPkcsPssParams;
+import org.xipki.commons.pkcs11proxy.common.Asn1RemoveCertsParams;
 import org.xipki.commons.pkcs11proxy.common.Asn1SignTemplate;
 import org.xipki.commons.pkcs11proxy.common.Asn1Util;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
@@ -293,7 +294,7 @@ class CmpResponder {
             respItvInfoValue = new DERSequence(vec);
         } else if (P11ProxyConstants.ACTION_getMechanisms == action) {
             P11SlotIdentifier slotId = Asn1P11SlotIdentifier.getInstance(reqValue).getSlotId();
-            Set<Long> mechs = p11CryptService.getMechanisms(slotId);
+            Set<Long> mechs = p11CryptService.getSlot(slotId).getMechanisms();
             ASN1EncodableVector vec = new ASN1EncodableVector();
             for (Long mech : mechs) {
                 vec.add(new ASN1Integer(mech));
@@ -349,6 +350,11 @@ class CmpResponder {
             P11Slot slot = getSlot(p11CryptService, asn1.getEntityId());
             slot.updateCertificate(asn1.getEntityId().getObjectId().getObjectId(),
                     new X509CertificateObject(asn1.getCertificate()));
+        } else if (P11ProxyConstants.ACTION_removeObjects == action) {
+            Asn1RemoveCertsParams asn1 = Asn1RemoveCertsParams.getInstance(reqValue);
+            P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
+            int num = slot.removeObjects(asn1.getObjectLabel());
+            respItvInfoValue = new ASN1Integer(num);
         } else {
             final String statusMessage = "unsupported XiPKI action code '" + action + "'";
             return createRejectionPkiMessage(respHeader,

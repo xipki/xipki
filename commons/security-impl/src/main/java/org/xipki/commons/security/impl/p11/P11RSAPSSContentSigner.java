@@ -63,6 +63,7 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
@@ -167,14 +168,15 @@ class P11RSAPSSContentSigner implements ContentSigner {
         }
 
         P11SlotIdentifier slotId = identityId.getSlotId();
-        if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_PKCS_PSS)) {
+        P11Slot slot = cryptService.getSlot(slotId);
+        if (slot.supportsMechanism(P11Constants.CKM_RSA_PKCS_PSS)) {
             this.mechanism = P11Constants.CKM_RSA_PKCS_PSS;
             this.parameters = new P11RSAPkcsPssParams(asn1Params);
             AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
                     new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
             Digest digest = SignerUtil.getDigest(digAlgId);
             this.outputStream = new DigestOutputStream(digest);
-        } else if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_X_509)) {
+        } else if (slot.supportsMechanism(P11Constants.CKM_RSA_X_509)) {
             this.mechanism = P11Constants.CKM_RSA_X_509;
             this.parameters = null;
             AsymmetricBlockCipher cipher = new P11PlainRSASigner();
@@ -209,7 +211,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
                         + hashAlgo);
             }
 
-            if (!cryptService.supportsMechanism(slotId, this.mechanism)) {
+            if (!slot.supportsMechanism(this.mechanism)) {
                 throw new SecurityException("unsupported signature algorithm "
                         + PKCSObjectIdentifiers.id_RSASSA_PSS.getId() + " with " + hashAlgo);
             }

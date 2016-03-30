@@ -45,6 +45,7 @@ import java.security.interfaces.RSAPublicKey;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
+import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 
 /**
  * @author Lijun Liao
@@ -63,8 +64,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
     public P11Identity(
             final P11EntityIdentifier identityId,
-            final X509Certificate[] certificateChain,
-            final PublicKey publicKey) {
+            final PublicKey publicKey,
+            final X509Certificate[] certificateChain) {
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         if ((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
                 && publicKey == null) {
@@ -158,8 +159,50 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     public boolean supportsMechanism(
             final long mechanism,
             final P11Params parameters) {
-        // TODO: implement me
-        return true;
+        if (publicKey instanceof RSAPublicKey) {
+            if (P11Constants.CKM_RSA_9796 == mechanism
+                    || P11Constants.CKM_RSA_PKCS == mechanism
+                    || P11Constants.CKM_SHA1_RSA_PKCS == mechanism
+                    || P11Constants.CKM_SHA224_RSA_PKCS == mechanism
+                    || P11Constants.CKM_SHA256_RSA_PKCS == mechanism
+                    || P11Constants.CKM_SHA384_RSA_PKCS == mechanism
+                    || P11Constants.CKM_SHA512_RSA_PKCS == mechanism) {
+                return parameters == null;
+            } else if (P11Constants.CKM_RSA_PKCS_PSS == mechanism
+                    || P11Constants.CKM_SHA1_RSA_PKCS_PSS == mechanism
+                    || P11Constants.CKM_SHA224_RSA_PKCS_PSS == mechanism
+                    || P11Constants.CKM_SHA256_RSA_PKCS_PSS == mechanism
+                    || P11Constants.CKM_SHA384_RSA_PKCS_PSS == mechanism
+                    || P11Constants.CKM_SHA512_RSA_PKCS_PSS == mechanism) {
+                return parameters instanceof P11RSAPkcsPssParams;
+            }
+        } else if (publicKey instanceof DSAPublicKey) {
+            if (parameters != null) {
+                return false;
+            }
+            if (P11Constants.CKM_DSA == mechanism
+                    || P11Constants.CKM_DSA_SHA1 == mechanism
+                    || P11Constants.CKM_DSA_SHA224 == mechanism
+                    || P11Constants.CKM_DSA_SHA256 == mechanism
+                    || P11Constants.CKM_DSA_SHA384 == mechanism
+                    || P11Constants.CKM_DSA_SHA512 == mechanism) {
+                return true;
+            }
+        } else if (publicKey instanceof ECPublicKey) {
+            if (parameters != null) {
+                return false;
+            }
+            if (P11Constants.CKM_ECDSA == mechanism
+                    || P11Constants.CKM_ECDSA_SHA1 == mechanism
+                    || P11Constants.CKM_ECDSA_SHA224 == mechanism
+                    || P11Constants.CKM_ECDSA_SHA256 == mechanism
+                    || P11Constants.CKM_ECDSA_SHA384 == mechanism
+                    || P11Constants.CKM_ECDSA_SHA512 == mechanism) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

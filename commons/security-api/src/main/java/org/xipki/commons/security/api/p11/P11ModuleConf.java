@@ -48,12 +48,12 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.internal.p11.jaxb.MechanismSetsType;
 import org.xipki.commons.security.api.internal.p11.jaxb.MechanismsType;
 import org.xipki.commons.security.api.internal.p11.jaxb.ModuleType;
 import org.xipki.commons.security.api.internal.p11.jaxb.NativeLibraryType;
-import org.xipki.commons.security.api.internal.p11.jaxb.PasswordType;
+import org.xipki.commons.security.api.internal.p11.jaxb.PasswordSetsType;
 import org.xipki.commons.security.api.internal.p11.jaxb.PasswordsType;
-import org.xipki.commons.security.api.internal.p11.jaxb.PermittedMechanismsType;
 import org.xipki.commons.security.api.internal.p11.jaxb.SlotType;
 import org.xipki.commons.security.api.internal.p11.jaxb.SlotsType;
 
@@ -76,7 +76,7 @@ public class P11ModuleConf {
 
     private final Set<P11SlotIdFilter> includeSlots;
 
-    private final P11PasswordRetriever passwordRetriever;
+    private final P11PasswordsRetriever passwordRetriever;
 
     private final P11MechanismFilter mechanismFilter;
 
@@ -102,9 +102,9 @@ public class P11ModuleConf {
 
         // Mechanism filter
         mechanismFilter = new P11MechanismFilter();
-        PermittedMechanismsType mechsType = moduleType.getPermittedMechanisms();
-        if (mechsType != null && CollectionUtil.isNonEmpty(mechsType.getMechanisms())) {
-            for (MechanismsType mechType : mechsType.getMechanisms()) {
+        MechanismSetsType mechsList = moduleType.getMechanismSets();
+        if (mechsList != null && CollectionUtil.isNonEmpty(mechsList.getMechanisms())) {
+            for (MechanismsType mechType : mechsList.getMechanisms()) {
                 Set<P11SlotIdFilter> slots = getSlotIdFilters(mechType.getSlots());
                 Set<Long> mechanisms = new HashSet<>();
                 for (String mechStr : mechType.getMechanism()) {
@@ -140,14 +140,14 @@ public class P11ModuleConf {
         }
 
         // Password retriever
-        passwordRetriever = new P11PasswordRetriever();
-        PasswordsType passwordsType = moduleType.getPasswords();
-        if (passwordsType != null && CollectionUtil.isNonEmpty(passwordsType.getPassword())) {
+        passwordRetriever = new P11PasswordsRetriever();
+        PasswordSetsType passwordsList = moduleType.getPasswordSets();
+        if (passwordsList != null && CollectionUtil.isNonEmpty(passwordsList.getPasswords())) {
             passwordRetriever.setPasswordResolver(securityFactory.getPasswordResolver());
-            for (PasswordType passwordType : passwordsType.getPassword()) {
+            for (PasswordsType passwordType : passwordsList.getPasswords()) {
                 Set<P11SlotIdFilter> slots = getSlotIdFilters(passwordType.getSlots());
                 passwordRetriever.addPasswordEntry(slots,
-                        new ArrayList<>(passwordType.getSinglePassword()));
+                        new ArrayList<>(passwordType.getPassword()));
             }
         }
 
@@ -206,7 +206,7 @@ public class P11ModuleConf {
         return securityFactory;
     }
 
-    public P11PasswordRetriever getPasswordRetriever() {
+    public P11PasswordsRetriever getPasswordRetriever() {
         return passwordRetriever;
     }
 

@@ -36,11 +36,14 @@
 
 package org.xipki.commons.security.impl.p11.keystore;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.p11.P11Conf;
-import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
+import org.xipki.commons.security.api.p11.AbstractP11CryptServiceFactory;
+import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11TokenException;
 
@@ -49,35 +52,37 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  * @since 2.0.0
  */
 
-public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory {
+public class KeystoreP11CryptServiceFactory extends AbstractP11CryptServiceFactory {
 
-    private P11Conf p11Conf;
+    private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11CryptServiceFactory.class);
+
+    private final Map<String, KeystoreP11Module> modules = new HashMap<>();
 
     @Override
-    public void init(
-            final P11Conf p11Conf) {
-        this.p11Conf = ParamUtil.requireNonNull("p11Conf", p11Conf);
+    public synchronized void shutdown() {
+        for (String pk11Lib : modules.keySet()) {
+            try {
+                modules.get(pk11Lib).close();
+            } catch (Throwable th) {
+                LOG.error("could not close PKCS11 Module " + pk11Lib + ":" + th.getMessage(),
+                        th);
+            }
+        }
+        modules.clear();
     }
 
     @Override
-    public P11CryptService getP11CryptService(
-            final String moduleName)
-    throws SecurityException, P11TokenException {
-        ParamUtil.requireNonBlank("moduleName", moduleName);
-        if (p11Conf == null) {
-            throw new IllegalStateException("please call init() first");
+    protected P11Module getModule(
+            final P11ModuleConf moduleConf)
+    throws P11TokenException {
+        ParamUtil.requireNonNull("moduleConf", moduleConf);
+        KeystoreP11Module extModule = modules.get(moduleConf.getName());
+        if (extModule == null) {
+            extModule = new KeystoreP11Module(moduleConf);
+            modules.put(moduleConf.getName(), extModule);
         }
 
-        P11ModuleConf conf = p11Conf.getModuleConf(moduleName);
-        if (conf == null) {
-            throw new SecurityException("PKCS#11 module " + moduleName + " is not defined");
-        }
-
-        return KeystoreP11CryptService.getInstance(conf);
+        return extModule;
     }
 
-    @Override
-    public void shutdown() {
-        KeystoreP11ModulePool.getInstance().shutdown();
-    }
 }

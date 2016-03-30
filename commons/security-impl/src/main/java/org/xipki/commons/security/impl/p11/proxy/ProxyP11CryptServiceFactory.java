@@ -36,11 +36,14 @@
 
 package org.xipki.commons.security.impl.p11.proxy;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.p11.P11Conf;
-import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
+import org.xipki.commons.security.api.p11.AbstractP11CryptServiceFactory;
+import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11TokenException;
 
@@ -49,35 +52,37 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  * @since 2.0.0
  */
 
-public class ProxyP11CryptServiceFactory implements P11CryptServiceFactory {
+public class ProxyP11CryptServiceFactory extends AbstractP11CryptServiceFactory {
 
-    private P11Conf p11Conf;
+    private static final Logger LOG = LoggerFactory.getLogger(ProxyP11CryptServiceFactory.class);
 
-    @Override
-    public void init(
-            final P11Conf p11Conf) {
-        this.p11Conf = ParamUtil.requireNonNull("p11Conf", p11Conf);
-    }
+    private final Map<String, ProxyP11Module> modules = new HashMap<>();
 
     @Override
-    public P11CryptService getP11CryptService(
-            final String moduleName)
-    throws P11TokenException, SecurityException {
-        if (p11Conf == null) {
-            throw new IllegalStateException("please call init() first");
+    protected P11Module getModule(
+            final P11ModuleConf moduleConf)
+    throws P11TokenException {
+        ParamUtil.requireNonNull("moduleConf", moduleConf);
+        ProxyP11Module module = modules.get(moduleConf.getName());
+        if (module == null) {
+            module = new ProxyP11Module(moduleConf);
+            modules.put(moduleConf.getName(), module);
         }
 
-        ParamUtil.requireNonBlank("moduleName", moduleName);
-        P11ModuleConf conf = p11Conf.getModuleConf(moduleName);
-        if (conf == null) {
-            throw new SecurityException("PKCS#11 module " + moduleName + " is not defined");
-        }
-
-        return new ProxyP11CryptService(conf);
-    }
+        return module;
+    } // nmethod getModule
 
     @Override
-    public void shutdown() {
+    public synchronized void shutdown() {
+        for (String pk11Lib : modules.keySet()) {
+            try {
+                modules.get(pk11Lib).close();
+            } catch (Throwable th) {
+                LOG.error("could not close PKCS11 Module " + pk11Lib + ":" + th.getMessage(),
+                        th);
+            }
+        }
+        modules.clear();
     }
 
 }

@@ -60,11 +60,14 @@ import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.Nonnull;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
@@ -85,8 +88,8 @@ import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.p11.AbstractP11Slot;
 import org.xipki.commons.security.api.p11.P11Constants;
-import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11MechanismFilter;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -372,7 +375,8 @@ class KeystoreP11Slot extends AbstractP11Slot {
             }
         } else if (X9ObjectIdentifiers.id_ecPublicKey.getId().equals(algorithm)) {
             byte[] ecdsaParams = Hex.decode(props.getProperty(PROP_EC_ECDSA_PARAMS));
-            byte[] ecPoint = Hex.decode(props.getProperty(PROP_EC_EC_POINT));
+            byte[] asn1EncodedPoint = Hex.decode(props.getProperty(PROP_EC_EC_POINT));
+            byte[] ecPoint = DEROctetString.getInstance(asn1EncodedPoint).getOctets();
             try {
                 return KeyUtil.createECPublicKey(ecdsaParams, ecPoint);
             } catch (InvalidKeySpecException ex) {
@@ -471,8 +475,8 @@ class KeystoreP11Slot extends AbstractP11Slot {
 
     private static boolean deletePkcs11Entry(
             final File dir,
-            final byte[] keyId) {
-        String hextId = Hex.toHexString(keyId);
+            final byte[] objectId) {
+        String hextId = Hex.toHexString(objectId);
         File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
         boolean b1 = true;
         if (infoFile.exists()) {
@@ -486,6 +490,33 @@ class KeystoreP11Slot extends AbstractP11Slot {
         }
 
         return b1 || b2;
+    }
+
+    private int deletePkcs11Entry(
+            final File dir,
+            final String label)
+    throws P11TokenException {
+        File[] infoFiles = dir.listFiles(INFO_FILENAME_FILTER);
+        if (infoFiles == null || infoFiles.length == 0) {
+            return 0;
+        }
+
+        List<byte[]> ids = new LinkedList<>();
+        for (File infoFile : infoFiles) {
+            Properties props = loadProperties(infoFile);
+            if (label.equals(props.getProperty("label"))) {
+                ids.add(getKeyIdFromInfoFilename(infoFile.getName()));
+            }
+        }
+
+        if (ids.isEmpty()) {
+            return 0;
+        }
+
+        for (byte[] id : ids) {
+            deletePkcs11Entry(dir, id);
+        }
+        return ids.size();
     }
 
     private void savePkcs11PrivateKey(
@@ -608,8 +639,14 @@ class KeystoreP11Slot extends AbstractP11Slot {
             destOffset = 1 + keysize + Math.max(0, keysize - wyBytes.length);
             System.arraycopy(wyBytes, srcOffset, ecPoint, destOffset, numBytesToCopy);
 
+            byte[] encodedEcPoint;
+            try {
+                encodedEcPoint = new DEROctetString(ecPoint).getEncoded();
+            } catch (IOException ex) {
+                throw new P11TokenException("could not ASN.1 encode the ECPoint");
+            }
             sb.append(PROP_EC_EC_POINT).append('=');
-            sb.append(Hex.toHexString(ecPoint));
+            sb.append(Hex.toHexString(encodedEcPoint));
             sb.append('\n');
         } else {
             throw new IllegalArgumentException(
@@ -659,6 +696,16 @@ class KeystoreP11Slot extends AbstractP11Slot {
         } catch (IOException ex) {
             throw new P11TokenException("could not save certificate");
         }
+    }
+
+    @Override
+    public int removeObjects(
+            final String label)
+    throws P11TokenException {
+        int num = deletePkcs11Entry(privKeyDir, label);
+        num += deletePkcs11Entry(pubKeyDir, label);
+        num += deletePkcs11Entry(certDir, label);
+        return num;
     }
 
     @Override
