@@ -59,6 +59,7 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.SignerUtil;
@@ -127,9 +128,10 @@ class P11RSAContentSigner implements ContentSigner {
         }
 
         P11SlotIdentifier slotId = identityId.getSlotId();
-        if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_PKCS)) {
+        P11Slot slot = cryptService.getSlot(slotId);
+        if (slot.supportsMechanism(P11Constants.CKM_RSA_PKCS)) {
             this.mechanism = P11Constants.CKM_RSA_PKCS;
-        } else if (cryptService.supportsMechanism(slotId, P11Constants.CKM_RSA_X_509)) {
+        } else if (slot.supportsMechanism(P11Constants.CKM_RSA_X_509)) {
             this.mechanism = P11Constants.CKM_RSA_X_509;
         } else {
             switch (hashAlgo) {
@@ -153,7 +155,7 @@ class P11RSAContentSigner implements ContentSigner {
                         + hashAlgo);
             }
 
-            if (!cryptService.supportsMechanism(slotId, this.mechanism)) {
+            if (!slot.supportsMechanism(this.mechanism)) {
                 throw new SecurityException("unsupported signature algorithm " + algOid.getId());
             }
         }

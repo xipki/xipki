@@ -58,6 +58,7 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.SignerUtil;
@@ -125,7 +126,8 @@ class P11ECDSAContentSigner implements ContentSigner {
         }
 
         P11SlotIdentifier slotId = identityId.getSlotId();
-        if (cryptService.supportsMechanism(slotId, P11Constants.CKM_ECDSA)) {
+        P11Slot slot = cryptService.getSlot(slotId);
+        if (slot.supportsMechanism(P11Constants.CKM_ECDSA)) {
             this.mechanism = P11Constants.CKM_ECDSA;
             AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
                     new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
@@ -133,7 +135,7 @@ class P11ECDSAContentSigner implements ContentSigner {
             this.outputStream = new DigestOutputStream(digest);
         } else {
             this.mechanism = hashMechMap.get(hashAlgo).longValue();
-            if (!cryptService.supportsMechanism(slotId, this.mechanism)) {
+            if (!slot.supportsMechanism(this.mechanism)) {
                 throw new SecurityException("unsupported signature algorithm " + algOid);
             }
             this.outputStream = new ByteArrayOutputStream();

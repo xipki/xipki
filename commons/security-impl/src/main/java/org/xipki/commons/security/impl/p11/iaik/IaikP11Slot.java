@@ -55,6 +55,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.util.encoders.Hex;
@@ -67,8 +68,8 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.p11.AbstractP11Slot;
 import org.xipki.commons.security.api.p11.P11Constants;
-import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11MechanismFilter;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -111,11 +112,13 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11Slot.class);
 
-    protected static final long DEFAULT_MAX_COUNT_SESSION = 32;
+    private static final long DEFAULT_MAX_COUNT_SESSION = 32;
 
-    protected final int maxMessageSize;
+    private final int maxMessageSize;
 
-    protected Slot slot;
+    private final IaikP11Module module;
+
+    private Slot slot;
 
     private final long userType;
 
@@ -134,7 +137,7 @@ class IaikP11Slot extends AbstractP11Slot {
     private Session writableSession;
 
     IaikP11Slot(
-            final String moduleName,
+            final IaikP11Module module,
             final P11SlotIdentifier slotId,
             final Slot slot,
             final boolean readOnly,
@@ -143,7 +146,8 @@ class IaikP11Slot extends AbstractP11Slot {
             final int maxMessageSize,
             final P11MechanismFilter mechanismFilter)
     throws P11TokenException {
-        super(moduleName, slotId, readOnly, mechanismFilter);
+        super(module.getName(), slotId, readOnly, mechanismFilter);
+        this.module = ParamUtil.requireNonNull("module", module);
         this.slot = ParamUtil.requireNonNull("slot", slot);
         this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 1);
         this.userType = ParamUtil.requireMin("userType", userType, 0);
@@ -318,8 +322,8 @@ class IaikP11Slot extends AbstractP11Slot {
         X509Certificate[] certs = (cert == null)
                 ? null
                 : new X509Certificate[]{cert.getCert()};
-        IaikP11Identity identity = new IaikP11Identity(moduleName,
-                new P11EntityIdentifier(slotId, objectId), privKey, certs, pubKey);
+        IaikP11Identity identity = new IaikP11Identity(module,
+                new P11EntityIdentifier(slotId, objectId), privKey, pubKey, certs);
         refreshResult.addIdentity(identity);
     }
 
@@ -618,7 +622,7 @@ class IaikP11Slot extends AbstractP11Slot {
             final byte[] keyId,
             final char[] keyLabel)
     throws P11TokenException {
-        return (PrivateKey) getKeyObject(new PublicKey(), keyId, keyLabel);
+        return (PrivateKey) getKeyObject(new PrivateKey(), keyId, keyLabel);
     }
 
     private PublicKey getPublicKeyObject(
@@ -768,7 +772,8 @@ class IaikP11Slot extends AbstractP11Slot {
         } else if (p11Key instanceof ECDSAPublicKey) {
             ECDSAPublicKey ecP11Key = (ECDSAPublicKey) p11Key;
             byte[] encodedAlgorithmIdParameters = ecP11Key.getEcdsaParams().getByteArrayValue();
-            byte[] encodedPoint = ecP11Key.getEcPoint().getByteArrayValue();
+            byte[] encodedPoint = DEROctetString.getInstance(
+                    ecP11Key.getEcPoint().getByteArrayValue()).getOctets();
             try {
                 return KeyUtil.createECPublicKey(encodedAlgorithmIdParameters, encodedPoint);
             } catch (InvalidKeySpecException ex) {
@@ -842,6 +847,27 @@ class IaikP11Slot extends AbstractP11Slot {
             return certs;
         } finally {
             returnIdleSession(session);
+        }
+    }
+
+    @Override
+    public int removeObjects(
+            final String label)
+    throws P11TokenException {
+        ParamUtil.requireNonBlank("label", label);
+        Storage template = new Storage();
+        template.getLabel().setCharArrayValue(label.toCharArray());
+        Session session = borrowWritableSession();
+        try {
+            List<Storage> objects = getObjects(session, template);
+            for (Storage obj : objects) {
+                session.destroyObject(obj);
+            }
+            return objects.size();
+        } catch (TokenException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
+        } finally {
+            returnWritableSession(session);
         }
     }
 
@@ -984,7 +1010,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 throw new P11TokenException("could not generate public key " + objId, ex);
             }
 
-            return new IaikP11Identity(moduleName, entityId, privateKey, null, jcePublicKey);
+            return new IaikP11Identity(module, entityId, privateKey, jcePublicKey, null);
         } finally {
             returnWritableSession(session);
         }
@@ -1100,7 +1126,7 @@ class IaikP11Slot extends AbstractP11Slot {
             P11ObjectIdentifier objectId)
     throws P11TokenException {
         PrivateKey privKey = getPrivateKeyObject(objectId.getId(), objectId.getLabelChars());
-        PrivateKey pubKey = getPrivateKeyObject(objectId.getId(), objectId.getLabelChars());
+        PublicKey pubKey = getPublicKeyObject(objectId.getId(), objectId.getLabelChars());
         X509PublicKeyCertificate[] certs = getCertificateObjects(objectId.getId(),
                 objectId.getLabelChars());
 

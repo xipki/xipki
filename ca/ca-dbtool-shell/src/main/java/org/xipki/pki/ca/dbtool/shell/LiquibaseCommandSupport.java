@@ -111,15 +111,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
         try {
             liquibase.init(logLevel, logFile);
             liquibase.releaseLocks();
-
-            if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel)) {
-                liquibase.init("severe", logFile);
-            }
             liquibase.dropAll();
-
-            if (!LiquibaseMain.loglevelIsSevereOrOff(logLevel)) {
-                liquibase.init(logLevel, logFile);
-            }
             liquibase.update();
         } finally {
             liquibase.shutdown();

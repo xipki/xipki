@@ -55,28 +55,19 @@ import iaik.pkcs.pkcs11.objects.PrivateKey;
 
 class IaikP11Identity extends P11Identity {
 
-    private final String moduleName;
+    private final IaikP11Module module;
 
     private final PrivateKey privateKey;
 
     IaikP11Identity(
-            final String moduleName,
+            final IaikP11Module module,
             final P11EntityIdentifier identityId,
             final PrivateKey privateKey,
-            final X509Certificate[] certificateChain,
-            final PublicKey publicKey) {
-        super(identityId, certificateChain, publicKey);
-        this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
+            final PublicKey publicKey,
+            final X509Certificate[] certificateChain) {
+        super(identityId, publicKey, certificateChain);
+        this.module = ParamUtil.requireNonNull("module", module);
         this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
-    }
-
-    private IaikP11Module getModule()
-    throws P11TokenException {
-        IaikP11Module module = IaikP11ModulePool.getInstance().getModule(moduleName);
-        if (module == null) {
-            throw new P11TokenException("could not find IaikP11Module '" + moduleName + "'");
-        }
-        return module;
     }
 
     @Override
@@ -91,7 +82,6 @@ class IaikP11Identity extends P11Identity {
             throw new P11UnsupportedMechanismException(mechanism, identityId);
         }
 
-        IaikP11Module module = getModule();
         IaikP11Slot slot = (IaikP11Slot) module.getSlot(identityId.getSlotId());
         return slot.sign(mechanism, parameters, content, this);
     }

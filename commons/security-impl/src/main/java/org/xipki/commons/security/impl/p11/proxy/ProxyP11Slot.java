@@ -61,6 +61,8 @@ import org.xipki.commons.pkcs11proxy.common.Asn1P11EntityIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11ObjectIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11ObjectIdentifiers;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11SlotIdentifier;
+import org.xipki.commons.pkcs11proxy.common.Asn1RemoveCertsParams;
+import org.xipki.commons.pkcs11proxy.common.Asn1Util;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.SecurityException;
@@ -147,8 +149,8 @@ public class ProxyP11Slot extends AbstractP11Slot {
                     ? null
                     : new X509Certificate[]{cert.getCert()};
 
-            ProxyP11Identity identity = new ProxyP11Identity(moduleName,
-                    new P11EntityIdentifier(slotId, keyId), certs, pubKey);
+            ProxyP11Identity identity = new ProxyP11Identity(module,
+                    new P11EntityIdentifier(slotId, keyId), pubKey, certs);
             refreshResult.addIdentity(identity);
         }
 
@@ -193,6 +195,19 @@ public class ProxyP11Slot extends AbstractP11Slot {
             return new X509Cert(X509Util.parseCert(encoded), encoded);
         } catch (CertificateException | IOException ex) {
             throw new P11TokenException("could not parse certificate:" + ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public int removeObjects(
+            final String label)
+    throws P11TokenException {
+        Asn1RemoveCertsParams params = new Asn1RemoveCertsParams(slotId, label);
+        ASN1Encodable resp = module.send(P11ProxyConstants.ACTION_removeObjects, params);
+        try {
+            return Asn1Util.getInteger(resp).intValue();
+        } catch (BadAsn1ObjectException ex) {
+            throw new P11TokenException(ex.getMessage(), ex);
         }
     }
 
@@ -275,7 +290,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
         P11EntityIdentifier entityId = ei.getEntityId();
 
         PublicKey publicKey = getPublicKey(entityId.getObjectId());
-        return new ProxyP11Identity(moduleName, entityId, null, publicKey);
+        return new ProxyP11Identity(module, entityId, publicKey, null);
     }
 
     @Override
