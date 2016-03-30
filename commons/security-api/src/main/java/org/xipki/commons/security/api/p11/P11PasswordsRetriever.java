@@ -52,22 +52,22 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
  * @since 2.0.0
  */
 
-public class P11PasswordRetriever {
+public class P11PasswordsRetriever {
 
     private static final class SingleRetriever {
 
         private final Set<P11SlotIdFilter> slots;
 
-        private final List<String> singlePasswords;
+        private final List<String> passwords;
 
         private SingleRetriever(
                 final Set<P11SlotIdFilter> slots,
-                final List<String> singlePasswords) {
+                final List<String> passwords) {
             this.slots = slots;
-            if (CollectionUtil.isEmpty(singlePasswords)) {
-                this.singlePasswords = null;
+            if (CollectionUtil.isEmpty(passwords)) {
+                this.passwords = null;
             } else {
-                this.singlePasswords = singlePasswords;
+                this.passwords = passwords;
             }
         }
 
@@ -88,16 +88,16 @@ public class P11PasswordRetriever {
         public List<char[]> getPasswords(
                 final PasswordResolver passwordResolver)
         throws PasswordResolverException {
-            if (singlePasswords == null) {
+            if (passwords == null) {
                 return null;
             }
 
-            List<char[]> ret = new ArrayList<char[]>(singlePasswords.size());
-            for (String singlePassword : singlePasswords) {
+            List<char[]> ret = new ArrayList<char[]>(passwords.size());
+            for (String password : passwords) {
                 if (passwordResolver == null) {
-                    ret.add(singlePassword.toCharArray());
+                    ret.add(password.toCharArray());
                 } else {
-                    ret.add(passwordResolver.resolvePassword(singlePassword));
+                    ret.add(passwordResolver.resolvePassword(password));
                 }
             }
 
@@ -109,14 +109,14 @@ public class P11PasswordRetriever {
     private final List<SingleRetriever> singleRetrievers;
     private PasswordResolver passwordResolver;
 
-    P11PasswordRetriever() {
+    P11PasswordsRetriever() {
         singleRetrievers = new LinkedList<>();
     }
 
     void addPasswordEntry(
             final Set<P11SlotIdFilter> slots,
-            final List<String> singlePasswords) {
-        singleRetrievers.add(new SingleRetriever(slots, singlePasswords));
+            final List<String> passwords) {
+        singleRetrievers.add(new SingleRetriever(slots, passwords));
     }
 
     public List<char[]> getPassword(

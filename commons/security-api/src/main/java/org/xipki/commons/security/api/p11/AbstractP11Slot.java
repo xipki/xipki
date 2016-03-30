@@ -238,6 +238,10 @@ public abstract class AbstractP11Slot implements P11Slot {
 
             for (P11ObjectIdentifier objId : certIds) {
                 X509Cert cert2 = certificates.get(objId);
+                if (cert2.getCert() == cert) {
+                    continue;
+                }
+
                 if (X509Util.issues(cert2.getCert(), cert)) {
                     return cert2.getCert();
                 }
@@ -270,6 +274,8 @@ public abstract class AbstractP11Slot implements P11Slot {
         objIds = new ArrayList<>(res.getIdentities().keySet());
         Collections.sort(objIds);
         identityIds.addAll(objIds);
+
+        updateCaCertsOfIdentities();
 
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
@@ -316,23 +322,6 @@ public abstract class AbstractP11Slot implements P11Slot {
         identities.put(objectId, identity);
 
         updateCaCertsOfIdentity(identity);
-    }
-
-    protected void deleteIdentity(
-            final P11ObjectIdentifier objectId)
-    throws P11DuplicateEntityException {
-        if (hasIdentity(objectId)) {
-            LOG.warn("could not find object " + objectId);
-            return;
-        }
-        identityIds.remove(objectId);
-        identities.remove(objectId);
-        certIds.remove(objectId);
-        certificates.remove(objectId);
-
-        updateCaCertsOfIdentities();
-
-        LOG.info("deleted identity " + objectId);
     }
 
     @Override
@@ -486,11 +475,10 @@ public abstract class AbstractP11Slot implements P11Slot {
             certificates.remove(objectId);
             identityIds.remove(objectId);
             identities.get(objectId).setCertificates(null);
-        } else {
-            throw new P11UnknownEntityException(slotId, objectId);
+            identities.remove(objectId);
+            updateCaCertsOfIdentities();
         }
 
-        updateCaCertsOfIdentities();
         doRemoveIdentity(objectId);
     }
 
@@ -725,7 +713,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
         java.security.PublicKey pk = identity.getPublicKey();
         java.security.PublicKey newPk = newCert.getPublicKey();
-        if (!pk.equals(newPk)) { // TODO: check non-named ec key
+        if (!pk.equals(newPk)) {
             throw new SecurityException("the given certificate is not for the key " + objectId);
         }
 
@@ -753,11 +741,13 @@ public abstract class AbstractP11Slot implements P11Slot {
             sb.append(" (").append("id: ").append(objectId.getIdHex()).append(")\n");
             String algo = identities.get(objectId).getPublicKey().getAlgorithm();
             sb.append("\t\tAlgorithm: ").append(algo).append("\n");
-            X509Certificate cert = identities.get(objectId).getCertificate();
-            if (cert == null) {
+            X509Certificate[] certs = identities.get(objectId).getCertificateChain();
+            if (certs == null || certs.length == 0) {
                 sb.append("\t\tCertificate: NONE\n");
             } else {
-                formatString(verbose, sb, cert);
+                for (int j = 0; j < certs.length; j++) {
+                    formatString(j, verbose, sb, certs[j]);
+                }
             }
         }
 
@@ -775,7 +765,7 @@ public abstract class AbstractP11Slot implements P11Slot {
                 P11ObjectIdentifier objectId = sortedObjectIds.get(i);
                 sb.append("\tCert-").append(i + 1).append(". ").append(objectId.getLabel());
                 sb.append(" (").append("id: ").append(objectId.getLabel()).append(")\n");
-                formatString(verbose, sb, certificates.get(objectId).getCert());
+                formatString(null, verbose, sb, certificates.get(objectId).getCert());
             }
         }
 
@@ -793,16 +783,24 @@ public abstract class AbstractP11Slot implements P11Slot {
     }
 
     private static void formatString(
+            final Integer index,
             final boolean verbose,
             final StringBuilder sb,
             final X509Certificate cert) {
         String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
+        sb.append("\t\tCertificate");
+        if (index != null) {
+            sb.append("[").append(index).append("]");
+        }
+        sb.append(": ");
+
         if (!verbose) {
-            sb.append("\t\tCertificate: ").append(subject).append("\n");
+            sb.append(subject).append("\n");
             return;
+        } else {
+            sb.append("\n");
         }
 
-        sb.append("\t\tCertificate:\n");
         sb.append("\t\t\tSubject: ").append(subject).append("\n");
 
         String issuer = X509Util.getRfc4519Name(cert.getIssuerX500Principal());

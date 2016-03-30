@@ -104,6 +104,10 @@ public interface P11Slot {
             @Nonnull X509Certificate newCert)
     throws P11TokenException, SecurityException;
 
+    int removeObjects(
+            @Nonnull String label)
+    throws P11TokenException;
+
     void removeIdentity(
             @Nonnull P11ObjectIdentifier objectId)
     throws P11TokenException;

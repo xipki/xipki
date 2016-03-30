@@ -48,8 +48,8 @@ import org.xipki.commons.pkcs11proxy.common.Asn1P11Params;
 import org.xipki.commons.pkcs11proxy.common.Asn1RSAPkcsPssParams;
 import org.xipki.commons.pkcs11proxy.common.Asn1SignTemplate;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
-import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
@@ -62,15 +62,15 @@ import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 
 class ProxyP11Identity extends P11Identity {
 
-    private final String moduleName;
+    private final ProxyP11Module module;
 
     ProxyP11Identity(
-            final String moduleName,
+            final ProxyP11Module module,
             final P11EntityIdentifier entityId,
-            final X509Certificate[] certificateChain,
-            final PublicKey publicKey) {
-        super(entityId, certificateChain, publicKey);
-        this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
+            final PublicKey publicKey,
+            final X509Certificate[] certificateChain) {
+        super(entityId, publicKey, certificateChain);
+        this.module = ParamUtil.requireNonNull("module", module);
     }
 
     @Override
@@ -93,10 +93,6 @@ class ProxyP11Identity extends P11Identity {
         }
         Asn1SignTemplate signTemplate = new Asn1SignTemplate(asn1EntityId, mechanism,
                 p11Param, content);
-        ProxyP11Module module = ProxyP11ModulePool.getInstance().getModule(moduleName);
-        if (module == null) {
-            throw new P11TokenException("could not find RemoteP11Module '" + moduleName + "'");
-        }
         ASN1Encodable result = module.send(P11ProxyConstants.ACTION_sign, signTemplate);
 
         ASN1OctetString octetString;

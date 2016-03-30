@@ -80,7 +80,7 @@ class KeystoreP11Module extends AbstractP11Module {
         Set<Integer> allSlotIndexes = new HashSet<>();
         Set<Long> allSlotIdentifiers = new HashSet<>();
 
-        List<P11SlotIdentifier> allSlotIds = new LinkedList<>();
+        List<P11SlotIdentifier> slotIds = new LinkedList<>();
 
         for (File child : children) {
             if ((child.isDirectory() && child.canRead() && !child.exists())) {
@@ -119,11 +119,14 @@ class KeystoreP11Module extends AbstractP11Module {
             allSlotIndexes.add(slotIndex);
             allSlotIdentifiers.add(slotId);
 
-            allSlotIds.add(new P11SlotIdentifier(slotIndex, slotId));
+            P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, slotId);
+            if (moduleConf.isSlotIncluded(slotIdentifier)) {
+                slotIds.add(slotIdentifier);
+            }
         } // end for
 
         Set<P11Slot> slots = new HashSet<>();
-        for (P11SlotIdentifier slotId : allSlotIds) {
+        for (P11SlotIdentifier slotId : slotIds) {
             List<char[]> pwd;
             try {
                 pwd = moduleConf.getPasswordRetriever().getPassword(slotId);

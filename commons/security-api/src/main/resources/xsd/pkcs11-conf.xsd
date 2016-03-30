@@ -62,8 +62,8 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="passwords" type="passwordsType" minOccurs="0"/>
-      <xs:element name="permittedMechanisms" type="permittedMechanismsType" minOccurs="0"/>
+      <xs:element name="passwordSets" type="passwordSetsType" minOccurs="0"/>
+      <xs:element name="mechanismSets" type="mechanismSetsType" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
@@ -84,12 +84,12 @@
       <xs:element name="id" type="xs:string"/>
     </xs:choice>
   </xs:complexType>
-  <xs:complexType name="passwordsType">
+  <xs:complexType name="passwordSetsType">
     <xs:sequence>
-      <xs:element name="password" type="passwordType" maxOccurs="unbounded"/>
+      <xs:element name="passwords" type="passwordsType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="passwordType">
+  <xs:complexType name="passwordsType">
     <xs:sequence>
       <xs:element name="slots" type="slotsType" minOccurs="0">
         <xs:annotation>
@@ -99,10 +99,10 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="singlePassword" type="xs:string" maxOccurs="unbounded"/>
+      <xs:element name="password" type="xs:string" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="permittedMechanismsType">
+  <xs:complexType name="mechanismSetsType">
     <xs:sequence>
       <xs:element name="mechanisms" type="mechanismsType" maxOccurs="unbounded"/>
     </xs:sequence>
