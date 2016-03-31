@@ -31,6 +31,12 @@
     <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/password-impl/${project.version}</bundle>
   </feature>
+  <feature name="xipki-shell-base">
+    <feature>bouncycastle</feature>
+    <feature>xipki-password</feature>
+    <bundle>mvn:org.xipki.commons/security-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
+  </feature>
   <feature name="xipki-datasource" version="${project.version}">
     <feature>xipki-password</feature>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
@@ -75,7 +81,7 @@
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}">
     <feature>xipki-caserver</feature>
-    <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
+    <feature>xipki-shell-base</feature>
     <bundle>mvn:org.xipki.pki/ca-mgmt-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-qa-shell" version="${project.version}">
@@ -89,7 +95,7 @@
   </feature>
   <feature name="xipki-caclient-shell" version="${project.version}">
     <feature>xipki-caclient</feature>
-    <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
+    <feature>xipki-shell-base</feature>
     <bundle>mvn:org.xipki.pki/ca-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caqa-shell" version="${project.version}">
@@ -101,25 +107,25 @@
   </feature>
   <feature name="xipki-security-shell" version="${project.version}">
     <feature>xipki-security</feature>
-    <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
+    <feature>xipki-shell-base</feature>
     <bundle>mvn:org.xipki.commons/security-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-speed-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-scepclient-shell" version="${project.version}">
     <feature>bouncycastle</feature>
+    <feature>xipki-shell-base</feature>
     <bundle>mvn:org.xipki.pki/scep-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/scep-client/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/scep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-jscepclient-shell" version="${project.version}">
     <feature>bouncycastle</feature>
+    <feature>xipki-shell-base</feature>
     <bundle>wrap:mvn:com.google.code.jscep/jscep/${jscep.version}</bundle>
     <bundle>wrap:mvn:net.jcip/jcip-annotations/1.0</bundle>
     <bundle>mvn:commons-codec/commons-codec/1.7</bundle>
     <bundle>mvn:commons-io/commons-io/2.4</bundle>
     <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
-    <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/jscep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspserver" version="${project.version}">
@@ -136,7 +142,7 @@
   </feature>
   <feature name="xipki-ocspclient-shell" version="${project.version}">
     <feature>xipki-ocspclient</feature>
-    <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
+    <feature>xipki-shell-base</feature>
     <bundle>mvn:org.xipki.pki/ocsp-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspqa-shell" version="${project.version}">
@@ -148,7 +154,7 @@
   <feature name="xipki-database-tool" version="${project.version}">
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
-    <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
+    <feature>xipki-shell-base</feature>
     <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
     <bundle>mvn:org.xipki.commons/database-tool/${project.version}</bundle>
