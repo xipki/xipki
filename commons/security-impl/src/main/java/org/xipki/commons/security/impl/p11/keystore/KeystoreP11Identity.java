@@ -67,6 +67,7 @@ import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
+import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
@@ -91,6 +92,7 @@ public class KeystoreP11Identity extends P11Identity {
     private final SecureRandom random;
 
     public KeystoreP11Identity(
+            final P11Slot slot,
             final P11EntityIdentifier identityId,
             final PrivateKey privateKey,
             final PublicKey publicKey,
@@ -98,7 +100,7 @@ public class KeystoreP11Identity extends P11Identity {
             final int maxSessions,
             final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
-        super(identityId, publicKey, certificateChain);
+        super(slot, identityId, publicKey, certificateChain);
         this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
         this.random = ParamUtil.requireNonNull("random", random);
 

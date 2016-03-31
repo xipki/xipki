@@ -61,6 +61,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
     private static final Logger LOG = LoggerFactory.getLogger(P11Identity.class);
 
+    protected final P11Slot slot;
+
     protected final P11EntityIdentifier identityId;
 
     protected final PublicKey publicKey;
@@ -70,9 +72,11 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     protected X509Certificate[] certificateChain;
 
     public P11Identity(
+            final P11Slot slot,
             final P11EntityIdentifier identityId,
             final PublicKey publicKey,
             final X509Certificate[] certificateChain) {
+        this.slot = ParamUtil.requireNonNull("slot", slot);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         if ((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
                 && publicKey == null) {
@@ -109,6 +113,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
             final byte[] content)
     throws P11TokenException, SecurityException {
         ParamUtil.requireNonNull("content", content);
+        slot.assertMechanismSupported(mechanism);
         if (!supportsMechanism(mechanism, parameters)) {
             throw new P11UnsupportedMechanismException(mechanism, identityId);
         }
