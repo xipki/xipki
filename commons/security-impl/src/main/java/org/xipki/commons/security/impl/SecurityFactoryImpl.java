@@ -287,7 +287,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 P11ObjectIdentifier p11ObjId = (keyId != null)
                         ? slot.getObjectIdForId(keyId)
                         : slot.getObjectIdForLabel(keyLabel);
-
+                if (p11ObjId == null) {
+                    String str2 = (keyId != null)
+                            ? "id " + Hex.toHexString(keyId)
+                            : "label " + keyLabel;
+                    throw new SecurityException("cound not find identity with " + str2);
+                }
                 P11EntityIdentifier entityId = new P11EntityIdentifier(slot.getSlotId(), p11ObjId);
 
                 try {

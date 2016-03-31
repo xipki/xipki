@@ -51,7 +51,6 @@ import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
 
@@ -74,17 +73,11 @@ class ProxyP11Identity extends P11Identity {
     }
 
     @Override
-    public byte[] sign(
+    protected byte[] doSign(
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
     throws P11TokenException {
-        ParamUtil.requireNonNull("content", content);
-
-        if (!supportsMechanism(mechanism, parameters)) {
-            throw new P11UnsupportedMechanismException(mechanism, identityId);
-        }
-
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
         Asn1P11Params p11Param = null;
         if (parameters instanceof P11RSAPkcsPssParams) {

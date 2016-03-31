@@ -42,6 +42,11 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
@@ -53,6 +58,8 @@ import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
  */
 
 public abstract class P11Identity implements Comparable<P11Identity> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(P11Identity.class);
 
     protected final P11EntityIdentifier identityId;
 
@@ -96,10 +103,25 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         }
     } // constructor
 
-    public abstract byte[] sign(
+    public byte[] sign(
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
+    throws P11TokenException, SecurityException {
+        ParamUtil.requireNonNull("content", content);
+        if (!supportsMechanism(mechanism, parameters)) {
+            throw new P11UnsupportedMechanismException(mechanism, identityId);
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("sign with mechanism {}", P11Constants.getMechanismDesc(mechanism));
+        }
+        return doSign(mechanism, parameters, content);
+    }
+
+    protected abstract byte[] doSign(
+            final long mechanism,
+            @Nullable final P11Params parameters,
+            @Nonnull final byte[] content)
     throws P11TokenException, SecurityException;
 
     public P11EntityIdentifier getIdentityId() {

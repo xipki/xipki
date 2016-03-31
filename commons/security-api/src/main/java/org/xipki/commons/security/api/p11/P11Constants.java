@@ -106,13 +106,13 @@ public class P11Constants {
 
     public static final long CKM_DSA_SHA1 = 0x00000012L;
 
-    public static final long CKM_DSA_SHA224 = 0x00000014L;
+    public static final long CKM_DSA_SHA224 = 0x00000013L;
 
-    public static final long CKM_DSA_SHA256 = 0x00000015L;
+    public static final long CKM_DSA_SHA256 = 0x00000014L;
 
-    public static final long CKM_DSA_SHA384 = 0x00000016L;
+    public static final long CKM_DSA_SHA384 = 0x00000015L;
 
-    public static final long CKM_DSA_SHA512 = 0x00000017L;
+    public static final long CKM_DSA_SHA512 = 0x00000016L;
 
     /* DSA */
     public static final long CKM_ECDSA = 0x00001041L;
@@ -223,6 +223,17 @@ public class P11Constants {
         return mech == null
                 ? -1
                 : mech.longValue();
+    }
+
+    public static String getMechanismDesc(
+            final long mechanism) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%#08x", mechanism));
+        String name = mechanismNameMap.get(mechanism);
+        if (name != null) {
+            sb.append(" (").append(name).append(")");
+        }
+        return sb.toString();
     }
 
     private P11Constants() {
