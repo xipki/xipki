@@ -59,7 +59,6 @@ import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.SignerUtil;
 
@@ -125,8 +124,7 @@ class P11ECDSAContentSigner implements ContentSigner {
             throw new SecurityException("unsupported signature algorithm " + algOid);
         }
 
-        P11SlotIdentifier slotId = identityId.getSlotId();
-        P11Slot slot = cryptService.getSlot(slotId);
+        P11Slot slot = cryptService.getSlot(identityId.getSlotId());
         if (slot.supportsMechanism(P11Constants.CKM_ECDSA)) {
             this.mechanism = P11Constants.CKM_ECDSA;
             AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(

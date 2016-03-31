@@ -339,6 +339,9 @@ public class SignerUtil {
             final byte[] signature)
     throws SecurityException {
         ParamUtil.requireNonNull("signature", signature);
+        if (signature.length % 2 != 0) {
+            throw new SecurityException("signature.lenth must be even, but is odd");
+        }
         byte[] ba = new byte[signature.length / 2];
         ASN1EncodableVector sigder = new ASN1EncodableVector();
 
@@ -377,15 +380,24 @@ public class SignerUtil {
         }
 
         byte[] plainSignature = new byte[2 * blockSize];
-
-        byte[] bytes = sigR.toByteArray();
-        int srcOffset = Math.max(0, bytes.length - blockSize);
-        System.arraycopy(bytes, srcOffset, plainSignature, 0, bytes.length - srcOffset);
-
-        bytes = sigS.toByteArray();
-        srcOffset = Math.max(0, bytes.length - blockSize);
-        System.arraycopy(bytes, srcOffset, plainSignature, blockSize, bytes.length - srcOffset);
+        bigIntToBytes(sigR, plainSignature, 0, blockSize);
+        bigIntToBytes(sigS, plainSignature, blockSize, blockSize);
         return plainSignature;
+    }
+
+    private static void bigIntToBytes(
+            final BigInteger num,
+            final byte[] dest,
+            final int destPos,
+            final int length) {
+        byte[] bytes = num.toByteArray();
+        if (bytes.length == length) {
+            System.arraycopy(bytes, 0, dest, destPos, length);
+        } else if (bytes.length < length) {
+            System.arraycopy(bytes, 0, dest, destPos + length - bytes.length, bytes.length);
+        } else {
+            System.arraycopy(bytes, bytes.length - length, dest, destPos, length);
+        }
     }
 
     public static Digest getDigest(

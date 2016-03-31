@@ -13,7 +13,7 @@ xipki-ca:profile-add \
 
 ## Create the PKCS#10 request for the command caqa:check-cert in QA
 xipki-tk:req \
-  --slot 0 \
+  --slot $SLOT \
   --label $RCA_KEY_LABEL \
   --out output/RCA1.p10 \
   --subject "CN=RCA1,O=xipki,C=DE"
@@ -29,7 +29,7 @@ xipki-ca:gen-rca \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS11 \
-  --signer-conf algo=$CA_SIGNER_ALGO,slot=0,key-label=$RCA_KEY_LABEL \
+  --signer-conf algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=$RCA_KEY_LABEL \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
@@ -40,7 +40,7 @@ xipki-ca:gen-rca \
 
 ## Update the certificate in the device
 xipki-tk:update-cert \
-  --slot 0 \
+  --slot $SLOT \
   --label $RCA_KEY_LABEL \
   --cert output/RCA1.der
 
@@ -85,7 +85,7 @@ xipki-ca:publish-self \
 
 ## Generate keys and PKCS#10 request for SubCA1
 xipki-tk:req \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCA_KEY_LABEL \
   --out output/SubCA1.p10 \
   --subject "CN=SubCA1,O=xipki,C=DE"
@@ -97,13 +97,13 @@ xipki-ca:enroll-cert \
   --profile SubCA
 
 xipki-tk:update-cert \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCA_KEY_LABEL \
   --cert output/SubCA1.der \
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
 xipki-tk:req \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCAwithCRL_KEY_LABEL --out output/SubCAwithCRL1.p10 \
   --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
   --subject-alt-name "[1]info@xipki.org" \
@@ -123,7 +123,7 @@ xipki-ca:enroll-cert \
   --profile SubCA.Complex
 
 xipki-tk:update-cert \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCAwithCRL_KEY_LABEL \
   --cert output/SubCAwithCRL1.der \
 
@@ -138,7 +138,7 @@ xipki-ca:ca-add \
   --next-crl-no 2 \
   --max-validity 5y \
   --signer-type PKCS11 \
-  --signer-conf algo=$CA_SIGNER_ALGO,slot=0,key-label=$SubCA_KEY_LABEL \
+  --signer-conf algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=$SubCA_KEY_LABEL \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/SubCA1.der \
   --cmp-control cmpcontrol1 \
@@ -199,7 +199,7 @@ xipki-ca:ca-add \
   --next-crl-no 2 \
   --max-validity 8000y \
   --signer-type PKCS11 \
-  --signer-conf algo=$CA_SIGNER_ALGO,slot=0,key-label=$SubCAwithCRL_KEY_LABEL \
+  --signer-conf algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=$SubCAwithCRL_KEY_LABEL \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://example.org/SubCAwithCRL1.der \
   --crl-uri http://subcawithcrl.example.org/crl \

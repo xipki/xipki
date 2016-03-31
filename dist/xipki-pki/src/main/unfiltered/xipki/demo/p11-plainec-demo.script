@@ -1,3 +1,5 @@
+SLOT = 0
+
 # Curve name or OID, e.g. secp256r1, brainpoolp256r1
 EC_CURVE = secp256r1
 
@@ -21,17 +23,17 @@ source ./xipki/demo/demo.d/p11-rm-keys.script
 
 xipki-tk:ec \
   --curve $EC_CURVE \
-  --slot 0 \
+  --slot $SLOT \
   --label $RCA_KEY_LABEL
 
 xipki-tk:ec \
   --curve $EC_CURVE \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCA_KEY_LABEL
 
 xipki-tk:ec \
   --curve $EC_CURVE \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCAwithCRL_KEY_LABEL
 
 feature:uninstall xipki-security-shell

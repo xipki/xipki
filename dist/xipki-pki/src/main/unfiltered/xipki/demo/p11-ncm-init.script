@@ -1,3 +1,5 @@
+SLOT = 0
+
 RCA_KEY_LABEL = RCA1
 
 feature:install xipki-security-shell
@@ -7,11 +9,11 @@ sleep 1000
 xipki-cmd:rm -r -f output
 
 xipki-tk:delete-key \
-  --slot 0 \
+  --slot $SLOT \
   --label $RCA_KEY_LABEL
 
 xipki-tk:rsa \
-  --slot 0 \
+  --slot $SLOT \
   --label $RCA_KEY_LABEL
 
 source ./xipki/demo/demo.d/initdb.script

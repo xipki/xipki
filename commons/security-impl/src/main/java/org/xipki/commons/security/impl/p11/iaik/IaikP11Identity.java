@@ -40,10 +40,9 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 import iaik.pkcs.pkcs11.objects.PrivateKey;
@@ -71,17 +70,11 @@ class IaikP11Identity extends P11Identity {
     }
 
     @Override
-    public byte[] sign(
+    protected byte[] doSign(
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
     throws P11TokenException {
-        ParamUtil.requireNonNull("content", content);
-
-        if (!supportsMechanism(mechanism, parameters)) {
-            throw new P11UnsupportedMechanismException(mechanism, identityId);
-        }
-
         IaikP11Slot slot = (IaikP11Slot) module.getSlot(identityId.getSlotId());
         return slot.sign(mechanism, parameters, content, this);
     }
