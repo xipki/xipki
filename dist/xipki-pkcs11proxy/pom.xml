@@ -14,7 +14,7 @@
   <properties>
     <app.name>PKCS#11 proxy</app.name>
     <features.artifactId>pkcs11proxy</features.artifactId>
-    <boot.features>http-whiteboard, xipki-pkcs11-proxy</boot.features>
+    <boot.features>http-whiteboard,xipki-shell-base,xipki-pkcs11-proxy</boot.features>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
   </properties>

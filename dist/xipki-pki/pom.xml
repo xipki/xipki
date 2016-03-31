@@ -14,7 +14,7 @@
   <properties>
     <app.name>PKI</app.name>
     <features.artifactId>pki</features.artifactId>
-    <boot.features>http-whiteboard, xipki-caserver</boot.features>
+    <boot.features>http-whiteboard,xipki-shell-base,xipki-caserver</boot.features>
     <postgresql.version>9.4.1207.jre7</postgresql.version>
     <h2-jdbc.version>1.4.191</h2-jdbc.version>
     <hsqldb.version>2.3.3</hsqldb.version>
