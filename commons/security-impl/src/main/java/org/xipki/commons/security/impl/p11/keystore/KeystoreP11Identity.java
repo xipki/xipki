@@ -65,8 +65,8 @@ import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.p11.P11Constants;
-import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
+import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.p11.parameters.P11Params;
 import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
@@ -154,18 +154,11 @@ public class KeystoreP11Identity extends P11Identity {
     } // constructor
 
     @Override
-    public byte[] sign(
+    protected byte[] doSign(
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
     throws P11TokenException, SecurityException {
-        ParamUtil.requireNonNull("content", content);
-
-        if (!supportsMechanism(mechanism, parameters)) {
-            throw new SecurityException("mechanism " + mechanism + " is not allowed for "
-                    + publicKey.getAlgorithm() + " public key");
-        }
-
         if (P11Constants.CKM_ECDSA == mechanism) {
             return dsaAndEcdsaSign(content, null);
         } else if (P11Constants.CKM_ECDSA_SHA1 == mechanism) {

@@ -1,3 +1,5 @@
+SLOT=0
+
 PLEN = 1024
 CA_SIGNER_ALGO = SHA256withDSA:SHA1withDSA
 
@@ -19,17 +21,17 @@ source ./xipki/demo/demo.d/p11-rm-keys.script
 
 xipki-tk:dsa \
   --plen $PLEN \
-  --slot 0 \
+  --slot $SLOT \
   --label $RCA_KEY_LABEL
 
 xipki-tk:dsa \
   --plen $PLEN \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCA_KEY_LABEL
 
 xipki-tk:dsa \
   --plen $PLEN \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCAwithCRL_KEY_LABEL
 
 feature:uninstall xipki-security-shell

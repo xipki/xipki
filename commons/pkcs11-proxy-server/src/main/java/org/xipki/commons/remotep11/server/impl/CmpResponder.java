@@ -281,7 +281,7 @@ class CmpResponder {
                 || P11ProxyConstants.ACTION_getIdentityIdentifiers == action) {
             Asn1P11SlotIdentifier slotId = Asn1P11SlotIdentifier.getInstance(reqValue);
             P11Slot slot = p11CryptService.getModule().getSlot(slotId.getSlotId());
-            List<P11ObjectIdentifier> objectIds;
+            Set<P11ObjectIdentifier> objectIds;
             if (P11ProxyConstants.ACTION_getCertIdentifiers == action) {
                 objectIds = slot.getCertIdentifiers();
             } else {

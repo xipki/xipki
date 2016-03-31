@@ -1,3 +1,5 @@
+SLOT = 0
+
 # Valid signer algos are SHA<n>withRSA where n is 1, 256, 384 and 512
 #
 CA_SIGNER_ALGO = SHA256withRSA:SHA1withRSA
@@ -19,15 +21,15 @@ xipki-cmd:rm -r -f output
 source ./xipki/demo/demo.d/p11-rm-keys.script
 
 xipki-tk:rsa \
-  --slot 0 \
+  --slot $SLOT \
   --label $RCA_KEY_LABEL
 
 xipki-tk:rsa \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCA_KEY_LABEL
 
 xipki-tk:rsa \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCAwithCRL_KEY_LABEL
 
 feature:uninstall xipki-security-shell

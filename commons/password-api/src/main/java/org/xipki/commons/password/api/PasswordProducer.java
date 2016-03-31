@@ -42,12 +42,17 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
 public class PasswordProducer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PasswordProducer.class);
 
     private static ConcurrentHashMap<String, BlockingQueue<char[]>> namePasswordsMap =
             new ConcurrentHashMap<>();
@@ -57,12 +62,14 @@ public class PasswordProducer {
         assertNameNotBlank(name);
         BlockingQueue<char[]> queue = new LinkedBlockingQueue<>(1);
         namePasswordsMap.put(name, queue);
+        LOG.info("registered passoword consumer '{}'", name);
     }
 
     public static void unregisterPasswordConsumer(
             final String name) {
         assertNameNotBlank(name);
         namePasswordsMap.remove(name);
+        LOG.info("unregistered passoword consumer '{}'", name);
     }
 
     public static char[] takePassword(
@@ -70,7 +77,8 @@ public class PasswordProducer {
     throws InterruptedException, PasswordResolverException {
         assertNameNotBlank(name);
         if (!namePasswordsMap.containsKey(name)) {
-            throw new PasswordResolverException("the name '" + name + "' is not registered ");
+            throw new PasswordResolverException("password consumer '" + name
+                    + "' is not registered ");
         }
         return namePasswordsMap.get(name).take();
     }
@@ -81,10 +89,12 @@ public class PasswordProducer {
     throws InterruptedException, PasswordResolverException {
         assertNameNotBlank(name);
         if (!namePasswordsMap.containsKey(name)) {
-            throw new PasswordResolverException("the name '" + name + "' is not registered ");
+            throw new PasswordResolverException("password consumer '" + name
+                    + "' is not registered ");
         }
 
         namePasswordsMap.get(name).put(password);
+        LOG.info("provided passoword for consumer '{}'", name);
     }
 
     public static boolean needsPassword(

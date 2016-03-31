@@ -120,9 +120,12 @@ class KeystoreP11Module extends AbstractP11Module {
             allSlotIdentifiers.add(slotId);
 
             P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, slotId);
-            if (moduleConf.isSlotIncluded(slotIdentifier)) {
-                slotIds.add(slotIdentifier);
+            if (!moduleConf.isSlotIncluded(slotIdentifier)) {
+                LOG.info("skipped slot {}", slotId);
+                continue;
             }
+
+            slotIds.add(slotIdentifier);
         } // end for
 
         Set<P11Slot> slots = new HashSet<>();

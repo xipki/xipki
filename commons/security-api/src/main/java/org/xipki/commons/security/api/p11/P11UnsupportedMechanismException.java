@@ -48,28 +48,20 @@ public class P11UnsupportedMechanismException extends P11TokenException {
     public P11UnsupportedMechanismException(
             final long mechanism,
             final P11SlotIdentifier slotId) {
-        super("mechanism " + getMechanismDesc(mechanism) + " is not supported by PKCS11 slot "
-            + slotId);
+        super("mechanism " + P11Constants.getMechanismDesc(mechanism)
+            + " is not supported by PKCS11 slot " + slotId);
     }
 
     public P11UnsupportedMechanismException(
             final long mechanism,
             final P11EntityIdentifier entityId) {
-        super("mechanism " + getMechanismDesc(mechanism) + " is not supported by PKCS11 entitiy "
-            + entityId);
+        super("mechanism " + P11Constants.getMechanismDesc(mechanism)
+            + " is not supported by PKCS11 entitiy " + entityId);
     }
 
     public P11UnsupportedMechanismException(
             final String message) {
         super(message);
-    }
-
-    private static String getMechanismDesc(
-            final long mechanism) {
-        String name = P11Constants.getMechanismName(mechanism);
-        return (name == null)
-                ? Long.toString(mechanism)
-                : name + " (" + mechanism + ")";
     }
 
 }

@@ -209,6 +209,10 @@ class IaikP11Slot extends AbstractP11Slot {
         refresh();
     } // constructor
 
+    public Slot getSlot() {
+        return slot;
+    }
+
     @Override
     protected P11SlotRefreshResult doRefresh(
             final P11MechanismFilter mechanismFilter)
@@ -379,7 +383,7 @@ class IaikP11Slot extends AbstractP11Slot {
     private byte[] singleSign(
             final long mechanism,
             final P11Params parameters,
-            final byte[] hash,
+            final byte[] content,
             final IaikP11Identity identity)
     throws P11TokenException {
         PrivateKey signingKey = identity.getPrivateKey();
@@ -398,7 +402,7 @@ class IaikP11Slot extends AbstractP11Slot {
             synchronized (session) {
                 login(session);
                 session.signInit(mechanismObj, signingKey);
-                signature = session.sign(hash);
+                signature = session.sign(content);
             }
         } catch (TokenException ex) {
             throw new P11TokenException(ex.getMessage(), ex);

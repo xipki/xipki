@@ -97,6 +97,7 @@ class IaikP11Module extends AbstractP11Module {
             P11SlotIdentifier slotId = new P11SlotIdentifier(i, slot.getSlotID());
             availableSlots.put(slotId, slot);
             if (!moduleConf.isSlotIncluded(slotId)) {
+                LOG.info("skipped slot {}", slotId);
                 continue;
             }
 
@@ -118,12 +119,13 @@ class IaikP11Module extends AbstractP11Module {
         if (LOG.isDebugEnabled()) {
             try {
                 StringBuilder msg = new StringBuilder();
-                for (int i = 0; i < slotList.length; i++) {
-                    Slot slot = slotList[i];
+                for (P11Slot p11Slot : slots) {
+                    P11SlotIdentifier slotId = p11Slot.getSlotId();
+                    Slot slot = ((IaikP11Slot) p11Slot).getSlot();
                     msg.append("------------------------Slot ")
-                        .append(i + 1)
+                        .append(slotId.getIndex())
                         .append("-------------------------\n");
-                    msg.append(slot.getSlotID()).append("\n");
+                    msg.append("id: ").append(slot.getSlotID()).append("\n");
                     try {
                         msg.append(slot.getSlotInfo().toString()).append("\n");
                     } catch (TokenException ex) {

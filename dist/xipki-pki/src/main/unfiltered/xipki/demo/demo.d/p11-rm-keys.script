@@ -1,11 +1,11 @@
 xipki-tk:delete-key \
-  --slot 0 \
+  --slot $SLOT \
   --label $RCA_KEY_LABEL
 
 xipki-tk:delete-key \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCA_KEY_LABEL
 
 xipki-tk:delete-key \
-  --slot 0 \
+  --slot $SLOT \
   --label $SubCAwithCRL_KEY_LABEL
