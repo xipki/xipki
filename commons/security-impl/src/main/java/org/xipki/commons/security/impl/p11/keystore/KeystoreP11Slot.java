@@ -305,7 +305,7 @@ class KeystoreP11Slot extends AbstractP11Slot {
                         ? null
                         : new X509Certificate[]{cert.getCert()};
 
-                KeystoreP11Identity identity = new KeystoreP11Identity(
+                KeystoreP11Identity identity = new KeystoreP11Identity(this,
                         new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey,
                         certs, maxSessions, securityFactory.getRandom4Sign());
                 LOG.info("added PKCS#11 key {}", p11ObjId);
@@ -796,8 +796,8 @@ class KeystoreP11Slot extends AbstractP11Slot {
         P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
                 new P11ObjectIdentifier(id, label));
         try {
-            return new KeystoreP11Identity(identityId, keypair.getPrivate(), keypair.getPublic(),
-                    null, maxSessions, securityFactory.getRandom4Sign());
+            return new KeystoreP11Identity(this,identityId, keypair.getPrivate(),
+                    keypair.getPublic(), null, maxSessions, securityFactory.getRandom4Sign());
         } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
             throw new P11TokenException(
                     "could not counstruct KeyStoreP11Identity: " + ex.getMessage(), ex);

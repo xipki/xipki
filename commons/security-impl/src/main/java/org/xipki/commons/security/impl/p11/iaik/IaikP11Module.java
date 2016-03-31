@@ -91,6 +91,8 @@ class IaikP11Module extends AbstractP11Module {
             throw new P11TokenException("no slot with present card could be found");
         }
 
+        StringBuilder msg = new StringBuilder();
+
         Set<P11Slot> slots = new HashSet<>();
         for (int i = 0; i < slotList.length; i++) {
             Slot slot = slotList[i];
@@ -101,47 +103,34 @@ class IaikP11Module extends AbstractP11Module {
                 continue;
             }
 
+            if (LOG.isDebugEnabled()) {
+                msg.append("--------------------Slot ").append(i).append("--------------------\n");
+                msg.append("id: ").append(slot.getSlotID()).append("\n");
+                try {
+                    msg.append(slot.getSlotInfo()).append("\n");
+                } catch (TokenException ex) {
+                    msg.append("error: " + ex.getMessage());
+                }
+            }
+
             List<char[]> pwd;
             try {
                 pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
             } catch (PasswordResolverException ex) {
                 throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
             }
-            P11Slot p11Slot = new IaikP11Slot(this, slotId, slot,
+            P11Slot p11Slot = new IaikP11Slot(moduleConf.getName(), slotId, slot,
                     moduleConf.isReadOnly(), moduleConf.getUserType(), pwd,
                     moduleConf.getMaxMessageSize(), moduleConf.getP11MechanismFilter());
 
             slots.add(p11Slot);
         }
 
-        setSlots(slots);
-
         if (LOG.isDebugEnabled()) {
-            try {
-                StringBuilder msg = new StringBuilder();
-                for (P11Slot p11Slot : slots) {
-                    P11SlotIdentifier slotId = p11Slot.getSlotId();
-                    Slot slot = ((IaikP11Slot) p11Slot).getSlot();
-                    msg.append("------------------------Slot ")
-                        .append(slotId.getIndex())
-                        .append("-------------------------\n");
-                    msg.append("id: ").append(slot.getSlotID()).append("\n");
-                    try {
-                        msg.append(slot.getSlotInfo().toString()).append("\n");
-                    } catch (TokenException ex) {
-                        msg.append("error: " + ex.getMessage());
-                    }
-                }
-                LOG.debug("{}", msg);
-            } catch (Throwable th) {
-                final String message = "unexpected error";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
-                            th.getMessage());
-                }
-                LOG.debug(message, th);
-            }
-        } // end if(LOG.isDebugEnabled())
+            LOG.debug("{}", msg);
+        }
+
+        setSlots(slots);
     }
 
     void close() {

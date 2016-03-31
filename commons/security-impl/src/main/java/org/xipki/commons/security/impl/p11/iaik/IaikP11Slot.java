@@ -116,8 +116,6 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private final int maxMessageSize;
 
-    private final IaikP11Module module;
-
     private Slot slot;
 
     private final long userType;
@@ -137,7 +135,7 @@ class IaikP11Slot extends AbstractP11Slot {
     private Session writableSession;
 
     IaikP11Slot(
-            final IaikP11Module module,
+            final String moduleName,
             final P11SlotIdentifier slotId,
             final Slot slot,
             final boolean readOnly,
@@ -146,8 +144,7 @@ class IaikP11Slot extends AbstractP11Slot {
             final int maxMessageSize,
             final P11MechanismFilter mechanismFilter)
     throws P11TokenException {
-        super(module.getName(), slotId, readOnly, mechanismFilter);
-        this.module = ParamUtil.requireNonNull("module", module);
+        super(moduleName, slotId, readOnly, mechanismFilter);
         this.slot = ParamUtil.requireNonNull("slot", slot);
         this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 1);
         this.userType = ParamUtil.requireMin("userType", userType, 0);
@@ -326,7 +323,7 @@ class IaikP11Slot extends AbstractP11Slot {
         X509Certificate[] certs = (cert == null)
                 ? null
                 : new X509Certificate[]{cert.getCert()};
-        IaikP11Identity identity = new IaikP11Identity(module,
+        IaikP11Identity identity = new IaikP11Identity(this,
                 new P11EntityIdentifier(slotId, objectId), privKey, pubKey, certs);
         refreshResult.addIdentity(identity);
     }
@@ -1023,7 +1020,7 @@ class IaikP11Slot extends AbstractP11Slot {
         if (privateKey2 == null) {
             throw new P11TokenException("could not read the generated privateKey");
         }
-        return new IaikP11Identity(module, entityId, privateKey2, jcePublicKey, null);
+        return new IaikP11Identity(this, entityId, privateKey2, jcePublicKey, null);
     }
 
     private static X509PublicKeyCertificate createPkcs11Template(

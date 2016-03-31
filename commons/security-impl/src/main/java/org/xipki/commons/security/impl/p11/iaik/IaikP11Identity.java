@@ -54,18 +54,15 @@ import iaik.pkcs.pkcs11.objects.PrivateKey;
 
 class IaikP11Identity extends P11Identity {
 
-    private final IaikP11Module module;
-
     private final PrivateKey privateKey;
 
     IaikP11Identity(
-            final IaikP11Module module,
+            final IaikP11Slot slot,
             final P11EntityIdentifier identityId,
             final PrivateKey privateKey,
             final PublicKey publicKey,
             final X509Certificate[] certificateChain) {
-        super(identityId, publicKey, certificateChain);
-        this.module = ParamUtil.requireNonNull("module", module);
+        super(slot, identityId, publicKey, certificateChain);
         this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
     }
 
@@ -75,8 +72,7 @@ class IaikP11Identity extends P11Identity {
             final P11Params parameters,
             final byte[] content)
     throws P11TokenException {
-        IaikP11Slot slot = (IaikP11Slot) module.getSlot(identityId.getSlotId());
-        return slot.sign(mechanism, parameters, content, this);
+        return ((IaikP11Slot) slot).sign(mechanism, parameters, content, this);
     }
 
     PrivateKey getPrivateKey() {
