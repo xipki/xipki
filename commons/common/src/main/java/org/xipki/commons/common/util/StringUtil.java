@@ -256,7 +256,7 @@ public class StringUtil {
         int destPos = 0;
         for (int i = 0; i < parts.length; i++) {
             char[] part = parts[i];
-            System.arraycopy(parts, 0, ret, destPos, part.length);
+            System.arraycopy(part, 0, ret, destPos, part.length);
             destPos += part.length;
         }
         return ret;
