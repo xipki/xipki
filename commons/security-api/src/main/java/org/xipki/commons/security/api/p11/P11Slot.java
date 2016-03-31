@@ -40,13 +40,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 
 import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.p11.parameters.P11Params;
 
 /**
  * @author Lijun Liao
@@ -61,9 +59,9 @@ public interface P11Slot {
 
     P11SlotIdentifier getSlotId();
 
-    List<P11ObjectIdentifier> getIdentityIdentifiers();
+    Set<P11ObjectIdentifier> getIdentityIdentifiers();
 
-    List<P11ObjectIdentifier> getCertIdentifiers();
+    Set<P11ObjectIdentifier> getCertIdentifiers();
 
     boolean hasIdentity(
             final P11ObjectIdentifier objectId);
@@ -91,13 +89,6 @@ public interface P11Slot {
 
     P11ObjectIdentifier getObjectIdForLabel(
             String label);
-
-    byte[] sign(
-            final long mechanism,
-            final P11Params parameters,
-            final byte[] content,
-            final P11ObjectIdentifier objectId)
-    throws P11TokenException, SecurityException;
 
     void updateCertificate(
             @Nonnull P11ObjectIdentifier objectId,

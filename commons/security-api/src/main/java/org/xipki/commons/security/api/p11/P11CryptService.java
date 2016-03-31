@@ -58,7 +58,6 @@ public class P11CryptService {
             final P11Module module)
     throws P11TokenException {
         this.module = ParamUtil.requireNonNull("module", module);
-        refresh();
     }
 
     public synchronized void refresh()

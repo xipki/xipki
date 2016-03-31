@@ -179,11 +179,14 @@ class ProxyP11Module extends AbstractP11Module {
                 continue;
             }
 
+            if (!conf.isSlotIncluded(slotId)) {
+                LOG.info("skipped slot {}", slotId);
+                continue;
+            }
+
             P11Slot slot = new ProxyP11Slot(this, slotId, conf.isReadOnly(),
                     conf.getP11MechanismFilter());
-            if (conf.isSlotIncluded(slotId)) {
-                slots.add(slot);
-            }
+            slots.add(slot);
         }
         setSlots(slots);
     }
