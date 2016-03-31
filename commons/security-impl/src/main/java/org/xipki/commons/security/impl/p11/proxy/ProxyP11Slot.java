@@ -149,7 +149,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
                     ? null
                     : new X509Certificate[]{cert.getCert()};
 
-            ProxyP11Identity identity = new ProxyP11Identity(module,
+            ProxyP11Identity identity = new ProxyP11Identity(this,
                     new P11EntityIdentifier(slotId, keyId), pubKey, certs);
             refreshResult.addIdentity(identity);
         }
@@ -290,7 +290,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
         P11EntityIdentifier entityId = ei.getEntityId();
 
         PublicKey publicKey = getPublicKey(entityId.getObjectId());
-        return new ProxyP11Identity(module, entityId, publicKey, null);
+        return new ProxyP11Identity(this, entityId, publicKey, null);
     }
 
     @Override
@@ -346,6 +346,10 @@ public class ProxyP11Slot extends AbstractP11Slot {
                     + response.getClass().getName());
         }
         return (ASN1Sequence) response;
+    }
+
+    ProxyP11Module getModule() {
+        return module;
     }
 
 }
