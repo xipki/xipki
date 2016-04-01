@@ -7,7 +7,7 @@
 
 dataSourceClassName = org.hsqldb.jdbc.JDBCDataSource
 
-dataSource.url = jdbc:hsqldb:file:./db/hsqldb/ca;sql.syntax_pgs=true
+dataSource.url = jdbc:hsqldb:file:./xipki/db/hsqldb/ca;sql.syntax_pgs=true
 dataSource.user = root
 dataSource.password = 123456
 
