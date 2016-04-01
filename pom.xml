@@ -35,7 +35,8 @@
   <properties>
     <karaf.version>4.0.4</karaf.version>
     <karaf-plugin.version>4.0.4</karaf-plugin.version>
-    <pax.web.version>4.2.5</pax.web.version>
+    <!--pax.web.version>4.2.5</pax.web.version-->
+    <jetty.version>9.2.15.v20160210</jetty.version>
     <bc.version>1.54</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <servlet-api.version>2.5</servlet-api.version>
