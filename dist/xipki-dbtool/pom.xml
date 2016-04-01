@@ -103,14 +103,7 @@
                   <artifactId>apache-karaf</artifactId>
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
-                  <outputDirectory>${project.build.directory}/unix-karaf</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.karaf</groupId>
-                  <artifactId>apache-karaf</artifactId>
-                  <version>${karaf.version}</version>
-                  <type>zip</type>
-                  <outputDirectory>${project.build.directory}/windows-karaf</outputDirectory>
+                  <outputDirectory>${project.build.directory}/apache-karaf</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -142,71 +135,26 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unix-bin</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/descriptors/assembly-main.xml</descriptor>
+              </descriptors>
+              <appendAssemblyId>false</appendAssemblyId>
+              <tarLongFileMode>posix</tarLongFileMode>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>unix</id>
-      <activation>
-        <os>
-          <family>unix</family>
-        </os>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>unix-bin</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-                <configuration>
-                  <descriptors>
-                    <descriptor>src/main/descriptors/unix-bin.xml</descriptor>
-                  </descriptors>
-                  <appendAssemblyId>false</appendAssemblyId>
-                  <tarLongFileMode>posix</tarLongFileMode>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>windows</id>
-      <activation>
-        <os>
-          <family>Windows</family>
-        </os>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>windows-bin</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-                <configuration>
-                  <descriptors>
-                    <descriptor>src/main/descriptors/windows-bin.xml</descriptor>
-                  </descriptors>
-                  <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
