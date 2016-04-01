@@ -7,7 +7,7 @@
 
 dataSourceClassName = org.h2.jdbcx.JdbcDataSource
 
-dataSource.url = jdbc:h2:./db/h2/ocsp
+dataSource.url = jdbc:h2:./xipki/db/h2/ocsp
 dataSource.user = root
 dataSource.password = 123456
 

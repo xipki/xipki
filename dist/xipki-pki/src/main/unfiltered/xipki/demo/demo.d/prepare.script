@@ -91,12 +91,12 @@ xipki-ca:publisher-add \
 xipki-ca:responder-add \
   --name responder1 \
   --signer-type JKS \
-  --signer-conf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
+  --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
 
 # CMP Requestors
 xipki-ca:requestor-add \
   --name requestor1 \
-  --cert etc/tlskeys/tls-client.der
+  --cert xipki/security/tlskeys/tls-client.der
 
 ## CRL Signer
 # Generate CRL every day at 02:00 UTC with 90 minutes overlap time

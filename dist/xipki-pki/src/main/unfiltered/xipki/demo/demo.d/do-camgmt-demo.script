@@ -104,27 +104,27 @@ xipki-ca:publisher-rm OCSP.PUBLISHER2
 
 ##### requestor #####
 
-xipki-ca:requestor-add --cert etc/tlskeys/tls-client.der --name requestor2
+xipki-ca:requestor-add --cert xipki/security/tlskeys/tls-client.der --name requestor2
 
 xipki-ca:requestor-info
 
 xipki-ca:requestor-info requestor2
 
-xipki-ca:requestor-up --cert etc/tlskeys/tls-client.der --name requestor2
+xipki-ca:requestor-up --cert xipki/security/tlskeys/tls-client.der --name requestor2
 
 xipki-ca:requestor-rm requestor2
 
 ##### responder #####
 
 xipki-ca:responder-add --name responder2 --signer-type  JKS \
-  --signer-conf  password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
+  --signer-conf  password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
 
 xipki-ca:responder-info
 
 xipki-ca:responder-info responder2
 
 xipki-ca:responder-up --name responder2 \
-  --signer-conf password=1234,keystore=file:etc/tlskeys/tls-server-keystore.jks,algo=SHA1withRSA
+  --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.jks,algo=SHA1withRSA
 
 xipki-ca:responder-rm responder2
 

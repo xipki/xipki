@@ -8,7 +8,7 @@
     <!-- Copy TLS keys -->
     <fileSet>
       <directory>${project.basedir}/../demo-tlskeys</directory>
-      <outputDirectory>etc/tlskeys</outputDirectory>
+      <outputDirectory>xipki/security/tlskeys</outputDirectory>
       <includes>
         <include>tls-server-keystore.jks</include>
         <include>tls-server-truststore.jks</include>

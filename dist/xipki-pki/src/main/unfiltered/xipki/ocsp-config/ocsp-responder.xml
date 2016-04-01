@@ -105,7 +105,7 @@
           <keystore>
             <type>JKS</type>
             <keystore>
-              <file>etc/tlskeys/tls-server-truststore.jks</file>
+              <file>xipki/security/tlskeys/tls-server-truststore.jks</file>
             </keystore>
             <password>1234</password>
           </keystore>
