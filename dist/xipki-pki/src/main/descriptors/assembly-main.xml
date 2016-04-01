@@ -12,76 +12,6 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <fileSet>
-      <directory>${output.directory}</directory>
-      <includes>
-        <include>bin/**</include>
-      </includes>
-      <excludes>
-        <exclude>bin/*.bat</exclude>
-      </excludes>
-      <outputDirectory>.</outputDirectory>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0755</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${output.directory}</directory>
-      <includes>
-        <include>bin/*.bat</include>
-      </includes>
-      <outputDirectory>.</outputDirectory>
-      <lineEnding>dos</lineEnding>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${output.directory}</directory>
-      <excludes>
-        <exclude>bin/**</exclude>
-      </excludes>
-      <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <!-- Copy over start scripts -->
-    <fileSet>
-      <directory>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}/bin</directory>
-      <excludes>
-        <exclude>*.bat</exclude>
-      </excludes>
-      <outputDirectory>bin/</outputDirectory>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0755</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}/bin</directory>
-      <includes>
-        <include>*.bat</include>
-      </includes>
-      <outputDirectory>bin/</outputDirectory>
-      <lineEnding>dos</lineEnding>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <!-- Expanded Karaf -->
-    <fileSet>
-      <directory>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}</directory>
-      <outputDirectory>.</outputDirectory>
-      <excludes>
-        <exclude>bin/**</exclude>
-        <exclude>**/demos/**</exclude>
-        <exclude>deploy/README</exclude>
-        <exclude>README</exclude>
-        <exclude>LICENSE</exclude>
-        <exclude>NOTICE</exclude>
-        <exclude>RELEASE-NOTES</exclude>
-        <exclude>karaf-manual*</exclude>
-      </excludes>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
   </fileSets>
   <files>
     <file>
@@ -96,23 +26,8 @@
       <destName>ocsp-db.properties</destName>
       <fileMode>0644</fileMode>
     </file>
-    <file>
-      <source>${project.basedir}/../../README.md</source>
-      <outputDirectory>xipki</outputDirectory>
-      <destName>README.md</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.basedir}/../../LICENSE</source>
-      <outputDirectory>license</outputDirectory>
-      <destName>xipki-LICENSE</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}/LICENSE</source>
-      <outputDirectory>license</outputDirectory>
-      <destName>karaf-LICENSE.txt</destName>
-      <fileMode>0644</fileMode>
-    </file>
   </files>
+  <componentDescriptors>
+    <componentDescriptor>${shared.dir}/descriptors/component-common.xml</componentDescriptor>
+  </componentDescriptors>
 </assembly>
