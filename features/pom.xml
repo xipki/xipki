@@ -13,6 +13,7 @@
   <name>${project.groupId}.${project.artifactId}</name>
   <packaging>pom</packaging>
   <modules>
+    <module>org.ops4j.pax.web.pax-web-features</module>
     <module>org.apache.karaf.features.standard</module>
     <module>pki</module>
     <module>ncmclient</module>
