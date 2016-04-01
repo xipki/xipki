@@ -1,19 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assembly>
-  <id>windows-bin</id>
+  <id>main</id>
   <formats>
-    <format>zip</format>
+    <format>tar.gz</format>
   </formats>
   <fileSets>
+    <!-- Copy TLS keys -->
+    <fileSet>
+      <directory>${project.basedir}/../demo-tlskeys</directory>
+      <outputDirectory>etc/tlskeys</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
     <fileSet>
       <directory>${output.directory}</directory>
       <includes>
         <include>bin/**</include>
       </includes>
       <excludes>
-        <exclude>bin/*.sh</exclude>
-        <exclude>bin/setenv</exclude>
+        <exclude>bin/*.bat</exclude>
       </excludes>
+      <outputDirectory>.</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>${output.directory}</directory>
+      <includes>
+        <include>bin/*.bat</include>
+      </includes>
       <outputDirectory>.</outputDirectory>
       <lineEnding>dos</lineEnding>
       <fileMode>0644</fileMode>
@@ -30,18 +46,28 @@
     </fileSet>
     <!-- Copy over start scripts -->
     <fileSet>
-      <directory>${project.build.directory}/windows-karaf/apache-karaf-${karaf.version}/bin</directory>
+      <directory>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}/bin</directory>
+      <excludes>
+        <exclude>*.bat</exclude>
+      </excludes>
       <outputDirectory>bin/</outputDirectory>
-      <includes>
-        <include>**/*.bat</include>
-      </includes>
-      <lineEnding>dos</lineEnding>
+      <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}/bin</directory>
+      <includes>
+        <include>*.bat</include>
+      </includes>
+      <outputDirectory>bin/</outputDirectory>
+      <lineEnding>dos</lineEnding>
+      <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <!-- Expanded Karaf -->
     <fileSet>
-      <directory>${project.build.directory}/windows-karaf/apache-karaf-${karaf.version}</directory>
+      <directory>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}</directory>
       <outputDirectory>.</outputDirectory>
       <excludes>
         <exclude>bin/**</exclude>
@@ -59,6 +85,18 @@
   </fileSets>
   <files>
     <file>
+      <source>${output.directory}/xipki/ca-config/example/ca-db.properties-h2</source>
+      <outputDirectory>xipki/ca-config</outputDirectory>
+      <destName>ca-db.properties</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${output.directory}/xipki/ca-config/example/ocsp-db.properties-h2</source>
+      <outputDirectory>xipki/ca-config</outputDirectory>
+      <destName>ocsp-db.properties</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>${project.basedir}/../../README.md</source>
       <outputDirectory>xipki</outputDirectory>
       <destName>README.md</destName>
@@ -71,7 +109,7 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/windows-karaf/apache-karaf-${karaf.version}/LICENSE</source>
+      <source>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}/LICENSE</source>
       <outputDirectory>license</outputDirectory>
       <destName>karaf-LICENSE.txt</destName>
       <fileMode>0644</fileMode>

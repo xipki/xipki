@@ -31,6 +31,16 @@
     </fileSet>
     <fileSet>
       <directory>${output.directory}</directory>
+      <includes>
+        <include>bin/*.bat</include>
+      </includes>
+      <outputDirectory>.</outputDirectory>
+      <lineEnding>dos</lineEnding>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>${output.directory}</directory>
       <excludes>
         <exclude>bin/**</exclude>
       </excludes>
@@ -40,7 +50,7 @@
     </fileSet>
     <!-- Copy over start scripts -->
     <fileSet>
-      <directory>${project.build.directory}/unix-karaf/apache-karaf-${karaf.version}/bin</directory>
+      <directory>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}/bin</directory>
       <excludes>
         <exclude>*.bat</exclude>
       </excludes>
@@ -49,9 +59,19 @@
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}/bin</directory>
+      <includes>
+        <include>*.bat</include>
+      </includes>
+      <outputDirectory>bin/</outputDirectory>
+      <lineEnding>dos</lineEnding>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
     <!-- Expanded Karaf -->
     <fileSet>
-      <directory>${project.build.directory}/unix-karaf/apache-karaf-${karaf.version}</directory>
+      <directory>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}</directory>
       <outputDirectory>.</outputDirectory>
       <excludes>
         <exclude>bin/**</exclude>
@@ -81,7 +101,7 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/unix-karaf/apache-karaf-${karaf.version}/LICENSE</source>
+      <source>${project.build.directory}/apache-karaf/apache-karaf-${karaf.version}/LICENSE</source>
       <outputDirectory>license</outputDirectory>
       <destName>karaf-LICENSE.txt</destName>
       <fileMode>0644</fileMode>
