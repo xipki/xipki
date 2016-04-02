@@ -354,22 +354,19 @@ class IaikP11Slot extends AbstractP11Slot {
         }
 
         try {
-            synchronized (session) {
-                login(session);
-                session.signInit(mechanismObj, signingKey);
-                for (int i = 0; i < len; i += maxMessageSize) {
-                    int blockLen = Math.min(maxMessageSize, len - i);
-                    byte[] block = new byte[blockLen];
-                    System.arraycopy(content, i, block, 0, blockLen);
-                    session.signUpdate(block);
-                }
-
-                byte[] signature = session.signFinal();
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("signature:\n{}", Hex.toHexString(signature));
-                }
-                return signature;
+            session.signInit(mechanismObj, signingKey);
+            for (int i = 0; i < len; i += maxMessageSize) {
+                int blockLen = Math.min(maxMessageSize, len - i);
+                byte[] block = new byte[blockLen];
+                System.arraycopy(content, i, block, 0, blockLen);
+                session.signUpdate(block);
             }
+
+            byte[] signature = session.signFinal();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("signature:\n{}", Hex.toHexString(signature));
+            }
+            return signature;
         } catch (TokenException e) {
             throw new P11TokenException(e);
         } finally {
@@ -397,7 +394,6 @@ class IaikP11Slot extends AbstractP11Slot {
         byte[] signature;
         try {
             synchronized (session) {
-                login(session);
                 session.signInit(mechanismObj, signingKey);
                 signature = session.sign(content);
             }
@@ -462,24 +458,27 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private Session borrowIdleSession()
     throws P11TokenException {
+        Session session = null;
         if (countSessions.get() < maxSessionCount) {
-            Session session = idleSessions.poll();
+            session = idleSessions.poll();
             if (session == null) {
                 // create new session
                 session = openSession(false);
             }
+        }
 
-            if (session != null) {
-                return session;
+        if (session == null) {
+            try {
+                session = idleSessions.poll(timeOutWaitNewSession, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
             }
         }
 
-        try {
-            return idleSessions.poll(timeOutWaitNewSession, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+        if (session == null) {
+            throw new P11TokenException("no idle session");
         }
-
-        throw new P11TokenException("no idle session");
+        login(session);
+        return session;
     }
 
     private void returnIdleSession(
@@ -821,6 +820,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
 
         writableSessionInUse = true;
+        login(writableSession);
         return writableSession;
     }
 
