@@ -109,26 +109,6 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Uncompress the IAIK PKCS#11 native libraries -->
-            <id>unpack-iaik</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>at.tugraz.iaik</groupId>
-                  <artifactId>pkcs11-wrapper-native</artifactId>
-                  <version>${pkcs11-wrapper.version}</version>
-                  <type>zip</type>
-                  <excludes>**/debug/**,**/release/**</excludes>
-                  <outputDirectory>${output.directory}/xipki/native-lib</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
             <!-- Extract the SQL scripts -->
             <id>unpack-sql</id>
             <phase>generate-resources</phase>

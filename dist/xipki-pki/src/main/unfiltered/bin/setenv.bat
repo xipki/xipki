@@ -68,14 +68,5 @@ rem XiPKI configuration
 rem
 
 SET JAVA_MAX_MEM=2048M
-if "%PROCESSOR_ARCHITECTURE%"=="x86" goto 32BIT
-SET NATIVE_LIB=xipki\native-lib\windows\win_x64
-goto OS_END
-:32BIT
-SET NATIVE_LIB=native-lib\windows\win_x86
-:OS_END
-
-SET PATH = %PATH% %NATIVE_LIB%
 
 rem SET KARAF_OPTS=%KARAF_OPTS% -DNSSLIB=point\to\firefox
-SET KARAF_OPTS=%KARAF_OPTS% -Djava.library.path=%NATIVE_LIB%

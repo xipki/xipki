@@ -55,16 +55,6 @@
 
 export JAVA_MAX_MEM=2048M
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  NATIVE_LIB="xipki/native-lib/unix/macosx_universal"
-else
-  UNAME=`uname -s`_`uname -m`
-  UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
-  NATIVE_LIB="xipki/native-lib/unix/$UNAME"
-fi
-
 #KARAF_OPTS="$KARAF_OPTS -DNSSLIB=/point/to/firefox"
-KARAF_OPTS="$KARAF_OPTS -Djava.library.path=$NATIVE_LIB"
 
-export LD_LIBRARY_PATH=$NATIVE_LIB:$LD_LIBRARY_PATH
 export KARAF_OPTS
