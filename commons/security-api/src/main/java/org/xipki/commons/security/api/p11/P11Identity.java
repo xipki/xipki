@@ -203,7 +203,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
                     || P11Constants.CKM_SHA512_RSA_PKCS_PSS == mechanism) {
                 return parameters instanceof P11RSAPkcsPssParams;
             } else if (P11Constants.CKM_RSA_X_509 == mechanism) {
-            	return true;
+                return true;
             }
         } else if (publicKey instanceof DSAPublicKey) {
             if (parameters != null) {

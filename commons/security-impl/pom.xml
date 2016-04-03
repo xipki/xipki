@@ -26,8 +26,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>at.tugraz.iaik</groupId>
-      <artifactId>pkcs11-wrapper</artifactId>
+      <groupId>org.xipki.iaik</groupId>
+      <artifactId>sunpkcs11-wrapper</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -44,18 +44,15 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
+        <!--configuration>
           <instructions>
             <Import-Package>
               sun.security.pkcs11;resolution:=optional,
               sun.security.pkcs11.wrapper;resolution:=optional,
-              iaik.pkcs.pkcs11;resolution:=optional,
-              iaik.pkcs.pkcs11.objects;resolution:=optional,
-              iaik.pkcs.pkcs11.wrapper;resolution:=optional,
               *
             </Import-Package>
           </instructions>
-        </configuration>
+        </configuration-->
       </plugin>
     </plugins>
   </build>

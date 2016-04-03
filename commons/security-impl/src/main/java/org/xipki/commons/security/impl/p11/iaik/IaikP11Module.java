@@ -36,10 +36,8 @@
 
 package org.xipki.commons.security.impl.p11.iaik;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -68,8 +66,6 @@ class IaikP11Module extends AbstractP11Module {
 
     private Module module;
 
-    private final Map<P11SlotIdentifier, Slot> availableSlots = new HashMap<>();
-
     IaikP11Module(
             final Module module,
             final P11ModuleConf moduleConf)
@@ -97,7 +93,6 @@ class IaikP11Module extends AbstractP11Module {
         for (int i = 0; i < slotList.length; i++) {
             Slot slot = slotList[i];
             P11SlotIdentifier slotId = new P11SlotIdentifier(i, slot.getSlotID());
-            availableSlots.put(slotId, slot);
             if (!moduleConf.isSlotIncluded(slotId)) {
                 LOG.info("skipped slot {}", slotId);
                 continue;
@@ -141,19 +136,7 @@ class IaikP11Module extends AbstractP11Module {
                 LOG.error("could not close PKCS#11 slot {}: {}", slotId, th.getMessage());
                 LOG.debug("could not close PKCS#11 slot " + slotId, th);
             }
-
-            availableSlots.remove(slotId);
         }
-
-        for (P11SlotIdentifier slotId : availableSlots.keySet()) {
-            try {
-                availableSlots.get(slotId).getToken().closeAllSessions();
-            } catch (Throwable th) {
-                LOG.error("could not close PKCS#11 token", th.getMessage());
-                LOG.debug("could not close PKCS#11 token", th);
-            }
-        }
-        availableSlots.clear();
 
         LOG.info("close", "close pkcs11 module: {}", module);
         try {
