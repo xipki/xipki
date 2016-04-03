@@ -127,7 +127,6 @@ Prerequisite
 * JRE / JDK 8
  * OpenJDK: none
  * Oracle: [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
- * IBM J9: [JCE Unlimited Jurisdiction Policy File](https://www14.software.ibm.com/webapp/iwm/web/preLogin.do?source=jcesdk) 
 
 Tested Platforms
 ----------------
@@ -149,7 +148,6 @@ Tested Platforms
 * JVM
  * OpenJDK 8
  * Oracle JRE/JDK 8
- * IBM J9 JRE/JDK 8
 * OS
  * CentOS
  * Fedora
@@ -170,10 +168,14 @@ Build and Assembly from Source Code
 * Prepare
   * Install the third party artifacts that are not availablle in maven repositories
     
-    In folder `xipki/ext`
-    ```sh
-    ./install.sh
-    ```
+    * Get a copy of pkcs11-wrapper code and build it
+      ```sh
+      git clone git://github.com/xipki/pkcs11wrapper
+
+      git branch sunpkcs11
+
+      mvn clean install
+      ```
  
 * Build
   * Compile and install the artifacts

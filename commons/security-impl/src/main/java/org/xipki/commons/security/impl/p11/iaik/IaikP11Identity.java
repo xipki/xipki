@@ -38,6 +38,9 @@ package org.xipki.commons.security.impl.p11.iaik;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -56,6 +59,8 @@ class IaikP11Identity extends P11Identity {
 
     private final PrivateKey privateKey;
 
+    private final int expectedSignatureLen;
+
     IaikP11Identity(
             final IaikP11Slot slot,
             final P11EntityIdentifier identityId,
@@ -64,6 +69,20 @@ class IaikP11Identity extends P11Identity {
             final X509Certificate[] certificateChain) {
         super(slot, identityId, publicKey, certificateChain);
         this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
+
+        int keyBitLen = getSignatureKeyBitLength();
+        if (publicKey instanceof RSAPublicKey) {
+            expectedSignatureLen = (keyBitLen + 7) / 8;
+        } else if (publicKey instanceof ECPublicKey) {
+            expectedSignatureLen = (keyBitLen + 7) / 8 * 2;
+        } else if (publicKey instanceof DSAPublicKey) {
+            expectedSignatureLen = (keyBitLen + 7) / 8 * 2;
+        } else {
+            throw new IllegalArgumentException(
+                    "currently only RSA, DSA and EC public key are supported, but not "
+                    + this.publicKey.getAlgorithm()
+                    + " (class: " + this.publicKey.getClass().getName() + ")");
+        }
     }
 
     @Override
@@ -77,6 +96,10 @@ class IaikP11Identity extends P11Identity {
 
     PrivateKey getPrivateKey() {
         return privateKey;
+    }
+
+    int getExpectedSignatureLen() {
+        return expectedSignatureLen;
     }
 
 }
