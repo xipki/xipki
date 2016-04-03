@@ -46,7 +46,7 @@
   <feature name="xipki-security-base" version="${project.version}">
     <feature>bouncycastle</feature>
     <feature>xipki-password</feature>
-    <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/pkcs11-wrapper/${pkcs11-wrapper.version}/$Bundle-SymbolicName=pkcs11-wrapper&Bundle-Version=${pkcs11-wrapper.version}]]></bundle>
+    <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/pkcs11-proxy-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-impl/${project.version}</bundle>

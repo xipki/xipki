@@ -10,7 +10,7 @@
     <bundle>mvn:org.xipki.commons/password-impl/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/pkcs11-wrapper/${pkcs11-wrapper.version}/$Bundle-SymbolicName=pkcs11-wrapper&Bundle-Version=${pkcs11-wrapper.version}]]></bundle>
+    <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-impl/${project.version}</bundle>
   </feature>

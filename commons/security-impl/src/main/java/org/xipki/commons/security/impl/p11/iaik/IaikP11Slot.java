@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -128,7 +128,9 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private final AtomicLong countSessions = new AtomicLong(0);
 
-    private final BlockingQueue<Session> idleSessions = new LinkedBlockingDeque<>();
+    private final BlockingDeque<Session> idleSessions = new LinkedBlockingDeque<>();
+
+    private final BlockingDeque<Session> busySessions = new LinkedBlockingDeque<>();
 
     private boolean writableSessionInUse;
 
@@ -202,7 +204,7 @@ class IaikP11Slot extends AbstractP11Slot {
         this.maxSessionCount = (int) maxSessionCount2;
         LOG.info("maxSessionCount: {}", this.maxSessionCount);
 
-        returnIdleSession(session);
+        idleSessions.addLast(session);
         refresh();
     } // constructor
 
@@ -278,7 +280,14 @@ class IaikP11Slot extends AbstractP11Slot {
         if (slot != null) {
             try {
                 LOG.info("close all sessions on token: {}", slot.getSlotID());
-                slot.getToken().closeAllSessions();
+
+                if (writableSession != null) {
+                    writableSession.closeSession();
+                }
+
+                for (Session session : idleSessions) {
+                    session.closeSession();
+                }
             } catch (Throwable th) {
                 final String message = "could not slot.getToken().closeAllSessions()";
                 if (LOG.isWarnEnabled()) {
@@ -357,16 +366,12 @@ class IaikP11Slot extends AbstractP11Slot {
             session.signInit(mechanismObj, signingKey);
             for (int i = 0; i < len; i += maxMessageSize) {
                 int blockLen = Math.min(maxMessageSize, len - i);
-                byte[] block = new byte[blockLen];
-                System.arraycopy(content, i, block, 0, blockLen);
-                session.signUpdate(block);
+                //byte[] block = new byte[blockLen];
+                //System.arraycopy(content, i, block, 0, blockLen);
+                session.signUpdate(content, i, blockLen);
             }
 
-            byte[] signature = session.signFinal();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("signature:\n{}", Hex.toHexString(signature));
-            }
-            return signature;
+            return session.signFinal(identity.getExpectedSignatureLen());
         } catch (TokenException e) {
             throw new P11TokenException(e);
         } finally {
@@ -444,18 +449,6 @@ class IaikP11Slot extends AbstractP11Slot {
         return session;
     }
 
-    private void closeSession(
-            final Session session)
-    throws P11TokenException {
-        try {
-            session.closeSession();
-        } catch (TokenException ex) {
-            throw new P11TokenException(ex.getMessage(), ex);
-        } finally {
-            countSessions.decrementAndGet();
-        }
-    }
-
     private Session borrowIdleSession()
     throws P11TokenException {
         Session session = null;
@@ -477,6 +470,7 @@ class IaikP11Slot extends AbstractP11Slot {
         if (session == null) {
             throw new P11TokenException("no idle session");
         }
+        busySessions.addLast(session);
         login(session);
         return session;
     }
@@ -487,19 +481,15 @@ class IaikP11Slot extends AbstractP11Slot {
             return;
         }
 
-        for (int i = 0; i < 3; i++) {
-            try {
-                idleSessions.put(session);
-                return;
-            } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
-            }
-        }
-
-        try {
-            closeSession(session);
-        } catch (P11TokenException ex) {
-            LOG.error("could not closeSession {}: {}", ex.getClass().getName(), ex.getMessage());
-            LOG.debug("closeSession", ex);
+        boolean isBusySession = busySessions.remove(session);
+        if (isBusySession) {
+            idleSessions.addLast(session);
+        } else {
+            final String msg =
+                    "session has not been borrowed before or has been returned more than once: "
+                    + session;
+            LOG.error(msg);
+            throw new IllegalStateException(msg);
         }
     }
 
@@ -577,16 +567,11 @@ class IaikP11Slot extends AbstractP11Slot {
         try {
             if (userType == P11Constants.CKU_USER) {
                 session.login(Session.UserType.USER, tmpPin);
-                return;
             } else if (userType == P11Constants.CKU_SO) {
                 session.login(Session.UserType.SO, tmpPin);
-                return;
+            } else {
+                session.login(userType, tmpPin);
             }
-
-            final long handle = session.getSessionHandle();
-            final boolean useUtf8Encoding = true;
-            session.getModule().getPKCS11Module().C_Login(handle, userType, tmpPin,
-                    useUtf8Encoding);
         } catch (TokenException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
         }

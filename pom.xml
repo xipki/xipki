@@ -42,7 +42,7 @@
     <servlet-api.version>2.5</servlet-api.version>
     <jscep.version>2.3.0</jscep.version>
     <junit.version>4.8.2</junit.version>
-    <pkcs11-wrapper.version>1.3</pkcs11-wrapper.version>
+    <pkcs11-wrapper.version>1.3.0-SNAPSHOT</pkcs11-wrapper.version>
     <!--ldapsdk.version>2.3.6</ldapsdk.version-->
     <liquibase.version>3.4.1</liquibase.version>
     <snakeyaml.version>1.13</snakeyaml.version>
@@ -72,8 +72,8 @@
         <version>${bc.version}</version>
       </dependency>
       <dependency>
-        <groupId>at.tugraz.iaik</groupId>
-        <artifactId>pkcs11-wrapper</artifactId>
+        <groupId>org.xipki.iaik</groupId>
+        <artifactId>sunpkcs11-wrapper</artifactId>
         <version>${pkcs11-wrapper.version}</version>
       </dependency>
       <dependency>

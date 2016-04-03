@@ -53,6 +53,7 @@ import iaik.pkcs.pkcs11.DefaultInitializeArgs;
 import iaik.pkcs.pkcs11.Module;
 import iaik.pkcs.pkcs11.TokenException;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
 /**
  * @author Lijun Liao
@@ -104,7 +105,7 @@ public class IaikP11CryptServiceFactory extends AbstractP11CryptServiceFactory {
 
         try {
             module.initialize(new DefaultInitializeArgs());
-        } catch (iaik.pkcs.pkcs11.wrapper.PKCS11Exception ex) {
+        } catch (PKCS11Exception ex) {
             if (ex.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
                 final String message = "PKCS11Exception";
                 if (LOG.isErrorEnabled()) {
