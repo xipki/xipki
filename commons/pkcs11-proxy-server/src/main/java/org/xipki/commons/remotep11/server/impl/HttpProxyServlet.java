@@ -64,9 +64,9 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  * @since 2.0.0
  */
 
-public class HttpCmpServlet extends HttpServlet {
+public class HttpProxyServlet extends HttpServlet {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HttpCmpServlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpProxyServlet.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -78,7 +78,7 @@ public class HttpCmpServlet extends HttpServlet {
 
     private LocalP11CryptServicePool localP11CryptServicePool;
 
-    public HttpCmpServlet() {
+    public HttpProxyServlet() {
         responder = new CmpResponder();
     }
 
@@ -166,7 +166,7 @@ public class HttpCmpServlet extends HttpServlet {
             PKIMessage pkiResp = responder.processPkiMessage(localP11CryptServicePool,
                     moduleName, pkiReq);
 
-            response.setContentType(HttpCmpServlet.CT_RESPONSE);
+            response.setContentType(CT_RESPONSE);
             response.setStatus(HttpServletResponse.SC_OK);
             ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
             asn1Out.writeObject(pkiResp);
