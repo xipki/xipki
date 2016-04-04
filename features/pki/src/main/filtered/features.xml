@@ -7,6 +7,7 @@
   <!-- Add the custom bundles for certprofiles here -->
   <feature name="xipki-certprofiles" version="${project.version}">
     <feature>xipki-ca-api</feature>
+    <bundle>mvn:org.xipki.pki/certprofile-demo/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-certprofile/${project.version}</bundle>
   </feature>
   <!-- Add the custom bundles for cert publishers here -->
