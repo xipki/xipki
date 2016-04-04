@@ -95,10 +95,7 @@ public class IaikP11CryptServiceFactory extends AbstractP11CryptServiceFactory {
             module = Module.getInstance(moduleConf.getNativeLibrary());
         } catch (IOException ex) {
             final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
             LOG.debug(msg, ex);
             throw new P11TokenException(msg, ex);
         }
@@ -107,13 +104,10 @@ public class IaikP11CryptServiceFactory extends AbstractP11CryptServiceFactory {
             module.initialize(new DefaultInitializeArgs());
         } catch (PKCS11Exception ex) {
             if (ex.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
-                final String message = "PKCS11Exception";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
-                }
-                LOG.debug(message, ex);
-                close(module);
+                final String msg = "PKCS11Exception";
+                LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
+                LOG.debug(msg, ex);
+                close(moduleConf.getName(), module);
                 throw new P11TokenException(ex.getMessage(), ex);
             } else {
                 LOG.info("PKCS#11 module already initialized");
@@ -126,13 +120,10 @@ public class IaikP11CryptServiceFactory extends AbstractP11CryptServiceFactory {
                 }
             }
         } catch (Throwable th) {
-            final String message = "unexpected Exception: ";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
-                        th.getMessage());
-            }
-            LOG.debug(message, th);
-            close(module);
+            final String msg = "unexpected Exception: ";
+            LOG.error(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
+            LOG.debug(msg, th);
+            close(moduleConf.getName(), module);
             throw new P11TokenException(th.getMessage());
         }
 
@@ -143,19 +134,19 @@ public class IaikP11CryptServiceFactory extends AbstractP11CryptServiceFactory {
     }
 
     private static void close(
+            final String modulePath,
             final Module module) {
-        if (module != null) {
-            LOG.info("close", "close pkcs11 module: {}", module);
-            try {
-                module.finalize(null);
-            } catch (Throwable th) {
-                final String message = "could not module.finalize()";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
-                            th.getMessage());
-                }
-                LOG.debug(message, th);
-            }
+        if (module == null) {
+            return;
+        }
+
+        LOG.info("close", "close pkcs11 module: {}", modulePath);
+        try {
+            module.finalize(null);
+        } catch (Throwable th) {
+            final String message = "could not clonse module " + modulePath;
+            LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
+            LOG.debug(message, th);
         }
     }
 

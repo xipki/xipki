@@ -311,22 +311,18 @@ class KeystoreP11Slot extends AbstractP11Slot {
                 LOG.info("added PKCS#11 key {}", p11ObjId);
                 ret.addIdentity(identity);
             } catch (InvalidKeyException ex) {
-                final String message = "InvalidKeyException while initializing key with key-id "
-                        + hexId;
+                String msg = "InvalidKeyException while initializing key with key-id " + hexId;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
+                    LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
                 }
-                LOG.debug(message, ex);
+                LOG.debug(msg, ex);
                 continue;
             } catch (Throwable th) {
-                final String message =
-                        "unexpected exception while initializing key with key-id " + hexId;
+                String msg = "unexpected exception while initializing key with key-id " + hexId;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
-                            th.getMessage());
+                    LOG.warn(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
                 }
-                LOG.debug(message, th);
+                LOG.debug(msg);
                 continue;
             }
         }

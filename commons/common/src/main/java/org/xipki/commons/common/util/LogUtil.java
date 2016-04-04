@@ -46,7 +46,7 @@ public class LogUtil {
     private LogUtil() {
     }
 
-    public static String buildExceptionLogFormat(
+    public static String getErrorLog(
             final String message) {
         return StringUtil.isBlank(message)
                 ? "{}: {}"

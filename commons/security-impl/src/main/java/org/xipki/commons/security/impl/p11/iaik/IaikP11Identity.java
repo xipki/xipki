@@ -81,7 +81,7 @@ class IaikP11Identity extends P11Identity {
             throw new IllegalArgumentException(
                     "currently only RSA, DSA and EC public key are supported, but not "
                     + this.publicKey.getAlgorithm()
-                    + " (class: " + this.publicKey.getClass().getName() + ")");
+                    + " (class: " + publicKey.getClass().getName() + ")");
         }
     }
 
