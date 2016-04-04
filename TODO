@@ -1,3 +1,2 @@
 0. https://code.google.com/p/gnupg-ecc/source/browse/branches/gpg2ecc/gnupg/sm/keylist.c?r=26
 http://www.zytrax.com/tech/survival/ssl.html
-1. Update karaf-plugin.version to 4.0.5 and remove the features-module org.apache.karaf.features.standard 
