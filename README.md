@@ -86,7 +86,7 @@ Highly scalable and high-performance open source PKI (Certification Authority an
   - Embedded client to send OCSP request
 
 - Key Tool (for both PKCS#12 and PKCS#11 tokens)
-  - Generating keypairs and self-signed certificates of RSA, EC and DSA in token
+  - Generating keypairs of RSA, EC and DSA in token
   - Deleting keypairs and certificates from token
   - Updating certificates in token
   - Generating PKCS#10 request
