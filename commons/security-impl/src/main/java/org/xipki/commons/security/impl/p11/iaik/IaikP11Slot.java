@@ -38,8 +38,6 @@ package org.xipki.commons.security.impl.p11.iaik;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -723,15 +721,10 @@ class IaikP11Slot extends AbstractP11Slot {
 
             byte[] modBytes = rsaP11Key.getModulus().getByteArrayValue();
             BigInteger mod = new BigInteger(1, modBytes);
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("modulus:\n {}", Hex.toHexString(modBytes));
-            }
             RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod, exp);
             try {
-                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                return keyFactory.generatePublic(keySpec);
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+                return KeyUtil.generateRSAPublicKey(keySpec);
+            } catch (InvalidKeySpecException ex) {
                 throw new SecurityException(ex.getMessage(), ex);
             }
         } else if (p11Key instanceof DSAPublicKey) {
@@ -742,12 +735,10 @@ class IaikP11Slot extends AbstractP11Slot {
                     dsaP11Key.getSubprime().getByteArrayValue()); // q
             BigInteger base = new BigInteger(1, dsaP11Key.getBase().getByteArrayValue()); // g
             BigInteger value = new BigInteger(1, dsaP11Key.getValue().getByteArrayValue()); // y
-
             DSAPublicKeySpec keySpec = new DSAPublicKeySpec(value, prime, subPrime, base);
             try {
-                KeyFactory keyFactory = KeyFactory.getInstance("DSA");
-                return keyFactory.generatePublic(keySpec);
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+                return KeyUtil.generateDSAPublicKey(keySpec);
+            } catch (InvalidKeySpecException ex) {
                 throw new SecurityException(ex.getMessage(), ex);
             }
         } else if (p11Key instanceof ECDSAPublicKey) {
