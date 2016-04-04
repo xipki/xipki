@@ -195,13 +195,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     certstore.deleteCertsInProcessOlderThan(
                             new Date(System.currentTimeMillis() - 10 * 60 * 1000L));
                 } catch (Throwable th) {
-                    final String message =
-                            "could not call certstore.deleteCertsInProcessOlderThan";
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                th.getClass().getName(), th.getMessage());
-                    }
-                    LOG.debug(message, th);
+                    final String msg = "could not call certstore.deleteCertsInProcessOlderThan";
+                    LOG.error(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
+                    LOG.debug(msg, th);
                 }
             } finally {
                 inProcess = false;
@@ -556,8 +552,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         } catch (DataAccessException | CaMgmtException ex) {
             final String message = "error in unlockCA()";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
+                LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             }
             LOG.debug(message, ex);
         }
@@ -628,8 +623,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         } catch (CaMgmtException ex) {
             final String message = "could not notify Slave CAs to restart";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
+                LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             }
             LOG.debug(message, ex);
             return false;
@@ -642,10 +636,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             caSystemStarted = doStartCaSystem();
         } catch (Throwable th) {
             final String message = "do_startCaSystem()";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
-                        th.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
             LOG.debug(message, th);
             LOG.error(message);
         }
@@ -672,10 +663,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 init();
             } catch (Exception ex) {
                 final String message = "do_startCaSystem().init()";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
                 return false;
             }
@@ -754,12 +742,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 crlSignerEntry.initSigner(securityFactory);
                 crlSignerEntry.getDbEntry().setConfFaulty(false);
             } catch (SecurityException | OperationException | InvalidConfException ex) {
-                final String message = "X09CrlSignerEntryWrapper.initSigner (name="
-                        + crlSignerName + ")";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                String message = "X09CrlSignerEntryWrapper.initSigner (name=" + crlSignerName + ")";
+                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
                 return false;
             }
@@ -773,10 +757,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             }
         } catch (OperationException ex) {
             final String message = "X509CA.<init> (ca=" + caName + ")";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
             return false;
         }
@@ -792,10 +773,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 sceps.get(caName).refreshCa();
             } catch (CaMgmtException ex) {
                 final String message = "X509CA.SCEP (ca=" + caName + ")";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
                 return false;
             }
@@ -824,15 +802,14 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             try {
                 ca.getCaInfo().commitNextSerial();
             } catch (Throwable th) {
-                LOG.info("could not call CAInfo.commitNextSerial for CA '{}': {}",
-                        caName, th.getMessage());
+                LOG.info("could not call CAInfo.commitNextSerial for CA '{}': {}", caName,
+                        th.getMessage());
             }
 
             try {
                 ca.shutdown();
             } catch (Throwable th) {
-                LOG.info("could not call ca.shutdown() for CA '{}': {}",
-                        caName, th.getMessage());
+                LOG.info("could not call ca.shutdown() for CA '{}': {}", caName, th.getMessage());
             }
         }
 
@@ -850,12 +827,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             try {
                 ds.shutdown();
             } catch (Exception ex) {
-                final String message = "could not shutdown datasource " + dsName;
+                final String msg = "could not shutdown datasource " + dsName;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
+                    LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
                 }
-                LOG.debug(message, ex);
+                LOG.debug(msg, ex);
             }
         }
 
@@ -1103,12 +1079,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 cmpControlDb.setFaulty(false);
                 cmpControls.put(name, cmpControl);
             } catch (InvalidConfException ex) {
-                final String message = "could not initialize CMP control " + name
-                        + ", ignore it";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                final String message = "could not initialize CMP control " + name + ", ignore it";
+                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
             }
         }
@@ -1140,12 +1112,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 scepDb.setConfFaulty(false);
                 sceps.put(name, scep);
             } catch (CaMgmtException ex) {
-                final String message = "could not initialize SCEP entry " + name
-                        + ", ignore it";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                final String message = "could not initialize SCEP entry " + name + ", ignore it";
+                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
             }
         }
@@ -1448,10 +1416,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             certstore.addRequestorName(name);
         } catch (OperationException ex) {
             final String message = "could not publish requestor name to certStore";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
             throw new CaMgmtException(message + ": " + ex.getErrorCode() + ", " + ex.getMessage());
         }
@@ -1646,10 +1611,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             certstore.addCertprofileName(name);
         } catch (OperationException ex) {
             final String message = "could not publish certprofile name to certStore";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
         }
 
@@ -1841,10 +1803,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             certstore.addPublisherName(name);
         } catch (OperationException ex) {
             final String message = "could not publish publisher nameto certStore";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
         }
 
@@ -1955,10 +1914,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             cmpControl = new CmpControl(dbEntry);
         } catch (InvalidConfException ex) {
             final String message = "could not add CMP requestor to certStore";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
             return false;
         }
@@ -2180,10 +2136,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 datasource.dropSequence(sequenceName);
             } catch (DataAccessException ex) {
                 final String message = "error in dropSequence " + sequenceName;
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
                 if (exception == null) {
                     exception = new CaMgmtException(ex.getMessage(), ex);
@@ -2690,8 +2643,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         } catch (Exception ex) {
             final String message = "could not shutdown Certprofile " + profile.getName();
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
+                LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             }
             LOG.debug(message, ex);
         }
@@ -2708,8 +2660,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         } catch (Exception ex) {
             final String message = "could not shutdown CertPublisher " + publisher.getName();
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
+                LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             }
             LOG.debug(message, ex);
         }
@@ -2745,10 +2696,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             signer.initSigner(securityFactory);
         } catch (SecurityException | OperationException | InvalidConfException ex) {
             final String message = "could not creat CRL signer " + dbEntry.getName();
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
 
             if (ex instanceof OperationException) {
@@ -2774,10 +2722,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         } catch (CertprofileException ex) {
             final String message = "could not initialize Certprofile " + dbEntry.getName()
                 + ", ignore it";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
             return null;
         }
@@ -2798,10 +2743,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return ret;
         } catch (CertPublisherException | RuntimeException ex) {
             final String message = "invalid configuration for the certPublisher " + name;
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message),
-                        ex.getClass().getName(), ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
             return null;
         }

@@ -115,10 +115,7 @@ abstract class CmpResponder {
             return getSigner() != null;
         } catch (Exception ex) {
             final String msg = "could not get responder signer";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
             LOG.debug(msg, ex);
 
             return false;
@@ -182,10 +179,7 @@ abstract class CmpResponder {
                 messageTime = reqHeader.getMessageTime().getDate();
             } catch (ParseException ex) {
                 final String msg = "tid=" + tidStr + ": could not parse messageDate";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(msg, ex);
                 messageTime = null;
             }
@@ -268,10 +262,7 @@ abstract class CmpResponder {
                 requestor = (CmpRequestorInfo) verificationResult.getRequestor();
             } catch (Exception ex) {
                 final String msg = "tid=" + tidStr + ": could not verify the signature";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(msg, ex);
                 errorStatus = "request has invalid signature based protection";
             }
@@ -385,13 +376,9 @@ abstract class CmpResponder {
                     getSender(),
                     getCmpControl().isSendResponderCert());
         } catch (Exception ex) {
-            final String message = "could not add protection to the PKI message";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message),
-                        ex.getClass().getName(),
-                        ex.getMessage());
-            }
-            LOG.debug(message, ex);
+            final String msg = "could not add protection to the PKI message";
+            LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
+            LOG.debug(msg, ex);
 
             PKIStatusInfo status = generateCmpRejectionStatus(
                     PKIFailureInfo.systemFailure, "could not sign the PKIMessage");

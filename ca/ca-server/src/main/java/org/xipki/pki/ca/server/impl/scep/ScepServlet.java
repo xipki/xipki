@@ -204,17 +204,14 @@ public class ScepServlet extends HttpServlet {
 
                     reqMessage = new CMSSignedData(content);
                 } catch (Exception ex) {
-                    final String message = "invalid request";
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                                ex.getMessage());
-                    }
-                    LOG.debug(message, ex);
+                    final String msg = "invalid request";
+                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
+                    LOG.debug(msg, ex);
 
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.setContentLength(0);
 
-                    auditMessage = message;
+                    auditMessage = msg;
                     auditStatus = AuditStatus.FAILED;
                     return;
                 }
@@ -223,31 +220,25 @@ public class ScepServlet extends HttpServlet {
                 try {
                     ci = responder.servicePkiOperation(reqMessage, certProfileName, auditEvent);
                 } catch (MessageDecodingException ex) {
-                    final String message = "could not decrypt and/or verify the request";
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                ex.getClass().getName(), ex.getMessage());
-                    }
-                    LOG.debug(message, ex);
+                    final String msg = "could not decrypt and/or verify the request";
+                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
+                    LOG.debug(msg, ex);
 
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.setContentLength(0);
 
-                    auditMessage = message;
+                    auditMessage = msg;
                     auditStatus = AuditStatus.FAILED;
                     return;
                 } catch (OperationException ex) {
-                    final String message = "system internal error";
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                ex.getClass().getName(), ex.getMessage());
-                    }
-                    LOG.debug(message, ex);
+                    final String msg = "system internal error";
+                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
+                    LOG.debug(msg, ex);
 
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.setContentLength(0);
 
-                    auditMessage = message;
+                    auditMessage = msg;
                     auditStatus = AuditStatus.FAILED;
                     return;
                 }
@@ -284,12 +275,11 @@ public class ScepServlet extends HttpServlet {
                 return;
             }
         } catch (EOFException ex) {
-            final String message = "connection reset by peer";
-            if (LOG.isErrorEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
+            final String msg = "connection reset by peer";
+            if (LOG.isWarnEnabled()) {
+                LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
             }
-            LOG.debug(message, ex);
+            LOG.debug(msg, ex);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);

@@ -52,6 +52,7 @@ import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.pkcs11proxy.common.ServerCaps;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
@@ -157,12 +158,8 @@ public class HttpCmpServlet extends HttpServlet {
                 response.setContentLength(0);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 final String message = "could not parse the request (PKIMessage)";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(message + ", class={}, message={}", ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
-
                 return;
             }
 
@@ -176,14 +173,16 @@ public class HttpCmpServlet extends HttpServlet {
             asn1Out.flush();
         } catch (EOFException ex) {
             final String message = "connection reset by peer";
-            LOG.error(message + ". {}: {}", ex.getClass().getName(), ex.getMessage());
+            if (LOG.isWarnEnabled()) {
+                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
+            }
             LOG.debug(message, ex);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } catch (Throwable th) {
-            LOG.error("Throwable thrown, this should not happen. {}: {}",
-                    th.getClass().getName(), th.getMessage());
-            LOG.debug("Throwable thrown, this should not happen.", th);
+            String msg = "Throwable thrown, this should not happen.";
+            LOG.error(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
+            LOG.debug(msg, th);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } finally {

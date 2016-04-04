@@ -508,12 +508,11 @@ public class X509CaCmpResponder extends CmpResponder {
                 certResponses[i] = generateCertificate(certTemplateData, tmpRequestor, user, tid,
                         certReqId, keyUpdate, confirmWaitTime, childAuditEvent);
             } catch (CMPException ex) {
-                final String message = "generateCertificate";
+                final String msg = "generateCertificate";
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
+                    LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
                 }
-                LOG.debug(message, ex);
+                LOG.debug(msg, ex);
 
                 certResponses[i] = new CertResponse(certReqId,
                         generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate,
@@ -985,8 +984,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 final String msg = "could not revoke certificate ca=" + ca.getCaInfo().getName()
                         + " serialNumber=" + serialNumber;
                 if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(msg), ex.getClass().getName(),
-                            ex.getMessage());
+                    LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
                 }
                 LOG.debug(msg, ex);
             }
@@ -1054,10 +1052,7 @@ public class X509CaCmpResponder extends CmpResponder {
             return certRequest.isValidSigningKeyPOP(cvp);
         } catch (InvalidKeyException | IllegalStateException | CRMFException ex) {
             final String message = "verifyPOP";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
         }
         return false;

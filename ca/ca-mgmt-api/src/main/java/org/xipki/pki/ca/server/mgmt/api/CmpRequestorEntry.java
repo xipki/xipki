@@ -73,10 +73,7 @@ public class CmpRequestorEntry implements Serializable {
             this.cert = X509Util.parseBase64EncodedCert(base64Cert);
         } catch (Throwable th) {
             final String message = "could not parse the certificate for requestor '" + name + "'";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
-                        th.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
             LOG.debug(message, th);
         }
     }
