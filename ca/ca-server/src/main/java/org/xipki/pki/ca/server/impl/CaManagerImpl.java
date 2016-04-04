@@ -635,7 +635,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         try {
             caSystemStarted = doStartCaSystem();
         } catch (Throwable th) {
-            final String message = "do_startCaSystem()";
+            final String message = "startCaSystem()";
             LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
             LOG.debug(message, th);
             LOG.error(message);
@@ -662,7 +662,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             try {
                 init();
             } catch (Exception ex) {
-                final String message = "do_startCaSystem().init()";
+                final String message = "doStartCaSystem().init()";
                 LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
                 return false;
