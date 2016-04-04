@@ -14,7 +14,7 @@
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
   <!-- create the servlet and inject our own app factory -->
-  <bean id="serverServlet" class="org.xipki.commons.remotep11.server.impl.HttpCmpServlet">
+  <bean id="serverServlet" class="org.xipki.commons.remotep11.server.impl.HttpProxyServlet">
     <property name="localP11CryptServicePool" ref="localP11CryptServicePool"/>
   </bean>
   <!-- register it as a servlet service for the web extender -->
