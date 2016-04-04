@@ -57,6 +57,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.DSAParameterSpec;
+import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
@@ -201,6 +202,15 @@ public class KeyUtil {
     }
 
     // CHECKSTYLE:SKIP
+    public static DSAPublicKey generateDSAPublicKey(
+            final DSAPublicKeySpec keySpec)
+    throws InvalidKeySpecException {
+        ParamUtil.requireNonNull("keySpec", keySpec);
+        KeyFactory kf = getKeyFactory("DSA");
+        return (DSAPublicKey) kf.generatePublic(keySpec);
+    }
+
+    // CHECKSTYLE:SKIP
     public static KeyPair generateECKeypairForCurveNameOrOid(
             final String curveNameOrOid,
             final SecureRandom random)
@@ -278,13 +288,9 @@ public class KeyUtil {
 
     // CHECKSTYLE:SKIP
     public static RSAPublicKey generateRSAPublicKey(
-            final BigInteger modulus,
-            final BigInteger publicExponent)
+            RSAPublicKeySpec keySpec)
     throws InvalidKeySpecException {
-        ParamUtil.requireNonNull("modulus", modulus);
-        ParamUtil.requireNonNull("publicExponent", publicExponent);
-
-        RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, publicExponent);
+        ParamUtil.requireNonNull("keySpec", keySpec);
         KeyFactory kf = getKeyFactory("RSA");
         return (RSAPublicKey) kf.generatePublic(keySpec);
     }
