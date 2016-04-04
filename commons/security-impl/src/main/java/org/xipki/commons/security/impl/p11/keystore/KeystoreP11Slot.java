@@ -349,8 +349,8 @@ class KeystoreP11Slot extends AbstractP11Slot {
 
             RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod, exp);
             try {
-                return KeyFactory.getInstance("RSA").generatePublic(keySpec);
-            } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
+                return KeyUtil.generateRSAPublicKey(keySpec);
+            } catch (InvalidKeySpecException ex) {
                 throw new P11TokenException(ex.getMessage(), ex);
             }
         } else if (X9ObjectIdentifiers.id_dsa.getId().equals(algorithm)) {
@@ -365,8 +365,8 @@ class KeystoreP11Slot extends AbstractP11Slot {
 
             DSAPublicKeySpec keySpec = new DSAPublicKeySpec(value, prime, subPrime, base);
             try {
-                return KeyFactory.getInstance("DSA").generatePublic(keySpec);
-            } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
+                return KeyUtil.generateDSAPublicKey(keySpec);
+            } catch (InvalidKeySpecException ex) {
                 throw new P11TokenException(ex.getMessage(), ex);
             }
         } else if (X9ObjectIdentifiers.id_ecPublicKey.getId().equals(algorithm)) {

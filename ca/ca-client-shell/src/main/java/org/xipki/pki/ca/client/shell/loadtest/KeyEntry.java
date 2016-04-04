@@ -43,6 +43,7 @@ import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.interfaces.DSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -99,9 +100,10 @@ public abstract class KeyEntry {
             BigInteger modulus = baseN.add(BigInteger.valueOf(index));
 
             try {
+                RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, BigInteger.valueOf(65537));
                 return SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
                         SignerUtil.generateRSAPublicKeyParameter(
-                                KeyUtil.generateRSAPublicKey(modulus, BigInteger.valueOf(65537))));
+                                KeyUtil.generateRSAPublicKey(keySpec)));
             } catch (InvalidKeySpecException ex) {
                 LOG.warn("InvalidKeySpecException: {}", ex.getMessage());
                 return null;
