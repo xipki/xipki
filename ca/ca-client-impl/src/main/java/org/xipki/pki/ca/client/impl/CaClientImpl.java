@@ -229,10 +229,7 @@ public final class CaClientImpl implements CaClient {
                 errorCaNames.add(name);
                 caNamesWithError.add(name);
                 final String message = "could not retrieve CAInfo for CA " + name;
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
-                            th.getMessage());
-                }
+                LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
                 LOG.debug(message, th);
             }
         }
@@ -286,10 +283,7 @@ public final class CaClientImpl implements CaClient {
                 cert = X509Util.parseCert(readData(m.getCert()));
             } catch (CertificateException ex) {
                 final String message = "could not configure responder " + m.getName();
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
 
                 throw new InvalidConfException(ex.getMessage(), ex);
@@ -354,10 +348,7 @@ public final class CaClientImpl implements CaClient {
                 configuredCaNames.add(caName);
             } catch (IOException | CertificateException ex) {
                 final String message = "could not configure CA " + caName;
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
 
                 if (!devMode) {
@@ -1174,10 +1165,8 @@ public final class CaClientImpl implements CaClient {
                             response);
                 } catch (IllegalArgumentException ex) {
                     final String message = "IOException while parsing the health json message";
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                                ex.getMessage());
-                    }
+                    LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(),
+                            ex.getMessage());
                     if (LOG.isDebugEnabled()) {
                         LOG.debug(message + ", json message: " + response, ex);
                     }
@@ -1186,12 +1175,8 @@ public final class CaClientImpl implements CaClient {
             }
         } catch (IOException ex) {
             final String message = "IOException while calling the URL " + healthUrlStr;
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
-
             healthCheckResult.setHealthy(false);
         }
 
@@ -1236,10 +1221,7 @@ public final class CaClientImpl implements CaClient {
                 caPubs.add(getCertificate(cmpCaPub));
             } catch (CertificateException ex) {
                 final String message = "could not extract the caPub from CMPCertificate";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
             }
         }

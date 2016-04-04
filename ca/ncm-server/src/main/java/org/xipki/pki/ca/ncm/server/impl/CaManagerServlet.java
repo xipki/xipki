@@ -977,10 +977,7 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
             } // end while
         } catch (Exception ex) {
             final String message = "could not initialize CAManagerServlet";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
         }
     } // method initialize

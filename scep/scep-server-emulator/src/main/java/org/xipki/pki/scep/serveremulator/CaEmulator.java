@@ -275,8 +275,7 @@ public class CaEmulator {
         } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
                 | InvalidKeySpecException ex) {
             String message = "could not validate POPO of PKCS#10 request";
-            LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                    ex.getMessage());
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.error(message, ex);
             return false;
         }

@@ -168,8 +168,7 @@ class P11DSAContentSigner implements ContentSigner {
         } catch (Throwable th) {
             final String message = "Throwable";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
-                        th.getMessage());
+                LOG.warn(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
             }
             LOG.debug(message, th);
             throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());

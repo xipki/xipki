@@ -118,10 +118,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
             } else {
                 exceptionMessage = ex.getMessage();
             }
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        exceptionMessage);
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), exceptionMessage);
             LOG.debug(message, ex);
             return;
         }
@@ -135,10 +132,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
                 } catch (IOException ex) {
                     final String message = "could not read the certificate bytes of issuer "
                             + issuerType.getName();
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                                ex.getMessage());
-                    }
+                    LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                     LOG.debug(message, ex);
                     continue;
                 }
@@ -150,13 +144,9 @@ public class QaSystemManagerImpl implements QaSystemManager {
                             issuerType.getCrlUrl(),
                             issuerType.getDeltaCrlUrl(), certBytes);
                 } catch (CertificateException ex) {
-                    final String message =
-                            "could not parse certificate of issuer " + issuerType.getName();
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                ex.getClass().getName(), ex.getMessage());
-                    }
-                    LOG.debug(message, ex);
+                    String msg = "could not parse certificate of issuer " + issuerType.getName();
+                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
+                    LOG.debug(msg, ex);
                     continue;
                 }
 
@@ -175,12 +165,9 @@ public class QaSystemManagerImpl implements QaSystemManager {
                     x509ProfileMap.put(name, new X509CertprofileQaImpl(content));
                     LOG.info("configured X509 certificate profile {}", name);
                 } catch (IOException | CertprofileException ex) {
-                    final String message = "could not parse QA certificate profile " + name;
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                ex.getClass().getName(), ex.getMessage());
-                    }
-                    LOG.debug(message, ex);
+                    String msg = "could not parse QA certificate profile " + name;
+                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
+                    LOG.debug(msg, ex);
                     continue;
                 }
             }

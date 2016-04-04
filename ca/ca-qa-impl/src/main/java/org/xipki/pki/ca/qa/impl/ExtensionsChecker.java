@@ -562,10 +562,7 @@ public class ExtensionsChecker {
             this.constantExtensions = buildConstantExtesions(extensionsType);
         } catch (RuntimeException ex) {
             final String message = "RuntimeException";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
             throw new CertprofileException(
                     "RuntimeException thrown while initializing certprofile: " + ex.getMessage());
