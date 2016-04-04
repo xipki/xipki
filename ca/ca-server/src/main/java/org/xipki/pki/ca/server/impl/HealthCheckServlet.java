@@ -131,10 +131,7 @@ public class HealthCheckServlet extends HttpServlet {
             response.getOutputStream().write(respBytes);
         } catch (EOFException ex) {
             final String message = "connection reset by peer";
-            if (LOG.isErrorEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message),
-                        ex.getClass().getName(), ex.getMessage());
-            }
+            LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

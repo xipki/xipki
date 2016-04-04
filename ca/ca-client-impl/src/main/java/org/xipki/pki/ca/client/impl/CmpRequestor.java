@@ -229,10 +229,8 @@ public abstract class CmpRequestor {
         try {
             response = new GeneralPKIMessage(encodedResponse);
         } catch (IOException ex) {
-            if (LOG.isErrorEnabled()) {
-                LOG.error("could not decode the received PKI message: {}",
-                        Hex.toHexString(encodedResponse));
-            }
+            LOG.error("could not decode the received PKI message: {}",
+                    Hex.toHexString(encodedResponse));
             throw new CmpRequestorException(ex.getMessage(), ex);
         }
 

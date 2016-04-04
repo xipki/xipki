@@ -143,10 +143,7 @@ class IaikP11Module extends AbstractP11Module {
             module.finalize(null);
         } catch (Throwable th) {
             final String message = "could not module.finalize()";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), th.getClass().getName(),
-                        th.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
             LOG.debug(message, th);
         }
     } // method close

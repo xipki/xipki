@@ -472,8 +472,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
                 | InvalidKeySpecException ex) {
             String message = "could not validate POPO of PKCS#10 request";
-            LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                    ex.getMessage());
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.error(message, ex);
             return false;
         }
@@ -564,10 +563,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             this.p11Conf = new P11Conf(new FileInputStream(pkcs11ConfFile), (SecurityFactory) this);
         } catch (InvalidConfException | IOException ex) {
             final String message = "invalid configuration file " + pkcs11ConfFile;
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
 
             throw new RuntimeException(message);

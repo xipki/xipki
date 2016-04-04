@@ -578,10 +578,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             LOG.info("updated CertStore {}", getName());
         } catch (Exception ex) {
             final String message = "could not execute initializeStore()";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
             initializationFailed = true;
             initialized = true;
@@ -903,12 +900,9 @@ public class CrlCertStatusStore extends CertStatusStore {
                 try {
                     aki = X509Util.extractAki(bcCert);
                 } catch (CertificateEncodingException ex) {
-                    final String message = "could not extract AuthorityKeyIdentifier";
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message),
-                                ex.getClass().getName(), ex.getMessage());
-                    }
-                    LOG.debug(message, ex);
+                    final String msg = "could not extract AuthorityKeyIdentifier";
+                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
+                    LOG.debug(msg, ex);
                 }
 
                 if (aki == null || !Arrays.equals(issuerSki, aki)) {

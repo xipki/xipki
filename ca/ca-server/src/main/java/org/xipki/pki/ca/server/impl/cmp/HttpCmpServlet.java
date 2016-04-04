@@ -182,11 +182,7 @@ public class HttpCmpServlet extends HttpServlet {
                 auditMessage = "bad request";
 
                 final String message = "could not parse the request (PKIMessage)";
-                if (LOG.isErrorEnabled()) {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message),
-                            ex.getClass().getName(),
-                            ex.getMessage());
-                }
+                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
 
                 return;
@@ -210,10 +206,7 @@ public class HttpCmpServlet extends HttpServlet {
             asn1Out.flush();
         } catch (EOFException ex) {
             final String message = "connection reset by peer";
-            if (LOG.isErrorEnabled()) {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

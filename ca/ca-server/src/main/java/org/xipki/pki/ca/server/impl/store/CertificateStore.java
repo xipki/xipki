@@ -95,12 +95,10 @@ public class CertificateStore {
                     certInfo.getTransactionId(),
                     certInfo.getRequestedSubject());
         } catch (Exception ex) {
-            if (LOG.isErrorEnabled()) {
-                LOG.error("could not save certificate {}: {}. Message: {}",
-                        new Object[]{certInfo.getCert().getSubject(),
-                            Base64.toBase64String(certInfo.getCert().getEncodedCert()),
-                            ex.getMessage()});
-            }
+            LOG.error("could not save certificate {}: {}. Message: {}",
+                    new Object[]{certInfo.getCert().getSubject(),
+                        Base64.toBase64String(certInfo.getCert().getEncodedCert()),
+                        ex.getMessage()});
             LOG.debug("error", ex);
             return false;
         }
@@ -361,10 +359,7 @@ public class CertificateStore {
             return queryExecutor.getCertStatusForSubject(caCert, subject);
         } catch (DataAccessException ex) {
             final String message = "queryExecutor.getCertStatusForSubject";
-            if (LOG.isErrorEnabled()) {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), ex.getClass().getName(),
-                        ex.getMessage());
-            }
+            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);
             return CertStatus.Unknown;
         }

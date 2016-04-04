@@ -80,8 +80,9 @@ public class NssProviderRegister {
             }
         } catch (Throwable th) {
             String msg = "could not initialize SunPKCS11 NSS provider";
-            LOG.info(LogUtil.buildExceptionLogFormat(msg), th.getClass().getName(),
-                    th.getMessage());
+            if (LOG.isInfoEnabled()) {
+                LOG.info(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
+            }
             LOG.debug(msg, th);
         }
     }
