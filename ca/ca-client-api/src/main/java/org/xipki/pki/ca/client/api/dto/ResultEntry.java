@@ -36,41 +36,16 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
-import org.bouncycastle.asn1.cmp.CMPCertificate;
-import org.bouncycastle.asn1.cmp.PKIStatus;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class EnrollCertResultEntryType extends ResultEntryType {
+public abstract class ResultEntry extends IdentifiedObject {
 
-    private final CMPCertificate cert;
-
-    private final int status;
-
-    public EnrollCertResultEntryType(
-            final String id,
-            final CMPCertificate cert) {
-        this(id, cert, PKIStatus.GRANTED);
-    }
-
-    public EnrollCertResultEntryType(
-            final String id,
-            final CMPCertificate cert,
-            final int status) {
+    public ResultEntry(
+            final String id) {
         super(id);
-        this.cert = cert;
-        this.status = status;
-    }
-
-    public CMPCertificate getCert() {
-        return cert;
-    }
-
-    public int getStatus() {
-        return status;
     }
 
 }

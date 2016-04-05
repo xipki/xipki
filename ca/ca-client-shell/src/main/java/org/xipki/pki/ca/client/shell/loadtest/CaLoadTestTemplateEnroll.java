@@ -70,9 +70,9 @@ import org.xipki.pki.ca.client.api.CaClientException;
 import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
 import org.xipki.pki.ca.client.api.PkiErrorException;
-import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
-import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
-import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType.Type;
+import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntry;
+import org.xipki.pki.ca.client.api.dto.EnrollCertRequest;
+import org.xipki.pki.ca.client.api.dto.EnrollCertRequest.Type;
 import org.xipki.pki.ca.client.shell.loadtest.jaxb.EnrollCertType;
 import org.xipki.pki.ca.client.shell.loadtest.jaxb.EnrollTemplateType;
 import org.xipki.pki.ca.client.shell.loadtest.jaxb.ObjectFactory;
@@ -122,10 +122,10 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
                 final Map<Integer, CertRequestWithProfile> certRequests) {
             EnrollCertResult result;
             try {
-                EnrollCertRequestType request = new EnrollCertRequestType(Type.CERT_REQ);
+                EnrollCertRequest request = new EnrollCertRequest(Type.CERT_REQ);
                 for (Integer certId : certRequests.keySet()) {
                     CertRequestWithProfile certRequest = certRequests.get(certId);
-                    EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType(
+                    EnrollCertRequestEntry requestEntry = new EnrollCertRequestEntry(
                             "id-" + certId,
                             certRequest.certprofile,
                             certRequest.certRequest,

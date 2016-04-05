@@ -36,16 +36,35 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.xipki.commons.common.util.ParamUtil;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class ResultEntryType extends IdentifiedObject {
+public class P10EnrollCertRequest extends IdentifiedObject {
 
-    public ResultEntryType(
-            final String id) {
+    private final String certprofile;
+
+    private final CertificationRequest p10Req;
+
+    public P10EnrollCertRequest(
+            final String id,
+            final String certprofile,
+            final CertificationRequest p10Req) {
         super(id);
+        this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
+        this.p10Req = ParamUtil.requireNonNull("p10Req", p10Req);
+    }
+
+    public CertificationRequest getP10Req() {
+        return p10Req;
+    }
+
+    public String getCertprofile() {
+        return certprofile;
     }
 
 }

@@ -36,35 +36,44 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.common.cmp.PkiStatusInfo;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class P10EnrollCertRequestType extends IdentifiedObject {
+public class ErrorResultEntry extends ResultEntry {
 
-    private final String certprofile;
+    private final PkiStatusInfo statusInfo;
 
-    private final CertificationRequest p10Req;
-
-    public P10EnrollCertRequestType(
+    public ErrorResultEntry(
             final String id,
-            final String certprofile,
-            final CertificationRequest p10Req) {
+            final PkiStatusInfo statusInfo) {
         super(id);
-        this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
-        this.p10Req = ParamUtil.requireNonNull("p10Req", p10Req);
+
+        this.statusInfo = ParamUtil.requireNonNull("statusInfo", statusInfo);
     }
 
-    public CertificationRequest getP10Req() {
-        return p10Req;
+    public ErrorResultEntry(
+            final String id,
+            final int status,
+            final int pkiFailureInfo,
+            final String statusMessage) {
+        super(id);
+        this.statusInfo = new PkiStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 
-    public String getCertprofile() {
-        return certprofile;
+    public ErrorResultEntry(
+            final String id,
+            final int status) {
+        super(id);
+        this.statusInfo = new PkiStatusInfo(status);
+    }
+
+    public PkiStatusInfo getStatusInfo() {
+        return statusInfo;
     }
 
 }

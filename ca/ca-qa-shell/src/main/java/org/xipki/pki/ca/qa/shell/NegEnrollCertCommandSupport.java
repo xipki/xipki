@@ -60,8 +60,8 @@ import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
-import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
-import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
+import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntry;
+import org.xipki.pki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.pki.ca.client.shell.ClientCommandSupport;
 import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 
@@ -118,8 +118,8 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        EnrollCertRequestType request = new EnrollCertRequestType(
-                EnrollCertRequestType.Type.CERT_REQ);
+        EnrollCertRequest request = new EnrollCertRequest(
+                EnrollCertRequest.Type.CERT_REQ);
 
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
         ConcurrentContentSigner signer = getSigner(
@@ -138,7 +138,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
         POPOSigningKey popoSk = signer.build(popoBuilder);
         ProofOfPossession popo = new ProofOfPossession(popoSk);
 
-        EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile,
+        EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry("id-1", profile,
                 certReq, popo);
         request.addRequestEntry(reqEntry);
 

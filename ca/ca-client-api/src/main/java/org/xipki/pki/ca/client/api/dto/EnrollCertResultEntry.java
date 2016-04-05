@@ -36,54 +36,41 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
-import java.math.BigInteger;
-import java.security.cert.X509Certificate;
-import java.util.Date;
-
-import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.cmp.CMPCertificate;
+import org.bouncycastle.asn1.cmp.PKIStatus;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class RevokeCertRequestEntryType extends IssuerSerialEntryType {
+public class EnrollCertResultEntry extends ResultEntry {
 
-    private final int reason;
+    private final CMPCertificate cert;
 
-    private final Date invalidityDate;
+    private final int status;
 
-    public RevokeCertRequestEntryType(
+    public EnrollCertResultEntry(
             final String id,
-            final X509Certificate cert,
-            final int reason,
-            final Date invalidityDate) {
-        this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
-                cert.getSerialNumber(), reason, invalidityDate);
+            final CMPCertificate cert) {
+        this(id, cert, PKIStatus.GRANTED);
     }
 
-    public RevokeCertRequestEntryType(
+    public EnrollCertResultEntry(
             final String id,
-            final X500Name issuer,
-            final BigInteger serialNumber,
-            final int reason,
-            final Date invalidityDate) {
-        super(id, issuer, serialNumber);
-
-        if (!(reason >= 0 && reason <= 10 && reason != 7)) {
-            throw new IllegalArgumentException("invalid reason: " + reason);
-        }
-
-        this.reason = reason;
-        this.invalidityDate = invalidityDate;
+            final CMPCertificate cert,
+            final int status) {
+        super(id);
+        this.cert = cert;
+        this.status = status;
     }
 
-    public int getReason() {
-        return reason;
+    public CMPCertificate getCert() {
+        return cert;
     }
 
-    public Date getInvalidityDate() {
-        return invalidityDate;
+    public int getStatus() {
+        return status;
     }
 
 }

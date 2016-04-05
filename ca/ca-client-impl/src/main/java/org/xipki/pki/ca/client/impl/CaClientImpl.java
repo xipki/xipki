@@ -107,20 +107,19 @@ import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
 import org.xipki.pki.ca.client.api.PkiErrorException;
-import org.xipki.pki.ca.client.api.dto.CrlResultType;
-import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
-import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
-import org.xipki.pki.ca.client.api.dto.EnrollCertResultEntryType;
-import org.xipki.pki.ca.client.api.dto.EnrollCertResultType;
-import org.xipki.pki.ca.client.api.dto.ErrorResultEntryType;
-import org.xipki.pki.ca.client.api.dto.IssuerSerialEntryType;
-import org.xipki.pki.ca.client.api.dto.P10EnrollCertRequestType;
-import org.xipki.pki.ca.client.api.dto.ResultEntryType;
-import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntryType;
-import org.xipki.pki.ca.client.api.dto.RevokeCertRequestType;
-import org.xipki.pki.ca.client.api.dto.RevokeCertResultEntryType;
+import org.xipki.pki.ca.client.api.dto.EnrollCertRequest;
+import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntry;
+import org.xipki.pki.ca.client.api.dto.EnrollCertResultEntry;
+import org.xipki.pki.ca.client.api.dto.EnrollCertResultResp;
+import org.xipki.pki.ca.client.api.dto.ErrorResultEntry;
+import org.xipki.pki.ca.client.api.dto.IssuerSerialEntry;
+import org.xipki.pki.ca.client.api.dto.P10EnrollCertRequest;
+import org.xipki.pki.ca.client.api.dto.ResultEntry;
+import org.xipki.pki.ca.client.api.dto.RevokeCertRequest;
+import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntry;
+import org.xipki.pki.ca.client.api.dto.RevokeCertResultEntry;
 import org.xipki.pki.ca.client.api.dto.RevokeCertResultType;
-import org.xipki.pki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
+import org.xipki.pki.ca.client.api.dto.UnrevokeOrRemoveCertRequest;
 import org.xipki.pki.ca.client.impl.jaxb.CAClientType;
 import org.xipki.pki.ca.client.impl.jaxb.CAType;
 import org.xipki.pki.ca.client.impl.jaxb.CertprofileType;
@@ -500,27 +499,27 @@ public final class CaClientImpl implements CaClient {
         }
 
         final String id = "cert-1";
-        P10EnrollCertRequestType request = new P10EnrollCertRequestType(id, profile, p10Request);
-        EnrollCertResultType result;
+        P10EnrollCertRequest request = new P10EnrollCertRequest(id, profile, p10Request);
+        EnrollCertResultResp result;
         try {
             result = ca.getRequestor().requestCertificate(request, username, debug);
         } catch (CmpRequestorException ex) {
             throw new CaClientException(ex.getMessage(), ex);
         }
 
-        return parseEnrollCertResult((EnrollCertResultType) result, tmpCaName);
+        return parseEnrollCertResult((EnrollCertResultResp) result, tmpCaName);
     } // method requestCert
 
     @Override
     public EnrollCertResult requestCerts(
-            final EnrollCertRequestType request,
+            final EnrollCertRequest request,
             final String caName,
             final String username,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
-        List<EnrollCertRequestEntryType> requestEntries = request.getRequestEntries();
+        List<EnrollCertRequestEntry> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
             return null;
         }
@@ -539,7 +538,7 @@ public final class CaClientImpl implements CaClient {
 
         if (bo || request.getRequestEntries().size() > 1) {
             // make sure that all requests are targeted on the same CA
-            for (EnrollCertRequestEntryType entry : request.getRequestEntries()) {
+            for (EnrollCertRequestEntry entry : request.getRequestEntries()) {
                 String profile = entry.getCertprofile();
                 checkCertprofileSupportInCa(profile, tmpCaName);
             }
@@ -550,14 +549,14 @@ public final class CaClientImpl implements CaClient {
             throw new CaClientException("could not find CA named " + tmpCaName);
         }
 
-        EnrollCertResultType result;
+        EnrollCertResultResp result;
         try {
             result = ca.getRequestor().requestCertificate(request, username, debug);
         } catch (CmpRequestorException ex) {
             throw new CaClientException(ex.getMessage(), ex);
         }
 
-        return parseEnrollCertResult((EnrollCertResultType) result, tmpCaName);
+        return parseEnrollCertResult((EnrollCertResultResp) result, tmpCaName);
     } // method requestCerts
 
     private void checkCertprofileSupportInCa(
@@ -624,9 +623,9 @@ public final class CaClientImpl implements CaClient {
         ParamUtil.requireNonNull("serial", serial);
 
         final String id = "cert-1";
-        RevokeCertRequestEntryType entry =
-                new RevokeCertRequestEntryType(id, issuer, serial, reason, invalidityDate);
-        RevokeCertRequestType request = new RevokeCertRequestType();
+        RevokeCertRequestEntry entry =
+                new RevokeCertRequestEntry(id, issuer, serial, reason, invalidityDate);
+        RevokeCertRequest request = new RevokeCertRequest();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = revokeCerts(request, debug);
         return (result == null)
@@ -636,12 +635,12 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public Map<String, CertIdOrError> revokeCerts(
-            final RevokeCertRequestType request,
+            final RevokeCertRequest request,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
-        List<RevokeCertRequestEntryType> requestEntries = request.getRequestEntries();
+        List<RevokeCertRequestEntry> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
             return Collections.emptyMap();
         }
@@ -672,13 +671,13 @@ public final class CaClientImpl implements CaClient {
     throws CaClientException {
         Map<String, CertIdOrError> ret = new HashMap<>();
 
-        for (ResultEntryType re : result.getResultEntries()) {
+        for (ResultEntry re : result.getResultEntries()) {
             CertIdOrError certIdOrError;
-            if (re instanceof RevokeCertResultEntryType) {
-                RevokeCertResultEntryType entry = (RevokeCertResultEntryType) re;
+            if (re instanceof RevokeCertResultEntry) {
+                RevokeCertResultEntry entry = (RevokeCertResultEntry) re;
                 certIdOrError = new CertIdOrError(entry.getCertId());
-            } else if (re instanceof ErrorResultEntryType) {
-                ErrorResultEntryType entry = (ErrorResultEntryType) re;
+            } else if (re instanceof ErrorResultEntry) {
+                ErrorResultEntry entry = (ErrorResultEntry) re;
                 certIdOrError = new CertIdOrError(entry.getStatusInfo());
             } else {
                 throw new CaClientException("unknwon type " + re);
@@ -713,7 +712,7 @@ public final class CaClientImpl implements CaClient {
         }
 
         X509CmpRequestor requestor = ca.getRequestor();
-        CrlResultType result;
+        X509CRL result;
         try {
             if (crlNumber == null) {
                 result = requestor.downloadCurrentCrl(debug);
@@ -724,7 +723,7 @@ public final class CaClientImpl implements CaClient {
             throw new CaClientException(ex.getMessage(), ex);
         }
 
-        return result.getCrl();
+        return result;
     }
 
     @Override
@@ -741,8 +740,7 @@ public final class CaClientImpl implements CaClient {
 
         X509CmpRequestor requestor = ca.getRequestor();
         try {
-            CrlResultType result = requestor.generateCrl(debug);
-            return result.getCrl();
+            return requestor.generateCrl(debug);
         } catch (CmpRequestorException ex) {
             throw new CaClientException(ex.getMessage(), ex);
         }
@@ -935,9 +933,9 @@ public final class CaClientImpl implements CaClient {
     throws CaClientException {
         ParamUtil.requireNonNull("issuer", issuer);
         final String id = "cert-1";
-        RevokeCertRequestEntryType entry =
-                new RevokeCertRequestEntryType(id, issuer, serial, reason, null);
-        RevokeCertRequestType request = new RevokeCertRequestType();
+        RevokeCertRequestEntry entry =
+                new RevokeCertRequestEntry(id, issuer, serial, reason, null);
+        RevokeCertRequest request = new RevokeCertRequest();
         request.addRequestEntry(entry);
 
         String caName = getCaNameByIssuer(issuer);
@@ -970,9 +968,9 @@ public final class CaClientImpl implements CaClient {
         ParamUtil.requireNonNull("issuer", issuer);
         ParamUtil.requireNonNull("serial", serial);
         final String id = "cert-1";
-        IssuerSerialEntryType entry =
-                new IssuerSerialEntryType(id, issuer, serial);
-        UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
+        IssuerSerialEntry entry =
+                new IssuerSerialEntry(id, issuer, serial);
+        UnrevokeOrRemoveCertRequest request = new UnrevokeOrRemoveCertRequest();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = unrevokeCerts(request, debug);
         return (result == null)
@@ -992,12 +990,12 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public Map<String, CertIdOrError> unrevokeCerts(
-            final UnrevokeOrRemoveCertRequestType request,
+            final UnrevokeOrRemoveCertRequest request,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
-        List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
+        List<IssuerSerialEntry> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
             return Collections.emptyMap();
         }
@@ -1032,8 +1030,8 @@ public final class CaClientImpl implements CaClient {
         ParamUtil.requireNonNull("issuer", issuer);
         ParamUtil.requireNonNull("serial", serial);
         final String id = "cert-1";
-        IssuerSerialEntryType entry = new IssuerSerialEntryType(id, issuer, serial);
-        UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
+        IssuerSerialEntry entry = new IssuerSerialEntry(id, issuer, serial);
+        UnrevokeOrRemoveCertRequest request = new UnrevokeOrRemoveCertRequest();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = removeCerts(request, debug);
         return (result == null)
@@ -1053,12 +1051,12 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public Map<String, CertIdOrError> removeCerts(
-            final UnrevokeOrRemoveCertRequestType request,
+            final UnrevokeOrRemoveCertRequest request,
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
-        List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
+        List<IssuerSerialEntry> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
             return Collections.emptyMap();
         }
@@ -1184,14 +1182,14 @@ public final class CaClientImpl implements CaClient {
     } // method getHealthCheckResult
 
     private EnrollCertResult parseEnrollCertResult(
-            final EnrollCertResultType result,
+            final EnrollCertResultResp result,
             final String caName)
     throws CaClientException {
         Map<String, CertOrError> certOrErrors = new HashMap<>();
-        for (ResultEntryType resultEntry : result.getResultEntries()) {
+        for (ResultEntry resultEntry : result.getResultEntries()) {
             CertOrError certOrError;
-            if (resultEntry instanceof EnrollCertResultEntryType) {
-                EnrollCertResultEntryType entry = (EnrollCertResultEntryType) resultEntry;
+            if (resultEntry instanceof EnrollCertResultEntry) {
+                EnrollCertResultEntry entry = (EnrollCertResultEntry) resultEntry;
                 try {
                     java.security.cert.Certificate cert = getCertificate(entry.getCert());
                     certOrError = new CertOrError(cert);
@@ -1200,8 +1198,8 @@ public final class CaClientImpl implements CaClient {
                             "CertificateParsingException for request (id=%s): %s",
                             entry.getId(), ex.getMessage()));
                 }
-            } else if (resultEntry instanceof ErrorResultEntryType) {
-                certOrError = new CertOrError(((ErrorResultEntryType) resultEntry).getStatusInfo());
+            } else if (resultEntry instanceof ErrorResultEntry) {
+                certOrError = new CertOrError(((ErrorResultEntry) resultEntry).getStatusInfo());
             } else {
                 certOrError = null;
             }

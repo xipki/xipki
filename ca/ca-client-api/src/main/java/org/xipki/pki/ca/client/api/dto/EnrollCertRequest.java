@@ -48,7 +48,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class EnrollCertRequestType {
+public class EnrollCertRequest {
 
     public enum Type {
 
@@ -60,9 +60,9 @@ public class EnrollCertRequestType {
 
     private final Type type;
 
-    private final List<EnrollCertRequestEntryType> requestEntries = new LinkedList<>();
+    private final List<EnrollCertRequestEntry> requestEntries = new LinkedList<>();
 
-    public EnrollCertRequestType(
+    public EnrollCertRequest(
             final Type type) {
         this.type = ParamUtil.requireNonNull("type", type);
     }
@@ -72,11 +72,11 @@ public class EnrollCertRequestType {
     }
 
     public boolean addRequestEntry(
-            final EnrollCertRequestEntryType requestEntry) {
+            final EnrollCertRequestEntry requestEntry) {
         ParamUtil.requireNonNull("requestEntry", requestEntry);
         String id = requestEntry.getId();
         ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
-        for (EnrollCertRequestEntryType re : requestEntries) {
+        for (EnrollCertRequestEntry re : requestEntries) {
             if (re.getId().equals(id)) {
                 return false;
             }
@@ -90,7 +90,7 @@ public class EnrollCertRequestType {
         return true;
     }
 
-    public List<EnrollCertRequestEntryType> getRequestEntries() {
+    public List<EnrollCertRequestEntry> getRequestEntries() {
         return Collections.unmodifiableList(requestEntries);
     }
 
