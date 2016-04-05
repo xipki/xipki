@@ -43,11 +43,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.crypto.digests.SHA224Digest;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.digests.SHA384Digest;
-import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
@@ -57,7 +52,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class HashCalculator {
+class HashCalculator {
 
     private static final int PARALLELISM = 50;
 
@@ -79,27 +74,7 @@ public class HashCalculator {
             final HashAlgoType hashAlgo) {
         BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
         for (int i = 0; i < PARALLELISM; i++) {
-            Digest md;
-            switch (hashAlgo) {
-            case SHA1:
-                md = new SHA1Digest();
-                break;
-            case SHA224:
-                md = new SHA224Digest();
-                break;
-            case SHA256:
-                md = new SHA256Digest();
-                break;
-            case SHA384:
-                md = new SHA384Digest();
-                break;
-            case SHA512:
-                md = new SHA512Digest();
-                break;
-            default:
-                throw new RuntimeException(
-                        "should not reach here, unknown HashAlgoType " + hashAlgo);
-            }
+            Digest md = hashAlgo.createDigest();
             mds.addLast(md);
         }
         return mds;

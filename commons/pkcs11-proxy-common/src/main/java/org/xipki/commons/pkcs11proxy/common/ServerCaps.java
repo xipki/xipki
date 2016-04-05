@@ -94,7 +94,7 @@ public class ServerCaps {
             this.readOnly = true;
         } else if ("false".equalsIgnoreCase(str)) {
             this.readOnly = false;
-        } else if (str == null){
+        } else if (str == null) {
             throw new IllegalArgumentException("property readOnly is not specified");
         } else {
             throw new IllegalArgumentException("invalid property readOnly '" + str + "'");

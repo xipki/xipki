@@ -37,6 +37,14 @@
 package org.xipki.commons.security.api;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bouncycastle.crypto.digests.SHA224Digest;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA384Digest;
+import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.p11.P11Constants;
 
@@ -55,7 +63,9 @@ public enum HashAlgoType {
 
     private final int length;
 
-    private final String oid;
+    private final ASN1ObjectIdentifier oid;
+
+    private final AlgorithmIdentifier algId;
 
     private final String name;
 
@@ -67,7 +77,8 @@ public enum HashAlgoType {
             final String name,
             final String shortName) {
         this.length = length;
-        this.oid = oid;
+        this.oid = new ASN1ObjectIdentifier(oid).intern();
+        this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
         this.name = name;
         this.shortName = shortName;
     }
@@ -76,7 +87,7 @@ public enum HashAlgoType {
         return length;
     }
 
-    public String getOid() {
+    public ASN1ObjectIdentifier getOid() {
         return oid;
     }
 
@@ -90,9 +101,9 @@ public enum HashAlgoType {
 
     public static HashAlgoType getHashAlgoType(
             final ASN1ObjectIdentifier oid) {
-        String oidStr = ParamUtil.requireNonNull("oid", oid).getId();
+        ParamUtil.requireNonNull("oid", oid);
         for (HashAlgoType hashAlgo : values()) {
-            if (hashAlgo.oid.equals(oidStr)) {
+            if (hashAlgo.oid.equals(oid)) {
                 return hashAlgo;
             }
         }
@@ -102,8 +113,11 @@ public enum HashAlgoType {
     public static HashAlgoType getHashAlgoType(
             final String nameOrOid) {
         String tmpNameOrOid = ParamUtil.requireNonBlank("nameOrOid", nameOrOid);
+        char ch = nameOrOid.charAt(0);
+
+        boolean maybeId = ch >= '0' && ch <= '9';
         for (HashAlgoType hashAlgo : values()) {
-            if (hashAlgo.oid.equals(tmpNameOrOid)) {
+            if (maybeId && hashAlgo.oid.getId().equals(tmpNameOrOid)) {
                 return hashAlgo;
             }
 
@@ -121,7 +135,7 @@ public enum HashAlgoType {
     }
 
     public static HashAlgoType getInstanceForPkcs11HashMech(
-            long hashMech) {
+            final long hashMech) {
         if (hashMech == P11Constants.CKM_SHA_1) {
             return HashAlgoType.SHA1;
         } else if (hashMech == P11Constants.CKM_SHA224) {
@@ -138,7 +152,7 @@ public enum HashAlgoType {
     }
 
     public static HashAlgoType getInstanceForPkcs11MgfMech(
-            long hashMech) {
+            final long hashMech) {
         if (hashMech == P11Constants.CKG_MGF1_SHA1) {
             return HashAlgoType.SHA1;
         } else if (hashMech == P11Constants.CKG_MGF1_SHA224) {
@@ -152,5 +166,41 @@ public enum HashAlgoType {
         } else {
             return null;
         }
+    }
+
+    public AlgorithmIdentifier getAlgorithmIdentifier() {
+        return algId;
+    }
+
+    public Digest createDigest() {
+        switch (this) {
+        case SHA1:
+            return new SHA1Digest();
+        case SHA224:
+            return new SHA224Digest();
+        case SHA256:
+            return new SHA256Digest();
+        case SHA384:
+            return new SHA384Digest();
+        case SHA512:
+            return new SHA512Digest();
+        default:
+            throw new RuntimeException("should not reach here, unknown HashAlgoType " + name());
+        }
+    }
+
+    public String hexHash(
+            final byte[] data) {
+        return HashCalculator.hexHash(this, data);
+    }
+
+    public String base64Hash(
+            final byte[] data) {
+        return HashCalculator.base64Hash(this, data);
+    }
+
+    public byte[] hash(
+            final byte[] data) {
+        return HashCalculator.hash(this, data);
     }
 }

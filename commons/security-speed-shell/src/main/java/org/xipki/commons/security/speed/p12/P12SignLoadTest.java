@@ -49,7 +49,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.util.KeyUtil;
-import org.xipki.commons.security.api.util.SignerConfUtil;
+import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -92,7 +92,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
         ParamUtil.requireNonBlank("signatureAlgorithm", signatureAlgorithm);
         ParamUtil.requireNonNull("keystore", keystore);
 
-        String signerConf = SignerConfUtil.getKeystoreSignerConf(
+        String signerConf = SignerUtil.getKeystoreSignerConf(
                 new ByteArrayInputStream(keystore), PASSWORD, signatureAlgorithm, 20);
         this.signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate) null);
     }

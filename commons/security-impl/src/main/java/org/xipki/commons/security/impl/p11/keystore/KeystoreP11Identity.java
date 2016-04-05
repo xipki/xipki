@@ -61,7 +61,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.p11.P11Constants;
@@ -246,7 +245,7 @@ public class KeystoreP11Identity extends P11Identity {
         if (hashAlgo == null) {
             hashValue = contentToSign;
         } else {
-            hashValue = HashCalculator.hash(hashAlgo, contentToSign);
+            hashValue = hashAlgo.hash(contentToSign);
         }
 
         byte[] encodedHashValue = SignerUtil.EMSA_PSS_ENCODE(contentHash, hashValue, mgfHash,
@@ -263,7 +262,7 @@ public class KeystoreP11Identity extends P11Identity {
         if (hashAlgo == null) {
             paddedHash = SignerUtil.EMSA_PKCS1_v1_5_encoding(contentToSign, modulusBitLen);
         } else {
-            byte[] hash = HashCalculator.hash(hashAlgo, contentToSign);
+            byte[] hash = hashAlgo.hash(contentToSign);
             paddedHash = SignerUtil.EMSA_PKCS1_v1_5_encoding(hash, modulusBitLen, hashAlgo);
         }
         return rsaX509Sign(paddedHash);
@@ -293,12 +292,9 @@ public class KeystoreP11Identity extends P11Identity {
             final byte[] dataToSign,
             final HashAlgoType hashAlgo)
     throws SecurityException {
-        byte[] hash;
-        if (hashAlgo == null) {
-            hash = dataToSign;
-        } else {
-            hash = HashCalculator.hash(hashAlgo, dataToSign);
-        }
+        byte[] hash = (hashAlgo == null)
+                ? dataToSign
+                : hashAlgo.hash(dataToSign);
 
         byte[] truncatedDigest = SecurityUtil.leftmost(hash, getSignatureKeyBitLength());
         Signature sig;

@@ -49,7 +49,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public enum HashAlgoType {
+public enum ScepHashAlgoType {
 
     MD5(16, "1.2.840.113549.2.5", "MD5"),
     SHA1(20, "1.3.14.3.2.26", "SHA1"),
@@ -62,7 +62,7 @@ public enum HashAlgoType {
 
     private final String name;
 
-    HashAlgoType(
+    ScepHashAlgoType(
             final int length,
             final String oid,
             final String name) {
@@ -111,12 +111,12 @@ public enum HashAlgoType {
         return ret;
     }
 
-    public static HashAlgoType getHashAlgoType(
+    public static ScepHashAlgoType getHashAlgoType(
             final String nameOrOid) {
 
         String tmpNameOrOid = nameOrOid;
 
-        for (HashAlgoType hashAlgo : values()) {
+        for (ScepHashAlgoType hashAlgo : values()) {
             if (hashAlgo.oid.equals(tmpNameOrOid)) {
                 return hashAlgo;
             }

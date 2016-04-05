@@ -81,7 +81,7 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.X509Cert;
@@ -608,31 +608,11 @@ class KeystoreP11Slot extends AbstractP11Slot {
 
             // EC point
             java.security.spec.ECPoint pointW = ecKey.getW();
-            BigInteger wx = pointW.getAffineX();
-            if (wx.signum() != 1) {
-                throw new P11TokenException("Wx is not positive");
-            }
-
-            BigInteger wy = pointW.getAffineY();
-            if (wy.signum() != 1) {
-                throw new P11TokenException("Wy is not positive");
-            }
-
             int keysize = (paramSpec.getOrder().bitLength() + 7) / 8;
-            byte[] wxBytes = wx.toByteArray();
-            byte[] wyBytes = wy.toByteArray();
             byte[] ecPoint = new byte[1 + keysize * 2];
             ecPoint[0] = 4; // uncompressed
-
-            int numBytesToCopy = Math.min(wxBytes.length, keysize);
-            int srcOffset = Math.max(0, wxBytes.length - numBytesToCopy);
-            int destOffset = 1 + Math.max(0, keysize - wxBytes.length);
-            System.arraycopy(wxBytes, srcOffset, ecPoint, destOffset, numBytesToCopy);
-
-            numBytesToCopy = Math.min(wyBytes.length, keysize);
-            srcOffset = Math.max(0, wyBytes.length - numBytesToCopy);
-            destOffset = 1 + keysize + Math.max(0, keysize - wyBytes.length);
-            System.arraycopy(wyBytes, srcOffset, ecPoint, destOffset, numBytesToCopy);
+            bigIntToBytes("Wx", pointW.getAffineX(), ecPoint, 1, keysize);
+            bigIntToBytes("Wx", pointW.getAffineY(), ecPoint, 1 + keysize, keysize);
 
             byte[] encodedEcPoint;
             try {
@@ -652,6 +632,26 @@ class KeystoreP11Slot extends AbstractP11Slot {
             IoUtil.save(new File(pubKeyDir, hexId + INFO_FILE_SUFFIX), sb.toString().getBytes());
         } catch (IOException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
+        }
+    }
+
+    private static void bigIntToBytes(
+            final String numName,
+            final BigInteger num,
+            final byte[] dest,
+            final int destPos,
+            final int length)
+    throws P11TokenException {
+        if (num.signum() != 1) {
+            throw new P11TokenException(numName + " is not positive");
+        }
+        byte[] bytes = num.toByteArray();
+        if (bytes.length == length) {
+            System.arraycopy(bytes, 0, dest, destPos, length);
+        } else if (bytes.length < length) {
+            System.arraycopy(bytes, 0, dest, destPos + length - bytes.length, bytes.length);
+        } else {
+            System.arraycopy(bytes, bytes.length - length, dest, destPos, length);
         }
     }
 
@@ -683,7 +683,7 @@ class KeystoreP11Slot extends AbstractP11Slot {
         StringBuilder sb = new StringBuilder(200);
         sb.append(PROP_ID).append('=').append(hexId).append('\n');
         sb.append(PROP_LABEL).append('=').append(label).append('\n');
-        sb.append(PROP_SHA1SUM).append('=').append(HashCalculator.hexSha1(value)).append('\n');
+        sb.append(PROP_SHA1SUM).append('=').append(HashAlgoType.SHA1.hexHash(value)).append('\n');
 
         try {
             IoUtil.save(new File(dir, hexId + INFO_FILE_SUFFIX), sb.toString().getBytes());
