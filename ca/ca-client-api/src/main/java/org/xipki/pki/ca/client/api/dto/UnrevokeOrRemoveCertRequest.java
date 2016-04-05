@@ -36,8 +36,10 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
-import org.bouncycastle.asn1.crmf.CertRequest;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -45,36 +47,24 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class EnrollCertRequestEntryType extends IdentifiedObject {
+public class UnrevokeOrRemoveCertRequest {
 
-    private final String certprofile;
+    private final List<IssuerSerialEntry> requestEntries = new LinkedList<>();
 
-    private final CertRequest certReq;
+    public boolean addRequestEntry(
+            final IssuerSerialEntry requestEntry) {
+        ParamUtil.requireNonNull("requestEntry", requestEntry);
+        for (IssuerSerialEntry re : requestEntries) {
+            if (re.getId().equals(requestEntry.getId())) {
+                return false;
+            }
+        }
 
-    private final ProofOfPossession popo;
-
-    public EnrollCertRequestEntryType(
-            final String id,
-            final String certprofile,
-            final CertRequest certReq,
-            final ProofOfPossession popo) {
-        super(id);
-
-        this.certprofile = certprofile;
-        this.certReq = ParamUtil.requireNonNull("certReq", certReq);
-        this.popo = popo;
+        requestEntries.add(requestEntry);
+        return true;
     }
 
-    public String getCertprofile() {
-        return certprofile;
+    public List<IssuerSerialEntry> getRequestEntries() {
+        return Collections.unmodifiableList(requestEntries);
     }
-
-    public CertRequest getCertReq() {
-        return certReq;
-    }
-
-    public ProofOfPossession getPopo() {
-        return popo;
-    }
-
 }

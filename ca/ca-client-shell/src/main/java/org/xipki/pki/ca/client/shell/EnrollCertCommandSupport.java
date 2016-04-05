@@ -95,8 +95,8 @@ import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
-import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntryType;
-import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
+import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntry;
+import org.xipki.pki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 
 /**
@@ -371,11 +371,11 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
         ProofOfPossession popo = new ProofOfPossession(popoSk);
 
-        EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile,
+        EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry("id-1", profile,
                 certReq, popo);
 
-        EnrollCertRequestType request = new EnrollCertRequestType(
-                EnrollCertRequestType.Type.CERT_REQ);
+        EnrollCertRequest request = new EnrollCertRequest(
+                EnrollCertRequest.Type.CERT_REQ);
         request.addRequestEntry(reqEntry);
 
         RequestResponseDebug debug = getRequestResponseDebug();

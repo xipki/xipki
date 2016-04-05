@@ -36,26 +36,45 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
-import org.bouncycastle.asn1.crmf.CertId;
+import java.math.BigInteger;
+import java.security.cert.X509Certificate;
+
+import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class RevokeCertResultEntryType extends ResultEntryType {
+public class IssuerSerialEntry extends ResultEntry {
 
-    private final CertId certId;
+    private final X500Name issuer;
 
-    public RevokeCertResultEntryType(
+    private final BigInteger serialNumber;
+
+    public IssuerSerialEntry(
             final String id,
-            final CertId certId) {
-        super(id);
-        this.certId = certId;
+            final X509Certificate cert) {
+        this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
+                cert.getSerialNumber());
     }
 
-    public CertId getCertId() {
-        return certId;
+    public IssuerSerialEntry(
+            final String id,
+            final X500Name issuer,
+            final BigInteger serialNumber) {
+        super(id);
+        this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
+        this.issuer = ParamUtil.requireNonNull("issuer", issuer);
+    }
+
+    public X500Name getIssuer() {
+        return issuer;
+    }
+
+    public BigInteger getSerialNumber() {
+        return serialNumber;
     }
 
 }

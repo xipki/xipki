@@ -36,36 +36,26 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.xipki.commons.common.util.ParamUtil;
+import org.bouncycastle.asn1.crmf.CertId;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class RevokeCertRequestType {
+public class RevokeCertResultEntry extends ResultEntry {
 
-    private final List<RevokeCertRequestEntryType> requestEntries = new LinkedList<>();
+    private final CertId certId;
 
-    public boolean addRequestEntry(
-            final RevokeCertRequestEntryType requestEntry) {
-        ParamUtil.requireNonNull("requestEntry", requestEntry);
-        for (RevokeCertRequestEntryType re : requestEntries) {
-            if (re.getId().equals(requestEntry.getId())) {
-                return false;
-            }
-        }
-
-        requestEntries.add(requestEntry);
-        return true;
+    public RevokeCertResultEntry(
+            final String id,
+            final CertId certId) {
+        super(id);
+        this.certId = certId;
     }
 
-    public List<RevokeCertRequestEntryType> getRequestEntries() {
-        return Collections.unmodifiableList(requestEntries);
+    public CertId getCertId() {
+        return certId;
     }
 
 }

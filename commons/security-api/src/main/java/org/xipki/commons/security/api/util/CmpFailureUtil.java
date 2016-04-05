@@ -104,11 +104,10 @@ public class CmpFailureUtil {
             final int failureInfo,
             final String statusMessage) {
         StringBuilder sb = new StringBuilder("PKIStatusInfo {");
-        sb.append("status = ");
-        sb.append(status);
+        sb.append("status = ").append(status);
         sb.append(" (").append(STATUS_TEXT_MAP.get(status)).append("), ");
-        sb.append("failureInfo = ");
-        sb.append(failureInfo).append(" (").append(getFailureInfoText(failureInfo)).append("), ");
+        sb.append("failureInfo = ").append(failureInfo);
+        sb.append(" (").append(getFailureInfoText(failureInfo)).append("), ");
         sb.append("statusMessage = ").append(statusMessage);
         sb.append("}");
         return sb.toString();

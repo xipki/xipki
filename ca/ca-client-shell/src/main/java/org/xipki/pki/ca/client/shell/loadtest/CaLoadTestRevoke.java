@@ -64,8 +64,8 @@ import org.xipki.pki.ca.client.api.CaClient;
 import org.xipki.pki.ca.client.api.CaClientException;
 import org.xipki.pki.ca.client.api.CertIdOrError;
 import org.xipki.pki.ca.client.api.PkiErrorException;
-import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntryType;
-import org.xipki.pki.ca.client.api.dto.RevokeCertRequestType;
+import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntry;
+import org.xipki.pki.ca.client.api.dto.RevokeCertRequest;
 
 /**
  * @author Lijun Liao
@@ -180,11 +180,11 @@ public class CaLoadTestRevoke extends LoadExecutor {
 
         private boolean testNext(
                 final List<Long> serialNumbers) {
-            RevokeCertRequestType request = new RevokeCertRequestType();
+            RevokeCertRequest request = new RevokeCertRequest();
             int id = 1;
             for (Long serialNumber : serialNumbers) {
                 CrlReason reason = REASONS[(int) (serialNumber % REASONS.length)];
-                RevokeCertRequestEntryType entry = new RevokeCertRequestEntryType(
+                RevokeCertRequestEntry entry = new RevokeCertRequestEntry(
                         Integer.toString(id++), caSubject, BigInteger.valueOf(serialNumber),
                         reason.getCode(), null);
                 request.addRequestEntry(entry);

@@ -36,10 +36,8 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
-import java.math.BigInteger;
-import java.security.cert.X509Certificate;
-
-import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.crmf.CertRequest;
+import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -47,34 +45,36 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class IssuerSerialEntryType extends ResultEntryType {
+public class EnrollCertRequestEntry extends IdentifiedObject {
 
-    private final X500Name issuer;
+    private final String certprofile;
 
-    private final BigInteger serialNumber;
+    private final CertRequest certReq;
 
-    public IssuerSerialEntryType(
+    private final ProofOfPossession popo;
+
+    public EnrollCertRequestEntry(
             final String id,
-            final X509Certificate cert) {
-        this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
-                cert.getSerialNumber());
-    }
-
-    public IssuerSerialEntryType(
-            final String id,
-            final X500Name issuer,
-            final BigInteger serialNumber) {
+            final String certprofile,
+            final CertRequest certReq,
+            final ProofOfPossession popo) {
         super(id);
-        this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
-        this.issuer = ParamUtil.requireNonNull("issuer", issuer);
+
+        this.certprofile = certprofile;
+        this.certReq = ParamUtil.requireNonNull("certReq", certReq);
+        this.popo = popo;
     }
 
-    public X500Name getIssuer() {
-        return issuer;
+    public String getCertprofile() {
+        return certprofile;
     }
 
-    public BigInteger getSerialNumber() {
-        return serialNumber;
+    public CertRequest getCertReq() {
+        return certReq;
+    }
+
+    public ProofOfPossession getPopo() {
+        return popo;
     }
 
 }
