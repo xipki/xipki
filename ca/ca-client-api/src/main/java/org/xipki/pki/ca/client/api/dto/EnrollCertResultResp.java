@@ -36,44 +36,57 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ca.common.cmp.PkiStatusInfo;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class ErrorResultEntryType extends ResultEntryType {
+public class EnrollCertResultResp {
 
-    private final PkiStatusInfo statusInfo;
+    private List<CMPCertificate> caCertificates;
 
-    public ErrorResultEntryType(
-            final String id,
-            final PkiStatusInfo statusInfo) {
-        super(id);
+    private List<ResultEntry> resultEntries;
 
-        this.statusInfo = ParamUtil.requireNonNull("statusInfo", statusInfo);
+    public EnrollCertResultResp() {
     }
 
-    public ErrorResultEntryType(
-            final String id,
-            final int status,
-            final int pkiFailureInfo,
-            final String statusMessage) {
-        super(id);
-        this.statusInfo = new PkiStatusInfo(status, pkiFailureInfo, statusMessage);
+    public void addCaCertificate(
+            final CMPCertificate caCertificate) {
+        if (caCertificates == null) {
+            caCertificates = new ArrayList<>(1);
+        }
+        caCertificates.add(caCertificate);
     }
 
-    public ErrorResultEntryType(
-            final String id,
-            final int status) {
-        super(id);
-        this.statusInfo = new PkiStatusInfo(status);
+    public void addResultEntry(
+            final ResultEntry resultEntry) {
+        ParamUtil.requireNonNull("resultEntry", resultEntry);
+
+        if (!(resultEntry instanceof EnrollCertResultEntry
+                || resultEntry instanceof ErrorResultEntry)) {
+            throw new IllegalArgumentException(
+                    "Unaccepted parameter of class " + resultEntry.getClass().getName());
+        }
+
+        if (resultEntries == null) {
+            resultEntries = new ArrayList<>(1);
+        }
+
+        resultEntries.add(resultEntry);
     }
 
-    public PkiStatusInfo getStatusInfo() {
-        return statusInfo;
+    public List<CMPCertificate> getCaCertificates() {
+        return caCertificates;
+    }
+
+    public List<ResultEntry> getResultEntries() {
+        return resultEntries;
     }
 
 }

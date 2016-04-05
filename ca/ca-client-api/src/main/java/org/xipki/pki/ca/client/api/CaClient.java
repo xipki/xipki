@@ -52,9 +52,9 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.RequestResponseDebug;
-import org.xipki.pki.ca.client.api.dto.EnrollCertRequestType;
-import org.xipki.pki.ca.client.api.dto.RevokeCertRequestType;
-import org.xipki.pki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
+import org.xipki.pki.ca.client.api.dto.EnrollCertRequest;
+import org.xipki.pki.ca.client.api.dto.RevokeCertRequest;
+import org.xipki.pki.ca.client.api.dto.UnrevokeOrRemoveCertRequest;
 
 /**
  * @author Lijun Liao
@@ -77,7 +77,7 @@ public interface CaClient {
     throws CaClientException, PkiErrorException;
 
     EnrollCertResult requestCerts(
-            @Nonnull EnrollCertRequestType request,
+            @Nonnull EnrollCertRequest request,
             @Nullable String caName,
             @Nullable String username,
             @Nullable RequestResponseDebug debug)
@@ -99,7 +99,7 @@ public interface CaClient {
     throws CaClientException, PkiErrorException;
 
     Map<String, CertIdOrError> revokeCerts(
-            @Nonnull RevokeCertRequestType request,
+            @Nonnull RevokeCertRequest request,
             @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
@@ -154,7 +154,7 @@ public interface CaClient {
     throws CaClientException, PkiErrorException;
 
     Map<String, CertIdOrError> unrevokeCerts(
-            @Nonnull UnrevokeOrRemoveCertRequestType request,
+            @Nonnull UnrevokeOrRemoveCertRequest request,
             @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
@@ -170,7 +170,7 @@ public interface CaClient {
     throws CaClientException, PkiErrorException;
 
     Map<String, CertIdOrError> removeCerts(
-            @Nonnull UnrevokeOrRemoveCertRequestType request,
+            @Nonnull UnrevokeOrRemoveCertRequest request,
             @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 

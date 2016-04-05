@@ -36,10 +36,7 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bouncycastle.asn1.cmp.CMPCertificate;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -47,46 +44,25 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class EnrollCertResultType {
+public class P10EnrollCertEntry {
 
-    private List<CMPCertificate> caCertificates;
+    private final CertificationRequest p10Request;
 
-    private List<ResultEntryType> resultEntries;
+    private final String profile;
 
-    public EnrollCertResultType() {
+    public P10EnrollCertEntry(
+            final CertificationRequest p10Request,
+            final String profile) {
+        this.p10Request = ParamUtil.requireNonNull("p10Request", p10Request);
+        this.profile = ParamUtil.requireNonNull("profile", profile);
     }
 
-    public void addCaCertificate(
-            final CMPCertificate caCertificate) {
-        if (caCertificates == null) {
-            caCertificates = new ArrayList<>(1);
-        }
-        caCertificates.add(caCertificate);
+    public CertificationRequest getP10Request() {
+        return p10Request;
     }
 
-    public void addResultEntry(
-            final ResultEntryType resultEntry) {
-        ParamUtil.requireNonNull("resultEntry", resultEntry);
-
-        if (!(resultEntry instanceof EnrollCertResultEntryType
-                || resultEntry instanceof ErrorResultEntryType)) {
-            throw new IllegalArgumentException(
-                    "Unaccepted parameter of class " + resultEntry.getClass().getName());
-        }
-
-        if (resultEntries == null) {
-            resultEntries = new ArrayList<>(1);
-        }
-
-        resultEntries.add(resultEntry);
-    }
-
-    public List<CMPCertificate> getCaCertificates() {
-        return caCertificates;
-    }
-
-    public List<ResultEntryType> getResultEntries() {
-        return resultEntries;
+    public String getProfile() {
+        return profile;
     }
 
 }

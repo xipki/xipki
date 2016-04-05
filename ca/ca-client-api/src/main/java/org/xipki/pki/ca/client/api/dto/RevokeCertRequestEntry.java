@@ -36,35 +36,54 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.math.BigInteger;
+import java.security.cert.X509Certificate;
+import java.util.Date;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.bouncycastle.asn1.x500.X500Name;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class UnrevokeOrRemoveCertRequestType {
+public class RevokeCertRequestEntry extends IssuerSerialEntry {
 
-    private final List<IssuerSerialEntryType> requestEntries = new LinkedList<>();
+    private final int reason;
 
-    public boolean addRequestEntry(
-            final IssuerSerialEntryType requestEntry) {
-        ParamUtil.requireNonNull("requestEntry", requestEntry);
-        for (IssuerSerialEntryType re : requestEntries) {
-            if (re.getId().equals(requestEntry.getId())) {
-                return false;
-            }
+    private final Date invalidityDate;
+
+    public RevokeCertRequestEntry(
+            final String id,
+            final X509Certificate cert,
+            final int reason,
+            final Date invalidityDate) {
+        this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
+                cert.getSerialNumber(), reason, invalidityDate);
+    }
+
+    public RevokeCertRequestEntry(
+            final String id,
+            final X500Name issuer,
+            final BigInteger serialNumber,
+            final int reason,
+            final Date invalidityDate) {
+        super(id, issuer, serialNumber);
+
+        if (!(reason >= 0 && reason <= 10 && reason != 7)) {
+            throw new IllegalArgumentException("invalid reason: " + reason);
         }
 
-        requestEntries.add(requestEntry);
-        return true;
+        this.reason = reason;
+        this.invalidityDate = invalidityDate;
     }
 
-    public List<IssuerSerialEntryType> getRequestEntries() {
-        return Collections.unmodifiableList(requestEntries);
+    public int getReason() {
+        return reason;
     }
+
+    public Date getInvalidityDate() {
+        return invalidityDate;
+    }
+
 }

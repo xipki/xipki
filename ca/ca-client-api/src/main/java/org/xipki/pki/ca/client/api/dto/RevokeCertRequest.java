@@ -36,7 +36,10 @@
 
 package org.xipki.pki.ca.client.api.dto;
 
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -44,25 +47,25 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class P10EnrollCertEntryType {
+public class RevokeCertRequest {
 
-    private final CertificationRequest p10Request;
+    private final List<RevokeCertRequestEntry> requestEntries = new LinkedList<>();
 
-    private final String profile;
+    public boolean addRequestEntry(
+            final RevokeCertRequestEntry requestEntry) {
+        ParamUtil.requireNonNull("requestEntry", requestEntry);
+        for (RevokeCertRequestEntry re : requestEntries) {
+            if (re.getId().equals(requestEntry.getId())) {
+                return false;
+            }
+        }
 
-    public P10EnrollCertEntryType(
-            final CertificationRequest p10Request,
-            final String profile) {
-        this.p10Request = ParamUtil.requireNonNull("p10Request", p10Request);
-        this.profile = ParamUtil.requireNonNull("profile", profile);
+        requestEntries.add(requestEntry);
+        return true;
     }
 
-    public CertificationRequest getP10Request() {
-        return p10Request;
-    }
-
-    public String getProfile() {
-        return profile;
+    public List<RevokeCertRequestEntry> getRequestEntries() {
+        return Collections.unmodifiableList(requestEntries);
     }
 
 }
