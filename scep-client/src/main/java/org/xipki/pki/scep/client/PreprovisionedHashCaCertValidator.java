@@ -43,7 +43,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -52,12 +52,12 @@ import org.xipki.pki.scep.crypto.HashAlgoType;
 
 public final class PreprovisionedHashCaCertValidator implements CaCertValidator {
 
-    private final HashAlgoType hashAlgo;
+    private final ScepHashAlgoType hashAlgo;
 
     private final Set<byte[]> hashValues;
 
     public PreprovisionedHashCaCertValidator(
-        final HashAlgoType hashAlgo,
+        final ScepHashAlgoType hashAlgo,
         final Set<byte[]> hashValues) {
         this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         ParamUtil.requireNonEmpty("hashValues", hashValues);

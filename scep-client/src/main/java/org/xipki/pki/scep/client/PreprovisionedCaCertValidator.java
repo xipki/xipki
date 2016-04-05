@@ -42,7 +42,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -59,7 +59,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
         fpOfCerts = new HashSet<String>(1);
         String hexFp;
         try {
-            hexFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
+            hexFp = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
         } catch (CertificateEncodingException ex) {
             throw new IllegalArgumentException(
                     "at least one of the certificate could not be encoded");
@@ -74,7 +74,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
         for (X509Certificate m : certs) {
             String hexFp;
             try {
-                hexFp = HashAlgoType.SHA256.hexDigest(m.getEncoded());
+                hexFp = ScepHashAlgoType.SHA256.hexDigest(m.getEncoded());
             } catch (CertificateEncodingException ex) {
                 throw new IllegalArgumentException(
                         "at least one of the certificate could not be encoded");
@@ -89,7 +89,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
         ParamUtil.requireNonNull("cert", cert);
         String hextFp;
         try {
-            hextFp = HashAlgoType.SHA256.hexDigest(cert.getEncoded());
+            hextFp = ScepHashAlgoType.SHA256.hexDigest(cert.getEncoded());
         } catch (CertificateEncodingException ex) {
             return false;
         }
