@@ -81,7 +81,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.util.ScepUtil;
 
 /**
@@ -203,7 +203,7 @@ public class CaEmulator {
         BasicConstraints bc = new BasicConstraints(false);
         certGenerator.addExtension(Extension.basicConstraints, true, bc);
 
-        String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, HashAlgoType.SHA256);
+        String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, ScepHashAlgoType.SHA256);
         ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
         Certificate asn1Cert = certGenerator.build(contentSigner).toASN1Structure();
 
@@ -255,7 +255,7 @@ public class CaEmulator {
         crlBuilder.addExtension(Extension.cRLNumber, false,
                 new ASN1Integer(crlNumber.getAndAdd(1)));
 
-        String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, HashAlgoType.SHA256);
+        String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, ScepHashAlgoType.SHA256);
         ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
         X509CRLHolder tmpCrl = crlBuilder.build(contentSigner);
         crl = tmpCrl.toASN1Structure();

@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.IdRange;
@@ -91,7 +91,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                 numCertsToPredicate, stopMe);
 
         this.caId = caId;
-        this.caFingerprint = HashCalculator.hexSha1(caCert.getEncoded()).toLowerCase();
+        this.caFingerprint = HashAlgoType.SHA1.hexHash(caCert.getEncoded()).toLowerCase();
         this.selectBase64CertSql = "SELECT base64Cert FROM CertificateData WHERE id=?";
 
         StringBuilder sb = new StringBuilder();

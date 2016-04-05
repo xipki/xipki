@@ -60,7 +60,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.exception.MessageEncodingException;
 import org.xipki.pki.scep.util.ScepUtil;
 
@@ -130,7 +130,7 @@ public class NextCaMessage {
             CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
 
             // I don't known which hash algorithm is supported by the client, use SHA-1
-            String signatureAlgo = getSignatureAlgorithm(signingKey, HashAlgoType.SHA1);
+            String signatureAlgo = getSignatureAlgorithm(signingKey, ScepHashAlgoType.SHA1);
             ContentSigner signer = new JcaContentSignerBuilder(signatureAlgo).build(signingKey);
 
             // signerInfo
@@ -163,7 +163,7 @@ public class NextCaMessage {
 
     private static String getSignatureAlgorithm(
             final PrivateKey key,
-            final HashAlgoType hashAlgo) {
+            final ScepHashAlgoType hashAlgo) {
         String algorithm = key.getAlgorithm();
         if ("RSA".equalsIgnoreCase(algorithm)) {
             return hashAlgo.getName() + "withRSA";

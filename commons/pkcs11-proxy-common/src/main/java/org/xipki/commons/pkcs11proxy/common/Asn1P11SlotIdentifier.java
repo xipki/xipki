@@ -90,7 +90,7 @@ public class Asn1P11SlotIdentifier extends ASN1Object {
         try {
             if (obj instanceof ASN1Sequence) {
                 return new Asn1P11SlotIdentifier((ASN1Sequence) obj);
-            } if (obj instanceof byte[]) {
+            } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());

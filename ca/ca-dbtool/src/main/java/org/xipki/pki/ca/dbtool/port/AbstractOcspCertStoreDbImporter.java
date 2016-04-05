@@ -43,7 +43,6 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.HashCalculator;
 
 /**
  * @author Lijun Liao
@@ -86,27 +85,27 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
 
     protected String sha1(
             final byte[] data) {
-        return HashCalculator.base64Hash(HashAlgoType.SHA1, data);
+        return HashAlgoType.SHA1.base64Hash(data);
     }
 
     protected String sha224(
             final byte[] data) {
-        return HashCalculator.base64Hash(HashAlgoType.SHA224, data);
+        return HashAlgoType.SHA224.base64Hash(data);
     }
 
     protected String sha256(
             final byte[] data) {
-        return HashCalculator.base64Hash(HashAlgoType.SHA256, data);
+        return HashAlgoType.SHA256.base64Hash(data);
     }
 
     protected String sha384(
             final byte[] data) {
-        return HashCalculator.base64Hash(HashAlgoType.SHA384, data);
+        return HashAlgoType.SHA384.base64Hash(data);
     }
 
     protected String sha512(
             final byte[] data) {
-        return HashCalculator.base64Hash(HashAlgoType.SHA512, data);
+        return HashAlgoType.SHA512.base64Hash(data);
     }
 
     protected void deleteCertGreatherThan(

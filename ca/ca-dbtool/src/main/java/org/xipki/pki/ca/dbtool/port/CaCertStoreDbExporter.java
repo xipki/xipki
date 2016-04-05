@@ -72,7 +72,7 @@ import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.dbtool.InvalidInputException;
-import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Cas;
@@ -313,7 +313,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         LOG.warn("CRL without CRL number, ignore it");
                         continue;
                     }
-                    String sha1Cert = HashCalculator.hexSha1(crlBytes);
+                    String sha1Cert = HashAlgoType.SHA1.hexHash(crlBytes);
 
                     final String crlFilename = sha1Cert + ".crl";
                     if (!evaulateOnly) {
@@ -779,7 +779,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                     String b64Cert = rs.getString("CERT");
                     byte[] certBytes = Base64.decode(b64Cert);
 
-                    String sha1Cert = HashCalculator.hexSha1(certBytes);
+                    String sha1Cert = HashAlgoType.SHA1.hexHash(certBytes);
 
                     if (!evaulateOnly) {
                         ZipEntry certZipEntry = new ZipEntry(sha1Cert + ".der");

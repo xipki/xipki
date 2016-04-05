@@ -55,7 +55,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
@@ -75,6 +74,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
@@ -335,20 +335,32 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             final byte[] nonce,
             final RequestOptions requestOptions)
     throws OcspRequestorException {
-        ASN1ObjectIdentifier hashAlgId = requestOptions.getHashAlgorithmId();
+        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(requestOptions.getHashAlgorithmId());
+        if (hashAlgo == null) {
+            throw new OcspRequestorException("unknown HashAlgo "
+                    + requestOptions.getHashAlgorithmId().getId());
+        }
         List<AlgorithmIdentifier> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
 
         DigestCalculator digestCalculator;
-        if (NISTObjectIdentifiers.id_sha224.equals(hashAlgId)) {
-            digestCalculator = new SHA224DigestCalculator();
-        } else if (NISTObjectIdentifiers.id_sha256.equals(hashAlgId)) {
-            digestCalculator = new SHA256DigestCalculator();
-        } else if (NISTObjectIdentifiers.id_sha384.equals(hashAlgId)) {
-            digestCalculator = new SHA384DigestCalculator();
-        } else if (NISTObjectIdentifiers.id_sha512.equals(hashAlgId)) {
-            digestCalculator = new SHA512DigestCalculator();
-        } else {
+        switch (hashAlgo) {
+        case SHA1:
             digestCalculator = new SHA1DigestCalculator();
+            break;
+        case SHA224:
+            digestCalculator = new SHA224DigestCalculator();
+            break;
+        case SHA256:
+            digestCalculator = new SHA256DigestCalculator();
+            break;
+        case SHA384:
+            digestCalculator = new SHA384DigestCalculator();
+            break;
+        case SHA512:
+            digestCalculator = new SHA512DigestCalculator();
+            break;
+        default:
+            throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
         }
 
         OCSPReqBuilder reqBuilder = new OCSPReqBuilder();

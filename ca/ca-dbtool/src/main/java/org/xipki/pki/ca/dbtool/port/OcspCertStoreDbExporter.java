@@ -62,7 +62,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.CertStoreType.Issuers;
 import org.xipki.pki.ca.dbtool.jaxb.ocsp.IssuerType;
@@ -322,7 +322,7 @@ class OcspCertStoreDbExporter extends DbPorter {
                     String b64Cert = rs.getString("CERT");
                     byte[] certBytes = Base64.decode(b64Cert);
 
-                    String sha1Cert = HashCalculator.hexSha1(certBytes);
+                    String sha1Cert = HashAlgoType.SHA1.hexHash(certBytes);
 
                     if (!evaulateOnly) {
                         ZipEntry certZipEntry = new ZipEntry(sha1Cert + ".der");

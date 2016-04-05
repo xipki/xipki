@@ -41,7 +41,7 @@ import java.security.cert.X509Certificate;
 
 import javax.annotation.Nonnull;
 
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -50,23 +50,23 @@ import org.xipki.pki.scep.crypto.HashAlgoType;
 
 public abstract class FingerprintCertificateValidator implements CaCertValidator {
 
-    private static final HashAlgoType DEFAULT_HASHALGO = HashAlgoType.SHA256;
+    private static final ScepHashAlgoType DEFAULT_HASHALGO = ScepHashAlgoType.SHA256;
 
-    private HashAlgoType hashAlgo;
+    private ScepHashAlgoType hashAlgo;
 
-    public HashAlgoType getHashAlgo() {
+    public ScepHashAlgoType getHashAlgo() {
         return hashAlgo;
     }
 
     public void setHashAlgo(
-            final HashAlgoType hashAlgo) {
+            final ScepHashAlgoType hashAlgo) {
         this.hashAlgo = hashAlgo;
     }
 
     @Override
     public boolean isTrusted(
             final X509Certificate cert) {
-        HashAlgoType algo = (hashAlgo == null)
+        ScepHashAlgoType algo = (hashAlgo == null)
                 ? DEFAULT_HASHALGO
                 : hashAlgo;
         byte[] actual;
@@ -80,7 +80,7 @@ public abstract class FingerprintCertificateValidator implements CaCertValidator
     }
 
     protected abstract boolean isCertTrusted(
-            @Nonnull HashAlgoType hashAlgo,
+            @Nonnull ScepHashAlgoType hashAlgo,
             @Nonnull byte[] hashValue);
 
 }

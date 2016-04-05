@@ -46,7 +46,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 
 /**
@@ -73,8 +72,7 @@ class PendingCertificatePool {
             this.certReqId = ParamUtil.requireNonNull("certReqId", certReqId);
             this.certInfo = ParamUtil.requireNonNull("certInfo", certInfo);
             this.waitForConfirmTill = waitForConfirmTill;
-            this.certHash = HashCalculator.hash(certInfo.getHashAlgo(),
-                    certInfo.getCert().getEncodedCert());
+            this.certHash = certInfo.getHashAlgo().hash(certInfo.getCert().getEncodedCert());
         }
 
         @Override

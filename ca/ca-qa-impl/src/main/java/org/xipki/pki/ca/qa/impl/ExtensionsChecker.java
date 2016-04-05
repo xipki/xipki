@@ -113,7 +113,7 @@ import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ExtensionExistence;
-import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
@@ -1039,7 +1039,7 @@ public class ExtensionsChecker {
         SubjectKeyIdentifier asn1 = SubjectKeyIdentifier.getInstance(extensionValue);
         byte[] ski = asn1.getKeyIdentifier();
         byte[] pkData = subjectPublicKeyInfo.getPublicKeyData().getBytes();
-        byte[] expectedSki = HashCalculator.sha1(pkData);
+        byte[] expectedSki = HashAlgoType.SHA1.hash(pkData);
         if (!Arrays.equals(expectedSki, ski)) {
             failureMsg.append("SKI is '")
                 .append(hex(ski));

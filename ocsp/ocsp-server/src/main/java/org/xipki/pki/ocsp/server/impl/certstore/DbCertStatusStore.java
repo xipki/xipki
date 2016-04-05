@@ -120,13 +120,7 @@ public class DbCertStatusStore extends CertStatusStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
 
-    private static final String SQL_CS_SINGLE_ISSUER =
-            "REV,RR,RT,RIT,PN FROM CERT WHERE SN=?";
-
-    private static final String SQL_CS =
-            "REV,RR,RT,RIT,PN FROM CERT WHERE SN=? AND IID=?";
-
-    private static final Map<HashAlgoType, String> SQL_CS_HASHMAP_SINGLE_ISSUER = new HashMap<>();
+    private static final String SQL_CS = "REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
 
     private static final Map<HashAlgoType, String> SQL_CS_HASHMAP = new HashMap<>();
 
@@ -136,16 +130,7 @@ public class DbCertStatusStore extends CertStatusStore {
             sb.append("ID,REV,RR,RT,RIT,PN,");
             sb.append(h.getShortName()).append(" ");
             sb.append(" FROM CERT INNER JOIN CHASH ON ");
-            sb.append(" CERT.SN=? AND CERT.ID=CHASH.CID");
-            SQL_CS_HASHMAP_SINGLE_ISSUER.put(h, sb.toString());
-        }
-
-        for (HashAlgoType h : HashAlgoType.values()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("ID,REV,RR,RT,RIT,PN,");
-            sb.append(h.getShortName()).append(" ");
-            sb.append(" FROM CERT INNER JOIN CHASH ON ");
-            sb.append(" CERT.SN=? AND CERT.IID=? AND CERT.ID=CHASH.CID");
+            sb.append(" CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID");
             SQL_CS_HASHMAP.put(h, sb.toString());
         }
     }
@@ -155,8 +140,6 @@ public class DbCertStatusStore extends CertStatusStore {
     private final IssuerFilter issuerFilter;
 
     private IssuerStore issuerStore;
-
-    private boolean multiplCasContained;
 
     private boolean initialized;
 
@@ -244,10 +227,8 @@ public class DbCertStatusStore extends CertStatusStore {
             try {
                 rs = ps.executeQuery();
                 List<IssuerEntry> caInfos = new LinkedList<>();
-                int numCas = 0;
                 while (rs.next()) {
                     String sha1Fp = rs.getString("S1C");
-                    numCas++;
                     if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
                         continue;
                     }
@@ -288,7 +269,6 @@ public class DbCertStatusStore extends CertStatusStore {
 
                 initialized = false;
                 this.issuerStore = new IssuerStore(caInfos);
-                this.multiplCasContained = (numCas > 1);
                 LOG.info("Updated CertStore: {}", getName());
                 initializationFailed = false;
                 initialized = true;
@@ -345,13 +325,9 @@ public class DbCertStatusStore extends CertStatusStore {
             certHashAlgo = (certHashAlg == null)
                     ? hashAlgo
                     : certHashAlg;
-            coreSql = multiplCasContained
-                    ? SQL_CS_HASHMAP.get(certHashAlgo)
-                    : SQL_CS_HASHMAP_SINGLE_ISSUER.get(certHashAlgo);
+            coreSql = SQL_CS_HASHMAP.get(certHashAlgo);
         } else {
-            coreSql = multiplCasContained
-                    ? SQL_CS
-                    : SQL_CS_SINGLE_ISSUER;
+            coreSql = SQL_CS;
         }
 
         try {
@@ -380,10 +356,8 @@ public class DbCertStatusStore extends CertStatusStore {
 
             try {
                 int idx = 1;
+                ps.setInt(idx++, issuer.getId());
                 ps.setLong(idx++, serialNumber.longValue());
-                if (multiplCasContained) {
-                    ps.setInt(idx++, issuer.getId());
-                }
 
                 rs = ps.executeQuery();
 

@@ -42,7 +42,7 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.util.SignerConfUtil;
+import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**
@@ -147,7 +147,7 @@ public class CmpResponderEntry implements Serializable {
         if (conf == null) {
             sb.append("null");
         } else {
-            sb.append(SignerConfUtil.signerConfToString(conf, verbose, ignoreSensitiveInfo));
+            sb.append(SignerUtil.signerConfToString(conf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
         sb.append("certificate: ").append("\n");

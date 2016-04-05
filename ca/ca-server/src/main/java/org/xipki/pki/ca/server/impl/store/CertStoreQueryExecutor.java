@@ -80,7 +80,7 @@ import org.xipki.commons.datasource.api.springframework.jdbc.DuplicateKeyExcepti
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.FpIdCalculator;
-import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.util.X509Util;
@@ -174,17 +174,11 @@ class CertStoreQueryExecutor {
     private static final String CORESQL_ID_FOR_SN_IN_CERT =
             "ID FROM CERT WHERE CA_ID=? AND SN=?";
 
-    private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED_SIMPLE_CA =
-            "ID FROM CERT WHERE FP_S=?";
-
     private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED =
-            "ID FROM CERT WHERE FP_S=? AND CA_ID=?";
-
-    private static final String CORESQL_CERT_FOR_KEY_ISSUED_SIMPLE_CA =
-            "ID FROM CERT WHERE FP_K=?";
+            "ID FROM CERT WHERE CA_ID=? AND FP_S=?";
 
     private static final String CORESQL_CERT_FOR_KEY_ISSUED =
-            "ID FROM CERT WHERE FP_K=? AND CA_ID=?";
+            "ID FROM CERT WHERE CA_ID=? AND FP_K=?";
 
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
 
@@ -1856,20 +1850,15 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        boolean onlySingleCa = (getNumberOfCas() == 1);
-        String coreSql = onlySingleCa
-                ? CORESQL_CERT_FOR_SUBJECT_ISSUED_SIMPLE_CA
-                : CORESQL_CERT_FOR_SUBJECT_ISSUED;
+        String coreSql = CORESQL_CERT_FOR_SUBJECT_ISSUED;
         String sql = datasource.createFetchFirstSelectSql(coreSql, 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
             int idx = 1;
+            ps.setInt(idx++, caId);
             ps.setLong(idx++, subjectFp);
-            if (!onlySingleCa) {
-                ps.setInt(idx++, caId);
-            }
             rs = ps.executeQuery();
             return rs.next();
         } catch (SQLException ex) {
@@ -1890,20 +1879,15 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        boolean onlySingleCa = (getNumberOfCas() == 1);
-        String coreSql = onlySingleCa
-                ? CORESQL_CERT_FOR_KEY_ISSUED_SIMPLE_CA
-                : CORESQL_CERT_FOR_KEY_ISSUED;
+        String coreSql = CORESQL_CERT_FOR_KEY_ISSUED;
         String sql = datasource.createFetchFirstSelectSql(coreSql, 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
             int idx = 1;
+            ps.setInt(idx++, caId);
             ps.setLong(idx++, keyFp);
-            if (!onlySingleCa) {
-                ps.setInt(idx++, caId);
-            }
             rs = ps.executeQuery();
             return rs.next();
         } catch (SQLException ex) {
@@ -1915,7 +1899,7 @@ class CertStoreQueryExecutor {
 
     private String base64Fp(
             final byte[] data) {
-        return HashCalculator.base64Sha1(data);
+        return HashAlgoType.SHA1.base64Hash(data);
     }
 
     private int getCaId(
@@ -1932,10 +1916,6 @@ class CertStoreQueryExecutor {
                 "could not find CA with subject '%s' in table %s, please start XiPKI in master mode"
                 + " first, then restart this XiPKI system",
                 caCert.getSubject(), caInfoStore.getTable()));
-    }
-
-    private int getNumberOfCas() {
-        return caInfoStore.getSize();
     }
 
     void addCa(
