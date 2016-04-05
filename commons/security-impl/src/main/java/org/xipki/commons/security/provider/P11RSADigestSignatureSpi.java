@@ -46,19 +46,11 @@ import java.security.SignatureSpi;
 import java.security.spec.AlgorithmParameterSpec;
 
 import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.NullDigest;
-import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.crypto.digests.SHA224Digest;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.digests.SHA384Digest;
-import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.p11.P11Constants;
 
 /**
@@ -72,7 +64,7 @@ class P11RSADigestSignatureSpi extends SignatureSpi {
     class SHA1 extends P11RSADigestSignatureSpi {
 
         SHA1() {
-            super(OIWObjectIdentifiers.idSHA1, new SHA1Digest());
+            super(HashAlgoType.SHA1);
         }
 
     } // class SHA1
@@ -81,7 +73,7 @@ class P11RSADigestSignatureSpi extends SignatureSpi {
     class SHA224 extends P11RSADigestSignatureSpi {
 
         SHA224() {
-            super(NISTObjectIdentifiers.id_sha224, new SHA224Digest());
+            super(HashAlgoType.SHA224);
         }
 
     } // class SHA224
@@ -90,7 +82,7 @@ class P11RSADigestSignatureSpi extends SignatureSpi {
     class SHA256 extends P11RSADigestSignatureSpi {
 
         SHA256() {
-            super(NISTObjectIdentifiers.id_sha256, new SHA256Digest());
+            super(HashAlgoType.SHA256);
         }
 
     } // class SHA256
@@ -99,7 +91,7 @@ class P11RSADigestSignatureSpi extends SignatureSpi {
     class SHA384 extends P11RSADigestSignatureSpi {
 
         SHA384() {
-            super(NISTObjectIdentifiers.id_sha384, new SHA384Digest());
+            super(HashAlgoType.SHA384);
         }
 
     } // class SHA384
@@ -108,7 +100,7 @@ class P11RSADigestSignatureSpi extends SignatureSpi {
     class SHA512 extends P11RSADigestSignatureSpi {
 
         SHA512() {
-            super(NISTObjectIdentifiers.id_sha512, new SHA512Digest());
+            super(HashAlgoType.SHA512);
         }
 
     } // class SHA512
@@ -124,23 +116,20 @@ class P11RSADigestSignatureSpi extends SignatureSpi {
 
     private Digest digest;
 
-    private AlgorithmIdentifier algId;
+    private AlgorithmIdentifier digestAlgId;
 
     private P11PrivateKey signingKey;
 
-    // care - this constructor is actually used by outside organisations
     protected P11RSADigestSignatureSpi(
             final Digest digest) {
         this.digest = digest;
-        this.algId = null;
+        this.digestAlgId = null;
     }
 
-    // care - this constructor is actually used by outside organisations
     protected P11RSADigestSignatureSpi(
-            final ASN1ObjectIdentifier objId,
-            final Digest digest) {
-        this.digest = digest;
-        this.algId = new AlgorithmIdentifier(objId, DERNull.INSTANCE);
+            final HashAlgoType digestAlg) {
+        this.digestAlgId = digestAlg.getAlgorithmIdentifier();
+        this.digest = digestAlg.createDigest();
     }
 
     @Override
@@ -234,13 +223,12 @@ class P11RSADigestSignatureSpi extends SignatureSpi {
     private byte[] derEncode(
             final byte[] hash)
     throws IOException {
-        if (algId == null) {
+        if (digestAlgId == null) {
             // For raw RSA, the DigestInfo must be prepared externally
             return hash;
         }
 
-        DigestInfo digestInfo = new DigestInfo(algId, hash);
-
+        DigestInfo digestInfo = new DigestInfo(digestAlgId, hash);
         return digestInfo.getEncoded(ASN1Encoding.DER);
     }
 

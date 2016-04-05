@@ -71,18 +71,18 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
 
     private final String label;
 
-    private final BigInteger p;
+    private final BigInteger p; // CHECKSTYLE:SKIP
 
-    private final BigInteger q;
+    private final BigInteger q; // CHECKSTYLE:SKIP
 
-    private final BigInteger g;
+    private final BigInteger g; // CHECKSTYLE:SKIP
 
     public Asn1GenDSAKeypairParams(
             final Asn1P11SlotIdentifier slotId,
             final String label,
-            final BigInteger p,
-            final BigInteger q,
-            final BigInteger g) {
+            final BigInteger p, // CHECKSTYLE:SKIP
+            final BigInteger q, // CHECKSTYLE:SKIP
+            final BigInteger g) { // CHECKSTYLE:SKIP
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.label = ParamUtil.requireNonBlank("label", label);
         this.p = ParamUtil.requireNonNull("p", p);

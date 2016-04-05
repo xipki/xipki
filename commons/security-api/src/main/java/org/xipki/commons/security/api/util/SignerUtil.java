@@ -37,6 +37,7 @@
 package org.xipki.commons.security.api.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -49,6 +50,7 @@ import java.util.Map;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
@@ -61,10 +63,13 @@ import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
+import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.SecurityException;
 
 /**
@@ -271,8 +276,7 @@ public class SignerUtil {
         random.nextBytes(salt);
         System.arraycopy(salt, 0, mDash, mDash.length - saltLen, saltLen);
 
-        byte[] hv = HashCalculator.hash(contentDigest, mDash);
-
+        byte[] hv = contentDigest.hash(mDash);
         byte[] block = new byte[(emBits + 7) / 8];
         block[block.length - saltLen - 1 - hLen - 1] = 0x01;
         System.arraycopy(salt, 0, block, block.length - saltLen - hLen - 1, saltLen);
@@ -319,14 +323,14 @@ public class SignerUtil {
 
         while (counter < (length / mgfhLen)) {
             ItoOSP(counter, all, Z.length);
-            byte[] hashBuf = HashCalculator.hash(mgfDigest, all);
+            byte[] hashBuf = mgfDigest.hash(all);
             System.arraycopy(hashBuf, 0, mask, counter * mgfhLen, mgfhLen);
             counter++;
         }
 
         if ((counter * mgfhLen) < length) {
             ItoOSP(counter, all, Z.length);
-            byte[] hashBuf = HashCalculator.hash(mgfDigest, all);
+            byte[] hashBuf = mgfDigest.hash(all);
             System.arraycopy(hashBuf, 0, mask, counter * mgfhLen,
                     mask.length - (counter * mgfhLen));
         }
@@ -401,14 +405,192 @@ public class SignerUtil {
     }
 
     public static Digest getDigest(
-            final AlgorithmIdentifier digestAlgId)
+            final HashAlgoType hashAlgo)
     throws SecurityException {
         try {
-            return BcDefaultDigestProvider.INSTANCE.get(digestAlgId);
+            return BcDefaultDigestProvider.INSTANCE.get(
+                    new AlgorithmIdentifier(hashAlgo.getOid(), DERNull.INSTANCE));
         } catch (OperatorCreationException ex) {
             throw new SecurityException(
-                    "could not get digest for " + digestAlgId.getAlgorithm().getId());
+                    "could not get digest for " + hashAlgo.getOid().getId());
         }
     }
 
+    public static Digest getDigest(
+            final AlgorithmIdentifier hashAlgo)
+    throws SecurityException {
+        try {
+            return BcDefaultDigestProvider.INSTANCE.get(hashAlgo);
+        } catch (OperatorCreationException ex) {
+            throw new SecurityException(
+                    "could not get digest for " + hashAlgo.getAlgorithm().getId());
+        }
+    }
+
+    public static String getPkcs11SignerConfWithoutAlgo(
+            final String pkcs11ModuleName,
+            final Integer slotIndex,
+            final Long slotId,
+            final String keyLabel,
+            final byte[] keyId,
+            final int parallelism) {
+        ParamUtil.requireMin("parallelism", parallelism, 1);
+        if (slotIndex == null && slotId == null) {
+            throw new IllegalArgumentException(
+                    "at least one of slotIndex and slotId must not be null");
+        }
+        if (keyId == null && keyLabel == null) {
+            throw new IllegalArgumentException(
+                    "at least one of keyId and keyLabel must not be null");
+        }
+
+        ConfPairs conf = new ConfPairs();
+        conf.putPair("parallelism", Integer.toString(parallelism));
+
+        if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
+            conf.putPair("module", pkcs11ModuleName);
+        }
+
+        if (slotId != null) {
+            conf.putPair("slot-id", slotId.toString());
+        }
+
+        if (slotIndex != null) {
+            conf.putPair("slot", slotIndex.toString());
+        }
+
+        if (keyId != null) {
+            conf.putPair("key-id", Hex.toHexString(keyId));
+        }
+
+        if (keyLabel != null) {
+            conf.putPair("key-label", keyLabel);
+        }
+
+        return conf.getEncoded();
+    }
+
+    public static String getKeystoreSignerConfWithoutAlgo(
+            final String keystoreFile,
+            final String password,
+            final int parallelism) {
+        ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
+        ParamUtil.requireNonBlank("password", password);
+        ParamUtil.requireMin("parallelism", parallelism, 1);
+
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("parallelism", Integer.toString(parallelism));
+        conf.putPair("keystore", "file:" + keystoreFile);
+        return conf.getEncoded();
+    }
+
+    public static String getKeystoreSignerConfWithoutAlgo(
+            final String keystoreFile,
+            final String password) {
+        ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
+        ParamUtil.requireNonBlank("password", password);
+
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("parallelism", "1");
+        conf.putPair("keystore", "file:" + keystoreFile);
+        return conf.getEncoded();
+    }
+
+    public static String signerConfToString(
+            final String signerConf,
+            final boolean verbose,
+            final boolean ignoreSensitiveInfo) {
+        String tmpSignerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
+        if (ignoreSensitiveInfo) {
+            tmpSignerConf = eraseSensitiveData(tmpSignerConf);
+        }
+
+        if (verbose || tmpSignerConf.length() < 101) {
+            return tmpSignerConf;
+        } else {
+            return new StringBuilder().append(tmpSignerConf.substring(0, 97))
+                    .append("...").toString();
+        }
+    }
+
+    public static String getPkcs11SignerConf(
+            final String pkcs11ModuleName,
+            final Integer slotIndex,
+            final Long slotId,
+            final String keyLabel,
+            final byte[] keyId,
+            final String signatureAlgorithm,
+            final int parallelism) {
+        ParamUtil.requireMin("parallelism", parallelism, 1);
+        ParamUtil.requireNonNull("algo", signatureAlgorithm);
+        if (slotIndex == null && slotId == null) {
+            throw new IllegalArgumentException(
+                    "at least one of slotIndex and slotId must not be null");
+        }
+        if (keyId == null && keyLabel == null) {
+            throw new IllegalArgumentException(
+                    "at least one of keyId and keyLabel must not be null");
+        }
+
+        ConfPairs conf = new ConfPairs("algo", signatureAlgorithm);
+        conf.putPair("parallelism", Integer.toString(parallelism));
+
+        if (pkcs11ModuleName != null && pkcs11ModuleName.length() > 0) {
+            conf.putPair("module", pkcs11ModuleName);
+        }
+
+        if (slotId != null) {
+            conf.putPair("slot-id", slotId.toString());
+        }
+
+        if (slotIndex != null) {
+            conf.putPair("slot", slotIndex.toString());
+        }
+
+        if (keyId != null) {
+            conf.putPair("key-id", Hex.toHexString(keyId));
+        }
+
+        if (keyLabel != null) {
+            conf.putPair("key-label", keyLabel);
+        }
+
+        return conf.getEncoded();
+    }
+
+    public static String getKeystoreSignerConf(
+            final InputStream keystoreStream,
+            final String password,
+            final String signatureAlgorithm,
+            final int parallelism)
+    throws IOException {
+        ParamUtil.requireNonNull("keystoreStream", keystoreStream);
+        ParamUtil.requireNonBlank("password", password);
+        ParamUtil.requireNonNull("signatureAlgorithm", signatureAlgorithm);
+        ParamUtil.requireMin("parallelism", parallelism, 1);
+
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("algo", signatureAlgorithm);
+        conf.putPair("parallelism", Integer.toString(parallelism));
+        conf.putPair("keystore", "base64:" + Base64.toBase64String(IoUtil.read(keystoreStream)));
+        return conf.getEncoded();
+    }
+
+    private static String eraseSensitiveData(
+            final String conf) {
+        if (conf == null || !conf.contains("password?")) {
+            return conf;
+        }
+
+        try {
+            ConfPairs pairs = new ConfPairs(conf);
+            String value = pairs.getValue("password");
+            if (value != null && !StringUtil.startsWithIgnoreCase(value, "PBE:")) {
+                pairs.putPair("password", "<sensitve>");
+            }
+            return pairs.getEncoded();
+        } catch (Exception ex) {
+            return conf;
+        }
+    }
 }

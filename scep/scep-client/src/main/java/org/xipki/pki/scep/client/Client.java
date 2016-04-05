@@ -68,7 +68,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.OperationNotSupportedException;
 import org.xipki.pki.scep.client.exception.ScepClientException;
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.exception.MessageEncodingException;
 import org.xipki.pki.scep.message.AuthorityCertStore;
@@ -490,8 +490,8 @@ public abstract class Client {
             final PrivateKey identityKey,
             final X509Certificate identityCert)
     throws ScepClientException {
-        HashAlgoType hashAlgo = caCaps.getMostSecureHashAlgo();
-        if (hashAlgo == HashAlgoType.MD5 && !useInsecureAlgorithms) {
+        ScepHashAlgoType hashAlgo = caCaps.getMostSecureHashAlgo();
+        if (hashAlgo == ScepHashAlgoType.MD5 && !useInsecureAlgorithms) {
             throw new ScepClientException(
                     "Scep server supports only MD5 but it not permitted in client");
         }

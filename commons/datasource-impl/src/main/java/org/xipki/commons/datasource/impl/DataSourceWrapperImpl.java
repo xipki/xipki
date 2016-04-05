@@ -1404,15 +1404,22 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     protected String getSqlToCreateIndex(
             final String indexName,
             final String table,
-            final String column) {
+            final String... columns) {
         ParamUtil.requireNonBlank("indexName", indexName);
         ParamUtil.requireNonBlank("table", table);
-        ParamUtil.requireNonBlank("column", column);
+        if (columns == null || columns.length == 0) {
+            throw new IllegalArgumentException("columns must not be null and empty");
+        }
 
-        final StringBuilder sb = new StringBuilder(
-                indexName.length() + table.length() + column.length() + 20);
+        final StringBuilder sb = new StringBuilder(200);
         sb.append("CREATE INDEX ").append(indexName);
-        sb.append(" ON ").append(table).append("(").append(column).append(")");
+        sb.append(" ON ").append(table).append("(");
+        for (String column : columns) {
+            ParamUtil.requireNonBlank("column", column);
+            sb.append(column).append(',');
+        }
+        sb.deleteCharAt(sb.length() - 1); // delete the last ","
+        sb.append(")");
         return sb.toString();
     }
 
@@ -1421,9 +1428,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             final Connection conn,
             final String indexName,
             final String table,
-            final String column)
+            final String... columns)
     throws DataAccessException {
-        executeUpdate(conn, getSqlToCreateIndex(indexName, table, column));
+        executeUpdate(conn, getSqlToCreateIndex(indexName, table, columns));
     }
 
     protected String getSqlToDropUniqueConstraint(

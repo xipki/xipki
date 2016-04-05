@@ -55,7 +55,6 @@ import java.util.Date;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -73,6 +72,7 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcECContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
 import org.xipki.commons.security.api.p12.P12KeypairGenerator;
 import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
@@ -285,29 +285,29 @@ public class P12KeypairGeneratorImpl implements P12KeypairGenerator {
 
             builder = new BcDSAContentSignerBuilder(sigId, buildAlgId(hashOid));
         } else if (key instanceof ECPrivateKey) {
-            ASN1ObjectIdentifier hashOid;
+            HashAlgoType hashAlgo;
             ASN1ObjectIdentifier sigOid;
 
             int keysize = ((ECPrivateKey) key).getParams().getOrder().bitLength();
             if (keysize > 384) {
-                hashOid = NISTObjectIdentifiers.id_sha512;
+                hashAlgo = HashAlgoType.SHA512;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
             } else if (keysize > 256) {
-                hashOid = NISTObjectIdentifiers.id_sha384;
+                hashAlgo = HashAlgoType.SHA384;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
             } else if (keysize > 224) {
-                hashOid = NISTObjectIdentifiers.id_sha224;
+                hashAlgo = HashAlgoType.SHA224;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
             } else if (keysize > 160) {
-                hashOid = NISTObjectIdentifiers.id_sha256;
+                hashAlgo = HashAlgoType.SHA256;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
             } else {
-                hashOid = X509ObjectIdentifiers.id_SHA1;
+                hashAlgo = HashAlgoType.SHA1;
                 sigOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
             }
 
             builder = new BcECContentSignerBuilder(new AlgorithmIdentifier(sigOid),
-                    buildAlgId(hashOid));
+                    buildAlgId(hashAlgo.getOid()));
         } else {
             throw new IllegalArgumentException("unknown type of key " + key.getClass().getName());
         }

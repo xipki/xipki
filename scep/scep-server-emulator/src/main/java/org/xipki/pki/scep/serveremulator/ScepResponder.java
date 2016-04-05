@@ -68,7 +68,7 @@ import org.xipki.commons.audit.api.AuditEvent;
 import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.message.CaCaps;
 import org.xipki.pki.scep.message.DecodedPkiMessage;
@@ -194,7 +194,7 @@ public class ScepResponder {
         }
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(getSigningKey(),
-                HashAlgoType.getHashAlgoType(req.getDigestAlgorithm().getId()));
+                ScepHashAlgoType.getHashAlgoType(req.getDigestAlgorithm().getId()));
 
         try {
             X509Certificate jceSignerCert = new X509CertificateObject(getSigningCert());
@@ -283,26 +283,26 @@ public class ScepResponder {
 
         // check the digest algorithm
         String oid = req.getDigestAlgorithm().getId();
-        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(oid);
+        ScepHashAlgoType hashAlgoType = ScepHashAlgoType.getHashAlgoType(oid);
         if (hashAlgoType == null) {
             LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badAlg);
         } else {
             boolean supported = false;
-            if (hashAlgoType == HashAlgoType.SHA1) {
+            if (hashAlgoType == ScepHashAlgoType.SHA1) {
                 if (caCaps.containsCapability(CaCapability.SHA1)) {
                     supported = true;
                 }
-            } else if (hashAlgoType == HashAlgoType.SHA256) {
+            } else if (hashAlgoType == ScepHashAlgoType.SHA256) {
                 if (caCaps.containsCapability(CaCapability.SHA256)) {
                     supported = true;
                 }
-            } else if (hashAlgoType == HashAlgoType.SHA512) {
+            } else if (hashAlgoType == ScepHashAlgoType.SHA512) {
                 if (caCaps.containsCapability(CaCapability.SHA512)) {
                     supported = true;
                 }
-            } else if (hashAlgoType == HashAlgoType.MD5) {
+            } else if (hashAlgoType == ScepHashAlgoType.MD5) {
                 if (control.isUseInsecureAlg()) {
                     supported = true;
                 }

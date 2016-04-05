@@ -47,7 +47,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.util.SignerConfUtil;
+import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
@@ -93,7 +93,7 @@ public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
             idBytes = Hex.decode(id);
         }
 
-        String signerConfWithoutAlgo = SignerConfUtil.getPkcs11SignerConfWithoutAlgo(
+        String signerConfWithoutAlgo = SignerUtil.getPkcs11SignerConfWithoutAlgo(
                         moduleName, slotIndex, null,label, idBytes, 1);
 
         return securityFactory.createSigner("PKCS11",

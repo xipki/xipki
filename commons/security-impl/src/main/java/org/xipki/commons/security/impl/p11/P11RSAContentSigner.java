@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Digest;
@@ -162,9 +161,7 @@ class P11RSAContentSigner implements ContentSigner {
 
         if (mechanism == P11Constants.CKM_RSA_PKCS || mechanism == P11Constants.CKM_RSA_X_509) {
             this.digestPkcsPrefix = digestPkcsPrefixMap.get(hashAlgo);
-            AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
-                    new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
-            Digest digest = SignerUtil.getDigest(digAlgId);
+            Digest digest = SignerUtil.getDigest(hashAlgo);
             this.outputStream = new DigestOutputStream(digest);
         } else {
             this.digestPkcsPrefix = null;
