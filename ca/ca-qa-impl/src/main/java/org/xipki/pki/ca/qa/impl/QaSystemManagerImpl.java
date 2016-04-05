@@ -132,7 +132,8 @@ public class QaSystemManagerImpl implements QaSystemManager {
                 } catch (IOException ex) {
                     final String message = "could not read the certificate bytes of issuer "
                             + issuerType.getName();
-                    LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
+                    LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(),
+                            ex.getMessage());
                     LOG.debug(message, ex);
                     continue;
                 }

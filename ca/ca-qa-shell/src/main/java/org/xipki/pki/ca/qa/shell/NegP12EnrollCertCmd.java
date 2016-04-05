@@ -47,7 +47,7 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.util.SignerConfUtil;
+import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -78,7 +78,7 @@ public class NegP12EnrollCertCmd extends NegEnrollCertCommandSupport {
             password = new String(readPassword());
         }
 
-        String signerConfWithoutAlgo = SignerConfUtil.getKeystoreSignerConfWithoutAlgo(
+        String signerConfWithoutAlgo = SignerUtil.getKeystoreSignerConfWithoutAlgo(
                 p12File, password);
         return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo,
                 signatureAlgoControl, (X509Certificate[]) null);

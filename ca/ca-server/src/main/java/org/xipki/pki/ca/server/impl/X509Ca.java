@@ -1216,7 +1216,8 @@ public class X509Ca {
                             false, false);
                 } catch (OperationException ex) {
                     final String message = "exception";
-                    LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
+                    LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(),
+                            ex.getMessage());
                     LOG.debug(message, ex);
                     return false;
                 }
@@ -2227,7 +2228,8 @@ public class X509Ca {
                     removed = doRemoveCertificate(serial) != null;
                 } catch (Throwable th) {
                     final String message = "could not remove expired certificate";
-                    LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
+                    LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(),
+                            th.getMessage());
 
                     if (!removed) {
                         return sum;

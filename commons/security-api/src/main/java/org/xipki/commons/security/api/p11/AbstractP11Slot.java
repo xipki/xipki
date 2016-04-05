@@ -62,7 +62,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.util.KeyUtil;
@@ -772,7 +772,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         sb.append("\t\t\tEnd time: ").append(cert.getNotAfter()).append("\n");
         sb.append("\t\t\tSHA1 Sum: ");
         try {
-            sb.append(HashCalculator.hexSha1(cert.getEncoded()));
+            sb.append(HashAlgoType.SHA1.hexHash(cert.getEncoded()));
         } catch (CertificateEncodingException ex) {
             sb.append("ERROR");
         }

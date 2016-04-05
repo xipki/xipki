@@ -57,6 +57,7 @@ import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 
 /**
@@ -73,46 +74,22 @@ public class AlgorithmUtil {
             final String hashAlgName)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgName", hashAlgName);
-        String tmpHashAlgName = hashAlgName.trim();
-        ParamUtil.requireNonBlank("hashAlgName", tmpHashAlgName);
-        tmpHashAlgName = tmpHashAlgName.replace("-", "").toUpperCase();
-
-        if ("SHA1".equalsIgnoreCase(tmpHashAlgName)) {
-            return X509ObjectIdentifiers.id_SHA1;
-        } else if ("SHA224".equalsIgnoreCase(tmpHashAlgName)) {
-            return NISTObjectIdentifiers.id_sha224;
-        } else if ("SHA256".equalsIgnoreCase(tmpHashAlgName)) {
-            return NISTObjectIdentifiers.id_sha256;
-        } else if ("SHA384".equalsIgnoreCase(tmpHashAlgName)) {
-            return NISTObjectIdentifiers.id_sha384;
-        } else if ("SHA512".equalsIgnoreCase(tmpHashAlgName)) {
-            return NISTObjectIdentifiers.id_sha512;
-        } else {
-            throw new NoSuchAlgorithmException("Unsupported hash algorithm " + tmpHashAlgName);
+        ASN1ObjectIdentifier oid = HashAlgoType.getHashAlgoType(hashAlgName).getOid();
+        if (oid == null) {
+            throw new NoSuchAlgorithmException("Unsupported hash algorithm " + hashAlgName);
         }
+        return oid;
     } // method getHashAlg
 
     public static int getHashOutputSizeInOctets(
             final ASN1ObjectIdentifier hashAlgo)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-        if (X509ObjectIdentifiers.id_SHA1.equals(hashAlgo)) {
-            return 20;
-        }
-        if (NISTObjectIdentifiers.id_sha224.equals(hashAlgo)) {
-            return 28;
-        }
-        if (NISTObjectIdentifiers.id_sha256.equals(hashAlgo)) {
-            return 32;
-        }
-        if (NISTObjectIdentifiers.id_sha384.equals(hashAlgo)) {
-            return 48;
-        }
-        if (NISTObjectIdentifiers.id_sha512.equals(hashAlgo)) {
-            return 64;
-        } else {
+        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(hashAlgo);
+        if (hashAlgoType == null) {
             throw new NoSuchAlgorithmException("Unsupported hash algorithm " + hashAlgo.getId());
         }
+        return hashAlgoType.getLength();
     } // method getHashOutputSizeInOctets
 
     public static String getSignatureAlgoName(
@@ -200,7 +177,10 @@ public class AlgorithmUtil {
             final String signatureAlgoName)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("signatureAlgoName", signatureAlgoName);
-        String algoS = signatureAlgoName.replaceAll("-", "");
+        String algoS = signatureAlgoName;
+        if (algoS.indexOf('-') != -1) {
+            algoS = algoS.replaceAll("-", "");
+        }
 
         AlgorithmIdentifier signatureAlgId;
         if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoS)
@@ -208,23 +188,23 @@ public class AlgorithmUtil {
                 || "SHA256withRSAandMGF1".equalsIgnoreCase(algoS)
                 || "SHA384withRSAandMGF1".equalsIgnoreCase(algoS)
                 || "SHA512withRSAandMGF1".equalsIgnoreCase(algoS)) {
-            ASN1ObjectIdentifier hashAlgo;
+            HashAlgoType hashAlgo;
             if ("SHA1withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = X509ObjectIdentifiers.id_SHA1;
+                hashAlgo = HashAlgoType.SHA1;
             } else if ("SHA224withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = NISTObjectIdentifiers.id_sha224;
+                hashAlgo = HashAlgoType.SHA224;
             } else if ("SHA256withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = NISTObjectIdentifiers.id_sha256;
+                hashAlgo = HashAlgoType.SHA256;
             } else if ("SHA384withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = NISTObjectIdentifiers.id_sha384;
+                hashAlgo = HashAlgoType.SHA384;
             } else if ("SHA512withRSAandMGF1".equalsIgnoreCase(algoS)) {
-                hashAlgo = NISTObjectIdentifiers.id_sha512;
+                hashAlgo = HashAlgoType.SHA512;
             } else {
                 throw new NoSuchAlgorithmException("should not reach here, unknown algorithm "
                         + algoS);
             }
 
-            signatureAlgId = AlgorithmUtil.buildRSAPSSAlgorithmIdentifier(hashAlgo);
+            signatureAlgId = AlgorithmUtil.buildRSAPSSAlgorithmIdentifier(hashAlgo.getOid());
         } else {
             boolean withNullParam = false;
             ASN1ObjectIdentifier algOid;
@@ -434,23 +414,34 @@ public class AlgorithmUtil {
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonBlank("hashAlgo", hashAlgo);
         if (mgf1) {
-            ASN1ObjectIdentifier hashAlgoOid = AlgorithmUtil.getHashAlg(hashAlgo);
+            ASN1ObjectIdentifier hashAlgoOid = getHashAlg(hashAlgo);
             return AlgorithmUtil.buildRSAPSSAlgorithmIdentifier(hashAlgoOid);
         }
 
-        ASN1ObjectIdentifier sigAlgoOid;
-        if ("SHA1".equalsIgnoreCase(hashAlgo)) {
-            sigAlgoOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
-        } else if ("SHA224".equalsIgnoreCase(hashAlgo)) {
-            sigAlgoOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
-        } else if ("SHA256".equalsIgnoreCase(hashAlgo)) {
-            sigAlgoOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
-        } else if ("SHA384".equalsIgnoreCase(hashAlgo)) {
-            sigAlgoOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
-        } else if ("SHA512".equalsIgnoreCase(hashAlgo)) {
-            sigAlgoOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
-        } else {
+        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(hashAlgo);
+        if (hashAlgoType == null) {
             throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
+        }
+
+        ASN1ObjectIdentifier sigAlgoOid;
+        switch (hashAlgoType) {
+        case SHA1:
+            sigAlgoOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
+            break;
+        case SHA224:
+            sigAlgoOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
+            break;
+        case SHA256:
+            sigAlgoOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
+            break;
+        case SHA384:
+            sigAlgoOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
+            break;
+        case SHA512:
+            sigAlgoOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
+            break;
+        default:
+            throw new RuntimeException("unknown HashAlgoType: " + hashAlgoType);
         }
 
         return new AlgorithmIdentifier(sigAlgoOid, DERNull.INSTANCE);
@@ -461,19 +452,30 @@ public class AlgorithmUtil {
             final String hashAlgo)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonBlank("hashAlgo", hashAlgo);
+        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(hashAlgo);
+        if (hashAlgoType == null) {
+            throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
+        }
+
         ASN1ObjectIdentifier sigAlgoOid;
-        if ("SHA1".equalsIgnoreCase(hashAlgo)) {
+        switch (hashAlgoType) {
+        case SHA1:
             sigAlgoOid = X9ObjectIdentifiers.id_dsa_with_sha1;
-        } else if ("SHA224".equalsIgnoreCase(hashAlgo)) {
+            break;
+        case SHA224:
             sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha224;
-        } else if ("SHA256".equalsIgnoreCase(hashAlgo)) {
+            break;
+        case SHA256:
             sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha256;
-        } else if ("SHA384".equalsIgnoreCase(hashAlgo)) {
+            break;
+        case SHA384:
             sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha384;
-        } else if ("SHA512".equalsIgnoreCase(hashAlgo)) {
+            break;
+        case SHA512:
             sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha512;
-        } else {
-            throw new NoSuchAlgorithmException("unsupported hash algorithm " + hashAlgo);
+            break;
+        default:
+            throw new RuntimeException("unknown HashAlgoType: " + hashAlgoType);
         }
 
         return new AlgorithmIdentifier(sigAlgoOid);
@@ -485,29 +487,40 @@ public class AlgorithmUtil {
             final boolean plainSignature)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonBlank("hashAlgo", hashAlgo);
+        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(hashAlgo);
+        if (hashAlgoType == null) {
+            throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
+        }
+
         ASN1ObjectIdentifier sigAlgoOid;
-        if ("SHA1".equalsIgnoreCase(hashAlgo)) {
+        switch (hashAlgoType) {
+        case SHA1:
             sigAlgoOid = plainSignature
                     ? BSIObjectIdentifiers.ecdsa_plain_SHA1
                     : X9ObjectIdentifiers.ecdsa_with_SHA1;
-        } else if ("SHA224".equalsIgnoreCase(hashAlgo)) {
+            break;
+        case SHA224:
             sigAlgoOid = plainSignature
                     ? BSIObjectIdentifiers.ecdsa_plain_SHA224
                     : X9ObjectIdentifiers.ecdsa_with_SHA224;
-        } else if ("SHA256".equalsIgnoreCase(hashAlgo)) {
+            break;
+        case SHA256:
             sigAlgoOid = plainSignature
                     ? BSIObjectIdentifiers.ecdsa_plain_SHA256
                     : X9ObjectIdentifiers.ecdsa_with_SHA256;
-        } else if ("SHA384".equalsIgnoreCase(hashAlgo)) {
+            break;
+        case SHA384:
             sigAlgoOid = plainSignature
                     ? BSIObjectIdentifiers.ecdsa_plain_SHA384
                     : X9ObjectIdentifiers.ecdsa_with_SHA384;
-        } else if ("SHA512".equalsIgnoreCase(hashAlgo)) {
+            break;
+        case SHA512:
             sigAlgoOid = plainSignature
                     ? BSIObjectIdentifiers.ecdsa_plain_SHA512
                     : X9ObjectIdentifiers.ecdsa_with_SHA512;
-        } else {
-            throw new NoSuchAlgorithmException("unsupported hash algorithm " + hashAlgo);
+            break;
+        default:
+            throw new RuntimeException("unknown HashAlgoType: " + hashAlgoType);
         }
 
         return new AlgorithmIdentifier(sigAlgoOid);
@@ -519,52 +532,58 @@ public class AlgorithmUtil {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
 
         ASN1ObjectIdentifier digestAlgOid;
-        if (X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid)) {
-            digestAlgOid = X509ObjectIdentifiers.id_SHA1;
-        } else if (X9ObjectIdentifiers.ecdsa_with_SHA224.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha224;
-        } else if (X9ObjectIdentifiers.ecdsa_with_SHA256.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha256;
-        } else if (X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha384;
-        } else if (X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha512;
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(algOid)) {
-            digestAlgOid = X509ObjectIdentifiers.id_SHA1;
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA224.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha224;
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA256.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha256;
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA384.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha384;
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA512.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha512;
-        } else if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid)) {
-            digestAlgOid = X509ObjectIdentifiers.id_SHA1;
-        } else if (NISTObjectIdentifiers.dsa_with_sha224.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha224;
-        } else if (NISTObjectIdentifiers.dsa_with_sha256.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha256;
-        } else if (NISTObjectIdentifiers.dsa_with_sha384.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha384;
-        } else if (NISTObjectIdentifiers.dsa_with_sha512.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha512;
-        } else if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid)) {
-            digestAlgOid = X509ObjectIdentifiers.id_SHA1;
-        } else if (PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha224;
-        } else if (PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha256;
-        } else if (PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha384;
-        } else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid)) {
-            digestAlgOid = NISTObjectIdentifiers.id_sha512;
-        } else if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
+        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
             ASN1Encodable asn1Encodable = sigAlgId.getParameters();
             RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
             digestAlgOid = param.getHashAlgorithm().getAlgorithm();
         } else {
-            throw new NoSuchAlgorithmException("unknown signature algorithm" + algOid.getId());
+            HashAlgoType digestAlg;
+
+            if (X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA1;
+            } else if (X9ObjectIdentifiers.ecdsa_with_SHA224.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA224;
+            } else if (X9ObjectIdentifiers.ecdsa_with_SHA256.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA256;
+            } else if (X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA384;
+            } else if (X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA512;
+            } else if (BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA1;
+            } else if (BSIObjectIdentifiers.ecdsa_plain_SHA224.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA224;
+            } else if (BSIObjectIdentifiers.ecdsa_plain_SHA256.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA256;
+            } else if (BSIObjectIdentifiers.ecdsa_plain_SHA384.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA384;
+            } else if (BSIObjectIdentifiers.ecdsa_plain_SHA512.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA512;
+            } else if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA1;
+            } else if (NISTObjectIdentifiers.dsa_with_sha224.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA224;
+            } else if (NISTObjectIdentifiers.dsa_with_sha256.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA256;
+            } else if (NISTObjectIdentifiers.dsa_with_sha384.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA384;
+            } else if (NISTObjectIdentifiers.dsa_with_sha512.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA512;
+            } else if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA1;
+            } else if (PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA224;
+            } else if (PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA256;
+            } else if (PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA384;
+            } else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid)) {
+                digestAlg = HashAlgoType.SHA512;
+            } else {
+                throw new NoSuchAlgorithmException("unknown signature algorithm" + algOid.getId());
+            }
+
+            digestAlgOid = digestAlg.getOid();
         }
 
         return new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
@@ -579,8 +598,16 @@ public class AlgorithmUtil {
             return true;
         }
 
-        String tmpA = algoNameA.replace("-", "");
-        String tmpB = algoNameB.replace("-", "");
+        String tmpA = algoNameA;
+        if (tmpA.indexOf('-') != -1) {
+            tmpA = tmpA.replace("-", "");
+        }
+
+        String tmpB = algoNameB;
+        if (tmpB.indexOf('-') != -1) {
+            tmpB = tmpB.replace("-", "");
+        }
+
         if (tmpA.equalsIgnoreCase(tmpB)) {
             return true;
         }
@@ -634,21 +661,32 @@ public class AlgorithmUtil {
             final AlgorithmIdentifier digAlgId)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("digAlgId", digAlgId);
-        ASN1ObjectIdentifier digAlgOid = digAlgId.getAlgorithm();
+        HashAlgoType digAlgoType = HashAlgoType.getHashAlgoType(digAlgId.getAlgorithm());
+        if (digAlgoType == null) {
+            throw new NoSuchAlgorithmException("no DSA signature algorithm with digest algorithm "
+                    + digAlgId.getAlgorithm().getId());
+        }
+
         ASN1ObjectIdentifier sid;
-        if (X509ObjectIdentifiers.id_SHA1.equals(digAlgOid)) {
+
+        switch (digAlgoType) {
+        case SHA1:
             sid = X9ObjectIdentifiers.id_dsa_with_sha1;
-        } else if (NISTObjectIdentifiers.id_sha224.equals(digAlgOid)) {
+            break;
+        case SHA224:
             sid = NISTObjectIdentifiers.dsa_with_sha224;
-        } else if (NISTObjectIdentifiers.id_sha256.equals(digAlgOid)) {
+            break;
+        case SHA256:
             sid = NISTObjectIdentifiers.dsa_with_sha256;
-        } else if (NISTObjectIdentifiers.id_sha384.equals(digAlgOid)) {
+            break;
+        case SHA384:
             sid = NISTObjectIdentifiers.dsa_with_sha384;
-        } else if (NISTObjectIdentifiers.id_sha512.equals(digAlgOid)) {
+            break;
+        case SHA512:
             sid = NISTObjectIdentifiers.dsa_with_sha512;
-        } else {
-            throw new NoSuchAlgorithmException(
-                    "no signature algorithm for DSA with digest algorithm " + digAlgOid.getId());
+            break;
+        default:
+            throw new RuntimeException("unknown HashAlgoType: " + digAlgoType);
         }
         return new AlgorithmIdentifier(sid);
     } // method buildRSAPSSAlgorithmIdentifier
@@ -658,28 +696,15 @@ public class AlgorithmUtil {
             final ASN1ObjectIdentifier digestAlgOid)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("digestAlgOid", digestAlgOid);
-        int saltSize;
-        if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOid)) {
-            saltSize = 20;
-        } else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOid)) {
-            saltSize = 28;
-        } else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOid)) {
-            saltSize = 32;
-        } else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOid)) {
-            saltSize = 48;
-        } else if (NISTObjectIdentifiers.id_sha512.equals(digestAlgOid)) {
-            saltSize = 64;
-        } else {
-            throw new NoSuchAlgorithmException(
-                    "unknown digest algorithm " + digestAlgOid);
+        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(digestAlgOid);
+        if (hashAlgoType == null) {
+            throw new RuntimeException("unsupported hash algorithm " + digestAlgOid.getId());
         }
-
+        int saltSize = hashAlgoType.getLength();
         AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
-        return new RSASSAPSSparams(
-            digAlgId,
+        return new RSASSAPSSparams(digAlgId,
             new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
-            new ASN1Integer(saltSize),
-            RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
+            new ASN1Integer(saltSize), RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
     } // method createPSSRSAParams
 
 }

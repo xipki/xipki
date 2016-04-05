@@ -43,7 +43,6 @@ import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -172,9 +171,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
         if (slot.supportsMechanism(P11Constants.CKM_RSA_PKCS_PSS)) {
             this.mechanism = P11Constants.CKM_RSA_PKCS_PSS;
             this.parameters = new P11RSAPkcsPssParams(asn1Params);
-            AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
-                    new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
-            Digest digest = SignerUtil.getDigest(digAlgId);
+            Digest digest = SignerUtil.getDigest(hashAlgo);
             this.outputStream = new DigestOutputStream(digest);
         } else if (slot.supportsMechanism(P11Constants.CKM_RSA_X_509)) {
             this.mechanism = P11Constants.CKM_RSA_X_509;

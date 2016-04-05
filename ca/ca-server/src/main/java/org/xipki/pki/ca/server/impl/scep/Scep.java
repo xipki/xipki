@@ -94,7 +94,7 @@ import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.ScepControl;
 import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.exception.MessageEncodingException;
 import org.xipki.pki.scep.message.CaCaps;
@@ -358,22 +358,22 @@ public class Scep {
 
         // check the digest algorithm
         String oid = req.getDigestAlgorithm().getId();
-        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(oid);
+        ScepHashAlgoType hashAlgoType = ScepHashAlgoType.getHashAlgoType(oid);
         if (hashAlgoType == null) {
             LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badAlg);
         } else {
             boolean supported = false;
-            if (hashAlgoType == HashAlgoType.SHA1) {
+            if (hashAlgoType == ScepHashAlgoType.SHA1) {
                 if (caCaps.containsCapability(CaCapability.SHA1)) {
                     supported = true;
                 }
-            } else if (hashAlgoType == HashAlgoType.SHA256) {
+            } else if (hashAlgoType == ScepHashAlgoType.SHA256) {
                 if (caCaps.containsCapability(CaCapability.SHA256)) {
                     supported = true;
                 }
-            } else if (hashAlgoType == HashAlgoType.SHA512) {
+            } else if (hashAlgoType == ScepHashAlgoType.SHA512) {
                 if (caCaps.containsCapability(CaCapability.SHA512)) {
                     supported = true;
                 }
@@ -729,9 +729,9 @@ public class Scep {
     private static String getSignatureAlgorithm(
             final PrivateKey key,
             final ASN1ObjectIdentifier digestOid) {
-        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(digestOid.getId());
+        ScepHashAlgoType hashAlgo = ScepHashAlgoType.getHashAlgoType(digestOid.getId());
         if (hashAlgo == null) {
-            hashAlgo = HashAlgoType.SHA256;
+            hashAlgo = ScepHashAlgoType.SHA256;
         }
         String algorithm = key.getAlgorithm();
         if ("RSA".equalsIgnoreCase(algorithm)) {

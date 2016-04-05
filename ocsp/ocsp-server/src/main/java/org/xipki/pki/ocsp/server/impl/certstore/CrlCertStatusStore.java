@@ -95,7 +95,6 @@ import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
@@ -393,8 +392,8 @@ public class CrlCertStatusStore extends CertStatusStore {
             Map<HashAlgoType, IssuerHashNameAndKey> newIssuerHashMap = new ConcurrentHashMap<>();
 
             for (HashAlgoType hashAlgo : HashAlgoType.values()) {
-                byte[] issuerNameHash = HashCalculator.hash(hashAlgo, encodedName);
-                byte[] issuerKeyHash = HashCalculator.hash(hashAlgo, encodedKey);
+                byte[] issuerNameHash = hashAlgo.hash(encodedName);
+                byte[] issuerKeyHash = hashAlgo.hash(encodedKey);
                 IssuerHashNameAndKey issuerHash =
                         new IssuerHashNameAndKey(hashAlgo, issuerNameHash, issuerKeyHash);
                 newIssuerHashMap.put(hashAlgo, issuerHash);
@@ -1004,7 +1003,7 @@ public class CrlCertStatusStore extends CertStatusStore {
 
         Map<HashAlgoType, byte[]> certHashes = new ConcurrentHashMap<>();
         for (HashAlgoType hashAlgo : certHashAlgos) {
-            byte[] certHash = HashCalculator.hash(hashAlgo, encodedCert);
+            byte[] certHash = hashAlgo.hash(encodedCert);
             certHashes.put(hashAlgo, certHash);
         }
 

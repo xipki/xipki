@@ -59,7 +59,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.CrlReason;
-import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.pki.ca.client.api.CaClient;
 import org.xipki.pki.ca.client.api.CaClientException;
 import org.xipki.pki.ca.client.api.CertIdOrError;
@@ -126,7 +126,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
             this.excludeSerials.add(caCert.getSerialNumber().getPositiveValue().longValue());
         }
 
-        String b64Sha1Fp = HashCalculator.base64Sha1(caCert.getEncoded());
+        String b64Sha1Fp = HashAlgoType.SHA1.base64Hash(caCert.getEncoded());
         String sql = "SELECT ID FROM CS_CA WHERE SHA1_CERT='" + b64Sha1Fp + "'";
         Statement stmt = caDataSource.getConnection().createStatement();
         try {

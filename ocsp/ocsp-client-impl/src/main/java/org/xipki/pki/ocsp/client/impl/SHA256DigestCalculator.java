@@ -37,9 +37,9 @@
 package org.xipki.pki.ocsp.client.impl;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.xipki.commons.security.api.HashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -50,7 +50,7 @@ class SHA256DigestCalculator extends AbstractDigestCalculator {
 
     @Override
     protected ASN1ObjectIdentifier getObjectIdentifier() {
-        return NISTObjectIdentifiers.id_sha256;
+        return HashAlgoType.SHA256.getOid();
     }
 
     @Override

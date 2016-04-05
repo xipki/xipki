@@ -47,7 +47,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.util.SignerConfUtil;
+import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.pki.ca.client.shell.completer.P11ModuleNameCompleter;
 
 /**
@@ -90,7 +90,7 @@ public class P11EnrollCertCmd extends EnrollCertCommandSupport {
             keyIdBytes = Hex.decode(keyId);
         }
 
-        String signerConfWithoutAlgo = SignerConfUtil.getPkcs11SignerConfWithoutAlgo(
+        String signerConfWithoutAlgo = SignerUtil.getPkcs11SignerConfWithoutAlgo(
                 moduleName, slotIndex, null, keyLabel, keyIdBytes, 1);
         return securityFactory.createSigner("PKCS11", signerConfWithoutAlgo, hashAlgo,
                 signatureAlgoControl, (X509Certificate[]) null);

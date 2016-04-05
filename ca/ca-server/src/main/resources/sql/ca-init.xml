@@ -406,13 +406,16 @@
           remarks="base64 encoded transactionId, maximal 256 bit"/>
     </createTable>
     <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SN" constraintName="CONST_CA_SN"/>
-    <createIndex tableName="CERT" unique="false" indexName="IDX_FPK">
+    <createIndex tableName="CERT" unique="false" indexName="IDX_CA_FPK">
+      <column name="CA_ID"/>
       <column name="FP_K"/>
     </createIndex>
-    <createIndex tableName="CERT" unique="false" indexName="IDX_FPS">
+    <createIndex tableName="CERT" unique="false" indexName="IDX_CA_FPS">
+      <column name="CA_ID"/>
       <column name="FP_S"/>
     </createIndex>
-    <createIndex tableName="CERT" unique="false" indexName="IDX_FPRS">
+    <createIndex tableName="CERT" unique="false" indexName="IDX_CA_FPRS">
+      <column name="CA_ID"/>
       <column name="FP_RS"/>
     </createIndex>
     <!-- table CRAW -->

@@ -41,8 +41,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
@@ -123,9 +121,7 @@ class P11DSAContentSigner implements ContentSigner {
         P11Slot slot = cryptService.getSlot(slotId);
         if (slot.supportsMechanism(P11Constants.CKM_DSA)) {
             this.mechanism = P11Constants.CKM_DSA;
-            AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
-                    new ASN1ObjectIdentifier(hashAlgo.getOid()), DERNull.INSTANCE);
-            Digest digest = SignerUtil.getDigest(digAlgId);
+            Digest digest = SignerUtil.getDigest(hashAlgo);
             this.outputStream = new DigestOutputStream(digest);
         } else {
             this.mechanism = hashMechMap.get(hashAlgo).longValue();

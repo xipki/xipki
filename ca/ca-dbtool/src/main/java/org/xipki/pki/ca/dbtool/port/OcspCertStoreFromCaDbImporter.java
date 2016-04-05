@@ -71,7 +71,6 @@ import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.dbtool.InvalidInputException;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaHasPublisherType;
@@ -351,27 +350,27 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             ps.setLong(idx++,
                     cert.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
             ps.setString(idx++,
-                    HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName));
+                    HashAlgoType.SHA1.base64Hash(encodedName));
             ps.setString(idx++,
-                    HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey));
+                    HashAlgoType.SHA1.base64Hash(encodedKey));
             ps.setString(idx++,
-                    HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName));
+                    HashAlgoType.SHA224.base64Hash(encodedName));
             ps.setString(idx++,
-                    HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey));
+                    HashAlgoType.SHA224.base64Hash(encodedKey));
             ps.setString(idx++,
-                    HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName));
+                    HashAlgoType.SHA256.base64Hash(encodedName));
             ps.setString(idx++,
-                    HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey));
+                    HashAlgoType.SHA256.base64Hash(encodedKey));
             ps.setString(idx++,
-                    HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName));
+                    HashAlgoType.SHA384.base64Hash(encodedName));
             ps.setString(idx++,
-                    HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey));
+                    HashAlgoType.SHA384.base64Hash(encodedKey));
             ps.setString(idx++,
-                    HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName));
+                    HashAlgoType.SHA512.base64Hash(encodedName));
             ps.setString(idx++,
-                    HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey));
+                    HashAlgoType.SHA512.base64Hash(encodedKey));
             ps.setString(idx++,
-                    HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
+                    HashAlgoType.SHA1.base64Hash(encodedCert));
             ps.setString(idx++, b64Cert);
 
             setBoolean(ps, idx++, ca.isRevoked());
@@ -581,16 +580,15 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                         try {
                             int idx = 1;
                             psCerthash.setInt(idx++, currentId);
+                            psCerthash.setString(idx++, HashAlgoType.SHA1.base64Hash(encodedCert));
                             psCerthash.setString(idx++,
-                                    HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert));
+                                    HashAlgoType.SHA224.base64Hash(encodedCert));
                             psCerthash.setString(idx++,
-                                    HashCalculator.base64Hash(HashAlgoType.SHA224, encodedCert));
+                                    HashAlgoType.SHA256.base64Hash(encodedCert));
                             psCerthash.setString(idx++,
-                                    HashCalculator.base64Hash(HashAlgoType.SHA256, encodedCert));
+                                    HashAlgoType.SHA384.base64Hash(encodedCert));
                             psCerthash.setString(idx++,
-                                    HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert));
-                            psCerthash.setString(idx++,
-                                    HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert));
+                                    HashAlgoType.SHA512.base64Hash(encodedCert));
                             psCerthash.addBatch();
                         } catch (SQLException ex) {
                             throw translate(SQL_ADD_CHASH, ex);

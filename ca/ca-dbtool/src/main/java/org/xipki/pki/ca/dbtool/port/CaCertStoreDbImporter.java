@@ -73,7 +73,7 @@ import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.FpIdCalculator;
-import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.Cas;
@@ -217,7 +217,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     String b64Cert = getValue(m.getCert());
                     byte[] encodedCert = Base64.decode(b64Cert);
                     Certificate cert = Certificate.getInstance(encodedCert);
-                    String b64Sha1FpCert = HashCalculator.base64Sha1(encodedCert);
+                    String b64Sha1FpCert = HashAlgoType.SHA1.base64Hash(encodedCert);
 
                     int idx = 1;
                     ps.setInt(idx++, m.getId());
@@ -849,7 +849,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                 byte[] encodedKey = tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
-                String b64Sha1FpCert = HashCalculator.base64Sha1(encodedCert);
+                String b64Sha1FpCert = HashAlgoType.SHA1.base64Hash(encodedCert);
 
                 // cert
                 String subjectText = X509Util.cutX500Name(tbsCert.getSubject(), maxX500nameLen);
@@ -976,9 +976,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     throws DataAccessException {
         long start = System.currentTimeMillis();
 
-        datasource.dropIndex(null, "CERT", "IDX_FPK");
-        datasource.dropIndex(null, "CERT", "IDX_FPS");
-        datasource.dropIndex(null, "CERT", "IDX_FPRS");
+        datasource.dropIndex(null, "CERT", "IDX_CA_FPK");
+        datasource.dropIndex(null, "CERT", "IDX_CA_FPS");
+        datasource.dropIndex(null, "CERT", "IDX_CA_FPRS");
 
         datasource.dropForeignKeyConstraint(null, "FK_CERT_CS_CA1", "CERT");
         datasource.dropUniqueConstrain(null, "CONST_CA_SN", "CERT");
@@ -1010,9 +1010,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 "CA_ID", "CS_CA", "ID", "CASCADE", "NO ACTION");
         datasource.addUniqueConstrain(null, "CONST_CA_SN", "CERT", "CA_ID", "SN");
 
-        datasource.createIndex(null, "IDX_FPK", "CERT", "FP_K");
-        datasource.createIndex(null, "IDX_FPS", "CERT", "FP_S");
-        datasource.createIndex(null, "IDX_FPRS", "CERT", "FP_RS");
+        datasource.createIndex(null, "IDX_CA_FPK", "CERT", "CA_ID", "FP_K");
+        datasource.createIndex(null, "IDX_CA_FPS", "CERT", "CA_ID", "FP_S");
+        datasource.createIndex(null, "IDX_CA_FPRS", "CERT", "CA_ID", "FP_RS");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
         System.out.println(" recovered indexes in " + StringUtil.formatTime(duration, false));

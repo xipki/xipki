@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.transaction.CaCapability;
 
 /**
@@ -134,15 +134,15 @@ public class CaCaps {
         return capabilities.contains(CaCapability.POSTPKIOperation);
     }
 
-    public HashAlgoType getMostSecureHashAlgo() {
+    public ScepHashAlgoType getMostSecureHashAlgo() {
         if (capabilities.contains(CaCapability.SHA512)) {
-            return HashAlgoType.SHA512;
+            return ScepHashAlgoType.SHA512;
         } else if (capabilities.contains(CaCapability.SHA256)) {
-            return HashAlgoType.SHA256;
+            return ScepHashAlgoType.SHA256;
         } else if (capabilities.contains(CaCapability.SHA1)) {
-            return HashAlgoType.SHA1;
+            return ScepHashAlgoType.SHA1;
         } else {
-            return HashAlgoType.MD5;
+            return ScepHashAlgoType.MD5;
         }
     }
 

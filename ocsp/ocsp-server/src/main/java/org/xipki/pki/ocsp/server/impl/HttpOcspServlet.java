@@ -64,7 +64,7 @@ import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.api.HashCalculator;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.pki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
 
 /**
@@ -269,7 +269,7 @@ public class HttpOcspServlet extends HttpServlet {
                     // HEX representation of the SHA1 hash of the OCSPResponse structure.
                     response.setHeader("ETag",
                             new StringBuilder(42).append('\\')
-                                .append(HashCalculator.hexSha1(encodedOcspResp))
+                                .append(HashAlgoType.SHA1.hexHash(encodedOcspResp))
                                 .append('\\')
                             .toString());
 

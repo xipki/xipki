@@ -911,8 +911,7 @@ public class OcspServer {
 
                 byte[] certHash = certStatusInfo.getCertHash();
                 if (certHash != null) {
-                    ASN1ObjectIdentifier hashAlgoOid =
-                            new ASN1ObjectIdentifier(certStatusInfo.getCertHashAlgo().getOid());
+                    ASN1ObjectIdentifier hashAlgoOid = certStatusInfo.getCertHashAlgo().getOid();
                     AlgorithmIdentifier hashAlgId =
                             new AlgorithmIdentifier(hashAlgoOid, DERNull.INSTANCE);
                     CertHash bcCertHash = new CertHash(hashAlgId, certHash);

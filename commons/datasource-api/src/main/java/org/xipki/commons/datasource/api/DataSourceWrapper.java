@@ -212,7 +212,7 @@ public interface DataSourceWrapper {
             @Nullable Connection conn,
             @Nonnull String indexName,
             @Nonnull String table,
-            @Nonnull String column)
+            @Nonnull String... columns)
     throws DataAccessException;
 
     void dropUniqueConstrain(

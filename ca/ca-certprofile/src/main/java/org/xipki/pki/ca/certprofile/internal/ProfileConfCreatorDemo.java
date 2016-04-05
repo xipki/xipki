@@ -57,7 +57,6 @@ import javax.xml.validation.SchemaFactory;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
@@ -67,6 +66,7 @@ import org.w3c.dom.Element;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.common.util.XmlUtil;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.TlsExtensionType;
 import org.xipki.commons.security.api.util.KeyUtil;
@@ -1435,10 +1435,10 @@ public class ProfileConfCreatorDemo {
         extValue.getType().add(type);
 
         // hash algorithm
-        extValue.getHashAlgorithm().add(
-            createOidType(NISTObjectIdentifiers.id_sha256, "SHA256"));
-        extValue.getHashAlgorithm().add(
-            createOidType(NISTObjectIdentifiers.id_sha384, "SHA384"));
+        HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA256, HashAlgoType.SHA384};
+        for (HashAlgoType hashAlgo : hashAlgos) {
+            extValue.getHashAlgorithm().add(createOidType(hashAlgo.getOid(), hashAlgo.getName()));
+        }
 
         extValue.setIncludeSourceDataUri(TripleState.REQUIRED);
         return createExtensionValueType(extValue);

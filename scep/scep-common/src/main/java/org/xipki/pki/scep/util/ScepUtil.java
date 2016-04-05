@@ -99,7 +99,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.scep.crypto.HashAlgoType;
+import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.crypto.KeyUsage;
 
 /**
@@ -153,7 +153,7 @@ public class ScepUtil {
         }
 
         ContentSigner contentSigner = new JcaContentSignerBuilder(
-                getSignatureAlgorithm(privatekey, HashAlgoType.SHA1)).build(privatekey);
+                getSignatureAlgorithm(privatekey, ScepHashAlgoType.SHA1)).build(privatekey);
         return p10ReqBuilder.build(contentSigner);
     }
 
@@ -235,10 +235,10 @@ public class ScepUtil {
                     "could not generate self-signed certificate: " + ex.getMessage(), ex);
         }
 
-        String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, HashAlgoType.SHA1);
+        String sigAlgorithm = ScepUtil.getSignatureAlgorithm(identityKey, ScepHashAlgoType.SHA1);
         ContentSigner contentSigner;
         try {
-            contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(identityKey);
+            contentSigner = new JcaContentSignerBuilder(sigAlgorithm).build(identityKey);
         } catch (OperatorCreationException ex) {
             throw new CertificateException("error whilc creating signer", ex);
         }
@@ -309,7 +309,7 @@ public class ScepUtil {
 
     public static String getSignatureAlgorithm(
             final PrivateKey key,
-            final HashAlgoType hashAlgo) {
+            final ScepHashAlgoType hashAlgo) {
         ParamUtil.requireNonNull("key", key);
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         String algorithm = key.getAlgorithm();

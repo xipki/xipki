@@ -42,7 +42,7 @@ import java.util.Set;
 
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.util.SignerConfUtil;
+import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.pki.ca.api.profile.CertValidity;
 
 /**
@@ -232,7 +232,7 @@ public class CaEntry implements Serializable {
         if (signerConf == null) {
             sb.append("null");
         } else {
-            sb.append(SignerConfUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo));
+            sb.append(SignerUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
         sb.append("cmpcontrolName: ").append(cmpControlName).append('\n');

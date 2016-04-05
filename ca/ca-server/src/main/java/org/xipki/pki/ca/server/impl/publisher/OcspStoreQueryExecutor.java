@@ -61,7 +61,6 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.datasource.api.springframework.jdbc.DuplicateKeyException;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.HashCalculator;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
@@ -192,11 +191,11 @@ class OcspStoreQueryExecutor {
         int certId = nextCertId();
         byte[] encodedCert = certificate.getEncodedCert();
         String b64Cert = Base64.toBase64String(encodedCert);
-        String sha1Fp = HashCalculator.base64Hash(HashAlgoType.SHA1, encodedCert);
-        String sha224Fp = HashCalculator.base64Hash(HashAlgoType.SHA224, encodedCert);
-        String sha256Fp = HashCalculator.base64Hash(HashAlgoType.SHA256, encodedCert);
-        String sha384Fp = HashCalculator.base64Hash(HashAlgoType.SHA384, encodedCert);
-        String sha512Fp = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedCert);
+        String sha1Fp = HashAlgoType.SHA1.base64Hash(encodedCert);
+        String sha224Fp = HashAlgoType.SHA224.base64Hash(encodedCert);
+        String sha256Fp = HashAlgoType.SHA256.base64Hash(encodedCert);
+        String sha384Fp = HashAlgoType.SHA384.base64Hash(encodedCert);
+        String sha512Fp = HashAlgoType.SHA512.base64Hash(encodedCert);
 
         long currentTimeSeconds = System.currentTimeMillis() / 1000;
         X509Certificate cert = certificate.getCert();
@@ -531,7 +530,7 @@ class OcspStoreQueryExecutor {
             return;
         }
 
-        String sha1FpCert = HashCalculator.base64Sha1(issuerCert.getEncodedCert());
+        String sha1FpCert = HashAlgoType.SHA1.base64Hash(issuerCert.getEncodedCert());
 
         Certificate bcCert = Certificate.getInstance(issuerCert.getEncodedCert());
         byte[] encodedName;
@@ -548,16 +547,16 @@ class OcspStoreQueryExecutor {
         byte[] encodedCert = issuerCert.getEncodedCert();
         long notBeforeSeconds = issuerCert.getCert().getNotBefore().getTime() / 1000;
         long notAfterSeconds = issuerCert.getCert().getNotAfter().getTime() / 1000;
-        String b64Sha1FpName = HashCalculator.base64Hash(HashAlgoType.SHA1, encodedName);
-        String b64Sha1FpKey = HashCalculator.base64Hash(HashAlgoType.SHA1, encodedKey);
-        String b64Sha224FpName = HashCalculator.base64Hash(HashAlgoType.SHA224, encodedName);
-        String b64Sha224FpKey = HashCalculator.base64Hash(HashAlgoType.SHA224, encodedKey);
-        String b64Sha256FpName = HashCalculator.base64Hash(HashAlgoType.SHA256, encodedName);
-        String b64Sha256FpKey = HashCalculator.base64Hash(HashAlgoType.SHA256, encodedKey);
-        String b64Sha384FpName = HashCalculator.base64Hash(HashAlgoType.SHA384, encodedName);
-        String b64Sha384FpKey = HashCalculator.base64Hash(HashAlgoType.SHA384, encodedKey);
-        String b64Sha512FpName = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedName);
-        String b64Sha512FpKey = HashCalculator.base64Hash(HashAlgoType.SHA512, encodedKey);
+        String b64Sha1FpName = HashAlgoType.SHA1.base64Hash(encodedName);
+        String b64Sha1FpKey = HashAlgoType.SHA1.base64Hash(encodedKey);
+        String b64Sha224FpName = HashAlgoType.SHA224.base64Hash(encodedName);
+        String b64Sha224FpKey = HashAlgoType.SHA224.base64Hash(encodedKey);
+        String b64Sha256FpName = HashAlgoType.SHA256.base64Hash(encodedName);
+        String b64Sha256FpKey = HashAlgoType.SHA256.base64Hash(encodedKey);
+        String b64Sha384FpName = HashAlgoType.SHA384.base64Hash(encodedName);
+        String b64Sha384FpKey = HashAlgoType.SHA384.base64Hash(encodedKey);
+        String b64Sha512FpName = HashAlgoType.SHA512.base64Hash(encodedName);
+        String b64Sha512FpKey = HashAlgoType.SHA512.base64Hash(encodedKey);
 
         final String sql =
                 "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,"
