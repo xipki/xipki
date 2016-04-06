@@ -65,7 +65,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.X509Cert;
-import org.xipki.commons.security.api.util.KeyUtil;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**
@@ -648,7 +648,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         assertWritable("generateECKeypair");
         assertMechanismSupported(P11Constants.CKM_EC_KEY_PAIR_GEN);
 
-        ASN1ObjectIdentifier curveId = KeyUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
+        ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (curveId == null) {
             throw new IllegalArgumentException("unknown curve " + curveNameOrOid);
         }

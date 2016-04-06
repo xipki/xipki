@@ -897,6 +897,7 @@ class IaikP11Slot extends AbstractP11Slot {
         if (publicExponent != null) {
             publicKey.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
         }
+
         return generateKeyPair(P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN, privateKey, publicKey);
     }
 
@@ -925,7 +926,6 @@ class IaikP11Slot extends AbstractP11Slot {
         ECDSAPrivateKey privateKey = new ECDSAPrivateKey();
         ECDSAPublicKey publicKey = new ECDSAPublicKey();
         setKeyAttributes(label, P11Constants.CKK_EC, publicKey, privateKey);
-
         byte[] encodedCurveId;
         try {
             encodedCurveId = curveId.getEncoded();
