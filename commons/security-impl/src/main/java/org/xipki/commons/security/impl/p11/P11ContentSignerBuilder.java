@@ -62,7 +62,7 @@ import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.commons.security.impl.DefaultConcurrentContentSigner;
-import org.xipki.commons.security.provider.P11PrivateKey;
+import org.xipki.commons.security.impl.provider.P11PrivateKey;
 
 /**
  * @author Lijun Liao

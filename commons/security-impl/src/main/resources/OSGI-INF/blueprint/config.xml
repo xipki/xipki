@@ -20,7 +20,7 @@
   <reference id="passwordResolver" interface="org.xipki.commons.password.api.PasswordResolver"/>
 
   <bean id="XipkiProviderNssRegister"
-      class="org.xipki.commons.security.provider.NssProviderRegister"
+      class="org.xipki.commons.security.impl.provider.NssProviderRegister"
       init-method="regist" destroy-method="unregist"/>
 
   <bean id="securityFactoryImpl" class="org.xipki.commons.security.impl.SecurityFactoryImpl"
@@ -35,7 +35,7 @@
   </bean>
   <service ref="securityFactoryImpl" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <bean id="XipkiProviderRegister"
-      class="org.xipki.commons.security.provider.XipkiProviderRegister"
+      class="org.xipki.commons.security.impl.provider.XipkiProviderRegister"
       init-method="regist" destroy-method="unregist">
     <property name="securityFactory" ref="securityFactoryImpl"/>
   </bean>

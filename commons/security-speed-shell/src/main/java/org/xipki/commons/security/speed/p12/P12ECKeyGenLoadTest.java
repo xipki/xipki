@@ -40,6 +40,7 @@ import java.security.SecureRandom;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 
 /**
@@ -59,7 +60,7 @@ public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
                 + "curve: " + curveNameOrOid,
                 securityFactory);
 
-        ASN1ObjectIdentifier oid = KeyUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
+        ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (oid == null) {
             throw new IllegalArgumentException("invalid curve name or OID " + curveNameOrOid);
         }
