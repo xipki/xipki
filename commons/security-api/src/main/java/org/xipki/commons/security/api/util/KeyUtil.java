@@ -63,8 +63,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,13 +73,9 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.sec.SECNamedCurves;
-import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.digests.SHA512Digest;
@@ -108,25 +102,6 @@ import org.xipki.commons.common.util.ParamUtil;
 public class KeyUtil {
 
     private static final Map<String, KeyFactory> KEY_FACTORIES = new HashMap<>();
-
-    private static final Map<String, ASN1ObjectIdentifier> ECC_CURVE_NAME_OID_MAP;
-
-    static {
-        Map<String, ASN1ObjectIdentifier> nameOidMap = new HashMap<>();
-
-        Enumeration<?> names = ECNamedCurveTable.getNames();
-        while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
-            ASN1ObjectIdentifier oid = org.bouncycastle.asn1.x9.ECNamedCurveTable.getOID(name);
-            if (oid == null) {
-                continue;
-            }
-
-            nameOidMap.put(name, oid);
-        }
-
-        ECC_CURVE_NAME_OID_MAP = Collections.unmodifiableMap(nameOidMap);
-    }
 
     private KeyUtil() {
     }
@@ -215,7 +190,7 @@ public class KeyUtil {
             final String curveNameOrOid,
             final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-        ASN1ObjectIdentifier oid = getCurveOidForCurveNameOrOid(curveNameOrOid);
+        ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (oid == null) {
             throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
         }
@@ -300,7 +275,7 @@ public class KeyUtil {
             final String curveNameOrOid,
             final byte[] encodedQ)
     throws InvalidKeySpecException {
-        ASN1ObjectIdentifier oid = getCurveOidForCurveNameOrOid(curveNameOrOid);
+        ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (oid == null) {
             throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
         }
@@ -360,46 +335,6 @@ public class KeyUtil {
         } else {
             throw new InvalidKeyException("unknown key " + key.getClass().getName());
         }
-    }
-
-    public static ASN1ObjectIdentifier getCurveOidForName(
-            final String curveName) {
-        ParamUtil.requireNonBlank("curveName", curveName);
-        return ECC_CURVE_NAME_OID_MAP.get(curveName.toLowerCase());
-    }
-
-    public static String getCurveName(
-            final ASN1ObjectIdentifier curveOid) {
-        ParamUtil.requireNonNull("curveOid", curveOid);
-
-        String curveName = X962NamedCurves.getName(curveOid);
-        if (curveName == null) {
-            curveName = SECNamedCurves.getName(curveOid);
-        }
-        if (curveName == null) {
-            curveName = TeleTrusTNamedCurves.getName(curveOid);
-        }
-        if (curveName == null) {
-            curveName = NISTNamedCurves.getName(curveOid);
-        }
-
-        return curveName;
-    }
-
-    public static Map<String, ASN1ObjectIdentifier> getCurveNameOidMap() {
-        return ECC_CURVE_NAME_OID_MAP;
-    } // method getCurveNameOidMap
-
-    public static ASN1ObjectIdentifier getCurveOidForCurveNameOrOid(
-            final String curveNameOrOid) {
-        ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
-        ASN1ObjectIdentifier oid;
-        try {
-            oid = new ASN1ObjectIdentifier(curveNameOrOid);
-        } catch (Exception ex) {
-            oid = getCurveOidForName(curveNameOrOid);
-        }
-        return oid;
     }
 
     public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(

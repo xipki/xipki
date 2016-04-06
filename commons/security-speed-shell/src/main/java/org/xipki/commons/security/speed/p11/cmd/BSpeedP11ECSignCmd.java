@@ -38,14 +38,11 @@ package org.xipki.commons.security.speed.p11.cmd;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11Slot;
-import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.speed.p11.P11ECSignLoadTest;
 
 /**
@@ -63,10 +60,9 @@ public class BSpeedP11ECSignCmd extends BSpeedP11SignCommandSupport {
     protected List<LoadExecutor> getTesters()
     throws Exception {
         List<LoadExecutor> ret = new LinkedList<>();
-        Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOidMap();
 
         P11Slot slot = getSlot();
-        for (String curveName : curveNameOidMap.keySet()) {
+        for (String curveName : getECCurveNames()) {
             ret.add(new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName));
         }
 

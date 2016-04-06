@@ -38,13 +38,10 @@ package org.xipki.commons.security.speed.p12.cmd;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.speed.cmd.BatchSpeedCommandSupport;
 import org.xipki.commons.security.speed.p12.P12ECKeyGenLoadTest;
 
@@ -63,11 +60,9 @@ public class BSpeedP12ECKeyGenCmd extends BatchSpeedCommandSupport {
     protected List<LoadExecutor> getTesters()
     throws Exception {
         List<LoadExecutor> ret = new LinkedList<>();
-        Map<String, ASN1ObjectIdentifier> curveNameOidMap = KeyUtil.getCurveNameOidMap();
-        for (String curveName : curveNameOidMap.keySet()) {
+        for (String curveName : getECCurveNames()) {
             ret.add(new P12ECKeyGenLoadTest(curveName, securityFactory));
         }
-
         return ret;
     }
 

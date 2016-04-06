@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.provider;
+package org.xipki.commons.security.impl.provider;
 
 import org.xipki.commons.security.api.HashAlgoType;
 
@@ -42,66 +42,67 @@ import org.xipki.commons.security.api.HashAlgoType;
  * @author Lijun Liao
  * @since 2.0.0
  */
+
 // CHECKSTYLE:SKIP
-class P11PlainECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
+public class P11ECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
 
     // CHECKSTYLE:SKIP
-    static class SHA1 extends P11PlainECDSASignatureSpi {
+    public static class NONE extends P11ECDSASignatureSpi {
 
-        SHA1() {
-            super(HashAlgoType.SHA1);
-        }
-
-    } // class SHA1
-
-    // CHECKSTYLE:SKIP
-    static class NONE extends P11PlainECDSASignatureSpi {
-
-        NONE() {
+        public NONE() {
             super(null);
         }
 
     } // class NONE
 
     // CHECKSTYLE:SKIP
-    static class SHA224 extends P11PlainECDSASignatureSpi {
+    public static class SHA1 extends P11ECDSASignatureSpi {
 
-        SHA224() {
+        public SHA1() {
+            super(HashAlgoType.SHA1);
+        }
+
+    } // class SHA1
+
+    // CHECKSTYLE:SKIP
+    public static class SHA224 extends P11ECDSASignatureSpi {
+
+        public SHA224() {
             super(HashAlgoType.SHA224);
         }
 
     } // class SHA224
 
     // CHECKSTYLE:SKIP
-    static class SHA256 extends P11PlainECDSASignatureSpi {
+    public static class SHA256 extends P11ECDSASignatureSpi {
 
-        SHA256() {
+        public SHA256() {
             super(HashAlgoType.SHA256);
         }
 
     } // class SHA256
 
     // CHECKSTYLE:SKIP
-    static class SHA384 extends P11PlainECDSASignatureSpi {
+    public static class SHA384 extends P11ECDSASignatureSpi {
 
-        SHA384() {
+        public SHA384() {
             super(HashAlgoType.SHA384);
         }
 
     } // class SHA384
 
     // CHECKSTYLE:SKIP
-    static class SHA512 extends P11PlainECDSASignatureSpi {
+    public static class SHA512 extends P11ECDSASignatureSpi {
 
-        SHA512() {
+        public SHA512() {
             super(HashAlgoType.SHA512);
         }
 
     } // class SHA512
 
-    P11PlainECDSASignatureSpi(
+    private P11ECDSASignatureSpi(
             final HashAlgoType hashAlgo) {
-        super(hashAlgo, true);
+        super(hashAlgo, false);
     }
 
 }

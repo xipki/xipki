@@ -117,10 +117,9 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     + "(only applied to RSA key)")
     private Boolean rsaMgf1 = Boolean.FALSE;
 
-    @Option(name = "--dsa-plain",
-            description = "whether to use the Plain DSA for the POPO computation\n"
-                    + "(only applied to DSA and ECDSA key)")
-    private Boolean dsaPlain = Boolean.FALSE;
+    @Option(name = "--ecdsa-plain",
+            description = "whether to use the Plain ECDSA for the POPO computation")
+    private Boolean ecdsaPlain = Boolean.FALSE;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
@@ -340,7 +339,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         }
 
         ConcurrentContentSigner signer = getSigner(
-                new SignatureAlgoControl(rsaMgf1, dsaPlain));
+                new SignatureAlgoControl(rsaMgf1, ecdsaPlain));
 
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
         if (CollectionUtil.isNonEmpty(extensions)) {

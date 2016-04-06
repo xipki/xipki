@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.provider;
+package org.xipki.commons.security.impl.provider;
 
 import java.io.ByteArrayOutputStream;
 import java.security.AlgorithmParameters;
@@ -63,39 +63,39 @@ import org.xipki.commons.security.impl.p11.P11RSAKeyParameter;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-class P11RSAPSSSignatureSpi extends SignatureSpi {
+public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
     // CHECKSTYLE:SKIP
-    class NonePSS extends P11RSAPSSSignatureSpi {
+    public static class NonePSS extends P11RSAPSSSignatureSpi {
 
-        NonePSS() {
+        public NonePSS() {
             super(null, true);
         }
 
     } // class nonePSS
 
     // CHECKSTYLE:SKIP
-    class PSSwithRSA extends P11RSAPSSSignatureSpi {
+    public static class PSSwithRSA extends P11RSAPSSSignatureSpi {
 
-        PSSwithRSA() {
+        public PSSwithRSA() {
             super(null);
         }
 
     } // class PSSwithRSA
 
     // CHECKSTYLE:SKIP
-    class SHA1withRSA extends P11RSAPSSSignatureSpi {
+    public static class SHA1withRSA extends P11RSAPSSSignatureSpi {
 
-        SHA1withRSA() {
+        public SHA1withRSA() {
             super(PSSParameterSpec.DEFAULT);
         }
 
     } // class SHA1withRSA
 
     // CHECKSTYLE:SKIP
-    class SHA224withRSA extends P11RSAPSSSignatureSpi {
+    public static class SHA224withRSA extends P11RSAPSSSignatureSpi {
 
-        SHA224withRSA() {
+        public SHA224withRSA() {
             super(new PSSParameterSpec("SHA-224", "MGF1",
                     new MGF1ParameterSpec("SHA-224"), 28, 1));
         }
@@ -103,9 +103,9 @@ class P11RSAPSSSignatureSpi extends SignatureSpi {
     } // class SHA224withRSA
 
     // CHECKSTYLE:SKIP
-    class SHA256withRSA extends P11RSAPSSSignatureSpi {
+    public static class SHA256withRSA extends P11RSAPSSSignatureSpi {
 
-        SHA256withRSA() {
+        public SHA256withRSA() {
             super(new PSSParameterSpec("SHA-256", "MGF1",
                     new MGF1ParameterSpec("SHA-256"), 32, 1));
         }
@@ -113,9 +113,9 @@ class P11RSAPSSSignatureSpi extends SignatureSpi {
     } // class SHA256withRSA
 
     // CHECKSTYLE:SKIP
-    class SHA384withRSA extends P11RSAPSSSignatureSpi {
+    public static class SHA384withRSA extends P11RSAPSSSignatureSpi {
 
-        SHA384withRSA() {
+        public SHA384withRSA() {
             super(new PSSParameterSpec("SHA-384", "MGF1",
                     new MGF1ParameterSpec("SHA-384"), 48, 1));
         }
@@ -123,9 +123,9 @@ class P11RSAPSSSignatureSpi extends SignatureSpi {
     } // class SHA384withRSA
 
     // CHECKSTYLE:SKIP
-    class SHA512withRSA extends P11RSAPSSSignatureSpi {
+    public static class SHA512withRSA extends P11RSAPSSSignatureSpi {
 
-        SHA512withRSA() {
+        public SHA512withRSA() {
             super(new PSSParameterSpec("SHA-512", "MGF1",
                     new MGF1ParameterSpec("SHA-512"), 64, 1));
         }

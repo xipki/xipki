@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.provider;
+package org.xipki.commons.security.impl.provider;
 
 import java.io.IOException;
 import java.security.AlgorithmParameters;
@@ -58,57 +58,57 @@ import org.xipki.commons.security.api.p11.P11Constants;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-class P11RSADigestSignatureSpi extends SignatureSpi {
+public class P11RSADigestSignatureSpi extends SignatureSpi {
 
     // CHECKSTYLE:SKIP
-    class SHA1 extends P11RSADigestSignatureSpi {
+    public static class SHA1 extends P11RSADigestSignatureSpi {
 
-        SHA1() {
+        public SHA1() {
             super(HashAlgoType.SHA1);
         }
 
     } // class SHA1
 
     // CHECKSTYLE:SKIP
-    class SHA224 extends P11RSADigestSignatureSpi {
+    public static class SHA224 extends P11RSADigestSignatureSpi {
 
-        SHA224() {
+        public SHA224() {
             super(HashAlgoType.SHA224);
         }
 
     } // class SHA224
 
     // CHECKSTYLE:SKIP
-    class SHA256 extends P11RSADigestSignatureSpi {
+    public static class SHA256 extends P11RSADigestSignatureSpi {
 
-        SHA256() {
+        public SHA256() {
             super(HashAlgoType.SHA256);
         }
 
     } // class SHA256
 
     // CHECKSTYLE:SKIP
-    class SHA384 extends P11RSADigestSignatureSpi {
+    public static class SHA384 extends P11RSADigestSignatureSpi {
 
-        SHA384() {
+        public SHA384() {
             super(HashAlgoType.SHA384);
         }
 
     } // class SHA384
 
     // CHECKSTYLE:SKIP
-    class SHA512 extends P11RSADigestSignatureSpi {
+    public static class SHA512 extends P11RSADigestSignatureSpi {
 
-        SHA512() {
+        public SHA512() {
             super(HashAlgoType.SHA512);
         }
 
     } // class SHA512
 
     // CHECKSTYLE:SKIP
-    class NoneRSA extends P11RSADigestSignatureSpi {
+    public static class NoneRSA extends P11RSADigestSignatureSpi {
 
-        NoneRSA() {
+        public NoneRSA() {
             super(new NullDigest());
         }
 
