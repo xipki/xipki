@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.provider;
+package org.xipki.commons.security.impl.provider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -61,63 +61,11 @@ import org.xipki.commons.security.impl.util.SecurityUtil;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-abstract class P11DSASignatureSpi extends SignatureSpi {
-
-    // CHECKSTYLE:SKIP
-    static class SHA1 extends P11DSASignatureSpi {
-
-        SHA1() {
-            super(HashAlgoType.SHA1);
-        }
-
-    } // class SHA1
-
-    // CHECKSTYLE:SKIP
-    static class NONE extends P11DSASignatureSpi {
-
-        NONE() {
-            super(null);
-        }
-
-    } // class NONE
-
-    // CHECKSTYLE:SKIP
-    static class SHA224 extends P11DSASignatureSpi {
-
-        SHA224() {
-            super(HashAlgoType.SHA224);
-        }
-
-    } // class SHA224
-
-    // CHECKSTYLE:SKIP
-    static class SHA256 extends P11DSASignatureSpi {
-
-        SHA256() {
-            super(HashAlgoType.SHA256);
-        }
-
-    } // class SHA256
-
-    // CHECKSTYLE:SKIP
-    static class SHA384 extends P11DSASignatureSpi {
-
-        SHA384() {
-            super(HashAlgoType.SHA384);
-        }
-
-    } // class SHA384
-
-    // CHECKSTYLE:SKIP
-    static class SHA512 extends P11DSASignatureSpi {
-
-        SHA512() {
-            super(HashAlgoType.SHA512);
-        }
-
-    } // class SHA512
+abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
 
     private final HashAlgoType hashAlgo;
+
+    private final boolean plain;
 
     private long mechanism;
 
@@ -125,9 +73,11 @@ abstract class P11DSASignatureSpi extends SignatureSpi {
 
     private P11PrivateKey signingKey;
 
-    P11DSASignatureSpi(
-            @Nullable final HashAlgoType hashAlgo) {
+    AbstractP11ECDSASignatureSpi(
+            @Nullable final HashAlgoType hashAlgo,
+            final boolean plain) {
         this.hashAlgo = hashAlgo;
+        this.plain = plain;
     }
 
     @Override
@@ -146,13 +96,13 @@ abstract class P11DSASignatureSpi extends SignatureSpi {
                     + P11PrivateKey.class.getName());
         }
         String algo = privateKey.getAlgorithm();
-        if (!"DSA".equals(algo)) {
-            throw new InvalidKeyException("privateKey is not a DSA private key: " + algo);
+        if (!("EC".equals(algo) || "ECDSA".equals(algo))) {
+            throw new InvalidKeyException("privateKey is not an EC private key: " + algo);
         }
 
         this.signingKey = (P11PrivateKey) privateKey;
-        if (signingKey.supportsMechanism(P11Constants.CKM_DSA)) {
-            mechanism = P11Constants.CKM_DSA;
+        if (signingKey.supportsMechanism(P11Constants.CKM_ECDSA)) {
+            mechanism = P11Constants.CKM_ECDSA;
             if (hashAlgo == null) {
                 outputStream = new ByteArrayOutputStream();
             } else {
@@ -160,24 +110,23 @@ abstract class P11DSASignatureSpi extends SignatureSpi {
             }
         } else {
             if (hashAlgo == HashAlgoType.SHA1
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA1)) {
-                mechanism = P11Constants.CKM_DSA_SHA1;
+                    && signingKey.supportsMechanism(P11Constants.CKM_ECDSA_SHA1)) {
+                mechanism = P11Constants.CKM_ECDSA_SHA1;
             } else if (hashAlgo == HashAlgoType.SHA224
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA224)) {
-                mechanism = P11Constants.CKM_DSA_SHA224;
+                    && signingKey.supportsMechanism(P11Constants.CKM_ECDSA_SHA224)) {
+                mechanism = P11Constants.CKM_ECDSA_SHA224;
             } else if (hashAlgo == HashAlgoType.SHA256
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA256)) {
-                mechanism = P11Constants.CKM_DSA_SHA256;
+                    && signingKey.supportsMechanism(P11Constants.CKM_ECDSA_SHA256)) {
+                mechanism = P11Constants.CKM_ECDSA_SHA256;
             } else if (hashAlgo == HashAlgoType.SHA384
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA384)) {
-                mechanism = P11Constants.CKM_DSA_SHA384;
+                    && signingKey.supportsMechanism(P11Constants.CKM_ECDSA_SHA384)) {
+                mechanism = P11Constants.CKM_ECDSA_SHA384;
             } else if (hashAlgo == HashAlgoType.SHA512
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA512)) {
-                mechanism = P11Constants.CKM_DSA_SHA512;
+                    && signingKey.supportsMechanism(P11Constants.CKM_ECDSA_SHA512)) {
+                mechanism = P11Constants.CKM_ECDSA_SHA512;
             } else {
                 throw new InvalidKeyException("privateKey and algorithm does not match");
             }
-
             outputStream = new ByteArrayOutputStream();
         }
 
@@ -222,8 +171,12 @@ abstract class P11DSASignatureSpi extends SignatureSpi {
 
         try {
             byte[] plainSignature = signingKey.sign(mechanism, null, dataToSign);
-            return SignerUtil.convertPlainDSASigToX962(plainSignature);
-        } catch (P11TokenException | SecurityException ex) {
+            if (plain) {
+                return plainSignature;
+            } else {
+                return SignerUtil.convertPlainDSASigToX962(plainSignature);
+            }
+        } catch (SecurityException | P11TokenException ex) {
             throw new SignatureException(ex.getMessage(), ex);
         }
     }

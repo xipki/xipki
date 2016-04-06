@@ -34,13 +34,64 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.provider;
+package org.xipki.commons.security.impl.provider;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.Provider;
 
+import org.xipki.commons.security.api.XiSecurityConstants;
+
 /**
+ *
+ * Supported algorithms:<p/>
+ *
+ * Keystore
+ * <ul>
+ *   <li><code>PKCS11</code></li>
+ * </ul>
+ *
+ * Signature (RSA)
+ * <ul>
+ *   <li><code>NONEwithRSA</code></li>
+ *   <li><code>SHA1withRSA</code></li>
+ *   <li><code>SHA224withRSA</code></li>
+ *   <li><code>SHA256withRSA</code></li>
+ *   <li><code>SHA384withRSA</code></li>
+ *   <li><code>SHA512withRSA</code></li>
+ *   <li><code>SHA1withRSAandMGF1</code></li>
+ *   <li><code>SHA224withRSAandMGF1</code></li>
+ *   <li><code>SHA256withRSAandMGF1</code></li>
+ *   <li><code>SHA384withRSAandMGF1</code></li>
+ *   <li><code>SHA512withRSAandMGF1</code></li>
+ * </ul>
+ *
+ * Signature (DSA)
+ * <ul>
+ *   <li><code>NONEwithDSA</code></li>
+ *   <li><code>SHA1withDSA</code></li>
+ *   <li><code>SHA224withDSA</code></li>
+ *   <li><code>SHA256withDSA</code></li>
+ *   <li><code>SHA384withDSA</code></li>
+ *   <li><code>SHA512withDSA</code></li>
+ * </ul>
+ *
+ * Signature (ECDSA)
+ * <ul>
+ *   <li><code>NONEwithECDSA</code></li>
+ *   <li><code>SHA1withECDSA</code></li>
+ *   <li><code>SHA224withECDSA</code></li>
+ *   <li><code>SHA256withECDSA</code></li>
+ *   <li><code>SHA384withECDSA</code></li>
+ *   <li><code>SHA512withECDSA</code></li>
+ *   <li><code>NONEwithPlain-ECDSA</code></li>
+ *   <li><code>SHA1withPlain-ECDSA</code></li>
+ *   <li><code>SHA224withPlain-ECDSA</code></li>
+ *   <li><code>SHA256withPlain-ECDSA</code></li>
+ *   <li><code>SHA384withPlain-ECDSA</code></li>
+ *   <li><code>SHA512withPlain-ECDSA</code></li>
+ * </ul>
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
@@ -198,7 +249,7 @@ public class XipkiProvider extends Provider {
      * Exactly the name this provider is registered under at
      * <code>java.security.Security</code>: "<code>XiPKI</code>".
      */
-    public static final String PROVIDER_NAME = "XiPKI";
+    public static final String PROVIDER_NAME = XiSecurityConstants.PROVIDER_NAME_XIPKI;
 
     /**
      * Version of this provider as registered at

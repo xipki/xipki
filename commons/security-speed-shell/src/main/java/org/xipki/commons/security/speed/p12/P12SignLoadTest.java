@@ -48,7 +48,7 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.util.KeyUtil;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
@@ -124,7 +124,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
     protected static byte[] getPrecomputedECKeystore(
             final String curveNamOrOid)
     throws IOException {
-        ASN1ObjectIdentifier oid = KeyUtil.getCurveOidForCurveNameOrOid(curveNamOrOid);
+        ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNamOrOid);
         if (oid == null) {
             return null;
         }

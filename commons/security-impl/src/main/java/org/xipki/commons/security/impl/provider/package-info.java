@@ -34,4 +34,4 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.provider;
+package org.xipki.commons.security.impl.provider;

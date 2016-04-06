@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.provider;
+package org.xipki.commons.security.impl.provider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,6 +72,14 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
+ * construction of alias:
+ * <ul>
+ *   <li><code>&lt;module name>#slotid-&lt;slot id>#keyid-&lt;key id></code></li>
+ *   <li><code>&lt;module name>#slotid-&lt;slot id>#keylabel-&lt;key label></code></li>
+ *   <li><code>&lt;module name>#slotindex-&lt;slot index>#keyid-&lt;key id></code></li>
+ *   <li><code>&lt;module name>#slotindex-&lt;slot index>#keylabel-&lt;key label></code></li>
+ * </ul>
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */

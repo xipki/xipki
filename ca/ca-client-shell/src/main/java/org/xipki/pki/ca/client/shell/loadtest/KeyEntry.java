@@ -62,6 +62,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.SignerUtil;
 
@@ -291,13 +292,14 @@ public abstract class KeyEntry {
         throws Exception {
             ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
 
-            ASN1ObjectIdentifier curveOid = KeyUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
+            ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(
+                    curveNameOrOid);
             if (curveOid == null) {
                 throw new IllegalArgumentException("unknown curveNameOrOid '" + curveNameOrOid
                         + "'");
             }
 
-            String curveName = KeyUtil.getCurveName(curveOid);
+            String curveName = AlgorithmUtil.getCurveName(curveOid);
             if (curveName == null) {
                 curveName = curveOid.getId();
             }
