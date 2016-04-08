@@ -313,9 +313,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private String caConfFile;
 
-    private long certProfileTimeout = 60000; // one minute
+    private long newCertProfileTimeout = 60000; // one minute
 
-    private long certPublisherTimeout = 60000; // one minute
+    private long newCertPublisherTimeout = 60000; // one minute
 
     private boolean caSystemSetuped;
 
@@ -2069,15 +2069,16 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         this.caConfFile = caConfFile;
     }
 
-    public void setCertProfileTimeout(
-            final long certProfileTimeout) {
-        this.certProfileTimeout = ParamUtil.requireMin("certProfileTimeout", certProfileTimeout, 0);
+    public void setNewCertProfileTimeout(
+            final long newCertProfileTimeout) {
+        this.newCertProfileTimeout = ParamUtil.requireMin("newCertProfileTimeout",
+                newCertProfileTimeout, 0);
     }
 
-    public void setCertPublisherTimeout(
-            final long certPublisherTimeout) {
-        this.certPublisherTimeout = ParamUtil.requireMin("certPublisherTimeout",
-                certPublisherTimeout, 0);
+    public void setNewCertPublisherTimeout(
+            final long newCertPublisherTimeout) {
+        this.newCertPublisherTimeout = ParamUtil.requireMin("newCertPublisherTimeout",
+                newCertPublisherTimeout, 0);
     }
 
     @Override
@@ -2754,7 +2755,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         try {
             X509Certprofile profile = x509CertProfileFactoryRegister.newCertprofile(
-                    dbEntry.getType(), certProfileTimeout);
+                    dbEntry.getType(), newCertProfileTimeout);
             IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(dbEntry, profile);
             ret.setEnvParameterResolver(envParameterResolver);
             ret.validate();
@@ -2778,7 +2779,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         X509CertPublisher publisher;
         IdentifiedX509CertPublisher ret;
         try {
-            publisher = x509CertPublisherFactoryRegister.newPublisher(type, certPublisherTimeout);
+            publisher = x509CertPublisherFactoryRegister.newPublisher(type,
+                    newCertPublisherTimeout);
             ret = new IdentifiedX509CertPublisher(dbEntry, publisher);
             ret.initialize(securityFactory.getPasswordResolver(), datasources);
             return ret;
