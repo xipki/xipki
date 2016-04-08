@@ -106,11 +106,6 @@ xipki-tk:rsa-p12 \
 
 xipki-tk:rsa-p12 \
   --password 1234 \
-  --out $P12_DIR/ee/DEMO1.p12 \
-  --subject "CN=DUMMY"
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
   --out $P12_DIR/ee/EE.Complex1.p12 \
   --subject "CN=DUMMY"
 

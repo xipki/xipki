@@ -30,9 +30,6 @@ sleep 1000
 #################################################################
 #                          ENVIRONMENT                          #
 #################################################################
-xipki-caqa:env-check \
-  --name certprofileType.map \
-  --value "DemoEE1=java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE1X509Certprofile,DemoEE2=java:org.xipki.pki.ca.demo.certprofile.x509.DemoEE2X509Certprofile"
 
 xipki-ca:env-add \
   --name qa-env1 \
@@ -203,11 +200,6 @@ xipki-caqa:profile-check \
   --name SubCA \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_SubCA.xml
-
-# certprofile without "--conf"
-xipki-caqa:profile-check \
-  --name DEMO \
-  --type DemoEE1
 
 xipki-ca:profile-add \
   --name qa-SubCA \
