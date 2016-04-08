@@ -101,16 +101,18 @@ import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
-import org.xipki.pki.ca.api.CertPublisherException;
-import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.DfltEnvParameterResolver;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.X509CertWithDbId;
+import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegister;
-import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.pki.ca.api.publisher.CertPublisherException;
+import org.xipki.pki.ca.api.publisher.x509.X509CertPublisher;
+import org.xipki.pki.ca.api.publisher.x509.X509CertPublisherFactoryRegister;
+import org.xipki.pki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.pki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderEntryWrapper;
@@ -311,7 +313,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private String caConfFile;
 
-    private long certprofileTimeout = 60000; // one minute
+    private long certProfileTimeout = 60000; // one minute
+
+    private long certPublisherTimeout = 60000; // one minute
 
     private boolean caSystemSetuped;
 
@@ -339,7 +343,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private AuditServiceRegister auditServiceRegister;
 
-    private X509CertprofileFactoryRegister x509CertprofileFactoryRegister;
+    private X509CertprofileFactoryRegister x509CertProfileFactoryRegister;
+
+    private X509CertPublisherFactoryRegister x509CertPublisherFactoryRegister;
 
     private DataSourceWrapper datasource;
 
@@ -416,8 +422,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         if (datasourceFactory == null) {
             throw new IllegalStateException("datasourceFactory is not set");
         }
-        if (x509CertprofileFactoryRegister == null) {
+        if (x509CertProfileFactoryRegister == null) {
             throw new IllegalStateException("x509CertprofileFactoryRegister is not set");
+        }
+        if (x509CertPublisherFactoryRegister == null) {
+            throw new IllegalStateException("x509CertPublisherFactoryRegister is not set");
         }
         if (caConfFile == null) {
             throw new IllegalStateException("caConfFile is not set");
@@ -2060,9 +2069,15 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         this.caConfFile = caConfFile;
     }
 
-    public void setCertprofileTimeout(
-            final long certprofileTimeout) {
-        this.certprofileTimeout = ParamUtil.requireMin("certprofileTimeout", certprofileTimeout, 0);
+    public void setCertProfileTimeout(
+            final long certProfileTimeout) {
+        this.certProfileTimeout = ParamUtil.requireMin("certProfileTimeout", certProfileTimeout, 0);
+    }
+
+    public void setCertPublisherTimeout(
+            final long certPublisherTimeout) {
+        this.certPublisherTimeout = ParamUtil.requireMin("certPublisherTimeout",
+                certPublisherTimeout, 0);
     }
 
     @Override
@@ -2317,9 +2332,14 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         return true;
     } // method unrevokeCa
 
-    public void setX509CertprofileFactoryRegister(
-            final X509CertprofileFactoryRegister x509CertprofileFactoryRegister) {
-        this.x509CertprofileFactoryRegister = x509CertprofileFactoryRegister;
+    public void setX509CertProfileFactoryRegister(
+            final X509CertprofileFactoryRegister x509CertProfileFactoryRegister) {
+        this.x509CertProfileFactoryRegister = x509CertProfileFactoryRegister;
+    }
+
+    public void setX509CertPublisherFactoryRegister(
+            final X509CertPublisherFactoryRegister x509CertPublisherFactoryRegister) {
+        this.x509CertPublisherFactoryRegister = x509CertPublisherFactoryRegister;
     }
 
     public void setAuditServiceRegister(
@@ -2733,8 +2753,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             final CertprofileEntry dbEntry) {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         try {
-            X509Certprofile profile = x509CertprofileFactoryRegister.newCertprofile(
-                    dbEntry.getType(), dbEntry.getConf(), certprofileTimeout);
+            X509Certprofile profile = x509CertProfileFactoryRegister.newCertprofile(
+                    dbEntry.getType(), certProfileTimeout);
             IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(dbEntry, profile);
             ret.setEnvParameterResolver(envParameterResolver);
             ret.validate();
@@ -2755,10 +2775,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         String name = dbEntry.getName();
         String type = dbEntry.getType();
 
-        String realType = getRealPublisherType(type);
+        X509CertPublisher publisher;
         IdentifiedX509CertPublisher ret;
         try {
-            ret = new IdentifiedX509CertPublisher(dbEntry, realType);
+            publisher = x509CertPublisherFactoryRegister.newPublisher(type, certPublisherTimeout);
+            ret = new IdentifiedX509CertPublisher(dbEntry, publisher);
             ret.initialize(securityFactory.getPasswordResolver(), datasources);
             return ret;
         } catch (CertPublisherException | RuntimeException ex) {
@@ -2768,12 +2789,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return null;
         }
     } // method createPublisher
-
-    private String getRealPublisherType(
-            final String publisherType) {
-        return getRealType(envParameterResolver.getParameterValue("publisherType.map"),
-                publisherType);
-    }
 
     @Override
     public boolean addUser(
@@ -3016,28 +3031,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
         return pairs.getEncoded();
     } // method canonicalizeSignerConf
-
-    private static String getRealType(
-            final String typeMap,
-            final String type) {
-        if (typeMap == null) {
-            return null;
-        }
-
-        String tmpTypeMap = typeMap.trim();
-        if (StringUtil.isBlank(tmpTypeMap)) {
-            return null;
-        }
-
-        ConfPairs pairs;
-        try {
-            pairs = new ConfPairs(tmpTypeMap);
-        } catch (IllegalArgumentException ex) {
-            LOG.error("CA environment {}: '{}' is not valid CMP UTF-8 pairs", tmpTypeMap, type);
-            return null;
-        }
-        return pairs.getValue(type);
-    } // method getRealType
 
     static List<String[]> splitCaSignerConfs(
             final String conf)

@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.impl.publisher;
+package org.xipki.pki.ca.publisher.ocsp.internal;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509CRL;
@@ -57,11 +57,11 @@ import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509CertWithDbId;
-import org.xipki.pki.ca.api.publisher.X509CertPublisher;
-import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.pki.ca.api.publisher.CertPublisherException;
+import org.xipki.pki.ca.api.publisher.x509.X509CertPublisher;
+import org.xipki.pki.ca.api.publisher.x509.X509CertificateInfo;
 
 /**
  * @author Lijun Liao

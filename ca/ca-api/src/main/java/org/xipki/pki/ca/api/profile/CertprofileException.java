@@ -34,54 +34,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.impl.publisher;
-
-import java.util.Arrays;
-
-import org.bouncycastle.util.encoders.Base64;
+package org.xipki.pki.ca.api.profile;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class IssuerEntry {
+public class CertprofileException extends Exception {
 
-    private final int id;
+    private static final long serialVersionUID = 1L;
 
-    private final String subject;
-
-    private final byte[] sha1Fp;
-
-    private final byte[] cert;
-
-    IssuerEntry(
-            final int id,
-            final String subject,
-            final String b64Sha1Fp,
-            final String b64Cert) {
-        super();
-        this.id = id;
-        this.subject = subject;
-        this.sha1Fp = Base64.decode(b64Sha1Fp);
-        this.cert = Base64.decode(b64Cert);
+    public CertprofileException() {
     }
 
-    int getId() {
-        return id;
+    public CertprofileException(
+            final String message) {
+        super(message);
     }
 
-    String getSubject() {
-        return subject;
+    public CertprofileException(
+            final Throwable cause) {
+        super(cause);
     }
 
-    boolean matchSha1Fp(
-            final byte[] anotherSha1Fp) {
-        return Arrays.equals(this.sha1Fp, anotherSha1Fp);
+    public CertprofileException(
+            final String message,
+            final Throwable cause) {
+        super(message, cause);
     }
 
-    boolean matchCert(
-            final byte[] encodedCert) {
-        return Arrays.equals(this.cert, encodedCert);
-    }
 }

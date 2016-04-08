@@ -41,17 +41,15 @@ import java.util.Map;
 
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.X509Cert;
-import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509CertWithDbId;
-import org.xipki.pki.ca.api.publisher.X509CertPublisher;
-import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.pki.ca.server.impl.publisher.OcspCertPublisher;
+import org.xipki.pki.ca.api.publisher.CertPublisherException;
+import org.xipki.pki.ca.api.publisher.x509.X509CertPublisher;
+import org.xipki.pki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 
 /**
@@ -67,28 +65,9 @@ class IdentifiedX509CertPublisher {
 
     IdentifiedX509CertPublisher(
             final PublisherEntry entry,
-            final String realType)
-    throws CertPublisherException {
+            final X509CertPublisher certPublisher) {
         this.entry = ParamUtil.requireNonNull("entry", entry);
-        final String type = (realType == null)
-                ? entry.getType()
-                : realType;
-
-        X509CertPublisher realPublisher;
-        if ("ocsp".equalsIgnoreCase(type)) {
-            realPublisher = new OcspCertPublisher();
-        } else if (StringUtil.startsWithIgnoreCase(type, "java:")) {
-            String className = type.substring("java:".length());
-            try {
-                Class<?> clazz = Class.forName(className);
-                realPublisher = (X509CertPublisher) clazz.newInstance();
-            } catch (Exception ex) {
-                throw new CertPublisherException("invalid type " + type + ", " + ex.getMessage());
-            }
-        } else {
-            throw new CertPublisherException("invalid type " + type);
-        }
-        this.certPublisher = realPublisher;
+        this.certPublisher = ParamUtil.requireNonNull("certPublisher", certPublisher);
     } // constructor
 
     public void initialize(

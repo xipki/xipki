@@ -34,43 +34,43 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.api.profile.x509;
+package org.xipki.pki.ca.api.publisher.x509;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ca.api.profile.CertprofileException;
+import org.xipki.pki.ca.api.publisher.CertPublisherException;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactoryRegister {
+public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFactoryRegister {
 
     private static final Logger LOG = LoggerFactory.getLogger(
-            X509CertprofileFactoryRegisterImpl.class);
+            X509CertPublisherFactoryRegisterImpl.class);
 
-    private ConcurrentLinkedDeque<X509CertprofileFactory> services =
-            new ConcurrentLinkedDeque<X509CertprofileFactory>();
+    private ConcurrentLinkedDeque<X509CertPublisherFactory> services =
+            new ConcurrentLinkedDeque<X509CertPublisherFactory>();
 
     @Override
-    public X509Certprofile newCertprofile(
+    public X509CertPublisher newPublisher(
             final String type,
             final long timeout)
-    throws CertprofileException {
+    throws CertPublisherException {
         ParamUtil.requireNonBlank("type", type);
         ParamUtil.requireMin("timeout", timeout, 0);
 
         long start = System.currentTimeMillis();
 
-        X509Certprofile certProfile = null;
+        X509CertPublisher publisher = null;
         while (true) {
-            for (X509CertprofileFactory service : services) {
-                if (service.canCreateProfile(type)) {
-                    certProfile = service.newCertprofile(type);
+            for (X509CertPublisherFactory service : services) {
+                if (service.canCreatePublisher(type)) {
+                    publisher = service.newPublisher(type);
                 }
             }
 
@@ -84,15 +84,15 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
             }
         }
 
-        if (certProfile == null) {
-            throw new CertprofileException("could not new Certprofile");
+        if (publisher == null) {
+            throw new CertPublisherException("could not new publisher");
         }
 
-        return certProfile;
+        return publisher;
     }
 
     public void bindService(
-            final X509CertprofileFactory service) {
+            final X509CertPublisherFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.debug("bindService invoked with null.");
@@ -105,11 +105,11 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
         String action = replaced
                 ? "replaced"
                 : "added";
-        LOG.debug("{} X509CertprofileFactory binding for {}", action, service);
+        LOG.debug("{} X509CertPublisherFactory binding for {}", action, service);
     }
 
     public void unbindService(
-            final X509CertprofileFactory service) {
+            final X509CertPublisherFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.debug("unbindService invoked with null.");
@@ -117,9 +117,9 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
         }
 
         if (services.remove(service)) {
-            LOG.debug("removed X509CertprofileFactory binding for {}", service);
+            LOG.debug("removed X509CertPublisherFactory binding for {}", service);
         } else {
-            LOG.debug("no X509CertprofileFactory binding found to remove for '{}'", service);
+            LOG.debug("no X509CertPublisherFactory binding found to remove for '{}'", service);
         }
     }
 

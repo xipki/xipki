@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.impl.publisher;
+package org.xipki.pki.ca.publisher.ocsp.internal;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -45,10 +45,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
@@ -66,7 +69,6 @@ import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.X509CertWithDbId;
-import org.xipki.pki.ca.server.impl.DbSchemaInfo;
 
 /**
  * @author Lijun Liao
@@ -110,10 +112,37 @@ class OcspStoreQueryExecutor {
         this.issuerStore = initIssuerStore();
         this.publishGoodCerts = publishGoodCerts;
 
-        DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
-        String str = dbSchemaInfo.getVariableValue("VERSION");
+        final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
+        Connection conn = datasource.getConnection();
+        if (conn == null) {
+            throw new DataAccessException("could not get connection");
+        }
+
+        Map<String, String> variables = new HashMap<>();
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = datasource.createStatement(conn);
+            if (stmt == null) {
+                throw new DataAccessException("could not create statement");
+            }
+
+            rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                String name = rs.getString("NAME");
+                String value = rs.getString("VALUE2");
+                variables.put(name, value);
+            }
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            datasource.releaseResources(stmt, rs);
+        }
+
+        String str = variables.get("VERSION");
         this.dbSchemaVersion = Integer.parseInt(str);
-        str = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
+        str = variables.get("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(str);
     } // constructor
 

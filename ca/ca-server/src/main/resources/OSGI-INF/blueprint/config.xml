@@ -8,7 +8,8 @@
     <cm:default-properties>
       <cm:property name="urlPatterns" value="/cmp/*"/>
       <cm:property name="caConfFile" value="xipki/ca-config/ca.properties"/>
-      <cm:property name="certprofileTimeout" value="60000"/>
+      <cm:property name="certProfileTimeout" value="60000"/>
+      <cm:property name="certPublisherTimeout" value="60000"/>
       <cm:property name="healthUrlPatterns" value="/health/*"/>
     </cm:default-properties>
   </cm:property-placeholder>
@@ -16,16 +17,20 @@
   <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <reference id="auditServiceRegister"
       interface="org.xipki.commons.audit.api.AuditServiceRegister"/>
-  <reference id="x509CertprofileFactoryRegister"
+  <reference id="x509CertProfileFactoryRegister"
       interface="org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegister"/>
+  <reference id="x509CertPublisherFactoryRegister"
+      interface="org.xipki.pki.ca.api.publisher.x509.X509CertPublisherFactoryRegister"/>
   <bean id="caManager" class="org.xipki.pki.ca.server.impl.CaManagerImpl"
       init-method="startCaSystem" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>
-    <property name="certprofileTimeout" value="${certprofileTimeout}"/>
+    <property name="certProfileTimeout" value="${certProfileTimeout}"/>
+    <property name="certPublisherTimeout" value="${certPublisherTimeout}"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
-    <property name="x509CertprofileFactoryRegister" ref="x509CertprofileFactoryRegister"/>
+    <property name="x509CertProfileFactoryRegister" ref="x509CertProfileFactoryRegister"/>
+    <property name="x509CertPublisherFactoryRegister" ref="x509CertPublisherFactoryRegister"/>
   </bean>
   <service ref="caManager" interface="org.xipki.pki.ca.server.mgmt.api.CaManager"/>
   <!-- CMP servlet -->

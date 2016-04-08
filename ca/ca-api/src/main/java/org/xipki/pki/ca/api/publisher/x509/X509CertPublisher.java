@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.api.publisher;
+package org.xipki.pki.ca.api.publisher.x509;
 
 import java.security.cert.X509CRL;
 import java.util.Map;
@@ -47,9 +47,9 @@ import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.X509Cert;
-import org.xipki.pki.ca.api.CertPublisherException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509CertWithDbId;
+import org.xipki.pki.ca.api.publisher.CertPublisherException;
 
 /**
  * @author Lijun Liao

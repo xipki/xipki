@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.api.publisher;
+package org.xipki.pki.ca.api.publisher.x509;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;

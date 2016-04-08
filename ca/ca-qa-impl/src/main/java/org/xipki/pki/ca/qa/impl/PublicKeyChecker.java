@@ -59,7 +59,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
-import org.xipki.pki.ca.api.CertprofileException;
+import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.KeyParametersOption;
 import org.xipki.pki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
 import org.xipki.pki.ca.api.profile.KeyParametersOption.DSAParametersOption;
