@@ -222,10 +222,6 @@ xipki-ca:caprofile-add \
 
 xipki-ca:caprofile-add \
   --ca SubCAwithCRL1 \
-  --profile DEMO
-
-xipki-ca:caprofile-add \
-  --ca SubCAwithCRL1 \
   --profile SCEP
 
 xipki-ca:caprofile-add \

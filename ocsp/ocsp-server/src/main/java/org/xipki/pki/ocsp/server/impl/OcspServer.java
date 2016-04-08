@@ -250,7 +250,7 @@ public class OcspServer {
         this.confFile = confFile;
     }
 
-    public ResponderAndRelativeUri getResponderAndRelativeUri(
+    ResponderAndRelativeUri getResponderAndRelativeUri(
             final HttpServletRequest request)
     throws UnsupportedEncodingException {
         ParamUtil.requireNonNull("request", request);

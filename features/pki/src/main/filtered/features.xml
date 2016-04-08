@@ -4,12 +4,6 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
   <repository>mvn:org.xipki.features/org.apache.karaf.features.standard/${project.version}/xml/features</repository>
-  <!-- Add the custom bundles for certprofiles here -->
-  <feature name="xipki-certprofiles" version="${project.version}">
-    <feature>xipki-ca-api</feature>
-    <bundle>mvn:org.xipki.pki/certprofile-demo/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/ca-certprofile/${project.version}</bundle>
-  </feature>
   <!-- Add the custom bundles for cert publishers here -->
   <feature name="xipki-publishers" version="${project.version}">
     <feature>xipki-ca-api</feature>
@@ -74,7 +68,6 @@
   <feature name="xipki-caserver" version="${project.version}">
     <feature>xipki-datasource</feature>
     <feature>xipki-cabase</feature>
-    <feature>xipki-certprofiles</feature>
     <feature>xipki-publishers</feature>
     <bundle>mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/scep-common/${project.version}</bundle>
@@ -101,7 +94,6 @@
   </feature>
   <feature name="xipki-caqa-shell" version="${project.version}">
     <feature>xipki-caclient-shell</feature>
-    <feature>xipki-certprofiles</feature>
     <bundle>mvn:org.xipki.pki/ca-qa-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-qa-impl/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-qa-shell/${project.version}</bundle>

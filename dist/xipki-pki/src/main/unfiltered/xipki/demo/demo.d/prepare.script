@@ -2,10 +2,6 @@
 #                       PREPARE ENVIRONMENET                    #
 #################################################################
 
-xipki-ca:env-add \
-  --name certprofileType.map \
-  --value "DemoEE1=java:org.xipki.pki.ca.demo.certprofile.x509.DemoEe1X509Certprofile,DemoEE2=java:org.xipki.pki.ca.demo.certprofile.x509.DemoEe2X509Certprofile"
-
 ## CMP control: messageTimeBias is set to 300 seconds.
 xipki-ca:cmpcontrol-add \
   --name cmpcontrol1 \
@@ -76,10 +72,6 @@ xipki-ca:profile-add \
   --name MaxTime \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_MaxTime.xml
-
-xipki-ca:profile-add \
-  --name DEMO \
-  --type DemoEE1
 
 ## Publishers
 xipki-ca:publisher-add \

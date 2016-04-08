@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+  <bean id="register"
+       class="org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegisterImpl"/>
+  <reference-list id="factories"
+       interface="org.xipki.pki.ca.api.profile.x509.X509CertprofileFactory"
+       availability="optional">
+    <reference-listener ref="register" bind-method="bindService" unbind-method="unbindService"/>
+  </reference-list>
+  <service ref="register"
+       interface="org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegister"/>
+</blueprint>

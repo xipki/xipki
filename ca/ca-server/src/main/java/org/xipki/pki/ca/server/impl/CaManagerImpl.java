@@ -108,6 +108,8 @@ import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.X509CertWithDbId;
+import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
+import org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegister;
 import org.xipki.pki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.pki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
@@ -309,6 +311,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private String caConfFile;
 
+    private long certprofileTimeout = 60000; // one minute
+
     private boolean caSystemSetuped;
 
     private boolean responderInitialized;
@@ -334,6 +338,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     private Date lastStartTime;
 
     private AuditServiceRegister auditServiceRegister;
+
+    private X509CertprofileFactoryRegister x509CertprofileFactoryRegister;
 
     private DataSourceWrapper datasource;
 
@@ -409,6 +415,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
         if (datasourceFactory == null) {
             throw new IllegalStateException("datasourceFactory is not set");
+        }
+        if (x509CertprofileFactoryRegister == null) {
+            throw new IllegalStateException("x509CertprofileFactoryRegister is not set");
         }
         if (caConfFile == null) {
             throw new IllegalStateException("caConfFile is not set");
@@ -2051,6 +2060,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         this.caConfFile = caConfFile;
     }
 
+    public void setCertprofileTimeout(
+            final long certprofileTimeout) {
+        this.certprofileTimeout = ParamUtil.requireMin("certprofileTimeout", certprofileTimeout, 0);
+    }
+
     @Override
     public boolean addCaAlias(
             final String aliasName,
@@ -2303,6 +2317,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         return true;
     } // method unrevokeCa
 
+    public void setX509CertprofileFactoryRegister(
+            final X509CertprofileFactoryRegister x509CertprofileFactoryRegister) {
+        this.x509CertprofileFactoryRegister = x509CertprofileFactoryRegister;
+    }
+
     public void setAuditServiceRegister(
             final AuditServiceRegister serviceRegister) {
         this.auditServiceRegister = serviceRegister;
@@ -2316,7 +2335,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             X509Ca ca = x509cas.get(name);
             ca.setAuditServiceRegister(serviceRegister);
         }
-    } // method setAuditServiceRegister
+    }
 
     private void auditLogPciEvent(
             final boolean successful,
@@ -2714,8 +2733,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             final CertprofileEntry dbEntry) {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         try {
-            String realType = getRealCertprofileType(dbEntry.getType());
-            IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(dbEntry, realType);
+            X509Certprofile profile = x509CertprofileFactoryRegister.newCertprofile(
+                    dbEntry.getType(), dbEntry.getConf(), certprofileTimeout);
+            IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(dbEntry, profile);
             ret.setEnvParameterResolver(envParameterResolver);
             ret.validate();
             return ret;
@@ -2748,12 +2768,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return null;
         }
     } // method createPublisher
-
-    private String getRealCertprofileType(
-            final String certprofileType) {
-        return getRealType(envParameterResolver.getParameterValue("certprofileType.map"),
-                certprofileType);
-    }
 
     private String getRealPublisherType(
             final String publisherType) {

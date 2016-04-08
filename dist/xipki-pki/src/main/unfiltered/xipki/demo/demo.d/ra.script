@@ -167,23 +167,6 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/SubCAwithCRL1.der \
   --ca-cert output/RCA1.der
 
-# Certificate DEMO1
-
-xipki-cli:enroll-p12 \
-  --p12 output/DEMO1.p12 \
-  --password 1234 \
-  --out output/DEMO1.der \
-  --profile DEMO \
-  --subject "O=no-cn-xipki,C=DE" \
-  --user USER-O
-
-xipki-tk:update-cert-p12 \
-  --p12 output/DEMO1.p12 \
-  --password 1234 \
-  --cert output/DEMO1.der \
-  --ca-cert output/SubCAwithCRL1.der \
-  --ca-cert output/RCA1.der
-
 # Certificate EE.Complex1
 
 xipki-tk:req-p12-complex \

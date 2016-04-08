@@ -82,7 +82,6 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.ExtensionExistence;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.ObjectIdentifiers;
@@ -104,7 +103,6 @@ import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
 import org.xipki.pki.ca.api.profile.x509.SubjectInfo;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
-import org.xipki.pki.ca.certprofile.XmlX509Certprofile;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 
@@ -168,55 +166,11 @@ class IdentifiedX509Certprofile {
 
     IdentifiedX509Certprofile(
             final CertprofileEntry dbEntry,
-            final String realType)
+            final X509Certprofile certProfile)
     throws CertprofileException {
         this.dbEntry = ParamUtil.requireNonNull("entry", dbEntry);
         this.name = dbEntry.getName();
-        X509Certprofile tmpCertprofile = null;
-
-        final String type = (realType == null)
-                ? dbEntry.getType()
-                : realType;
-        String className;
-        if ("xml".equalsIgnoreCase(type)) {
-            tmpCertprofile = new XmlX509Certprofile();
-        } else if (StringUtil.startsWithIgnoreCase(type, "java:")) {
-            className = type.substring("java:".length());
-            try {
-                Class<?> clazz = Class.forName(className);
-                tmpCertprofile = (X509Certprofile) clazz.newInstance();
-            } catch (ClassNotFoundException | InstantiationException
-                    | IllegalAccessException | ClassCastException ex) {
-                throw new CertprofileException("invalid type " + type + ", "
-                        + ex.getClass().getName() + ": " + ex.getMessage());
-            }
-        } else {
-            throw new CertprofileException("invalid type " + type);
-        }
-
-        tmpCertprofile.initialize(dbEntry.getConf());
-
-        if (tmpCertprofile.getSpecialCertprofileBehavior()
-                == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
-            String paramName = SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME;
-            String str = tmpCertprofile.getParameter(paramName);
-            if (str == null) {
-                throw new CertprofileException("parameter " + paramName + " is not defined");
-            }
-
-            str = str.trim();
-            int idx;
-            try {
-                idx = Integer.parseInt(str);
-            } catch (NumberFormatException ex) {
-                throw new CertprofileException("invalid " + paramName + ": " + str);
-            }
-            if (idx < 1) {
-                throw new CertprofileException("invalid " + paramName + ": " + str);
-            }
-        }
-
-        this.certprofile = tmpCertprofile;
+        this.certprofile = ParamUtil.requireNonNull("certProfile", certProfile);
     } // constructor
 
     public String getName() {
