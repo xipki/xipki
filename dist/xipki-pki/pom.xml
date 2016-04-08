@@ -239,6 +239,11 @@
                   <artifactId>ca-certprofile-xml</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.pki</groupId>
+                  <artifactId>ca-publisher-ocsp</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>

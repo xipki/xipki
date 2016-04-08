@@ -34,34 +34,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.api;
+package org.xipki.pki.ca.publisher.ocsp.internal;
+
+import org.xipki.pki.ca.api.publisher.CertPublisherException;
+import org.xipki.pki.ca.api.publisher.x509.X509CertPublisher;
+import org.xipki.pki.ca.api.publisher.x509.X509CertPublisherFactory;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CertprofileException extends Exception {
+public class X509CertPublisherFactoryImpl implements X509CertPublisherFactory {
 
-    private static final long serialVersionUID = 1L;
-
-    public CertprofileException() {
+    @Override
+    public boolean canCreatePublisher(
+            final String type) {
+        return "OCSP".equalsIgnoreCase(type);
     }
 
-    public CertprofileException(
-            final String message) {
-        super(message);
-    }
-
-    public CertprofileException(
-            final Throwable cause) {
-        super(cause);
-    }
-
-    public CertprofileException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
+    @Override
+    public X509CertPublisher newPublisher(
+            final String type)
+    throws CertPublisherException {
+        if ("OCSP".equalsIgnoreCase(type)) {
+            return new OcspCertPublisher();
+        } else {
+            throw new CertPublisherException("unknown cert publisher type '" + type + "'");
+        }
     }
 
 }

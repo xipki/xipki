@@ -88,9 +88,9 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.BadFormatException;
-import org.xipki.pki.ca.api.CertprofileException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.profile.CertValidity;
+import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.ExtensionControl;
 import org.xipki.pki.ca.api.profile.ExtensionValue;
 import org.xipki.pki.ca.api.profile.ExtensionValues;
@@ -171,6 +171,28 @@ class IdentifiedX509Certprofile {
         this.dbEntry = ParamUtil.requireNonNull("entry", dbEntry);
         this.name = dbEntry.getName();
         this.certprofile = ParamUtil.requireNonNull("certProfile", certProfile);
+
+        this.certprofile.initialize(dbEntry.getConf());
+        if (certProfile.getSpecialCertprofileBehavior()
+                == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
+            String paramName = SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME;
+            String str = certProfile.getParameter(paramName);
+            if (str == null) {
+                throw new CertprofileException("parameter " + paramName + " is not defined");
+            }
+
+            str = str.trim();
+            int idx;
+            try {
+                idx = Integer.parseInt(str);
+            } catch (NumberFormatException ex) {
+                throw new CertprofileException("invalid " + paramName + ": " + str);
+            }
+            if (idx < 1) {
+                throw new CertprofileException("invalid " + paramName + ": " + str);
+            }
+        }
+
     } // constructor
 
     public String getName() {

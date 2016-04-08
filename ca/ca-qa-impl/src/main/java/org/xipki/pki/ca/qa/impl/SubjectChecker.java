@@ -64,7 +64,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
-import org.xipki.pki.ca.api.CertprofileException;
+import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.RdnControl;
 import org.xipki.pki.ca.api.profile.StringType;

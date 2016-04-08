@@ -34,24 +34,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.api.profile.x509;
-
-import javax.annotation.Nonnull;
-
-import org.xipki.pki.ca.api.profile.CertprofileException;
+package org.xipki.pki.ca.api.publisher;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface X509CertprofileFactory {
+public class CertPublisherException extends Exception {
 
-    boolean canCreateProfile(
-            @Nonnull String type);
+    private static final long serialVersionUID = 1L;
 
-    X509Certprofile newCertprofile(
-            @Nonnull String type)
-    throws CertprofileException;
+    public CertPublisherException() {
+    }
+
+    public CertPublisherException(
+            final String message) {
+        super(message);
+    }
+
+    public CertPublisherException(
+            final Throwable cause) {
+        super(cause);
+    }
+
+    public CertPublisherException(
+            final String message,
+            final Throwable cause) {
+        super(message, cause);
+    }
 
 }

@@ -60,7 +60,7 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.common.util.XmlUtil;
-import org.xipki.pki.ca.api.CertprofileException;
+import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.qa.api.QaSystemManager;
 import org.xipki.pki.ca.qa.api.X509CertprofileQa;
 import org.xipki.pki.ca.qa.api.X509IssuerInfo;

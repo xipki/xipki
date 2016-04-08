@@ -36,7 +36,7 @@
 
 package org.xipki.pki.ca.certprofile.internal;
 
-import org.xipki.pki.ca.api.CertprofileException;
+import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.pki.ca.api.profile.x509.X509CertprofileFactory;
 
@@ -50,14 +50,14 @@ public class X509CertprofileFactoryImpl implements X509CertprofileFactory {
     @Override
     public boolean canCreateProfile(
             final String type) {
-        return "XML".equals(type);
+        return "XML".equalsIgnoreCase(type);
     }
 
     @Override
     public X509Certprofile newCertprofile(
             final String type)
     throws CertprofileException {
-        if ("XML".equals(type)) {
+        if ("XML".equalsIgnoreCase(type)) {
             return new XmlX509Certprofile();
         } else {
             throw new CertprofileException("unknown certprofile type '" + type + "'");

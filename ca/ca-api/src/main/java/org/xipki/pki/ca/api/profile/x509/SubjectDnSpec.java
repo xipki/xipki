@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.pki.ca.api.CertprofileException;
+import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.RdnControl;
 import org.xipki.pki.ca.api.profile.StringType;

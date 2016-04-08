@@ -81,7 +81,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ca.api.CertprofileException;
+import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.DirectoryStringType;
 import org.xipki.pki.ca.api.profile.ExtensionControl;
 import org.xipki.pki.ca.api.profile.ExtensionValue;

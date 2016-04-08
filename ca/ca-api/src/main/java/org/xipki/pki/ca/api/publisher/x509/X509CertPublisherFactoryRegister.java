@@ -34,34 +34,30 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.api;
+package org.xipki.pki.ca.api.publisher.x509;
+
+import javax.annotation.Nonnull;
+
+import org.xipki.pki.ca.api.profile.CertprofileException;
+import org.xipki.pki.ca.api.publisher.CertPublisherException;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CertPublisherException extends Exception {
+public interface X509CertPublisherFactoryRegister {
 
-    private static final long serialVersionUID = 1L;
-
-    public CertPublisherException() {
-    }
-
-    public CertPublisherException(
-            final String message) {
-        super(message);
-    }
-
-    public CertPublisherException(
-            final Throwable cause) {
-        super(cause);
-    }
-
-    public CertPublisherException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
-    }
+    /**
+     *
+     * @param type type of the publisher
+     * @param timeout timeout in milliseconds, 0 for forever
+     * @return new publisher.
+     * @throws CertprofileException if publisher could not be created.
+     */
+    X509CertPublisher newPublisher(
+            @Nonnull final String type,
+            final long timeout)
+    throws CertPublisherException;
 
 }
