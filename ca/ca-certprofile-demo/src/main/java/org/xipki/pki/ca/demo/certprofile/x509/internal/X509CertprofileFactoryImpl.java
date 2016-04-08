@@ -34,4 +34,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.certprofile;
+package org.xipki.pki.ca.demo.certprofile.x509.internal;
+
+import org.xipki.pki.ca.api.CertprofileException;
+import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
+import org.xipki.pki.ca.api.profile.x509.X509CertprofileFactory;
+
+/**
+ * @author Lijun Liao
+ * @since 2.0.0
+ */
+
+public class X509CertprofileFactoryImpl implements X509CertprofileFactory {
+
+    @Override
+    public boolean canCreateProfile(
+            final String type) {
+        return "DemoEE1".equalsIgnoreCase(type) || "DemoEE2".equalsIgnoreCase(type);
+    }
+
+    @Override
+    public X509Certprofile newCertprofile(
+            final String type)
+    throws CertprofileException {
+        if ("DemoEE1".equalsIgnoreCase(type)) {
+            return new DemoEe1X509Certprofile();
+        } else if ("DemoEE2".equalsIgnoreCase(type)) {
+            return new DemoEe2X509Certprofile();
+        } else {
+            throw new CertprofileException("unknown certprofile type '" + type + "'");
+        }
+    }
+
+}
