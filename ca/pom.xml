@@ -18,6 +18,7 @@
     <module>ca-client-impl</module>
     <module>ca-client-shell</module>
     <module>ca-certprofile-xml</module>
+    <module>ca-publisher-ocsp</module>
     <module>ca-qa-api</module>
     <module>ca-qa-impl</module>
     <module>ca-qa-shell</module>

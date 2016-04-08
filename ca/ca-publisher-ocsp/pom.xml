@@ -8,27 +8,14 @@
     <groupId>org.xipki.pki</groupId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>ca-qa-impl</artifactId>
+  <artifactId>ca-publisher-ocsp</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ca-qa-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>ca-certprofile-xml</artifactId>
+      <artifactId>ca-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.jvnet.jaxb2.maven2</groupId>
-        <artifactId>maven-jaxb2-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>
