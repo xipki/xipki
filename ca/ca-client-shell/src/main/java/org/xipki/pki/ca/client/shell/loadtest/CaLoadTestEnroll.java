@@ -56,9 +56,9 @@ import org.xipki.pki.ca.client.api.CaClientException;
 import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
 import org.xipki.pki.ca.client.api.PkiErrorException;
-import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequest.Type;
+import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntry;
 
 /**
  * @author Lijun Liao

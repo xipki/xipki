@@ -45,7 +45,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
@@ -80,7 +79,7 @@ public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
     @Option(name = "--module",
             description = "name of the PKCS#11 module")
     @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    private String moduleName = DEFAULT_P11MODULE_NAME;
 
     @Override
     protected ConcurrentContentSigner getSigner(

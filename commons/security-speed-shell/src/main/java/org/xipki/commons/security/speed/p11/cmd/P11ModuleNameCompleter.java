@@ -37,14 +37,13 @@
 package org.xipki.commons.security.speed.p11.cmd;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
-import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 
 /**
  * @author Lijun Liao
@@ -53,20 +52,16 @@ import org.xipki.commons.security.api.SecurityFactory;
 @Service
 public class P11ModuleNameCompleter extends AbstractDynamicEnumCompleter {
 
-    @Reference
-    private SecurityFactory securityFactory;
+    @Reference (optional = true)
+    private P11CryptServiceFactory p11CryptServiceFactory;
 
     @Override
     protected Set<String> getEnums() {
-        Set<String> names = securityFactory.getP11ModuleNames();
+        Set<String> names = p11CryptServiceFactory.getModuleNames();
         if (CollectionUtil.isEmpty(names)) {
             return Collections.emptySet();
         }
-        Set<String> ret = new HashSet<>(names);
-        if (!ret.contains(SecurityFactory.DEFAULT_P11MODULE_NAME)) {
-            ret.add(SecurityFactory.DEFAULT_P11MODULE_NAME);
-        }
-        return ret;
+        return names;
     }
 
 }

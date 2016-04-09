@@ -45,8 +45,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
+import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.pki.ca.client.shell.completer.P11ModuleNameCompleter;
 
@@ -79,7 +79,7 @@ public class P11EnrollCertCmd extends EnrollCertCommandSupport {
     @Option(name = "--module",
             description = "name of the PKCS#11 module")
     @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    private String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
     protected ConcurrentContentSigner getSigner(

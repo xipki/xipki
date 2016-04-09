@@ -36,6 +36,8 @@
 
 package org.xipki.commons.security.api.p11;
 
+import java.util.Set;
+
 import javax.annotation.Nonnull;
 
 import org.xipki.commons.security.api.SecurityException;
@@ -47,12 +49,13 @@ import org.xipki.commons.security.api.SecurityException;
 
 public interface P11CryptServiceFactory {
 
-    void init(
-            @Nonnull P11Conf p11Conf);
+    String DEFAULT_P11MODULE_NAME = "default";
 
     P11CryptService getP11CryptService(
             @Nonnull String moduleName)
     throws P11TokenException, SecurityException;
+
+    Set<String> getModuleNames();
 
     void shutdown();
 

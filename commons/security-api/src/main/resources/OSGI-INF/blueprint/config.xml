@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+
+  <bean id="signerFactoryRegister"
+       class="org.xipki.commons.security.api.SignerFactoryRegisterImpl"/>
+  <service ref="signerFactoryRegister"
+       interface="org.xipki.commons.security.api.SignerFactoryRegister"/>
+  <reference-list id="signerFactories"
+       interface="org.xipki.commons.security.api.SignerFactory"
+       availability="optional">
+    <reference-listener ref="signerFactoryRegister" bind-method="bindService" 
+         unbind-method="unbindService"/>
+  </reference-list>
+
+</blueprint>

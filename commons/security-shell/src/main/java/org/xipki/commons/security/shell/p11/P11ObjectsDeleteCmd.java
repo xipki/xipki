@@ -40,7 +40,6 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
@@ -68,7 +67,7 @@ public class P11ObjectsDeleteCmd extends SecurityCommandSupport {
     @Option(name = "--module",
             description = "name of the PKCS#11 module")
     @Completion(P11ModuleNameCompleter.class)
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    protected String moduleName = DEFAULT_P11MODULE_NAME;
 
     @Override
     protected Object doExecute()
