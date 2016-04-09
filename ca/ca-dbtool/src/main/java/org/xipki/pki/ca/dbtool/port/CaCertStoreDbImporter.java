@@ -691,7 +691,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     numProcessed += numEntriesInBatch;
                     numEntriesInBatch = 0;
                     processLog.printStatus();
-
                 }
             }
             return numProcessed;
