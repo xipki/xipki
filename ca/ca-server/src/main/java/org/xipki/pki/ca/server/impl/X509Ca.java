@@ -58,7 +58,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
@@ -2107,24 +2106,24 @@ public class X509Ca {
     }
 
     public IdentifiedX509Certprofile getX509Certprofile(
-            final String certprofileLocalName) {
-        if (certprofileLocalName == null) {
+            final String certprofileName) {
+        if (certprofileName == null) {
             return null;
         }
 
-        Map<String, String> profileNames = caManager.getCertprofilesForCa(caInfo.getName());
-        if (profileNames == null || !profileNames.containsKey(certprofileLocalName)) {
+        Set<String> profileNames = caManager.getCertprofilesForCa(caInfo.getName());
+        if (profileNames == null || !profileNames.contains(certprofileName)) {
             return null;
         }
 
-        return caManager.getIdentifiedCertprofile(profileNames.get(certprofileLocalName));
+        return caManager.getIdentifiedCertprofile(certprofileName);
     } // method getX509Certprofile
 
     public boolean supportsCertProfile(
             final String certprofileLocalName) {
         ParamUtil.requireNonNull("certprofileLocalName", certprofileLocalName);
-        Map<String, String> profileNames = caManager.getCertprofilesForCa(caInfo.getName());
-        return profileNames.containsKey(certprofileLocalName);
+        Set<String> profileNames = caManager.getCertprofilesForCa(caInfo.getName());
+        return profileNames.contains(certprofileLocalName);
     }
 
     public CmpRequestorInfo getRequestor(

@@ -646,7 +646,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println("exporting table CA_HAS_PROFILE");
         CaHasProfiles caHasProfiles = new CaHasProfiles();
         StringBuilder sqlBuilder = new StringBuilder(100);
-        sqlBuilder.append("SELECT CA_NAME, PROFILE_NAME, PROFILE_LOCALNAME FROM CA_HAS_PROFILE");
+        sqlBuilder.append("SELECT CA_NAME, PROFILE_NAME FROM CA_HAS_PROFILE");
         final String sql = sqlBuilder.toString();
 
         Statement stmt = null;
@@ -658,12 +658,10 @@ class CaConfigurationDbExporter extends DbPorter {
             while (rs.next()) {
                 String caName = rs.getString("CA_NAME");
                 String profileName = rs.getString("PROFILE_NAME");
-                String profileLocalname = rs.getString("PROFILE_LOCALNAME");
 
                 CaHasProfileType caHasProfile = new CaHasProfileType();
                 caHasProfile.setCaName(caName);
                 caHasProfile.setProfileName(profileName);
-                caHasProfile.setProfileLocalname(profileLocalname);
 
                 caHasProfiles.getCaHasProfile().add(caHasProfile);
             }

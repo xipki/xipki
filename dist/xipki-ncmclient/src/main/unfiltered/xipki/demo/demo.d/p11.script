@@ -99,7 +99,7 @@ xipki-ca:ca-add --name SubCA1.complex-Name \
 xipki-ca:caalias-add --ca SubCA1.complex-Name --alias SubCA
 
 ## Add cert profile to CA
-xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLS_g --local-name TLS
+xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLS
 
 xipki-ca:caprofile-add --ca SubCA1.complex-Name --profile TLS_C
 

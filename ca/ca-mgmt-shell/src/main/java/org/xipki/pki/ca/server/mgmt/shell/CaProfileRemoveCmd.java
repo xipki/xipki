@@ -59,17 +59,17 @@ public class CaProfileRemoveCmd extends CaCommandSupport {
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--profile-local",
-            required = true, description = "certificate profile local name\n"
+    @Option(name = "--profile",
+            required = true, description = "certificate profile name\n"
                     + "(required)")
-    private String profileLocalname;
+    private String profileName;
 
     @Override
     protected Object doExecute()
     throws Exception {
-        boolean bo = caManager.removeCertprofileFromCa(profileLocalname, caName);
+        boolean bo = caManager.removeCertprofileFromCa(profileName, caName);
         output(bo, "removed", "could not remove",
-                "certificate with localname " + profileLocalname + " from CA " + caName);
+                "certificate profile " + profileName + " from CA " + caName);
         return null;
     }
 

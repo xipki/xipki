@@ -47,7 +47,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -307,11 +306,10 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     @Override
     public boolean addCertprofileToCa(
             final String profileName,
-            final String profileLocalname,
             final String caName)
     throws HessianCaMgmtException {
         try {
-            return caManager.addCertprofileToCa(profileName, profileLocalname, caName);
+            return caManager.addCertprofileToCa(profileName, caName);
         } catch (CaMgmtException ex) {
             throw new HessianCaMgmtException(ex.getMessage());
         }
@@ -342,7 +340,7 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     }
 
     @Override
-    public Map<String, String> getCertprofilesForCa(
+    public Set<String> getCertprofilesForCa(
             final String caName) {
         return caManager.getCertprofilesForCa(caName);
     }

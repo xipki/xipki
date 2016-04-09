@@ -159,8 +159,7 @@ xipki-ca:caprofile-add \
 
 xipki-ca:caprofile-add \
   --ca SubCA1.complex-Name \
-  --profile TLS_g \
-  --local-name TLS
+  --profile TLS
 
 xipki-ca:caprofile-add \
   --ca SubCA1.complex-Name \
