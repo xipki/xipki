@@ -103,9 +103,9 @@ public class P11Conf {
                 confs.put(conf.getName(), conf);
             } // end for (ModuleType moduleType
 
-            if (!confs.containsKey(SecurityFactory.DEFAULT_P11MODULE_NAME)) {
-                throw new InvalidConfException("module '" + SecurityFactory.DEFAULT_P11MODULE_NAME
-                        + "' is not defined");
+            if (!confs.containsKey(P11CryptServiceFactory.DEFAULT_P11MODULE_NAME)) {
+                throw new InvalidConfException("module '"
+                        + P11CryptServiceFactory.DEFAULT_P11MODULE_NAME + "' is not defined");
             }
             this.moduleConfs = Collections.unmodifiableMap(confs);
             this.moduleNames = Collections.unmodifiableSet(new HashSet<>(confs.keySet()));

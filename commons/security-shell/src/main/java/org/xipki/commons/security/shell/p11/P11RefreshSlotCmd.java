@@ -41,7 +41,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
@@ -59,12 +58,12 @@ public class P11RefreshSlotCmd extends SecurityCommandSupport {
     @Option(name = "--module",
             description = "name of the PKCS#11 module.")
     @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    private String moduleName = DEFAULT_P11MODULE_NAME;
 
     @Override
     protected Object doExecute()
     throws Exception {
-        P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
+        P11CryptService p11Service = p11CryppServiceFactory.getP11CryptService(moduleName);
         if (p11Service == null) {
             throw new IllegalCmdParamException("undefined module " + moduleName);
         }

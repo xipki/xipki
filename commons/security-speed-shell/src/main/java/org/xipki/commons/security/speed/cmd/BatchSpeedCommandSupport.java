@@ -44,6 +44,7 @@ import java.util.List;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.xipki.commons.common.LoadExecutor;
+import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 
 /**
  * @author Lijun Liao
@@ -51,6 +52,9 @@ import org.xipki.commons.common.LoadExecutor;
  */
 
 public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
+
+    protected static final String DEFAULT_P11MODULE_NAME =
+            P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     @Option(name = "--duration",
             description = "duration in seconds for each test case")

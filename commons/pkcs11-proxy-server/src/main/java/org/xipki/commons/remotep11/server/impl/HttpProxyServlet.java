@@ -56,7 +56,7 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.pkcs11proxy.common.ServerCaps;
 import org.xipki.commons.security.api.BadAsn1ObjectException;
-import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
@@ -226,7 +226,7 @@ public class HttpProxyServlet extends HttpServlet {
             if (!servletPath.endsWith("/")) {
                 servletPath += "/";
                 if (servletPath.startsWith(constructedPath)) {
-                    moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+                    moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
                 }
             }
 
