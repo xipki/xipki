@@ -21,12 +21,12 @@
         generateElementProperty="true"
     </jxb:globalBindings-->
 
-    <jxb:bindings schemaLocation="../resources/xsd/dbtool-ocsp.xsd" node="/xsd:schema">
+    <jxb:bindings schemaLocation="../resources/xsd/dbi-ocsp.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
             <jxb:package name="org.xipki.pki.ca.dbtool.jaxb.ocsp"/>
         </jxb:schemaBindings>
     </jxb:bindings>
-    <jxb:bindings schemaLocation="../resources/xsd/dbtool-ca.xsd" node="/xsd:schema">
+    <jxb:bindings schemaLocation="../resources/xsd/dbi-ca.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
             <jxb:package name="org.xipki.pki.ca.dbtool.jaxb.ca"/>
         </jxb:schemaBindings>
