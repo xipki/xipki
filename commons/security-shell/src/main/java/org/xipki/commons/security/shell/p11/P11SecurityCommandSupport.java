@@ -41,7 +41,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11TokenException;
@@ -74,7 +73,7 @@ public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
     @Option(name = "--module",
             description = "name of the PKCS#11 module")
     @Completion(P11ModuleNameCompleter.class)
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    protected String moduleName = DEFAULT_P11MODULE_NAME;
 
     public P11ObjectIdentifier getObjectIdentifier()
     throws IllegalCmdParamException, SecurityException, P11TokenException {

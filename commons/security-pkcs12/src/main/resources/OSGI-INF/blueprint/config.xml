@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+  <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
+
+  <bean id="factory" class="org.xipki.commons.security.pkcs12.internal.SignerFactoryImpl">
+      <property name="securityFactory" ref="securityFactory"/>
+  </bean>
+  <service ref="factory" interface="org.xipki.commons.security.api.SignerFactory"/>
+  
+</blueprint>

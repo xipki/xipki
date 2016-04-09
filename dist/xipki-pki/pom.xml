@@ -147,7 +147,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-certprofile</artifactId>
+                  <artifactId>ca-certprofile-xml</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
@@ -221,28 +221,6 @@
                   <groupId>org.hsqldb</groupId>
                   <artifactId>hsqldb</artifactId>
                   <version>${hsqldb.version}</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-to-deploy</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${output.directory}/deploy</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-certprofile-xml</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-publisher-ocsp</artifactId>
-                  <version>${project.version}</version>
                 </artifactItem>
               </artifactItems>
             </configuration>

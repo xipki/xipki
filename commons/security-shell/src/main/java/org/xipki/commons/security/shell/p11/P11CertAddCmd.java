@@ -43,7 +43,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.util.X509Util;
@@ -76,7 +75,7 @@ public class P11CertAddCmd extends SecurityCommandSupport {
     @Option(name = "--module",
             description = "name of the PKCS#11 module.")
     @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    private String moduleName = DEFAULT_P11MODULE_NAME;
 
     @Override
     protected Object doExecute()

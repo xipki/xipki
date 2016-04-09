@@ -41,7 +41,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11TokenException;
@@ -70,7 +69,7 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
     @Option(name = "--module",
             description = "Name of the PKCS#11 module.")
     @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    private String moduleName = DEFAULT_P11MODULE_NAME;
 
     protected void finalize(
             final String keyType,

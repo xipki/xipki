@@ -24,6 +24,8 @@
     <module>password-impl</module>
     <module>security-api</module>
     <module>security-impl</module>
+    <module>security-pkcs11</module>
+    <module>security-pkcs12</module>
     <module>security-shell</module>
     <module>security-speed-shell</module>
     <module>pkcs11-proxy-common</module>
