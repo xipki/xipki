@@ -104,7 +104,7 @@ public abstract class DbiXmlReader {
         }
 
         DbDataObject ret = next;
-        next = null;
+        next = retrieveNext();
 
         return ret;
     }
