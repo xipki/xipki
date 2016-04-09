@@ -41,7 +41,6 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -147,13 +146,12 @@ public interface HessianCaManager {
     throws HessianCaMgmtException;
 
     boolean removeCertprofileFromCa(
-            @Nonnull String profileLocalname,
+            @Nonnull String profilename,
             @Nonnull String caName)
     throws HessianCaMgmtException;
 
     boolean addCertprofileToCa(
             @Nonnull String profileName,
-            @Nullable String profileLocalname,
             @Nonnull String caName)
     throws HessianCaMgmtException;
 
@@ -167,7 +165,7 @@ public interface HessianCaManager {
             @Nonnull String caName)
     throws HessianCaMgmtException;
 
-    Map<String, String> getCertprofilesForCa(
+    Set<String> getCertprofilesForCa(
             @Nonnull String caName);
 
     Set<CaHasRequestorEntry> getCmpRequestorsForCa(
