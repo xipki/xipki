@@ -41,7 +41,6 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -277,10 +276,9 @@ public class CaManagerClient implements CaManager {
     @Override
     public boolean addCertprofileToCa(
             final String profileName,
-            final String profileLocalname,
             final String caName)
     throws CaMgmtException {
-        return client.addCertprofileToCa(profileName, profileLocalname, caName);
+        return client.addCertprofileToCa(profileName, caName);
     }
 
     @Override
@@ -300,7 +298,7 @@ public class CaManagerClient implements CaManager {
     }
 
     @Override
-    public Map<String, String> getCertprofilesForCa(
+    public Set<String> getCertprofilesForCa(
             final String caName) {
         return client.getCertprofilesForCa(caName);
     }

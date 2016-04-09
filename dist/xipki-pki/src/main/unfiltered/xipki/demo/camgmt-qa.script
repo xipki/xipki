@@ -564,43 +564,26 @@ xipki-caqa:caprofile-check \
   
 xipki-ca:caprofile-add \
   --ca RCA1 \
-  --profile TLS_g \
-  --local-name TLS
+  --profile TLS \
 
 xipki-caqa:caprofile-check \
   --ca RCA1 \
-  --profile TLS_g \
-  --local-name TLS
+  --profile TLS \
 
 # CA name does not exist
 xipki-caqa:neg-caprofile-add \
   --ca RCA10 \
   --profile PROFILE-DUMMY
 
-# CA name does not exist
-xipki-caqa:neg-caprofile-rm \
-  --ca RCA10 \
-  --profile-local PROFILE-DUMMY
-
 # profile name does not exist
 xipki-caqa:neg-caprofile-add \
   --ca RCA1 \
   --profile PROFILE-DUMMY
-
-# profile name does not exist
-xipki-caqa:neg-caprofile-rm \
-  --ca RCA1 \
-  --profile-local PROFILE-DUMMY
 
 # invalid permission
-xipki-caqa:neg-caprofile-add \
-  --ca RCA1 \
-  --profile PROFILE-DUMMY
-
-# profile name does not exist
 xipki-caqa:neg-caprofile-rm \
   --ca RCA1 \
-  --profile-local PROFILE-DUMMY
+  --profile PROFILE-DUMMY
 
 #################################################################
 #                         CA HAS PUBLISHER                      #

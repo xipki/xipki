@@ -51,7 +51,6 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -292,7 +291,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private final Map<String, ScepEntry> scepDbEntries = new ConcurrentHashMap<>();
 
-    private final Map<String, Map<String, String>> caHasProfiles = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> caHasProfiles = new ConcurrentHashMap<>();
 
     private final Map<String, Set<String>> caHasPublishers = new ConcurrentHashMap<>();
 
@@ -1180,7 +1179,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         Set<CaHasRequestorEntry> caHasRequestorList = queryExecutor.createCaHasRequestors(name);
         caHasRequestors.put(name, caHasRequestorList);
 
-        Map<String, String> profileNames = queryExecutor.createCaHasProfiles(name);
+        Set<String> profileNames = queryExecutor.createCaHasProfiles(name);
         caHasProfiles.put(name, profileNames);
 
         Set<String> publisherNames = queryExecutor.createCaHasPublishers(name);
@@ -1277,21 +1276,21 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeCertprofileFromCa(
-            final String profileLocalname,
+            final String profileName,
             final String caName)
     throws CaMgmtException {
-        ParamUtil.requireNonBlank("profileLocalname", profileLocalname);
+        ParamUtil.requireNonBlank("profileName", profileName);
         String tmpCaName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
         asssertMasterMode();
-        boolean bo = queryExecutor.removeCertprofileFromCa(profileLocalname, tmpCaName);
+        boolean bo = queryExecutor.removeCertprofileFromCa(profileName, tmpCaName);
         if (!bo) {
             return false;
         }
 
         if (caHasProfiles.containsKey(tmpCaName)) {
-            Map<String, String> map = caHasProfiles.get(tmpCaName);
-            if (map != null) {
-                map.remove(profileLocalname);
+            Set<String> set = caHasProfiles.get(tmpCaName);
+            if (set != null) {
+                set.remove(profileName);
             }
         }
         return true;
@@ -1300,36 +1299,29 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean addCertprofileToCa(
             final String profileName,
-            final String profileLocalname,
             final String caName)
     throws CaMgmtException {
-        String localProfileName = ParamUtil.requireNonBlank("profileName", profileName);
-        String tmpCaName = ParamUtil.requireNonBlank("caName", caName);
+        String tmpProfileName = ParamUtil.requireNonBlank("profileName", profileName);
+        String tmpCaName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
+
         asssertMasterMode();
 
-        String localProfileLocalname = profileLocalname;
-
-        if (StringUtil.isBlank(localProfileLocalname)) {
-            localProfileLocalname = localProfileName;
-        }
-        tmpCaName = tmpCaName.toUpperCase();
-
-        Map<String, String> map = caHasProfiles.get(tmpCaName);
-        if (map == null) {
-            map = new HashMap<>();
-            caHasProfiles.put(tmpCaName, map);
+        Set<String> set = caHasProfiles.get(tmpCaName);
+        if (set == null) {
+            set = new HashSet<>();
+            caHasProfiles.put(tmpCaName, set);
         } else {
-            if (map.containsKey(localProfileLocalname)) {
+            if (set.contains(tmpProfileName)) {
                 return false;
             }
         }
 
-        if (!certprofiles.containsKey(localProfileName)) {
-            throw new CaMgmtException("certprofile '" + localProfileName + "' is faulty");
+        if (!certprofiles.containsKey(tmpProfileName)) {
+            throw new CaMgmtException("certprofile '" + tmpProfileName + "' is faulty");
         }
 
-        queryExecutor.addCertprofileToCa(localProfileName, localProfileLocalname, tmpCaName);
-        map.put(localProfileLocalname, localProfileName);
+        queryExecutor.addCertprofileToCa(tmpProfileName, tmpCaName);
+        set.add(tmpProfileName);
         return true;
     } // method addCertprofileToCa
 
@@ -1385,7 +1377,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method addPublisherToCa
 
     @Override
-    public Map<String, String> getCertprofilesForCa(
+    public Set<String> getCertprofilesForCa(
             final String caName) {
         ParamUtil.requireNonBlank("caName", caName);
         return caHasProfiles.get(caName.toUpperCase());

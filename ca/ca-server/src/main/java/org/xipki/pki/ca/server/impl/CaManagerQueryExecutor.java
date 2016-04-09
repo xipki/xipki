@@ -703,10 +703,10 @@ class CaManagerQueryExecutor {
         }
     } // method createCaHasRequestors
 
-    Map<String, String> createCaHasProfiles(
+    Set<String> createCaHasProfiles(
             final String caName)
     throws CaMgmtException {
-        final String sql = new StringBuilder("SELECT PROFILE_NAME, PROFILE_LOCALNAME")
+        final String sql = new StringBuilder("SELECT PROFILE_NAME")
                 .append(" FROM CA_HAS_PROFILE")
                 .append(" WHERE CA_NAME=?").toString();
         PreparedStatement stmt = null;
@@ -716,11 +716,10 @@ class CaManagerQueryExecutor {
             stmt.setString(1, caName);
             rs = stmt.executeQuery();
 
-            Map<String, String> ret = new HashMap<>();
+            Set<String> ret = new HashSet<>();
             while (rs.next()) {
                 String profileName = rs.getString("PROFILE_NAME");
-                String profileLocalname = rs.getString("PROFILE_LOCALNAME");
-                ret.put(profileLocalname, profileName);
+                ret.add(profileName);
             }
 
             return ret;
@@ -938,24 +937,20 @@ class CaManagerQueryExecutor {
 
     void addCertprofileToCa(
             final String profileName,
-            final String profileLocalName,
             final String caName)
     throws CaMgmtException {
         ParamUtil.requireNonNull("profileName", profileName);
-        ParamUtil.requireNonNull("profileLocalName", profileLocalName);
         ParamUtil.requireNonNull("caName", caName);
 
-        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME, PROFILE_LOCALNAME)"
-                + " VALUES (?, ?, ?)";
+        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME)"
+                + " VALUES (?, ?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
             ps.setString(1, caName);
             ps.setString(2, profileName);
-            ps.setString(3, profileLocalName);
             ps.executeUpdate();
-            LOG.info("added profile '{} (localname {})' to CA '{}'", profileName,
-                    profileLocalName, caName);
+            LOG.info("added profile '{}' to CA '{}'", profileName, caName);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -2094,21 +2089,21 @@ class CaManagerQueryExecutor {
     } // method removeCaAlias
 
     boolean removeCertprofileFromCa(
-            final String profileLocalName,
+            final String profileName,
             final String caName)
     throws CaMgmtException {
-        ParamUtil.requireNonBlank("profileLocalName", profileLocalName);
+        ParamUtil.requireNonBlank("profileName", profileName);
         ParamUtil.requireNonBlank("caName", caName);
 
-        final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_NAME=? AND PROFILE_LOCALNAME=?";
+        final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_NAME=? AND PROFILE_NAME=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
             ps.setString(1, caName);
-            ps.setString(2, profileLocalName);
+            ps.setString(2, profileName);
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
-                LOG.info("removed profile '{}' from CA '{}'", profileLocalName, caName);
+                LOG.info("removed profile '{}' from CA '{}'", profileName, caName);
             }
             return bo;
         } catch (SQLException ex) {

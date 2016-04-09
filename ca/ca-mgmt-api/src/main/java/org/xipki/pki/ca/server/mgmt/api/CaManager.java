@@ -130,13 +130,12 @@ public interface CaManager {
     throws CaMgmtException;
 
     boolean removeCertprofileFromCa(
-            @Nonnull String profileLocalname,
+            @Nonnull String profileName,
             @Nonnull String caName)
     throws CaMgmtException;
 
     boolean addCertprofileToCa(
             @Nonnull String profileName,
-            @Nullable String profileLocalname,
             @Nonnull String caName)
     throws CaMgmtException;
 
@@ -150,7 +149,7 @@ public interface CaManager {
             @Nonnull String caName)
     throws CaMgmtException;
 
-    Map<String, String> getCertprofilesForCa(
+    Set<String> getCertprofilesForCa(
             @Nonnull String caName);
 
     Set<CaHasRequestorEntry> getCmpRequestorsForCa(

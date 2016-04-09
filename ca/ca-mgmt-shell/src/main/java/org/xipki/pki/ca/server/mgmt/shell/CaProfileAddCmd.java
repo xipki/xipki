@@ -40,7 +40,6 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.common.util.StringUtil;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
@@ -68,26 +67,14 @@ public class CaProfileAddCmd extends CaCommandSupport {
     @Completion(ProfileNameCompleter.class)
     private String profileName;
 
-    @Option(name = "--local-name",
-            required = false,
-            description = "profile localname")
-    private String profileLocalname;
-
     @Override
     protected Object doExecute()
     throws Exception {
-        if (StringUtil.isBlank(profileLocalname)) {
-            profileLocalname = profileName;
-        }
-
         StringBuilder sb = new StringBuilder();
         sb.append("certificate profile ").append(profileName);
-        if (!profileLocalname.equals(profileName)) {
-            sb.append(" (localname ").append(profileLocalname).append(")");
-        }
         sb.append(" to CA ").append(caName);
 
-        boolean bo = caManager.addCertprofileToCa(profileName, profileLocalname, caName);
+        boolean bo = caManager.addCertprofileToCa(profileName, caName);
         output(bo, "associated", "could not associate",
                 sb.toString());
         return null;

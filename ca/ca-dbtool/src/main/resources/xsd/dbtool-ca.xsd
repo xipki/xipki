@@ -223,7 +223,6 @@
     <xs:sequence>
       <xs:element name="caName" type="xs:string"/>
       <xs:element name="profileName" type="xs:string"/>
-      <xs:element name="profileLocalname" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="scep" type="scepType"/>

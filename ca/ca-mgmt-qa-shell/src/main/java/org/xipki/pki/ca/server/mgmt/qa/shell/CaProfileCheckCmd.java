@@ -37,7 +37,7 @@
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
 import java.rmi.UnexpectedException;
-import java.util.Map;
+import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -72,11 +72,6 @@ public class CaProfileCheckCmd extends CaCommandSupport {
     @Completion(ProfileNameCompleter.class)
     private String profileName;
 
-    @Option(name = "--local-name",
-            required = false,
-            description = "profile localname")
-    private String profileLocalname;
-
     @Override
     protected Object doExecute()
     throws Exception {
@@ -86,19 +81,11 @@ public class CaProfileCheckCmd extends CaCommandSupport {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
-        if (profileLocalname == null) {
-            profileLocalname = profileName;
-        }
-        Map<String, String> entries = caManager.getCertprofilesForCa(caName);
-        if (!entries.containsKey(profileLocalname)) {
-            throw new CmdFailure("CA is not associated with profile '" + profileLocalname + "'");
+        Set<String> entries = caManager.getCertprofilesForCa(caName);
+        if (!entries.contains(profileName)) {
+            throw new CmdFailure("CA is not associated with profile '" + profileName + "'");
         }
 
-        String name = entries.get(profileLocalname);
-        if (!profileName.equals(name)) {
-            throw new CmdFailure(
-                    "Profile name is '" + name + "', but expected '" + profileName + "'");
-        }
         println(" checked CA profile CA='" + caName + "', profile='" + profileName + "'");
         return null;
     }

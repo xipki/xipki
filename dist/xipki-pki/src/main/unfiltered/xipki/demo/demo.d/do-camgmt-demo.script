@@ -14,7 +14,7 @@ xipki-ca:ca-export --name RCA1 --out output/RCA1.export
 
 xipki-ca:caprofile-info --ca RCA1
 
-xipki-ca:caprofile-rm --profile-local SubCA --ca RCA1
+xipki-ca:caprofile-rm --profile SubCA --ca RCA1
 
 xipki-ca:caprofile-add  --profile SubCA --ca RCA1
 

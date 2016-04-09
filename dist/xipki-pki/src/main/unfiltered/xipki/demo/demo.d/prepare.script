@@ -49,7 +49,7 @@ xipki-ca:profile-add \
   --conf-file xipki/demo/profile/Certprofile_EE_Complex.xml
 
 xipki-ca:profile-add \
-  --name TLS_g \
+  --name TLS \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_TLS.xml
 

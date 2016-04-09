@@ -226,11 +226,8 @@
       <column name="CA_NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="PROFILE_LOCALNAME" type="VARCHAR(45)">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
       <column name="PROFILE_NAME" type="VARCHAR(45)">
-        <constraints nullable="false"/>
+        <constraints primaryKey="true" nullable="false"/>
       </column>
     </createTable>
     <!-- table SCEP -->

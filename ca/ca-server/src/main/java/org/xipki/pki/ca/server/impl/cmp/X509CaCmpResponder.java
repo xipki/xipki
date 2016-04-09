@@ -46,7 +46,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -1147,27 +1146,26 @@ public class X509CaCmpResponder extends CmpResponder {
             // Profiles
             Set<String> requestorProfiles = requestor.getCaHasRequestor().getProfiles();
 
-            Set<String> supportedLocalProfileNames = new HashSet<>();
-            Map<String, String> caProfileNames = ca.getCaManager().getCertprofilesForCa(
+            Set<String> supportedProfileNames = new HashSet<>();
+            Set<String> caProfileNames = ca.getCaManager().getCertprofilesForCa(
                     ca.getCaInfo().getName());
-            for (String caProfileName : caProfileNames.keySet()) {
+            for (String caProfileName : caProfileNames) {
                 if (requestorProfiles.contains("all")
                         || requestorProfiles.contains(caProfileName)) {
-                    supportedLocalProfileNames.add(caProfileName);
+                    supportedProfileNames.add(caProfileName);
                 }
             }
 
-            if (CollectionUtil.isNonEmpty(supportedLocalProfileNames)) {
+            if (CollectionUtil.isNonEmpty(supportedProfileNames)) {
                 sb.append("<certprofiles>");
-                for (String localname : supportedLocalProfileNames) {
-                    String name = caProfileNames.get(localname);
+                for (String name : supportedProfileNames) {
                     CertprofileEntry entry = ca.getCaManager().getCertprofile(name);
                     if (entry.isFaulty()) {
                         continue;
                     }
 
                     sb.append("<certprofile>");
-                    sb.append("<name>").append(localname).append("</name>");
+                    sb.append("<name>").append(name).append("</name>");
                     sb.append("<type>").append(entry.getType()).append("</type>");
                     sb.append("<conf>");
                     String conf = entry.getConf();
