@@ -99,8 +99,8 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.crypto.KeyUsage;
+import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 
 /**
  * @author Lijun Liao

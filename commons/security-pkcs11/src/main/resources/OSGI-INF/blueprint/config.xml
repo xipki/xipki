@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+    
+  <cm:property-placeholder persistent-id="org.xipki.commons.security.pkcs11" update-strategy="reload">
+    <cm:default-properties>
+      <cm:property name="pkcs11.confFile" value=""/>
+      <cm:property name="pkcs11.engine" value="IAIK-PKCS11"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
+
+  <bean id="p11CryptServiceFactory"
+      class="org.xipki.commons.security.pkcs11.internal.P11CryptServiceFactoryImpl"
+      destroy-method="shutdown">
+    <property name="pkcs11Engine" value="${pkcs11.engine}"/>
+    <property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>
+    <property name="securityFactory" ref="securityFactory"/>
+  </bean>
+  <service ref="p11CryptServiceFactory"
+      interface="org.xipki.commons.security.api.p11.P11CryptServiceFactory"/>
+
+  <bean id="factory" class="org.xipki.commons.security.pkcs11.internal.SignerFactoryImpl">
+    <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
+    <property name="securityFactory" ref="securityFactory"/>
+  </bean>
+  <service ref="factory" interface="org.xipki.commons.security.api.SignerFactory"/>
+  
+  <!-- provider SunPKCS11-NSS -->
+  <bean id="XipkiProviderNssRegister"
+      class="org.xipki.commons.security.pkcs11.internal.provider.NssProviderRegister"
+      init-method="regist" destroy-method="unregist"/>
+
+  <!-- provider XIPKI -->
+  <bean id="XipkiProviderRegister"
+      class="org.xipki.commons.security.pkcs11.internal.provider.XipkiProviderRegister"
+      init-method="regist" destroy-method="unregist">
+    <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
+  </bean>
+
+</blueprint>

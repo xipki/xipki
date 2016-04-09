@@ -64,8 +64,8 @@ import org.xipki.pki.ca.client.api.CaClient;
 import org.xipki.pki.ca.client.api.CaClientException;
 import org.xipki.pki.ca.client.api.CertIdOrError;
 import org.xipki.pki.ca.client.api.PkiErrorException;
-import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntry;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequest;
+import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntry;
 
 /**
  * @author Lijun Liao

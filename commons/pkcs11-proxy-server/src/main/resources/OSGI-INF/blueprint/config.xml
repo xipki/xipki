@@ -8,15 +8,20 @@
       <cm:property name="urlPatterns" value="/p11proxy/*"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
+
+  <reference id="p11CryptServiceFactory"
+      interface="org.xipki.commons.security.api.p11.P11CryptServiceFactory"/>
+
   <bean id="localP11CryptServicePool"
       class="org.xipki.commons.remotep11.server.impl.LocalP11CryptServicePool" init-method="init">
-    <property name="securityFactory" ref="securityFactory"/>
+    <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
   </bean>
+
   <!-- create the servlet and inject our own app factory -->
   <bean id="serverServlet" class="org.xipki.commons.remotep11.server.impl.HttpProxyServlet">
     <property name="localP11CryptServicePool" ref="localP11CryptServicePool"/>
   </bean>
+
   <!-- register it as a servlet service for the web extender -->
   <service ref="serverServlet" interface="javax.servlet.Servlet">
     <service-properties>

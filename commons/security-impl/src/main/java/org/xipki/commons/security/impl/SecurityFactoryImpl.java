@@ -38,10 +38,7 @@ package org.xipki.commons.security.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -59,13 +56,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
@@ -79,42 +71,22 @@ import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
-import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordResolver;
-import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.AbstractSecurityFactory;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.KeyCertPair;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.p11.P11Conf;
-import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
-import org.xipki.commons.security.api.p11.P11EntityIdentifier;
-import org.xipki.commons.security.api.p11.P11Module;
-import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
-import org.xipki.commons.security.api.p11.P11Slot;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.p11.P11TokenException;
+import org.xipki.commons.security.api.SignerFactoryRegister;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.commons.security.impl.p11.P11ContentSignerBuilder;
-import org.xipki.commons.security.impl.p11.iaik.IaikP11CryptServiceFactory;
-import org.xipki.commons.security.impl.p11.keystore.KeystoreP11CryptServiceFactory;
-import org.xipki.commons.security.impl.p11.proxy.ProxyP11CryptServiceFactory;
-import org.xipki.commons.security.impl.p12.SoftTokenContentSignerBuilder;
 
 /**
  * @author Lijun Liao
@@ -131,25 +103,17 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER
         = new HashMap<>();
 
-    private String pkcs11Provider;
-
-    private int defaultParallelism = 32;
-
-    private P11Conf p11Conf;
-
-    private P11CryptServiceFactory p11CryptServiceFactory;
-
-    private boolean p11CryptServiciceFactoryInitialized;
+    private int defaultSignerParallelism = 32;
 
     private PasswordResolver passwordResolver;
 
-    private String pkcs11ConfFile;
+    private SignerFactoryRegister signerFactoryRegister;
+
+    private long newSignerTimeout;
 
     private boolean strongRandom4KeyEnabled = true;
 
     private boolean strongRandom4SignEnabled;
-
-    private final Map<String, String> signerTypeMapping = new HashMap<>();
 
     public SecurityFactoryImpl() {
         if (Security.getProvider("BC") == null) {
@@ -183,8 +147,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final SignatureAlgoControl sigAlgoControl,
             final X509Certificate[] certs)
     throws SecurityException {
-        ConcurrentContentSigner signer = doCreateSigner(type, confWithoutAlgo, hashAlgo,
-                sigAlgoControl, certs);
+        ConcurrentContentSigner signer = signerFactoryRegister.newSigner(type, confWithoutAlgo,
+                hashAlgo, sigAlgoControl, certs, newSignerTimeout);
         validateSigner(signer, type, confWithoutAlgo);
         return signer;
     }
@@ -195,217 +159,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final String conf,
             final X509Certificate[] certificateChain)
     throws SecurityException {
-        ConcurrentContentSigner signer = doCreateSigner(type, conf, null, null,
-                certificateChain);
+        ConcurrentContentSigner signer = signerFactoryRegister.newSigner(type, conf, null, null,
+                certificateChain, newSignerTimeout);
         validateSigner(signer, type, conf);
         return signer;
-    }
-
-    /*
-     * sigAlgoControl will be considered only if hashAlgo is not set
-     *
-     */
-    private ConcurrentContentSigner doCreateSigner(
-            final String type,
-            final String conf,
-            final String hashAlgo,
-            final SignatureAlgoControl sigAlgoControl,
-            final X509Certificate[] certificateChain)
-    throws SecurityException {
-        String tmpType = type;
-        if (signerTypeMapping.containsKey(tmpType)) {
-            tmpType = signerTypeMapping.get(tmpType);
-        }
-
-        if ("PKCS11".equalsIgnoreCase(tmpType)
-                || "PKCS12".equalsIgnoreCase(tmpType)
-                || "JKS".equalsIgnoreCase(tmpType)) {
-            ConfPairs keyValues = new ConfPairs(conf);
-
-            String str = keyValues.getValue("parallelism");
-            int parallelism = defaultParallelism;
-            if (str != null) {
-                try {
-                    parallelism = Integer.parseInt(str);
-                } catch (NumberFormatException ex) {
-                    throw new SecurityException("invalid parallelism " + str);
-                }
-
-                if (parallelism < 1) {
-                    throw new SecurityException("invalid parallelism " + str);
-                }
-            }
-
-            if ("PKCS11".equalsIgnoreCase(tmpType)) {
-                String moduleName = keyValues.getValue("module");
-                if (moduleName == null) {
-                    moduleName = DEFAULT_P11MODULE_NAME;
-                }
-
-                str = keyValues.getValue("slot");
-                Integer slotIndex = (str == null)
-                        ? null
-                        : Integer.parseInt(str);
-
-                str = keyValues.getValue("slot-id");
-                Long slotId = (str == null)
-                        ? null
-                        : Long.parseLong(str);
-
-                if ((slotIndex == null && slotId == null)
-                        || (slotIndex != null && slotId != null)) {
-                    throw new SecurityException(
-                            "exactly one of slot (index) and slot-id must be specified");
-                }
-
-                String keyLabel = keyValues.getValue("key-label");
-                str = keyValues.getValue("key-id");
-                byte[] keyId = null;
-                if (str != null) {
-                    keyId = Hex.decode(str);
-                }
-
-                if ((keyId == null && keyLabel == null)
-                        || (keyId != null && keyLabel != null)) {
-                    throw new SecurityException(
-                            "exactly one of key-id and key-label must be specified");
-                }
-
-                P11CryptService p11Service;
-                P11Slot slot;
-                try {
-                    p11Service = getP11CryptService(moduleName);
-                    P11Module module = p11Service.getModule();
-                    P11SlotIdentifier p11SlotId = (slotId != null)
-                            ? module.getSlotIdForId(slotId)
-                            : module.getSlotIdForIndex(slotIndex);
-                    slot = module.getSlot(p11SlotId);
-                } catch (P11TokenException ex) {
-                    throw new SecurityException("P11TokenException: " + ex.getMessage(), ex);
-                }
-
-                P11ObjectIdentifier p11ObjId = (keyId != null)
-                        ? slot.getObjectIdForId(keyId)
-                        : slot.getObjectIdForLabel(keyLabel);
-                if (p11ObjId == null) {
-                    String str2 = (keyId != null)
-                            ? "id " + Hex.toHexString(keyId)
-                            : "label " + keyLabel;
-                    throw new SecurityException("cound not find identity with " + str2);
-                }
-                P11EntityIdentifier entityId = new P11EntityIdentifier(slot.getSlotId(), p11ObjId);
-
-                try {
-                    AlgorithmIdentifier signatureAlgId;
-                    if (hashAlgo == null) {
-                        signatureAlgId = getSignatureAlgoId(conf);
-                    } else {
-                        PublicKey pubKey = slot.getIdentity(p11ObjId).getPublicKey();
-                        signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo,
-                                sigAlgoControl);
-                    }
-
-                    P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
-                            p11Service, (SecurityFactory) this, entityId, certificateChain);
-                    return signerBuilder.createSigner(signatureAlgId, parallelism);
-                } catch (P11TokenException | NoSuchAlgorithmException ex) {
-                    throw new SecurityException(ex.getMessage(), ex);
-                }
-            } else {
-                String passwordHint = keyValues.getValue("password");
-                char[] password;
-                if (passwordHint == null) {
-                    password = null;
-                } else {
-                    if (passwordResolver == null) {
-                        password = passwordHint.toCharArray();
-                    } else {
-                        try {
-                            password = passwordResolver.resolvePassword(passwordHint);
-                        } catch (PasswordResolverException ex) {
-                            throw new SecurityException(
-                                    "could not resolve password. Message: " + ex.getMessage());
-                        }
-                    }
-                }
-
-                str = keyValues.getValue("keystore");
-                String keyLabel = keyValues.getValue("key-label");
-
-                InputStream keystoreStream;
-                if (StringUtil.startsWithIgnoreCase(str, "base64:")) {
-                    keystoreStream = new ByteArrayInputStream(
-                            Base64.decode(str.substring("base64:".length())));
-                } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {
-                    String fn = str.substring("file:".length());
-                    try {
-                        keystoreStream = new FileInputStream(IoUtil.expandFilepath(fn));
-                    } catch (FileNotFoundException ex) {
-                        throw new SecurityException("file not found: " + fn);
-                    }
-                } else {
-                    throw new SecurityException("unknown keystore content format");
-                }
-
-                SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
-                        tmpType, keystoreStream, password, keyLabel, password, certificateChain);
-
-                try {
-                    AlgorithmIdentifier signatureAlgId;
-                    if (hashAlgo == null) {
-                        signatureAlgId = getSignatureAlgoId(conf);
-                    } else {
-                        PublicKey pubKey = signerBuilder.getCert().getPublicKey();
-                        signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo,
-                                sigAlgoControl);
-                    }
-
-                    return signerBuilder.createSigner(
-                            signatureAlgId, parallelism, getRandom4Sign());
-                } catch (OperatorCreationException | NoSuchPaddingException
-                        | NoSuchAlgorithmException ex) {
-                    throw new SecurityException(String.format("%s: %s",
-                            ex.getClass().getName(), ex.getMessage()));
-                }
-            }
-        } else if (StringUtil.startsWithIgnoreCase(tmpType, "java:")) {
-            if (hashAlgo == null) {
-                ConcurrentContentSigner contentSigner;
-                String classname = tmpType.substring("java:".length());
-                try {
-                    Class<?> clazz = Class.forName(classname);
-                    contentSigner = (ConcurrentContentSigner) clazz.newInstance();
-                } catch (Exception ex) {
-                    throw new SecurityException(ex.getMessage(), ex);
-                }
-                contentSigner.initialize(conf, passwordResolver);
-
-                if (certificateChain != null) {
-                    contentSigner.setCertificateChain(certificateChain);
-                }
-
-                return contentSigner;
-            } else {
-                throw new SecurityException("unknwon type: " + tmpType);
-            }
-        } else {
-            throw new SecurityException("unknwon type: " + tmpType);
-        }
-    } // method doCreateSigner
-
-    private AlgorithmIdentifier getSignatureAlgoId(
-            final String signerConf)
-    throws SecurityException {
-        ConfPairs keyValues = new ConfPairs(signerConf);
-        String algoS = keyValues.getValue("algo");
-        if (algoS == null) {
-            throw new SecurityException("algo is not specified");
-        }
-        try {
-            return AlgorithmUtil.getSignatureAlgoId(algoS);
-        } catch (NoSuchAlgorithmException ex) {
-            throw new SecurityException(ex.getMessage(), ex);
-        }
     }
 
     @Override
@@ -478,112 +235,25 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
     }
 
-    public void setPkcs11Provider(
-            final String pkcs11Provider) {
-        this.pkcs11Provider = pkcs11Provider;
-    }
-
-    public void setDefaultParallelism(
-            final int defaultParallelism) {
-        if (defaultParallelism > 0) {
-            this.defaultParallelism = defaultParallelism;
-        }
-    }
-
     @Override
-    public P11CryptService getP11CryptService(
-            final String moduleName)
-    throws SecurityException, P11TokenException {
-        initP11CryptServiceFactory();
-        return p11CryptServiceFactory.getP11CryptService(getRealPkcs11ModuleName(moduleName));
+    public int getDefaultSignerParallelism() {
+        return defaultSignerParallelism;
     }
 
-    @Override
-    public Set<String> getP11ModuleNames() {
-        initPkcs11ModuleConf();
-        return (p11Conf == null)
-                ? null
-                : p11Conf.getModuleNames();
+    public void setDefaultSignerParallelism(
+            final int defaultSignerParallelism) {
+        this.defaultSignerParallelism = ParamUtil.requireMin("defaultSignerParallelism",
+                defaultSignerParallelism, 1);
     }
 
-    private synchronized void initP11CryptServiceFactory()
-    throws SecurityException {
-        if (p11CryptServiceFactory != null) {
-            return;
-        }
-
-        if (p11CryptServiciceFactoryInitialized) {
-            throw new SecurityException("initialization of P11CryptServiceFactory has been"
-                    + " processed and failed, no retry");
-        }
-
-        try {
-            initPkcs11ModuleConf();
-
-            Object p11Provider;
-
-            if (IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
-                p11Provider = new IaikP11CryptServiceFactory();
-            } else if (KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
-                p11Provider = new KeystoreP11CryptServiceFactory();
-            } else if (ProxyP11CryptServiceFactory.class.getName().equals(pkcs11Provider)) {
-                p11Provider = new ProxyP11CryptServiceFactory();
-            } else {
-                try {
-                    Class<?> clazz = Class.forName(pkcs11Provider);
-                    p11Provider = clazz.newInstance();
-                } catch (Exception ex) {
-                    throw new SecurityException(ex.getMessage(), ex);
-                }
-            }
-
-            if (p11Provider instanceof P11CryptServiceFactory) {
-                P11CryptServiceFactory p11CryptServiceFact = (P11CryptServiceFactory) p11Provider;
-                p11CryptServiceFact.init(p11Conf);
-                this.p11CryptServiceFactory = p11CryptServiceFact;
-            } else {
-                throw new SecurityException(pkcs11Provider + " is not instanceof "
-                        + P11CryptServiceFactory.class.getName());
-            }
-        } finally {
-            p11CryptServiciceFactoryInitialized = true;
-        }
-    } // method initP11CryptServiceFactory
-
-    private void initPkcs11ModuleConf() {
-        if (p11Conf != null) {
-            return;
-        }
-
-        if (StringUtil.isBlank(pkcs11ConfFile)) {
-            throw new IllegalStateException("pkcs11ConfFile is not set");
-        }
-
-        try {
-            this.p11Conf = new P11Conf(new FileInputStream(pkcs11ConfFile), (SecurityFactory) this);
-        } catch (InvalidConfException | IOException ex) {
-            final String message = "invalid configuration file " + pkcs11ConfFile;
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
-
-            throw new RuntimeException(message);
-        }
-    } // method initPkcs11ModuleConf
-
-    public void setPkcs11ConfFile(
-            final String confFile) {
-        if (StringUtil.isBlank(confFile)) {
-            this.pkcs11ConfFile = null;
-        } else {
-            this.pkcs11ConfFile = confFile;
-        }
+    public void setNewSignerTimeout(
+            final long newSignerTimeout) {
+        this.newSignerTimeout = ParamUtil.requireMin("newSignerTimeout", newSignerTimeout, 0);
     }
 
-    private String getRealPkcs11ModuleName(
-            final String moduleName) {
-        return (moduleName == null)
-                ? DEFAULT_P11MODULE_NAME
-                : moduleName;
+    public void setSignerFactoryRegister(
+            final SignerFactoryRegister signerFactoryRegister) {
+        this.signerFactoryRegister = signerFactoryRegister;
     }
 
     public void setPasswordResolver(
@@ -596,97 +266,30 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         return passwordResolver;
     }
 
-    public void setSignerTypeMap(
-            final String signerTypeMap) {
-        if (signerTypeMap == null) {
-            LOG.debug("signerTypeMap is null");
-            return;
-        }
-
-        String tmpSignerTypeMap = signerTypeMap.trim();
-        if (StringUtil.isBlank(tmpSignerTypeMap)) {
-            LOG.debug("signerTypeMap is empty");
-            return;
-        }
-
-        StringTokenizer st = new StringTokenizer(tmpSignerTypeMap, " \t");
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            StringTokenizer st2 = new StringTokenizer(token, "=");
-            if (st2.countTokens() != 2) {
-                LOG.warn("invalid signerTypeMap entry '" + token + "'");
-                continue;
-            }
-
-            String alias = st2.nextToken();
-            if (signerTypeMapping.containsKey(alias)) {
-                LOG.warn("signerType alias '{}' already defined, ignore map '{}'", alias, token);
-                continue;
-            }
-            String signerType = st2.nextToken();
-            signerTypeMapping.put(alias, signerType);
-            LOG.info("add alias '{}' for signerType '{}'", alias, signerType);
-        }
-    }
-
     @Override
     public KeyCertPair createPrivateKeyAndCert(
             final String type,
             final String conf,
             final X509Certificate cert)
     throws SecurityException {
-        if (!"PKCS11".equalsIgnoreCase(type) && !"PKCS12".equalsIgnoreCase(type)) {
-            throw new SecurityException("unsupported SCEP responder type '" + type + "'");
+        ConfPairs confPairs = new ConfPairs(conf);
+        confPairs.putPair("parallelism", Integer.toString(1));
+        String algo = confPairs.getValue("algo");
+
+        X509Certificate[] certs = null;
+        if (cert != null) {
+            certs = new X509Certificate[]{cert};
         }
-
-        ConfPairs keyValues = new ConfPairs(conf);
-
-        String passwordHint = keyValues.getValue("password");
-        char[] password;
-        if (passwordHint == null) {
-            password = null;
+        ConcurrentContentSigner signer;
+        if (algo == null) {
+            signer = signerFactoryRegister.newSigner(type, confPairs.getEncoded(), "SHA256",
+                    new SignatureAlgoControl(), certs, newSignerTimeout);
         } else {
-            if (passwordResolver == null) {
-                password = passwordHint.toCharArray();
-            } else {
-                try {
-                    password = passwordResolver.resolvePassword(passwordHint);
-                } catch (PasswordResolverException ex) {
-                    throw new SecurityException("could not resolve password. Message: "
-                            + ex.getMessage());
-                }
-            }
+            signer = signerFactoryRegister.newSigner(type, confPairs.getEncoded(), certs,
+                    newSignerTimeout);
         }
-
-        String str = keyValues.getValue("keystore");
-        String keyLabel = keyValues.getValue("key-label");
-
-        InputStream keystoreStream;
-        if (StringUtil.startsWithIgnoreCase(str, "base64:")) {
-            keystoreStream = new ByteArrayInputStream(
-                    Base64.decode(str.substring("base64:".length())));
-        } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {
-            String fn = str.substring("file:".length());
-            try {
-                keystoreStream = new FileInputStream(IoUtil.expandFilepath(fn));
-            } catch (FileNotFoundException ex) {
-                throw new SecurityException("file not found: " + fn);
-            }
-        } else {
-            throw new SecurityException("unknown keystore content format");
-        }
-
-        X509Certificate[] certs = (cert == null)
-                ? null
-                : new X509Certificate[]{cert};
-        SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
-                type, keystoreStream, password, keyLabel, password,
-                certs);
-
-        KeyCertPair keycertPair = new KeyCertPair(
-                signerBuilder.getKey(), signerBuilder.getCert());
-        return keycertPair;
-    } // method createPrivateKeyAndCert
+        return new KeyCertPair(signer.getPrivateKey(), signer.getCertificate());
+    }
 
     @Override
     public SecureRandom getRandom4Key() {
@@ -774,18 +377,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             }
         }
     } // method extractMinimalKeyStore
-
-    public void shutdown() {
-        if (p11CryptServiceFactory == null) {
-            return;
-        }
-
-        try {
-            p11CryptServiceFactory.shutdown();
-        } catch (Throwable th) {
-            LOG.error("could not shutdown KeyStoreP11ModulePool: " + th.getMessage(), th);
-        }
-    }
 
     private static SecureRandom getSecureRandom(
             final boolean strong) {

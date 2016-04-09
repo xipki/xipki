@@ -42,6 +42,7 @@ import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11CryptService;
+import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -54,8 +55,14 @@ import org.xipki.commons.security.api.p11.P11TokenException;
 
 public abstract class SecurityCommandSupport extends XipkiCommandSupport {
 
+    protected static final String DEFAULT_P11MODULE_NAME =
+            P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
+
     @Reference
     protected SecurityFactory securityFactory;
+
+    @Reference (optional = true)
+    protected P11CryptServiceFactory p11CryppServiceFactory;
 
     protected P11Slot getSlot(
             final String moduleName,
@@ -69,7 +76,7 @@ public abstract class SecurityCommandSupport extends XipkiCommandSupport {
     protected P11Module getP11Module(
             final String moduleName)
     throws SecurityException, P11TokenException, IllegalCmdParamException {
-        P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
+        P11CryptService p11Service = p11CryppServiceFactory.getP11CryptService(moduleName);
         if (p11Service == null) {
             throw new IllegalCmdParamException("undefined module " + moduleName);
         }

@@ -42,7 +42,6 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -66,7 +65,7 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
     @Option(name = "--module",
             description = "name of the PKCS#11 module.")
     @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    private String moduleName = DEFAULT_P11MODULE_NAME;
 
     @Option(name = "--slot",
             description = "slot index")

@@ -45,8 +45,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11CryptService;
+import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 
 /**
  * @author Lijun Liao
@@ -57,7 +57,7 @@ public class LocalP11CryptServicePool {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalP11CryptServicePool.class);
 
-    private SecurityFactory securityFactory;
+    private P11CryptServiceFactory p11CryptServiceFactory;
 
     private Map<String, P11CryptService> p11CryptServices = new HashMap<>();
 
@@ -66,9 +66,9 @@ public class LocalP11CryptServicePool {
     public LocalP11CryptServicePool() {
     }
 
-    public void setSecurityFactory(
-            final SecurityFactory securityFactory) {
-        this.securityFactory = securityFactory;
+    public void setP11CryptServiceFactory(
+            final P11CryptServiceFactory p11CryptServiceFactory) {
+        this.p11CryptServiceFactory = p11CryptServiceFactory;
     }
 
     public void init()
@@ -82,13 +82,13 @@ public class LocalP11CryptServicePool {
         }
 
         try {
-            if (securityFactory == null) {
+            if (p11CryptServiceFactory == null) {
                 throw new IllegalStateException("securityFactory is not configured");
             }
 
-            Set<String> moduleNames = securityFactory.getP11ModuleNames();
+            Set<String> moduleNames = p11CryptServiceFactory.getModuleNames();
             for (String moduleName : moduleNames) {
-                P11CryptService p11Service = securityFactory.getP11CryptService(moduleName);
+                P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
                 if (p11Service != null) {
                     p11CryptServices.put(moduleName, p11Service);
                 }

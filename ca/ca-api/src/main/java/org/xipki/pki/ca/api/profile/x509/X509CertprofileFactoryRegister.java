@@ -55,8 +55,8 @@ public interface X509CertprofileFactoryRegister {
      * @throws CertprofileException if certificate profile could not be created.
      */
     X509Certprofile newCertprofile(
-            @Nonnull final String type,
-            final long timeout)
+            @Nonnull String type,
+            long timeout)
     throws CertprofileException;
 
 }

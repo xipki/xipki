@@ -11,23 +11,11 @@
   <artifactId>security-impl</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <DynamicImport-Package>*</DynamicImport-Package>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>security-api</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>pkcs11-proxy-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki.iaik</groupId>
-      <artifactId>sunpkcs11-wrapper</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

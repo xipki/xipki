@@ -105,6 +105,23 @@
               </artifactItems>
             </configuration>
           </execution>
+          <execution>
+            <id>copy-to-deploy</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${output.directory}/deploy</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.commons</groupId>
+                  <artifactId>security-pkcs12</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>

@@ -56,8 +56,8 @@ public interface X509CertPublisherFactoryRegister {
      * @throws CertprofileException if publisher could not be created.
      */
     X509CertPublisher newPublisher(
-            @Nonnull final String type,
-            final long timeout)
+            @Nonnull String type,
+            long timeout)
     throws CertPublisherException;
 
 }

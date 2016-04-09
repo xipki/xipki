@@ -41,7 +41,6 @@ import java.security.KeyStoreException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -52,8 +51,6 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.commons.password.api.PasswordResolver;
-import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -61,14 +58,6 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  */
 
 public interface SecurityFactory {
-
-    String DEFAULT_P11MODULE_NAME = "default";
-
-    Set<String> getP11ModuleNames();
-
-    P11CryptService getP11CryptService(
-            @Nonnull String moduleName)
-    throws SecurityException, P11TokenException;
 
     PasswordResolver getPasswordResolver();
 
@@ -139,5 +128,7 @@ public interface SecurityFactory {
     SecureRandom getRandom4Sign();
 
     SecureRandom getRandom4Key();
+
+    int getDefaultSignerParallelism();
 
 }

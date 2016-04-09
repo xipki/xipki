@@ -105,6 +105,34 @@
               </artifactItems>
             </configuration>
           </execution>
+          <execution>
+            <id>copy-to-deploy</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${output.directory}/deploy</outputDirectory>
+              <artifactItems>
+                <!-- security PKCS#11 -->
+                <artifactItem>
+                  <groupId>org.xipki.commons</groupId>
+                  <artifactId>security-pkcs11</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.iaik</groupId>
+                  <artifactId>sunpkcs11-wrapper</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.commons</groupId>
+                  <artifactId>pkcs11-proxy-common</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
