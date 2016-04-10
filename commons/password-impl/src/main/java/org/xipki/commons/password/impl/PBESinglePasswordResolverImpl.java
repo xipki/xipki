@@ -36,8 +36,10 @@
 
 package org.xipki.commons.password.impl;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordCallback;
+import org.xipki.commons.password.api.PasswordCallbackFactoryRegister;
 import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.password.api.SinglePasswordResolver;
 
@@ -52,6 +54,12 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
 
     private final Object masterPasswordLock = new Object();
 
+    private PasswordCallbackFactoryRegister callbackFactoryRegister;
+
+    private long newPasswordCallbackTimeout = 60000; // 1 minute
+
+    private String masterPasswordCallbackConf;
+
     private PasswordCallback masterPwdCallback;
 
     public PBESinglePasswordResolverImpl() {
@@ -60,6 +68,7 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
     protected char[] getMasterPassword(String encryptedPassword)
     throws PasswordResolverException {
         synchronized (masterPasswordLock) {
+            init();
             if (masterPassword == null) {
                 if (masterPwdCallback == null) {
                     throw new PasswordResolverException(
@@ -70,6 +79,43 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
             }
             return masterPassword;
         }
+    }
+
+    private void init() {
+        if (masterPwdCallback != null) {
+            return;
+        }
+
+        if (masterPasswordCallbackConf == null) {
+            return;
+        }
+
+        String tmpCallback = masterPasswordCallbackConf.trim();
+        if (StringUtil.isBlank(tmpCallback)) {
+            return;
+        }
+
+        String type;
+        String conf = null;
+
+        int delimIndex = tmpCallback.indexOf(' ');
+        if (delimIndex == -1) {
+            type = tmpCallback;
+        } else {
+            type = tmpCallback.substring(0, delimIndex);
+            conf = tmpCallback.substring(delimIndex + 1);
+        }
+
+        PasswordCallback pwdCallback;
+        try {
+            pwdCallback = callbackFactoryRegister.newPasswordCallback(type,
+                    newPasswordCallbackTimeout);
+            pwdCallback.init(conf);
+        } catch (PasswordResolverException ex) {
+            throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
+                    + tmpCallback + ", " + ex.getClass().getName() + ": " + ex.getMessage());
+        }
+        this.masterPwdCallback = pwdCallback;
     }
 
     public void clearMasterPassword() {
@@ -90,43 +136,19 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
                 passwordHint);
     }
 
+    public void setCallbackFactoryRegister(
+            final PasswordCallbackFactoryRegister callbackFactoryRegister) {
+        this.callbackFactoryRegister = callbackFactoryRegister;
+    }
+
     public void setMasterPasswordCallback(
             final String masterPasswordCallback) {
-        if (masterPasswordCallback == null) {
-            return;
-        }
+        this.masterPasswordCallbackConf = masterPasswordCallback;
+    }
 
-        String tmpCallback = masterPasswordCallback.trim();
-        if (StringUtil.isBlank(tmpCallback)) {
-            return;
-        }
-
-        String className;
-        String conf = null;
-
-        int delimIndex = tmpCallback.indexOf(' ');
-        if (delimIndex == -1) {
-            className = tmpCallback;
-        } else {
-            className = tmpCallback.substring(0, delimIndex);
-            conf = tmpCallback.substring(delimIndex + 1);
-        }
-
-        try {
-            Class<?> clazz = Class.forName(className);
-            Object obj = clazz.newInstance();
-            if (obj instanceof PasswordCallback) {
-                ((PasswordCallback) obj).init(conf);
-                this.masterPwdCallback = (PasswordCallback) obj;
-            } else {
-                throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
-                        + tmpCallback);
-            }
-
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
-                    + tmpCallback + ", " + ex.getClass().getName() + ": " + ex.getMessage());
-        }
-    } // method setMasterPasswordCallback
+    public void setNewPasswordCallbackTimeout(
+            final long timeout) {
+        this.newPasswordCallbackTimeout = ParamUtil.requireMin("timeout", timeout, 0);
+    }
 
 }

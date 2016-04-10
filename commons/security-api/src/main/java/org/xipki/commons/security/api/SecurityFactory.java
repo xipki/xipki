@@ -50,6 +50,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.password.api.PasswordResolver;
 
 /**
@@ -65,19 +66,19 @@ public interface SecurityFactory {
             @Nonnull String type,
             @Nullable String conf,
             @Nullable X509Certificate cert)
-    throws SecurityException;
+    throws ObjectCreationException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
             @Nullable String conf,
             @Nullable X509Certificate cert)
-    throws SecurityException;
+    throws ObjectCreationException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
             @Nullable String conf,
             @Nullable X509Certificate[] certs)
-    throws SecurityException;
+    throws ObjectCreationException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
@@ -85,7 +86,7 @@ public interface SecurityFactory {
             @Nonnull String hashAlgo,
             @Nullable SignatureAlgoControl sigAlgoControl,
             @Nullable X509Certificate cert)
-    throws SecurityException;
+    throws ObjectCreationException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
@@ -93,7 +94,7 @@ public interface SecurityFactory {
             @Nonnull String hashAlgo,
             @Nonnull SignatureAlgoControl sigAlgoControl,
             @Nullable X509Certificate[] certs)
-    throws SecurityException;
+    throws ObjectCreationException;
 
     ContentVerifierProvider getContentVerifierProvider(
             @Nonnull PublicKey publicKey)

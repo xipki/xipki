@@ -45,6 +45,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
@@ -84,11 +85,16 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final X500Name subjectDn,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    throws PasswordResolverException, SecurityException {
+    throws SecurityException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         ParamUtil.requireNonNull("signerType", signerType);
-        ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf,
-                (X509Certificate[]) null);
+        ConcurrentContentSigner signer;
+        try {
+            signer = securityFactory.createSigner(signerType, signerConf,
+                    (X509Certificate[]) null);
+        } catch (ObjectCreationException ex) {
+            throw new SecurityException("could not create signer: " + ex.getMessage(), ex);
+        }
         return generateRequest(signer, subjectPublicKeyInfo, subjectDn, attributes);
     }
 

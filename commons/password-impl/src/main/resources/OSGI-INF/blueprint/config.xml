@@ -4,10 +4,16 @@
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
   <cm:property-placeholder persistent-id="org.xipki.commons.password" update-strategy="reload">
     <cm:default-properties>
-      <cm:property name="masterPassword.callback"
-          value="org.xipki.commons.password.impl.GuiPasswordCallback"/>
+      <cm:property name="masterPassword.callback" value="PBE-GUI"/>
+      <cm:property name="newPasswordCallbackTimeout" value="60000"/>
     </cm:default-properties>
   </cm:property-placeholder>
+
+  <bean id="factory" class="org.xipki.commons.password.impl.callback.PasswordCallbackFactoryImpl"/>
+  <service ref="factory" interface="org.xipki.commons.password.api.PasswordCallbackFactory"/>
+
+  <reference id="callbackFactoryRegister"
+      interface="org.xipki.commons.password.api.PasswordCallbackFactoryRegister"/>
 
   <bean id="passwordResolver" class="org.xipki.commons.password.impl.PasswordResolverImpl"/>
   <reference-list id="singlePasswordResolvers"
@@ -21,8 +27,11 @@
   <service ref="obfSinglePasswordResolver"
       interface="org.xipki.commons.password.api.SinglePasswordResolver"/>
 
-  <bean id="pbeSinglePasswordResolver" class="org.xipki.commons.password.impl.PBESinglePasswordResolverImpl">
+  <bean id="pbeSinglePasswordResolver"
+      class="org.xipki.commons.password.impl.PBESinglePasswordResolverImpl">
+    <property name="callbackFactoryRegister" ref="callbackFactoryRegister"/>
     <property name="masterPasswordCallback" value="${masterPassword.callback}"/>
+    <property name="newPasswordCallbackTimeout" value="${newPasswordCallbackTimeout}"/>
   </bean>
   <service ref="pbeSinglePasswordResolver"
       interface="org.xipki.commons.password.api.SinglePasswordResolver"/>

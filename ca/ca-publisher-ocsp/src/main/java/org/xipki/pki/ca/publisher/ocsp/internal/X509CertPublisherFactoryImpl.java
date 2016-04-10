@@ -36,7 +36,7 @@
 
 package org.xipki.pki.ca.publisher.ocsp.internal;
 
-import org.xipki.pki.ca.api.publisher.CertPublisherException;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.pki.ca.api.publisher.x509.X509CertPublisher;
 import org.xipki.pki.ca.api.publisher.x509.X509CertPublisherFactory;
 
@@ -56,11 +56,11 @@ public class X509CertPublisherFactoryImpl implements X509CertPublisherFactory {
     @Override
     public X509CertPublisher newPublisher(
             final String type)
-    throws CertPublisherException {
+    throws ObjectCreationException {
         if ("OCSP".equalsIgnoreCase(type)) {
             return new OcspCertPublisher();
         } else {
-            throw new CertPublisherException("unknown cert publisher type '" + type + "'");
+            throw new ObjectCreationException("unknown cert publisher type '" + type + "'");
         }
     }
 

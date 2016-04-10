@@ -37,7 +37,6 @@
 package org.xipki.pki.ca.client.shell;
 
 import java.io.File;
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -74,6 +73,7 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
@@ -88,7 +88,6 @@ import org.xipki.commons.security.api.ExtensionExistence;
 import org.xipki.commons.security.api.InvalidOidOrNameException;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
@@ -219,7 +218,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
     protected abstract ConcurrentContentSigner getSigner(
             @Nonnull SignatureAlgoControl signatureAlgoControl)
-    throws SecurityException, IOException;
+    throws ObjectCreationException;
 
     @Override
     protected Object doExecute()

@@ -45,6 +45,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
@@ -85,7 +86,7 @@ public class SignerFactoryImpl implements SignerFactory {
             final String type,
             final String conf,
             final X509Certificate[] certificateChain)
-    throws SecurityException {
+    throws ObjectCreationException {
         return doCreateSigner(type, conf, null, null, certificateChain);
     }
 
@@ -96,7 +97,7 @@ public class SignerFactoryImpl implements SignerFactory {
             final String hashAlgo,
             final SignatureAlgoControl sigAlgoControl,
             final X509Certificate[] certificateChain)
-    throws SecurityException {
+    throws ObjectCreationException {
         return doCreateSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl, certificateChain);
     }
 
@@ -106,9 +107,9 @@ public class SignerFactoryImpl implements SignerFactory {
             final String hashAlgo,
             final SignatureAlgoControl sigAlgoControl,
             final X509Certificate[] certificateChain)
-    throws SecurityException {
+    throws ObjectCreationException {
         if (!canCreateSigner(type)) {
-            throw new SecurityException("unknown cert signer type '" + type + "'");
+            throw new ObjectCreationException("unknown cert signer type '" + type + "'");
         }
         ConfPairs keyValues = new ConfPairs(conf);
 
@@ -118,11 +119,11 @@ public class SignerFactoryImpl implements SignerFactory {
             try {
                 parallelism = Integer.parseInt(str);
             } catch (NumberFormatException ex) {
-                throw new SecurityException("invalid parallelism " + str);
+                throw new ObjectCreationException("invalid parallelism " + str);
             }
 
             if (parallelism < 1) {
-                throw new SecurityException("invalid parallelism " + str);
+                throw new ObjectCreationException("invalid parallelism " + str);
             }
         }
 
@@ -139,7 +140,7 @@ public class SignerFactoryImpl implements SignerFactory {
 
         if ((slotIndex == null && slotId == null)
                 || (slotIndex != null && slotId != null)) {
-            throw new SecurityException(
+            throw new ObjectCreationException(
                     "exactly one of slot (index) and slot-id must be specified");
         }
 
@@ -152,7 +153,7 @@ public class SignerFactoryImpl implements SignerFactory {
 
         if ((keyId == null && keyLabel == null)
                 || (keyId != null && keyLabel != null)) {
-            throw new SecurityException(
+            throw new ObjectCreationException(
                     "exactly one of key-id and key-label must be specified");
         }
 
@@ -165,8 +166,8 @@ public class SignerFactoryImpl implements SignerFactory {
                     ? module.getSlotIdForId(slotId)
                     : module.getSlotIdForIndex(slotIndex);
             slot = module.getSlot(p11SlotId);
-        } catch (P11TokenException ex) {
-            throw new SecurityException("P11TokenException: " + ex.getMessage(), ex);
+        } catch (P11TokenException | SecurityException ex) {
+            throw new ObjectCreationException(ex.getMessage(), ex);
         }
 
         P11ObjectIdentifier p11ObjId = (keyId != null)
@@ -176,7 +177,7 @@ public class SignerFactoryImpl implements SignerFactory {
             String str2 = (keyId != null)
                     ? "id " + Hex.toHexString(keyId)
                     : "label " + keyLabel;
-            throw new SecurityException("cound not find identity with " + str2);
+            throw new ObjectCreationException("cound not find identity with " + str2);
         }
         P11EntityIdentifier entityId = new P11EntityIdentifier(slot.getSlotId(), p11ObjId);
 
@@ -193,8 +194,8 @@ public class SignerFactoryImpl implements SignerFactory {
             P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
                     p11Service, securityFactory, entityId, certificateChain);
             return signerBuilder.createSigner(signatureAlgId, parallelism);
-        } catch (P11TokenException | NoSuchAlgorithmException ex) {
-            throw new SecurityException(ex.getMessage(), ex);
+        } catch (P11TokenException | NoSuchAlgorithmException | SecurityException ex) {
+            throw new ObjectCreationException(ex.getMessage(), ex);
         }
 
     }

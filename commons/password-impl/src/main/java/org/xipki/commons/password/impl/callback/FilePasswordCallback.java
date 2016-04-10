@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.password.impl;
+package org.xipki.commons.password.impl.callback;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,6 +48,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordCallback;
 import org.xipki.commons.password.api.PasswordResolverException;
+import org.xipki.commons.password.impl.OBFPasswordServiceImpl;
 
 /**
  * @author Lijun Liao

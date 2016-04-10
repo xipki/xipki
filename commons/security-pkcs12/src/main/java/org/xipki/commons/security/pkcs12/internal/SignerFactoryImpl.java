@@ -50,6 +50,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordResolver;
@@ -82,7 +83,7 @@ public class SignerFactoryImpl implements SignerFactory {
             final String type,
             final String conf,
             final X509Certificate[] certificateChain)
-    throws SecurityException {
+    throws ObjectCreationException {
         return doCreateSigner(type, conf, null, null, certificateChain);
     }
 
@@ -93,7 +94,7 @@ public class SignerFactoryImpl implements SignerFactory {
             final String hashAlgo,
             final SignatureAlgoControl sigAlgoControl,
             final X509Certificate[] certificateChain)
-    throws SecurityException {
+    throws ObjectCreationException {
         return doCreateSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl, certificateChain);
     }
 
@@ -103,9 +104,9 @@ public class SignerFactoryImpl implements SignerFactory {
             final String hashAlgo,
             final SignatureAlgoControl sigAlgoControl,
             final X509Certificate[] certificateChain)
-    throws SecurityException {
+    throws ObjectCreationException {
         if (!canCreateSigner(type)) {
-            throw new SecurityException("unknown cert signer type '" + type + "'");
+            throw new ObjectCreationException("unknown cert signer type '" + type + "'");
         }
         ConfPairs keyValues = new ConfPairs(conf);
 
@@ -115,11 +116,11 @@ public class SignerFactoryImpl implements SignerFactory {
             try {
                 parallelism = Integer.parseInt(str);
             } catch (NumberFormatException ex) {
-                throw new SecurityException("invalid parallelism " + str);
+                throw new ObjectCreationException("invalid parallelism " + str);
             }
 
             if (parallelism < 1) {
-                throw new SecurityException("invalid parallelism " + str);
+                throw new ObjectCreationException("invalid parallelism " + str);
             }
         }
 
@@ -135,7 +136,7 @@ public class SignerFactoryImpl implements SignerFactory {
                 try {
                     password = passwordResolver.resolvePassword(passwordHint);
                 } catch (PasswordResolverException ex) {
-                    throw new SecurityException(
+                    throw new ObjectCreationException(
                             "could not resolve password. Message: " + ex.getMessage());
                 }
             }
@@ -153,16 +154,16 @@ public class SignerFactoryImpl implements SignerFactory {
             try {
                 keystoreStream = new FileInputStream(IoUtil.expandFilepath(fn));
             } catch (FileNotFoundException ex) {
-                throw new SecurityException("file not found: " + fn);
+                throw new ObjectCreationException("file not found: " + fn);
             }
         } else {
-            throw new SecurityException("unknown keystore content format");
+            throw new ObjectCreationException("unknown keystore content format");
         }
 
-        SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
-                type, keystoreStream, password, keyLabel, password, certificateChain);
-
         try {
+            SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
+                    type, keystoreStream, password, keyLabel, password, certificateChain);
+
             AlgorithmIdentifier signatureAlgId;
             if (hashAlgo == null) {
                 signatureAlgId = SignerUtil.getSignatureAlgoId(conf);
@@ -174,9 +175,9 @@ public class SignerFactoryImpl implements SignerFactory {
 
             return signerBuilder.createSigner(signatureAlgId, parallelism,
                     securityFactory.getRandom4Sign());
-        } catch (OperatorCreationException | NoSuchPaddingException
-                | NoSuchAlgorithmException ex) {
-            throw new SecurityException(String.format("%s: %s",
+        } catch (NoSuchAlgorithmException | OperatorCreationException | NoSuchPaddingException
+                | SecurityException ex) {
+            throw new ObjectCreationException(String.format("%s: %s",
                     ex.getClass().getName(), ex.getMessage()));
         }
     }

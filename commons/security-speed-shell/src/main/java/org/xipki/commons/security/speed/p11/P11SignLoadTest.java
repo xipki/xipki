@@ -41,9 +41,9 @@ import java.security.cert.X509Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LoadExecutor;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
@@ -91,7 +91,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
             final String signatureAlgorithm,
             final P11ObjectIdentifier objectId,
             final String description)
-    throws SecurityException {
+    throws ObjectCreationException {
         super(description + "\nsignature algorithm: " + signatureAlgorithm);
 
         ParamUtil.requireNonNull("securityFactory", securityFactory);

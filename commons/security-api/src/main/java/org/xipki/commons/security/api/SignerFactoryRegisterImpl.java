@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -59,7 +60,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
             final SignerFactory service) {
         //might be null if dependency is optional
         if (service == null) {
-            LOG.debug("bindService invoked with null.");
+            LOG.info("bindService invoked with null.");
             return;
         }
 
@@ -69,21 +70,21 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         String action = replaced
                 ? "replaced"
                 : "added";
-        LOG.debug("{} SignerFactory binding for {}", action, service);
+        LOG.info("{} SignerFactory binding for {}", action, service);
     }
 
     public void unbindService(
             final SignerFactory service) {
         //might be null if dependency is optional
         if (service == null) {
-            LOG.debug("unbindService invoked with null.");
+            LOG.info("unbindService invoked with null.");
             return;
         }
 
         if (services.remove(service)) {
-            LOG.debug("removed SignerFactory binding for {}", service);
+            LOG.info("removed SignerFactory binding for {}", service);
         } else {
-            LOG.debug("no SignerFactory binding found to remove for '{}'", service);
+            LOG.info("no SignerFactory binding found to remove for '{}'", service);
         }
     }
 
@@ -93,7 +94,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
             final String conf,
             final X509Certificate[] certificateChain,
             final long timeout)
-    throws SecurityException {
+    throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
         ParamUtil.requireMin("timeout", timeout, 0);
 
@@ -118,7 +119,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         }
 
         if (signer == null) {
-            throw new SecurityException("could not new signer");
+            throw new ObjectCreationException("could not new signer '" + type + "'");
         }
         return signer;
     }
@@ -131,7 +132,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
             final SignatureAlgoControl sigAlgoControl,
             final X509Certificate[] certificateChain,
             final long timeout)
-    throws SecurityException {
+    throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
         ParamUtil.requireMin("timeout", timeout, 0);
 
@@ -157,7 +158,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         }
 
         if (signer == null) {
-            throw new SecurityException("could not new signer");
+            throw new ObjectCreationException("could not new signer '" + type + "'");
         }
         return signer;
     }

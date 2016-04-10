@@ -89,6 +89,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
@@ -96,7 +97,6 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.util.X509Util;
@@ -381,7 +381,7 @@ public final class CaClientImpl implements CaClient {
                             requestorConf.getSignerType(), requestorConf.getSignerConf(),
                             requestorCert);
                     requestorSigners.put(name, requestorSigner);
-                } catch (SecurityException ex) {
+                } catch (ObjectCreationException ex) {
                     throw new InvalidConfException(ex.getMessage(), ex);
                 }
             } else {
