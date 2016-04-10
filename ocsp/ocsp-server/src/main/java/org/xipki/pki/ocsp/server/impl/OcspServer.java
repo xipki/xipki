@@ -134,6 +134,7 @@ import org.xipki.pki.ocsp.api.CertStatus;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
 import org.xipki.pki.ocsp.api.CertStatusStore;
 import org.xipki.pki.ocsp.api.CertStatusStoreException;
+import org.xipki.pki.ocsp.api.CertStatusStoreFactoryRegister;
 import org.xipki.pki.ocsp.api.CertprofileOption;
 import org.xipki.pki.ocsp.api.OcspMode;
 import org.xipki.pki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
@@ -216,6 +217,10 @@ public class OcspServer {
 
     private AuditServiceRegister auditServiceRegister;
 
+    private CertStatusStoreFactoryRegister certStatusStoreFactoryRegister;
+
+    private long newStoreTimeout;
+
     private Map<String, Responder> responders = new HashMap<>();
 
     private Map<String, ResponderSigner> signers = new HashMap<>();
@@ -248,6 +253,12 @@ public class OcspServer {
     public void setConfFile(
             final String confFile) {
         this.confFile = confFile;
+    }
+
+    public void setNewStoreTimeout(
+            final long newStoreTimeout) {
+        this.newStoreTimeout = ParamUtil.requireMin("newStoreTimeout",
+                newStoreTimeout, 0);
     }
 
     ResponderAndRelativeUri getResponderAndRelativeUri(
@@ -1129,6 +1140,11 @@ public class OcspServer {
         }
     }
 
+    public void setCertStatusStoreFactoryRegister(
+            final CertStatusStoreFactoryRegister certStatusStoreFactoryRegister) {
+        this.certStatusStoreFactoryRegister = certStatusStoreFactoryRegister;
+    }
+
     private void auditLogPciEvent(
             final boolean successful,
             final String eventType) {
@@ -1279,23 +1295,14 @@ public class OcspServer {
                     getBoolean(conf.isUnknownSerialAsGood(), true));
         } else if (source.getCustomStore() != null) {
             CustomStoreType customStoreConf = source.getCustomStore();
-            String className = customStoreConf.getClassName();
+            String type = customStoreConf.getType();
             statusStoreConf = customStoreConf.getConf();
             datasourceName = customStoreConf.getDatasource();
-
-            Object instance;
             try {
-                Class<?> clazz = Class.forName(className);
-                instance = clazz.newInstance();
-            } catch (Exception ex) {
-                throw new InvalidConfException(ex.getMessage(), ex);
-            }
-
-            if (instance instanceof CertStatusStore) {
-                store = (CertStatusStore) instance;
-            } else {
-                throw new InvalidConfException(className + " is not instanceof "
-                        + CertStatusStore.class.getName());
+                store = certStatusStoreFactoryRegister.newCertStatusStore(type, newStoreTimeout);
+            } catch (CertStatusStoreException ex) {
+                throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
+                        + ":" + ex.getMessage(), ex);
             }
         } else {
             throw new RuntimeException("should not reach here, unknwon CertStore type");
