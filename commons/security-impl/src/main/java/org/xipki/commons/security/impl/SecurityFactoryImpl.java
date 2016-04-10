@@ -74,6 +74,7 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolver;
@@ -81,7 +82,6 @@ import org.xipki.commons.security.api.AbstractSecurityFactory;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.KeyCertPair;
 import org.xipki.commons.security.api.NoIdleSignerException;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.SignerFactoryRegister;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
@@ -146,7 +146,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final String hashAlgo,
             final SignatureAlgoControl sigAlgoControl,
             final X509Certificate[] certs)
-    throws SecurityException {
+    throws ObjectCreationException {
         ConcurrentContentSigner signer = signerFactoryRegister.newSigner(type, confWithoutAlgo,
                 hashAlgo, sigAlgoControl, certs, newSignerTimeout);
         validateSigner(signer, type, confWithoutAlgo);
@@ -158,7 +158,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final String type,
             final String conf,
             final X509Certificate[] certificateChain)
-    throws SecurityException {
+    throws ObjectCreationException {
         ConcurrentContentSigner signer = signerFactoryRegister.newSigner(type, conf, null, null,
                 certificateChain, newSignerTimeout);
         validateSigner(signer, type, conf);
@@ -271,7 +271,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final String type,
             final String conf,
             final X509Certificate cert)
-    throws SecurityException {
+    throws ObjectCreationException {
         ConfPairs confPairs = new ConfPairs(conf);
         confPairs.putPair("parallelism", Integer.toString(1));
         String algo = confPairs.getValue("algo");
@@ -396,7 +396,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final ConcurrentContentSigner signer,
             final String signerType,
             final String signerConf)
-    throws SecurityException {
+    throws ObjectCreationException {
         if (signer.getPublicKey() == null) {
             return;
         }
@@ -406,7 +406,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             signatureAlgoName = AlgorithmUtil.getSignatureAlgoName(
                     signer.getAlgorithmIdentifier());
         } catch (NoSuchAlgorithmException ex) {
-            throw new SecurityException(ex.getMessage(), ex);
+            throw new ObjectCreationException(ex.getMessage(), ex);
         }
 
         try {
@@ -435,11 +435,11 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                     sb.append("', certificate subject='").append(subject).append("'");
                 }
 
-                throw new SecurityException(sb.toString());
+                throw new ObjectCreationException(sb.toString());
             }
         } catch (IOException | NoSuchAlgorithmException | InvalidKeyException
                 | SignatureException | NoSuchProviderException | NoIdleSignerException ex) {
-            throw new SecurityException(ex.getMessage(), ex);
+            throw new ObjectCreationException(ex.getMessage(), ex);
         }
     } // method validateSigner
 

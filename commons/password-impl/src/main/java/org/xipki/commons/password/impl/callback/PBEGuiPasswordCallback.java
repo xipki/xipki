@@ -34,56 +34,33 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.api;
+package org.xipki.commons.password.impl.callback;
 
-import java.security.cert.X509Certificate;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.xipki.commons.common.ObjectCreationException;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.password.api.PasswordResolverException;
+import org.xipki.commons.password.impl.PBEPasswordServiceImpl;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface SignerFactoryRegister {
+// CHECKSTYLE:SKIP
+public class PBEGuiPasswordCallback extends GuiPasswordCallback {
 
-    /**
-     *
-     * @param type type of the signer
-     * @param conf configuration
-     * @param certificateChain certificate chain
-     * @param timeout timeout in milliseconds, 0 for forever
-     * @return new signer.
-     * @throws ObjectCreationException if signer could not be created.
-     */
-    ConcurrentContentSigner newSigner(
-            @Nonnull String type,
-            @Nullable String conf,
-            @Nullable X509Certificate[] certificateChain,
-            final long timeout)
-    throws ObjectCreationException;
-
-    /**
-     *
-     * @param type type of the signer
-     * @param confWithoutAlgo configuration without algorithm
-     * @param hashAlgo hash algorithm
-     * @param sigAlgoControl signature algorithm control
-     * @param certificateChain certificate chain
-     * @param timeout timeout in milliseconds, 0 for forever.
-     * @return new signer.
-     * @throws ObjectCreationException if signer could not be created.
-     */
-    ConcurrentContentSigner newSigner(
-            @Nonnull String type,
-            @Nullable String confWithoutAlgo,
-            @Nullable String hashAlgo,
-            @Nullable SignatureAlgoControl sigAlgoControl,
-            @Nullable X509Certificate[] certificateChain,
-            final long timeout)
-    throws ObjectCreationException;
+    @Override
+    protected boolean isPasswordValid(
+            final char[] password,
+            final String testToken) {
+        if (StringUtil.isBlank(testToken)) {
+            return true;
+        }
+        try {
+            PBEPasswordServiceImpl.doDecryptPassword(password, testToken);
+            return true;
+        } catch (PasswordResolverException ex) {
+            return false;
+        }
+    }
 
 }

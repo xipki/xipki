@@ -11,9 +11,6 @@
   <artifactId>password-impl</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <DynamicImport-Package>*</DynamicImport-Package>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+
+  <bean id="factoryRegister"
+       class="org.xipki.commons.password.api.PasswordCallbackFactoryRegisterImpl"/>
+  <service ref="factoryRegister"
+       interface="org.xipki.commons.password.api.PasswordCallbackFactoryRegister"/>
+  <reference-list id="factories"
+       interface="org.xipki.commons.password.api.PasswordCallbackFactory"
+       availability="optional">
+    <reference-listener ref="factoryRegister" bind-method="bindService"
+         unbind-method="unbindService"/>
+  </reference-list>
+
+</blueprint>

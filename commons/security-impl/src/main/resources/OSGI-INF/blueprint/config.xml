@@ -10,6 +10,7 @@
       <cm:property name="hostnameVerifier.trustAll" value="false"/>
       <cm:property name="hostnameVerifier.commonnameHostMap" value=""/>
       <cm:property name="defaultSignerParallelism" value="32"/>
+      <cm:property name="newSignerTimeout" value="60000"/>
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -24,6 +25,7 @@
     <property name="defaultSignerParallelism" value="${defaultSignerParallelism}"/>
     <property name="passwordResolver" ref="passwordResolver"/>
     <property name="signerFactoryRegister" ref="signerFactoryRegister"/>
+    <property name="newSignerTimeout" value="${newSignerTimeout}"/>
   </bean>
   <service ref="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
 

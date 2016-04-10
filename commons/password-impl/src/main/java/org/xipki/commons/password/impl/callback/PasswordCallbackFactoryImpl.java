@@ -34,56 +34,41 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.api;
+package org.xipki.commons.password.impl.callback;
 
-import java.security.cert.X509Certificate;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.xipki.commons.common.ObjectCreationException;
+import org.xipki.commons.password.api.PasswordCallback;
+import org.xipki.commons.password.api.PasswordCallbackFactory;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface SignerFactoryRegister {
+public class PasswordCallbackFactoryImpl implements PasswordCallbackFactory {
 
-    /**
-     *
-     * @param type type of the signer
-     * @param conf configuration
-     * @param certificateChain certificate chain
-     * @param timeout timeout in milliseconds, 0 for forever
-     * @return new signer.
-     * @throws ObjectCreationException if signer could not be created.
-     */
-    ConcurrentContentSigner newSigner(
-            @Nonnull String type,
-            @Nullable String conf,
-            @Nullable X509Certificate[] certificateChain,
-            final long timeout)
-    throws ObjectCreationException;
+    @Override
+    public boolean canCreatePasswordCallback(
+            final String type) {
+        return "FILE".equalsIgnoreCase(type)
+                || "GUI".equalsIgnoreCase(type)
+                || "PBE-GUI".equalsIgnoreCase(type)
+                || "PBE-Consumer".equalsIgnoreCase(type);
+    }
 
-    /**
-     *
-     * @param type type of the signer
-     * @param confWithoutAlgo configuration without algorithm
-     * @param hashAlgo hash algorithm
-     * @param sigAlgoControl signature algorithm control
-     * @param certificateChain certificate chain
-     * @param timeout timeout in milliseconds, 0 for forever.
-     * @return new signer.
-     * @throws ObjectCreationException if signer could not be created.
-     */
-    ConcurrentContentSigner newSigner(
-            @Nonnull String type,
-            @Nullable String confWithoutAlgo,
-            @Nullable String hashAlgo,
-            @Nullable SignatureAlgoControl sigAlgoControl,
-            @Nullable X509Certificate[] certificateChain,
-            final long timeout)
-    throws ObjectCreationException;
+    @Override
+    public PasswordCallback newPasswordCallback(
+            final String type) {
+        if ("FILE".equalsIgnoreCase(type)) {
+            return new FilePasswordCallback();
+        } else if ("GUI".equalsIgnoreCase(type)) {
+            return new GuiPasswordCallback();
+        } else if ("PBE-GUI".equalsIgnoreCase(type)) {
+            return new PBEGuiPasswordCallback();
+        } else if ("PBE-Consumer".equalsIgnoreCase(type)) {
+            return new PBEConsumerPasswordCallback();
+        } else {
+            throw new RuntimeException("unknown PasswordCallback type '" + type + "'");
+        }
+    }
 
 }
