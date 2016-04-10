@@ -110,6 +110,7 @@ import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.audit.api.PciAuditEvent;
 import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
@@ -127,7 +128,6 @@ import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.api.CertStatus;
@@ -1202,8 +1202,8 @@ public class OcspServer {
                         "algo=" + sigAlgo + "," + responderKeyConf,
                         explicitCertificateChain);
                 singleSigners.add(requestorSigner);
-            } catch (SecurityException ex) {
-                throw new InvalidConfException("SignerException: " + ex.getMessage(), ex);
+            } catch (ObjectCreationException ex) {
+                throw new InvalidConfException(ex.getMessage(), ex);
             }
         }
 
@@ -1300,8 +1300,8 @@ public class OcspServer {
             datasourceName = customStoreConf.getDatasource();
             try {
                 store = certStatusStoreFactoryRegister.newCertStatusStore(type, newStoreTimeout);
-            } catch (CertStatusStoreException ex) {
-                throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
+            } catch (ObjectCreationException ex) {
+                throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
                         + ":" + ex.getMessage(), ex);
             }
         } else {

@@ -34,43 +34,65 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api;
+package org.xipki.commons.password.api;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.audit.slf4j.impl.Slf4jAuditServiceImpl;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class AuditServiceRegisterImpl implements AuditServiceRegister {
+public class PasswordCallbackFactoryRegisterImpl implements PasswordCallbackFactoryRegister {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AuditServiceRegisterImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(
+            PasswordCallbackFactoryRegisterImpl.class);
 
-    private ConcurrentLinkedDeque<AuditService> services =
-            new ConcurrentLinkedDeque<AuditService>();
-
-    private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
-
-    private boolean auditEnabled;
+    private ConcurrentLinkedDeque<PasswordCallbackFactory> services =
+            new ConcurrentLinkedDeque<PasswordCallbackFactory>();
 
     @Override
-    public AuditService getAuditService() {
-        if (auditEnabled) {
-            return services.isEmpty()
-                    ? defaultAuditService
-                    : services.getLast();
-        } else {
-            return null;
+    public PasswordCallback newPasswordCallback(
+            final String type,
+            final long timeout) {
+        Objects.requireNonNull(type, "type could not be null");
+        if (timeout < 0) {
+            throw new IllegalArgumentException("timeout is invalid: " + timeout);
         }
+
+        long start = System.currentTimeMillis();
+
+        PasswordCallback callback = null;
+        while (true) {
+            for (PasswordCallbackFactory service : services) {
+                if (service.canCreatePasswordCallback(type)) {
+                    callback = service.newPasswordCallback(type);
+                }
+            }
+
+            if (timeout != 0 || System.currentTimeMillis() - start > timeout) {
+                break;
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
+            }
+        }
+
+        if (callback == null) {
+            throw new RuntimeException("could not new PasswordCallback '" + type + "'");
+        }
+
+        return callback;
     }
 
     public void bindService(
-            final AuditService service) {
+            final PasswordCallbackFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.info("bindService invoked with null.");
@@ -83,32 +105,22 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
         String action = replaced
                 ? "replaced"
                 : "added";
-        LOG.info("{} AuditService binding for {}", action, service);
+        LOG.info("{} PasswordCallbackFactory binding for {}", action, service);
     }
 
     public void unbindService(
-            final AuditService service) {
+            final PasswordCallbackFactory service) {
         //might be null if dependency is optional
         if (service == null) {
-            LOG.debug("unbindService invoked with null.");
+            LOG.info("unbindService invoked with null.");
             return;
         }
 
         if (services.remove(service)) {
-            LOG.info("removed AuditService binding for {}", service);
+            LOG.info("removed PasswordCallbackFactory binding for {}", service);
         } else {
-            LOG.info("no AuditService binding found to remove for '{}'", service);
+            LOG.info("no PasswordCallbackFactory binding found to remove for '{}'", service);
         }
-    }
-
-    public void setAuditEnabled(
-            final boolean auditEnabled) {
-        this.auditEnabled = auditEnabled;
-    }
-
-    @Override
-    public boolean isAuditEnabled() {
-        return auditEnabled;
     }
 
 }

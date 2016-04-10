@@ -38,7 +38,7 @@ package org.xipki.pki.ca.api.profile.x509;
 
 import javax.annotation.Nonnull;
 
-import org.xipki.pki.ca.api.profile.CertprofileException;
+import org.xipki.commons.common.ObjectCreationException;
 
 /**
  * @author Lijun Liao
@@ -52,11 +52,11 @@ public interface X509CertprofileFactoryRegister {
      * @param type type of the certificate
      * @param timeout timeout in milliseconds, 0 for forever
      * @return new certificate profile.
-     * @throws CertprofileException if certificate profile could not be created.
+     * @throws ObjectCreationException if certificate profile could not be created.
      */
     X509Certprofile newCertprofile(
             @Nonnull String type,
             long timeout)
-    throws CertprofileException;
+    throws ObjectCreationException;
 
 }

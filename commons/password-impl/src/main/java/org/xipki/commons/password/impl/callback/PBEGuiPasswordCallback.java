@@ -34,33 +34,32 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.certprofile.internal;
+package org.xipki.commons.password.impl.callback;
 
-import org.xipki.commons.common.ObjectCreationException;
-import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
-import org.xipki.pki.ca.api.profile.x509.X509CertprofileFactory;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.password.api.PasswordResolverException;
+import org.xipki.commons.password.impl.PBEPasswordServiceImpl;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class X509CertprofileFactoryImpl implements X509CertprofileFactory {
+// CHECKSTYLE:SKIP
+public class PBEGuiPasswordCallback extends GuiPasswordCallback {
 
     @Override
-    public boolean canCreateProfile(
-            final String type) {
-        return "XML".equalsIgnoreCase(type);
-    }
-
-    @Override
-    public X509Certprofile newCertprofile(
-            final String type)
-    throws ObjectCreationException {
-        if ("XML".equalsIgnoreCase(type)) {
-            return new XmlX509Certprofile();
-        } else {
-            throw new ObjectCreationException("unknown certprofile type '" + type + "'");
+    protected boolean isPasswordValid(
+            final char[] password,
+            final String testToken) {
+        if (StringUtil.isBlank(testToken)) {
+            return true;
+        }
+        try {
+            PBEPasswordServiceImpl.doDecryptPassword(password, testToken);
+            return true;
+        } catch (PasswordResolverException ex) {
+            return false;
         }
     }
 

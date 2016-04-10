@@ -36,7 +36,7 @@
 
 package org.xipki.pki.ca.api.publisher.x509;
 
-import org.xipki.pki.ca.api.publisher.CertPublisherException;
+import org.xipki.commons.common.ObjectCreationException;
 
 /**
  * @author Lijun Liao
@@ -50,6 +50,6 @@ public interface X509CertPublisherFactory {
 
     X509CertPublisher newPublisher(
             String type)
-    throws CertPublisherException;
+    throws ObjectCreationException;
 
 }

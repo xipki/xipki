@@ -38,7 +38,7 @@ package org.xipki.pki.ca.api.profile.x509;
 
 import javax.annotation.Nonnull;
 
-import org.xipki.pki.ca.api.profile.CertprofileException;
+import org.xipki.commons.common.ObjectCreationException;
 
 /**
  * @author Lijun Liao
@@ -52,6 +52,6 @@ public interface X509CertprofileFactory {
 
     X509Certprofile newCertprofile(
             @Nonnull String type)
-    throws CertprofileException;
+    throws ObjectCreationException;
 
 }

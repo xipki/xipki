@@ -43,8 +43,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.util.SignerUtil;
@@ -84,7 +84,7 @@ public class P11EnrollCertCmd extends EnrollCertCommandSupport {
     @Override
     protected ConcurrentContentSigner getSigner(
             final SignatureAlgoControl signatureAlgoControl)
-    throws SecurityException {
+    throws ObjectCreationException {
         byte[] keyIdBytes = null;
         if (keyId != null) {
             keyIdBytes = Hex.decode(keyId);

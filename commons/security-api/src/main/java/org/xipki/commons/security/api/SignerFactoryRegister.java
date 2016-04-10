@@ -41,6 +41,8 @@ import java.security.cert.X509Certificate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.xipki.commons.common.ObjectCreationException;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -55,14 +57,14 @@ public interface SignerFactoryRegister {
      * @param certificateChain certificate chain
      * @param timeout timeout in milliseconds, 0 for forever
      * @return new signer.
-     * @throws SecurityException if signer could not be created.
+     * @throws ObjectCreationException if signer could not be created.
      */
     ConcurrentContentSigner newSigner(
             @Nonnull String type,
             @Nullable String conf,
             @Nullable X509Certificate[] certificateChain,
             final long timeout)
-    throws SecurityException;
+    throws ObjectCreationException;
 
     /**
      *
@@ -72,9 +74,8 @@ public interface SignerFactoryRegister {
      * @param sigAlgoControl signature algorithm control
      * @param certificateChain certificate chain
      * @param timeout timeout in milliseconds, 0 for forever.
-     *
      * @return new signer.
-     * @throws SecurityException if signer could not be created.
+     * @throws ObjectCreationException if signer could not be created.
      */
     ConcurrentContentSigner newSigner(
             @Nonnull String type,
@@ -83,6 +84,6 @@ public interface SignerFactoryRegister {
             @Nullable SignatureAlgoControl sigAlgoControl,
             @Nullable X509Certificate[] certificateChain,
             final long timeout)
-    throws SecurityException;
+    throws ObjectCreationException;
 
 }

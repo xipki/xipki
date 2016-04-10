@@ -49,6 +49,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.util.X509Util;
@@ -120,7 +121,7 @@ public class P12CertUpdateCmd extends P12SecurityCommandSupport {
     private void assertMatch(
             final X509Certificate cert,
             final String password)
-    throws SecurityException {
+    throws ObjectCreationException {
         ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
         if (password != null) {
             pairs.putPair("password", new String(password));

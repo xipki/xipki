@@ -40,9 +40,9 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 
@@ -81,14 +81,14 @@ public class CmpResponderEntryWrapper {
 
     public void initSigner(
             final SecurityFactory securityFactory)
-    throws SecurityException {
+    throws ObjectCreationException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         if (signer != null) {
             return;
         }
 
         if (dbEntry == null) {
-            throw new SecurityException("dbEntry is null");
+            throw new ObjectCreationException("dbEntry is null");
         }
 
         X509Certificate responderCert = dbEntry.getCertificate();
@@ -96,7 +96,7 @@ public class CmpResponderEntryWrapper {
         signer = securityFactory.createSigner(
                 dbEntry.getType(), dbEntry.getConf(), responderCert);
         if (signer.getCertificate() == null) {
-            throw new SecurityException("signer without certificate is not allowed");
+            throw new ObjectCreationException("signer without certificate is not allowed");
         }
         dbEntry.setConfFaulty(false);
 

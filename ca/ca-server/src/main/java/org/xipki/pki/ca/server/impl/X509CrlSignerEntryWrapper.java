@@ -44,6 +44,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.KeyUsage;
@@ -103,8 +104,12 @@ class X509CrlSignerEntryWrapper {
         dbEntry.setConfFaulty(true);
 
         X509Certificate responderCert = dbEntry.getCertificate();
-        signer = securityFactory.createSigner(
-                dbEntry.getType(), dbEntry.getConf(), responderCert);
+        try {
+            signer = securityFactory.createSigner(
+                    dbEntry.getType(), dbEntry.getConf(), responderCert);
+        } catch (ObjectCreationException ex1) {
+            throw new SecurityException("signer without certificate is not allowed");
+        }
 
         X509Certificate signerCert = signer.getCertificate();
         if (signerCert == null) {

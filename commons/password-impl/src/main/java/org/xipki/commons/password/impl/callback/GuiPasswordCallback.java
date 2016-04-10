@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.password.impl;
+package org.xipki.commons.password.impl.callback;
 
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.StringUtil;

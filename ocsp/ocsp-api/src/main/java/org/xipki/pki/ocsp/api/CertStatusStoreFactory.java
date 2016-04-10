@@ -38,6 +38,8 @@ package org.xipki.pki.ocsp.api;
 
 import javax.annotation.Nonnull;
 
+import org.xipki.commons.common.ObjectCreationException;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -50,6 +52,6 @@ public interface CertStatusStoreFactory {
 
     CertStatusStore newCertStatusStore(
             @Nonnull String type)
-    throws CertStatusStoreException;
+    throws ObjectCreationException;
 
 }
