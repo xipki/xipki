@@ -43,13 +43,18 @@ import javax.annotation.Nonnull;
  * @since 2.0.0
  */
 
-public interface CertStatusStoreFactory {
+public interface CertStatusStoreFactoryRegister {
 
-    boolean canCreateCertStatusStore(
-            @Nonnull String type);
-
+    /**
+     *
+     * @param type type of the certificate
+     * @param timeout timeout in milliseconds, 0 for forever
+     * @return new certificate profile.
+     * @throws CertprofileException if certificate profile could not be created.
+     */
     CertStatusStore newCertStatusStore(
-            @Nonnull String type)
+            @Nonnull String type,
+            long timeout)
     throws CertStatusStoreException;
 
 }
