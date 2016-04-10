@@ -40,8 +40,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ca.api.profile.CertprofileException;
 
 /**
  * @author Lijun Liao
@@ -60,7 +60,7 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
     public X509Certprofile newCertprofile(
             final String type,
             final long timeout)
-    throws CertprofileException {
+    throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
         ParamUtil.requireMin("timeout", timeout, 0);
 
@@ -85,7 +85,7 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
         }
 
         if (certProfile == null) {
-            throw new CertprofileException("could not new Certprofile");
+            throw new ObjectCreationException("could not new Certprofile '" + type + "'");
         }
 
         return certProfile;
@@ -95,7 +95,7 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
             final X509CertprofileFactory service) {
         //might be null if dependency is optional
         if (service == null) {
-            LOG.debug("bindService invoked with null.");
+            LOG.info("bindService invoked with null.");
             return;
         }
 
@@ -105,7 +105,7 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
         String action = replaced
                 ? "replaced"
                 : "added";
-        LOG.debug("{} X509CertprofileFactory binding for {}", action, service);
+        LOG.info("{} X509CertprofileFactory binding for {}", action, service);
     }
 
     public void unbindService(
@@ -117,9 +117,9 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
         }
 
         if (services.remove(service)) {
-            LOG.debug("removed X509CertprofileFactory binding for {}", service);
+            LOG.info("removed X509CertprofileFactory binding for {}", service);
         } else {
-            LOG.debug("no X509CertprofileFactory binding found to remove for '{}'", service);
+            LOG.info("no X509CertprofileFactory binding found to remove for '{}'", service);
         }
     }
 

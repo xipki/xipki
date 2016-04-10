@@ -34,31 +34,25 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.password.impl;
-
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.password.api.PasswordResolverException;
+package org.xipki.commons.common;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-// CHECKSTYLE:SKIP
-public class PBEGuiPasswordCallback extends GuiPasswordCallback {
+public class ObjectCreationException extends Exception {
 
-    protected boolean isPasswordValid(
-            final char[] password,
-            final String testToken) {
-        if (StringUtil.isBlank(testToken)) {
-            return true;
-        }
-        try {
-            PBEPasswordServiceImpl.doDecryptPassword(password, testToken);
-            return true;
-        } catch (PasswordResolverException ex) {
-            return false;
-        }
+    private static final long serialVersionUID = 1L;
+
+    public ObjectCreationException(
+            final String msg,
+            final Throwable cause) {
+        super(msg, cause);
     }
 
+    public ObjectCreationException(
+            final String msg) {
+        super(msg);
+    }
 }

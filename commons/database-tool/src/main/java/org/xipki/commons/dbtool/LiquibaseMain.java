@@ -106,7 +106,7 @@ public class LiquibaseMain {
         changeLogLevel(logLevel, logFile);
 
         FileSystemResourceAccessor fsOpener = new FileSystemResourceAccessor();
-        ClassLoader classLoader = getClass().getClassLoader();
+        ClassLoader classLoader = CommandLineResourceAccessor.class.getClassLoader();
         ResourceAccessor clOpener = new CommandLineResourceAccessor(classLoader);
 
         String defaultSchemaName = dbConf.getSchema();

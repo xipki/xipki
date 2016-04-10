@@ -71,6 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
@@ -184,7 +185,7 @@ class X509SelfSignedCertBuilder {
 
             signer = securityFactory.createSigner(signerType, thisSignerConf,
                     (X509Certificate[]) null);
-        } catch (SecurityException ex) {
+        } catch (SecurityException | ObjectCreationException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     ex.getClass().getName() + ": " + ex.getMessage());
         }

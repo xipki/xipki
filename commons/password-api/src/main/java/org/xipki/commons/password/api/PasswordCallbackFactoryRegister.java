@@ -34,34 +34,26 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.certprofile.internal;
+package org.xipki.commons.password.api;
 
-import org.xipki.commons.common.ObjectCreationException;
-import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
-import org.xipki.pki.ca.api.profile.x509.X509CertprofileFactory;
+import javax.annotation.Nonnull;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class X509CertprofileFactoryImpl implements X509CertprofileFactory {
+public interface PasswordCallbackFactoryRegister {
 
-    @Override
-    public boolean canCreateProfile(
-            final String type) {
-        return "XML".equalsIgnoreCase(type);
-    }
-
-    @Override
-    public X509Certprofile newCertprofile(
-            final String type)
-    throws ObjectCreationException {
-        if ("XML".equalsIgnoreCase(type)) {
-            return new XmlX509Certprofile();
-        } else {
-            throw new ObjectCreationException("unknown certprofile type '" + type + "'");
-        }
-    }
+    /**
+     *
+     * @param type type of the certificate
+     * @param timeout timeout in milliseconds, 0 for forever
+     * @return new certificate profile.
+     * @throws RuntimeException if passwordCallback could not be created.
+     */
+    PasswordCallback newPasswordCallback(
+            @Nonnull String type,
+            long timeout);
 
 }

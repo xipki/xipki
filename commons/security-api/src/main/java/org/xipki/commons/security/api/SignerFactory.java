@@ -41,6 +41,8 @@ import java.security.cert.X509Certificate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.xipki.commons.common.ObjectCreationException;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -57,13 +59,13 @@ public interface SignerFactory {
      * @param conf configuration
      * @param certificateChain certificate chain
      * @return new signer.
-     * @throws SecurityException if signer could not be created.
+     * @throws ObjectCreationException if signer could not be created.
      */
     ConcurrentContentSigner newSigner(
             @Nonnull String type,
             @Nullable String conf,
             @Nullable X509Certificate[] certificateChain)
-    throws SecurityException;
+    throws ObjectCreationException;
 
     /**
      *
@@ -74,7 +76,7 @@ public interface SignerFactory {
      * @param certificateChain certificate chain
      *
      * @return new signer.
-     * @throws SecurityException if signer could not be created.
+     * @throws ObjectCreationException if signer could not be created.
      */
     ConcurrentContentSigner newSigner(
             @Nonnull String type,
@@ -82,6 +84,6 @@ public interface SignerFactory {
             @Nullable String hashAlgo,
             @Nullable SignatureAlgoControl sigAlgoControl,
             @Nullable X509Certificate[] certificateChain)
-    throws SecurityException;
+    throws ObjectCreationException;
 
 }

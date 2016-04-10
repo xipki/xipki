@@ -66,6 +66,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
@@ -1236,7 +1237,7 @@ class CaManagerQueryExecutor {
                     for (String[] m : signerConfs) {
                         securityFactory.createSigner(tmpSignerType, m[1], tmpCert);
                     }
-                } catch (SecurityException ex) {
+                } catch (SecurityException | ObjectCreationException ex) {
                     throw new CaMgmtException(
                             "could not create signer for CA '" + name + "'" + ex.getMessage(), ex);
                 }

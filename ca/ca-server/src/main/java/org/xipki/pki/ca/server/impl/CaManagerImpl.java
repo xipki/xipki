@@ -85,6 +85,7 @@ import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.audit.api.PciAuditEvent;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -1233,7 +1234,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                         tmpCaEntry.setCertificate(signer.getCertificate());
                     }
                 }
-            } catch (SecurityException ex) {
+            } catch (SecurityException | ObjectCreationException ex) {
                 throw new CaMgmtException(
                         "could not create signer for new CA " + name + ": " + ex.getMessage(), ex);
             }
@@ -2706,7 +2707,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ret.setDbEntry(dbEntry);
         try {
             ret.initSigner(securityFactory);
-        } catch (SecurityException ex) {
+        } catch (ObjectCreationException ex) {
             final String message = "createCmpResponder";
             LOG.debug(message, ex);
             throw new CaMgmtException(ex.getMessage());
@@ -2752,7 +2753,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             ret.setEnvParameterResolver(envParameterResolver);
             ret.validate();
             return ret;
-        } catch (CertprofileException ex) {
+        } catch (ObjectCreationException | CertprofileException ex) {
             final String message = "could not initialize Certprofile " + dbEntry.getName()
                 + ", ignore it";
             LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
@@ -2776,7 +2777,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             ret = new IdentifiedX509CertPublisher(dbEntry, publisher);
             ret.initialize(securityFactory.getPasswordResolver(), datasources);
             return ret;
-        } catch (CertPublisherException | RuntimeException ex) {
+        } catch (ObjectCreationException | CertPublisherException | RuntimeException ex) {
             final String message = "invalid configuration for the certPublisher " + name;
             LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
             LOG.debug(message, ex);

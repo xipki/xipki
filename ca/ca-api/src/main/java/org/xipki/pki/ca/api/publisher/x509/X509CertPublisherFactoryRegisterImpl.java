@@ -40,8 +40,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ca.api.publisher.CertPublisherException;
 
 /**
  * @author Lijun Liao
@@ -60,7 +60,7 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
     public X509CertPublisher newPublisher(
             final String type,
             final long timeout)
-    throws CertPublisherException {
+    throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
         ParamUtil.requireMin("timeout", timeout, 0);
 
@@ -85,7 +85,7 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
         }
 
         if (publisher == null) {
-            throw new CertPublisherException("could not new publisher");
+            throw new ObjectCreationException("could not new publisher '" + type + "'");
         }
 
         return publisher;
@@ -95,7 +95,7 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
             final X509CertPublisherFactory service) {
         //might be null if dependency is optional
         if (service == null) {
-            LOG.debug("bindService invoked with null.");
+            LOG.info("bindService invoked with null.");
             return;
         }
 
@@ -105,21 +105,21 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
         String action = replaced
                 ? "replaced"
                 : "added";
-        LOG.debug("{} X509CertPublisherFactory binding for {}", action, service);
+        LOG.info("{} X509CertPublisherFactory binding for {}", action, service);
     }
 
     public void unbindService(
             final X509CertPublisherFactory service) {
         //might be null if dependency is optional
         if (service == null) {
-            LOG.debug("unbindService invoked with null.");
+            LOG.info("unbindService invoked with null.");
             return;
         }
 
         if (services.remove(service)) {
-            LOG.debug("removed X509CertPublisherFactory binding for {}", service);
+            LOG.info("removed X509CertPublisherFactory binding for {}", service);
         } else {
-            LOG.debug("no X509CertPublisherFactory binding found to remove for '{}'", service);
+            LOG.info("no X509CertPublisherFactory binding found to remove for '{}'", service);
         }
     }
 

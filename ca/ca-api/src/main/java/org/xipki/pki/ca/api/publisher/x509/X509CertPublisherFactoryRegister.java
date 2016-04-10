@@ -38,8 +38,7 @@ package org.xipki.pki.ca.api.publisher.x509;
 
 import javax.annotation.Nonnull;
 
-import org.xipki.pki.ca.api.profile.CertprofileException;
-import org.xipki.pki.ca.api.publisher.CertPublisherException;
+import org.xipki.commons.common.ObjectCreationException;
 
 /**
  * @author Lijun Liao
@@ -53,11 +52,11 @@ public interface X509CertPublisherFactoryRegister {
      * @param type type of the publisher
      * @param timeout timeout in milliseconds, 0 for forever
      * @return new publisher.
-     * @throws CertprofileException if publisher could not be created.
+     * @throws ObjectCreationException if publisher could not be created.
      */
     X509CertPublisher newPublisher(
             @Nonnull String type,
             long timeout)
-    throws CertPublisherException;
+    throws ObjectCreationException;
 
 }

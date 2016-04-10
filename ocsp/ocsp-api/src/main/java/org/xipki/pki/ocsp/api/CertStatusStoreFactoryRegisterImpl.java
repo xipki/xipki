@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -59,7 +60,7 @@ public class CertStatusStoreFactoryRegisterImpl implements CertStatusStoreFactor
     public CertStatusStore newCertStatusStore(
             final String type,
             final long timeout)
-    throws CertStatusStoreException {
+    throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
         ParamUtil.requireMin("timeout", timeout, 0);
 
@@ -84,7 +85,7 @@ public class CertStatusStoreFactoryRegisterImpl implements CertStatusStoreFactor
         }
 
         if (store == null) {
-            throw new CertStatusStoreException("could not new CertStatusStore");
+            throw new ObjectCreationException("could not new CertStatusStore '" + type + "'");
         }
 
         return store;
@@ -94,7 +95,7 @@ public class CertStatusStoreFactoryRegisterImpl implements CertStatusStoreFactor
             final CertStatusStoreFactory service) {
         //might be null if dependency is optional
         if (service == null) {
-            LOG.debug("bindService invoked with null.");
+            LOG.info("bindService invoked with null.");
             return;
         }
 
@@ -104,21 +105,21 @@ public class CertStatusStoreFactoryRegisterImpl implements CertStatusStoreFactor
         String action = replaced
                 ? "replaced"
                 : "added";
-        LOG.debug("{} CertStatusStoreFactory binding for {}", action, service);
+        LOG.info("{} CertStatusStoreFactory binding for {}", action, service);
     }
 
     public void unbindService(
             final CertStatusStoreFactory service) {
         //might be null if dependency is optional
         if (service == null) {
-            LOG.debug("unbindService invoked with null.");
+            LOG.info("unbindService invoked with null.");
             return;
         }
 
         if (services.remove(service)) {
-            LOG.debug("removed CertStatusStoreFactory binding for {}", service);
+            LOG.info("removed CertStatusStoreFactory binding for {}", service);
         } else {
-            LOG.debug("no CertStatusStoreFactory binding found to remove for '{}'", service);
+            LOG.info("no CertStatusStoreFactory binding found to remove for '{}'", service);
         }
     }
 

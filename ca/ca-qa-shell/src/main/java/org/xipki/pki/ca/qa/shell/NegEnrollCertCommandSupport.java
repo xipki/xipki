@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.qa.shell;
 
-import java.io.IOException;
 import java.security.cert.X509Certificate;
 
 import javax.annotation.Nonnull;
@@ -51,11 +50,11 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
+import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.pki.ca.client.api.CertOrError;
@@ -113,7 +112,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
 
     protected abstract ConcurrentContentSigner getSigner(
             @Nonnull SignatureAlgoControl signatureAlgoControl)
-    throws SecurityException, IOException;
+    throws ObjectCreationException;
 
     @Override
     protected Object doExecute()
