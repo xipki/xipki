@@ -233,7 +233,7 @@ public class AlgorithmUtil {
                         + algoS);
             }
 
-            signatureAlgId = AlgorithmUtil.buildRSAPSSAlgorithmIdentifier(hashAlgo.getOid());
+            signatureAlgId = buildRSAPSSAlgorithmIdentifier(hashAlgo);
         } else {
             boolean withNullParam = false;
             ASN1ObjectIdentifier algOid;
@@ -351,11 +351,11 @@ public class AlgorithmUtil {
                     : algoControl.isEcdsaPlain();
 
             if (pubKey instanceof RSAPublicKey) {
-                return getRSASignatureAlgoId(hashAlgo.getName(), rsaMgf1);
+                return getRSASignatureAlgoId(hashAlgo, rsaMgf1);
             } else if (pubKey instanceof ECPublicKey) {
-                return getECDSASignatureAlgoId(hashAlgo.getName(), ecdsaPlain);
+                return getECDSASignatureAlgoId(hashAlgo, ecdsaPlain);
             } else if (pubKey instanceof DSAPublicKey) {
-                return getDSASignatureAlgoId(hashAlgo.getName());
+                return getDSASignatureAlgoId(hashAlgo);
             } else {
                 throw new NoSuchAlgorithmException("Unknown public key '"
                         + pubKey.getClass().getName());
@@ -377,11 +377,11 @@ public class AlgorithmUtil {
                 : algoControl.isEcdsaPlain();
 
         if (pubKey instanceof RSAPublicKey) {
-            return getRSASignatureAlgoId(hashAlgo.getName(), rsaMgf1);
+            return getRSASignatureAlgoId(hashAlgo, rsaMgf1);
         } else if (pubKey instanceof ECPublicKey) {
-            return getECDSASignatureAlgoId(hashAlgo.getName(), ecdsaPlain);
+            return getECDSASignatureAlgoId(hashAlgo, ecdsaPlain);
         } else if (pubKey instanceof DSAPublicKey) {
-            return getDSASignatureAlgoId(hashAlgo.getName());
+            return getDSASignatureAlgoId(hashAlgo);
         } else {
             throw new NoSuchAlgorithmException("Unknown public key '"
                     + pubKey.getClass().getName());
@@ -464,22 +464,16 @@ public class AlgorithmUtil {
 
     // CHECKSTYLE:SKIP
     public static AlgorithmIdentifier getRSASignatureAlgoId(
-            final String hashAlgo,
+            final HashAlgoType hashAlgo,
             final boolean mgf1)
     throws NoSuchAlgorithmException {
-        ParamUtil.requireNonBlank("hashAlgo", hashAlgo);
+        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         if (mgf1) {
-            ASN1ObjectIdentifier hashAlgoOid = getHashAlg(hashAlgo);
-            return AlgorithmUtil.buildRSAPSSAlgorithmIdentifier(hashAlgoOid);
-        }
-
-        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(hashAlgo);
-        if (hashAlgoType == null) {
-            throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
+            return buildRSAPSSAlgorithmIdentifier(hashAlgo);
         }
 
         ASN1ObjectIdentifier sigAlgoOid;
-        switch (hashAlgoType) {
+        switch (hashAlgo) {
         case SHA1:
             sigAlgoOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
             break;
@@ -496,7 +490,7 @@ public class AlgorithmUtil {
             sigAlgoOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
             break;
         default:
-            throw new RuntimeException("unknown HashAlgoType: " + hashAlgoType);
+            throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
         }
 
         return new AlgorithmIdentifier(sigAlgoOid, DERNull.INSTANCE);
@@ -504,16 +498,12 @@ public class AlgorithmUtil {
 
     // CHECKSTYLE:SKIP
     public static AlgorithmIdentifier getDSASignatureAlgoId(
-            final String hashAlgo)
+            final HashAlgoType hashAlgo)
     throws NoSuchAlgorithmException {
-        ParamUtil.requireNonBlank("hashAlgo", hashAlgo);
-        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(hashAlgo);
-        if (hashAlgoType == null) {
-            throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
-        }
+        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
         ASN1ObjectIdentifier sigAlgoOid;
-        switch (hashAlgoType) {
+        switch (hashAlgo) {
         case SHA1:
             sigAlgoOid = X9ObjectIdentifiers.id_dsa_with_sha1;
             break;
@@ -530,7 +520,7 @@ public class AlgorithmUtil {
             sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha512;
             break;
         default:
-            throw new RuntimeException("unknown HashAlgoType: " + hashAlgoType);
+            throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
         }
 
         return new AlgorithmIdentifier(sigAlgoOid);
@@ -538,17 +528,13 @@ public class AlgorithmUtil {
 
     // CHECKSTYLE:SKIP
     public static AlgorithmIdentifier getECDSASignatureAlgoId(
-            final String hashAlgo,
+            final HashAlgoType hashAlgo,
             final boolean plainSignature)
     throws NoSuchAlgorithmException {
-        ParamUtil.requireNonBlank("hashAlgo", hashAlgo);
-        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(hashAlgo);
-        if (hashAlgoType == null) {
-            throw new RuntimeException("unsupported hash algorithm " + hashAlgo);
-        }
+        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
         ASN1ObjectIdentifier sigAlgoOid;
-        switch (hashAlgoType) {
+        switch (hashAlgo) {
         case SHA1:
             sigAlgoOid = plainSignature
                     ? BSIObjectIdentifiers.ecdsa_plain_SHA1
@@ -575,7 +561,7 @@ public class AlgorithmUtil {
                     : X9ObjectIdentifiers.ecdsa_with_SHA512;
             break;
         default:
-            throw new RuntimeException("unknown HashAlgoType: " + hashAlgoType);
+            throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
         }
 
         return new AlgorithmIdentifier(sigAlgoOid);
@@ -705,26 +691,21 @@ public class AlgorithmUtil {
 
     // CHECKSTYLE:SKIP
     public static AlgorithmIdentifier buildRSAPSSAlgorithmIdentifier(
-            final ASN1ObjectIdentifier digAlgOid)
+            final HashAlgoType digestAlg)
     throws NoSuchAlgorithmException {
-        RSASSAPSSparams params = createPSSRSAParams(digAlgOid);
+        RSASSAPSSparams params = createPSSRSAParams(digestAlg);
         return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
     }
 
     // CHECKSTYLE:SKIP
     public static AlgorithmIdentifier buildDSASigAlgorithmIdentifier(
-            final AlgorithmIdentifier digAlgId)
+            final HashAlgoType digestAlg)
     throws NoSuchAlgorithmException {
-        ParamUtil.requireNonNull("digAlgId", digAlgId);
-        HashAlgoType digAlgoType = HashAlgoType.getHashAlgoType(digAlgId.getAlgorithm());
-        if (digAlgoType == null) {
-            throw new NoSuchAlgorithmException("no DSA signature algorithm with digest algorithm "
-                    + digAlgId.getAlgorithm().getId());
-        }
+        ParamUtil.requireNonNull("digestAlg", digestAlg);
 
         ASN1ObjectIdentifier sid;
 
-        switch (digAlgoType) {
+        switch (digestAlg) {
         case SHA1:
             sid = X9ObjectIdentifiers.id_dsa_with_sha1;
             break;
@@ -741,22 +722,19 @@ public class AlgorithmUtil {
             sid = NISTObjectIdentifiers.dsa_with_sha512;
             break;
         default:
-            throw new RuntimeException("unknown HashAlgoType: " + digAlgoType);
+            throw new RuntimeException("unknown HashAlgoType: " + digestAlg);
         }
         return new AlgorithmIdentifier(sid);
     } // method buildRSAPSSAlgorithmIdentifier
 
     // CHECKSTYLE:SKIP
     public static RSASSAPSSparams createPSSRSAParams(
-            final ASN1ObjectIdentifier digestAlgOid)
+            final HashAlgoType digestAlg)
     throws NoSuchAlgorithmException {
-        ParamUtil.requireNonNull("digestAlgOid", digestAlgOid);
-        HashAlgoType hashAlgoType = HashAlgoType.getHashAlgoType(digestAlgOid);
-        if (hashAlgoType == null) {
-            throw new RuntimeException("unsupported hash algorithm " + digestAlgOid.getId());
-        }
-        int saltSize = hashAlgoType.getLength();
-        AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
+        ParamUtil.requireNonNull("digestAlg", digestAlg);
+        int saltSize = digestAlg.getLength();
+        AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlg.getOid(),
+                DERNull.INSTANCE);
         return new RSASSAPSSparams(digAlgId,
             new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
             new ASN1Integer(saltSize), RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
