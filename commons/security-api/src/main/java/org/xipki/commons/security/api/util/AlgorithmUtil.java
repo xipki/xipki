@@ -68,6 +68,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SignatureAlgoControl;
+import org.xipki.commons.security.api.SignerConf;
 
 /**
  * @author Lijun Liao
@@ -334,11 +335,40 @@ public class AlgorithmUtil {
 
     public static AlgorithmIdentifier getSignatureAlgoId(
             final PublicKey pubKey,
-            final String hashAlgo,
+            final SignerConf signerConf)
+    throws NoSuchAlgorithmException {
+        ParamUtil.requireNonNull("signerConf", signerConf);
+        if (signerConf.getHashAlgo() == null) {
+            return getSignatureAlgoId(signerConf.getConfValue("algo"));
+        } else {
+            SignatureAlgoControl algoControl = signerConf.getSignatureAlgoControl();
+            HashAlgoType hashAlgo = signerConf.getHashAlgo();
+            boolean rsaMgf1 = (algoControl == null)
+                    ? false
+                    : algoControl.isRsaMgf1();
+            boolean ecdsaPlain = (algoControl == null)
+                    ? false
+                    : algoControl.isEcdsaPlain();
+
+            if (pubKey instanceof RSAPublicKey) {
+                return getRSASignatureAlgoId(hashAlgo.getName(), rsaMgf1);
+            } else if (pubKey instanceof ECPublicKey) {
+                return getECDSASignatureAlgoId(hashAlgo.getName(), ecdsaPlain);
+            } else if (pubKey instanceof DSAPublicKey) {
+                return getDSASignatureAlgoId(hashAlgo.getName());
+            } else {
+                throw new NoSuchAlgorithmException("Unknown public key '"
+                        + pubKey.getClass().getName());
+            }
+        }
+    }
+
+    public static AlgorithmIdentifier getSignatureAlgoId(
+            final PublicKey pubKey,
+            final HashAlgoType hashAlgo,
             final SignatureAlgoControl algoControl)
     throws NoSuchAlgorithmException {
-        ParamUtil.requireNonNull("pubKey", pubKey);
-
+        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         boolean rsaMgf1 = (algoControl == null)
                 ? false
                 : algoControl.isRsaMgf1();
@@ -347,11 +377,11 @@ public class AlgorithmUtil {
                 : algoControl.isEcdsaPlain();
 
         if (pubKey instanceof RSAPublicKey) {
-            return getRSASignatureAlgoId(hashAlgo, rsaMgf1);
+            return getRSASignatureAlgoId(hashAlgo.getName(), rsaMgf1);
         } else if (pubKey instanceof ECPublicKey) {
-            return getECDSASignatureAlgoId(hashAlgo, ecdsaPlain);
+            return getECDSASignatureAlgoId(hashAlgo.getName(), ecdsaPlain);
         } else if (pubKey instanceof DSAPublicKey) {
-            return getDSASignatureAlgoId(hashAlgo);
+            return getDSASignatureAlgoId(hashAlgo.getName());
         } else {
             throw new NoSuchAlgorithmException("Unknown public key '"
                     + pubKey.getClass().getName());

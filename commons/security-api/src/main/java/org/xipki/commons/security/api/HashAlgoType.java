@@ -134,6 +134,24 @@ public enum HashAlgoType {
         return null;
     }
 
+    public static HashAlgoType getNonNullHashAlgoType(
+            final ASN1ObjectIdentifier oid) {
+        HashAlgoType type = getHashAlgoType(oid);
+        if (type == null) {
+            throw new IllegalArgumentException("Unknown HashAlgo OID '" + oid.getId() + "'");
+        }
+        return type;
+    }
+
+    public static HashAlgoType getNonNullHashAlgoType(
+            final String nameOrOid) {
+        HashAlgoType type = getHashAlgoType(nameOrOid);
+        if (type == null) {
+            throw new IllegalArgumentException("Unknown HashAlgo OID/name '" + nameOrOid + "'");
+        }
+        return type;
+    }
+
     public static HashAlgoType getInstanceForPkcs11HashMech(
             final long hashMech) {
         if (hashMech == P11Constants.CKM_SHA_1) {
