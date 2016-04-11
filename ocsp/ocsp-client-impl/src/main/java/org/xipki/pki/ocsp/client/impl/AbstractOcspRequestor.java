@@ -78,6 +78,7 @@ import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.client.api.InvalidOcspResponseException;
 import org.xipki.pki.ocsp.client.api.OcspNonceUnmatchedException;
@@ -426,8 +427,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                         }
 
                         try {
-                            signer = getSecurityFactory().createSigner(
-                                    signerType, signerConf, cert);
+                            signer = getSecurityFactory().createSigner(signerType,
+                                    new SignerConf(signerConf), cert);
                         } catch (Exception ex) {
                             throw new OcspRequestorException("could not create signer: "
                                     + ex.getMessage());

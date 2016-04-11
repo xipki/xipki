@@ -44,12 +44,11 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignatureAlgoControl;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.SignerFactory;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
@@ -60,7 +59,6 @@ import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
-import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -84,36 +82,14 @@ public class SignerFactoryImpl implements SignerFactory {
     @Override
     public ConcurrentContentSigner newSigner(
             final String type,
-            final String conf,
-            final X509Certificate[] certificateChain)
-    throws ObjectCreationException {
-        return doCreateSigner(type, conf, null, null, certificateChain);
-    }
-
-    @Override
-    public ConcurrentContentSigner newSigner(
-            final String type,
-            final String confWithoutAlgo,
-            final String hashAlgo,
-            final SignatureAlgoControl sigAlgoControl,
-            final X509Certificate[] certificateChain)
-    throws ObjectCreationException {
-        return doCreateSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl, certificateChain);
-    }
-
-    private ConcurrentContentSigner doCreateSigner(
-            final String type,
-            final String conf,
-            final String hashAlgo,
-            final SignatureAlgoControl sigAlgoControl,
+            final SignerConf conf,
             final X509Certificate[] certificateChain)
     throws ObjectCreationException {
         if (!canCreateSigner(type)) {
             throw new ObjectCreationException("unknown cert signer type '" + type + "'");
         }
-        ConfPairs keyValues = new ConfPairs(conf);
 
-        String str = keyValues.getValue("parallelism");
+        String str = conf.getConfValue("parallelism");
         int parallelism = securityFactory.getDefaultSignerParallelism();
         if (str != null) {
             try {
@@ -127,13 +103,13 @@ public class SignerFactoryImpl implements SignerFactory {
             }
         }
 
-        String moduleName = keyValues.getValue("module");
-        str = keyValues.getValue("slot");
+        String moduleName = conf.getConfValue("module");
+        str = conf.getConfValue("slot");
         Integer slotIndex = (str == null)
                 ? null
                 : Integer.parseInt(str);
 
-        str = keyValues.getValue("slot-id");
+        str = conf.getConfValue("slot-id");
         Long slotId = (str == null)
                 ? null
                 : Long.parseLong(str);
@@ -144,8 +120,8 @@ public class SignerFactoryImpl implements SignerFactory {
                     "exactly one of slot (index) and slot-id must be specified");
         }
 
-        String keyLabel = keyValues.getValue("key-label");
-        str = keyValues.getValue("key-id");
+        String keyLabel = conf.getConfValue("key-label");
+        str = conf.getConfValue("key-id");
         byte[] keyId = null;
         if (str != null) {
             keyId = Hex.decode(str);
@@ -183,12 +159,11 @@ public class SignerFactoryImpl implements SignerFactory {
 
         try {
             AlgorithmIdentifier signatureAlgId;
-            if (hashAlgo == null) {
-                signatureAlgId = SignerUtil.getSignatureAlgoId(conf);
+            if (conf.getHashAlgo() == null) {
+                signatureAlgId = AlgorithmUtil.getSignatureAlgoId(null, conf);
             } else {
                 PublicKey pubKey = slot.getIdentity(p11ObjId).getPublicKey();
-                signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo,
-                        sigAlgoControl);
+                signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, conf);
             }
 
             P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(

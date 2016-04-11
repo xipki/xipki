@@ -49,7 +49,6 @@ import javax.crypto.NoSuchPaddingException;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
@@ -58,10 +57,9 @@ import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignatureAlgoControl;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.SignerFactory;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
-import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -81,36 +79,13 @@ public class SignerFactoryImpl implements SignerFactory {
     @Override
     public ConcurrentContentSigner newSigner(
             final String type,
-            final String conf,
-            final X509Certificate[] certificateChain)
-    throws ObjectCreationException {
-        return doCreateSigner(type, conf, null, null, certificateChain);
-    }
-
-    @Override
-    public ConcurrentContentSigner newSigner(
-            final String type,
-            final String confWithoutAlgo,
-            final String hashAlgo,
-            final SignatureAlgoControl sigAlgoControl,
-            final X509Certificate[] certificateChain)
-    throws ObjectCreationException {
-        return doCreateSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl, certificateChain);
-    }
-
-    private ConcurrentContentSigner doCreateSigner(
-            final String type,
-            final String conf,
-            final String hashAlgo,
-            final SignatureAlgoControl sigAlgoControl,
+            final SignerConf conf,
             final X509Certificate[] certificateChain)
     throws ObjectCreationException {
         if (!canCreateSigner(type)) {
             throw new ObjectCreationException("unknown cert signer type '" + type + "'");
         }
-        ConfPairs keyValues = new ConfPairs(conf);
-
-        String str = keyValues.getValue("parallelism");
+        String str = conf.getConfValue("parallelism");
         int parallelism = securityFactory.getDefaultSignerParallelism();
         if (str != null) {
             try {
@@ -124,7 +99,7 @@ public class SignerFactoryImpl implements SignerFactory {
             }
         }
 
-        String passwordHint = keyValues.getValue("password");
+        String passwordHint = conf.getConfValue("password");
         char[] password;
         if (passwordHint == null) {
             password = null;
@@ -142,8 +117,8 @@ public class SignerFactoryImpl implements SignerFactory {
             }
         }
 
-        str = keyValues.getValue("keystore");
-        String keyLabel = keyValues.getValue("key-label");
+        str = conf.getConfValue("keystore");
+        String keyLabel = conf.getConfValue("key-label");
 
         InputStream keystoreStream;
         if (StringUtil.startsWithIgnoreCase(str, "base64:")) {
@@ -165,12 +140,11 @@ public class SignerFactoryImpl implements SignerFactory {
                     type, keystoreStream, password, keyLabel, password, certificateChain);
 
             AlgorithmIdentifier signatureAlgId;
-            if (hashAlgo == null) {
-                signatureAlgId = SignerUtil.getSignatureAlgoId(conf);
+            if (conf.getHashAlgo() == null) {
+                signatureAlgId = AlgorithmUtil.getSignatureAlgoId(null, conf);
             } else {
                 PublicKey pubKey = signerBuilder.getCert().getPublicKey();
-                signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo,
-                        sigAlgoControl);
+                signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, conf);
             }
 
             return signerBuilder.createSigner(signatureAlgId, parallelism,

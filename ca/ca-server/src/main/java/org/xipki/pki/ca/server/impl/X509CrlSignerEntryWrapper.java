@@ -50,6 +50,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
@@ -105,8 +106,8 @@ class X509CrlSignerEntryWrapper {
 
         X509Certificate responderCert = dbEntry.getCertificate();
         try {
-            signer = securityFactory.createSigner(
-                    dbEntry.getType(), dbEntry.getConf(), responderCert);
+            signer = securityFactory.createSigner(dbEntry.getType(),
+                    new SignerConf(dbEntry.getConf()), responderCert);
         } catch (ObjectCreationException ex1) {
             throw new SecurityException("signer without certificate is not allowed");
         }

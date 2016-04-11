@@ -74,8 +74,8 @@ import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.X509Cert;
-import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -1235,7 +1235,7 @@ class CaManagerQueryExecutor {
                 try {
                     List<String[]> signerConfs = CaManagerImpl.splitCaSignerConfs(tmpSignerConf);
                     for (String[] m : signerConfs) {
-                        securityFactory.createSigner(tmpSignerType, m[1], tmpCert);
+                        securityFactory.createSigner(tmpSignerType, new SignerConf(m[1]), tmpCert);
                     }
                 } catch (SecurityException | ObjectCreationException ex) {
                     throw new CaMgmtException(
@@ -1354,7 +1354,7 @@ class CaManagerQueryExecutor {
 
             if (idxSignerConf != null) {
                 sb.append("signerConf: '");
-                sb.append(SignerUtil.signerConfToString(signerConf, false, true));
+                sb.append(SignerConf.toString(signerConf, false, true));
                 sb.append("'; ");
                 ps.setString(idxSignerConf, signerConf);
             }
@@ -1658,7 +1658,7 @@ class CaManagerQueryExecutor {
 
             if (idxConf != null) {
                 String txt = getRealString(tmpConf);
-                sb.append("conf: '").append(SignerUtil.signerConfToString(txt, false, true));
+                sb.append("conf: '").append(SignerConf.toString(txt, false, true));
                 ps.setString(idxConf, txt);
             }
 
@@ -1784,7 +1784,7 @@ class CaManagerQueryExecutor {
             if (idxSignerConf != null) {
                 String txt = getRealString(tmpSignerConf);
                 sb.append("signerConf: '")
-                    .append(SignerUtil.signerConfToString(txt, false, true))
+                    .append(SignerConf.toString(txt, false, true))
                     .append("'; ");
                 ps.setString(idxSignerConf, txt);
             }
@@ -1902,7 +1902,7 @@ class CaManagerQueryExecutor {
             if (idxConf != null) {
                 String txt = getRealString(tmpResponderConf);
                 sb.append("responder conf: '")
-                    .append(SignerUtil.signerConfToString(txt, false, true));
+                    .append(SignerConf.toString(txt, false, true));
                 ps.setString(idxConf, txt);
             }
 

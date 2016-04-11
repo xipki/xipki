@@ -218,7 +218,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
         }
 
         IssuerHash issuerHash = new IssuerHash(
-                HashAlgoType.getHashAlgoType(options.getHashAlgorithmId()),
+                HashAlgoType.getNonNullHashAlgoType(options.getHashAlgorithmId()),
                 Certificate.getInstance(issuerCert.getEncoded()));
         OCSPResp response;
         try {

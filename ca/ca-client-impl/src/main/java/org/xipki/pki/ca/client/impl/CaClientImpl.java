@@ -98,6 +98,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.client.api.CaClient;
@@ -377,9 +378,9 @@ public final class CaClientImpl implements CaClient {
 
             if (requestorConf.getSignerType() != null) {
                 try {
+                    SignerConf signerConf = new SignerConf(requestorConf.getSignerConf());
                     ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
-                            requestorConf.getSignerType(), requestorConf.getSignerConf(),
-                            requestorCert);
+                            requestorConf.getSignerType(), signerConf, requestorCert);
                     requestorSigners.put(name, requestorSigner);
                 } catch (ObjectCreationException ex) {
                     throw new InvalidConfException(ex.getMessage(), ex);

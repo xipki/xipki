@@ -56,6 +56,7 @@ import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
@@ -433,11 +434,11 @@ public class X509CaInfo {
         Map<String, ConcurrentContentSigner> tmpSigners = new HashMap<>();
         for (String[] m : signerConfs) {
             String algo = m[0];
-            String signerConf = m[1];
+            SignerConf signerConf = new SignerConf(m[1]);
             ConcurrentContentSigner signer;
             try {
-                signer = securityFactory.createSigner(
-                    caEntry.getSignerType(), signerConf, caEntry.getCertificate());
+                signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf,
+                        caEntry.getCertificate());
                 if (dfltSigner == null) {
                     dfltSigner = signer;
                 }

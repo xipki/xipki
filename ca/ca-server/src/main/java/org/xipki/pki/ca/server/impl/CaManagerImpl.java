@@ -99,6 +99,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.CrlReason;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.DfltEnvParameterResolver;
@@ -1223,7 +1224,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             try {
                 List<String[]> signerConfs = splitCaSignerConfs(tmpCaEntry.getSignerConf());
                 for (String[] m : signerConfs) {
-                    String signerConf = m[1];
+                    SignerConf signerConf = new SignerConf(m[1]);
                     signer = securityFactory.createSigner(
                             tmpCaEntry.getSignerType(), signerConf, tmpCaEntry.getCertificate());
                     if (tmpCaEntry.getCertificate() == null) {

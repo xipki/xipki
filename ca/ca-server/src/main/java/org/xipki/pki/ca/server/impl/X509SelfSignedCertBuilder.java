@@ -78,6 +78,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
@@ -183,7 +184,7 @@ class X509SelfSignedCertBuilder {
                     "CA does not support any signature algorithm restricted by the cert profile");
             }
 
-            signer = securityFactory.createSigner(signerType, thisSignerConf,
+            signer = securityFactory.createSigner(signerType, new SignerConf(thisSignerConf),
                     (X509Certificate[]) null);
         } catch (SecurityException | ObjectCreationException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,

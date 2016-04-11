@@ -58,7 +58,7 @@ public interface P10RequestGenerator {
     PKCS10CertificationRequest generateRequest(
             @Nonnull final SecurityFactory securityFactory,
             @Nonnull final String signerType,
-            @Nullable final String signerConf,
+            @Nullable final SignerConf signerConf,
             @Nonnull final SubjectPublicKeyInfo subjectPublicKeyInfo,
             @Nonnull final String subject,
             @Nullable final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
@@ -67,7 +67,7 @@ public interface P10RequestGenerator {
     PKCS10CertificationRequest generateRequest(
             @Nonnull final SecurityFactory securityFactory,
             @Nonnull final String signerType,
-            @Nullable final String signerConf,
+            @Nullable final SignerConf signerConf,
             @Nonnull final SubjectPublicKeyInfo subjectPublicKeyInfo,
             @Nonnull final X500Name subjectDn,
             @Nullable final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)

@@ -45,7 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.util.SignerUtil;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**
@@ -165,7 +165,7 @@ public class X509CrlSignerEntry implements Serializable {
         if (signerConf == null) {
             sb.append("null");
         } else {
-            sb.append(SignerUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo));
+            sb.append(SignerConf.toString(signerConf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
         sb.append("crlControl: ").append(crlControl).append("\n");

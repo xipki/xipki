@@ -79,7 +79,10 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.KeyCertPair;
+import org.xipki.commons.security.api.SignatureAlgoControl;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
@@ -193,9 +196,11 @@ public class Scep {
 
         KeyCertPair privKeyAndCert;
         try {
+            // ResponderConf does not contain algo.
+            SignerConf signerConf = new SignerConf(dbEntry.getResponderConf(), HashAlgoType.SHA256,
+                    new SignatureAlgoControl());
             privKeyAndCert = caManager.getSecurityFactory().createPrivateKeyAndCert(
-                    dbEntry.getResponderType(), dbEntry.getResponderConf(),
-                    dbEntry.getCertificate());
+                    dbEntry.getResponderType(), signerConf, dbEntry.getCertificate());
         } catch (ObjectCreationException ex) {
             throw new CaMgmtException(ex);
         }
