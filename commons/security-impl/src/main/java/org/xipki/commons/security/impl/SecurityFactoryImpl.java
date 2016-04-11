@@ -73,7 +73,6 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -82,7 +81,7 @@ import org.xipki.commons.security.api.AbstractSecurityFactory;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.KeyCertPair;
 import org.xipki.commons.security.api.NoIdleSignerException;
-import org.xipki.commons.security.api.SignatureAlgoControl;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.SignerFactoryRegister;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
@@ -142,24 +141,10 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     @Override
     public ConcurrentContentSigner createSigner(
             final String type,
-            final String confWithoutAlgo,
-            final String hashAlgo,
-            final SignatureAlgoControl sigAlgoControl,
-            final X509Certificate[] certs)
-    throws ObjectCreationException {
-        ConcurrentContentSigner signer = signerFactoryRegister.newSigner(type, confWithoutAlgo,
-                hashAlgo, sigAlgoControl, certs, newSignerTimeout);
-        validateSigner(signer, type, confWithoutAlgo);
-        return signer;
-    }
-
-    @Override
-    public ConcurrentContentSigner createSigner(
-            final String type,
-            final String conf,
+            final SignerConf conf,
             final X509Certificate[] certificateChain)
     throws ObjectCreationException {
-        ConcurrentContentSigner signer = signerFactoryRegister.newSigner(type, conf, null, null,
+        ConcurrentContentSigner signer = signerFactoryRegister.newSigner(type, conf,
                 certificateChain, newSignerTimeout);
         validateSigner(signer, type, conf);
         return signer;
@@ -269,25 +254,18 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     @Override
     public KeyCertPair createPrivateKeyAndCert(
             final String type,
-            final String conf,
+            final SignerConf conf,
             final X509Certificate cert)
     throws ObjectCreationException {
-        ConfPairs confPairs = new ConfPairs(conf);
-        confPairs.putPair("parallelism", Integer.toString(1));
-        String algo = confPairs.getValue("algo");
+        conf.putConfEntry("parallelism", Integer.toString(1));
 
         X509Certificate[] certs = null;
         if (cert != null) {
             certs = new X509Certificate[]{cert};
         }
-        ConcurrentContentSigner signer;
-        if (algo == null) {
-            signer = signerFactoryRegister.newSigner(type, confPairs.getEncoded(), "SHA256",
-                    new SignatureAlgoControl(), certs, newSignerTimeout);
-        } else {
-            signer = signerFactoryRegister.newSigner(type, confPairs.getEncoded(), certs,
-                    newSignerTimeout);
-        }
+
+        ConcurrentContentSigner signer = signerFactoryRegister.newSigner(type, conf, certs,
+                newSignerTimeout);
         return new KeyCertPair(signer.getPrivateKey(), signer.getCertificate());
     }
 
@@ -395,7 +373,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     private static void validateSigner(
             final ConcurrentContentSigner signer,
             final String signerType,
-            final String signerConf)
+            final SignerConf signerConf)
     throws ObjectCreationException {
         if (signer.getPublicKey() == null) {
             return;
@@ -422,13 +400,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 StringBuilder sb = new StringBuilder();
                 sb.append("private key and public key does not match, ");
                 sb.append("key type='").append(signerType).append("'; ");
-                ConfPairs keyValues = new ConfPairs(signerConf);
-                String pwd = keyValues.getValue("password");
+                String pwd = signerConf.getConfValue("password");
                 if (pwd != null) {
-                    keyValues.putPair("password", "****");
+                    signerConf.putConfEntry("password", "****");
                 }
-                keyValues.putPair("algo", signatureAlgoName);
-                sb.append("conf='").append(keyValues.getEncoded());
+                signerConf.putConfEntry("algo", signatureAlgoName);
+                sb.append("conf='").append(signerConf.getConf());
                 X509Certificate cert = signer.getCertificate();
                 if (cert != null) {
                     String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());

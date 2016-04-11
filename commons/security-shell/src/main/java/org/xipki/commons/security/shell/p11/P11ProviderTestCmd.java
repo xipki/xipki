@@ -50,6 +50,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
@@ -145,8 +146,8 @@ public class P11ProviderTestCmd extends P11SecurityCommandSupport {
             final PublicKey pubKey)
     throws NoSuchAlgorithmException {
         SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, ecdsaPlain);
-        AlgorithmIdentifier sigAlgoId = AlgorithmUtil.getSignatureAlgoId(pubKey, hashAlgo,
-                algoControl);
+        AlgorithmIdentifier sigAlgoId = AlgorithmUtil.getSignatureAlgoId(pubKey,
+                HashAlgoType.getNonNullHashAlgoType(hashAlgo), algoControl);
         return AlgorithmUtil.getSignatureAlgoName(sigAlgoId);
     }
 

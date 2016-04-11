@@ -54,6 +54,7 @@ import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.P10RequestGenerator;
 import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerConf;
 
 /**
  * @author Lijun Liao
@@ -66,7 +67,7 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
     public PKCS10CertificationRequest generateRequest(
             final SecurityFactory securityFactory,
             final String signerType,
-            final String signerConf,
+            final SignerConf signerConf,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final String subject,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
@@ -81,7 +82,7 @@ public class P10RequestGeneratorImpl implements P10RequestGenerator {
     public PKCS10CertificationRequest generateRequest(
             final SecurityFactory securityFactory,
             final String signerType,
-            final String signerConf,
+            final SignerConf signerConf,
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final X500Name subjectDn,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)

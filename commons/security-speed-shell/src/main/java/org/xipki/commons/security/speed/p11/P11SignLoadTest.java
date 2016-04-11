@@ -45,10 +45,10 @@ import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -103,7 +103,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
         this.objectId = objectId;
 
         P11SlotIdentifier slotId = slot.getSlotId();
-        String signerConf = SignerUtil.getPkcs11SignerConf(slot.getModuleName(),
+        SignerConf signerConf = SignerConf.getPkcs11SignerConf(slot.getModuleName(),
                 slotId.getIndex(), slotId.getId(), objectId.getLabel(), objectId.getId(),
                 signatureAlgorithm, 20);
         this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Certificate) null);

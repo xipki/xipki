@@ -51,7 +51,9 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**
@@ -127,7 +129,8 @@ public class P12CertUpdateCmd extends P12SecurityCommandSupport {
             pairs.putPair("password", new String(password));
         }
 
-        securityFactory.createSigner("PKCS12", pairs.getEncoded(), "SHA1", null, cert);
+        SignerConf conf = new SignerConf(pairs.getEncoded(), HashAlgoType.SHA256, null);
+        securityFactory.createSigner("PKCS12", conf, cert);
     }
 
 }
