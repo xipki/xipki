@@ -46,9 +46,9 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.util.SignerUtil;
+import org.xipki.commons.security.api.SignerConf;
 
 /**
  * @author Lijun Liao
@@ -84,10 +84,9 @@ public class NegP12EnrollCertCmd extends NegEnrollCertCommandSupport {
             }
         }
 
-        String signerConfWithoutAlgo = SignerUtil.getKeystoreSignerConfWithoutAlgo(
-                p12File, password);
-        return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo,
-                signatureAlgoControl, (X509Certificate[]) null);
+        SignerConf signerConf = SignerConf.getKeystoreSignerConf(p12File, password, 1,
+                HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
+        return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
     }
 
 }

@@ -58,31 +58,13 @@ public interface SignerFactory {
      * @param type type of the signer
      * @param conf configuration
      * @param certificateChain certificate chain
-     * @return new signer.
-     * @throws ObjectCreationException if signer could not be created.
-     */
-    ConcurrentContentSigner newSigner(
-            @Nonnull String type,
-            @Nullable String conf,
-            @Nullable X509Certificate[] certificateChain)
-    throws ObjectCreationException;
-
-    /**
-     *
-     * @param type type of the signer
-     * @param confWithoutAlgo configuration without algorithm
-     * @param hashAlgo hash algorithm
-     * @param sigAlgoControl signature algorithm control
-     * @param certificateChain certificate chain
      *
      * @return new signer.
      * @throws ObjectCreationException if signer could not be created.
      */
     ConcurrentContentSigner newSigner(
             @Nonnull String type,
-            @Nullable String confWithoutAlgo,
-            @Nullable String hashAlgo,
-            @Nullable SignatureAlgoControl sigAlgoControl,
+            @Nullable SignerConf conf,
             @Nullable X509Certificate[] certificateChain)
     throws ObjectCreationException;
 

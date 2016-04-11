@@ -45,9 +45,10 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SignatureAlgoControl;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
-import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.pki.ca.client.shell.completer.P11ModuleNameCompleter;
 
 /**
@@ -90,10 +91,10 @@ public class P11EnrollCertCmd extends EnrollCertCommandSupport {
             keyIdBytes = Hex.decode(keyId);
         }
 
-        String signerConfWithoutAlgo = SignerUtil.getPkcs11SignerConfWithoutAlgo(
-                moduleName, slotIndex, null, keyLabel, keyIdBytes, 1);
-        return securityFactory.createSigner("PKCS11", signerConfWithoutAlgo, hashAlgo,
-                signatureAlgoControl, (X509Certificate[]) null);
+        SignerConf signerConf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null,
+                keyLabel, keyIdBytes, 1, HashAlgoType.getNonNullHashAlgoType(hashAlgo),
+                signatureAlgoControl);
+        return securityFactory.createSigner("PKCS11", signerConf, (X509Certificate[]) null);
     }
 
 }

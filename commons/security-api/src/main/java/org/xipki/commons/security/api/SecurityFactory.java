@@ -64,35 +64,19 @@ public interface SecurityFactory {
 
     KeyCertPair createPrivateKeyAndCert(
             @Nonnull String type,
-            @Nullable String conf,
+            @Nullable SignerConf conf,
             @Nullable X509Certificate cert)
     throws ObjectCreationException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
-            @Nullable String conf,
+            @Nullable SignerConf conf,
             @Nullable X509Certificate cert)
     throws ObjectCreationException;
 
     ConcurrentContentSigner createSigner(
             @Nonnull String type,
-            @Nullable String conf,
-            @Nullable X509Certificate[] certs)
-    throws ObjectCreationException;
-
-    ConcurrentContentSigner createSigner(
-            @Nonnull String type,
-            @Nonnull String confWithoutAlgo,
-            @Nonnull String hashAlgo,
-            @Nullable SignatureAlgoControl sigAlgoControl,
-            @Nullable X509Certificate cert)
-    throws ObjectCreationException;
-
-    ConcurrentContentSigner createSigner(
-            @Nonnull String type,
-            @Nonnull String confWithoutAlgo,
-            @Nonnull String hashAlgo,
-            @Nonnull SignatureAlgoControl sigAlgoControl,
+            @Nullable SignerConf conf,
             @Nullable X509Certificate[] certs)
     throws ObjectCreationException;
 

@@ -91,7 +91,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
     @Override
     public ConcurrentContentSigner newSigner(
             final String type,
-            final String conf,
+            final SignerConf conf,
             final X509Certificate[] certificateChain,
             final long timeout)
     throws ObjectCreationException {
@@ -105,45 +105,6 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
             for (SignerFactory service : services) {
                 if (service.canCreateSigner(type)) {
                     signer = service.newSigner(type, conf, certificateChain);
-                }
-            }
-
-            if (timeout != 0 || System.currentTimeMillis() - start > timeout) {
-                break;
-            }
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
-            }
-        }
-
-        if (signer == null) {
-            throw new ObjectCreationException("could not new signer '" + type + "'");
-        }
-        return signer;
-    }
-
-    @Override
-    public ConcurrentContentSigner newSigner(
-            final String type,
-            final String confWithoutAlgo,
-            final String hashAlgo,
-            final SignatureAlgoControl sigAlgoControl,
-            final X509Certificate[] certificateChain,
-            final long timeout)
-    throws ObjectCreationException {
-        ParamUtil.requireNonBlank("type", type);
-        ParamUtil.requireMin("timeout", timeout, 0);
-
-        long start = System.currentTimeMillis();
-
-        ConcurrentContentSigner signer = null;
-        while (true) {
-            for (SignerFactory service : services) {
-                if (service.canCreateSigner(type)) {
-                    signer = service.newSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl,
-                            certificateChain);
                 }
             }
 

@@ -44,6 +44,7 @@ import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 
 /**
@@ -94,7 +95,7 @@ public class CmpResponderEntryWrapper {
         X509Certificate responderCert = dbEntry.getCertificate();
         dbEntry.setConfFaulty(true);
         signer = securityFactory.createSigner(
-                dbEntry.getType(), dbEntry.getConf(), responderCert);
+                dbEntry.getType(), new SignerConf(dbEntry.getConf()), responderCert);
         if (signer.getCertificate() == null) {
             throw new ObjectCreationException("signer without certificate is not allowed");
         }

@@ -53,8 +53,9 @@ import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
+import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.util.SignerUtil;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
 
 /**
@@ -109,9 +110,9 @@ public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
         } catch (IOException ex) {
             throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
         }
-        String signerConf = SignerUtil.getKeystoreSignerConfWithoutAlgo(p12File, new String(pwd));
-        return securityFactory.createSigner(
-                "PKCS12", signerConf, hashAlgo, signatureAlgoControl, (X509Certificate[]) null);
+        SignerConf conf = SignerConf.getKeystoreSignerConf(p12File, new String(pwd), 1,
+                HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
+        return securityFactory.createSigner("PKCS12", conf, (X509Certificate[]) null);
     }
 
 }

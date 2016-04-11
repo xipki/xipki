@@ -107,12 +107,7 @@ public class X509CertificateInfo {
                 algId = new AlgorithmIdentifier(oid, new ASN1StreamParser(params).readObject());
             }
             AlgorithmIdentifier hashId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(algId);
-            this.hashAlgo = HashAlgoType.getHashAlgoType(hashId.getAlgorithm().getId());
-
-            if (this.hashAlgo == null) {
-                throw new CertificateEncodingException(
-                        "unknown hash algorithm " + hashId.getAlgorithm().getId());
-            }
+            this.hashAlgo = HashAlgoType.getNonNullHashAlgoType(hashId.getAlgorithm().getId());
         } catch (IllegalArgumentException | IOException | NoSuchAlgorithmException ex) {
             throw new CertificateEncodingException(
                     "could not retrieve hash algorithm used to sign the certifiate: "

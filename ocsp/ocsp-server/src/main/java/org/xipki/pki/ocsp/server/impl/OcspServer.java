@@ -129,6 +129,7 @@ import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.NoIdleSignerException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.api.CertStatus;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
@@ -1199,7 +1200,7 @@ public class OcspServer {
             try {
                 ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
                         responderSignerType,
-                        "algo=" + sigAlgo + "," + responderKeyConf,
+                        new SignerConf("algo=" + sigAlgo + "," + responderKeyConf),
                         explicitCertificateChain);
                 singleSigners.add(requestorSigner);
             } catch (ObjectCreationException ex) {

@@ -242,7 +242,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
             StringBuilder msg = new StringBuilder();
 
             CertificateID certId = singleResp.getCertID();
-            HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(certId.getHashAlgOID());
+            HashAlgoType hashAlgo = HashAlgoType.getNonNullHashAlgoType(certId.getHashAlgOID());
             boolean issuerMatch = issuerHash.match(hashAlgo, certId.getIssuerNameHash(),
                     certId.getIssuerNameHash());
             BigInteger serialNumber = certId.getSerialNumber();

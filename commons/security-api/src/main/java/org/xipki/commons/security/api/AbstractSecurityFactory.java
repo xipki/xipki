@@ -55,27 +55,13 @@ public abstract class AbstractSecurityFactory implements SecurityFactory {
     @Override
     public ConcurrentContentSigner createSigner(
             final String type,
-            final String conf,
+            final SignerConf conf,
             final X509Certificate cert)
     throws ObjectCreationException {
         X509Certificate[] certs = (cert == null)
                 ? null
                 : new X509Certificate[]{cert};
         return createSigner(type, conf, certs);
-    }
-
-    @Override
-    public ConcurrentContentSigner createSigner(
-            final String type,
-            final String confWithoutAlgo,
-            final String hashAlgo,
-            final SignatureAlgoControl sigAlgoControl,
-            final X509Certificate cert)
-    throws ObjectCreationException {
-        X509Certificate[] certs = (cert == null)
-                ? null
-                : new X509Certificate[]{cert};
-        return createSigner(type, confWithoutAlgo, hashAlgo, sigAlgoControl, certs);
     }
 
     @Override
