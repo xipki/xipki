@@ -12,6 +12,10 @@
     <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/password-impl/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/security-pkcs12/${project.version}</bundle>
+    <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
+    <bundle>mvn:org.xipki.commons/pkcs11-proxy-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/security-pkcs11/${project.version}</bundle>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.xipki.commons/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/datasource-impl/${project.version}</bundle>
