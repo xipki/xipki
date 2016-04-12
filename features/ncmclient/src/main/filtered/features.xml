@@ -25,7 +25,7 @@
   <feature name="xipki-ncm-client" version="${project.version}">
     <feature>xipki-security</feature>
     <bundle>mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/audit/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/audit-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-api/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>
