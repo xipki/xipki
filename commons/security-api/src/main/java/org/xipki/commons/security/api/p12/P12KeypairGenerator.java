@@ -73,8 +73,6 @@ import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcECContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
-import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;

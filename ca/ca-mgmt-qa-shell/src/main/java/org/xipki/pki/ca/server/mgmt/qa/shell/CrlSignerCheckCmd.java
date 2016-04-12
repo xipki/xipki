@@ -40,8 +40,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.CrlControl;
-import org.xipki.pki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CrlSignerUpdateCmd;
 
 /**

@@ -55,7 +55,7 @@ import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.server.mgmt.api.CrlControl;
-import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 
 /**
  * @author Lijun Liao

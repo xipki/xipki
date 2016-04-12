@@ -45,7 +45,7 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.util.X509Util;
-import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 
 /**

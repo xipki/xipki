@@ -50,7 +50,7 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
-import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
