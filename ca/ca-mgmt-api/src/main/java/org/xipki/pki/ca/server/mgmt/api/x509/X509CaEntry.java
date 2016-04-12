@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.mgmt.api;
+package org.xipki.pki.ca.server.mgmt.api.x509;
 
 import java.io.Serializable;
 import java.security.cert.CertificateEncodingException;
@@ -48,6 +48,8 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.pki.ca.server.mgmt.api.CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 
 /**
  * @author Lijun Liao

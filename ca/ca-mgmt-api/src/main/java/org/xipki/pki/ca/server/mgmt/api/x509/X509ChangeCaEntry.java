@@ -34,11 +34,14 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.mgmt.api;
+package org.xipki.pki.ca.server.mgmt.api.x509;
 
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
 import java.util.List;
+
+import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.pki.ca.server.mgmt.api.ChangeCaEntry;
 
 /**
  * @author Lijun Liao

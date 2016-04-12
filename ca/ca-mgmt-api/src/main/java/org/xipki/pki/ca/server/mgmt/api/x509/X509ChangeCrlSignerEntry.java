@@ -34,48 +34,76 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.mgmt.api;
+package org.xipki.pki.ca.server.mgmt.api.x509;
 
-import java.util.List;
+import java.io.Serializable;
 
-import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class X509CaUris {
-    private final List<String> cacertUris;
-    private final List<String> ocspUris;
-    private final List<String> crlUris;
-    private final List<String> deltaCrlUris;
+public class X509ChangeCrlSignerEntry implements Serializable {
 
-    public X509CaUris(
-            final List<String> cacertUris,
-            final List<String> ocspUris,
-            final List<String> crlUris,
-            final List<String> deltaCrlUris) {
-        this.cacertUris = cacertUris;
-        this.ocspUris = ocspUris;
-        this.crlUris = crlUris;
-        this.deltaCrlUris = deltaCrlUris;
+    private static final long serialVersionUID = 1L;
+
+    private final String name;
+
+    private String signerType;
+
+    private String signerConf;
+
+    private String base64Cert;
+
+    private String crlControl;
+
+    public X509ChangeCrlSignerEntry(
+            final String name)
+    throws InvalidConfException {
+        this.name = ParamUtil.requireNonBlank("name", name);
     }
 
-    public List<String> getCacertUris() {
-        return CollectionUtil.unmodifiableList(cacertUris);
+    public String getName() {
+        return name;
     }
 
-    public List<String> getOcspUris() {
-        return CollectionUtil.unmodifiableList(ocspUris);
+    public String getSignerType() {
+        return signerType;
     }
 
-    public List<String> getCrlUris() {
-        return CollectionUtil.unmodifiableList(crlUris);
+    public void setSignerType(
+            final String signerType) {
+        this.signerType = signerType;
     }
 
-    public List<String> getDeltaCrlUris() {
-        return CollectionUtil.unmodifiableList(deltaCrlUris);
+    public String getSignerConf() {
+        return signerConf;
+    }
+
+    public void setSignerConf(
+            final String signerConf) {
+        this.signerConf = signerConf;
+    }
+
+    public String getBase64Cert() {
+        return base64Cert;
+    }
+
+    public void setBase64Cert(
+            final String base64Cert) {
+        this.base64Cert = base64Cert;
+    }
+
+    public String getCrlControl() {
+        return crlControl;
+    }
+
+    public void setCrlControl(
+            final String crlControl) {
+        this.crlControl = crlControl;
     }
 
 }
