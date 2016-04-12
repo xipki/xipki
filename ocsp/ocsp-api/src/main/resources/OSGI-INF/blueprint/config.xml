@@ -4,7 +4,7 @@
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
   <bean id="factoryRegister"
-       class="org.xipki.pki.ocsp.api.CertStatusStoreFactoryRegisterImpl"/>
+       class="org.xipki.pki.ocsp.api.internal.CertStatusStoreFactoryRegisterImpl"/>
   <service ref="factoryRegister"
        interface="org.xipki.pki.ocsp.api.CertStatusStoreFactoryRegister"/>
   <reference-list id="factories"

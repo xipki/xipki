@@ -34,7 +34,6 @@
     <feature>bouncycastle</feature>
     <feature>xipki-password</feature>
     <bundle>mvn:org.xipki.commons/security-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security-impl/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-pkcs12/${project.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.commons/pkcs11-proxy-common/${project.version}</bundle>
@@ -147,7 +146,7 @@
   </feature>
   <feature name="xipki-audit" version="${project.version}">
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.bundle.version}</bundle>
-    <bundle>mvn:org.xipki.commons/audit/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/audit-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}">
     <feature>xipki-audit</feature>

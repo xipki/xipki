@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;

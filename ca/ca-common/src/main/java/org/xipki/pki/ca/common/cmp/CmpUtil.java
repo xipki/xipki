@@ -56,7 +56,7 @@ import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.NoIdleSignerException;
+import org.xipki.commons.security.api.exception.NoIdleSignerException;
 
 /**
  * @author Lijun Liao

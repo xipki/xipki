@@ -55,10 +55,10 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.SignerFactory;
+import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 
 /**

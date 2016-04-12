@@ -15,18 +15,6 @@
   <reference id="callbackFactoryRegister"
       interface="org.xipki.commons.password.api.PasswordCallbackFactoryRegister"/>
 
-  <bean id="passwordResolver" class="org.xipki.commons.password.impl.PasswordResolverImpl"/>
-  <reference-list id="singlePasswordResolvers"
-      interface="org.xipki.commons.password.api.SinglePasswordResolver" availability="optional">
-    <reference-listener ref="passwordResolver" bind-method="bindService"
-        unbind-method="unbindService"/>
-  </reference-list>
-  <service ref="passwordResolver" interface="org.xipki.commons.password.api.PasswordResolver"/>
-
-  <bean id="obfSinglePasswordResolver" class="org.xipki.commons.password.impl.OBFSinglePasswordResolverImpl"/>
-  <service ref="obfSinglePasswordResolver"
-      interface="org.xipki.commons.password.api.SinglePasswordResolver"/>
-
   <bean id="pbeSinglePasswordResolver"
       class="org.xipki.commons.password.impl.PBESinglePasswordResolverImpl">
     <property name="callbackFactoryRegister" ref="callbackFactoryRegister"/>
@@ -35,10 +23,6 @@
   </bean>
   <service ref="pbeSinglePasswordResolver"
       interface="org.xipki.commons.password.api.SinglePasswordResolver"/>
-
-  <bean id="obfPasswordService" class="org.xipki.commons.password.impl.OBFPasswordServiceImpl"/>
-  <service ref="obfPasswordService"
-      interface="org.xipki.commons.password.api.OBFPasswordService"/>
 
   <bean id="pbePasswordService" class="org.xipki.commons.password.impl.PBEPasswordServiceImpl"/>
   <service ref="pbePasswordService"

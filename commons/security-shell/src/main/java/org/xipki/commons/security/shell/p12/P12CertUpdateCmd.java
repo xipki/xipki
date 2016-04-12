@@ -52,8 +52,8 @@ import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.SignerConf;
+import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**

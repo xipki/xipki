@@ -45,6 +45,7 @@ import java.util.Set;
 
 import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.exception.P11UnknownEntityException;
 
 /**
  * @author Lijun Liao

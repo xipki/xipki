@@ -40,6 +40,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.xipki.commons.security.api.exception.P11UnknownEntityException;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0

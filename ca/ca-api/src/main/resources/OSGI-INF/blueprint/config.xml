@@ -4,7 +4,7 @@
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
   <bean id="certprofileFactoryRegister"
-       class="org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegisterImpl"/>
+       class="org.xipki.pki.ca.api.internal.X509CertprofileFactoryRegisterImpl"/>
   <service ref="certprofileFactoryRegister"
        interface="org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegister"/>
   <reference-list id="certprofileFactories"
@@ -15,7 +15,7 @@
   </reference-list>
 
   <bean id="publisherFactoryRegister"
-       class="org.xipki.pki.ca.api.publisher.x509.X509CertPublisherFactoryRegisterImpl"/>
+       class="org.xipki.pki.ca.api.internal.X509CertPublisherFactoryRegisterImpl"/>
   <service ref="publisherFactoryRegister"
        interface="org.xipki.pki.ca.api.publisher.x509.X509CertPublisherFactoryRegister"/>
   <reference-list id="publisherFactories"

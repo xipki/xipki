@@ -41,6 +41,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
+import org.xipki.commons.security.api.p12.P12KeypairGenerator;
 
 /**
  * @author Lijun Liao
@@ -76,8 +77,8 @@ public class P12DSAKeyGenCmd extends P12KeyGenCommandSupport {
             }
         }
 
-        P12KeypairGenerationResult keypair = keyGenerator.generateDSAKeypair(plen, qlen,
-                getKeyGenParameters());
+        P12KeypairGenerationResult keypair = new P12KeypairGenerator().generateDSAKeypair(plen,
+                qlen, getKeyGenParameters());
         saveKeypair(keypair);
 
         return null;

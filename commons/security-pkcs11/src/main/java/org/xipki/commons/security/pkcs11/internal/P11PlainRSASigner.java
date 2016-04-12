@@ -40,7 +40,7 @@ import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11TokenException;
 
