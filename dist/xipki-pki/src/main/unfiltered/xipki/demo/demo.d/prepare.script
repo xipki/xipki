@@ -80,10 +80,11 @@ xipki-ca:publisher-add \
   --conf datasource=ocsp,publish.goodcerts=true
 
 # CMP Responder
+# with encrypted password 1234
 xipki-ca:responder-add \
   --name responder1 \
   --signer-type JKS \
-  --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
+  --signer-conf password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:xipki/security/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
 
 # CMP Requestors
 xipki-ca:requestor-add \

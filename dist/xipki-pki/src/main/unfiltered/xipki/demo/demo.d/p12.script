@@ -18,6 +18,7 @@ xipki-tk:req-p12 \
   --subject "CN=RCA1,O=xipki,C=DE"
   
 ## Generate selfsigned RCA
+# signerConf with encrypted password 1234
 xipki-ca:gen-rca \
   --name RCA1 \
   --p10 output/RCA1.p10 \
@@ -28,7 +29,7 @@ xipki-ca:gen-rca \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
+  --signer-conf password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
@@ -133,6 +134,7 @@ xipki-tk:update-cert-p12 \
 #                        ADD SubCA with OCSP                    #
 #################################################################
 ## Add CA
+# signerConf with encrypted password 1234
 xipki-ca:ca-add \
   --name SubCA1.complex-Name \
   --permission all \
@@ -140,7 +142,7 @@ xipki-ca:ca-add \
   --next-crl-no 2 \
   --max-validity 5y \
   --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/SubCA1.p12,algo=$CA_SIGNER_ALGO \
+  --signer-conf password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/SubCA1.p12,algo=$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/SubCA1.der \
   --cmp-control cmpcontrol1 \
@@ -190,6 +192,7 @@ xipki-ca:careq-add \
 #                       ADD SubCA with CRL                      #
 #################################################################
 ## Add CA
+# signerConf with encrypted password 1234
 xipki-ca:ca-add \
   --name SubCAwithCRL1 \
   --permission all \
@@ -197,7 +200,7 @@ xipki-ca:ca-add \
   --next-crl-no 2 \
   --max-validity 8000y \
   --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/SubCAwithCRL1.p12,algo=$CA_SIGNER_ALGO \
+  --signer-conf password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/SubCAwithCRL1.p12,algo=$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://example.org/SubCAwithCRL1.der \
   --crl-uri http://subcawithcrl.example.org/crl \

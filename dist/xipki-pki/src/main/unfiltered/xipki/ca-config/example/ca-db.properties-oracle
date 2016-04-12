@@ -19,7 +19,8 @@ dataSource.driverType = thin
 #dataSource.URL = jdbc:oracle:thin:@localhost:1521:XE
 
 dataSource.user = orauserca
-dataSource.password = 123456
+# encrypted password 123456
+dataSource.password = PBE:B9B3GLTSTCrjEB53BiirBAxt5XxNP+KjcPkPbGfRBEz+pA==
 dataSource.implicitCachingEnabled = true
 dataSource.explicitCachingEnabled = true
 

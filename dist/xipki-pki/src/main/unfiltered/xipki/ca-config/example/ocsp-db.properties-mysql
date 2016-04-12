@@ -11,7 +11,8 @@ dataSource.serverName = localhost
 dataSource.port = 3306
 dataSource.databaseName = ocsp
 dataSource.user = root
-dataSource.password = 123456
+# encrypted password 123456
+dataSource.password = PBE:B9A/zfIDGOTc+xhshvJGWMMdft32EjtEZPWGH9M0JvoWFA==
 dataSource.cachePrepStmts = true
 dataSource.prepStmtCacheSize = 250
 dataSource.prepStmtCacheSqlLimit = 2048

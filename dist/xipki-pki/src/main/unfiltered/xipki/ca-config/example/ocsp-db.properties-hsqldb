@@ -9,7 +9,8 @@ dataSourceClassName = org.hsqldb.jdbc.JDBCDataSource
 
 dataSource.url = jdbc:hsqldb:file:./xipki/db/hsqldb/ocsp;sql.syntax_pgs=true
 dataSource.user = root
-dataSource.password = 123456
+# encrypted password 123456
+dataSource.password = PBE:B9A/zfIDGOTc+xhshvJGWMMdft32EjtEZPWGH9M0JvoWFA==
 
 autoCommit = true
 readOnly = false

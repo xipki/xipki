@@ -11,7 +11,8 @@ dataSource.serverName = localhost
 dataSource.portNumber = 5432
 dataSource.databaseName = ocsp
 dataSource.user = pguser1
-dataSource.password = 123456
+# encrypted password 123456
+dataSource.password = PBE:B9A/zfIDGOTc+xhshvJGWMMdft32EjtEZPWGH9M0JvoWFA==
 
 dataSource.prepareThreshold = 0
 
