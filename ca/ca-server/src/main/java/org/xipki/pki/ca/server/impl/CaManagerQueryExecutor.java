@@ -100,13 +100,13 @@ import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.pki.ca.server.mgmt.api.CrlControl;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509CaUris;
-import org.xipki.pki.ca.server.mgmt.api.X509ChangeCaEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CaUris;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCaEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 
 /**
  * @author Lijun Liao

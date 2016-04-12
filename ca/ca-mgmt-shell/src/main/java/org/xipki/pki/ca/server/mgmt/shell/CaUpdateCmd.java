@@ -59,7 +59,7 @@ import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.pki.ca.server.mgmt.api.X509ChangeCaEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaStatusCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNamePlusNullCompleter;

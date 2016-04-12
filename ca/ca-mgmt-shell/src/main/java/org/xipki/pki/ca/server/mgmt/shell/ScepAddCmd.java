@@ -46,7 +46,7 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.password.api.PasswordResolver;
-import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 
 /**

@@ -42,7 +42,7 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 
 /**
  * @author Lijun Liao

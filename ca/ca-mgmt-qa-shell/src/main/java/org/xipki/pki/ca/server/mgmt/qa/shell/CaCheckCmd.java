@@ -50,8 +50,8 @@ import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509ChangeCaEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
 
 /**

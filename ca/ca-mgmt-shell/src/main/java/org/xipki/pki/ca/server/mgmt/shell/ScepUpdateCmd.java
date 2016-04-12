@@ -52,7 +52,7 @@ import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.ChangeScepEntry;
-import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 
 /**

@@ -62,8 +62,8 @@ import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509CaUris;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CaUris;
 
 /**
  * @author Lijun Liao
