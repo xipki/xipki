@@ -48,6 +48,10 @@ import javax.annotation.Nullable;
 
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.CrlReason;
+import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 
 /**
  * @author Lijun Liao
