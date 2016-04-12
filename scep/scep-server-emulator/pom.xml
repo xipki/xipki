@@ -24,7 +24,7 @@
     </dependency>
     <dependency>
       <groupId>org.xipki.commons</groupId>
-      <artifactId>audit</artifactId>
+      <artifactId>audit-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

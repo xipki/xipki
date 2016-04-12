@@ -42,7 +42,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.p11.P11Conf;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11Module;

@@ -64,8 +64,7 @@ public class SpeedP12RSASignCmd extends SpeedP12SignCommandSupport {
     @Override
     protected LoadExecutor getTester()
     throws Exception {
-        return new P12RSASignLoadTest(p12KeypairGenerator, securityFactory, sigAlgo, keysize,
-                toBigInt(publicExponent));
+        return new P12RSASignLoadTest(securityFactory, sigAlgo, keysize, toBigInt(publicExponent));
     }
 
 }

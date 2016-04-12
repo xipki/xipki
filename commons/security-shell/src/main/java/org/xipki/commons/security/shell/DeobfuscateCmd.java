@@ -41,7 +41,6 @@ import java.io.File;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
@@ -58,9 +57,6 @@ import org.xipki.commons.password.api.OBFPasswordService;
         description = "deobfuscate password")
 @Service
 public class DeobfuscateCmd extends SecurityCommandSupport {
-
-    @Reference
-    private OBFPasswordService obfPasswordService;
 
     @Option(name = "--password",
             description = "obfuscated password, starts with OBF:\n"
@@ -92,7 +88,7 @@ public class DeobfuscateCmd extends SecurityCommandSupport {
                     + "' does not start with OBF:");
         }
 
-        String password = obfPasswordService.deobfuscate(passwordHint);
+        String password = OBFPasswordService.doDeobfuscate(passwordHint);
         if (outFile != null) {
             saveVerbose("saved the password to file", new File(outFile),
                     new String(password).getBytes());

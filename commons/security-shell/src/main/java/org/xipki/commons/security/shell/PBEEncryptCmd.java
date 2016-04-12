@@ -62,9 +62,6 @@ import org.xipki.commons.password.api.PBEPasswordService;
 public class PBEEncryptCmd extends SecurityCommandSupport {
 
     @Reference
-    private OBFPasswordService obfPasswordService;
-
-    @Reference
     private PBEPasswordService pbePasswordService;
 
     @Option(name = "--iteration-count", aliases = "-n",
@@ -97,7 +94,7 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
         if (masterPasswordFile != null) {
             String str = new String(IoUtil.read(masterPasswordFile));
             if (str.startsWith("OBF:") || str.startsWith("obf:")) {
-                str = obfPasswordService.deobfuscate(str);
+                str = OBFPasswordService.doDeobfuscate(str);
             }
             masterPassword = str.toCharArray();
         } else {

@@ -53,7 +53,7 @@ import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.xipki.commons.audit.slf4j.impl.Slf4jAuditServiceImpl;
+import org.xipki.commons.audit.api.internal.Slf4jAuditServiceImpl;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.message.CaCaps;

@@ -99,10 +99,10 @@ import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.BadInputException;
 import org.xipki.commons.security.api.FpIdCalculator;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.api.exception.BadInputException;
 
 /**
  * @author Lijun Liao

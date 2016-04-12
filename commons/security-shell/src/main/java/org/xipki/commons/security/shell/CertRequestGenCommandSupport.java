@@ -51,7 +51,6 @@ import javax.annotation.Nonnull;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -74,6 +73,7 @@ import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -85,11 +85,12 @@ import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.KeyusageCompleter;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.ExtensionExistence;
-import org.xipki.commons.security.api.InvalidOidOrNameException;
 import org.xipki.commons.security.api.KeyUsage;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.P10RequestGenerator;
 import org.xipki.commons.security.api.SignatureAlgoControl;
+import org.xipki.commons.security.api.exception.InvalidOidOrNameException;
+import org.xipki.commons.security.api.exception.NoIdleSignerException;
+import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
@@ -196,9 +197,6 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     + "(multi-valued)")
     @Completion(ExtensionNameCompleter.class)
     private List<String> wantExtensionTypes;
-
-    @Reference
-    private P10RequestGenerator p10Gen;
 
     protected abstract ConcurrentContentSigner getSigner(
             @Nonnull SignatureAlgoControl signatureAlgoControl)
@@ -363,7 +361,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         }
 
         X500Name subjectDn = getSubject(subject);
-        PKCS10CertificationRequest p10Req = p10Gen.generateRequest(signer, subjectPublicKeyInfo,
+        PKCS10CertificationRequest p10Req = generateRequest(signer, subjectPublicKeyInfo,
                 subjectDn, attributes);
 
         File file = new File(outputFilename);
@@ -424,4 +422,27 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         return oid;
     }
 
+    private PKCS10CertificationRequest generateRequest(
+            final ConcurrentContentSigner signer,
+            final SubjectPublicKeyInfo subjectPublicKeyInfo,
+            final X500Name subjectDn,
+            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+    throws SecurityException {
+        ParamUtil.requireNonNull("signer", signer);
+        ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
+        ParamUtil.requireNonNull("subjectDn", subjectDn);
+        PKCS10CertificationRequestBuilder p10ReqBuilder =
+                new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
+        if (CollectionUtil.isNonEmpty(attributes)) {
+            for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
+                p10ReqBuilder.addAttribute(attrType, attributes.get(attrType));
+            }
+        }
+
+        try {
+            return signer.build(p10ReqBuilder);
+        } catch (NoIdleSignerException ex) {
+            throw new SecurityException(ex.getMessage(), ex);
+        }
+    }
 }

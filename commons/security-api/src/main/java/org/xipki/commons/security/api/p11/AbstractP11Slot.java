@@ -63,8 +63,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.SecurityException;
 import org.xipki.commons.security.api.X509Cert;
+import org.xipki.commons.security.api.exception.P11DuplicateEntityException;
+import org.xipki.commons.security.api.exception.P11PermissionException;
+import org.xipki.commons.security.api.exception.P11UnknownEntityException;
+import org.xipki.commons.security.api.exception.P11UnsupportedMechanismException;
+import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.X509Util;
 

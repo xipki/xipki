@@ -89,20 +89,20 @@ import org.xipki.commons.pkcs11proxy.common.Asn1RemoveCertsParams;
 import org.xipki.commons.pkcs11proxy.common.Asn1SignTemplate;
 import org.xipki.commons.pkcs11proxy.common.Asn1Util;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
-import org.xipki.commons.security.api.BadAsn1ObjectException;
 import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.exception.BadAsn1ObjectException;
+import org.xipki.commons.security.api.exception.P11DuplicateEntityException;
+import org.xipki.commons.security.api.exception.P11UnknownEntityException;
+import org.xipki.commons.security.api.exception.P11UnsupportedMechanismException;
+import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11DuplicateEntityException;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
+import org.xipki.commons.security.api.p11.P11Params;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.api.p11.P11UnknownEntityException;
-import org.xipki.commons.security.api.p11.P11UnsupportedMechanismException;
-import org.xipki.commons.security.api.p11.parameters.P11Params;
 import org.xipki.commons.security.api.util.KeyUtil;
 
 /**

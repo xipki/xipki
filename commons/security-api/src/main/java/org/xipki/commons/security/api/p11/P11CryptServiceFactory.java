@@ -40,7 +40,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.exception.SecurityException;
 
 /**
  * @author Lijun Liao

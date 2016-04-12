@@ -137,6 +137,23 @@ public class SignerConf {
         return sb.toString();
     }
 
+    public static String toString(
+            final String signerConf,
+            final boolean verbose,
+            final boolean ignoreSensitiveInfo) {
+        String tmpSignerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
+        if (ignoreSensitiveInfo) {
+            tmpSignerConf = eraseSensitiveData(tmpSignerConf);
+        }
+
+        if (verbose || tmpSignerConf.length() < 101) {
+            return tmpSignerConf;
+        } else {
+            return new StringBuilder().append(tmpSignerConf.substring(0, 97))
+                    .append("...").toString();
+        }
+    }
+
     public static SignerConf getKeystoreSignerConf(
             final InputStream keystoreStream,
             final String password,
@@ -277,23 +294,6 @@ public class SignerConf {
         conf.putPair("parallelism", "1");
         conf.putPair("keystore", "file:" + keystoreFile);
         return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
-    }
-
-    public static String toString(
-            final String signerConf,
-            final boolean verbose,
-            final boolean ignoreSensitiveInfo) {
-        String tmpSignerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
-        if (ignoreSensitiveInfo) {
-            tmpSignerConf = eraseSensitiveData(tmpSignerConf);
-        }
-
-        if (verbose || tmpSignerConf.length() < 101) {
-            return tmpSignerConf;
-        } else {
-            return new StringBuilder().append(tmpSignerConf.substring(0, 97))
-                    .append("...").toString();
-        }
     }
 
     private static String eraseSensitiveData(
