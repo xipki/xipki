@@ -140,7 +140,6 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
     private String getPkcs11ModuleName(
             final String moduleName) {
-        initPkcs11ModuleConf();
         return (moduleName == null)
                 ? DEFAULT_P11MODULE_NAME
                 : moduleName;
