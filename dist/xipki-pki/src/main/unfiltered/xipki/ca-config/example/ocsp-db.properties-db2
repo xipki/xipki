@@ -12,7 +12,8 @@ dataSource.portNumber = 50000
 dataSource.databaseName = ocsp
 dataSource.currentSchema = DB2INST1
 dataSource.user = db2inst1
-dataSource.password = 123456
+# encrypted password 123456
+dataSource.password = PBE:B9A/zfIDGOTc+xhshvJGWMMdft32EjtEZPWGH9M0JvoWFA==
 dataSource.maxStatements = 2048
 dataSource.driverType = 4
 

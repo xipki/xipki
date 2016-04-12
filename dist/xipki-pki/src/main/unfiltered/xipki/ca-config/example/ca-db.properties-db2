@@ -12,7 +12,8 @@ dataSource.portNumber = 50000
 dataSource.databaseName = ca
 dataSource.currentSchema = DB2INST1
 dataSource.user = db2inst1
-dataSource.password = 123456
+# encrypted password 123456
+dataSource.password = PBE:B9B3GLTSTCrjEB53BiirBAxt5XxNP+KjcPkPbGfRBEz+pA==
 dataSource.maxStatements = 2048
 dataSource.driverType = 4
 

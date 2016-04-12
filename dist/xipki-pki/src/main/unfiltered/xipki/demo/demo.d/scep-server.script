@@ -17,10 +17,11 @@ xipki-tk:update-cert-p12 \
   --password 1234 \
   --cert output/SCEP1.der
 
+# with encrypted password 1234
 xipki-ca:scep-add \
   --ca SubCAwithCRL1 \
   --resp-type PKCS12 \
-  --resp-conf password=1234,keystore=file:output/SCEP1.p12 \
+  --resp-conf password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/SCEP1.p12 \
   --control caCert.included=true,signerCert.included=false
   
 ## add user
