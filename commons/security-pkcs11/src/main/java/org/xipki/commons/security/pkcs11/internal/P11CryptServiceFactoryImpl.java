@@ -104,7 +104,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
         }
     }
 
-    private void initPkcs11ModuleConf() {
+    private synchronized void initPkcs11ModuleConf() {
         if (p11Conf != null) {
             return;
         }
@@ -140,6 +140,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
     private String getPkcs11ModuleName(
             final String moduleName) {
+        initPkcs11ModuleConf();
         return (moduleName == null)
                 ? DEFAULT_P11MODULE_NAME
                 : moduleName;
@@ -178,6 +179,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
     @Override
     public Set<String> getModuleNames() {
+        initPkcs11ModuleConf();
         return p11Conf.getModuleNames();
     }
 
