@@ -14,7 +14,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
     <module>common</module>
-    <module>audit</module>
+    <module>audit-api</module>
     <module>audit-syslog</module>
     <module>datasource-api</module>
     <module>datasource-impl</module>
@@ -23,7 +23,6 @@
     <module>password-api</module>
     <module>password-impl</module>
     <module>security-api</module>
-    <module>security-impl</module>
     <module>security-pkcs11</module>
     <module>security-pkcs12</module>
     <module>security-shell</module>

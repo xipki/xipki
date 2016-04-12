@@ -72,6 +72,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolver;
+import org.xipki.commons.security.api.exception.NoIdleSignerException;
+import org.xipki.commons.security.api.exception.SecurityException;
 
 /**
  * @author Lijun Liao

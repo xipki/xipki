@@ -140,7 +140,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.commons</groupId>
-                  <artifactId>security-impl</artifactId>
+                  <artifactId>security-api</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>

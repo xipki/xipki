@@ -3,8 +3,9 @@
     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
+  <!-- PasswordCallbackFactory -->
   <bean id="factoryRegister"
-       class="org.xipki.commons.password.api.PasswordCallbackFactoryRegisterImpl"/>
+       class="org.xipki.commons.password.api.internal.PasswordCallbackFactoryRegisterImpl"/>
   <service ref="factoryRegister"
        interface="org.xipki.commons.password.api.PasswordCallbackFactoryRegister"/>
   <reference-list id="factories"
@@ -14,4 +15,20 @@
          unbind-method="unbindService"/>
   </reference-list>
 
+  <!-- Password Resolver -->
+  <bean id="passwordResolver" class="org.xipki.commons.password.api.internal.PasswordResolverImpl"/>
+  <reference-list id="singlePasswordResolvers"
+      interface="org.xipki.commons.password.api.SinglePasswordResolver" availability="optional">
+    <reference-listener ref="passwordResolver" bind-method="bindService"
+        unbind-method="unbindService"/>
+  </reference-list>
+  <service ref="passwordResolver" interface="org.xipki.commons.password.api.PasswordResolver"/>
+
+  <!-- OBF -->
+  <bean id="obfSinglePasswordResolver"
+      class="org.xipki.commons.password.api.internal.OBFSinglePasswordResolverImpl"/>
+  <service ref="obfSinglePasswordResolver"
+      interface="org.xipki.commons.password.api.SinglePasswordResolver"/>
+
+  
 </blueprint>

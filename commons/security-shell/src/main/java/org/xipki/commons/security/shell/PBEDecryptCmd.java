@@ -63,9 +63,6 @@ import org.xipki.commons.password.api.PBEPasswordService;
 public class PBEDecryptCmd extends SecurityCommandSupport {
 
     @Reference
-    private OBFPasswordService obfPasswordService;
-
-    @Reference
     private PBEPasswordService pbePasswordService;
 
     @Option(name = "--password",
@@ -111,7 +108,7 @@ public class PBEDecryptCmd extends SecurityCommandSupport {
         if (masterPasswordFile != null) {
             String str = new String(IoUtil.read(masterPasswordFile));
             if (str.startsWith("OBF:") || str.startsWith("obf:")) {
-                str = obfPasswordService.deobfuscate(str);
+                str = OBFPasswordService.doDeobfuscate(str);
             }
             masterPassword = str.toCharArray();
         } else {

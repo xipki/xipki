@@ -36,19 +36,84 @@
 
 package org.xipki.commons.password.api;
 
-import javax.annotation.Nonnull;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-public interface OBFPasswordService {
+public class OBFPasswordService {
 
-    String obfuscate(
-            @Nonnull String str);
+    public static final String OBFUSCATE = "OBF:";
 
-    String deobfuscate(
-            @Nonnull String str);
+    public static String doObfuscate(
+            final String str) {
+        Objects.requireNonNull(str, "str must not be null");
+        StringBuilder buf = new StringBuilder();
+        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
 
+        buf.append(OBFUSCATE);
+        for (int i = 0; i < bytes.length; i++) {
+            byte b1 = bytes[i];
+            byte b2 = bytes[bytes.length - (i + 1)];
+            if (b1 < 0 || b2 < 0) {
+                int i0 = (0xff & b1) * 256 + (0xff & b2);
+                String sx = Integer.toString(i0, 36).toLowerCase();
+                buf.append("U0000", 0, 5 - sx.length());
+                buf.append(sx);
+            } else {
+                int i1 = 127 + b1 + b2;
+                int i2 = 127 + b1 - b2;
+                int i0 = i1 * 256 + i2;
+                String sx = Integer.toString(i0, 36).toLowerCase();
+
+                buf.append("000", 0, 4 - sx.length());
+                buf.append(sx);
+            }
+        } // end for
+        return buf.toString();
+    }
+
+    public static String doDeobfuscate(
+            final String str) {
+        Objects.requireNonNull(str, "str must not be null");
+        String tmpStr = str;
+
+        if (startsWithIgnoreCase(tmpStr, OBFUSCATE)) {
+            tmpStr = tmpStr.substring(4);
+        }
+
+        byte[] bytes = new byte[tmpStr.length() / 2];
+        int idx = 0;
+        for (int i = 0; i < tmpStr.length(); i += 4) {
+            if (tmpStr.charAt(i) == 'U') {
+                i++;
+                String sx = tmpStr.substring(i, i + 4);
+                int i0 = Integer.parseInt(sx, 36);
+                byte bx = (byte) (i0 >> 8);
+                bytes[idx++] = bx;
+            } else {
+                String sx = tmpStr.substring(i, i + 4);
+                int i0 = Integer.parseInt(sx, 36);
+                int i1 = (i0 / 256);
+                int i2 = (i0 % 256);
+                byte bx = (byte) ((i1 + i2 - 254) / 2);
+                bytes[idx++] = bx;
+            }
+        } // end for
+
+        return new String(bytes, 0, idx, StandardCharsets.UTF_8);
+    }
+
+    private static boolean startsWithIgnoreCase(
+            final String str,
+            final String prefix) {
+        if (str.length() < prefix.length()) {
+            return false;
+        }
+
+        return prefix.equalsIgnoreCase(str.substring(0, prefix.length()));
+    }
 }

@@ -63,6 +63,8 @@ import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.commons.password.api.PasswordResolver;
+import org.xipki.commons.security.api.exception.NoIdleSignerException;
+import org.xipki.commons.security.api.exception.SecurityException;
 
 /**
  * @author Lijun Liao

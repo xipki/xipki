@@ -42,11 +42,9 @@ import java.security.SecureRandom;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
-import org.xipki.commons.security.api.p12.P12KeypairGenerator;
 import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
 import org.xipki.commons.security.shell.KeyGenCommandSupport;
 
@@ -56,9 +54,6 @@ import org.xipki.commons.security.shell.KeyGenCommandSupport;
  */
 
 public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
-
-    @Reference
-    protected P12KeypairGenerator keyGenerator;
 
     @Option(name = "--out", aliases = "-o",
             required = true,

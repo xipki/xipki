@@ -38,7 +38,6 @@ package org.xipki.commons.security.speed.p12;
 
 import java.security.SecureRandom;
 
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
 import org.xipki.commons.security.api.p12.P12KeypairGenerator;
@@ -52,28 +51,25 @@ import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
 public class P12ECSignLoadTest extends P12SignLoadTest {
 
     public P12ECSignLoadTest(
-            final P12KeypairGenerator p12KeypairGenerator,
             final SecurityFactory securityFactory,
             final String signatureAlgorithm,
             final String curveNameOrOid)
     throws Exception {
         super(securityFactory, signatureAlgorithm,
-                generateKeystore(p12KeypairGenerator, curveNameOrOid),
+                generateKeystore(curveNameOrOid),
                 "PKCS#12 EC signature creation\n"
                         + "curve: " + curveNameOrOid);
     }
 
     private static byte[] generateKeystore(
-            final P12KeypairGenerator p12KeypairGenerator,
             final String curveNameOrOid)
     throws Exception {
         byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
         if (keystoreBytes == null) {
-            ParamUtil.requireNonNull("p12KeypairGenerator", p12KeypairGenerator);
             P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
                     PASSWORD.toCharArray());
             params.setRandom(new SecureRandom());
-            P12KeypairGenerationResult identity = p12KeypairGenerator.generateECKeypair(
+            P12KeypairGenerationResult identity = new P12KeypairGenerator().generateECKeypair(
                     curveNameOrOid, params);
             keystoreBytes = identity.getKeystore();
         }

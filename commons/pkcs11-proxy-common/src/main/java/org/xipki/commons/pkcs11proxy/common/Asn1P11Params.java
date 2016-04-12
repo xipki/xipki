@@ -44,7 +44,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.BadAsn1ObjectException;
+import org.xipki.commons.security.api.exception.BadAsn1ObjectException;
 
 /**
  *

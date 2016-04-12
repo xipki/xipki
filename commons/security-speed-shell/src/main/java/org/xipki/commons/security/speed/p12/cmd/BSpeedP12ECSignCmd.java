@@ -60,7 +60,7 @@ public class BSpeedP12ECSignCmd extends BSpeedP12SignCommandSupport {
     throws Exception {
         List<LoadExecutor> ret = new LinkedList<>();
         for (String curveName : getECCurveNames()) {
-            ret.add(new P12ECSignLoadTest(p12KeypairGenerator, securityFactory, sigAlgo,
+            ret.add(new P12ECSignLoadTest(securityFactory, sigAlgo,
                     curveName));
         }
 
