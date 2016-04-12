@@ -75,11 +75,11 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.pki.ca.server.mgmt.api.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509CaEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509ChangeCrlSignerEntry;
-import org.xipki.pki.ca.server.mgmt.api.X509CrlSignerEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 
 import com.caucho.hessian.server.HessianServlet;
 
