@@ -49,7 +49,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import javax.annotation.Nullable;
 
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.SignerUtil;

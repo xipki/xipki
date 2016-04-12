@@ -48,9 +48,8 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityException;
-import org.xipki.commons.security.api.p11.parameters.P11Params;
-import org.xipki.commons.security.api.p11.parameters.P11RSAPkcsPssParams;
+import org.xipki.commons.security.api.exception.P11UnsupportedMechanismException;
+import org.xipki.commons.security.api.exception.SecurityException;
 
 /**
  * @author Lijun Liao

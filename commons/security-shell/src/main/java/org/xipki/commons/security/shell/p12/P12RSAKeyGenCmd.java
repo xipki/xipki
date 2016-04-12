@@ -41,6 +41,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
+import org.xipki.commons.security.api.p12.P12KeypairGenerator;
 
 /**
  * @author Lijun Liao
@@ -68,7 +69,7 @@ public class P12RSAKeyGenCmd extends P12KeyGenCommandSupport {
             throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
         }
 
-        P12KeypairGenerationResult keypair = keyGenerator.generateRSAKeypair(keysize,
+        P12KeypairGenerationResult keypair = new P12KeypairGenerator().generateRSAKeypair(keysize,
                 toBigInt(publicExponent), getKeyGenParameters());
         saveKeypair(keypair);
 

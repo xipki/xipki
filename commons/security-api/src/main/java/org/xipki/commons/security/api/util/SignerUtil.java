@@ -65,7 +65,7 @@ import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.SecurityException;
+import org.xipki.commons.security.api.exception.SecurityException;
 
 /**
  * utility class for converting java.security RSA objects into their

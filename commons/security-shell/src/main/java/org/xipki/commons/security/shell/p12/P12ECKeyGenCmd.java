@@ -42,6 +42,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.ECCurveNameCompleter;
 import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
+import org.xipki.commons.security.api.p12.P12KeypairGenerator;
 
 /**
  * @author Lijun Liao
@@ -64,7 +65,7 @@ public class P12ECKeyGenCmd extends P12KeyGenCommandSupport {
     @Override
     protected Object doExecute()
     throws Exception {
-        P12KeypairGenerationResult keypair = keyGenerator.generateECKeypair(curveName,
+        P12KeypairGenerationResult keypair = new P12KeypairGenerator().generateECKeypair(curveName,
                 getKeyGenParameters());
         saveKeypair(keypair);
 

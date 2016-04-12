@@ -46,7 +46,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.BadAsn1ObjectException;
+import org.xipki.commons.security.api.exception.BadAsn1ObjectException;
 
 /**
  *

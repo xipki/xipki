@@ -46,9 +46,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.password.api.OBFPasswordService;
 import org.xipki.commons.password.api.PasswordCallback;
 import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.password.impl.OBFPasswordServiceImpl;
 
 /**
  * @author Lijun Liao
@@ -98,8 +98,8 @@ public class FilePasswordCallback implements PasswordCallback {
             throw new PasswordResolverException("no password is specified in file " + passwordFile);
         }
 
-        if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordServiceImpl.OBFUSCATE)) {
-            return OBFPasswordServiceImpl.doDeobfuscate(passwordHint).toCharArray();
+        if (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordService.OBFUSCATE)) {
+            return OBFPasswordService.doDeobfuscate(passwordHint).toCharArray();
         } else {
             return passwordHint.toCharArray();
         }
