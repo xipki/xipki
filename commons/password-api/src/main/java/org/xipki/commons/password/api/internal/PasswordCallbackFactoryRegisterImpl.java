@@ -69,16 +69,15 @@ public class PasswordCallbackFactoryRegisterImpl implements PasswordCallbackFact
 
         long start = System.currentTimeMillis();
 
-        PasswordCallback callback = null;
         while (true) {
             for (PasswordCallbackFactory service : services) {
                 if (service.canCreatePasswordCallback(type)) {
-                    callback = service.newPasswordCallback(type);
+                    return service.newPasswordCallback(type);
                 }
             }
 
-            if (timeout != 0 || System.currentTimeMillis() - start > timeout) {
-                break;
+            if (timeout != 0 && System.currentTimeMillis() - start > timeout) {
+                throw new RuntimeException("could not new PasswordCallback '" + type + "'");
             }
 
             try {
@@ -86,12 +85,6 @@ public class PasswordCallbackFactoryRegisterImpl implements PasswordCallbackFact
             } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
             }
         }
-
-        if (callback == null) {
-            throw new RuntimeException("could not new PasswordCallback '" + type + "'");
-        }
-
-        return callback;
     }
 
     public void bindService(
