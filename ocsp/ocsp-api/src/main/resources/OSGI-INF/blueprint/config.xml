@@ -4,11 +4,11 @@
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
   <bean id="factoryRegister"
-       class="org.xipki.pki.ocsp.api.internal.CertStatusStoreFactoryRegisterImpl"/>
+       class="org.xipki.pki.ocsp.api.internal.OcspStoreFactoryRegisterImpl"/>
   <service ref="factoryRegister"
-       interface="org.xipki.pki.ocsp.api.CertStatusStoreFactoryRegister"/>
+       interface="org.xipki.pki.ocsp.api.OcspStoreFactoryRegister"/>
   <reference-list id="factories"
-       interface="org.xipki.pki.ocsp.api.CertStatusStoreFactory"
+       interface="org.xipki.pki.ocsp.api.OcspStoreFactory"
        availability="optional">
     <reference-listener ref="factoryRegister" bind-method="bindService"
          unbind-method="unbindService"/>

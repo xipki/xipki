@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.server.impl.certstore;
+package org.xipki.pki.ocsp.store.crl.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +42,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
@@ -98,8 +99,8 @@ import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
-import org.xipki.pki.ocsp.api.CertStatusStore;
-import org.xipki.pki.ocsp.api.CertStatusStoreException;
+import org.xipki.pki.ocsp.api.OcspStore;
+import org.xipki.pki.ocsp.api.OcspStoreException;
 import org.xipki.pki.ocsp.api.CertprofileOption;
 import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
 
@@ -108,7 +109,7 @@ import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
  * @since 2.0.0
  */
 
-public class CrlCertStatusStore extends CertStatusStore {
+public class CrlCertStatusStore extends OcspStore {
 
     private class StoreUpdateService implements Runnable {
 
@@ -123,21 +124,21 @@ public class CrlCertStatusStore extends CertStatusStore {
 
     private final Map<BigInteger, CrlCertStatusInfo> certStatusInfoMap = new ConcurrentHashMap<>();
 
-    private final X509Certificate caCert;
+    private X509Certificate caCert;
 
-    private final X509Certificate issuerCert;
+    private X509Certificate issuerCert;
 
-    private final String crlFilename;
+    private String crlFilename;
 
-    private final String deltaCrlFilename;
+    private String deltaCrlFilename;
 
-    private final SHA1Digest sha1;
+    private SHA1Digest sha1;
 
-    private final String crlUrl;
+    private String crlUrl;
 
-    private final Date caNotBefore;
+    private Date caNotBefore;
 
-    private final String certsDirname;
+    private String certsDirname;
 
     private boolean useUpdateDatesFromCrl;
 
@@ -159,7 +160,7 @@ public class CrlCertStatusStore extends CertStatusStore {
 
     private BigInteger crlNumber;
 
-    private final Set<HashAlgoType> certHashAlgos;
+    private Set<HashAlgoType> certHashAlgos;
 
     private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap =
             new ConcurrentHashMap<>();
@@ -169,42 +170,6 @@ public class CrlCertStatusStore extends CertStatusStore {
     private boolean initialized;
 
     private boolean initializationFailed;
-
-    public CrlCertStatusStore(
-            final String name,
-            final String crlFile,
-            final String deltaCrlFile,
-            final X509Certificate caCert,
-            final String crlUrl,
-            final String certsDirname,
-            final Set<HashAlgoType> certHashAlgos) {
-        this(name, crlFile, (String) null, caCert, (X509Certificate) null, crlUrl,
-                certsDirname, certHashAlgos);
-    }
-
-    public CrlCertStatusStore(
-            final String name,
-            final String crlFilename,
-            final String deltaCrlFilename,
-            final X509Certificate caCert,
-            final X509Certificate issuerCert,
-            final String crlUrl,
-            final String certsDirname,
-            final Set<HashAlgoType> certHashAlgos) {
-        super(name);
-        ParamUtil.requireNonBlank("crlFilename", crlFilename);
-        this.caCert = ParamUtil.requireNonNull("caCert", caCert);
-        this.certHashAlgos = ParamUtil.requireNonNull("certHashAlgos", certHashAlgos);
-        this.crlFilename = IoUtil.expandFilepath(crlFilename);
-        this.deltaCrlFilename = (deltaCrlFilename == null)
-                ? null
-                : IoUtil.expandFilepath(deltaCrlFilename);
-        this.issuerCert = issuerCert;
-        this.crlUrl = crlUrl;
-        this.caNotBefore = caCert.getNotBefore();
-        this.certsDirname = certsDirname;
-        this.sha1 = new SHA1Digest();
-    }
 
     private synchronized void initializeStore(
             final boolean force) {
@@ -277,14 +242,14 @@ public class CrlCertStatusStore extends CertStatusStore {
 
             byte[] octetString = crl.getExtensionValue(Extension.cRLNumber.getId());
             if (octetString == null) {
-                throw new CertStatusStoreException("CRL withour CRLNumber is not supported");
+                throw new OcspStoreException("CRL withour CRLNumber is not supported");
             }
             BigInteger newCrlNumber = ASN1Integer.getInstance(
                     DEROctetString.getInstance(octetString).getOctets())
                     .getPositiveValue();
 
             if (crlNumber != null && newCrlNumber.compareTo(crlNumber) <= 0) {
-                throw new CertStatusStoreException(String.format(
+                throw new OcspStoreException(String.format(
                         "CRLNumber of new CRL (%s) <= current CRL (%s)",
                         newCrlNumber, crlNumber));
             }
@@ -309,7 +274,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             try {
                 crl.verify(crlSignerCert.getPublicKey());
             } catch (Exception ex) {
-                throw new CertStatusStoreException(ex.getMessage(), ex);
+                throw new OcspStoreException(ex.getMessage(), ex);
             }
 
             X509CRL deltaCrl = null;
@@ -318,7 +283,7 @@ public class CrlCertStatusStore extends CertStatusStore {
 
             if (deltaCrlExists) {
                 if (newCrlNumber == null) {
-                    throw new CertStatusStoreException("baseCRL does not contains CRLNumber");
+                    throw new OcspStoreException("baseCRL does not contains CRLNumber");
                 }
 
                 deltaCrl = X509Util.parseCrl(deltaCrlFilename);
@@ -376,7 +341,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             try {
                 encodedCaCert = caCert.getEncoded();
             } catch (CertificateEncodingException ex) {
-                throw new CertStatusStoreException(ex.getMessage(), ex);
+                throw new OcspStoreException(ex.getMessage(), ex);
             }
 
             Certificate bcCaCert = Certificate.getInstance(encodedCaCert);
@@ -384,7 +349,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             try {
                 encodedName = bcCaCert.getSubject().getEncoded("DER");
             } catch (IOException ex) {
-                throw new CertStatusStoreException(ex.getMessage(), ex);
+                throw new OcspStoreException(ex.getMessage(), ex);
             }
 
             byte[] encodedKey = bcCaCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
@@ -434,7 +399,7 @@ public class CrlCertStatusStore extends CertStatusStore {
                     X500Principal thisIssuer = revokedCert.getCertificateIssuer();
                     if (thisIssuer != null
                             && !caCert.getSubjectX500Principal().equals(thisIssuer)) {
-                        throw new CertStatusStoreException("invalid CRLEntry");
+                        throw new OcspStoreException("invalid CRLEntry");
                     }
                 }
             }
@@ -447,7 +412,7 @@ public class CrlCertStatusStore extends CertStatusStore {
                         X500Principal thisIssuer = revokedCert.getCertificateIssuer();
                         if (thisIssuer != null
                                 && !caCert.getSubjectX500Principal().equals(thisIssuer)) {
-                            throw new CertStatusStoreException("invalid CRLEntry");
+                            throw new OcspStoreException("invalid CRLEntry");
                         }
                     } // end for
                 } // end if
@@ -507,7 +472,7 @@ public class CrlCertStatusStore extends CertStatusStore {
                         try {
                             invalidityTime = genTime.getDate();
                         } catch (ParseException ex) {
-                            throw new CertStatusStoreException(ex.getMessage(), ex);
+                            throw new OcspStoreException(ex.getMessage(), ex);
                         }
 
                         if (revTime.equals(invalidityTime)) {
@@ -602,7 +567,7 @@ public class CrlCertStatusStore extends CertStatusStore {
     private Map<BigInteger, CertWithInfo> extractCertsFromExtCrlCertSet(
             final byte[] encodedExtCrlCertSet,
             final X500Name caName)
-    throws CertStatusStoreException {
+    throws OcspStoreException {
         Map<BigInteger, CertWithInfo> certsMap = new HashMap<>();
         ASN1Set asn1Set = DERSet.getInstance(encodedExtCrlCertSet);
         final int n = asn1Set.size();
@@ -637,13 +602,13 @@ public class CrlCertStatusStore extends CertStatusStore {
 
             if (bcCert != null) {
                 if (!caName.equals(bcCert.getIssuer())) {
-                    throw new CertStatusStoreException(
+                    throw new OcspStoreException(
                         "issuer not match (serial=" + serialNumber
                         + ") in CRL Extension Xipki-CertSet");
                 }
 
                 if (!serialNumber.equals(bcCert.getSerialNumber().getValue())) {
-                    throw new CertStatusStoreException(
+                    throw new OcspStoreException(
                             "serialNumber not match (serial=" + serialNumber
                             + ") in CRL Extension Xipki-CertSet");
                 }
@@ -673,7 +638,7 @@ public class CrlCertStatusStore extends CertStatusStore {
             final boolean includeCertHash,
             final HashAlgoType certHashAlg,
             final CertprofileOption certprofileOption)
-    throws CertStatusStoreException {
+    throws OcspStoreException {
         // wait for max. 0.5 second
         int num = 5;
         while (!initialized && (num-- > 0)) {
@@ -684,11 +649,11 @@ public class CrlCertStatusStore extends CertStatusStore {
         }
 
         if (!initialized) {
-            throw new CertStatusStoreException("initialization of CertStore is still in process");
+            throw new OcspStoreException("initialization of CertStore is still in process");
         }
 
         if (initializationFailed) {
-            throw new CertStatusStoreException("initialization of CertStore failed");
+            throw new OcspStoreException("initialization of CertStore failed");
         }
 
         HashAlgoType certHashAlgo = null;
@@ -802,8 +767,30 @@ public class CrlCertStatusStore extends CertStatusStore {
     @Override
     public void init(
             final String conf,
-            final DataSourceWrapper datasource)
-    throws CertStatusStoreException {
+            final DataSourceWrapper datasource,
+            final Set<HashAlgoType> certHashAlgos)
+    throws OcspStoreException {
+        ParamUtil.requireNonBlank("conf", conf);
+        this.certHashAlgos = ParamUtil.requireNonNull("certHashAlgos", certHashAlgos);
+
+        StoreConf storeConf = new StoreConf(conf);
+        this.crlFilename = IoUtil.expandFilepath(storeConf.getCrlFile());
+        this.crlUrl = storeConf.getCrlUrl();
+        this.deltaCrlFilename = (storeConf.getDeltaCrlFile() == null)
+                ? null
+                : IoUtil.expandFilepath(storeConf.getDeltaCrlFile());
+        this.certsDirname = (storeConf.getCertsDir() == null)
+                ? null
+                : IoUtil.expandFilepath(storeConf.getCertsDir());
+        this.caCert = parseCert(storeConf.getCaCertFile());
+        this.issuerCert = null;
+        if (storeConf.getIssuerCertFile() != null) {
+            this.issuerCert = parseCert(storeConf.getIssuerCertFile());
+        }
+        this.caNotBefore = caCert.getNotBefore();
+
+        this.sha1 = new SHA1Digest();
+
         initializeStore(true);
 
         StoreUpdateService storeUpdateService = new StoreUpdateService();
@@ -814,7 +801,7 @@ public class CrlCertStatusStore extends CertStatusStore {
 
     @Override
     public void shutdown()
-    throws CertStatusStoreException {
+    throws OcspStoreException {
         if (scheduledThreadPoolExecutor == null) {
             return;
         }
@@ -988,7 +975,7 @@ public class CrlCertStatusStore extends CertStatusStore {
 
     private Map<HashAlgoType, byte[]> getCertHashes(
             final Certificate cert)
-    throws CertStatusStoreException {
+    throws OcspStoreException {
         ParamUtil.requireNonNull("cert", cert);
         if (certHashAlgos.isEmpty()) {
             return null;
@@ -998,7 +985,7 @@ public class CrlCertStatusStore extends CertStatusStore {
         try {
             encodedCert = cert.getEncoded();
         } catch (IOException ex) {
-            throw new CertStatusStoreException(ex.getMessage(), ex);
+            throw new OcspStoreException(ex.getMessage(), ex);
         }
 
         Map<HashAlgoType, byte[]> certHashes = new ConcurrentHashMap<>();
@@ -1013,6 +1000,17 @@ public class CrlCertStatusStore extends CertStatusStore {
     private static byte[] removeTagAndLenFromExtensionValue(
             final byte[] encodedExtensionValue) {
         return ASN1OctetString.getInstance(encodedExtensionValue).getOctets();
+    }
+
+    private static X509Certificate parseCert(
+            final String certFile)
+    throws OcspStoreException {
+        try {
+            return X509Util.parseCert(certFile);
+        } catch (CertificateException | IOException ex) {
+            throw new OcspStoreException("could not parse X.509 certificate from file "
+                    + certFile + ": " + ex.getMessage(), ex);
+        }
     }
 
 }

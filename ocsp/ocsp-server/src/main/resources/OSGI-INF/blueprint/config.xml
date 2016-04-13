@@ -16,15 +16,16 @@
   <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <reference id="auditServiceRegister"
       interface="org.xipki.commons.audit.api.AuditServiceRegister"/>
-  <reference id="certStatusStoreFactoryRegister"
-      interface="org.xipki.pki.ocsp.api.CertStatusStoreFactoryRegister"/>
+  <reference id="ocspStoreFactoryRegister"
+      interface="org.xipki.pki.ocsp.api.OcspStoreFactoryRegister"/>
   <bean id="ocspServer" class="org.xipki.pki.ocsp.server.impl.OcspServer" 
       init-method="init" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
+    <property name="newStoreTimeout" value="${newStoreTimeout}"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="securityFactory" ref="securityFactory"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
-    <property name="certStatusStoreFactoryRegister" ref="certStatusStoreFactoryRegister"/>
+    <property name="ocspStoreFactoryRegister" ref="ocspStoreFactoryRegister"/>
   </bean>
   <!-- create the servlet and inject our own app factory -->
   <bean id="ocspServlet" class="org.xipki.pki.ocsp.server.impl.HttpOcspServlet">

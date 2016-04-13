@@ -116,6 +116,8 @@
     <feature>xipki-security</feature>
     <feature>xipki-audit</feature>
     <bundle>mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-store-db/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-store-crl/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspclient" version="${project.version}">

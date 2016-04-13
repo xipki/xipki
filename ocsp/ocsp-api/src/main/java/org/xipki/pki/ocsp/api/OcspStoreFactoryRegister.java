@@ -45,13 +45,18 @@ import org.xipki.commons.common.ObjectCreationException;
  * @since 2.0.0
  */
 
-public interface CertStatusStoreFactory {
+public interface OcspStoreFactoryRegister {
 
-    boolean canCreateCertStatusStore(
-            @Nonnull String type);
-
-    CertStatusStore newCertStatusStore(
-            @Nonnull String type)
+    /**
+     *
+     * @param type type of the OcspStore
+     * @param timeout timeout in milliseconds, 0 for forever
+     * @return new OcspStore.
+     * @throws ObjectCreationException if OcspStore could not be created.
+     */
+    OcspStore newOcspStore(
+            @Nonnull String type,
+            long timeout)
     throws ObjectCreationException;
 
 }
