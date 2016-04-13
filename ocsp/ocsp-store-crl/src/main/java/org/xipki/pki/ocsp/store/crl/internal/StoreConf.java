@@ -5,7 +5,7 @@
  * Author: Lijun Liao
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General License version 3
+ * it under the terms of the GNU Affero General Public License version 3
  * as published by the Free Software Foundation with the addition of the
  * following permission added to Section 15 as permitted in Section 7(a):
  *
@@ -16,14 +16,14 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * The interactive user interfaces in modified source and object code versions
  * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General License.
+ * Section 5 of the GNU Affero General Public License.
  *
  * You can be released from the requirements of the license by purchasing
  * a commercial license. Buying such a license is mandatory as soon as you
