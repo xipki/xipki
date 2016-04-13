@@ -273,11 +273,11 @@
     <xs:all>
       <xs:element name="source">
         <xs:complexType>
-          <xs:choice>
-            <xs:element name="dbStore" type="dbStoreType"/>
-            <xs:element name="crlStore" type="crlStoreType"/>
-            <xs:element name="customStore" type="customStoreType"/>          
-          </xs:choice>
+          <xs:all>
+            <xs:element name="type" type="xs:string"/>
+            <xs:element name="datasource" type="xs:string" minOccurs="0"/>
+            <xs:element name="conf" type="xs:string"/>
+          </xs:all>
         </xs:complexType>
       </xs:element>
       <xs:element name="retentionInterval" type="xs:int" minOccurs="0">
@@ -318,76 +318,6 @@
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>    
   </xs:complexType>
-  <xs:complexType name="dbStoreType">
-    <xs:all>
-      <xs:element name="datasource" type="xs:string"/>
-      <xs:element name="cacerts" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-            Which CAs should be included and excluded. If not present, then all CAs will be 
-            considered.
-          </xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-          <xs:all>
-            <xs:element name="includes" type="includesFileOrValueType" minOccurs="0"/>
-            <xs:element name="excludes" type="excludesFileOrValueType" minOccurs="0"/>
-          </xs:all>
-        </xs:complexType>
-      </xs:element>
-    </xs:all>
-  </xs:complexType>
-  <xs:complexType name="crlStoreType">
-    <xs:all>
-      <xs:element name="crlFile" type="xs:string"/>
-      <xs:element name="crlUrl" type="xs:string" minOccurs="0"/>
-      <xs:element name="deltaCrlFile" type="xs:string" minOccurs="0"/>
-      <xs:element name="useUpdateDatesFromCRL" type="xs:boolean" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-             Where use thisUpdate and nextUpdate of CRL in the corresponding fields
-             of OCSP response. The default value is true.
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="caCert" type="fileOrValueType"/>
-      <xs:element name="issuerCert" type="fileOrValueType" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-             Required for indirect CRL
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="caRevoked" type="xs:boolean" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-             Whether CA is revoked. The default is false.
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="caRevocationTime" type="xs:dateTime" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-             When CA certificate is revoked. Required if caRevoked is true
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="certsDir" type="xs:string" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-             Folder containing the DER-encoded certificates suffixed with ".der" and ".crt"
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-    </xs:all>
-  </xs:complexType>
-  <xs:complexType name="customStoreType">
-    <xs:all>
-      <xs:element name="type" type="xs:string"/>
-      <xs:element name="datasource" type="xs:string" minOccurs="0"/>
-      <xs:element name="conf" type="xs:string"/>
-    </xs:all>
-  </xs:complexType>
   <xs:complexType name="versionsType">
     <xs:sequence>
       <xs:element name="version" type="xs:int" maxOccurs="unbounded"/>
@@ -413,16 +343,6 @@
   <xs:complexType name="excludesType">
     <xs:sequence>
       <xs:element name="exclude" type="xs:string" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="includesFileOrValueType">
-    <xs:sequence>
-      <xs:element name="include" type="fileOrValueType" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="excludesFileOrValueType">
-    <xs:sequence>
-      <xs:element name="exclude" type="fileOrValueType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
   <xs:simpleType name="embedCertsMode">

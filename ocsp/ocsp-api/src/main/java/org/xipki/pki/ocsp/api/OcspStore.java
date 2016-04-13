@@ -54,11 +54,11 @@ import org.xipki.commons.security.api.HashAlgoType;
  * @since 2.0.0
  */
 
-public abstract class CertStatusStore {
+public abstract class OcspStore {
 
     protected static final long DAY = 24L * 60 * 60 * 1000;
 
-    private final String name;
+    private String name;
 
     private boolean unknownSerialAsGood;
 
@@ -70,9 +70,7 @@ public abstract class CertStatusStore {
 
     private AuditServiceRegister auditServiceRegister;
 
-    protected CertStatusStore(
-            final String name) {
-        this.name = ParamUtil.requireNonBlank("name", name);
+    public OcspStore() {
     }
 
     public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
@@ -90,12 +88,13 @@ public abstract class CertStatusStore {
             boolean includeCertHash,
             @Nullable HashAlgoType certHashAlg,
             @Nullable CertprofileOption certprofileOption)
-    throws CertStatusStoreException;
+    throws OcspStoreException;
 
     public abstract void init(
-            @Nullable String conf,
-            @Nullable DataSourceWrapper datasource)
-    throws CertStatusStoreException;
+            @Nonnull String conf,
+            @Nonnull DataSourceWrapper datasource,
+            @Nonnull Set<HashAlgoType> certHashAlgos)
+    throws OcspStoreException;
 
     public abstract CertRevocationInfo getCaRevocationInfo(
             @Nonnull HashAlgoType hashAlgo,
@@ -103,9 +102,14 @@ public abstract class CertStatusStore {
             @Nonnull byte[] issuerKeyHash);
 
     public abstract void shutdown()
-    throws CertStatusStoreException;
+    throws OcspStoreException;
 
     public abstract boolean isHealthy();
+
+    public void setName(
+            final String name) {
+        this.name = ParamUtil.requireNonBlank("name", name);
+    }
 
     public String getName() {
         return name;

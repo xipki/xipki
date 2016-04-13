@@ -34,53 +34,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.server.impl.certstore;
+package org.xipki.pki.ocsp.store.db.internal;
 
-import java.math.BigInteger;
-
-import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.common.ObjectCreationException;
+import org.xipki.pki.ocsp.api.OcspStore;
+import org.xipki.pki.ocsp.api.OcspStoreFactory;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class CertWithInfo {
+public class OcspStoreFactoryImpl implements OcspStoreFactory {
 
-    private final BigInteger serialNumber;
-
-    private Certificate cert;
-
-    private String profileName;
-
-    CertWithInfo(
-            final BigInteger serialNumber) {
-        this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
+    @Override
+    public boolean canCreateOcspStore(
+            final String type) {
+        return "DB".equalsIgnoreCase(type);
     }
 
-    public void setProfileName(
-            final String profileName) {
-        this.profileName = StringUtil.isBlank(profileName)
-                ? null
-                : profileName;
+    @Override
+    public OcspStore newOcspStore(
+            final String type)
+    throws ObjectCreationException {
+        if ("DB".equalsIgnoreCase(type)) {
+            return new DbCertStatusStore();
+        } else {
+            throw new ObjectCreationException("unknown OCSP store type '" + type + "'");
+        }
     }
 
-    public void setCert(Certificate cert) {
-        this.cert = cert;
-    }
-
-    public BigInteger getSerialNumber() {
-        return serialNumber;
-    }
-
-    public Certificate getCert() {
-        return cert;
-    }
-
-    public String getProfileName() {
-        return profileName;
-    }
-
-} // class CertWithInfo
+}

@@ -34,29 +34,4 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.api;
-
-import javax.annotation.Nonnull;
-
-import org.xipki.commons.common.ObjectCreationException;
-
-/**
- * @author Lijun Liao
- * @since 2.0.0
- */
-
-public interface CertStatusStoreFactoryRegister {
-
-    /**
-     *
-     * @param type type of the certificate
-     * @param timeout timeout in milliseconds, 0 for forever
-     * @return new certificate profile.
-     * @throws ObjectCreationException if CertStatusStore could not be created.
-     */
-    CertStatusStore newCertStatusStore(
-            @Nonnull String type,
-            long timeout)
-    throws ObjectCreationException;
-
-}
+package org.xipki.pki.ocsp.store.db.internal;

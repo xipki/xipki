@@ -42,25 +42,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ocsp.api.CertStatusStore;
-import org.xipki.pki.ocsp.api.CertStatusStoreFactory;
-import org.xipki.pki.ocsp.api.CertStatusStoreFactoryRegister;
+import org.xipki.pki.ocsp.api.OcspStore;
+import org.xipki.pki.ocsp.api.OcspStoreFactory;
+import org.xipki.pki.ocsp.api.OcspStoreFactoryRegister;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CertStatusStoreFactoryRegisterImpl implements CertStatusStoreFactoryRegister {
+public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
 
     private static final Logger LOG = LoggerFactory.getLogger(
-            CertStatusStoreFactoryRegisterImpl.class);
+            OcspStoreFactoryRegisterImpl.class);
 
-    private ConcurrentLinkedDeque<CertStatusStoreFactory> services =
-            new ConcurrentLinkedDeque<CertStatusStoreFactory>();
+    private ConcurrentLinkedDeque<OcspStoreFactory> services =
+            new ConcurrentLinkedDeque<OcspStoreFactory>();
 
     @Override
-    public CertStatusStore newCertStatusStore(
+    public OcspStore newOcspStore(
             final String type,
             final long timeout)
     throws ObjectCreationException {
@@ -69,16 +69,15 @@ public class CertStatusStoreFactoryRegisterImpl implements CertStatusStoreFactor
 
         long start = System.currentTimeMillis();
 
-        CertStatusStore store = null;
         while (true) {
-            for (CertStatusStoreFactory service : services) {
-                if (service.canCreateCertStatusStore(type)) {
-                    store = service.newCertStatusStore(type);
+            for (OcspStoreFactory service : services) {
+                if (service.canCreateOcspStore(type)) {
+                    return service.newOcspStore(type);
                 }
             }
 
-            if (timeout != 0 || System.currentTimeMillis() - start > timeout) {
-                break;
+            if ((timeout != 0 && System.currentTimeMillis() - start > timeout)) {
+                throw new ObjectCreationException("could not new CertStatusStore '" + type + "'");
             }
 
             try {
@@ -86,16 +85,10 @@ public class CertStatusStoreFactoryRegisterImpl implements CertStatusStoreFactor
             } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
             }
         }
-
-        if (store == null) {
-            throw new ObjectCreationException("could not new CertStatusStore '" + type + "'");
-        }
-
-        return store;
     }
 
     public void bindService(
-            final CertStatusStoreFactory service) {
+            final OcspStoreFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.info("bindService invoked with null.");
@@ -112,7 +105,7 @@ public class CertStatusStoreFactoryRegisterImpl implements CertStatusStoreFactor
     }
 
     public void unbindService(
-            final CertStatusStoreFactory service) {
+            final OcspStoreFactory service) {
         //might be null if dependency is optional
         if (service == null) {
             LOG.info("unbindService invoked with null.");

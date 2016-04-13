@@ -34,34 +34,65 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.api;
+package org.xipki.pki.ocsp.store.db.internal;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import org.xipki.pki.ocsp.api.OcspStoreException;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CertStatusStoreException extends Exception {
+class StoreConf {
 
-    private static final long serialVersionUID = 1L;
+    private static final String KEY_cacerts_includes = "cacerts.includes";
 
-    public CertStatusStoreException() {
+    private static final String KEY_cacerts_excludes = "cacerts.excludes";
+
+    private final Set<String> caCertsIncludes = new HashSet<>();
+
+    private final Set<String> caCertsExcludes = new HashSet<>();
+
+    StoreConf(
+            final String propsConf)
+    throws OcspStoreException {
+        Properties props = new Properties();
+        try {
+            props.load(new ByteArrayInputStream(propsConf.getBytes()));
+        } catch (IOException ex) {
+            throw new OcspStoreException("could not load properties: " + ex.getMessage(), ex);
+        }
+
+        String str = props.getProperty(KEY_cacerts_includes);
+        if (str != null) {
+            StringTokenizer st = new StringTokenizer(str, ", ");
+            while (st.hasMoreTokens()) {
+                caCertsIncludes.add(st.nextToken());
+            }
+        }
+
+        str = props.getProperty(KEY_cacerts_excludes);
+        if (str != null) {
+            StringTokenizer st = new StringTokenizer(str, ", ");
+            while (st.hasMoreTokens()) {
+                caCertsExcludes.add(st.nextToken());
+            }
+        }
     }
 
-    public CertStatusStoreException(
-            final String message) {
-        super(message);
+    Set<String> getCaCertsIncludes() {
+        return caCertsIncludes;
     }
 
-    public CertStatusStoreException(
-            final Throwable cause) {
-        super(cause);
-    }
-
-    public CertStatusStoreException(
-            final String message,
-            final Throwable cause) {
-        super(message, cause);
+    Set<String> getCaCertsExcludes() {
+        return caCertsExcludes;
     }
 
 }

@@ -65,7 +65,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -133,26 +132,18 @@ import org.xipki.commons.security.api.exception.NoIdleSignerException;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.api.CertStatus;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
-import org.xipki.pki.ocsp.api.CertStatusStore;
-import org.xipki.pki.ocsp.api.CertStatusStoreException;
-import org.xipki.pki.ocsp.api.CertStatusStoreFactoryRegister;
 import org.xipki.pki.ocsp.api.CertprofileOption;
 import org.xipki.pki.ocsp.api.OcspMode;
+import org.xipki.pki.ocsp.api.OcspStore;
+import org.xipki.pki.ocsp.api.OcspStoreException;
+import org.xipki.pki.ocsp.api.OcspStoreFactoryRegister;
 import org.xipki.pki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
-import org.xipki.pki.ocsp.server.impl.certstore.CrlCertStatusStore;
-import org.xipki.pki.ocsp.server.impl.certstore.DbCertStatusStore;
-import org.xipki.pki.ocsp.server.impl.certstore.IssuerFilter;
 import org.xipki.pki.ocsp.server.impl.jaxb.AuditOptionType;
 import org.xipki.pki.ocsp.server.impl.jaxb.CertprofileOptionType;
-import org.xipki.pki.ocsp.server.impl.jaxb.CrlStoreType;
-import org.xipki.pki.ocsp.server.impl.jaxb.CustomStoreType;
 import org.xipki.pki.ocsp.server.impl.jaxb.DatasourceType;
-import org.xipki.pki.ocsp.server.impl.jaxb.DbStoreType;
 import org.xipki.pki.ocsp.server.impl.jaxb.EmbedCertsMode;
-import org.xipki.pki.ocsp.server.impl.jaxb.ExcludesFileOrValueType;
 import org.xipki.pki.ocsp.server.impl.jaxb.FileOrPlainValueType;
 import org.xipki.pki.ocsp.server.impl.jaxb.FileOrValueType;
-import org.xipki.pki.ocsp.server.impl.jaxb.IncludesFileOrValueType;
 import org.xipki.pki.ocsp.server.impl.jaxb.OCSPServer;
 import org.xipki.pki.ocsp.server.impl.jaxb.ObjectFactory;
 import org.xipki.pki.ocsp.server.impl.jaxb.RequestOptionType;
@@ -160,7 +151,6 @@ import org.xipki.pki.ocsp.server.impl.jaxb.ResponderType;
 import org.xipki.pki.ocsp.server.impl.jaxb.ResponseOptionType;
 import org.xipki.pki.ocsp.server.impl.jaxb.SignerType;
 import org.xipki.pki.ocsp.server.impl.jaxb.StoreType;
-import org.xipki.pki.ocsp.server.impl.jaxb.StoreType.Source;
 import org.xml.sax.SAXException;
 
 /**
@@ -218,7 +208,7 @@ public class OcspServer {
 
     private AuditServiceRegister auditServiceRegister;
 
-    private CertStatusStoreFactoryRegister certStatusStoreFactoryRegister;
+    private OcspStoreFactoryRegister ocspStoreFactoryRegister;
 
     private long newStoreTimeout;
 
@@ -234,7 +224,7 @@ public class OcspServer {
 
     private Map<String, CertprofileOption> certprofileOptions = new HashMap<>();
 
-    private Map<String, CertStatusStore> stores = new HashMap<>();
+    private Map<String, OcspStore> stores = new HashMap<>();
 
     private List<ServletPathResponderName> servletPaths = new ArrayList<>();
 
@@ -585,7 +575,7 @@ public class OcspServer {
 
         // stores
         for (StoreType m : conf.getStores().getStore()) {
-            CertStatusStore store = initStore(m, datasources,
+            OcspStore store = initStore(m, datasources,
                     storeCertHashAlgoSet.get(m.getName()));
             stores.put(m.getName(), store);
         }
@@ -619,7 +609,7 @@ public class OcspServer {
             String aoName = option.getAuditOptionName();
             String cfoName = option.getCertprofileOptionName();
 
-            List<CertStatusStore> statusStores = new ArrayList<>(option.getStoreNames().size());
+            List<OcspStore> statusStores = new ArrayList<>(option.getStoreNames().size());
             for (String storeName : option.getStoreNames()) {
                 statusStores.add(stores.get(storeName));
             }
@@ -646,7 +636,7 @@ public class OcspServer {
 
     public void shutdown() {
         LOG.info("stopped OCSP Responder");
-        for (CertStatusStore store : stores.values()) {
+        for (OcspStore store : stores.values()) {
             try {
                 store.shutdown();
             } catch (Exception ex) {
@@ -774,10 +764,10 @@ public class OcspServer {
                 }
 
                 CertStatusInfo certStatusInfo = null;
-                CertStatusStore answeredStore = null;
+                OcspStore answeredStore = null;
                 boolean exceptionOccurs = false;
 
-                for (CertStatusStore store : responder.getStores()) {
+                for (OcspStore store : responder.getStores()) {
                     try {
                         certStatusInfo = store.getCertStatus(
                                 reqHashAlgo,
@@ -791,7 +781,7 @@ public class OcspServer {
                             answeredStore = store;
                             break;
                         }
-                    } catch (CertStatusStoreException ex) {
+                    } catch (OcspStoreException ex) {
                         exceptionOccurs = true;
                         final String msg = "getCertStatus() of CertStatusStore " + store.getName();
                         LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(),
@@ -1112,7 +1102,7 @@ public class OcspServer {
         HealthCheckResult result = new HealthCheckResult("OCSPResponder");
         boolean healthy = true;
 
-        for (CertStatusStore store : responder.getStores()) {
+        for (OcspStore store : responder.getStores()) {
             boolean storeHealthy = store.isHealthy();
             healthy &= storeHealthy;
 
@@ -1136,14 +1126,14 @@ public class OcspServer {
     public void setAuditServiceRegister(
             final AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = auditServiceRegister;
-        for (CertStatusStore store : stores.values()) {
+        for (OcspStore store : stores.values()) {
             store.setAuditServiceRegister(auditServiceRegister);
         }
     }
 
-    public void setCertStatusStoreFactoryRegister(
-            final CertStatusStoreFactoryRegister certStatusStoreFactoryRegister) {
-        this.certStatusStoreFactoryRegister = certStatusStoreFactoryRegister;
+    public void setOcspStoreFactoryRegister(
+            final OcspStoreFactoryRegister ocspStoreFactoryRegister) {
+        this.ocspStoreFactoryRegister = ocspStoreFactoryRegister;
     }
 
     private void auditLogPciEvent(
@@ -1215,105 +1205,35 @@ public class OcspServer {
         }
     } // method initSigner
 
-    private CertStatusStore initStore(
+    private OcspStore initStore(
             final StoreType conf,
             final Map<String, DataSourceWrapper> datasources,
             final Set<HashAlgoType> certHashAlgos)
     throws InvalidConfException {
-        String name = conf.getName();
-
-        String statusStoreConf = null;
-        String datasourceName = null;
-
-        Source source = conf.getSource();
-        CertStatusStore store;
-        if (source.getDbStore() != null) {
-            DbStoreType dbStoreConf = source.getDbStore();
-            datasourceName = dbStoreConf.getDatasource();
-
-            IssuerFilter issuerFilter;
-            try {
-                Set<X509Certificate> includeIssuers = null;
-                Set<X509Certificate> excludeIssuers = null;
-
-                if (dbStoreConf.getCacerts() != null) {
-                    IncludesFileOrValueType includes = dbStoreConf.getCacerts().getIncludes();
-                    if (includes != null) {
-                        includeIssuers = parseCerts(includes.getInclude());
-                    }
-
-                    ExcludesFileOrValueType excludes = dbStoreConf.getCacerts().getExcludes();
-                    if (excludes != null) {
-                        excludeIssuers = parseCerts(excludes.getExclude());
-                    }
-                }
-
-                issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
-            } catch (CertificateException ex) {
-                throw new InvalidConfException(ex.getMessage(), ex);
-            } // end try
-            store = new DbCertStatusStore(name, issuerFilter);
-
-            Integer interval = conf.getRetentionInterval();
-            int retentionInterva = (interval == null)
-                    ? -1
-                    : interval.intValue();
-            store.setRetentionInterval(retentionInterva);
-            store.setUnknownSerialAsGood(
-                    getBoolean(conf.isUnknownSerialAsGood(), false));
-        } else if (source.getCrlStore() != null) {
-            CrlStoreType crlStoreConf = source.getCrlStore();
-            X509Certificate caCert = parseCert(crlStoreConf.getCaCert());
-            X509Certificate crlIssuerCert = null;
-            if (crlStoreConf.getIssuerCert() != null) {
-                crlIssuerCert = parseCert(crlStoreConf.getIssuerCert());
-            }
-
-            CrlCertStatusStore crlStore = new CrlCertStatusStore(name,
-                    crlStoreConf.getCrlFile(), crlStoreConf.getDeltaCrlFile(),
-                    caCert, crlIssuerCert, crlStoreConf.getCrlUrl(),
-                    crlStoreConf.getCertsDir(),
-                    certHashAlgos);
-            store = crlStore;
-
-            crlStore.setUseUpdateDatesFromCrl(
-                    getBoolean(crlStoreConf.isUseUpdateDatesFromCRL(), true));
-            boolean caRevoked = getBoolean(crlStoreConf.isCaRevoked(), false);
-            if (caRevoked) {
-                XMLGregorianCalendar caRevTime = crlStoreConf.getCaRevocationTime();
-                if (caRevTime == null) {
-                    throw new InvalidConfException("caRevocationTime is not specified");
-                }
-                crlStore.setCaRevocationInfo(caRevTime.toGregorianCalendar().getTime());
-            }
-
-            Integer interval = conf.getRetentionInterval();
-            int retentionInterval = (interval == null)
-                    ? 0
-                    : interval.intValue();
-            store.setRetentionInterval(retentionInterval);
-            store.setUnknownSerialAsGood(
-                    getBoolean(conf.isUnknownSerialAsGood(), true));
-        } else if (source.getCustomStore() != null) {
-            CustomStoreType customStoreConf = source.getCustomStore();
-            String type = customStoreConf.getType();
-            statusStoreConf = customStoreConf.getConf();
-            datasourceName = customStoreConf.getDatasource();
-            try {
-                store = certStatusStoreFactoryRegister.newCertStatusStore(type, newStoreTimeout);
-            } catch (ObjectCreationException ex) {
-                throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
-                        + ":" + ex.getMessage(), ex);
-            }
-        } else {
-            throw new RuntimeException("should not reach here, unknwon CertStore type");
+        OcspStore store;
+        try {
+            store = ocspStoreFactoryRegister.newOcspStore(conf.getSource().getType(),
+                    newStoreTimeout);
+        } catch (ObjectCreationException ex) {
+            throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
+                    + ":" + ex.getMessage(), ex);
         }
+        store.setName(conf.getName());
+
+        Integer interval = conf.getRetentionInterval();
+        int retentionInterva = (interval == null)
+                ? -1
+                : interval.intValue();
+        store.setRetentionInterval(retentionInterva);
+        store.setUnknownSerialAsGood(
+                getBoolean(conf.isUnknownSerialAsGood(), false));
 
         store.setIncludeArchiveCutoff(
                 getBoolean(conf.isIncludeArchiveCutoff(), true));
         store.setIncludeCrlId(
                 getBoolean(conf.isIncludeCrlID(), true));
 
+        String datasourceName = conf.getSource().getDatasource();
         DataSourceWrapper datasource = null;
         if (datasourceName != null) {
             datasource = datasources.get(datasourceName);
@@ -1323,8 +1243,8 @@ public class OcspServer {
             }
         }
         try {
-            store.init(statusStoreConf, datasource);
-        } catch (CertStatusStoreException ex) {
+            store.init(conf.getSource().getConf(), datasource, certHashAlgos);
+        } catch (OcspStoreException ex) {
             throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
                     + ":" + ex.getMessage(), ex);
         }
@@ -1514,16 +1434,6 @@ public class OcspServer {
         return (bo == null)
                 ? defaultValue
                 : bo.booleanValue();
-    }
-
-    private static Set<X509Certificate> parseCerts(
-            final List<FileOrValueType> certConfs)
-    throws InvalidConfException {
-        Set<X509Certificate> certs = new HashSet<>(certConfs.size());
-        for (FileOrValueType m : certConfs) {
-            certs.add(parseCert(m));
-        }
-        return certs;
     }
 
     private static InputStream getInputStream(

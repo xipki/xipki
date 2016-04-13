@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.server.impl.certstore;
+package org.xipki.pki.ocsp.store.db.internal;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;

@@ -34,9 +34,12 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.server.impl.certstore;
+package org.xipki.pki.ocsp.store.db.internal;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -45,6 +48,7 @@ import java.sql.Statement;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -55,26 +59,26 @@ import java.util.concurrent.TimeUnit;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
-import org.xipki.pki.ocsp.api.CertStatusStore;
-import org.xipki.pki.ocsp.api.CertStatusStoreException;
+import org.xipki.pki.ocsp.api.OcspStore;
+import org.xipki.pki.ocsp.api.OcspStoreException;
 import org.xipki.pki.ocsp.api.CertprofileOption;
 import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
-import org.xipki.pki.ocsp.server.impl.IssuerEntry;
-import org.xipki.pki.ocsp.server.impl.IssuerStore;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class DbCertStatusStore extends CertStatusStore {
+public class DbCertStatusStore extends OcspStore {
 
     private static class SimpleIssuerEntry {
 
@@ -137,7 +141,7 @@ public class DbCertStatusStore extends CertStatusStore {
 
     private DataSourceWrapper datasource;
 
-    private final IssuerFilter issuerFilter;
+    private IssuerFilter issuerFilter;
 
     private IssuerStore issuerStore;
 
@@ -146,13 +150,6 @@ public class DbCertStatusStore extends CertStatusStore {
     private boolean initializationFailed;
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
-
-    public DbCertStatusStore(
-            final String name,
-            final IssuerFilter issuerFilter) {
-        super(name);
-        this.issuerFilter = ParamUtil.requireNonNull("issuerFilter", issuerFilter);
-    }
 
     private synchronized void initIssuerStore() {
         try {
@@ -293,7 +290,7 @@ public class DbCertStatusStore extends CertStatusStore {
             final boolean includeCertHash,
             final HashAlgoType certHashAlg,
             final CertprofileOption certprofileOption)
-    throws CertStatusStoreException {
+    throws OcspStoreException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
@@ -312,11 +309,11 @@ public class DbCertStatusStore extends CertStatusStore {
         }
 
         if (!initialized) {
-            throw new CertStatusStoreException("initialization of CertStore is still in process");
+            throw new OcspStoreException("initialization of CertStore is still in process");
         }
 
         if (initializationFailed) {
-            throw new CertStatusStoreException("initialization of CertStore failed");
+            throw new OcspStoreException("initialization of CertStore failed");
         }
 
         String coreSql;
@@ -438,7 +435,7 @@ public class DbCertStatusStore extends CertStatusStore {
 
             return certStatusInfo;
         } catch (DataAccessException ex) {
-            throw new CertStatusStoreException(ex.getMessage(), ex);
+            throw new OcspStoreException(ex.getMessage(), ex);
         }
     } // method getCertStatus
 
@@ -491,20 +488,42 @@ public class DbCertStatusStore extends CertStatusStore {
     @Override
     public void init(
             final String conf,
-            final DataSourceWrapper datasource)
-    throws CertStatusStoreException {
+            final DataSourceWrapper datasource,
+            final Set<HashAlgoType> certHashAlgos)
+    throws OcspStoreException {
+        ParamUtil.requireNonNull("conf", conf);
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+
+        StoreConf storeConf = new StoreConf(conf);
+
+        try {
+            Set<X509Certificate> includeIssuers = null;
+            Set<X509Certificate> excludeIssuers = null;
+
+            if (CollectionUtil.isNonEmpty(storeConf.getCaCertsIncludes())) {
+                includeIssuers = parseCerts(storeConf.getCaCertsIncludes());
+            }
+
+            if (CollectionUtil.isNonEmpty(storeConf.getCaCertsExcludes())) {
+                excludeIssuers = parseCerts(storeConf.getCaCertsExcludes());
+            }
+
+            this.issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
+        } catch (CertificateException ex) {
+            throw new OcspStoreException(ex.getMessage(), ex);
+        } // end try
+
         initIssuerStore();
 
         StoreUpdateService storeUpdateService = new StoreUpdateService();
-        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
-        scheduledThreadPoolExecutor.scheduleAtFixedRate(
+        this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+        this.scheduledThreadPoolExecutor.scheduleAtFixedRate(
                 storeUpdateService, 60, 60, TimeUnit.SECONDS);
     }
 
     @Override
     public void shutdown()
-    throws CertStatusStoreException {
+    throws OcspStoreException {
         if (scheduledThreadPoolExecutor != null) {
             scheduledThreadPoolExecutor.shutdown();
             scheduledThreadPoolExecutor = null;
@@ -533,6 +552,21 @@ public class DbCertStatusStore extends CertStatusStore {
         return (issuer == null)
                 ? null
                 : issuer.getRevocationInfo();
+    }
+
+    private static Set<X509Certificate> parseCerts(
+            final Set<String> certFiles)
+    throws OcspStoreException {
+        Set<X509Certificate> certs = new HashSet<>(certFiles.size());
+        for (String certFile : certFiles) {
+            try {
+                certs.add(X509Util.parseCert(certFile));
+            } catch (CertificateException | IOException ex) {
+                throw new OcspStoreException("could not parse X.509 certificate from file "
+                        + certFile + ": " + ex.getMessage(), ex);
+            }
+        }
+        return certs;
     }
 
 }

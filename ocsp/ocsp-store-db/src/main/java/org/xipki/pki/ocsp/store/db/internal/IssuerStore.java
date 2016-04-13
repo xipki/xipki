@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.server.impl;
+package org.xipki.pki.ocsp.store.db.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;

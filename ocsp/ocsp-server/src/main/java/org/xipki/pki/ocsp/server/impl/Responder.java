@@ -39,7 +39,7 @@ package org.xipki.pki.ocsp.server.impl;
 import java.util.List;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ocsp.api.CertStatusStore;
+import org.xipki.pki.ocsp.api.OcspStore;
 import org.xipki.pki.ocsp.api.CertprofileOption;
 
 /**
@@ -61,7 +61,7 @@ class Responder {
 
     private final ResponderSigner signer;
 
-    private final List<CertStatusStore> stores;
+    private final List<OcspStore> stores;
 
     Responder(
             final ResponderOption responderOption,
@@ -70,7 +70,7 @@ class Responder {
             final AuditOption auditOption,
             final CertprofileOption certprofileOption,
             final ResponderSigner signer,
-            final List<CertStatusStore> stores) {
+            final List<OcspStore> stores) {
         this.responderOption = ParamUtil.requireNonNull("responderOption", responderOption);
         this.requestOption = ParamUtil.requireNonNull("requestOption", requestOption);
         this.responseOption = ParamUtil.requireNonNull("responseOption", responseOption);
@@ -104,7 +104,7 @@ class Responder {
         return signer;
     }
 
-    public List<CertStatusStore> getStores() {
+    public List<OcspStore> getStores() {
         return stores;
     }
 
