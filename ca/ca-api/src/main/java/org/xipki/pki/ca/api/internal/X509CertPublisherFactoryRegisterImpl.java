@@ -69,16 +69,15 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
 
         long start = System.currentTimeMillis();
 
-        X509CertPublisher publisher = null;
         while (true) {
             for (X509CertPublisherFactory service : services) {
                 if (service.canCreatePublisher(type)) {
-                    publisher = service.newPublisher(type);
+                    return service.newPublisher(type);
                 }
             }
 
-            if (timeout != 0 || System.currentTimeMillis() - start > timeout) {
-                break;
+            if (timeout != 0 && System.currentTimeMillis() - start > timeout) {
+                throw new ObjectCreationException("could not new Certprofile '" + type + "'");
             }
 
             try {
@@ -86,12 +85,6 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
             } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
             }
         }
-
-        if (publisher == null) {
-            throw new ObjectCreationException("could not new publisher '" + type + "'");
-        }
-
-        return publisher;
     }
 
     public void bindService(
