@@ -69,16 +69,15 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
 
         long start = System.currentTimeMillis();
 
-        X509Certprofile certProfile = null;
         while (true) {
             for (X509CertprofileFactory service : services) {
                 if (service.canCreateProfile(type)) {
-                    certProfile = service.newCertprofile(type);
+                    return service.newCertprofile(type);
                 }
             }
 
-            if (timeout != 0 || System.currentTimeMillis() - start > timeout) {
-                break;
+            if (timeout != 0 && System.currentTimeMillis() - start > timeout) {
+                throw new ObjectCreationException("could not new Certprofile '" + type + "'");
             }
 
             try {
@@ -86,12 +85,6 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
             } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
             }
         }
-
-        if (certProfile == null) {
-            throw new ObjectCreationException("could not new Certprofile '" + type + "'");
-        }
-
-        return certProfile;
     }
 
     public void bindService(
