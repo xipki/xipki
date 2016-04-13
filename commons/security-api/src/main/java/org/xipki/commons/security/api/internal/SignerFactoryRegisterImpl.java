@@ -104,16 +104,15 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
         long start = System.currentTimeMillis();
 
-        ConcurrentContentSigner signer = null;
         while (true) {
             for (SignerFactory service : services) {
                 if (service.canCreateSigner(type)) {
-                    signer = service.newSigner(type, conf, certificateChain);
+                    return service.newSigner(type, conf, certificateChain);
                 }
             }
 
-            if (timeout != 0 || System.currentTimeMillis() - start > timeout) {
-                break;
+            if (timeout != 0 && System.currentTimeMillis() - start > timeout) {
+                throw new ObjectCreationException("could not new signer '" + type + "'");
             }
 
             try {
@@ -121,11 +120,6 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
             } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
             }
         }
-
-        if (signer == null) {
-            throw new ObjectCreationException("could not new signer '" + type + "'");
-        }
-        return signer;
     }
 
 }
