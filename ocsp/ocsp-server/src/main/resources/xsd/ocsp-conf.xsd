@@ -276,7 +276,7 @@
           <xs:all>
             <xs:element name="type" type="xs:string"/>
             <xs:element name="datasource" type="xs:string" minOccurs="0"/>
-            <xs:element name="conf" type="xs:string"/>
+            <xs:element name="conf" type="xs:string" minOccurs="0"/>
           </xs:all>
         </xs:complexType>
       </xs:element>

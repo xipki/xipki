@@ -13,7 +13,8 @@
       interface="org.xipki.commons.security.api.p11.P11CryptServiceFactory"/>
 
   <bean id="localP11CryptServicePool"
-      class="org.xipki.commons.remotep11.server.impl.LocalP11CryptServicePool" init-method="init">
+      class="org.xipki.commons.remotep11.server.impl.LocalP11CryptServicePool"
+      init-method="asynInit">
     <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
   </bean>
 

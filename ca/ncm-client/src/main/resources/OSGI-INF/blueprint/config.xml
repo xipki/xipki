@@ -9,8 +9,8 @@
       <cm:property name="server.url" value="https://localhost:8443/ncm/hessian"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <bean id="caManager" class="org.xipki.pki.ca.ncm.client.impl.CaManagerClient" init-method="init"
-      destroy-method="shutdown">
+  <bean id="caManager" class="org.xipki.pki.ca.ncm.client.impl.CaManagerClient"
+      init-method="asynInit" destroy-method="shutdown">
     <property name="serverUrl" value="${server.url}"/>
   </bean>
   <service ref="caManager" interface="org.xipki.pki.ca.server.mgmt.api.CAManager"/>

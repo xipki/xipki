@@ -14,7 +14,7 @@
   <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <!-- create the servlet and inject our own app factory -->
   <bean id="serverServlet" class="org.xipki.pki.ca.ncm.server.impl.CaManagerServlet"
-      init-method="initialize" destroy-method="shutdown">
+      init-method="asynInit" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="caManager" ref="caManager"/>
     <property name="truststoreFile" value="${truststore.file}"/>

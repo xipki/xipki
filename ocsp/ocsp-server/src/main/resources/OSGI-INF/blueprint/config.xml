@@ -19,7 +19,7 @@
   <reference id="ocspStoreFactoryRegister"
       interface="org.xipki.pki.ocsp.api.OcspStoreFactoryRegister"/>
   <bean id="ocspServer" class="org.xipki.pki.ocsp.server.impl.OcspServer" 
-      init-method="init" destroy-method="shutdown">
+      init-method="asynInit" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
     <property name="newStoreTimeout" value="${newStoreTimeout}"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>

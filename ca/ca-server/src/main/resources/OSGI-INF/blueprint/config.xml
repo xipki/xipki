@@ -22,7 +22,7 @@
   <reference id="x509CertPublisherFactoryRegister"
       interface="org.xipki.pki.ca.api.publisher.x509.X509CertPublisherFactoryRegister"/>
   <bean id="caManager" class="org.xipki.pki.ca.server.impl.CaManagerImpl"
-      init-method="startCaSystem" destroy-method="shutdown">
+      init-method="asynStartCaSystem" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>

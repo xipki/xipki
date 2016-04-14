@@ -44,9 +44,12 @@ import java.util.Set;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
+import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -71,8 +74,27 @@ public class LocalP11CryptServicePool {
         this.p11CryptServiceFactory = p11CryptServiceFactory;
     }
 
+    public void asynInit() {
+        Runnable initRun = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    init();
+                } catch (Throwable th) {
+                    String msg = "could not init";
+                    LOG.error(msg, th.getMessage());
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(LogUtil.getErrorLog(msg), th.getClass().getName(),
+                                th.getMessage());
+                    }
+                }
+            }
+        };
+        new Thread(initRun).start();
+    }
+
     public void init()
-    throws Exception {
+    throws P11TokenException, SecurityException {
         if (initialized) {
             return;
         }
@@ -81,25 +103,19 @@ public class LocalP11CryptServicePool {
             Security.addProvider(new BouncyCastleProvider());
         }
 
-        try {
-            if (p11CryptServiceFactory == null) {
-                throw new IllegalStateException("securityFactory is not configured");
-            }
-
-            Set<String> moduleNames = p11CryptServiceFactory.getModuleNames();
-            for (String moduleName : moduleNames) {
-                P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-                if (p11Service != null) {
-                    p11CryptServices.put(moduleName, p11Service);
-                }
-            }
-
-            initialized = true;
-        } catch (Exception ex) {
-            LOG.error("exception thrown. {}: {}", ex.getClass().getName(), ex.getMessage());
-            LOG.debug("exception thrown", ex);
-            throw ex;
+        if (p11CryptServiceFactory == null) {
+            throw new IllegalStateException("securityFactory is not configured");
         }
+
+        Set<String> moduleNames = p11CryptServiceFactory.getModuleNames();
+        for (String moduleName : moduleNames) {
+            P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
+            if (p11Service != null) {
+                p11CryptServices.put(moduleName, p11Service);
+            }
+        }
+
+        initialized = true;
     }
 
     public P11CryptService getP11CryptService(
