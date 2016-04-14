@@ -37,6 +37,7 @@
 package org.xipki.pki.ca.ncm.client.impl;
 
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -45,6 +46,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.CrlReason;
@@ -89,8 +91,27 @@ public class CaManagerClient implements CaManager {
     public CaManagerClient() {
     }
 
+    public void asynInit() {
+        Runnable initRun = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    init();
+                } catch (Throwable th) {
+                    String msg = "could not init";
+                    LOG.error(msg, th.getMessage());
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(LogUtil.getErrorLog(msg), th.getClass().getName(),
+                                th.getMessage());
+                    }
+                }
+            }
+        };
+        new Thread(initRun).start();
+    }
+
     public void init()
-    throws Exception {
+    throws MalformedURLException {
         if (serverUrl == null) {
             throw new IllegalStateException("serverUrl is not set");
         }

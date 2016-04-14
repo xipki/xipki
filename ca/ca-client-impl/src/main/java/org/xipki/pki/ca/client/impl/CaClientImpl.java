@@ -243,6 +243,25 @@ public final class CaClientImpl implements CaClient {
         return caNamesWithError;
     } // method autoConfCas
 
+    public void asynInit() {
+        Runnable initRun = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    init();
+                } catch (Throwable th) {
+                    String msg = "could not init";
+                    LOG.error(msg, th.getMessage());
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(LogUtil.getErrorLog(msg), th.getClass().getName(),
+                                th.getMessage());
+                    }
+                }
+            }
+        };
+        new Thread(initRun).start();
+    }
+
     public void init()
     throws InvalidConfException, IOException {
         ParamUtil.requireNonNull("confFile", confFile);

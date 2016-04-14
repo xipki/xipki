@@ -12,7 +12,7 @@
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
   <bean id="caClient" class="org.xipki.pki.ca.client.impl.CaClientImpl"
-      init-method="init" destroy-method="shutdown">
+      init-method="asynInit" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="confFile" value="${clientConfFile}"/>
   </bean>
