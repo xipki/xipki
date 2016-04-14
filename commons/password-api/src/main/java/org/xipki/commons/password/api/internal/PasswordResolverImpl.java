@@ -57,6 +57,26 @@ public class PasswordResolverImpl implements PasswordResolver {
     private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers =
             new ConcurrentLinkedQueue<SinglePasswordResolver>();
 
+    /**
+     * timeout in milliseconds, 0 for forever.
+     */
+    private static int timeout = 120000; // 120 seconds
+
+    static {
+        final String propKey = "org.xipki.password.resolve.timeout";
+        String str = System.getProperty(propKey);
+        if (str != null) {
+            int vi = Integer.parseInt(str);
+            // valid value is between 0 and 600 seconds
+            if (vi < 0 || vi > 600 * 1000) {
+                LOG.error("invalid {}: {}", propKey, vi);
+            } else {
+                LOG.info("use {}: {}", propKey, vi);
+                timeout = vi;
+            }
+        }
+    }
+
     public PasswordResolverImpl() {
     }
 
@@ -107,15 +127,30 @@ public class PasswordResolverImpl implements PasswordResolver {
         }
 
         String protocol = passwordHint.substring(0, index);
+        long start = System.currentTimeMillis();
 
-        for (SinglePasswordResolver resolver : resolvers) {
-            if (resolver.canResolveProtocol(protocol)) {
-                return resolver.resolvePassword(passwordHint);
+        while (true) {
+            long duration = System.currentTimeMillis() - start;
+            for (SinglePasswordResolver resolver : resolvers) {
+                if (resolver.canResolveProtocol(protocol)) {
+                    LOG.info("fould password resolver to resolve password of protocol '"
+                            + protocol + "' @" + duration + "ms");
+                    return resolver.resolvePassword(passwordHint);
+                }
+            }
+
+            duration = System.currentTimeMillis() - start;
+            if (timeout != 0 && duration > timeout) {
+                throw new PasswordResolverException(
+                        "could not find password resolver to resolve password of protocol '"
+                        + protocol + "' @" + duration + "ms");
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
             }
         }
-
-        throw new PasswordResolverException("password of protocol '" + protocol
-                + "' could not be resolved");
     }
 
 }
