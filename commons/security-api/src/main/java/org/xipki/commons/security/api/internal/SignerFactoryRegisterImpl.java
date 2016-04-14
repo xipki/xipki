@@ -105,14 +105,20 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         long start = System.currentTimeMillis();
 
         while (true) {
+            long duration = System.currentTimeMillis() - start;
             for (SignerFactory service : services) {
                 if (service.canCreateSigner(type)) {
+                    LOG.info("fould Factory to create Signer of type '" + type
+                            + "' @" + duration + " ms");
                     return service.newSigner(type, conf, certificateChain);
                 }
             }
 
-            if (timeout != 0 && System.currentTimeMillis() - start > timeout) {
-                throw new ObjectCreationException("could not new signer '" + type + "'");
+            duration = System.currentTimeMillis() - start;
+            if (timeout != 0 && duration > timeout) {
+                throw new ObjectCreationException(
+                        "could not find Factory to create Signer of type '" + type
+                        + "' @" + duration + "ms");
             }
 
             try {

@@ -70,14 +70,20 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
         long start = System.currentTimeMillis();
 
         while (true) {
+            long duration = System.currentTimeMillis() - start;
             for (OcspStoreFactory service : services) {
                 if (service.canCreateOcspStore(type)) {
+                    LOG.info("fould factory to create OcspStore of type '" + type + "' in "
+                            + duration + " ms");
                     return service.newOcspStore(type);
                 }
             }
 
-            if ((timeout != 0 && System.currentTimeMillis() - start > timeout)) {
-                throw new ObjectCreationException("could not new CertStatusStore '" + type + "'");
+            duration = System.currentTimeMillis() - start;
+            if (timeout != 0 && duration > timeout) {
+                throw new ObjectCreationException(
+                        "could not find factory to create OcspStore of type '" + type
+                        + "' @" + duration + "ms");
             }
 
             try {

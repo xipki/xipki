@@ -70,14 +70,20 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
         long start = System.currentTimeMillis();
 
         while (true) {
+            long duration = System.currentTimeMillis() - start;
             for (X509CertprofileFactory service : services) {
                 if (service.canCreateProfile(type)) {
+                    LOG.info("fould factory to create Certprofile of type '" + type + "' @"
+                            + duration + "ms");
                     return service.newCertprofile(type);
                 }
             }
 
-            if (timeout != 0 && System.currentTimeMillis() - start > timeout) {
-                throw new ObjectCreationException("could not new Certprofile '" + type + "'");
+            duration = System.currentTimeMillis() - start;
+            if (timeout != 0 && duration > timeout) {
+                throw new ObjectCreationException(
+                        "could not find factory to create Certprofile of type '" + type
+                        + "' @" + duration + "ms");
             }
 
             try {
