@@ -189,7 +189,7 @@ Build and Assembly from Source Code
   
     In folder `xipki/dist/xipki-pki`
     ```sh
-    mvn clean install
+    mvn clean package
     ```
 
 Download the Released Binary Package
@@ -216,7 +216,19 @@ Install
     $XIPKI_HOME/xipki/ca-config/ca-db.properties
     $XIPKI_HOME/xipki/ca-config/ocsp-db.properties
     ```
+* In case if the real PKCS#11 device instead of the simulator is used:
 
+  * In file etc/org.xipki.commons.security.pkcs11.cfg, change the pkcs11.engine and pkcs11.confFile as follows:
+  
+    ```sh
+    pkcs11.engine = IAIK-PKCS11
+    pkcs11.confFile = xipki/security/pkcs11-conf-hsm.xml
+
+    #pkcs11.engine = KEYSTORE-PKCS11
+    #pkcs11.confFile = xipki/security/pkcs11-conf-keystore.xml
+    ```
+  * In file xipki/security/pkcs11-conf-hsm.xml, change the PKCS#11 configuration.
+    
 Run Demo
 -----
 
@@ -240,7 +252,7 @@ Run Demo
 
 In the OSGi console, call `source <OSGi batch script file>`, the demo script files are in folder `xipki/demo` and can be retrieved from the following table. The generated keys, certificates and CRLs are saved in folder `output`.
 
-|Signature Algorithm \ Key container |  PKCS#12  | PKCS#11 (HSM simulator)|
+|Signature Algorithm \ Key container |  PKCS#12  | PKCS#11                |
 |:----------------:|:----------------------:|:-----------------------:|
 |RSA PKCS#1v1.5    | p12-rsa-demo.script    | p11-rsa-demo.script     |
 |RSA PSS           | p12-rsapss-demo.script | p11-rsapss-demo.script  |
