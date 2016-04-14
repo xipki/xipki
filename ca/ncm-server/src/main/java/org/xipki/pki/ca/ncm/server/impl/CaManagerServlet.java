@@ -48,6 +48,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -107,6 +108,8 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
     private SecurityFactory securityFactory;
 
     private Set<X509Certificate> trustedUserCerts = new HashSet<>();
+
+    private AtomicBoolean initialized = new AtomicBoolean(false);
 
     public CaManagerServlet() {
     }
@@ -927,6 +930,10 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
         super.service(request, response);
     }
 
+    public boolean isInitialized() {
+        return initialized.get();
+    }
+
     public void asynInit() {
         Runnable initRun = new Runnable() {
             @Override
@@ -948,12 +955,16 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
 
     public void init() {
         if (truststoreFile == null) {
-            LOG.error("truststoreFile is not set");
-            return;
+            throw new IllegalStateException("truststoreFile is not set");
         }
 
         if (truststorePassword == null) {
-            LOG.error("truststorePassword is not set");
+            throw new IllegalStateException("truststorePassword is not set");
+        }
+
+        LOG.info("initializing ...");
+        if (initialized.get()) {
+            LOG.info("already initialized, skipping ...");
             return;
         }
 
@@ -992,6 +1003,9 @@ public class CaManagerServlet extends HessianServlet implements HessianCaManager
                     } // end if
                 } // end if
             } // end while
+
+            initialized.set(true);
+            LOG.info("initialized");
         } catch (Exception ex) {
             final String message = "could not initialize CAManagerServlet";
             LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());

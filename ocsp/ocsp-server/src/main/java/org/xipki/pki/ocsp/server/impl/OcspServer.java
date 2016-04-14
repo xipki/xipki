@@ -60,6 +60,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
@@ -228,6 +229,8 @@ public class OcspServer {
 
     private List<ServletPathResponderName> servletPaths = new ArrayList<>();
 
+    private AtomicBoolean initialized = new AtomicBoolean(false);
+
     public OcspServer() {
     }
 
@@ -297,6 +300,10 @@ public class OcspServer {
         return responders.get(name);
     }
 
+    public boolean isInitialized() {
+        return initialized.get();
+    }
+
     public void asynInit() {
         Runnable initRun = new Runnable() {
             @Override
@@ -318,17 +325,22 @@ public class OcspServer {
 
     public void init()
     throws InvalidConfException, PasswordResolverException, DataAccessException {
-        boolean successful = false;
+        LOG.info("starting OCSPResponder server ...");
+        if (initialized.get()) {
+            LOG.info("already started, skipping ...");
+            return;
+        }
+
         try {
             doInit();
-            successful = true;
+            initialized.set(true);
         } finally {
-            if (successful) {
+            if (initialized.get()) {
                 LOG.info("started OCSPResponder server");
             } else {
                 LOG.error("could not start OCSPResponder server");
             }
-            auditLogPciEvent(successful, "START");
+            auditLogPciEvent(initialized.get(), "START");
         }
     }
 
