@@ -315,7 +315,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                     long serial = Long.parseLong(str);
 
                     int status = rs.getInt("status");
-                    boolean revoked = (status == 40);
+                    boolean revoked = (status == EjbcaConstants.CERT_REVOKED
+                            || status == EjbcaConstants.CERT_TEMP_REVOKED);
 
                     Integer revReason = null;
                     Long revTime = null;
