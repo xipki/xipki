@@ -188,6 +188,8 @@ public final class CaClientImpl implements CaClient {
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
+    private AtomicBoolean initialized = new AtomicBoolean(false);
+
     public CaClientImpl() {
     }
 
@@ -262,10 +264,24 @@ public final class CaClientImpl implements CaClient {
         new Thread(initRun).start();
     }
 
+    public boolean isInitialized() {
+        return initialized.get();
+    }
+
     public void init()
     throws InvalidConfException, IOException {
-        ParamUtil.requireNonNull("confFile", confFile);
-        ParamUtil.requireNonNull("securityFactory", securityFactory);
+        if (confFile == null) {
+            throw new IllegalStateException("confFile is not set");
+        }
+        if (securityFactory == null) {
+            throw new IllegalStateException("securityFactory is not set");
+        }
+
+        LOG.info("initializing ...");
+        if (initialized.get()) {
+            LOG.info("already initialized, skipping ...");
+            return;
+        }
 
         if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
@@ -437,8 +453,7 @@ public final class CaClientImpl implements CaClient {
                         securityFactory);
             } else {
                 throw new InvalidConfException("could not find requestor named "
-                        + requestorName
-                        + " for CA " + ca.getName());
+                        + requestorName + " for CA " + ca.getName());
             }
 
             ca.setRequestor(cmpRequestor);
@@ -478,6 +493,9 @@ public final class CaClientImpl implements CaClient {
                         caInfoUpdateInterval, caInfoUpdateInterval, TimeUnit.MINUTES);
             }
         }
+
+        initialized.set(true);
+        LOG.info("initialized");
     } // method init
 
     public void shutdown() {

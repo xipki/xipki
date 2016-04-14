@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -88,6 +89,8 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
     private Map<String, X509IssuerInfo> x509IssuerInfoMap = new HashMap<>();
 
+    private AtomicBoolean initialized = new AtomicBoolean(false);
+
     public QaSystemManagerImpl() {
     }
 
@@ -98,6 +101,10 @@ public class QaSystemManagerImpl implements QaSystemManager {
     public void setConfFile(
             final String confFile) {
         this.confFile = ParamUtil.requireNonBlank("confFile", confFile);
+    }
+
+    public boolean isInitialized() {
+        return initialized.get();
     }
 
     public void asynInit() {
@@ -121,7 +128,12 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
     public void init() {
         if (StringUtil.isBlank(confFile)) {
-            LOG.error("confFile must not be null and empty");
+            throw new IllegalStateException("confFile must not be null and empty");
+        }
+
+        LOG.info("initializing ...");
+        if (initialized.get()) {
+            LOG.info("already initialized, skipping ...");
             return;
         }
 
@@ -192,6 +204,9 @@ public class QaSystemManagerImpl implements QaSystemManager {
                 }
             }
         }
+
+        initialized.set(true);
+        LOG.info("initialized");
     } // method init
 
     public void shutdown() {

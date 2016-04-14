@@ -43,6 +43,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +89,13 @@ public class CaManagerClient implements CaManager {
 
     private String serverUrl;
 
+    private AtomicBoolean initialized = new AtomicBoolean(false);
+
     public CaManagerClient() {
+    }
+
+    public boolean isInitialized() {
+        return initialized.get();
     }
 
     public void asynInit() {
@@ -115,6 +122,13 @@ public class CaManagerClient implements CaManager {
         if (serverUrl == null) {
             throw new IllegalStateException("serverUrl is not set");
         }
+
+        LOG.info("initializing ...");
+        if (initialized.get()) {
+            LOG.info("already initialized, skipping ...");
+            return;
+        }
+
         HessianProxyFactory factory = new HessianProxyFactory(getClass().getClassLoader());
         factory.setHessian2Request(true);
         factory.setHessian2Reply(true);
@@ -122,6 +136,9 @@ public class CaManagerClient implements CaManager {
         this.client = (HessianCaManager) factory.create(
                 HessianCaManager.class, serverUrl);
         determineServerVersion();
+
+        initialized.set(true);
+        LOG.info("initialized");
     }
 
     public void shutdown()
