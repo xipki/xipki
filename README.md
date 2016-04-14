@@ -187,7 +187,7 @@ Build and Assembly from Source Code
     
   * Assembly
   
-    In folder `xipki/dist`
+    In folder `xipki/dist/xipki-pki`
     ```sh
     mvn clean install
     ```
