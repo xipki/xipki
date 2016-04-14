@@ -11,7 +11,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <bean id="qaSystemManager" class="org.xipki.pki.ca.qa.impl.QaSystemManagerImpl"
-      init-method="init" destroy-method="shutdown">
+      init-method="asynInit" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
   </bean>
   <service ref="qaSystemManager" interface="org.xipki.pki.ca.qa.api.QaSystemManager"/>  
