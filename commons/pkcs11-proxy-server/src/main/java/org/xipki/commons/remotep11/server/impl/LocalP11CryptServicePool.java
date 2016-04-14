@@ -40,6 +40,7 @@ import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public class LocalP11CryptServicePool {
 
     private Map<String, P11CryptService> p11CryptServices = new HashMap<>();
 
-    private boolean initialized;
+    private AtomicBoolean initialized = new AtomicBoolean(false);
 
     public LocalP11CryptServicePool() {
     }
@@ -72,6 +73,10 @@ public class LocalP11CryptServicePool {
     public void setP11CryptServiceFactory(
             final P11CryptServiceFactory p11CryptServiceFactory) {
         this.p11CryptServiceFactory = p11CryptServiceFactory;
+    }
+
+    public boolean isInitialized() {
+        return initialized.get();
     }
 
     public void asynInit() {
@@ -95,7 +100,9 @@ public class LocalP11CryptServicePool {
 
     public void init()
     throws P11TokenException, SecurityException {
-        if (initialized) {
+        LOG.info("initializing ...");
+        if (initialized.get()) {
+            LOG.info("already initialized, skipping ...");
             return;
         }
 
@@ -115,7 +122,8 @@ public class LocalP11CryptServicePool {
             }
         }
 
-        initialized = true;
+        initialized.set(true);
+        LOG.info("initialized");
     }
 
     public P11CryptService getP11CryptService(

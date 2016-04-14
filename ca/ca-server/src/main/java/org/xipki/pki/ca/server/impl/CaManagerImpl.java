@@ -700,7 +700,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             try {
                 init();
             } catch (Exception ex) {
-                final String message = "doStartCaSystem().init()";
+                final String message = "doStartCaSystem init()";
                 LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
                 LOG.debug(message, ex);
                 return false;
