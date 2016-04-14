@@ -70,14 +70,20 @@ public class PasswordCallbackFactoryRegisterImpl implements PasswordCallbackFact
         long start = System.currentTimeMillis();
 
         while (true) {
+            long duration = System.currentTimeMillis() - start;
             for (PasswordCallbackFactory service : services) {
                 if (service.canCreatePasswordCallback(type)) {
+                    LOG.info("fould Factory to create PasswordCallback of type '" + type + "' @"
+                            + duration + "ms");
                     return service.newPasswordCallback(type);
                 }
             }
 
-            if (timeout != 0 && System.currentTimeMillis() - start > timeout) {
-                throw new RuntimeException("could not new PasswordCallback '" + type + "'");
+            duration = System.currentTimeMillis() - start;
+            if (timeout != 0 && duration > timeout) {
+                throw new RuntimeException(
+                        "could not find Factory to create PasswordCallback of type '" + type
+                        + "' @" + duration + "ms");
             }
 
             try {
