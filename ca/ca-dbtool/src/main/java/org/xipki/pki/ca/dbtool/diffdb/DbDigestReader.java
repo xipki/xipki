@@ -91,8 +91,6 @@ abstract class DbDigestReader implements DigestReader {
 
     protected final StopMe stopMe;
 
-    protected final boolean revokedOnly;
-
     private final int numThreads;
 
     private ExecutorService executor;
@@ -116,7 +114,6 @@ abstract class DbDigestReader implements DigestReader {
     DbDigestReader(
             final DataSourceWrapper datasource,
             final X509Certificate caCert,
-            final boolean revokedOnly,
             final int totalAccount,
             final int minId,
             final int maxId,
@@ -128,7 +125,6 @@ abstract class DbDigestReader implements DigestReader {
         this.caCert = ParamUtil.requireNonNull("caCert", caCert);
         this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
         this.totalAccount = totalAccount;
-        this.revokedOnly = revokedOnly;
         this.numThreads = numThreads;
         this.caSubjectName = X509Util.getRfc4519Name(caCert.getSubjectX500Principal());
         this.minId = minId;
@@ -230,12 +226,6 @@ abstract class DbDigestReader implements DigestReader {
     protected abstract Retriever getRetriever()
     throws DataAccessException;
 
-    protected abstract int getNumSkippedCerts(
-            final int fromId,
-            final int toId,
-            final int numCerts)
-    throws DataAccessException;
-
     @Override
     public X509Certificate getCaCert() {
         return caCert;
@@ -289,12 +279,6 @@ abstract class DbDigestReader implements DigestReader {
             return null;
         }
 
-        int numSkipped = 0;
-        if (revokedOnly) {
-            numSkipped = getNumSkippedCerts(entries.get(0).getId(), entries.get(ik - 1).getId(),
-                    ik);
-        }
-
         List<Long> serialNumbers = new ArrayList<>(ik);
         Map<Long, DbDigestEntry> certsMap = new HashMap<>(ik);
         for (IdentifiedDbDigestEntry m : entries) {
@@ -303,7 +287,7 @@ abstract class DbDigestReader implements DigestReader {
             certsMap.put(sn, m.getContent());
         }
 
-        return new CertsBundle(numSkipped, certsMap, serialNumbers);
+        return new CertsBundle(certsMap, serialNumbers);
     } // method nextCerts
 
     public void close() {

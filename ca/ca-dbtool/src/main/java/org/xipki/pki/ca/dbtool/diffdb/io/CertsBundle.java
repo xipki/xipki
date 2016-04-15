@@ -48,23 +48,15 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CertsBundle {
 
-    private int numSkipped;
-
     private Map<Long, DbDigestEntry> certs;
 
     private List<Long> serialNumbers;
 
     public CertsBundle(
-            final int numSkipped,
             final Map<Long, DbDigestEntry> certs,
             final List<Long> serialNumbers) {
-        this.numSkipped = ParamUtil.requireMin("numSkipped", numSkipped, 0);
         this.certs = ParamUtil.requireNonEmpty("certs", certs);
         this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
-    }
-
-    public int getNumSkipped() {
-        return numSkipped;
     }
 
     public Map<Long, DbDigestEntry> getCerts() {

@@ -62,21 +62,25 @@ public class DbDigestReporter {
 
     private final String reportDirname;
 
-    private final BufferedWriter missingWriter;
+    private final BufferedWriter goodWriter;
 
     private final BufferedWriter diffWriter;
 
-    private final BufferedWriter goodWriter;
+    private final BufferedWriter missingWriter;
+
+    private final BufferedWriter unexpectedWriter;
 
     private final BufferedWriter errorWriter;
 
     private Date startTime;
 
-    private AtomicInteger numDiff = new AtomicInteger(0);
-
     private AtomicInteger numGood = new AtomicInteger(0);
 
+    private AtomicInteger numDiff = new AtomicInteger(0);
+
     private AtomicInteger numMissing = new AtomicInteger(0);
+
+    private AtomicInteger numUnexpected = new AtomicInteger(0);
 
     private AtomicInteger numError = new AtomicInteger(0);
 
@@ -91,6 +95,8 @@ public class DbDigestReporter {
 
         this.missingWriter = new BufferedWriter(
                 new FileWriter(reportDirname + File.separator + "missing"));
+        this.unexpectedWriter = new BufferedWriter(
+                new FileWriter(reportDirname + File.separator + "unexpected"));
         this.diffWriter = new BufferedWriter(
                 new FileWriter(reportDirname + File.separator + "diff"));
         this.goodWriter = new BufferedWriter(
@@ -121,6 +127,13 @@ public class DbDigestReporter {
     throws IOException {
         numGood.incrementAndGet();
         writeSerialNumberLine(goodWriter, serialNumber);
+    }
+
+    public void addUnexpected(
+            final long serialNumber)
+    throws IOException {
+        numUnexpected.incrementAndGet();
+        writeSerialNumberLine(unexpectedWriter, serialNumber);
     }
 
     public void addDiff(
@@ -169,11 +182,13 @@ public class DbDigestReporter {
 
     public void close() {
         closeWriter(missingWriter);
+        closeWriter(unexpectedWriter);
         closeWriter(diffWriter);
         closeWriter(goodWriter);
         closeWriter(errorWriter);
 
-        int sum = numGood.get() + numDiff.get() + numMissing.get() + numError.get();
+        final int sum = numGood.get() + numDiff.get() + numMissing.get() + numUnexpected.get()
+                + numError.get();
         Date now = new Date();
         int durationSec = (int) ((now.getTime() - startTime.getTime()) / 1000);
 
@@ -186,6 +201,8 @@ public class DbDigestReporter {
             .append(StringUtil.formatAccount(numDiff.get(), false)).append("\n");
         sb.append("   missing: ")
             .append(StringUtil.formatAccount(numMissing.get(), false)).append("\n");
+        sb.append("unexpected: ")
+        .append(StringUtil.formatAccount(numUnexpected.get(), false)).append("\n");
         sb.append("     error: ")
             .append(StringUtil.formatAccount(numError.get(), false)).append("\n");
         sb.append("  duration: ")

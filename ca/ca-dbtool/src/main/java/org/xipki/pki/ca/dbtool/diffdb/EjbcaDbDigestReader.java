@@ -78,7 +78,6 @@ public class EjbcaDbDigestReader extends DbDigestReader {
     private EjbcaDbDigestReader(
             final DataSourceWrapper datasource,
             final X509Certificate caCert,
-            final boolean revokedOnly,
             final int totalAccount,
             final int minId,
             final int maxId,
@@ -87,7 +86,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             final int numCertsToPredicate,
             final StopMe stopMe)
     throws Exception {
-        super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads,
+        super(datasource, caCert, totalAccount, minId, maxId, numThreads,
                 numCertsToPredicate, stopMe);
 
         this.caId = caId;
@@ -98,9 +97,6 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         sb.append("SELECT id,serialNumber,cAFingerprint,fingerprint");
         sb.append(",status,revocationDate,revocationReason");
         sb.append(" FROM CertificateData WHERE id>=? AND id<?");
-        if (revokedOnly) {
-            sb.append(" AND status=40");
-        }
         this.selectCertSql = sb.toString();
         if (!init()) {
             throw new Exception("could not initialize the EjbcaDigestReader");
@@ -229,20 +225,10 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         return new EjbcaDbRetriever();
     }
 
-    @Override
-    protected int getNumSkippedCerts(
-            final int fromId,
-            final int toId,
-            final int numCerts)
-    throws DataAccessException {
-        return 0;
-    }
-
     public static EjbcaDbDigestReader getInstance(
             final DataSourceWrapper datasource,
             final int caId,
             final boolean dbContainsOtherCa,
-            final boolean revokedOnly,
             final int numThreads,
             final int numCertsToPredicate,
             final StopMe stopMe)
@@ -279,9 +265,6 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                 totalAccount = -1;
             } else {
                 sql = "SELECT COUNT(*) FROM CertificateData";
-                if (revokedOnly) {
-                    sql += " WHERE status=40";
-                }
                 rs = stmt.executeQuery(sql);
                 totalAccount = rs.next()
                         ? rs.getInt(1)
@@ -291,9 +274,6 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
             // maxId
             sql = "SELECT MAX(id) FROM CertificateData";
-            if (revokedOnly) {
-                sql += " WHERE status=40";
-            }
             rs = stmt.executeQuery(sql);
             maxId = rs.next()
                     ? rs.getInt(1)
@@ -301,9 +281,6 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             rs.close();
 
             sql = "SELECT MIN(id) FROM CertificateData";
-            if (revokedOnly) {
-                sql += " WHERE status=40";
-            }
             rs = stmt.executeQuery(sql);
             minId = rs.next()
                     ? rs.getInt(1)
@@ -316,7 +293,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             datasource.returnConnection(conn);
         }
 
-        return new EjbcaDbDigestReader(datasource, caCert, revokedOnly, totalAccount,
+        return new EjbcaDbDigestReader(datasource, caCert, totalAccount,
                 minId, maxId, numThreads, caId,
                 numCertsToPredicate, stopMe);
     } // method getInstance
