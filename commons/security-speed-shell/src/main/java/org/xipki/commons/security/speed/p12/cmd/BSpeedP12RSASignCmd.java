@@ -36,7 +36,6 @@
 
 package org.xipki.commons.security.speed.p12.cmd;
 
-import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,7 +62,7 @@ public class BSpeedP12RSASignCmd extends BSpeedP12SignCommandSupport {
         int[] keysizes = new int[]{1024, 2048, 3072, 4096};
         for (int keysize : keysizes) {
             ret.add(new P12RSASignLoadTest(securityFactory, sigAlgo, keysize,
-                        new BigInteger("0x10001")));
+                        toBigInt("0x10001")));
         }
         return ret;
     }

@@ -36,6 +36,7 @@
 
 package org.xipki.commons.security.pkcs11.internal.keystore;
 
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -57,6 +58,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
@@ -295,7 +297,6 @@ public class KeystoreP11Identity extends P11Identity {
                 ? dataToSign
                 : hashAlgo.hash(dataToSign);
 
-        byte[] truncatedDigest = SignerUtil.leftmost(hash, getSignatureKeyBitLength());
         Signature sig;
         try {
             sig = dsaSignatures.takeFirst();
@@ -305,7 +306,7 @@ public class KeystoreP11Identity extends P11Identity {
         }
 
         try {
-            sig.update(truncatedDigest);
+            sig.update(hash);
             byte[] x962Signature = sig.sign();
             return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
         } catch (SignatureException ex) {

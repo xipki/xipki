@@ -93,8 +93,8 @@ public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
             idBytes = Hex.decode(id);
         }
 
-        SignerConf conf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null,label, idBytes,
-                1, HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
+        SignerConf conf = SignerConf.getPkcs11SignerConf(moduleName, slotIndex, null, label,
+                idBytes, 1, HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
         return securityFactory.createSigner("PKCS11", conf, (X509Certificate[]) null);
     }
 
