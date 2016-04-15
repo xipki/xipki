@@ -40,11 +40,13 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
+import org.xipki.commons.security.api.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao
@@ -67,18 +69,6 @@ public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
     protected abstract List<LoadExecutor> getTesters()
     throws Exception;
 
-    private static final List<String> ecCurveNames;
-
-    static {
-        Enumeration<?> names = ECNamedCurveTable.getNames();
-        List<String> tmpList = new LinkedList<>();
-        while (names.hasMoreElements()) {
-            String curveName = (String) names.nextElement();
-            tmpList.add(curveName);
-        }
-        ecCurveNames = Collections.unmodifiableList(tmpList);
-    }
-
     @Override
     protected Object doExecute()
     throws Exception {
@@ -95,8 +85,8 @@ public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
         return null;
     }
 
-    protected List<String> getECCurveNames() { // CHECKSTYLE:SKIP
-        return ecCurveNames;
+    protected Set<String> getECCurveNames() { // CHECKSTYLE:SKIP
+        return AlgorithmUtil.ECC_CURVE_NAME_OID_MAP.keySet();
     }
 
 }

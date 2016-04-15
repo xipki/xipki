@@ -44,6 +44,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.speed.p11.P11ECSignLoadTest;
+import org.xipki.commons.security.speed.p11.P11SignLoadTest;
 
 /**
  * @author Lijun Liao
@@ -62,8 +63,15 @@ public class BSpeedP11ECSignCmd extends BSpeedP11SignCommandSupport {
         List<LoadExecutor> ret = new LinkedList<>();
 
         P11Slot slot = getSlot();
-        for (String curveName : getECCurveNames()) {
-            ret.add(new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName));
+        try {
+            for (String curveName : getECCurveNames()) {
+                ret.add(new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName));
+            }
+        } catch (Exception ex) {
+            for (LoadExecutor exec : ret) {
+                ((P11SignLoadTest) exec).close();
+            }
+            throw ex;
         }
 
         return ret;
