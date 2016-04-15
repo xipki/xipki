@@ -50,7 +50,7 @@
   <stores>
     <store name="dbstore1">
       <source>
-        <type>DB</type>
+        <type>XIPKI-DB</type>
         <datasource>datasource1</datasource>
         <conf>
 # Comma-separated files of CA certificates to be considered
