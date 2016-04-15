@@ -36,14 +36,10 @@
 
 package org.xipki.commons.security.speed.cmd;
 
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Option;
-import org.bouncycastle.jce.ECNamedCurveTable;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
