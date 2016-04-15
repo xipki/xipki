@@ -50,14 +50,14 @@ public class OcspStoreFactoryImpl implements OcspStoreFactory {
     @Override
     public boolean canCreateOcspStore(
             final String type) {
-        return "DB".equalsIgnoreCase(type);
+        return "XIPKI-DB".equalsIgnoreCase(type);
     }
 
     @Override
     public OcspStore newOcspStore(
             final String type)
     throws ObjectCreationException {
-        if ("DB".equalsIgnoreCase(type)) {
+        if ("XIPKI-DB".equalsIgnoreCase(type)) {
             return new DbCertStatusStore();
         } else {
             throw new ObjectCreationException("unknown OCSP store type '" + type + "'");
