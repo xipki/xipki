@@ -78,25 +78,19 @@ public class FileDigestReader implements DigestReader {
 
     private final BufferedReader certsFilesReader;
 
-    private final boolean revokedOnly;
-
     private BufferedReader certsReader;
 
     private DbDigestEntry next;
 
     public FileDigestReader(
-            final String caDirname,
-            final boolean revokedOnly)
+            final String caDirname)
     throws IOException, CertificateException {
         this.caDirname = ParamUtil.requireNonBlank("caDirname", caDirname);
-        this.revokedOnly = revokedOnly;
 
         this.caCert = X509Util.parseCert(new File(caDirname, "ca.der"));
         Properties props = new Properties();
         props.load(new FileInputStream(new File(caDirname, CaEntry.FILENAME_OVERVIEW)));
-        String accoutPropKey = revokedOnly
-                ? CaEntry.PROPKEY_ACCOUNT_REVOKED
-                : CaEntry.PROPKEY_ACCOUNT;
+        String accoutPropKey = CaEntry.PROPKEY_ACCOUNT;
         String accoutS = props.getProperty(accoutPropKey);
         this.totalAccount = Integer.parseInt(accoutS);
 
@@ -129,7 +123,6 @@ public class FileDigestReader implements DigestReader {
             return null;
         }
 
-        int numSkipped = 0;
         List<Long> serialNumbers = new ArrayList<>(numCerts);
         Map<Long, DbDigestEntry> certs = new HashMap<>(numCerts);
 
@@ -140,10 +133,6 @@ public class FileDigestReader implements DigestReader {
                 line = nextCert();
             } catch (IOException ex) {
                 throw new DataAccessException("IOException: " + ex.getMessage());
-            }
-            if (revokedOnly && !line.isRevoked()) {
-                numSkipped++;
-                continue;
             }
 
             serialNumbers.add(line.getSerialNumber());
@@ -156,7 +145,7 @@ public class FileDigestReader implements DigestReader {
 
         return (ik == 0)
                 ? null
-                : new CertsBundle(numSkipped, certs, serialNumbers);
+                : new CertsBundle(certs, serialNumbers);
     } // method nextCerts
 
     private DbDigestEntry nextCert()

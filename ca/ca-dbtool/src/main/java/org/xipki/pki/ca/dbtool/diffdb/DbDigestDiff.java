@@ -171,7 +171,7 @@ public class DbDigestDiff {
                     }
 
                     String caDirPath = caDir.getPath();
-                    DigestReader refReader = new FileDigestReader(caDirPath, revokedOnly);
+                    DigestReader refReader = new FileDigestReader(caDirPath);
                     diffSingleCa(refReader, caIdCertMap);
                 }
             }
@@ -221,12 +221,11 @@ public class DbDigestDiff {
                 DigestReader refReader;
                 if (refDbSchemaType == DbSchemaType.EJBCA_CA_v3) {
                     refReader = EjbcaDbDigestReader.getInstance(refDatasource,
-                                refCaId, dbContainsMultipleCAs, revokedOnly, numRefThreads,
+                                refCaId, dbContainsMultipleCAs, numRefThreads,
                                 numCertsToPredicate, new StopMe(stopMe));
                 } else {
                     refReader = XipkiDbDigestReader.getInstance(refDatasource, refDbSchemaType,
-                                refCaId, revokedOnly, numRefThreads,
-                                numCertsToPredicate, new StopMe(stopMe));
+                                refCaId, numRefThreads, numCertsToPredicate, new StopMe(stopMe));
                 }
                 diffSingleCa(refReader, caIdCertMap);
             }
@@ -286,7 +285,7 @@ public class DbDigestDiff {
                     + refReader.getCaSubjectName() + "'");
             processLog.printHeader();
 
-            target = new TargetDigestRetriever(processLog, refReader, reporter,
+            target = new TargetDigestRetriever(revokedOnly, processLog, refReader, reporter,
                     targetDatasource, targetDbControl, caId, numPerSelect, numTargetThreads,
                     new StopMe(stopMe));
 

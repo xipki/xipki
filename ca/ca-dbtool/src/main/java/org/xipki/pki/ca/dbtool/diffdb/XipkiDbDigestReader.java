@@ -82,7 +82,6 @@ public class XipkiDbDigestReader extends DbDigestReader {
     private XipkiDbDigestReader(
             final DataSourceWrapper datasource,
             final X509Certificate caCert,
-            final boolean revokedOnly,
             final int totalAccount,
             final int minId,
             final int maxId,
@@ -90,7 +89,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
             final int numCertsToPredicate,
             final StopMe stopMe)
     throws Exception {
-        super(datasource, caCert, revokedOnly, totalAccount, minId, maxId, numThreads,
+        super(datasource, caCert, totalAccount, minId, maxId, numThreads,
                 numCertsToPredicate, stopMe);
     } // constructor
 
@@ -193,11 +192,6 @@ public class XipkiDbDigestReader extends DbDigestReader {
         sb.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
         sb.append(" ON CERT.").append(dbControl.getColCaId()).append("=").append(caId);
         sb.append(" AND CERT.ID>=? AND CERT.ID<?");
-
-        if (revokedOnly) {
-            sb.append(" AND CERT.").append(dbControl.getColRevoked()).append("=1");
-        }
-
         sb.append(" AND CERT.ID=").append(dbControl.getTblCerthash())
             .append(".").append(dbControl.getColCertId());
 
@@ -211,34 +205,6 @@ public class XipkiDbDigestReader extends DbDigestReader {
             throw new Exception("could not initialize the EjbcaDigestReader");
         }
     }
-
-    @Override
-    protected int getNumSkippedCerts(
-            final int fromId,
-            final int toId,
-            final int numCerts)
-    throws DataAccessException {
-        if (fromId > toId) {
-            return 0;
-        }
-
-        ResultSet rs = null;
-        try {
-            numCertStmt.setInt(1, fromId);
-            numCertStmt.setInt(2, toId);
-            rs = numCertStmt.executeQuery();
-            int in = rs.next()
-                    ? rs.getInt(1)
-                    : 0;
-            return (in < numCerts)
-                    ? in - numCerts
-                    : 0;
-        } catch (SQLException ex) {
-            throw datasource.translate(numCertSql, ex);
-        } finally {
-            releaseResources(null, rs);
-        }
-    } // method getNumSkippedCerts
 
     public void close() {
         super.close();
@@ -261,7 +227,6 @@ public class XipkiDbDigestReader extends DbDigestReader {
             final DataSourceWrapper datasource,
             final DbSchemaType dbSchemaType,
             final int caId,
-            final boolean revokedOnly,
             final int numThreads,
             final int numCertsToPredicate,
             final StopMe stopMe)
@@ -294,9 +259,6 @@ public class XipkiDbDigestReader extends DbDigestReader {
             rs.close();
 
             sql = "SELECT COUNT(*) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if (revokedOnly) {
-                sql += " AND " + dbControl.getColRevoked() + "=1";
-            }
             rs = stmt.executeQuery(sql);
 
             totalAccount = rs.next()
@@ -305,9 +267,6 @@ public class XipkiDbDigestReader extends DbDigestReader {
             rs.close();
 
             sql = "SELECT MAX(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if (revokedOnly) {
-                sql += " AND " + dbControl.getColRevoked() + "=1";
-            }
 
             rs = stmt.executeQuery(sql);
             maxId = rs.next()
@@ -316,16 +275,12 @@ public class XipkiDbDigestReader extends DbDigestReader {
             rs.close();
 
             sql = "SELECT MIN(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-            if (revokedOnly) {
-                sql += " AND " + dbControl.getColRevoked() + "=1";
-            }
-
             rs = stmt.executeQuery(sql);
             minId = rs.next()
                     ? rs.getInt(1)
                     : 1;
 
-            XipkiDbDigestReader reader = new XipkiDbDigestReader(datasource, caCert, revokedOnly,
+            XipkiDbDigestReader reader = new XipkiDbDigestReader(datasource, caCert,
                     totalAccount, minId, maxId, numThreads, numCertsToPredicate, stopMe);
             reader.init(dbSchemaType, caId);
             return reader;
