@@ -44,6 +44,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
+import org.xipki.commons.security.speed.p11.P11SignLoadTest;
 
 /**
  * @author Lijun Liao
@@ -63,14 +64,22 @@ public class BSpeedP11DSASignCmd extends BSpeedP11SignCommandSupport {
         int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
 
         P11Slot slot = getSlot();
-        for (int i = 0; i < pqLens.length; i += 2) {
-            int plen = pqLens[i];
-            int qlen = pqLens[i + 1];
-            if (plen == 1024) {
-                sigAlgo = "SHA1withDSA";
-            }
 
-            ret.add(new P11DSASignLoadTest(securityFactory, slot, sigAlgo, plen, qlen));
+        try {
+            for (int i = 0; i < pqLens.length; i += 2) {
+                int plen = pqLens[i];
+                int qlen = pqLens[i + 1];
+                if (plen == 1024) {
+                    sigAlgo = "SHA1withDSA";
+                }
+
+                ret.add(new P11DSASignLoadTest(securityFactory, slot, sigAlgo, plen, qlen));
+            }
+        } catch (Exception ex) {
+            for (LoadExecutor exec : ret) {
+                ((P11SignLoadTest) exec).close();
+            }
+            throw ex;
         }
         return ret;
     }

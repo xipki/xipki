@@ -36,7 +36,6 @@
 
 package org.xipki.commons.security.speed.p11.cmd;
 
-import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,6 +44,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.speed.p11.P11RSASignLoadTest;
+import org.xipki.commons.security.speed.p11.P11SignLoadTest;
 
 /**
  * @author Lijun Liao
@@ -64,10 +64,18 @@ public class BSpeedP11RSASignCmd extends BSpeedP11SignCommandSupport {
         int[] keysizes = new int[]{1024, 2048, 3072, 4096};
 
         P11Slot slot = getSlot();
-        for (int keysize : keysizes) {
-            ret.add(new P11RSASignLoadTest(securityFactory, slot, sigAlgo, keysize,
-                            new BigInteger("0x10001")));
+        try {
+            for (int keysize : keysizes) {
+                ret.add(new P11RSASignLoadTest(securityFactory, slot, sigAlgo, keysize,
+                                toBigInt("0x10001")));
+            }
+        } catch (Exception ex) {
+            for (LoadExecutor exec : ret) {
+                ((P11SignLoadTest) exec).close();
+            }
+            throw ex;
         }
+
         return ret;
     }
 
