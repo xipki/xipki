@@ -42,6 +42,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import java.util.concurrent.TimeUnit;
 import org.xipki.commons.common.ProcessLog;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
+import org.xipki.commons.datasource.api.DatabaseType;
 import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.StopMe;
@@ -67,6 +69,8 @@ public class TargetDigestRetriever {
 
     private class Retriever implements Runnable {
 
+        private final boolean revokedOnly;
+
         private Connection conn;
 
         private PreparedStatement singleSelectStmt;
@@ -75,9 +79,8 @@ public class TargetDigestRetriever {
 
         private PreparedStatement rangeSelectStmt;
 
-        private final boolean revokedOnly;
-
-        Retriever(boolean revokedOnly)
+        Retriever(
+                final boolean revokedOnly)
         throws DataAccessException {
             this.revokedOnly = revokedOnly;
             conn = datasource.getConnection();
@@ -138,7 +141,6 @@ public class TargetDigestRetriever {
                             reporter.addMissing(serialNumber);
                         }
                     }
-
                     processLog.addNumProcessed(size);
                     processLog.printStatus();
                 } catch (Exception ex) {
@@ -156,6 +158,7 @@ public class TargetDigestRetriever {
         private Map<Long, DbDigestEntry> query(CertsBundle bundle)
         throws DataAccessException {
             List<Long> serialNumbers = bundle.getSerialNumbers();
+            int size = serialNumbers.size();
 
             long minSerialNumber = serialNumbers.get(0);
             long maxSerialNumber = serialNumbers.get(0);
@@ -169,17 +172,30 @@ public class TargetDigestRetriever {
             }
 
             Map<Long, DbDigestEntry> certsInB;
-            ResultSet rs = null;
-            try {
-                rangeSelectStmt.setLong(1, minSerialNumber);
-                rangeSelectStmt.setLong(2, maxSerialNumber);
-                rs = rangeSelectStmt.executeQuery();
+            long serialDiff = maxSerialNumber - minSerialNumber;
 
-                certsInB = buildResult(rs, serialNumbers);
-            } catch (SQLException ex) {
-                throw datasource.translate(inArrayCertsSql, ex);
-            } finally {
-                releaseResources(null, rs);
+            if (serialDiff < numPerSelect * 2) {
+                ResultSet rs = null;
+                try {
+                    rangeSelectStmt.setLong(1, minSerialNumber);
+                    rangeSelectStmt.setLong(2, maxSerialNumber);
+                    rs = rangeSelectStmt.executeQuery();
+
+                    certsInB = buildResult(rs, serialNumbers);
+                } catch (SQLException ex) {
+                    throw datasource.translate(inArrayCertsSql, ex);
+                } finally {
+                    releaseResources(null, rs);
+                }
+            } else {
+                boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
+                if (batchSupported && size == numPerSelect) {
+                    certsInB = getCertsViaInArraySelectInB(inArraySelectStmt,
+                            serialNumbers);
+                } else {
+                    certsInB = getCertsViaSingleSelectInB(
+                            singleSelectStmt, serialNumbers);
+                }
             }
 
             return certsInB;
@@ -306,6 +322,50 @@ public class TargetDigestRetriever {
         }
     }
 
+    private Map<Long, DbDigestEntry> getCertsViaSingleSelectInB(
+            final PreparedStatement singleSelectStmt,
+            final List<Long> serialNumbers)
+    throws DataAccessException {
+        Map<Long, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
+
+        for (Long serialNumber : serialNumbers) {
+            DbDigestEntry certB = getSingleCert(singleSelectStmt, serialNumber);
+            if (certB != null) {
+                ret.put(serialNumber, certB);
+            }
+        }
+
+        return ret;
+    }
+
+    private Map<Long, DbDigestEntry> getCertsViaInArraySelectInB(
+            final PreparedStatement batchSelectStmt,
+            final List<Long> serialNumbers)
+    throws DataAccessException {
+        final int n = serialNumbers.size();
+        if (n != numPerSelect) {
+            throw new IllegalArgumentException("size of serialNumbers is not '" + numPerSelect
+                    + "': " + n);
+        }
+
+        Collections.sort(serialNumbers);
+
+        ResultSet rs = null;
+
+        try {
+            for (int i = 0; i < n; i++) {
+                batchSelectStmt.setLong(i + 1, serialNumbers.get(i));
+            }
+
+            rs = batchSelectStmt.executeQuery();
+            return buildResult(rs, serialNumbers);
+        } catch (SQLException ex) {
+            throw datasource.translate(inArrayCertsSql, ex);
+        } finally {
+            releaseResources(null, rs);
+        }
+    }
+
     private Map<Long, DbDigestEntry> buildResult(
             final ResultSet rs,
             final List<Long> serialNumbers)
@@ -337,6 +397,39 @@ public class TargetDigestRetriever {
         }
 
         return ret;
+    }
+
+    private DbDigestEntry getSingleCert(
+            final PreparedStatement singleSelectStmt,
+            final long serialNumber)
+    throws DataAccessException {
+        ResultSet rs = null;
+        try {
+            singleSelectStmt.setLong(1, serialNumber);
+            rs = singleSelectStmt.executeQuery();
+            if (!rs.next()) {
+                return null;
+            }
+            boolean revoked = rs.getBoolean(dbControl.getColRevoked());
+            Integer revReason = null;
+            Long revTime = null;
+            Long revInvTime = null;
+            if (revoked) {
+                revReason = rs.getInt(dbControl.getColRevReason());
+                revTime = rs.getLong(dbControl.getColRevTime());
+                revInvTime = rs.getLong(dbControl.getColRevInvTime());
+                if (revInvTime == 0) {
+                    revInvTime = null;
+                }
+            }
+            String sha1Fp = rs.getString(dbControl.getColCerthash());
+            return new DbDigestEntry(serialNumber,
+                    revoked, revReason, revTime, revInvTime, sha1Fp);
+        } catch (SQLException ex) {
+            throw datasource.translate(singleCertSql, ex);
+        } finally {
+            releaseResources(null, rs);
+        }
     }
 
     private void releaseResources(
