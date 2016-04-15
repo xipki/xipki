@@ -94,8 +94,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         if (this.publicKey instanceof RSAPublicKey) {
             signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
         } else if (this.publicKey instanceof ECPublicKey) {
-            signatureKeyBitLength = ((ECPublicKey) this.publicKey)
-                    .getParams().getCurve().getField().getFieldSize();
+            signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams()
+                    .getOrder().bitLength();
         } else if (this.publicKey instanceof DSAPublicKey) {
             signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
         } else {

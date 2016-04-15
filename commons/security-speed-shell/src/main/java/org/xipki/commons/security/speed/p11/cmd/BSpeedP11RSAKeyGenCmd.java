@@ -36,7 +36,6 @@
 
 package org.xipki.commons.security.speed.p11.cmd;
 
-import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -65,7 +64,7 @@ public class BSpeedP11RSAKeyGenCmd extends BSpeedP11CommandSupport {
 
         P11Slot slot = getSlot();
         for (int keysize : keysizes) {
-            ret.add(new P11RSAKeyGenLoadTest(slot, keysize, new BigInteger("0x10001")));
+            ret.add(new P11RSAKeyGenLoadTest(slot, keysize, toBigInt("0x10001")));
         }
         return ret;
     }

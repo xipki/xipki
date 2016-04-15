@@ -77,7 +77,7 @@ import org.xipki.commons.security.api.SignerConf;
 
 public class AlgorithmUtil {
 
-    private static final Map<String, ASN1ObjectIdentifier> ECC_CURVE_NAME_OID_MAP;
+    public static final Map<String, ASN1ObjectIdentifier> ECC_CURVE_NAME_OID_MAP;
 
     static {
         Map<String, ASN1ObjectIdentifier> nameOidMap = new HashMap<>();
@@ -90,7 +90,7 @@ public class AlgorithmUtil {
                 continue;
             }
 
-            nameOidMap.put(name, oid);
+            nameOidMap.put(name.toLowerCase(), oid);
         }
 
         ECC_CURVE_NAME_OID_MAP = Collections.unmodifiableMap(nameOidMap);

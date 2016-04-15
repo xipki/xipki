@@ -36,7 +36,6 @@
 
 package org.xipki.commons.security.speed.p12.cmd;
 
-import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,7 +63,7 @@ public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCommandSupport {
         int[] keysizes = new int[]{1024, 2048, 3072, 4096};
         for (int keysize : keysizes) {
             ret.add(
-                    new P12RSAKeyGenLoadTest(keysize, new BigInteger("0x10001"), securityFactory));
+                    new P12RSAKeyGenLoadTest(keysize, toBigInt("0x10001"), securityFactory));
         }
         return ret;
     }
