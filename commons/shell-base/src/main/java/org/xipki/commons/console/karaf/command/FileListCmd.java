@@ -130,6 +130,8 @@ public class FileListCmd extends XipkiCommandSupport {
             }
         }
 
+        println("");
+
         return null;
     }
 
