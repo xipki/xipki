@@ -36,6 +36,8 @@
 
 package org.xipki.commons.common.util;
 
+import javax.xml.bind.JAXBException;
+
 import org.slf4j.Logger;
 
 /**
@@ -60,9 +62,9 @@ public class LogUtil {
         if (traces.length > 2) {
             StackTraceElement trace = traces[2];
             log.error("({} {}), {}: {}", trace.getMethodName(), trace.getLineNumber(),
-                    th.getClass().getName(), th.getMessage());
+                    th.getClass().getName(), getMessage(th));
         } else {
-            log.error("{}: {}", th.getClass().getName(), th.getMessage());
+            log.error("{}: {}", th.getClass().getName(), getMessage(th));
         }
         log.debug("Exception", th);
     }
@@ -80,9 +82,9 @@ public class LogUtil {
         if (traces.length > 2) {
             StackTraceElement trace = traces[2];
             log.error("({} {}) {}, {}: {}", trace.getMethodName(), trace.getLineNumber(), msg,
-                    th.getClass().getName(), th.getMessage());
+                    th.getClass().getName(), getMessage(th));
         } else {
-            log.error("{}, {}: {}", msg, th.getClass().getName(), th.getMessage());
+            log.error("{}, {}: {}", msg, th.getClass().getName(), getMessage(th));
         }
         log.debug(msg, th);
     }
@@ -99,9 +101,9 @@ public class LogUtil {
         if (traces.length > 2) {
             StackTraceElement trace = traces[2];
             log.error("({} {}), {}: {}", trace.getMethodName(), trace.getLineNumber(),
-                    th.getClass().getName(), th.getMessage());
+                    th.getClass().getName(), getMessage(th));
         } else {
-            log.warn("{}: {}", th.getClass().getName(), th.getMessage());
+            log.warn("{}: {}", th.getClass().getName(), getMessage(th));
         }
         log.debug("Exception", th);
     }
@@ -119,11 +121,19 @@ public class LogUtil {
         if (traces.length > 2) {
             StackTraceElement trace = traces[2];
             log.warn("({} {}) {}, {}: {}", trace.getMethodName(), trace.getLineNumber(), msg,
-                    th.getClass().getName(), th.getMessage());
+                    th.getClass().getName(), getMessage(th));
         } else {
-            log.warn("{}, {}: {}", msg, th.getClass().getName(), th.getMessage());
+            log.warn("{}, {}: {}", msg, th.getClass().getName(), getMessage(th));
         }
         log.debug(msg, th);
     }
 
+    private static String getMessage(
+            final Throwable th) {
+        if (th instanceof JAXBException) {
+            return XmlUtil.getMessage((JAXBException) th);
+        } else {
+            return th.getMessage();
+        }
+    }
 }
