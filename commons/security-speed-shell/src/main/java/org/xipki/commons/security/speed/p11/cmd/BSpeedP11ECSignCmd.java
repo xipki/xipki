@@ -36,15 +36,15 @@
 
 package org.xipki.commons.security.speed.p11.cmd;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.speed.cmd.ECControl;
 import org.xipki.commons.security.speed.p11.P11ECSignLoadTest;
-import org.xipki.commons.security.speed.p11.P11SignLoadTest;
 
 /**
  * @author Lijun Liao
@@ -57,24 +57,24 @@ import org.xipki.commons.security.speed.p11.P11SignLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP11ECSignCmd extends BSpeedP11SignCommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
+    private final BlockingDeque<ECControl> queue = new LinkedBlockingDeque<>();
 
-        P11Slot slot = getSlot();
-        try {
-            for (String curveName : getECCurveNames()) {
-                ret.add(new P11ECSignLoadTest(securityFactory, slot, sigAlgo, curveName));
-            }
-        } catch (Exception ex) {
-            for (LoadExecutor exec : ret) {
-                ((P11SignLoadTest) exec).close();
-            }
-            throw ex;
+    public BSpeedP11ECSignCmd() {
+        for (String curveName : getECCurveNames()) {
+            queue.add(new ECControl(curveName));
+        }
+    }
+
+    @Override
+    protected LoadExecutor nextTester()
+    throws Exception {
+        ECControl control = queue.takeFirst();
+        if (control == null) {
+            return null;
         }
 
-        return ret;
+        P11Slot slot = getSlot();
+        return new P11ECSignLoadTest(securityFactory, slot, sigAlgo, control.getCurveName());
     }
 
 }
