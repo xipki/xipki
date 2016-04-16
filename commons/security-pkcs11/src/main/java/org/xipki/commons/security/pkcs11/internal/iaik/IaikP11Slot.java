@@ -247,8 +247,13 @@ class IaikP11Slot extends AbstractP11Slot {
                         "SecurityException while initializing key with id " + hex(keyId));
                 continue;
             } catch (Throwable th) {
+                String label = "";
+                if (privKey.getLabel() != null) {
+                    label = new String(privKey.getLabel().getCharArrayValue());
+                }
                 LogUtil.error(LOG, th,
-                        "unexpected exception while initializing key with id " + hex(keyId));
+                        "unexpected exception while initializing key with id " + hex(keyId)
+                        + " and label " + label);
                 continue;
             }
         } // end for (PrivateKey signatureKey : signatureKeys)
