@@ -60,7 +60,6 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.qa.api.QaSystemManager;
 import org.xipki.pki.ca.qa.api.X509CertprofileQa;
@@ -138,12 +137,6 @@ public class QaSystemManagerImpl implements QaSystemManager {
             qaConf = parseQaConf(issuerConfStream);
         } catch (IOException | JAXBException | SAXException ex) {
             final String message = "could not parse the QA configuration";
-            String exceptionMessage;
-            if (ex instanceof JAXBException) {
-                exceptionMessage = XmlUtil.getMessage((JAXBException) ex);
-            } else {
-                exceptionMessage = ex.getMessage();
-            }
             LogUtil.error(LOG, ex, message);
             return;
         }
