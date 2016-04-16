@@ -14,6 +14,7 @@ Highly scalable and high-performance open source PKI (Certification Authority an
     - DB2
     - PostgreSQL
     - MySQL
+    - MariaDB
     - H2
     - HSQLDB
   - Direct and indirect CRL
@@ -80,6 +81,7 @@ Highly scalable and high-performance open source PKI (Certification Authority an
     - DB2
     - PostgreSQL
     - MySQL
+    - MariaDB
     - H2
     - HSQLDB
   - Embedded database tool (export and import OCSP database) simplifies the switch of databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
@@ -136,6 +138,7 @@ Tested Platforms
  * Oracle RAC
  * PostgreSQL
  * MySQL
+ * MariaDB
  * H2
  * HSQLDB
  
