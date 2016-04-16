@@ -36,12 +36,13 @@
 
 package org.xipki.commons.security.speed.p12.cmd;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
+import org.xipki.commons.security.speed.cmd.DSAControl;
 import org.xipki.commons.security.speed.p12.P12DSASignLoadTest;
 
 /**
@@ -55,22 +56,28 @@ import org.xipki.commons.security.speed.p12.P12DSASignLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP12DSASignCmd extends BSpeedP12SignCommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
-        for (int i = 0; i < pqLens.length; i += 2) {
-            int plen = pqLens[i];
-            int qlen = pqLens[i + 1];
-            if (plen == 1024) {
-                sigAlgo = "SHA1withDSA";
-            }
+    private final BlockingDeque<DSAControl> queue = new LinkedBlockingDeque<>();
 
-            ret.add(new P12DSASignLoadTest(securityFactory, sigAlgo, plen,
-                    qlen));
+    public BSpeedP12DSASignCmd() {
+        queue.add(new DSAControl(1024, 160));
+        queue.add(new DSAControl(2048, 224));
+        queue.add(new DSAControl(2048, 256));
+        queue.add(new DSAControl(3072, 256));
+    }
+
+    @Override
+    protected LoadExecutor nextTester()
+    throws Exception {
+        DSAControl control = queue.takeFirst();
+        if (control == null) {
+            return null;
         }
-        return ret;
+        if (control.getPlen() == 1024) {
+            sigAlgo = "SHA1withDSA";
+        }
+
+        return new P12DSASignLoadTest(securityFactory, sigAlgo, control.getPlen(),
+                control.getQlen());
     }
 
 }
