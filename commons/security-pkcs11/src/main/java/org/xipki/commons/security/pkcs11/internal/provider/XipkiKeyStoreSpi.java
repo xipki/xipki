@@ -162,9 +162,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
             try {
                 engineLoad(moduleName);
             } catch (SecurityException | P11TokenException ex) {
-                String msg = "could not load PKCS#11 module " + moduleName;
-                LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                LOG.error("msg", ex);
+                LogUtil.error(LOG, ex, "could not load PKCS#11 module " + moduleName);
             }
         }
 

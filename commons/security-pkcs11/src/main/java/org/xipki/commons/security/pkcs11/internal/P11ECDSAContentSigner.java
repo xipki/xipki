@@ -165,11 +165,7 @@ class P11ECDSAContentSigner implements ContentSigner {
             LOG.debug("SignerException", ex);
             throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
         } catch (Throwable th) {
-            final String message = "Throwable";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
-            }
-            LOG.debug(message, th);
+            LogUtil.warn(LOG, th);
             throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
         }
     }

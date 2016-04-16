@@ -110,17 +110,14 @@ public class P11Conf {
             this.moduleConfs = Collections.unmodifiableMap(confs);
             this.moduleNames = Collections.unmodifiableSet(new HashSet<>(confs.keySet()));
         } catch (JAXBException | SAXException ex) {
-            final String message = "invalid PKCS#11 configuration" ;
-            final String exeptionMsg;
+            final String exceptionMsg;
             if (ex instanceof JAXBException) {
-                exeptionMsg = getMessage((JAXBException) ex);
+                exceptionMsg = getMessage((JAXBException) ex);
             } else {
-                exeptionMsg = ex.getMessage();
+                exceptionMsg = ex.getMessage();
             }
-            LOG.error(LogUtil.getErrorLog(exeptionMsg), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
-
-            throw new InvalidConfException(message);
+            LogUtil.error(LOG, ex, exceptionMsg);
+            throw new InvalidConfException("invalid PKCS#11 configuration");
         } finally {
             confStream.close();
         }

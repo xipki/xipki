@@ -116,11 +116,9 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
         try {
             this.p11Conf = new P11Conf(new FileInputStream(pkcs11ConfFile), securityFactory);
         } catch (InvalidConfException | IOException ex) {
-            final String message = "invalid configuration file " + pkcs11ConfFile;
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
-
-            throw new RuntimeException(message);
+            final String msg = "invalid configuration file " + pkcs11ConfFile;
+            LogUtil.error(LOG, ex, msg);
+            throw new RuntimeException(msg);
         }
     }
 
