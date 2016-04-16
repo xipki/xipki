@@ -81,7 +81,7 @@ public class NssProviderRegister {
             final String msg = "could not initialize SunPKCS11 NSS provider";
             if (LOG.isInfoEnabled()) {
                 LOG.info("{}: {}", msg, th.getMessage());
-            };
+            }
             LOG.debug(msg, th);
         }
     }
