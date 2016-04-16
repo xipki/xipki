@@ -45,6 +45,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,9 +79,13 @@ import org.xipki.commons.security.api.SignerConf;
 
 public class AlgorithmUtil {
 
-    public static final Map<String, ASN1ObjectIdentifier> ECC_CURVE_NAME_OID_MAP;
+    // CHECKSTYLE:SKIP
+    private static final List<String> eCCurveNames;
+
+    private static final Map<String, ASN1ObjectIdentifier> ecCurveNameOidMap;
 
     static {
+        List<String> nameList = new LinkedList<>();
         Map<String, ASN1ObjectIdentifier> nameOidMap = new HashMap<>();
 
         Enumeration<?> names = ECNamedCurveTable.getNames();
@@ -90,10 +96,13 @@ public class AlgorithmUtil {
                 continue;
             }
 
+            nameList.add(name);
             nameOidMap.put(name.toLowerCase(), oid);
         }
 
-        ECC_CURVE_NAME_OID_MAP = Collections.unmodifiableMap(nameOidMap);
+        Collections.sort(nameList);
+        eCCurveNames = Collections.unmodifiableList(nameList);
+        ecCurveNameOidMap = Collections.unmodifiableMap(nameOidMap);
     }
 
     private AlgorithmUtil() {
@@ -743,7 +752,12 @@ public class AlgorithmUtil {
     public static ASN1ObjectIdentifier getCurveOidForName(
             final String curveName) {
         ParamUtil.requireNonBlank("curveName", curveName);
-        return ECC_CURVE_NAME_OID_MAP.get(curveName.toLowerCase());
+        return ecCurveNameOidMap.get(curveName.toLowerCase());
+    }
+
+    // CHECKSTYLE:SKIP
+    public static List<String> getECCurveNames() {
+        return eCCurveNames;
     }
 
     public static String getCurveName(

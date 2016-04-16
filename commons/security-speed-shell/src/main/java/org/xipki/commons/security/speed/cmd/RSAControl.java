@@ -34,48 +34,25 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.speed.p11.cmd;
-
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
-
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.security.api.p11.P11Slot;
-import org.xipki.commons.security.speed.cmd.DSAControl;
-import org.xipki.commons.security.speed.p11.P11DSAKeyGenLoadTest;
+package org.xipki.commons.security.speed.cmd;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "bspeed-dsa-gen",
-        description = "performance test of PKCS#11 DSA key generation (batch)")
-@Service
 // CHECKSTYLE:SKIP
-public class BSpeedP11DSAKeyGenCmd extends BSpeedP11CommandSupport {
+public class RSAControl {
+    private final int modulusLen;
 
-    private final BlockingDeque<DSAControl> queue = new LinkedBlockingDeque<>();
-
-    public BSpeedP11DSAKeyGenCmd() {
-        queue.add(new DSAControl(1024, 160));
-        queue.add(new DSAControl(2048, 224));
-        queue.add(new DSAControl(2048, 256));
-        queue.add(new DSAControl(3072, 256));
+    public RSAControl(
+            final int modulusLen) {
+        this.modulusLen = modulusLen;
     }
 
-    @Override
-    protected LoadExecutor nextTester()
-    throws Exception {
-        DSAControl control = queue.takeFirst();
-        if (control == null) {
-            return null;
-        }
-
-        P11Slot slot = getSlot();
-        return new P11DSAKeyGenLoadTest(slot, control.getPlen(), control.getQlen());
+    public int getModulusLen() {
+        return modulusLen;
     }
 
 }
+
