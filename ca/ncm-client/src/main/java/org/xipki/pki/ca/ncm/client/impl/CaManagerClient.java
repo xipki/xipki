@@ -105,12 +105,7 @@ public class CaManagerClient implements CaManager {
                 try {
                     init();
                 } catch (Throwable th) {
-                    String msg = "could not init";
-                    LOG.error(msg, th.getMessage());
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug(LogUtil.getErrorLog(msg), th.getClass().getName(),
-                                th.getMessage());
-                    }
+                    LogUtil.error(LOG, th, "could not init");
                 }
             }
         };

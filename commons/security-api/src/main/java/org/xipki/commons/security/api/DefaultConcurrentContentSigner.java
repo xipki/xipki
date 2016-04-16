@@ -275,9 +275,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             byte[] signature = signer.getSignature();
             return signature != null && signature.length > 0;
         } catch (Exception ex) {
-            final String message = "isHealthy()";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex);
             return false;
         } finally {
             if (signer != null) {

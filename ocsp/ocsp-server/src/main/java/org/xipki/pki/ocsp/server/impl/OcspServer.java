@@ -311,12 +311,7 @@ public class OcspServer {
                 try {
                     init();
                 } catch (Throwable th) {
-                    String msg = "could not init";
-                    LOG.error(msg, th.getMessage());
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug(LogUtil.getErrorLog(msg), th.getClass().getName(),
-                                th.getMessage());
-                    }
+                    LogUtil.error(LOG, th, "could not init");
                 }
             }
         };
@@ -671,11 +666,7 @@ public class OcspServer {
             try {
                 store.shutdown();
             } catch (Exception ex) {
-                final String msg = "shutdown store " + store.getName();
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                }
-                LOG.debug(msg, ex);
+                LogUtil.warn(LOG, ex, "shutdown store " + store.getName());
             }
         }
 
@@ -814,10 +805,8 @@ public class OcspServer {
                         }
                     } catch (OcspStoreException ex) {
                         exceptionOccurs = true;
-                        final String msg = "getCertStatus() of CertStatusStore " + store.getName();
-                        LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(),
-                                ex.getMessage());
-                        LOG.debug(msg, ex);
+                        LogUtil.error(LOG, ex,
+                                "getCertStatus() of CertStatusStore " + store.getName());
                     } // end try
                 } // end for
 
@@ -953,10 +942,7 @@ public class OcspServer {
                     try {
                         encodedCertHash = bcCertHash.getEncoded();
                     } catch (IOException ex) {
-                        final String message = "answer() bcCertHash.getEncoded";
-                        LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(),
-                                ex.getMessage());
-                        LOG.debug(message, ex);
+                        LogUtil.error(LOG, ex, "answer() bcCertHash.getEncoded");
                         if (childAuditEvent != null) {
                             fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                                     "CertHash.getEncoded() with IOException");
@@ -1079,9 +1065,7 @@ public class OcspServer {
             } catch (NoIdleSignerException ex) {
                 return createUnsuccessfulOcspResp(OcspResponseStatus.tryLater);
             } catch (OCSPException ex) {
-                final String message = "answer() basicOcspBuilder.build";
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(message, ex);
+                LogUtil.error(LOG, ex, "answer() basicOcspBuilder.build");
                 if (auditEvent != null) {
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                             "BasicOCSPRespBuilder.build() with OCSPException");
@@ -1104,9 +1088,7 @@ public class OcspServer {
                     return new OcspRespWithCacheInfo(ocspResp, null);
                 }
             } catch (OCSPException ex) {
-                final String message = "answer() ocspRespBuilder.build";
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(message, ex);
+                LogUtil.error(LOG, ex, "answer() ocspRespBuilder.build");
                 if (auditEvent != null) {
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                             "OCSPRespBuilder.build() with OCSPException");
@@ -1115,10 +1097,7 @@ public class OcspServer {
             }
 
         } catch (Throwable th) {
-            final String message = "Throwable";
-            LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
-            LOG.debug(message, th);
-
+            LogUtil.error(LOG, th);
             if (auditEvent != null) {
                 fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                         "internal error");

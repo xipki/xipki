@@ -169,17 +169,13 @@ public class X509Ca {
                 try {
                     caInfo.commitNextSerial();
                 } catch (Throwable th) {
-                    final String msg = "could not commit the NEXT_SN";
-                    LOG.error(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
-                    LOG.debug(msg, th);
+                    LogUtil.error(LOG, th, "could not commit the NEXT_SN");
                 }
 
                 try {
                     caInfo.commitNextCrlNo();
                 } catch (Throwable th) {
-                    final String msg = "could not commit the NEXT_CRLNO";
-                    LOG.error(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
-                    LOG.debug(msg, th);
+                    LogUtil.error(LOG, th, "could not commit the NEXT_CRLNO");
                 }
             } finally {
                 inProcess = false;
@@ -214,9 +210,7 @@ public class X509Ca {
                 LOG.info("removed {} certificates expired at {}", num, expiredAt.toString());
             } catch (Throwable th) {
                 successful = false;
-                final String message = "could not remove expired certificates";
-                LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
-                LOG.debug(message, th);
+                LogUtil.error(LOG, th, "could not remove expired certificates");
             } finally {
                 AuditService audit = getAuditService();
                 if (audit != null) {
@@ -398,17 +392,13 @@ public class X509Ca {
                 try {
                     certstore.clearDeltaCrlCache(caInfo.getCertificate(), maxIdOfDeltaCrlCache);
                 } catch (Throwable th) {
-                    final String msg = "CRL_GEN_INTERVAL: could not clear DeltaCRLCache of CA "
-                            + caInfo.getName();
-                    LOG.error(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
-                    LOG.debug(msg, th);
+                    LogUtil.error(LOG, th, "CRL_GEN_INTERVAL: could not clear DeltaCRLCache of CA "
+                            + caInfo.getName());
                 }
             } catch (Throwable th) {
                 auditEvent.setStatus(AuditStatus.FAILED);
                 auditEvent.setLevel(AuditLevel.ERROR);
-                final String message = "CRL_GEN_INTERVAL: Error";
-                LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
-                LOG.debug(message, th);
+                LogUtil.error(LOG, th, "CRL_GEN_INTERVAL: Error");
             } finally {
                 auditEvent.setDuration(System.currentTimeMillis() - start.getTime());
             }
@@ -473,11 +463,8 @@ public class X509Ca {
             try {
                 caInfo.initSigner(securityFactory);
             } catch (SecurityException ex) {
-                final String message =
-                        "security.createSigner caSigner (ca=" + caInfo.getName() + ")";
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(message, ex);
-
+                LogUtil.error(LOG, ex,
+                        "security.createSigner caSigner (ca=" + caInfo.getName() + ")");
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                         "SigenrException: " + ex.getMessage());
             }
@@ -675,9 +662,8 @@ public class X509Ca {
                 try {
                     certstore.clearDeltaCrlCache(caInfo.getCertificate(), maxIdOfDeltaCrlCache);
                 } catch (Throwable th) {
-                    final String msg = "could not clear DeltaCRLCache of CA " + caInfo.getName();
-                    LOG.error(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
-                    LOG.debug(msg, th);
+                    LogUtil.error(LOG, th,
+                            "could not clear DeltaCRLCache of CA " + caInfo.getName());
                 }
             }
 
@@ -880,9 +866,7 @@ public class X509Ca {
                     crlBuilder.addExtension(Extension.issuingDistributionPoint, true, idp);
                 }
             } catch (CertIOException ex) {
-                final String message = "crlBuilder.addExtension";
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(message, ex);
+                LogUtil.error(LOG, ex, "crlBuilder.addExtension");
                 throw new OperationException(ErrorCode.INVALID_EXTENSION, ex.getMessage());
             }
 
@@ -1029,11 +1013,7 @@ public class X509Ca {
                         ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
             return ret;
         } catch (RuntimeException ex) {
-            final String message = "RuntimeException in generateCertificate()";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            }
-            LOG.debug(message, ex);
+            LogUtil.warn(LOG, ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, "RuntimeException: "
                     + ex.getMessage());
         } finally {
@@ -1071,11 +1051,7 @@ public class X509Ca {
 
             return ret;
         } catch (RuntimeException ex) {
-            final String message = "RuntimeException in regenerateCertificate()";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            }
-            LOG.debug(message, ex);
+            LogUtil.warn(LOG, ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     "RuntimeException: " + ex.getMessage());
         } finally {
@@ -1115,13 +1091,8 @@ public class X509Ca {
                     successful = publisher.certificateAdded(certInfo);
                 } catch (RuntimeException ex) {
                     successful = false;
-                    final String message = "could not publish certificate to the publisher "
-                            + publisher.getName();
-                    if (LOG.isWarnEnabled()) {
-                        LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(),
-                                ex.getMessage());
-                    }
-                    LOG.debug(message, ex);
+                    LogUtil.warn(LOG, ex, "could not publish certificate to the publisher "
+                            + publisher.getName());
                 }
 
                 if (successful) {
@@ -1134,9 +1105,7 @@ public class X509Ca {
                 certstore.addToPublishQueue(publisher.getName(), certId.intValue(),
                         caInfo.getCertificate());
             } catch (Throwable th) {
-                final String message = "could not add entry to PublishQueue";
-                LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
-                LOG.debug(message, th);
+                LogUtil.error(LOG, th, "could not add entry to PublishQueue");
                 return 2;
             }
         } // end for
@@ -1190,9 +1159,7 @@ public class X509Ca {
                 certstore.clearPublishQueue(this.caInfo.getCertificate(), name);
                 LOG.info(" cleared PublishQueue for publisher {}", name);
             } catch (OperationException ex) {
-                final String message = "could not clear PublishQueue for publisher";
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(message, ex);
+                LogUtil.error(LOG, ex, "could not clear PublishQueue for publisher");
             }
         } // end for
 
@@ -1214,10 +1181,7 @@ public class X509Ca {
                             numEntries, onlyRevokedCerts,
                             false, false);
                 } catch (OperationException ex) {
-                    final String message = "exception";
-                    LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(),
-                            ex.getMessage());
-                    LOG.debug(message, ex);
+                    LogUtil.error(LOG, ex);
                     return false;
                 }
 
@@ -1239,10 +1203,7 @@ public class X509Ca {
                     try {
                         certInfo = certstore.getCertificateInfoForSerial(caCert, serial);
                     } catch (OperationException | CertificateException ex) {
-                        final String message = "exception";
-                        LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(),
-                                ex.getMessage());
-                        LOG.debug(message, ex);
+                        LogUtil.error(LOG, ex);
                         return false;
                     }
 
@@ -1328,9 +1289,7 @@ public class X509Ca {
             try {
                 certIds = certstore.getPublishQueueEntries(caCert, publisher.getName(), numEntries);
             } catch (OperationException ex) {
-                final String message = "exception";
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(message, ex);
+                LogUtil.error(LOG, ex);
                 return false;
             }
 
@@ -1344,9 +1303,7 @@ public class X509Ca {
                 try {
                     certInfo = certstore.getCertificateInfoForId(caCert, certId);
                 } catch (OperationException | CertificateException ex) {
-                    final String msg = "exception";
-                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                    LOG.debug(msg, ex);
+                    LogUtil.error(LOG, ex);
                     return false;
                 }
 
@@ -1359,13 +1316,8 @@ public class X509Ca {
                 try {
                     certstore.removeFromPublishQueue(publisher.getName(), certId);
                 } catch (OperationException ex) {
-                    final String message = "could not remove republished cert id=" + certId
-                            + " and publisher=" + publisher.getName();
-                    if (LOG.isWarnEnabled()) {
-                        LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(),
-                                ex.getMessage());
-                    }
-                    LOG.debug(message, ex);
+                    LogUtil.warn(LOG, ex, "could not remove republished cert id=" + certId
+                            + " and publisher=" + publisher.getName());
                     continue;
                 }
             } // end for
@@ -1385,10 +1337,8 @@ public class X509Ca {
             try {
                 publisher.crlAdded(caCert, crl);
             } catch (RuntimeException ex) {
-                final String message = "could not publish CRL to the publisher "
-                        + publisher.getName();
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(message, ex);
+                LogUtil.error(LOG, ex, "could not publish CRL to the publisher "
+                        + publisher.getName());
             }
         } // end for
 
@@ -1472,12 +1422,8 @@ public class X509Ca {
                         certToRemove);
             } catch (RuntimeException ex) {
                 singleSuccessful = false;
-                final String msg = "could not remove certificate to the publisher "
-                        + publisher.getName();
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                }
-                LOG.debug(msg, ex);
+                LogUtil.warn(LOG, ex, "could not remove certificate to the publisher "
+                        + publisher.getName());
             }
 
             if (singleSuccessful) {
@@ -1533,11 +1479,9 @@ public class X509Ca {
                             revokedCert.getRevInfo());
                 } catch (RuntimeException ex) {
                     successful = false;
-                    final String msg =
+                    LogUtil.error(LOG, ex,
                             "could not publish revocation of certificate to the publisher "
-                            + publisher.getName();
-                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                    LOG.debug(msg, ex);
+                            + publisher.getName());
                 }
 
                 if (successful) {
@@ -1550,9 +1494,7 @@ public class X509Ca {
                 certstore.addToPublishQueue(publisher.getName(), certId.intValue(),
                         caInfo.getCertificate());
             } catch (Throwable th) {
-                final String message = "could not add entry to PublishQueue";
-                LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
-                LOG.debug(message, th);
+                LogUtil.error(LOG, th, "could not add entry to PublishQueue");
             }
         } // end for
 
@@ -1590,11 +1532,9 @@ public class X509Ca {
                             unrevokedCert);
                 } catch (RuntimeException ex) {
                     successful = false;
-                    final String msg =
+                    LogUtil.error(LOG, ex,
                             "could not publish unrevocation of certificate to the publisher "
-                            + publisher.getName();
-                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                    LOG.debug(msg, ex);
+                            + publisher.getName());
                 }
 
                 if (successful) {
@@ -1607,9 +1547,7 @@ public class X509Ca {
                 certstore.addToPublishQueue(publisher.getName(), certId.intValue(),
                         caInfo.getCertificate());
             } catch (Throwable th) {
-                final String message = "could not add entry to PublishQueue";
-                LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
-                LOG.debug(message, th);
+                LogUtil.error(LOG, th, "could not add entry to PublishQueue");
             }
         } // end for
 
@@ -1663,8 +1601,7 @@ public class X509Ca {
             } catch (RuntimeException ex) {
                 final String message = "could not publish revocation of CA to the publisher "
                         + publisher.getName();
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(message, ex);
+                LogUtil.error(LOG, ex, message);
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
         } // end for
@@ -1687,8 +1624,7 @@ public class X509Ca {
             } catch (RuntimeException ex) {
                 final String message = "could not publish revocation of CA to the publisher "
                         + publisher.getName();
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(message, ex);
+                LogUtil.error(LOG, ex, message);
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
         } // end for
@@ -2069,10 +2005,7 @@ public class X509Ca {
             } catch (BadCertTemplateException ex) {
                 throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
             } catch (Throwable th) {
-                final String message = "could not generate certificate";
-                LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
-                LOG.debug(message, th);
-
+                LogUtil.error(LOG, th, "could not generate certificate");
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                         th.getClass().getName() + ": " + th.getMessage());
             }
@@ -2226,10 +2159,7 @@ public class X509Ca {
                 try {
                     removed = doRemoveCertificate(serial) != null;
                 } catch (Throwable th) {
-                    final String message = "could not remove expired certificate";
-                    LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(),
-                            th.getMessage());
-
+                    LogUtil.error(LOG, th, "could not remove expired certificate");
                     if (!removed) {
                         return sum;
                     }

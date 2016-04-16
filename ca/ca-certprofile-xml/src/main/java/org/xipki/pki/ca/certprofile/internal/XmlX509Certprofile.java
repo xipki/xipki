@@ -292,9 +292,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         try {
             doInitialize(data);
         } catch (RuntimeException ex) {
-            final String message = "RuntimeException";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex);
             throw new CertprofileException(
                     "caught RuntimeException while initializing certprofile: " + ex.getMessage());
         }

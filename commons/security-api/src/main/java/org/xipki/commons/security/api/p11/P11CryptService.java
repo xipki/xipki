@@ -70,18 +70,10 @@ public class P11CryptService {
             try {
                 slot = module.getSlot(slotId);
             } catch (P11TokenException ex) {
-                final String msg = "P11TokenException while initializing slot " + slotId;
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                }
-                LOG.debug(msg, ex);
+                LogUtil.warn(LOG, ex, "P11TokenException while initializing slot " + slotId);
                 continue;
             } catch (Throwable th) {
-                final String msg = "unexpected error while initializing slot " + slotId;
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
-                }
-                LOG.debug(msg, th);
+                LogUtil.warn(LOG, th, "unexpected error while initializing slot " + slotId);
                 continue;
             }
 

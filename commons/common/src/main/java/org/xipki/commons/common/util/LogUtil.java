@@ -36,6 +36,8 @@
 
 package org.xipki.commons.common.util;
 
+import org.slf4j.Logger;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -46,11 +48,82 @@ public class LogUtil {
     private LogUtil() {
     }
 
-    public static String getErrorLog(
-            final String message) {
-        return StringUtil.isBlank(message)
-                ? "{}: {}"
-                : message + ", {}: {}";
+    public static void error(
+            final Logger log,
+            final Throwable th) {
+        if (!log.isErrorEnabled()) {
+            return;
+        }
+
+        // this operation is expensive, hence don't abuse it.
+        StackTraceElement[] traces = Thread.currentThread().getStackTrace();
+        if (traces.length > 2) {
+            StackTraceElement trace = traces[2];
+            log.error("({} {}), {}: {}", trace.getMethodName(), trace.getLineNumber(),
+                    th.getClass().getName(), th.getMessage());
+        } else {
+            log.error("{}: {}", th.getClass().getName(), th.getMessage());
+        }
+        log.debug("Exception", th);
+    }
+
+    public static void error(
+            final Logger log,
+            final Throwable th,
+            final String msg) {
+        if (!log.isErrorEnabled()) {
+            return;
+        }
+
+        // this operation is expensive, hence don't abuse it.
+        StackTraceElement[] traces = Thread.currentThread().getStackTrace();
+        if (traces.length > 2) {
+            StackTraceElement trace = traces[2];
+            log.error("({} {}) {}, {}: {}", trace.getMethodName(), trace.getLineNumber(), msg,
+                    th.getClass().getName(), th.getMessage());
+        } else {
+            log.error("{}, {}: {}", msg, th.getClass().getName(), th.getMessage());
+        }
+        log.debug(msg, th);
+    }
+
+    public static void warn(
+            final Logger log,
+            final Throwable th) {
+        if (!log.isWarnEnabled()) {
+            return;
+        }
+
+        // this operation is expensive, don't abuse it.
+        StackTraceElement[] traces = Thread.currentThread().getStackTrace();
+        if (traces.length > 2) {
+            StackTraceElement trace = traces[2];
+            log.error("({} {}), {}: {}", trace.getMethodName(), trace.getLineNumber(),
+                    th.getClass().getName(), th.getMessage());
+        } else {
+            log.warn("{}: {}", th.getClass().getName(), th.getMessage());
+        }
+        log.debug("Exception", th);
+    }
+
+    public static void warn(
+            final Logger log,
+            final Throwable th,
+            final String msg) {
+        if (!log.isWarnEnabled()) {
+            return;
+        }
+
+        // this operation is expensive, hence don't abuse it.
+        StackTraceElement[] traces = Thread.currentThread().getStackTrace();
+        if (traces.length > 2) {
+            StackTraceElement trace = traces[2];
+            log.warn("({} {}) {}, {}: {}", trace.getMethodName(), trace.getLineNumber(), msg,
+                    th.getClass().getName(), th.getMessage());
+        } else {
+            log.warn("{}, {}: {}", msg, th.getClass().getName(), th.getMessage());
+        }
+        log.debug(msg, th);
     }
 
 }

@@ -208,9 +208,7 @@ class P11RSAContentSigner implements ContentSigner {
 
             return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
         } catch (SecurityException | P11TokenException ex) {
-            final String message = "could not sign";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex, "could not sign");
             throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
         }
     }

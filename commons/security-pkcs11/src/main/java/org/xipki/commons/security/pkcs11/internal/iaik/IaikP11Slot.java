@@ -157,11 +157,7 @@ class IaikP11Slot extends AbstractP11Slot {
         try {
             session = openSession(false);
         } catch (P11TokenException ex) {
-            final String message = "openSession";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            }
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex, "openSession");
             close();
             throw ex;
         }
@@ -169,11 +165,7 @@ class IaikP11Slot extends AbstractP11Slot {
         try {
             firstLogin(session, password);
         } catch (P11TokenException ex) {
-            final String message = "firstLogin";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            }
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex, "firstLogin");
             close();
             throw ex;
         }
@@ -251,19 +243,12 @@ class IaikP11Slot extends AbstractP11Slot {
             try {
                 analyseSingleKey(privKey, ret);
             } catch (SecurityException ex) {
-                final String msg = "SecurityException while initializing key with id " + hex(keyId);
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                }
-                LOG.debug(msg, ex);
+                LogUtil.error(LOG, ex,
+                        "SecurityException while initializing key with id " + hex(keyId));
                 continue;
             } catch (Throwable th) {
-                final String msg =
-                        "unexpected exception while initializing key with id " + hex(keyId);
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
-                }
-                LOG.debug(msg, th);
+                LogUtil.error(LOG, th,
+                        "unexpected exception while initializing key with id " + hex(keyId));
                 continue;
             }
         } // end for (PrivateKey signatureKey : signatureKeys)
@@ -285,11 +270,7 @@ class IaikP11Slot extends AbstractP11Slot {
                     session.closeSession();
                 }
             } catch (Throwable th) {
-                final String msg = "could not slot.getToken().closeAllSessions()";
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
-                }
-                LOG.debug(msg, th);
+                LogUtil.error(LOG, th, "could not slot.getToken().closeAllSessions()");
             }
 
             slot = null;
@@ -528,9 +509,7 @@ class IaikP11Slot extends AbstractP11Slot {
         try {
             loginRequired = session.getToken().getTokenInfo().isLoginRequired();
         } catch (TokenException ex) {
-            String msg = "could not check whether LoginRequired of token";
-            LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(msg, ex);
+            LogUtil.error(LOG, ex, "could not check whether LoginRequired of token");
             loginRequired = true;
         }
 

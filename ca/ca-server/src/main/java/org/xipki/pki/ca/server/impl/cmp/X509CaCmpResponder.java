@@ -507,12 +507,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 certResponses[i] = generateCertificate(certTemplateData, tmpRequestor, user, tid,
                         certReqId, keyUpdate, confirmWaitTime, childAuditEvent);
             } catch (CMPException ex) {
-                final String msg = "generateCertificate";
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                }
-                LOG.debug(msg, ex);
-
+                LogUtil.warn(LOG, ex, "generateCertificate");
                 certResponses[i] = new CertResponse(certReqId,
                         generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate,
                                 ex.getMessage()));
@@ -980,12 +975,8 @@ public class X509CaCmpResponder extends CmpResponder {
             try {
                 ca.revokeCertificate(serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date());
             } catch (OperationException ex) {
-                final String msg = "could not revoke certificate ca=" + ca.getCaInfo().getName()
-                        + " serialNumber=" + serialNumber;
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                }
-                LOG.debug(msg, ex);
+                LogUtil.warn(LOG, ex, "could not revoke certificate ca=" + ca.getCaInfo().getName()
+                        + " serialNumber=" + serialNumber);
             }
 
             successful = false;
@@ -1050,9 +1041,7 @@ public class X509CaCmpResponder extends CmpResponder {
             ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(publicKey);
             return certRequest.isValidSigningKeyPOP(cvp);
         } catch (InvalidKeyException | IllegalStateException | CRMFException ex) {
-            final String message = "verifyPOP";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex);
         }
         return false;
     } // method verifyPopo

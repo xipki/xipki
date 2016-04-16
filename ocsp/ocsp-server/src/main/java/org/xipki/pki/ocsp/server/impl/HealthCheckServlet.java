@@ -112,18 +112,11 @@ public class HealthCheckServlet extends HttpServlet {
             response.setContentLength(respBytes.length);
             response.getOutputStream().write(respBytes);
         } catch (EOFException ex) {
-            final String message = "connection reset by peer";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            }
-            LOG.debug(message, ex);
-
+            LogUtil.warn(LOG, ex, "connection reset by peer");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } catch (Throwable th) {
-            final String message = "Throwable thrown, this should not happen";
-            LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
-            LOG.debug(message, th);
+            LogUtil.error(LOG, th, "Throwable thrown, this should not happen");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         }
