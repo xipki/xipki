@@ -205,8 +205,7 @@ public class ScepServlet extends HttpServlet {
                     reqMessage = new CMSSignedData(content);
                 } catch (Exception ex) {
                     final String msg = "invalid request";
-                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                    LOG.debug(msg, ex);
+                    LogUtil.error(LOG, ex, msg);
 
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.setContentLength(0);
@@ -221,8 +220,7 @@ public class ScepServlet extends HttpServlet {
                     ci = responder.servicePkiOperation(reqMessage, certProfileName, auditEvent);
                 } catch (MessageDecodingException ex) {
                     final String msg = "could not decrypt and/or verify the request";
-                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                    LOG.debug(msg, ex);
+                    LogUtil.error(LOG, ex, msg);
 
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.setContentLength(0);
@@ -232,8 +230,7 @@ public class ScepServlet extends HttpServlet {
                     return;
                 } catch (OperationException ex) {
                     final String msg = "system internal error";
-                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                    LOG.debug(msg, ex);
+                    LogUtil.error(LOG, ex, msg);
 
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.setContentLength(0);
@@ -277,7 +274,7 @@ public class ScepServlet extends HttpServlet {
         } catch (EOFException ex) {
             final String msg = "connection reset by peer";
             if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
+                LogUtil.warn(LOG, ex, msg);
             }
             LOG.debug(msg, ex);
 

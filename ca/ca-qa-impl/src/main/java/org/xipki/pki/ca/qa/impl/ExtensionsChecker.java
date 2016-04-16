@@ -561,9 +561,7 @@ public class ExtensionsChecker {
             // constant extensions
             this.constantExtensions = buildConstantExtesions(extensionsType);
         } catch (RuntimeException ex) {
-            final String message = "RuntimeException";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex);
             throw new CertprofileException(
                     "RuntimeException thrown while initializing certprofile: " + ex.getMessage());
         }

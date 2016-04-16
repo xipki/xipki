@@ -419,9 +419,7 @@ public class Scep {
         try {
             ca = caManager.getX509Ca(caName);
         } catch (CaMgmtException ex) {
-            final String message = tid + "=" + tid + ",could not get X509CA";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex, tid + "=" + tid + ",could not get X509CA");
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
 
@@ -608,8 +606,7 @@ public class Scep {
         } catch (CertificateException ex) {
             final String message = "could not get certificate (CA='" + caName
                     + "' and serialNumber='" + serialNumber + "')";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex, message);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
         if (cert == null) {
@@ -656,9 +653,7 @@ public class Scep {
             CMSSignedData signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
             return (SignedData) signedData.toASN1Structure().getContent();
         } catch (CMSException | IOException | CertificateEncodingException ex) {
-            final String message = "error in buildSignedData";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     } // method buildSignedData
@@ -678,9 +673,7 @@ public class Scep {
         try {
             signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
         } catch (CMSException ex) {
-            final String message = "could not generate CMSSignedData";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex, "could not generate CMSSignedData");
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
         return (SignedData) signedData.toASN1Structure().getContent();
@@ -708,9 +701,7 @@ public class Scep {
                     signatureAlgorithm, responderCert, cmsCertSet,
                     request.getSignatureCert(), request.getContentEncryptionAlgorithm());
         } catch (MessageEncodingException ex) {
-            final String message = "could not encode response";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex, "could not encode response");
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
         return ci;

@@ -99,10 +99,10 @@ import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
-import org.xipki.pki.ocsp.api.OcspStore;
-import org.xipki.pki.ocsp.api.OcspStoreException;
 import org.xipki.pki.ocsp.api.CertprofileOption;
 import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
+import org.xipki.pki.ocsp.api.OcspStore;
+import org.xipki.pki.ocsp.api.OcspStoreException;
 
 /**
  * @author Lijun Liao
@@ -541,9 +541,7 @@ public class CrlCertStatusStore extends OcspStore {
             updateCrlSuccessful = true;
             LOG.info("updated CertStore {}", getName());
         } catch (Exception ex) {
-            final String message = "could not execute initializeStore()";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex, "could not execute initializeStore()");
             initializationFailed = true;
             initialized = true;
         } finally {
@@ -886,9 +884,7 @@ public class CrlCertStatusStore extends OcspStore {
                 try {
                     aki = X509Util.extractAki(bcCert);
                 } catch (CertificateEncodingException ex) {
-                    final String msg = "could not extract AuthorityKeyIdentifier";
-                    LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                    LOG.debug(msg, ex);
+                    LogUtil.error(LOG, ex, "could not extract AuthorityKeyIdentifier");
                 }
 
                 if (aki == null || !Arrays.equals(issuerSki, aki)) {

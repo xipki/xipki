@@ -78,9 +78,8 @@ public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
             try {
                 tester = nextTester();
             } catch (Exception ex) {
-                String msg = "ERROR while getting nextTester";
-                LOG.error(LogUtil.getErrorLog(msg), ex.getClass(), ex.getMessage());
-                LOG.debug(msg, ex);
+                String msg = "could not get nextTester";
+                LogUtil.error(LOG, ex, msg);
                 println(msg + ": " + ex.getMessage());
                 continue;
             }

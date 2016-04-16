@@ -68,10 +68,10 @@ import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
-import org.xipki.pki.ocsp.api.OcspStore;
-import org.xipki.pki.ocsp.api.OcspStoreException;
 import org.xipki.pki.ocsp.api.CertprofileOption;
 import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
+import org.xipki.pki.ocsp.api.OcspStore;
+import org.xipki.pki.ocsp.api.OcspStoreException;
 
 /**
  * @author Lijun Liao
@@ -273,9 +273,7 @@ public class DbCertStatusStore extends OcspStore {
                 releaseDbResources(ps, rs);
             }
         } catch (Exception ex) {
-            final String message = "could not executing initializeStore()";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex, "could not executing initializeStore()");
             initializationFailed = true;
             initialized = true;
         }
@@ -472,9 +470,7 @@ public class DbCertStatusStore extends OcspStore {
                 releaseDbResources(ps, rs);
             }
         } catch (Exception ex) {
-            final String message = "isHealthy()";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex);
             return false;
         }
     }

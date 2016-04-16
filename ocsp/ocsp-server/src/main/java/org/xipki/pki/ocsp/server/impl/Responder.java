@@ -39,8 +39,8 @@ package org.xipki.pki.ocsp.server.impl;
 import java.util.List;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ocsp.api.OcspStore;
 import org.xipki.pki.ocsp.api.CertprofileOption;
+import org.xipki.pki.ocsp.api.OcspStore;
 
 /**
  * @author Lijun Liao

@@ -358,9 +358,7 @@ public class CertificateStore {
         try {
             return queryExecutor.getCertStatusForSubject(caCert, subject);
         } catch (DataAccessException ex) {
-            final String message = "queryExecutor.getCertStatusForSubject";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(message, ex);
+            LogUtil.error(LOG, ex, "queryExecutor.getCertStatusForSubject");
             return CertStatus.Unknown;
         }
     }

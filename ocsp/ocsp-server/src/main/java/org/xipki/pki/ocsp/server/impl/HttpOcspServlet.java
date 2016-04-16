@@ -222,10 +222,7 @@ public class HttpOcspServlet extends HttpServlet {
                 auditStatus = AuditStatus.FAILED;
                 auditMessage = "bad request";
 
-                final String message = "could not parse the request (OCSPRequest)";
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(message, ex);
-
+                LogUtil.error(LOG, ex, "could not parse the request (OCSPRequest)");
                 return;
             }
 
@@ -300,12 +297,7 @@ public class HttpOcspServlet extends HttpServlet {
                 }
             } // end if (ocspRespWithCacheInfo)
         } catch (EOFException ex) {
-            final String message = "Connection reset by peer";
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            }
-            LOG.debug(message, ex);
-
+            LogUtil.warn(LOG, ex, "Connection reset by peer");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } catch (Throwable th) {
