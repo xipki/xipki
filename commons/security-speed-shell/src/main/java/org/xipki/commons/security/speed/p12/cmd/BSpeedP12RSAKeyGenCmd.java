@@ -36,13 +36,14 @@
 
 package org.xipki.commons.security.speed.p12.cmd;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.speed.cmd.BatchSpeedCommandSupport;
+import org.xipki.commons.security.speed.cmd.RSAControl;
 import org.xipki.commons.security.speed.p12.P12RSAKeyGenLoadTest;
 
 /**
@@ -56,16 +57,25 @@ import org.xipki.commons.security.speed.p12.P12RSAKeyGenLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCommandSupport {
 
+    private final BlockingDeque<RSAControl> queue = new LinkedBlockingDeque<>();
+
+    public BSpeedP12RSAKeyGenCmd() {
+        queue.add(new RSAControl(1024));
+        queue.add(new RSAControl(2048));
+        queue.add(new RSAControl(3072));
+        queue.add(new RSAControl(4096));
+    }
+
     @Override
-    protected List<LoadExecutor> getTesters()
+    protected LoadExecutor nextTester()
     throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] keysizes = new int[]{1024, 2048, 3072, 4096};
-        for (int keysize : keysizes) {
-            ret.add(
-                    new P12RSAKeyGenLoadTest(keysize, toBigInt("0x10001"), securityFactory));
+        RSAControl control = queue.takeFirst();
+        if (control == null) {
+            return null;
         }
-        return ret;
+
+        return new P12RSAKeyGenLoadTest(control.getModulusLen(), toBigInt("0x10001"),
+                securityFactory);
     }
 
 }

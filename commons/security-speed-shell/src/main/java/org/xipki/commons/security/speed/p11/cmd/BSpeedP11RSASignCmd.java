@@ -36,15 +36,15 @@
 
 package org.xipki.commons.security.speed.p11.cmd;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.speed.cmd.RSAControl;
 import org.xipki.commons.security.speed.p11.P11RSASignLoadTest;
-import org.xipki.commons.security.speed.p11.P11SignLoadTest;
 
 /**
  * @author Lijun Liao
@@ -57,26 +57,26 @@ import org.xipki.commons.security.speed.p11.P11SignLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP11RSASignCmd extends BSpeedP11SignCommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] keysizes = new int[]{1024, 2048, 3072, 4096};
+    private final BlockingDeque<RSAControl> queue = new LinkedBlockingDeque<>();
 
-        P11Slot slot = getSlot();
-        try {
-            for (int keysize : keysizes) {
-                ret.add(new P11RSASignLoadTest(securityFactory, slot, sigAlgo, keysize,
-                                toBigInt("0x10001")));
-            }
-        } catch (Exception ex) {
-            for (LoadExecutor exec : ret) {
-                ((P11SignLoadTest) exec).close();
-            }
-            throw ex;
+    public BSpeedP11RSASignCmd() {
+        queue.add(new RSAControl(1024));
+        queue.add(new RSAControl(2048));
+        queue.add(new RSAControl(3072));
+        queue.add(new RSAControl(4096));
+    }
+
+    @Override
+    protected LoadExecutor nextTester()
+    throws Exception {
+        RSAControl control = queue.takeFirst();
+        if (control == null) {
+            return null;
         }
 
-        return ret;
+        P11Slot slot = getSlot();
+        return new P11RSASignLoadTest(securityFactory, slot, sigAlgo, control.getModulusLen(),
+                                toBigInt("0x10001"));
     }
 
 }

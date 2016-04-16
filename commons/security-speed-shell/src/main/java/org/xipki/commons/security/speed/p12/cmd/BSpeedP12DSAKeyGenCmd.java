@@ -36,13 +36,14 @@
 
 package org.xipki.commons.security.speed.p12.cmd;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.speed.cmd.BatchSpeedCommandSupport;
+import org.xipki.commons.security.speed.cmd.DSAControl;
 import org.xipki.commons.security.speed.p12.P12DSAKeyGenLoadTest;
 
 /**
@@ -56,21 +57,24 @@ import org.xipki.commons.security.speed.p12.P12DSAKeyGenLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCommandSupport {
 
+    private final BlockingDeque<DSAControl> queue = new LinkedBlockingDeque<>();
+
+    public BSpeedP12DSAKeyGenCmd() {
+        queue.add(new DSAControl(1024, 160));
+        queue.add(new DSAControl(2048, 224));
+        queue.add(new DSAControl(2048, 256));
+        queue.add(new DSAControl(3072, 256));
+    }
+
     @Override
-    protected List<LoadExecutor> getTesters()
+    protected LoadExecutor nextTester()
     throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
-
-        for (int i = 0; i < pqLens.length; i += 2) {
-            int plen = pqLens[i];
-            int qlen = pqLens[i + 1];
-
-            ret.add(
-                    new P12DSAKeyGenLoadTest(plen, qlen, securityFactory));
+        DSAControl control = queue.takeFirst();
+        if (control == null) {
+            return null;
         }
 
-        return ret;
+        return new P12DSAKeyGenLoadTest(control.getPlen(), control.getQlen(), securityFactory);
     }
 
 }

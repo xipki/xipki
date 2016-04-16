@@ -36,15 +36,15 @@
 
 package org.xipki.commons.security.speed.p11.cmd;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.speed.cmd.DSAControl;
 import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
-import org.xipki.commons.security.speed.p11.P11SignLoadTest;
 
 /**
  * @author Lijun Liao
@@ -57,31 +57,31 @@ import org.xipki.commons.security.speed.p11.P11SignLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP11DSASignCmd extends BSpeedP11SignCommandSupport {
 
+    private final BlockingDeque<DSAControl> queue = new LinkedBlockingDeque<>();
+
+    public BSpeedP11DSASignCmd() {
+        queue.add(new DSAControl(1024, 160));
+        queue.add(new DSAControl(2048, 224));
+        queue.add(new DSAControl(2048, 256));
+        queue.add(new DSAControl(3072, 256));
+    }
+
     @Override
-    protected List<LoadExecutor> getTesters()
+    protected LoadExecutor nextTester()
     throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] pqLens = new int[]{1024, 160, 2048, 224, 2048, 256, 3072, 256};
+        DSAControl control = queue.takeFirst();
+        if (control == null) {
+            return null;
+        }
 
         P11Slot slot = getSlot();
 
-        try {
-            for (int i = 0; i < pqLens.length; i += 2) {
-                int plen = pqLens[i];
-                int qlen = pqLens[i + 1];
-                if (plen == 1024) {
-                    sigAlgo = "SHA1withDSA";
-                }
-
-                ret.add(new P11DSASignLoadTest(securityFactory, slot, sigAlgo, plen, qlen));
-            }
-        } catch (Exception ex) {
-            for (LoadExecutor exec : ret) {
-                ((P11SignLoadTest) exec).close();
-            }
-            throw ex;
+        if (control.getPlen() == 1024) {
+            sigAlgo = "SHA1withDSA";
         }
-        return ret;
+
+        return new P11DSASignLoadTest(securityFactory, slot, sigAlgo, control.getPlen(),
+                control.getQlen());
     }
 
 }

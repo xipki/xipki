@@ -36,13 +36,14 @@
 
 package org.xipki.commons.security.speed.p11.cmd;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.speed.cmd.ECControl;
 import org.xipki.commons.security.speed.p11.P11ECKeyGenLoadTest;
 
 /**
@@ -56,17 +57,24 @@ import org.xipki.commons.security.speed.p11.P11ECKeyGenLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP11ECKeyGenCmd extends BSpeedP11CommandSupport {
 
-    @Override
-    protected List<LoadExecutor> getTesters()
-    throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
+    private final BlockingDeque<ECControl> queue = new LinkedBlockingDeque<>();
 
-        P11Slot slot = getSlot();
+    public BSpeedP11ECKeyGenCmd() {
         for (String curveName : getECCurveNames()) {
-            ret.add(new P11ECKeyGenLoadTest(slot, curveName));
+            queue.add(new ECControl(curveName));
+        }
+    }
+
+    @Override
+    protected LoadExecutor nextTester()
+    throws Exception {
+        ECControl control = queue.takeFirst();
+        if (control == null) {
+            return null;
         }
 
-        return ret;
+        P11Slot slot = getSlot();
+        return new P11ECKeyGenLoadTest(slot, control.getCurveName());
     }
 
 }

@@ -36,13 +36,14 @@
 
 package org.xipki.commons.security.speed.p11.cmd;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.speed.cmd.RSAControl;
 import org.xipki.commons.security.speed.p11.P11RSAKeyGenLoadTest;
 
 /**
@@ -56,17 +57,25 @@ import org.xipki.commons.security.speed.p11.P11RSAKeyGenLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP11RSAKeyGenCmd extends BSpeedP11CommandSupport {
 
+    private final BlockingDeque<RSAControl> queue = new LinkedBlockingDeque<>();
+
+    public BSpeedP11RSAKeyGenCmd() {
+        queue.add(new RSAControl(1024));
+        queue.add(new RSAControl(2048));
+        queue.add(new RSAControl(3072));
+        queue.add(new RSAControl(4096));
+    }
+
     @Override
-    protected List<LoadExecutor> getTesters()
+    protected LoadExecutor nextTester()
     throws Exception {
-        List<LoadExecutor> ret = new LinkedList<>();
-        int[] keysizes = new int[]{1024, 2048, 3072, 4096};
+        RSAControl control = queue.takeFirst();
+        if (control == null) {
+            return null;
+        }
 
         P11Slot slot = getSlot();
-        for (int keysize : keysizes) {
-            ret.add(new P11RSAKeyGenLoadTest(slot, keysize, toBigInt("0x10001")));
-        }
-        return ret;
+        return new P11RSAKeyGenLoadTest(slot, control.getModulusLen(), toBigInt("0x10001"));
     }
 
 }

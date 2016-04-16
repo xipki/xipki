@@ -37,10 +37,12 @@
 package org.xipki.commons.security.speed.cmd;
 
 import java.util.List;
-import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LoadExecutor;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 
@@ -50,6 +52,8 @@ import org.xipki.commons.security.api.util.AlgorithmUtil;
  */
 
 public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BatchSpeedCommandSupport.class);
 
     protected static final String DEFAULT_P11MODULE_NAME =
             P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
@@ -62,17 +66,30 @@ public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
             description = "number of threads")
     private Integer numThreads = 5;
 
-    protected abstract List<LoadExecutor> getTesters()
+    protected abstract LoadExecutor nextTester()
     throws Exception;
 
     @Override
     protected Object doExecute()
-    throws Exception {
-        List<LoadExecutor> testers = getTesters();
-        for (LoadExecutor tester : testers) {
+    throws InterruptedException {
+        while (true) {
+            println("============================================");
+            LoadExecutor tester;
+            try {
+                tester = nextTester();
+            } catch (Exception ex) {
+                String msg = "ERROR while getting nextTester";
+                LOG.error(LogUtil.getErrorLog(msg), ex.getClass(), ex.getMessage());
+                LOG.debug(msg, ex);
+                println(msg + ": " + ex.getMessage());
+                continue;
+            }
+            if (tester == null) {
+                break;
+            }
+
             tester.setDuration(durationInSecond);
             tester.setThreads(Math.min(20, numThreads));
-            System.out.println("============================================");
             tester.test();
             if (tester.isInterrupted()) {
                 throw new InterruptedException("cancelled by the user");
@@ -81,8 +98,8 @@ public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
         return null;
     }
 
-    protected Set<String> getECCurveNames() { // CHECKSTYLE:SKIP
-        return AlgorithmUtil.ECC_CURVE_NAME_OID_MAP.keySet();
+    protected List<String> getECCurveNames() { // CHECKSTYLE:SKIP
+        return AlgorithmUtil.getECCurveNames();
     }
 
 }
