@@ -42,7 +42,6 @@ import java.security.Security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.security.api.XiSecurityConstants;
 
 /**
@@ -79,10 +78,10 @@ public class NssProviderRegister {
                         PROVIDER_NAME);
             }
         } catch (Throwable th) {
-            String msg = "could not initialize SunPKCS11 NSS provider";
+            final String msg = "could not initialize SunPKCS11 NSS provider";
             if (LOG.isInfoEnabled()) {
-                LOG.info(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
-            }
+                LOG.info("{}: {}", msg, th.getMessage());
+            };
             LOG.debug(msg, th);
         }
     }

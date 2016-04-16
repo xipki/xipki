@@ -101,8 +101,7 @@ public class IaikP11CryptServiceEngine extends P11CryptServiceEngine {
             module = Module.getInstance(moduleConf.getNativeLibrary());
         } catch (IOException ex) {
             final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
-            LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-            LOG.debug(msg, ex);
+            LogUtil.error(LOG, ex, msg);
             throw new P11TokenException(msg, ex);
         }
 
@@ -110,9 +109,7 @@ public class IaikP11CryptServiceEngine extends P11CryptServiceEngine {
             module.initialize(new DefaultInitializeArgs());
         } catch (PKCS11Exception ex) {
             if (ex.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
-                final String msg = "PKCS11Exception";
-                LOG.error(LogUtil.getErrorLog(msg), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(msg, ex);
+                LogUtil.error(LOG, ex);
                 close(moduleConf.getName(), module);
                 throw new P11TokenException(ex.getMessage(), ex);
             } else {
@@ -126,9 +123,7 @@ public class IaikP11CryptServiceEngine extends P11CryptServiceEngine {
                 }
             }
         } catch (Throwable th) {
-            final String msg = "unexpected Exception: ";
-            LOG.error(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
-            LOG.debug(msg, th);
+            LogUtil.error(LOG, th, "unexpected Exception");
             close(moduleConf.getName(), module);
             throw new P11TokenException(th.getMessage());
         }
@@ -150,9 +145,7 @@ public class IaikP11CryptServiceEngine extends P11CryptServiceEngine {
         try {
             module.finalize(null);
         } catch (Throwable th) {
-            final String message = "could not clonse module " + modulePath;
-            LOG.error(LogUtil.getErrorLog(message), th.getClass().getName(), th.getMessage());
-            LOG.debug(message, th);
+            LogUtil.error(LOG, th, "could not clonse module " + modulePath);
         }
     }
 

@@ -157,9 +157,7 @@ public class HttpProxyServlet extends HttpServlet {
             } catch (Exception ex) {
                 response.setContentLength(0);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                final String message = "could not parse the request (PKIMessage)";
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-                LOG.debug(message, ex);
+                LogUtil.error(LOG, ex, "could not parse the request (PKIMessage)");
                 return;
             }
 
@@ -172,17 +170,11 @@ public class HttpProxyServlet extends HttpServlet {
             asn1Out.writeObject(pkiResp);
             asn1Out.flush();
         } catch (EOFException ex) {
-            final String message = "connection reset by peer";
-            if (LOG.isWarnEnabled()) {
-                LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            }
-            LOG.debug(message, ex);
+            LogUtil.warn(LOG, ex, "connection reset by peer");
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } catch (Throwable th) {
-            String msg = "Throwable thrown, this should not happen.";
-            LOG.error(LogUtil.getErrorLog(msg), th.getClass().getName(), th.getMessage());
-            LOG.debug(msg, th);
+            LogUtil.error(LOG, th, "Throwable thrown, this should not happen.");
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } finally {

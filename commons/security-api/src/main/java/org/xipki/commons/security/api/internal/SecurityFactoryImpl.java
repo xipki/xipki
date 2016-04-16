@@ -213,9 +213,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             return p10Request.isSignatureValid(cvp);
         } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
                 | InvalidKeySpecException ex) {
-            String message = "could not validate POPO of PKCS#10 request";
-            LOG.error(LogUtil.getErrorLog(message), ex.getClass().getName(), ex.getMessage());
-            LOG.error(message, ex);
+            LogUtil.error(LOG, ex, "could not validate POPO of PKCS#10 request");
             return false;
         }
     }
