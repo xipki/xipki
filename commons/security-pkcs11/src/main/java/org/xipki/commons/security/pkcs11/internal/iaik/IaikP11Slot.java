@@ -922,7 +922,7 @@ class IaikP11Slot extends AbstractP11Slot {
         } catch (P11TokenException ex) {
             X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
             if (ecParams == null) {
-                throw new IllegalArgumentException("could not ge X9ECParameters for curve "
+                throw new IllegalArgumentException("could not get X9ECParameters for curve "
                         + curveId.getId());
             }
 
@@ -941,43 +941,51 @@ class IaikP11Slot extends AbstractP11Slot {
             final PublicKey publicKey)
     throws P11TokenException {
         final String label = toString(privateKey.getLabel());
-        KeyPair keypair;
         byte[] id;
 
-        Session session = borrowWritableSession();
         try {
-            if (labelExists(session, label)) {
-                throw new IllegalArgumentException(
-                        "label " + label + " exists, please specify another one");
-            }
-
-            id = generateKeyId(session);
-            privateKey.getId().setByteArrayValue(id);
-            publicKey.getId().setByteArrayValue(id);
+            KeyPair keypair;
+            Session session = borrowWritableSession();
             try {
-                keypair = session.generateKeyPair(Mechanism.get(mech), publicKey, privateKey);
-            } catch (TokenException ex) {
-                throw new P11TokenException(
-                        "could not generate keypair " + P11Constants.getMechanismName(mech), ex);
+                if (labelExists(session, label)) {
+                    throw new IllegalArgumentException(
+                            "label " + label + " exists, please specify another one");
+                }
+
+                id = generateKeyId(session);
+                privateKey.getId().setByteArrayValue(id);
+                publicKey.getId().setByteArrayValue(id);
+                try {
+                    keypair = session.generateKeyPair(Mechanism.get(mech), publicKey, privateKey);
+                } catch (TokenException ex) {
+                    throw new P11TokenException(
+                            "could not generate keypair " + P11Constants.getMechanismName(mech), ex);
+                }
+            } finally {
+                returnWritableSession(session);
             }
-        } finally {
-            returnWritableSession(session);
-        }
 
-        P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
-        P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId);
-        java.security.PublicKey jcePublicKey;
-        try {
-            jcePublicKey = generatePublicKey(keypair.getPublicKey());
-        } catch (SecurityException ex) {
-            throw new P11TokenException("could not generate public key " + objId, ex);
-        }
+            P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
+            P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId);
+            java.security.PublicKey jcePublicKey;
+            try {
+                jcePublicKey = generatePublicKey(keypair.getPublicKey());
+            } catch (SecurityException ex) {
+                throw new P11TokenException("could not generate public key " + objId, ex);
+            }
 
-        PrivateKey privateKey2 = getPrivateKeyObject(id, label.toCharArray());
-        if (privateKey2 == null) {
-            throw new P11TokenException("could not read the generated privateKey");
+            PrivateKey privateKey2 = getPrivateKeyObject(id, label.toCharArray());
+            if (privateKey2 == null) {
+                throw new P11TokenException("could not read the generated privateKey");
+            }
+            return new IaikP11Identity(this, entityId, privateKey2, jcePublicKey, null);
+        } catch (P11TokenException ex) {
+            removeObjects(label);
+            throw ex;
+        } catch (RuntimeException ex) {
+            removeObjects(label);
+            throw ex;
         }
-        return new IaikP11Identity(this, entityId, privateKey2, jcePublicKey, null);
     }
 
     private static X509PublicKeyCertificate createPkcs11Template(
