@@ -6,7 +6,6 @@
   <cm:property-placeholder persistent-id="org.xipki.commons.security.pkcs11" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="pkcs11.confFile" value=""/>
-      <cm:property name="pkcs11.engine" value="IAIK-PKCS11"/>
     </cm:default-properties>
   </cm:property-placeholder>
 
@@ -14,8 +13,7 @@
 
   <bean id="p11CryptServiceFactory"
       class="org.xipki.commons.security.pkcs11.internal.P11CryptServiceFactoryImpl"
-      destroy-method="shutdown">
-    <property name="pkcs11Engine" value="${pkcs11.engine}"/>
+      init-method="init" destroy-method="shutdown">
     <property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>
     <property name="securityFactory" ref="securityFactory"/>
   </bean>

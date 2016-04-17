@@ -75,6 +75,7 @@ import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11SlotIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1Util;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
@@ -85,6 +86,7 @@ import org.xipki.commons.security.api.exception.P11DuplicateEntityException;
 import org.xipki.commons.security.api.exception.P11UnknownEntityException;
 import org.xipki.commons.security.api.exception.P11UnsupportedMechanismException;
 import org.xipki.commons.security.api.p11.AbstractP11Module;
+import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -96,7 +98,9 @@ import org.xipki.commons.security.api.util.CmpFailureUtil;
  * @since 2.0.0
  */
 
-class ProxyP11Module extends AbstractP11Module {
+public class ProxyP11Module extends AbstractP11Module {
+
+    public static final String PREFIX = "proxy:";
 
     private static final Logger LOG = LoggerFactory.getLogger(ProxyP11Module.class);
 
@@ -118,12 +122,18 @@ class ProxyP11Module extends AbstractP11Module {
 
     private boolean readOnly;
 
-    ProxyP11Module(
+    private ProxyP11Module(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         super(moduleConf);
 
-        ConfPairs confPairs = new ConfPairs(moduleConf.getNativeLibrary());
+        final String modulePath = moduleConf.getNativeLibrary();
+        if (!StringUtil.startsWithIgnoreCase(modulePath, PREFIX)) {
+            throw new IllegalArgumentException("the module path does not starts with " + PREFIX
+                    + ": " + modulePath);
+        }
+
+        ConfPairs confPairs = new ConfPairs(modulePath.substring(PREFIX.length()));
         String urlStr = confPairs.getValue("url");
         try {
             serverUrl = new URL(urlStr);
@@ -138,6 +148,13 @@ class ProxyP11Module extends AbstractP11Module {
             throw new IllegalArgumentException("invalid url: " + urlStr);
         }
         refresh();
+    }
+
+    public static P11Module getInstance(
+            final P11ModuleConf moduleConf)
+    throws P11TokenException {
+        ParamUtil.requireNonNull("moduleConf", moduleConf);
+        return new ProxyP11Module(moduleConf);
     }
 
     @Override
@@ -192,7 +209,8 @@ class ProxyP11Module extends AbstractP11Module {
         setSlots(slots);
     }
 
-    void close() {
+    @Override
+    public void close() {
         for (P11SlotIdentifier slotId : getSlotIdentifiers()) {
             try {
                 getSlot(slotId).close();
