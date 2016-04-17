@@ -80,7 +80,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(QaSystemManagerImpl.class);
 
-    private static Unmarshaller jaxbUnmarshaller;
+    private final Unmarshaller jaxbUnmarshaller;
 
     private String confFile;
 
@@ -90,7 +90,15 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
     private AtomicBoolean initialized = new AtomicBoolean(false);
 
-    public QaSystemManagerImpl() {
+    public QaSystemManagerImpl()
+    throws JAXBException, SAXException {
+        JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+        jaxbUnmarshaller = context.createUnmarshaller();
+
+        final SchemaFactory schemaFact = SchemaFactory.newInstance(
+                javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        URL url = QaSystemManagerImpl.class.getResource("/xsd/caqa-conf.xsd");
+        jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
     }
 
     public String getConfFile() {
@@ -217,21 +225,11 @@ public class QaSystemManagerImpl implements QaSystemManager {
         return x509ProfileMap.get(certprofileName);
     }
 
-    private static QAConfType parseQaConf(
+    private QAConfType parseQaConf(
             final InputStream confStream)
     throws IOException, JAXBException, SAXException {
         JAXBElement<?> rootElement;
         try {
-            if (jaxbUnmarshaller == null) {
-                JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
-                jaxbUnmarshaller = context.createUnmarshaller();
-
-                final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                        javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                URL url = QaSystemManagerImpl.class.getResource("/xsd/caqa-conf.xsd");
-                jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
-            }
-
             rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(confStream);
         } finally {
             confStream.close();
