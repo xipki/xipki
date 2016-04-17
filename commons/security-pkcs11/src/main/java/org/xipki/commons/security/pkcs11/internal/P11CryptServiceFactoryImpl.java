@@ -112,9 +112,9 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
         String nativeLib = conf.getNativeLibrary();
         P11Module p11Module = modules.get(nativeLib);
         if (p11Module == null) {
-            if (StringUtil.startsWithIgnoreCase(nativeLib, "proxy:")) {
+            if (StringUtil.startsWithIgnoreCase(nativeLib, ProxyP11Module.PREFIX)) {
                 p11Module = ProxyP11Module.getInstance(conf);
-            } else if (StringUtil.startsWithIgnoreCase(nativeLib, "emulator:")) {
+            } else if (StringUtil.startsWithIgnoreCase(nativeLib, EmulatorP11Module.PREFIX)) {
                 p11Module = EmulatorP11Module.getInstance(conf);
             } else {
                 p11Module = IaikP11Module.getInstance(conf);
