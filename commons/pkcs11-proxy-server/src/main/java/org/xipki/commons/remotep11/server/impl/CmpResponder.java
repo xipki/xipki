@@ -85,7 +85,7 @@ import org.xipki.commons.pkcs11proxy.common.Asn1P11ObjectIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11Params;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11SlotIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1RSAPkcsPssParams;
-import org.xipki.commons.pkcs11proxy.common.Asn1RemoveCertsParams;
+import org.xipki.commons.pkcs11proxy.common.Asn1RemoveObjectsParams;
 import org.xipki.commons.pkcs11proxy.common.Asn1SignTemplate;
 import org.xipki.commons.pkcs11proxy.common.Asn1Util;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
@@ -351,9 +351,9 @@ class CmpResponder {
             slot.updateCertificate(asn1.getEntityId().getObjectId().getObjectId(),
                     new X509CertificateObject(asn1.getCertificate()));
         } else if (P11ProxyConstants.ACTION_removeObjects == action) {
-            Asn1RemoveCertsParams asn1 = Asn1RemoveCertsParams.getInstance(reqValue);
+            Asn1RemoveObjectsParams asn1 = Asn1RemoveObjectsParams.getInstance(reqValue);
             P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());
-            int num = slot.removeObjects(asn1.getObjectLabel());
+            int num = slot.removeObjects(asn1.getObjectId(), asn1.getObjectLabel());
             respItvInfoValue = new ASN1Integer(num);
         } else {
             final String statusMessage = "unsupported XiPKI action code '" + action + "'";

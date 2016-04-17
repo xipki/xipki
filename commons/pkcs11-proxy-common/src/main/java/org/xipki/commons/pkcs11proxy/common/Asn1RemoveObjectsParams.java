@@ -38,12 +38,15 @@ package org.xipki.commons.pkcs11proxy.common;
 
 import java.io.IOException;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.util.Arrays;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.exception.BadAsn1ObjectException;
@@ -52,9 +55,10 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 /**
  *
  * <pre>
- * RemoveCertsParams ::= SEQUENCE {
+ * RemoveObjectsParams ::= SEQUENCE {
  *     slotId     SlotIdentifier,
- *     label      UTF8String
+ *     id         OCTET STRING OPTIONAL, -- at least one of id and label must be present
+ *     label      UTF8String OPTIONAL
  *     }
  * </pre>
  *
@@ -62,43 +66,76 @@ import org.xipki.commons.security.api.p11.P11SlotIdentifier;
  * @since 2.0.0
  */
 
-public class Asn1RemoveCertsParams extends ASN1Object {
+public class Asn1RemoveObjectsParams extends ASN1Object {
 
     private final Asn1P11SlotIdentifier slotId;
 
+    private final byte[] objectId;
+
     private final String objectLabel;
 
-    public Asn1RemoveCertsParams(
+    public Asn1RemoveObjectsParams(
             final P11SlotIdentifier slotId,
+            final byte[] objectId,
             final String objectLabel) {
         ParamUtil.requireNonNull("slotId", slotId);
-        this.objectLabel = ParamUtil.requireNonBlank("objectLabel", objectLabel);
+        if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
+            throw new IllegalArgumentException(
+                    "at least onf of objectId and objectLabel must not be null");
+        }
+
+        this.objectId = objectId;
+        this.objectLabel = objectLabel;
         this.slotId = new Asn1P11SlotIdentifier(slotId);
     }
 
-    private Asn1RemoveCertsParams(
+    private Asn1RemoveObjectsParams(
             final ASN1Sequence seq)
     throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 2, 2);
+        Asn1Util.requireRange(seq, 2, 3);
         int idx = 0;
         slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
-        objectLabel = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-        if (StringUtil.isBlank(objectLabel)) {
-            throw new BadAsn1ObjectException(
-                    "invalid object Asn1RemoveCertsParams: label must not be blank");
+        final int size = seq.size();
+        ASN1Encodable asn1Id = null;
+        ASN1Encodable asn1Label = null;
+        if (size == 2) {
+            ASN1Encodable asn1 = seq.getObjectAt(1);
+            if (asn1 instanceof ASN1String) {
+                asn1Label = asn1;
+                asn1Id = null;
+            } else {
+                asn1Label = null;
+                asn1Id = asn1;
+            }
+        } else {
+            asn1Id = seq.getObjectAt(idx++);
+            asn1Label = seq.getObjectAt(idx++);
+        }
+
+        objectId = (asn1Id == null)
+                ? null
+                : Asn1Util.getOctetStringBytes(asn1Id);
+
+        objectLabel = (asn1Label == null)
+                ? null
+                : Asn1Util.getUtf8String(seq.getObjectAt(idx++));
+
+        if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
+            throw new BadAsn1ObjectException("invalid object Asn1RemoveObjectsParams: "
+                    + "at least one of id and label must not be null");
         }
     }
 
-    public static Asn1RemoveCertsParams getInstance(
+    public static Asn1RemoveObjectsParams getInstance(
             final Object obj)
     throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1RemoveCertsParams) {
-            return (Asn1RemoveCertsParams) obj;
+        if (obj == null || obj instanceof Asn1RemoveObjectsParams) {
+            return (Asn1RemoveObjectsParams) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new Asn1RemoveCertsParams((ASN1Sequence) obj);
+                return new Asn1RemoveObjectsParams((ASN1Sequence) obj);
             } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {
@@ -120,6 +157,10 @@ public class Asn1RemoveCertsParams extends ASN1Object {
 
     public Asn1P11SlotIdentifier getSlotId() {
         return slotId;
+    }
+
+    public byte[] getObjectId() {
+        return Arrays.clone(objectId);
     }
 
     public String getObjectLabel() {
