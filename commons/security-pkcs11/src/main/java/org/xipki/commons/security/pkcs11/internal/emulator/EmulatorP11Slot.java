@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.internal.keystore;
+package org.xipki.commons.security.pkcs11.internal.emulator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -103,7 +103,7 @@ import org.xipki.commons.security.api.util.X509Util;
  * @since 2.0.0
  */
 
-class KeystoreP11Slot extends AbstractP11Slot {
+class EmulatorP11Slot extends AbstractP11Slot {
 
     private static class InfoFilenameFilter implements FilenameFilter {
 
@@ -163,9 +163,9 @@ class KeystoreP11Slot extends AbstractP11Slot {
 
     private final int maxSessions;
 
-    private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Slot.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Slot.class);
 
-    KeystoreP11Slot(
+    EmulatorP11Slot(
             final String moduleName,
             final File slotDir,
             final P11SlotIdentifier slotId,
@@ -304,7 +304,7 @@ class KeystoreP11Slot extends AbstractP11Slot {
                         ? null
                         : new X509Certificate[]{cert.getCert()};
 
-                KeystoreP11Identity identity = new KeystoreP11Identity(this,
+                EmulatorP11Identity identity = new EmulatorP11Identity(this,
                         new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey,
                         certs, maxSessions, securityFactory.getRandom4Sign());
                 LOG.info("added PKCS#11 key {}", p11ObjId);
@@ -815,7 +815,7 @@ class KeystoreP11Slot extends AbstractP11Slot {
         P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
                 new P11ObjectIdentifier(id, label));
         try {
-            return new KeystoreP11Identity(this,identityId, keypair.getPrivate(),
+            return new EmulatorP11Identity(this,identityId, keypair.getPrivate(),
                     keypair.getPublic(), null, maxSessions, securityFactory.getRandom4Sign());
         } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
             throw new P11TokenException(

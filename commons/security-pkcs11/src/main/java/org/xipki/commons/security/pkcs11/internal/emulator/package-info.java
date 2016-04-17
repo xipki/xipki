@@ -34,4 +34,4 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.internal.keystore;
+package org.xipki.commons.security.pkcs11.internal.emulator;

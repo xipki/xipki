@@ -55,8 +55,8 @@ import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11TokenException;
+import org.xipki.commons.security.pkcs11.internal.emulator.EmulatorP11Module;
 import org.xipki.commons.security.pkcs11.internal.iaik.IaikP11Module;
-import org.xipki.commons.security.pkcs11.internal.keystore.KeystoreP11Module;
 import org.xipki.commons.security.pkcs11.internal.proxy.ProxyP11Module;
 
 /**
@@ -115,7 +115,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
             if (StringUtil.startsWithIgnoreCase(nativeLib, "proxy:")) {
                 p11Module = ProxyP11Module.getInstance(conf);
             } else if (StringUtil.startsWithIgnoreCase(nativeLib, "emulator:")) {
-                p11Module = KeystoreP11Module.getInstance(conf);
+                p11Module = EmulatorP11Module.getInstance(conf);
             } else {
                 p11Module = IaikP11Module.getInstance(conf);
             }
