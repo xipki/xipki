@@ -40,6 +40,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
@@ -60,9 +61,15 @@ public class P11ObjectsDeleteCmd extends SecurityCommandSupport {
                     + "(required)")
     protected Integer slotIndex;
 
+    @Option(name = "--id",
+            description = "id of the objects in the PKCS#11 device\n"
+                    + "at least one of id and label must be specified")
+    private String id;
+
     @Option(name = "--label",
-            description = "label of the objects in the PKCS#11 device")
-    protected String label;
+            description = "label of the objects in the PKCS#11 device\n"
+                    + "at least one of id and label must be specified")
+    private String label;
 
     @Option(name = "--module",
             description = "name of the PKCS#11 module")
@@ -73,7 +80,11 @@ public class P11ObjectsDeleteCmd extends SecurityCommandSupport {
     protected Object doExecute()
     throws Exception {
         P11Slot slot = getSlot(moduleName, slotIndex);
-        int num = slot.removeObjects(label);
+        byte[] idBytes = null;
+        if (id != null) {
+            idBytes = Hex.decode(id);
+        }
+        int num = slot.removeObjects(idBytes, label);
         println("deleted " + num + " objects");
         return null;
     }
