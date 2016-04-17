@@ -43,6 +43,7 @@ import java.security.cert.X509Certificate;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.xipki.commons.security.api.exception.P11UnknownEntityException;
 import org.xipki.commons.security.api.exception.P11UnsupportedMechanismException;
@@ -97,8 +98,16 @@ public interface P11Slot {
             @Nonnull X509Certificate newCert)
     throws P11TokenException, SecurityException;
 
+    /**
+     *
+     * @param id id of the objects to be deleted. At least one of id and label must not be null.
+     * @param label label of the objects to be deleted
+     * @return how many objects have been deleted
+     * @throws P11TokenException if PKCS#11 error happens.
+     */
     int removeObjects(
-            @Nonnull String label)
+            @Nullable byte[] id,
+            @Nullable String label)
     throws P11TokenException;
 
     void removeIdentity(

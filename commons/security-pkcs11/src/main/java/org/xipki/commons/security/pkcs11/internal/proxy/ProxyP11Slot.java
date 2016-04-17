@@ -53,6 +53,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.pkcs11proxy.common.Asn1EntityIdAndCert;
 import org.xipki.commons.pkcs11proxy.common.Asn1GenDSAKeypairParams;
 import org.xipki.commons.pkcs11proxy.common.Asn1GenECKeypairParams;
@@ -61,7 +62,7 @@ import org.xipki.commons.pkcs11proxy.common.Asn1P11EntityIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11ObjectIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11ObjectIdentifiers;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11SlotIdentifier;
-import org.xipki.commons.pkcs11proxy.common.Asn1RemoveCertsParams;
+import org.xipki.commons.pkcs11proxy.common.Asn1RemoveObjectsParams;
 import org.xipki.commons.pkcs11proxy.common.Asn1Util;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
 import org.xipki.commons.security.api.X509Cert;
@@ -200,9 +201,14 @@ public class ProxyP11Slot extends AbstractP11Slot {
 
     @Override
     public int removeObjects(
+            final byte[] id,
             final String label)
     throws P11TokenException {
-        Asn1RemoveCertsParams params = new Asn1RemoveCertsParams(slotId, label);
+        if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
+            throw new IllegalArgumentException("at least onf of id and label must not be null");
+        }
+
+        Asn1RemoveObjectsParams params = new Asn1RemoveObjectsParams(slotId, id, label);
         ASN1Encodable resp = module.send(P11ProxyConstants.ACTION_removeObjects, params);
         try {
             return Asn1Util.getInteger(resp).intValue();

@@ -483,17 +483,42 @@ class KeystoreP11Slot extends AbstractP11Slot {
 
     private int deletePkcs11Entry(
             final File dir,
+            final byte[] id,
             final String label)
     throws P11TokenException {
+        if (StringUtil.isBlank(label)) {
+            return deletePkcs11Entry(dir, id)
+                    ? 1
+                    : 0;
+        }
+
+        if (id != null && id.length > 0) {
+            String hextId = Hex.toHexString(id);
+            File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
+            if (!infoFile.exists()) {
+                return 0;
+            }
+
+            Properties props = loadProperties(infoFile);
+            if (!label.equals(props.get(PROP_LABEL))) {
+                return 0;
+            }
+
+            return deletePkcs11Entry(dir, id)
+                    ? 1
+                    : 0;
+        }
+
         File[] infoFiles = dir.listFiles(INFO_FILENAME_FILTER);
         if (infoFiles == null || infoFiles.length == 0) {
             return 0;
         }
 
         List<byte[]> ids = new LinkedList<>();
+
         for (File infoFile : infoFiles) {
             Properties props = loadProperties(infoFile);
-            if (label.equals(props.getProperty("label"))) {
+            if (label.equals(props.getProperty(PROP_LABEL))) {
                 ids.add(getKeyIdFromInfoFilename(infoFile.getName()));
             }
         }
@@ -502,8 +527,8 @@ class KeystoreP11Slot extends AbstractP11Slot {
             return 0;
         }
 
-        for (byte[] id : ids) {
-            deletePkcs11Entry(dir, id);
+        for (byte[] m : ids) {
+            deletePkcs11Entry(dir, m);
         }
         return ids.size();
     }
@@ -689,11 +714,16 @@ class KeystoreP11Slot extends AbstractP11Slot {
 
     @Override
     public int removeObjects(
+            final byte[] id,
             final String label)
     throws P11TokenException {
-        int num = deletePkcs11Entry(privKeyDir, label);
-        num += deletePkcs11Entry(pubKeyDir, label);
-        num += deletePkcs11Entry(certDir, label);
+        if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
+            throw new IllegalArgumentException("at least onf of id and label must not be null");
+        }
+
+        int num = deletePkcs11Entry(privKeyDir, id, label);
+        num += deletePkcs11Entry(pubKeyDir, id, label);
+        num += deletePkcs11Entry(certDir, id, label);
         return num;
     }
 

@@ -65,6 +65,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.p11.AbstractP11Slot;
@@ -808,11 +809,38 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     public int removeObjects(
+            final byte[] id,
             final String label)
     throws P11TokenException {
-        ParamUtil.requireNonBlank("label", label);
-        Storage template = new Storage();
-        template.getLabel().setCharArrayValue(label.toCharArray());
+        if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
+            throw new IllegalArgumentException("at least onf of id and label must not be null");
+        }
+
+        Key keyTemplate = new Key();
+        if (id != null && id.length > 0) {
+            keyTemplate.getId().setByteArrayValue(id);
+        }
+        if (StringUtil.isNotBlank(label)) {
+            keyTemplate.getLabel().setCharArrayValue(label.toCharArray());
+        }
+
+        int num = removeObjects(keyTemplate);
+
+        X509PublicKeyCertificate certTemplate = new X509PublicKeyCertificate();
+        if (id != null && id.length > 0) {
+            certTemplate.getId().setByteArrayValue(id);
+        }
+        if (StringUtil.isNotBlank(label)) {
+            certTemplate.getLabel().setCharArrayValue(label.toCharArray());
+        }
+
+        num += removeObjects(certTemplate);
+        return num;
+    }
+
+    private int removeObjects(
+            final Storage template)
+    throws P11TokenException {
         Session session = borrowWritableSession();
         try {
             List<Storage> objects = getObjects(session, template);
@@ -941,7 +969,7 @@ class IaikP11Slot extends AbstractP11Slot {
             final PublicKey publicKey)
     throws P11TokenException {
         final String label = toString(privateKey.getLabel());
-        byte[] id;
+        byte[] id = null;
 
         try {
             KeyPair keypair;
@@ -958,8 +986,8 @@ class IaikP11Slot extends AbstractP11Slot {
                 try {
                     keypair = session.generateKeyPair(Mechanism.get(mech), publicKey, privateKey);
                 } catch (TokenException ex) {
-                    throw new P11TokenException(
-                            "could not generate keypair " + P11Constants.getMechanismName(mech), ex);
+                    throw new P11TokenException("could not generate keypair "
+                            + P11Constants.getMechanismName(mech), ex);
                 }
             } finally {
                 returnWritableSession(session);
@@ -980,10 +1008,10 @@ class IaikP11Slot extends AbstractP11Slot {
             }
             return new IaikP11Identity(this, entityId, privateKey2, jcePublicKey, null);
         } catch (P11TokenException ex) {
-            removeObjects(label);
+            removeObjects(id, label);
             throw ex;
         } catch (RuntimeException ex) {
-            removeObjects(label);
+            removeObjects(id, label);
             throw ex;
         }
     }
