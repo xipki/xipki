@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.internal.keystore;
+package org.xipki.commons.security.pkcs11.internal.emulator;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -77,9 +77,9 @@ import org.xipki.commons.security.api.util.SignerUtil;
  * @since 2.0.0
  */
 
-public class KeystoreP11Identity extends P11Identity {
+public class EmulatorP11Identity extends P11Identity {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Identity.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Identity.class);
 
     private final PrivateKey privateKey;
 
@@ -89,7 +89,7 @@ public class KeystoreP11Identity extends P11Identity {
 
     private final SecureRandom random;
 
-    public KeystoreP11Identity(
+    public EmulatorP11Identity(
             final P11Slot slot,
             final P11EntityIdentifier identityId,
             final PrivateKey privateKey,

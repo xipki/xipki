@@ -219,16 +219,14 @@ Install
     $XIPKI_HOME/xipki/ca-config/ca-db.properties
     $XIPKI_HOME/xipki/ca-config/ocsp-db.properties
     ```
-* In case if the real PKCS#11 device instead of the simulator is used:
+* In case if the real PKCS#11 device instead of the emulator is used:
 
-  * In file etc/org.xipki.commons.security.pkcs11.cfg, change the pkcs11.engine and pkcs11.confFile as follows:
+  * In file etc/org.xipki.commons.security.pkcs11.cfg, change the pkcs11.confFile as follows:
   
     ```sh
-    pkcs11.engine = IAIK-PKCS11
     pkcs11.confFile = xipki/security/pkcs11-conf-hsm.xml
 
-    #pkcs11.engine = KEYSTORE-PKCS11
-    #pkcs11.confFile = xipki/security/pkcs11-conf-keystore.xml
+    #pkcs11.confFile = xipki/security/pkcs11-conf-emulator.xml
     ```
   * In file xipki/security/pkcs11-conf-hsm.xml, change the PKCS#11 configuration.
     
