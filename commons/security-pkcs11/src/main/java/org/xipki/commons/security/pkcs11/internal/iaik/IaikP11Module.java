@@ -78,9 +78,9 @@ class IaikP11Module extends AbstractP11Module {
             boolean cardPresent = true;
             slotList = module.getSlotList(cardPresent);
         } catch (Throwable th) {
-            LOG.error("module.getSlotList(). {}: {}", th.getClass().getName(), th.getMessage());
-            LOG.debug("module.getSlotList()", th);
-            throw new P11TokenException("could not call module.getSlotList(): " + th.getMessage());
+            final String msg = "could not getSlotList of module " + moduleConf.getName();
+            LogUtil.error(LOG, th, msg);
+            throw new P11TokenException(msg);
         }
 
         if (slotList == null || slotList.length == 0) {
@@ -133,8 +133,7 @@ class IaikP11Module extends AbstractP11Module {
             try {
                 getSlot(slotId).close();
             } catch (Throwable th) {
-                LOG.error("could not close PKCS#11 slot {}: {}", slotId, th.getMessage());
-                LOG.debug("could not close PKCS#11 slot " + slotId, th);
+                LogUtil.error(LOG, th, "could not close PKCS#11 slot " + slotId);
             }
         }
 
