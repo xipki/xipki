@@ -90,7 +90,7 @@ import org.xipki.commons.security.api.ObjectIdentifiers;
 import org.xipki.commons.security.api.SignatureAlgoControl;
 import org.xipki.commons.security.api.exception.InvalidOidOrNameException;
 import org.xipki.commons.security.api.exception.NoIdleSignerException;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
@@ -427,7 +427,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
             final SubjectPublicKeyInfo subjectPublicKeyInfo,
             final X500Name subjectDn,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    throws SecurityException {
+    throws XiSecurityException {
         ParamUtil.requireNonNull("signer", signer);
         ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
         ParamUtil.requireNonNull("subjectDn", subjectDn);
@@ -442,7 +442,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         try {
             return signer.build(p10ReqBuilder);
         } catch (NoIdleSignerException ex) {
-            throw new SecurityException(ex.getMessage(), ex);
+            throw new XiSecurityException(ex.getMessage(), ex);
         }
     }
 }

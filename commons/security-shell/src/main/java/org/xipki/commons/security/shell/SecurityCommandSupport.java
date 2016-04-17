@@ -40,13 +40,13 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -67,7 +67,7 @@ public abstract class SecurityCommandSupport extends XipkiCommandSupport {
     protected P11Slot getSlot(
             final String moduleName,
             final int slotIndex)
-    throws SecurityException, P11TokenException, IllegalCmdParamException {
+    throws XiSecurityException, P11TokenException, IllegalCmdParamException {
         P11Module module = getP11Module(moduleName);
         P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
         return module.getSlot(slotId);
@@ -75,7 +75,7 @@ public abstract class SecurityCommandSupport extends XipkiCommandSupport {
 
     protected P11Module getP11Module(
             final String moduleName)
-    throws SecurityException, P11TokenException, IllegalCmdParamException {
+    throws XiSecurityException, P11TokenException, IllegalCmdParamException {
         P11CryptService p11Service = p11CryppServiceFactory.getP11CryptService(moduleName);
         if (p11Service == null) {
             throw new IllegalCmdParamException("undefined module " + moduleName);

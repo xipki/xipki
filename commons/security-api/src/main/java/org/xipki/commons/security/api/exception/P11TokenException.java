@@ -41,26 +41,22 @@ package org.xipki.commons.security.api.exception;
  * @since 2.0.0
  */
 
-public class SecurityException extends Exception {
+public class P11TokenException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public SecurityException() {
-        super();
-    }
-
-    public SecurityException(
+    public P11TokenException(
             final String message,
             final Throwable cause) {
         super(message, cause);
     }
 
-    public SecurityException(
+    public P11TokenException(
             final String message) {
         super(message);
     }
 
-    public SecurityException(
+    public P11TokenException(
             final Throwable cause) {
         super(cause);
     }

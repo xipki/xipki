@@ -66,9 +66,10 @@ import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.exception.P11DuplicateEntityException;
 import org.xipki.commons.security.api.exception.P11PermissionException;
+import org.xipki.commons.security.api.exception.P11TokenException;
 import org.xipki.commons.security.api.exception.P11UnknownEntityException;
 import org.xipki.commons.security.api.exception.P11UnsupportedMechanismException;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
@@ -139,7 +140,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     protected abstract void doUpdateCertificate(
             final P11ObjectIdentifier objectId,
             final X509Certificate newCert)
-    throws SecurityException, P11TokenException;
+    throws XiSecurityException, P11TokenException;
 
     protected abstract void doRemoveIdentity(
             P11ObjectIdentifier objectId)
@@ -148,7 +149,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     protected abstract void doAddCert(
             @Nonnull final P11ObjectIdentifier objectId,
             @Nonnull final X509Certificate cert)
-    throws P11TokenException, SecurityException;
+    throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:OFF
     protected abstract P11Identity doGenerateDSAKeypair(
@@ -415,7 +416,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     @Override
     public X509Certificate exportCert(
             final P11ObjectIdentifier objectId)
-    throws SecurityException, P11TokenException {
+    throws XiSecurityException, P11TokenException {
         ParamUtil.requireNonNull("objectId", objectId);
         try {
             return getIdentity(objectId).getCertificate();
@@ -470,7 +471,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     @Override
     public P11ObjectIdentifier addCert(
             final X509Certificate cert)
-    throws P11TokenException, SecurityException {
+    throws P11TokenException, XiSecurityException {
         ParamUtil.requireNonNull("cert", cert);
         assertWritable("addCert");
 
@@ -478,7 +479,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         try {
             encodedCert = cert.getEncoded();
         } catch (CertificateEncodingException ex) {
-            throw new SecurityException("could not encode certifiate: " + ex.getMessage(), ex);
+            throw new XiSecurityException("could not encode certifiate: " + ex.getMessage(), ex);
         }
         for (P11ObjectIdentifier objectId : certificates.keySet()) {
             X509Cert tmpCert = certificates.get(objectId);
@@ -499,7 +500,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     public void addCert(
             final P11ObjectIdentifier objectId,
             final X509Certificate cert)
-    throws P11TokenException, SecurityException {
+    throws P11TokenException, XiSecurityException {
         doAddCert(objectId, cert);
         certificates.put(objectId, new X509Cert(cert));
         updateCaCertsOfIdentities();
@@ -646,7 +647,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     public P11ObjectIdentifier generateECKeypair(
             final String curveNameOrOid,
             final String label)
-    throws SecurityException, P11TokenException {
+    throws XiSecurityException, P11TokenException {
         ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
         ParamUtil.requireNonBlank("label", label);
         assertWritable("generateECKeypair");
@@ -667,7 +668,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     public void updateCertificate(
             final P11ObjectIdentifier objectId,
             final X509Certificate newCert)
-    throws SecurityException, P11TokenException {
+    throws XiSecurityException, P11TokenException {
         ParamUtil.requireNonNull("objectId", objectId);
         ParamUtil.requireNonNull("newCert", newCert);
         assertWritable("updateCertificate");
@@ -680,7 +681,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         java.security.PublicKey pk = identity.getPublicKey();
         java.security.PublicKey newPk = newCert.getPublicKey();
         if (!pk.equals(newPk)) {
-            throw new SecurityException("the given certificate is not for the key " + objectId);
+            throw new XiSecurityException("the given certificate is not for the key " + objectId);
         }
 
         doUpdateCertificate(objectId, newCert);
@@ -693,7 +694,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     public void showDetails(
             final OutputStream stream,
             final boolean verbose)
-    throws IOException, SecurityException, P11TokenException {
+    throws IOException, XiSecurityException, P11TokenException {
         ParamUtil.requireNonNull("stream", stream);
 
         List<P11ObjectIdentifier> sortedObjectIds = getSortedObjectIds(identities.keySet());

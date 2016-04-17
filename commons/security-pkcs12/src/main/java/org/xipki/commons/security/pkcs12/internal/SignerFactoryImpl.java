@@ -58,7 +58,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.SignerFactory;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 
 /**
@@ -150,7 +150,7 @@ public class SignerFactoryImpl implements SignerFactory {
             return signerBuilder.createSigner(signatureAlgId, parallelism,
                     securityFactory.getRandom4Sign());
         } catch (NoSuchAlgorithmException | OperatorCreationException | NoSuchPaddingException
-                | SecurityException ex) {
+                | XiSecurityException ex) {
             throw new ObjectCreationException(String.format("%s: %s",
                     ex.getClass().getName(), ex.getMessage()));
         }

@@ -39,7 +39,6 @@ package org.xipki.commons.security.api.exception;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao

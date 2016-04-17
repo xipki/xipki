@@ -36,8 +36,6 @@
 
 package org.xipki.commons.security.api.exception;
 
-import org.xipki.commons.security.api.p11.P11TokenException;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0

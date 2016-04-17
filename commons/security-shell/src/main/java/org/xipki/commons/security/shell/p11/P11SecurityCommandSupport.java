@@ -40,10 +40,10 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
-import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
@@ -76,7 +76,7 @@ public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
     protected String moduleName = DEFAULT_P11MODULE_NAME;
 
     public P11ObjectIdentifier getObjectIdentifier()
-    throws IllegalCmdParamException, SecurityException, P11TokenException {
+    throws IllegalCmdParamException, XiSecurityException, P11TokenException {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objIdentifier;
         if (id != null && label == null) {
@@ -91,7 +91,7 @@ public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
     }
 
     protected P11Slot getSlot()
-    throws SecurityException, P11TokenException, IllegalCmdParamException {
+    throws XiSecurityException, P11TokenException, IllegalCmdParamException {
         return getSlot(moduleName, slotIndex);
     }
 
