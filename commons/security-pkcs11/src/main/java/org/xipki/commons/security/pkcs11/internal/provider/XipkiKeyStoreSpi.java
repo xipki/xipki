@@ -61,7 +61,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11Identity;
@@ -69,7 +70,6 @@ import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * construction of alias:
@@ -161,7 +161,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
         for (String moduleName : moduleNames) {
             try {
                 engineLoad(moduleName);
-            } catch (SecurityException | P11TokenException ex) {
+            } catch (XiSecurityException | P11TokenException ex) {
                 LogUtil.error(LOG, ex, "could not load PKCS#11 module " + moduleName);
             }
         }
@@ -173,7 +173,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
     private void engineLoad(
             final String moduleName)
-    throws P11TokenException, SecurityException {
+    throws P11TokenException, XiSecurityException {
         P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
         P11Module module = p11Service.getModule();
         List<P11SlotIdentifier> slotIds = module.getSlotIdentifiers();

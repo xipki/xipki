@@ -56,8 +56,8 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.pkcs11proxy.common.ServerCaps;
 import org.xipki.commons.security.api.exception.BadAsn1ObjectException;
+import org.xipki.commons.security.api.exception.P11TokenException;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
-import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao

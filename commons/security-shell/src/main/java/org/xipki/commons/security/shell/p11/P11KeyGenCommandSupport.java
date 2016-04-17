@@ -40,10 +40,10 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
-import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.shell.KeyGenCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 
@@ -80,7 +80,7 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
     }
 
     protected P11Slot getSlot()
-    throws SecurityException, P11TokenException, IllegalCmdParamException {
+    throws XiSecurityException, P11TokenException, IllegalCmdParamException {
         return getSlot(moduleName, slotIndex);
     }
 

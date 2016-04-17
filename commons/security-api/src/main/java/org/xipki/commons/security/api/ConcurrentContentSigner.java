@@ -64,7 +64,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.exception.NoIdleSignerException;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 
 /**
  * @author Lijun Liao
@@ -102,7 +102,7 @@ public interface ConcurrentContentSigner {
     void initialize(
             @Nullable String conf,
             @Nullable PasswordResolver passwordResolver)
-    throws SecurityException;
+    throws XiSecurityException;
 
     POPOSigningKey build(
             @Nonnull ProofOfPossessionSigningKeyBuilder builder)

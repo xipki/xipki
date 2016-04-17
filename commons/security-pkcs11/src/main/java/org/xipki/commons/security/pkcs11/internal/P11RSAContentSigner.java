@@ -54,13 +54,13 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.SignerUtil;
 
 /**
@@ -105,7 +105,7 @@ class P11RSAContentSigner implements ContentSigner {
             final P11CryptService cryptService,
             final P11EntityIdentifier identityId,
             final AlgorithmIdentifier signatureAlgId)
-    throws SecurityException, P11TokenException {
+    throws XiSecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
@@ -123,7 +123,7 @@ class P11RSAContentSigner implements ContentSigner {
         } else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid)) {
             hashAlgo = HashAlgoType.SHA512;
         } else {
-            throw new SecurityException("unsupported signature algorithm " + algOid.getId());
+            throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
         }
 
         P11SlotIdentifier slotId = identityId.getSlotId();
@@ -155,7 +155,7 @@ class P11RSAContentSigner implements ContentSigner {
             }
 
             if (!slot.supportsMechanism(this.mechanism)) {
-                throw new SecurityException("unsupported signature algorithm " + algOid.getId());
+                throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
             }
         }
 
@@ -207,7 +207,7 @@ class P11RSAContentSigner implements ContentSigner {
             }
 
             return cryptService.getIdentity(identityId).sign(mechanism, null, dataToSign);
-        } catch (SecurityException | P11TokenException ex) {
+        } catch (XiSecurityException | P11TokenException ex) {
             LogUtil.error(LOG, ex, "could not sign");
             throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
         }

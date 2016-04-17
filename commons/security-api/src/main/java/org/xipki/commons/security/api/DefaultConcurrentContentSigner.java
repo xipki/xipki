@@ -73,7 +73,7 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolver;
 import org.xipki.commons.security.api.exception.NoIdleSignerException;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 
 /**
  * @author Lijun Liao
@@ -191,7 +191,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     public void initialize(
             final String conf,
             final PasswordResolver passwordResolver)
-    throws SecurityException {
+    throws XiSecurityException {
     }
 
     @Override

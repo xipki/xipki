@@ -50,7 +50,8 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.SignerFactory;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -58,7 +59,6 @@ import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 
 /**
@@ -143,7 +143,7 @@ public class SignerFactoryImpl implements SignerFactory {
                     ? module.getSlotIdForId(slotId)
                     : module.getSlotIdForIndex(slotIndex);
             slot = module.getSlot(p11SlotId);
-        } catch (P11TokenException | SecurityException ex) {
+        } catch (P11TokenException | XiSecurityException ex) {
             throw new ObjectCreationException(ex.getMessage(), ex);
         }
 
@@ -170,7 +170,7 @@ public class SignerFactoryImpl implements SignerFactory {
             P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
                     p11Service, securityFactory, entityId, certificateChain);
             return signerBuilder.createSigner(signatureAlgId, parallelism);
-        } catch (P11TokenException | NoSuchAlgorithmException | SecurityException ex) {
+        } catch (P11TokenException | NoSuchAlgorithmException | XiSecurityException ex) {
             throw new ObjectCreationException(ex.getMessage(), ex);
         }
 

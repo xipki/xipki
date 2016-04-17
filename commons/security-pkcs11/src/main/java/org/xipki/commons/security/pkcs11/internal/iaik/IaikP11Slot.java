@@ -67,7 +67,8 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.X509Cert;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.p11.AbstractP11Slot;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -78,7 +79,6 @@ import org.xipki.commons.security.api.p11.P11Params;
 import org.xipki.commons.security.api.p11.P11RSAPkcsPssParams;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotRefreshResult;
-import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
@@ -243,7 +243,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
             try {
                 analyseSingleKey(privKey, ret);
-            } catch (SecurityException ex) {
+            } catch (XiSecurityException ex) {
                 LogUtil.error(LOG, ex,
                         "SecurityException while initializing key with id " + hex(keyId));
                 continue;
@@ -290,7 +290,7 @@ class IaikP11Slot extends AbstractP11Slot {
     private void analyseSingleKey(
             final PrivateKey privKey,
             final P11SlotRefreshResult refreshResult)
-    throws P11TokenException, SecurityException {
+    throws P11TokenException, XiSecurityException {
         byte[] id = privKey.getId().getByteArrayValue();
         java.security.PublicKey pubKey = null;
         X509Cert cert = refreshResult.getCertForId(id);
@@ -698,7 +698,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private static java.security.PublicKey generatePublicKey(
             final PublicKey p11Key)
-    throws SecurityException {
+    throws XiSecurityException {
         if (p11Key instanceof RSAPublicKey) {
             RSAPublicKey rsaP11Key = (RSAPublicKey) p11Key;
             byte[] expBytes = rsaP11Key.getPublicExponent().getByteArrayValue();
@@ -710,7 +710,7 @@ class IaikP11Slot extends AbstractP11Slot {
             try {
                 return KeyUtil.generateRSAPublicKey(keySpec);
             } catch (InvalidKeySpecException ex) {
-                throw new SecurityException(ex.getMessage(), ex);
+                throw new XiSecurityException(ex.getMessage(), ex);
             }
         } else if (p11Key instanceof DSAPublicKey) {
             DSAPublicKey dsaP11Key = (DSAPublicKey) p11Key;
@@ -724,7 +724,7 @@ class IaikP11Slot extends AbstractP11Slot {
             try {
                 return KeyUtil.generateDSAPublicKey(keySpec);
             } catch (InvalidKeySpecException ex) {
-                throw new SecurityException(ex.getMessage(), ex);
+                throw new XiSecurityException(ex.getMessage(), ex);
             }
         } else if (p11Key instanceof ECDSAPublicKey) {
             ECDSAPublicKey ecP11Key = (ECDSAPublicKey) p11Key;
@@ -734,10 +734,10 @@ class IaikP11Slot extends AbstractP11Slot {
             try {
                 return KeyUtil.createECPublicKey(encodedAlgorithmIdParameters, encodedPoint);
             } catch (InvalidKeySpecException ex) {
-                throw new SecurityException(ex.getMessage(), ex);
+                throw new XiSecurityException(ex.getMessage(), ex);
             }
         } else {
-            throw new SecurityException("unknown publicKey class " + p11Key.getClass().getName());
+            throw new XiSecurityException("unknown publicKey class " + p11Key.getClass().getName());
         }
     } // method generatePublicKey
 
@@ -882,7 +882,7 @@ class IaikP11Slot extends AbstractP11Slot {
     protected void doAddCert(
             final P11ObjectIdentifier objectId,
             final X509Certificate cert)
-    throws P11TokenException, SecurityException {
+    throws P11TokenException, XiSecurityException {
         X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
                 new X509Cert(cert), objectId.getId(), objectId.getLabelChars());
         Session session = borrowWritableSession();
@@ -998,7 +998,7 @@ class IaikP11Slot extends AbstractP11Slot {
             java.security.PublicKey jcePublicKey;
             try {
                 jcePublicKey = generatePublicKey(keypair.getPublicKey());
-            } catch (SecurityException ex) {
+            } catch (XiSecurityException ex) {
                 throw new P11TokenException("could not generate public key " + objId, ex);
             }
 
@@ -1066,7 +1066,7 @@ class IaikP11Slot extends AbstractP11Slot {
     protected void doUpdateCertificate(
             final P11ObjectIdentifier objectId,
             final X509Certificate newCert)
-    throws SecurityException, P11TokenException {
+    throws XiSecurityException, P11TokenException {
         removeCerts(objectId);
         try {
             Thread.sleep(1000);

@@ -47,12 +47,12 @@ import org.xipki.commons.pkcs11proxy.common.Asn1P11Params;
 import org.xipki.commons.pkcs11proxy.common.Asn1RSAPkcsPssParams;
 import org.xipki.commons.pkcs11proxy.common.Asn1SignTemplate;
 import org.xipki.commons.pkcs11proxy.common.P11ProxyConstants;
+import org.xipki.commons.security.api.exception.P11TokenException;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11Params;
 import org.xipki.commons.security.api.p11.P11RSAPkcsPssParams;
 import org.xipki.commons.security.api.p11.P11Slot;
-import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao

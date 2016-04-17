@@ -34,29 +34,33 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.api.p11;
+package org.xipki.commons.security.api.exception;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class P11TokenException extends Exception {
+public class XiSecurityException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public P11TokenException(
+    public XiSecurityException() {
+        super();
+    }
+
+    public XiSecurityException(
             final String message,
             final Throwable cause) {
         super(message, cause);
     }
 
-    public P11TokenException(
+    public XiSecurityException(
             final String message) {
         super(message);
     }
 
-    public P11TokenException(
+    public XiSecurityException(
             final Throwable cause) {
         super(cause);
     }
