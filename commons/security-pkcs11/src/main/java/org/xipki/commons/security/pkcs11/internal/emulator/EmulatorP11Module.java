@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.internal.keystore;
+package org.xipki.commons.security.pkcs11.internal.emulator;
 
 import java.io.File;
 import java.util.Collections;
@@ -61,13 +61,13 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  * @since 2.0.0
  */
 
-public class KeystoreP11Module extends AbstractP11Module {
+public class EmulatorP11Module extends AbstractP11Module {
 
     public static final String PREFIX = "emulator:";
 
-    private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Module.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Module.class);
 
-    private KeystoreP11Module(
+    private EmulatorP11Module(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         super(moduleConf);
@@ -161,7 +161,7 @@ public class KeystoreP11Module extends AbstractP11Module {
             PrivateKeyCryptor privateKeyCryptor = new PrivateKeyCryptor(pwd.get(0));
 
             int maxSessions = 20;
-            P11Slot slot = new KeystoreP11Slot(moduleConf.getName(), slotDir, slotId,
+            P11Slot slot = new EmulatorP11Slot(moduleConf.getName(), slotDir, slotId,
                     moduleConf.isReadOnly(), privateKeyCryptor, moduleConf.getSecurityFactory(),
                     moduleConf.getP11MechanismFilter(), maxSessions);
             slots.add(slot);
@@ -174,7 +174,7 @@ public class KeystoreP11Module extends AbstractP11Module {
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
-        return new KeystoreP11Module(moduleConf);
+        return new EmulatorP11Module(moduleConf);
     }
 
     @Override
