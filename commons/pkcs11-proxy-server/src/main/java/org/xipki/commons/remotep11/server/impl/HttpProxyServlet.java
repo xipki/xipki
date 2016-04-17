@@ -110,7 +110,7 @@ public class HttpProxyServlet extends HttpServlet {
                     readOnly = localP11CryptServicePool.getP11CryptService(moduleName).getModule()
                             .isReadOnly();
                 } catch (P11TokenException ex) {
-                    LOG.error("localP11CryptService in servlet not configured");
+                    LogUtil.error(LOG, ex, "localP11CryptService in servlet not configured");
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     return;
                 }
