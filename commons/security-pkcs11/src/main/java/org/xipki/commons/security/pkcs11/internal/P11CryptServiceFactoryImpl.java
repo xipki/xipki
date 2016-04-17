@@ -170,7 +170,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
         try {
             engine.shutdown();
         } catch (Throwable th) {
-            LOG.error("could not shutdown: " + th.getMessage(), th);
+            LogUtil.error(LOG, th, "could not shutdown: " + th.getMessage());
         }
     }
 

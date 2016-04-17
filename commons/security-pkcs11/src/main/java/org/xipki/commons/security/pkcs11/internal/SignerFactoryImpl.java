@@ -45,6 +45,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ObjectCreationException;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerConf;
@@ -193,7 +194,7 @@ public class SignerFactoryImpl implements SignerFactory {
         try {
             p11CryptServiceFactory.shutdown();
         } catch (Throwable th) {
-            LOG.error("could not shutdown KeyStoreP11ModulePool: " + th.getMessage(), th);
+            LogUtil.error(LOG, th, "could not shutdown KeyStoreP11ModulePool");
         }
     }
 

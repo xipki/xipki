@@ -168,8 +168,7 @@ public class XmlX509CertprofileUtil {
                         "parse profile failed, message: " + ex.getMessage(), ex);
             } catch (JAXBException ex) {
                 throw new CertprofileException(
-                        "parse profile failed, message: " + XmlUtil.getMessage((JAXBException) ex),
-                        ex);
+                        "parse profile failed, message: " + XmlUtil.getMessage(ex), ex);
             }
 
             Object rootType = rootElement.getValue();
@@ -250,10 +249,9 @@ public class XmlX509CertprofileUtil {
         ParamUtil.requireNonNull("type", type);
         GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
         GeneralSubtree[] excluded = buildGeneralSubtrees(type.getExcludedSubtrees());
-        if (permitted == null && excluded == null) {
-            return null;
-        }
-        return new NameConstraints(permitted, excluded);
+        return (permitted == null && excluded == null)
+                ? null
+                : new NameConstraints(permitted, excluded);
     } // method buildNameConstrains
 
     private static GeneralSubtree[] buildGeneralSubtrees(

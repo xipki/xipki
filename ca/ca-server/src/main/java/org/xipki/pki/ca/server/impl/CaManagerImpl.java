@@ -175,7 +175,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     }
                 }
             } catch (Throwable th) {
-                LOG.error("could not publish CertsInQueue: {}", th.getMessage());
+                LogUtil.error(LOG, th, "could not publish CertsInQueue");
             } finally {
                 inProcess = false;
             }
@@ -239,7 +239,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     LOG.debug("received no event to restart CA");
                 }
             } catch (Throwable th) {
-                LOG.error("ScheduledCArestarter: " + th.getMessage(), th);
+                LogUtil.error(LOG, th, "ScheduledCARestarter");
             } finally {
                 inProcess = false;
             }

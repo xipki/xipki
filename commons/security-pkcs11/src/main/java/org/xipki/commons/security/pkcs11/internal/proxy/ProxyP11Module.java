@@ -73,6 +73,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.pkcs11proxy.common.Asn1P11SlotIdentifier;
 import org.xipki.commons.pkcs11proxy.common.Asn1Util;
@@ -196,8 +197,7 @@ class ProxyP11Module extends AbstractP11Module {
             try {
                 getSlot(slotId).close();
             } catch (Throwable th) {
-                LOG.error("could not close PKCS#11 slot {}: {}", slotId, th.getMessage());
-                LOG.debug("could not close PKCS#11 slot " + slotId, th);
+                LogUtil.error(LOG, th, "could not close PKCS#11 slot " + slotId);
             }
         }
     }

@@ -74,6 +74,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.pkcs11proxy.common.Asn1EntityIdAndCert;
@@ -194,14 +195,11 @@ class CmpResponder {
         try {
             return doProcessPkiMessage(p11CryptServicePool, moduleName, itv, respHeader);
         } catch (BadAsn1ObjectException ex) {
-            LOG.error("could not process CMP message {}, message: {}", tidStr, ex.getMessage());
-            LOG.debug("could not process CMP message " + tidStr, ex);
-
+            LogUtil.error(LOG, ex, "could not process CMP message " + tidStr);
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                     ex.getMessage());
         } catch (P11TokenException ex) {
-            LOG.error("could not process CMP message {}, message: {}", tidStr, ex.getMessage());
-            LOG.debug("could not process CMP message " + tidStr, ex);
+            LogUtil.error(LOG, ex, "could not process CMP message " + tidStr);
 
             String p11ErrorType;
             if (ex instanceof P11UnknownEntityException) {
@@ -226,8 +224,7 @@ class CmpResponder {
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.badRequest,
                     confPairs.getEncoded());
         } catch (Throwable th) {
-            LOG.error("could not process CMP message {}, message: {}", tidStr, th.getMessage());
-            LOG.debug("could not process CMP message " + tidStr, th);
+            LogUtil.error(LOG, th, "could not process CMP message " + tidStr);
             return createRejectionPkiMessage(respHeader, PKIFailureInfo.systemFailure,
                     "SYSTEM_FAILURE");
         }

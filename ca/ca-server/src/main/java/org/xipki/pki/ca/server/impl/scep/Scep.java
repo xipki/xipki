@@ -774,8 +774,8 @@ public class Scep {
             if (n % 4 == 0) {
                 try {
                     return Base64.decode(tid);
-                } catch (Exception e2) {
-                    LOG.error("could not decode (hex or base64) '{}': {}", tid, e2.getMessage());
+                } catch (Exception ex2) {
+                    LOG.error("could not decode (hex or base64) '{}': {}", tid, ex2.getMessage());
                 }
             }
         }
