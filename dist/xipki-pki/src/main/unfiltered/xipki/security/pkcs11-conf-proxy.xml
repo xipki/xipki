@@ -5,7 +5,7 @@
     <module name="default">
       <nativeLibraries>
         <nativeLibrary>
-          <path>url=https://localhost:9443/p11proxy/default</path>
+          <path>proxy:url=https://localhost:9443/p11proxy/default</path>
         </nativeLibrary>
       </nativeLibraries>
       <includeSlots>
