@@ -40,13 +40,13 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
-import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.speed.cmd.SingleSpeedCommandSupport;
 
 /**
@@ -71,7 +71,7 @@ public abstract class SpeedP11CommandSupport extends SingleSpeedCommandSupport {
     protected String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     protected P11Slot getSlot()
-    throws SecurityException, P11TokenException, IllegalCmdParamException {
+    throws XiSecurityException, P11TokenException, IllegalCmdParamException {
         P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
         if (p11Service == null) {
             throw new IllegalCmdParamException("undefined module " + moduleName);

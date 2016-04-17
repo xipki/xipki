@@ -57,7 +57,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.X509Cert;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -423,7 +423,7 @@ public class X509CaInfo {
 
     public boolean initSigner(
             final SecurityFactory securityFactory)
-    throws SecurityException {
+    throws XiSecurityException {
         if (signers != null) {
             return true;
         }
@@ -448,7 +448,7 @@ public class X509CaInfo {
                     ccs.shutdown();
                 }
                 tmpSigners.clear();
-                throw new SecurityException("could not initialize the CA signer");
+                throw new XiSecurityException("could not initialize the CA signer");
             }
         }
 

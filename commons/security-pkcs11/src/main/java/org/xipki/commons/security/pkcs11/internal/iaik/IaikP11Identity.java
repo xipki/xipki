@@ -43,10 +43,10 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.exception.P11TokenException;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
 import org.xipki.commons.security.api.p11.P11Identity;
 import org.xipki.commons.security.api.p11.P11Params;
-import org.xipki.commons.security.api.p11.P11TokenException;
 
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 

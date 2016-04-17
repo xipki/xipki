@@ -118,7 +118,7 @@ import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.X509Cert;
 import org.xipki.commons.security.api.XiSecurityConstants;
 import org.xipki.commons.security.api.exception.NoIdleSignerException;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.BadFormatException;
@@ -462,7 +462,7 @@ public class X509Ca {
         if (caInfo.isSignerRequired()) {
             try {
                 caInfo.initSigner(securityFactory);
-            } catch (SecurityException ex) {
+            } catch (XiSecurityException ex) {
                 LogUtil.error(LOG, ex,
                         "security.createSigner caSigner (ca=" + caInfo.getName() + ")");
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE,

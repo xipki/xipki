@@ -40,7 +40,8 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 
 /**
  * @author Lijun Liao
@@ -53,7 +54,7 @@ public interface P11CryptServiceFactory {
 
     P11CryptService getP11CryptService(
             @Nonnull String moduleName)
-    throws P11TokenException, SecurityException;
+    throws P11TokenException, XiSecurityException;
 
     Set<String> getModuleNames();
 

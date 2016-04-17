@@ -53,7 +53,7 @@ import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SignerConf;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.util.X509Util;
 
 /**
@@ -100,7 +100,7 @@ public class P12CertUpdateCmd extends P12SecurityCommandSupport {
         }
 
         if (keyname == null) {
-            throw new SecurityException("could not find private key");
+            throw new XiSecurityException("could not find private key");
         }
 
         Key key = ks.getKey(keyname, pwd);

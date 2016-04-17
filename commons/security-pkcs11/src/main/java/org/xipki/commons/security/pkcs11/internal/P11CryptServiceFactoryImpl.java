@@ -48,13 +48,13 @@ import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11Conf;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
-import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.pkcs11.internal.emulator.EmulatorP11Module;
 import org.xipki.commons.security.pkcs11.internal.iaik.IaikP11Module;
 import org.xipki.commons.security.pkcs11.internal.proxy.ProxyP11Module;
@@ -93,7 +93,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
     public synchronized P11CryptService getP11CryptService(
             final String moduleName)
-    throws SecurityException, P11TokenException {
+    throws XiSecurityException, P11TokenException {
         if (p11Conf == null) {
             throw new IllegalStateException("please set pkcs11ConfFile and then call init() first");
         }
@@ -101,7 +101,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
         final String name = getModuleName(moduleName);
         P11ModuleConf conf = p11Conf.getModuleConf(name);
         if (conf == null) {
-            throw new SecurityException("PKCS#11 module " + name + " is not defined");
+            throw new XiSecurityException("PKCS#11 module " + name + " is not defined");
         }
 
         P11CryptService instance = services.get(moduleName);

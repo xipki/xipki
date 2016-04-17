@@ -84,8 +84,9 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.api.HashAlgoType;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.X509Cert;
+import org.xipki.commons.security.api.exception.P11TokenException;
 import org.xipki.commons.security.api.exception.P11UnknownEntityException;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.p11.AbstractP11Slot;
 import org.xipki.commons.security.api.p11.P11Constants;
 import org.xipki.commons.security.api.p11.P11EntityIdentifier;
@@ -94,7 +95,6 @@ import org.xipki.commons.security.api.p11.P11MechanismFilter;
 import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11SlotRefreshResult;
-import org.xipki.commons.security.api.p11.P11TokenException;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 
@@ -678,11 +678,11 @@ class EmulatorP11Slot extends AbstractP11Slot {
             final byte[] id,
             final String label,
             final X509Certificate cert)
-    throws SecurityException, P11TokenException {
+    throws XiSecurityException, P11TokenException {
         try {
             savePkcs11Entry(certDir, id, label, cert.getEncoded());
         } catch (CertificateEncodingException ex) {
-            throw new SecurityException(ex.getMessage(), ex);
+            throw new XiSecurityException(ex.getMessage(), ex);
         }
     }
 
@@ -750,7 +750,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     protected void doAddCert(
             final P11ObjectIdentifier objectId,
             final X509Certificate cert)
-    throws P11TokenException, SecurityException {
+    throws P11TokenException, XiSecurityException {
         savePkcs11Cert(objectId.getId(), objectId.getLabel(), cert);
     }
 
@@ -827,7 +827,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     protected void doUpdateCertificate(
             final P11ObjectIdentifier objectId,
             final X509Certificate newCert)
-    throws SecurityException, P11TokenException {
+    throws XiSecurityException, P11TokenException {
         removePkcs11Cert(objectId);
         doAddCert(objectId, newCert);
     }

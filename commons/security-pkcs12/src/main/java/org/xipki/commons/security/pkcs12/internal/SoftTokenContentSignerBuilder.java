@@ -86,7 +86,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.DefaultConcurrentContentSigner;
 import org.xipki.commons.security.api.SignatureSigner;
 import org.xipki.commons.security.api.XiSecurityConstants;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.util.AlgorithmUtil;
 import org.xipki.commons.security.api.util.SignerUtil;
 import org.xipki.commons.security.api.util.X509Util;
@@ -125,7 +125,7 @@ public class SoftTokenContentSignerBuilder {
             if (Security.getProvider(XiSecurityConstants.PROVIDER_NAME_NSS) == null) {
                 try {
                     return SignerUtil.createPSSRSASigner(sigAlgId);
-                } catch (SecurityException ex) {
+                } catch (XiSecurityException ex) {
                     throw new OperatorCreationException(ex.getMessage(), ex);
                 }
             }
@@ -142,7 +142,7 @@ public class SoftTokenContentSignerBuilder {
             }
             try {
                 return SignerUtil.createPSSRSASigner(sigAlgId, plainSigner);
-            } catch (SecurityException ex) {
+            } catch (XiSecurityException ex) {
                 throw new OperatorCreationException(ex.getMessage(), ex);
             }
         }
@@ -229,7 +229,7 @@ public class SoftTokenContentSignerBuilder {
     public SoftTokenContentSignerBuilder(
             final PrivateKey privateKey,
             final PublicKey publicKey)
-    throws SecurityException {
+    throws XiSecurityException {
         this.key = ParamUtil.requireNonNull("privateKey", privateKey);
         this.publicKey = ParamUtil.requireNonNull("publicKey", publicKey);
         this.certificateChain = null;
@@ -242,7 +242,7 @@ public class SoftTokenContentSignerBuilder {
             final String keyname,
             final char[] keyPassword,
             final X509Certificate[] certificateChain)
-    throws SecurityException {
+    throws XiSecurityException {
         if (!("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType))) {
             throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
         }
@@ -271,7 +271,7 @@ public class SoftTokenContentSignerBuilder {
                 }
             } else {
                 if (!ks.isKeyEntry(tmpKeyname)) {
-                    throw new SecurityException("unknown key named " + tmpKeyname);
+                    throw new XiSecurityException("unknown key named " + tmpKeyname);
                 }
             }
 
@@ -279,7 +279,7 @@ public class SoftTokenContentSignerBuilder {
 
             if (!(key instanceof RSAPrivateKey || key instanceof DSAPrivateKey
                     || key instanceof ECPrivateKey)) {
-                throw new SecurityException("unsupported key " + key.getClass().getName());
+                throw new XiSecurityException("unsupported key " + key.getClass().getName());
             }
 
             Set<Certificate> caCerts = new HashSet<>();
@@ -311,7 +311,7 @@ public class SoftTokenContentSignerBuilder {
         } catch (KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException
                 | CertificateException | IOException | UnrecoverableKeyException
                 | ClassCastException ex) {
-            throw new SecurityException(ex.getMessage(), ex);
+            throw new XiSecurityException(ex.getMessage(), ex);
         }
     }
 
