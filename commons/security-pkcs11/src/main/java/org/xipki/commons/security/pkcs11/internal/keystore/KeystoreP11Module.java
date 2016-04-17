@@ -46,8 +46,11 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.p11.AbstractP11Module;
+import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
@@ -58,17 +61,23 @@ import org.xipki.commons.security.api.p11.P11TokenException;
  * @since 2.0.0
  */
 
-class KeystoreP11Module extends AbstractP11Module {
+public class KeystoreP11Module extends AbstractP11Module {
+
+    public static final String PREFIX = "emulator:";
 
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Module.class);
 
-    KeystoreP11Module(
+    private KeystoreP11Module(
             final P11ModuleConf moduleConf)
     throws P11TokenException {
         super(moduleConf);
-        final String nativeLib = moduleConf.getNativeLibrary();
+        final String modulePath = moduleConf.getNativeLibrary();
+        if (!StringUtil.startsWithIgnoreCase(modulePath, PREFIX)) {
+            throw new IllegalArgumentException("the module path does not starts with " + PREFIX
+                    + ": " + modulePath);
+        }
 
-        File baseDir = new File(IoUtil.expandFilepath(nativeLib));
+        File baseDir = new File(IoUtil.expandFilepath(modulePath.substring(PREFIX.length())));
         File[] children = baseDir.listFiles();
 
         if (children == null || children.length == 0) {
@@ -161,7 +170,15 @@ class KeystoreP11Module extends AbstractP11Module {
         setSlots(slots);
     } // constructor
 
-    void close() {
+    public static P11Module getInstance(
+            final P11ModuleConf moduleConf)
+    throws P11TokenException {
+        ParamUtil.requireNonNull("moduleConf", moduleConf);
+        return new KeystoreP11Module(moduleConf);
+    }
+
+    @Override
+    public void close() {
         LOG.info("close", "close pkcs11 module: {}", getName());
     }
 

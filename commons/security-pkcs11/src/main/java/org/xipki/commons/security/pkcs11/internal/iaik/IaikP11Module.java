@@ -36,6 +36,7 @@
 
 package org.xipki.commons.security.pkcs11.internal.iaik;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,27 +47,31 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.api.PasswordResolverException;
 import org.xipki.commons.security.api.p11.AbstractP11Module;
+import org.xipki.commons.security.api.p11.P11Module;
 import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11Slot;
 import org.xipki.commons.security.api.p11.P11SlotIdentifier;
 import org.xipki.commons.security.api.p11.P11TokenException;
 
+import iaik.pkcs.pkcs11.DefaultInitializeArgs;
 import iaik.pkcs.pkcs11.Module;
 import iaik.pkcs.pkcs11.Slot;
 import iaik.pkcs.pkcs11.TokenException;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class IaikP11Module extends AbstractP11Module {
+public class IaikP11Module extends AbstractP11Module {
 
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
 
     private Module module;
 
-    IaikP11Module(
+    private IaikP11Module(
             final Module module,
             final P11ModuleConf moduleConf)
     throws P11TokenException {
@@ -128,7 +133,49 @@ class IaikP11Module extends AbstractP11Module {
         setSlots(slots);
     }
 
-    void close() {
+    public static P11Module getInstance(
+            final P11ModuleConf moduleConf)
+    throws P11TokenException {
+        ParamUtil.requireNonNull("moduleConf", moduleConf);
+
+        Module module;
+
+        try {
+            module = Module.getInstance(moduleConf.getNativeLibrary());
+        } catch (IOException ex) {
+            final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
+            LogUtil.error(LOG, ex, msg);
+            throw new P11TokenException(msg, ex);
+        }
+
+        try {
+            module.initialize(new DefaultInitializeArgs());
+        } catch (PKCS11Exception ex) {
+            if (ex.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
+                LogUtil.error(LOG, ex);
+                close(moduleConf.getName(), module);
+                throw new P11TokenException(ex.getMessage(), ex);
+            } else {
+                LOG.info("PKCS#11 module already initialized");
+                if (LOG.isInfoEnabled()) {
+                    try {
+                        LOG.info("pkcs11.getInfo():\n{}", module.getInfo());
+                    } catch (TokenException e2) {
+                        LOG.debug("module.getInfo()", e2);
+                    }
+                }
+            }
+        } catch (Throwable th) {
+            LogUtil.error(LOG, th, "unexpected Exception");
+            close(moduleConf.getName(), module);
+            throw new P11TokenException(th.getMessage());
+        }
+
+        return new IaikP11Module(module, moduleConf);
+    }
+
+    @Override
+    public void close() {
         for (P11SlotIdentifier slotId : getSlotIdentifiers()) {
             try {
                 getSlot(slotId).close();
@@ -137,12 +184,21 @@ class IaikP11Module extends AbstractP11Module {
             }
         }
 
-        LOG.info("close", "close pkcs11 module: {}", module);
+        close(conf.getNativeLibrary(), module);
+    }
+
+    private static void close(
+            final String modulePath,
+            final Module module) {
+        if (module == null) {
+            return;
+        }
+
+        LOG.info("close", "close pkcs11 module: {}", modulePath);
         try {
             module.finalize(null);
         } catch (Throwable th) {
-            LogUtil.error(LOG, th, "could not module.finalize()");
+            LogUtil.error(LOG, th, "could not clonse module " + modulePath);
         }
-    } // method close
-
+    }
 }

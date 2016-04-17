@@ -69,4 +69,6 @@ public interface P11Module {
             long id)
     throws P11UnknownEntityException;
 
+    void close();
+
 }

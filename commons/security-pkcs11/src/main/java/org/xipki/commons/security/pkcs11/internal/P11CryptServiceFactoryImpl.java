@@ -38,6 +38,8 @@ package org.xipki.commons.security.pkcs11.internal;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -50,10 +52,12 @@ import org.xipki.commons.security.api.exception.SecurityException;
 import org.xipki.commons.security.api.p11.P11Conf;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
+import org.xipki.commons.security.api.p11.P11Module;
+import org.xipki.commons.security.api.p11.P11ModuleConf;
 import org.xipki.commons.security.api.p11.P11TokenException;
-import org.xipki.commons.security.pkcs11.internal.iaik.IaikP11CryptServiceEngine;
-import org.xipki.commons.security.pkcs11.internal.keystore.KeystoreP11CryptServiceEngine;
-import org.xipki.commons.security.pkcs11.internal.proxy.ProxyP11CryptServiceEngine;
+import org.xipki.commons.security.pkcs11.internal.iaik.IaikP11Module;
+import org.xipki.commons.security.pkcs11.internal.keystore.KeystoreP11Module;
+import org.xipki.commons.security.pkcs11.internal.proxy.ProxyP11Module;
 
 /**
  * @author Lijun Liao
@@ -64,79 +68,67 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(P11CryptServiceFactoryImpl.class);
 
-    private String pkcs11Engine;
+    private static final Map<String, P11CryptService> services = new HashMap<>();
 
-    private P11Conf p11Conf;
-
-    private P11CryptServiceEngine engine;
+    private static final Map<String, P11Module> modules = new HashMap<>();
 
     private SecurityFactory securityFactory;
 
+    private P11Conf p11Conf;
+
     private String pkcs11ConfFile;
 
-    private boolean initialized;
-
-    private synchronized void init()
-    throws SecurityException {
-        if (engine != null) {
-            return;
-        }
-
-        if (initialized) {
-            throw new SecurityException("initialization has been"
-                    + " processed and failed, no retry");
-        }
-
-        try {
-            initPkcs11ModuleConf();
-
-            if ("IAIK-PKCS11".equalsIgnoreCase(pkcs11Engine)) {
-                engine = new IaikP11CryptServiceEngine(p11Conf);
-            } else if ("KEYSTORE-PKCS11".equalsIgnoreCase(pkcs11Engine)) {
-                engine = new KeystoreP11CryptServiceEngine(p11Conf);
-            } else if ("PROXY-PKCS11".equalsIgnoreCase(pkcs11Engine)) {
-                engine = new ProxyP11CryptServiceEngine(p11Conf);
-            } else {
-                throw new SecurityException("unknown pkcs11Engine: '" + pkcs11Engine + "'");
-            }
-        } finally {
-            initialized = true;
-        }
-    }
-
-    private synchronized void initPkcs11ModuleConf() {
+    public synchronized void init()
+    throws InvalidConfException, IOException {
         if (p11Conf != null) {
             return;
         }
-
         if (StringUtil.isBlank(pkcs11ConfFile)) {
-            throw new IllegalStateException("pkcs11ConfFile is not set");
+            LOG.info("no pkcs11ConfFile is configured");
+            return;
         }
 
-        try {
-            this.p11Conf = new P11Conf(new FileInputStream(pkcs11ConfFile), securityFactory);
-        } catch (InvalidConfException | IOException ex) {
-            final String msg = "invalid configuration file " + pkcs11ConfFile;
-            LogUtil.error(LOG, ex, msg);
-            throw new RuntimeException(msg);
-        }
+        this.p11Conf = new P11Conf(new FileInputStream(pkcs11ConfFile), securityFactory);
     }
 
-    public P11CryptService getP11CryptService(
+    public synchronized P11CryptService getP11CryptService(
             final String moduleName)
     throws SecurityException, P11TokenException {
-        init();
-        return engine.getP11CryptService(getPkcs11ModuleName(moduleName));
+        if (p11Conf == null) {
+            throw new IllegalStateException("please set pkcs11ConfFile and then call init() first");
+        }
+
+        final String name = getModuleName(moduleName);
+        P11ModuleConf conf = p11Conf.getModuleConf(name);
+        if (conf == null) {
+            throw new SecurityException("PKCS#11 module " + name + " is not defined");
+        }
+
+        P11CryptService instance = services.get(moduleName);
+        if (instance != null) {
+            return instance;
+        }
+
+        String nativeLib = conf.getNativeLibrary();
+        P11Module p11Module = modules.get(nativeLib);
+        if (p11Module == null) {
+            if (StringUtil.startsWithIgnoreCase(nativeLib, "proxy:")) {
+                p11Module = ProxyP11Module.getInstance(conf);
+            } else if (StringUtil.startsWithIgnoreCase(nativeLib, "emulator:")) {
+                p11Module = KeystoreP11Module.getInstance(conf);
+            } else {
+                p11Module = IaikP11Module.getInstance(conf);
+            }
+        }
+
+        modules.put(nativeLib, p11Module);
+        instance = new P11CryptService(p11Module);
+        services.put(moduleName, instance);
+
+        return instance;
     }
 
-    public Set<String> getP11ModuleNames() {
-        initPkcs11ModuleConf();
-        return (p11Conf == null)
-                ? null
-                : p11Conf.getModuleNames();
-    }
-
-    private String getPkcs11ModuleName(
+    private String getModuleName(
             final String moduleName) {
         return (moduleName == null)
                 ? DEFAULT_P11MODULE_NAME
@@ -152,31 +144,28 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
         }
     }
 
-    public void setPkcs11Engine(
-            final String pkcs11Engine) {
-        this.pkcs11Engine = pkcs11Engine;
-    }
-
     public void setSecurityFactory(
             final SecurityFactory securityFactory) {
         this.securityFactory = securityFactory;
     }
 
     public void shutdown() {
-        if (engine == null) {
-            return;
+        for (String pk11Lib : modules.keySet()) {
+            try {
+                modules.get(pk11Lib).close();
+            } catch (Throwable th) {
+                LogUtil.error(LOG, th, "could not close PKCS11 Module " + pk11Lib);
+            }
         }
-
-        try {
-            engine.shutdown();
-        } catch (Throwable th) {
-            LogUtil.error(LOG, th, "could not shutdown: " + th.getMessage());
-        }
+        modules.clear();
+        services.clear();
     }
 
     @Override
     public Set<String> getModuleNames() {
-        initPkcs11ModuleConf();
+        if (p11Conf == null) {
+            throw new IllegalStateException("pkcs11ConfFile is not set");
+        }
         return p11Conf.getModuleNames();
     }
 
