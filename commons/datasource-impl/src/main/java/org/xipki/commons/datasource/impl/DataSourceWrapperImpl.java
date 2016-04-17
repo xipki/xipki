@@ -48,6 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.api.DataSourceWrapper;
@@ -704,8 +705,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             if (cause instanceof SQLException) {
                 ex = (SQLException) cause;
             }
-            LOG.error("could not create connection to database {}", ex.getMessage());
-            LOG.debug("could not create connection to database", ex);
+            LogUtil.error(LOG, ex, "could not create connection to database");
             if (ex instanceof SQLException) {
                 throw translate(null, (SQLException) ex);
             } else {
@@ -729,8 +729,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             if (cause instanceof SQLException) {
                 ex = (SQLException) cause;
             }
-            LOG.error("could not close connection to database {}", ex.getMessage());
-            LOG.debug("could not close connection to database", ex);
+            LogUtil.error(LOG, ex, "could not close connection to database {}");
         }
     }
 

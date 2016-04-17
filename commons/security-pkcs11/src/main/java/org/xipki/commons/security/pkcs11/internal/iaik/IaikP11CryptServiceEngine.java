@@ -78,8 +78,7 @@ public class IaikP11CryptServiceEngine extends P11CryptServiceEngine {
             try {
                 modules.get(pk11Lib).close();
             } catch (Throwable th) {
-                LOG.error("could not close PKCS11 Module " + pk11Lib + ":" + th.getMessage(),
-                        th);
+                LogUtil.error(LOG, th, "could not close PKCS11 Module " + pk11Lib);
             }
         }
         modules.clear();

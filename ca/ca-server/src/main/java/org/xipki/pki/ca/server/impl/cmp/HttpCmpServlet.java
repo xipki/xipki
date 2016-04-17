@@ -207,7 +207,7 @@ public class HttpCmpServlet extends HttpServlet {
             response.setContentLength(0);
         } catch (Throwable th) {
             final String message = "Throwable thrown, this should not happen!";
-            LOG.error(message, th);
+            LogUtil.error(LOG, th, message);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);

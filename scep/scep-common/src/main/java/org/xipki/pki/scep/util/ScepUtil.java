@@ -454,13 +454,6 @@ public class ScepUtil {
         return issues;
     }
 
-    public static String buildExceptionLogFormat(
-            final String message) {
-        return (message == null || message.isEmpty())
-                ? "{}: {}"
-                : message + ", {}: {}";
-    }
-
     public static ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(
             final String sigOid,
             final byte[] sigParams)
