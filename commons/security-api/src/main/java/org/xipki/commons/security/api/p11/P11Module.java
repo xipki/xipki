@@ -40,6 +40,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.xipki.commons.security.api.exception.P11TokenException;
 import org.xipki.commons.security.api.exception.P11UnknownEntityException;
 
 /**

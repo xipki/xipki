@@ -75,7 +75,7 @@ import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.X509Cert;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -1237,7 +1237,7 @@ class CaManagerQueryExecutor {
                     for (String[] m : signerConfs) {
                         securityFactory.createSigner(tmpSignerType, new SignerConf(m[1]), tmpCert);
                     }
-                } catch (SecurityException | ObjectCreationException ex) {
+                } catch (XiSecurityException | ObjectCreationException ex) {
                     throw new CaMgmtException(
                             "could not create signer for CA '" + name + "'" + ex.getMessage(), ex);
                 }

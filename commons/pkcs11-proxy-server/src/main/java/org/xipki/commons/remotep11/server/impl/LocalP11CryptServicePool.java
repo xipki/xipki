@@ -47,10 +47,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
-import org.xipki.commons.security.api.p11.P11TokenException;
 
 /**
  * @author Lijun Liao
@@ -94,7 +94,7 @@ public class LocalP11CryptServicePool {
     }
 
     public void init()
-    throws P11TokenException, SecurityException {
+    throws P11TokenException, XiSecurityException {
         LOG.info("initializing ...");
         if (initialized.get()) {
             LOG.info("already initialized, skipping ...");

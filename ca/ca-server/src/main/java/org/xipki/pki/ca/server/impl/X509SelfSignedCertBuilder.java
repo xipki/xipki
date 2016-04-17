@@ -78,7 +78,7 @@ import org.xipki.commons.security.api.ConcurrentContentSigner;
 import org.xipki.commons.security.api.SecurityFactory;
 import org.xipki.commons.security.api.SignerConf;
 import org.xipki.commons.security.api.exception.NoIdleSignerException;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 import org.xipki.commons.security.api.util.KeyUtil;
 import org.xipki.commons.security.api.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
@@ -186,7 +186,7 @@ class X509SelfSignedCertBuilder {
 
             signer = securityFactory.createSigner(signerType, new SignerConf(thisSignerConf),
                     (X509Certificate[]) null);
-        } catch (SecurityException | ObjectCreationException ex) {
+        } catch (XiSecurityException | ObjectCreationException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                     ex.getClass().getName() + ": " + ex.getMessage());
         }

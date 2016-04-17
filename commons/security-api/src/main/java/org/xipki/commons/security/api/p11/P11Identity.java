@@ -48,8 +48,9 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.api.exception.P11TokenException;
 import org.xipki.commons.security.api.exception.P11UnsupportedMechanismException;
-import org.xipki.commons.security.api.exception.SecurityException;
+import org.xipki.commons.security.api.exception.XiSecurityException;
 
 /**
  * @author Lijun Liao
@@ -110,7 +111,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
             final long mechanism,
             final P11Params parameters,
             final byte[] content)
-    throws P11TokenException, SecurityException {
+    throws P11TokenException, XiSecurityException {
         ParamUtil.requireNonNull("content", content);
         slot.assertMechanismSupported(mechanism);
         if (!supportsMechanism(mechanism, parameters)) {
@@ -126,7 +127,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
             final long mechanism,
             @Nullable final P11Params parameters,
             @Nonnull final byte[] content)
-    throws P11TokenException, SecurityException;
+    throws P11TokenException, XiSecurityException;
 
     public P11EntityIdentifier getIdentityId() {
         return identityId;
