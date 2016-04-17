@@ -92,7 +92,7 @@ public abstract class OcspStore {
 
     public abstract void init(
             @Nullable String conf,
-            @Nonnull DataSourceWrapper datasource,
+            @Nullable DataSourceWrapper datasource,
             @Nonnull Set<HashAlgoType> certHashAlgos)
     throws OcspStoreException;
 
