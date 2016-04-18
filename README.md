@@ -31,7 +31,7 @@ Highly scalable and high-performance open source PKI (Certification Authority an
     - SHA*withECDSA: where * is 1, 224, 256, 384 and 512
     - SHA*withPlainECDSA: where * is 1, 224, 256, 384 and 512
     - SHA*withDSA: where * is 1, 224, 256, 384 and 512
- - Native support of X.509 extensions
+ - Embedded support of X.509 extensions
     - AdditionalInformation (German national standard CommonPKI)
     - Admission (German national standard CommonPKI)
     - AuthorityInformationAccess (RFC 5280)
