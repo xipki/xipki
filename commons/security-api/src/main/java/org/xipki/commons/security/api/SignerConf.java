@@ -66,7 +66,7 @@ public class SignerConf {
         ParamUtil.requireNonBlank("conf", conf);
         this.confPairs = new ConfPairs(conf);
         if (getConfValue("algo") == null) {
-            throw new IllegalArgumentException("confWithoutAlgo must contain the entry 'algo'");
+            throw new IllegalArgumentException("conf must contain the entry 'algo'");
         }
     }
 
@@ -189,6 +189,21 @@ public class SignerConf {
         return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
     }
 
+    public static SignerConf getKeystoreSignerConf(
+            final String keystoreFile,
+            final String password,
+            final HashAlgoType hashAlgo,
+            final SignatureAlgoControl signatureAlgoControl) {
+        ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
+        ParamUtil.requireNonBlank("password", password);
+        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+
+        ConfPairs conf = new ConfPairs("password", password);
+        conf.putPair("parallelism", "1");
+        conf.putPair("keystore", "file:" + keystoreFile);
+        return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
+    }
+
     public static SignerConf getPkcs11SignerConf(
             final String pkcs11ModuleName,
             final Integer slotIndex,
@@ -279,21 +294,6 @@ public class SignerConf {
         }
 
         return new SignerConf(conf.getEncoded());
-    }
-
-    public static SignerConf getKeystoreSignerConfWithoutAlgo(
-            final String keystoreFile,
-            final String password,
-            final HashAlgoType hashAlgo,
-            final SignatureAlgoControl signatureAlgoControl) {
-        ParamUtil.requireNonBlank("keystoreFile", keystoreFile);
-        ParamUtil.requireNonBlank("password", password);
-        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-
-        ConfPairs conf = new ConfPairs("password", password);
-        conf.putPair("parallelism", "1");
-        conf.putPair("keystore", "file:" + keystoreFile);
-        return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
     }
 
     private static String eraseSensitiveData(

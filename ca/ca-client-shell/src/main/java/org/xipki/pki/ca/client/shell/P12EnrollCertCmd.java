@@ -84,7 +84,7 @@ public class P12EnrollCertCmd extends EnrollCertCommandSupport {
             }
         }
 
-        SignerConf signerConf = SignerConf.getKeystoreSignerConfWithoutAlgo(p12File, password,
+        SignerConf signerConf = SignerConf.getKeystoreSignerConf(p12File, password,
                 HashAlgoType.getNonNullHashAlgoType(hashAlgo), signatureAlgoControl);
         return securityFactory.createSigner("PKCS12", signerConf, (X509Certificate[]) null);
     }
