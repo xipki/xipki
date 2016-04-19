@@ -59,7 +59,7 @@ public class LiquibaseDatabaseConf {
 
     private final String schema;
 
-    public LiquibaseDatabaseConf(
+    private LiquibaseDatabaseConf(
             final String driver,
             final String username,
             final String password,
@@ -100,7 +100,14 @@ public class LiquibaseDatabaseConf {
 
         String driverClassName;
         String url;
-        String schema = null;
+        String schema = dbProps.getProperty("liquibase.schema");
+        if (schema != null) {
+            schema = schema.trim();
+            if (schema.isEmpty()) {
+                schema = null;
+            }
+        }
+
         String user;
         String password;
 
@@ -115,6 +122,9 @@ public class LiquibaseDatabaseConf {
             if (datasourceClassName.contains("org.h2.")) {
                 driverClassName = "org.h2.Driver";
                 urlBuilder.append(dbProps.getProperty("dataSource.url"));
+                if (schema != null) {
+                    urlBuilder.append(";INIT=CREATE SCHEMA IF NOT EXISTS ").append(schema);
+                }
             } else if (datasourceClassName.contains("mysql.")) {
                 driverClassName = "com.mysql.jdbc.Driver";
                 urlBuilder.append("jdbc:mysql://");

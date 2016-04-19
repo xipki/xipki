@@ -7,7 +7,7 @@
 
 dataSourceClassName = org.h2.jdbcx.JdbcDataSource
 
-dataSource.url = jdbc:h2:./xipki/db/h2/ca
+dataSource.url = jdbc:h2:./xipki/db/h2/xipki
 dataSource.user = root
 # encrypted password 123456
 dataSource.password = PBE:B9B3GLTSTCrjEB53BiirBAxt5XxNP+KjcPkPbGfRBEz+pA==
@@ -20,3 +20,11 @@ connectionTimeout = 10000
 idleTimeout = 600000
 maxLifetime = 1800000
 transactionIsolation = TRANSACTION_READ_COMMITTED
+
+# Optional, required only if non-default schema is used
+connectionInitSql = SET SCHEMA CA
+
+# For Liquibase.
+# Optional, required only if non-default schema is used
+liquibase.schema = CA
+
