@@ -40,7 +40,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,6 +126,13 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
                 password = new String(passwordResolver.resolvePassword(password));
             }
             conf.setProperty("dataSource.password", password);
+        }
+
+        Set<Object> keySet = new HashSet<>(conf.keySet());
+        for (Object key : keySet) {
+            if (((String) key).startsWith("liquibase")) {
+                conf.remove(key);
+            }
         }
 
         return DataSourceWrapperImpl.createDataSource(name, conf, databaseType);
