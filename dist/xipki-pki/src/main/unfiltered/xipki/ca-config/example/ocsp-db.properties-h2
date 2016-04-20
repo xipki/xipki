@@ -7,7 +7,7 @@
 
 dataSourceClassName = org.h2.jdbcx.JdbcDataSource
 
-dataSource.url = jdbc:h2:./xipki/db/h2/xipki
+dataSource.url = jdbc:h2:./xipki/db/h2/ocsp
 dataSource.user = root
 # encrypted password 123456
 dataSource.password = PBE:B9A/zfIDGOTc+xhshvJGWMMdft32EjtEZPWGH9M0JvoWFA==
@@ -22,9 +22,9 @@ maxLifetime = 1800000
 transactionIsolation = TRANSACTION_READ_COMMITTED
 
 # Optional, required only if non-default schema is used
-connectionInitSql = SET SCHEMA OCSP
+#connectionInitSql = SET SCHEMA OCSP
 
 # For Liquibase.
 # Optional, required only if non-default schema is used
-liquibase.schema = OCSP
+#liquibase.schema = OCSP
 
