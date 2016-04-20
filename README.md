@@ -58,7 +58,6 @@ Highly scalable and high-performance open source PKI (Certification Authority an
     - SubjectKeyIdentifier (RFC 5280)
     - TLSFeature (RFC 7633)
     - ValidityModel (German national standard CommonPKI)
- - Support of both random and sequential certificate serial number assignment
  - Management of multiple CAs in one software instance
  - Multiple software instances (all can be in active mode) for the same CA
  - Embedded support of management of CA via embedded OSGi commands
