@@ -292,8 +292,7 @@ public class DbCertStatusStore extends OcspStore {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-        // our database supports up to 63 bit (8 byte positive) serialNumber
-        if (serialNumber.bitLength() > 63) {
+        if (serialNumber.signum() != 1) { // non-positive serial number
             return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
         }
 
@@ -352,7 +351,7 @@ public class DbCertStatusStore extends OcspStore {
             try {
                 int idx = 1;
                 ps.setInt(idx++, issuer.getId());
-                ps.setLong(idx++, serialNumber.longValue());
+                ps.setString(idx++, serialNumber.toString(16));
 
                 rs = ps.executeQuery();
 
