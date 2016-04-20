@@ -736,7 +736,7 @@ public class X509Ca {
                 crlBuilder.setNextUpdate(nextUpdate);
             }
 
-            BigInteger startSerial = BigInteger.ONE;
+            int startId = 1;
             final int numEntries = 100;
 
             X509Cert caCert = caInfo.getCertificate();
@@ -753,20 +753,19 @@ public class X509Ca {
 
             do {
                 if (deltaCrl) {
-                    revInfos = certstore.getCertsForDeltaCrl(caCert, startSerial, numEntries,
+                    revInfos = certstore.getCertsForDeltaCrl(caCert, startId, numEntries,
                             control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
                 } else {
-                    revInfos = certstore.getRevokedCerts(caCert, notExpireAt, startSerial,
+                    revInfos = certstore.getRevokedCerts(caCert, notExpireAt, startId,
                             numEntries,
                             control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
                 }
 
-                BigInteger maxSerial = BigInteger.ONE;
+                int maxId = 1;
 
                 for (CertRevInfoWithSerial revInfo : revInfos) {
-                    BigInteger serial = revInfo.getSerial();
-                    if (serial.compareTo(maxSerial) > 0) {
-                        maxSerial = serial;
+                    if (revInfo.getId() > maxId) {
+                        maxId = revInfo.getId();
                     }
 
                     CrlReason reason = revInfo.getReason();
@@ -824,7 +823,7 @@ public class X509Ca {
                     isFirstCrlEntry = false;
                 } // end for
 
-                startSerial = maxSerial.add(BigInteger.ONE);
+                startId = maxId + 1;
 
             } while (revInfos.size() >= numEntries);
             // end do
@@ -870,7 +869,7 @@ public class X509Ca {
                 throw new OperationException(ErrorCode.INVALID_EXTENSION, ex.getMessage());
             }
 
-            startSerial = BigInteger.ONE;
+            startId = 1;
             if (!deltaCrl && control.isXipkiCertsetIncluded()) { // XiPKI extension
                 /*
                  * Xipki-CrlCertSet ::= SET OF Xipki-CrlCert
@@ -883,28 +882,27 @@ public class X509Ca {
                  */
                 ASN1EncodableVector vector = new ASN1EncodableVector();
 
-                List<BigInteger> serials;
+                List<SerialWithId> serials;
 
                 do {
-                    serials = certstore.getCertSerials(caCert, notExpireAt, startSerial,
-                            numEntries, false,
-                            onlyCaCerts, onlyUserCerts);
+                    serials = certstore.getCertSerials(caCert, notExpireAt, startId,
+                            numEntries, false, onlyCaCerts, onlyUserCerts);
 
-                    BigInteger maxSerial = BigInteger.ONE;
-                    for (BigInteger serial : serials) {
-                        if (serial.compareTo(maxSerial) > 0) {
-                            maxSerial = serial;
+                    int maxId = 1;
+                    for (SerialWithId sid : serials) {
+                        if (sid.getId() > maxId) {
+                            maxId = sid.getId();
                         }
 
                         ASN1EncodableVector vec = new ASN1EncodableVector();
-                        vec.add(new ASN1Integer(serial));
+                        vec.add(new ASN1Integer(sid.getSerial()));
 
                         String profileName = null;
 
                         if (control.isXipkiCertsetCertIncluded()) {
                             X509CertificateInfo certInfo;
                             try {
-                                certInfo = certstore.getCertificateInfoForSerial(caCert, serial);
+                                certInfo = certstore.getCertificateInfoForId(caCert, sid.getId());
                             } catch (CertificateException ex) {
                                 throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                                         "CertificateException: " + ex.getMessage());
@@ -919,7 +917,7 @@ public class X509Ca {
                                 profileName = certInfo.getProfileName();
                             }
                         } else if (control.isXipkiCertsetProfilenameIncluded()) {
-                            profileName = certstore.getCertProfileForSerial(caCert, serial);
+                            profileName = certstore.getCertProfileForId(caCert, sid.getId());
                         }
 
                         if (StringUtil.isNotBlank(profileName)) {
@@ -933,7 +931,7 @@ public class X509Ca {
                         vector.add(certWithInfo);
                     } // end for
 
-                    startSerial = maxSerial.add(BigInteger.ONE);
+                    startId = maxId + 1;
                 } while (serials.size() >= numEntries);
                 // end do
 
@@ -1164,22 +1162,21 @@ public class X509Ca {
         } // end for
 
         try {
-            List<BigInteger> serials;
             X509Cert caCert = caInfo.getCertificate();
 
             Date notExpiredAt = null;
 
-            BigInteger startSerial = BigInteger.ONE;
+            int startId = 1;
             int numEntries = 100;
 
             boolean onlyRevokedCerts = false;
 
+            List<SerialWithId> serials;
             int sum = 0;
             do {
                 try {
-                    serials = certstore.getCertSerials(caCert, notExpiredAt, startSerial,
-                            numEntries, onlyRevokedCerts,
-                            false, false);
+                    serials = certstore.getCertSerials(caCert, notExpiredAt, startId,
+                            numEntries, onlyRevokedCerts, false, false);
                 } catch (OperationException ex) {
                     LogUtil.error(LOG, ex);
                     return false;
@@ -1192,16 +1189,16 @@ public class X509Ca {
                     onlyRevokedCerts = true;
                 }
 
-                BigInteger maxSerial = BigInteger.ONE;
-                for (BigInteger serial : serials) {
-                    if (serial.compareTo(maxSerial) > 0) {
-                        maxSerial = serial;
+                int maxId = 1;
+                for (SerialWithId sid : serials) {
+                    if (sid.getId() > maxId) {
+                        maxId = sid.getId();
                     }
 
                     X509CertificateInfo certInfo;
 
                     try {
-                        certInfo = certstore.getCertificateInfoForSerial(caCert, serial);
+                        certInfo = certstore.getCertificateInfoForId(caCert, sid.getId());
                     } catch (OperationException | CertificateException ex) {
                         LogUtil.error(LOG, ex);
                         return false;
@@ -1211,13 +1208,13 @@ public class X509Ca {
                         boolean successful = publisher.certificateAdded(certInfo);
                         if (!successful) {
                             LOG.error("republish certificate serial={} to publisher {} failed",
-                                    serial, publisher.getName());
+                                    sid.getSerial(), publisher.getName());
                             return false;
                         }
                     }
                 } // end for
 
-                startSerial = maxSerial.add(BigInteger.ONE);
+                startId = maxId + 1;
 
                 sum += serials.size();
                 System.out.println("CA " + caInfo.getName() + " republished " + sum

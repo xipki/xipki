@@ -94,6 +94,7 @@ import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.pki.ca.server.impl.CertStatus;
 import org.xipki.pki.ca.server.impl.DbSchemaInfo;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
+import org.xipki.pki.ca.server.impl.SerialWithId;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.impl.util.PasswordHash;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
@@ -1020,10 +1021,10 @@ class CertStoreQueryExecutor {
         }
     } // method containsCertificates
 
-    List<BigInteger> getSerialNumbers(
+    List<SerialWithId> getSerialNumbers(
             final X509Cert caCert,
             final Date notExpiredAt,
-            final BigInteger startSerial,
+            final int startId,
             final int numEntries,
             final boolean onlyRevoked,
             final boolean onlyCaCerts,
@@ -1033,7 +1034,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
         int caId = getCaId(caCert);
-        StringBuilder sb = new StringBuilder("SN FROM CERT WHERE CA_ID=? AND SN>?");
+        StringBuilder sb = new StringBuilder("ID, SN FROM CERT WHERE ID>? AND CA_ID=?");
         if (notExpiredAt != null) {
             sb.append(" AND NAFTER>?");
         }
@@ -1046,25 +1047,23 @@ class CertStoreQueryExecutor {
             sb.append(" AND EE=1");
         }
         final String sql = datasource.createFetchFirstSelectSql(sb.toString(), numEntries,
-                "SN ASC");
+                "ID ASC");
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
             int idx = 1;
+            ps.setInt(idx++, startId - 1);
             ps.setInt(idx++, caId);
-            ps.setLong(idx++,
-                    (startSerial == null)
-                            ? 0
-                            : startSerial.longValue() - 1);
             if (notExpiredAt != null) {
                 ps.setLong(idx++, notExpiredAt.getTime() / 1000 + 1);
             }
             rs = ps.executeQuery();
-            List<BigInteger> ret = new ArrayList<>();
+            List<SerialWithId> ret = new ArrayList<>();
             while (rs.next() && ret.size() < numEntries) {
+                int id = rs.getInt("ID");
                 long serial = rs.getLong("SN");
-                ret.add(BigInteger.valueOf(serial));
+                ret.add(new SerialWithId(id, BigInteger.valueOf(serial)));
             }
             return ret;
         } catch (SQLException ex) {
@@ -1454,6 +1453,40 @@ class CertStoreQueryExecutor {
         }
     } // method getCertificateInfo
 
+    String getCertProfileForId(
+            final X509Cert caCert,
+            final int id)
+    throws OperationException, DataAccessException {
+        ParamUtil.requireNonNull("caCert", caCert);
+
+        final String sql = datasource.createFetchFirstSelectSql(
+                "PID, CA_ID FROM CERT WHERE ID=?", 1);
+        ResultSet rs = null;
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        try {
+            int idx = 1;
+            ps.setInt(idx++, id);
+
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                return null;
+            }
+
+            int caId = getCaId(caCert);
+            int caId2 = rs.getInt("CA_ID");
+            if (caId != caId2) {
+                return null;
+            }
+            int profileId = rs.getInt("PID");
+            return certprofileStore.getName(profileId);
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            releaseDbResources(ps, rs);
+        }
+    } // method getCertProfileForId
+
     String getCertProfileForSerial(
             final X509Cert caCert,
             final BigInteger serial)
@@ -1643,7 +1676,7 @@ class CertStoreQueryExecutor {
     List<CertRevInfoWithSerial> getRevokedCertificates(
             final X509Cert caCert,
             final Date notExpiredAt,
-            final BigInteger startSerial,
+            final int startId,
             final int numEntries,
             final boolean onlyCaCerts,
             final boolean onlyUserCerts)
@@ -1651,13 +1684,12 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("notExpiredAt", notExpiredAt);
         ParamUtil.requireMin("numEntries", numEntries, 1);
-        ParamUtil.requireNonNull("startSerial", startSerial);
 
         int caId = getCaId(caCert);
 
         StringBuilder sqlBuiler = new StringBuilder();
-        sqlBuiler.append("SN, RR, RT, RIT FROM CERT");
-        sqlBuiler.append(" WHERE CA_ID=? AND REV=? AND SN>? AND NAFTER>?");
+        sqlBuiler.append("ID, SN, RR, RT, RIT FROM CERT");
+        sqlBuiler.append(" WHERE ID>? AND CA_ID=? AND REV=? AND NAFTER>?");
         if (onlyCaCerts) {
             sqlBuiler.append(" AND EE=0");
         } else if (onlyUserCerts) {
@@ -1665,21 +1697,22 @@ class CertStoreQueryExecutor {
         }
 
         String sql = datasource.createFetchFirstSelectSql(sqlBuiler.toString(), numEntries,
-                "SN ASC");
+                "ID ASC");
 
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
             int idx = 1;
+            ps.setInt(idx++, startId - 1);
             ps.setInt(idx++, caId);
             setBoolean(ps, idx++, true);
-            ps.setLong(idx++, startSerial.longValue() - 1);
             ps.setLong(idx++, notExpiredAt.getTime() / 1000 + 1);
             rs = ps.executeQuery();
 
             List<CertRevInfoWithSerial> ret = new LinkedList<>();
             while (rs.next()) {
+                int id = rs.getInt("ID");
                 long serial = rs.getLong("SN");
                 int revReason = rs.getInt("RR");
                 long revTime = rs.getLong("RT");
@@ -1688,9 +1721,9 @@ class CertStoreQueryExecutor {
                 Date invalidityTime = (revInvalidityTime == 0)
                         ? null
                         : new Date(1000 * revInvalidityTime);
-                CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(
-                        BigInteger.valueOf(serial),
-                        revReason, new Date(1000 * revTime), invalidityTime);
+                CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(id,
+                        BigInteger.valueOf(serial), revReason, new Date(1000 * revTime),
+                        invalidityTime);
                 ret.add(revInfo);
             }
 
@@ -1704,31 +1737,30 @@ class CertStoreQueryExecutor {
 
     List<CertRevInfoWithSerial> getCertificatesForDeltaCrl(
             final X509Cert caCert,
-            final BigInteger startSerial,
+            final int startId,
             final int numEntries,
             final boolean onlyCaCerts,
             final boolean onlyUserCerts)
     throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireMin("numEntries", numEntries, 1);
-        ParamUtil.requireNonNull("startSerial", startSerial);
 
         int caId = getCaId(caCert);
 
         String sql = datasource.createFetchFirstSelectSql(
-                "SN FROM DELTACRL_CACHE WHERE CA_ID=? AND SN>?", numEntries, "SN ASC");
-        List<Long> serials = new LinkedList<>();
+                "ID FROM DELTACRL_CACHE WHERE ID>? AND CA_ID=?", numEntries, "ID ASC");
+        List<Integer> ids = new LinkedList<>();
         ResultSet rs = null;
 
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
             int idx = 1;
+            ps.setInt(idx++, startId - 1);
             ps.setInt(idx++, caId);
-            ps.setLong(idx++, startSerial.longValue() - 1);
             rs = ps.executeQuery();
             while (rs.next()) {
-                long serial = rs.getLong("SN");
-                serials.add(serial);
+                int id = rs.getInt("ID");
+                ids.add(id);
             }
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
@@ -1737,30 +1769,36 @@ class CertStoreQueryExecutor {
         }
 
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("REV, RR, RT, RIT");
-        sqlBuilder.append(" FROM CERT WHERE SN=? AND CA_ID=?");
-        if (onlyCaCerts) {
-            sqlBuilder.append(" AND EE=0");
-        } else if (onlyUserCerts) {
-            sqlBuilder.append(" AND EE=1");
-        }
+        sqlBuilder.append("SN, EE, REV, RR, RT, RIT");
+        sqlBuilder.append(" FROM CERT WHERE ID=?");
 
         sql = datasource.createFetchFirstSelectSql(sqlBuilder.toString(), 1);
         ps = borrowPreparedStatement(sql);
 
         List<CertRevInfoWithSerial> ret = new ArrayList<>();
-        for (Long serial : serials) {
+        for (Integer id : ids) {
             try {
-                ps.setLong(1, serial);
-                ps.setInt(2, caId);
+                ps.setInt(1, id);
                 rs = ps.executeQuery();
 
                 if (!rs.next()) {
                     continue;
                 }
 
+                int ee = rs.getInt("EE");
+                if (onlyCaCerts) {
+                    if (ee != 0) {
+                        continue;
+                    }
+                } else if (onlyUserCerts) {
+                    if (ee != 1) {
+                        continue;
+                    }
+                }
+
                 CertRevInfoWithSerial revInfo;
 
+                long serial = rs.getLong("SN");
                 boolean revoked = rs.getBoolean("REVOEKD");
                 if (revoked) {
                     int revReason = rs.getInt("RR");
@@ -1770,12 +1808,11 @@ class CertStoreQueryExecutor {
                     Date invalidityTime = (revInvalidityTime == 0)
                             ? null
                             : new Date(1000 * revInvalidityTime);
-                    revInfo = new CertRevInfoWithSerial(
-                            BigInteger.valueOf(serial),
+                    revInfo = new CertRevInfoWithSerial(id, BigInteger.valueOf(serial),
                             revReason, new Date(1000 * tmpRevTime), invalidityTime);
                 } else {
                     long lastUpdate = rs.getLong("LUPDATE");
-                    revInfo = new CertRevInfoWithSerial(BigInteger.valueOf(serial),
+                    revInfo = new CertRevInfoWithSerial(id, BigInteger.valueOf(serial),
                             CrlReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
                 }
                 ret.add(revInfo);

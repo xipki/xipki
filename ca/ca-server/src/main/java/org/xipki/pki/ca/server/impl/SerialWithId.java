@@ -37,45 +37,23 @@
 package org.xipki.pki.ca.server.impl;
 
 import java.math.BigInteger;
-import java.util.Date;
-
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.CertRevocationInfo;
-import org.xipki.commons.security.api.CrlReason;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CertRevInfoWithSerial extends CertRevocationInfo {
+public class SerialWithId {
 
-    private static final long serialVersionUID = 1L;
+    private int id;
 
-    private final int id;
+    private BigInteger serial;
 
-    private final BigInteger serial;
-
-    public CertRevInfoWithSerial(
+    public SerialWithId(
             final int id,
-            final BigInteger serial,
-            final CrlReason reason,
-            final Date revocationTime,
-            final Date invalidityTime) {
-        super(reason, revocationTime, invalidityTime);
+            final BigInteger serial) {
         this.id = id;
         this.serial = serial;
-    }
-
-    public CertRevInfoWithSerial(
-            final int id,
-            final BigInteger serial,
-            final int reasonCode,
-            final Date revocationTime,
-            final Date invalidityTime) {
-        super(reasonCode, revocationTime, invalidityTime);
-        this.id = id;
-        this.serial = ParamUtil.requireNonNull("serial", serial);
     }
 
     public BigInteger getSerial() {
