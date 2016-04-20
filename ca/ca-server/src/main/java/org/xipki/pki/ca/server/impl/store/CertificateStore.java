@@ -62,6 +62,7 @@ import org.xipki.pki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.pki.ca.server.impl.CertStatus;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
+import org.xipki.pki.ca.server.impl.SerialWithId;
 
 /**
  * @author Lijun Liao
@@ -365,19 +366,18 @@ public class CertificateStore {
 
     /**
      * Returns the first serial number ascend sorted {@code numEntries} revoked certificates
-     * which are not expired at {@code notExpiredAt} and their serial numbers are not less than
-     * {@code startSerial}.
+     * which are not expired at {@code notExpiredAt} and the IDs are not less than {@code startId}.
      */
     public List<CertRevInfoWithSerial> getRevokedCerts(
             final X509Cert caCert,
             final Date notExpiredAt,
-            final BigInteger startSerial,
+            final int startId,
             final int numEntries,
             final boolean onlyCaCerts,
             final boolean onlyUserCerts)
     throws OperationException {
         try {
-            return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial,
+            return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startId,
                     numEntries, onlyCaCerts, onlyUserCerts);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
@@ -389,13 +389,13 @@ public class CertificateStore {
 
     public List<CertRevInfoWithSerial> getCertsForDeltaCrl(
             final X509Cert caCert,
-            final BigInteger startSerial,
+            final int startId,
             final int numEntries,
             final boolean onlyCaCerts,
             final boolean onlyUserCerts)
     throws OperationException {
         try {
-            return queryExecutor.getCertificatesForDeltaCrl(caCert, startSerial, numEntries,
+            return queryExecutor.getCertificatesForDeltaCrl(caCert, startId, numEntries,
                     onlyCaCerts, onlyUserCerts);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
@@ -405,17 +405,17 @@ public class CertificateStore {
         }
     }
 
-    public List<BigInteger> getCertSerials(
+    public List<SerialWithId> getCertSerials(
             final X509Cert caCert,
             final Date notExpiredAt,
-            final BigInteger startSerial,
+            final int startId,
             final int numEntries,
             final boolean onlyRevoked,
             final boolean onlyCaCerts,
             final boolean onlyUserCerts)
     throws OperationException {
         try {
-            return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial,
+            return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startId,
                     numEntries, onlyRevoked,
                     onlyCaCerts, onlyUserCerts);
         } catch (DataAccessException ex) {
@@ -476,6 +476,20 @@ public class CertificateStore {
     throws OperationException, CertificateException {
         try {
             return queryExecutor.getCertificateInfo(caCert, serial);
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+        }
+    }
+
+    public String getCertProfileForId(
+            final X509Cert caCert,
+            final int id)
+    throws OperationException {
+        try {
+            return queryExecutor.getCertProfileForId(caCert, id);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
