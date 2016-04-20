@@ -567,19 +567,6 @@ public class CertificateStore {
         }
     }
 
-    public Long getGreatestSerialNumber(
-            final X509Cert caCert)
-    throws OperationException {
-        try {
-            return queryExecutor.getGreatestSerialNumber(caCert);
-        } catch (DataAccessException ex) {
-            LOG.debug("DataAccessException", ex);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
-        } catch (RuntimeException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
-        }
-    }
-
     public boolean isHealthy() {
         return queryExecutor.isHealthy();
     }
@@ -684,45 +671,6 @@ public class CertificateStore {
             return queryExecutor.containsCertificates(caCert, true);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
-        } catch (RuntimeException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
-        }
-    }
-
-    public long nextSerial(
-            final X509Cert caCert,
-            final String seqName)
-    throws OperationException {
-        try {
-            return queryExecutor.nextSerial(caCert, seqName);
-        } catch (DataAccessException ex) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
-        } catch (RuntimeException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
-        }
-    }
-
-    public void commitNextSerialIfLess(
-            final String caName,
-            final long nextSerial)
-    throws OperationException {
-        try {
-            queryExecutor.commitNextSerialIfLess(caName, nextSerial);
-        } catch (DataAccessException ex) {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
-        } catch (RuntimeException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
-        }
-    }
-
-    public void markMaxSerial(
-            final X509Cert caCert,
-            final String seqName)
-    throws OperationException {
-        try {
-            queryExecutor.markMaxSerial(caCert, seqName);
-        } catch (DataAccessException ex) {
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());

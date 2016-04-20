@@ -367,7 +367,7 @@ class CaConfigurationDbImporter extends DbPorter {
     throws DataAccessException, CertificateException, IOException {
         System.out.println("importing table CA");
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CA (NAME, ART, SUBJECT, NEXT_SN, NEXT_CRLNO, STATUS,");
+        sqlBuilder.append("INSERT INTO CA (NAME, ART, SUBJECT, SN_SIZE, NEXT_CRLNO, STATUS,");
         sqlBuilder.append(" CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, MAX_VALIDITY,");
         sqlBuilder.append(" CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME,");
         sqlBuilder.append(" DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS,");
@@ -395,7 +395,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setInt(idx++, art);
                     ps.setString(idx++, X509Util.cutX500Name(cert.getSubjectX500Principal(),
                             maxX500nameLen));
-                    ps.setLong(idx++, ca.getNextSerial());
+                    ps.setInt(idx++, ca.getSnSize());
                     ps.setInt(idx++, ca.getNextCrlNo());
                     ps.setString(idx++, ca.getStatus());
                     ps.setString(idx++, ca.getCrlUris());

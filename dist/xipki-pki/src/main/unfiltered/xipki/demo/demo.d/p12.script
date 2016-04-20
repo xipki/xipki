@@ -25,7 +25,7 @@ xipki-ca:gen-rca \
   --profile RCA \
   --out output/RCA1.der \
   --permission all \
-  --next-serial 1 \
+  --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
@@ -138,7 +138,7 @@ xipki-tk:update-cert-p12 \
 xipki-ca:ca-add \
   --name SubCA1.complex-Name \
   --permission all \
-  --next-serial 1 \
+  --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 5y \
   --signer-type PKCS12 \
@@ -196,7 +196,7 @@ xipki-ca:careq-add \
 xipki-ca:ca-add \
   --name SubCAwithCRL1 \
   --permission all \
-  --next-serial 1 \
+  --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 8000y \
   --signer-type PKCS12 \

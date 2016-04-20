@@ -65,7 +65,7 @@ public class CaExportCmd extends CaCommandSupport {
 
     static final String KEY_ART = "ART";
 
-    static final String KEY_NEXT_SN = "NEXT_SN";
+    static final String KEY_SN_SIZE = "SN_SIZE";
 
     static final String KEY_NEXT_CRLNO = "NEXT_CRLNO";
 
@@ -150,7 +150,7 @@ public class CaExportCmd extends CaCommandSupport {
         propsput(props, KEY_ART, CertArt.X509PKC.name());
 
         // NEXT_SN
-        propsput(props, KEY_NEXT_SN, x509Entry.getNextSerial());
+        propsput(props, KEY_SN_SIZE, x509Entry.getSerialNoSize());
 
         // NEXT_CRLNO
         propsput(props, KEY_NEXT_CRLNO, x509Entry.getNextCrlNumber());

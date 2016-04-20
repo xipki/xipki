@@ -43,7 +43,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CertRevocationInfo;
 import org.xipki.commons.security.api.KeyUsage;
@@ -72,7 +71,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
 
     private String crlSignerName;
 
-    private long nextSerial;
+    private int serialNoSize;
 
     private int nextCrlNumber;
 
@@ -82,11 +81,9 @@ public class X509CaEntry extends CaEntry implements Serializable {
 
     private String subject;
 
-    private String serialSeqName;
-
     public X509CaEntry(
             final String name,
-            final long nextSerial,
+            final int serialNoSize,
             final int nextCrlNumber,
             final String signerType,
             final String signerConf,
@@ -95,19 +92,18 @@ public class X509CaEntry extends CaEntry implements Serializable {
             final int expirationPeriod)
     throws CaMgmtException {
         super(name, signerType, signerConf, expirationPeriod);
-        init(nextSerial, nextCrlNumber, caUris, numCrls);
+        init(serialNoSize, nextCrlNumber, caUris, numCrls);
     }
 
     private void init(
-            final long nextSerial,
+            final int serialNoSize,
             final int nextCrlNumber,
             final X509CaUris caUris,
             final int numCrls)
     throws CaMgmtException {
-        this.numCrls = ParamUtil.requireMin("pNumCrls", numCrls, 0);
-        this.serialSeqName = IoUtil.convertSequenceName("SN_" + getName());
-        this.nextSerial = ParamUtil.requireMin("pNextSerial", nextSerial, 0);
-        this.nextCrlNumber = ParamUtil.requireMin("pNextCRLNumber", nextCrlNumber, 0);
+        this.numCrls = ParamUtil.requireMin("numCrls", numCrls, 0);
+        this.serialNoSize = ParamUtil.requireRange("serialNoSize", serialNoSize, 8, 20);
+        this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 0);
 
         this.cacertUris = caUris.getCacertUris();
         this.ocspUris = caUris.getOcspUris();
@@ -130,13 +126,13 @@ public class X509CaEntry extends CaEntry implements Serializable {
         }
     }
 
-    public long getNextSerial() {
-        return nextSerial;
+    public int getSerialNoSize() {
+        return serialNoSize;
     }
 
-    public void setNextSerial(
-            final long nextSerial) {
-        this.nextSerial = nextSerial;
+    public void setSerialNoSize(
+            final int serialNoSize) {
+        this.serialNoSize = ParamUtil.requireMin("serialNoSize", serialNoSize, 8);
     }
 
     public int getNextCrlNumber() {
@@ -205,7 +201,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
         if (sb.charAt(sb.length() - 1) != '\n') {
             sb.append('\n');
         }
-        sb.append("nextSerial: ").append(nextSerial).append('\n');
+        sb.append("serialNoSize: ").append(serialNoSize).append('\n');
         sb.append("nextCrlNumber: ").append(nextCrlNumber).append('\n');
         sb.append("deltaCrlUris: ").append(getDeltaCrlUrisAsString()).append('\n');
         sb.append("crlUris: ").append(getCrlUrisAsString()).append('\n');
@@ -268,10 +264,6 @@ public class X509CaEntry extends CaEntry implements Serializable {
 
     public String getSubject() {
         return subject;
-    }
-
-    public String getSerialSeqName() {
-        return serialSeqName;
     }
 
 }

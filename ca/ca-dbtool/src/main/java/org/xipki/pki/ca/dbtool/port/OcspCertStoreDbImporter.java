@@ -371,7 +371,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     int idx = 1;
                     psCert.setInt(idx++, id);
                     psCert.setInt(idx++, cert.getIid());
-                    psCert.setLong(idx++, tbsCert.getSerialNumber().getPositiveValue().longValue());
+                    psCert.setString(idx++,
+                            tbsCert.getSerialNumber().getPositiveValue().toString(16));
                     psCert.setLong(idx++, cert.getUpdate());
                     psCert.setLong(idx++, tbsCert.getStartDate().getDate().getTime() / 1000);
                     psCert.setLong(idx++, tbsCert.getEndDate().getDate().getTime() / 1000);

@@ -392,7 +392,7 @@ xipki-caqa:neg-gen-rca \
   --profile RCA \
   --out output/RCA1-2.der \
   --permission all \
-  --next-serial 1 \
+  --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
@@ -412,7 +412,7 @@ xipki-caqa:neg-gen-rca \
   --profile RCA \
   --out output/RCA1-2.der \
   --permission all \
-  --next-serial 1 \
+  --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
@@ -432,7 +432,7 @@ xipki-caqa:neg-gen-rca \
   --profile RCA \
   --out output/RCA1-2.der \
   --permission all \
-  --next-serial 1 \
+  --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
@@ -451,7 +451,7 @@ xipki-ca:profile-rm RCA
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
-  --next-serial 1 \
+  --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
@@ -469,7 +469,7 @@ xipki-caqa:neg-ca-add \
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
-  --next-serial 1 \
+  --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
@@ -487,7 +487,7 @@ xipki-caqa:neg-ca-add \
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
-  --next-serial 1 \
+  --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \
@@ -506,7 +506,7 @@ xipki-caqa:neg-ca-add \
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
-  --next-serial 1 \
+  --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type PKCS12 \

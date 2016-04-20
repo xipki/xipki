@@ -430,7 +430,7 @@ class CaConfigurationDbExporter extends DbPorter {
         Cas cas = new Cas();
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("SELECT NAME, ");
-        sqlBuilder.append("NEXT_SN, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, ");
+        sqlBuilder.append("SN_SIZE, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, ");
         sqlBuilder.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
         sqlBuilder.append("PERMISSIONS, NUM_CRLS, ");
         sqlBuilder.append("EXPIRATION_PERIOD, KEEP_EXPIRED_CERT_DAYS, REV, RR, RT, RIT, ");
@@ -455,7 +455,7 @@ class CaConfigurationDbExporter extends DbPorter {
                 String cmpcontrolName = rs.getString("CMPCONTROL_NAME");
                 String caCertUris = rs.getString("CACERT_URIS");
                 String extraControl = rs.getString("EXTRA_CONTROL");
-                long nextSerial = rs.getLong("NEXT_SN");
+                int serialSize = rs.getInt("SN_SIZE");
                 String status = rs.getString("STATUS");
                 String crlUris = rs.getString("CRL_URIS");
                 String deltaCrlUris = rs.getString("DELTACRL_URIS");
@@ -475,7 +475,7 @@ class CaConfigurationDbExporter extends DbPorter {
                 CaType ca = new CaType();
                 ca.setName(name);
                 ca.setArt(art);
-                ca.setNextSerial(nextSerial);
+                ca.setSnSize(serialSize);
                 ca.setNextCrlNo(nextCrlNo);
                 ca.setStatus(status);
                 ca.setCrlUris(crlUris);

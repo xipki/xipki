@@ -160,42 +160,14 @@ public class TargetDigestRetriever {
             List<Long> serialNumbers = bundle.getSerialNumbers();
             int size = serialNumbers.size();
 
-            long minSerialNumber = serialNumbers.get(0);
-            long maxSerialNumber = serialNumbers.get(0);
-            for (Long m : serialNumbers) {
-                if (minSerialNumber > m) {
-                    minSerialNumber = m;
-                }
-                if (maxSerialNumber < m) {
-                    maxSerialNumber = m;
-                }
-            }
-
             Map<Long, DbDigestEntry> certsInB;
-            long serialDiff = maxSerialNumber - minSerialNumber;
-
-            if (serialDiff < numPerSelect * 2) {
-                ResultSet rs = null;
-                try {
-                    rangeSelectStmt.setLong(1, minSerialNumber);
-                    rangeSelectStmt.setLong(2, maxSerialNumber);
-                    rs = rangeSelectStmt.executeQuery();
-
-                    certsInB = buildResult(rs, serialNumbers);
-                } catch (SQLException ex) {
-                    throw datasource.translate(inArrayCertsSql, ex);
-                } finally {
-                    releaseResources(null, rs);
-                }
+            boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
+            if (batchSupported && size == numPerSelect) {
+                certsInB = getCertsViaInArraySelectInB(inArraySelectStmt,
+                        serialNumbers);
             } else {
-                boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
-                if (batchSupported && size == numPerSelect) {
-                    certsInB = getCertsViaInArraySelectInB(inArraySelectStmt,
-                            serialNumbers);
-                } else {
-                    certsInB = getCertsViaSingleSelectInB(
-                            singleSelectStmt, serialNumbers);
-                }
+                certsInB = getCertsViaSingleSelectInB(
+                        singleSelectStmt, serialNumbers);
             }
 
             return certsInB;

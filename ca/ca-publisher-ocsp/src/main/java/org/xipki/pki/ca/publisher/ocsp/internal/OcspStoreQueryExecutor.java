@@ -243,7 +243,7 @@ class OcspStoreQueryExecutor {
             // CERT
             int idx = 2;
             psAddcert.setLong(idx++, currentTimeSeconds);
-            psAddcert.setLong(idx++, serialNumber.longValue());
+            psAddcert.setString(idx++, serialNumber.toString(16));
             psAddcert.setLong(idx++, notBeforeSeconds);
             psAddcert.setLong(idx++, notAfterSeconds);
             setBoolean(psAddcert, idx++, revoked);
@@ -384,7 +384,7 @@ class OcspStoreQueryExecutor {
                 ps.setNull(idx++, Types.INTEGER); // rev_reason
             }
             ps.setInt(idx++, issuerId);
-            ps.setLong(idx++, serialNumber.longValue());
+            ps.setString(idx++, serialNumber.toString(16));
             ps.executeUpdate();
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
@@ -434,7 +434,7 @@ class OcspStoreQueryExecutor {
                 ps.setNull(idx++, Types.INTEGER);
                 ps.setNull(idx++, Types.INTEGER);
                 ps.setInt(idx++, issuerId);
-                ps.setLong(idx++, serialNumber.longValue());
+                ps.setString(idx++, serialNumber.toString(16));
                 ps.executeUpdate();
             } catch (SQLException ex) {
                 throw datasource.translate(sql, ex);
@@ -448,7 +448,7 @@ class OcspStoreQueryExecutor {
             try {
                 int idx = 1;
                 ps.setInt(idx++, issuerId);
-                ps.setLong(idx++, serialNumber.longValue());
+                ps.setString(idx++, serialNumber.toString(16));
                 ps.executeUpdate();
             } catch (SQLException ex) {
                 throw datasource.translate(sql, ex);
@@ -477,7 +477,7 @@ class OcspStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setInt(idx++, issuerId);
-            ps.setLong(idx++, cert.getCert().getSerialNumber().longValue());
+            ps.setString(idx++, cert.getCert().getSerialNumber().toString(16));
             ps.executeUpdate();
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
@@ -691,7 +691,7 @@ class OcspStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setLong(idx++, serialNumber.longValue());
+            ps.setString(idx++, serialNumber.toString(16));
             ps.setInt(idx++, issuerId);
 
             rs = ps.executeQuery();

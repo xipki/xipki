@@ -513,7 +513,7 @@ class CaManagerQueryExecutor {
             final boolean masterMode,
             final CertificateStore certstore)
     throws CaMgmtException {
-        final String sql = "NAME, ART, NEXT_SN, NEXT_CRLNO, STATUS, MAX_VALIDITY"
+        final String sql = "NAME, ART, SN_SIZE, NEXT_CRLNO, STATUS, MAX_VALIDITY"
                 + ", CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME"
                 + ", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS"
                 + ", KEEP_EXPIRED_CERT_DAYS, EXPIRATION_PERIOD, REV, RR, RT, RIT, VALIDITY_MODE"
@@ -577,14 +577,14 @@ class CaManagerQueryExecutor {
             X509CaUris caUris = new X509CaUris(tmpCacertUris, tmpOcspUris, tmpCrlUris,
                     tmpDeltaCrlUris);
 
-            long nextSerial = rs.getLong("NEXT_SN");
+            int serialNoSize = rs.getInt("SN_SIZE");
             int nextCrlNo = rs.getInt("NEXT_CRLNO");
             String signerType = rs.getString("SIGNER_TYPE");
             String signerConf = rs.getString("SIGNER_CONF");
             int numCrls = rs.getInt("NUM_CRLS");
             int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
 
-            X509CaEntry entry = new X509CaEntry(name, nextSerial, nextCrlNo,
+            X509CaEntry entry = new X509CaEntry(name, serialNoSize, nextCrlNo,
                     signerType, signerConf, caUris, numCrls, expirationPeriod);
             String b64cert = rs.getString("CERT");
             X509Certificate cert = generateCert(b64cert);
@@ -816,7 +816,7 @@ class CaManagerQueryExecutor {
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("INSERT INTO CA (");
-        sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SN, NEXT_CRLNO, STATUS");
+        sqlBuilder.append("NAME, ART, SUBJECT, SN_SIZE, NEXT_CRLNO, STATUS");
         sqlBuilder.append(", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS");
         sqlBuilder.append(", MAX_VALIDITY, CERT, SIGNER_TYPE");
         sqlBuilder.append(", CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME");
@@ -835,13 +835,7 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, name);
             ps.setInt(idx++, CertArt.X509PKC.getCode());
             ps.setString(idx++, entry.getSubject());
-
-            long nextSerial = entry.getNextSerial();
-            if (nextSerial < 0) {
-                nextSerial = 0;
-            }
-            ps.setLong(idx++, nextSerial);
-
+            ps.setInt(idx++, entry.getSerialNoSize());
             ps.setInt(idx++, entry.getNextCrlNumber());
             ps.setString(idx++, entry.getStatus().getStatus());
             ps.setString(idx++, entry.getCrlUrisAsString());
@@ -867,18 +861,13 @@ class CaManagerQueryExecutor {
 
             ps.executeUpdate();
 
-            // create serial sequence
-            if (nextSerial > 0) {
-                datasource.createSequence(entry.getSerialSeqName(), nextSerial);
-            }
-
             if (LOG.isInfoEnabled()) {
                 LOG.info("add CA '{}': {}", name, entry.toString(false, true));
             }
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
-        } catch (CertificateEncodingException | DataAccessException ex) {
+        } catch (CertificateEncodingException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
             datasource.releaseResources(ps, null);

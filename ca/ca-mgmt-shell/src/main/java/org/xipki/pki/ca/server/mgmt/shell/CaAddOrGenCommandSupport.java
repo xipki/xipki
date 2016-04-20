@@ -43,6 +43,7 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
@@ -110,11 +111,11 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
     @Completion(PermissionCompleter.class)
     private Set<String> permissions;
 
-    @Option(name = "--next-serial",
+    @Option(name = "--sn-size",
             required = true,
-            description = "serial number for the next certificate, 0 for random serial number\n"
+            description = "number of octets of the serial number, between 8 and 20\n"
                     + "(required)")
-    private Long nextSerial;
+    private int snSize;
 
     @Option(name = "--next-crl-no",
             required = true,
@@ -190,9 +191,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
 
     protected X509CaEntry getCaEntry()
     throws Exception {
-        if (nextSerial < 0) {
-            throw new IllegalCmdParamException("invalid serial number: " + nextSerial);
-        }
+        ParamUtil.requireRange("sn-size", snSize, 8, 20);
 
         if (nextCrlNumber < 1) {
             throw new IllegalCmdParamException("invalid CRL number: " + nextCrlNumber);
@@ -218,7 +217,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
 
         X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
         X509CaEntry entry = new X509CaEntry(
-                caName, nextSerial, nextCrlNumber, signerType, signerConf,
+                caName, snSize, nextCrlNumber, signerType, signerConf,
                 caUris, numCrls.intValue(), expirationPeriod.intValue());
 
         entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());

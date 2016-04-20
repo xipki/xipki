@@ -167,12 +167,6 @@ public class X509Ca {
             inProcess = true;
             try {
                 try {
-                    caInfo.commitNextSerial();
-                } catch (Throwable th) {
-                    LogUtil.error(LOG, th, "could not commit the NEXT_SN");
-                }
-
-                try {
                     caInfo.commitNextCrlNo();
                 } catch (Throwable th) {
                     LogUtil.error(LOG, th, "could not commit the NEXT_CRLNO");
@@ -484,13 +478,10 @@ public class X509Ca {
         }
 
         this.cf = new CertificateFactory();
-
-        if (!caInfo.useRandomSerialNumber()) {
-            nextSerialCommitService = caManager.getScheduledThreadPoolExecutor()
-                    .scheduleAtFixedRate(
-                            new ScheduledNextSerialCommitService(),
-                            1, 1, TimeUnit.MINUTES); // commit the next_serial every 1 minute
-        }
+        this.nextSerialCommitService = caManager.getScheduledThreadPoolExecutor()
+                .scheduleAtFixedRate(
+                        new ScheduledNextSerialCommitService(),
+                        1, 1, TimeUnit.MINUTES); // commit the next_serial every 1 minute
 
         if (!masterMode) {
             return;
@@ -501,13 +492,11 @@ public class X509Ca {
         }
 
         // CRL generation services
-        crlGenerationService = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
-                new ScheduledCrlGenerationService(),
-                1, 1, TimeUnit.MINUTES);
+        this.crlGenerationService = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
+                new ScheduledCrlGenerationService(), 1, 1, TimeUnit.MINUTES);
 
-        expiredCertsRemover = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
-                new ScheduledExpiredCertsRemover(),
-                1, 1, TimeUnit.DAYS);
+        this.expiredCertsRemover = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
+                new ScheduledExpiredCertsRemover(), 1, 1, TimeUnit.DAYS);
     } // constructor
 
     public X509CaInfo getCaInfo() {

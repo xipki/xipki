@@ -48,8 +48,6 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.api.CertRevocationInfo;
@@ -74,8 +72,6 @@ import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 
 public class X509CaInfo {
 
-    private static final Logger LOG = LoggerFactory.getLogger(X509CaInfo.class);
-
     private static final long MS_PER_DAY = 24L * 60 * 60 * 1000;
 
     private final X509CaEntry caEntry;
@@ -95,8 +91,6 @@ public class X509CaInfo {
     private PublicCaInfo publicCaInfo;
 
     private CertificateStore certStore;
-
-    private boolean useRandomSerialNumber;
 
     private RandomSerialNumberGenerator randomSnGenerator;
 
@@ -136,41 +130,8 @@ public class X509CaInfo {
         this.noNewCertificateAfter =
                 this.notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
 
-        this.useRandomSerialNumber = caEntry.getNextSerial() < 1;
-        if (this.useRandomSerialNumber) {
-            randomSnGenerator = RandomSerialNumberGenerator.getInstance();
-            return;
-        }
-
-        Long greatestSerialNumber = certStore.getGreatestSerialNumber(
-                this.publicCaInfo.getCaCertificate());
-
-        if (greatestSerialNumber == null) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "could not retrieve the greatest serial number for ca " + caEntry.getName());
-        }
-
-        long nextSerial = greatestSerialNumber + 1;
-        if (nextSerial < 2) {
-            nextSerial = 2;
-        }
-
-        if (caEntry.getNextSerial() < nextSerial) {
-            LOG.info("corrected the next_serial of {} from {} to {}",
-                    new Object[]{caEntry.getName(), caEntry.getNextSerial(), nextSerial});
-            caEntry.setNextSerial(nextSerial);
-            certStore.commitNextSerialIfLess(getName(), nextSerial);
-        } else {
-            nextSerial = caEntry.getNextSerial();
-        }
+        this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
     } // constructor
-
-    public void commitNextSerial()
-    throws OperationException {
-        if (!useRandomSerialNumber) {
-            certStore.commitNextSerialIfLess(caEntry.getName(), caEntry.getNextSerial());
-        }
-    }
 
     public void commitNextCrlNo()
     throws OperationException {
@@ -375,20 +336,7 @@ public class X509CaInfo {
 
     public BigInteger nextSerial()
     throws OperationException {
-        if (useRandomSerialNumber) {
-            return randomSnGenerator.nextSerialNumber();
-        }
-
-        long serial = certStore.nextSerial(getCertificate(), caEntry.getSerialSeqName());
-        caEntry.setNextSerial(serial + 1);
-        return BigInteger.valueOf(serial);
-    }
-
-    public void markMaxSerial()
-    throws OperationException {
-        if (!useRandomSerialNumber) {
-            certStore.markMaxSerial(getCertificate(), caEntry.getSerialSeqName());
-        }
+        return randomSnGenerator.nextSerialNumber(caEntry.getSerialNoSize());
     }
 
     public BigInteger nextCrlNumber()
@@ -400,10 +348,6 @@ public class X509CaInfo {
         }
         caEntry.setNextCrlNumber(crlNo + 1);
         return BigInteger.valueOf(crlNo);
-    }
-
-    public boolean useRandomSerialNumber() {
-        return useRandomSerialNumber;
     }
 
     public ConcurrentContentSigner getSigner(
