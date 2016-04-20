@@ -126,8 +126,8 @@
       <column name="ART" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
-      <column name="NEXT_SN" type="BIGINT"
-          remarks="next serial number"/>
+      <column name="SN_SIZE" type="SMALLINT"
+          remarks="number of octets of the serial number"/>
       <column name="NEXT_CRLNO" type="INT"/>
       <column name="STATUS" type="VARCHAR(10)"
           remarks="valid values: active, inactive">
@@ -345,7 +345,7 @@
           remarks="Issuer (CA) id">
         <constraints nullable="false"/>
       </column>
-      <column name="SN" type="BIGINT"
+      <column name="SN" type="VARCHAR(40)"
           remarks="serial number">
         <constraints nullable="false"/>
       </column>
@@ -449,7 +449,7 @@
       <column name="CA_ID" type="INT">
         <constraints nullable="false"/>
       </column>
-      <column name="SN" type="BIGINT">
+      <column name="SN" type="VARCHAR(40)">
         <constraints nullable="false"/>
       </column>
     </createTable>

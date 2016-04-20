@@ -124,10 +124,10 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         }
 
         // NEXT_SN
-        key = CaExportCmd.KEY_NEXT_SN;
-        long nextSerial = getRequiredLongProp(props, key);
-        if (nextSerial < 0) {
-            throw new IllegalCmdParamException("invalid " + key + ": " + nextSerial);
+        key = CaExportCmd.KEY_SN_SIZE;
+        int serialSize = getRequiredIntProp(props, key);
+        if (serialSize < 8 || serialSize > 20) {
+            throw new IllegalCmdParamException("invalid " + key + ": " + serialSize);
         }
 
         // NEXT_CRLNO
@@ -199,7 +199,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
         // CHECKSTYLE:SKIP
         X509CaEntry entry = new X509CaEntry(
-                caName, nextSerial, nextCrlNumber, signerType, signerConf,
+                caName, serialSize, nextCrlNumber, signerType, signerConf,
                 caUris, numCrls, expirationPeriod);
 
         // STATUS

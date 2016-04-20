@@ -341,8 +341,8 @@ class OcspCertStoreDbExporter extends DbPorter {
                     int issuerId = rs.getInt("IID");
                     cert.setIid(issuerId);
 
-                    long serial = rs.getLong("SN");
-                    cert.setSn(Long.toHexString(serial));
+                    String serial = rs.getString("SN");
+                    cert.setSn(serial);
 
                     long update = rs.getLong("LUPDATE");
                     cert.setUpdate(update);

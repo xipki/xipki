@@ -109,7 +109,7 @@
           remarks="issuer id">
         <constraints nullable="false"/>
       </column>
-      <column name="SN" type="BIGINT"
+      <column name="SN" type="VARCHAR(40)"
           remarks="serial number">
         <constraints nullable="false"/>
       </column>

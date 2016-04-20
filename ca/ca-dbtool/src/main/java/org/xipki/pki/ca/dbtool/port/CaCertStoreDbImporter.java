@@ -501,7 +501,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 try {
                     int idx = 1;
                     ps.setLong(idx++, id++);
-                    ps.setLong(idx++, entry.getSerial());
+                    ps.setString(idx++, entry.getSerial());
                     ps.setInt(idx++, entry.getCaId());
                     ps.execute();
                 } catch (SQLException ex) {
@@ -859,7 +859,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     psCert.setInt(idx++, id);
                     psCert.setInt(idx++, certArt);
                     psCert.setLong(idx++, cert.getUpdate());
-                    psCert.setLong(idx++, tbsCert.getSerialNumber().getPositiveValue().longValue());
+                    psCert.setString(idx++,
+                            tbsCert.getSerialNumber().getPositiveValue().toString(16));
 
                     psCert.setString(idx++, subjectText);
                     long fpSubject = X509Util.fpCanonicalizedName(tbsCert.getSubject());

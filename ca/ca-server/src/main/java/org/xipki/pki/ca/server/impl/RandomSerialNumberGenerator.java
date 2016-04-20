@@ -54,21 +54,13 @@ class RandomSerialNumberGenerator {
         this.random = new SecureRandom();
     }
 
-    public BigInteger nextSerialNumber() {
-        while (true) {
-            byte[] rdnBytes = new byte[8];
-            random.nextBytes(rdnBytes);
-            byte[] positiveRdnBytes = new byte[9];
-            System.arraycopy(rdnBytes, 0, positiveRdnBytes, 1, 8);
-            BigInteger serial = new java.math.BigInteger(positiveRdnBytes);
-            if (serial.testBit(63)) {
-                serial = serial.clearBit(63);
-            }
-            // make sure serial != 0
-            if (serial.bitLength() != 0) {
-                return serial;
-            }
+    public BigInteger nextSerialNumber(int size) {
+        byte[] rdnBytes = new byte[size];
+        random.nextBytes(rdnBytes);
+        if (rdnBytes[0] < 0) {
+            rdnBytes[0] = (byte) (255 + rdnBytes[0]); // clear the first bit
         }
+        return new java.math.BigInteger(1, rdnBytes);
     }
 
     public static synchronized RandomSerialNumberGenerator getInstance() {

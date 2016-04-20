@@ -145,9 +145,6 @@ class CertStoreQueryExecutor {
     private static final String SQL_REMOVE_CERT =
             "DELETE FROM CERT WHERE CA_ID=? AND SN=?";
 
-    private static final String SQL_MAX_SN =
-            "SELECT MAX(SN) FROM CERT WHERE CA_ID=?";
-
     private static final String CORESQL_CERT_FOR_ID =
             "PID, REV, RR, RT, RIT, CERT FROM CERT INNER JOIN CRAW"
             + " ON CERT.ID=? AND CRAW.CID=CERT.ID";
@@ -171,9 +168,6 @@ class CertStoreQueryExecutor {
 
     private static final String SQL_DELETE_CERT_INPROCESS_OLDER_THAN =
             "DELETE FROM CERT_IN_PROCESS WHERE TIME2 < ?";
-
-    private static final String CORESQL_ID_FOR_SN_IN_CERT =
-            "ID FROM CERT WHERE CA_ID=? AND SN=?";
 
     private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED =
             "ID FROM CERT WHERE CA_ID=? AND FP_S=?";
@@ -315,7 +309,7 @@ class CertStoreQueryExecutor {
                 : Base64.toBase64String(transactionId);
 
         long currentTimeSeconds = System.currentTimeMillis() / 1000;
-        long serialNumber = cert.getSerialNumber().longValue();
+        BigInteger serialNumber = cert.getSerialNumber();
         long notBeforeSeconds = cert.getNotBefore().getTime() / 1000;
         long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
 
@@ -331,7 +325,7 @@ class CertStoreQueryExecutor {
             int idx = 2;
             psAddcert.setInt(idx++, CertArt.X509PKC.getCode());
             psAddcert.setLong(idx++, currentTimeSeconds);
-            psAddcert.setLong(idx++, serialNumber);
+            psAddcert.setString(idx++, serialNumber.toString(16));
             psAddcert.setString(idx++, subjectText);
             psAddcert.setLong(idx++, fpSubject);
             if (fpReqSubject != null) {
@@ -875,7 +869,7 @@ class CertStoreQueryExecutor {
             int idx = 1;
             ps.setLong(idx++, id);
             ps.setInt(idx++, caId);
-            ps.setLong(idx++, serialNumber.longValue());
+            ps.setString(idx++, serialNumber.toString(16));
             ps.executeUpdate();
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
@@ -910,7 +904,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setInt(idx++, caId);
-            ps.setLong(idx++, serialNumber.longValue());
+            ps.setString(idx++, serialNumber.toString(16));
 
             int count = ps.executeUpdate();
             if (count != 1) {
@@ -928,27 +922,6 @@ class CertStoreQueryExecutor {
             releaseDbResources(ps, null);
         }
     } // method removeCertificate
-
-    Long getGreatestSerialNumber(
-            final X509Cert caCert)
-    throws DataAccessException, OperationException {
-        ParamUtil.requireNonNull("caCert", caCert);
-
-        final String sql = SQL_MAX_SN;
-        int caId = getCaId(caCert);
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        ResultSet rs = null;
-        try {
-            ps.setInt(1, caId);
-            rs = ps.executeQuery();
-            rs.next();
-            return rs.getLong(1);
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            releaseDbResources(ps, rs);
-        }
-    } // method getGreatestSerialNumber
 
     List<Integer> getPublishQueueEntries(
             final X509Cert caCert,
@@ -1062,8 +1035,8 @@ class CertStoreQueryExecutor {
             List<SerialWithId> ret = new ArrayList<>();
             while (rs.next() && ret.size() < numEntries) {
                 int id = rs.getInt("ID");
-                long serial = rs.getLong("SN");
-                ret.add(new SerialWithId(id, BigInteger.valueOf(serial)));
+                String serial = rs.getString("SN");
+                ret.add(new SerialWithId(id, new BigInteger(serial, 16)));
             }
             return ret;
         } catch (SQLException ex) {
@@ -1094,8 +1067,8 @@ class CertStoreQueryExecutor {
             rs = ps.executeQuery();
             List<BigInteger> ret = new ArrayList<>();
             while (rs.next() && ret.size() < numEntries) {
-                long serial = rs.getLong("SN");
-                ret.add(BigInteger.valueOf(serial));
+                String serial = rs.getString("SN");
+                ret.add(new BigInteger(serial, 16));
             }
             return ret;
         } catch (SQLException ex) {
@@ -1329,7 +1302,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setInt(idx++, caId);
-            ps.setLong(idx++, serial.longValue());
+            ps.setString(idx++, serial.toString(16));
             rs = ps.executeQuery();
             if (!rs.next()) {
                 return null;
@@ -1403,7 +1376,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setInt(idx++, caId);
-            ps.setLong(idx++, serial.longValue());
+            ps.setString(idx++, serial.toString(16));
             rs = ps.executeQuery();
             if (!rs.next()) {
                 return null;
@@ -1503,7 +1476,7 @@ class CertStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setLong(idx++, serial.longValue());
+            ps.setString(idx++, serial.toString(16));
             ps.setInt(idx++, caId);
 
             rs = ps.executeQuery();
@@ -1655,7 +1628,7 @@ class CertStoreQueryExecutor {
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
-            ps.setLong(1, serial.longValue());
+            ps.setString(1, serial.toString(16));
             ps.setInt(2, caId);
             rs = ps.executeQuery();
 
@@ -1713,7 +1686,7 @@ class CertStoreQueryExecutor {
             List<CertRevInfoWithSerial> ret = new LinkedList<>();
             while (rs.next()) {
                 int id = rs.getInt("ID");
-                long serial = rs.getLong("SN");
+                String serial = rs.getString("SN");
                 int revReason = rs.getInt("RR");
                 long revTime = rs.getLong("RT");
                 long revInvalidityTime = rs.getLong("RIT");
@@ -1722,7 +1695,7 @@ class CertStoreQueryExecutor {
                         ? null
                         : new Date(1000 * revInvalidityTime);
                 CertRevInfoWithSerial revInfo = new CertRevInfoWithSerial(id,
-                        BigInteger.valueOf(serial), revReason, new Date(1000 * revTime),
+                        new BigInteger(serial, 16), revReason, new Date(1000 * revTime),
                         invalidityTime);
                 ret.add(revInfo);
             }
@@ -1798,7 +1771,7 @@ class CertStoreQueryExecutor {
 
                 CertRevInfoWithSerial revInfo;
 
-                long serial = rs.getLong("SN");
+                String serial = rs.getString("SN");
                 boolean revoked = rs.getBoolean("REVOEKD");
                 if (revoked) {
                     int revReason = rs.getInt("RR");
@@ -1808,11 +1781,11 @@ class CertStoreQueryExecutor {
                     Date invalidityTime = (revInvalidityTime == 0)
                             ? null
                             : new Date(1000 * revInvalidityTime);
-                    revInfo = new CertRevInfoWithSerial(id, BigInteger.valueOf(serial),
+                    revInfo = new CertRevInfoWithSerial(id, new BigInteger(serial, 16),
                             revReason, new Date(1000 * tmpRevTime), invalidityTime);
                 } else {
                     long lastUpdate = rs.getLong("LUPDATE");
-                    revInfo = new CertRevInfoWithSerial(id, BigInteger.valueOf(serial),
+                    revInfo = new CertRevInfoWithSerial(id, new BigInteger(serial, 16),
                             CrlReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
                 }
                 ret.add(revInfo);
@@ -2245,81 +2218,6 @@ class CertStoreQueryExecutor {
         }
     } // method getNotBeforeOfFirstCertStartsWithCommonName
 
-    void markMaxSerial(
-            final X509Cert caCert,
-            final String seqName)
-    throws DataAccessException {
-        byte[] encodedCert = caCert.getEncodedCert();
-        Integer caId = caInfoStore.getCaIdForCert(encodedCert);
-        if (caId == null) {
-            return;
-        }
-
-        final String sql = "SELECT MAX(SN) FROM CERT WHERE CA_ID=?";
-        Long maxSerial = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            ps = borrowPreparedStatement(sql);
-            ps.setInt(1, caId);
-            rs = ps.executeQuery();
-            if (!rs.next()) {
-                return;
-            }
-            maxSerial = rs.getLong(1);
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, rs);
-        }
-
-        if (maxSerial != null) {
-            datasource.setLastUsedSeqValue(seqName, maxSerial);
-        }
-    } // method markMaxSerial
-
-    void commitNextSerialIfLess(
-            final String caName,
-            final long nextSerial)
-    throws DataAccessException {
-        Connection conn = datasource.getConnection();
-        PreparedStatement ps = null;
-        try {
-            String sql = "SELECT NEXT_SN FROM CA WHERE NAME = '" + caName + "'";
-            ResultSet rs = null;
-            long nextSerialInDb;
-
-            try {
-                ps = conn.prepareStatement(sql);
-                rs = ps.executeQuery();
-                rs.next();
-                nextSerialInDb = rs.getLong("NEXT_SN");
-            } catch (SQLException ex) {
-                throw datasource.translate(sql, ex);
-            } finally {
-                releaseStatement(ps);
-
-                if (rs != null) {
-                    releaseResultSet(rs);
-                }
-            }
-
-            if (nextSerialInDb < nextSerial) {
-                sql = "UPDATE CA SET NEXT_SN=? WHERE NAME=?";
-                try {
-                    ps = conn.prepareStatement(sql);
-                    ps.setLong(1, nextSerial);
-                    ps.setString(2, caName);
-                    ps.executeUpdate();
-                } catch (SQLException ex) {
-                    throw datasource.translate(sql, ex);
-                }
-            }
-        } finally {
-            datasource.releaseResources(ps, null);
-        }
-    } // method commitNextSerialIfLess
-
     void commitNextCrlNoIfLess(
             final String caName,
             final int nextCrlNo)
@@ -2361,52 +2259,6 @@ class CertStoreQueryExecutor {
             datasource.releaseResources(ps, null);
         }
     } // method commitNextCrlNoIfLess
-
-    long nextSerial(
-            final X509Cert caCert,
-            final String seqName)
-    throws DataAccessException {
-        byte[] encodedCert = caCert.getEncodedCert();
-        Integer caId = caInfoStore.getCaIdForCert(encodedCert);
-        if (caId == null) {
-            throw new IllegalArgumentException(
-                    "unknown CA with subject '" + caCert.getSubject() + "'");
-        }
-
-        final String sql = datasource.createFetchFirstSelectSql(CORESQL_ID_FOR_SN_IN_CERT, 1);
-        Connection conn = datasource.getConnection();
-        PreparedStatement ps = null;
-
-        try {
-            ps = datasource.prepareStatement(conn, sql);
-            ps.setInt(1, caId);
-
-            while (true) {
-                long serial = datasource.nextSeqValue(conn, seqName);
-
-                ResultSet rs = null;
-                try {
-                    ps.setLong(2, serial);
-                    rs = ps.executeQuery();
-                    if (!rs.next()) {
-                        return serial;
-                    }
-                } catch (SQLException ex) {
-                    throw datasource.translate(sql, ex);
-                } finally {
-                    datasource.releaseResources(null, rs);
-                }
-            }
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            if (ps != null) {
-                datasource.releaseResources(ps, null);
-            } else {
-                datasource.returnConnection(conn);
-            }
-        }
-    }
 
     private int nextCertId()
     throws DataAccessException {

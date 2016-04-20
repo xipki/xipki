@@ -131,7 +131,7 @@ class X509SelfSignedCertBuilder {
             final String signerConf,
             final IdentifiedX509Certprofile certprofile,
             final CertificationRequest p10Request,
-            final long serialNumber,
+            final BigInteger serialNumber,
             final List<String> cacertUris,
             final List<String> ocspUris,
             final List<String> crlUris,
@@ -141,7 +141,11 @@ class X509SelfSignedCertBuilder {
         ParamUtil.requireNonBlank("signerType", signerType);
         ParamUtil.requireNonNull("certprofile", certprofile);
         ParamUtil.requireNonNull("p10Request", p10Request);
-        ParamUtil.requireMin("serialNumber", serialNumber, 1);
+        ParamUtil.requireNonNull("serialNumber", serialNumber);
+        if (serialNumber.compareTo(BigInteger.ZERO) != 1) {
+            throw new IllegalArgumentException(
+                    "serialNumber must not be non-positive: " + serialNumber);
+        }
 
         if (!securityFactory.verifyPopo(p10Request)) {
             throw new InvalidConfException("could not validate POP for the pkcs#10 requst");
@@ -223,7 +227,7 @@ class X509SelfSignedCertBuilder {
             final ConcurrentContentSigner signer,
             final IdentifiedX509Certprofile certprofile,
             final CertificationRequest p10Request,
-            final long serialNumber,
+            final BigInteger serialNumber,
             final SubjectPublicKeyInfo publicKeyInfo,
             final List<String> cacertUris,
             final List<String> ocspUris,
@@ -275,17 +279,16 @@ class X509SelfSignedCertBuilder {
 
         X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
-        BigInteger tmpSerialNumber = BigInteger.valueOf(serialNumber);
         X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                 grantedSubject,
-                tmpSerialNumber,
+                serialNumber,
                 notBefore,
                 notAfter,
                 grantedSubject,
                 tmpPublicKeyInfo);
 
         PublicCaInfo publicCaInfo = new PublicCaInfo(
-                grantedSubject, tmpSerialNumber, null, null,
+                grantedSubject, serialNumber, null, null,
                 cacertUris, ocspUris, crlUris, deltaCrlUris);
 
         Extensions extensions = null;

@@ -811,8 +811,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                     int cainfoId = rs.getInt("CA_ID");
                     cert.setCaId(cainfoId);
 
-                    long serial = rs.getLong("SN");
-                    cert.setSn(Long.toHexString(serial));
+                    String serial = rs.getString("SN");
+                    cert.setSn(serial);
 
                     int certprofileId = rs.getInt("PID");
                     cert.setPid(certprofileId);
@@ -977,11 +977,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     throws DataAccessException, IOException, JAXBException {
         System.out.println("exporting table DELTACRL_CACHE");
 
-        StringBuilder sqlBuilder = new StringBuilder("SELECT");
-        sqlBuilder.append(" SN, ");
-        sqlBuilder.append("CA_ID");
-        sqlBuilder.append(" FROM DELTACRL_CACHE");
-        final String sql = sqlBuilder.toString();
+        final String sql = "SELECT SN, CA_ID FROM DELTACRL_CACHE";
 
         DeltaCRLCache deltaCache = new DeltaCRLCache();
         certstore.setDeltaCRLCache(deltaCache);
@@ -995,7 +991,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                long serial = rs.getLong("SN");
+                String serial = rs.getString("SN");
                 int caId = rs.getInt("CA_ID");
 
                 DeltaCRLCacheEntryType entry = new DeltaCRLCacheEntryType();

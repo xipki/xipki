@@ -812,13 +812,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         for (String caName : x509cas.keySet()) {
             X509Ca ca = x509cas.get(caName);
             try {
-                ca.getCaInfo().commitNextSerial();
-            } catch (Throwable th) {
-                LOG.info("could not call CAInfo.commitNextSerial for CA '{}': {}", caName,
-                        th.getMessage());
-            }
-
-            try {
                 ca.shutdown();
             } catch (Throwable th) {
                 LOG.info("could not call ca.shutdown() for CA '{}': {}", caName, th.getMessage());
@@ -1156,11 +1149,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         X509CaInfo ca = queryExecutor.createCaInfo(name, masterMode, certstore);
-        try {
-            ca.markMaxSerial();
-        } catch (OperationException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
-        }
         caInfos.put(name, ca);
 
         Set<CaHasRequestorEntry> caHasRequestorList = queryExecutor.createCaHasRequestors(name);
@@ -2128,22 +2116,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return false;
         }
 
-        CaMgmtException exception = null;
-
-        X509CaInfo caInfo = caInfos.get(tmpCaName);
-        if (caInfo != null && caInfo.getCaEntry().getNextSerial() > 0) {
-            // drop the serial number sequence
-            final String sequenceName = caInfo.getCaEntry().getSerialSeqName();
-            try {
-                datasource.dropSequence(sequenceName);
-            } catch (DataAccessException ex) {
-                LogUtil.warn(LOG, ex, "error in dropSequence " + sequenceName);
-                if (exception == null) {
-                    exception = new CaMgmtException(ex.getMessage(), ex);
-                }
-            }
-        }
-
         LOG.info("removed CA '{}'", tmpCaName);
         caInfos.remove(tmpCaName);
         caHasProfiles.remove(tmpCaName);
@@ -2153,10 +2125,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         x509Responders.remove(tmpCaName);
         if (ca != null) {
             ca.shutdown();
-        }
-
-        if (exception != null) {
-            throw exception;
         }
         return true;
     } // method removeCa
@@ -2535,7 +2503,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonNull("caEntry", caEntry);
         ParamUtil.requireNonBlank("certprofileName", certprofileName);
         ParamUtil.requireNonNull("p10Req", p10Req);
-        long nextSerial = caEntry.getNextSerial();
         int numCrls = caEntry.getNumCrls();
         List<String> crlUris = caEntry.getCrlUris();
         List<String> deltaCrlUris = caEntry.getDeltaCrlUris();
@@ -2544,10 +2511,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         String signerType = caEntry.getSignerType();
 
         asssertMasterMode();
-        if (nextSerial < 0) {
-            System.err.println("invalid serial number: " + nextSerial);
-            return null;
-        }
 
         if (numCrls < 0) {
             System.err.println("invalid numCrls: " + numCrls);
@@ -2578,14 +2541,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("unknown cert profile " + certprofileName);
         }
 
-        long serialOfThisCert;
-        if (nextSerial > 0) {
-            serialOfThisCert = nextSerial;
-            nextSerial++;
-        } else {
-            serialOfThisCert =
-                    RandomSerialNumberGenerator.getInstance().nextSerialNumber().longValue();
-        }
+        BigInteger serialOfThisCert = RandomSerialNumberGenerator.getInstance().nextSerialNumber(
+                caEntry.getSerialNoSize());
 
         GenerateSelfSignedResult result;
         try {
@@ -2615,9 +2572,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         int nextCrlNumber = caEntry.getNextCrlNumber();
         CaStatus status = caEntry.getStatus();
 
-        X509CaEntry entry = new X509CaEntry(name, nextSerial, nextCrlNumber,
-                signerType, signerConf,
-                caUris, numCrls, expirationPeriod);
+        X509CaEntry entry = new X509CaEntry(name, caEntry.getSerialNoSize(), nextCrlNumber,
+                signerType, signerConf, caUris, numCrls, expirationPeriod);
         entry.setCertificate(caCert);
         entry.setCmpControlName(caEntry.getCmpControlName());
         entry.setCrlSignerName(caEntry.getCrlSignerName());
