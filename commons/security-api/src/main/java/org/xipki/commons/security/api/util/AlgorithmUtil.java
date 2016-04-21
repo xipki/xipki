@@ -80,9 +80,9 @@ import org.xipki.commons.security.api.SignerConf;
 public class AlgorithmUtil {
 
     // CHECKSTYLE:SKIP
-    private static final List<String> eCCurveNames;
+    private static final List<String> curveNames;
 
-    private static final Map<String, ASN1ObjectIdentifier> ecCurveNameOidMap;
+    private static final Map<String, ASN1ObjectIdentifier> curveNameOidMap;
 
     static {
         List<String> nameList = new LinkedList<>();
@@ -101,8 +101,8 @@ public class AlgorithmUtil {
         }
 
         Collections.sort(nameList);
-        eCCurveNames = Collections.unmodifiableList(nameList);
-        ecCurveNameOidMap = Collections.unmodifiableMap(nameOidMap);
+        curveNames = Collections.unmodifiableList(nameList);
+        curveNameOidMap = Collections.unmodifiableMap(nameOidMap);
     }
 
     private AlgorithmUtil() {
@@ -752,12 +752,12 @@ public class AlgorithmUtil {
     public static ASN1ObjectIdentifier getCurveOidForName(
             final String curveName) {
         ParamUtil.requireNonBlank("curveName", curveName);
-        return ecCurveNameOidMap.get(curveName.toLowerCase());
+        return curveNameOidMap.get(curveName.toLowerCase());
     }
 
     // CHECKSTYLE:SKIP
     public static List<String> getECCurveNames() {
-        return eCCurveNames;
+        return curveNames;
     }
 
     public static String getCurveName(
