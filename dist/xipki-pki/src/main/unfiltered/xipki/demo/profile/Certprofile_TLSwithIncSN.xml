@@ -14,7 +14,7 @@
     <algorithm>SHA1withPlainECDSA</algorithm>
     <algorithm>SHA1withRSAandMGF1</algorithm>
   </signatureAlgorithms>
-  <ca>false</ca>
+  <certLevel>EndEntity</certLevel>
   <validity>5y</validity>
   <notBeforeTime>current</notBeforeTime>
   <duplicateKey>true</duplicateKey>

@@ -44,8 +44,8 @@ package org.xipki.pki.ca.api.profile.x509;
 public abstract class AbstractEeX509Certprofile extends BaseX509Certprofile {
 
     @Override
-    public boolean isCa() {
-        return false;
+    public X509CertLevel getCertLevel() {
+        return X509CertLevel.EndEntity;
     }
 
     @Override

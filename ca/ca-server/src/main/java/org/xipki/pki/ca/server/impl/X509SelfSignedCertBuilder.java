@@ -89,6 +89,7 @@ import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.ExtensionValue;
 import org.xipki.pki.ca.api.profile.ExtensionValues;
 import org.xipki.pki.ca.api.profile.x509.SubjectInfo;
+import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 
 /**
  * @author Lijun Liao
@@ -145,6 +146,12 @@ class X509SelfSignedCertBuilder {
         if (serialNumber.compareTo(BigInteger.ZERO) != 1) {
             throw new IllegalArgumentException(
                     "serialNumber must not be non-positive: " + serialNumber);
+        }
+
+        X509CertLevel level = certprofile.getCertLevel();
+        if (X509CertLevel.RootCA != level) {
+            throw new IllegalArgumentException("certprofile is not of level "
+                    + X509CertLevel.RootCA);
         }
 
         if (!securityFactory.verifyPopo(p10Request)) {

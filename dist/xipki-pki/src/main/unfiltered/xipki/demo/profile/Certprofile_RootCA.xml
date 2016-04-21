@@ -19,7 +19,7 @@
     <algorithm>SHA256withRSAandMGF1</algorithm>
     <algorithm>SHA1withRSAandMGF1</algorithm>
   </signatureAlgorithms>
-  <ca>true</ca>
+  <certLevel>RootCA</certLevel>
   <validity>10y</validity>
   <notBeforeTime>current</notBeforeTime>
   <duplicateKey>false</duplicateKey>
