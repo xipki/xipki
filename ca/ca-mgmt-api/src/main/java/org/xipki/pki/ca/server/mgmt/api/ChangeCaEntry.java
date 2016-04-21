@@ -53,6 +53,8 @@ public class ChangeCaEntry implements Serializable {
 
     private final String name;
 
+    private Integer serialNumberSize;
+
     private CaStatus status;
 
     private CertValidity maxValidity;
@@ -85,6 +87,18 @@ public class ChangeCaEntry implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public Integer getSerialNumberSize() {
+        return serialNumberSize;
+    }
+
+    public void setSerialNumberSize(
+            final Integer serialNumberSize) {
+        if (serialNumberSize != null) {
+            ParamUtil.requireRange("serialNumberSize", serialNumberSize, 8, 20);
+        }
+        this.serialNumberSize = serialNumberSize;
     }
 
     public CaStatus getStatus() {
