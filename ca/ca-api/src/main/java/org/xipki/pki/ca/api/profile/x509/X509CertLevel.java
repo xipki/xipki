@@ -36,31 +36,13 @@
 
 package org.xipki.pki.ca.api.profile.x509;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.xipki.commons.security.api.KeyUsage;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class AbstractCaX509Certprofile extends BaseX509Certprofile {
-
-    protected Set<KeyUsageControl> keyUsages;
-
-    public AbstractCaX509Certprofile() {
-        Set<KeyUsageControl> usages = new HashSet<>();
-        usages.add(new KeyUsageControl(KeyUsage.keyCertSign, true));
-        usages.add(new KeyUsageControl(KeyUsage.cRLSign, false));
-        this.keyUsages = Collections.unmodifiableSet(usages);
-    }
-
-    @Override
-    public Set<KeyUsageControl> getKeyUsage() {
-        return keyUsages;
-    }
-
+public enum X509CertLevel {
+    RootCA,
+    SubCA,
+    EndEntity
 }

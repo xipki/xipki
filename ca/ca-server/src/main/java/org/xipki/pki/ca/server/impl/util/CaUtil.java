@@ -64,6 +64,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
+import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 
 /**
  * @author Lijun Liao
@@ -103,17 +104,19 @@ public class CaUtil {
     }
 
     public static BasicConstraints createBasicConstraints(
-            final boolean isCa,
+            final X509CertLevel level,
             final Integer pathLen) {
         BasicConstraints basicConstraints;
-        if (isCa) {
+        if (level == X509CertLevel.RootCA || level == X509CertLevel.SubCA) {
             if (pathLen != null) {
                 basicConstraints = new BasicConstraints(pathLen);
             } else {
                 basicConstraints = new BasicConstraints(true);
             }
-        } else {
+        } else if (level == X509CertLevel.EndEntity){
             basicConstraints = new BasicConstraints(false);
+        } else {
+            throw new RuntimeException("unknown X509CertLevel " + level);
         }
         return basicConstraints;
     }

@@ -165,7 +165,7 @@ public abstract class X509Certprofile {
             @Nullable String data)
     throws CertprofileException;
 
-    public abstract boolean isCa();
+    public abstract X509CertLevel getCertLevel();
 
     public abstract Set<KeyUsageControl> getKeyUsage();
 

@@ -127,6 +127,7 @@ import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.x509.AuthorityInfoAccessControl;
 import org.xipki.pki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
+import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.pki.ca.certprofile.BiometricInfoOption;
@@ -209,7 +210,7 @@ public class ExtensionsChecker {
 
     private Set<String> signatureAlgorithms;
 
-    private boolean ca;
+    private X509CertLevel certLevel;
 
     private Integer pathLen;
 
@@ -280,7 +281,17 @@ public class ExtensionsChecker {
                 }
             }
 
-            this.ca = conf.isCa();
+            String str = conf.getCertLevel();
+            if ("RootCA".equalsIgnoreCase(str)) {
+                this.certLevel = X509CertLevel.RootCA;
+            } else if ("SubCA".equalsIgnoreCase(str)) {
+                this.certLevel = X509CertLevel.SubCA;
+            } else if ("EndEntity".equalsIgnoreCase(str)) {
+                this.certLevel = X509CertLevel.EndEntity;
+            } else {
+                throw new CertprofileException("invalid CertLevel '" + str + "'");
+            }
+
             this.specialBehavior = conf.getSpecialBehavior();
             if (this.specialBehavior != null
                     && !"gematik_gSMC_K".equalsIgnoreCase(this.specialBehavior)) {
@@ -1000,6 +1011,7 @@ public class ExtensionsChecker {
             final StringBuilder failureMsg,
             final byte[] extensionValue) {
         BasicConstraints bc = BasicConstraints.getInstance(extensionValue);
+        boolean ca = (X509CertLevel.RootCA == certLevel) || (X509CertLevel.SubCA == certLevel);
         if (ca != bc.isCA()) {
             failureMsg.append("ca is '").append(bc.isCA());
             failureMsg.append("' but expected '").append(ca).append("'");

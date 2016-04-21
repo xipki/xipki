@@ -101,6 +101,7 @@ import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
 import org.xipki.pki.ca.api.profile.x509.SubjectInfo;
+import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
@@ -122,6 +123,10 @@ class IdentifiedX509Certprofile {
     private static final Set<ASN1ObjectIdentifier> CA_ONLY_EXTENSION_TYPES;
 
     private static final Set<ASN1ObjectIdentifier> NONE_REQUEST_EXTENSION_TYPES;
+
+    private static final Set<ASN1ObjectIdentifier> REQUIRED_CA_EXTENSION_TYPES;
+
+    private static final Set<ASN1ObjectIdentifier> REQUIRED_EE_EXTENSION_TYPES;
 
     static {
         CRITICAL_ONLY_EXTENSION_TYPES = new HashSet<>();
@@ -158,6 +163,16 @@ class IdentifiedX509Certprofile {
         NONE_REQUEST_EXTENSION_TYPES.add(Extension.freshestCRL);
         NONE_REQUEST_EXTENSION_TYPES.add(Extension.basicConstraints);
         NONE_REQUEST_EXTENSION_TYPES.add(Extension.inhibitAnyPolicy);
+
+        REQUIRED_CA_EXTENSION_TYPES = new HashSet<>();
+        REQUIRED_CA_EXTENSION_TYPES.add(Extension.basicConstraints);
+        REQUIRED_CA_EXTENSION_TYPES.add(Extension.subjectKeyIdentifier);
+        REQUIRED_CA_EXTENSION_TYPES.add(Extension.keyUsage);
+
+        REQUIRED_EE_EXTENSION_TYPES = new HashSet<>();
+        REQUIRED_EE_EXTENSION_TYPES.add(Extension.authorityKeyIdentifier);
+        REQUIRED_EE_EXTENSION_TYPES.add(Extension.basicConstraints);
+        REQUIRED_EE_EXTENSION_TYPES.add(Extension.subjectKeyIdentifier);
     } // end static
 
     private final String name;
@@ -423,7 +438,7 @@ class IdentifiedX509Certprofile {
         extControl = controls.remove(extType);
         if (extControl != null
                 && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes)) {
-            BasicConstraints value = CaUtil.createBasicConstraints(certprofile.isCa(),
+            BasicConstraints value = CaUtil.createBasicConstraints(certprofile.getCertLevel(),
                     certprofile.getPathLenBasicConstraint());
             addExtension(values, extType, value, extControl,
                     neededExtensionTypes, wantedExtensionTypes);
@@ -566,8 +581,8 @@ class IdentifiedX509Certprofile {
         return values;
     } // method getExtensions
 
-    public boolean isCa() {
-        return certprofile.isCa();
+    public X509CertLevel getCertLevel() {
+        return certprofile.getCertLevel();
     }
 
     public boolean isOnlyForRa() {
@@ -643,6 +658,8 @@ class IdentifiedX509Certprofile {
         StringBuilder msg = new StringBuilder();
 
         Map<ASN1ObjectIdentifier, ExtensionControl> controls = getExtensionControls();
+
+        // make sure that non-request extensions are not permitted in requests
         Set<ASN1ObjectIdentifier> set = new HashSet<>();
         for (ASN1ObjectIdentifier type : NONE_REQUEST_EXTENSION_TYPES) {
             ExtensionControl control = controls.get(type);
@@ -657,8 +674,10 @@ class IdentifiedX509Certprofile {
                 .append(" must not be contained in request, ");
         }
 
-        boolean ca = isCa();
+        X509CertLevel level = getCertLevel();
+        boolean ca = (level == X509CertLevel.RootCA) || (level == X509CertLevel.SubCA);
 
+        // make sure that CA-only extensions are not permitted in EE certificate
         set.clear();
         if (!ca) {
             set.clear();
@@ -675,6 +694,7 @@ class IdentifiedX509Certprofile {
             }
         }
 
+        // make sure that critical only extensions are not marked as non-critical.
         set.clear();
         for (ASN1ObjectIdentifier type : controls.keySet()) {
             ExtensionControl control = controls.get(type);
@@ -696,6 +716,7 @@ class IdentifiedX509Certprofile {
                 .append(toString(set)).append(", ");
         }
 
+        // make sure that non-critical only extensions are not marked as critical.
         set.clear();
         for (ASN1ObjectIdentifier type : controls.keySet()) {
             ExtensionControl control = controls.get(type);
@@ -707,49 +728,48 @@ class IdentifiedX509Certprofile {
         }
 
         if (CollectionUtil.isNonEmpty(set)) {
-            msg.append("none-critical extensions are marked as critical ")
+            msg.append("non-critical extensions are marked as critical ")
                 .append(toString(set))
                 .append(", ");
         }
 
+        // make sure that required extensions are present
+        set.clear();
+        Set<ASN1ObjectIdentifier> requiredTypes = ca
+                ? REQUIRED_CA_EXTENSION_TYPES
+                : REQUIRED_EE_EXTENSION_TYPES;
+
+        for (ASN1ObjectIdentifier type : requiredTypes) {
+            ExtensionControl extCtrl = controls.get(type);
+            if (extCtrl == null || !extCtrl.isRequired()) {
+                set.add(type);
+            }
+        }
+
+        if (level == X509CertLevel.SubCA) {
+            ASN1ObjectIdentifier type = Extension.authorityKeyIdentifier;
+            ExtensionControl extCtrl = controls.get(type);
+            if (extCtrl == null || !extCtrl.isRequired()) {
+                set.add(type);
+            }
+        }
+
+        if (!set.isEmpty()) {
+            msg.append("required extensions are not marked as required ")
+                .append(toString(set)).append(", ");
+        }
+
+        // KeyUsage
         Set<KeyUsageControl> usages = getKeyUsage();
 
-        boolean bo = containsKeyusage(usages, KeyUsage.digitalSignature);
-        if (!bo) {
-            bo = containsKeyusage(usages, KeyUsage.contentCommitment);
-        }
-        if (!bo) {
-            bo = containsKeyusage(usages, KeyUsage.keyCertSign);
-        }
-        if (!bo) {
-            bo = containsKeyusage(usages, KeyUsage.cRLSign);
-        }
-
-        if (bo) {
-            ASN1ObjectIdentifier[] types = new ASN1ObjectIdentifier[] {
-                Extension.basicConstraints, Extension.keyUsage};
-
-            set.clear();
-            for (ASN1ObjectIdentifier type : types) {
-                if (!controls.containsKey(type) || !controls.get(type).isRequired()) {
-                    set.add(type);
-                }
-            }
-
-            if (CollectionUtil.isNonEmpty(set)) {
-                msg.append("required extensions are not marked as required ")
-                    .append(toString(set))
-                    .append(", ");
-            }
-        }
-
         if (ca) {
+            // make sure the CA certificate contains usage keyCertSign
             if (!containsKeyusage(usages, KeyUsage.keyCertSign)) {
                 msg.append("CA profile does not contain keyUsage ")
-                    .append(KeyUsage.keyCertSign)
-                    .append(", ");
+                    .append(KeyUsage.keyCertSign).append(", ");
             }
         } else {
+            // make sure the EE certificate does not contain CA-only usages
             KeyUsage[] caOnlyUsages = new KeyUsage[] {KeyUsage.keyCertSign, KeyUsage.cRLSign};
 
             Set<KeyUsage> setUsages = new HashSet<>();
@@ -761,8 +781,7 @@ class IdentifiedX509Certprofile {
 
             if (CollectionUtil.isNonEmpty(set)) {
                 msg.append("EE profile contains CA-only keyUsage ")
-                    .append(setUsages)
-                    .append(", ");
+                    .append(setUsages).append(", ");
             }
         }
 

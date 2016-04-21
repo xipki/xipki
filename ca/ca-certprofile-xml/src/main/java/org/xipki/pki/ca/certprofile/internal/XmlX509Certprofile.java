@@ -107,6 +107,7 @@ import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.pki.ca.api.profile.x509.SubjectControl;
 import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
+import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.certprofile.BiometricInfoOption;
 import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
@@ -173,7 +174,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
     private BiometricInfoOption biometricDataOption;
 
-    private boolean ca;
+    private X509CertLevel certLevel;
 
     private ExtensionValue certificatePolicies;
 
@@ -247,7 +248,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         allowedSubjectInfoAccessModes = null;
         authorizationTemplate = null;
         biometricDataOption = null;
-        ca = false;
+        certLevel = null;
         certificatePolicies = null;
         constantExtensions = null;
         duplicateKeyPermitted = true;
@@ -339,7 +340,16 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         this.maxSize = conf.getMaxSize();
 
         this.validity = CertValidity.getInstance(conf.getValidity());
-        this.ca = conf.isCa();
+        String str = conf.getCertLevel();
+        if ("RootCA".equalsIgnoreCase(str)) {
+            this.certLevel = X509CertLevel.RootCA;
+        } else if ("SubCA".equalsIgnoreCase(str)) {
+            this.certLevel = X509CertLevel.SubCA;
+        } else if ("EndEntity".equalsIgnoreCase(str)) {
+            this.certLevel = X509CertLevel.EndEntity;
+        } else {
+            throw new CertprofileException("invalid CertLevel '" + str + "'");
+        }
         this.notBeforeMidnight = "midnight".equalsIgnoreCase(conf.getNotBeforeTime());
 
         String specBehavior = conf.getSpecialBehavior();
@@ -1393,8 +1403,8 @@ class XmlX509Certprofile extends BaseX509Certprofile {
     }
 
     @Override
-    public boolean isCa() {
-        return ca;
+    public X509CertLevel getCertLevel() {
+        return certLevel;
     }
 
     @Override
