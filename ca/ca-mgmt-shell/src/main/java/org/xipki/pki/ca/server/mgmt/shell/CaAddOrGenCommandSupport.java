@@ -112,10 +112,8 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
     private Set<String> permissions;
 
     @Option(name = "--sn-size",
-            required = true,
-            description = "number of octets of the serial number, between 8 and 20\n"
-                    + "(required)")
-    private int snSize;
+            description = "number of octets of the serial number, between 8 and 20")
+    private int snSize = 16;
 
     @Option(name = "--next-crl-no",
             required = true,

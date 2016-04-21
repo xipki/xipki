@@ -85,6 +85,10 @@ public class CaUpdateCmd extends CaCommandSupport {
     @Completion(CaNameCompleter.class)
     private String caName;
 
+    @Option(name = "--sn-size",
+            description = "number of octets of the serial number, between 8 and 20")
+    private Integer snSize;
+
     @Option(name = "--status",
             description = "CA status")
     @Completion(CaStatusCompleter.class)
@@ -191,6 +195,11 @@ public class CaUpdateCmd extends CaCommandSupport {
     protected X509ChangeCaEntry getChangeCaEntry()
     throws Exception {
         X509ChangeCaEntry entry = new X509ChangeCaEntry(caName);
+
+        if (snSize != null) {
+            entry.setSerialNumberSize(snSize);
+        }
+
         if (caStatus != null) {
             entry.setStatus(CaStatus.getCaStatus(caStatus));
         }
