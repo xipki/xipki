@@ -820,7 +820,7 @@ public class X509Util {
         case GeneralName.dNSName:
             return new GeneralName(tag, value);
         case GeneralName.directoryName:
-            X500Name x500Name = X509Util.reverse(new X500Name(value));
+            X500Name x500Name = reverse(new X500Name(value));
             return new GeneralName(GeneralName.directoryName, x500Name);
         case GeneralName.ediPartyName:
             idxSep = value.indexOf("=");
