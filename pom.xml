@@ -46,7 +46,7 @@
     <liquibase.version>3.4.2</liquibase.version>
     <snakeyaml.version>1.13</snakeyaml.version>
     <hessian.version>4.0.38</hessian.version>
-    <hikaricp.version>2.4.3</hikaricp.version>
+    <hikaricp.version>2.4.5</hikaricp.version>
     <syslog-java-client.version>1.0.8</syslog-java-client.version>
     <jsr305.version>3.0.0</jsr305.version>
     <jsr305.bundle.version>3.0.0_1</jsr305.bundle.version>
