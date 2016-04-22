@@ -248,7 +248,7 @@ public final class CaClientImpl implements CaClient {
             @Override
             public void run() {
                 try {
-                    init();
+                    init(true);
                 } catch (Throwable th) {
                     LogUtil.error(LOG, th, "could not init");
                 }
@@ -257,12 +257,9 @@ public final class CaClientImpl implements CaClient {
         new Thread(initRun).start();
     }
 
-    public boolean isInitialized() {
-        return initialized.get();
-    }
-
-    public void init()
-    throws InvalidConfException, IOException {
+    private synchronized void init(
+            final boolean force)
+    throws CaClientException {
         if (confFile == null) {
             throw new IllegalStateException("confFile is not set");
         }
@@ -271,7 +268,7 @@ public final class CaClientImpl implements CaClient {
         }
 
         LOG.info("initializing ...");
-        if (initialized.get()) {
+        if (!force && initialized.get()) {
             LOG.info("already initialized, skipping ...");
             return;
         }
@@ -282,10 +279,15 @@ public final class CaClientImpl implements CaClient {
 
         File configFile = new File(IoUtil.expandFilepath(confFile));
         if (!configFile.exists()) {
-            throw new FileNotFoundException("cound not find configuration file " + confFile);
+            throw new CaClientException("cound not find configuration file " + confFile);
         }
 
-        CAClientType config = parse(new FileInputStream(configFile));
+        CAClientType config;
+        try {
+            config = parse(new FileInputStream(configFile));
+        } catch (FileNotFoundException ex) {
+            throw new CaClientException("could not read file " + confFile);
+        }
         int numActiveCAs = 0;
 
         for (CAType caType : config.getCAs().getCA()) {
@@ -301,7 +303,8 @@ public final class CaClientImpl implements CaClient {
         }
 
         Boolean bo = config.isDevMode();
-        boolean devMode = bo != null && bo.booleanValue();
+        //TODO: remove me boolean devMode = bo != null && bo.booleanValue();
+        boolean devMode = false;
 
         // responders
         Map<String, X509Certificate> responders = new HashMap<>();
@@ -309,9 +312,9 @@ public final class CaClientImpl implements CaClient {
             X509Certificate cert;
             try {
                 cert = X509Util.parseCert(readData(m.getCert()));
-            } catch (CertificateException ex) {
+            } catch (CertificateException | IOException ex) {
                 LogUtil.error(LOG, ex, "could not configure responder " + m.getName());
-                throw new InvalidConfException(ex.getMessage(), ex);
+                throw new CaClientException(ex.getMessage(), ex);
             }
             responders.put(m.getName(), cert);
         }
@@ -331,7 +334,7 @@ public final class CaClientImpl implements CaClient {
                 // responder
                 X509Certificate responder = responders.get(caType.getResponder());
                 if (responder == null) {
-                    throw new InvalidConfException("no responder named " + caType.getResponder()
+                    throw new CaClientException("no responder named " + caType.getResponder()
                             + " is configured");
                 }
                 CaConf ca = new CaConf(caName, caType.getUrl(), caType.getHealthUrl(),
@@ -374,7 +377,7 @@ public final class CaClientImpl implements CaClient {
             } catch (IOException | CertificateException ex) {
                 LogUtil.error(LOG, ex, "could not configure CA " + caName);
                 if (!devMode) {
-                    throw new InvalidConfException(ex.getMessage(), ex);
+                    throw new CaClientException(ex.getMessage(), ex);
                 }
             }
         }
@@ -394,7 +397,7 @@ public final class CaClientImpl implements CaClient {
                     requestorCert = X509Util.parseCert(readData(requestorConf.getCert()));
                     requestorCerts.put(name, requestorCert);
                 } catch (Exception ex) {
-                    throw new InvalidConfException(ex.getMessage(), ex);
+                    throw new CaClientException(ex.getMessage(), ex);
                 }
             }
 
@@ -405,13 +408,13 @@ public final class CaClientImpl implements CaClient {
                             requestorConf.getSignerType(), signerConf, requestorCert);
                     requestorSigners.put(name, requestorSigner);
                 } catch (ObjectCreationException ex) {
-                    throw new InvalidConfException(ex.getMessage(), ex);
+                    throw new CaClientException(ex.getMessage(), ex);
                 }
             } else {
                 if (requestorConf.isSignRequest()) {
-                    throw new InvalidConfException("signer of requestor must be configured");
+                    throw new CaClientException("signer of requestor must be configured");
                 } else if (requestorCert == null) {
-                    throw new InvalidConfException(
+                    throw new CaClientException(
                         "at least one of certificate and signer of requestor must be configured");
                 }
             }
@@ -420,7 +423,7 @@ public final class CaClientImpl implements CaClient {
         boolean autoConf = false;
         for (CaConf ca :cas) {
             if (this.casMap.containsKey(ca.getName())) {
-                throw new InvalidConfException("duplicate CAs with the same name " + ca.getName());
+                throw new CaClientException("duplicate CAs with the same name " + ca.getName());
             }
 
             if (ca.isCertAutoconf() || ca.isCertprofilesAutoconf()) {
@@ -439,7 +442,7 @@ public final class CaClientImpl implements CaClient {
                         requestorCerts.get(requestorName), ca.getResponder(), ca.getUrl(),
                         securityFactory);
             } else {
-                throw new InvalidConfException("could not find requestor named "
+                throw new CaClientException("could not find requestor named "
                         + requestorName + " for CA " + ca.getName());
             }
 
@@ -469,7 +472,7 @@ public final class CaClientImpl implements CaClient {
                 if (devMode) {
                     LOG.warn(msg);
                 } else {
-                    throw new InvalidConfException(msg);
+                    throw new CaClientException(msg);
                 }
             }
 
@@ -730,6 +733,7 @@ public final class CaClientImpl implements CaClient {
             final RequestResponseDebug debug)
     throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("caName", caName);
+        init(false);
 
         CaConf ca = casMap.get(caName.trim());
         if (ca == null) {
@@ -849,6 +853,7 @@ public final class CaClientImpl implements CaClient {
         ParamUtil.requireNonNull("pop", pop);
         ParamUtil.requireNonNull("profileName", profileName);
 
+        init(false);
         String tmpCaName = caName;
         if (tmpCaName == null) {
             // detect the CA name
@@ -957,6 +962,8 @@ public final class CaClientImpl implements CaClient {
             final int reason)
     throws CaClientException {
         ParamUtil.requireNonNull("issuer", issuer);
+
+        init(false);
         final String id = "cert-1";
         RevokeCertRequestEntry entry =
                 new RevokeCertRequestEntry(id, issuer, serial, reason, null);
@@ -1020,6 +1027,7 @@ public final class CaClientImpl implements CaClient {
     throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
+        init(false);
         List<IssuerSerialEntry> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
             return Collections.emptyMap();
@@ -1081,6 +1089,7 @@ public final class CaClientImpl implements CaClient {
     throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
+        init(false);
         List<IssuerSerialEntry> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
             return Collections.emptyMap();
@@ -1109,9 +1118,11 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public Set<CertprofileInfo> getCertprofiles(
-            final String caName) {
+            final String caName)
+    throws CaClientException {
         ParamUtil.requireNonNull("caName", caName);
 
+        init(false);
         CaConf ca = casMap.get(caName.trim());
         if (ca == null) {
             return Collections.emptySet();
@@ -1135,6 +1146,17 @@ public final class CaClientImpl implements CaClient {
     throws CaClientException {
         ParamUtil.requireNonNull("caName", caName);
 
+        String name = "X509CA";
+        HealthCheckResult healthCheckResult = new HealthCheckResult(name);
+
+        try {
+            init(false);
+        } catch (CaClientException ex) {
+            LogUtil.error(LOG, ex, "could not initialize CaCleint");
+            healthCheckResult.setHealthy(false);
+            return healthCheckResult;
+        }
+
         CaConf ca = casMap.get(caName.trim());
         if (ca == null) {
             throw new IllegalArgumentException("unknown CA " + caName);
@@ -1148,9 +1170,6 @@ public final class CaClientImpl implements CaClient {
         } catch (MalformedURLException ex) {
             throw new CaClientException("invalid URL '" + healthUrlStr + "'");
         }
-
-        String name = "X509CA";
-        HealthCheckResult healthCheckResult = new HealthCheckResult(name);
 
         try {
             HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
@@ -1284,7 +1303,7 @@ public final class CaClientImpl implements CaClient {
 
     private static CAClientType parse(
             final InputStream configStream)
-    throws InvalidConfException {
+    throws CaClientException {
         synchronized (jaxbUnmarshallerLock) {
             Object root;
             try {
@@ -1300,17 +1319,17 @@ public final class CaClientImpl implements CaClient {
 
                 root = jaxbUnmarshaller.unmarshal(configStream);
             } catch (SAXException ex) {
-                throw new InvalidConfException("parse profile failed, message: " + ex.getMessage(),
+                throw new CaClientException("parse profile failed, message: " + ex.getMessage(),
                         ex);
             } catch (JAXBException ex) {
-                throw new InvalidConfException("parse profile failed, message: "
+                throw new CaClientException("parse profile failed, message: "
                         + XmlUtil.getMessage((JAXBException) ex), ex);
             }
 
             if (root instanceof JAXBElement) {
                 return (CAClientType) ((JAXBElement<?>) root).getValue();
             } else {
-                throw new InvalidConfException("invalid root element type");
+                throw new CaClientException("invalid root element type");
             }
         }
     } // method parse
