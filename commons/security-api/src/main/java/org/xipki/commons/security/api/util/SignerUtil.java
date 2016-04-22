@@ -326,8 +326,8 @@ public class SignerUtil {
         if ((counter * mgfhLen) < length) {
             ItoOSP(counter, all, Z.length);
             byte[] hashBuf = mgfDigest.hash(all);
-            System.arraycopy(hashBuf, 0, mask, counter * mgfhLen,
-                    mask.length - (counter * mgfhLen));
+            int offset = counter * mgfhLen;
+            System.arraycopy(hashBuf, 0, mask, offset, mask.length - offset);
         }
 
         return mask;
