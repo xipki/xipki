@@ -61,36 +61,18 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
 
     @Override
     public X509Certprofile newCertprofile(
-            final String type,
-            final long timeout)
+            final String type)
     throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
-        ParamUtil.requireMin("timeout", timeout, 0);
 
-        long start = System.currentTimeMillis();
-
-        while (true) {
-            long duration = System.currentTimeMillis() - start;
-            for (X509CertprofileFactory service : services) {
-                if (service.canCreateProfile(type)) {
-                    LOG.info("fould factory to create Certprofile of type '" + type + "' @"
-                            + duration + "ms");
-                    return service.newCertprofile(type);
-                }
-            }
-
-            duration = System.currentTimeMillis() - start;
-            if (timeout != 0 && duration > timeout) {
-                throw new ObjectCreationException(
-                        "could not find factory to create Certprofile of type '" + type
-                        + "' @" + duration + "ms");
-            }
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
+        for (X509CertprofileFactory service : services) {
+            if (service.canCreateProfile(type)) {
+                return service.newCertprofile(type);
             }
         }
+
+        throw new ObjectCreationException(
+                "could not find factory to create Certprofile of type '" + type + "'");
     }
 
     public void bindService(

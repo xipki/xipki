@@ -209,8 +209,6 @@ public class OcspServer {
 
     private OcspStoreFactoryRegister ocspStoreFactoryRegister;
 
-    private long newStoreTimeout;
-
     private Map<String, Responder> responders = new HashMap<>();
 
     private Map<String, ResponderSigner> signers = new HashMap<>();
@@ -245,12 +243,6 @@ public class OcspServer {
     public void setConfFile(
             final String confFile) {
         this.confFile = confFile;
-    }
-
-    public void setNewStoreTimeout(
-            final long newStoreTimeout) {
-        this.newStoreTimeout = ParamUtil.requireMin("newStoreTimeout",
-                newStoreTimeout, 0);
     }
 
     ResponderAndRelativeUri getResponderAndRelativeUri(
@@ -1216,8 +1208,7 @@ public class OcspServer {
     throws InvalidConfException {
         OcspStore store;
         try {
-            store = ocspStoreFactoryRegister.newOcspStore(conf.getSource().getType(),
-                    newStoreTimeout);
+            store = ocspStoreFactoryRegister.newOcspStore(conf.getSource().getType());
         } catch (ObjectCreationException ex) {
             throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
                     + ":" + ex.getMessage(), ex);

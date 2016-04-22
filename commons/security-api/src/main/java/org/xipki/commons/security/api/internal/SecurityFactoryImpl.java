@@ -106,8 +106,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     private SignerFactoryRegister signerFactoryRegister;
 
-    private long newSignerTimeout;
-
     private boolean strongRandom4KeyEnabled = true;
 
     private boolean strongRandom4SignEnabled;
@@ -140,7 +138,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final X509Certificate[] certificateChain)
     throws ObjectCreationException {
         ConcurrentContentSigner signer = signerFactoryRegister.newSigner(type, conf,
-                certificateChain, newSignerTimeout);
+                certificateChain);
         validateSigner(signer, type, conf);
         return signer;
     }
@@ -224,11 +222,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 defaultSignerParallelism, 1);
     }
 
-    public void setNewSignerTimeout(
-            final long newSignerTimeout) {
-        this.newSignerTimeout = ParamUtil.requireMin("newSignerTimeout", newSignerTimeout, 0);
-    }
-
     public void setSignerFactoryRegister(
             final SignerFactoryRegister signerFactoryRegister) {
         this.signerFactoryRegister = signerFactoryRegister;
@@ -257,8 +250,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             certs = new X509Certificate[]{cert};
         }
 
-        ConcurrentContentSigner signer = signerFactoryRegister.newSigner(type, conf, certs,
-                newSignerTimeout);
+        ConcurrentContentSigner signer = signerFactoryRegister.newSigner(type, conf, certs);
         return new KeyCertPair(signer.getPrivateKey(), signer.getCertificate());
     }
 

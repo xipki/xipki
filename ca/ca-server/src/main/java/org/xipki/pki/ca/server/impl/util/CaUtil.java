@@ -113,7 +113,7 @@ public class CaUtil {
             } else {
                 basicConstraints = new BasicConstraints(true);
             }
-        } else if (level == X509CertLevel.EndEntity){
+        } else if (level == X509CertLevel.EndEntity) {
             basicConstraints = new BasicConstraints(false);
         } else {
             throw new RuntimeException("unknown X509CertLevel " + level);

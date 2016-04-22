@@ -60,37 +60,17 @@ public class PasswordCallbackFactoryRegisterImpl implements PasswordCallbackFact
 
     @Override
     public PasswordCallback newPasswordCallback(
-            final String type,
-            final long timeout) {
+            final String type) {
         Objects.requireNonNull(type, "type could not be null");
-        if (timeout < 0) {
-            throw new IllegalArgumentException("timeout is invalid: " + timeout);
-        }
 
-        long start = System.currentTimeMillis();
-
-        while (true) {
-            long duration = System.currentTimeMillis() - start;
-            for (PasswordCallbackFactory service : services) {
-                if (service.canCreatePasswordCallback(type)) {
-                    LOG.info("fould Factory to create PasswordCallback of type '" + type + "' @"
-                            + duration + "ms");
-                    return service.newPasswordCallback(type);
-                }
-            }
-
-            duration = System.currentTimeMillis() - start;
-            if (timeout != 0 && duration > timeout) {
-                throw new RuntimeException(
-                        "could not find Factory to create PasswordCallback of type '" + type
-                        + "' @" + duration + "ms");
-            }
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
+        for (PasswordCallbackFactory service : services) {
+            if (service.canCreatePasswordCallback(type)) {
+                return service.newPasswordCallback(type);
             }
         }
+
+        throw new RuntimeException(
+                "could not find Factory to create PasswordCallback of type '" + type + "'");
     }
 
     public void bindService(

@@ -50,13 +50,11 @@ public interface X509CertprofileFactoryRegister {
     /**
      *
      * @param type type of the certificate
-     * @param timeout timeout in milliseconds, 0 for forever
      * @return new certificate profile.
      * @throws ObjectCreationException if certificate profile could not be created.
      */
     X509Certprofile newCertprofile(
-            @Nonnull String type,
-            long timeout)
+            @Nonnull String type)
     throws ObjectCreationException;
 
 }

@@ -50,13 +50,11 @@ public interface OcspStoreFactoryRegister {
     /**
      *
      * @param type type of the OcspStore
-     * @param timeout timeout in milliseconds, 0 for forever
      * @return new OcspStore.
      * @throws ObjectCreationException if OcspStore could not be created.
      */
     OcspStore newOcspStore(
-            @Nonnull String type,
-            long timeout)
+            @Nonnull String type)
     throws ObjectCreationException;
 
 }

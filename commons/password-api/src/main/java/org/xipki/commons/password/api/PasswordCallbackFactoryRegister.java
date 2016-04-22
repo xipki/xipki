@@ -48,12 +48,10 @@ public interface PasswordCallbackFactoryRegister {
     /**
      *
      * @param type type of the certificate
-     * @param timeout timeout in milliseconds, 0 for forever
      * @return new certificate profile.
      * @throws RuntimeException if passwordCallback could not be created.
      */
     PasswordCallback newPasswordCallback(
-            @Nonnull String type,
-            long timeout);
+            @Nonnull String type);
 
 }

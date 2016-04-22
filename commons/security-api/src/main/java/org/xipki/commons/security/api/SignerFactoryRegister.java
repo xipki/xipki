@@ -55,15 +55,13 @@ public interface SignerFactoryRegister {
      * @param type type of the signer
      * @param conf configuration
      * @param certificateChain certificate chain
-     * @param timeout timeout in milliseconds, 0 for forever.
      * @return new signer.
      * @throws ObjectCreationException if signer could not be created.
      */
     ConcurrentContentSigner newSigner(
             @Nonnull String type,
             @Nullable SignerConf conf,
-            @Nullable X509Certificate[] certificateChain,
-            final long timeout)
+            @Nullable X509Certificate[] certificateChain)
     throws ObjectCreationException;
 
 }

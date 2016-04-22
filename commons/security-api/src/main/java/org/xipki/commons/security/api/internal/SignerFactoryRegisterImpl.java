@@ -96,36 +96,18 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
     public ConcurrentContentSigner newSigner(
             final String type,
             final SignerConf conf,
-            final X509Certificate[] certificateChain,
-            final long timeout)
+            final X509Certificate[] certificateChain)
     throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
-        ParamUtil.requireMin("timeout", timeout, 0);
 
-        long start = System.currentTimeMillis();
-
-        while (true) {
-            long duration = System.currentTimeMillis() - start;
-            for (SignerFactory service : services) {
-                if (service.canCreateSigner(type)) {
-                    LOG.info("fould Factory to create Signer of type '" + type
-                            + "' @" + duration + " ms");
-                    return service.newSigner(type, conf, certificateChain);
-                }
-            }
-
-            duration = System.currentTimeMillis() - start;
-            if (timeout != 0 && duration > timeout) {
-                throw new ObjectCreationException(
-                        "could not find Factory to create Signer of type '" + type
-                        + "' @" + duration + "ms");
-            }
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
+        for (SignerFactory service : services) {
+            if (service.canCreateSigner(type)) {
+                return service.newSigner(type, conf, certificateChain);
             }
         }
+
+        throw new ObjectCreationException(
+                "could not find Factory to create Signer of type '" + type + "'");
     }
 
 }
