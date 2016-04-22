@@ -9,7 +9,6 @@
       <cm:property name="confFile" value="xipki/ocsp-config/ocsp-responder.xml"/>
       <cm:property name="urlPatterns" value="/ocsp/*"/>
       <cm:property name="healthUrlPatterns" value="/health/ocsp/*"/>
-      <cm:property name="newStoreTimeout" value="60000"/>
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="dataSourceFactory" interface="org.xipki.commons.datasource.api.DataSourceFactory"/>
@@ -21,7 +20,6 @@
   <bean id="ocspServer" class="org.xipki.pki.ocsp.server.impl.OcspServer" 
       init-method="asynInit" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
-    <property name="newStoreTimeout" value="${newStoreTimeout}"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="securityFactory" ref="securityFactory"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>

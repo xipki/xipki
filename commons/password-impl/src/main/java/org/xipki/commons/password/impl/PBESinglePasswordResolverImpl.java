@@ -36,7 +36,6 @@
 
 package org.xipki.commons.password.impl;
 
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.password.api.PasswordCallback;
 import org.xipki.commons.password.api.PasswordCallbackFactoryRegister;
@@ -55,8 +54,6 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
     private final Object masterPasswordLock = new Object();
 
     private PasswordCallbackFactoryRegister callbackFactoryRegister;
-
-    private long newPasswordCallbackTimeout = 60000; // 1 minute
 
     private String masterPasswordCallbackConf;
 
@@ -108,8 +105,7 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
 
         PasswordCallback pwdCallback;
         try {
-            pwdCallback = callbackFactoryRegister.newPasswordCallback(type,
-                    newPasswordCallbackTimeout);
+            pwdCallback = callbackFactoryRegister.newPasswordCallback(type);
             pwdCallback.init(conf);
         } catch (PasswordResolverException ex) {
             throw new IllegalArgumentException("invalid masterPasswordCallback configuration "
@@ -144,11 +140,6 @@ public class PBESinglePasswordResolverImpl implements SinglePasswordResolver {
     public void setMasterPasswordCallback(
             final String masterPasswordCallback) {
         this.masterPasswordCallbackConf = masterPasswordCallback;
-    }
-
-    public void setNewPasswordCallbackTimeout(
-            final long timeout) {
-        this.newPasswordCallbackTimeout = ParamUtil.requireMin("timeout", timeout, 0);
     }
 
 }

@@ -310,10 +310,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private String caConfFile;
 
-    private long newCertProfileTimeout = 60000; // one minute
-
-    private long newCertPublisherTimeout = 60000; // one minute
-
     private boolean caSystemSetuped;
 
     private boolean responderInitialized;
@@ -2023,18 +2019,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         this.caConfFile = caConfFile;
     }
 
-    public void setNewCertProfileTimeout(
-            final long newCertProfileTimeout) {
-        this.newCertProfileTimeout = ParamUtil.requireMin("newCertProfileTimeout",
-                newCertProfileTimeout, 0);
-    }
-
-    public void setNewCertPublisherTimeout(
-            final long newCertPublisherTimeout) {
-        this.newCertPublisherTimeout = ParamUtil.requireMin("newCertPublisherTimeout",
-                newCertPublisherTimeout, 0);
-    }
-
     @Override
     public boolean addCaAlias(
             final String aliasName,
@@ -2666,7 +2650,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         try {
             X509Certprofile profile = x509CertProfileFactoryRegister.newCertprofile(
-                    dbEntry.getType(), newCertProfileTimeout);
+                    dbEntry.getType());
             IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(dbEntry, profile);
             ret.setEnvParameterResolver(envParameterResolver);
             ret.validate();
@@ -2688,8 +2672,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         X509CertPublisher publisher;
         IdentifiedX509CertPublisher ret;
         try {
-            publisher = x509CertPublisherFactoryRegister.newPublisher(type,
-                    newCertPublisherTimeout);
+            publisher = x509CertPublisherFactoryRegister.newPublisher(type);
             ret = new IdentifiedX509CertPublisher(dbEntry, publisher);
             ret.initialize(securityFactory.getPasswordResolver(), datasources);
             return ret;

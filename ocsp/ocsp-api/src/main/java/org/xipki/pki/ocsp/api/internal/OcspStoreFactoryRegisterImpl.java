@@ -61,36 +61,19 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
 
     @Override
     public OcspStore newOcspStore(
-            final String type,
-            final long timeout)
+            final String type)
     throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
-        ParamUtil.requireMin("timeout", timeout, 0);
 
-        long start = System.currentTimeMillis();
-
-        while (true) {
-            long duration = System.currentTimeMillis() - start;
-            for (OcspStoreFactory service : services) {
-                if (service.canCreateOcspStore(type)) {
-                    LOG.info("fould factory to create OcspStore of type '" + type + "' in "
-                            + duration + " ms");
-                    return service.newOcspStore(type);
-                }
-            }
-
-            duration = System.currentTimeMillis() - start;
-            if (timeout != 0 && duration > timeout) {
-                throw new ObjectCreationException(
-                        "could not find factory to create OcspStore of type '" + type
-                        + "' @" + duration + "ms");
-            }
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
+        for (OcspStoreFactory service : services) {
+            if (service.canCreateOcspStore(type)) {
+                LOG.info("fould factory to create OcspStore of type '" + type + "'");
+                return service.newOcspStore(type);
             }
         }
+
+        throw new ObjectCreationException(
+                "could not find factory to create OcspStore of type '" + type + "'");
     }
 
     public void bindService(

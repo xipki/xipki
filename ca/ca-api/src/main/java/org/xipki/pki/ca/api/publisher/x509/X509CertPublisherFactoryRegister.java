@@ -50,13 +50,11 @@ public interface X509CertPublisherFactoryRegister {
     /**
      *
      * @param type type of the publisher
-     * @param timeout timeout in milliseconds, 0 for forever
      * @return new publisher.
      * @throws ObjectCreationException if publisher could not be created.
      */
     X509CertPublisher newPublisher(
-            @Nonnull String type,
-            long timeout)
+            @Nonnull String type)
     throws ObjectCreationException;
 
 }

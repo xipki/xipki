@@ -61,36 +61,18 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
 
     @Override
     public X509CertPublisher newPublisher(
-            final String type,
-            final long timeout)
+            final String type)
     throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
-        ParamUtil.requireMin("timeout", timeout, 0);
 
-        long start = System.currentTimeMillis();
-
-        while (true) {
-            long duration = System.currentTimeMillis() - start;
-            for (X509CertPublisherFactory service : services) {
-                if (service.canCreatePublisher(type)) {
-                    LOG.info("fould factory to create Publisher of type '" + type + "' @"
-                            + duration + "ms");
-                    return service.newPublisher(type);
-                }
-            }
-
-            duration = System.currentTimeMillis() - start;
-            if (timeout != 0 && duration > timeout) {
-                throw new ObjectCreationException(
-                        "could not find factory to create Publisher of type '" + type
-                        + "' @" + duration + "ms");
-            }
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {// CHECKSTYLE:SKIP
+        for (X509CertPublisherFactory service : services) {
+            if (service.canCreatePublisher(type)) {
+                return service.newPublisher(type);
             }
         }
+
+        throw new ObjectCreationException(
+                "could not find factory to create Publisher of type '" + type + "'");
     }
 
     public void bindService(

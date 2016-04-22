@@ -8,8 +8,6 @@
     <cm:default-properties>
       <cm:property name="urlPatterns" value="/cmp/*"/>
       <cm:property name="caConfFile" value="xipki/ca-config/ca.properties"/>
-      <cm:property name="newCertProfileTimeout" value="60000"/>
-      <cm:property name="newCertPublisherTimeout" value="60000"/>
       <cm:property name="healthUrlPatterns" value="/health/*"/>
     </cm:default-properties>
   </cm:property-placeholder>
@@ -26,8 +24,6 @@
     <property name="securityFactory" ref="securityFactory"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>
-    <property name="newCertProfileTimeout" value="${newCertProfileTimeout}"/>
-    <property name="newCertPublisherTimeout" value="${newCertPublisherTimeout}"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
     <property name="x509CertProfileFactoryRegister" ref="x509CertProfileFactoryRegister"/>
     <property name="x509CertPublisherFactoryRegister" ref="x509CertPublisherFactoryRegister"/>
