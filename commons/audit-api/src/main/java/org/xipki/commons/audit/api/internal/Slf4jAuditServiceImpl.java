@@ -56,7 +56,7 @@ import org.xipki.commons.audit.api.PciAuditEvent;
 
 public class Slf4jAuditServiceImpl implements AuditService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Slf4jAuditServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger("xipki.audit.slf4j");
 
     public Slf4jAuditServiceImpl() {
     }
