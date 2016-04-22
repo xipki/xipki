@@ -83,12 +83,10 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.HealthCheckResult;
-import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.util.CollectionUtil;
@@ -271,10 +269,6 @@ public final class CaClientImpl implements CaClient {
         if (!force && initialized.get()) {
             LOG.info("already initialized, skipping ...");
             return;
-        }
-
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
         }
 
         File configFile = new File(IoUtil.expandFilepath(confFile));

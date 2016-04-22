@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Security;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509CRL;
@@ -71,7 +70,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CRLObject;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -360,10 +358,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     public CaManagerImpl()
     throws InvalidConfException {
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-
         String calockId = null;
         File caLockFile = new File("calock");
         if (caLockFile.exists()) {

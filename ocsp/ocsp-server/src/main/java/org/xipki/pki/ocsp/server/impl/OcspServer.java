@@ -45,7 +45,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -94,7 +93,6 @@ import org.bouncycastle.cert.ocsp.Req;
 import org.bouncycastle.cert.ocsp.RespID;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
@@ -349,10 +347,6 @@ public class OcspServer {
         }
         if (securityFactory == null) {
             throw new IllegalStateException("securityFactory is not set");
-        }
-
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
         }
 
         OCSPServer conf = parseConf(confFile);

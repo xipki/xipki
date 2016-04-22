@@ -36,13 +36,11 @@
 
 package org.xipki.commons.remotep11.server.impl;
 
-import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
@@ -99,10 +97,6 @@ public class LocalP11CryptServicePool {
         if (initialized.get()) {
             LOG.info("already initialized, skipping ...");
             return;
-        }
-
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
         }
 
         if (p11CryptServiceFactory == null) {
