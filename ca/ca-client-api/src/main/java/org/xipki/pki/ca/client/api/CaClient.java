@@ -66,7 +66,8 @@ public interface CaClient {
     Set<String> getCaNames();
 
     Set<CertprofileInfo> getCertprofiles(
-            @Nonnull String caName);
+            @Nonnull String caName)
+    throws CaClientException;
 
     EnrollCertResult requestCert(
             @Nonnull CertificationRequest p10Request,
