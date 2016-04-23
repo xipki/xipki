@@ -121,8 +121,7 @@ License
 
 Owner
 -----------
-Dr. Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com)
-
+Dr. Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com), LinkedIn (https://www.linkedin.com/in/lijun-liao-644696b8)
 Prerequisite
 ------------
 * JRE / JDK 8
