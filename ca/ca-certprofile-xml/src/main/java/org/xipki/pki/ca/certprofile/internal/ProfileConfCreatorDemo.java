@@ -115,10 +115,10 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyIdMappingType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
-import org.xipki.pki.ca.certprofile.x509.jaxb.QCStatementType;
-import org.xipki.pki.ca.certprofile.x509.jaxb.QCStatementValueType;
-import org.xipki.pki.ca.certprofile.x509.jaxb.QCStatements;
 import org.xipki.pki.ca.certprofile.x509.jaxb.QcEuLimitValueType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.QcStatementType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.QcStatementValueType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.QcStatements;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RSAParameters;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Range2Type;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RangeType;
@@ -302,7 +302,7 @@ public class ProfileConfCreatorDemo {
         // Extensions - keyUsage
         extensionValue = createKeyUsages(
                 new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN},
-                new KeyUsageEnum[]{KeyUsageEnum.C_RL_SIGN});
+                new KeyUsageEnum[]{KeyUsageEnum.CRL_SIGN});
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
@@ -396,7 +396,7 @@ public class ProfileConfCreatorDemo {
         // Extensions - keyUsage
         extensionValue = createKeyUsages(
                 new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN},
-                new KeyUsageEnum[]{KeyUsageEnum.C_RL_SIGN});
+                new KeyUsageEnum[]{KeyUsageEnum.CRL_SIGN});
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
@@ -443,7 +443,7 @@ public class ProfileConfCreatorDemo {
         // Extensions - keyUsage
         extensionValue = createKeyUsages(
                 new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN},
-                new KeyUsageEnum[]{KeyUsageEnum.C_RL_SIGN});
+                new KeyUsageEnum[]{KeyUsageEnum.CRL_SIGN});
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         // Certificate Policies
@@ -484,11 +484,11 @@ public class ProfileConfCreatorDemo {
         otherName.getType().add(createOidType(ObjectIdentifiers.DN_O));
         subjectAltNameMode.setOtherName(otherName);
         subjectAltNameMode.setRfc822Name("");
-        subjectAltNameMode.setDNSName("");
+        subjectAltNameMode.setDnsName("");
         subjectAltNameMode.setDirectoryName("");
         subjectAltNameMode.setEdiPartyName("");
         subjectAltNameMode.setUniformResourceIdentifier("");
-        subjectAltNameMode.setIPAddress("");
+        subjectAltNameMode.setIpAddress("");
         subjectAltNameMode.setRegisteredID("");
 
         extensionValue = createExtensionValueType(subjectAltNameMode);
@@ -1349,26 +1349,26 @@ public class ProfileConfCreatorDemo {
     }
 
     private static ExtensionValueType createQcStatements() {
-        QCStatements extValue = new QCStatements();
-        QCStatementType statement = new QCStatementType();
+        QcStatements extValue = new QcStatements();
+        QcStatementType statement = new QcStatementType();
         statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcCompliance));
-        extValue.getQCStatement().add(statement);
+        extValue.getQcStatement().add(statement);
 
-        statement = new QCStatementType();
+        statement = new QcStatementType();
         statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcSSCD));
-        extValue.getQCStatement().add(statement);
+        extValue.getQcStatement().add(statement);
 
-        statement = new QCStatementType();
+        statement = new QcStatementType();
         statement.setStatementId(
                 createOidType(ObjectIdentifiers.id_etsi_qcs_QcRetentionPeriod));
-        QCStatementValueType statementValue = new QCStatementValueType();
+        QcStatementValueType statementValue = new QcStatementValueType();
         statementValue.setQcRetentionPeriod(10);
         statement.setStatementValue(statementValue);
-        extValue.getQCStatement().add(statement);
+        extValue.getQcStatement().add(statement);
 
-        statement = new QCStatementType();
+        statement = new QcStatementType();
         statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcLimitValue));
-        statementValue = new QCStatementValueType();
+        statementValue = new QcStatementValueType();
 
         QcEuLimitValueType euLimit = new QcEuLimitValueType();
         euLimit.setCurrency("EUR");
@@ -1384,12 +1384,12 @@ public class ProfileConfCreatorDemo {
 
         statementValue.setQcEuLimitValue(euLimit);
         statement.setStatementValue(statementValue);
-        extValue.getQCStatement().add(statement);
+        extValue.getQcStatement().add(statement);
 
-        statement = new QCStatementType();
+        statement = new QcStatementType();
         statement.setStatementId(
                 createOidType(new ASN1ObjectIdentifier("1.2.3.4.5"), "dummy"));
-        statementValue = new QCStatementValueType();
+        statementValue = new QcStatementValueType();
         ConstantValueType value = new ConstantValueType();
         try {
             value.setValue(DERNull.INSTANCE.getEncoded());
@@ -1399,7 +1399,7 @@ public class ProfileConfCreatorDemo {
         value.setDescription("DER NULL");
         statementValue.setConstant(value);
         statement.setStatementValue(statementValue);
-        extValue.getQCStatement().add(statement);
+        extValue.getQcStatement().add(statement);
 
         return createExtensionValueType(extValue);
     } // method createQcStatements

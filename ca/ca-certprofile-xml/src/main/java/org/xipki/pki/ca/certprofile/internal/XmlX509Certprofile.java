@@ -132,10 +132,10 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
-import org.xipki.pki.ca.certprofile.x509.jaxb.QCStatementType;
-import org.xipki.pki.ca.certprofile.x509.jaxb.QCStatementValueType;
-import org.xipki.pki.ca.certprofile.x509.jaxb.QCStatements;
 import org.xipki.pki.ca.certprofile.x509.jaxb.QcEuLimitValueType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.QcStatementType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.QcStatementValueType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.QcStatements;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Range2Type;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RdnType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Restriction;
@@ -813,25 +813,25 @@ class XmlX509Certprofile extends BaseX509Certprofile {
             return;
         }
 
-        QCStatements extConf = (QCStatements) getExtensionValue(
-                type, extensionsType, QCStatements.class);
+        QcStatements extConf = (QcStatements) getExtensionValue(
+                type, extensionsType, QcStatements.class);
 
         if (extConf == null) {
             return;
         }
 
-        List<QCStatementType> qcStatementTypes = extConf.getQCStatement();
+        List<QcStatementType> qcStatementTypes = extConf.getQcStatement();
 
         this.qcStatementsOption = new ArrayList<>(qcStatementTypes.size());
         Set<String> currencyCodes = new HashSet<>();
         boolean requireInfoFromReq = false;
 
-        for (QCStatementType m : qcStatementTypes) {
+        for (QcStatementType m : qcStatementTypes) {
             ASN1ObjectIdentifier qcStatementId =
                     new ASN1ObjectIdentifier(m.getStatementId().getValue());
             QcStatementOption qcStatementOption;
 
-            QCStatementValueType statementValue = m.getStatementValue();
+            QcStatementValueType statementValue = m.getStatementValue();
             if (statementValue == null) {
                 QCStatement qcStatment = new QCStatement(qcStatementId);
                 qcStatementOption = new QcStatementOption(qcStatment);

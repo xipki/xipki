@@ -138,7 +138,7 @@
       <value>
         <keyUsage>
           <usage required="true">keyCertSign</usage>
-          <usage required="false">cRLSign</usage>
+          <usage required="false">crlSign</usage>
         </keyUsage>
       </value>
     </extension>
@@ -215,11 +215,11 @@
       <value>
         <subjectAltName>
           <rfc822Name></rfc822Name>
-          <dNSName></dNSName>
+          <dnsName></dnsName>
           <directoryName></directoryName>
           <ediPartyName></ediPartyName>
           <uniformResourceIdentifier></uniformResourceIdentifier>
-          <iPAddress></iPAddress>
+          <ipAddress></ipAddress>
           <registeredID></registeredID>
           <otherName>
             <type description="o">2.5.4.10</type>
