@@ -18,12 +18,12 @@
     <bundle>mvn:org.xipki.commons/security-pkcs11/${project.version}</bundle>
   </feature>
   <feature name="xipki-security-shell" version="${project.version}">
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ncm-client" version="${project.version}">
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <bundle>mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/audit-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/datasource-api/${project.version}</bundle>

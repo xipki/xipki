@@ -50,18 +50,18 @@
     <bundle>mvn:org.xipki.pki/ca-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-cabase" version="${project.version}">
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <feature>xipki-ca-api</feature>
     <feature>xipki-audit</feature>
   </feature>
   <feature name="xipki-caserver" version="${project.version}">
     <feature>xipki-datasource</feature>
     <feature>xipki-cabase</feature>
-    <bundle>mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/ca-publisher-ocsp/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/scep-common/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/ca-server/${project.version}</bundle>
+    <bundle start-level="30">mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
+    <bundle start-level="30">mvn:org.xipki.pki/ca-publisher-ocsp/${project.version}</bundle>
+    <bundle start-level="30">mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
+    <bundle start-level="30">mvn:org.xipki.pki/scep-common/${project.version}</bundle>
+    <bundle start-level="40">mvn:org.xipki.pki/ca-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}">
     <feature>xipki-caserver</feature>
@@ -89,7 +89,7 @@
     <bundle>mvn:org.xipki.pki/ca-qa-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-security-shell" version="${project.version}">
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <feature>xipki-shell-base</feature>
     <bundle>mvn:org.xipki.commons/security-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-speed-shell/${project.version}</bundle>
@@ -113,15 +113,15 @@
   </feature>
   <feature name="xipki-ocspserver" version="${project.version}">
     <feature>xipki-datasource</feature>
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <feature>xipki-audit</feature>
-    <bundle>mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/ocsp-store-db/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/ocsp-store-crl/${project.version}</bundle>
-    <bundle>mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
+    <bundle start-level="30">mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
+    <bundle start-level="30">mvn:org.xipki.pki/ocsp-store-db/${project.version}</bundle>
+    <bundle start-level="30">mvn:org.xipki.pki/ocsp-store-crl/${project.version}</bundle>
+    <bundle start-level="40">mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspclient" version="${project.version}">
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <bundle>mvn:org.xipki.pki/ocsp-client-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ocsp-client-impl/${project.version}</bundle>
   </feature>
@@ -138,7 +138,7 @@
   </feature>
   <feature name="xipki-database-tool" version="${project.version}">
     <feature>xipki-datasource</feature>
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <feature>xipki-shell-base</feature>
     <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
