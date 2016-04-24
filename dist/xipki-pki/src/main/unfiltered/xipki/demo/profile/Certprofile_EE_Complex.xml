@@ -200,20 +200,20 @@
       <type description="qCStatements">1.3.6.1.5.5.7.1.3</type>
       <critical>false</critical>
       <value>
-        <qCStatements>
-          <qCStatement>
+        <qcStatements>
+          <qcStatement>
             <statementId description="etsi-qcs-QcCompliance">0.4.0.1862.1.1</statementId>
-          </qCStatement>
-          <qCStatement>
+          </qcStatement>
+          <qcStatement>
             <statementId description="etsi-qcs-QcSSCD">0.4.0.1862.1.4</statementId>
-          </qCStatement>
-          <qCStatement>
+          </qcStatement>
+          <qcStatement>
             <statementId description="etsi-qcs-QcRetentionPeriod">0.4.0.1862.1.3</statementId>
             <statementValue>
               <qcRetentionPeriod>10</qcRetentionPeriod>
             </statementValue>
-          </qCStatement>
-          <qCStatement>
+          </qcStatement>
+          <qcStatement>
             <statementId description="etsi-qcs-QcLimitValue">0.4.0.1862.1.2</statementId>
             <statementValue>
               <qcEuLimitValue>
@@ -222,14 +222,14 @@
                 <exponent min="10" max="20"/>
               </qcEuLimitValue>
             </statementValue>
-          </qCStatement>
-          <qCStatement>
+          </qcStatement>
+          <qcStatement>
             <statementId description="dummy">1.2.3.4.5</statementId>
             <statementValue>
               <constant description="DER NULL">BQA=</constant>
             </statementValue>
-          </qCStatement>
-        </qCStatements>
+          </qcStatement>
+        </qcStatements>
       </value>
     </extension>
     <extension required="true" permittedInRequest="false">

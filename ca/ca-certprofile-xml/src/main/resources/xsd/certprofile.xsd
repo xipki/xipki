@@ -257,7 +257,7 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="GostParameters">
+  <xs:element name="gostParameters">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="publicKeyParamSet" type="oidWithDescType" minOccurs="0"
@@ -300,7 +300,7 @@
   <xs:element name="keyUsage">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="usage" type="UsageType" maxOccurs="unbounded"/>
+        <xs:element name="usage" type="usageType" maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -443,10 +443,10 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="qCStatements">
+  <xs:element name="qcStatements">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="qCStatement" type="qCStatementType" maxOccurs="unbounded"/>
+        <xs:element name="qcStatement" type="qcStatementType" maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -457,13 +457,13 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:complexType name="qCStatementType">
+  <xs:complexType name="qcStatementType">
     <xs:sequence>
       <xs:element name="statementId" type="oidWithDescType"/>
-      <xs:element name="statementValue" type="qCStatementValueType" minOccurs="0"/> 
+      <xs:element name="statementValue" type="qcStatementValueType" minOccurs="0"/> 
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="qCStatementValueType">
+  <xs:complexType name="qcStatementValueType">
     <xs:choice>
       <xs:element name="constant" type="constantValueType"/>
       <xs:element name="qcRetentionPeriod" type="xs:int"/>
@@ -552,11 +552,11 @@
   <xs:complexType name="generalNameType">
     <xs:all>
       <xs:element name="rfc822Name" type="xs:string" minOccurs="0"/>
-      <xs:element name="dNSName" type="xs:string" minOccurs="0"/>
+      <xs:element name="dnsName" type="xs:string" minOccurs="0"/>
       <xs:element name="directoryName" type="xs:string" minOccurs="0"/>
       <xs:element name="ediPartyName" type="xs:string" minOccurs="0"/>
       <xs:element name="uniformResourceIdentifier" type="xs:string" minOccurs="0"/>
-      <xs:element name="iPAddress" type="xs:string" minOccurs="0"/>
+      <xs:element name="ipAddress" type="xs:string" minOccurs="0"/>
       <xs:element name="registeredID" type="xs:string" minOccurs="0"/>
       <xs:element name="otherName" minOccurs="0">
         <xs:complexType>
@@ -581,7 +581,7 @@
   <xs:complexType name="generalSubtreeBaseType">
     <xs:choice>
       <xs:element name="rfc822Name" type="xs:string"/>
-      <xs:element name="dNSName" type="xs:string"/>
+      <xs:element name="dnsName" type="xs:string"/>
       <xs:element name="directoryName" type="xs:string"/>
       <xs:element name="uri" type="xs:string"/>
       <xs:element name="ipAddress" type="xs:string"/>
@@ -623,7 +623,7 @@
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
-  <xs:complexType name="UsageType">
+  <xs:complexType name="usageType">
     <xs:simpleContent>
       <xs:extension base="keyUsageEnum">
         <xs:attribute name="required" type="xs:boolean" use="required"/>
@@ -643,7 +643,7 @@
       <xs:enumeration value="dataEncipherment"/>
       <xs:enumeration value="keyAgreement"/>
       <xs:enumeration value="keyCertSign"/>
-      <xs:enumeration value="cRLSign"/>
+      <xs:enumeration value="crlSign"/>
       <xs:enumeration value="encipherOnly"/>
       <xs:enumeration value="decipherOnly"/>
     </xs:restriction>

@@ -144,10 +144,10 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
-import org.xipki.pki.ca.certprofile.x509.jaxb.QCStatementType;
-import org.xipki.pki.ca.certprofile.x509.jaxb.QCStatementValueType;
-import org.xipki.pki.ca.certprofile.x509.jaxb.QCStatements;
 import org.xipki.pki.ca.certprofile.x509.jaxb.QcEuLimitValueType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.QcStatementType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.QcStatementValueType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.QcStatements;
 import org.xipki.pki.ca.certprofile.x509.jaxb.Range2Type;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RangeType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RangesType;
@@ -246,7 +246,7 @@ public class ExtensionsChecker {
 
     private CertValidity privateKeyUsagePeriod;
 
-    private QCStatements qcStatements;
+    private QcStatements qcStatements;
 
     private BiometricInfoOption biometricInfo;
 
@@ -491,8 +491,8 @@ public class ExtensionsChecker {
             // QCStatements
             type = Extension.qCStatements;
             if (extensionControls.containsKey(type)) {
-                QCStatements extConf = (QCStatements) getExtensionValue(
-                        type, extensionsType, QCStatements.class);
+                QcStatements extConf = (QcStatements) getExtensionValue(
+                        type, extensionsType, QcStatements.class);
                 if (extConf != null) {
                     qcStatements = extConf;
                 }
@@ -2383,7 +2383,7 @@ public class ExtensionsChecker {
             final byte[] extensionValue,
             final Extensions requestExtensions,
             final ExtensionControl extControl) {
-        QCStatements conf = qcStatements;
+        QcStatements conf = qcStatements;
         if (conf == null) {
             byte[] expected = getExpectedExtValue(Extension.qCStatements,
                     requestExtensions, extControl);
@@ -2399,7 +2399,7 @@ public class ExtensionsChecker {
             return;
         }
 
-        final int expSize = conf.getQCStatement().size();
+        final int expSize = conf.getQcStatement().size();
         ASN1Sequence extValue = ASN1Sequence.getInstance(extensionValue);
         final int isSize = extValue.size();
         if (isSize != expSize) {
@@ -2435,7 +2435,7 @@ public class ExtensionsChecker {
 
         for (int i = 0; i < expSize; i++) {
             QCStatement is = QCStatement.getInstance(extValue.getObjectAt(i));
-            QCStatementType exp = conf.getQCStatement().get(i);
+            QcStatementType exp = conf.getQcStatement().get(i);
             if (!is.getStatementId().getId().equals(exp.getStatementId().getValue())) {
                 failureMsg.append("statmentId[")
                     .append(i).append("] is '").append(is.getStatementId().getId());
@@ -2461,7 +2461,7 @@ public class ExtensionsChecker {
                 continue;
             }
 
-            QCStatementValueType expStatementValue = exp.getStatementValue();
+            QcStatementValueType expStatementValue = exp.getStatementValue();
             try {
                 if (expStatementValue.getConstant() != null) {
                     byte[] expValue = expStatementValue.getConstant().getValue();

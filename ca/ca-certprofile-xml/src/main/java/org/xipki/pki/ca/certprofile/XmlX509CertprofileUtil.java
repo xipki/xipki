@@ -279,8 +279,8 @@ public class XmlX509CertprofileUtil {
         if (type.getDirectoryName() != null) {
             base = new GeneralName(X509Util.reverse(
                     new X500Name(type.getDirectoryName())));
-        } else if (type.getDNSName() != null) {
-            base = new GeneralName(GeneralName.dNSName, type.getDNSName());
+        } else if (type.getDnsName() != null) {
+            base = new GeneralName(GeneralName.dNSName, type.getDnsName());
         } else if (type.getIpAddress() != null) {
             base = new GeneralName(GeneralName.iPAddress, type.getIpAddress());
         } else if (type.getRfc822Name() != null) {
@@ -366,7 +366,7 @@ public class XmlX509CertprofileUtil {
             ret.add(new GeneralNameMode(GeneralNameTag.rfc822Name));
         }
 
-        if (name.getDNSName() != null) {
+        if (name.getDnsName() != null) {
             ret.add(new GeneralNameMode(GeneralNameTag.dNSName));
         }
 
@@ -382,7 +382,7 @@ public class XmlX509CertprofileUtil {
             ret.add(new GeneralNameMode(GeneralNameTag.uniformResourceIdentifier));
         }
 
-        if (name.getIPAddress() != null) {
+        if (name.getIpAddress() != null) {
             ret.add(new GeneralNameMode(GeneralNameTag.iPAddress));
         }
 
@@ -475,7 +475,7 @@ public class XmlX509CertprofileUtil {
         for (UsageType m : usages) {
             boolean required = m.isRequired();
             switch (m.getValue()) {
-            case C_RL_SIGN:
+            case CRL_SIGN:
                 controls.add(new KeyUsageControl(KeyUsage.cRLSign, required));
                 break;
             case DATA_ENCIPHERMENT:

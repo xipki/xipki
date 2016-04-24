@@ -136,7 +136,7 @@
       <value>
         <keyUsage>
           <usage required="true">keyCertSign</usage>
-          <usage required="false">cRLSign</usage>
+          <usage required="false">crlSign</usage>
         </keyUsage>
       </value>
     </extension>

@@ -67,7 +67,7 @@ public class QaGeneralSubtree {
     }
 
     public String getDnsName() {
-        return jaxb.getDNSName();
+        return jaxb.getDnsName();
     }
 
     public String getDirectoryName() {
