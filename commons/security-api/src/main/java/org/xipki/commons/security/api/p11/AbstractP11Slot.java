@@ -618,7 +618,7 @@ public abstract class AbstractP11Slot implements P11Slot {
                 dsaParams.getG(), label);
         addIdentity(identity);
         P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
-        LOG.info("generated RSA keypair {}", objId);
+        LOG.info("generated DSA keypair {}", objId);
         return objId;
     }
 
@@ -639,7 +639,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         P11Identity identity = doGenerateDSAKeypair(p, q, g, label);
         addIdentity(identity);
         P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
-        LOG.info("generated RSA keypair {}", objId);
+        LOG.info("generated DSA keypair {}", objId);
         return objId;
     }
 
@@ -660,7 +660,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         P11Identity identity = doGenerateECKeypair(curveId, label);
         addIdentity(identity);
         P11ObjectIdentifier objId = identity.getIdentityId().getObjectId();
-        LOG.info("generated RSA keypair {}", objId);
+        LOG.info("generated EC keypair {}", objId);
         return objId;
     }
 
