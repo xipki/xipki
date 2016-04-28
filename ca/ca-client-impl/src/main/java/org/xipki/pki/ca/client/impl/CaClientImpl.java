@@ -265,12 +265,11 @@ public final class CaClientImpl implements CaClient {
             throw new IllegalStateException("securityFactory is not set");
         }
 
-        LOG.info("initializing ...");
         if (!force && initialized.get()) {
-            LOG.info("already initialized, skipping ...");
             return;
         }
 
+        LOG.info("initializing ...");
         File configFile = new File(IoUtil.expandFilepath(confFile));
         if (!configFile.exists()) {
             throw new CaClientException("cound not find configuration file " + confFile);
@@ -297,8 +296,7 @@ public final class CaClientImpl implements CaClient {
         }
 
         Boolean bo = config.isDevMode();
-        //TODO: remove me boolean devMode = bo != null && bo.booleanValue();
-        boolean devMode = false;
+        boolean devMode = bo != null && bo.booleanValue();
 
         // responders
         Map<String, X509Certificate> responders = new HashMap<>();
