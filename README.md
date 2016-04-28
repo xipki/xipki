@@ -111,7 +111,7 @@ Highly scalable and high-performance open source PKI (Certification Authority an
 Version
 ----
 
-2.0
+2.1
 
 License
 -----------
