@@ -5,7 +5,7 @@
     <module name="default">
       <nativeLibraries>
         <nativeLibrary>
-          <path>xipki/security/keystore-p11</path>
+          <path>emulator:xipki/security/keystore-p11</path>
         </nativeLibrary>
       </nativeLibraries>
       <includeSlots>
@@ -17,7 +17,7 @@
       <passwordSets>
         <passwords>
           <!-- encrypted password 123456 -->
-          <password>PBE:B9DkCMI/SuDrh7JsFvH0aE70tVlCLSpHcIQoLEM1dBjfWA==</password>
+          <password>PBE:B9DMVClv2SOKHsxDmVFPQpMElhnKWkdjr76L4jy1+fLGXg==</password>
         </passwords>
       </passwordSets>
       <mechanismSets>
