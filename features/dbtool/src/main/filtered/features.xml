@@ -4,7 +4,6 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" name="dbtool-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
-  <repository>mvn:org.xipki.features/org.apache.karaf.features.standard/${project.version}/xml/features</repository>
   <feature name="xipki-database-tool" version="${project.version}">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>

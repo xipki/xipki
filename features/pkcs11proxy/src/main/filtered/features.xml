@@ -2,7 +2,6 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" name="pkcs11proxy-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
-  <repository>mvn:org.xipki.features/org.apache.karaf.features.standard/${project.version}/xml/features</repository>
   <feature name="xipki-security" version="${project.version}">
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.bundle.version}</bundle>
     <bundle>mvn:org.xipki.commons/password-api/${project.version}</bundle>
