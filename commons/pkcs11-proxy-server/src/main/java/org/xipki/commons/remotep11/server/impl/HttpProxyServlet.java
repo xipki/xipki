@@ -125,6 +125,14 @@ public class HttpProxyServlet extends HttpServlet {
                 response.getOutputStream().write(respText.getBytes());
                 response.getOutputStream().flush();
             }
+        } catch (EOFException ex) {
+            LogUtil.warn(LOG, ex, "connection reset by peer");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
+        } catch (Throwable th) {
+            LogUtil.error(LOG, th, "Throwable thrown, this should not happen.");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
         } finally {
             response.flushBuffer();
         }
