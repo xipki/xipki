@@ -57,6 +57,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.pkcs11proxy.common.ServerCaps;
 import org.xipki.commons.security.api.exception.BadAsn1ObjectException;
 import org.xipki.commons.security.api.exception.P11TokenException;
+import org.xipki.commons.security.api.p11.P11CryptService;
 import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
 
 /**
@@ -104,11 +105,15 @@ public class HttpProxyServlet extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     return;
                 }
+                P11CryptService service = localP11CryptServicePool.getP11CryptService(moduleName);
+                if (service == null) {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
 
                 boolean readOnly;
                 try {
-                    readOnly = localP11CryptServicePool.getP11CryptService(moduleName).getModule()
-                            .isReadOnly();
+                    readOnly = service.getModule().isReadOnly();
                 } catch (P11TokenException ex) {
                     LogUtil.error(LOG, ex, "localP11CryptService in servlet not configured");
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
