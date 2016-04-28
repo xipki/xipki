@@ -27,14 +27,6 @@
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
-    <dependency>
-      <!-- adapted karaf standard features -->
-      <groupId>org.xipki.features</groupId>
-      <artifactId>org.apache.karaf.features.standard</artifactId>
-      <version>${project.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
   </dependencies>
   <build>
     <resources>
