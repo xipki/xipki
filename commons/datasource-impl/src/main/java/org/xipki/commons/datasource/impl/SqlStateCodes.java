@@ -89,6 +89,13 @@ public class SqlStateCodes {
         }
     }
 
+    // CHECKSTYLE:SKIP
+    private static class MariaDB extends MySQL {
+        MariaDB() {
+            super();
+        }
+    }
+
     private static class Oracle extends SqlStateCodes {
 
         Oracle() {
@@ -199,6 +206,8 @@ public class SqlStateCodes {
             return new HSQL();
         case MYSQL:
             return new MySQL();
+        case MARIADB:
+            return new MariaDB();
         case ORACLE:
             return new Oracle();
         case POSTGRES:
