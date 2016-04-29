@@ -103,6 +103,8 @@ public class KeyUtil {
 
     private static final Map<String, KeyFactory> KEY_FACTORIES = new HashMap<>();
 
+    private static final Map<String, KeyPairGenerator> KEYPAIR_GENERATORS = new HashMap<>();
+
     private KeyUtil() {
     }
 
@@ -120,19 +122,20 @@ public class KeyUtil {
             final BigInteger publicExponent,
             final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
-
         BigInteger tmpPublicExponent = publicExponent;
         if (tmpPublicExponent == null) {
             tmpPublicExponent = RSAKeyGenParameterSpec.F4;
         }
         AlgorithmParameterSpec params = new RSAKeyGenParameterSpec(keysize, tmpPublicExponent);
-        if (random == null) {
-            kpGen.initialize(params);
-        } else {
-            kpGen.initialize(params, random);
+        KeyPairGenerator kpGen = getKeyPairGenerator("RSA");
+        synchronized (kpGen) {
+            if (random == null) {
+                kpGen.initialize(params);
+            } else {
+                kpGen.initialize(params, random);
+            }
+            return kpGen.generateKeyPair();
         }
-        return kpGen.generateKeyPair();
     }
 
     // CHECKSTYLE:SKIP
@@ -156,12 +159,13 @@ public class KeyUtil {
                 plength, qlength, certainty, random);
         paramGen.init(genParams);
         DSAParameters dsaParams = paramGen.generateParameters();
-
-        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("DSA", "BC");
         DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
                 dsaParams.getG());
-        kpGen.initialize(dsaParamSpec, random);
-        return kpGen.generateKeyPair();
+        KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
+        synchronized (kpGen) {
+            kpGen.initialize(dsaParamSpec, random);
+            return kpGen.generateKeyPair();
+        }
     }
 
     // CHECKSTYLE:SKIP
@@ -169,11 +173,13 @@ public class KeyUtil {
             final DSAParameters dsaParams,
             final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("DSA", "BC");
         DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
                 dsaParams.getG());
-        kpGen.initialize(dsaParamSpec, random);
-        return kpGen.generateKeyPair();
+        KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
+        synchronized (kpGen) {
+            kpGen.initialize(dsaParamSpec, random);
+            return kpGen.generateKeyPair();
+        }
     }
 
     // CHECKSTYLE:SKIP
@@ -182,7 +188,9 @@ public class KeyUtil {
     throws InvalidKeySpecException {
         ParamUtil.requireNonNull("keySpec", keySpec);
         KeyFactory kf = getKeyFactory("DSA");
-        return (DSAPublicKey) kf.generatePublic(keySpec);
+        synchronized (kf) {
+            return (DSAPublicKey) kf.generatePublic(keySpec);
+        }
     }
 
     // CHECKSTYLE:SKIP
@@ -205,18 +213,24 @@ public class KeyUtil {
         ParamUtil.requireNonNull("curveId", curveId);
 
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveId.getId());
-        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ECDSA", "BC");
-        if (random == null) {
-            kpGen.initialize(spec);
-        } else {
-            kpGen.initialize(spec, random);
+        KeyPairGenerator kpGen = getKeyPairGenerator("EC");
+        synchronized (kpGen) {
+            if (random == null) {
+                kpGen.initialize(spec);
+            } else {
+                kpGen.initialize(spec, random);
+            }
+            return kpGen.generateKeyPair();
         }
-        return kpGen.generateKeyPair();
     }
 
     private static KeyFactory getKeyFactory(
             final String algorithm)
     throws InvalidKeySpecException {
+        String alg = algorithm.toUpperCase();
+        if ("ECDSA".equals(alg)) {
+            alg = "EC";
+        }
         synchronized (KEY_FACTORIES) {
             KeyFactory kf = KEY_FACTORIES.get(algorithm);
             if (kf != null) {
@@ -234,6 +248,25 @@ public class KeyUtil {
         }
     }
 
+    private static KeyPairGenerator getKeyPairGenerator(
+            final String algorithm)
+    throws NoSuchAlgorithmException, NoSuchProviderException {
+        String alg = algorithm.toUpperCase();
+        if ("ECDSA".equals(alg)) {
+            alg = "EC";
+        }
+        synchronized (KEYPAIR_GENERATORS) {
+            KeyPairGenerator kg = KEYPAIR_GENERATORS.get(algorithm);
+            if (kg != null) {
+                return kg;
+            }
+
+            kg = KeyPairGenerator.getInstance(algorithm, "BC");
+            KEYPAIR_GENERATORS.put(algorithm, kg);
+            return kg;
+        }
+    }
+
     public static PublicKey generatePublicKey(
             final SubjectPublicKeyInfo pkInfo)
     throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -247,18 +280,21 @@ public class KeyUtil {
         }
         ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
 
-        KeyFactory kf;
+        String algorithm;
         if (PKCSObjectIdentifiers.rsaEncryption.equals(aid)) {
-            kf = KeyFactory.getInstance("RSA");
+            algorithm = "RSA";
         } else if (X9ObjectIdentifiers.id_dsa.equals(aid)) {
-            kf = KeyFactory.getInstance("DSA");
+            algorithm = "DSA";
         } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(aid)) {
-            kf = KeyFactory.getInstance("ECDSA");
+            algorithm = "EC";
         } else {
             throw new InvalidKeySpecException("unsupported key algorithm: " + aid);
         }
 
-        return kf.generatePublic(keyspec);
+        KeyFactory kf = getKeyFactory(algorithm);
+        synchronized (kf) {
+            return kf.generatePublic(keyspec);
+        }
     }
 
     // CHECKSTYLE:SKIP
@@ -267,7 +303,9 @@ public class KeyUtil {
     throws InvalidKeySpecException {
         ParamUtil.requireNonNull("keySpec", keySpec);
         KeyFactory kf = getKeyFactory("RSA");
-        return (RSAPublicKey) kf.generatePublic(keySpec);
+        synchronized (kf) {
+            return (RSAPublicKey) kf.generatePublic(keySpec);
+        }
     }
 
     // CHECKSTYLE:SKIP
@@ -292,9 +330,10 @@ public class KeyUtil {
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveOid.getId());
         ECPoint pointQ = spec.getCurve().decodePoint(encodedQ);
         ECPublicKeySpec keySpec = new ECPublicKeySpec(pointQ, spec);
-
         KeyFactory kf = getKeyFactory("EC");
-        return (ECPublicKey) kf.generatePublic(keySpec);
+        synchronized (kf) {
+            return (ECPublicKey) kf.generatePublic(keySpec);
+        }
     }
 
     public static AsymmetricKeyParameter generatePrivateKeyParameter(
