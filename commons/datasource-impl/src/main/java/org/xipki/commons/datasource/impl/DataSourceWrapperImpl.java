@@ -87,9 +87,11 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
             super(name, service, DatabaseType.MYSQL);
         }
 
-        @Override
-        public final DatabaseType getDatabaseType() {
-            return DatabaseType.MYSQL;
+        MySQL(
+                final String name,
+                final HikariDataSource service,
+                final DatabaseType type) {
+            super(name, service, type);
         }
 
         @Override
@@ -220,17 +222,21 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     } // class MySQL
 
     // CHECKSTYLE:SKIP
+    private static class MariaDB extends MySQL {
+
+        MariaDB(String name, HikariDataSource service) {
+            super(name, service, DatabaseType.MARIADB);
+        }
+
+    }
+
+    // CHECKSTYLE:SKIP
     private static class DB2 extends DataSourceWrapperImpl {
 
         DB2(
                 final String name,
                 final HikariDataSource service) {
             super(name, service, DatabaseType.DB2);
-        }
-
-        @Override
-        public final DatabaseType getDatabaseType() {
-            return DatabaseType.DB2;
         }
 
         @Override
@@ -297,11 +303,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 final String name,
                 final HikariDataSource service) {
             super(name, service, DatabaseType.POSTGRES);
-        }
-
-        @Override
-        public final DatabaseType getDatabaseType() {
-            return DatabaseType.POSTGRES;
         }
 
         @Override
@@ -389,11 +390,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 final String name,
                 final HikariDataSource service) {
             super(name, service, DatabaseType.ORACLE);
-        }
-
-        @Override
-        public final DatabaseType getDatabaseType() {
-            return DatabaseType.ORACLE;
         }
 
         /*
@@ -528,11 +524,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
         }
 
         @Override
-        public final DatabaseType getDatabaseType() {
-            return DatabaseType.H2;
-        }
-
-        @Override
         public String createFetchFirstSelectSql(
                 final String coreSql,
                 final int rows,
@@ -594,11 +585,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 final String name,
                 final HikariDataSource service) {
             super(name, service, DatabaseType.HSQL);
-        }
-
-        @Override
-        public final DatabaseType getDatabaseType() {
-            return DatabaseType.H2;
         }
 
         @Override
@@ -675,11 +661,14 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
 
     private final SqlStateCodes sqlStateCodes;
 
+    private final DatabaseType databaseType;
+
     private DataSourceWrapperImpl(
             final String name,
             final HikariDataSource service,
             final DatabaseType dbType) {
         this.service = ParamUtil.requireNonNull("service", service);
+        this.databaseType = ParamUtil.requireNonNull("dbType", dbType);
         this.name = name;
         this.sqlErrorCodes = SqlErrorCodes.newInstance(dbType);
         this.sqlStateCodes = SqlStateCodes.newInstance(dbType);
@@ -688,6 +677,11 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
     @Override
     public final String getDatasourceName() {
         return name;
+    }
+
+    @Override
+    public final DatabaseType getDatabaseType() {
+        return this.databaseType;
     }
 
     @Override
@@ -1687,6 +1681,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 || databaseType == DatabaseType.H2
                 || databaseType == DatabaseType.HSQL
                 || databaseType == DatabaseType.MYSQL
+                || databaseType == DatabaseType.MARIADB
                 || databaseType == DatabaseType.ORACLE
                 || databaseType == DatabaseType.POSTGRES) {
             HikariConfig conf = new HikariConfig(props);
@@ -1700,6 +1695,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper {
                 return new HSQL(name, service);
             case MYSQL:
                 return new MySQL(name, service);
+            case MARIADB:
+                return new MariaDB(name, service);
             case ORACLE:
                 return new Oracle(name, service);
             default: // POSTGRESQL:

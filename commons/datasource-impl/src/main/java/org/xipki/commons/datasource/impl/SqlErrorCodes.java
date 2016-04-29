@@ -112,6 +112,15 @@ public class SqlErrorCodes {
 
     } // class MySQL
 
+    // CHECKSTYLE:SKIP
+    private static class MariaDB extends MySQL {
+
+        MariaDB() {
+            super();
+        }
+
+    } // class MariaDB
+
     private static class Oracle extends SqlErrorCodes {
 
         Oracle() {
@@ -237,6 +246,8 @@ public class SqlErrorCodes {
             return new HSQL();
         case MYSQL:
             return new MySQL();
+        case MARIADB:
+            return new MariaDB();
         case ORACLE:
             return new Oracle();
         case POSTGRES:

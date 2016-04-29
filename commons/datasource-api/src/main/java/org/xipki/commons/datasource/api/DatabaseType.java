@@ -49,6 +49,7 @@ public enum DatabaseType {
     DB2,
     HSQL,
     MYSQL,
+    MARIADB,
     ORACLE,
     POSTGRES,
     UNKNOWN;
@@ -76,6 +77,8 @@ public enum DatabaseType {
             return DatabaseType.HSQL;
         } else if (className.contains("mysql.")) {
             return DatabaseType.MYSQL;
+        } else if (className.contains("mariadb.")) {
+            return DatabaseType.MARIADB;
         } else if (className.contains("oracle.")) {
             return DatabaseType.ORACLE;
         } else if (className.contains("postgres.") || className.contains("postgresql.")) {
