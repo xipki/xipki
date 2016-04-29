@@ -150,9 +150,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         ParamUtil.requireNonNull("publicKey", publicKey);
 
         String keyAlg = publicKey.getAlgorithm().toUpperCase();
-        if ("EC".equals(keyAlg)) {
-            keyAlg = "ECDSA";
-        }
 
         BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
         if (builder == null) {
@@ -160,7 +157,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 builder = new BcRSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
             } else if ("DSA".equals(keyAlg)) {
                 builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
-            } else if ("ECDSA".equals(keyAlg)) {
+            } else if ("EC".equals(keyAlg) || "ECDSA".equals(keyAlg)) {
                 builder = new BcECContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
             } else {
                 throw new InvalidKeyException("unknown key algorithm of the public key "

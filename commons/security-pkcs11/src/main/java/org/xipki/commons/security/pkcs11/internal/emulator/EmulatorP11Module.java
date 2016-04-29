@@ -134,7 +134,7 @@ public class EmulatorP11Module extends AbstractP11Module {
                 LOG.info("skipped slot {}", slotId);
                 continue;
             }
-            
+
             DHPublicKeyParameters a = null;
             a.getParameters();
 
