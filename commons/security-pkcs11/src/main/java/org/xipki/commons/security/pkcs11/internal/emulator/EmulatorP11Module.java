@@ -43,6 +43,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.bouncycastle.crypto.params.DHPublicKeyParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.IoUtil;
@@ -133,6 +134,9 @@ public class EmulatorP11Module extends AbstractP11Module {
                 LOG.info("skipped slot {}", slotId);
                 continue;
             }
+            
+            DHPublicKeyParameters a = null;
+            a.getParameters();
 
             slotIds.add(slotIdentifier);
         } // end for
@@ -146,8 +150,7 @@ public class EmulatorP11Module extends AbstractP11Module {
                 throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
             }
 
-            File slotDir = new File(moduleConf.getNativeLibrary(), slotId.getIndex() + "-"
-                    + slotId.getId());
+            File slotDir = new File(baseDir, slotId.getIndex() + "-" + slotId.getId());
 
             if (pwd == null) {
                 throw new P11TokenException("no password is configured");
