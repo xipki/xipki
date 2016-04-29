@@ -106,7 +106,6 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
         String className = conf.getProperty("dataSourceClassName");
         if (className != null) {
             databaseType = DatabaseType.getDataSourceForDataSource(className);
-
         } else {
             className = conf.getProperty("driverClassName");
             databaseType = DatabaseType.getDataSourceForDriver(className);
