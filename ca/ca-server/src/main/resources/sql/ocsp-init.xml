@@ -202,7 +202,7 @@
       baseColumnNames="CID" baseTableName="CRAW"
       referencedColumnNames="ID" referencedTableName="CERT"/>
   </changeSet>
-  <changeSet author="xipki" id="3" dbms="mysql">
+  <changeSet author="xipki" id="3" dbms="mysql,mariadb">
     <createTable tableName="SEQ_TBL">
       <column name="SEQ_NAME" type="CHAR(20)">
         <constraints primaryKey="true" nullable="false"/>
