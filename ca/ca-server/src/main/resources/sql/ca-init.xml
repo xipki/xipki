@@ -10,7 +10,7 @@
   <property name="x500name.type" value="VARCHAR(350)"/>
   <!-- 100 MB for DB2 -->
   <property name="crl.data.type" value="CLOB(104857600)" dbms="db2"/>
-  <property name="crl.data.type" value="CLOB" dbms="oracle,postgresql,mysql,h2,hsqldb"/>
+  <property name="crl.data.type" value="CLOB" dbms="oracle,postgresql,mysql,mariadb,h2,hsqldb"/>
   <!-- CA configuration :: create table -->
   <changeSet author="xipki" id="1">
     <!-- table DBSCHEMAINFO -->
@@ -468,7 +468,7 @@
       </column>
     </createTable>
   </changeSet>
-  <changeSet author="xipki" id="3" dbms="mysql">
+  <changeSet author="xipki" id="3" dbms="mysql,mariadb">
     <createTable tableName="SEQ_TBL">
       <column name="SEQ_NAME" type="CHAR(100)">
         <constraints primaryKey="true" nullable="false"/>
