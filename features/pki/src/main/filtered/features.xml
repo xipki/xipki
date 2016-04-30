@@ -6,32 +6,27 @@
   <!-- Note: instead of defining all features monolithically in a central features file,
     Project-plugins should be defined in their own feature descriptors and then aggregated later
   -->
-  <feature name="bouncycastle" version="${bc.version}">
+  <feature name="xipki-password" version="${proejct.version}">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-  </feature>
-  <feature name="xipki-password" version="${proejct.version}">
-    <feature>bouncycastle</feature>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.bundle.version}</bundle>
     <bundle>mvn:org.xipki.commons/password-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/password-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-shell-base">
-    <feature>bouncycastle</feature>
-    <feature>xipki-password</feature>
+    <feature prerequisite="true">xipki-password</feature>
     <bundle>mvn:org.xipki.commons/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
   </feature>
   <feature name="xipki-datasource" version="${project.version}">
-    <feature>xipki-password</feature>
+    <feature prerequisite="true">xipki-password</feature>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.xipki.commons/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/datasource-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-security" version="${project.version}">
-    <feature>bouncycastle</feature>
-    <feature>xipki-password</feature>
+    <feature prerequisite="true">xipki-password</feature>
     <bundle>mvn:org.xipki.commons/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-pkcs12/${project.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
@@ -40,18 +35,18 @@
   </feature>
   <feature name="xipki-cabase" version="${project.version}">
     <feature>xipki-audit</feature>
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <bundle>mvn:org.xipki.pki/ca-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-caserver" version="${project.version}">
     <feature>xipki-datasource</feature>
     <feature>xipki-cabase</feature>
-    <bundle start-level="30">mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
-    <bundle start-level="30">mvn:org.xipki.pki/ca-publisher-ocsp/${project.version}</bundle>
-    <bundle start-level="30">mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
-    <bundle start-level="30">mvn:org.xipki.pki/scep-common/${project.version}</bundle>
-    <bundle start-level="40">mvn:org.xipki.pki/ca-server/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-publisher-ocsp/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/scep-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}">
     <feature>xipki-caserver</feature>
@@ -79,20 +74,18 @@
     <bundle>mvn:org.xipki.pki/ca-qa-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-security-shell" version="${project.version}">
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <feature>xipki-shell-base</feature>
     <bundle>mvn:org.xipki.commons/security-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-speed-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-scepclient-shell" version="${project.version}">
-    <feature>bouncycastle</feature>
     <feature>xipki-shell-base</feature>
     <bundle>mvn:org.xipki.pki/scep-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/scep-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/scep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-jscepclient-shell" version="${project.version}">
-    <feature>bouncycastle</feature>
     <feature>xipki-shell-base</feature>
     <bundle>wrap:mvn:com.google.code.jscep/jscep/${jscep.version}</bundle>
     <bundle>wrap:mvn:net.jcip/jcip-annotations/1.0</bundle>
@@ -103,15 +96,15 @@
   </feature>
   <feature name="xipki-ocspserver" version="${project.version}">
     <feature>xipki-datasource</feature>
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <feature>xipki-audit</feature>
-    <bundle start-level="30">mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
-    <bundle start-level="30">mvn:org.xipki.pki/ocsp-store-db/${project.version}</bundle>
-    <bundle start-level="30">mvn:org.xipki.pki/ocsp-store-crl/${project.version}</bundle>
-    <bundle start-level="40">mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-store-db/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-store-crl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspclient" version="${project.version}">
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <bundle>mvn:org.xipki.pki/ocsp-client-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ocsp-client-impl/${project.version}</bundle>
   </feature>
@@ -128,7 +121,7 @@
   </feature>
   <feature name="xipki-database-tool" version="${project.version}">
     <feature>xipki-datasource</feature>
-    <feature>xipki-security</feature>
+    <feature prerequisite="true">xipki-security</feature>
     <feature>xipki-shell-base</feature>
     <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
