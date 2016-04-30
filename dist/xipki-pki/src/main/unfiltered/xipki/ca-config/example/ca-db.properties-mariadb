@@ -3,20 +3,17 @@
 #      https://github.com/brettwooldridge/HikariCP         #
 ############################################################
 
-################## MySQL/MariaDB via MySQL Connector #################
+################## MySQL/MariaDB via MariaDB Connector #################
 
-dataSourceClassName = com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+dataSourceClassName = org.mariadb.jdbc.MariaDbDataSource 
 
 dataSource.serverName = localhost
 dataSource.port = 3306
-dataSource.databaseName = ocsp
+dataSource.databaseName = ca
 dataSource.user = root
 # encrypted password 123456
-dataSource.password = PBE:B9A/zfIDGOTc+xhshvJGWMMdft32EjtEZPWGH9M0JvoWFA==
-dataSource.cachePrepStmts = true
-dataSource.prepStmtCacheSize = 250
-dataSource.prepStmtCacheSqlLimit = 2048
-dataSource.useServerPrepStmts = true
+dataSource.password = PBE:B9B3GLTSTCrjEB53BiirBAxt5XxNP+KjcPkPbGfRBEz+pA==
+#dataSource.properties = key1=value1&key2=value2
 
 autoCommit = true
 readOnly = false
