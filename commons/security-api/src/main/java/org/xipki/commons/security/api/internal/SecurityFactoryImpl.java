@@ -106,7 +106,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     private SignerFactoryRegister signerFactoryRegister;
 
-    private boolean strongRandom4KeyEnabled = true;
+    private boolean strongRandom4KeyEnabled;
 
     private boolean strongRandom4SignEnabled;
 
