@@ -173,7 +173,7 @@ Build and Assembly from Source Code
       ```sh
       git clone git://github.com/xipki/pkcs11wrapper
 
-      git branch sunpkcs11
+      git checkout sunpkcs11-wrapper-v1.3.0
 
       mvn clean install
       ```
