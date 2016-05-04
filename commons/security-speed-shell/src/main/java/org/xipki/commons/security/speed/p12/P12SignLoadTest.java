@@ -46,10 +46,10 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerConf;
-import org.xipki.commons.security.api.util.AlgorithmUtil;
+import org.xipki.commons.security.ConcurrentContentSigner;
+import org.xipki.commons.security.SecurityFactory;
+import org.xipki.commons.security.SignerConf;
+import org.xipki.commons.security.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

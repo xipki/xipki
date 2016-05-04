@@ -16,15 +16,11 @@
     <module>common</module>
     <module>audit-api</module>
     <module>audit-syslog</module>
-    <module>datasource-api</module>
-    <module>datasource-impl</module>
+    <module>datasource</module>
     <module>database-tool</module>
     <module>shell-base</module>
-    <module>password-api</module>
-    <module>password-impl</module>
-    <module>security-api</module>
-    <module>security-pkcs11</module>
-    <module>security-pkcs12</module>
+    <module>password</module>
+    <module>security</module>
     <module>security-shell</module>
     <module>security-speed-shell</module>
     <module>pkcs11-proxy-common</module>

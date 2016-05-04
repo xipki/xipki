@@ -43,12 +43,12 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerConf;
-import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
-import org.xipki.commons.security.api.p11.P11Slot;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.ConcurrentContentSigner;
+import org.xipki.commons.security.SecurityFactory;
+import org.xipki.commons.security.SignerConf;
+import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.commons.security.pkcs11.P11Slot;
+import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao

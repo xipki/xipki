@@ -44,8 +44,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
-import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
+import org.xipki.commons.security.pkcs12.P12KeypairGenerationResult;
+import org.xipki.commons.security.pkcs12.P12KeystoreGenerationParameters;
 import org.xipki.commons.security.shell.KeyGenCommandSupport;
 
 /**

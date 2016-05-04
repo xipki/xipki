@@ -38,10 +38,10 @@ package org.xipki.commons.security.speed.p12;
 
 import java.security.SecureRandom;
 
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
-import org.xipki.commons.security.api.p12.P12KeypairGenerator;
-import org.xipki.commons.security.api.p12.P12KeystoreGenerationParameters;
+import org.xipki.commons.security.SecurityFactory;
+import org.xipki.commons.security.pkcs12.P12KeypairGenerationResult;
+import org.xipki.commons.security.pkcs12.P12KeypairGenerator;
+import org.xipki.commons.security.pkcs12.P12KeystoreGenerationParameters;
 
 /**
  * @author Lijun Liao

@@ -41,15 +41,14 @@ import java.io.File;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.password.api.OBFPasswordService;
-import org.xipki.commons.password.api.PBEPasswordService;
+import org.xipki.commons.password.OBFPasswordService;
+import org.xipki.commons.password.PBEPasswordService;
 
 /**
  * @author Lijun Liao
@@ -61,9 +60,6 @@ import org.xipki.commons.password.api.PBEPasswordService;
 @Service
 // CHECKSTYLE:SKIP
 public class PBEDecryptCmd extends SecurityCommandSupport {
-
-    @Reference
-    private PBEPasswordService pbePasswordService;
 
     @Option(name = "--password",
             description = "encrypted password, starts with PBE:\n"
@@ -108,7 +104,7 @@ public class PBEDecryptCmd extends SecurityCommandSupport {
         if (masterPasswordFile != null) {
             String str = new String(IoUtil.read(masterPasswordFile));
             if (str.startsWith("OBF:") || str.startsWith("obf:")) {
-                str = OBFPasswordService.doDeobfuscate(str);
+                str = OBFPasswordService.deobfuscate(str);
             }
             masterPassword = str.toCharArray();
         } else {
@@ -123,7 +119,7 @@ public class PBEDecryptCmd extends SecurityCommandSupport {
                 masterPassword = StringUtil.merge(parts);
             }
         }
-        char[] password = pbePasswordService.decryptPassword(masterPassword, passwordHint);
+        char[] password = PBEPasswordService.decryptPassword(masterPassword, passwordHint);
 
         if (outFile != null) {
             saveVerbose("saved the password to file", new File(outFile),
