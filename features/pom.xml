@@ -14,7 +14,6 @@
   <packaging>pom</packaging>
   <modules>
     <module>pki</module>
-    <module>ncmclient</module>
     <module>pkcs11proxy</module>
     <module>dbtool</module>
   </modules>
