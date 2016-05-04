@@ -41,8 +41,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.ECCurveNameCompleter;
-import org.xipki.commons.security.api.p12.P12KeypairGenerationResult;
-import org.xipki.commons.security.api.p12.P12KeypairGenerator;
+import org.xipki.commons.security.pkcs12.P12KeypairGenerationResult;
+import org.xipki.commons.security.pkcs12.P12KeypairGenerator;
 
 /**
  * @author Lijun Liao

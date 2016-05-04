@@ -39,8 +39,8 @@ package org.xipki.commons.dbtool;
 import java.util.Objects;
 import java.util.Properties;
 
-import org.xipki.commons.password.api.PasswordResolver;
-import org.xipki.commons.password.api.PasswordResolverException;
+import org.xipki.commons.password.PasswordResolver;
+import org.xipki.commons.password.PasswordResolverException;
 
 /**
  * @author Lijun Liao

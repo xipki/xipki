@@ -48,9 +48,9 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.datasource.api.DataSourceFactory;
-import org.xipki.commons.datasource.api.DataSourceWrapper;
-import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.datasource.DataSourceFactory;
+import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.commons.security.SecurityFactory;
 
 /**
  * @author Lijun Liao
@@ -93,19 +93,12 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
             description = "number of certificates to be revoked in one request")
     private Integer num = 1;
 
-    @Reference(optional = true)
-    private DataSourceFactory datasourceFactory;
-
     @Reference
     private SecurityFactory securityFactory;
 
     @Override
     protected Object doExecute()
     throws Exception {
-        if (datasourceFactory == null) {
-            throw new IllegalStateException("datasourceFactory is not available");
-        }
-
         if (numThreads < 1) {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
@@ -133,7 +126,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
         props.setProperty("maximumPoolSize", "1");
         props.setProperty("minimumIdle", "1");
 
-        DataSourceWrapper caDataSource = datasourceFactory.createDataSource(
+        DataSourceWrapper caDataSource = new DataSourceFactory().createDataSource(
                 "ds-" + caDbConfFile, props,
                 securityFactory.getPasswordResolver());
         try {

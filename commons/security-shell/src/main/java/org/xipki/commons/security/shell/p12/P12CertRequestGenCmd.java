@@ -52,10 +52,10 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.SignerConf;
+import org.xipki.commons.security.ConcurrentContentSigner;
+import org.xipki.commons.security.HashAlgoType;
+import org.xipki.commons.security.SignatureAlgoControl;
+import org.xipki.commons.security.SignerConf;
 import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
 
 /**

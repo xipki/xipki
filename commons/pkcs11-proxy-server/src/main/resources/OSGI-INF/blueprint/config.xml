@@ -10,16 +10,16 @@
   </cm:property-placeholder>
 
   <reference id="p11CryptServiceFactory"
-      interface="org.xipki.commons.security.api.p11.P11CryptServiceFactory"/>
+      interface="org.xipki.commons.security.pkcs11.P11CryptServiceFactory"/>
 
   <bean id="localP11CryptServicePool"
-      class="org.xipki.commons.remotep11.server.impl.LocalP11CryptServicePool"
+      class="org.xipki.commons.remotep11.server.LocalP11CryptServicePool"
       init-method="asynInit">
     <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
   </bean>
 
   <!-- create the servlet and inject our own app factory -->
-  <bean id="serverServlet" class="org.xipki.commons.remotep11.server.impl.HttpProxyServlet">
+  <bean id="serverServlet" class="org.xipki.commons.remotep11.server.HttpProxyServlet">
     <property name="localP11CryptServicePool" ref="localP11CryptServicePool"/>
   </bean>
 

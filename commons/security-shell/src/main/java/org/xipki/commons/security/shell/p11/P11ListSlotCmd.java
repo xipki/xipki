@@ -42,9 +42,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.security.api.p11.P11Module;
-import org.xipki.commons.security.api.p11.P11Slot;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.pkcs11.P11Module;
+import org.xipki.commons.security.pkcs11.P11Slot;
+import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 

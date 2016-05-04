@@ -43,11 +43,11 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
-import org.xipki.commons.security.api.p11.P11Slot;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.commons.security.pkcs11.P11Slot;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
 import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
+import org.xipki.commons.security.util.X509Util;
 
 /**
  * @author Lijun Liao

@@ -37,7 +37,7 @@
 package org.xipki.pki.ca.client.api;
 
 import org.bouncycastle.asn1.cmp.PKIStatusInfo;
-import org.xipki.commons.security.api.util.CmpFailureUtil;
+import org.xipki.commons.security.util.CmpFailureUtil;
 
 /**
  * @author Lijun Liao

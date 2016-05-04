@@ -55,14 +55,15 @@ import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.SigAlgCompleter;
-import org.xipki.commons.security.api.IssuerHash;
-import org.xipki.commons.security.api.util.AlgorithmUtil;
+import org.xipki.commons.security.IssuerHash;
+import org.xipki.commons.security.SecurityFactory;
+import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.pki.ocsp.client.shell.BaseOcspStatusCommandSupport;
-import org.xipki.pki.ocsp.qa.api.Occurrence;
-import org.xipki.pki.ocsp.qa.api.OcspCertStatus;
-import org.xipki.pki.ocsp.qa.api.OcspError;
-import org.xipki.pki.ocsp.qa.api.OcspQa;
-import org.xipki.pki.ocsp.qa.api.OcspResponseOption;
+import org.xipki.pki.ocsp.qa.Occurrence;
+import org.xipki.pki.ocsp.qa.OcspCertStatus;
+import org.xipki.pki.ocsp.qa.OcspError;
+import org.xipki.pki.ocsp.qa.OcspQa;
+import org.xipki.pki.ocsp.qa.OcspResponseOption;
 import org.xipki.pki.ocsp.qa.shell.completer.CertStatusCompleter;
 import org.xipki.pki.ocsp.qa.shell.completer.OccurrenceCompleter;
 import org.xipki.pki.ocsp.qa.shell.completer.OcspErrorCompleter;
@@ -115,6 +116,8 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
     private String nonceOccurrenceText = Occurrence.optional.name();
 
     @Reference
+    private SecurityFactory securityFactory;
+
     private OcspQa ocspQa;
 
     private OcspError expectedOcspError;
@@ -194,6 +197,10 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
         responseOption.setSignatureAlgName(sigAlg);
         if (isNotBlank(certhashAlg)) {
             responseOption.setCerthashAlgId(AlgorithmUtil.getHashAlg(certhashAlg));
+        }
+
+        if (ocspQa == null) {
+            ocspQa = new OcspQa(securityFactory);
         }
 
         ValidationResult result = ocspQa.checkOcsp(response,

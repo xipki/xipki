@@ -67,10 +67,10 @@ import org.xipki.commons.common.RequestResponsePair;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.IssuerHash;
-import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.HashAlgoType;
+import org.xipki.commons.security.IssuerHash;
+import org.xipki.commons.security.ObjectIdentifiers;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 
 /**

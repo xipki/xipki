@@ -43,8 +43,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
-import org.xipki.commons.security.api.util.AlgorithmUtil;
+import org.xipki.commons.security.pkcs11.P11CryptServiceFactory;
+import org.xipki.commons.security.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

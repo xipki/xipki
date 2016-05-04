@@ -44,7 +44,7 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.PasswordNameCompleter;
-import org.xipki.commons.password.api.PasswordProducer;
+import org.xipki.commons.password.PasswordProducer;
 
 /**
  * @author Lijun Liao

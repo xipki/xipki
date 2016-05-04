@@ -42,7 +42,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.pkcs11.P11Slot;
 import org.xipki.commons.security.speed.cmd.ECControl;
 import org.xipki.commons.security.speed.p11.P11ECSignLoadTest;
 

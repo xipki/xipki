@@ -14,7 +14,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>datasource-api</artifactId>
+      <artifactId>datasource</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

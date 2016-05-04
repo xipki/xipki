@@ -38,8 +38,8 @@ package org.xipki.commons.security.speed.p12;
 
 import java.security.SecureRandom;
 
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.util.KeyUtil;
+import org.xipki.commons.security.SecurityFactory;
+import org.xipki.commons.security.util.KeyUtil;
 
 /**
  * @author Lijun Liao

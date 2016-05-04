@@ -40,13 +40,13 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.exception.P11TokenException;
-import org.xipki.commons.security.api.exception.XiSecurityException;
-import org.xipki.commons.security.api.p11.P11CryptService;
-import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
-import org.xipki.commons.security.api.p11.P11Module;
-import org.xipki.commons.security.api.p11.P11Slot;
-import org.xipki.commons.security.api.p11.P11SlotIdentifier;
+import org.xipki.commons.security.exception.P11TokenException;
+import org.xipki.commons.security.exception.XiSecurityException;
+import org.xipki.commons.security.pkcs11.P11CryptService;
+import org.xipki.commons.security.pkcs11.P11CryptServiceFactory;
+import org.xipki.commons.security.pkcs11.P11Module;
+import org.xipki.commons.security.pkcs11.P11Slot;
+import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 import org.xipki.commons.security.speed.cmd.BatchSpeedCommandSupport;
 
 /**

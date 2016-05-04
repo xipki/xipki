@@ -46,8 +46,8 @@ import java.security.cert.X509Certificate;
 
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.ConcurrentContentSigner;
+import org.xipki.commons.security.SecurityFactory;
 
 /**
  * @author Lijun Liao

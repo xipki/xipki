@@ -40,7 +40,7 @@ import java.security.SecureRandom;
 
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.SecurityFactory;
 
 /**
  * @author Lijun Liao

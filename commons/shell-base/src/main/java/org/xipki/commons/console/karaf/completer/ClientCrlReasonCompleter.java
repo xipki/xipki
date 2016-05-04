@@ -38,7 +38,7 @@ package org.xipki.commons.console.karaf.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.AbstractEnumCompleter;
-import org.xipki.commons.security.api.CrlReason;
+import org.xipki.commons.security.CrlReason;
 
 /**
  * @author Lijun Liao

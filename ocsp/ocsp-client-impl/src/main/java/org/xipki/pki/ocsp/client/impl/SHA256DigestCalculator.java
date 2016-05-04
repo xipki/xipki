@@ -39,7 +39,7 @@ package org.xipki.pki.ocsp.client.impl;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.HashAlgoType;
 
 /**
  * @author Lijun Liao

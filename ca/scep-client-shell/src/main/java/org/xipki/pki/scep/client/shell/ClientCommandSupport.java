@@ -48,7 +48,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.scep.client.CaCertValidator;
 import org.xipki.pki.scep.client.CaIdentifier;
 import org.xipki.pki.scep.client.PreprovisionedCaCertValidator;

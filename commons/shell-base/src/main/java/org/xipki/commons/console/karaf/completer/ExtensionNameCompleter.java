@@ -44,7 +44,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.AbstractEnumCompleter;
-import org.xipki.commons.security.api.ObjectIdentifiers;
+import org.xipki.commons.security.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao

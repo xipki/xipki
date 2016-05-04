@@ -41,14 +41,13 @@ import java.io.File;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.password.api.OBFPasswordService;
-import org.xipki.commons.password.api.PBEPasswordService;
+import org.xipki.commons.password.OBFPasswordService;
+import org.xipki.commons.password.PBEPasswordService;
 
 /**
  * @author Lijun Liao
@@ -60,9 +59,6 @@ import org.xipki.commons.password.api.PBEPasswordService;
 @Service
 // CHECKSTYLE:SKIP
 public class PBEEncryptCmd extends SecurityCommandSupport {
-
-    @Reference
-    private PBEPasswordService pbePasswordService;
 
     @Option(name = "--iteration-count", aliases = "-n",
             description = "iteration count, between 1 and 65535")
@@ -94,7 +90,7 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
         if (masterPasswordFile != null) {
             String str = new String(IoUtil.read(masterPasswordFile));
             if (str.startsWith("OBF:") || str.startsWith("obf:")) {
-                str = OBFPasswordService.doDeobfuscate(str);
+                str = OBFPasswordService.deobfuscate(str);
             }
             masterPassword = str.toCharArray();
         } else {
@@ -121,7 +117,7 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
             password = StringUtil.merge(parts);
         }
 
-        String passwordHint = pbePasswordService.encryptPassword(iterationCount, masterPassword,
+        String passwordHint = PBEPasswordService.encryptPassword(iterationCount, masterPassword,
                 password);
         if (outFile != null) {
             saveVerbose("saved the encrypted password to file", new File(outFile),

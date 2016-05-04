@@ -63,11 +63,11 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.SignerConf;
+import org.xipki.commons.security.ConcurrentContentSigner;
+import org.xipki.commons.security.HashAlgoType;
+import org.xipki.commons.security.ObjectIdentifiers;
+import org.xipki.commons.security.SignatureAlgoControl;
+import org.xipki.commons.security.SignerConf;
 import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
 
 /**
