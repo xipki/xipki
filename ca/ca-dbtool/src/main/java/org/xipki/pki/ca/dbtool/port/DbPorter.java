@@ -48,8 +48,8 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.api.DataSourceWrapper;
-import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbSchemaInfo;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.jaxb.ca.FileOrValueType;

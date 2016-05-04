@@ -38,7 +38,7 @@ package org.xipki.commons.security.speed.cmd;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.SecurityFactory;
 
 /**
  * @author Lijun Liao

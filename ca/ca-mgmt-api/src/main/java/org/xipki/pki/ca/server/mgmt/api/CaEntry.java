@@ -42,7 +42,7 @@ import java.util.Set;
 
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.SignerConf;
+import org.xipki.commons.security.SignerConf;
 import org.xipki.pki.ca.api.profile.CertValidity;
 
 /**

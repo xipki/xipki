@@ -38,7 +38,7 @@ package org.xipki.pki.ca.common.cmp;
 
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.util.CmpFailureUtil;
+import org.xipki.commons.security.util.CmpFailureUtil;
 
 /**
  * @author Lijun Liao

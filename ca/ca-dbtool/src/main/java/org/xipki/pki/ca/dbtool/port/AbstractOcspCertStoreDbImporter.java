@@ -40,9 +40,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.datasource.api.DataSourceWrapper;
-import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.commons.datasource.springframework.dao.DataAccessException;
+import org.xipki.commons.security.HashAlgoType;
 
 /**
  * @author Lijun Liao

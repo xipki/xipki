@@ -39,7 +39,7 @@ package org.xipki.pki.ocsp.server.impl;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.HashAlgoType;
 import org.xipki.pki.ocsp.server.impl.jaxb.CacheType;
 import org.xipki.pki.ocsp.server.impl.jaxb.EmbedCertsMode;
 import org.xipki.pki.ocsp.server.impl.jaxb.ResponseOptionType;

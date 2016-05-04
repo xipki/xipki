@@ -48,7 +48,7 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
-import org.xipki.commons.password.api.PasswordResolver;
+import org.xipki.commons.password.PasswordResolver;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.Permission;

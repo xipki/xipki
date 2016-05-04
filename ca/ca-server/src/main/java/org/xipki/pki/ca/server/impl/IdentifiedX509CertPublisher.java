@@ -41,10 +41,10 @@ import java.util.Map;
 
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.api.DataSourceWrapper;
-import org.xipki.commons.password.api.PasswordResolver;
-import org.xipki.commons.security.api.CertRevocationInfo;
-import org.xipki.commons.security.api.X509Cert;
+import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.commons.password.PasswordResolver;
+import org.xipki.commons.security.CertRevocationInfo;
+import org.xipki.commons.security.X509Cert;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.publisher.CertPublisherException;

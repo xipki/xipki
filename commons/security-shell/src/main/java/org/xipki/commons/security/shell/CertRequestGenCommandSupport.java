@@ -83,17 +83,17 @@ import org.xipki.commons.console.karaf.completer.ExtensionNameCompleter;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.KeyusageCompleter;
-import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.ExtensionExistence;
-import org.xipki.commons.security.api.KeyUsage;
-import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.SignatureAlgoControl;
-import org.xipki.commons.security.api.exception.InvalidOidOrNameException;
-import org.xipki.commons.security.api.exception.NoIdleSignerException;
-import org.xipki.commons.security.api.exception.XiSecurityException;
-import org.xipki.commons.security.api.util.AlgorithmUtil;
-import org.xipki.commons.security.api.util.KeyUtil;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.ConcurrentContentSigner;
+import org.xipki.commons.security.ExtensionExistence;
+import org.xipki.commons.security.KeyUsage;
+import org.xipki.commons.security.ObjectIdentifiers;
+import org.xipki.commons.security.SignatureAlgoControl;
+import org.xipki.commons.security.exception.InvalidOidOrNameException;
+import org.xipki.commons.security.exception.NoIdleSignerException;
+import org.xipki.commons.security.exception.XiSecurityException;
+import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.commons.security.util.KeyUtil;
+import org.xipki.commons.security.util.X509Util;
 
 /**
  * @author Lijun Liao

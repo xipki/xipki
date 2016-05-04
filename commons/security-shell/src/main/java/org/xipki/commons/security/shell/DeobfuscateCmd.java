@@ -46,7 +46,7 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.password.api.OBFPasswordService;
+import org.xipki.commons.password.OBFPasswordService;
 
 /**
  * @author Lijun Liao
@@ -88,7 +88,7 @@ public class DeobfuscateCmd extends SecurityCommandSupport {
                     + "' does not start with OBF:");
         }
 
-        String password = OBFPasswordService.doDeobfuscate(passwordHint);
+        String password = OBFPasswordService.deobfuscate(passwordHint);
         if (outFile != null) {
             saveVerbose("saved the password to file", new File(outFile),
                     new String(password).getBytes());

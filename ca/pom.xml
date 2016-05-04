@@ -18,9 +18,7 @@
     <module>ca-client-impl</module>
     <module>ca-client-shell</module>
     <module>ca-certprofile-xml</module>
-    <module>ca-publisher-ocsp</module>
-    <module>ca-qa-api</module>
-    <module>ca-qa-impl</module>
+    <module>ca-qa</module>
     <module>ca-qa-shell</module>
     <module>ca-api</module>
     <module>ca-mgmt-api</module>
@@ -31,8 +29,5 @@
     <module>jscep-client-shell</module>
     <module>ca-dbtool</module>
     <module>ca-dbtool-shell</module>
-    <module>ncm-common</module>
-    <module>ncm-client</module>
-    <module>ncm-server</module>
   </modules>
 </project>

@@ -38,8 +38,8 @@ package org.xipki.commons.security.speed.p11;
 
 import java.math.BigInteger;
 
-import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
-import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.commons.security.pkcs11.P11Slot;
 
 /**
  * @author Lijun Liao

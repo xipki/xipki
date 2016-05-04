@@ -49,8 +49,8 @@ import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.ClientCrlReasonCompleter;
-import org.xipki.commons.security.api.CrlReason;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.CrlReason;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.client.api.CertIdOrError;
 import org.xipki.pki.ca.common.cmp.PkiStatusInfo;
 

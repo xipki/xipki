@@ -38,7 +38,7 @@ package org.xipki.pki.ocsp.qa.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ocsp.qa.api.Occurrence;
+import org.xipki.pki.ocsp.qa.Occurrence;
 
 /**
  * @author Lijun Liao

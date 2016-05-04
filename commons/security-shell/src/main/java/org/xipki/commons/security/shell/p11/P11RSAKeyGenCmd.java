@@ -40,8 +40,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.api.p11.P11ObjectIdentifier;
-import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.commons.security.pkcs11.P11Slot;
 
 /**
  * @author Lijun Liao

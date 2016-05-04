@@ -115,20 +115,20 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.common.util.XmlUtil;
-import org.xipki.commons.datasource.api.DataSourceFactory;
-import org.xipki.commons.datasource.api.DataSourceWrapper;
-import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.security.api.CertRevocationInfo;
-import org.xipki.commons.security.api.CertpathValidationModel;
-import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.CrlReason;
-import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerConf;
-import org.xipki.commons.security.api.exception.NoIdleSignerException;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.datasource.DataSourceFactory;
+import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.commons.datasource.springframework.dao.DataAccessException;
+import org.xipki.commons.password.PasswordResolverException;
+import org.xipki.commons.security.CertRevocationInfo;
+import org.xipki.commons.security.CertpathValidationModel;
+import org.xipki.commons.security.ConcurrentContentSigner;
+import org.xipki.commons.security.CrlReason;
+import org.xipki.commons.security.HashAlgoType;
+import org.xipki.commons.security.ObjectIdentifiers;
+import org.xipki.commons.security.SecurityFactory;
+import org.xipki.commons.security.SignerConf;
+import org.xipki.commons.security.exception.NoIdleSignerException;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ocsp.api.CertStatus;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
 import org.xipki.pki.ocsp.api.CertprofileOption;
@@ -150,6 +150,8 @@ import org.xipki.pki.ocsp.server.impl.jaxb.ResponderType;
 import org.xipki.pki.ocsp.server.impl.jaxb.ResponseOptionType;
 import org.xipki.pki.ocsp.server.impl.jaxb.SignerType;
 import org.xipki.pki.ocsp.server.impl.jaxb.StoreType;
+import org.xipki.pki.ocsp.server.impl.store.crl.CrlCertStatusStore;
+import org.xipki.pki.ocsp.server.impl.store.db.DbCertStatusStore;
 import org.xml.sax.SAXException;
 
 /**
@@ -199,7 +201,7 @@ public class OcspServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
 
-    private DataSourceFactory datasourceFactory;
+    private final DataSourceFactory datasourceFactory;
 
     private SecurityFactory securityFactory;
 
@@ -228,16 +230,12 @@ public class OcspServer {
     private AtomicBoolean initialized = new AtomicBoolean(false);
 
     public OcspServer() {
+        this.datasourceFactory = new DataSourceFactory();
     }
 
     public void setSecurityFactory(
             final SecurityFactory securityFactory) {
         this.securityFactory = securityFactory;
-    }
-
-    public void setDataSourceFactory(
-            final DataSourceFactory datasourceFactory) {
-        this.datasourceFactory = datasourceFactory;
     }
 
     public void setConfFile(
@@ -587,7 +585,7 @@ public class OcspServer {
 
         // stores
         for (StoreType m : conf.getStores().getStore()) {
-            OcspStore store = initStore(m, datasources,
+            OcspStore store = newStore(m, datasources,
                     storeCertHashAlgoSet.get(m.getName()));
             stores.put(m.getName(), store);
         }
@@ -1201,17 +1199,24 @@ public class OcspServer {
         }
     } // method initSigner
 
-    private OcspStore initStore(
+    private OcspStore newStore(
             final StoreType conf,
             final Map<String, DataSourceWrapper> datasources,
             final Set<HashAlgoType> certHashAlgos)
     throws InvalidConfException {
         OcspStore store;
-        try {
-            store = ocspStoreFactoryRegister.newOcspStore(conf.getSource().getType());
-        } catch (ObjectCreationException ex) {
-            throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
-                    + ":" + ex.getMessage(), ex);
+        String type = conf.getSource().getType();
+        if ("CRL".equalsIgnoreCase(type)) {
+            store = new CrlCertStatusStore();
+        } else if ("XIPKI-DB".equals(type)) {
+            store = new DbCertStatusStore();
+        } else {
+            try {
+                store = ocspStoreFactoryRegister.newOcspStore(conf.getSource().getType());
+            } catch (ObjectCreationException ex) {
+                throw new InvalidConfException("ObjectCreationException of store " + conf.getName()
+                        + ":" + ex.getMessage(), ex);
+            }
         }
         store.setName(conf.getName());
 

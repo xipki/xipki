@@ -41,7 +41,7 @@ import java.util.Collection;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.security.api.SecurityFactory;
+import org.xipki.commons.security.SecurityFactory;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
 
 /**

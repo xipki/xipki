@@ -37,7 +37,7 @@
 package org.xipki.pki.ca.api.profile.x509;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.KeyUsage;
+import org.xipki.commons.security.KeyUsage;
 
 /**
  * @author Lijun Liao

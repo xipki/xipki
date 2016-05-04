@@ -88,18 +88,18 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.datasource.api.DataSourceFactory;
-import org.xipki.commons.datasource.api.DataSourceWrapper;
-import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.commons.password.api.PasswordResolverException;
-import org.xipki.commons.security.api.CertRevocationInfo;
-import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.CrlReason;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerConf;
-import org.xipki.commons.security.api.X509Cert;
-import org.xipki.commons.security.api.exception.XiSecurityException;
-import org.xipki.commons.security.api.util.AlgorithmUtil;
+import org.xipki.commons.datasource.DataSourceFactory;
+import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.commons.datasource.springframework.dao.DataAccessException;
+import org.xipki.commons.password.PasswordResolverException;
+import org.xipki.commons.security.CertRevocationInfo;
+import org.xipki.commons.security.ConcurrentContentSigner;
+import org.xipki.commons.security.CrlReason;
+import org.xipki.commons.security.SecurityFactory;
+import org.xipki.commons.security.SignerConf;
+import org.xipki.commons.security.X509Cert;
+import org.xipki.commons.security.exception.XiSecurityException;
+import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.DfltEnvParameterResolver;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.OperationException;
@@ -117,6 +117,7 @@ import org.xipki.pki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderEntryWrapper;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderManager;
 import org.xipki.pki.ca.server.impl.cmp.X509CaCmpResponder;
+import org.xipki.pki.ca.server.impl.ocsp.OcspCertPublisher;
 import org.xipki.pki.ca.server.impl.scep.Scep;
 import org.xipki.pki.ca.server.impl.scep.ScepManager;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
@@ -308,6 +309,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private final Map<String, X509Ca> x509cas = new ConcurrentHashMap<>();
 
+    private final DataSourceFactory datasourceFactory;
+
     private String caConfFile;
 
     private boolean caSystemSetuped;
@@ -346,14 +349,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private SecurityFactory securityFactory;
 
-    private DataSourceFactory datasourceFactory;
-
     private CaManagerQueryExecutor queryExecutor;
 
     private boolean initializing;
 
     public CaManagerImpl()
     throws InvalidConfException {
+        this.datasourceFactory = new DataSourceFactory();
         String calockId = null;
         File caLockFile = new File("calock");
         if (caLockFile.exists()) {
@@ -396,11 +398,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     public DataSourceFactory getDataSourceFactory() {
         return datasourceFactory;
-    }
-
-    public void setDataSourceFactory(
-            final DataSourceFactory datasourceFactory) {
-        this.datasourceFactory = datasourceFactory;
     }
 
     private void init()
@@ -2672,7 +2669,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         X509CertPublisher publisher;
         IdentifiedX509CertPublisher ret;
         try {
-            publisher = x509CertPublisherFactoryRegister.newPublisher(type);
+            if ("OCSP".equalsIgnoreCase(type)) {
+                publisher = new OcspCertPublisher();
+            } else {
+                publisher = x509CertPublisherFactoryRegister.newPublisher(type);
+            }
             ret = new IdentifiedX509CertPublisher(dbEntry, publisher);
             ret.initialize(securityFactory.getPasswordResolver(), datasources);
             return ret;

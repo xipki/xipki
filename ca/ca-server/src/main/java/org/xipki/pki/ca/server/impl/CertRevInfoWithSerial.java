@@ -40,8 +40,8 @@ import java.math.BigInteger;
 import java.util.Date;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.CertRevocationInfo;
-import org.xipki.commons.security.api.CrlReason;
+import org.xipki.commons.security.CertRevocationInfo;
+import org.xipki.commons.security.CrlReason;
 
 /**
  * @author Lijun Liao

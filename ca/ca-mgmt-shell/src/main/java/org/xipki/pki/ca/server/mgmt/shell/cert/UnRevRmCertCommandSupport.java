@@ -47,7 +47,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;

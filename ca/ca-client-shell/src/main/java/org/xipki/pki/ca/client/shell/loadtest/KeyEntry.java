@@ -62,9 +62,9 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.util.AlgorithmUtil;
-import org.xipki.commons.security.api.util.KeyUtil;
-import org.xipki.commons.security.api.util.SignerUtil;
+import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.commons.security.util.KeyUtil;
+import org.xipki.commons.security.util.SignerUtil;
 
 /**
  * @author Lijun Liao

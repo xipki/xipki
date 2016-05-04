@@ -19,12 +19,12 @@
     </dependency>
     <dependency>
       <groupId>org.xipki.commons</groupId>
-      <artifactId>datasource-api</artifactId>
+      <artifactId>datasource</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki.commons</groupId>
-      <artifactId>security-api</artifactId>
+      <artifactId>security</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

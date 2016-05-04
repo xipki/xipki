@@ -42,9 +42,9 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.SignerConf;
+import org.xipki.commons.security.ConcurrentContentSigner;
+import org.xipki.commons.security.SecurityFactory;
+import org.xipki.commons.security.SignerConf;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 
 /**

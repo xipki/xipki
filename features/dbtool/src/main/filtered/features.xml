@@ -8,20 +8,15 @@
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.bundle.version}</bundle>
-    <bundle>mvn:org.xipki.commons/password-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/password-impl/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security-pkcs12/${project.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
-    <bundle>mvn:org.xipki.commons/pkcs11-proxy-common/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security-pkcs11/${project.version}</bundle>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
-    <bundle>mvn:org.xipki.commons/datasource-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/datasource-impl/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
     <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
+    <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/password/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/datasource/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/database-tool/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-dbtool/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>

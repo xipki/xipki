@@ -49,7 +49,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.scep.client.ScepClient;
 
 /**

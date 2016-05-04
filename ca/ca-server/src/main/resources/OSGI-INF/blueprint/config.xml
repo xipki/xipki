@@ -11,8 +11,7 @@
       <cm:property name="healthUrlPatterns" value="/health/*"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <reference id="dataSourceFactory" interface="org.xipki.commons.datasource.api.DataSourceFactory"/>
-  <reference id="securityFactory" interface="org.xipki.commons.security.api.SecurityFactory"/>
+  <reference id="securityFactory" interface="org.xipki.commons.security.SecurityFactory"/>
   <reference id="auditServiceRegister"
       interface="org.xipki.commons.audit.api.AuditServiceRegister"/>
   <reference id="x509CertProfileFactoryRegister"
@@ -22,7 +21,6 @@
   <bean id="caManager" class="org.xipki.pki.ca.server.impl.CaManagerImpl"
       init-method="asynStartCaSystem" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
-    <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
     <property name="x509CertProfileFactoryRegister" ref="x509CertProfileFactoryRegister"/>

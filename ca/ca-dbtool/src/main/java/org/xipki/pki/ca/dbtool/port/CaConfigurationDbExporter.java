@@ -49,9 +49,9 @@ import javax.xml.bind.Marshaller;
 
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.XmlUtil;
-import org.xipki.commons.datasource.api.DataSourceWrapper;
-import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.commons.password.api.PasswordResolverException;
+import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.commons.datasource.springframework.dao.DataAccessException;
+import org.xipki.commons.password.PasswordResolverException;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasProfiles;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.CaHasPublishers;

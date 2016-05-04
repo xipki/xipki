@@ -64,7 +64,7 @@ import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.HashAlgoType;
 import org.xipki.pki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
 
 /**

@@ -47,7 +47,7 @@ import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.api.util.AlgorithmUtil;
+import org.xipki.commons.security.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

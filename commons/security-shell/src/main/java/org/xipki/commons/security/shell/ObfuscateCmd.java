@@ -45,7 +45,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.password.api.OBFPasswordService;
+import org.xipki.commons.password.OBFPasswordService;
 
 /**
  * @author Lijun Liao
@@ -80,7 +80,7 @@ public class ObfuscateCmd extends SecurityCommandSupport {
             password = StringUtil.merge(parts);
         }
 
-        String passwordHint = OBFPasswordService.doObfuscate(new String(password));
+        String passwordHint = OBFPasswordService.obfuscate(new String(password));
         if (outFile != null) {
             saveVerbose("saved the obfuscated password to file", new File(outFile),
                     passwordHint.getBytes());

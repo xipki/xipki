@@ -40,7 +40,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.commons.security.api.KeyUsage;
+import org.xipki.commons.security.KeyUsage;
 
 /**
  * @author Lijun Liao

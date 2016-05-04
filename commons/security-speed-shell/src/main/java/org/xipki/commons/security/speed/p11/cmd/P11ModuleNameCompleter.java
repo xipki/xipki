@@ -43,7 +43,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
-import org.xipki.commons.security.api.p11.P11CryptServiceFactory;
+import org.xipki.commons.security.pkcs11.P11CryptServiceFactory;
 
 /**
  * @author Lijun Liao

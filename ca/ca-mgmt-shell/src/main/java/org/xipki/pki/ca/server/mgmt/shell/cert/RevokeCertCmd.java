@@ -45,7 +45,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.console.karaf.completer.ClientCrlReasonCompleter;
-import org.xipki.commons.security.api.CrlReason;
+import org.xipki.commons.security.CrlReason;
 
 /**
  * @author Lijun Liao

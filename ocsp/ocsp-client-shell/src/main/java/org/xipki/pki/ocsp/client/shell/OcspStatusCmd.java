@@ -70,14 +70,14 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.security.api.CrlReason;
-import org.xipki.commons.security.api.HashAlgoType;
-import org.xipki.commons.security.api.IssuerHash;
-import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.util.AlgorithmUtil;
-import org.xipki.commons.security.api.util.KeyUtil;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.CrlReason;
+import org.xipki.commons.security.HashAlgoType;
+import org.xipki.commons.security.IssuerHash;
+import org.xipki.commons.security.ObjectIdentifiers;
+import org.xipki.commons.security.SecurityFactory;
+import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.commons.security.util.KeyUtil;
+import org.xipki.commons.security.util.X509Util;
 
 /**
  * @author Lijun Liao

@@ -42,7 +42,7 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
-import org.xipki.commons.security.api.KeyUsage;
+import org.xipki.commons.security.KeyUsage;
 
 /**
  * @author Lijun Liao

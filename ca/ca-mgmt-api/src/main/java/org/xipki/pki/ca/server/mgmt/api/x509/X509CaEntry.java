@@ -44,9 +44,9 @@ import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.CertRevocationInfo;
-import org.xipki.commons.security.api.KeyUsage;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.CertRevocationInfo;
+import org.xipki.commons.security.KeyUsage;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 

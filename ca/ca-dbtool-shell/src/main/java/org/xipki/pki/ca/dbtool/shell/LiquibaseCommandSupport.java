@@ -55,8 +55,8 @@ import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
 import org.xipki.commons.dbtool.LiquibaseMain;
-import org.xipki.commons.password.api.PasswordResolver;
-import org.xipki.commons.password.api.PasswordResolverException;
+import org.xipki.commons.password.PasswordResolver;
+import org.xipki.commons.password.PasswordResolverException;
 import org.xipki.pki.ca.dbtool.shell.completer.LogLevelCompleter;
 
 /**

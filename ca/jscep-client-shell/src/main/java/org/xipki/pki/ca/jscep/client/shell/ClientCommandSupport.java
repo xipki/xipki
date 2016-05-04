@@ -55,7 +55,7 @@ import org.jscep.client.verification.PreProvisionedCertificateVerifier;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.util.X509Util;
 
 /**
  * @author Lijun Liao

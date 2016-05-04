@@ -133,7 +133,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.commons</groupId>
-                  <artifactId>security-api</artifactId>
+                  <artifactId>security</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
@@ -258,7 +258,6 @@
                 <feature>xipki-ocspqa-shell</feature>
                 <feature>xipki-database-tool</feature>
                 <feature>xipki-audit-syslog</feature>
-                <feature>xipki-ncm-server</feature>
                 <feature>xipki-scepclient-shell</feature>
                 <feature>xipki-jscepclient-shell</feature>
               </features>

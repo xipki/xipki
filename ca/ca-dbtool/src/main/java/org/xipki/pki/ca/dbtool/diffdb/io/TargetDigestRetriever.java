@@ -52,9 +52,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.xipki.commons.common.ProcessLog;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.api.DataSourceWrapper;
-import org.xipki.commons.datasource.api.DatabaseType;
-import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.commons.datasource.DatabaseType;
+import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.DbDigestReporter;

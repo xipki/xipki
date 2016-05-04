@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.password.api.SecurePasswordInputPanel;
+import org.xipki.commons.password.SecurePasswordInputPanel;
 
 /**
  * @author Lijun Liao

@@ -3,17 +3,13 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
   <feature name="xipki-security" version="${project.version}">
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.bundle.version}</bundle>
-    <bundle>mvn:org.xipki.commons/password-api/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki.commons/password-impl/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security-pkcs12/${project.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.bundle.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
-    <bundle>mvn:org.xipki.commons/pkcs11-proxy-common/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/security-pkcs11/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/password/${project.version}</bundle>
+    <bundle>mvn:org.xipki.commons/security/${project.version}</bundle>
   </feature>
   <feature name="xipki-security-shell" version="${project.version}">
     <feature prerequisite="true">xipki-security</feature>
@@ -22,7 +18,6 @@
   </feature>
   <feature name="xipki-pkcs11-proxy" version="${project.version}">
     <feature prerequisite="true">xipki-security</feature>
-    <bundle>mvn:org.xipki.commons/pkcs11-proxy-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/pkcs11-proxy-server/${project.version}</bundle>
   </feature>
 </features>

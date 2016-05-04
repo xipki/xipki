@@ -49,11 +49,11 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.datasource.api.DataSourceFactory;
-import org.xipki.commons.datasource.api.DataSourceWrapper;
-import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
-import org.xipki.commons.password.api.PasswordResolver;
-import org.xipki.commons.password.api.PasswordResolverException;
+import org.xipki.commons.datasource.DataSourceFactory;
+import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.commons.datasource.springframework.dao.DataAccessException;
+import org.xipki.commons.password.PasswordResolver;
+import org.xipki.commons.password.PasswordResolverException;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 import org.xipki.pki.ca.dbtool.port.DbPorter;
 

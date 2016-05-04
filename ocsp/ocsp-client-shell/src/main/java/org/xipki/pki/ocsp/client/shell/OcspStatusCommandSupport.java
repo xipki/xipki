@@ -46,7 +46,7 @@ import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.SigAlgCompleter;
-import org.xipki.commons.security.api.util.AlgorithmUtil;
+import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.pki.ocsp.client.api.OcspRequestor;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 

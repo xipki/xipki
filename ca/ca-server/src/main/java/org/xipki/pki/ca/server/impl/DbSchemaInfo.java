@@ -46,8 +46,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.api.DataSourceWrapper;
-import org.xipki.commons.datasource.api.springframework.dao.DataAccessException;
+import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 
 /**
  * @author Lijun Liao

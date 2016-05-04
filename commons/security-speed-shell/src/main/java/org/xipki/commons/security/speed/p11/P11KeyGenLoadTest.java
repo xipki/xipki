@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.p11.P11Slot;
+import org.xipki.commons.security.pkcs11.P11Slot;
 
 /**
  * @author Lijun Liao

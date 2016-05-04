@@ -55,9 +55,9 @@ import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.pki.ca.qa.api.QaSystemManager;
-import org.xipki.pki.ca.qa.api.X509CertprofileQa;
-import org.xipki.pki.ca.qa.api.X509IssuerInfo;
+import org.xipki.pki.ca.qa.QaSystemManager;
+import org.xipki.pki.ca.qa.X509CertprofileQa;
+import org.xipki.pki.ca.qa.X509IssuerInfo;
 import org.xipki.pki.ca.qa.shell.completer.X509IssuerNameCompleter;
 
 /**

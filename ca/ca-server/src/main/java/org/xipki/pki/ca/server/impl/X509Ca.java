@@ -108,18 +108,18 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.api.CertRevocationInfo;
-import org.xipki.commons.security.api.ConcurrentContentSigner;
-import org.xipki.commons.security.api.CrlReason;
-import org.xipki.commons.security.api.FpIdCalculator;
-import org.xipki.commons.security.api.KeyUsage;
-import org.xipki.commons.security.api.ObjectIdentifiers;
-import org.xipki.commons.security.api.SecurityFactory;
-import org.xipki.commons.security.api.X509Cert;
-import org.xipki.commons.security.api.XiSecurityConstants;
-import org.xipki.commons.security.api.exception.NoIdleSignerException;
-import org.xipki.commons.security.api.exception.XiSecurityException;
-import org.xipki.commons.security.api.util.X509Util;
+import org.xipki.commons.security.CertRevocationInfo;
+import org.xipki.commons.security.ConcurrentContentSigner;
+import org.xipki.commons.security.CrlReason;
+import org.xipki.commons.security.FpIdCalculator;
+import org.xipki.commons.security.KeyUsage;
+import org.xipki.commons.security.ObjectIdentifiers;
+import org.xipki.commons.security.SecurityFactory;
+import org.xipki.commons.security.X509Cert;
+import org.xipki.commons.security.XiSecurityConstants;
+import org.xipki.commons.security.exception.NoIdleSignerException;
+import org.xipki.commons.security.exception.XiSecurityException;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.BadFormatException;
 import org.xipki.pki.ca.api.OperationException;
@@ -153,30 +153,6 @@ import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
  */
 
 public class X509Ca {
-
-    private class ScheduledNextSerialCommitService implements Runnable {
-
-        private boolean inProcess;
-
-        @Override
-        public void run() {
-            if (inProcess) {
-                return;
-            }
-
-            inProcess = true;
-            try {
-                try {
-                    caInfo.commitNextCrlNo();
-                } catch (Throwable th) {
-                    LogUtil.error(LOG, th, "could not commit the NEXT_CRLNO");
-                }
-            } finally {
-                inProcess = false;
-            }
-        } // method run
-
-    } // class ScheduledNextSerialCommitService
 
     private class ScheduledExpiredCertsRemover implements Runnable {
 
@@ -433,8 +409,6 @@ public class X509Ca {
 
     private AtomicBoolean crlGenInProcess = new AtomicBoolean(false);
 
-    private ScheduledFuture<?> nextSerialCommitService;
-
     private ScheduledFuture<?> crlGenerationService;
 
     private ScheduledFuture<?> expiredCertsRemover;
@@ -478,11 +452,6 @@ public class X509Ca {
         }
 
         this.cf = new CertificateFactory();
-        this.nextSerialCommitService = caManager.getScheduledThreadPoolExecutor()
-                .scheduleAtFixedRate(
-                        new ScheduledNextSerialCommitService(),
-                        1, 1, TimeUnit.MINUTES); // commit the next_serial every 1 minute
-
         if (!masterMode) {
             return;
         }
@@ -745,8 +714,7 @@ public class X509Ca {
                     revInfos = certstore.getCertsForDeltaCrl(caCert, startId, numEntries,
                             control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
                 } else {
-                    revInfos = certstore.getRevokedCerts(caCert, notExpireAt, startId,
-                            numEntries,
+                    revInfos = certstore.getRevokedCerts(caCert, notExpireAt, startId, numEntries,
                             control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
                 }
 
@@ -947,6 +915,8 @@ public class X509Ca {
 
             try {
                 X509CRL crl = new X509CRLObject(crlHolder.toASN1Structure());
+                caInfo.getCaEntry().setNextCrlNumber(crlNumber.intValue() + 1);
+                caInfo.commitNextCrlNo();
                 publishCrl(crl);
 
                 successful = true;
@@ -2302,11 +2272,6 @@ public class X509Ca {
         if (crlGenerationService != null) {
             crlGenerationService.cancel(false);
             crlGenerationService = null;
-        }
-
-        if (nextSerialCommitService != null) {
-            nextSerialCommitService.cancel(false);
-            nextSerialCommitService = null;
         }
 
         if (expiredCertsRemover != null) {

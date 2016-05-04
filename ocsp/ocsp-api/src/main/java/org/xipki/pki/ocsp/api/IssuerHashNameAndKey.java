@@ -39,7 +39,7 @@ package org.xipki.pki.ocsp.api;
 import java.util.Arrays;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.api.HashAlgoType;
+import org.xipki.commons.security.HashAlgoType;
 
 /**
  * @author Lijun Liao
