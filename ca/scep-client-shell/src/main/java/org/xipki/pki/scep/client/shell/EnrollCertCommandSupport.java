@@ -73,7 +73,9 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     @Completion(FilePathCompleter.class)
     private String outputFile;
 
-    protected abstract EnrolmentResponse requestCertificate(@Nonnull ScepClient client, @Nonnull CertificationRequest csr, @Nonnull PrivateKey identityKey, @Nonnull X509Certificate identityCert)
+    protected abstract EnrolmentResponse requestCertificate(@Nonnull ScepClient client,
+            @Nonnull CertificationRequest csr, @Nonnull PrivateKey identityKey,
+            @Nonnull X509Certificate identityCert)
     throws ScepClientException;
 
     @Override

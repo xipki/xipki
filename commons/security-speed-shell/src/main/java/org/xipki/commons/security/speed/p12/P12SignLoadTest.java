@@ -80,7 +80,8 @@ public abstract class P12SignLoadTest extends LoadExecutor {
 
     private final ConcurrentContentSigner signer;
 
-    public P12SignLoadTest(final SecurityFactory securityFactory, final String signatureAlgorithm, final byte[] keystore, final String description)
+    public P12SignLoadTest(final SecurityFactory securityFactory, final String signatureAlgorithm,
+            final byte[] keystore, final String description)
     throws Exception {
         super(description);
 
@@ -100,7 +101,8 @@ public abstract class P12SignLoadTest extends LoadExecutor {
     }
 
     // CHECKSTYLE:SKIP
-    protected static byte[] getPrecomputedRSAKeystore(final int keysize, final BigInteger publicExponent)
+    protected static byte[] getPrecomputedRSAKeystore(final int keysize,
+            final BigInteger publicExponent)
     throws IOException {
         return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16)
             + ".p12");
