@@ -23,7 +23,6 @@
     <module>security</module>
     <module>security-shell</module>
     <module>security-speed-shell</module>
-    <module>pkcs11-proxy-common</module>
     <module>pkcs11-proxy-server</module>
   </modules>
 </project>
