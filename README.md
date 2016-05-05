@@ -166,19 +166,14 @@ Build and Assembly from Source Code
   git clone git://github.com/xipki/xipki
   ```
 
-* Prepare
-  * Install the third party artifacts that are not availablle in maven repositories
-    
-    * Get a copy of pkcs11-wrapper code and build it
-      ```sh
-      git clone git://github.com/xipki/pkcs11wrapper
-
-      git checkout sunpkcs11-wrapper-v1.3.0
-
-      mvn clean install
-      ```
- 
 * Build
+  * Install the third party artifacts that are not availablle in maven repositories
+
+    * In folder `xipki/ext`
+      ```sh
+      ./install.sh
+      ```
+
   * Compile and install the artifacts
     
     In folder `xipki`
