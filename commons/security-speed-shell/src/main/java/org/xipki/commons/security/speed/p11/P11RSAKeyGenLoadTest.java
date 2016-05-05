@@ -52,7 +52,8 @@ public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest {
 
     private final BigInteger publicExponent;
 
-    public P11RSAKeyGenLoadTest(final P11Slot slot, final int keysize, final BigInteger publicExponent)
+    public P11RSAKeyGenLoadTest(final P11Slot slot, final int keysize,
+            final BigInteger publicExponent)
     throws Exception {
         super(slot,
                 "PKCS#11 RSA key generation\n"
