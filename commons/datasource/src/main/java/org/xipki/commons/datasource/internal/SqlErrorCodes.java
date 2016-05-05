@@ -234,8 +234,7 @@ public class SqlErrorCodes {
         return cannotSerializeTransactionCodes;
     }
 
-    public static SqlErrorCodes newInstance(
-            final DatabaseType dbType) {
+    public static SqlErrorCodes newInstance(final DatabaseType dbType) {
         ParamUtil.requireNonNull("dbType", dbType);
         switch (dbType) {
         case DB2:
@@ -259,8 +258,7 @@ public class SqlErrorCodes {
         }
     }
 
-    private static Set<String> toSet(
-            final String... strs) {
+    private static Set<String> toSet(final String... strs) {
         if (strs == null || strs.length == 0) {
             return Collections.emptySet();
         }
@@ -272,8 +270,7 @@ public class SqlErrorCodes {
         return Collections.unmodifiableSet(set);
     }
 
-    private static Set<String> toSet(
-            final int... ints) {
+    private static Set<String> toSet(final int... ints) {
         if (ints == null || ints.length == 0) {
             return Collections.emptySet();
         }

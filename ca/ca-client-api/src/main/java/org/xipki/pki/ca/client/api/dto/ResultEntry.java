@@ -43,8 +43,7 @@ package org.xipki.pki.ca.client.api.dto;
 
 public abstract class ResultEntry extends IdentifiedObject {
 
-    public ResultEntry(
-            final String id) {
+    public ResultEntry(final String id) {
         super(id);
     }
 

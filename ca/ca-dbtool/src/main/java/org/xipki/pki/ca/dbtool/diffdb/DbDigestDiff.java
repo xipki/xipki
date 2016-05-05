@@ -97,14 +97,9 @@ public class DbDigestDiff {
 
     private final int numTargetThreads;
 
-    private DbDigestDiff(
-            final String refDir,
-            final DataSourceWrapper refDatasource,
-            final DataSourceWrapper targetDatasource,
-            final String reportDirName,
-            final boolean revokedOnly,
-            final AtomicBoolean stopMe,
-            final int numPerSelect,
+    private DbDigestDiff(final String refDir, final DataSourceWrapper refDatasource,
+            final DataSourceWrapper targetDatasource, final String reportDirName,
+            final boolean revokedOnly, final AtomicBoolean stopMe, final int numPerSelect,
             final NumThreads numThreads)
     throws IOException, DataAccessException {
         if (refDir == null) {
@@ -152,8 +147,7 @@ public class DbDigestDiff {
         return includeCaCerts;
     }
 
-    public void setIncludeCaCerts(
-            final Set<byte[]> includeCaCerts) {
+    public void setIncludeCaCerts(final Set<byte[]> includeCaCerts) {
         this.includeCaCerts = includeCaCerts;
     }
 
@@ -232,8 +226,7 @@ public class DbDigestDiff {
         }
     } // method diff
 
-    private void diffSingleCa(
-            final DigestReader refReader,
+    private void diffSingleCa(final DigestReader refReader,
             final Map<Integer, byte[]> caIdCertBytesMap)
     throws CertificateException, IOException, InterruptedException {
         X509Certificate caCert = refReader.getCaCert();
@@ -306,13 +299,9 @@ public class DbDigestDiff {
         }
     } // method diffSingleCa
 
-    public static DbDigestDiff getInstanceForDirRef(
-            final String refDirname,
-            final DataSourceWrapper targetDatasource,
-            final String reportDirName,
-            final boolean revokedOnly,
-            final AtomicBoolean stopMe,
-            final int numPerSelect,
+    public static DbDigestDiff getInstanceForDirRef(final String refDirname,
+            final DataSourceWrapper targetDatasource, final String reportDirName,
+            final boolean revokedOnly, final AtomicBoolean stopMe, final int numPerSelect,
             final NumThreads numThreads)
     throws IOException, DataAccessException {
         return new DbDigestDiff(refDirname, null,
@@ -320,21 +309,16 @@ public class DbDigestDiff {
                 numPerSelect, numThreads);
     }
 
-    public static DbDigestDiff getInstanceForDbRef(
-            final DataSourceWrapper refDatasource,
-            final DataSourceWrapper targetDatasource,
-            final String reportDirName,
-            final boolean revokedOnly,
-            final AtomicBoolean stopMe,
-            final int numPerSelect,
+    public static DbDigestDiff getInstanceForDbRef(final DataSourceWrapper refDatasource,
+            final DataSourceWrapper targetDatasource, final String reportDirName,
+            final boolean revokedOnly, final AtomicBoolean stopMe, final int numPerSelect,
             final NumThreads numThreads)
     throws IOException, DataAccessException {
         return new DbDigestDiff(null, refDatasource, targetDatasource, reportDirName, revokedOnly,
                 stopMe, numPerSelect, numThreads);
     }
 
-    private static Map<Integer, byte[]> getCas(
-            final DataSourceWrapper datasource,
+    private static Map<Integer, byte[]> getCas(final DataSourceWrapper datasource,
             final XipkiDbControl dbControl)
     throws DataAccessException {
         // get a list of available CAs in the target database

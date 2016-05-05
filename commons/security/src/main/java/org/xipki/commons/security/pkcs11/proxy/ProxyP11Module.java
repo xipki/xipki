@@ -118,8 +118,7 @@ public class ProxyP11Module extends AbstractP11Module {
 
     private boolean readOnly;
 
-    private ProxyP11Module(
-            final P11ModuleConf moduleConf)
+    private ProxyP11Module(final P11ModuleConf moduleConf)
     throws P11TokenException {
         super(moduleConf);
 
@@ -146,8 +145,7 @@ public class ProxyP11Module extends AbstractP11Module {
         refresh();
     }
 
-    public static P11Module getInstance(
-            final P11ModuleConf moduleConf)
+    public static P11Module getInstance(final P11ModuleConf moduleConf)
     throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
         return new ProxyP11Module(moduleConf);
@@ -216,8 +214,7 @@ public class ProxyP11Module extends AbstractP11Module {
         }
     }
 
-    byte[] send(
-            final byte[] request)
+    byte[] send(final byte[] request)
     throws IOException {
         ParamUtil.requireNonNull("request", request);
         HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
@@ -274,9 +271,7 @@ public class ProxyP11Module extends AbstractP11Module {
         }
     } // method send
 
-    ASN1Encodable send(
-            final int action,
-            final ASN1Encodable content)
+    ASN1Encodable send(final int action, final ASN1Encodable content)
     throws P11TokenException {
         ASN1EncodableVector vec = new ASN1EncodableVector();
         vec.add(new ASN1Integer(version));
@@ -332,8 +327,7 @@ public class ProxyP11Module extends AbstractP11Module {
         return extractItvInfoValue(action, response);
     } // method send
 
-    private PKIHeader buildPkiHeader(
-            final ASN1OctetString tid) {
+    private PKIHeader buildPkiHeader(final ASN1OctetString tid) {
         PKIHeaderBuilder hdrBuilder = new PKIHeaderBuilder(
                 PKIHeader.CMP_2000,
                 sender,
@@ -375,9 +369,7 @@ public class ProxyP11Module extends AbstractP11Module {
         return new ServerCaps(respBytes);
     }
 
-    private ASN1Encodable extractItvInfoValue(
-            final int action,
-            final GeneralPKIMessage response)
+    private ASN1Encodable extractItvInfoValue(final int action, final GeneralPKIMessage response)
     throws P11TokenException {
         PKIBody respBody = response.getBody();
         int bodyType = respBody.getType();
@@ -473,8 +465,7 @@ public class ProxyP11Module extends AbstractP11Module {
         }
     } // method extractItvInfoValue
 
-    private void checkResponseCode(
-            final HttpURLConnection conn)
+    private void checkResponseCode(final HttpURLConnection conn)
     throws P11TokenException {
         ParamUtil.requireNonNull("conn", conn);
         try {

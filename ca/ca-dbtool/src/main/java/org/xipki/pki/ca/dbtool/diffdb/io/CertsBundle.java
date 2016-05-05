@@ -52,9 +52,7 @@ public class CertsBundle {
 
     private List<Long> serialNumbers;
 
-    public CertsBundle(
-            final Map<Long, DbDigestEntry> certs,
-            final List<Long> serialNumbers) {
+    public CertsBundle(final Map<Long, DbDigestEntry> certs, final List<Long> serialNumbers) {
         this.certs = ParamUtil.requireNonEmpty("certs", certs);
         this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
     }

@@ -106,12 +106,8 @@ public class CaLoadTestRevoke extends LoadExecutor {
 
     private boolean noUnrevokedCerts;
 
-    public CaLoadTestRevoke(
-            final CaClient caClient,
-            final Certificate caCert,
-            final DataSourceWrapper caDataSource,
-            final int maxCerts,
-            final int num,
+    public CaLoadTestRevoke(final CaClient caClient, final Certificate caCert,
+            final DataSourceWrapper caDataSource, final int maxCerts, final int num,
             final String description)
     throws Exception {
         super(description);
@@ -178,8 +174,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
             }
         }
 
-        private boolean testNext(
-                final List<Long> serialNumbers) {
+        private boolean testNext(final List<Long> serialNumbers) {
             RevokeCertRequest request = new RevokeCertRequest();
             int id = 1;
             for (Long serialNumber : serialNumbers) {

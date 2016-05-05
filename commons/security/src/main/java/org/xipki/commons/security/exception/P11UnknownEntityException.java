@@ -49,24 +49,20 @@ public class P11UnknownEntityException extends P11TokenException {
 
     private static final long serialVersionUID = 1L;
 
-    public P11UnknownEntityException(
-            final P11EntityIdentifier entityId) {
+    public P11UnknownEntityException(final P11EntityIdentifier entityId) {
         super("unknown entity '" + entityId + "'");
     }
 
-    public P11UnknownEntityException(
-            final P11SlotIdentifier slotId) {
+    public P11UnknownEntityException(final P11SlotIdentifier slotId) {
         super("unknown slot '" + slotId + "'");
     }
 
-    public P11UnknownEntityException(
-            final P11SlotIdentifier slotId,
+    public P11UnknownEntityException(final P11SlotIdentifier slotId,
             final P11ObjectIdentifier objectId) {
         super("unknown entity 'slot " + slotId + ", object " + objectId + "'");
     }
 
-    public P11UnknownEntityException(
-            final String message) {
+    public P11UnknownEntityException(final String message) {
         super(message);
     }
 

@@ -79,8 +79,7 @@ public class TargetDigestRetriever {
 
         private PreparedStatement rangeSelectStmt;
 
-        Retriever(
-                final boolean revokedOnly)
+        Retriever(final boolean revokedOnly)
         throws DataAccessException {
             this.revokedOnly = revokedOnly;
             conn = datasource.getConnection();
@@ -201,17 +200,10 @@ public class TargetDigestRetriever {
 
     private final List<Retriever> retrievers;
 
-    public TargetDigestRetriever(
-            final boolean revokedOnly,
-            final ProcessLog processLog,
-            final DigestReader reader,
-            final DbDigestReporter reporter,
-            final DataSourceWrapper datasource,
-            final XipkiDbControl dbControl,
-            final int caId,
-            final int numPerSelect,
-            final int numThreads,
-            final StopMe stopMe)
+    public TargetDigestRetriever(final boolean revokedOnly, final ProcessLog processLog,
+            final DigestReader reader, final DbDigestReporter reporter,
+            final DataSourceWrapper datasource, final XipkiDbControl dbControl, final int caId,
+            final int numPerSelect, final int numThreads, final StopMe stopMe)
     throws DataAccessException {
         this.processLog = ParamUtil.requireNonNull("processLog", processLog);
         this.numPerSelect = numPerSelect;
@@ -295,8 +287,7 @@ public class TargetDigestRetriever {
     }
 
     private Map<Long, DbDigestEntry> getCertsViaSingleSelectInB(
-            final PreparedStatement singleSelectStmt,
-            final List<Long> serialNumbers)
+            final PreparedStatement singleSelectStmt, final List<Long> serialNumbers)
     throws DataAccessException {
         Map<Long, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
 
@@ -311,8 +302,7 @@ public class TargetDigestRetriever {
     }
 
     private Map<Long, DbDigestEntry> getCertsViaInArraySelectInB(
-            final PreparedStatement batchSelectStmt,
-            final List<Long> serialNumbers)
+            final PreparedStatement batchSelectStmt, final List<Long> serialNumbers)
     throws DataAccessException {
         final int n = serialNumbers.size();
         if (n != numPerSelect) {
@@ -338,9 +328,7 @@ public class TargetDigestRetriever {
         }
     }
 
-    private Map<Long, DbDigestEntry> buildResult(
-            final ResultSet rs,
-            final List<Long> serialNumbers)
+    private Map<Long, DbDigestEntry> buildResult(final ResultSet rs, final List<Long> serialNumbers)
     throws SQLException {
         Map<Long, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
 
@@ -371,8 +359,7 @@ public class TargetDigestRetriever {
         return ret;
     }
 
-    private DbDigestEntry getSingleCert(
-            final PreparedStatement singleSelectStmt,
+    private DbDigestEntry getSingleCert(final PreparedStatement singleSelectStmt,
             final long serialNumber)
     throws DataAccessException {
         ResultSet rs = null;
@@ -404,9 +391,7 @@ public class TargetDigestRetriever {
         }
     }
 
-    private void releaseResources(
-            final Statement ps,
-            final ResultSet rs) {
+    private void releaseResources(final Statement ps, final ResultSet rs) {
         DbToolBase.releaseResources(datasource, ps, rs);
     }
 

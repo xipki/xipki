@@ -50,9 +50,7 @@ public class P10EnrollCertEntry {
 
     private final String profile;
 
-    public P10EnrollCertEntry(
-            final CertificationRequest p10Request,
-            final String profile) {
+    public P10EnrollCertEntry(final CertificationRequest p10Request, final String profile) {
         this.p10Request = ParamUtil.requireNonNull("p10Request", p10Request);
         this.profile = ParamUtil.requireNonNull("profile", profile);
     }

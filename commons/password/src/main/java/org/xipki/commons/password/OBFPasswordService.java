@@ -48,8 +48,7 @@ public class OBFPasswordService {
 
     public static final String OBFUSCATE = "OBF:";
 
-    public static String obfuscate(
-            final String str) {
+    public static String obfuscate(final String str) {
         Objects.requireNonNull(str, "str must not be null");
         StringBuilder buf = new StringBuilder();
         byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
@@ -76,8 +75,7 @@ public class OBFPasswordService {
         return buf.toString();
     }
 
-    public static String deobfuscate(
-            final String str) {
+    public static String deobfuscate(final String str) {
         Objects.requireNonNull(str, "str must not be null");
         String tmpStr = str;
 
@@ -107,9 +105,7 @@ public class OBFPasswordService {
         return new String(bytes, 0, idx, StandardCharsets.UTF_8);
     }
 
-    private static boolean startsWithIgnoreCase(
-            final String str,
-            final String prefix) {
+    private static boolean startsWithIgnoreCase(final String str, final String prefix) {
         if (str.length() < prefix.length()) {
             return false;
         }

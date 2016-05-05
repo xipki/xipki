@@ -48,19 +48,15 @@ public class IllegalCmdParamException extends Exception {
     public IllegalCmdParamException() {
     }
 
-    public IllegalCmdParamException(
-            final String message) {
+    public IllegalCmdParamException(final String message) {
         super(message);
     }
 
-    public IllegalCmdParamException(
-            final Throwable cause) {
+    public IllegalCmdParamException(final Throwable cause) {
         super(cause);
     }
 
-    public IllegalCmdParamException(
-            final String message,
-            final Throwable cause) {
+    public IllegalCmdParamException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

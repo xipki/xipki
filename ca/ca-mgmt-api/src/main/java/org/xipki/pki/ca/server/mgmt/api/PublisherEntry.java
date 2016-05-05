@@ -57,10 +57,7 @@ public class PublisherEntry implements Serializable {
 
     private boolean faulty;
 
-    public PublisherEntry(
-            final String name,
-            final String type,
-            final String conf) {
+    public PublisherEntry(final String name, final String type, final String conf) {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.type = ParamUtil.requireNonBlank("type", type);
         this.conf = conf;
@@ -82,8 +79,7 @@ public class PublisherEntry implements Serializable {
         return faulty;
     }
 
-    public void setFaulty(
-            final boolean faulty) {
+    public void setFaulty(final boolean faulty) {
         this.faulty = faulty;
     }
 

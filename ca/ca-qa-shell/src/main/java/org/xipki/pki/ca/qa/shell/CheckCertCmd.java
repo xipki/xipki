@@ -169,15 +169,11 @@ public class CheckCertCmd extends XipkiCommandSupport {
         return null;
     } // method doExecute
 
-    private static void format(
-            final ValidationIssue issue,
-            final String prefix,
-            final StringBuilder sb) {
+    private static void format(final ValidationIssue issue, final String prefix, final StringBuilder sb) {
         sb.append(prefix);
         sb.append(issue.getCode());
         sb.append(", ").append(issue.getDescription());
-        sb.append(", ").append(
-                issue.isFailed()
+        sb.append(", ").append(issue.isFailed()
                     ? "failed"
                     : "successful");
         if (issue.getFailureMessage() != null) {

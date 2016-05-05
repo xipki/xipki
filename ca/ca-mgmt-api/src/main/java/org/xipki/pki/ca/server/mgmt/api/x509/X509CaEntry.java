@@ -81,24 +81,15 @@ public class X509CaEntry extends CaEntry implements Serializable {
 
     private String subject;
 
-    public X509CaEntry(
-            final String name,
-            final int serialNoSize,
-            final int nextCrlNumber,
-            final String signerType,
-            final String signerConf,
-            final X509CaUris caUris,
-            final int numCrls,
-            final int expirationPeriod)
+    public X509CaEntry(final String name, final int serialNoSize, final int nextCrlNumber,
+            final String signerType, final String signerConf, final X509CaUris caUris,
+            final int numCrls, final int expirationPeriod)
     throws CaMgmtException {
         super(name, signerType, signerConf, expirationPeriod);
         init(serialNoSize, nextCrlNumber, caUris, numCrls);
     }
 
-    private void init(
-            final int serialNoSize,
-            final int nextCrlNumber,
-            final X509CaUris caUris,
+    private void init(final int serialNoSize, final int nextCrlNumber, final X509CaUris caUris,
             final int numCrls)
     throws CaMgmtException {
         this.numCrls = ParamUtil.requireMin("numCrls", numCrls, 0);
@@ -111,8 +102,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
         this.deltaCrlUris = caUris.getDeltaCrlUris();
     }
 
-    public void setCertificate(
-            final X509Certificate certificate)
+    public void setCertificate(final X509Certificate certificate)
     throws CaMgmtException {
         if (certificate == null) {
             this.cert = null;
@@ -130,8 +120,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
         return serialNoSize;
     }
 
-    public void setSerialNoSize(
-            final int serialNoSize) {
+    public void setSerialNoSize(final int serialNoSize) {
         this.serialNoSize = ParamUtil.requireMin("serialNoSize", serialNoSize, 8);
     }
 
@@ -139,8 +128,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
         return nextCrlNumber;
     }
 
-    public void setNextCrlNumber(
-            final int crlNumber) {
+    public void setNextCrlNumber(final int crlNumber) {
         this.nextCrlNumber = crlNumber;
     }
 
@@ -188,14 +176,11 @@ public class X509CaEntry extends CaEntry implements Serializable {
         return crlSignerName;
     }
 
-    public void setCrlSignerName(
-            final String crlSignerName) {
+    public void setCrlSignerName(final String crlSignerName) {
         this.crlSignerName = crlSignerName;
     }
 
-    public String toString(
-            final boolean verbose,
-            final boolean ignoreSensitiveInfo) {
+    public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(1000);
         sb.append(super.toString(verbose, ignoreSensitiveInfo));
         if (sb.charAt(sb.length() - 1) != '\n') {
@@ -230,10 +215,9 @@ public class X509CaEntry extends CaEntry implements Serializable {
 
         sb.append("crlsignerName: ").append(crlSignerName).append('\n');
         sb.append("revocation: ");
-        sb.append(
-                revocationInfo == null
-                        ? "not revoked"
-                        : "revoked");
+        sb.append(revocationInfo == null
+                ? "not revoked"
+                : "revoked");
         sb.append("\n");
         if (revocationInfo != null) {
             sb.append("\treason: ")
@@ -251,8 +235,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
         return revocationInfo;
     }
 
-    public void setRevocationInfo(
-            final CertRevocationInfo revocationInfo) {
+    public void setRevocationInfo(final CertRevocationInfo revocationInfo) {
         this.revocationInfo = revocationInfo;
     }
 

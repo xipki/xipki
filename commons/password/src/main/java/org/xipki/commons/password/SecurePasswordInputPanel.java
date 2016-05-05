@@ -66,8 +66,7 @@ public class SecurePasswordInputPanel extends Panel {
     public class MyActionListener implements ActionListener {
 
         @Override
-        public void actionPerformed(
-                final ActionEvent event) {
+        public void actionPerformed(final ActionEvent event) {
             JButton btn = (JButton) event.getSource();
             String pressedKey = (String) btn.getClientProperty("key");
 
@@ -178,12 +177,10 @@ public class SecurePasswordInputPanel extends Panel {
         return password.toCharArray();
     }
 
-    public static char[] readPassword(
-            final String prompt) {
+    public static char[] readPassword(final String prompt) {
         LookAndFeel currentLookAndFeel = UIManager.getLookAndFeel();
         try {
-            UIManager.setLookAndFeel(
-                UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) { // CHECKSTYLE:SKIP
         }
 

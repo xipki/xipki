@@ -96,16 +96,14 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static RSAKeyParameters generateRSAPublicKeyParameter(
-            final RSAPublicKey key) {
+    public static RSAKeyParameters generateRSAPublicKeyParameter(final RSAPublicKey key) {
         ParamUtil.requireNonNull("key", key);
         return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
 
     }
 
     // CHECKSTYLE:SKIP
-    public static RSAKeyParameters generateRSAPrivateKeyParameter(
-            final RSAPrivateKey key) {
+    public static RSAKeyParameters generateRSAPrivateKeyParameter(final RSAPrivateKey key) {
         ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPrivateCrtKey) {
             RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey) key;
@@ -120,16 +118,13 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static PSSSigner createPSSRSASigner(
-            final AlgorithmIdentifier sigAlgId)
+    public static PSSSigner createPSSRSASigner(final AlgorithmIdentifier sigAlgId)
     throws XiSecurityException {
         return createPSSRSASigner(sigAlgId, null);
     }
 
     // CHECKSTYLE:SKIP
-    public static PSSSigner createPSSRSASigner(
-            final AlgorithmIdentifier sigAlgId,
-            final AsymmetricBlockCipher cipher)
+    public static PSSSigner createPSSRSASigner(final AlgorithmIdentifier sigAlgId, final AsymmetricBlockCipher cipher)
     throws XiSecurityException {
         ParamUtil.requireNonNull("sigAlgId", sigAlgId);
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
@@ -162,8 +157,7 @@ public class SignerUtil {
         return new PSSSigner(tmpCipher, dig, mfgDig, saltSize, getTrailer(trailerField));
     }
 
-    private static byte getTrailer(
-            final int trailerField) {
+    private static byte getTrailer(final int trailerField) {
         if (trailerField == 1) {
             return org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT;
         }
@@ -172,10 +166,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] EMSA_PKCS1_v1_5_encoding(
-            final byte[] hashValue,
-            final int modulusBigLength,
-            final HashAlgoType hashAlgo)
+    public static byte[] EMSA_PKCS1_v1_5_encoding(final byte[] hashValue, final int modulusBigLength, final HashAlgoType hashAlgo)
     throws XiSecurityException {
         ParamUtil.requireNonNull("hashValue", hashValue);
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
@@ -211,9 +202,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] EMSA_PKCS1_v1_5_encoding(
-            final byte[] encodedDigestInfo,
-            final int modulusBigLength)
+    public static byte[] EMSA_PKCS1_v1_5_encoding(final byte[] encodedDigestInfo, final int modulusBigLength)
     throws XiSecurityException {
         ParamUtil.requireNonNull("encodedDigestInfo", encodedDigestInfo);
 
@@ -243,13 +232,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] EMSA_PSS_ENCODE(
-            final HashAlgoType contentDigest,
-            final byte[] hashValue,
-            final HashAlgoType mgfDigest,
-            final int saltLen,
-            final int modulusBitLength,
-            final SecureRandom random)
+    public static byte[] EMSA_PSS_ENCODE(final HashAlgoType contentDigest, final byte[] hashValue, final HashAlgoType mgfDigest, final int saltLen, final int modulusBitLength, final SecureRandom random)
     throws XiSecurityException {
         final int hLen = contentDigest.getLength();
         final byte[] salt = new byte[saltLen];
@@ -305,10 +288,9 @@ public class SignerUtil {
     /**
      * mask generator function, as described in PKCS1v2.
      */
-    private static byte[] maskGeneratorFunction1(
-        final HashAlgoType mgfDigest,
-        final byte[] Z, // CHECKSTYLE:SKIP
-        final int length) {
+    private static byte[] maskGeneratorFunction1(final HashAlgoType mgfDigest,
+            final byte[] Z, // CHECKSTYLE:SKIP
+            final int length) {
         int mgfhLen = mgfDigest.getLength();
         byte[] mask = new byte[length];
         int counter = 0;
@@ -334,8 +316,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] convertPlainDSASigToX962(
-            final byte[] signature)
+    public static byte[] convertPlainDSASigToX962(final byte[] signature)
     throws XiSecurityException {
         ParamUtil.requireNonNull("signature", signature);
         if (signature.length % 2 != 0) {
@@ -359,9 +340,7 @@ public class SignerUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static byte[] convertX962DSASigToPlain(
-            final byte[] x962Signature,
-            final int keyBitLen)
+    public static byte[] convertX962DSASigToPlain(final byte[] x962Signature, final int keyBitLen)
     throws XiSecurityException {
         ParamUtil.requireNonNull("x962Signature", x962Signature);
         final int blockSize = (keyBitLen + 7) / 8;
@@ -384,10 +363,7 @@ public class SignerUtil {
         return plainSignature;
     }
 
-    private static void bigIntToBytes(
-            final BigInteger num,
-            final byte[] dest,
-            final int destPos,
+    private static void bigIntToBytes(final BigInteger num, final byte[] dest, final int destPos,
             final int length) {
         byte[] bytes = num.toByteArray();
         if (bytes.length == length) {
@@ -399,8 +375,7 @@ public class SignerUtil {
         }
     }
 
-    public static Digest getDigest(
-            final HashAlgoType hashAlgo)
+    public static Digest getDigest(final HashAlgoType hashAlgo)
     throws XiSecurityException {
         try {
             return BcDefaultDigestProvider.INSTANCE.get(
@@ -411,8 +386,7 @@ public class SignerUtil {
         }
     }
 
-    public static Digest getDigest(
-            final AlgorithmIdentifier hashAlgo)
+    public static Digest getDigest(final AlgorithmIdentifier hashAlgo)
     throws XiSecurityException {
         try {
             return BcDefaultDigestProvider.INSTANCE.get(hashAlgo);

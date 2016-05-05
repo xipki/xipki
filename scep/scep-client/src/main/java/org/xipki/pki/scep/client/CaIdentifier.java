@@ -57,9 +57,7 @@ public class CaIdentifier {
 
     private final String profile;
 
-    public CaIdentifier(
-            final String serverUrl,
-            final String profile)
+    public CaIdentifier(final String serverUrl, final String profile)
     throws MalformedURLException {
         ParamUtil.requireNonBlank("serverUrl", serverUrl);
         URL tmpUrl = new URL(serverUrl);
@@ -86,16 +84,13 @@ public class CaIdentifier {
         return profile;
     }
 
-    public String buildGetUrl(
-            final Operation operation)
+    public String buildGetUrl(final Operation operation)
     throws TransactionException {
         return buildGetUrl(operation, null);
     }
 
     @SuppressWarnings("deprecation")
-    public String buildGetUrl(
-            final Operation operation,
-            final String message) {
+    public String buildGetUrl(final Operation operation, final String message) {
         ParamUtil.requireNonNull("operation", operation);
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.getCode());
@@ -111,8 +106,7 @@ public class CaIdentifier {
         return ub.toString();
     }
 
-    public String buildPostUrl(
-            final Operation operation) {
+    public String buildPostUrl(final Operation operation) {
         ParamUtil.requireNonNull("operation", operation);
         StringBuilder ub = new StringBuilder(url);
         ub.append('?').append("operation=").append(operation.getCode());
@@ -130,8 +124,7 @@ public class CaIdentifier {
     }
 
     @Override
-    public boolean equals(
-            final Object object) {
+    public boolean equals(final Object object) {
         if (object instanceof CaIdentifier) {
             CaIdentifier objB = (CaIdentifier) object;
             return url == objB.url && profile == objB.profile;

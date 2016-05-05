@@ -54,8 +54,7 @@ public class CaUsersWriter extends DbiXmlWriter {
         super("users", "1");
     }
 
-    public void add(
-            final CaUserType user)
+    public void add(final CaUserType user)
     throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("user", user);
         user.validate();

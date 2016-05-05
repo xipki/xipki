@@ -59,8 +59,7 @@ public class DbPortFileNameIterator implements Iterator<String> {
 
     private String nextFilename;
 
-    public DbPortFileNameIterator(
-            final String filename)
+    public DbPortFileNameIterator(final String filename)
     throws IOException {
         ParamUtil.requireNonNull("filename", filename);
 

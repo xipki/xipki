@@ -49,19 +49,15 @@ public class CaMgmtException extends Exception {
         super();
     }
 
-    public CaMgmtException(
-            final String message,
-            final Throwable cause) {
+    public CaMgmtException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public CaMgmtException(
-            final String message) {
+    public CaMgmtException(final String message) {
         super(message);
     }
 
-    public CaMgmtException(
-            final Throwable cause) {
+    public CaMgmtException(final Throwable cause) {
         super(cause);
     }
 

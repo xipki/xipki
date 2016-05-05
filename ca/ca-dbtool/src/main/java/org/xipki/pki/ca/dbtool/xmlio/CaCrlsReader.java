@@ -48,8 +48,7 @@ import javax.xml.stream.XMLStreamException;
 
 public class CaCrlsReader extends DbiXmlReader {
 
-    public CaCrlsReader(
-            final InputStream xmlStream)
+    public CaCrlsReader(final InputStream xmlStream)
     throws XMLStreamException, InvalidDataObjectException {
         super("crls", xmlStream);
     }

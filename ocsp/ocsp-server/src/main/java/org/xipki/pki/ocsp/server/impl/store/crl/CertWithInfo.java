@@ -55,13 +55,11 @@ class CertWithInfo {
 
     private String profileName;
 
-    CertWithInfo(
-            final BigInteger serialNumber) {
+    CertWithInfo(final BigInteger serialNumber) {
         this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
     }
 
-    public void setProfileName(
-            final String profileName) {
+    public void setProfileName(final String profileName) {
         this.profileName = StringUtil.isBlank(profileName)
                 ? null
                 : profileName;

@@ -53,8 +53,7 @@ public class CaEntryContainer {
 
     private final Map<Integer, CaEntry> caEntryMap;
 
-    public CaEntryContainer(
-            final Set<CaEntry> caEntries) {
+    public CaEntryContainer(final Set<CaEntry> caEntries) {
         ParamUtil.requireNonEmpty("caEntries", caEntries);
         caEntryMap = new HashMap<>(caEntries.size());
         for (CaEntry m : caEntries) {
@@ -62,10 +61,7 @@ public class CaEntryContainer {
         }
     }
 
-    public void addDigestEntry(
-            final int caId,
-            final int id,
-            final DbDigestEntry reportEntry)
+    public void addDigestEntry(final int caId, final int id, final DbDigestEntry reportEntry)
     throws IOException, InvalidDataObjectException {
         CaEntry ce = caEntryMap.get(caId);
         if (ce == null) {

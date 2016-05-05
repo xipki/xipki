@@ -56,10 +56,7 @@ class CertBasedIdentityEntry {
 
     private final byte[] cert;
 
-    CertBasedIdentityEntry(
-            final int id,
-            final String subject,
-            final String b64Sha1Fp,
+    CertBasedIdentityEntry(final int id, final String subject, final String b64Sha1Fp,
             final String b64Cert) {
         ParamUtil.requireNonBlank("b64Sha1Fp", b64Sha1Fp);
         ParamUtil.requireNonBlank("b64Cert", b64Cert);
@@ -77,13 +74,11 @@ class CertBasedIdentityEntry {
         return subject;
     }
 
-    boolean matchSha1Fp(
-            final byte[] sha1HashValue) {
+    boolean matchSha1Fp(final byte[] sha1HashValue) {
         return Arrays.equals(this.sha1Fp, sha1HashValue);
     }
 
-    boolean matchCert(
-            final byte[] encodedCert) {
+    boolean matchCert(final byte[] encodedCert) {
         return Arrays.equals(this.cert, encodedCert);
     }
 

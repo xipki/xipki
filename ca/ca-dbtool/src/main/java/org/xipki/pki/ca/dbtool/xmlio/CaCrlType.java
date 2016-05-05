@@ -67,8 +67,7 @@ public class CaCrlType extends DbDataObject {
         return id;
     }
 
-    public void setId(
-            final Integer id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 
@@ -76,8 +75,7 @@ public class CaCrlType extends DbDataObject {
         return caId;
     }
 
-    public void setCaId(
-            final Integer caId) {
+    public void setCaId(final Integer caId) {
         this.caId = caId;
     }
 
@@ -85,8 +83,7 @@ public class CaCrlType extends DbDataObject {
         return crlNo;
     }
 
-    public void setCrlNo(
-            final String crlNo) {
+    public void setCrlNo(final String crlNo) {
         this.crlNo = crlNo;
     }
 
@@ -94,8 +91,7 @@ public class CaCrlType extends DbDataObject {
         return file;
     }
 
-    public void setFile(
-            final String file) {
+    public void setFile(final String file) {
         this.file = file;
     }
 
@@ -109,8 +105,7 @@ public class CaCrlType extends DbDataObject {
     }
 
     @Override
-    public void writeTo(
-            final DbiXmlWriter writer)
+    public void writeTo(final DbiXmlWriter writer)
     throws InvalidDataObjectException, XMLStreamException {
         validate();
 

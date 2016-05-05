@@ -63,8 +63,7 @@ public class BiometricInfoOption {
 
     private final TripleState sourceDataUriOccurrence;
 
-    public BiometricInfoOption(
-            final BiometricInfo jaxb)
+    public BiometricInfoOption(final BiometricInfo jaxb)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("jaxb", jaxb);
 
@@ -88,8 +87,7 @@ public class BiometricInfoOption {
         }
     }
 
-    public boolean isTypePermitted(
-            final TypeOfBiometricData type) {
+    public boolean isTypePermitted(final TypeOfBiometricData type) {
         ParamUtil.requireNonNull("type", type);
 
         if (type.isPredefined()) {
@@ -99,8 +97,7 @@ public class BiometricInfoOption {
         }
     }
 
-    public boolean isHashAlgorithmPermitted(
-            final ASN1ObjectIdentifier hashAlgorithm) {
+    public boolean isHashAlgorithmPermitted(final ASN1ObjectIdentifier hashAlgorithm) {
         ParamUtil.requireNonNull("hashAlgorithm", hashAlgorithm);
         return hashAlgorithms.contains(hashAlgorithm);
     }

@@ -95,8 +95,7 @@ abstract class CmpResponder {
 
     private final SecureRandom random = new SecureRandom();
 
-    protected CmpResponder(
-            final SecurityFactory securityFactory) {
+    protected CmpResponder(final SecurityFactory securityFactory) {
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
     }
 
@@ -106,8 +105,7 @@ abstract class CmpResponder {
     protected abstract GeneralName getSender()
     throws InvalidConfException;
 
-    protected abstract boolean intendsMe(
-            GeneralName requestRecipient)
+    protected abstract boolean intendsMe(GeneralName requestRecipient)
     throws InvalidConfException;
 
     public boolean isInService() {
@@ -124,11 +122,9 @@ abstract class CmpResponder {
      */
     protected abstract CmpControl getCmpControl();
 
-    protected abstract CmpRequestorInfo getRequestor(
-            X500Name requestorSender);
+    protected abstract CmpRequestorInfo getRequestor(X500Name requestorSender);
 
-    private CmpRequestorInfo getRequestor(
-            final PKIHeader reqHeader) {
+    private CmpRequestorInfo getRequestor(final PKIHeader reqHeader) {
         GeneralName requestSender = reqHeader.getSender();
         if (requestSender.getTagNo() != GeneralName.directoryName) {
             return null;
@@ -137,18 +133,12 @@ abstract class CmpResponder {
         return getRequestor((X500Name) requestSender.getName());
     } // method getRequestor
 
-    protected abstract PKIMessage doProcessPkiMessage(
-            RequestorInfo requestor,
-            String user,
-            ASN1OctetString transactionId,
-            GeneralPKIMessage pkiMessage,
-            AuditEvent auditEvent)
+    protected abstract PKIMessage doProcessPkiMessage(RequestorInfo requestor, String user,
+            ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, AuditEvent auditEvent)
     throws InvalidConfException;
 
-    public PKIMessage processPkiMessage(
-            final PKIMessage pkiMessage,
-            final X509Certificate tlsClientCert,
-            final AuditEvent auditEvent)
+    public PKIMessage processPkiMessage(final PKIMessage pkiMessage,
+            final X509Certificate tlsClientCert, final AuditEvent auditEvent)
     throws InvalidConfException {
         ParamUtil.requireNonNull("pkiMessage", pkiMessage);
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
@@ -318,10 +308,8 @@ abstract class CmpResponder {
         return bytes;
     }
 
-    private ProtectionVerificationResult verifyProtection(
-            final String tid,
-            final GeneralPKIMessage pkiMessage,
-            final CmpControl cmpControl)
+    private ProtectionVerificationResult verifyProtection(final String tid,
+            final GeneralPKIMessage pkiMessage, final CmpControl cmpControl)
     throws CMPException, InvalidKeyException, OperatorCreationException {
         ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
@@ -360,9 +348,7 @@ abstract class CmpResponder {
                     : ProtectionResult.INVALID);
     } // method verifyProtection
 
-    private PKIMessage addProtection(
-            final PKIMessage pkiMessage,
-            final AuditEvent auditEvent) {
+    private PKIMessage addProtection(final PKIMessage pkiMessage, final AuditEvent auditEvent) {
         try {
             return CmpUtil.addProtection(pkiMessage,
                     getSigner(),
@@ -384,11 +370,8 @@ abstract class CmpResponder {
         }
     } // method addProtection
 
-    protected PKIMessage buildErrorPkiMessage(
-            final ASN1OctetString tid,
-            final PKIHeader requestHeader,
-            final int failureCode,
-            final String statusText)
+    protected PKIMessage buildErrorPkiMessage(final ASN1OctetString tid,
+            final PKIHeader requestHeader, final int failureCode, final String statusText)
     throws InvalidConfException {
         GeneralName respRecipient = requestHeader.getSender();
 
@@ -407,8 +390,7 @@ abstract class CmpResponder {
         return new PKIMessage(respHeader.build(), body);
     } // method buildErrorPkiMessage
 
-    protected PKIStatusInfo generateCmpRejectionStatus(
-            final Integer info,
+    protected PKIStatusInfo generateCmpRejectionStatus(final Integer info,
             final String errorMessage) {
         PKIFreeText statusMessage = (errorMessage == null)
                 ? null

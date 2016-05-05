@@ -65,118 +65,76 @@ public interface CaClient {
 
     Set<String> getCaNames();
 
-    Set<CertprofileInfo> getCertprofiles(
-            @Nonnull String caName)
+    Set<CertprofileInfo> getCertprofiles(@Nonnull String caName)
     throws CaClientException;
 
-    EnrollCertResult requestCert(
-            @Nonnull CertificationRequest p10Request,
-            @Nonnull String profile,
-            @Nullable String caName,
-            @Nullable String username,
+    EnrollCertResult requestCert(@Nonnull CertificationRequest p10Request, @Nonnull String profile,
+            @Nullable String caName, @Nullable String username,
             @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
-    EnrollCertResult requestCerts(
-            @Nonnull EnrollCertRequest request,
-            @Nullable String caName,
-            @Nullable String username,
+    EnrollCertResult requestCerts(@Nonnull EnrollCertRequest request, @Nullable String caName,
+            @Nullable String username, @Nullable RequestResponseDebug debug)
+    throws CaClientException, PkiErrorException;
+
+    CertIdOrError revokeCert(@Nonnull X500Name issuer, @Nonnull BigInteger serial, int reason,
+            @Nullable Date invalidityTime, @Nullable RequestResponseDebug debug)
+    throws CaClientException, PkiErrorException;
+
+    CertIdOrError revokeCert(@Nonnull X509Certificate cert, int reason,
+            @Nullable Date invalidityTime, @Nullable RequestResponseDebug debug)
+    throws CaClientException, PkiErrorException;
+
+    Map<String, CertIdOrError> revokeCerts(@Nonnull RevokeCertRequest request,
             @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
-    CertIdOrError revokeCert(
-            @Nonnull X500Name issuer,
-            @Nonnull BigInteger serial,
-            int reason,
-            @Nullable Date invalidityTime,
+    X509CRL downloadCrl(@Nonnull String caName, @Nullable RequestResponseDebug debug)
+    throws CaClientException, PkiErrorException;
+
+    X509CRL downloadCrl(@Nonnull String caName, @Nullable BigInteger crlNumber,
             @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
-    CertIdOrError revokeCert(
-            @Nonnull X509Certificate cert,
-            int reason,
-            @Nullable Date invalidityTime,
-            @Nullable RequestResponseDebug debug)
+    X509CRL generateCrl(@Nonnull String caName, @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
-    Map<String, CertIdOrError> revokeCerts(
-            @Nonnull RevokeCertRequest request,
-            @Nullable RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException;
-
-    X509CRL downloadCrl(
-            @Nonnull String caName,
-            @Nullable RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException;
-
-    X509CRL downloadCrl(
-            @Nonnull String caName,
-            @Nullable BigInteger crlNumber,
-            @Nullable RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException;
-
-    X509CRL generateCrl(
-            @Nonnull String caName,
-            @Nullable RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException;
-
-    String getCaNameByIssuer(
-            @Nonnull X500Name issuer)
+    String getCaNameByIssuer(@Nonnull X500Name issuer)
     throws CaClientException;
 
-    byte[] envelope(
-            @Nonnull CertRequest certRequest,
-            @Nonnull ProofOfPossession popo,
-            @Nonnull String profileName,
-            @Nullable String caName,
-            @Nullable String username)
+    byte[] envelope(@Nonnull CertRequest certRequest, @Nonnull ProofOfPossession popo,
+            @Nonnull String profileName, @Nullable String caName, @Nullable String username)
     throws CaClientException;
 
-    byte[] envelopeRevocation(
-            @Nonnull X500Name issuer,
-            @Nonnull BigInteger serial,
-            int reason)
+    byte[] envelopeRevocation(@Nonnull X500Name issuer, @Nonnull BigInteger serial, int reason)
     throws CaClientException;
 
-    byte[] envelopeRevocation(
-            @Nonnull X509Certificate cert,
-            int reason)
+    byte[] envelopeRevocation(@Nonnull X509Certificate cert, int reason)
     throws CaClientException;
 
-    CertIdOrError unrevokeCert(
-            @Nonnull X500Name issuer,
-            @Nonnull BigInteger serial,
+    CertIdOrError unrevokeCert(@Nonnull X500Name issuer, @Nonnull BigInteger serial,
             @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
-    CertIdOrError unrevokeCert(
-            @Nonnull X509Certificate cert,
+    CertIdOrError unrevokeCert(@Nonnull X509Certificate cert, @Nullable RequestResponseDebug debug)
+    throws CaClientException, PkiErrorException;
+
+    Map<String, CertIdOrError> unrevokeCerts(@Nonnull UnrevokeOrRemoveCertRequest request,
             @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
-    Map<String, CertIdOrError> unrevokeCerts(
-            @Nonnull UnrevokeOrRemoveCertRequest request,
+    CertIdOrError removeCert(@Nonnull X500Name issuer, @Nonnull BigInteger serial,
             @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
-    CertIdOrError removeCert(
-            @Nonnull X500Name issuer,
-            @Nonnull BigInteger serial,
+    CertIdOrError removeCert(@Nonnull X509Certificate cert, @Nullable RequestResponseDebug debug)
+    throws CaClientException, PkiErrorException;
+
+    Map<String, CertIdOrError> removeCerts(@Nonnull UnrevokeOrRemoveCertRequest request,
             @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
-    CertIdOrError removeCert(
-            @Nonnull X509Certificate cert,
-            @Nullable RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException;
-
-    Map<String, CertIdOrError> removeCerts(
-            @Nonnull UnrevokeOrRemoveCertRequest request,
-            @Nullable RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException;
-
-    HealthCheckResult getHealthCheckResult(
-            @Nonnull String caName)
+    HealthCheckResult getHealthCheckResult(@Nonnull String caName)
     throws CaClientException;
 
 }

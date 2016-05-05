@@ -51,8 +51,7 @@ public enum X509CertVersion {
 
     private int versionNumber;
 
-    X509CertVersion(
-            final int versionNumber) {
+    X509CertVersion(final int versionNumber) {
         this.versionNumber = versionNumber;
     }
 
@@ -60,8 +59,7 @@ public enum X509CertVersion {
         return versionNumber;
     }
 
-    public static X509CertVersion getInstance(
-            final String version) {
+    public static X509CertVersion getInstance(final String version) {
         ParamUtil.requireNonNull("version", version);
 
         for (X509CertVersion m : values()) {
@@ -72,8 +70,7 @@ public enum X509CertVersion {
         return null;
     }
 
-    public static X509CertVersion getInstance(
-            final int versionNumber) {
+    public static X509CertVersion getInstance(final int versionNumber) {
         for (X509CertVersion m : values()) {
             if (m.versionNumber == versionNumber) {
                 return m;

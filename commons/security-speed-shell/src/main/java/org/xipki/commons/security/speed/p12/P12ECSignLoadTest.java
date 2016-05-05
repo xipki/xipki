@@ -50,10 +50,7 @@ import org.xipki.commons.security.pkcs12.P12KeystoreGenerationParameters;
 // CHECKSTYLE:SKIP
 public class P12ECSignLoadTest extends P12SignLoadTest {
 
-    public P12ECSignLoadTest(
-            final SecurityFactory securityFactory,
-            final String signatureAlgorithm,
-            final String curveNameOrOid)
+    public P12ECSignLoadTest(final SecurityFactory securityFactory, final String signatureAlgorithm, final String curveNameOrOid)
     throws Exception {
         super(securityFactory, signatureAlgorithm,
                 generateKeystore(curveNameOrOid),
@@ -61,8 +58,7 @@ public class P12ECSignLoadTest extends P12SignLoadTest {
                         + "curve: " + curveNameOrOid);
     }
 
-    private static byte[] generateKeystore(
-            final String curveNameOrOid)
+    private static byte[] generateKeystore(final String curveNameOrOid)
     throws Exception {
         byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
         if (keystoreBytes == null) {

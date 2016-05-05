@@ -52,9 +52,7 @@ class CertBasedIdentityStore {
 
     private final List<CertBasedIdentityEntry> entries;
 
-    CertBasedIdentityStore(
-            final String table,
-            final List<CertBasedIdentityEntry> entries) {
+    CertBasedIdentityStore(final String table, final List<CertBasedIdentityEntry> entries) {
         this.table = ParamUtil.requireNonNull("table", table);
         ParamUtil.requireNonNull("entries", entries);
         this.entries = new ArrayList<>(entries.size());
@@ -64,8 +62,7 @@ class CertBasedIdentityStore {
         }
     }
 
-    void addIdentityEntry(
-            final CertBasedIdentityEntry entry) {
+    void addIdentityEntry(final CertBasedIdentityEntry entry) {
         ParamUtil.requireNonNull("entry", entry);
 
         for (CertBasedIdentityEntry existingEntry : entries) {
@@ -79,8 +76,7 @@ class CertBasedIdentityStore {
         entries.add(entry);
     }
 
-    Integer getCaIdForSubject(
-            final String subject) {
+    Integer getCaIdForSubject(final String subject) {
         for (CertBasedIdentityEntry entry : entries) {
             if (entry.getSubject().equals(subject)) {
                 return entry.getId();
@@ -90,8 +86,7 @@ class CertBasedIdentityStore {
         return null;
     }
 
-    Integer getCaIdForSha1Fp(
-            final byte[] sha1FpCert) {
+    Integer getCaIdForSha1Fp(final byte[] sha1FpCert) {
         for (CertBasedIdentityEntry entry : entries) {
             if (entry.matchSha1Fp(sha1FpCert)) {
                 return entry.getId();
@@ -101,8 +96,7 @@ class CertBasedIdentityStore {
         return null;
     }
 
-    Integer getCaIdForCert(
-            final byte[] encodedCert) {
+    Integer getCaIdForCert(final byte[] encodedCert) {
         for (CertBasedIdentityEntry entry : entries) {
             if (entry.matchCert(encodedCert)) {
                 return entry.getId();

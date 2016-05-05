@@ -86,8 +86,7 @@ public class SubjectChecker {
 
     private final SubjectControl subjectControl;
 
-    public SubjectChecker(
-            final X509ProfileType conf)
+    public SubjectChecker(final X509ProfileType conf)
     throws CertprofileException {
         ParamUtil.requireNonNull("conf", conf);
         this.specialBehavior = conf.getSpecialBehavior();
@@ -139,8 +138,7 @@ public class SubjectChecker {
         this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDnControls);
     } // constructor
 
-    public List<ValidationIssue> checkSubject(
-            final X500Name subject,
+    public List<ValidationIssue> checkSubject(final X500Name subject,
             final X500Name requestedSubject) {
         ParamUtil.requireNonNull("subject", subject);
         ParamUtil.requireNonNull("requestedSubject", requestedSubject);
@@ -208,10 +206,8 @@ public class SubjectChecker {
         return result;
     } // method checkSubject
 
-    private ValidationIssue checkSubjectAttribute(
-            final ASN1ObjectIdentifier type,
-            final X500Name subject,
-            final X500Name requestedSubject)
+    private ValidationIssue checkSubjectAttribute(final ASN1ObjectIdentifier type,
+            final X500Name subject, final X500Name requestedSubject)
     throws BadCertTemplateException {
         boolean multiValuedRdn = subjectControl.getGroup(type) != null;
         if (multiValuedRdn) {
@@ -221,10 +217,8 @@ public class SubjectChecker {
         }
     }
 
-    private ValidationIssue checkSubjectAttributeNotMultiValued(
-            final ASN1ObjectIdentifier type,
-            final X500Name subject,
-            final X500Name requestedSubject)
+    private ValidationIssue checkSubjectAttributeNotMultiValued(final ASN1ObjectIdentifier type,
+            final X500Name subject, final X500Name requestedSubject)
     throws BadCertTemplateException {
         ValidationIssue issue = createSubjectIssue(type);
 
@@ -311,10 +305,8 @@ public class SubjectChecker {
         return issue;
     } // method checkSubjectAttributeNotMultiValued
 
-    private ValidationIssue checkSubjectAttributeMultiValued(
-            final ASN1ObjectIdentifier type,
-            final X500Name subject,
-            final X500Name requestedSubject)
+    private ValidationIssue checkSubjectAttributeMultiValued(final ASN1ObjectIdentifier type,
+            final X500Name subject, final X500Name requestedSubject)
     throws BadCertTemplateException {
         ValidationIssue issue = createSubjectIssue(type);
 
@@ -406,13 +398,9 @@ public class SubjectChecker {
         return issue;
     } // method checkSubjectAttributeMultiValued
 
-    private void checkAttributeTypeAndValue(
-            final String name,
-            final ASN1ObjectIdentifier type,
-            final String atvTextValue,
-            final RdnControl rdnControl,
-            final List<String> requestedCoreAtvTextValues,
-            final int index,
+    private void checkAttributeTypeAndValue(final String name, final ASN1ObjectIdentifier type,
+            final String atvTextValue, final RdnControl rdnControl,
+            final List<String> requestedCoreAtvTextValues, final int index,
             final StringBuilder failureMsg)
     throws BadCertTemplateException {
         String tmpAtvTextValue = atvTextValue;
@@ -490,8 +478,7 @@ public class SubjectChecker {
         }
     } // mehtod checkAttributeTypeAndValue
 
-    private static List<String> sort(
-            final List<String> contentList,
+    private static List<String> sort(final List<String> contentList,
             final List<Pattern> patternList) {
         List<String> sorted = new ArrayList<>(contentList.size());
         for (Pattern p : patternList) {
@@ -509,8 +496,7 @@ public class SubjectChecker {
         return sorted;
     }
 
-    private static boolean matchStringType(
-            final ASN1Encodable atvValue,
+    private static boolean matchStringType(final ASN1Encodable atvValue,
             final StringType stringType) {
         boolean correctStringType = true;
         switch (stringType) {
@@ -535,8 +521,7 @@ public class SubjectChecker {
         return correctStringType;
     }
 
-    private static String getRdnTextValueOfRequest(
-            final RDN requestedRdn)
+    private static String getRdnTextValueOfRequest(final RDN requestedRdn)
     throws BadCertTemplateException {
         ASN1ObjectIdentifier type = requestedRdn.getFirst().getType();
         ASN1Encodable vec = requestedRdn.getFirst().getValue();
@@ -566,8 +551,7 @@ public class SubjectChecker {
         }
     }
 
-    private static ValidationIssue createSubjectIssue(
-            final ASN1ObjectIdentifier subjectAttrType) {
+    private static ValidationIssue createSubjectIssue(final ASN1ObjectIdentifier subjectAttrType) {
         ValidationIssue issue;
         String attrName = ObjectIdentifiers.getName(subjectAttrType);
         if (attrName == null) {
@@ -581,11 +565,8 @@ public class SubjectChecker {
         return issue;
     }
 
-    private static String getAtvValueString(
-            final String name,
-            final AttributeTypeAndValue atv,
-            final StringType stringType,
-            final StringBuilder failureMsg) {
+    private static String getAtvValueString(final String name, final AttributeTypeAndValue atv,
+            final StringType stringType, final StringBuilder failureMsg) {
         ASN1ObjectIdentifier type = atv.getType();
         ASN1Encodable atvValue = atv.getValue();
 

@@ -67,15 +67,11 @@ public class RdnControl {
 
     private String group;
 
-    public RdnControl(
-            final ASN1ObjectIdentifier type) {
+    public RdnControl(final ASN1ObjectIdentifier type) {
         this(type, 1, 1);
     }
 
-    public RdnControl(
-            final ASN1ObjectIdentifier type,
-            final int minOccurs,
-            final int maxOccurs) {
+    public RdnControl(final ASN1ObjectIdentifier type, final int minOccurs, final int maxOccurs) {
         if (minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs) {
             throw new IllegalArgumentException(
                     String.format("illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
@@ -110,18 +106,15 @@ public class RdnControl {
         return stringLengthRange;
     }
 
-    public void setStringType(
-            final StringType stringType) {
+    public void setStringType(final StringType stringType) {
         this.stringType = stringType;
     }
 
-    public void setStringLengthRange(
-            final Range stringLengthRange) {
+    public void setStringLengthRange(final Range stringLengthRange) {
         this.stringLengthRange = stringLengthRange;
     }
 
-    public void setPatterns(
-            final List<Pattern> patterns) {
+    public void setPatterns(final List<Pattern> patterns) {
         this.patterns = patterns;
     }
 
@@ -129,8 +122,7 @@ public class RdnControl {
         return prefix;
     }
 
-    public void setPrefix(
-            final String prefix) {
+    public void setPrefix(final String prefix) {
         this.prefix = prefix;
     }
 
@@ -138,8 +130,7 @@ public class RdnControl {
         return suffix;
     }
 
-    public void setSuffix(
-            final String suffix) {
+    public void setSuffix(final String suffix) {
         this.suffix = suffix;
     }
 
@@ -147,8 +138,7 @@ public class RdnControl {
         return group;
     }
 
-    public void setGroup(
-            final String group) {
+    public void setGroup(final String group) {
         this.group = group;
     }
 

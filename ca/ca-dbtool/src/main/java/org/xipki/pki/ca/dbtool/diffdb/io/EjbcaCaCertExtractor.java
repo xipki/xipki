@@ -52,8 +52,7 @@ public class EjbcaCaCertExtractor {
     private EjbcaCaCertExtractor() {
     }
 
-    public static X509Certificate extractCaCert(
-            final String caData)
+    public static X509Certificate extractCaCert(final String caData)
     throws Exception {
         ParamUtil.requireNonNull("caData", caData);
 

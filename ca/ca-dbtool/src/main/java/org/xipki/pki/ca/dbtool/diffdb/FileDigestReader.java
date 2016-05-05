@@ -82,8 +82,7 @@ public class FileDigestReader implements DigestReader {
 
     private DbDigestEntry next;
 
-    public FileDigestReader(
-            final String caDirname)
+    public FileDigestReader(final String caDirname)
     throws IOException, CertificateException {
         this.caDirname = ParamUtil.requireNonBlank("caDirname", caDirname);
 
@@ -116,8 +115,7 @@ public class FileDigestReader implements DigestReader {
     }
 
     @Override
-    public synchronized CertsBundle nextCerts(
-            final int numCerts)
+    public synchronized CertsBundle nextCerts(final int numCerts)
     throws DataAccessException, InterruptedException {
         if (!hasNext()) {
             return null;
@@ -160,8 +158,7 @@ public class FileDigestReader implements DigestReader {
         return ret;
     }
 
-    private DbDigestEntry retrieveNext(
-            final boolean firstTime)
+    private DbDigestEntry retrieveNext(final boolean firstTime)
     throws IOException {
         String line = firstTime
                 ? null
@@ -192,8 +189,7 @@ public class FileDigestReader implements DigestReader {
         return next != null;
     }
 
-    private static void closeReader(
-            final Reader reader) {
+    private static void closeReader(final Reader reader) {
         if (reader == null) {
             return;
         }

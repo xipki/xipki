@@ -48,19 +48,15 @@ public class CaException extends Exception {
     public CaException() {
     }
 
-    public CaException(
-            final String message) {
+    public CaException(final String message) {
         super(message);
     }
 
-    public CaException(
-            final Throwable cause) {
+    public CaException(final Throwable cause) {
         super(cause);
     }
 
-    public CaException(
-            final String message,
-            final Throwable cause) {
+    public CaException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

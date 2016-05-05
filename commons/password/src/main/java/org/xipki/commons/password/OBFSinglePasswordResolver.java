@@ -47,14 +47,12 @@ public class OBFSinglePasswordResolver implements SinglePasswordResolver {
     }
 
     @Override
-    public boolean canResolveProtocol(
-            final String protocol) {
+    public boolean canResolveProtocol(final String protocol) {
         return "OBF".equalsIgnoreCase(protocol);
     }
 
     @Override
-    public char[] resolvePassword(
-            final String passwordHint)
+    public char[] resolvePassword(final String passwordHint)
     throws PasswordResolverException {
         return OBFPasswordService.deobfuscate(passwordHint).toCharArray();
     }

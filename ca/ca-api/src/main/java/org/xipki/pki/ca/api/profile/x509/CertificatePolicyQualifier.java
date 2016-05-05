@@ -49,9 +49,7 @@ public class CertificatePolicyQualifier {
 
     private final String userNotice;
 
-    private CertificatePolicyQualifier(
-            final String cpsUri,
-            final String userNotice) {
+    private CertificatePolicyQualifier(final String cpsUri, final String userNotice) {
         this.cpsUri = cpsUri;
         this.userNotice = userNotice;
     }
@@ -64,14 +62,12 @@ public class CertificatePolicyQualifier {
         return userNotice;
     }
 
-    public static CertificatePolicyQualifier getInstanceForUserNotice(
-            final String userNotice) {
+    public static CertificatePolicyQualifier getInstanceForUserNotice(final String userNotice) {
         ParamUtil.requireNonNull("userNotice", userNotice);
         return new CertificatePolicyQualifier(null, userNotice);
     }
 
-    public static CertificatePolicyQualifier getInstanceForCpsUri(
-            final String cpsUri) {
+    public static CertificatePolicyQualifier getInstanceForCpsUri(final String cpsUri) {
         ParamUtil.requireNonNull("cpsUri", cpsUri);
         return new CertificatePolicyQualifier(cpsUri, null);
     }

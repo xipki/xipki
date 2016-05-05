@@ -68,9 +68,7 @@ public class XmlDocumentReader {
 
     private final XPathFactory xpathfactory;
 
-    public XmlDocumentReader(
-            final InputStream xmlStream,
-            final boolean namespaceAware)
+    public XmlDocumentReader(final InputStream xmlStream, final boolean namespaceAware)
     throws ParserConfigurationException, SAXException, IOException {
         ParamUtil.requireNonNull("xmlStream", xmlStream);
 
@@ -83,21 +81,17 @@ public class XmlDocumentReader {
         xpathfactory = XPathFactory.newInstance();
     }
 
-    private static void disableDtdValidation(
-            final DocumentBuilder db) {
+    private static void disableDtdValidation(final DocumentBuilder db) {
         db.setEntityResolver(new EntityResolver() {
             @Override
-            public InputSource resolveEntity(
-                    final String publicId,
-                    final String systemId)
+            public InputSource resolveEntity(final String publicId, final String systemId)
             throws SAXException, IOException { // XIPKI-CODECHECK:IGNORE
                 return new InputSource(new StringReader(""));
             }
         });
     }
 
-    public String getValue(
-            final String xpathExpression)
+    public String getValue(final String xpathExpression)
     throws XPathExpressionException {
         ParamUtil.requireNonNull("xpathExpression", xpathExpression);
 
@@ -107,8 +101,7 @@ public class XmlDocumentReader {
                 : null;
     }
 
-    private Node getNode(
-            final String xpathExpression)
+    private Node getNode(final String xpathExpression)
     throws XPathExpressionException {
         XPath xpath = xpathfactory.newXPath();
         XPathExpression xpathE = xpath.compile(xpathExpression);

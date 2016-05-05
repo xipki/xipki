@@ -237,10 +237,7 @@ public class CaExportCmd extends CaCommandSupport {
         return null;
     } // method doExecute
 
-    private static void propsput(
-            final Properties props,
-            final String key,
-            final Object value) {
+    private static void propsput(final Properties props, final String key, final Object value) {
         if (value instanceof String) {
             props.put(key, (String) value);
         } else if (value != null) {

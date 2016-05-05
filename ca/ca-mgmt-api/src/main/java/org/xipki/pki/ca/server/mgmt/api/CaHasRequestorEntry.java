@@ -60,8 +60,7 @@ public class CaHasRequestorEntry implements Serializable {
 
     private Set<String> profiles;
 
-    public CaHasRequestorEntry(
-            final String requestorName) {
+    public CaHasRequestorEntry(final String requestorName) {
         this.requestorName = ParamUtil.requireNonBlank("requestorName", requestorName);
     }
 
@@ -69,8 +68,7 @@ public class CaHasRequestorEntry implements Serializable {
         return ra;
     }
 
-    public void setRa(
-            final boolean ra) {
+    public void setRa(final boolean ra) {
         this.ra = ra;
     }
 
@@ -78,8 +76,7 @@ public class CaHasRequestorEntry implements Serializable {
         return permissions;
     }
 
-    public void setPermissions(
-            final Set<Permission> permissions) {
+    public void setPermissions(final Set<Permission> permissions) {
         this.permissions = Collections.unmodifiableSet(permissions);
     }
 
@@ -87,8 +84,7 @@ public class CaHasRequestorEntry implements Serializable {
         return requestorName;
     }
 
-    public void setProfiles(
-            final Set<String> profiles) {
+    public void setProfiles(final Set<String> profiles) {
         if (profiles == null) {
             this.profiles = Collections.emptySet();
         } else {

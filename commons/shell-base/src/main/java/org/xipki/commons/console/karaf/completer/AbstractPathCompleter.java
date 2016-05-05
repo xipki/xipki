@@ -76,9 +76,7 @@ abstract class AbstractPathCompleter implements Completer {
         }
 
         @Override
-        public boolean accept(
-                final File dir,
-                final String name) {
+        public boolean accept(final File dir, final String name) {
             if (IGNORE_PATTERN == null) {
                 return true;
             }
@@ -95,9 +93,7 @@ abstract class AbstractPathCompleter implements Completer {
     protected abstract boolean isDirOnly();
 
     @Override
-    public int complete(
-            final Session session,
-            final CommandLine commandLine,
+    public int complete(final Session session, final CommandLine commandLine,
             final List<String> candidates) {
         // buffer can be null
         if (candidates == null) {
@@ -166,10 +162,7 @@ abstract class AbstractPathCompleter implements Completer {
         return new File(".");
     }
 
-    protected int matchFiles(
-            final String buffer,
-            final String translated,
-            final File[] files,
+    protected int matchFiles(final String buffer, final String translated, final File[] files,
             final List<String> candidates) {
         if (files == null) {
             return -1;

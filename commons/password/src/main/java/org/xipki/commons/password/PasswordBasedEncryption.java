@@ -79,11 +79,7 @@ public class PasswordBasedEncryption {
         }
     }
 
-    public static byte[] encrypt(
-            final byte[] plaintext,
-            final char[] password,
-            final int iterationCount,
-            final byte[] salt)
+    public static byte[] encrypt(final byte[] plaintext, final char[] password, final int iterationCount, final byte[] salt)
     throws GeneralSecurityException {
         ParamUtil.requireNonNull("plaintext", plaintext);
         ParamUtil.requireNonNull("password", password);
@@ -104,11 +100,7 @@ public class PasswordBasedEncryption {
         return cipher.doFinal(plaintext);
     }
 
-    public static byte[] decrypt(
-            final byte[] cipherText,
-            final char[] password,
-            final int iterationCount,
-            byte[] salt)
+    public static byte[] decrypt(final byte[] cipherText, final char[] password, final int iterationCount, final byte[] salt)
     throws GeneralSecurityException {
         ParamUtil.requireNonNull("ciperText", cipherText);
         ParamUtil.requireNonNull("password", password);

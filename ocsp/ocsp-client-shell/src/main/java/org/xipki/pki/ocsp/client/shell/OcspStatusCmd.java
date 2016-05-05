@@ -93,20 +93,15 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
     private SecurityFactory securityFactory;
 
     @Override
-    protected void checkParameters(
-            final X509Certificate respIssuer,
-            final List<BigInteger> serialNumbers,
-            final Map<BigInteger, byte[]> encodedCerts)
+    protected void checkParameters(final X509Certificate respIssuer,
+            final List<BigInteger> serialNumbers, final Map<BigInteger, byte[]> encodedCerts)
     throws Exception {
         ParamUtil.requireNonEmpty("serialNunmbers", serialNumbers);
     }
 
     @Override
-    protected Object processResponse(
-            final OCSPResp response,
-            final X509Certificate respIssuer,
-            final IssuerHash issuerHash,
-            final List<BigInteger> serialNumbers,
+    protected Object processResponse(final OCSPResp response, final X509Certificate respIssuer,
+            final IssuerHash issuerHash, final List<BigInteger> serialNumbers,
             final Map<BigInteger, byte[]> encodedCerts)
     throws Exception {
         ParamUtil.requireNonNull("response", response);

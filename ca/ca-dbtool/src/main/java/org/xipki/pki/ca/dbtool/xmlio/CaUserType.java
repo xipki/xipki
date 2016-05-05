@@ -69,8 +69,7 @@ public class CaUserType extends DbDataObject {
         return id;
     }
 
-    public void setId(
-            final int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
@@ -78,8 +77,7 @@ public class CaUserType extends DbDataObject {
         return name;
     }
 
-    public void setName(
-            final String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -87,8 +85,7 @@ public class CaUserType extends DbDataObject {
         return password;
     }
 
-    public void setPassword(
-            final String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 
@@ -96,8 +93,7 @@ public class CaUserType extends DbDataObject {
         return cnRegex;
     }
 
-    public void setCnRegex(
-            final String cnRegex) {
+    public void setCnRegex(final String cnRegex) {
         this.cnRegex = cnRegex;
     }
 
@@ -111,8 +107,7 @@ public class CaUserType extends DbDataObject {
     }
 
     @Override
-    public void writeTo(
-            final DbiXmlWriter writer)
+    public void writeTo(final DbiXmlWriter writer)
     throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("writer", writer);
         validate();

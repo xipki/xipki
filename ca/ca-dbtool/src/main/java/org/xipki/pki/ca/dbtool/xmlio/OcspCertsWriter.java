@@ -54,8 +54,7 @@ public class OcspCertsWriter extends DbiXmlWriter {
         super("certs", "1");
     }
 
-    public void add(
-            final OcspCertType cert)
+    public void add(final OcspCertType cert)
     throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("cert", cert);
 

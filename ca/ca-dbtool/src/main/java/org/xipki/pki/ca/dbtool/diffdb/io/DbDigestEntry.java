@@ -62,13 +62,8 @@ public class DbDigestEntry {
 
     private final String base64Sha1;
 
-    public DbDigestEntry(
-            final long serialNumber,
-            final boolean revoked,
-            final Integer revReason,
-            final Long revTime,
-            final Long revInvTime,
-            final String sha1Fp) {
+    public DbDigestEntry(final long serialNumber, final boolean revoked, final Integer revReason,
+            final Long revTime, final Long revInvTime, final String sha1Fp) {
         ParamUtil.requireNonNull("sha1Fp", sha1Fp);
         if (revoked) {
             ParamUtil.requireNonNull("revReason", revReason);
@@ -127,8 +122,7 @@ public class DbDigestEntry {
         return getEncoded(true);
     }
 
-    private String getEncoded(
-            final boolean withSerialNumber) {
+    private String getEncoded(final boolean withSerialNumber) {
         StringBuilder sb = new StringBuilder();
         if (withSerialNumber) {
             sb.append(serialNumber).append(";");
@@ -155,8 +149,7 @@ public class DbDigestEntry {
         return sb.toString();
     }
 
-    public boolean contentEquals(
-            final DbDigestEntry obj) {
+    public boolean contentEquals(final DbDigestEntry obj) {
         if (obj == null) {
             return false;
         }
@@ -188,8 +181,7 @@ public class DbDigestEntry {
         return true;
     } // method contentEquals
 
-    public static DbDigestEntry decode(
-            final String encoded) {
+    public static DbDigestEntry decode(final String encoded) {
         ParamUtil.requireNonNull("encoded", encoded);
 
         List<Integer> indexes = getIndexes(encoded);
@@ -228,8 +220,7 @@ public class DbDigestEntry {
         return new DbDigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
     } // method decode
 
-    private static List<Integer> getIndexes(
-            final String encoded) {
+    private static List<Integer> getIndexes(final String encoded) {
         List<Integer> ret = new ArrayList<>(6);
         for (int i = 0; i < encoded.length(); i++) {
             if (encoded.charAt(i) == ';') {
@@ -239,9 +230,7 @@ public class DbDigestEntry {
         return ret;
     }
 
-    private static boolean equals(
-            final Object obj1,
-            final Object obj2) {
+    private static boolean equals(final Object obj1, final Object obj2) {
         if (obj1 == null) {
             return obj2 == null;
         } else {

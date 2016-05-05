@@ -61,8 +61,7 @@ public class QaAdmission extends QaExtension {
 
     private final List<String> professionItems;
 
-    public QaAdmission(
-            final Admission jaxb) {
+    public QaAdmission(final Admission jaxb) {
         ParamUtil.requireNonNull("jaxb", jaxb);
 
         this.registrationNumber = jaxb.getRegistrationNumber();

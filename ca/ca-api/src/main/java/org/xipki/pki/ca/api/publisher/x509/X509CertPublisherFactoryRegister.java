@@ -53,8 +53,7 @@ public interface X509CertPublisherFactoryRegister {
      * @return new publisher.
      * @throws ObjectCreationException if publisher could not be created.
      */
-    X509CertPublisher newPublisher(
-            @Nonnull String type)
+    X509CertPublisher newPublisher(@Nonnull String type)
     throws ObjectCreationException;
 
 }

@@ -63,13 +63,9 @@ class Responder {
 
     private final List<OcspStore> stores;
 
-    Responder(
-            final ResponderOption responderOption,
-            final RequestOption requestOption,
-            final ResponseOption responseOption,
-            final AuditOption auditOption,
-            final CertprofileOption certprofileOption,
-            final ResponderSigner signer,
+    Responder(final ResponderOption responderOption, final RequestOption requestOption,
+            final ResponseOption responseOption, final AuditOption auditOption,
+            final CertprofileOption certprofileOption, final ResponderSigner signer,
             final List<OcspStore> stores) {
         this.responderOption = ParamUtil.requireNonNull("responderOption", responderOption);
         this.requestOption = ParamUtil.requireNonNull("requestOption", requestOption);

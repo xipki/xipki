@@ -74,9 +74,7 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
 
     private final String objectLabel;
 
-    public Asn1RemoveObjectsParams(
-            final P11SlotIdentifier slotId,
-            final byte[] objectId,
+    public Asn1RemoveObjectsParams(final P11SlotIdentifier slotId, final byte[] objectId,
             final String objectLabel) {
         ParamUtil.requireNonNull("slotId", slotId);
         if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
@@ -89,8 +87,7 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
         this.slotId = new Asn1P11SlotIdentifier(slotId);
     }
 
-    private Asn1RemoveObjectsParams(
-            final ASN1Sequence seq)
+    private Asn1RemoveObjectsParams(final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 3);
         int idx = 0;
@@ -126,8 +123,7 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
         }
     }
 
-    public static Asn1RemoveObjectsParams getInstance(
-            final Object obj)
+    public static Asn1RemoveObjectsParams getInstance(final Object obj)
     throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1RemoveObjectsParams) {
             return (Asn1RemoveObjectsParams) obj;

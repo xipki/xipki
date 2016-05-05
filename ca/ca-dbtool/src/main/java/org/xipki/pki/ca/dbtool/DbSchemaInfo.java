@@ -58,8 +58,7 @@ public class DbSchemaInfo {
 
     private final Map<String, String> variables = new HashMap<>();
 
-    public DbSchemaInfo(
-            final DataSourceWrapper datasource)
+    public DbSchemaInfo(final DataSourceWrapper datasource)
     throws DataAccessException {
         ParamUtil.requireNonNull("datasource", datasource);
 
@@ -95,8 +94,7 @@ public class DbSchemaInfo {
         return Collections.unmodifiableSet(variables.keySet());
     }
 
-    public String getVariableValue(
-            final String variableName) {
+    public String getVariableValue(final String variableName) {
         ParamUtil.requireNonNull("variableName", variableName);
         return variables.get(variableName);
     }

@@ -66,17 +66,13 @@ class DSAPlainDigestSigner implements Signer {
 
     private int keyBitLen;
 
-    DSAPlainDigestSigner(
-            final DSA signer,
-            final Digest digest) {
+    DSAPlainDigestSigner(final DSA signer, final Digest digest) {
         this.digest = digest;
         this.dsaSigner = signer;
     }
 
     @Override
-    public void init(
-            final boolean forSigning,
-            final CipherParameters parameters) {
+    public void init(final boolean forSigning, final CipherParameters parameters) {
         this.forSigning = forSigning;
 
         AsymmetricKeyParameter param;
@@ -114,16 +110,12 @@ class DSAPlainDigestSigner implements Signer {
     }
 
     @Override
-    public void update(
-            final byte input) {
+    public void update(final byte input) {
         digest.update(input);
     }
 
     @Override
-    public void update(
-            final byte[] input,
-            final int inOff,
-            final int length) {
+    public void update(final byte[] input, final int inOff, final int length) {
         digest.update(input, inOff, length);
     }
 
@@ -147,8 +139,7 @@ class DSAPlainDigestSigner implements Signer {
     }
 
     @Override
-    public boolean verifySignature(
-            final byte[] signature) {
+    public boolean verifySignature(final byte[] signature) {
         if (forSigning) {
             throw new IllegalStateException("DSADigestSigner not initialised for verification");
         }
@@ -169,9 +160,9 @@ class DSAPlainDigestSigner implements Signer {
         digest.reset();
     }
 
-    private byte[] encode(
-            final BigInteger r, // CHECKSTYLE:SKIP
-            final BigInteger s) // CHECKSTYLE:SKIP
+    // CHECKSTYLE:OFF
+    private byte[] encode(final BigInteger r, final BigInteger s)
+    // CHECKSTYLE:ON
     throws IOException {
         int blockSize = (keyBitLen + 7) / 8;
         if ((r.bitLength() + 7) / 8 > blockSize) {
@@ -194,8 +185,7 @@ class DSAPlainDigestSigner implements Signer {
         return ret;
     }
 
-    private BigInteger[] decode(
-            final byte[] encoding)
+    private BigInteger[] decode(final byte[] encoding)
     throws IOException {
         int blockSize = (keyBitLen + 7) / 8;
         if (encoding.length != 2 * blockSize) {

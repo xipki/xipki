@@ -49,7 +49,6 @@ public interface EnvParameterResolver {
 
     Set<String> getAllParameterNames();
 
-    String getParameterValue(
-            @Nonnull String parameterName);
+    String getParameterValue(@Nonnull String parameterName);
 
 }

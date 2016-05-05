@@ -161,9 +161,7 @@ public class Scep {
         AES_ENC_ALGOS.add(CMSAlgorithm.AES256_GCM);
     }
 
-    public Scep(
-            final ScepEntry dbEntry,
-            final CaManagerImpl caManager)
+    public Scep(final ScepEntry dbEntry, final CaManagerImpl caManager)
     throws CaMgmtException {
         this.caManager = ParamUtil.requireNonNull("caManager", caManager);
         this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
@@ -182,8 +180,7 @@ public class Scep {
      * @param ms signing time bias in milliseconds. non-positive value deactivate the check of
      *     signing time.
      */
-    public void setMaxSigningTimeBias(
-            final long ms) {
+    public void setMaxSigningTimeBias(final long ms) {
         this.maxSigningTimeBiasInMs = ms;
     }
 
@@ -255,8 +252,7 @@ public class Scep {
         return caCaps;
     }
 
-    public void setCaCaps(
-            final CaCaps caCaps) {
+    public void setCaCaps(final CaCaps caCaps) {
         this.caCaps = ParamUtil.requireNonNull("caCaps", caCaps);
     }
 
@@ -264,8 +260,7 @@ public class Scep {
         return caCertRespBytes;
     }
 
-    public boolean supportsCertProfile(
-            final String profileName)
+    public boolean supportsCertProfile(final String profileName)
     throws CaMgmtException {
         return caManager.getX509Ca(caName).supportsCertProfile(profileName);
     }
@@ -275,10 +270,8 @@ public class Scep {
         return caManager.getX509Ca(caName).getCaInfo().getStatus();
     }
 
-    public ContentInfo servicePkiOperation(
-            final CMSSignedData requestContent,
-            final String certProfileName,
-            final AuditEvent auditEvent)
+    public ContentInfo servicePkiOperation(final CMSSignedData requestContent,
+            final String certProfileName, final AuditEvent auditEvent)
     throws MessageDecodingException, OperationException {
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent,
                 envelopedDataDecryptor, null);
@@ -296,10 +289,8 @@ public class Scep {
         return encodeResponse(rep, req);
     } // method servicePkiOperation
 
-    private PkiMessage doServicePkiOperation(
-            final DecodedPkiMessage req,
-            final String certProfileName,
-            final AuditEvent auditEvent)
+    private PkiMessage doServicePkiOperation(final DecodedPkiMessage req,
+            final String certProfileName, final AuditEvent auditEvent)
     throws MessageDecodingException, OperationException {
         ParamUtil.requireNonNull("req", req);
 
@@ -515,9 +506,8 @@ public class Scep {
                     } // end if
 
                     // only the same subject is permitted
-                    String cnInSignatureCert = X509Util.getCommonName(
-                            X500Name.getInstance(
-                                    reqSignatureCert.getSubjectX500Principal().getEncoded()));
+                    String cnInSignatureCert = X509Util.getCommonName(X500Name.getInstance(
+                            reqSignatureCert.getSubjectX500Principal().getEncoded()));
                     boolean b2 = cn.equals(cnInSignatureCert);
                     if (!b2) {
                         if (user != null) {
@@ -596,9 +586,7 @@ public class Scep {
         return rep;
     } // method doServicePkiOperation
 
-    private SignedData getCert(
-            final X509Ca ca,
-            final BigInteger serialNumber)
+    private SignedData getCert(final X509Ca ca, final BigInteger serialNumber)
     throws FailInfoException, OperationException {
         X509Certificate cert;
         try {
@@ -615,10 +603,7 @@ public class Scep {
         return buildSignedData(cert);
     } // method getCert
 
-    private SignedData pollCert(
-            final X509Ca ca,
-            final X500Name subject,
-            final TransactionId tid)
+    private SignedData pollCert(final X509Ca ca, final X500Name subject, final TransactionId tid)
     throws FailInfoException, OperationException {
         byte[] tidBytes = getTransactionIdBytes(tid.getId());
         List<X509Certificate> certs = ca.getCertificate(subject, tidBytes);
@@ -640,8 +625,7 @@ public class Scep {
         return buildSignedData(certs.get(0));
     } // method pollCert
 
-    private SignedData buildSignedData(
-            final X509Certificate cert)
+    private SignedData buildSignedData(final X509Certificate cert)
     throws OperationException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         try {
@@ -658,9 +642,7 @@ public class Scep {
         }
     } // method buildSignedData
 
-    private SignedData getCrl(
-            final X509Ca ca,
-            final BigInteger serialNumber)
+    private SignedData getCrl(final X509Ca ca, final BigInteger serialNumber)
     throws FailInfoException, OperationException {
         CertificateList crl = ca.getCurrentCrl();
         if (crl == null) {
@@ -679,9 +661,7 @@ public class Scep {
         return (SignedData) signedData.toASN1Structure().getContent();
     } // method getCRL
 
-    private ContentInfo encodeResponse(
-            final PkiMessage response,
-            final DecodedPkiMessage request)
+    private ContentInfo encodeResponse(final PkiMessage response, final DecodedPkiMessage request)
     throws OperationException {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonNull("request", request);
@@ -707,10 +687,7 @@ public class Scep {
         return ci;
     } // method encodeResponse
 
-    private static void checkCommonName(
-            final X509Ca ca,
-            final String user,
-            final String cn)
+    private static void checkCommonName(final X509Ca ca, final String user, final String cn)
     throws OperationException {
         String cnRegex = ca.getCnRegexForUser(user);
         if (StringUtil.isNotBlank(cnRegex)) {
@@ -722,8 +699,7 @@ public class Scep {
         }
     }
 
-    private static String getSignatureAlgorithm(
-            final PrivateKey key,
+    private static String getSignatureAlgorithm(final PrivateKey key,
             final ASN1ObjectIdentifier digestOid) {
         ScepHashAlgoType hashAlgo = ScepHashAlgoType.getHashAlgoType(digestOid.getId());
         if (hashAlgo == null) {
@@ -738,8 +714,7 @@ public class Scep {
         }
     } // method getSignatureAlgorithm
 
-    private static void ensureIssuedByThisCa(
-            final X500Name thisCaX500Name,
+    private static void ensureIssuedByThisCa(final X500Name thisCaX500Name,
             final X500Name caX500Name)
     throws FailInfoException {
         if (!thisCaX500Name.equals(caX500Name)) {
@@ -747,8 +722,7 @@ public class Scep {
         }
     }
 
-    static CMSSignedData createDegeneratedSigendData(
-            final X509Certificate... certs)
+    static CMSSignedData createDegeneratedSigendData(final X509Certificate... certs)
     throws CMSException, CertificateException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         try {
@@ -761,8 +735,7 @@ public class Scep {
         }
     }
 
-    private static byte[] getTransactionIdBytes(
-            final String tid) {
+    private static byte[] getTransactionIdBytes(final String tid) {
         final int n = tid.length();
         if (n % 2 != 0) { // neither hex nor base64 encoded
             return tid.getBytes();
@@ -782,16 +755,12 @@ public class Scep {
         return tid.getBytes();
     } // method getTransactionIdBytes
 
-    private static void audit(
-            final AuditEvent audit,
-            final String name,
-            final String value) {
+    private static void audit(final AuditEvent audit, final String name, final String value) {
         if (audit == null) {
             return;
         }
 
-        audit.addEventData(
-            new AuditEventData(name,
+        audit.addEventData(new AuditEventData(name,
                 (value == null)
                     ? "null"
                     : value));

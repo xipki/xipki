@@ -53,12 +53,8 @@ public class SubjectKeyProfileBundle {
 
     private final boolean revoked;
 
-    public SubjectKeyProfileBundle(
-            final int certId,
-            final long subjectFp,
-            final long keyFp,
-            final String profile,
-            final boolean revoked) {
+    public SubjectKeyProfileBundle(final int certId, final long subjectFp, final long keyFp,
+            final String profile, final boolean revoked) {
         super();
         this.certId = certId;
         this.subjectFp = subjectFp;

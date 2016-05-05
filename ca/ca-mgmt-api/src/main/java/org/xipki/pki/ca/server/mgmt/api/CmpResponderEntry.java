@@ -68,10 +68,7 @@ public class CmpResponderEntry implements Serializable {
 
     private X509Certificate certificate;
 
-    public CmpResponderEntry(
-            final String name,
-            final String type,
-            final String conf,
+    public CmpResponderEntry(final String name, final String type, final String conf,
             final String base64Cert) {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.type = ParamUtil.requireNonBlank("type", type);
@@ -105,8 +102,7 @@ public class CmpResponderEntry implements Serializable {
         return certificate;
     }
 
-    public void setCertificate(
-            final X509Certificate certificate) {
+    public void setCertificate(final X509Certificate certificate) {
         if (base64Cert != null) {
             throw new IllegalStateException("certificate is already specified by base64Cert");
         }
@@ -121,8 +117,7 @@ public class CmpResponderEntry implements Serializable {
         return confFaulty || certFaulty;
     }
 
-    public void setConfFaulty(
-            final boolean confFaulty) {
+    public void setConfFaulty(final boolean confFaulty) {
         this.confFaulty = confFaulty;
     }
 
@@ -131,14 +126,11 @@ public class CmpResponderEntry implements Serializable {
         return toString(false);
     }
 
-    public String toString(
-            final boolean verbose) {
+    public String toString(final boolean verbose) {
         return toString(verbose, true);
     }
 
-    public String toString(
-            final boolean verbose,
-            final boolean ignoreSensitiveInfo) {
+    public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(1000);
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');
@@ -153,12 +145,11 @@ public class CmpResponderEntry implements Serializable {
         sb.append("certificate: ").append("\n");
         if (certificate != null || base64Cert != null) {
             if (certificate != null) {
-                sb.append("\tissuer: ").append(
-                        X509Util.getRfc4519Name(certificate.getIssuerX500Principal())).append('\n');
+                sb.append("\tissuer: ").append(X509Util.getRfc4519Name(
+                        certificate.getIssuerX500Principal())).append('\n');
                 sb.append("\tserialNumber: ").append(certificate.getSerialNumber()).append('\n');
-                sb.append("\tsubject: ").append(
-                        X509Util.getRfc4519Name(
-                                certificate.getSubjectX500Principal())).append('\n');
+                sb.append("\tsubject: ").append(X509Util.getRfc4519Name(
+                        certificate.getSubjectX500Principal())).append('\n');
             }
             if (verbose) {
                 sb.append("\tencoded: ");

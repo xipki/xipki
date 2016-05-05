@@ -50,9 +50,7 @@ public class NextCaAndRa {
 
     private final Certificate raCert;
 
-    public NextCaAndRa(
-            final Certificate caCert,
-            final Certificate raCert) {
+    public NextCaAndRa(final Certificate caCert, final Certificate raCert) {
         this.caCert = ParamUtil.requireNonNull("caCert", caCert);
         this.raCert = raCert;
     }

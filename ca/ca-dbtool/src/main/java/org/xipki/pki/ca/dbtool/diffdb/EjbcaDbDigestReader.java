@@ -75,16 +75,9 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
     private final String caFingerprint;
 
-    private EjbcaDbDigestReader(
-            final DataSourceWrapper datasource,
-            final X509Certificate caCert,
-            final int totalAccount,
-            final int minId,
-            final int maxId,
-            final int numThreads,
-            final int caId,
-            final int numCertsToPredicate,
-            final StopMe stopMe)
+    private EjbcaDbDigestReader(final DataSourceWrapper datasource, final X509Certificate caCert,
+            final int totalAccount, final int minId, final int maxId, final int numThreads,
+            final int caId, final int numCertsToPredicate, final StopMe stopMe)
     throws Exception {
         super(datasource, caCert, totalAccount, minId, maxId, numThreads,
                 numCertsToPredicate, stopMe);
@@ -142,8 +135,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         }
 
         @SuppressWarnings("resource")
-        private void query(
-                final IdRange idRange) {
+        private void query(final IdRange idRange) {
             DigestDbEntrySet result = new DigestDbEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
@@ -225,13 +217,9 @@ public class EjbcaDbDigestReader extends DbDigestReader {
         return new EjbcaDbRetriever();
     }
 
-    public static EjbcaDbDigestReader getInstance(
-            final DataSourceWrapper datasource,
-            final int caId,
-            final boolean dbContainsOtherCa,
-            final int numThreads,
-            final int numCertsToPredicate,
-            final StopMe stopMe)
+    public static EjbcaDbDigestReader getInstance(final DataSourceWrapper datasource,
+            final int caId, final boolean dbContainsOtherCa, final int numThreads,
+            final int numCertsToPredicate, final StopMe stopMe)
     throws Exception {
         ParamUtil.requireNonNull("datasource", datasource);
 

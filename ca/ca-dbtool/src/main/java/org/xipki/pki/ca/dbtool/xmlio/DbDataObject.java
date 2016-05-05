@@ -51,27 +51,21 @@ public abstract class DbDataObject {
     protected DbDataObject() {
     }
 
-    protected void assertNotBlank(
-            final String name,
-            final String value)
+    protected void assertNotBlank(final String name, final String value)
     throws InvalidDataObjectException {
         if (StringUtil.isBlank(value)) {
             throw new InvalidDataObjectException(name + " must not be blank");
         }
     }
 
-    protected void assertNotNull(
-            final String name,
-            final Object value)
+    protected void assertNotNull(final String name, final Object value)
     throws InvalidDataObjectException {
         if (value == null) {
             throw new InvalidDataObjectException(name + " must not be null");
         }
     }
 
-    protected static void writeIfNotNull(
-            final DbiXmlWriter writer,
-            final String tag,
+    protected static void writeIfNotNull(final DbiXmlWriter writer, final String tag,
             final Object value)
     throws XMLStreamException, InvalidDataObjectException {
         if (value == null) {
@@ -95,8 +89,7 @@ public abstract class DbDataObject {
     public abstract void validate()
     throws InvalidDataObjectException;
 
-    public abstract void writeTo(
-            @Nonnull DbiXmlWriter os)
+    public abstract void writeTo(@Nonnull DbiXmlWriter os)
     throws InvalidDataObjectException, XMLStreamException;
 
 }

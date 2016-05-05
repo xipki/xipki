@@ -82,10 +82,7 @@ public class CaEntry implements Serializable {
 
     private String extraControl;
 
-    public CaEntry(
-            final String name,
-            final String signerType,
-            final String signerConf,
+    public CaEntry(final String name, final String signerType, final String signerConf,
             final int expirationPeriod)
     throws CaMgmtException {
         this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
@@ -102,8 +99,7 @@ public class CaEntry implements Serializable {
         return maxValidity;
     }
 
-    public void setMaxValidity(
-            final CertValidity maxValidity) {
+    public void setMaxValidity(final CertValidity maxValidity) {
         this.maxValidity = maxValidity;
     }
 
@@ -111,8 +107,7 @@ public class CaEntry implements Serializable {
         return keepExpiredCertInDays;
     }
 
-    public void setKeepExpiredCertInDays(
-            final int days) {
+    public void setKeepExpiredCertInDays(final int days) {
         this.keepExpiredCertInDays = days;
     }
 
@@ -124,8 +119,7 @@ public class CaEntry implements Serializable {
         return status;
     }
 
-    public void setStatus(
-            final CaStatus status) {
+    public void setStatus(final CaStatus status) {
         this.status = status;
     }
 
@@ -133,8 +127,7 @@ public class CaEntry implements Serializable {
         return signerType;
     }
 
-    public void setCmpControlName(
-            final String cmpControlName) {
+    public void setCmpControlName(final String cmpControlName) {
         this.cmpControlName = cmpControlName;
     }
 
@@ -146,8 +139,7 @@ public class CaEntry implements Serializable {
         return responderName;
     }
 
-    public void setResponderName(
-            final String responderName) {
+    public void setResponderName(final String responderName) {
         this.responderName = responderName;
     }
 
@@ -155,8 +147,7 @@ public class CaEntry implements Serializable {
         return duplicateKeyPermitted;
     }
 
-    public void setDuplicateKeyPermitted(
-            final boolean duplicateKeyPermitted) {
+    public void setDuplicateKeyPermitted(final boolean duplicateKeyPermitted) {
         this.duplicateKeyPermitted = duplicateKeyPermitted;
     }
 
@@ -164,8 +155,7 @@ public class CaEntry implements Serializable {
         return duplicateSubjectPermitted;
     }
 
-    public void setDuplicateSubjectPermitted(
-            final boolean duplicateSubjectPermitted) {
+    public void setDuplicateSubjectPermitted(final boolean duplicateSubjectPermitted) {
         this.duplicateSubjectPermitted = duplicateSubjectPermitted;
     }
 
@@ -173,8 +163,7 @@ public class CaEntry implements Serializable {
         return validityMode;
     }
 
-    public void setValidityMode(
-            final ValidityMode mode) {
+    public void setValidityMode(final ValidityMode mode) {
         this.validityMode = ParamUtil.requireNonNull("mode", mode);
     }
 
@@ -186,8 +175,7 @@ public class CaEntry implements Serializable {
         return toString(permissions);
     }
 
-    public void setPermissions(
-            final Set<Permission> permissions) {
+    public void setPermissions(final Set<Permission> permissions) {
         this.permissions = CollectionUtil.unmodifiableSet(permissions);
     }
 
@@ -199,8 +187,7 @@ public class CaEntry implements Serializable {
         return extraControl;
     }
 
-    public void setExtraControl(
-            final String extraControl) {
+    public void setExtraControl(final String extraControl) {
         this.extraControl = extraControl;
     }
 
@@ -209,21 +196,17 @@ public class CaEntry implements Serializable {
         return toString(false);
     }
 
-    public String toString(
-            final boolean verbose) {
+    public String toString(final boolean verbose) {
         return toString(verbose, true);
     }
 
-    public String toString(
-            final boolean verbose,
-            final boolean ignoreSensitiveInfo) {
+    public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(500);
         sb.append("name: ").append(name).append('\n');
         sb.append("status: ");
-        sb.append(
-                (status == null)
-                        ? "null"
-                        : status.getStatus());
+        sb.append((status == null)
+                ? "null"
+                : status.getStatus());
         sb.append('\n');
         sb.append("maxValidity: ").append(maxValidity).append("\n");
         sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
@@ -253,8 +236,7 @@ public class CaEntry implements Serializable {
         return sb.toString();
     } // method toString
 
-    protected static String toString(
-            final Collection<? extends Object> tokens) {
+    protected static String toString(final Collection<? extends Object> tokens) {
         if (CollectionUtil.isEmpty(tokens)) {
             return null;
         }

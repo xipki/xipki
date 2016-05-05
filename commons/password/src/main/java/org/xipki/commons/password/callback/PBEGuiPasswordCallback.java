@@ -49,9 +49,7 @@ import org.xipki.commons.password.PasswordResolverException;
 public class PBEGuiPasswordCallback extends GuiPasswordCallback {
 
     @Override
-    protected boolean isPasswordValid(
-            final char[] password,
-            final String testToken) {
+    protected boolean isPasswordValid(final char[] password, final String testToken) {
         if (StringUtil.isBlank(testToken)) {
             return true;
         }

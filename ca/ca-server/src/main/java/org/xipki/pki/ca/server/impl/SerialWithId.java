@@ -49,9 +49,7 @@ public class SerialWithId {
 
     private BigInteger serial;
 
-    public SerialWithId(
-            final int id,
-            final BigInteger serial) {
+    public SerialWithId(final int id, final BigInteger serial) {
         this.id = id;
         this.serial = serial;
     }

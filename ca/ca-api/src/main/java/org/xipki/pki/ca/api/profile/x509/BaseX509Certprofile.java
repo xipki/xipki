@@ -100,9 +100,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
     protected abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
 
-    protected String[] sortRdns(
-            final RdnControl control,
-            final String[] values) {
+    protected String[] sortRdns(final RdnControl control, final String[] values) {
         ParamUtil.requireNonNull("values", values);
 
         if (control == null) {
@@ -139,8 +137,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     protected abstract SubjectControl getSubjectControl();
 
     @Override
-    public Date getNotBefore(
-            final Date notBefore) {
+    public Date getNotBefore(final Date notBefore) {
         Date now = new Date();
         if (notBefore != null && notBefore.after(now)) {
             return notBefore;
@@ -150,8 +147,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     }
 
     @Override
-    public SubjectInfo getSubject(
-            final X500Name requestedSubject)
+    public SubjectInfo getSubject(final X500Name requestedSubject)
     throws CertprofileException, BadCertTemplateException {
         ParamUtil.requireNonNull("requestedSubject", requestedSubject);
 
@@ -259,8 +255,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     } // method getSubject
 
     @Override
-    public void setEnvParameterResolver(
-            final EnvParameterResolver envParameterResolver) {
+    public void setEnvParameterResolver(final EnvParameterResolver envParameterResolver) {
         this.envParameterResolver = envParameterResolver;
     }
 
@@ -270,8 +265,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     }
 
     @Override
-    public SubjectPublicKeyInfo checkPublicKey(
-            final SubjectPublicKeyInfo publicKey)
+    public SubjectPublicKeyInfo checkPublicKey(final SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException {
         ParamUtil.requireNonNull("publicKey", publicKey);
 
@@ -384,13 +378,11 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     } // method checkPublicKey
 
     @Override
-    public void initialize(
-            final String data)
+    public void initialize(final String data)
     throws CertprofileException {
     }
 
-    protected void verifySubjectDnOccurence(
-            final X500Name requestedSubject)
+    protected void verifySubjectDnOccurence(final X500Name requestedSubject)
     throws BadCertTemplateException {
         ParamUtil.requireNonNull("requestedSubject", requestedSubject);
 
@@ -441,11 +433,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         }
     } // method verifySubjectDnOccurence
 
-    protected RDN createSubjectRdn(
-            final String text,
-            final ASN1ObjectIdentifier type,
-            final RdnControl option,
-            final int index)
+    protected RDN createSubjectRdn(final String text, final ASN1ObjectIdentifier type,
+            final RdnControl option, final int index)
     throws BadCertTemplateException {
         ASN1Encodable rdnValue = createRdnValue(text, type, option, index);
         return (rdnValue == null)
@@ -453,8 +442,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 : new RDN(type, rdnValue);
     }
 
-    private static RDN createDateOfBirthRdn(
-            final ASN1ObjectIdentifier type,
+    private static RDN createDateOfBirthRdn(final ASN1ObjectIdentifier type,
             final ASN1Encodable rdnValue)
     throws BadCertTemplateException {
         ParamUtil.requireNonNull("type", type);
@@ -482,11 +470,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         return new RDN(type, newRdnValue);
     }
 
-    private static RDN createPostalAddressRdn(
-            final ASN1ObjectIdentifier type,
-            final ASN1Encodable rdnValue,
-            final RdnControl control,
-            final int index)
+    private static RDN createPostalAddressRdn(final ASN1ObjectIdentifier type,
+            final ASN1Encodable rdnValue, final RdnControl control, final int index)
     throws BadCertTemplateException {
         ParamUtil.requireNonNull("type", type);
 
@@ -520,9 +505,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         return new RDN(type, new DERSequence(vec));
     }
 
-    private static RDN[] getRdns(
-            final RDN[] rdns,
-            final ASN1ObjectIdentifier type) {
+    private static RDN[] getRdns(final RDN[] rdns, final ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("rdns", rdns);
         ParamUtil.requireNonNull("type", type);
 
@@ -539,11 +522,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 : ret.toArray(new RDN[0]);
     }
 
-    private static ASN1Encodable createRdnValue(
-            final String text,
-            final ASN1ObjectIdentifier type,
-            final RdnControl option,
-            final int index)
+    private static ASN1Encodable createRdnValue(final String text, final ASN1ObjectIdentifier type,
+            final RdnControl option, final int index)
     throws BadCertTemplateException {
         ParamUtil.requireNonNull("text", text);
         ParamUtil.requireNonNull("type", type);
@@ -620,13 +600,11 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         return stringType.createString(tmpText.trim());
     } // method createRdnValue
 
-    private static String oidToDisplayName(
-            final ASN1ObjectIdentifier type) {
+    private static String oidToDisplayName(final ASN1ObjectIdentifier type) {
         return ObjectIdentifiers.oidToDisplayName(type);
     }
 
-    private static void checkEcSubjectPublicKeyInfo(
-            final ASN1ObjectIdentifier curveOid,
+    private static void checkEcSubjectPublicKeyInfo(final ASN1ObjectIdentifier curveOid,
             final byte[] encoded)
     throws BadCertTemplateException {
         ParamUtil.requireNonNull("curveOid", curveOid);

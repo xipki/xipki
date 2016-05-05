@@ -60,8 +60,7 @@ class StoreConf {
 
     private final Set<String> caCertsExcludes = new HashSet<>();
 
-    StoreConf(
-            final String propsConf)
+    StoreConf(final String propsConf)
     throws OcspStoreException {
         Properties props = new Properties();
         try {

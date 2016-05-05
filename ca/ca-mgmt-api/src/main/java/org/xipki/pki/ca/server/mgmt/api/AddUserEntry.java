@@ -55,10 +55,7 @@ public class AddUserEntry implements Serializable {
 
     private final String cnRegex;
 
-    public AddUserEntry(
-            final String name,
-            final String password,
-            final String cnRegex)
+    public AddUserEntry(final String name, final String password, final String cnRegex)
     throws CaMgmtException {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.password = ParamUtil.requireNonBlank("password", password);

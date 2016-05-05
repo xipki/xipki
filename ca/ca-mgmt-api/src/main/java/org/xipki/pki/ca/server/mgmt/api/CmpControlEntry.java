@@ -55,9 +55,7 @@ public class CmpControlEntry implements Serializable {
 
     private boolean faulty;
 
-    public CmpControlEntry(
-            final String name,
-            final String conf) {
+    public CmpControlEntry(final String name, final String conf) {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.conf = ParamUtil.requireNonBlank("conf", conf);
     }
@@ -66,8 +64,7 @@ public class CmpControlEntry implements Serializable {
         return faulty;
     }
 
-    public void setFaulty(
-            final boolean faulty) {
+    public void setFaulty(final boolean faulty) {
         this.faulty = faulty;
     }
 

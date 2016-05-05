@@ -49,8 +49,7 @@ public class StopMe {
 
     private final AtomicBoolean stopMe;
 
-    public StopMe(
-            final AtomicBoolean stopMe) {
+    public StopMe(final AtomicBoolean stopMe) {
         this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
     }
 

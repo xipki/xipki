@@ -47,11 +47,9 @@ import org.xipki.commons.common.ObjectCreationException;
 
 public interface OcspStoreFactory {
 
-    boolean canCreateOcspStore(
-            @Nonnull String type);
+    boolean canCreateOcspStore(@Nonnull String type);
 
-    OcspStore newOcspStore(
-            @Nonnull String type)
+    OcspStore newOcspStore(@Nonnull String type)
     throws ObjectCreationException;
 
 }

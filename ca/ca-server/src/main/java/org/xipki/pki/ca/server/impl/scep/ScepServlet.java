@@ -98,24 +98,18 @@ public class ScepServlet extends HttpServlet {
     }
 
     @Override
-    public void doGet(
-            final HttpServletRequest request,
-            final HttpServletResponse response)
+    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
         service(request, response, false);
     }
 
     @Override
-    public void doPost(
-            final HttpServletRequest request,
-            final HttpServletResponse response)
+    public void doPost(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
         service(request, response, true);
     }
 
-    private void service(
-            final HttpServletRequest request,
-            final HttpServletResponse response,
+    private void service(final HttpServletRequest request, final HttpServletResponse response,
             final boolean post)
     throws ServletException, IOException {
         String requestUri = request.getRequestURI();
@@ -300,8 +294,7 @@ public class ScepServlet extends HttpServlet {
         }
     } // method service
 
-    protected PKIMessage generatePkiMessage(
-            final InputStream is)
+    protected PKIMessage generatePkiMessage(final InputStream is)
     throws IOException {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 
@@ -316,22 +309,16 @@ public class ScepServlet extends HttpServlet {
         }
     } // method generatePKIMessage
 
-    public void setResponderManager(
-            final CaManagerImpl responderManager) {
+    public void setResponderManager(final CaManagerImpl responderManager) {
         this.responderManager = responderManager;
     }
 
-    public void setAuditServiceRegister(
-            final AuditServiceRegister auditServiceRegister) {
+    public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = auditServiceRegister;
     }
 
-    private static void audit(
-            final AuditService auditService,
-            final AuditEvent auditEvent,
-            final AuditLevel auditLevel,
-            final AuditStatus auditStatus,
-            final String auditMessage) {
+    private static void audit(final AuditService auditService, final AuditEvent auditEvent,
+            final AuditLevel auditLevel, final AuditStatus auditStatus, final String auditMessage) {
         if (auditLevel != null) {
             auditEvent.setLevel(auditLevel);
         }

@@ -50,9 +50,7 @@ public class KeyUsageControl {
 
     private final boolean required;
 
-    public KeyUsageControl(
-            final KeyUsage keyUsage,
-            final boolean required) {
+    public KeyUsageControl(final KeyUsage keyUsage, final boolean required) {
         this.keyUsage = ParamUtil.requireNonNull("keyUsage", keyUsage);
         this.required = required;
     }

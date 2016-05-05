@@ -70,17 +70,14 @@ public class Asn1GenECKeypairParams extends ASN1Object {
 
     private final ASN1ObjectIdentifier curveId;
 
-    public Asn1GenECKeypairParams(
-            final Asn1P11SlotIdentifier slotId,
-            final String label,
+    public Asn1GenECKeypairParams(final Asn1P11SlotIdentifier slotId, final String label,
             final ASN1ObjectIdentifier curveId) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.label = ParamUtil.requireNonBlank("label", label);
         this.curveId = ParamUtil.requireNonNull("curveId", curveId);
     }
 
-    private Asn1GenECKeypairParams(
-            final ASN1Sequence seq)
+    private Asn1GenECKeypairParams(final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 3, 3);
         int idx = 0;
@@ -91,8 +88,7 @@ public class Asn1GenECKeypairParams extends ASN1Object {
         curveId = Asn1Util.getObjectIdentifier(seq.getObjectAt(idx++));
     }
 
-    public static Asn1GenECKeypairParams getInstance(
-            final Object obj)
+    public static Asn1GenECKeypairParams getInstance(final Object obj)
     throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1GenECKeypairParams) {
             return (Asn1GenECKeypairParams) obj;

@@ -53,21 +53,14 @@ public class RevokeCertRequestEntry extends IssuerSerialEntry {
 
     private final Date invalidityDate;
 
-    public RevokeCertRequestEntry(
-            final String id,
-            final X509Certificate cert,
-            final int reason,
+    public RevokeCertRequestEntry(final String id, final X509Certificate cert, final int reason,
             final Date invalidityDate) {
         this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
                 cert.getSerialNumber(), reason, invalidityDate);
     }
 
-    public RevokeCertRequestEntry(
-            final String id,
-            final X500Name issuer,
-            final BigInteger serialNumber,
-            final int reason,
-            final Date invalidityDate) {
+    public RevokeCertRequestEntry(final String id, final X500Name issuer,
+            final BigInteger serialNumber, final int reason, final Date invalidityDate) {
         super(id, issuer, serialNumber);
 
         if (!(reason >= 0 && reason <= 10 && reason != 7)) {

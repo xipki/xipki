@@ -62,51 +62,36 @@ public interface SecurityFactory {
 
     PasswordResolver getPasswordResolver();
 
-    KeyCertPair createPrivateKeyAndCert(
-            @Nonnull String type,
-            @Nullable SignerConf conf,
+    KeyCertPair createPrivateKeyAndCert(@Nonnull String type, @Nullable SignerConf conf,
             @Nullable X509Certificate cert)
     throws ObjectCreationException;
 
-    ConcurrentContentSigner createSigner(
-            @Nonnull String type,
-            @Nullable SignerConf conf,
+    ConcurrentContentSigner createSigner(@Nonnull String type, @Nullable SignerConf conf,
             @Nullable X509Certificate cert)
     throws ObjectCreationException;
 
-    ConcurrentContentSigner createSigner(
-            @Nonnull String type,
-            @Nullable SignerConf conf,
+    ConcurrentContentSigner createSigner(@Nonnull String type, @Nullable SignerConf conf,
             @Nullable X509Certificate[] certs)
     throws ObjectCreationException;
 
-    ContentVerifierProvider getContentVerifierProvider(
-            @Nonnull PublicKey publicKey)
+    ContentVerifierProvider getContentVerifierProvider(@Nonnull PublicKey publicKey)
     throws InvalidKeyException;
 
-    ContentVerifierProvider getContentVerifierProvider(
-            @Nonnull X509Certificate cert)
+    ContentVerifierProvider getContentVerifierProvider(@Nonnull X509Certificate cert)
     throws InvalidKeyException;
 
-    ContentVerifierProvider getContentVerifierProvider(
-            @Nonnull X509CertificateHolder cert)
+    ContentVerifierProvider getContentVerifierProvider(@Nonnull X509CertificateHolder cert)
     throws InvalidKeyException;
 
-    boolean verifyPopo(
-            @Nonnull PKCS10CertificationRequest p10Request);
+    boolean verifyPopo(@Nonnull PKCS10CertificationRequest p10Request);
 
-    boolean verifyPopo(
-            @Nonnull CertificationRequest p10Req);
+    boolean verifyPopo(@Nonnull CertificationRequest p10Req);
 
-    PublicKey generatePublicKey(
-            @Nonnull SubjectPublicKeyInfo subjectPublicKeyInfo)
+    PublicKey generatePublicKey(@Nonnull SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException;
 
-    byte[] extractMinimalKeyStore(
-            @Nonnull String keystoreType,
-            @Nonnull byte[] keystoreBytes,
-            @Nullable String keyname,
-            @Nonnull char[] password,
+    byte[] extractMinimalKeyStore(@Nonnull String keystoreType, @Nonnull byte[] keystoreBytes,
+            @Nullable String keyname, @Nonnull char[] password,
             @Nullable X509Certificate[] newCertChain)
     throws KeyStoreException;
 

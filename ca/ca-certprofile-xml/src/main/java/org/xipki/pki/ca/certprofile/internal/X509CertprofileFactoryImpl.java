@@ -48,14 +48,12 @@ import org.xipki.pki.ca.api.profile.x509.X509CertprofileFactory;
 public class X509CertprofileFactoryImpl implements X509CertprofileFactory {
 
     @Override
-    public boolean canCreateProfile(
-            final String type) {
+    public boolean canCreateProfile(final String type) {
         return "XML".equalsIgnoreCase(type);
     }
 
     @Override
-    public X509Certprofile newCertprofile(
-            final String type)
+    public X509Certprofile newCertprofile(final String type)
     throws ObjectCreationException {
         if ("XML".equalsIgnoreCase(type)) {
             return new XmlX509Certprofile();

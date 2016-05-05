@@ -69,8 +69,7 @@ public class ScepControl implements Serializable {
 
     private boolean includeSignerCert = true;
 
-    public ScepControl(
-            final String conf)
+    public ScepControl(final String conf)
     throws InvalidConfException {
         if (StringUtil.isBlank(conf)) {
             return;
@@ -99,8 +98,7 @@ public class ScepControl implements Serializable {
         return includeCaCert;
     }
 
-    public void setIncludeCaCert(
-            final boolean includeCaCert) {
+    public void setIncludeCaCert(final boolean includeCaCert) {
         this.includeCaCert = includeCaCert;
     }
 
@@ -108,8 +106,7 @@ public class ScepControl implements Serializable {
         return includeSignerCert;
     }
 
-    public void setIncludeSignerCert(
-            final boolean includeSignerCert) {
+    public void setIncludeSignerCert(final boolean includeSignerCert) {
         this.includeSignerCert = includeSignerCert;
     }
 
@@ -124,8 +121,7 @@ public class ScepControl implements Serializable {
     }
 
     @Override
-    public boolean equals(
-            final Object obj) {
+    public boolean equals(final Object obj) {
         if (!(obj instanceof ScepControl)) {
             return false;
         }
@@ -139,9 +135,7 @@ public class ScepControl implements Serializable {
         return true;
     }
 
-    private static boolean getBoolean(
-            final ConfPairs props,
-            final String propKey,
+    private static boolean getBoolean(final ConfPairs props, final String propKey,
             final boolean dfltValue)
     throws InvalidConfException {
         String str = props.getValue(propKey);

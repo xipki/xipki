@@ -51,11 +51,8 @@ public class X509CaUris {
     private final List<String> crlUris;
     private final List<String> deltaCrlUris;
 
-    public X509CaUris(
-            final List<String> cacertUris,
-            final List<String> ocspUris,
-            final List<String> crlUris,
-            final List<String> deltaCrlUris) {
+    public X509CaUris(final List<String> cacertUris, final List<String> ocspUris,
+            final List<String> crlUris, final List<String> deltaCrlUris) {
         this.cacertUris = cacertUris;
         this.ocspUris = ocspUris;
         this.crlUris = crlUris;

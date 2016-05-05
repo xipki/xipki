@@ -80,8 +80,7 @@ public abstract class KeyEntry {
 
         private final BigInteger baseN;
 
-        public RSAKeyEntry(
-                final int keysize)
+        public RSAKeyEntry(final int keysize)
         throws Exception {
             if (keysize % 1024 != 0) {
                 throw new IllegalArgumentException("invalid RSA keysize " + keysize);
@@ -96,8 +95,7 @@ public abstract class KeyEntry {
         }
 
         @Override
-        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
-                final long index) {
+        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(final long index) {
             BigInteger modulus = baseN.add(BigInteger.valueOf(index));
 
             try {
@@ -202,8 +200,7 @@ public abstract class KeyEntry {
 
         private BigInteger baseY;
 
-        public DSAKeyEntry(
-                final int plength)
+        public DSAKeyEntry(final int plength)
         throws Exception {
             if (plength == 1024) {
                 init(P_1024, Q_1024, G_1024, Y_1024);
@@ -232,26 +229,17 @@ public abstract class KeyEntry {
         }
 
         // CHECKSTYLE:OFF
-        private void init(
-                final String p,
-                final String q,
-                final String g,
-                final String y) {
+        private void init(final String p, final String q, final String g, final String y) {
             // CHECKSTYLE:ON
             init(base64ToInt(p), base64ToInt(q), base64ToInt(g), base64ToInt(y));
         }
 
-        private static BigInteger base64ToInt(
-                final String base64Str) {
+        private static BigInteger base64ToInt(final String base64Str) {
             return new BigInteger(1, Base64.decode(base64Str));
         }
 
         // CHECKSTYLE:OFF
-        private void init(
-                final BigInteger p,
-                final BigInteger q,
-                final BigInteger g,
-                final BigInteger y) {
+        private void init(final BigInteger p, final BigInteger q, final BigInteger g, final BigInteger y) {
             // CHECKSTYLE:ON
             ASN1EncodableVector vec = new ASN1EncodableVector();
             vec.add(new ASN1Integer(p));
@@ -263,8 +251,7 @@ public abstract class KeyEntry {
         }
 
         @Override
-        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
-                final long index) {
+        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(final long index) {
             // CHECKSTYLE:SKIP
             BigInteger y = baseY.add(BigInteger.valueOf(index));
 
@@ -287,8 +274,7 @@ public abstract class KeyEntry {
 
         private final BigInteger basePublicKey;
 
-        public ECKeyEntry(
-                final String curveNameOrOid)
+        public ECKeyEntry(final String curveNameOrOid)
         throws Exception {
             ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
 
@@ -317,15 +303,13 @@ public abstract class KeyEntry {
         }
 
         @Override
-        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
-                final long index) {
+        public SubjectPublicKeyInfo getSubjectPublicKeyInfo(final long index) {
             BigInteger publicKey = basePublicKey.add(BigInteger.valueOf(index));
             return new SubjectPublicKeyInfo(algId, publicKey.toByteArray());
         }
 
     } // class ECKeyEntry
 
-    public abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo(
-            long index);
+    public abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index);
 
 }

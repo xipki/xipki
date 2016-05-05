@@ -63,8 +63,7 @@ class ResponseOption {
 
     private final Long cacheMaxAge;
 
-    ResponseOption(
-            final ResponseOptionType conf)
+    ResponseOption(final ResponseOptionType conf)
     throws InvalidConfException {
         ParamUtil.requireNonNull("conf", conf);
         this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
@@ -118,9 +117,7 @@ class ResponseOption {
         return certHashAlgo;
     }
 
-    private static boolean getBoolean(
-            final Boolean bo,
-            final boolean dflt) {
+    private static boolean getBoolean(final Boolean bo, final boolean dflt) {
         return (bo == null)
                 ? dflt
                 : bo.booleanValue();

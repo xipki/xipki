@@ -88,8 +88,7 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
         return null;
     }
 
-    private void output(
-            final List<P11SlotIdentifier> slots) {
+    private void output(final List<P11SlotIdentifier> slots) {
         // list all slots
         final int n = slots.size();
 

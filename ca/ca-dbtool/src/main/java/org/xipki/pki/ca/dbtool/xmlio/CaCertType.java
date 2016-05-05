@@ -154,8 +154,7 @@ public class CaCertType extends DbDataObject {
         return id;
     }
 
-    public void setId(
-            final Integer id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 
@@ -163,8 +162,7 @@ public class CaCertType extends DbDataObject {
         return art;
     }
 
-    public void setArt(
-            final Integer art) {
+    public void setArt(final Integer art) {
         this.art = art;
     }
 
@@ -172,8 +170,7 @@ public class CaCertType extends DbDataObject {
         return caId;
     }
 
-    public void setCaId(
-            final Integer caId) {
+    public void setCaId(final Integer caId) {
         this.caId = caId;
     }
 
@@ -181,8 +178,7 @@ public class CaCertType extends DbDataObject {
         return sn;
     }
 
-    public void setSn(
-            final String sn) {
+    public void setSn(final String sn) {
         this.sn = sn;
     }
 
@@ -190,8 +186,7 @@ public class CaCertType extends DbDataObject {
         return pid;
     }
 
-    public void setPid(
-            final Integer pid) {
+    public void setPid(final Integer pid) {
         this.pid = pid;
     }
 
@@ -199,8 +194,7 @@ public class CaCertType extends DbDataObject {
         return rid;
     }
 
-    public void setRid(
-            final Integer rid) {
+    public void setRid(final Integer rid) {
         this.rid = rid;
     }
 
@@ -208,8 +202,7 @@ public class CaCertType extends DbDataObject {
         return update;
     }
 
-    public void setUpdate(
-            final Long update) {
+    public void setUpdate(final Long update) {
         this.update = update;
     }
 
@@ -217,8 +210,7 @@ public class CaCertType extends DbDataObject {
         return rev;
     }
 
-    public void setRev(
-            final Boolean rev) {
+    public void setRev(final Boolean rev) {
         this.rev = rev;
     }
 
@@ -226,8 +218,7 @@ public class CaCertType extends DbDataObject {
         return rr;
     }
 
-    public void setRr(
-            final Integer rr) {
+    public void setRr(final Integer rr) {
         this.rr = rr;
     }
 
@@ -235,8 +226,7 @@ public class CaCertType extends DbDataObject {
         return rt;
     }
 
-    public void setRt(
-            final Long rt) {
+    public void setRt(final Long rt) {
         this.rt = rt;
     }
 
@@ -244,8 +234,7 @@ public class CaCertType extends DbDataObject {
         return rit;
     }
 
-    public void setRit(
-            final Long rit) {
+    public void setRit(final Long rit) {
         this.rit = rit;
     }
 
@@ -253,8 +242,7 @@ public class CaCertType extends DbDataObject {
         return tid;
     }
 
-    public void setTid(
-            final String tid) {
+    public void setTid(final String tid) {
         this.tid = tid;
     }
 
@@ -262,8 +250,7 @@ public class CaCertType extends DbDataObject {
         return reqType;
     }
 
-    public void setReqType(
-            final Integer reqType) {
+    public void setReqType(final Integer reqType) {
         this.reqType = reqType;
     }
 
@@ -271,8 +258,7 @@ public class CaCertType extends DbDataObject {
         return fpRs;
     }
 
-    public void setFpRs(
-            final Long fpRs) {
+    public void setFpRs(final Long fpRs) {
         this.fpRs = fpRs;
     }
 
@@ -280,8 +266,7 @@ public class CaCertType extends DbDataObject {
         return rs;
     }
 
-    public void setRs(
-            final String rs) {
+    public void setRs(final String rs) {
         this.rs = rs;
     }
 
@@ -289,8 +274,7 @@ public class CaCertType extends DbDataObject {
         return file;
     }
 
-    public void setFile(
-            final String file) {
+    public void setFile(final String file) {
         this.file = file;
     }
 
@@ -321,14 +305,12 @@ public class CaCertType extends DbDataObject {
         return user;
     }
 
-    public void setUser(
-            final String user) {
+    public void setUser(final String user) {
         this.user = user;
     }
 
     @Override
-    public void writeTo(
-            final DbiXmlWriter writer)
+    public void writeTo(final DbiXmlWriter writer)
     throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("writer", writer);
 

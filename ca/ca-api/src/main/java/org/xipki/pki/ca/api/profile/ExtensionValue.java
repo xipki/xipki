@@ -50,9 +50,7 @@ public class ExtensionValue {
 
     private final ASN1Encodable value;
 
-    public ExtensionValue(
-            final boolean critical,
-            final ASN1Encodable value) {
+    public ExtensionValue(final boolean critical, final ASN1Encodable value) {
         this.critical = critical;
         this.value = ParamUtil.requireNonNull("value", value);
     }

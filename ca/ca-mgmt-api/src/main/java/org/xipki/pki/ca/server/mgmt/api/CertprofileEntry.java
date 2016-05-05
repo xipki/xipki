@@ -57,10 +57,7 @@ public class CertprofileEntry implements Serializable {
 
     private boolean faulty;
 
-    public CertprofileEntry(
-            final String name,
-            final String type,
-            final String conf) {
+    public CertprofileEntry(final String name, final String type, final String conf) {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.type = ParamUtil.requireNonBlank("type", type);
         this.conf = conf;
@@ -86,8 +83,7 @@ public class CertprofileEntry implements Serializable {
         return faulty;
     }
 
-    public void setFaulty(
-            final boolean faulty) {
+    public void setFaulty(final boolean faulty) {
         this.faulty = faulty;
     }
 
@@ -96,8 +92,7 @@ public class CertprofileEntry implements Serializable {
         return toString(false);
     }
 
-    public String toString(
-            final boolean verbose) {
+    public String toString(final boolean verbose) {
         StringBuilder sb = new StringBuilder(200);
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(faulty).append('\n');

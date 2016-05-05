@@ -140,8 +140,7 @@ public class XmlX509CertprofileUtil {
     private XmlX509CertprofileUtil() {
     }
 
-    public static X509ProfileType parse(
-            final InputStream xmlConfStream)
+    public static X509ProfileType parse(final InputStream xmlConfStream)
     throws CertprofileException {
         ParamUtil.requireNonNull("xmlConfStream", xmlConfStream);
         synchronized (JAXB_LOCK) {
@@ -254,8 +253,7 @@ public class XmlX509CertprofileUtil {
                 : new NameConstraints(permitted, excluded);
     } // method buildNameConstrains
 
-    private static GeneralSubtree[] buildGeneralSubtrees(
-            final GeneralSubtreesType subtrees)
+    private static GeneralSubtree[] buildGeneralSubtrees(final GeneralSubtreesType subtrees)
     throws CertprofileException {
         if (subtrees == null || CollectionUtil.isEmpty(subtrees.getBase())) {
             return null;
@@ -271,8 +269,7 @@ public class XmlX509CertprofileUtil {
         return ret;
     } // method buildGeneralSubtrees
 
-    private static GeneralSubtree buildGeneralSubtree(
-            final GeneralSubtreeBaseType type)
+    private static GeneralSubtree buildGeneralSubtree(final GeneralSubtreeBaseType type)
     throws CertprofileException {
         ParamUtil.requireNonNull("type", type);
         GeneralName base = null;
@@ -313,8 +310,7 @@ public class XmlX509CertprofileUtil {
         return new GeneralSubtree(base, minimum, maximum);
     } // method buildGeneralSubtree
 
-    public static ASN1Sequence buildPolicyConstrains(
-            final PolicyConstraints type)
+    public static ASN1Sequence buildPolicyConstrains(final PolicyConstraints type)
     throws CertprofileException {
         ParamUtil.requireNonNull("type", type);
         Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
@@ -348,8 +344,7 @@ public class XmlX509CertprofileUtil {
         return new DERSequence(vec);
     } //method buildPolicyConstrains
 
-    public static Set<GeneralNameMode> buildGeneralNameMode(
-            final GeneralNameType name) {
+    public static Set<GeneralNameMode> buildGeneralNameMode(final GeneralNameType name) {
         ParamUtil.requireNonNull("name", name);
 
         Set<GeneralNameMode> ret = new HashSet<>();
@@ -393,8 +388,7 @@ public class XmlX509CertprofileUtil {
         return ret;
     } // method buildGeneralNameMode
 
-    private static Set<Range> buildParametersMap(
-            final RangesType ranges) {
+    private static Set<Range> buildParametersMap(final RangesType ranges) {
         if (ranges == null) {
             return null;
         }
@@ -511,8 +505,7 @@ public class XmlX509CertprofileUtil {
         return Collections.unmodifiableSet(controls);
     } // method buildKeyUsageOptions
 
-    public static Set<ExtKeyUsageControl> buildExtKeyUsageOptions(
-            final ExtendedKeyUsage extConf) {
+    public static Set<ExtKeyUsageControl> buildExtKeyUsageOptions(final ExtendedKeyUsage extConf) {
         ParamUtil.requireNonNull("extConf", extConf);
         List<Usage> usages = extConf.getUsage();
         Set<ExtKeyUsageControl> controls = new HashSet<>();
@@ -568,8 +561,7 @@ public class XmlX509CertprofileUtil {
         return Collections.unmodifiableMap(map);
     } // buildConstantExtesions
 
-    public static Set<ASN1ObjectIdentifier> toOidSet(
-            final List<OidWithDescType> oidWithDescTypes) {
+    public static Set<ASN1ObjectIdentifier> toOidSet(final List<OidWithDescType> oidWithDescTypes) {
         if (CollectionUtil.isEmpty(oidWithDescTypes)) {
             return null;
         }
@@ -581,8 +573,7 @@ public class XmlX509CertprofileUtil {
         return Collections.unmodifiableSet(oids);
     }
 
-    private static KeyParametersOption convertKeyParametersOption(
-            final AlgorithmType type)
+    private static KeyParametersOption convertKeyParametersOption(final AlgorithmType type)
     throws CertprofileException {
         ParamUtil.requireNonNull("type", type);
         if (type.getParameters() == null || type.getParameters().getAny() == null) {

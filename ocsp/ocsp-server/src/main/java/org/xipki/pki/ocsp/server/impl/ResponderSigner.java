@@ -75,8 +75,7 @@ class ResponderSigner {
 
     private final X500Name responderId;
 
-    ResponderSigner(
-            final List<ConcurrentContentSigner> signers)
+    ResponderSigner(final List<ConcurrentContentSigner> signers)
     throws CertificateEncodingException, IOException {
         this.signers = ParamUtil.requireNonEmpty("signers", signers);
         X509Certificate[] tmpCertificateChain = signers.get(0).getCertificateChain();
@@ -159,8 +158,7 @@ class ResponderSigner {
         return true;
     }
 
-    private static String getSignatureAlgorithmName(
-            final AlgorithmIdentifier sigAlgId) {
+    private static String getSignatureAlgorithmName(final AlgorithmIdentifier sigAlgId) {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid)) {
             return algOid.getId();

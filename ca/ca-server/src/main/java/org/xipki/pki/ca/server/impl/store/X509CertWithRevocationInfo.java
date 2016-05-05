@@ -67,13 +67,11 @@ public class X509CertWithRevocationInfo {
         return revInfo;
     }
 
-    public void setCert(
-            final X509CertWithDbId cert) {
+    public void setCert(final X509CertWithDbId cert) {
         this.cert = cert;
     }
 
-    public void setRevInfo(
-            final CertRevocationInfo revInfo) {
+    public void setRevInfo(final CertRevocationInfo revInfo) {
         this.revInfo = revInfo;
     }
 
@@ -81,8 +79,7 @@ public class X509CertWithRevocationInfo {
         return certprofile;
     }
 
-    public void setCertprofile(
-            final String certprofile) {
+    public void setCertprofile(final String certprofile) {
         this.certprofile = certprofile;
     }
 

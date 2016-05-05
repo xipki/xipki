@@ -60,11 +60,8 @@ class CrlCertStatusInfo {
 
     private final Map<HashAlgoType, byte[]> certHashes;
 
-    private CrlCertStatusInfo(
-            final CertStatus certStatus,
-            final CertRevocationInfo revocationInfo,
-            final String certprofile,
-            final Map<HashAlgoType, byte[]> certHashes) {
+    private CrlCertStatusInfo(final CertStatus certStatus, final CertRevocationInfo revocationInfo,
+            final String certprofile, final Map<HashAlgoType, byte[]> certHashes) {
         this.certStatus = ParamUtil.requireNonNull("certStatus", certStatus);
         this.revocationInfo = revocationInfo;
         this.certprofile = certprofile;
@@ -83,9 +80,7 @@ class CrlCertStatusInfo {
         return certprofile;
     }
 
-    CertStatusInfo getCertStatusInfo(
-            final HashAlgoType hashAlgo,
-            final Date thisUpdate,
+    CertStatusInfo getCertStatusInfo(final HashAlgoType hashAlgo, final Date thisUpdate,
             final Date nextUpdate) {
         switch (certStatus) {
         case ISSUER_UNKNOWN:
@@ -118,17 +113,14 @@ class CrlCertStatusInfo {
         return new CrlCertStatusInfo(CertStatus.IGNORE, null, null, null);
     }
 
-    static CrlCertStatusInfo getGoodCertStatusInfo(
-            final String certprofile,
-            final Map<HashAlgoType, byte[]> certHashes) {
+    static CrlCertStatusInfo getGoodCertStatusInfo(final String certprofile, final Map<HashAlgoType,
+            byte[]> certHashes) {
         ParamUtil.requireNonBlank("certprofile", certprofile);
         return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes);
     }
 
-    static CrlCertStatusInfo getRevokedCertStatusInfo(
-            final CertRevocationInfo revocationInfo,
-            final String certprofile,
-            final Map<HashAlgoType, byte[]> certHashes) {
+    static CrlCertStatusInfo getRevokedCertStatusInfo(final CertRevocationInfo revocationInfo,
+            final String certprofile, final Map<HashAlgoType, byte[]> certHashes) {
         ParamUtil.requireNonNull("revocationInfo", revocationInfo);
         return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certprofile, certHashes);
     }

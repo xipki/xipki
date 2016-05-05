@@ -53,15 +53,13 @@ public class QcStatementOption {
 
     private final MonetaryValueOption monetaryValueOption;
 
-    public QcStatementOption(
-            final QCStatement statement) {
+    public QcStatementOption(final QCStatement statement) {
         this.statement = ParamUtil.requireNonNull("statement", statement);
         this.statementId = null;
         this.monetaryValueOption = null;
     }
 
-    public QcStatementOption(
-            final ASN1ObjectIdentifier statementId,
+    public QcStatementOption(final ASN1ObjectIdentifier statementId,
             final MonetaryValueOption monetaryValueOption) {
         this.statement = null;
         this.statementId = ParamUtil.requireNonNull("statementId", statementId);

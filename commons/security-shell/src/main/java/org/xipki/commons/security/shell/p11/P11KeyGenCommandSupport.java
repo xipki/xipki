@@ -71,9 +71,7 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
     @Completion(P11ModuleNameCompleter.class)
     private String moduleName = DEFAULT_P11MODULE_NAME;
 
-    protected void finalize(
-            final String keyType,
-            final P11ObjectIdentifier objectId)
+    protected void finalize(final String keyType, final P11ObjectIdentifier objectId)
     throws Exception {
         ParamUtil.requireNonNull("objectId", objectId);
         println("generated " + keyType + " keypair " + objectId);

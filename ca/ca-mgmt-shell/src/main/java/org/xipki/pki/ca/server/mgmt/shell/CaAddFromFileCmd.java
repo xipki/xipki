@@ -101,8 +101,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         return null;
     }
 
-    protected X509CaEntry getCaEntry(
-            final boolean ignoreCert)
+    protected X509CaEntry getCaEntry(final boolean ignoreCert)
     throws Exception {
         Properties props = new Properties();
         confFile = IoUtil.expandFilepath(confFile);
@@ -329,10 +328,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         return entry;
     } // method getCaEntry
 
-    private String getStrProp(
-            final Properties props,
-            final String propKey,
-            final boolean required)
+    private String getStrProp(final Properties props, final String propKey, final boolean required)
     throws IllegalCmdParamException {
         String str = props.getProperty(propKey);
         if (StringUtil.isBlank(str)) {
@@ -353,17 +349,12 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         }
     }
 
-    private int getRequiredIntProp(
-            final Properties props,
-            final String propKey)
+    private int getRequiredIntProp(final Properties props, final String propKey)
     throws IllegalCmdParamException {
         return getIntProp(props, propKey, true).intValue();
     }
 
-    private Integer getIntProp(
-            final Properties props,
-            final String propKey,
-            final boolean required)
+    private Integer getIntProp(final Properties props, final String propKey, final boolean required)
     throws IllegalCmdParamException {
         String str = getStrProp(props, propKey, required);
         return (str == null)
@@ -371,17 +362,12 @@ public class CaAddFromFileCmd extends CaCommandSupport {
                 : Integer.parseInt(str);
     }
 
-    private long getRequiredLongProp(
-            final Properties props,
-            final String propKey)
+    private long getRequiredLongProp(final Properties props, final String propKey)
     throws IllegalCmdParamException {
         return getLongProp(props, propKey, true).longValue();
     }
 
-    private Long getLongProp(
-            final Properties props,
-            final String propKey,
-            final boolean required)
+    private Long getLongProp(final Properties props, final String propKey, final boolean required)
     throws IllegalCmdParamException {
         String str = getStrProp(props, propKey, required);
         return (str == null)
@@ -389,10 +375,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
                 : Long.parseLong(str);
     }
 
-    private static void assertNotNull(
-            final Object obj,
-            final String key,
-            final String value)
+    private static void assertNotNull(final Object obj, final String key, final String value)
     throws IllegalCmdParamException {
         if (obj == null) {
             throw new IllegalCmdParamException("invalid " + key + ": '" + value + "'");

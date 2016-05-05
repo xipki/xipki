@@ -49,14 +49,11 @@ public class X509CertWithDbId extends X509Cert {
 
     private Integer certId;
 
-    public X509CertWithDbId(
-            final X509Certificate cert) {
+    public X509CertWithDbId(final X509Certificate cert) {
         super(cert);
     }
 
-    public X509CertWithDbId(
-            final X509Certificate cert,
-            final byte[] encodedCert) {
+    public X509CertWithDbId(final X509Certificate cert, final byte[] encodedCert) {
         super(cert, encodedCert);
     }
 
@@ -64,8 +61,7 @@ public class X509CertWithDbId extends X509Cert {
         return certId;
     }
 
-    public void setCertId(
-            final Integer certId) {
+    public void setCertId(final Integer certId) {
         this.certId = certId;
     }
 

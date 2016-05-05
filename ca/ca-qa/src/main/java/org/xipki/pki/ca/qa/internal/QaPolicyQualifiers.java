@@ -56,8 +56,7 @@ public class QaPolicyQualifiers {
 
     private final List<QaPolicyQualifierInfo> policyQualifiers;
 
-    public QaPolicyQualifiers(
-            final PolicyQualifiers jaxb) {
+    public QaPolicyQualifiers(final PolicyQualifiers jaxb) {
         ParamUtil.requireNonNull("jaxb", jaxb);
         List<QaPolicyQualifierInfo> list = new LinkedList<>();
         List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();

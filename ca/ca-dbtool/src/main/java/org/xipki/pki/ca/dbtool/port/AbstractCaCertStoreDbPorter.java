@@ -65,11 +65,8 @@ class AbstractCaCertStoreDbPorter extends DbPorter {
 
     protected final String usersListFile;
 
-    AbstractCaCertStoreDbPorter(
-            final DataSourceWrapper datasource,
-            final String baseDir,
-            final AtomicBoolean stopMe,
-            final boolean evaluateOnly)
+    AbstractCaCertStoreDbPorter(final DataSourceWrapper datasource, final String baseDir,
+            final AtomicBoolean stopMe, final boolean evaluateOnly)
     throws DataAccessException {
         super(datasource, baseDir, stopMe, evaluateOnly);
 

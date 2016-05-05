@@ -104,9 +104,7 @@ class X509SelfSignedCertBuilder {
 
         private final X509Certificate cert;
 
-        GenerateSelfSignedResult(
-                final String signerConf,
-                final X509Certificate cert) {
+        GenerateSelfSignedResult(final String signerConf, final X509Certificate cert) {
             this.signerConf = signerConf;
             this.cert = cert;
         }
@@ -126,16 +124,11 @@ class X509SelfSignedCertBuilder {
     private X509SelfSignedCertBuilder() {
     }
 
-    public static GenerateSelfSignedResult generateSelfSigned(
-            final SecurityFactory securityFactory,
-            final String signerType,
-            final String signerConf,
-            final IdentifiedX509Certprofile certprofile,
-            final CertificationRequest p10Request,
-            final BigInteger serialNumber,
-            final List<String> cacertUris,
-            final List<String> ocspUris,
-            final List<String> crlUris,
+    public static GenerateSelfSignedResult generateSelfSigned(final SecurityFactory securityFactory,
+            final String signerType, final String signerConf,
+            final IdentifiedX509Certprofile certprofile, final CertificationRequest p10Request,
+            final BigInteger serialNumber, final List<String> cacertUris,
+            final List<String> ocspUris, final List<String> crlUris,
             final List<String> deltaCrlUris)
     throws OperationException, InvalidConfException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
@@ -230,15 +223,10 @@ class X509SelfSignedCertBuilder {
         return new GenerateSelfSignedResult(signerConf, newCert);
     } // method generateSelfSigned
 
-    private static X509Certificate generateCertificate(
-            final ConcurrentContentSigner signer,
-            final IdentifiedX509Certprofile certprofile,
-            final CertificationRequest p10Request,
-            final BigInteger serialNumber,
-            final SubjectPublicKeyInfo publicKeyInfo,
-            final List<String> cacertUris,
-            final List<String> ocspUris,
-            final List<String> crlUris,
+    private static X509Certificate generateCertificate(final ConcurrentContentSigner signer,
+            final IdentifiedX509Certprofile certprofile, final CertificationRequest p10Request,
+            final BigInteger serialNumber, final SubjectPublicKeyInfo publicKeyInfo,
+            final List<String> cacertUris, final List<String> ocspUris, final List<String> crlUris,
             final List<String> deltaCrlUris)
     throws OperationException {
 
@@ -308,15 +296,8 @@ class X509SelfSignedCertBuilder {
         }
 
         try {
-            addExtensions(
-                    certBuilder,
-                    certprofile,
-                    requestedSubject,
-                    extensions,
-                    tmpPublicKeyInfo,
-                    publicCaInfo,
-                    notBefore,
-                    notAfter);
+            addExtensions(certBuilder, certprofile, requestedSubject, extensions, tmpPublicKeyInfo,
+                    publicCaInfo, notBefore, notAfter);
 
             Certificate bcCert = signer.build(certBuilder).toASN1Structure();
             byte[] encodedCert = bcCert.getEncoded();
@@ -332,15 +313,10 @@ class X509SelfSignedCertBuilder {
         }
     } // method generateCertificate
 
-    private static void addExtensions(
-            final X509v3CertificateBuilder certBuilder,
-            final IdentifiedX509Certprofile profile,
-            final X500Name requestedSubject,
-            final Extensions extensions,
-            final SubjectPublicKeyInfo requestedPublicKeyInfo,
-            final PublicCaInfo publicCaInfo,
-            final Date notBefore,
-            final Date notAfter)
+    private static void addExtensions(final X509v3CertificateBuilder certBuilder,
+            final IdentifiedX509Certprofile profile, final X500Name requestedSubject,
+            final Extensions extensions, final SubjectPublicKeyInfo requestedPublicKeyInfo,
+            final PublicCaInfo publicCaInfo, final Date notBefore, final Date notAfter)
     throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException {
         ExtensionValues extensionTuples = profile.getExtensions(
                 requestedSubject, extensions, requestedPublicKeyInfo,
@@ -355,8 +331,7 @@ class X509SelfSignedCertBuilder {
         }
     } // method addExtensions
 
-    public static AsymmetricKeyParameter generatePublicKeyParameter(
-            final PublicKey key)
+    public static AsymmetricKeyParameter generatePublicKeyParameter(final PublicKey key)
     throws InvalidKeyException {
         ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPublicKey) {

@@ -48,11 +48,7 @@ import org.xipki.commons.security.pkcs11.P11Slot;
 // CHECKSTYLE:SKIP
 public class P11ECSignLoadTest extends P11SignLoadTest {
 
-    public P11ECSignLoadTest(
-            final SecurityFactory securityFactory,
-            final P11Slot slot,
-            final String signatureAlgorithm,
-            final String curveNameOrOid)
+    public P11ECSignLoadTest(final SecurityFactory securityFactory, final P11Slot slot, final String signatureAlgorithm, final String curveNameOrOid)
     throws Exception {
         super(securityFactory, slot, signatureAlgorithm,
                 generateKey(slot, curveNameOrOid),
@@ -60,9 +56,7 @@ public class P11ECSignLoadTest extends P11SignLoadTest {
                         + "curve: " + curveNameOrOid);
     }
 
-    private static P11ObjectIdentifier generateKey(
-            final P11Slot slot,
-            final String curveNameOrOid)
+    private static P11ObjectIdentifier generateKey(final P11Slot slot, final String curveNameOrOid)
     throws Exception {
         ParamUtil.requireNonNull("slot", slot);
         ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);

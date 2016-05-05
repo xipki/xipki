@@ -60,8 +60,7 @@ public class ChangeScepEntry implements Serializable {
 
     private String control;
 
-    public ChangeScepEntry(
-            final String caName)
+    public ChangeScepEntry(final String caName)
     throws InvalidConfException {
         this.caName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
     }
@@ -74,8 +73,7 @@ public class ChangeScepEntry implements Serializable {
         return responderType;
     }
 
-    public void setResponderType(
-            final String responderType) {
+    public void setResponderType(final String responderType) {
         this.responderType = responderType;
     }
 
@@ -83,8 +81,7 @@ public class ChangeScepEntry implements Serializable {
         return responderConf;
     }
 
-    public void setResponderConf(
-            final String responderConf) {
+    public void setResponderConf(final String responderConf) {
         this.responderConf = responderConf;
     }
 
@@ -92,8 +89,7 @@ public class ChangeScepEntry implements Serializable {
         return base64Cert;
     }
 
-    public void setBase64Cert(
-            final String base64Cert) {
+    public void setBase64Cert(final String base64Cert) {
         this.base64Cert = base64Cert;
     }
 
@@ -101,8 +97,7 @@ public class ChangeScepEntry implements Serializable {
         return control;
     }
 
-    public void setControl(
-            final String control) {
+    public void setControl(final String control) {
         this.control = control;
     }
 

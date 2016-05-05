@@ -45,10 +45,8 @@ import javax.annotation.Nonnull;
 
 public interface CmpResponderManager {
 
-    String getCaNameForAlias(
-            @Nonnull String caAlias);
+    String getCaNameForAlias(@Nonnull String caAlias);
 
-    X509CaCmpResponder getX509CaCmpResponder(
-            @Nonnull String caName);
+    X509CaCmpResponder getX509CaCmpResponder(@Nonnull String caName);
 
 }

@@ -50,9 +50,7 @@ public class QaExtensionValue {
 
     private final byte[] value;
 
-    public QaExtensionValue(
-            final boolean critical,
-            final byte[] value) {
+    public QaExtensionValue(final boolean critical, final byte[] value) {
         this.critical = critical;
         this.value = Arrays.clone(ParamUtil.requireNonNull("value", value));
     }

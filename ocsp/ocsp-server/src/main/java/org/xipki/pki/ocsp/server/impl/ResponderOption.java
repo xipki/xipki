@@ -70,8 +70,7 @@ class ResponderOption {
 
     private final List<String> servletPaths;
 
-    ResponderOption(
-            final ResponderType conf)
+    ResponderOption(final ResponderType conf)
     throws InvalidConfException {
         ParamUtil.requireNonNull("conf", conf);
         String str = conf.getMode();

@@ -52,13 +52,11 @@ public class DigestDbEntrySet implements Comparable<DigestDbEntrySet> {
 
     private List<IdentifiedDbDigestEntry> entries = new LinkedList<>();
 
-    public DigestDbEntrySet(
-            final int startId) {
+    public DigestDbEntrySet(final int startId) {
         this.startId = startId;
     }
 
-    public void setException(
-            final Exception exception) {
+    public void setException(final Exception exception) {
         this.exception = exception;
     }
 
@@ -66,8 +64,7 @@ public class DigestDbEntrySet implements Comparable<DigestDbEntrySet> {
         return exception;
     }
 
-    public void addEntry(
-            final IdentifiedDbDigestEntry entry) {
+    public void addEntry(final IdentifiedDbDigestEntry entry) {
         entries.add(entry);
     }
 

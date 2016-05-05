@@ -61,8 +61,7 @@ public abstract class DbPortWorker implements Runnable {
         return exception;
     }
 
-    public void setStopMe(
-            final boolean stopMe) {
+    public void setStopMe(final boolean stopMe) {
         this.stopMe.set(stopMe);
     }
 

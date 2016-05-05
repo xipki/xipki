@@ -54,10 +54,8 @@ public class IssuerHash {
 
     private final byte[] issuerKeyHash;
 
-    public IssuerHash(
-            final HashAlgoType hashAlgo,
-            byte[] issuerNameHash,
-            byte[] issuerKeyHash) {
+    public IssuerHash(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
+            final byte[] issuerKeyHash) {
         this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         this.issuerNameHash = ParamUtil.requireNonNull("issuerNameHash", issuerNameHash);
         this.issuerKeyHash = ParamUtil.requireNonNull("issuerKeyHash", issuerKeyHash);
@@ -67,9 +65,7 @@ public class IssuerHash {
         ParamUtil.requireRange("issuerKeyHash.length", issuerKeyHash.length, len, len);
     }
 
-    public IssuerHash(
-            final HashAlgoType hashAlgo,
-            Certificate issuerCert)
+    public IssuerHash(final HashAlgoType hashAlgo, final Certificate issuerCert)
     throws IOException {
         this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         ParamUtil.requireNonNull("issuerCert", issuerCert);
@@ -92,9 +88,7 @@ public class IssuerHash {
         return Arrays.clone(issuerKeyHash);
     }
 
-    public boolean match(
-            final HashAlgoType hashAlgo,
-            final byte[] issuerNameHash,
+    public boolean match(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         ParamUtil.requireNonNull("issuerNameHash", issuerNameHash);

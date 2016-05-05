@@ -50,9 +50,7 @@ public class P10EnrollCertRequest extends IdentifiedObject {
 
     private final CertificationRequest p10Req;
 
-    public P10EnrollCertRequest(
-            final String id,
-            final String certprofile,
+    public P10EnrollCertRequest(final String id, final String certprofile,
             final CertificationRequest p10Req) {
         super(id);
         this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);

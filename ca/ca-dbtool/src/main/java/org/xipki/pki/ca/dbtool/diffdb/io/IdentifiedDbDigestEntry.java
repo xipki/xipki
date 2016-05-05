@@ -52,9 +52,7 @@ public class IdentifiedDbDigestEntry implements QueueEntry {
 
     private final int id;
 
-    public IdentifiedDbDigestEntry(
-            final DbDigestEntry content,
-            final int id) {
+    public IdentifiedDbDigestEntry(final DbDigestEntry content, final int id) {
         this.content = ParamUtil.requireNonNull("content", content);
         this.id = id;
     }

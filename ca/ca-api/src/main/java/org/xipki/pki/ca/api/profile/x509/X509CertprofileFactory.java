@@ -47,11 +47,9 @@ import org.xipki.commons.common.ObjectCreationException;
 
 public interface X509CertprofileFactory {
 
-    boolean canCreateProfile(
-            @Nonnull String type);
+    boolean canCreateProfile(@Nonnull String type);
 
-    X509Certprofile newCertprofile(
-            @Nonnull String type)
+    X509Certprofile newCertprofile(@Nonnull String type)
     throws ObjectCreationException;
 
 }

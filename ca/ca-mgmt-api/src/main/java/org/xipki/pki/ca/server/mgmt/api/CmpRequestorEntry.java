@@ -64,9 +64,7 @@ public class CmpRequestorEntry implements Serializable {
 
     private X509Certificate cert;
 
-    public CmpRequestorEntry(
-            final String name,
-            final String base64Cert) {
+    public CmpRequestorEntry(final String name, final String base64Cert) {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.base64Cert = ParamUtil.requireNonBlank("base64Cert", base64Cert);
         try {
@@ -93,8 +91,7 @@ public class CmpRequestorEntry implements Serializable {
         return toString(false);
     }
 
-    public String toString(
-            final boolean verbose) {
+    public String toString(final boolean verbose) {
         StringBuilder sb = new StringBuilder(500);
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(cert == null).append('\n');

@@ -86,15 +86,12 @@ public class DbCertStatusStore extends OcspStore {
 
         private final Long revocationTimeMs;
 
-        SimpleIssuerEntry(
-                final int id,
-                final Long revocationTimeMs) {
+        SimpleIssuerEntry(final int id, final Long revocationTimeMs) {
             this.id = id;
             this.revocationTimeMs = revocationTimeMs;
         }
 
-        public boolean match(
-                final IssuerEntry issuer) {
+        public boolean match(final IssuerEntry issuer) {
             if (id != issuer.getId()) {
                 return false;
             }
@@ -280,13 +277,9 @@ public class DbCertStatusStore extends OcspStore {
     } // method initIssuerStore
 
     @Override
-    public CertStatusInfo getCertStatus(
-            final HashAlgoType hashAlgo,
-            final byte[] issuerNameHash,
-            final byte[] issuerKeyHash,
-            final BigInteger serialNumber,
-            final boolean includeCertHash,
-            final HashAlgoType certHashAlg,
+    public CertStatusInfo getCertStatus(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
+            final byte[] issuerKeyHash, final BigInteger serialNumber,
+            final boolean includeCertHash, final HashAlgoType certHashAlg,
             final CertprofileOption certprofileOption)
     throws OcspStoreException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
@@ -441,8 +434,7 @@ public class DbCertStatusStore extends OcspStore {
      * @return the next idle preparedStatement, {@code null} will be returned if no PreparedStament
      *     can be created within 5 seconds.
      */
-    private PreparedStatement borrowPreparedStatement(
-            final String sqlQuery)
+    private PreparedStatement borrowPreparedStatement(final String sqlQuery)
     throws DataAccessException {
         PreparedStatement ps = null;
         Connection conn = datasource.getConnection();
@@ -474,16 +466,12 @@ public class DbCertStatusStore extends OcspStore {
         }
     }
 
-    private void releaseDbResources(
-            final Statement ps,
-            final ResultSet rs) {
+    private void releaseDbResources(final Statement ps, final ResultSet rs) {
         datasource.releaseResources(ps, rs);
     }
 
     @Override
-    public void init(
-            final String conf,
-            final DataSourceWrapper datasource,
+    public void init(final String conf, final DataSourceWrapper datasource,
             final Set<HashAlgoType> certHashAlgos)
     throws OcspStoreException {
         ParamUtil.requireNonNull("conf", conf);
@@ -512,8 +500,8 @@ public class DbCertStatusStore extends OcspStore {
 
         StoreUpdateService storeUpdateService = new StoreUpdateService();
         this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
-        this.scheduledThreadPoolExecutor.scheduleAtFixedRate(
-                storeUpdateService, 60, 60, TimeUnit.SECONDS);
+        this.scheduledThreadPoolExecutor.scheduleAtFixedRate(storeUpdateService, 60, 60,
+                TimeUnit.SECONDS);
     }
 
     @Override
@@ -526,9 +514,7 @@ public class DbCertStatusStore extends OcspStore {
     }
 
     @Override
-    public boolean canResolveIssuer(
-            final HashAlgoType hashAlgo,
-            final byte[] issuerNameHash,
+    public boolean canResolveIssuer(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {
         return null != issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
     }
@@ -539,18 +525,15 @@ public class DbCertStatusStore extends OcspStore {
     }
 
     @Override
-    public CertRevocationInfo getCaRevocationInfo(
-            final HashAlgoType hashAlgo,
-            final byte[] issuerNameHash,
-            final byte[] issuerKeyHash) {
+    public CertRevocationInfo getCaRevocationInfo(final HashAlgoType hashAlgo,
+            final byte[] issuerNameHash, final byte[] issuerKeyHash) {
         IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
         return (issuer == null)
                 ? null
                 : issuer.getRevocationInfo();
     }
 
-    private static Set<X509Certificate> parseCerts(
-            final Set<String> certFiles)
+    private static Set<X509Certificate> parseCerts(final Set<String> certFiles)
     throws OcspStoreException {
         Set<X509Certificate> certs = new HashSet<>(certFiles.size());
         for (String certFile : certFiles) {

@@ -117,8 +117,7 @@ public class OcspCertType extends DbDataObject {
         return id;
     }
 
-    public void setId(
-            final Integer id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 
@@ -126,8 +125,7 @@ public class OcspCertType extends DbDataObject {
         return iid;
     }
 
-    public void setIid(
-            final Integer iid) {
+    public void setIid(final Integer iid) {
         this.iid = iid;
     }
 
@@ -135,8 +133,7 @@ public class OcspCertType extends DbDataObject {
         return sn;
     }
 
-    public void setSn(
-            final String sn) {
+    public void setSn(final String sn) {
         this.sn = sn;
     }
 
@@ -144,8 +141,7 @@ public class OcspCertType extends DbDataObject {
         return profile;
     }
 
-    public void setProfile(
-            final String profile) {
+    public void setProfile(final String profile) {
         this.profile = profile;
     }
 
@@ -153,8 +149,7 @@ public class OcspCertType extends DbDataObject {
         return update;
     }
 
-    public void setUpdate(
-            final Long update) {
+    public void setUpdate(final Long update) {
         this.update = update;
     }
 
@@ -162,8 +157,7 @@ public class OcspCertType extends DbDataObject {
         return rev;
     }
 
-    public void setRev(
-            final Boolean rev) {
+    public void setRev(final Boolean rev) {
         this.rev = rev;
     }
 
@@ -171,8 +165,7 @@ public class OcspCertType extends DbDataObject {
         return rr;
     }
 
-    public void setRr(
-            final Integer rr) {
+    public void setRr(final Integer rr) {
         this.rr = rr;
     }
 
@@ -180,8 +173,7 @@ public class OcspCertType extends DbDataObject {
         return rt;
     }
 
-    public void setRt(
-            final Long rt) {
+    public void setRt(final Long rt) {
         this.rt = rt;
     }
 
@@ -189,8 +181,7 @@ public class OcspCertType extends DbDataObject {
         return rit;
     }
 
-    public void setRit(
-            final Long rit) {
+    public void setRit(final Long rit) {
         this.rit = rit;
     }
 
@@ -198,8 +189,7 @@ public class OcspCertType extends DbDataObject {
         return file;
     }
 
-    public void setFile(
-            final String file) {
+    public void setFile(final String file) {
         this.file = file;
     }
 
@@ -220,8 +210,7 @@ public class OcspCertType extends DbDataObject {
     }
 
     @Override
-    public void writeTo(
-            final DbiXmlWriter writer)
+    public void writeTo(final DbiXmlWriter writer)
     throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("writer", writer);
 

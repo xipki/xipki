@@ -45,7 +45,6 @@ import javax.annotation.Nonnull;
 
 public interface ScepManager {
 
-    Scep getScep(
-            @Nonnull String name);
+    Scep getScep(@Nonnull String name);
 
 }

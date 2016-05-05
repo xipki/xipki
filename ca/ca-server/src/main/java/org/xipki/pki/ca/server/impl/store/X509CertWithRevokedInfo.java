@@ -50,9 +50,7 @@ public class X509CertWithRevokedInfo {
 
     private final boolean revoked;
 
-    public X509CertWithRevokedInfo(
-            final X509CertWithDbId cert,
-            final boolean revoked) {
+    public X509CertWithRevokedInfo(final X509CertWithDbId cert, final boolean revoked) {
         this.cert = ParamUtil.requireNonNull("cert", cert);
         this.revoked = revoked;
     }

@@ -54,9 +54,7 @@ public class IssuerHashNameAndKey {
 
     private final byte[] issuerKeyHash;
 
-    public IssuerHashNameAndKey(
-            final HashAlgoType algo,
-            final byte[] issuerNameHash,
+    public IssuerHashNameAndKey(final HashAlgoType algo, final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {
         this.algo = ParamUtil.requireNonNull("algo", algo);
 
@@ -73,9 +71,7 @@ public class IssuerHashNameAndKey {
         this.issuerKeyHash = Arrays.copyOf(issuerKeyHash, len);
     }
 
-    public boolean match(
-            final HashAlgoType algo,
-            final byte[] issuerNameHash,
+    public boolean match(final HashAlgoType algo, final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {
         return this.algo == algo
                 && Arrays.equals(this.issuerNameHash, issuerNameHash)

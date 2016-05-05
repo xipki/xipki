@@ -60,8 +60,7 @@ public class X509ChangeCrlSignerEntry implements Serializable {
 
     private String crlControl;
 
-    public X509ChangeCrlSignerEntry(
-            final String name)
+    public X509ChangeCrlSignerEntry(final String name)
     throws InvalidConfException {
         this.name = ParamUtil.requireNonBlank("name", name);
     }
@@ -74,8 +73,7 @@ public class X509ChangeCrlSignerEntry implements Serializable {
         return signerType;
     }
 
-    public void setSignerType(
-            final String signerType) {
+    public void setSignerType(final String signerType) {
         this.signerType = signerType;
     }
 
@@ -83,8 +81,7 @@ public class X509ChangeCrlSignerEntry implements Serializable {
         return signerConf;
     }
 
-    public void setSignerConf(
-            final String signerConf) {
+    public void setSignerConf(final String signerConf) {
         this.signerConf = signerConf;
     }
 
@@ -92,8 +89,7 @@ public class X509ChangeCrlSignerEntry implements Serializable {
         return base64Cert;
     }
 
-    public void setBase64Cert(
-            final String base64Cert) {
+    public void setBase64Cert(final String base64Cert) {
         this.base64Cert = base64Cert;
     }
 
@@ -101,8 +97,7 @@ public class X509ChangeCrlSignerEntry implements Serializable {
         return crlControl;
     }
 
-    public void setCrlControl(
-            final String crlControl) {
+    public void setCrlControl(final String crlControl) {
         this.crlControl = crlControl;
     }
 

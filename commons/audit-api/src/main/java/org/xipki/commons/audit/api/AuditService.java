@@ -45,10 +45,8 @@ import javax.annotation.Nonnull;
 
 public interface AuditService {
 
-    void logEvent(
-            @Nonnull AuditEvent event);
+    void logEvent(@Nonnull AuditEvent event);
 
-    void logEvent(
-            @Nonnull PciAuditEvent event);
+    void logEvent(@Nonnull PciAuditEvent event);
 
 }

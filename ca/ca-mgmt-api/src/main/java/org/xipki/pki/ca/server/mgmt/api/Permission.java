@@ -59,8 +59,7 @@ public enum Permission {
 
     private String permission;
 
-    Permission(
-            final String permission) {
+    Permission(final String permission) {
         this.permission = permission;
     }
 
@@ -68,8 +67,7 @@ public enum Permission {
         return permission;
     }
 
-    public static Permission getPermission(
-            final String permission) {
+    public static Permission getPermission(final String permission) {
         ParamUtil.requireNonNull("permission", permission);
 
         for (Permission p : values()) {
@@ -81,8 +79,7 @@ public enum Permission {
         return null;
     }
 
-    public static String toString(
-            final Set<Permission> permissions) {
+    public static String toString(final Set<Permission> permissions) {
         if (CollectionUtil.isEmpty(permissions)) {
             return null;
         }

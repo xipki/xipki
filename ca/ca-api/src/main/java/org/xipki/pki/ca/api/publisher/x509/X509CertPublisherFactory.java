@@ -36,6 +36,8 @@
 
 package org.xipki.pki.ca.api.publisher.x509;
 
+import javax.annotation.Nonnull;
+
 import org.xipki.commons.common.ObjectCreationException;
 
 /**
@@ -45,11 +47,9 @@ import org.xipki.commons.common.ObjectCreationException;
 
 public interface X509CertPublisherFactory {
 
-    boolean canCreatePublisher(
-            String type);
+    boolean canCreatePublisher(@Nonnull String type);
 
-    X509CertPublisher newPublisher(
-            String type)
+    X509CertPublisher newPublisher(@Nonnull String type)
     throws ObjectCreationException;
 
 }

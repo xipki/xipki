@@ -100,8 +100,7 @@ public abstract class X509Certprofile {
         return null;
     }
 
-    public String incSerialNumber(
-            @Nullable final String currentSerialNumber)
+    public String incSerialNumber(@Nullable final String currentSerialNumber)
     throws BadFormatException {
         try {
             int currentSn = (currentSerialNumber == null)
@@ -131,8 +130,7 @@ public abstract class X509Certprofile {
         return true;
     }
 
-    public String getParameter(
-            @Nonnull final String paramName) {
+    public String getParameter(@Nonnull final String paramName) {
         return null;
     }
 
@@ -161,8 +159,7 @@ public abstract class X509Certprofile {
 
     public abstract Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls();
 
-    public abstract void initialize(
-            @Nullable String data)
+    public abstract void initialize(@Nullable String data)
     throws CertprofileException;
 
     public abstract X509CertLevel getCertLevel();
@@ -171,28 +168,22 @@ public abstract class X509Certprofile {
 
     public abstract Integer getPathLenBasicConstraint();
 
-    public abstract void setEnvParameterResolver(
-            @Nullable EnvParameterResolver parameterResolver);
+    public abstract void setEnvParameterResolver(@Nullable EnvParameterResolver parameterResolver);
 
-    public abstract Date getNotBefore(
-            @Nullable Date notBefore);
+    public abstract Date getNotBefore(@Nullable Date notBefore);
 
     public abstract CertValidity getValidity();
 
-    public abstract SubjectPublicKeyInfo checkPublicKey(
-            @Nonnull SubjectPublicKeyInfo publicKey)
+    public abstract SubjectPublicKeyInfo checkPublicKey(@Nonnull SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException;
 
-    public abstract SubjectInfo getSubject(
-            @Nonnull X500Name requestedSubject)
+    public abstract SubjectInfo getSubject(@Nonnull X500Name requestedSubject)
     throws CertprofileException, BadCertTemplateException;
 
     public abstract ExtensionValues getExtensions(
             @Nonnull Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
-            @Nonnull X500Name requestedSubject,
-            @Nullable Extensions requestExtensions,
-            @Nonnull Date notBefore,
-            @Nonnull Date notAfter)
+            @Nonnull X500Name requestedSubject, @Nullable Extensions requestExtensions,
+            @Nonnull Date notBefore, @Nonnull Date notAfter)
     throws CertprofileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();

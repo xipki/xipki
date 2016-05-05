@@ -128,18 +128,13 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
                 "ExtendedRevoke");
     }
 
-    protected abstract void checkParameters(
-            @Nullable X509Certificate respIssuer,
-            @Nonnull List<BigInteger> serialNumbers,
-            @Nullable Map<BigInteger, byte[]> encodedCerts)
+    protected abstract void checkParameters(@Nullable X509Certificate respIssuer,
+            @Nonnull List<BigInteger> serialNumbers, @Nullable Map<BigInteger, byte[]> encodedCerts)
     throws Exception;
 
-    protected abstract Object processResponse(
-            @Nonnull OCSPResp response,
-            @Nullable X509Certificate respIssuer,
-            @Nonnull IssuerHash issuerHash,
-            @Nonnull List<BigInteger> serialNumbers,
-            @Nullable Map<BigInteger, byte[]> encodedCerts)
+    protected abstract Object processResponse(@Nonnull OCSPResp response,
+            @Nullable X509Certificate respIssuer, @Nonnull IssuerHash issuerHash,
+            @Nonnull List<BigInteger> serialNumbers, @Nullable Map<BigInteger, byte[]> encodedCerts)
     throws Exception;
 
     @Override
@@ -246,8 +241,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
         return processResponse(response, respIssuer, issuerHash, sns, encodedCerts);
     } // method doExecute
 
-    public static List<String> extractOcspUrls(
-            final X509Certificate cert)
+    public static List<String> extractOcspUrls(final X509Certificate cert)
     throws CertificateEncodingException {
         byte[] extValue = X509Util.getCoreExtValue(cert, Extension.authorityInfoAccess);
         if (extValue == null) {

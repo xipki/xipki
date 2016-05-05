@@ -111,15 +111,9 @@ abstract class DbDigestReader implements DigestReader {
 
     private int nextId;
 
-    DbDigestReader(
-            final DataSourceWrapper datasource,
-            final X509Certificate caCert,
-            final int totalAccount,
-            final int minId,
-            final int maxId,
-            final int numThreads,
-            final int numCertsToPredicate,
-            final StopMe stopMe)
+    DbDigestReader(final DataSourceWrapper datasource, final X509Certificate caCert,
+            final int totalAccount, final int minId, final int maxId, final int numThreads,
+            final int numCertsToPredicate, final StopMe stopMe)
     throws DataAccessException, CertificateException, IOException {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.caCert = ParamUtil.requireNonNull("caCert", caCert);
@@ -242,8 +236,7 @@ abstract class DbDigestReader implements DigestReader {
     }
 
     @Override
-    public synchronized CertsBundle nextCerts(
-            final int numCerts)
+    public synchronized CertsBundle nextCerts(final int numCerts)
     throws Exception {
         if (endReached.get() && fixedSizedCerts.isEmpty()) {
             return null;
@@ -300,9 +293,7 @@ abstract class DbDigestReader implements DigestReader {
         return minId;
     }
 
-    protected void releaseResources(
-            final Statement ps,
-            final ResultSet rs) {
+    protected void releaseResources(final Statement ps, final ResultSet rs) {
         DbToolBase.releaseResources(datasource, ps, rs);
     }
 

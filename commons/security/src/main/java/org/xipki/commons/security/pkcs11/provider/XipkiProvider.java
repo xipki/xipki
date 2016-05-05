@@ -103,8 +103,7 @@ public class XipkiProvider extends Provider {
 
         private final XipkiProvider provider;
 
-        MyPrivilegedAction(
-                final XipkiProvider provider) {
+        MyPrivilegedAction(final XipkiProvider provider) {
             this.provider = provider;
         }
 

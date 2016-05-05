@@ -78,14 +78,9 @@ public class CaDbImportWorker extends DbPortWorker {
 
     private final boolean evaluateOnly;
 
-    public CaDbImportWorker(
-            final DataSourceFactory datasourceFactory,
-            final PasswordResolver passwordResolver,
-            final String dbConfFile,
-            final boolean resume,
-            final String srcFolder,
-            final int batchEntriesPerCommit,
-            final boolean evaluateOnly)
+    public CaDbImportWorker(final DataSourceFactory datasourceFactory,
+            final PasswordResolver passwordResolver, final String dbConfFile, final boolean resume,
+            final String srcFolder, final int batchEntriesPerCommit, final boolean evaluateOnly)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
 

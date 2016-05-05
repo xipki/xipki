@@ -69,8 +69,7 @@ public class XipkiDbControl {
 
     private final String certSql;
 
-    public XipkiDbControl(
-            final DbSchemaType dbSchemaType) {
+    public XipkiDbControl(final DbSchemaType dbSchemaType) {
         ParamUtil.requireNonNull("dbSchemaType", dbSchemaType);
 
         if (dbSchemaType == DbSchemaType.XIPKI_CA_v1

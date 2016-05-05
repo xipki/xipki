@@ -68,16 +68,13 @@ public class OperationException extends Exception {
 
     private final String errorMessage;
 
-    public OperationException(
-            final ErrorCode errorCode) {
+    public OperationException(final ErrorCode errorCode) {
         super(String.format("error code: %s", errorCode));
         this.errorCode = errorCode;
         this.errorMessage = null;
     }
 
-    public OperationException(
-            final ErrorCode errorCode,
-            final String errorMessage) {
+    public OperationException(final ErrorCode errorCode, final String errorMessage) {
         super(String.format("error code: %s, error message: %s", errorCode, errorMessage));
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;

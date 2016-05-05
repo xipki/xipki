@@ -48,19 +48,15 @@ public class InvalidConfException extends Exception {
     public InvalidConfException() {
     }
 
-    public InvalidConfException(
-            final String message) {
+    public InvalidConfException(final String message) {
         super(message);
     }
 
-    public InvalidConfException(
-            final Throwable cause) {
+    public InvalidConfException(final Throwable cause) {
         super(cause);
     }
 
-    public InvalidConfException(
-            final String message,
-            final Throwable cause) {
+    public InvalidConfException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

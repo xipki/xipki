@@ -50,8 +50,7 @@ public class QaAuthorizationTemplate extends QaExtension {
 
     private final byte[] accessRights;
 
-    public QaAuthorizationTemplate(
-            final AuthorizationTemplate jaxb) {
+    public QaAuthorizationTemplate(final AuthorizationTemplate jaxb) {
         ParamUtil.requireNonNull("jaxb", jaxb);
         this.type = jaxb.getType().getValue();
         this.accessRights = jaxb.getAccessRights().getValue();

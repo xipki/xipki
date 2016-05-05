@@ -75,12 +75,8 @@ public class X509CrlSignerEntry implements Serializable {
 
     private String crlControl;
 
-    public X509CrlSignerEntry(
-            final String name,
-            final String signerType,
-            final String signerConf,
-            final String base64Cert,
-            final String crlControl)
+    public X509CrlSignerEntry(final String name, final String signerType, final String signerConf,
+            final String base64Cert, final String crlControl)
     throws InvalidConfException {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
@@ -107,8 +103,7 @@ public class X509CrlSignerEntry implements Serializable {
         return name;
     }
 
-    public void setConfFaulty(
-            final boolean faulty) {
+    public void setConfFaulty(final boolean faulty) {
         this.confFaulty = faulty;
     }
 
@@ -132,8 +127,7 @@ public class X509CrlSignerEntry implements Serializable {
         return cert;
     }
 
-    public void setCertificate(
-            final X509Certificate certificate) {
+    public void setCertificate(final X509Certificate certificate) {
         if (base64Cert != null) {
             throw new IllegalStateException("certificate is already by specified by base64Cert");
         }
@@ -149,14 +143,11 @@ public class X509CrlSignerEntry implements Serializable {
         return toString(false);
     }
 
-    public String toString(
-            final boolean verbose) {
+    public String toString(final boolean verbose) {
         return toString(verbose, true);
     }
 
-    public String toString(
-            final boolean verbose,
-            final boolean ignoreSensitiveInfo) {
+    public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(1000);
         sb.append("name: ").append(name).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');

@@ -57,8 +57,7 @@ public class QaCertificatePolicies extends QaExtension {
 
         private final QaPolicyQualifiers policyQualifiers;
 
-        public QaCertificatePolicyInformation(
-                final CertificatePolicyInformationType jaxb) {
+        public QaCertificatePolicyInformation(final CertificatePolicyInformationType jaxb) {
             ParamUtil.requireNonNull("jaxb", jaxb);
             this.policyId = jaxb.getPolicyIdentifier().getValue();
             if (jaxb.getPolicyQualifiers() == null) {
@@ -80,8 +79,7 @@ public class QaCertificatePolicies extends QaExtension {
 
     private final List<QaCertificatePolicyInformation> policyInformations;
 
-    public QaCertificatePolicies(
-            final CertificatePolicies jaxb) {
+    public QaCertificatePolicies(final CertificatePolicies jaxb) {
         ParamUtil.requireNonNull("jaxb", jaxb);
         List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
         List<QaCertificatePolicyInformation> list = new LinkedList<>();
@@ -96,8 +94,7 @@ public class QaCertificatePolicies extends QaExtension {
         return policyInformations;
     }
 
-    public QaCertificatePolicyInformation getPolicyInformation(
-            final String policyId) {
+    public QaCertificatePolicyInformation getPolicyInformation(final String policyId) {
         ParamUtil.requireNonBlank("policyId", policyId);
         for (QaCertificatePolicyInformation entry : policyInformations) {
             if (entry.getPolicyId().equals(policyId)) {

@@ -82,8 +82,7 @@ public class PublicKeyChecker {
 
     private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
-    public PublicKeyChecker(
-            final X509ProfileType conf)
+    public PublicKeyChecker(final X509ProfileType conf)
     throws CertprofileException {
         ParamUtil.requireNonNull("conf", conf);
         try {
@@ -100,8 +99,7 @@ public class PublicKeyChecker {
         }
     }
 
-    public List<ValidationIssue> checkPublicKey(
-            final SubjectPublicKeyInfo publicKey,
+    public List<ValidationIssue> checkPublicKey(final SubjectPublicKeyInfo publicKey,
             final SubjectPublicKeyInfo requestedPublicKey) {
         ParamUtil.requireNonNull("publicKey", publicKey);
         ParamUtil.requireNonNull("requestedPublicKey", requestedPublicKey);
@@ -135,8 +133,7 @@ public class PublicKeyChecker {
         return resultIssues;
     } // method checkPublicKey
 
-    private void checkPublicKey(
-            final SubjectPublicKeyInfo publicKey)
+    private void checkPublicKey(final SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException {
         if (CollectionUtil.isEmpty(keyAlgorithms)) {
             return;
@@ -248,9 +245,7 @@ public class PublicKeyChecker {
     } // method checkPublicKey
 
     // CHECKSTYLE:SKIP
-    private static void checkECSubjectPublicKeyInfo(
-            final ASN1ObjectIdentifier curveOid,
-            final byte[] encoded)
+    private static void checkECSubjectPublicKeyInfo(final ASN1ObjectIdentifier curveOid, final byte[] encoded)
     throws BadCertTemplateException {
         Integer expectedLength = EC_CURVEFIELD_SIZES.get(curveOid);
         if (expectedLength == null) {

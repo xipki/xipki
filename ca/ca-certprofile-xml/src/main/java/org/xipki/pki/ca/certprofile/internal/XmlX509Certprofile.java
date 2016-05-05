@@ -284,8 +284,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
     } // method reset
 
     @Override
-    public void initialize(
-            final String data)
+    public void initialize(final String data)
     throws CertprofileException {
         ParamUtil.requireNonBlank("data", data);
 
@@ -299,8 +298,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         }
     } // method initialize
 
-    private void doInitialize(
-            final String data)
+    private void doInitialize(final String data)
     throws CertprofileException {
         byte[] bytes;
         try {
@@ -327,8 +325,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
             this.signatureAlgorithms = new ArrayList<>(algoNames.size());
             for (String algoName : algoNames) {
                 try {
-                    this.signatureAlgorithms.add(
-                            AlgorithmUtil.canonicalizeSignatureAlgo(algoName));
+                    this.signatureAlgorithms.add(AlgorithmUtil.canonicalizeSignatureAlgo(algoName));
                 } catch (NoSuchAlgorithmException ex) {
                     throw new CertprofileException(ex.getMessage(), ex);
                 }
@@ -1060,8 +1057,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
     }
 
     @Override
-    public String getParameter(
-            final String paramName) {
+    public String getParameter(final String paramName) {
         return (parameters == null)
                 ? null
                 : parameters.get(paramName);
@@ -1070,10 +1066,8 @@ class XmlX509Certprofile extends BaseX509Certprofile {
     @Override
     public ExtensionValues getExtensions(
             final Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
-            final X500Name requestedSubject,
-            final Extensions requestedExtensions,
-            final Date notBefore,
-            final Date notAfter)
+            final X500Name requestedSubject, final Extensions requestedExtensions,
+            final Date notBefore, final Date notAfter)
     throws CertprofileException, BadCertTemplateException {
         ExtensionValues values = new ExtensionValues();
         if (CollectionUtil.isEmpty(extensionOccurences)) {
@@ -1454,12 +1448,9 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         return specialBehavior;
     }
 
-    private ExtensionValue createAdmission(
-            final boolean critical,
-            final List<ASN1ObjectIdentifier> professionOids,
-            final List<String> professionItems,
-            final String registrationNumber,
-            final byte[] addProfessionInfo)
+    private ExtensionValue createAdmission(final boolean critical,
+            final List<ASN1ObjectIdentifier> professionOids, final List<String> professionItems,
+            final String registrationNumber, final byte[] addProfessionInfo)
     throws CertprofileException {
         if (CollectionUtil.isEmpty(professionItems)
                 && CollectionUtil.isEmpty(professionOids)
@@ -1546,10 +1537,8 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         return incSerialNoIfSubjectExists;
     }
 
-    private static Object getExtensionValue(
-            final ASN1ObjectIdentifier type,
-            final ExtensionsType extensionsType,
-            final Class<?> expectedClass)
+    private static Object getExtensionValue(final ASN1ObjectIdentifier type,
+            final ExtensionsType extensionsType, final Class<?> expectedClass)
     throws CertprofileException {
         for (ExtensionType m : extensionsType.getExtension()) {
             if (!m.getType().getValue().equals(type.getId())) {
@@ -1578,8 +1567,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                 + ObjectIdentifiers.oidToDisplayName(type));
     } // method getExtensionValue
 
-    private static ASN1Encodable readAsn1Encodable(
-            final byte[] encoded)
+    private static ASN1Encodable readAsn1Encodable(final byte[] encoded)
     throws CertprofileException {
         ASN1StreamParser parser = new ASN1StreamParser(encoded);
         try {

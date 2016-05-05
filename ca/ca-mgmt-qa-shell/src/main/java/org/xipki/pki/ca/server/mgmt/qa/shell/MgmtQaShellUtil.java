@@ -51,10 +51,7 @@ public class MgmtQaShellUtil {
     private MgmtQaShellUtil() {
     }
 
-    public static void assertEquals(
-            final String desc,
-            final String ex,
-            final String is)
+    public static void assertEquals(final String desc, final String ex, final String is)
     throws CmdFailure {
 
         String tmpEx = ex;
@@ -74,9 +71,7 @@ public class MgmtQaShellUtil {
         }
     }
 
-    public static void assertEquals(
-            final String desc,
-            final Collection<?> ex, Collection<?> is)
+    public static void assertEquals(final String desc, final Collection<?> ex, Collection<?> is)
     throws CmdFailure {
         boolean bo;
         if (ex == null) {

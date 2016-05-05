@@ -120,28 +120,24 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
 
     private P11PrivateKey signingKey;
 
-    protected P11RSADigestSignatureSpi(
-            final Digest digest) {
+    protected P11RSADigestSignatureSpi(final Digest digest) {
         this.digest = digest;
         this.digestAlgId = null;
     }
 
-    protected P11RSADigestSignatureSpi(
-            final HashAlgoType digestAlg) {
+    protected P11RSADigestSignatureSpi(final HashAlgoType digestAlg) {
         this.digestAlgId = digestAlg.getAlgorithmIdentifier();
         this.digest = digestAlg.createDigest();
     }
 
     @Override
-    protected void engineInitVerify(
-            final PublicKey publicKey)
+    protected void engineInitVerify(final PublicKey publicKey)
     throws InvalidKeyException {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     @Override
-    protected void engineInitSign(
-            final PrivateKey privateKey)
+    protected void engineInitSign(final PrivateKey privateKey)
     throws InvalidKeyException {
         if (!(privateKey instanceof P11PrivateKey)) {
             throw new InvalidKeyException("privateKey is not instanceof "
@@ -158,17 +154,13 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected void engineUpdate(
-            final byte input)
+    protected void engineUpdate(final byte input)
     throws SignatureException {
         digest.update(input);
     }
 
     @Override
-    protected void engineUpdate(
-            final byte[] input,
-            final int off,
-            final int len)
+    protected void engineUpdate(final byte[] input, final int off, final int len)
     throws SignatureException {
         digest.update(input, off, len);
     }
@@ -190,28 +182,23 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected boolean engineVerify(
-            final byte[] sigBytes)
+    protected boolean engineVerify(final byte[] sigBytes)
     throws SignatureException {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     @Override
-    protected void engineSetParameter(
-            final AlgorithmParameterSpec params) {
+    protected void engineSetParameter(final AlgorithmParameterSpec params) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
     @Override
-    protected void engineSetParameter(
-            final String param,
-            final Object value) {
+    protected void engineSetParameter(final String param, final Object value) {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
 
     @Override
-    protected Object engineGetParameter(
-            final String param) {
+    protected Object engineGetParameter(final String param) {
         return null;
     }
 
@@ -220,8 +207,7 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
         return null;
     }
 
-    private byte[] derEncode(
-            final byte[] hash)
+    private byte[] derEncode(final byte[] hash)
     throws IOException {
         if (digestAlgId == null) {
             // For raw RSA, the DigestInfo must be prepared externally

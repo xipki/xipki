@@ -60,9 +60,7 @@ public class DataSourceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataSourceFactory.class);
 
-    public DataSourceWrapper createDataSourceForFile(
-            final String name,
-            final String confFile,
+    public DataSourceWrapper createDataSourceForFile(final String name, final String confFile,
             final PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException {
         ParamUtil.requireNonNull("confFile", confFile);
@@ -70,9 +68,7 @@ public class DataSourceFactory {
         return createDataSource(name, fileIn, passwordResolver);
     }
 
-    public DataSourceWrapper createDataSource(
-            final String name,
-            final InputStream conf,
+    public DataSourceWrapper createDataSource(final String name, final InputStream conf,
             final PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException, IOException {
         ParamUtil.requireNonNull("conf", conf);
@@ -90,9 +86,7 @@ public class DataSourceFactory {
         return createDataSource(name, config, passwordResolver);
     } // method createDataSource
 
-    public DataSourceWrapper createDataSource(
-            final String name,
-            final Properties conf,
+    public DataSourceWrapper createDataSource(final String name, final Properties conf,
             final PasswordResolver passwordResolver)
     throws DataAccessException, PasswordResolverException {
         ParamUtil.requireNonNull("conf", conf);
@@ -131,8 +125,7 @@ public class DataSourceFactory {
         return DataSourceWrapper.createDataSource(name, conf, databaseType);
     } // method createDataSource
 
-    private static String expandFilepath(
-            final String path) {
+    private static String expandFilepath(final String path) {
         if (path.startsWith("~" + File.separator)) {
             return System.getProperty("user.home") + path.substring(1);
         } else {

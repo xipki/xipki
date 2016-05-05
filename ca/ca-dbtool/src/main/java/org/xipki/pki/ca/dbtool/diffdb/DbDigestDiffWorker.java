@@ -82,16 +82,10 @@ public class DbDigestDiffWorker extends DbPortWorker {
 
     private final NumThreads numThreads;
 
-    public DbDigestDiffWorker(
-            final DataSourceFactory datasourceFactory,
-            final PasswordResolver passwordResolver,
-            final boolean revokedOnly,
-            final String refDirname,
-            final String refDbConfFile,
-            final String dbConfFile,
-            final String reportDirName,
-            final int numCertsPerSelect,
-            final NumThreads numThreads,
+    public DbDigestDiffWorker(final DataSourceFactory datasourceFactory,
+            final PasswordResolver passwordResolver, final boolean revokedOnly,
+            final String refDirname, final String refDbConfFile, final String dbConfFile,
+            final String reportDirName, final int numCertsPerSelect, final NumThreads numThreads,
             final Set<byte[]> includeCaCerts)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);

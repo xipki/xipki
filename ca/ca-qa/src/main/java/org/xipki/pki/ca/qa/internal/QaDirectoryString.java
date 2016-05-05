@@ -50,9 +50,7 @@ public class QaDirectoryString {
 
     private final String text;
 
-    public QaDirectoryString(
-            final DirectoryStringType type,
-            final String text) {
+    public QaDirectoryString(final DirectoryStringType type, final String text) {
         this.type = ParamUtil.requireNonNull("type", type);
         this.text = ParamUtil.requireNonBlank("text", text);
     }

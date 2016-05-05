@@ -81,11 +81,8 @@ public class CaLoadTestEnroll extends LoadExecutor {
 
     private final int num;
 
-    public CaLoadTestEnroll(
-            final CaClient caClient,
-            final LoadTestEntry loadtestEntry,
-            final int num,
-            final String description) {
+    public CaLoadTestEnroll(final CaClient caClient, final LoadTestEntry loadtestEntry,
+            final int num, final String description) {
         super(description);
         this.num = ParamUtil.requireMin("num", num, 1);
         this.loadtestEntry = ParamUtil.requireNonNull("loadtestEntry", loadtestEntry);
@@ -110,8 +107,7 @@ public class CaLoadTestEnroll extends LoadExecutor {
             }
         }
 
-        private boolean testNext(
-                final Map<Integer, CertRequest> certRequests) {
+        private boolean testNext(final Map<Integer, CertRequest> certRequests) {
             EnrollCertResult result;
             try {
                 EnrollCertRequest request = new EnrollCertRequest(Type.CERT_REQ);

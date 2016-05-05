@@ -84,9 +84,7 @@ public class DbDigestReporter {
 
     private AtomicInteger numError = new AtomicInteger(0);
 
-    public DbDigestReporter(
-            final String reportDirname,
-            final byte[] caCertBytes)
+    public DbDigestReporter(final String reportDirname, final byte[] caCertBytes)
     throws IOException {
         this.reportDirname = ParamUtil.requireNonBlank("reportDirname", reportDirname);
         File dir = new File(reportDirname);
@@ -115,30 +113,25 @@ public class DbDigestReporter {
         return reportDirname;
     }
 
-    public void addMissing(
-            final long serialNumber)
+    public void addMissing(final long serialNumber)
     throws IOException {
         numMissing.incrementAndGet();
         writeSerialNumberLine(missingWriter, serialNumber);
     }
 
-    public void addGood(
-            final long serialNumber)
+    public void addGood(final long serialNumber)
     throws IOException {
         numGood.incrementAndGet();
         writeSerialNumberLine(goodWriter, serialNumber);
     }
 
-    public void addUnexpected(
-            final long serialNumber)
+    public void addUnexpected(final long serialNumber)
     throws IOException {
         numUnexpected.incrementAndGet();
         writeSerialNumberLine(unexpectedWriter, serialNumber);
     }
 
-    public void addDiff(
-            final DbDigestEntry refCert,
-            final DbDigestEntry targetCert)
+    public void addDiff(final DbDigestEntry refCert, final DbDigestEntry targetCert)
     throws IOException {
         ParamUtil.requireNonNull("refCert", refCert);
         ParamUtil.requireNonNull("targetCert", targetCert);
@@ -159,8 +152,7 @@ public class DbDigestReporter {
         }
     }
 
-    public void addError(
-            final String errorMessage)
+    public void addError(final String errorMessage)
     throws IOException {
         ParamUtil.requireNonNull("errorMessage", errorMessage);
 
@@ -225,9 +217,7 @@ public class DbDigestReporter {
         }
     } // method close
 
-    private static void writeSerialNumberLine(
-            final BufferedWriter writer,
-            final long serialNumber)
+    private static void writeSerialNumberLine(final BufferedWriter writer, final long serialNumber)
     throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append(serialNumber).append('\n');
@@ -237,8 +227,7 @@ public class DbDigestReporter {
         }
     }
 
-    private static void closeWriter(
-            final Writer writer) {
+    private static void closeWriter(final Writer writer) {
         try {
             writer.close();
         } catch (Exception ex) {

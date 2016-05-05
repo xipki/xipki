@@ -48,19 +48,15 @@ public abstract class OcspResponseException extends Exception {
     public OcspResponseException() {
     }
 
-    public OcspResponseException(
-            final String message) {
+    public OcspResponseException(final String message) {
         super(message);
     }
 
-    public OcspResponseException(
-            final Throwable cause) {
+    public OcspResponseException(final Throwable cause) {
         super(cause);
     }
 
-    public OcspResponseException(
-            final String message,
-            final Throwable cause) {
+    public OcspResponseException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

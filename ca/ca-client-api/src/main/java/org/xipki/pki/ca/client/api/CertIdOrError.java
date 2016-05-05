@@ -51,14 +51,12 @@ public class CertIdOrError {
 
     private final PkiStatusInfo error;
 
-    public CertIdOrError(
-            final CertId certId) {
+    public CertIdOrError(final CertId certId) {
         this.certId = ParamUtil.requireNonNull("certId", certId);
         this.error = null;
     }
 
-    public CertIdOrError(
-            final PkiStatusInfo error) {
+    public CertIdOrError(final PkiStatusInfo error) {
         this.certId = null;
         this.error = ParamUtil.requireNonNull("error", error);
     }

@@ -52,9 +52,7 @@ public class SignatureAlgoControl {
         this.ecdsaPlain = false;
     }
 
-    public SignatureAlgoControl(
-            final boolean rsaMgf1,
-            final boolean ecdsaPlain) {
+    public SignatureAlgoControl(final boolean rsaMgf1, final boolean ecdsaPlain) {
         this.rsaMgf1 = rsaMgf1;
         this.ecdsaPlain = ecdsaPlain;
     }

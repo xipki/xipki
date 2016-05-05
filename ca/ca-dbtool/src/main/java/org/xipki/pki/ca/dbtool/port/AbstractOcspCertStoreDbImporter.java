@@ -74,43 +74,33 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
     protected static final String SQL_DEL_CRAW =
         "DELETE FROM CRAW WHERE ID>?";
 
-    AbstractOcspCertStoreDbImporter(
-            final DataSourceWrapper datasource,
-            final String srcDir,
-            final AtomicBoolean stopMe,
-            final boolean evaluateOnly)
+    AbstractOcspCertStoreDbImporter(final DataSourceWrapper datasource, final String srcDir,
+            final AtomicBoolean stopMe, final boolean evaluateOnly)
     throws Exception {
         super(datasource, srcDir, stopMe, evaluateOnly);
     }
 
-    protected String sha1(
-            final byte[] data) {
+    protected String sha1(final byte[] data) {
         return HashAlgoType.SHA1.base64Hash(data);
     }
 
-    protected String sha224(
-            final byte[] data) {
+    protected String sha224(final byte[] data) {
         return HashAlgoType.SHA224.base64Hash(data);
     }
 
-    protected String sha256(
-            final byte[] data) {
+    protected String sha256(final byte[] data) {
         return HashAlgoType.SHA256.base64Hash(data);
     }
 
-    protected String sha384(
-            final byte[] data) {
+    protected String sha384(final byte[] data) {
         return HashAlgoType.SHA384.base64Hash(data);
     }
 
-    protected String sha512(
-            final byte[] data) {
+    protected String sha512(final byte[] data) {
         return HashAlgoType.SHA512.base64Hash(data);
     }
 
-    protected void deleteCertGreatherThan(
-            final int id,
-            final Logger log) {
+    protected void deleteCertGreatherThan(final int id, final Logger log) {
         deleteFromTableWithLargerId("CRAW", "CID", id, log);
         deleteFromTableWithLargerId("CHASH", "CID", id, log);
         deleteFromTableWithLargerId("CERT", "ID", id, log);

@@ -48,19 +48,15 @@ public class OcspStoreException extends Exception {
     public OcspStoreException() {
     }
 
-    public OcspStoreException(
-            final String message) {
+    public OcspStoreException(final String message) {
         super(message);
     }
 
-    public OcspStoreException(
-            final Throwable cause) {
+    public OcspStoreException(final Throwable cause) {
         super(cause);
     }
 
-    public OcspStoreException(
-            final String message,
-            final Throwable cause) {
+    public OcspStoreException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

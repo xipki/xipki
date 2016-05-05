@@ -52,8 +52,7 @@ public enum Operation {
 
     private final String code;
 
-    Operation(
-            final String code) {
+    Operation(final String code) {
         this.code = code;
     }
 
@@ -61,8 +60,7 @@ public enum Operation {
         return code;
     }
 
-    public static Operation valueForCode(
-            final String code) {
+    public static Operation valueForCode(final String code) {
         ParamUtil.requireNonNull("code", code);
         for (Operation m : values()) {
             if (code.equalsIgnoreCase(m.code)) {

@@ -62,13 +62,11 @@ public class Asn1P11ObjectIdentifiers extends ASN1Object {
 
     private final List<Asn1P11ObjectIdentifier> objectIds;
 
-    public Asn1P11ObjectIdentifiers(
-            final List<Asn1P11ObjectIdentifier> objectIds) {
+    public Asn1P11ObjectIdentifiers(final List<Asn1P11ObjectIdentifier> objectIds) {
         this.objectIds = ParamUtil.requireNonNull("objectIds", objectIds);
     }
 
-    private Asn1P11ObjectIdentifiers(
-            final ASN1Sequence seq)
+    private Asn1P11ObjectIdentifiers(final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         this.objectIds = new LinkedList<>();
         final int size = seq.size();
@@ -77,8 +75,7 @@ public class Asn1P11ObjectIdentifiers extends ASN1Object {
         }
     }
 
-    public static Asn1P11ObjectIdentifiers getInstance(
-            final Object obj)
+    public static Asn1P11ObjectIdentifiers getInstance(final Object obj)
     throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1P11ObjectIdentifiers) {
             return (Asn1P11ObjectIdentifiers) obj;

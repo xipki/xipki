@@ -121,14 +121,12 @@ public class X509CertprofileQa {
 
     private final int maxSize;
 
-    public X509CertprofileQa(
-            final String data)
+    public X509CertprofileQa(final String data)
     throws CertprofileException {
         this(ParamUtil.requireNonNull("data", data).getBytes());
     }
 
-    public X509CertprofileQa(
-            final byte[] dataBytes)
+    public X509CertprofileQa(final byte[] dataBytes)
     throws CertprofileException {
         ParamUtil.requireNonNull("dataBytes", dataBytes);
         try {
@@ -172,11 +170,8 @@ public class X509CertprofileQa {
         }
     } // constructor
 
-    public ValidationResult checkCert(
-            final byte[] certBytes,
-            final X509IssuerInfo issuerInfo,
-            final X500Name requestedSubject,
-            final SubjectPublicKeyInfo requestedPublicKey,
+    public ValidationResult checkCert(final byte[] certBytes, final X509IssuerInfo issuerInfo,
+            final X500Name requestedSubject, final SubjectPublicKeyInfo requestedPublicKey,
             final Extensions requestedExtensions) {
         ParamUtil.requireNonNull("certBytes", certBytes);
         ParamUtil.requireNonNull("issuerInfo", issuerInfo);
@@ -196,9 +191,8 @@ public class X509CertprofileQa {
         if (maxSize > 0) {
             int size = certBytes.length;
             if (size > maxSize) {
-                issue.setFailureMessage(
-                    String.format("certificate exceeds the maximal allowed size: %d > %d",
-                            size, maxSize));
+                issue.setFailureMessage(String.format(
+                        "certificate exceeds the maximal allowed size: %d > %d", size, maxSize));
             }
         }
 
@@ -330,17 +324,13 @@ public class X509CertprofileQa {
         // issuer
         issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
         resultIssues.add(issue);
-        if (!cert.getIssuerX500Principal().equals(
-                issuerInfo.getCert().getSubjectX500Principal())) {
+        if (!cert.getIssuerX500Principal().equals(issuerInfo.getCert().getSubjectX500Principal())) {
             issue.setFailureMessage(
                     "issue in certificate does not equal the subject of CA certificate");
         }
 
         // subject
-        resultIssues.addAll(
-                subjectChecker.checkSubject(
-                bcCert.getSubject(),
-                requestedSubject));
+        resultIssues.addAll(subjectChecker.checkSubject(bcCert.getSubject(), requestedSubject));
 
         // issuerUniqueID
         issue = new ValidationIssue("X509.IssuerUniqueID", "issuerUniqueID");
@@ -363,8 +353,7 @@ public class X509CertprofileQa {
         return new ValidationResult(resultIssues);
     } // method checkCert
 
-    static Set<Range> buildParametersMap(
-            final RangesType ranges) {
+    static Set<Range> buildParametersMap(final RangesType ranges) {
         if (ranges == null) {
             return null;
         }

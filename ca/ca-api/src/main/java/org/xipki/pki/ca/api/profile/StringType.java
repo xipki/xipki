@@ -57,8 +57,7 @@ public enum StringType {
     bmpString,
     ia5String;
 
-    public ASN1Encodable createString(
-            final String text) {
+    public ASN1Encodable createString(final String text) {
         ParamUtil.requireNonNull("text", text);
 
         if (teletexString == this) {

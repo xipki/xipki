@@ -48,19 +48,15 @@ public class InvalidOcspResponseException extends OcspResponseException {
         super();
     }
 
-    public InvalidOcspResponseException(
-            final String message,
-            final Throwable cause) {
+    public InvalidOcspResponseException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public InvalidOcspResponseException(
-            final String message) {
+    public InvalidOcspResponseException(final String message) {
         super(message);
     }
 
-    public InvalidOcspResponseException(
-            final Throwable cause) {
+    public InvalidOcspResponseException(final Throwable cause) {
         super(cause);
     }
 

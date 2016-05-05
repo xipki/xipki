@@ -71,12 +71,8 @@ public class X509IssuerInfo {
 
     private final byte[] ski;
 
-    public X509IssuerInfo(
-            final List<String> caIssuerUrls,
-            final List<String> ocspUrls,
-            final List<String> crlUrls,
-            final List<String> deltaCrlUrls,
-            final byte[] certBytes)
+    public X509IssuerInfo(final List<String> caIssuerUrls, final List<String> ocspUrls,
+            final List<String> crlUrls, final List<String> deltaCrlUrls, final byte[] certBytes)
     throws CertificateException {
         ParamUtil.requireNonNull("certBytes", certBytes);
 

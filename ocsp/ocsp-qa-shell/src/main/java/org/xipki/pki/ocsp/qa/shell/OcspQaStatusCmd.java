@@ -131,10 +131,8 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
     private Occurrence expectedNonceOccurrence;
 
     @Override
-    protected void checkParameters(
-            final X509Certificate respIssuer,
-            final List<BigInteger> serialNumbers,
-            final Map<BigInteger, byte[]> encodedCerts)
+    protected void checkParameters(final X509Certificate respIssuer,
+            final List<BigInteger> serialNumbers, final Map<BigInteger, byte[]> encodedCerts)
     throws Exception {
         ParamUtil.requireNonEmpty("serialNunmbers", serialNumbers);
 
@@ -182,12 +180,9 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
     } // method checkParameters
 
     @Override
-    protected Object processResponse(
-            final OCSPResp response,
-            final X509Certificate respIssuer,
-            final IssuerHash issuerHash,
-            final List<BigInteger> serialNumbers,
-            final Map<BigInteger, byte[]> encodedCerts)
+    protected Object processResponse(final OCSPResp response, final X509Certificate respIssuer,
+            final IssuerHash issuerHash, final List<BigInteger> serialNumbers, final Map<BigInteger,
+            byte[]> encodedCerts)
     throws Exception {
         OcspResponseOption responseOption = new OcspResponseOption();
         responseOption.setNextUpdateOccurrence(expectedNextUpdateOccurrence);
@@ -232,9 +227,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
         return null;
     } // method processResponse
 
-    private static void format(
-            final ValidationIssue issue,
-            final String prefix,
+    private static void format(final ValidationIssue issue, final String prefix,
             final StringBuilder sb) {
         sb.append(prefix);
         sb.append(issue.getCode());
@@ -249,8 +242,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
         }
     }
 
-    private static Occurrence getOccurrence(
-            final String text)
+    private static Occurrence getOccurrence(final String text)
     throws IllegalCmdParamException {
         Occurrence ret = Occurrence.getInstance(text);
         if (ret == null) {

@@ -85,9 +85,7 @@ public class CaEntry {
 
     private int numInCsvFile;
 
-    public CaEntry(
-            final int caId,
-            final String caDir)
+    public CaEntry(final int caId, final String caDir)
     throws IOException {
         ParamUtil.requireNonNull("caDir", caDir);
 
@@ -105,9 +103,7 @@ public class CaEntry {
         return caId;
     }
 
-    public void addDigestEntry(
-            final int id,
-            final DbDigestEntry reportEntry)
+    public void addDigestEntry(final int id, final DbDigestEntry reportEntry)
     throws IOException, InvalidDataObjectException {
         ParamUtil.requireNonNull("reportEntry", reportEntry);
 

@@ -50,8 +50,7 @@ import org.xipki.commons.common.ObjectCreationException;
 
 public interface SignerFactory {
 
-    boolean canCreateSigner(
-            @Nonnull String type);
+    boolean canCreateSigner(@Nonnull String type);
 
     /**
      *
@@ -62,9 +61,7 @@ public interface SignerFactory {
      * @return new signer.
      * @throws ObjectCreationException if signer could not be created.
      */
-    ConcurrentContentSigner newSigner(
-            @Nonnull String type,
-            @Nullable SignerConf conf,
+    ConcurrentContentSigner newSigner(@Nonnull String type, @Nullable SignerConf conf,
             @Nullable X509Certificate[] certificateChain)
     throws ObjectCreationException;
 

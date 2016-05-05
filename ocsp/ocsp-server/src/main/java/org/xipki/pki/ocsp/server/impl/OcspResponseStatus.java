@@ -52,8 +52,7 @@ public enum OcspResponseStatus {
 
     private final int status;
 
-    OcspResponseStatus(
-            final int status) {
+    OcspResponseStatus(final int status) {
         this.status = status;
     }
 
@@ -61,8 +60,7 @@ public enum OcspResponseStatus {
         return status;
     }
 
-    public static OcspResponseStatus getOcspResponseStatus(
-            final int status) {
+    public static OcspResponseStatus getOcspResponseStatus(final int status) {
         for (OcspResponseStatus entry : values()) {
             if (entry.status == status) {
                 return entry;

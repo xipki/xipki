@@ -257,8 +257,7 @@ public class ExtensionsChecker {
 
     private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
-    public ExtensionsChecker(
-            final X509ProfileType conf)
+    public ExtensionsChecker(final X509ProfileType conf)
     throws CertprofileException {
         ParamUtil.requireNonNull("conf", conf);
         try {
@@ -378,8 +377,8 @@ public class ExtensionsChecker {
             if (extensionControls.containsKey(type)) {
                 org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints extConf =
                     (org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints) getExtensionValue(
-                        type, extensionsType,
-                        org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints.class);
+                            type, extensionsType,
+                            org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints.class);
                 if (extConf != null) {
                     this.nameConstraints = new QaNameConstraints(extConf);
                 }
@@ -577,10 +576,8 @@ public class ExtensionsChecker {
         }
     } // constructor
 
-    public List<ValidationIssue> checkExtensions(
-            final Certificate cert,
-            final X509IssuerInfo issuerInfo,
-            final Extensions requestExtensions) {
+    public List<ValidationIssue> checkExtensions(final Certificate cert,
+            final X509IssuerInfo issuerInfo, final Extensions requestExtensions) {
         ParamUtil.requireNonNull("cert", cert);
         ParamUtil.requireNonNull("issuerInfo", issuerInfo);
 
@@ -771,10 +768,8 @@ public class ExtensionsChecker {
         return result;
     } // method checkExtensions
 
-    private byte[] getExpectedExtValue(
-            final ASN1ObjectIdentifier type,
-            final Extensions requestExtensions,
-            final ExtensionControl extControl) {
+    private byte[] getExpectedExtValue(final ASN1ObjectIdentifier type,
+            final Extensions requestExtensions, final ExtensionControl extControl) {
         if (extControl.isRequest() && requestExtensions != null) {
             Extension reqExt = requestExtensions.getExtension(type);
             if (reqExt != null) {
@@ -788,10 +783,8 @@ public class ExtensionsChecker {
         return null;
     } // getExpectedExtValue
 
-    private Set<ASN1ObjectIdentifier> getExensionTypes(
-            final Certificate cert,
-            final X509IssuerInfo issuerInfo,
-            final Extensions requestedExtensions) {
+    private Set<ASN1ObjectIdentifier> getExensionTypes(final Certificate cert,
+            final X509IssuerInfo issuerInfo, final Extensions requestedExtensions) {
         Set<ASN1ObjectIdentifier> types = new HashSet<>();
         // profile required extension types
         for (ASN1ObjectIdentifier oid : extensionControls.keySet()) {
@@ -992,8 +985,7 @@ public class ExtensionsChecker {
         return types;
     } // method getExensionTypes
 
-    private ValidationIssue createExtensionIssue(
-            final ASN1ObjectIdentifier extId) {
+    private ValidationIssue createExtensionIssue(final ASN1ObjectIdentifier extId) {
         ValidationIssue issue;
         String extName = ObjectIdentifiers.getName(extId);
         if (extName == null) {
@@ -1006,8 +998,7 @@ public class ExtensionsChecker {
         return issue;
     } // method createExtensionIssue
 
-    private void checkExtensionBasicConstraints(
-            final StringBuilder failureMsg,
+    private void checkExtensionBasicConstraints(final StringBuilder failureMsg,
             final byte[] extensionValue) {
         BasicConstraints bc = BasicConstraints.getInstance(extensionValue);
         boolean ca = (X509CertLevel.RootCA == certLevel) || (X509CertLevel.SubCA == certLevel);
@@ -1040,10 +1031,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionBasicConstraints
 
-    private void checkExtensionSubjectKeyIdentifier(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final SubjectPublicKeyInfo subjectPublicKeyInfo) {
+    private void checkExtensionSubjectKeyIdentifier(final StringBuilder failureMsg,
+            final byte[] extensionValue, final SubjectPublicKeyInfo subjectPublicKeyInfo) {
         // subjectKeyIdentifier
         SubjectKeyIdentifier asn1 = SubjectKeyIdentifier.getInstance(extensionValue);
         byte[] ski = asn1.getKeyIdentifier();
@@ -1059,10 +1048,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionSubjectKeyIdentifier
 
-    private void checkExtensionIssuerKeyIdentifier(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final X509IssuerInfo issuerInfo) {
+    private void checkExtensionIssuerKeyIdentifier(final StringBuilder failureMsg,
+            final byte[] extensionValue, final X509IssuerInfo issuerInfo) {
         AuthorityKeyIdentifier asn1 = AuthorityKeyIdentifier.getInstance(extensionValue);
         byte[] keyIdentifier = asn1.getKeyIdentifier();
         if (keyIdentifier == null) {
@@ -1145,10 +1132,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionIssuerKeyIdentifier
 
-    private void checkExtensionNameConstraints(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionNameConstraints(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         QaNameConstraints conf = nameConstraints;
 
@@ -1179,10 +1164,8 @@ public class ExtensionsChecker {
                 conf.getExcludedSubtrees());
     } // method checkExtensionNameConstraints
 
-    private void checkExtensionNameConstraintsSubtrees(
-            final StringBuilder failureMsg,
-            final String description,
-            final GeneralSubtree[] subtrees,
+    private void checkExtensionNameConstraintsSubtrees(final StringBuilder failureMsg,
+            final String description, final GeneralSubtree[] subtrees,
             final List<QaGeneralSubtree> expectedSubtrees) {
         int isSize = (subtrees == null)
                 ? 0
@@ -1272,10 +1255,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionNameConstraintsSubtrees
 
-    private void checkExtensionPolicyConstraints(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionPolicyConstraints(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         QaPolicyConstraints conf = policyConstraints;
         if (conf == null) {
@@ -1345,12 +1326,9 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionPolicyConstraints
 
-    private void checkExtensionKeyUsage(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final boolean[] usages,
-            final Extensions requestExtensions,
-            final ExtensionControl extControl) {
+    private void checkExtensionKeyUsage(final StringBuilder failureMsg,
+            final byte[] extensionValue, final boolean[] usages,
+            final Extensions requestExtensions, final ExtensionControl extControl) {
         int len = usages.length;
 
         if (len > 9) {
@@ -1410,10 +1388,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionKeyUsage
 
-    private void checkExtensionExtendedKeyUsage(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionExtendedKeyUsage(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         Set<String> isUsages = new HashSet<>();
         org.bouncycastle.asn1.x509.ExtendedKeyUsage keyusage =
@@ -1473,10 +1449,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionExtendedKeyUsage
 
-    private void checkExtensionTlsFeature(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionTlsFeature(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         QaTlsFeature conf = tlsFeature;
         if (conf == null) {
@@ -1526,10 +1500,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionTlsFeature
 
-    private void checkExtensionCertificatePolicies(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionCertificatePolicies(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         QaCertificatePolicies conf = certificatePolicies;
         if (conf == null) {
@@ -1635,10 +1607,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionCertificatePolicies
 
-    private void checkExtensionPolicyMappings(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionPolicyMappings(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         QaPolicyMappingsOption conf = policyMappings;
         if (conf == null) {
@@ -1696,10 +1666,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionPolicyMappings
 
-    private void checkExtensionInhibitAnyPolicy(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionInhibitAnyPolicy(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         QaInhibitAnyPolicy conf = inhibitAnyPolicy;
         if (conf == null) {
@@ -1729,10 +1697,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionInhibitAnyPolicy
 
-    private void checkExtensionSubjectAltName(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionSubjectAltName(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         Set<GeneralNameMode> conf = allowedSubjectAltNameModes;
         if (conf == null) {
@@ -1790,10 +1756,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionSubjectAltName
 
-    private void checkExtensionSubjectInfoAccess(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionSubjectInfoAccess(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> conf = allowedSubjectInfoAccessModes;
         if (conf == null) {
@@ -1891,13 +1855,10 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionSubjectInfoAccess
 
-    private void checkExtensionIssuerAltNames(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final X509IssuerInfo issuerInfo) {
-        Extension caSubjectAltExtension =
-                issuerInfo.getBcCert().getTBSCertificate().getExtensions().getExtension(
-                        Extension.subjectAlternativeName);
+    private void checkExtensionIssuerAltNames(final StringBuilder failureMsg,
+            final byte[] extensionValue, final X509IssuerInfo issuerInfo) {
+        Extension caSubjectAltExtension = issuerInfo.getBcCert().getTBSCertificate().getExtensions()
+                .getExtension(Extension.subjectAlternativeName);
         if (caSubjectAltExtension == null) {
             failureMsg.append("issuerAlternativeName is present but expected 'none'");
             failureMsg.append("; ");
@@ -1914,10 +1875,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionIssuerAltNames
 
-    private void checkExtensionCrlDistributionPoints(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final X509IssuerInfo issuerInfo) {
+    private void checkExtensionCrlDistributionPoints(final StringBuilder failureMsg,
+            final byte[] extensionValue, final X509IssuerInfo issuerInfo) {
         CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
         DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
         int len = (isDistributionPoints == null)
@@ -1981,10 +1940,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionCrlDistributionPoints
 
-    private void checkExtensionDeltaCrlDistributionPoints(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final X509IssuerInfo issuerInfo) {
+    private void checkExtensionDeltaCrlDistributionPoints(final StringBuilder failureMsg,
+            final byte[] extensionValue, final X509IssuerInfo issuerInfo) {
         CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
         DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
         int len = (isDistributionPoints == null)
@@ -2050,10 +2007,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionDeltaCrlDistributionPoints
 
-    private void checkExtensionAdmission(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionAdmission(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         QaAdmission conf = admission;
         if (conf == null) {
@@ -2184,10 +2139,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionAdmission
 
-    private void checkExtensionAuthorityInfoAccess(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final X509IssuerInfo issuerInfo) {
+    private void checkExtensionAuthorityInfoAccess(final StringBuilder failureMsg,
+            final byte[] extensionValue, final X509IssuerInfo issuerInfo) {
         Set<String> expCaIssuerUris;
         if (aiaControl == null || aiaControl.includesCaIssuers()) {
             expCaIssuerUris = issuerInfo.getCaIssuerUrls();
@@ -2213,8 +2166,7 @@ public class ExtensionsChecker {
         checkAia(failureMsg, isAia, X509ObjectIdentifiers.id_ad_ocsp, expOcspUris);
     } // method checkExtensionAuthorityInfoAccess
 
-    private void checkExtensionOcspNocheck(
-            final StringBuilder failureMsg,
+    private void checkExtensionOcspNocheck(final StringBuilder failureMsg,
             final byte[] extensionValue) {
         if (!Arrays.equals(DER_NULL, extensionValue)) {
             failureMsg.append("value is not DER NULL");
@@ -2222,31 +2174,24 @@ public class ExtensionsChecker {
         }
     }
 
-    private void checkExtensionRestriction(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionRestriction(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         checkDirectoryString(ObjectIdentifiers.id_extension_restriction, restriction,
                 failureMsg, extensionValue, requestExtensions, extControl);
     }
 
-    private void checkExtensionAdditionalInformation(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionAdditionalInformation(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         checkDirectoryString(ObjectIdentifiers.id_extension_additionalInformation,
                 additionalInformation,
                 failureMsg, extensionValue, requestExtensions, extControl);
     }
 
-    private void checkDirectoryString(
-            final ASN1ObjectIdentifier extType,
-            final QaDirectoryString conf,
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkDirectoryString(final ASN1ObjectIdentifier extType,
+            final QaDirectoryString conf, final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         if (conf == null) {
             byte[] expected = getExpectedExtValue(extType,
@@ -2306,10 +2251,8 @@ public class ExtensionsChecker {
         }
     } // method checkDirectoryString
 
-    private void checkExtensionValidityModel(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionValidityModel(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         ASN1ObjectIdentifier conf = validityModelId;
         if (conf == null) {
@@ -2336,11 +2279,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionValidityModel
 
-    private void checkExtensionPrivateKeyUsagePeriod(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Date certNotBefore,
-            final Date certNotAfter) {
+    private void checkExtensionPrivateKeyUsagePeriod(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Date certNotBefore, final Date certNotAfter) {
         ASN1GeneralizedTime notBefore = new ASN1GeneralizedTime(certNotBefore);
         Date dateNotAfter;
         if (privateKeyUsagePeriod == null) {
@@ -2377,10 +2317,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionPrivateKeyUsagePeriod
 
-    private void checkExtensionQcStatements(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionQcStatements(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         QcStatements conf = qcStatements;
         if (conf == null) {
@@ -2569,10 +2507,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionQcStatements
 
-    private void checkExtensionBiometricInfo(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionBiometricInfo(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         BiometricInfoOption conf = biometricInfo;
 
@@ -2727,10 +2663,8 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionBiometricInfo
 
-    private void checkExtensionAuthorizationTemplate(
-            final StringBuilder failureMsg,
-            final byte[] extensionValue,
-            final Extensions requestExtensions,
+    private void checkExtensionAuthorizationTemplate(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         QaAuthorizationTemplate conf = authorizationTemplate;
 
@@ -2768,8 +2702,7 @@ public class ExtensionsChecker {
         }
     } // method checkExtensionAuthorizationTemplate
 
-    private Set<KeyUsageControl> getKeyusage(
-            final boolean required) {
+    private Set<KeyUsageControl> getKeyusage(final boolean required) {
         Set<KeyUsageControl> ret = new HashSet<>();
 
         Set<KeyUsageControl> controls = keyusages;
@@ -2783,8 +2716,7 @@ public class ExtensionsChecker {
         return ret;
     }
 
-    private Set<ExtKeyUsageControl> getExtKeyusage(
-            final boolean required) {
+    private Set<ExtKeyUsageControl> getExtKeyusage(final boolean required) {
         Set<ExtKeyUsageControl> ret = new HashSet<>();
 
         Set<ExtKeyUsageControl> controls = extendedKeyusages;
@@ -2798,17 +2730,14 @@ public class ExtensionsChecker {
         return ret;
     }
 
-    private byte[] getConstantExtensionValue(
-            final ASN1ObjectIdentifier type) {
+    private byte[] getConstantExtensionValue(final ASN1ObjectIdentifier type) {
         return (constantExtensions == null)
                 ? null
                 : constantExtensions.get(type).getValue();
     }
 
-    private Object getExtensionValue(
-            final ASN1ObjectIdentifier type,
-            final ExtensionsType extensionsType,
-            final Class<?> expectedClass)
+    private Object getExtensionValue(final ASN1ObjectIdentifier type,
+            final ExtensionsType extensionsType, final Class<?> expectedClass)
     throws CertprofileException {
         for (ExtensionType m : extensionsType.getExtension()) {
             if (!m.getType().getValue().equals(type.getId())) {
@@ -2876,8 +2805,7 @@ public class ExtensionsChecker {
         return Collections.unmodifiableMap(map);
     } // method buildConstantExtesions
 
-    private static ASN1Encodable readAsn1Encodable(
-            final byte[] encoded)
+    private static ASN1Encodable readAsn1Encodable(final byte[] encoded)
     throws CertprofileException {
         ASN1StreamParser parser = new ASN1StreamParser(encoded);
         try {
@@ -2887,13 +2815,11 @@ public class ExtensionsChecker {
         }
     }
 
-    private static String hex(
-            final byte[] bytes) {
+    private static String hex(final byte[] bytes) {
         return Hex.toHexString(bytes);
     }
 
-    private static Set<String> strInBnotInA(
-            final Collection<String> collectionA,
+    private static Set<String> strInBnotInA(final Collection<String> collectionA,
             final Collection<String> collectionB) {
         if (collectionB == null) {
             return Collections.emptySet();
@@ -2908,8 +2834,7 @@ public class ExtensionsChecker {
         return result;
     }
 
-    static Set<Range> buildParametersMap(
-            final RangesType ranges) {
+    static Set<Range> buildParametersMap(final RangesType ranges) {
         if (ranges == null) {
             return null;
         }
@@ -2923,8 +2848,7 @@ public class ExtensionsChecker {
         return ret;
     }
 
-    private static GeneralName createGeneralName(
-            final GeneralName reqName,
+    private static GeneralName createGeneralName(final GeneralName reqName,
             final Set<GeneralNameMode> modes)
     throws BadCertTemplateException {
         int tag = reqName.getTagNo();
@@ -2998,8 +2922,7 @@ public class ExtensionsChecker {
         } // end switch
     } // method createGeneralName
 
-    private static Set<String> getKeyUsage(
-            final byte[] extensionValue) {
+    private static Set<String> getKeyUsage(final byte[] extensionValue) {
         Set<String> usages = new HashSet<>();
         org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage =
                 org.bouncycastle.asn1.x509.KeyUsage.getInstance(extensionValue);
@@ -3012,8 +2935,7 @@ public class ExtensionsChecker {
         return usages;
     }
 
-    private static Set<String> getExtKeyUsage(
-            final byte[] extensionValue) {
+    private static Set<String> getExtKeyUsage(final byte[] extensionValue) {
         Set<String> usages = new HashSet<>();
         org.bouncycastle.asn1.x509.ExtendedKeyUsage reqKeyUsage =
                 org.bouncycastle.asn1.x509.ExtendedKeyUsage.getInstance(extensionValue);
@@ -3023,10 +2945,8 @@ public class ExtensionsChecker {
         return usages;
     }
 
-    private static void checkAia(
-            final StringBuilder failureMsg,
-            final AuthorityInformationAccess aia,
-            final ASN1ObjectIdentifier accessMethod,
+    private static void checkAia(final StringBuilder failureMsg,
+            final AuthorityInformationAccess aia, final ASN1ObjectIdentifier accessMethod,
             final Set<String> expectedUris) {
         String typeDesc;
         if (X509ObjectIdentifiers.id_ad_ocsp.equals(accessMethod)) {

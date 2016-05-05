@@ -51,8 +51,7 @@ public class RevokeCertRequest {
 
     private final List<RevokeCertRequestEntry> requestEntries = new LinkedList<>();
 
-    public boolean addRequestEntry(
-            final RevokeCertRequestEntry requestEntry) {
+    public boolean addRequestEntry(final RevokeCertRequestEntry requestEntry) {
         ParamUtil.requireNonNull("requestEntry", requestEntry);
         for (RevokeCertRequestEntry re : requestEntries) {
             if (re.getId().equals(requestEntry.getId())) {

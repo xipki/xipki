@@ -56,8 +56,7 @@ public class QaNameConstraints extends QaExtension {
 
     private final List<QaGeneralSubtree> excludedSubtrees;
 
-    public QaNameConstraints(
-            final NameConstraints jaxb) {
+    public QaNameConstraints(final NameConstraints jaxb) {
         ParamUtil.requireNonNull("jaxb", jaxb);
         if (jaxb.getPermittedSubtrees() != null
                 && CollectionUtil.isNonEmpty(jaxb.getPermittedSubtrees().getBase())) {

@@ -53,8 +53,7 @@ public class EnrollCertResult {
 
     private final Map<String, CertOrError> certificatesOrErrors;
 
-    public EnrollCertResult(
-            final Certificate caCertificate,
+    public EnrollCertResult(final Certificate caCertificate,
             final Map<String, CertOrError> certificatesOrErrors) {
         this.certificatesOrErrors = ParamUtil.requireNonEmpty("certificatesOrErrors",
                 certificatesOrErrors);
@@ -65,8 +64,7 @@ public class EnrollCertResult {
         return caCertificate;
     }
 
-    public CertOrError getCertificateOrError(
-            final String id) {
+    public CertOrError getCertificateOrError(final String id) {
         ParamUtil.requireNonBlank("id", id);
         return certificatesOrErrors.get(id);
     }

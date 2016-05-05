@@ -75,8 +75,7 @@ class X509CrlSignerEntryWrapper {
     X509CrlSignerEntryWrapper() {
     }
 
-    public void setDbEntry(
-            final X509CrlSignerEntry dbEntry)
+    public void setDbEntry(final X509CrlSignerEntry dbEntry)
     throws InvalidConfException {
         this.dbEntry = dbEntry;
         this.crlControl = new CrlControl(dbEntry.getCrlControl());
@@ -86,8 +85,7 @@ class X509CrlSignerEntryWrapper {
         return crlControl;
     }
 
-    public void initSigner(
-            final SecurityFactory securityFactory)
+    public void initSigner(final SecurityFactory securityFactory)
     throws XiSecurityException, OperationException, InvalidConfException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         if (signer != null) {

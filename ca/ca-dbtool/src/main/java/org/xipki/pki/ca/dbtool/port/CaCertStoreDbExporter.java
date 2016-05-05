@@ -121,15 +121,9 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
     private final boolean resume;
 
-    CaCertStoreDbExporter(
-            final DataSourceWrapper datasource,
-            final Marshaller marshaller,
-            final Unmarshaller unmarshaller,
-            final String baseDir,
-            final int numCertsInBundle,
-            final int numCertsPerSelect,
-            final boolean resume,
-            final AtomicBoolean stopMe,
+    CaCertStoreDbExporter(final DataSourceWrapper datasource, final Marshaller marshaller,
+            final Unmarshaller unmarshaller, final String baseDir, final int numCertsInBundle,
+            final int numCertsPerSelect, final boolean resume, final AtomicBoolean stopMe,
             final boolean evaluateOnly)
     throws DataAccessException {
         super(datasource, baseDir, stopMe, evaluateOnly);
@@ -202,8 +196,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
     } // method export
 
-    private Exception exportCrl(
-            final CertStoreType certstore) {
+    private Exception exportCrl(final CertStoreType certstore) {
         File tmpCrlsDir = new File(crlsDir);
         tmpCrlsDir.mkdirs();
 
@@ -224,9 +217,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
     } // method exportCrl
 
-    private void doExportCrl(
-            final CertStoreType certstore,
-            final FileOutputStream filenameListOs)
+    private void doExportCrl(final CertStoreType certstore, final FileOutputStream filenameListOs)
     throws Exception {
         System.out.println(getExportingText() + "table CRL");
 
@@ -397,8 +388,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(getExportedText() + sum + " CRLs from table CRL");
     } // method doExportCrl
 
-    private void exportCa(
-            final CertStoreType certstore)
+    private void exportCa(final CertStoreType certstore)
     throws DataAccessException, IOException {
         System.out.println("exporting table CS_CA");
         Cas cas = new Cas();
@@ -430,8 +420,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" exported table CS_CA");
     } // method exportCa
 
-    private void exportRequestor(
-            final CertStoreType certstore)
+    private void exportRequestor(final CertStoreType certstore)
     throws DataAccessException {
         System.out.println("exporting table CS_REQUESTOR");
         Requestors infos = new Requestors();
@@ -460,8 +449,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" exported table CS_REQUESTOR");
     } // method exportRequestor
 
-    private void exportPublisherinfo(
-            final CertStoreType certstore)
+    private void exportPublisherinfo(final CertStoreType certstore)
     throws DataAccessException {
         System.out.println("exporting table CS_PUBLISHER");
         Publishers infos = new Publishers();
@@ -490,8 +478,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" exported table CS_PUBLISHER");
     } // method exportPublisherinfo
 
-    private Exception exportUser(
-            final CertStoreType certstore) {
+    private Exception exportUser(final CertStoreType certstore) {
         File tmpUsersDir = new File(usersDir);
         tmpUsersDir.mkdirs();
 
@@ -512,9 +499,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
     } // method exportUser
 
-    private void doExportUser(
-            final CertStoreType certstore,
-            final FileOutputStream filenameListOs)
+    private void doExportUser(final CertStoreType certstore, final FileOutputStream filenameListOs)
     throws Exception {
         System.out.println(getExportingText() + "table USERNAME");
 
@@ -635,8 +620,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(getExportedText() + sum + " users from table USERNAME");
     } // method doExportUser
 
-    private void exportCertprofileinfo(
-            final CertStoreType certstore)
+    private void exportCertprofileinfo(final CertStoreType certstore)
     throws DataAccessException {
         System.out.println("exporting table CS_PROFILE");
         Profiles infos = new Profiles();
@@ -670,9 +654,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
      * @return exception instanceof {{@link DataAccessException}, {@link IOException} or
      * {@link JAXBException}.
      */
-    private Exception exportCert(
-            final CertStoreType certstore,
-            final File processLogFile) {
+    private Exception exportCert(final CertStoreType certstore, final File processLogFile) {
         File tmpCertsDir = new File(certsDir);
         tmpCertsDir.mkdirs();
 
@@ -693,9 +675,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
     } // method exportCert
 
-    private void doExportCert(
-            final CertStoreType certstore,
-            final File processLogFile,
+    private void doExportCert(final CertStoreType certstore, final File processLogFile,
             final FileOutputStream filenameListOs)
     throws Exception {
         final int numEntriesPerSelect = numCertsPerSelect;
@@ -919,8 +899,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(getExportedText() + sum + " certificates from tables CERT and CRAW");
     } // method doExportCert
 
-    private void exportPublishQueue(
-            final CertStoreType certstore)
+    private void exportPublishQueue(final CertStoreType certstore)
     throws DataAccessException, IOException, JAXBException {
         System.out.println("exporting table PUBLISHQUEUE");
 
@@ -972,8 +951,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" exported table PUBLISHQUEUE");
     } // method exportPublishQueue
 
-    private void exportDeltaCrlCache(
-            final CertStoreType certstore)
+    private void exportDeltaCrlCache(final CertStoreType certstore)
     throws DataAccessException, IOException, JAXBException {
         System.out.println("exporting table DELTACRL_CACHE");
 
@@ -1008,9 +986,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" exported table DELTACRL_CACHE");
     } // method exportDeltaCRLCache
 
-    private void finalizeZip(
-            final ZipOutputStream zipOutStream,
-            final String filename,
+    private void finalizeZip(final ZipOutputStream zipOutStream, final String filename,
             final DbiXmlWriter os)
     throws JAXBException, IOException, XMLStreamException {
         ZipEntry certZipEntry = new ZipEntry(filename);
@@ -1024,9 +1000,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         zipOutStream.close();
     }
 
-    private void finalizeZip(
-            final String zipFilename,
-            final CaUsersWriter os)
+    private void finalizeZip(final String zipFilename, final CaUsersWriter os)
     throws JAXBException, IOException, XMLStreamException {
         File zipFile = new File(baseDir, "tmp-users-" + System.currentTimeMillis() + ".zip");
         ZipOutputStream zipOutStream = getZipOutputStream(zipFile);
@@ -1043,9 +1017,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         zipFile.renameTo(new File(zipFilename));
     }
 
-    private static NameIdType createNameId(
-            final String name,
-            final int id) {
+    private static NameIdType createNameId(final String name, final int id) {
         NameIdType info = new NameIdType();
         info.setId(id);
         info.setName(name);

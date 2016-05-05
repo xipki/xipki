@@ -133,10 +133,7 @@ class CmpResponder {
         return versions;
     }
 
-    PKIMessage processPkiMessage(
-            final LocalP11CryptServicePool p11CryptServicePool,
-            final String moduleName,
-            final PKIMessage pkiMessage) {
+    PKIMessage processPkiMessage(final LocalP11CryptServicePool p11CryptServicePool, final String moduleName, final PKIMessage pkiMessage) {
         ParamUtil.requireNonNull("p11CryptServicePool", p11CryptServicePool);
         ParamUtil.requireNonNull("pkiMessage", pkiMessage);
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
@@ -230,11 +227,7 @@ class CmpResponder {
         }
     } // method processPkiMessage
 
-    private PKIMessage doProcessPkiMessage(
-            final LocalP11CryptServicePool p11CryptServicePool,
-            final String moduleName,
-            final InfoTypeAndValue itv,
-            final PKIHeader respHeader)
+    private PKIMessage doProcessPkiMessage(final LocalP11CryptServicePool p11CryptServicePool, final String moduleName, final InfoTypeAndValue itv, final PKIHeader respHeader)
     throws BadAsn1ObjectException, P11TokenException, CertificateException, XiSecurityException,
     InvalidKeyException {
         ASN1Sequence seq = Asn1Util.getSequence(itv.getInfoValue());
@@ -373,10 +366,7 @@ class CmpResponder {
         return new PKIMessage(respHeader, respBody);
     }
 
-    private PKIMessage createRejectionPkiMessage(
-            final PKIHeader header,
-            final int pkiFailureInfo,
-            final String statusMessage) {
+    private PKIMessage createRejectionPkiMessage(final PKIHeader header, final int pkiFailureInfo, final String statusMessage) {
         ErrorMsgContent emc = new ErrorMsgContent(
                 new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(statusMessage),
                 new PKIFailureInfo(pkiFailureInfo)));
@@ -392,16 +382,12 @@ class CmpResponder {
         return bytes;
     }
 
-    private P11Slot getSlot(
-            final P11CryptService p11Service,
-            final Asn1P11EntityIdentifier entityId)
+    private P11Slot getSlot(final P11CryptService p11Service, final Asn1P11EntityIdentifier entityId)
     throws P11TokenException {
         return p11Service.getModule().getSlot(entityId.getSlotId().getSlotId());
     }
 
-    private P11Slot getSlot(
-            final P11CryptService p11Service,
-            final Asn1P11SlotIdentifier slotId)
+    private P11Slot getSlot(final P11CryptService p11Service, final Asn1P11SlotIdentifier slotId)
     throws P11TokenException {
         return p11Service.getModule().getSlot(slotId.getSlotId());
     }

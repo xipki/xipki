@@ -72,9 +72,7 @@ public class HealthCheckServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(
-            final HttpServletRequest request,
-            final HttpServletResponse response)
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
         response.setHeader("Access-Control-Allow-Origin", "*");
         try {
@@ -144,8 +142,7 @@ public class HealthCheckServlet extends HttpServlet {
         response.flushBuffer();
     } // method doGet
 
-    public void setResponderManager(
-            final CmpResponderManager responderManager) {
+    public void setResponderManager(final CmpResponderManager responderManager) {
         this.responderManager = ParamUtil.requireNonNull("responderManager", responderManager);
     }
 

@@ -75,13 +75,9 @@ public class DbDigestExportWorker extends DbPortWorker {
 
     private final int numThreads;
 
-    public DbDigestExportWorker(
-            final DataSourceFactory datasourceFactory,
-            final PasswordResolver passwordResolver,
-            final String dbConfFile,
-            final String destFolder,
-            final int numCertsPerSelect,
-            final int numThreads)
+    public DbDigestExportWorker(final DataSourceFactory datasourceFactory,
+            final PasswordResolver passwordResolver, final String dbConfFile,
+            final String destFolder, final int numCertsPerSelect, final int numThreads)
     throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
         ParamUtil.requireNonNull("dbConfFile", dbConfFile);
@@ -141,8 +137,7 @@ public class DbDigestExportWorker extends DbPortWorker {
         }
     } // method doRun
 
-    public static DbSchemaType detectDbSchemaType(
-            final DataSourceWrapper datasource)
+    public static DbSchemaType detectDbSchemaType(final DataSourceWrapper datasource)
     throws DataAccessException {
         Connection conn = datasource.getConnection();
         try {

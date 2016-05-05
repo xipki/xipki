@@ -127,8 +127,7 @@ public class CrlControl implements Serializable {
         interval,
         onDemand;
 
-        public static UpdateMode getUpdateMode(
-                final String mode) {
+        public static UpdateMode getUpdateMode(final String mode) {
             ParamUtil.requireNonNull("mode", mode);
             for (UpdateMode v : values()) {
                 if (v.name().equalsIgnoreCase(mode)) {
@@ -149,9 +148,7 @@ public class CrlControl implements Serializable {
 
         private final int minute;
 
-        public HourMinute(
-                final int hour,
-                final int minute) {
+        public HourMinute(final int hour, final int minute) {
             this.hour = ParamUtil.requireRange("hour", hour, 0, 23);
             this.minute = ParamUtil.requireRange("minute", minute, 0, 59);
         }
@@ -262,8 +259,7 @@ public class CrlControl implements Serializable {
 
     private final Set<String> extensionOids;
 
-    public CrlControl(
-            final String conf)
+    public CrlControl(final String conf)
     throws InvalidConfException {
         ConfPairs props;
         try {
@@ -490,8 +486,7 @@ public class CrlControl implements Serializable {
     }
 
     @Override
-    public boolean equals(
-            final Object obj) {
+    public boolean equals(final Object obj) {
         if (!(obj instanceof CrlControl)) {
             return false;
         }
@@ -544,10 +539,7 @@ public class CrlControl implements Serializable {
         return true;
     } // method equals
 
-    private static int getInteger(
-            final ConfPairs props,
-            final String propKey,
-            final int dfltValue)
+    private static int getInteger(final ConfPairs props, final String propKey, final int dfltValue)
     throws InvalidConfException {
         String str = props.getValue(propKey);
         if (str != null) {
@@ -560,9 +552,7 @@ public class CrlControl implements Serializable {
         return dfltValue;
     }
 
-    private static boolean getBoolean(
-            final ConfPairs props,
-            final String propKey,
+    private static boolean getBoolean(final ConfPairs props, final String propKey,
             final boolean dfltValue)
     throws InvalidConfException {
         String str = props.getValue(propKey);

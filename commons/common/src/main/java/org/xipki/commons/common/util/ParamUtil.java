@@ -55,10 +55,7 @@ public class ParamUtil {
     private ParamUtil() {
     }
 
-    public static int requireMin(
-            @Nonnull final String objName,
-            final int obj,
-            final int min) {
+    public static int requireMin(@Nonnull final String objName, final int obj, final int min) {
         if (obj < min) {
             throw new IllegalArgumentException(String.format(
                     "%s must not be less than %d: %d", objName, min, obj));
@@ -66,10 +63,7 @@ public class ParamUtil {
         return obj;
     }
 
-    public static long requireMin(
-            @Nonnull final String objName,
-            final long obj,
-            final long min) {
+    public static long requireMin(@Nonnull final String objName, final long obj, final long min) {
         if (obj < min) {
             throw new IllegalArgumentException(String.format(
                     "%s must not be less than %d: %d", objName, min, obj));
@@ -77,10 +71,7 @@ public class ParamUtil {
         return obj;
     }
 
-    public static int requireMax(
-            @Nonnull final String objName,
-            final int obj,
-            final int max) {
+    public static int requireMax(@Nonnull final String objName, final int obj, final int max) {
         if (obj > max) {
             throw new IllegalArgumentException(String.format(
                     "%s must not be greater than %d: %d", objName, max, obj));
@@ -88,10 +79,7 @@ public class ParamUtil {
         return obj;
     }
 
-    public static long requireMax(
-            @Nonnull final String objName,
-            final long obj,
-            final long max) {
+    public static long requireMax(@Nonnull final String objName, final long obj, final long max) {
         if (obj > max) {
             throw new IllegalArgumentException(String.format(
                     "%s must not be greater than %d: %d", objName, max, obj));
@@ -99,10 +87,7 @@ public class ParamUtil {
         return obj;
     }
 
-    public static int requireRange(
-            @Nonnull final String objName,
-            final int obj,
-            final int min,
+    public static int requireRange(@Nonnull final String objName, final int obj, final int min,
             final int max) {
         if (obj < min || obj > max) {
             throw new IllegalArgumentException(String.format(
@@ -111,10 +96,7 @@ public class ParamUtil {
         return obj;
     }
 
-    public static long requireRange(
-            @Nonnull final String objName,
-            final long obj,
-            final long min,
+    public static long requireRange(@Nonnull final String objName, final long obj, final long min,
             final long max) {
         if (obj < min || obj > max) {
             throw new IllegalArgumentException(String.format(
@@ -123,15 +105,11 @@ public class ParamUtil {
         return obj;
     }
 
-    public static <T> T requireNonNull(
-            @Nonnull final String objName,
-            @Nonnull final T obj) {
+    public static <T> T requireNonNull(@Nonnull final String objName, @Nonnull final T obj) {
         return Objects.requireNonNull(obj, objName + " must not be null");
     }
 
-    public static String requireNonBlank(
-            @Nonnull final String objName,
-            @Nonnull final String obj) {
+    public static String requireNonBlank(@Nonnull final String objName, @Nonnull final String obj) {
         Objects.requireNonNull(obj, objName + " must not be null");
         if (obj.isEmpty()) {
             throw new IllegalArgumentException(objName + " must not be blank");
@@ -139,8 +117,7 @@ public class ParamUtil {
         return obj;
     }
 
-    public static <T> Collection<T> requireNonEmpty(
-            @Nonnull final String objName,
+    public static <T> Collection<T> requireNonEmpty(@Nonnull final String objName,
             @Nonnull final Collection<T> obj) {
         Objects.requireNonNull(obj, objName + " must not be null");
         if (obj.isEmpty()) {
@@ -149,8 +126,7 @@ public class ParamUtil {
         return obj;
     }
 
-    public static <T> Set<T> requireNonEmpty(
-            @Nonnull final String objName,
+    public static <T> Set<T> requireNonEmpty(@Nonnull final String objName,
             @Nonnull final Set<T> obj) {
         Objects.requireNonNull(obj, objName + " must not be null");
         if (obj.isEmpty()) {
@@ -159,8 +135,7 @@ public class ParamUtil {
         return obj;
     }
 
-    public static <T> List<T> requireNonEmpty(
-            @Nonnull final String objName,
+    public static <T> List<T> requireNonEmpty(@Nonnull final String objName,
             @Nonnull final List<T> obj) {
         Objects.requireNonNull(obj, objName + " must not be null");
         if (obj.isEmpty()) {
@@ -169,8 +144,7 @@ public class ParamUtil {
         return obj;
     }
 
-    public static <K,V> Map<K,V> requireNonEmpty(
-            @Nonnull final String objName,
+    public static <K,V> Map<K,V> requireNonEmpty(@Nonnull final String objName,
             @Nonnull final Map<K,V> obj) {
         Objects.requireNonNull(obj, objName + " must not be null");
         if (obj.isEmpty()) {
@@ -179,8 +153,7 @@ public class ParamUtil {
         return obj;
     }
 
-    public static <K,V> Dictionary<K,V> requireNonEmpty(
-            @Nonnull final String objName,
+    public static <K,V> Dictionary<K,V> requireNonEmpty(@Nonnull final String objName,
             @Nonnull final Dictionary<K,V> obj) {
         Objects.requireNonNull(obj, objName + " must not be null");
         if (obj.isEmpty()) {

@@ -56,8 +56,7 @@ public class IssuerStore {
 
     private final List<IssuerEntry> entries;
 
-    public IssuerStore(
-            final List<IssuerEntry> entries) {
+    public IssuerStore(final List<IssuerEntry> entries) {
         this.entries = new ArrayList<>(entries.size());
         Set<Integer> idSet = new HashSet<>(entries.size());
 
@@ -83,9 +82,7 @@ public class IssuerStore {
         return ids;
     }
 
-    public Integer getIssuerIdForFp(
-            final HashAlgoType hashAlgo,
-            final byte[] issuerNameHash,
+    public Integer getIssuerIdForFp(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {
         IssuerEntry issuerEntry = getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
         return (issuerEntry == null)
@@ -93,8 +90,7 @@ public class IssuerStore {
                 : issuerEntry.getId();
     }
 
-    public IssuerEntry getIssuerForId(
-            final int id) {
+    public IssuerEntry getIssuerForId(final int id) {
         for (IssuerEntry entry : entries) {
             if (entry.getId() == id) {
                 return entry;
@@ -104,9 +100,7 @@ public class IssuerStore {
         return null;
     }
 
-    public IssuerEntry getIssuerForFp(
-            final HashAlgoType hashAlgo,
-            final byte[] issuerNameHash,
+    public IssuerEntry getIssuerForFp(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {
         for (IssuerEntry entry : entries) {
             if (entry.matchHash(hashAlgo, issuerNameHash, issuerKeyHash)) {

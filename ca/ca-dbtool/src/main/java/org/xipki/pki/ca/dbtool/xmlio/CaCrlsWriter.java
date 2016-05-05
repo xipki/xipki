@@ -54,8 +54,7 @@ public class CaCrlsWriter extends DbiXmlWriter {
         super("crls", "1");
     }
 
-    public void add(
-            final CaCrlType crl)
+    public void add(final CaCrlType crl)
     throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("crl", crl);
         crl.validate();

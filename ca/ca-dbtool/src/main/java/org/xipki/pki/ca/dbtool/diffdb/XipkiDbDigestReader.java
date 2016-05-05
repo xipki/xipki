@@ -79,15 +79,9 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
     private PreparedStatement numCertStmt;
 
-    private XipkiDbDigestReader(
-            final DataSourceWrapper datasource,
-            final X509Certificate caCert,
-            final int totalAccount,
-            final int minId,
-            final int maxId,
-            final int numThreads,
-            final int numCertsToPredicate,
-            final StopMe stopMe)
+    private XipkiDbDigestReader(final DataSourceWrapper datasource, final X509Certificate caCert,
+            final int totalAccount, final int minId, final int maxId, final int numThreads,
+            final int numCertsToPredicate, final StopMe stopMe)
     throws Exception {
         super(datasource, caCert, totalAccount, minId, maxId, numThreads,
                 numCertsToPredicate, stopMe);
@@ -125,8 +119,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
             selectCertStmt = null;
         }
 
-        private void query(
-                final IdRange idRange) {
+        private void query(final IdRange idRange) {
             DigestDbEntrySet result = new DigestDbEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
@@ -173,9 +166,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
     } // class XipkiDbRetriever
 
-    private void init(
-            final DbSchemaType dbSchemaType,
-            final int caId)
+    private void init(final DbSchemaType dbSchemaType, final int caId)
     throws Exception {
         this.caId = caId;
         this.conn = datasource.getConnection();
@@ -223,13 +214,9 @@ public class XipkiDbDigestReader extends DbDigestReader {
         return new XipkiDbRetriever();
     }
 
-    public static XipkiDbDigestReader getInstance(
-            final DataSourceWrapper datasource,
-            final DbSchemaType dbSchemaType,
-            final int caId,
-            final int numThreads,
-            final int numCertsToPredicate,
-            final StopMe stopMe)
+    public static XipkiDbDigestReader getInstance(final DataSourceWrapper datasource,
+            final DbSchemaType dbSchemaType, final int caId, final int numThreads,
+            final int numCertsToPredicate, final StopMe stopMe)
     throws Exception {
         ParamUtil.requireNonNull("datasource", datasource);
 

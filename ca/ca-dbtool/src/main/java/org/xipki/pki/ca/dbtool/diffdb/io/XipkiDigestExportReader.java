@@ -97,8 +97,7 @@ public class XipkiDigestExportReader {
             selectCertStmt = null;
         }
 
-        private void query(
-                final IdRange idRange) {
+        private void query(final IdRange idRange) {
             DigestDbEntrySet result = new DigestDbEntrySet(idRange.getFrom());
 
             ResultSet rs = null;
@@ -167,10 +166,8 @@ public class XipkiDigestExportReader {
 
     private final String selectCertSql;
 
-    public XipkiDigestExportReader(
-            final DataSourceWrapper datasource,
-            final XipkiDbControl dbControl,
-            final int numThreads)
+    public XipkiDigestExportReader(final DataSourceWrapper datasource,
+            final XipkiDbControl dbControl, final int numThreads)
     throws Exception {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.numThreads = numThreads;
@@ -190,8 +187,7 @@ public class XipkiDigestExportReader {
         }
     }
 
-    public List<IdentifiedDbDigestEntry> readCerts(
-            final List<IdRange> idRanges)
+    public List<IdentifiedDbDigestEntry> readCerts(final List<IdRange> idRanges)
     throws DataAccessException {
         ParamUtil.requireNonNull("idRanges", idRanges);
 

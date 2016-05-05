@@ -79,8 +79,7 @@ public class OcspLoadTest extends LoadExecutor {
             }
         }
 
-        private boolean testNext(
-                final long sn) {
+        private boolean testNext(final long sn) {
             BasicOCSPResp basicResp;
             try {
                 OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl,
@@ -157,12 +156,8 @@ public class OcspLoadTest extends LoadExecutor {
 
     private RequestOptions options;
 
-    public OcspLoadTest(
-            final OcspRequestor requestor,
-            final List<Long> serials,
-            final X509Certificate caCert,
-            final URL serverUrl,
-            final RequestOptions options,
+    public OcspLoadTest(final OcspRequestor requestor, final List<Long> serials,
+            final X509Certificate caCert, final URL serverUrl, final RequestOptions options,
             final String description) {
         super(description);
         this.requestor = ParamUtil.requireNonNull("requestor", requestor);

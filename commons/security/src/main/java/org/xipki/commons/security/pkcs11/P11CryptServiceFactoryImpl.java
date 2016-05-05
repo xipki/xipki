@@ -86,8 +86,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
         this.p11Conf = new P11Conf(new FileInputStream(pkcs11ConfFile), passwordResolver);
     }
 
-    public synchronized P11CryptService getP11CryptService(
-            final String moduleName)
+    public synchronized P11CryptService getP11CryptService(final String moduleName)
     throws XiSecurityException, P11TokenException {
         if (p11Conf == null) {
             throw new IllegalStateException("please set pkcs11ConfFile and then call init() first");
@@ -123,15 +122,13 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
         return instance;
     }
 
-    private String getModuleName(
-            final String moduleName) {
+    private String getModuleName(final String moduleName) {
         return (moduleName == null)
                 ? DEFAULT_P11MODULE_NAME
                 : moduleName;
     }
 
-    public void setPkcs11ConfFile(
-            final String confFile) {
+    public void setPkcs11ConfFile(final String confFile) {
         if (StringUtil.isBlank(confFile)) {
             this.pkcs11ConfFile = null;
         } else {
@@ -139,8 +136,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
         }
     }
 
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
+    public void setPasswordResolver(final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 

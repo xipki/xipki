@@ -80,9 +80,7 @@ class NssPlainRSASigner implements AsymmetricBlockCipher {
     }
 
     @Override
-    public void init(
-            final boolean forEncryption,
-            final CipherParameters param) {
+    public void init(final boolean forEncryption, final CipherParameters param) {
         if (!forEncryption) {
             throw new RuntimeCryptoException("verification mode not supported.");
         }
@@ -137,10 +135,7 @@ class NssPlainRSASigner implements AsymmetricBlockCipher {
     }
 
     @Override
-    public byte[] processBlock(
-            final byte[] in,
-            final int inOff,
-            final int len)
+    public byte[] processBlock(final byte[] in, final int inOff, final int len)
     throws InvalidCipherTextException {
         try {
             return cipher.doFinal(in, 0, in.length);

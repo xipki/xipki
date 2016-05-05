@@ -90,13 +90,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
     private final int numThreads;
 
-    public EjbcaDigestExporter(
-            final DataSourceWrapper datasource,
-            final String baseDir,
-            final AtomicBoolean stopMe,
-            final int numCertsPerSelect,
-            final DbSchemaType dbSchemaType,
-            final int numThreads)
+    public EjbcaDigestExporter(final DataSourceWrapper datasource, final String baseDir,
+            final AtomicBoolean stopMe, final int numCertsPerSelect,
+            final DbSchemaType dbSchemaType, final int numThreads)
     throws Exception {
         super(datasource, baseDir, stopMe);
         this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
@@ -237,10 +233,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         return cas;
     } // method getCas
 
-    private void doDigestNoTableId(
-            final ProcessLog processLog,
-            final CaEntryContainer caEntryContainer,
-            final Map<String, EjbcaCaInfo> caInfos)
+    private void doDigestNoTableId(final ProcessLog processLog,
+            final CaEntryContainer caEntryContainer, final Map<String, EjbcaCaInfo> caInfos)
     throws Exception {
         int skippedAccount = 0;
         String lastProcessedHexCertFp;
@@ -368,10 +362,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         System.out.println(sb.toString());
     } // method doDigestNoTableId
 
-    private void doDigestWithTableId(
-            final EjbcaDigestExportReader certsReader,
-            final ProcessLog processLog,
-            final CaEntryContainer caEntryContainer,
+    private void doDigestWithTableId(final EjbcaDigestExportReader certsReader,
+            final ProcessLog processLog, final CaEntryContainer caEntryContainer,
             final Map<String, EjbcaCaInfo> caInfos)
     throws Exception {
         final int minCertId = (int) getMin("CertificateData", "id");

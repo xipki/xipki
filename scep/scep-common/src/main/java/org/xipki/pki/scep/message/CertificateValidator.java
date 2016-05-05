@@ -48,8 +48,7 @@ import javax.annotation.Nullable;
 
 public interface CertificateValidator {
 
-    boolean trustCertificate(
-            @Nonnull X509Certificate target,
+    boolean trustCertificate(@Nonnull X509Certificate target,
             @Nullable X509Certificate[] otherCerts);
 
 }

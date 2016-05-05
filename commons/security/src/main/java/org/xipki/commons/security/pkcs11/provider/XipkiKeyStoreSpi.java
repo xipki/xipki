@@ -92,8 +92,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
         private Iterator<E> iter;
 
-        MyEnumeration(
-                final Iterator<E> iter) {
+        MyEnumeration(final Iterator<E> iter) {
             this.iter = iter;
         }
 
@@ -115,9 +114,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
         private Certificate[] chain;
 
-        KeyCertEntry(
-                final PrivateKey key,
-                final Certificate[] chain) {
+        KeyCertEntry(final PrivateKey key, final Certificate[] chain) {
             this.key = ParamUtil.requireNonNull("key", key);
             this.chain = ParamUtil.requireNonNull("chain", chain);
             if (chain.length < 1) {
@@ -145,15 +142,12 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
     private Map<String, KeyCertEntry> keyCerts = new HashMap<>();
 
-    public static void setP11CryptServiceFactory(
-            final P11CryptServiceFactory service) {
+    public static void setP11CryptServiceFactory(final P11CryptServiceFactory service) {
         p11CryptServiceFactory = service;
     }
 
     @Override
-    public void engineLoad(
-            final InputStream stream,
-            final char[] password)
+    public void engineLoad(final InputStream stream, final char[] password)
     throws IOException, NoSuchAlgorithmException, CertificateException {
         this.creationDate = new Date();
 
@@ -171,8 +165,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
         }
     }
 
-    private void engineLoad(
-            final String moduleName)
+    private void engineLoad(final String moduleName)
     throws P11TokenException, XiSecurityException {
         P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
         P11Module module = p11Service.getModule();
@@ -203,16 +196,12 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     } // method engineLoad
 
     @Override
-    public void engineStore(
-            final OutputStream stream,
-            final char[] password)
+    public void engineStore(final OutputStream stream, final char[] password)
     throws IOException, NoSuchAlgorithmException, CertificateException {
     }
 
     @Override
-    public Key engineGetKey(
-            final String alias,
-            final char[] password)
+    public Key engineGetKey(final String alias, final char[] password)
     throws NoSuchAlgorithmException, UnrecoverableKeyException {
         if (!keyCerts.containsKey(alias)) {
             return null;
@@ -222,8 +211,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     }
 
     @Override
-    public Certificate[] engineGetCertificateChain(
-            final String alias) {
+    public Certificate[] engineGetCertificateChain(final String alias) {
         if (!keyCerts.containsKey(alias)) {
             return null;
         }
@@ -232,8 +220,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     }
 
     @Override
-    public Certificate engineGetCertificate(
-            final String alias) {
+    public Certificate engineGetCertificate(final String alias) {
         if (!keyCerts.containsKey(alias)) {
             return null;
         }
@@ -242,8 +229,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     }
 
     @Override
-    public Date engineGetCreationDate(
-            final String alias) {
+    public Date engineGetCreationDate(final String alias) {
         if (!keyCerts.containsKey(alias)) {
             return null;
         }
@@ -251,35 +237,26 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     }
 
     @Override
-    public void engineSetKeyEntry(
-            final String alias,
-            final Key key,
-            final char[] password,
+    public void engineSetKeyEntry(final String alias, final Key key, final char[] password,
             final Certificate[] chain)
     throws KeyStoreException {
         throw new KeyStoreException("keystore is read only");
     }
 
     @Override
-    public void engineSetKeyEntry(
-            final String alias,
-            final byte[] key,
-            final Certificate[] chain)
+    public void engineSetKeyEntry(final String alias, final byte[] key, final Certificate[] chain)
     throws KeyStoreException {
         throw new KeyStoreException("keystore is read only");
     }
 
     @Override
-    public void engineSetCertificateEntry(
-            final String alias,
-            final Certificate cert)
+    public void engineSetCertificateEntry(final String alias, final Certificate cert)
     throws KeyStoreException {
         throw new KeyStoreException("keystore is read only");
     }
 
     @Override
-    public void engineDeleteEntry(
-            final String alias)
+    public void engineDeleteEntry(final String alias)
     throws KeyStoreException {
         throw new KeyStoreException("keystore is read only");
     }
@@ -290,8 +267,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     }
 
     @Override
-    public boolean engineContainsAlias(
-            final String alias) {
+    public boolean engineContainsAlias(final String alias) {
         return keyCerts.containsKey(alias);
     }
 
@@ -301,8 +277,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     }
 
     @Override
-    public boolean engineIsKeyEntry(
-            final String alias) {
+    public boolean engineIsKeyEntry(final String alias) {
         if (!keyCerts.containsKey(alias)) {
             return false;
         }
@@ -311,8 +286,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     }
 
     @Override
-    public boolean engineIsCertificateEntry(
-            final String alias) {
+    public boolean engineIsCertificateEntry(final String alias) {
         if (!keyCerts.containsKey(alias)) {
             return false;
         }
@@ -321,8 +295,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     }
 
     @Override
-    public String engineGetCertificateAlias(
-            final Certificate cert) {
+    public String engineGetCertificateAlias(final Certificate cert) {
         for (String alias : keyCerts.keySet()) {
             if (keyCerts.get(alias).getCertificate().equals(cert)) {
                 return alias;

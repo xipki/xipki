@@ -52,8 +52,7 @@ public class P12KeypairGenerationResult extends KeypairGenerationResult {
 
     private KeyStore keystoreObject;
 
-    public P12KeypairGenerationResult(
-            final byte[] keystore) {
+    public P12KeypairGenerationResult(final byte[] keystore) {
         this.keystore = ParamUtil.requireNonNull("keystore", keystore);
     }
 
@@ -65,8 +64,7 @@ public class P12KeypairGenerationResult extends KeypairGenerationResult {
         return keystoreObject;
     }
 
-    public void setKeystoreObject(
-            final KeyStore keystoreObject) {
+    public void setKeystoreObject(final KeyStore keystoreObject) {
         this.keystoreObject = keystoreObject;
     }
 

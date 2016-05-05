@@ -92,8 +92,7 @@ public class CmpControl {
 
     private final Set<String> sigAlgos;
 
-    public CmpControl(
-            final CmpControlEntry dbEntry)
+    public CmpControl(final CmpControlEntry dbEntry)
     throws InvalidConfException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
 
@@ -120,14 +119,9 @@ public class CmpControl {
         this.dbEntry = new CmpControlEntry(dbEntry.getName(), pairs.getEncoded());
     } // constructor
 
-    public CmpControl(
-            final String name,
-            final Boolean confirmCert,
-            final Boolean sendCaCert,
-            final Boolean messageTimeRequired,
-            final Boolean sendResponderCert,
-            final Integer messageTimeBias,
-            final Integer confirmWaitTime,
+    public CmpControl(final String name, final Boolean confirmCert, final Boolean sendCaCert,
+            final Boolean messageTimeRequired, final Boolean sendResponderCert,
+            final Integer messageTimeBias, final Integer confirmWaitTime,
             final Set<String> sigAlgos)
     throws InvalidConfException {
         ParamUtil.requireNonBlank("name", name);
@@ -203,8 +197,7 @@ public class CmpControl {
         return sigAlgos;
     }
 
-    public boolean isSigAlgoPermitted(
-            final AlgorithmIdentifier algId) {
+    public boolean isSigAlgoPermitted(final AlgorithmIdentifier algId) {
         ParamUtil.requireNonNull("algId", algId);
 
         if (sigAlgos == null) {
@@ -242,8 +235,7 @@ public class CmpControl {
         return sb.toString();
     }
 
-    private static Set<String> canonicalizeAlgos(
-            final Set<String> algos)
+    private static Set<String> canonicalizeAlgos(final Set<String> algos)
     throws InvalidConfException {
         Set<String> ret = new HashSet<String>();
         for (String m : algos) {
@@ -256,9 +248,7 @@ public class CmpControl {
         return Collections.unmodifiableSet(ret);
     }
 
-    private static boolean getBoolean(
-            final ConfPairs pairs,
-            final String key,
+    private static boolean getBoolean(final ConfPairs pairs, final String key,
             final boolean defaultValue) {
         String str = pairs.getValue(key);
         boolean ret = StringUtil.isBlank(str)
@@ -268,10 +258,7 @@ public class CmpControl {
         return ret;
     }
 
-    private static int getInt(
-            final ConfPairs pairs,
-            final String key,
-            final int defaultValue) {
+    private static int getInt(final ConfPairs pairs, final String key, final int defaultValue) {
         String str = pairs.getValue(key);
         int ret = StringUtil.isBlank(str)
                 ? defaultValue

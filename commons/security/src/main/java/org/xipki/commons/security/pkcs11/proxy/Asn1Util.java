@@ -57,10 +57,7 @@ public class Asn1Util {
     private Asn1Util() {
     }
 
-    public static void requireRange(
-            final ASN1Sequence seq,
-            final int minSize,
-            final int maxSize)
+    public static void requireRange(final ASN1Sequence seq, final int minSize, final int maxSize)
     throws BadAsn1ObjectException {
         int size = seq.size();
         if (size < minSize || size > maxSize) {
@@ -70,8 +67,7 @@ public class Asn1Util {
         }
     }
 
-    public static ASN1Sequence getSequence(
-            final ASN1Encodable object)
+    public static ASN1Sequence getSequence(final ASN1Encodable object)
     throws BadAsn1ObjectException {
         try {
             return ASN1Sequence.getInstance(object);
@@ -81,8 +77,7 @@ public class Asn1Util {
         }
     }
 
-    public static Certificate getCertificate(
-            final ASN1Encodable object)
+    public static Certificate getCertificate(final ASN1Encodable object)
     throws BadAsn1ObjectException {
         try {
             return Certificate.getInstance(object);
@@ -92,8 +87,7 @@ public class Asn1Util {
         }
     }
 
-    public static BigInteger getInteger(
-            final ASN1Encodable object)
+    public static BigInteger getInteger(final ASN1Encodable object)
     throws BadAsn1ObjectException {
         try {
             return ASN1Integer.getInstance(object).getValue();
@@ -103,8 +97,7 @@ public class Asn1Util {
         }
     }
 
-    public static String getUtf8String(
-            final ASN1Encodable object)
+    public static String getUtf8String(final ASN1Encodable object)
     throws BadAsn1ObjectException {
         try {
             return DERUTF8String.getInstance(object).getString();
@@ -114,8 +107,7 @@ public class Asn1Util {
         }
     }
 
-    public static byte[] getOctetStringBytes(
-            final ASN1Encodable object)
+    public static byte[] getOctetStringBytes(final ASN1Encodable object)
     throws BadAsn1ObjectException {
         try {
             return DEROctetString.getInstance(object).getOctets();
@@ -125,8 +117,7 @@ public class Asn1Util {
         }
     }
 
-    public static ASN1ObjectIdentifier getObjectIdentifier(
-            final ASN1Encodable object)
+    public static ASN1ObjectIdentifier getObjectIdentifier(final ASN1Encodable object)
     throws BadAsn1ObjectException {
         try {
             return ASN1ObjectIdentifier.getInstance(object);

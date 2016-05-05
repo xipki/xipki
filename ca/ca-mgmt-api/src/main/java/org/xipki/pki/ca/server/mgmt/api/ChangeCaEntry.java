@@ -79,8 +79,7 @@ public class ChangeCaEntry implements Serializable {
 
     private Integer expirationPeriod;
 
-    public ChangeCaEntry(
-            final String name)
+    public ChangeCaEntry(final String name)
     throws CaMgmtException {
         this.name = ParamUtil.requireNonBlank("name", name);
     }
@@ -93,8 +92,7 @@ public class ChangeCaEntry implements Serializable {
         return serialNumberSize;
     }
 
-    public void setSerialNumberSize(
-            final Integer serialNumberSize) {
+    public void setSerialNumberSize(final Integer serialNumberSize) {
         if (serialNumberSize != null) {
             ParamUtil.requireRange("serialNumberSize", serialNumberSize, 8, 20);
         }
@@ -105,8 +103,7 @@ public class ChangeCaEntry implements Serializable {
         return status;
     }
 
-    public void setStatus(
-            final CaStatus status) {
+    public void setStatus(final CaStatus status) {
         this.status = status;
     }
 
@@ -114,8 +111,7 @@ public class ChangeCaEntry implements Serializable {
         return maxValidity;
     }
 
-    public void setMaxValidity(
-            final CertValidity maxValidity) {
+    public void setMaxValidity(final CertValidity maxValidity) {
         this.maxValidity = maxValidity;
     }
 
@@ -123,8 +119,7 @@ public class ChangeCaEntry implements Serializable {
         return signerType;
     }
 
-    public void setSignerType(
-            final String signerType) {
+    public void setSignerType(final String signerType) {
         this.signerType = signerType;
     }
 
@@ -132,8 +127,7 @@ public class ChangeCaEntry implements Serializable {
         return signerConf;
     }
 
-    public void setSignerConf(
-            final String signerConf) {
+    public void setSignerConf(final String signerConf) {
         this.signerConf = signerConf;
     }
 
@@ -141,8 +135,7 @@ public class ChangeCaEntry implements Serializable {
         return cmpControlName;
     }
 
-    public void setCmpControlName(
-            final String cmpControlName) {
+    public void setCmpControlName(final String cmpControlName) {
         this.cmpControlName = cmpControlName;
     }
 
@@ -150,8 +143,7 @@ public class ChangeCaEntry implements Serializable {
         return responderName;
     }
 
-    public void setResponderName(
-            final String responderName) {
+    public void setResponderName(final String responderName) {
         this.responderName = responderName;
     }
 
@@ -159,8 +151,7 @@ public class ChangeCaEntry implements Serializable {
         return duplicateKeyPermitted;
     }
 
-    public void setDuplicateKeyPermitted(
-            final Boolean duplicateKeyPermitted) {
+    public void setDuplicateKeyPermitted(final Boolean duplicateKeyPermitted) {
         this.duplicateKeyPermitted = duplicateKeyPermitted;
     }
 
@@ -168,8 +159,7 @@ public class ChangeCaEntry implements Serializable {
         return duplicateSubjectPermitted;
     }
 
-    public void setDuplicateSubjectPermitted(
-            final Boolean duplicateSubjectPermitted) {
+    public void setDuplicateSubjectPermitted(final Boolean duplicateSubjectPermitted) {
         this.duplicateSubjectPermitted = duplicateSubjectPermitted;
     }
 
@@ -177,8 +167,7 @@ public class ChangeCaEntry implements Serializable {
         return validityMode;
     }
 
-    public void setValidityMode(
-            final ValidityMode validityMode) {
+    public void setValidityMode(final ValidityMode validityMode) {
         this.validityMode = validityMode;
     }
 
@@ -186,8 +175,7 @@ public class ChangeCaEntry implements Serializable {
         return permissions;
     }
 
-    public void setPermissions(
-            final Set<Permission> permissions) {
+    public void setPermissions(final Set<Permission> permissions) {
         this.permissions = permissions;
     }
 
@@ -195,8 +183,7 @@ public class ChangeCaEntry implements Serializable {
         return expirationPeriod;
     }
 
-    public void setExpirationPeriod(
-            final Integer expirationPeriod) {
+    public void setExpirationPeriod(final Integer expirationPeriod) {
         this.expirationPeriod = expirationPeriod;
     }
 
@@ -204,8 +191,7 @@ public class ChangeCaEntry implements Serializable {
         return keepExpiredCertInDays;
     }
 
-    public void setKeepExpiredCertInDays(
-            final Integer days) {
+    public void setKeepExpiredCertInDays(final Integer days) {
         this.keepExpiredCertInDays = days;
     }
 

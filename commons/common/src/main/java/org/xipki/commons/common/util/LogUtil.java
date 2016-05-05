@@ -50,9 +50,7 @@ public class LogUtil {
     private LogUtil() {
     }
 
-    public static void error(
-            final Logger log,
-            final Throwable th) {
+    public static void error(final Logger log, final Throwable th) {
         if (!log.isErrorEnabled()) {
             return;
         }
@@ -69,10 +67,7 @@ public class LogUtil {
         log.debug("Exception", th);
     }
 
-    public static void error(
-            final Logger log,
-            final Throwable th,
-            final String msg) {
+    public static void error(final Logger log, final Throwable th, final String msg) {
         if (!log.isErrorEnabled()) {
             return;
         }
@@ -89,9 +84,7 @@ public class LogUtil {
         log.debug(msg, th);
     }
 
-    public static void warn(
-            final Logger log,
-            final Throwable th) {
+    public static void warn(final Logger log, final Throwable th) {
         if (!log.isWarnEnabled()) {
             return;
         }
@@ -108,10 +101,7 @@ public class LogUtil {
         log.debug("Exception", th);
     }
 
-    public static void warn(
-            final Logger log,
-            final Throwable th,
-            final String msg) {
+    public static void warn(final Logger log, final Throwable th, final String msg) {
         if (!log.isWarnEnabled()) {
             return;
         }
@@ -128,8 +118,7 @@ public class LogUtil {
         log.debug(msg, th);
     }
 
-    private static String getMessage(
-            final Throwable th) {
+    private static String getMessage(final Throwable th) {
         if (th instanceof JAXBException) {
             return XmlUtil.getMessage((JAXBException) th);
         } else {

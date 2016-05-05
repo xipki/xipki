@@ -75,12 +75,8 @@ public class ScepEntry implements Serializable {
 
     private boolean confFaulty;
 
-    public ScepEntry(
-            final String caName,
-            final String responderType,
-            final String responderConf,
-            final String base64Cert,
-            final String control)
+    public ScepEntry(final String caName, final String responderType, final String responderConf,
+            final String base64Cert, final String control)
     throws InvalidConfException {
         this.caName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
         this.responderType = ParamUtil.requireNonBlank("responderType", responderType);
@@ -123,8 +119,7 @@ public class ScepEntry implements Serializable {
         return certFaulty || confFaulty;
     }
 
-    public void setConfFaulty(
-            boolean faulty) {
+    public void setConfFaulty(final boolean faulty) {
         this.confFaulty = faulty;
     }
 
@@ -132,8 +127,7 @@ public class ScepEntry implements Serializable {
         return caName;
     }
 
-    public void setCertificate(
-            final X509Certificate certificate) {
+    public void setCertificate(final X509Certificate certificate) {
         if (base64Cert != null) {
             throw new IllegalStateException("certificate is already by specified by base64Cert");
         }
@@ -145,14 +139,11 @@ public class ScepEntry implements Serializable {
         return toString(false);
     }
 
-    public String toString(
-            final boolean verbose) {
+    public String toString(final boolean verbose) {
         return toString(verbose, true);
     }
 
-    public String toString(
-            final boolean verbose,
-            final boolean ignoreSensitiveInfo) {
+    public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(100);
         sb.append("caName: ").append(caName).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');

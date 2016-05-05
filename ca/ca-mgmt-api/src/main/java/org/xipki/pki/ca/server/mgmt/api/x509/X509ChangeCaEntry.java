@@ -68,8 +68,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry implements Serializable {
 
     private String extraControl;
 
-    public X509ChangeCaEntry(
-            final String name)
+    public X509ChangeCaEntry(final String name)
     throws CaMgmtException {
         super(name);
     }
@@ -78,8 +77,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry implements Serializable {
         return crlUris;
     }
 
-    public void setCrlUris(
-            final List<String> crlUris) {
+    public void setCrlUris(final List<String> crlUris) {
         this.crlUris = crlUris;
     }
 
@@ -87,8 +85,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry implements Serializable {
         return deltaCrlUris;
     }
 
-    public void setDeltaCrlUris(
-            final List<String> deltaCrlUris) {
+    public void setDeltaCrlUris(final List<String> deltaCrlUris) {
         this.deltaCrlUris = deltaCrlUris;
     }
 
@@ -96,8 +93,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry implements Serializable {
         return ocspUris;
     }
 
-    public void setOcspUris(
-            final List<String> ocspUris) {
+    public void setOcspUris(final List<String> ocspUris) {
         this.ocspUris = ocspUris;
     }
 
@@ -105,8 +101,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry implements Serializable {
         return caCertUris;
     }
 
-    public void setCaCertUris(
-            final List<String> caCertUris) {
+    public void setCaCertUris(final List<String> caCertUris) {
         this.caCertUris = caCertUris;
     }
 
@@ -114,8 +109,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry implements Serializable {
         return cert;
     }
 
-    public void setCert(
-            final X509Certificate cert) {
+    public void setCert(final X509Certificate cert) {
         this.cert = cert;
     }
 
@@ -123,8 +117,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry implements Serializable {
         return crlSignerName;
     }
 
-    public void setCrlSignerName(
-            final String crlSignerName) {
+    public void setCrlSignerName(final String crlSignerName) {
         this.crlSignerName = crlSignerName;
     }
 
@@ -132,8 +125,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry implements Serializable {
         return numCrls;
     }
 
-    public void setNumCrls(
-            final Integer numCrls) {
+    public void setNumCrls(final Integer numCrls) {
         this.numCrls = numCrls;
     }
 
@@ -141,8 +133,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry implements Serializable {
         return extraControl;
     }
 
-    public void setExtraControl(
-            final String extraControl) {
+    public void setExtraControl(final String extraControl) {
         this.extraControl = extraControl;
     }
 

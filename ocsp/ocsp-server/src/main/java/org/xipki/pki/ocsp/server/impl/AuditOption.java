@@ -53,8 +53,7 @@ class AuditOption {
 
     private final Map<String, String> certprofileMapping;
 
-    AuditOption(
-            final AuditOptionType conf) {
+    AuditOption(final AuditOptionType conf) {
         ParamUtil.requireNonNull("conf", conf);
         Map<String, String> map = new ConcurrentHashMap<>();
         if (conf.getCertprofileMappings() != null) {

@@ -87,11 +87,8 @@ class PublicCaInfo {
 
     private final List<String> deltaCrlUris;
 
-    PublicCaInfo(
-            final X509Certificate caCertificate,
-            final List<String> caCertUris,
-            final List<String> ocspUris,
-            final List<String> crlUris,
+    PublicCaInfo(final X509Certificate caCertificate, final List<String> caCertUris,
+            final List<String> ocspUris, final List<String> crlUris,
             final List<String> deltaCrlUris)
     throws OperationException {
         ParamUtil.requireNonNull("caCertificate", caCertificate);
@@ -126,14 +123,9 @@ class PublicCaInfo {
         }
     } // constructor
 
-    PublicCaInfo(
-            final X500Name subject,
-            final BigInteger serialNumber,
-            final GeneralNames subjectAltName,
-            final byte[] subjectKeyIdentifier,
-            final List<String> caCertUris,
-            final List<String> ocspUris,
-            final List<String> crlUris,
+    PublicCaInfo(final X500Name subject, final BigInteger serialNumber,
+            final GeneralNames subjectAltName, final byte[] subjectKeyIdentifier,
+            final List<String> caCertUris, final List<String> ocspUris, final List<String> crlUris,
             final List<String> deltaCrlUris)
     throws OperationException {
         this.x500Subject = ParamUtil.requireNonNull("subject", subject);
@@ -181,8 +173,7 @@ class PublicCaInfo {
         return crlSignerCertificate;
     }
 
-    public void setCrlSignerCertificate(
-            final X509Certificate crlSignerCert) {
+    public void setCrlSignerCertificate(final X509Certificate crlSignerCert) {
         if (caCertificate.getCert().equals(crlSignerCert)) {
             this.crlSignerCertificate = null;
         } else {

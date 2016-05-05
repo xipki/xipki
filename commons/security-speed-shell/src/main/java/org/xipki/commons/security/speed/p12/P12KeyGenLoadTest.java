@@ -67,15 +67,12 @@ public abstract class P12KeyGenLoadTest extends LoadExecutor {
 
     private final SecurityFactory securityFactory;
 
-    public P12KeyGenLoadTest(
-            final String description,
-            final SecurityFactory securityFactory) {
+    public P12KeyGenLoadTest(final String description, final SecurityFactory securityFactory) {
         super(description);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
     }
 
-    protected abstract void generateKeypair(
-            SecureRandom random)
+    protected abstract void generateKeypair(SecureRandom random)
     throws Exception;
 
     @Override

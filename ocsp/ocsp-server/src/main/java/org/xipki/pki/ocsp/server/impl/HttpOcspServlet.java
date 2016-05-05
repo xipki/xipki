@@ -89,15 +89,12 @@ public class HttpOcspServlet extends HttpServlet {
     public HttpOcspServlet() {
     }
 
-    public void setServer(
-            final OcspServer server) {
+    public void setServer(final OcspServer server) {
         this.server = server;
     }
 
     @Override
-    protected void doGet(
-            final HttpServletRequest request,
-            final HttpServletResponse response)
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
         ResponderAndRelativeUri respAndUri = server.getResponderAndRelativeUri(request);
         if (respAndUri == null) {
@@ -114,9 +111,7 @@ public class HttpOcspServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(
-            final HttpServletRequest request,
-            final HttpServletResponse response)
+    protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
         ResponderAndRelativeUri respAndUri = server.getResponderAndRelativeUri(request);
         if (respAndUri == null) {
@@ -132,10 +127,8 @@ public class HttpOcspServlet extends HttpServlet {
         processRequest(request, response, respAndUri, false);
     }
 
-    private void processRequest(
-            final HttpServletRequest request,
-            final HttpServletResponse response,
-            final ResponderAndRelativeUri respAndUri,
+    private void processRequest(final HttpServletRequest request,
+            final HttpServletResponse response, final ResponderAndRelativeUri respAndUri,
             final boolean getMethod)
     throws ServletException, IOException {
         Responder responder = respAndUri.getResponder();
@@ -342,8 +335,7 @@ public class HttpOcspServlet extends HttpServlet {
         } // end external try
     } // method processRequest
 
-    public void setAuditServiceRegister(
-            final AuditServiceRegister auditServiceRegister) {
+    public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = auditServiceRegister;
     }
 

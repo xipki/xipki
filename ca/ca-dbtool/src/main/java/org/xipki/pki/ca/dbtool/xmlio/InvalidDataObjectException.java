@@ -48,8 +48,7 @@ public class InvalidDataObjectException extends Exception {
     public InvalidDataObjectException() {
     }
 
-    public InvalidDataObjectException(
-            final String message) {
+    public InvalidDataObjectException(final String message) {
         super(message);
     }
 

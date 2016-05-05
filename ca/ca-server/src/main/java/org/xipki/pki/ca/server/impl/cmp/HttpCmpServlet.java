@@ -89,9 +89,7 @@ public class HttpCmpServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(
-            final HttpServletRequest request,
-            final HttpServletResponse response)
+    public void doPost(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
                 "javax.servlet.request.X509Certificate");
@@ -225,8 +223,7 @@ public class HttpCmpServlet extends HttpServlet {
         }
     } // method doPost
 
-    protected PKIMessage generatePkiMessage(
-            final InputStream is)
+    protected PKIMessage generatePkiMessage(final InputStream is)
     throws IOException {
         ParamUtil.requireNonNull("is", is);
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
@@ -242,22 +239,16 @@ public class HttpCmpServlet extends HttpServlet {
         }
     }
 
-    public void setResponderManager(
-            final CmpResponderManager responderManager) {
+    public void setResponderManager(final CmpResponderManager responderManager) {
         this.responderManager = responderManager;
     }
 
-    public void setAuditServiceRegister(
-            final AuditServiceRegister auditServiceRegister) {
+    public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = auditServiceRegister;
     }
 
-    private static void audit(
-            final AuditService auditService,
-            final AuditEvent auditEvent,
-            final AuditLevel auditLevel,
-            final AuditStatus auditStatus,
-            final String auditMessage) {
+    private static void audit(final AuditService auditService, final AuditEvent auditEvent,
+            final AuditLevel auditLevel, final AuditStatus auditStatus, final String auditMessage) {
         if (auditLevel != null) {
             auditEvent.setLevel(auditLevel);
         }

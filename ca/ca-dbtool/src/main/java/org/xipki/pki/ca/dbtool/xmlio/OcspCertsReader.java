@@ -48,8 +48,7 @@ import javax.xml.stream.XMLStreamException;
 
 public class OcspCertsReader extends DbiXmlReader {
 
-    public OcspCertsReader(
-            final InputStream xmlStream)
+    public OcspCertsReader(final InputStream xmlStream)
     throws XMLStreamException, InvalidDataObjectException {
         super("certs", xmlStream);
     }

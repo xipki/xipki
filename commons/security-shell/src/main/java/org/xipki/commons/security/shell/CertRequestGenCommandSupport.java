@@ -198,8 +198,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     @Completion(ExtensionNameCompleter.class)
     private List<String> wantExtensionTypes;
 
-    protected abstract ConcurrentContentSigner getSigner(
-            @Nonnull SignatureAlgoControl signatureAlgoControl)
+    protected abstract ConcurrentContentSigner getSigner(@Nonnull SignatureAlgoControl signatureAlgoControl)
     throws Exception;
 
     @Override
@@ -218,15 +217,13 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         List<Extension> extensions = new LinkedList<>();
 
         if (isNotEmpty(subjectAltNames)) {
-            extensions.add(X509Util.createExtensionSubjectAltName(
-                    subjectAltNames, false));
+            extensions.add(X509Util.createExtensionSubjectAltName(subjectAltNames, false));
             needExtensionTypes.add(Extension.subjectAlternativeName.getId());
         }
 
         // SubjectInfoAccess
         if (isNotEmpty(subjectInfoAccesses)) {
-            extensions.add(X509Util.createExtensionSubjectInfoAccess(
-                    subjectInfoAccesses, false));
+            extensions.add(X509Util.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
             needExtensionTypes.add(Extension.subjectInfoAccess.getId());
         }
 
@@ -331,8 +328,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
             ExtensionExistence ee = new ExtensionExistence(
                     textToAsn1ObjectIdentifers(needExtensionTypes),
                     textToAsn1ObjectIdentifers(wantExtensionTypes));
-            extensions.add(new Extension(
-                    ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false,
+            extensions.add(new Extension(ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false,
                     ee.toASN1Primitive().getEncoded()));
         }
 
@@ -369,14 +365,12 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         return null;
     } // method doExecute
 
-    protected X500Name getSubject(
-            final String subjectText) {
+    protected X500Name getSubject(final String subjectText) {
         ParamUtil.requireNonBlank("subjectText", subjectText);
         return new X500Name(subjectText);
     }
 
-    private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
-            final List<String> oidTexts)
+    private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(final List<String> oidTexts)
     throws InvalidOidOrNameException {
         if (oidTexts == null) {
             return null;
@@ -396,8 +390,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         return ret;
     }
 
-    private static ASN1ObjectIdentifier toOid(
-            final String str)
+    private static ASN1ObjectIdentifier toOid(final String str)
     throws InvalidOidOrNameException {
         final int n = str.length();
         boolean isName = false;
@@ -422,11 +415,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         return oid;
     }
 
-    private PKCS10CertificationRequest generateRequest(
-            final ConcurrentContentSigner signer,
-            final SubjectPublicKeyInfo subjectPublicKeyInfo,
-            final X500Name subjectDn,
-            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+    private PKCS10CertificationRequest generateRequest(final ConcurrentContentSigner signer, final SubjectPublicKeyInfo subjectPublicKeyInfo, final X500Name subjectDn, final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws XiSecurityException {
         ParamUtil.requireNonNull("signer", signer);
         ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);

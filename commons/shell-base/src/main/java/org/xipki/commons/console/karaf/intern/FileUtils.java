@@ -48,8 +48,7 @@ public class FileUtils {
      * @throws IOException in case deletion is unsuccessful
      * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
      */
-    public static void deleteDirectory(
-            final File directory)
+    public static void deleteDirectory(final File directory)
     throws IOException {
         if (!directory.exists()) {
             return;
@@ -83,8 +82,7 @@ public class FileUtils {
      * @throws IOException if an IO error occurs while checking the file
      * @since 2.0.0
      */
-    public static boolean isSymlink(
-            final File file)
+    public static boolean isSymlink(final File file)
     throws IOException {
         if (file == null) {
             throw new NullPointerException("File must not be null");
@@ -113,8 +111,7 @@ public class FileUtils {
      * @throws IOException in case cleaning is unsuccessful
      * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
      */
-    public static void cleanDirectory(
-            final File directory)
+    public static void cleanDirectory(final File directory)
     throws IOException {
         if (!directory.exists()) {
             throw new IllegalArgumentException(directory + " does not exist");
@@ -161,8 +158,7 @@ public class FileUtils {
      * @throws FileNotFoundException if the file was not found
      * @throws IOException in case deletion is unsuccessful
      */
-    public static void forceDelete(
-            final File file)
+    public static void forceDelete(final File file)
     throws IOException {
         if (file.isDirectory()) {
             deleteDirectory(file);
@@ -197,9 +193,7 @@ public class FileUtils {
      * @throws IllegalArgumentException "Negative size" if the file is truncated so that the size
      *     is less than the position
      */
-    public static void copyFile(
-            final File srcFile,
-            final File destFile,
+    public static void copyFile(final File srcFile, final File destFile,
             final boolean preserveFileDate)
     throws IOException {
         if (destFile.exists() && destFile.isDirectory()) {
@@ -246,9 +240,7 @@ public class FileUtils {
         }
     }
 
-    public static void copyDirectory(
-            final File srcDir,
-            final File destDir)
+    public static void copyDirectory(final File srcDir, final File destDir)
     throws IOException {
         copyDirectory(srcDir, destDir, null, true, null);
     }
@@ -266,12 +258,8 @@ public class FileUtils {
      * @throws IOException if an error occurs
      * @since 1.1
      */
-    public static void copyDirectory(
-            final File srcDir,
-            final File destDir,
-            final FileFilter filter,
-            final boolean preserveFileDate,
-            final List<String> exclusionList)
+    public static void copyDirectory(final File srcDir, final File destDir, final FileFilter filter,
+            final boolean preserveFileDate, final List<String> exclusionList)
     throws IOException {
         // recurse
         final File[] srcFiles = (filter == null)
@@ -311,8 +299,7 @@ public class FileUtils {
         }
     }
 
-    public static void closeQuietly(
-            final Closeable... closeables) {
+    public static void closeQuietly(final Closeable... closeables) {
         if (closeables == null) {
             return;
         }
@@ -321,8 +308,7 @@ public class FileUtils {
         }
     }
 
-    private static void doCloseQuietly(
-            final Closeable closable) {
+    private static void doCloseQuietly(final Closeable closable) {
         if (closable == null) {
             return;
         }

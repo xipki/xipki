@@ -86,16 +86,12 @@ public class OcspQa {
 
     private final SecurityFactory securityFactory;
 
-    public OcspQa(
-            final SecurityFactory securityFactory) {
+    public OcspQa(final SecurityFactory securityFactory) {
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
     }
 
-    public ValidationResult checkOcsp(
-            final OCSPResp response,
-            final IssuerHash issuerHash,
-            final List<BigInteger> serialNumbers,
-            final Map<BigInteger, byte[]> encodedCerts,
+    public ValidationResult checkOcsp(final OCSPResp response, final IssuerHash issuerHash,
+            final List<BigInteger> serialNumbers, final Map<BigInteger, byte[]> encodedCerts,
             final OcspError expectedOcspError,
             final Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
             final OcspResponseOption responseOption) {
@@ -197,8 +193,7 @@ public class OcspQa {
             if (responderCerts == null || responderCerts.length < 1) {
                 sigSignerCertIssue.setFailureMessage(
                         "No responder certificate is contained in the response");
-                sigValIssue.setFailureMessage(
-                        "could not find certificate to validate signature");
+                sigValIssue.setFailureMessage("could not find certificate to validate signature");
             } else {
                 X509CertificateHolder respSigner = responderCerts[0];
 
@@ -276,15 +271,10 @@ public class OcspQa {
         return new ValidationResult(resultIssues);
     } // method checkOcsp
 
-    private List<ValidationIssue> checkSingleCert(
-            final int index,
-            final SingleResp singleResp,
-            final IssuerHash issuerHash,
-            final OcspCertStatus expectedStatus,
-            final byte[] encodedCert,
-            final boolean extendedRevoke,
-            final Occurrence nextupdateOccurrence,
-            final Occurrence certhashOccurrence,
+    private List<ValidationIssue> checkSingleCert(final int index, final SingleResp singleResp,
+            final IssuerHash issuerHash, final OcspCertStatus expectedStatus,
+            final byte[] encodedCert, final boolean extendedRevoke,
+            final Occurrence nextupdateOccurrence, final Occurrence certhashOccurrence,
             final ASN1ObjectIdentifier certhashAlg) {
         List<ValidationIssue> issues = new LinkedList<>();
 
@@ -366,13 +356,11 @@ public class OcspQa {
         } else if (singleCertStatus instanceof UnknownStatus) {
             status = OcspCertStatus.issuerUnknown;
         } else {
-            issue.setFailureMessage(
-                    "unknown certstatus: " + singleCertStatus.getClass().getName());
+            issue.setFailureMessage("unknown certstatus: " + singleCertStatus.getClass().getName());
         }
 
         if (!issue.isFailed() && expectedStatus != status) {
-            issue.setFailureMessage(
-                    "is='" + status + "', but expected='" + expectedStatus + "'");
+            issue.setFailureMessage("is='" + status + "', but expected='" + expectedStatus + "'");
         }
 
         // nextUpdate
@@ -423,9 +411,7 @@ public class OcspQa {
         return issues;
     } // method checkSingleCert
 
-    private static ValidationIssue checkOccurrence(
-            final String targetName,
-            final Object target,
+    private static ValidationIssue checkOccurrence(final String targetName, final Object target,
             final Occurrence occurrence) {
         ValidationIssue issue = new ValidationIssue("OCSP." + targetName, targetName);
         if (occurrence == Occurrence.forbidden) {

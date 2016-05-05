@@ -49,9 +49,7 @@ class ResponderAndRelativeUri {
 
     private final String relativeUri;
 
-    ResponderAndRelativeUri(
-            final Responder responder,
-            final String relativeUri) {
+    ResponderAndRelativeUri(final Responder responder, final String relativeUri) {
         this.responder = ParamUtil.requireNonNull("responder", responder);
         this.relativeUri = ParamUtil.requireNonNull("relativeUri", relativeUri);
     }

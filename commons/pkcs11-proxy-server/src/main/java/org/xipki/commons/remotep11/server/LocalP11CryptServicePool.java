@@ -68,8 +68,7 @@ public class LocalP11CryptServicePool {
     public LocalP11CryptServicePool() {
     }
 
-    public void setP11CryptServiceFactory(
-            final P11CryptServiceFactory p11CryptServiceFactory) {
+    public void setP11CryptServiceFactory(final P11CryptServiceFactory p11CryptServiceFactory) {
         this.p11CryptServiceFactory = p11CryptServiceFactory;
     }
 
@@ -115,8 +114,7 @@ public class LocalP11CryptServicePool {
         LOG.info("initialized");
     }
 
-    public P11CryptService getP11CryptService(
-            final String moduleName) {
+    public P11CryptService getP11CryptService(final String moduleName) {
         ParamUtil.requireNonBlank("moduleName", moduleName);
         return p11CryptServices.get(moduleName);
     }

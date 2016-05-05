@@ -58,8 +58,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
 
         private String suffix;
 
-        Unit(
-                String suffix) {
+        Unit(final String suffix) {
             this.suffix = suffix;
         }
 
@@ -82,15 +81,12 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
     private final int validity;
     private final Unit unit;
 
-    public CertValidity(
-            final int validity,
-            final Unit unit) {
+    public CertValidity(final int validity, final Unit unit) {
         this.validity = ParamUtil.requireMin("validity", validity, 1);
         this.unit = ParamUtil.requireNonNull("unit", unit);
     }
 
-    public static CertValidity getInstance(
-            final String validityS) {
+    public static CertValidity getInstance(final String validityS) {
         ParamUtil.requireNonBlank("validityS", validityS);
 
         final int len = validityS.length();
@@ -132,8 +128,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
         return unit;
     }
 
-    public Date add(
-            final Date referenceDate) {
+    public Date add(final Date referenceDate) {
         switch (unit) {
         case HOUR:
             return new Date(referenceDate.getTime() + HOUR - SECOND);
@@ -186,8 +181,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
     }
 
     @Override
-    public int compareTo(
-            final CertValidity obj) {
+    public int compareTo(final CertValidity obj) {
         ParamUtil.requireNonNull("obj", obj);
         if (unit == obj.unit) {
             if (validity == obj.validity) {
@@ -211,8 +205,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
     }
 
     @Override
-    public boolean equals(
-            final Object obj) {
+    public boolean equals(final Object obj) {
         if (!(obj instanceof CertValidity)) {
             return false;
         }
@@ -236,8 +229,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
         }
     }
 
-    private static boolean isLeapYear(
-            final int year) {
+    private static boolean isLeapYear(final int year) {
         if (year % 4 != 0) {
             return false;
         } else if (year % 100 != 0) {

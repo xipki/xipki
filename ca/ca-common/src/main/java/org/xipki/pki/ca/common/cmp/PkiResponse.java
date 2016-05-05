@@ -50,8 +50,7 @@ public class PkiResponse {
 
     private ProtectionVerificationResult protectionVerificationResult;
 
-    public PkiResponse(
-            final GeneralPKIMessage pkiMessage) {
+    public PkiResponse(final GeneralPKIMessage pkiMessage) {
         this.pkiMessage = ParamUtil.requireNonNull("pkiMessage", pkiMessage);
     }
 

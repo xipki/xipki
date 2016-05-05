@@ -62,15 +62,13 @@ public class Asn1EntityIdAndCert extends ASN1Object {
 
     private final Certificate certificate;
 
-    public Asn1EntityIdAndCert(
-            final Asn1P11EntityIdentifier entityId,
+    public Asn1EntityIdAndCert(final Asn1P11EntityIdentifier entityId,
             final Certificate certificate) {
         this.entityId = ParamUtil.requireNonNull("entityId", entityId);
         this.certificate = ParamUtil.requireNonNull("certificate", certificate);
     }
 
-    public Asn1EntityIdAndCert(
-            final P11EntityIdentifier entityId,
+    public Asn1EntityIdAndCert(final P11EntityIdentifier entityId,
             final X509Certificate certificate) {
         ParamUtil.requireNonNull("entityId", entityId);
         ParamUtil.requireNonNull("certificate", certificate);
@@ -85,8 +83,7 @@ public class Asn1EntityIdAndCert extends ASN1Object {
         this.certificate = Certificate.getInstance(encoded);
     }
 
-    private Asn1EntityIdAndCert(
-            final ASN1Sequence seq)
+    private Asn1EntityIdAndCert(final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
@@ -94,8 +91,7 @@ public class Asn1EntityIdAndCert extends ASN1Object {
         this.certificate = Asn1Util.getCertificate(seq.getObjectAt(idx++));
     }
 
-    public static Asn1EntityIdAndCert getInstance(
-            final Object obj)
+    public static Asn1EntityIdAndCert getInstance(final Object obj)
     throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1EntityIdAndCert) {
             return (Asn1EntityIdAndCert) obj;

@@ -57,9 +57,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
 
     private final String label;
 
-    public P11ObjectIdentifier(
-            @Nonnull final byte[] id,
-            @Nonnull final String label) {
+    public P11ObjectIdentifier(@Nonnull final byte[] id, @Nonnull final String label) {
         this.id = ParamUtil.requireNonNull("id", id);
         this.label = ParamUtil.requireNonNull("label", label);
         this.idHex = Hex.toHexString(id).toUpperCase();
@@ -69,8 +67,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
         return id;
     }
 
-    public boolean matchesId(
-            final byte[] id) {
+    public boolean matchesId(final byte[] id) {
         return Arrays.equals(id, this.id);
     }
 
@@ -101,8 +98,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
     }
 
     @Override
-    public boolean equals(
-            final Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -116,8 +112,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
     }
 
     @Override
-    public int compareTo(
-            final P11ObjectIdentifier obj) {
+    public int compareTo(final P11ObjectIdentifier obj) {
         ParamUtil.requireNonNull("obj", obj);
         if (this == obj) {
             return 0;
