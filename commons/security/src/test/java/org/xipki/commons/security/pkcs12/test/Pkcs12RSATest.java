@@ -110,15 +110,12 @@ public abstract class Pkcs12RSATest {
         Assert.assertTrue("Signature invalid", signatureValid);
     }
 
-    protected byte[] sign(
-            final byte[] data)
+    protected byte[] sign(final byte[] data)
     throws Exception {
         return getSigner().sign(data);
     }
 
-    protected boolean verify(
-            final byte[] data,
-            final byte[] signatureValue,
+    protected boolean verify(final byte[] data, final byte[] signatureValue,
             final X509Certificate cert)
     throws Exception {
         Signature signature = Signature.getInstance(getSignatureAlgorithm().getAlgorithm().getId());

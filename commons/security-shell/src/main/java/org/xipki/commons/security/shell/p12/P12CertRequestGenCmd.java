@@ -100,8 +100,7 @@ public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
     }
 
     @Override
-    protected ConcurrentContentSigner getSigner(
-            final SignatureAlgoControl signatureAlgoControl)
+    protected ConcurrentContentSigner getSigner(final SignatureAlgoControl signatureAlgoControl)
     throws ObjectCreationException {
         ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
         char[] pwd;

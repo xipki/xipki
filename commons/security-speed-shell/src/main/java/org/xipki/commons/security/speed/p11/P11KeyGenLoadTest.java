@@ -69,9 +69,7 @@ public abstract class P11KeyGenLoadTest extends LoadExecutor {
 
     private AtomicLong idx = new AtomicLong(System.currentTimeMillis());
 
-    public P11KeyGenLoadTest(
-            final P11Slot slot,
-            final String description) {
+    public P11KeyGenLoadTest(final P11Slot slot, final String description) {
         super(description);
         this.slot = ParamUtil.requireNonNull("slot", slot);
     }

@@ -45,8 +45,7 @@ public class OperationNotSupportedException extends ScepClientException {
 
     private static final long serialVersionUID = 1L;
 
-    public OperationNotSupportedException(
-            final String message) {
+    public OperationNotSupportedException(final String message) {
         super(message);
     }
 

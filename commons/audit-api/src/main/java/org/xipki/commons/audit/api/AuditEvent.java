@@ -82,8 +82,7 @@ public class AuditEvent {
 
     private final List<AuditChildEvent> childAuditEvents = new LinkedList<>();
 
-    public AuditEvent(
-            final Date timestamp) {
+    public AuditEvent(final Date timestamp) {
         this.timestamp = (timestamp == null)
                 ? new Date()
                 : timestamp;
@@ -94,8 +93,7 @@ public class AuditEvent {
         return level;
     }
 
-    public void setLevel(
-            final AuditLevel level) {
+    public void setLevel(final AuditLevel level) {
         this.level = level;
     }
 
@@ -103,8 +101,7 @@ public class AuditEvent {
         return name;
     }
 
-    public void setName(
-            final String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -112,8 +109,7 @@ public class AuditEvent {
         return applicationName;
     }
 
-    public void setApplicationName(
-            final String applicationName) {
+    public void setApplicationName(final String applicationName) {
         this.applicationName = Objects.requireNonNull(applicationName,
                 "applicationName must not be null");
     }
@@ -126,8 +122,7 @@ public class AuditEvent {
         return Collections.unmodifiableList(eventDatas);
     }
 
-    public AuditEventData addEventData(
-            final AuditEventData eventData) {
+    public AuditEventData addEventData(final AuditEventData eventData) {
         Objects.requireNonNull(eventData, "eventData must not be null");
 
         int idx = -1;
@@ -156,13 +151,11 @@ public class AuditEvent {
         return status;
     }
 
-    public void setStatus(
-            final AuditStatus status) {
+    public void setStatus(final AuditStatus status) {
         this.status = Objects.requireNonNull(status, "status must not be null");
     }
 
-    public void addChildAuditEvent(
-            final AuditChildEvent childAuditEvent) {
+    public void addChildAuditEvent(final AuditChildEvent childAuditEvent) {
         Objects.requireNonNull(childAuditEvent, "childAuditEvent must not be null");
         childAuditEvents.add(childAuditEvent);
     }
@@ -214,8 +207,7 @@ public class AuditEvent {
         return duration;
     }
 
-    public void setDuration(
-            final long duration) {
+    public void setDuration(final long duration) {
         this.duration = duration;
     }
 

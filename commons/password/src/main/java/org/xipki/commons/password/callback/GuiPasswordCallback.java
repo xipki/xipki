@@ -52,16 +52,12 @@ public class GuiPasswordCallback implements PasswordCallback {
 
     private int tries = 3;
 
-    protected boolean isPasswordValid(
-            final char[] password,
-            final String testToken) {
+    protected boolean isPasswordValid(final char[] password, final String testToken) {
         return true;
     }
 
     @Override
-    public char[] getPassword(
-            final String prompt,
-            final String testToken)
+    public char[] getPassword(final String prompt, final String testToken)
     throws PasswordResolverException {
         String tmpPrompt = prompt;
         if (StringUtil.isBlank(tmpPrompt)) {
@@ -96,8 +92,7 @@ public class GuiPasswordCallback implements PasswordCallback {
     }
 
     @Override
-    public void init(
-            final String conf)
+    public void init(final String conf)
     throws PasswordResolverException {
         if (StringUtil.isBlank(conf)) {
             quorum = 1;

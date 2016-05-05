@@ -47,9 +47,7 @@ public class MeasurePoint {
 
     private final long measureAccount;
 
-    public MeasurePoint(
-            final long measureTime,
-            final long measureAccount) {
+    public MeasurePoint(final long measureTime, final long measureAccount) {
         this.measureTime = measureTime;
         this.measureAccount = measureAccount;
     }

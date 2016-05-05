@@ -33,8 +33,7 @@ public class TransientDataAccessResourceException extends TransientDataAccessExc
      * Constructor for TransientDataAccessResourceException.
      * @param msg the detail message
      */
-    public TransientDataAccessResourceException(
-            final String msg) {
+    public TransientDataAccessResourceException(final String msg) {
         super(msg);
     }
 
@@ -43,9 +42,7 @@ public class TransientDataAccessResourceException extends TransientDataAccessExc
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public TransientDataAccessResourceException(
-            final String msg,
-            final Throwable cause) {
+    public TransientDataAccessResourceException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 

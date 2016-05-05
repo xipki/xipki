@@ -212,21 +212,18 @@ public class P11Constants {
         nameMechanismNameMap = Collections.unmodifiableMap(imp);
     }
 
-    public static String getMechanismName(
-            final long mechanism) {
+    public static String getMechanismName(final long mechanism) {
         return mechanismNameMap.get(mechanism);
     }
 
-    public static long getMechanism(
-            @Nonnull final String mechanismName) {
+    public static long getMechanism(@Nonnull final String mechanismName) {
         Long mech = nameMechanismNameMap.get(mechanismName);
         return mech == null
                 ? -1
                 : mech.longValue();
     }
 
-    public static String getMechanismDesc(
-            final long mechanism) {
+    public static String getMechanismDesc(final long mechanism) {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%#08x", mechanism));
         String name = mechanismNameMap.get(mechanism);

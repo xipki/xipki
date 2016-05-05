@@ -125,10 +125,7 @@ public class CaEmulator {
 
     private CertificateList crl;
 
-    public CaEmulator(
-            final PrivateKey caKey,
-            final Certificate caCert,
-            final boolean generateCrl)
+    public CaEmulator(final PrivateKey caKey, final Certificate caCert, final boolean generateCrl)
     throws CertificateEncodingException {
         this.caKey = ParamUtil.requireNonNull("caKey", caKey);
         this.caCert = ParamUtil.requireNonNull("caCert", caCert);
@@ -157,8 +154,7 @@ public class CaEmulator {
         return generateCrl;
     }
 
-    public Certificate generateCert(
-            final CertificationRequest p10ReqInfo)
+    public Certificate generateCert(final CertificationRequest p10ReqInfo)
     throws Exception {
         if (!verifyPopo(p10ReqInfo)) {
             throw new Exception("PKCS#10 request invalid");
@@ -167,17 +163,13 @@ public class CaEmulator {
         return generateCert(reqInfo.getSubjectPublicKeyInfo(), reqInfo.getSubject());
     }
 
-    public Certificate generateCert(
-            final SubjectPublicKeyInfo pubKeyInfo,
-            final X500Name subjectDn)
+    public Certificate generateCert(final SubjectPublicKeyInfo pubKeyInfo, final X500Name subjectDn)
     throws Exception {
         return generateCert(pubKeyInfo, subjectDn,
                 new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
     }
 
-    public Certificate generateCert(
-            final SubjectPublicKeyInfo pubKeyInfo,
-            final X500Name subjectDn,
+    public Certificate generateCert(final SubjectPublicKeyInfo pubKeyInfo, final X500Name subjectDn,
             final Date notBefore)
     throws Exception {
         ParamUtil.requireNonNull("pubKeyInfo", pubKeyInfo);
@@ -212,9 +204,7 @@ public class CaEmulator {
         return asn1Cert;
     }
 
-    public Certificate getCert(
-            final X500Name issuer,
-            final BigInteger serialNumber) {
+    public Certificate getCert(final X500Name issuer, final BigInteger serialNumber) {
         if (!caSubject.equals(issuer)) {
             return null;
         }
@@ -222,9 +212,7 @@ public class CaEmulator {
         return serialCertMap.get(serialNumber);
     }
 
-    public Certificate pollCert(
-            final X500Name issuer,
-            final X500Name subject) {
+    public Certificate pollCert(final X500Name issuer, final X500Name subject) {
         ParamUtil.requireNonNull("issuer", issuer);
         ParamUtil.requireNonNull("subject", subject);
         if (!caSubject.equals(issuer)) {
@@ -234,9 +222,7 @@ public class CaEmulator {
         return reqSubjectCertMap.get(subject);
     }
 
-    public synchronized CertificateList getCrl(
-            final X500Name issuer,
-            final BigInteger serialNumber)
+    public synchronized CertificateList getCrl(final X500Name issuer, final BigInteger serialNumber)
     throws Exception {
         if (crl != null) {
             return crl;
@@ -262,8 +248,7 @@ public class CaEmulator {
         return crl;
     }
 
-    private boolean verifyPopo(
-            final CertificationRequest p10Request) {
+    private boolean verifyPopo(final CertificationRequest p10Request) {
         ParamUtil.requireNonNull("p10Request", p10Request);
         try {
             PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);
@@ -279,8 +264,7 @@ public class CaEmulator {
         }
     }
 
-    public ContentVerifierProvider getContentVerifierProvider(
-            final PublicKey publicKey)
+    public ContentVerifierProvider getContentVerifierProvider(final PublicKey publicKey)
     throws InvalidKeyException {
         ParamUtil.requireNonNull("publicKey", publicKey);
 

@@ -58,16 +58,13 @@ public interface P11Module {
 
     List<P11SlotIdentifier> getSlotIdentifiers();
 
-    P11Slot getSlot(
-            @Nonnull P11SlotIdentifier slotId)
+    P11Slot getSlot(@Nonnull P11SlotIdentifier slotId)
     throws P11TokenException;
 
-    P11SlotIdentifier getSlotIdForIndex(
-            int index)
+    P11SlotIdentifier getSlotIdForIndex(int index)
     throws P11UnknownEntityException;
 
-    P11SlotIdentifier getSlotIdForId(
-            long id)
+    P11SlotIdentifier getSlotIdForId(long id)
     throws P11UnknownEntityException;
 
     void close();

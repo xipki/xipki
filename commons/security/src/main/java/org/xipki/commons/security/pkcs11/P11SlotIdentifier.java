@@ -49,9 +49,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
 
     private final long id;
 
-    public P11SlotIdentifier(
-            final int index,
-            final long id) {
+    public P11SlotIdentifier(final int index, final long id) {
         this.index = ParamUtil.requireMin("index", index, 0);
         this.id = ParamUtil.requireMin("id", id, 0);
     }
@@ -65,8 +63,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
     }
 
     @Override
-    public boolean equals(
-            final Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -94,8 +91,7 @@ public class P11SlotIdentifier implements Comparable<P11SlotIdentifier> {
     }
 
     @Override
-    public int compareTo(
-            final P11SlotIdentifier obj) {
+    public int compareTo(final P11SlotIdentifier obj) {
         ParamUtil.requireNonNull("obj", obj);
         if (this == obj) {
             return 0;

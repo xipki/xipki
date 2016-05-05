@@ -48,19 +48,15 @@ public class NoIdleSignerException extends Exception {
     public NoIdleSignerException() {
     }
 
-    public NoIdleSignerException(
-            final String message) {
+    public NoIdleSignerException(final String message) {
         super(message);
     }
 
-    public NoIdleSignerException(
-            final Throwable cause) {
+    public NoIdleSignerException(final Throwable cause) {
         super(cause);
     }
 
-    public NoIdleSignerException(
-            final String message,
-            final Throwable cause) {
+    public NoIdleSignerException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

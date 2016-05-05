@@ -94,9 +94,7 @@ public class XmlUtil {
     private XmlUtil() {
     }
 
-    public static Element createElement(
-            final String namespace,
-            final String localPart,
+    public static Element createElement(final String namespace, final String localPart,
             final String value) {
         if (document == null) {
             throw new RuntimeException("XMLDocumentBuilder must not be initialized");
@@ -109,16 +107,14 @@ public class XmlUtil {
         return element;
     }
 
-    public static Element getDocumentElment(
-            final byte[] xmlFragement)
+    public static Element getDocumentElment(final byte[] xmlFragement)
     throws IOException, SAXException {
         ParamUtil.requireNonNull("xmlFragement", xmlFragement);
         Document doc = builder.parse(new ByteArrayInputStream(xmlFragement));
         return doc.getDocumentElement();
     }
 
-    public static Calendar getCalendar(
-            final Date dateAndTime) {
+    public static Calendar getCalendar(final Date dateAndTime) {
         if (null == dateAndTime) {
             return null;
         }
@@ -131,8 +127,7 @@ public class XmlUtil {
         return getXmlDate(new Date());
     }
 
-    public static XMLGregorianCalendar getXmlDate(
-            final Calendar calendar) {
+    public static XMLGregorianCalendar getXmlDate(final Calendar calendar) {
         ParamUtil.requireNonNull("calendar", calendar);
         GregorianCalendar cal;
         if (calendar instanceof GregorianCalendar) {
@@ -152,8 +147,7 @@ public class XmlUtil {
         }
     }
 
-    public static XMLGregorianCalendar getXmlDate(
-            final Date dateAndTime) {
+    public static XMLGregorianCalendar getXmlDate(final Date dateAndTime) {
         ParamUtil.requireNonNull("dateAndTime", dateAndTime);
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTimeZone(UTC);
@@ -168,9 +162,7 @@ public class XmlUtil {
         }
     }
 
-    public static String getValueOfFirstElementChild(
-            final Element element,
-            final String namespace,
+    public static String getValueOfFirstElementChild(final Element element, final String namespace,
             final String localname) {
         Node node = getFirstElementChild(element, namespace, localname);
         return (node == null)
@@ -178,8 +170,7 @@ public class XmlUtil {
                 : getNodeValue(node);
     }
 
-    public static String getNodeValue(
-            final Node node) {
+    public static String getNodeValue(final Node node) {
         ParamUtil.requireNonNull("node", node);
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             Node cn = node.getFirstChild();
@@ -196,9 +187,7 @@ public class XmlUtil {
         return node.getNodeValue();
     }
 
-    public static Element getFirstElementChild(
-            final Element element,
-            final String namespace,
+    public static Element getFirstElementChild(final Element element, final String namespace,
             final String localname) {
         ParamUtil.requireNonNull("element", element);
         ParamUtil.requireNonBlank("localname", localname);
@@ -225,9 +214,7 @@ public class XmlUtil {
      * @return List of the expected children element. If no match children could be found, empty
      *     list will be returned.
      */
-    public static List<Element> getElementChilden(
-            final Element element,
-            final String namespace,
+    public static List<Element> getElementChilden(final Element element, final String namespace,
             final String localname) {
         ParamUtil.requireNonNull("element", element);
         ParamUtil.requireNonBlank("localname", localname);
@@ -243,8 +230,7 @@ public class XmlUtil {
         return rv;
     }
 
-    public static List<Element> getAllElementsWithAttrId(
-            final Element element,
+    public static List<Element> getAllElementsWithAttrId(final Element element,
             final String namespace) {
         ParamUtil.requireNonNull("element", element);
         List<Element> list = new LinkedList<Element>();
@@ -265,9 +251,7 @@ public class XmlUtil {
         return list;
     }
 
-    private static void addAllElementsWithAttrId(
-            final List<Element> list,
-            final Element element,
+    private static void addAllElementsWithAttrId(final List<Element> list, final Element element,
             final String namespace) {
         if (elementHasId(element, namespace)) {
             list.add(element);
@@ -289,16 +273,11 @@ public class XmlUtil {
         }
     }
 
-    private static boolean elementHasId(
-            final Element element,
-            final String namespace) {
+    private static boolean elementHasId(final Element element, final String namespace) {
         return element.hasAttributeNS(namespace, "Id");
     }
 
-    private static boolean match(
-            final Node node,
-            final String namespace,
-            final String localname) {
+    private static boolean match(final Node node, final String namespace, final String localname) {
         if (node instanceof Element) {
             Element element = (Element) node;
             String ln = element.getLocalName();
@@ -315,9 +294,7 @@ public class XmlUtil {
         return false;
     }
 
-    public static String getValueOfFirstMatch(
-            final Element contextNode,
-            final String relativeXpath,
+    public static String getValueOfFirstMatch(final Element contextNode, final String relativeXpath,
             final Map<String, String> nsPrefixUriMap) {
         Node node = getFirstMatch(contextNode, relativeXpath, nsPrefixUriMap);
         return (node == null)
@@ -325,9 +302,7 @@ public class XmlUtil {
                 : getNodeValue(node);
     }
 
-    public static Node getFirstMatch(
-            final Element contextNode,
-            final String relativeXPath,
+    public static Node getFirstMatch(final Element contextNode, final String relativeXPath,
             final Map<String, String> nsPrefixUriMap) {
         List<Node> nodes = getMatch(contextNode, relativeXPath, nsPrefixUriMap, true);
         return CollectionUtil.isEmpty(nodes)
@@ -335,18 +310,13 @@ public class XmlUtil {
                 : nodes.get(0);
     }
 
-    public static List<Node> getMatch(
-            final Element contextNode,
-            final String relativeXPath,
+    public static List<Node> getMatch(final Element contextNode, final String relativeXPath,
             final Map<String, String> nsPrefixUriMap) {
         return getMatch(contextNode, relativeXPath, nsPrefixUriMap, false);
     }
 
-    private static List<Node> getMatch(
-            final Element contextNode,
-            final String relativeXpath,
-            final Map<String, String> nsPrefixUriMap,
-            final boolean onlyFirstMatch) {
+    private static List<Node> getMatch(final Element contextNode, final String relativeXpath,
+            final Map<String, String> nsPrefixUriMap, final boolean onlyFirstMatch) {
         try {
             SimpleXpath simpleXpath = new SimpleXpath(relativeXpath, nsPrefixUriMap);
             if (onlyFirstMatch) {
@@ -365,10 +335,8 @@ public class XmlUtil {
         }
     }
 
-    public static List<Element> getElementMatch(
-            final Element contextNode,
-            final String relativeXpath,
-            final Map<String, String> nsPrefixUriMap) {
+    public static List<Element> getElementMatch(final Element contextNode,
+            final String relativeXpath, final Map<String, String> nsPrefixUriMap) {
         List<Node> nodes = getMatch(contextNode, relativeXpath, nsPrefixUriMap, false);
         List<Element> elements = new ArrayList<Element>(nodes.size());
         for (Node node : nodes) {
@@ -379,8 +347,7 @@ public class XmlUtil {
         return elements;
     }
 
-    public static String getMessage(
-            final JAXBException ex) {
+    public static String getMessage(final JAXBException ex) {
         ParamUtil.requireNonNull("ex", ex);
         String ret = ex.getMessage();
         if (ret == null && ex.getLinkedException() != null) {
@@ -389,8 +356,7 @@ public class XmlUtil {
         return ret;
     }
 
-    public static JAXBException convert(
-            final JAXBException ex) {
+    public static JAXBException convert(final JAXBException ex) {
         ParamUtil.requireNonNull("ex", ex);
         return new JAXBException(getMessage(ex), ex.getLinkedException());
     }

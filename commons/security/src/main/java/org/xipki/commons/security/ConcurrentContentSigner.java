@@ -83,8 +83,7 @@ public interface ConcurrentContentSigner {
      */
     PrivateKey getPrivateKey();
 
-    void setPublicKey(
-            @Nonnull PublicKey publicKey);
+    void setPublicKey(@Nonnull PublicKey publicKey);
 
     PublicKey getPublicKey();
 
@@ -92,51 +91,38 @@ public interface ConcurrentContentSigner {
 
     X509CertificateHolder getCertificateAsBcObject();
 
-    void setCertificateChain(
-            @Nullable X509Certificate[] certchain);
+    void setCertificateChain(@Nullable X509Certificate[] certchain);
 
     X509Certificate[] getCertificateChain();
 
     X509CertificateHolder[] getCertificateChainAsBcObjects();
 
-    void initialize(
-            @Nullable String conf,
-            @Nullable PasswordResolver passwordResolver)
+    void initialize(@Nullable String conf, @Nullable PasswordResolver passwordResolver)
     throws XiSecurityException;
 
-    POPOSigningKey build(
-            @Nonnull ProofOfPossessionSigningKeyBuilder builder)
+    POPOSigningKey build(@Nonnull ProofOfPossessionSigningKeyBuilder builder)
     throws NoIdleSignerException;
 
-    ProtectedPKIMessage build(
-            @Nonnull ProtectedPKIMessageBuilder builder)
+    ProtectedPKIMessage build(@Nonnull ProtectedPKIMessageBuilder builder)
     throws NoIdleSignerException, CMPException;
 
-    X509CRLHolder build(
-            @Nonnull X509v2CRLBuilder builder)
+    X509CRLHolder build(@Nonnull X509v2CRLBuilder builder)
     throws NoIdleSignerException;
 
-    X509CertificateHolder build(
-            @Nonnull X509v3CertificateBuilder builder)
+    X509CertificateHolder build(@Nonnull X509v3CertificateBuilder builder)
     throws NoIdleSignerException;
 
-    OCSPReq build(
-            @Nonnull OCSPReqBuilder builder,
-            X509CertificateHolder[] chain)
+    OCSPReq build(@Nonnull OCSPReqBuilder builder, X509CertificateHolder[] chain)
     throws NoIdleSignerException, OCSPException;
 
-    BasicOCSPResp build(
-            @Nonnull BasicOCSPRespBuilder builder,
-            @Nullable X509CertificateHolder[] chain,
-            @Nonnull Date producedAt)
+    BasicOCSPResp build(@Nonnull BasicOCSPRespBuilder builder,
+            @Nullable X509CertificateHolder[] chain, @Nonnull Date producedAt)
     throws NoIdleSignerException, OCSPException;
 
-    PKCS10CertificationRequest build(
-            @Nonnull PKCS10CertificationRequestBuilder builder)
+    PKCS10CertificationRequest build(@Nonnull PKCS10CertificationRequestBuilder builder)
     throws NoIdleSignerException;
 
-    byte[] sign(
-            @Nonnull byte[] data)
+    byte[] sign(@Nonnull byte[] data)
     throws NoIdleSignerException, IOException;
 
     boolean isHealthy();

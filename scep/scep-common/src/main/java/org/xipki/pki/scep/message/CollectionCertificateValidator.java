@@ -53,8 +53,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
 
     private final Collection<String> certHashes;
 
-    public CollectionCertificateValidator(
-            final Collection<X509Certificate> certs) {
+    public CollectionCertificateValidator(final Collection<X509Certificate> certs) {
         ParamUtil.requireNonEmpty("certs", certs);
 
         certHashes = new HashSet<String>(certs.size());
@@ -70,8 +69,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
         }
     }
 
-    public CollectionCertificateValidator(
-            final X509Certificate cert) {
+    public CollectionCertificateValidator(final X509Certificate cert) {
         ParamUtil.requireNonNull("cert", cert);
 
         certHashes = new HashSet<String>(1);
@@ -86,8 +84,7 @@ public class CollectionCertificateValidator implements CertificateValidator {
     }
 
     @Override
-    public boolean trustCertificate(
-            final X509Certificate signerCert,
+    public boolean trustCertificate(final X509Certificate signerCert,
             final X509Certificate[] otherCerts) {
         ParamUtil.requireNonNull("signerCert", signerCert);
 

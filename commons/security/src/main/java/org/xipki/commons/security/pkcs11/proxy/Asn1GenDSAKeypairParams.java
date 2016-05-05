@@ -77,12 +77,10 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
 
     private final BigInteger g; // CHECKSTYLE:SKIP
 
-    public Asn1GenDSAKeypairParams(
-            final Asn1P11SlotIdentifier slotId,
-            final String label,
-            final BigInteger p, // CHECKSTYLE:SKIP
-            final BigInteger q, // CHECKSTYLE:SKIP
-            final BigInteger g) { // CHECKSTYLE:SKIP
+    // CHECKSTYLE:OFF
+    public Asn1GenDSAKeypairParams(final Asn1P11SlotIdentifier slotId, final String label,
+            final BigInteger p, final BigInteger q, final BigInteger g) {
+    // CHECKSTYLE:ON
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.label = ParamUtil.requireNonBlank("label", label);
         this.p = ParamUtil.requireNonNull("p", p);
@@ -90,8 +88,7 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
         this.g = ParamUtil.requireNonNull("g", g);
     }
 
-    private Asn1GenDSAKeypairParams(
-            final ASN1Sequence seq)
+    private Asn1GenDSAKeypairParams(final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 5, 5);
         int idx = 0;
@@ -102,8 +99,7 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
         g = Asn1Util.getInteger(seq.getObjectAt(idx++));
     }
 
-    public static Asn1GenDSAKeypairParams getInstance(
-            final Object obj)
+    public static Asn1GenDSAKeypairParams getInstance(final Object obj)
     throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1GenDSAKeypairParams) {
             return (Asn1GenDSAKeypairParams) obj;

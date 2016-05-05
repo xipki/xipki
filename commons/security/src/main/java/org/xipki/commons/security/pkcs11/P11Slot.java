@@ -67,36 +67,28 @@ public interface P11Slot {
 
     Set<P11ObjectIdentifier> getCertIdentifiers();
 
-    boolean hasIdentity(
-            final P11ObjectIdentifier objectId);
+    boolean hasIdentity(P11ObjectIdentifier objectId);
 
     void close();
 
     Set<Long> getMechanisms();
 
-    boolean supportsMechanism(
-            final long mechanism);
+    boolean supportsMechanism(long mechanism);
 
-    void assertMechanismSupported(
-            final long mechanism)
+    void assertMechanismSupported(long mechanism)
     throws P11UnsupportedMechanismException;
 
-    P11Identity getIdentity(
-            final P11ObjectIdentifier objectId)
+    P11Identity getIdentity(P11ObjectIdentifier objectId)
     throws P11UnknownEntityException;
 
     void refresh()
     throws P11TokenException;
 
-    P11ObjectIdentifier getObjectIdForId(
-            byte[] id);
+    P11ObjectIdentifier getObjectIdForId(byte[] id);
 
-    P11ObjectIdentifier getObjectIdForLabel(
-            String label);
+    P11ObjectIdentifier getObjectIdForLabel(String label);
 
-    void updateCertificate(
-            @Nonnull P11ObjectIdentifier objectId,
-            @Nonnull X509Certificate newCert)
+    void updateCertificate(@Nonnull P11ObjectIdentifier objectId, @Nonnull X509Certificate newCert)
     throws P11TokenException, XiSecurityException;
 
     /**
@@ -106,63 +98,44 @@ public interface P11Slot {
      * @return how many objects have been deleted
      * @throws P11TokenException if PKCS#11 error happens.
      */
-    int removeObjects(
-            @Nullable byte[] id,
-            @Nullable String label)
+    int removeObjects(@Nullable byte[] id, @Nullable String label)
     throws P11TokenException;
 
-    void removeIdentity(
-            @Nonnull P11ObjectIdentifier objectId)
+    void removeIdentity(@Nonnull P11ObjectIdentifier objectId)
     throws P11TokenException;
 
-    void removeCerts(
-            @Nonnull P11ObjectIdentifier objectId)
+    void removeCerts(@Nonnull P11ObjectIdentifier objectId)
     throws P11TokenException;
 
-    P11ObjectIdentifier addCert(
-            @Nonnull X509Certificate cert)
+    P11ObjectIdentifier addCert(@Nonnull X509Certificate cert)
     throws P11TokenException, XiSecurityException;
 
-    void addCert(
-            @Nonnull P11ObjectIdentifier objectId,
-            @Nonnull X509Certificate cert)
+    void addCert(@Nonnull P11ObjectIdentifier objectId, @Nonnull X509Certificate cert)
     throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:SKIP
-    P11ObjectIdentifier generateRSAKeypair(
-            int keysize,
-            @Nonnull BigInteger publicExponent,
+    P11ObjectIdentifier generateRSAKeypair(int keysize, @Nonnull BigInteger publicExponent,
             @Nonnull String label)
     throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:SKIP
-    P11ObjectIdentifier generateDSAKeypair(
-            int plength,
-            int qlength,
+    P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, @Nonnull String label)
+    throws P11TokenException, XiSecurityException;
+
+    // CHECKSTYLE:OFF
+    P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
             @Nonnull String label)
+    // CHECKSTYLE:ON
     throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:SKIP
-    P11ObjectIdentifier generateDSAKeypair(
-            BigInteger p, // CHECKSTYLE:SKIP
-            BigInteger q, // CHECKSTYLE:SKIP
-            BigInteger g, // CHECKSTYLE:SKIP
-            @Nonnull String label)
+    P11ObjectIdentifier generateECKeypair(@Nonnull String curveNameOrOid, @Nonnull String label)
     throws P11TokenException, XiSecurityException;
 
-    // CHECKSTYLE:SKIP
-    P11ObjectIdentifier generateECKeypair(
-            @Nonnull String curveNameOrOid,
-            @Nonnull String label)
+    X509Certificate exportCert(@Nonnull P11ObjectIdentifier objectId)
     throws P11TokenException, XiSecurityException;
 
-    X509Certificate exportCert(
-            @Nonnull P11ObjectIdentifier objectId)
-    throws P11TokenException, XiSecurityException;
-
-    void showDetails(
-            @Nonnull OutputStream stream,
-            boolean verbose)
+    void showDetails(@Nonnull OutputStream stream, boolean verbose)
     throws P11TokenException, XiSecurityException, IOException;
 
 }

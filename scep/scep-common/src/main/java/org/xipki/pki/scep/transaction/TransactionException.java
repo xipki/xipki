@@ -45,27 +45,20 @@ public class TransactionException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public TransactionException(
-            final String message,
-            final Throwable cause,
-            final boolean enableSuppression,
-            final boolean writableStackTrace) {
+    public TransactionException(final String message, final Throwable cause,
+            final boolean enableSuppression, final boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public TransactionException(
-            final String message,
-            final Throwable cause) {
+    public TransactionException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public TransactionException(
-            final String message) {
+    public TransactionException(final String message) {
         super(message);
     }
 
-    public TransactionException(
-            final Throwable cause) {
+    public TransactionException(final Throwable cause) {
         super(cause);
     }
 

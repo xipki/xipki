@@ -65,15 +65,12 @@ public class Asn1Mechanism extends ASN1Object {
 
     private final Asn1P11Params params;
 
-    public Asn1Mechanism(
-            final long mechanism,
-            final Asn1P11Params params) {
+    public Asn1Mechanism(final long mechanism, final Asn1P11Params params) {
         this.mechanism = mechanism;
         this.params = params;
     }
 
-    private Asn1Mechanism(
-            final ASN1Sequence seq)
+    private Asn1Mechanism(final ASN1Sequence seq)
     throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 1, 2);
         int size = seq.size();
@@ -86,8 +83,7 @@ public class Asn1Mechanism extends ASN1Object {
         }
     }
 
-    public static Asn1Mechanism getInstance(
-            final Object obj)
+    public static Asn1Mechanism getInstance(final Object obj)
     throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1Mechanism) {
             return (Asn1Mechanism) obj;

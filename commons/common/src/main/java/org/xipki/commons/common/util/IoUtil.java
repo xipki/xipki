@@ -67,8 +67,7 @@ public class IoUtil {
     private IoUtil() {
     }
 
-    public static void closeStream(
-            final OutputStream stream) {
+    public static void closeStream(final OutputStream stream) {
         if (stream == null) {
             return;
         }
@@ -79,20 +78,17 @@ public class IoUtil {
         }
     }
 
-    public static byte[] read(
-            final String fileName)
+    public static byte[] read(final String fileName)
     throws IOException {
         return read(new File(expandFilepath(fileName)));
     }
 
-    public static byte[] read(
-            final File file)
+    public static byte[] read(final File file)
     throws IOException {
         return read(new FileInputStream(expandFilepath(file)));
     }
 
-    public static byte[] read(
-            final InputStream in)
+    public static byte[] read(final InputStream in)
     throws IOException {
         try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -114,16 +110,12 @@ public class IoUtil {
         }
     }
 
-    public static void save(
-            final String fileName,
-            final byte[] encoded)
+    public static void save(final String fileName, final byte[] encoded)
     throws IOException {
         save(new File(expandFilepath(fileName)), encoded);
     }
 
-    public static void save(
-            final File file,
-            final byte[] content)
+    public static void save(final File file, final byte[] content)
     throws IOException {
         File tmpFile = expandFilepath(file);
 
@@ -138,40 +130,6 @@ public class IoUtil {
         } finally {
             out.close();
         }
-    }
-
-    public static byte[] leftmost(
-            final byte[] bytes,
-            final int bitCount) {
-        int byteLenKey = (bitCount + 7) / 8;
-
-        if (bitCount >= (bytes.length << 3)) {
-            return bytes;
-        }
-
-        byte[] truncatedBytes = new byte[byteLenKey];
-        System.arraycopy(bytes, 0, truncatedBytes, 0, byteLenKey);
-
-        // shift the bits to the right
-        if (bitCount % 8 > 0) {
-            int shiftBits = 8 - (bitCount % 8);
-
-            for (int i = byteLenKey - 1; i > 0; i--) {
-                truncatedBytes[i] = (byte) (
-                        (byte2int(truncatedBytes[i]) >>> shiftBits)
-                        | ((byte2int(truncatedBytes[i - 1]) << (8 - shiftBits)) & 0xFF));
-            }
-            truncatedBytes[0] = (byte) (byte2int(truncatedBytes[0]) >>> shiftBits);
-        }
-
-        return truncatedBytes;
-    }
-
-    private static int byte2int(
-            final byte bt) {
-        return (bt >= 0)
-                ? bt
-                : 256 + bt;
     }
 
     public static String getHostAddress()
@@ -213,8 +171,7 @@ public class IoUtil {
         }
     }
 
-    public static String expandFilepath(
-            final String path) {
+    public static String expandFilepath(final String path) {
         ParamUtil.requireNonBlank("path", path);
 
         if (path.startsWith("~" + File.separator)) {
@@ -224,8 +181,7 @@ public class IoUtil {
         }
     }
 
-    public static File expandFilepath(
-            final File file) {
+    public static File expandFilepath(final File file) {
         String path = file.getPath();
         String expandedPath = expandFilepath(path);
         if (path.equals(expandedPath)) {
@@ -235,8 +191,7 @@ public class IoUtil {
         }
     }
 
-    public static String convertSequenceName(
-            final String sequenceName) {
+    public static String convertSequenceName(final String sequenceName) {
         StringBuilder sb = new StringBuilder();
         int len = sequenceName.length();
         for (int i = 0; i < len; i++) {
@@ -250,9 +205,7 @@ public class IoUtil {
         return sb.toString();
     }
 
-    public static String base64Encode(
-            final byte[] data,
-            final boolean withLineBreak) {
+    public static String base64Encode(final byte[] data, final boolean withLineBreak) {
 
         String b64Str = Base64.getEncoder().encodeToString(data);
         if (!withLineBreak) {

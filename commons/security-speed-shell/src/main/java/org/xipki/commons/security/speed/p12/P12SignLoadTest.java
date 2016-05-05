@@ -80,11 +80,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
 
     private final ConcurrentContentSigner signer;
 
-    public P12SignLoadTest(
-            final SecurityFactory securityFactory,
-            final String signatureAlgorithm,
-            final byte[] keystore,
-            final String description)
+    public P12SignLoadTest(final SecurityFactory securityFactory, final String signatureAlgorithm, final byte[] keystore, final String description)
     throws Exception {
         super(description);
 
@@ -104,25 +100,20 @@ public abstract class P12SignLoadTest extends LoadExecutor {
     }
 
     // CHECKSTYLE:SKIP
-    protected static byte[] getPrecomputedRSAKeystore(
-            final int keysize,
-            final BigInteger publicExponent)
+    protected static byte[] getPrecomputedRSAKeystore(final int keysize, final BigInteger publicExponent)
     throws IOException {
         return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16)
             + ".p12");
     }
 
     // CHECKSTYLE:SKIP
-    protected static byte[] getPrecomputedDSAKeystore(
-            final int plength,
-            final int qlength)
+    protected static byte[] getPrecomputedDSAKeystore(final int plength, final int qlength)
     throws IOException {
         return getPrecomputedKeystore("dsa-" + plength + "-" + qlength + ".p12");
     }
 
     // CHECKSTYLE:SKIP
-    protected static byte[] getPrecomputedECKeystore(
-            final String curveNamOrOid)
+    protected static byte[] getPrecomputedECKeystore(final String curveNamOrOid)
     throws IOException {
         ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNamOrOid);
         if (oid == null) {
@@ -132,8 +123,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
         return getPrecomputedKeystore("ec-" + oid.getId() + ".p12");
     }
 
-    private static byte[] getPrecomputedKeystore(
-            final String filename)
+    private static byte[] getPrecomputedKeystore(final String filename)
     throws IOException {
         InputStream in = P12ECSignLoadTest.class.getResourceAsStream("/testkeys/" + filename);
         return (in == null)

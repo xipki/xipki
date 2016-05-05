@@ -68,8 +68,7 @@ public class AuditChildEvent {
         return level;
     }
 
-    public void setLevel(
-            AuditLevel level) {
+    public void setLevel(final AuditLevel level) {
         this.level = Objects.requireNonNull(level, "level must not be null");
     }
 
@@ -77,8 +76,7 @@ public class AuditChildEvent {
         return Collections.unmodifiableList(eventDatas);
     }
 
-    public AuditEventData removeEventData(
-            final String eventDataName) {
+    public AuditEventData removeEventData(final String eventDataName) {
         Objects.requireNonNull(eventDataName, "eventDataName must not be null");
 
         AuditEventData tbr = null;
@@ -95,8 +93,7 @@ public class AuditChildEvent {
         return tbr;
     }
 
-    public AuditEventData addEventData(
-            final AuditEventData eventData) {
+    public AuditEventData addEventData(final AuditEventData eventData) {
         Objects.requireNonNull(eventData, "eventData must not be null");
 
         int idx = -1;
@@ -120,8 +117,7 @@ public class AuditChildEvent {
         return status;
     }
 
-    public void setStatus(
-            final AuditStatus status) {
+    public void setStatus(final AuditStatus status) {
         this.status = Objects.requireNonNull(status, "status must not be null");
     }
 

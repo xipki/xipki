@@ -112,8 +112,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         return strongRandom4KeyEnabled;
     }
 
-    public void setStrongRandom4KeyEnabled(
-            final boolean strongRandom4KeyEnabled) {
+    public void setStrongRandom4KeyEnabled(final boolean strongRandom4KeyEnabled) {
         this.strongRandom4KeyEnabled = strongRandom4KeyEnabled;
     }
 
@@ -121,15 +120,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         return strongRandom4SignEnabled;
     }
 
-    public void setStrongRandom4SignEnabled(
-            final boolean strongRandom4SignEnabled) {
+    public void setStrongRandom4SignEnabled(final boolean strongRandom4SignEnabled) {
         this.strongRandom4SignEnabled = strongRandom4SignEnabled;
     }
 
     @Override
-    public ConcurrentContentSigner createSigner(
-            final String type,
-            final SignerConf conf,
+    public ConcurrentContentSigner createSigner(final String type, final SignerConf conf,
             final X509Certificate[] certificateChain)
     throws ObjectCreationException {
         ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf,
@@ -139,8 +135,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     @Override
-    public ContentVerifierProvider getContentVerifierProvider(
-            final PublicKey publicKey)
+    public ContentVerifierProvider getContentVerifierProvider(final PublicKey publicKey)
     throws InvalidKeyException {
         ParamUtil.requireNonNull("publicKey", publicKey);
 
@@ -171,8 +166,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     @Override
-    public PublicKey generatePublicKey(
-            final SubjectPublicKeyInfo subjectPublicKeyInfo)
+    public PublicKey generatePublicKey(final SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException {
         try {
             return KeyUtil.generatePublicKey(subjectPublicKeyInfo);
@@ -182,14 +176,12 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     @Override
-    public boolean verifyPopo(
-            final CertificationRequest p10Req) {
+    public boolean verifyPopo(final CertificationRequest p10Req) {
         return verifyPopo(new PKCS10CertificationRequest(p10Req));
     }
 
     @Override
-    public boolean verifyPopo(
-            final PKCS10CertificationRequest p10Request) {
+    public boolean verifyPopo(final PKCS10CertificationRequest p10Request) {
         try {
             SubjectPublicKeyInfo pkInfo = p10Request.getSubjectPublicKeyInfo();
             PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
@@ -208,19 +200,16 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         return defaultSignerParallelism;
     }
 
-    public void setDefaultSignerParallelism(
-            final int defaultSignerParallelism) {
+    public void setDefaultSignerParallelism(final int defaultSignerParallelism) {
         this.defaultSignerParallelism = ParamUtil.requireMin("defaultSignerParallelism",
                 defaultSignerParallelism, 1);
     }
 
-    public void setSignerFactoryRegister(
-            final SignerFactoryRegister signerFactoryRegister) {
+    public void setSignerFactoryRegister(final SignerFactoryRegister signerFactoryRegister) {
         this.signerFactoryRegister = signerFactoryRegister;
     }
 
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
+    public void setPasswordResolver(final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 
@@ -230,9 +219,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     @Override
-    public KeyCertPair createPrivateKeyAndCert(
-            final String type,
-            final SignerConf conf,
+    public KeyCertPair createPrivateKeyAndCert(final String type, final SignerConf conf,
             final X509Certificate cert)
     throws ObjectCreationException {
         conf.putConfEntry("parallelism", Integer.toString(1));
@@ -257,12 +244,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     @Override
-    public byte[] extractMinimalKeyStore(
-            final String keystoreType,
-            final byte[] keystoreBytes,
-            final String keyname,
-            final char[] password,
-            final X509Certificate[] newCertChain)
+    public byte[] extractMinimalKeyStore(final String keystoreType, final byte[] keystoreBytes,
+            final String keyname, final char[] password, final X509Certificate[] newCertChain)
     throws KeyStoreException {
         ParamUtil.requireNonBlank("keystoreType", keystoreType);
         ParamUtil.requireNonNull("keystoreBytes", keystoreBytes);
@@ -333,8 +316,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
     } // method extractMinimalKeyStore
 
-    private static SecureRandom getSecureRandom(
-            final boolean strong) {
+    private static SecureRandom getSecureRandom(final boolean strong) {
         if (!strong) {
             return new SecureRandom();
         }
@@ -347,10 +329,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
     }
 
-    private static void validateSigner(
-            final ConcurrentContentSigner signer,
-            final String signerType,
-            final SignerConf signerConf)
+    private static void validateSigner(final ConcurrentContentSigner signer,
+            final String signerType, final SignerConf signerConf)
     throws ObjectCreationException {
         if (signer.getPublicKey() == null) {
             return;

@@ -62,10 +62,7 @@ public enum ScepHashAlgoType {
 
     private final String name;
 
-    ScepHashAlgoType(
-            final int length,
-            final String oid,
-            final String name) {
+    ScepHashAlgoType(final int length, final String oid, final String name) {
         this.length = length;
         this.oid = oid;
         this.name = name;
@@ -83,16 +80,14 @@ public enum ScepHashAlgoType {
         return name;
     }
 
-    public String hexDigest(
-            final byte[] content) {
+    public String hexDigest(final byte[] content) {
         byte[] dgst = digest(content);
         return (dgst == null)
                 ? null
                 : Hex.toHexString(dgst).toUpperCase();
     }
 
-    public byte[] digest(
-            final byte[] content) {
+    public byte[] digest(final byte[] content) {
         ParamUtil.requireNonNull("content", content);
         Digest digest;
         if (this == SHA1) {
@@ -111,8 +106,7 @@ public enum ScepHashAlgoType {
         return ret;
     }
 
-    public static ScepHashAlgoType getHashAlgoType(
-            final String nameOrOid) {
+    public static ScepHashAlgoType getHashAlgoType(final String nameOrOid) {
 
         String tmpNameOrOid = nameOrOid;
 

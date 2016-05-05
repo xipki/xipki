@@ -48,8 +48,7 @@ public class RequestResponseDebug {
 
     private final List<RequestResponsePair> pairs = new LinkedList<>();
 
-    public void add(
-            final RequestResponsePair pair) {
+    public void add(final RequestResponsePair pair) {
         pairs.add(pair);
     }
 
@@ -57,18 +56,15 @@ public class RequestResponseDebug {
         return pairs.size();
     }
 
-    public RequestResponsePair get(
-            final int index) {
+    public RequestResponsePair get(final int index) {
         return pairs.get(index);
     }
 
-    public boolean remove(
-            final RequestResponsePair pair) {
+    public boolean remove(final RequestResponsePair pair) {
         return pairs.remove(pair);
     }
 
-    public RequestResponsePair remove(
-            final int index) {
+    public RequestResponsePair remove(final int index) {
         return pairs.remove(index);
     }
 

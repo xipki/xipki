@@ -48,19 +48,15 @@ public class PasswordResolverException extends Exception {
     public PasswordResolverException() {
     }
 
-    public PasswordResolverException(
-            final String message) {
+    public PasswordResolverException(final String message) {
         super(message);
     }
 
-    public PasswordResolverException(
-            final Throwable cause) {
+    public PasswordResolverException(final Throwable cause) {
         super(cause);
     }
 
-    public PasswordResolverException(
-            final String message,
-            final Throwable cause) {
+    public PasswordResolverException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

@@ -89,13 +89,9 @@ public class EmulatorP11Identity extends P11Identity {
 
     private final SecureRandom random;
 
-    public EmulatorP11Identity(
-            final P11Slot slot,
-            final P11EntityIdentifier identityId,
-            final PrivateKey privateKey,
-            final PublicKey publicKey,
-            final X509Certificate[] certificateChain,
-            final int maxSessions,
+    public EmulatorP11Identity(final P11Slot slot, final P11EntityIdentifier identityId,
+            final PrivateKey privateKey, final PublicKey publicKey,
+            final X509Certificate[] certificateChain, final int maxSessions,
             final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         super(slot, identityId, publicKey, certificateChain);
@@ -154,10 +150,7 @@ public class EmulatorP11Identity extends P11Identity {
     } // constructor
 
     @Override
-    protected byte[] doSign(
-            final long mechanism,
-            final P11Params parameters,
-            final byte[] content)
+    protected byte[] doSign(final long mechanism, final P11Params parameters, final byte[] content)
     throws P11TokenException, XiSecurityException {
         if (P11Constants.CKM_ECDSA == mechanism) {
             return dsaAndEcdsaSign(content, null);
@@ -214,10 +207,8 @@ public class EmulatorP11Identity extends P11Identity {
         }
     }
 
-    private byte[] rsaPkcsPssSign(
-            P11Params parameters,
-            final byte[] contentToSign,
-            HashAlgoType hashAlgo)
+    private byte[] rsaPkcsPssSign(final P11Params parameters, final byte[] contentToSign,
+            final HashAlgoType hashAlgo)
     throws XiSecurityException {
         if (!(parameters instanceof P11RSAPkcsPssParams)) {
             throw new XiSecurityException("the parameters is not of "
@@ -253,9 +244,7 @@ public class EmulatorP11Identity extends P11Identity {
         return rsaX509Sign(encodedHashValue);
     }
 
-    private byte[] rsaPkcsSign(
-            final byte[] contentToSign,
-            final HashAlgoType hashAlgo)
+    private byte[] rsaPkcsSign(final byte[] contentToSign, final HashAlgoType hashAlgo)
     throws XiSecurityException {
         int modulusBitLen = getSignatureKeyBitLength();
         byte[] paddedHash;
@@ -268,8 +257,7 @@ public class EmulatorP11Identity extends P11Identity {
         return rsaX509Sign(paddedHash);
     }
 
-    private byte[] rsaX509Sign(
-            final byte[] dataToSign)
+    private byte[] rsaX509Sign(final byte[] dataToSign)
     throws XiSecurityException {
         Cipher cipher;
         try {
@@ -288,9 +276,7 @@ public class EmulatorP11Identity extends P11Identity {
         }
     }
 
-    private byte[] dsaAndEcdsaSign(
-            final byte[] dataToSign,
-            final HashAlgoType hashAlgo)
+    private byte[] dsaAndEcdsaSign(final byte[] dataToSign, final HashAlgoType hashAlgo)
     throws XiSecurityException {
         byte[] hash = (hashAlgo == null)
                 ? dataToSign

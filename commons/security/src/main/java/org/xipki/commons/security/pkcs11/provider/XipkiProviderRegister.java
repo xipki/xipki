@@ -59,8 +59,7 @@ public class XipkiProviderRegister {
         }
     }
 
-    public void setP11CryptServiceFactory(
-            final P11CryptServiceFactory p11CryptServiceFactory) {
+    public void setP11CryptServiceFactory(final P11CryptServiceFactory p11CryptServiceFactory) {
         XipkiKeyStoreSpi.setP11CryptServiceFactory(p11CryptServiceFactory);
     }
 

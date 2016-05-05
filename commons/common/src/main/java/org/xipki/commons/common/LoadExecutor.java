@@ -74,8 +74,7 @@ public abstract class LoadExecutor {
 
     private String unit = "";
 
-    public LoadExecutor(
-            final String description) {
+    public LoadExecutor(final String description) {
         this.description = ParamUtil.requireNonNull("description", description);
         this.processLog = new ProcessLog(0);
     }
@@ -91,8 +90,7 @@ public abstract class LoadExecutor {
             try {
                 runnable = getTestor();
             } catch (Exception ex) {
-                System.err.println(
-                        "could not initialize Testor\nError message: " + ex.getMessage());
+                System.err.println("could not initialize Testor: " + ex.getMessage());
                 return;
             }
 
@@ -142,15 +140,13 @@ public abstract class LoadExecutor {
         return interrupted;
     }
 
-    public void setDuration(
-            final int duration) {
+    public void setDuration(final int duration) {
         if (duration > 0) {
             this.duration = duration;
         }
     }
 
-    public void setThreads(
-            final int threads) {
+    public void setThreads(final int threads) {
         if (threads > 0) {
             this.threads = threads;
         }
@@ -160,9 +156,7 @@ public abstract class LoadExecutor {
         return errorAccount.get();
     }
 
-    protected void account(
-            final int all,
-            final int failed) {
+    protected void account(final int all, final int failed) {
         processLog.addNumProcessed(all);
         errorAccount.addAndGet(failed);
     }
@@ -185,8 +179,7 @@ public abstract class LoadExecutor {
         processLog.printStatus();
     }
 
-    public void setUnit(
-            final String unit) {
+    public void setUnit(final String unit) {
         this.unit = ParamUtil.requireNonNull("unit", unit);
     }
 

@@ -45,19 +45,15 @@ public class MessageEncodingException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public MessageEncodingException(
-            final String message,
-            final Throwable cause) {
+    public MessageEncodingException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public MessageEncodingException(
-            final String message) {
+    public MessageEncodingException(final String message) {
         super(message);
     }
 
-    public MessageEncodingException(
-            final Throwable cause) {
+    public MessageEncodingException(final Throwable cause) {
         super(cause.getMessage(), cause);
     }
 

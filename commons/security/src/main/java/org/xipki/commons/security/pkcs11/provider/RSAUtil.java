@@ -68,8 +68,7 @@ public class RSAUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static boolean isRSAOid(
-            final ASN1ObjectIdentifier algOid) {
+    public static boolean isRSAOid(final ASN1ObjectIdentifier algOid) {
         ParamUtil.requireNonNull("algOid", algOid);
         for (int i = 0; i != RSA_OIDS.length; i++) {
             if (algOid.equals(RSA_OIDS[i])) {
@@ -80,15 +79,13 @@ public class RSAUtil {
         return false;
     }
 
-    static RSAKeyParameters generatePublicKeyParameter(
-            final RSAPublicKey key) {
+    static RSAKeyParameters generatePublicKeyParameter(final RSAPublicKey key) {
         ParamUtil.requireNonNull("key", key);
         return new RSAKeyParameters(false, key.getModulus(), key.getPublicExponent());
 
     }
 
-    static RSAKeyParameters generatePrivateKeyParameter(
-            final RSAPrivateKey key) {
+    static RSAKeyParameters generatePrivateKeyParameter(final RSAPrivateKey key) {
         ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPrivateCrtKey) {
             RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey) key;

@@ -94,8 +94,7 @@ public class Configuration {
      * @param ctype The ctype to parse, may be null
      * @return The encoding, if one was present, otherwise null
      */
-    static String extractEncodingFromCtype(
-            final String ctype) {
+    static String extractEncodingFromCtype(final String ctype) {
         if (ctype != null && ctype.indexOf('.') > 0) {
             String encodingAndModifier = ctype.substring(ctype.indexOf('.') + 1);
             if (encodingAndModifier.indexOf('@') > 0) {

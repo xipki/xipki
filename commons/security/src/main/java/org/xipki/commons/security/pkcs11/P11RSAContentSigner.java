@@ -96,9 +96,7 @@ class P11RSAContentSigner implements ContentSigner {
                 Hex.decode("3051300d060960864801650304020305000440"));
     }
 
-    P11RSAContentSigner(
-            final P11CryptService cryptService,
-            final P11EntityIdentifier identityId,
+    P11RSAContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,
             final AlgorithmIdentifier signatureAlgId)
     throws XiSecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);

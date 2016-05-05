@@ -56,9 +56,7 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher {
     }
 
     @Override
-    public void init(
-            final boolean forEncryption,
-            final CipherParameters cipherParam) {
+    public void init(final boolean forEncryption, final CipherParameters cipherParam) {
         if (!forEncryption) {
             throw new RuntimeCryptoException("verification mode not supported.");
         }
@@ -81,17 +79,14 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher {
     }
 
     @Override
-    public byte[] processBlock(
-            final byte[] in,
-            final int inOff,
-            final int len)
+    public byte[] processBlock(final byte[] in, final int inOff, final int len)
     throws InvalidCipherTextException {
         byte[] content = new byte[getInputBlockSize()];
         System.arraycopy(in, inOff, content, content.length - len, len);
 
         try {
-            return param.getP11CryptService().getIdentity(param.getIdentityId()).sign(
-                    P11Constants.CKM_RSA_X_509, null, content);
+            P11Identity identity = param.getP11CryptService().getIdentity(param.getIdentityId());
+            return identity.sign(P11Constants.CKM_RSA_X_509, null, content);
         } catch (XiSecurityException | P11TokenException ex) {
             throw new InvalidCipherTextException(ex.getMessage(), ex);
         }

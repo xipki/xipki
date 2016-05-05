@@ -46,9 +46,7 @@ public class DSAControl {
     private final int plen;
     private final int qlen;
 
-    public DSAControl(
-            final int plen,
-            final int qlen) {
+    public DSAControl(final int plen, final int qlen) {
         this.plen = plen;
         this.qlen = qlen;
     }

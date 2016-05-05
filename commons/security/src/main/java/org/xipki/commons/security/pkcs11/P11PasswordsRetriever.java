@@ -59,9 +59,7 @@ public class P11PasswordsRetriever {
 
         private final List<String> passwords;
 
-        private SingleRetriever(
-                final Set<P11SlotIdFilter> slots,
-                final List<String> passwords) {
+        private SingleRetriever(final Set<P11SlotIdFilter> slots, final List<String> passwords) {
             this.slots = slots;
             if (CollectionUtil.isEmpty(passwords)) {
                 this.passwords = null;
@@ -70,8 +68,7 @@ public class P11PasswordsRetriever {
             }
         }
 
-        public boolean match(
-                final P11SlotIdentifier slot) {
+        public boolean match(final P11SlotIdentifier slot) {
             if (slots == null) {
                 return true;
             }
@@ -84,8 +81,7 @@ public class P11PasswordsRetriever {
             return false;
         }
 
-        public List<char[]> getPasswords(
-                final PasswordResolver passwordResolver)
+        public List<char[]> getPasswords(final PasswordResolver passwordResolver)
         throws PasswordResolverException {
             if (passwords == null) {
                 return null;
@@ -112,14 +108,11 @@ public class P11PasswordsRetriever {
         singleRetrievers = new LinkedList<>();
     }
 
-    void addPasswordEntry(
-            final Set<P11SlotIdFilter> slots,
-            final List<String> passwords) {
+    void addPasswordEntry(final Set<P11SlotIdFilter> slots, final List<String> passwords) {
         singleRetrievers.add(new SingleRetriever(slots, passwords));
     }
 
-    public List<char[]> getPassword(
-            final P11SlotIdentifier slotId)
+    public List<char[]> getPassword(final P11SlotIdentifier slotId)
     throws PasswordResolverException {
         ParamUtil.requireNonNull("slotId", slotId);
         if (CollectionUtil.isEmpty(singleRetrievers)) {
@@ -139,8 +132,7 @@ public class P11PasswordsRetriever {
         return passwordResolver;
     }
 
-    public void setPasswordResolver(
-            final PasswordResolver passwordResolver) {
+    public void setPasswordResolver(final PasswordResolver passwordResolver) {
         this.passwordResolver = passwordResolver;
     }
 

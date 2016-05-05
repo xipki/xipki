@@ -80,8 +80,7 @@ public abstract class AbstractP11Module implements P11Module {
         return conf;
     }
 
-    protected void setSlots(
-            final Set<P11Slot> slots) {
+    protected void setSlots(final Set<P11Slot> slots) {
         this.slots.clear();
         this.slotIds.clear();
         for (P11Slot slot : slots) {
@@ -92,8 +91,7 @@ public abstract class AbstractP11Module implements P11Module {
         Collections.sort(this.slotIds);
     }
 
-    public P11Slot getSlot(
-            final P11SlotIdentifier slotId)
+    public P11Slot getSlot(final P11SlotIdentifier slotId)
     throws P11TokenException {
         ParamUtil.requireNonNull("slotId", slotId);
         P11Slot slot = slots.get(slotId);
@@ -103,8 +101,7 @@ public abstract class AbstractP11Module implements P11Module {
         return slot;
     } // method gestSlot
 
-    void destroySlot(
-            final long slotId) {
+    void destroySlot(final long slotId) {
         P11SlotIdentifier p11SlotId = null;
         for (P11SlotIdentifier si : slots.keySet()) {
             if (CompareUtil.equalsObject(si.getId(), slotId)) {
@@ -123,8 +120,7 @@ public abstract class AbstractP11Module implements P11Module {
     }
 
     @Override
-    public P11SlotIdentifier getSlotIdForIndex(
-            final int index)
+    public P11SlotIdentifier getSlotIdForIndex(final int index)
     throws P11UnknownEntityException {
         for (P11SlotIdentifier id : slotIds) {
             if (id.getIndex() == index) {
@@ -135,8 +131,7 @@ public abstract class AbstractP11Module implements P11Module {
     }
 
     @Override
-    public P11SlotIdentifier getSlotIdForId(
-            final long id)
+    public P11SlotIdentifier getSlotIdForId(final long id)
     throws P11UnknownEntityException {
         for (P11SlotIdentifier slotId : slotIds) {
             if (slotId.getId() == id) {

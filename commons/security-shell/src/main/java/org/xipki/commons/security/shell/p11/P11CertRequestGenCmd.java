@@ -83,8 +83,7 @@ public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
     private String moduleName = DEFAULT_P11MODULE_NAME;
 
     @Override
-    protected ConcurrentContentSigner getSigner(
-            final SignatureAlgoControl signatureAlgoControl)
+    protected ConcurrentContentSigner getSigner(final SignatureAlgoControl signatureAlgoControl)
     throws Exception {
         ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
 

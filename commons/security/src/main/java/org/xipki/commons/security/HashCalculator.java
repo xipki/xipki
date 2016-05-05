@@ -70,8 +70,7 @@ class HashCalculator {
     private HashCalculator() {
     }
 
-    private static BlockingDeque<Digest> getMessageDigests(
-            final HashAlgoType hashAlgo) {
+    private static BlockingDeque<Digest> getMessageDigests(final HashAlgoType hashAlgo) {
         BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
         for (int i = 0; i < PARALLELISM; i++) {
             Digest md = hashAlgo.createDigest();
@@ -80,57 +79,45 @@ class HashCalculator {
         return mds;
     }
 
-    public static String base64Sha1(
-            final byte[] data) {
+    public static String base64Sha1(final byte[] data) {
         return base64Hash(HashAlgoType.SHA1, data);
     }
 
-    public static String hexSha1(
-            final byte[] data) {
+    public static String hexSha1(final byte[] data) {
         return hexHash(HashAlgoType.SHA1, data);
     }
 
-    public static byte[] sha1(
-            final byte[] data) {
+    public static byte[] sha1(final byte[] data) {
         return hash(HashAlgoType.SHA1, data);
     }
 
-    public static String base64Sha256(
-            final byte[] data) {
+    public static String base64Sha256(final byte[] data) {
         return base64Hash(HashAlgoType.SHA256, data);
     }
 
-    public static String hexSha256(
-            final byte[] data) {
+    public static String hexSha256(final byte[] data) {
         return hexHash(HashAlgoType.SHA256, data);
     }
 
-    public static byte[] sha256(
-            final byte[] data) {
+    public static byte[] sha256(final byte[] data) {
         return hash(HashAlgoType.SHA256, data);
     }
 
-    public static String hexHash(
-            final HashAlgoType hashAlgoType,
-            final byte[] data) {
+    public static String hexHash(final HashAlgoType hashAlgoType, final byte[] data) {
         byte[] bytes = hash(hashAlgoType, data);
         return (bytes == null)
                 ? null
                 : Hex.toHexString(bytes).toUpperCase();
     }
 
-    public static String base64Hash(
-            final HashAlgoType hashAlgoType,
-            final byte[] data) {
+    public static String base64Hash(final HashAlgoType hashAlgoType, final byte[] data) {
         byte[] bytes = hash(hashAlgoType, data);
         return (bytes == null)
                 ? null
                 : Base64.getEncoder().encodeToString(bytes);
     }
 
-    public static byte[] hash(
-            final HashAlgoType hashAlgoType,
-            final byte[] data) {
+    public static byte[] hash(final HashAlgoType hashAlgoType, final byte[] data) {
         ParamUtil.requireNonNull("hashAlgoType", hashAlgoType);
         ParamUtil.requireNonNull("data", data);
         if (!MDS_MAP.containsKey(hashAlgoType)) {

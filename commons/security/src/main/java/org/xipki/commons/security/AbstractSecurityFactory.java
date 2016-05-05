@@ -53,9 +53,7 @@ import org.xipki.commons.common.util.ParamUtil;
 public abstract class AbstractSecurityFactory implements SecurityFactory {
 
     @Override
-    public ConcurrentContentSigner createSigner(
-            final String type,
-            final SignerConf conf,
+    public ConcurrentContentSigner createSigner(final String type, final SignerConf conf,
             final X509Certificate cert)
     throws ObjectCreationException {
         X509Certificate[] certs = (cert == null)
@@ -65,16 +63,14 @@ public abstract class AbstractSecurityFactory implements SecurityFactory {
     }
 
     @Override
-    public ContentVerifierProvider getContentVerifierProvider(
-            final X509Certificate cert)
+    public ContentVerifierProvider getContentVerifierProvider(final X509Certificate cert)
     throws InvalidKeyException {
         ParamUtil.requireNonNull("cert", cert);
         return getContentVerifierProvider(cert.getPublicKey());
     }
 
     @Override
-    public ContentVerifierProvider getContentVerifierProvider(
-            final X509CertificateHolder cert)
+    public ContentVerifierProvider getContentVerifierProvider(final X509CertificateHolder cert)
     throws InvalidKeyException {
         ParamUtil.requireNonNull("cert", cert);
         PublicKey publicKey = generatePublicKey(cert.getSubjectPublicKeyInfo());

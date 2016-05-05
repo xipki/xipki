@@ -33,9 +33,7 @@ public class DeadlockLoserDataAccessException extends PessimisticLockingFailureE
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public DeadlockLoserDataAccessException(
-            final String msg,
-            final Throwable cause) {
+    public DeadlockLoserDataAccessException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 

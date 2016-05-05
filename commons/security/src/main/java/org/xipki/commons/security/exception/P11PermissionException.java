@@ -45,8 +45,7 @@ public class P11PermissionException extends P11TokenException {
 
     private static final long serialVersionUID = 1L;
 
-    public P11PermissionException(
-            final String message) {
+    public P11PermissionException(final String message) {
         super(message);
     }
 

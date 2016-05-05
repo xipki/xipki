@@ -50,10 +50,7 @@ public class P12DSAKeyGenLoadTest extends P12KeyGenLoadTest {
     private final int plength;
     private final int qlength;
 
-    public P12DSAKeyGenLoadTest(
-            final int plength,
-            final int qlength,
-            final SecurityFactory securityFactory)
+    public P12DSAKeyGenLoadTest(final int plength, final int qlength, final SecurityFactory securityFactory)
     throws Exception {
         super("PKCS#12 DSA key generation\n"
                 + "plength: " + plength + "\n"
@@ -65,8 +62,7 @@ public class P12DSAKeyGenLoadTest extends P12KeyGenLoadTest {
     }
 
     @Override
-    protected void generateKeypair(
-            final SecureRandom random)
+    protected void generateKeypair(final SecureRandom random)
     throws Exception {
         KeyUtil.generateDSAKeypair(plength, qlength, random);
     }

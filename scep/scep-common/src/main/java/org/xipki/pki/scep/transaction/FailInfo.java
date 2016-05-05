@@ -71,8 +71,7 @@ public enum FailInfo {
 
     private final int code;
 
-    FailInfo(
-            final int code) {
+    FailInfo(final int code) {
         this.code = code;
     }
 
@@ -80,8 +79,7 @@ public enum FailInfo {
         return code;
     }
 
-    public static FailInfo valueForCode(
-            final int code) {
+    public static FailInfo valueForCode(final int code) {
         for (FailInfo m : values()) {
             if (m.code == code) {
                 return m;

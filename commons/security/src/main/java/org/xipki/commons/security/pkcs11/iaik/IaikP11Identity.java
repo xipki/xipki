@@ -61,11 +61,8 @@ class IaikP11Identity extends P11Identity {
 
     private final int expectedSignatureLen;
 
-    IaikP11Identity(
-            final IaikP11Slot slot,
-            final P11EntityIdentifier identityId,
-            final PrivateKey privateKey,
-            final PublicKey publicKey,
+    IaikP11Identity(final IaikP11Slot slot, final P11EntityIdentifier identityId,
+            final PrivateKey privateKey, final PublicKey publicKey,
             final X509Certificate[] certificateChain) {
         super(slot, identityId, publicKey, certificateChain);
         this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
@@ -86,10 +83,7 @@ class IaikP11Identity extends P11Identity {
     }
 
     @Override
-    protected byte[] doSign(
-            final long mechanism,
-            final P11Params parameters,
-            final byte[] content)
+    protected byte[] doSign(final long mechanism, final P11Params parameters, final byte[] content)
     throws P11TokenException {
         return ((IaikP11Slot) slot).sign(mechanism, parameters, content, this);
     }

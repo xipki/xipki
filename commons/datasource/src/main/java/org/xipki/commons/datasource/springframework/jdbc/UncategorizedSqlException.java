@@ -44,9 +44,7 @@ public class UncategorizedSqlException extends UncategorizedDataAccessException 
      * @param sql the offending SQL statement
      * @param ex the root cause
      */
-    public UncategorizedSqlException(
-            final String sql,
-            final SQLException ex) {
+    public UncategorizedSqlException(final String sql, final SQLException ex) {
         super("uncategorized SQLException for SQL [" + sql + "]; SQL state ["
                 + ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; "
                 + ex.getMessage(), ex);

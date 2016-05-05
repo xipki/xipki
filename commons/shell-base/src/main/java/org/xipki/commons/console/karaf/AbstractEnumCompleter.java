@@ -55,8 +55,7 @@ public abstract class AbstractEnumCompleter implements Completer {
 
     private final List<String> enums = new LinkedList<>();
 
-    protected void setTokens(
-            final String tokens) {
+    protected void setTokens(final String tokens) {
         ParamUtil.requireNonNull("tokens", tokens);
         enums.clear();
         StringTokenizer st = new StringTokenizer(tokens, ", ");
@@ -66,9 +65,7 @@ public abstract class AbstractEnumCompleter implements Completer {
     }
 
     @Override
-    public int complete(
-            final Session session,
-            final CommandLine commandLine,
+    public int complete(final Session session, final CommandLine commandLine,
             final List<String> candidates) {
         StringsCompleter delegate = new StringsCompleter();
         for (String entry : enums) {

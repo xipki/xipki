@@ -61,13 +61,11 @@ public class Asn1P11Params extends ASN1Object {
 
     private final ASN1Encodable p11Params;
 
-    public Asn1P11Params(
-            final ASN1Encodable p11Params) {
+    public Asn1P11Params(final ASN1Encodable p11Params) {
         this.p11Params = ParamUtil.requireNonNull("p11Params", p11Params);
     }
 
-    private Asn1P11Params(
-            final ASN1TaggedObject taggedObject)
+    private Asn1P11Params(final ASN1TaggedObject taggedObject)
     throws BadAsn1ObjectException {
         int tagNo = taggedObject.getTagNo();
         if (tagNo == 0) {
@@ -77,8 +75,7 @@ public class Asn1P11Params extends ASN1Object {
         }
     }
 
-    public static Asn1P11Params getInstance(
-            final Object obj)
+    public static Asn1P11Params getInstance(final Object obj)
     throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1P11Params) {
             return (Asn1P11Params) obj;

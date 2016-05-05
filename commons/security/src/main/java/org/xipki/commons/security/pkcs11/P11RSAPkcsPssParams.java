@@ -58,17 +58,14 @@ public class P11RSAPkcsPssParams implements P11Params {
 
     private final long saltLength;
 
-    public P11RSAPkcsPssParams(
-            final long hashAlgorithm,
-            final long maskGenerationFunction,
+    public P11RSAPkcsPssParams(final long hashAlgorithm, final long maskGenerationFunction,
             final long saltLength) {
         this.hashAlgorithm = hashAlgorithm;
         this.maskGenerationFunction = maskGenerationFunction;
         this.saltLength = saltLength;
     }
 
-    public P11RSAPkcsPssParams(
-            final RSASSAPSSparams asn1Params) {
+    public P11RSAPkcsPssParams(final RSASSAPSSparams asn1Params) {
         ASN1ObjectIdentifier asn1Oid = asn1Params.getHashAlgorithm().getAlgorithm();
         HashAlgoType contentHashAlgo = HashAlgoType.getHashAlgoType(asn1Oid);
         if (contentHashAlgo == null) {

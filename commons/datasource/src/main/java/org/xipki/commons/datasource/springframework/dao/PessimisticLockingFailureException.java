@@ -39,8 +39,7 @@ public class PessimisticLockingFailureException extends ConcurrencyFailureExcept
      * Constructor for PessimisticLockingFailureException.
      * @param msg the detail message
      */
-    public PessimisticLockingFailureException(
-            final String msg) {
+    public PessimisticLockingFailureException(final String msg) {
         super(msg);
     }
 
@@ -49,9 +48,7 @@ public class PessimisticLockingFailureException extends ConcurrencyFailureExcept
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public PessimisticLockingFailureException(
-            final String msg,
-            final Throwable cause) {
+    public PessimisticLockingFailureException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 

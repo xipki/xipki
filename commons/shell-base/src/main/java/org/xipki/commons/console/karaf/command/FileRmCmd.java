@@ -86,14 +86,13 @@ public class FileRmCmd extends XipkiCommandSupport {
                 return null;
             }
 
-            if (force || confirm(
-                    "Do you want to remove directory " + targetPath + " [yes/no]?", 3)) {
+            if (force
+                    || confirm("Do you want to remove directory " + targetPath + " [yes/no]?", 3)) {
                 FileUtils.deleteDirectory(target);
                 println("removed directory " + targetPath);
             }
         } else {
-            if (force || confirm(
-                    "Do you want o remove file " + targetPath + " [yes/no]?", 3)) {
+            if (force || confirm("Do you want o remove file " + targetPath + " [yes/no]?", 3)) {
                 target.delete();
                 println("removed file " + targetPath);
             }

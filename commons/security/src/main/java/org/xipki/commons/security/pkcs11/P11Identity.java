@@ -71,11 +71,8 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
     protected X509Certificate[] certificateChain;
 
-    public P11Identity(
-            final P11Slot slot,
-            final P11EntityIdentifier identityId,
-            final PublicKey publicKey,
-            final X509Certificate[] certificateChain) {
+    public P11Identity(final P11Slot slot, final P11EntityIdentifier identityId,
+            final PublicKey publicKey, final X509Certificate[] certificateChain) {
         this.slot = ParamUtil.requireNonNull("slot", slot);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         if ((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
@@ -107,10 +104,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         }
     } // constructor
 
-    public byte[] sign(
-            final long mechanism,
-            final P11Params parameters,
-            final byte[] content)
+    public byte[] sign(final long mechanism, final P11Params parameters, final byte[] content)
     throws P11TokenException, XiSecurityException {
         ParamUtil.requireNonNull("content", content);
         slot.assertMechanismSupported(mechanism);
@@ -123,9 +117,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         return doSign(mechanism, parameters, content);
     }
 
-    protected abstract byte[] doSign(
-            final long mechanism,
-            @Nullable final P11Params parameters,
+    protected abstract byte[] doSign(final long mechanism, @Nullable final P11Params parameters,
             @Nonnull final byte[] content)
     throws P11TokenException, XiSecurityException;
 
@@ -149,8 +141,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         return publicKey;
     }
 
-    public void setCertificates(
-            X509Certificate[] certificateChain)
+    public void setCertificates(final X509Certificate[] certificateChain)
     throws P11TokenException {
         if (certificateChain == null || certificateChain.length == 0) {
             this.certificateChain = null;
@@ -163,14 +154,11 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         }
     }
 
-    public boolean match(
-            final P11EntityIdentifier identityId) {
+    public boolean match(final P11EntityIdentifier identityId) {
         return this.identityId.equals(identityId);
     }
 
-    public boolean match(
-            final P11SlotIdentifier slotId,
-            final String keyLabel) {
+    public boolean match(final P11SlotIdentifier slotId, final String keyLabel) {
         return identityId.match(slotId, keyLabel);
     }
 
@@ -183,9 +171,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         return identityId.compareTo(obj.identityId);
     }
 
-    public boolean supportsMechanism(
-            final long mechanism,
-            final P11Params parameters) {
+    public boolean supportsMechanism(final long mechanism, final P11Params parameters) {
         if (publicKey instanceof RSAPublicKey) {
             if (P11Constants.CKM_RSA_9796 == mechanism
                     || P11Constants.CKM_RSA_PKCS == mechanism

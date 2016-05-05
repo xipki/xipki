@@ -84,9 +84,7 @@ public class HttpProxyServlet extends HttpServlet {
     }
 
     @Override
-    public void doGet(
-            final HttpServletRequest request,
-            final HttpServletResponse response)
+    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
         String operation = request.getParameter("operation");
         try {
@@ -139,9 +137,7 @@ public class HttpProxyServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(
-            final HttpServletRequest request,
-            final HttpServletResponse response)
+    public void doPost(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
         try {
             String moduleName = extractModuleName(request);
@@ -195,8 +191,7 @@ public class HttpProxyServlet extends HttpServlet {
         }
     } // method doPost
 
-    protected PKIMessage generatePkiMessage(
-            final InputStream is)
+    protected PKIMessage generatePkiMessage(final InputStream is)
     throws BadAsn1ObjectException {
         ParamUtil.requireNonNull("is", is);
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
@@ -214,13 +209,11 @@ public class HttpProxyServlet extends HttpServlet {
         }
     }
 
-    public void setLocalP11CryptServicePool(
-            final LocalP11CryptServicePool localP11CryptServicePool) {
+    public void setLocalP11CryptServicePool(final LocalP11CryptServicePool localP11CryptServicePool) {
         this.localP11CryptServicePool = localP11CryptServicePool;
     }
 
-    private static String extractModuleName(
-            final HttpServletRequest request)
+    private static String extractModuleName(final HttpServletRequest request)
     throws UnsupportedEncodingException {
         String moduleName = null;
         String encodedUrl = request.getRequestURI();
