@@ -53,8 +53,7 @@ public class ScepServerContainer {
 
     private Server server;
 
-    public ScepServerContainer(final int port, final ScepServer scepServer)
-    throws Exception {
+    public ScepServerContainer(final int port, final ScepServer scepServer) throws Exception {
         this(port, Arrays.asList(ParamUtil.requireNonNull("scepServer", scepServer)));
     }
 
@@ -76,8 +75,7 @@ public class ScepServerContainer {
         this.server = tmpServer;
     }
 
-    public void start()
-    throws Exception {
+    public void start() throws Exception {
         try {
             server.start();
         } catch (Exception ex) {
@@ -86,8 +84,7 @@ public class ScepServerContainer {
         }
     }
 
-    public void stop()
-    throws Exception {
+    public void stop() throws Exception {
         server.stop();
     }
 
