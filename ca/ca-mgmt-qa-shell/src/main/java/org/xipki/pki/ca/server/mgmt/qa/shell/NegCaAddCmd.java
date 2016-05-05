@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaAddCmd;
 public class NegCaAddCmd extends CaAddCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-ca-add");
 
         try {

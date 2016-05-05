@@ -60,8 +60,7 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
             new ConcurrentLinkedDeque<OcspStoreFactory>();
 
     @Override
-    public OcspStore newOcspStore(final String type)
-    throws ObjectCreationException {
+    public OcspStore newOcspStore(final String type) throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
 
         for (OcspStoreFactory service : services) {

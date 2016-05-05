@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.ResponderUpdateCmd;
 public class NegResponderUpdateCmd extends ResponderUpdateCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-responder-up");
 
         try {

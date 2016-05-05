@@ -63,8 +63,7 @@ public class MkdirCmd extends XipkiCommandSupport {
     private String dirName;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         File target = new File(expandFilepath(dirName));
         if (target.exists()) {
             if (!target.isDirectory()) {

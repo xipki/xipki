@@ -87,8 +87,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
 
     private AtomicBoolean initialized = new AtomicBoolean(false);
 
-    public QaSystemManagerImpl()
-    throws JAXBException, SAXException {
+    public QaSystemManagerImpl() throws JAXBException, SAXException {
         JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
         jaxbUnmarshaller = context.createUnmarshaller();
 
@@ -236,8 +235,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
         }
     }
 
-    private static byte[] readData(final FileOrValueType fileOrValue)
-    throws IOException {
+    private static byte[] readData(final FileOrValueType fileOrValue) throws IOException {
         byte[] data = fileOrValue.getValue();
         if (data == null) {
             data = IoUtil.read(fileOrValue.getFile());

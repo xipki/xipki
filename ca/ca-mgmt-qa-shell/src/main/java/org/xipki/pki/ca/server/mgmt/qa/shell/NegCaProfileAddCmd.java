@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaProfileAddCmd;
 public class NegCaProfileAddCmd extends CaProfileAddCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-caprofile-add");
 
         try {

@@ -66,8 +66,7 @@ public final class EnvelopedDataDecryptor {
         this.decryptors.add(decryptor);
     }
 
-    public byte[] decrypt(final CMSEnvelopedData envData)
-    throws MessageDecodingException {
+    public byte[] decrypt(final CMSEnvelopedData envData) throws MessageDecodingException {
         ParamUtil.requireNonNull("envData", envData);
         final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
         RecipientInformation recipientInfo = null;

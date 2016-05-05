@@ -92,8 +92,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         X509CaEntry caEntry = getCaEntry(false);
 
         boolean bo = caManager.addCa(caEntry);
@@ -101,8 +100,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         return null;
     }
 
-    protected X509CaEntry getCaEntry(final boolean ignoreCert)
-    throws Exception {
+    protected X509CaEntry getCaEntry(final boolean ignoreCert) throws Exception {
         Properties props = new Properties();
         confFile = IoUtil.expandFilepath(confFile);
         FileInputStream stream = new FileInputStream(confFile);

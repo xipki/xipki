@@ -65,8 +65,7 @@ public class UserUpdateCmd extends CaCommandSupport {
     private String cnRegex;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if ("CONSOLE".equalsIgnoreCase(password)) {
             password = new String(readPassword());
         }

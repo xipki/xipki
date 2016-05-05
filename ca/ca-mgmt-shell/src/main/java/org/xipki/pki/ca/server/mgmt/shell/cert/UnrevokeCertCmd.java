@@ -50,8 +50,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 public class UnrevokeCertCmd extends UnRevRmCertCommandSupport {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         boolean successful = caManager.unrevokeCertificate(caName, getSerialNumber());
         output(successful, "unrevoked", "could not unrevoke", "certificate");
 

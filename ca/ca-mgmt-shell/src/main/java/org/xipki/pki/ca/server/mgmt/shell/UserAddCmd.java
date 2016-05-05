@@ -67,8 +67,7 @@ public class UserAddCmd extends CaCommandSupport {
     private String cnRegex;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (password == null) {
             password = new String(readPassword());
         }

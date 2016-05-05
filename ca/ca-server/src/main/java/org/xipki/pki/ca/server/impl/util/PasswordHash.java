@@ -98,8 +98,7 @@ public class PasswordHash {
      * @return a salted PBKDF2 hash of the password
      */
     public static String createHash(final byte[] password, final int saltSize, final int iterations,
-            final int dkSize)
-    throws NoSuchAlgorithmException, InvalidKeySpecException {
+            final int dkSize) throws NoSuchAlgorithmException, InvalidKeySpecException {
         ParamUtil.requireNonNull("password", password);
         // Generate a random salt
         SecureRandom random = new SecureRandom();
@@ -175,8 +174,7 @@ public class PasswordHash {
      * @return the PBDKF2 hash of the password
      */
     public static byte[] pbkdf2(final byte[] password, final byte[] salt, final int iterations,
-            final int bytes)
-    throws NoSuchAlgorithmException, InvalidKeySpecException {
+            final int bytes) throws NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] pwdBytes;
         try {
             pwdBytes = new String(password).getBytes("UTF-8");

@@ -66,12 +66,10 @@ public abstract class XipkiCommandSupport implements Action {
     @Reference
     protected Session session;
 
-    protected abstract Object doExecute()
-    throws Exception;
+    protected abstract Object doExecute() throws Exception;
 
     @Override
-    public Object execute()
-    throws Exception {
+    public Object execute() throws Exception {
         try {
             return doExecute();
         } catch (Exception ex) {
@@ -149,8 +147,7 @@ public abstract class XipkiCommandSupport implements Action {
         println(tmpPromptPrefix + " " + saveTo.getPath());
     } // method saveVerbose
 
-    protected void save(final File file, final byte[] encoded)
-    throws IOException {
+    protected void save(final File file, final byte[] encoded) throws IOException {
         File tmpFile = expandFilepath(file);
         File parent = tmpFile.getParentFile();
         if (parent != null && !parent.exists()) {
@@ -195,8 +192,7 @@ public abstract class XipkiCommandSupport implements Action {
         }
     }
 
-    protected String readPrompt(final String prompt)
-    throws IOException {
+    protected String readPrompt(final String prompt) throws IOException {
         String tmpPrompt = prompt;
         if (StringUtil.isNotBlank(prompt)) {
             if (!prompt.endsWith(" ")) {
@@ -206,8 +202,7 @@ public abstract class XipkiCommandSupport implements Action {
         return readLine(tmpPrompt, null);
     }
 
-    protected char[] readPasswordIfNotSet(final String password)
-    throws IOException {
+    protected char[] readPasswordIfNotSet(final String password) throws IOException {
         if (password != null) {
             return password.toCharArray();
         }
@@ -215,13 +210,11 @@ public abstract class XipkiCommandSupport implements Action {
         return readPassword(null);
     }
 
-    protected char[] readPassword()
-    throws IOException {
+    protected char[] readPassword() throws IOException {
         return readPassword(null);
     }
 
-    protected char[] readPassword(final String prompt)
-    throws IOException {
+    protected char[] readPassword(final String prompt) throws IOException {
         String tmpPrompt = (prompt == null)
                 ? "Password:"
                 : prompt.trim();
@@ -238,8 +231,7 @@ public abstract class XipkiCommandSupport implements Action {
         }
     }
 
-    private String readLine(String prompt, Character ch)
-    throws IOException {
+    private String readLine(String prompt, Character ch) throws IOException {
         Object oldIgnoreInterrupts = session.get(Session.IGNORE_INTERRUPTS);
         session.put(Session.IGNORE_INTERRUPTS, Boolean.TRUE);
         try {
@@ -301,8 +293,7 @@ public abstract class XipkiCommandSupport implements Action {
         return new BigInteger(tmpStr);
     }
 
-    protected boolean confirm(final String prompt, final int maxTries)
-    throws IOException {
+    protected boolean confirm(final String prompt, final int maxTries) throws IOException {
         String tmpPrompt = prompt;
         if (prompt != null && !prompt.endsWith("\n")) {
             tmpPrompt += "\n";

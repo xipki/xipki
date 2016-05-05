@@ -71,8 +71,7 @@ public class RequestorUpdateCmd extends CaCommandSupport {
     protected String certFile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         // check if the certificate is valid
         byte[] certBytes = IoUtil.read(certFile);
         X509Util.parseCert(new ByteArrayInputStream(certBytes));

@@ -92,8 +92,7 @@ public class CmpControl {
 
     private final Set<String> sigAlgos;
 
-    public CmpControl(final CmpControlEntry dbEntry)
-    throws InvalidConfException {
+    public CmpControl(final CmpControlEntry dbEntry) throws InvalidConfException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
 
         ConfPairs pairs = new ConfPairs(dbEntry.getConf());
@@ -122,8 +121,7 @@ public class CmpControl {
     public CmpControl(final String name, final Boolean confirmCert, final Boolean sendCaCert,
             final Boolean messageTimeRequired, final Boolean sendResponderCert,
             final Integer messageTimeBias, final Integer confirmWaitTime,
-            final Set<String> sigAlgos)
-    throws InvalidConfException {
+            final Set<String> sigAlgos) throws InvalidConfException {
         ParamUtil.requireNonBlank("name", name);
 
         ConfPairs pairs = new ConfPairs();

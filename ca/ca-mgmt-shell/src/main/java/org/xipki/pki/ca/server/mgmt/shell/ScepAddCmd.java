@@ -93,8 +93,7 @@ public class ScepAddCmd extends CaCommandSupport {
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         String base64Cert = null;
         if (certFile != null) {
             base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);

@@ -55,8 +55,7 @@ public class InitDbCaCmd extends LiquibaseCommandSupport {
     private static final String SCHEMA_FILE = "xipki/sql/ca-init.xml";
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
         LiquibaseDatabaseConf dbConf = dbConfs.get("ca");

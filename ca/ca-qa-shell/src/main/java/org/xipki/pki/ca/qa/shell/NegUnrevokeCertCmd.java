@@ -59,8 +59,7 @@ import org.xipki.pki.ca.client.shell.UnRevRemoveCertCommandSupport;
 public class NegUnrevokeCertCmd extends UnRevRemoveCertCommandSupport {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
             throw new IllegalCmdParamException("either cert or (cacert, serial) must be specified");
         }

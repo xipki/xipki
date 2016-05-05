@@ -70,8 +70,7 @@ public class XipkiDigestExportReader {
 
         private PreparedStatement selectCertStmt;
 
-        Retriever()
-        throws DataAccessException {
+        Retriever() throws DataAccessException {
             this.conn = datasource.getConnection();
             try {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
@@ -167,8 +166,7 @@ public class XipkiDigestExportReader {
     private final String selectCertSql;
 
     public XipkiDigestExportReader(final DataSourceWrapper datasource,
-            final XipkiDbControl dbControl, final int numThreads)
-    throws Exception {
+            final XipkiDbControl dbControl, final int numThreads) throws Exception {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.numThreads = numThreads;
         this.dbControl = ParamUtil.requireNonNull("dbControl", dbControl);

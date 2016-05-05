@@ -85,8 +85,7 @@ public class ExportOcspCmd extends DbPortCommandSupport {
     private Boolean testOnly = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbPortWorker()
-    throws Exception {
+    protected DbPortWorker getDbPortWorker() throws Exception {
         return new OcspDbExportWorker(datasourceFactory, passwordResolver, dbconfFile, outdir,
                 resume, numCertsInBundle, numCertsPerSelect, testOnly);
     }

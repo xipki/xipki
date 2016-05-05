@@ -159,8 +159,7 @@ public abstract class X509Certprofile {
 
     public abstract Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls();
 
-    public abstract void initialize(@Nullable String data)
-    throws CertprofileException;
+    public abstract void initialize(@Nullable String data) throws CertprofileException;
 
     public abstract X509CertLevel getCertLevel();
 

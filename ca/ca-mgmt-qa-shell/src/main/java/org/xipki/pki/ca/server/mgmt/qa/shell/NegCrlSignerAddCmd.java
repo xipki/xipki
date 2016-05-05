@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CrlSignerAddCmd;
 public class NegCrlSignerAddCmd extends CrlSignerAddCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-crlsigner-add");
 
         try {

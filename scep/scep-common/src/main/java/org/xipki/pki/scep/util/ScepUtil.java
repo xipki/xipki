@@ -179,16 +179,14 @@ public class ScepUtil {
     }
 
     public static X509Certificate generateSelfsignedCert(final CertificationRequest csr,
-            final PrivateKey identityKey)
-    throws CertificateException {
+            final PrivateKey identityKey) throws CertificateException {
         ParamUtil.requireNonNull("csr", csr);
         return generateSelfsignedCert(csr.getCertificationRequestInfo().getSubject(),
                 csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), identityKey);
     }
 
     public static X509Certificate generateSelfsignedCert(final X500Name subjectDn,
-            final PublicKey pubKey, final PrivateKey identityKey)
-    throws CertificateException {
+            final PublicKey pubKey, final PrivateKey identityKey) throws CertificateException {
         SubjectPublicKeyInfo pubKeyInfo;
         try {
             pubKeyInfo = createSubjectPublicKeyInfo(pubKey);
@@ -278,8 +276,7 @@ public class ScepUtil {
         return certs;
     } // method getCertsFromSignedData
 
-    public static X509CRL getCrlFromPkiMessage(final SignedData signedData)
-    throws CRLException {
+    public static X509CRL getCrlFromPkiMessage(final SignedData signedData) throws CRLException {
         ParamUtil.requireNonNull("signedData", signedData);
         ASN1Set set = signedData.getCRLs();
         if (set == null || set.size() == 0) {
@@ -365,8 +362,7 @@ public class ScepUtil {
     }
 
     private static byte[] getCoreExtValue(final X509Certificate cert,
-            final ASN1ObjectIdentifier type)
-    throws CertificateEncodingException {
+            final ASN1ObjectIdentifier type) throws CertificateEncodingException {
         ParamUtil.requireNonNull("cert", cert);
         ParamUtil.requireNonNull("type", type);
         byte[] fullExtValue = cert.getExtensionValue(type.getId());
@@ -431,8 +427,7 @@ public class ScepUtil {
     }
 
     public static ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(final String sigOid,
-            final byte[] sigParams)
-    throws NoSuchAlgorithmException {
+            final byte[] sigParams) throws NoSuchAlgorithmException {
         ParamUtil.requireNonBlank("sigOid", sigOid);
 
         ASN1ObjectIdentifier algOid = new ASN1ObjectIdentifier(sigOid);
@@ -474,8 +469,7 @@ public class ScepUtil {
                 : set.getObjectAt(0);
     }
 
-    public static byte[] read(final InputStream in)
-    throws IOException {
+    public static byte[] read(final InputStream in) throws IOException {
         ParamUtil.requireNonNull("in", in);
         try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -496,8 +490,7 @@ public class ScepUtil {
     }
 
     public static void addCmsCertSet(final CMSSignedDataGenerator generator,
-            final X509Certificate[] cmsCertSet)
-    throws CertificateEncodingException, CMSException {
+            final X509Certificate[] cmsCertSet) throws CertificateEncodingException, CMSException {
         if (cmsCertSet == null || cmsCertSet.length == 0) {
             return;
         }

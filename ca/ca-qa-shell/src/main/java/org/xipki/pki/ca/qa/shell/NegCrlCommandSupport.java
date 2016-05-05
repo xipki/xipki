@@ -58,12 +58,10 @@ public abstract class NegCrlCommandSupport extends ClientCommandSupport {
                     + "required if multiple CAs are configured")
     protected String caName;
 
-    protected abstract X509CRL retrieveCrl()
-    throws CaClientException, PkiErrorException;
+    protected abstract X509CRL retrieveCrl() throws CaClientException, PkiErrorException;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         Set<String> caNames = caClient.getCaNames();
         if (isEmpty(caNames)) {
             throw new IllegalCmdParamException("no CA is configured");

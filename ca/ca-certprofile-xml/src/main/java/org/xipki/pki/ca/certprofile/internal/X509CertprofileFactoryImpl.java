@@ -53,8 +53,7 @@ public class X509CertprofileFactoryImpl implements X509CertprofileFactory {
     }
 
     @Override
-    public X509Certprofile newCertprofile(final String type)
-    throws ObjectCreationException {
+    public X509Certprofile newCertprofile(final String type) throws ObjectCreationException {
         if ("XML".equalsIgnoreCase(type)) {
             return new XmlX509Certprofile();
         } else {

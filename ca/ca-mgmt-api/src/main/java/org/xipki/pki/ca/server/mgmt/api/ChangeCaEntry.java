@@ -79,8 +79,7 @@ public class ChangeCaEntry implements Serializable {
 
     private Integer expirationPeriod;
 
-    public ChangeCaEntry(final String name)
-    throws CaMgmtException {
+    public ChangeCaEntry(final String name) throws CaMgmtException {
         this.name = ParamUtil.requireNonBlank("name", name);
     }
 

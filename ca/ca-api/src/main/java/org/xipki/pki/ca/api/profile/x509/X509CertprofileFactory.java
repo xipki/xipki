@@ -49,7 +49,6 @@ public interface X509CertprofileFactory {
 
     boolean canCreateProfile(@Nonnull String type);
 
-    X509Certprofile newCertprofile(@Nonnull String type)
-    throws ObjectCreationException;
+    X509Certprofile newCertprofile(@Nonnull String type) throws ObjectCreationException;
 
 }

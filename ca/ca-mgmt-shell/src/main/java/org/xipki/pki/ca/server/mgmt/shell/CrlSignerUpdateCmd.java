@@ -93,8 +93,7 @@ public class CrlSignerUpdateCmd extends CaCommandSupport {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected X509ChangeCrlSignerEntry getCrlSignerChangeEntry()
-    throws Exception {
+    protected X509ChangeCrlSignerEntry getCrlSignerChangeEntry() throws Exception {
         String signerCertConf = null;
         if (CaManager.NULL.equalsIgnoreCase(signerCert)) {
             signerCertConf = CaManager.NULL;
@@ -127,8 +126,7 @@ public class CrlSignerUpdateCmd extends CaCommandSupport {
     } // method getCrlSignerChangeEntry
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         boolean bo = caManager.changeCrlSigner(getCrlSignerChangeEntry());
         output(bo, "updated", "could not update", "CRL signer " + name);
         return null;

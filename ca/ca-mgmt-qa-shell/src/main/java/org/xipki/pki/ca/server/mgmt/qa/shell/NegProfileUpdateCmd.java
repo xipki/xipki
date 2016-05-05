@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.ProfileUpdateCmd;
 public class NegProfileUpdateCmd extends ProfileUpdateCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-profile-up");
 
         try {

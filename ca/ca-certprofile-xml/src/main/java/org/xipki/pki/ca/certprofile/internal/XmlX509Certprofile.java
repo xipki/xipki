@@ -284,8 +284,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
     } // method reset
 
     @Override
-    public void initialize(final String data)
-    throws CertprofileException {
+    public void initialize(final String data) throws CertprofileException {
         ParamUtil.requireNonBlank("data", data);
 
         reset();
@@ -298,8 +297,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         }
     } // method initialize
 
-    private void doInitialize(final String data)
-    throws CertprofileException {
+    private void doInitialize(final String data) throws CertprofileException {
         byte[] bytes;
         try {
             bytes = data.getBytes("UTF-8");
@@ -527,8 +525,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                 new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
 
-    private void initAdmission(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initAdmission(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_admission;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -622,8 +619,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                 new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
 
-    private void initBasicConstraints(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initBasicConstraints(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.basicConstraints;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -637,8 +633,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         this.pathLen = extConf.getPathLen();
     }
 
-    private void initBiometricInfo(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initBiometricInfo(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.biometricInfo;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -679,8 +674,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                 new ExtensionValue(extensionControls.get(type).isCritical(), value);
     }
 
-    private void initExtendedKeyUsage(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initExtendedKeyUsage(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.extendedKeyUsage;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -695,8 +689,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         this.extendedKeyusages = XmlX509CertprofileUtil.buildExtKeyUsageOptions(extConf);
     }
 
-    private void initInhibitAnyPolicy(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initInhibitAnyPolicy(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.inhibitAnyPolicy;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -718,8 +711,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                 new ExtensionValue(extensionControls.get(type).isCritical(), value);
     }
 
-    private void initKeyUsage(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initKeyUsage(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.keyUsage;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -734,8 +726,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         this.keyusages = XmlX509CertprofileUtil.buildKeyUsageOptions(extConf);
     }
 
-    private void initNameConstraints(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initNameConstraints(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.nameConstraints;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -767,8 +758,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         privateKeyUsagePeriod = CertValidity.getInstance(extConf.getValidity());
     }
 
-    private void initPolicyConstraints(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initPolicyConstraints(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.policyConstraints;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -785,8 +775,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                 new ExtensionValue(extensionControls.get(type).isCritical(), value);
     }
 
-    private void initPolicyMappings(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initPolicyMappings(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.policyMappings;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -803,8 +792,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         this.policyMappings = new ExtensionValue(extensionControls.get(type).isCritical(), value);
     }
 
-    private void initQcStatements(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initQcStatements(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.qCStatements;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -904,8 +892,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         qcStatementsOption = null;
     }
 
-    private void initRestriction(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initRestriction(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_restriction;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -923,8 +910,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         restriction = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
 
-    private void initSmimeCapabilities(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initSmimeCapabilities(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_smimeCapabilities;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -978,8 +964,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                 XmlX509CertprofileUtil.buildGeneralNameMode(extConf);
     }
 
-    private void initSubjectInfoAccess(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initSubjectInfoAccess(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = Extension.subjectInfoAccess;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -1000,8 +985,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         }
     }
 
-    private void initTlsFeature(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initTlsFeature(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_pe_tlsfeature;
         if (!extensionControls.containsKey(type)) {
             return;
@@ -1032,8 +1016,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         tlsFeature = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
 
-    private void initValidityModel(ExtensionsType extensionsType)
-    throws CertprofileException {
+    private void initValidityModel(ExtensionsType extensionsType) throws CertprofileException {
         ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_validityModel;
         if (!extensionControls.containsKey(type)) {
             return;

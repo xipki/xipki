@@ -378,8 +378,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     } // method checkPublicKey
 
     @Override
-    public void initialize(final String data)
-    throws CertprofileException {
+    public void initialize(final String data) throws CertprofileException {
     }
 
     protected void verifySubjectDnOccurence(final X500Name requestedSubject)
@@ -434,8 +433,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     } // method verifySubjectDnOccurence
 
     protected RDN createSubjectRdn(final String text, final ASN1ObjectIdentifier type,
-            final RdnControl option, final int index)
-    throws BadCertTemplateException {
+            final RdnControl option, final int index) throws BadCertTemplateException {
         ASN1Encodable rdnValue = createRdnValue(text, type, option, index);
         return (rdnValue == null)
                 ? null
@@ -443,8 +441,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     }
 
     private static RDN createDateOfBirthRdn(final ASN1ObjectIdentifier type,
-            final ASN1Encodable rdnValue)
-    throws BadCertTemplateException {
+            final ASN1Encodable rdnValue) throws BadCertTemplateException {
         ParamUtil.requireNonNull("type", type);
 
         String text;
@@ -523,8 +520,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     }
 
     private static ASN1Encodable createRdnValue(final String text, final ASN1ObjectIdentifier type,
-            final RdnControl option, final int index)
-    throws BadCertTemplateException {
+            final RdnControl option, final int index) throws BadCertTemplateException {
         ParamUtil.requireNonNull("text", text);
         ParamUtil.requireNonNull("type", type);
 
@@ -605,8 +601,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     }
 
     private static void checkEcSubjectPublicKeyInfo(final ASN1ObjectIdentifier curveOid,
-            final byte[] encoded)
-    throws BadCertTemplateException {
+            final byte[] encoded) throws BadCertTemplateException {
         ParamUtil.requireNonNull("curveOid", curveOid);
         ParamUtil.requireNonNull("encoded", encoded);
         ParamUtil.requireMin("encoded.length", encoded.length, 1);

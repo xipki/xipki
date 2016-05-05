@@ -57,8 +57,7 @@ public class UserInfoCmd extends CaCommandSupport {
     private String name;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         StringBuilder sb = new StringBuilder();
 
         UserEntry userEntry = caManager.getUser(name);

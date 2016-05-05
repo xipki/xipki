@@ -63,8 +63,7 @@ public class PBESinglePasswordResolver implements SinglePasswordResolver {
     public PBESinglePasswordResolver() {
     }
 
-    protected char[] getMasterPassword(String encryptedPassword)
-    throws PasswordResolverException {
+    protected char[] getMasterPassword(String encryptedPassword) throws PasswordResolverException {
         synchronized (masterPasswordLock) {
             init();
             if (masterPassword == null) {
@@ -137,8 +136,7 @@ public class PBESinglePasswordResolver implements SinglePasswordResolver {
     }
 
     @Override
-    public char[] resolvePassword(final String passwordHint)
-    throws PasswordResolverException {
+    public char[] resolvePassword(final String passwordHint) throws PasswordResolverException {
         return PBEPasswordService.decryptPassword(getMasterPassword(passwordHint),
                 passwordHint);
     }

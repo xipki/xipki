@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.ResponderAddCmd;
 public class NegResponderAddCmd extends ResponderAddCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-responder-add");
 
         try {

@@ -63,8 +63,7 @@ public class SpeedP11ECKeyGenCmd extends SpeedP11CommandSupport {
     private String curveName;
 
     @Override
-    protected LoadExecutor getTester()
-    throws Exception {
+    protected LoadExecutor getTester() throws Exception {
         return new P11ECKeyGenLoadTest(getSlot(), curveName);
     }
 

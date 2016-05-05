@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CmpControlAddCmd;
 public class NegCmpControlAddCmd extends CmpControlAddCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-cmpcontrol-add");
 
         try {

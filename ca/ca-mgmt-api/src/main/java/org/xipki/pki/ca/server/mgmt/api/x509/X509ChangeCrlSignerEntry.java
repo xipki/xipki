@@ -60,8 +60,7 @@ public class X509ChangeCrlSignerEntry implements Serializable {
 
     private String crlControl;
 
-    public X509ChangeCrlSignerEntry(final String name)
-    throws InvalidConfException {
+    public X509ChangeCrlSignerEntry(final String name) throws InvalidConfException {
         this.name = ParamUtil.requireNonBlank("name", name);
     }
 

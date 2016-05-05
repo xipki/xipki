@@ -63,8 +63,7 @@ public class ScepInfoCmd extends CaCommandSupport {
     private String name;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         ScepEntry scep = caManager.getScepEntry(name);
         if (scep == null) {
             throw new UnexpectedException("could not find SCEP '" + name + "'");

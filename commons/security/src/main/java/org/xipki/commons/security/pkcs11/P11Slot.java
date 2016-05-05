@@ -75,14 +75,11 @@ public interface P11Slot {
 
     boolean supportsMechanism(long mechanism);
 
-    void assertMechanismSupported(long mechanism)
-    throws P11UnsupportedMechanismException;
+    void assertMechanismSupported(long mechanism) throws P11UnsupportedMechanismException;
 
-    P11Identity getIdentity(P11ObjectIdentifier objectId)
-    throws P11UnknownEntityException;
+    P11Identity getIdentity(P11ObjectIdentifier objectId) throws P11UnknownEntityException;
 
-    void refresh()
-    throws P11TokenException;
+    void refresh() throws P11TokenException;
 
     P11ObjectIdentifier getObjectIdForId(byte[] id);
 
@@ -98,14 +95,11 @@ public interface P11Slot {
      * @return how many objects have been deleted
      * @throws P11TokenException if PKCS#11 error happens.
      */
-    int removeObjects(@Nullable byte[] id, @Nullable String label)
-    throws P11TokenException;
+    int removeObjects(@Nullable byte[] id, @Nullable String label) throws P11TokenException;
 
-    void removeIdentity(@Nonnull P11ObjectIdentifier objectId)
-    throws P11TokenException;
+    void removeIdentity(@Nonnull P11ObjectIdentifier objectId) throws P11TokenException;
 
-    void removeCerts(@Nonnull P11ObjectIdentifier objectId)
-    throws P11TokenException;
+    void removeCerts(@Nonnull P11ObjectIdentifier objectId) throws P11TokenException;
 
     P11ObjectIdentifier addCert(@Nonnull X509Certificate cert)
     throws P11TokenException, XiSecurityException;
@@ -115,8 +109,7 @@ public interface P11Slot {
 
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateRSAKeypair(int keysize, @Nonnull BigInteger publicExponent,
-            @Nonnull String label)
-    throws P11TokenException, XiSecurityException;
+            @Nonnull String label) throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, @Nonnull String label)
@@ -124,9 +117,8 @@ public interface P11Slot {
 
     // CHECKSTYLE:OFF
     P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
-            @Nonnull String label)
+            @Nonnull String label)  throws P11TokenException, XiSecurityException;
     // CHECKSTYLE:ON
-    throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateECKeypair(@Nonnull String curveNameOrOid, @Nonnull String label)

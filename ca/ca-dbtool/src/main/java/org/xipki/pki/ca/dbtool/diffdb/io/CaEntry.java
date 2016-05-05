@@ -85,8 +85,7 @@ public class CaEntry {
 
     private int numInCsvFile;
 
-    public CaEntry(final int caId, final String caDir)
-    throws IOException {
+    public CaEntry(final int caId, final String caDir) throws IOException {
         ParamUtil.requireNonNull("caDir", caDir);
 
         this.caId = caId;
@@ -136,8 +135,7 @@ public class CaEntry {
         }
     }
 
-    public void close()
-    throws IOException {
+    public void close() throws IOException {
         // write the account
         StringBuilder sb = new StringBuilder(50);
         sb.append(PROPKEY_ACCOUNT).append("=").append(numProcessed).append("\n");
@@ -148,8 +146,7 @@ public class CaEntry {
         IoUtil.closeStream(certsManifestOs);
     }
 
-    private void closeCurrentCsvFile()
-    throws IOException {
+    private void closeCurrentCsvFile() throws IOException {
         csvOutputStream.close();
 
         String zipFilename = DbToolBase.buildFilename("certs_", ".csv", minIdInCsvFile,
@@ -159,8 +156,7 @@ public class CaEntry {
         certsManifestOs.flush();
     }
 
-    private void createNewCsvFile()
-    throws IOException {
+    private void createNewCsvFile() throws IOException {
         this.csvFile = new File(caDir.getParentFile(),
                 "tmp-ca-" + caId + "-" + System.currentTimeMillis() + ".csv");
         csvOutputStream = new BufferedOutputStream(

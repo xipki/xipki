@@ -67,8 +67,7 @@ public class BSpeedP11DSASignCmd extends BSpeedP11SignCommandSupport {
     }
 
     @Override
-    protected LoadExecutor nextTester()
-    throws Exception {
+    protected LoadExecutor nextTester() throws Exception {
         DSAControl control = queue.takeFirst();
         if (control == null) {
             return null;

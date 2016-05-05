@@ -91,8 +91,7 @@ public class CaRevokeCmd extends CaCommandSupport {
     private String invalidityDateS;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         CrlReason crlReason = CrlReason.getInstance(reason);
         if (crlReason == null) {
             throw new IllegalCmdParamException("invalid reason " + reason);

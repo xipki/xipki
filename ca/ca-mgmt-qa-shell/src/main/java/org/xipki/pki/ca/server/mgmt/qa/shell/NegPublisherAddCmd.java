@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.PublisherAddCmd;
 public class NegPublisherAddCmd extends PublisherAddCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-publisher-add");
 
         try {

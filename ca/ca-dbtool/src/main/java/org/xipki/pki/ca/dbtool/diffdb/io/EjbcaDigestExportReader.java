@@ -78,8 +78,7 @@ public class EjbcaDigestExportReader {
 
         private PreparedStatement selectRawCertStmt;
 
-        Retriever()
-        throws DataAccessException {
+        Retriever() throws DataAccessException {
             this.conn = datasource.getConnection();
             try {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
@@ -223,8 +222,7 @@ public class EjbcaDigestExportReader {
     private final AtomicInteger numSkippedCerts = new AtomicInteger(0);
 
     public EjbcaDigestExportReader(final DataSourceWrapper datasource,
-            final Map<String, EjbcaCaInfo> fpCaInfoMap, final int numThreads)
-    throws Exception {
+            final Map<String, EjbcaCaInfo> fpCaInfoMap, final int numThreads) throws Exception {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.numThreads = numThreads;
         this.fpCaInfoMap = ParamUtil.requireNonNull("fpCaInfoMap", fpCaInfoMap);

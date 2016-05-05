@@ -194,8 +194,7 @@ public class OcspCertType extends DbDataObject {
     }
 
     @Override
-    public void validate()
-    throws InvalidDataObjectException {
+    public void validate() throws InvalidDataObjectException {
         assertNotNull("id", id);
         assertNotNull("iid", iid);
         assertNotBlank("sn", sn);

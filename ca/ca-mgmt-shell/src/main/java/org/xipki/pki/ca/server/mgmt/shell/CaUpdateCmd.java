@@ -192,8 +192,7 @@ public class CaUpdateCmd extends CaCommandSupport {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected X509ChangeCaEntry getChangeCaEntry()
-    throws Exception {
+    protected X509ChangeCaEntry getChangeCaEntry() throws Exception {
         X509ChangeCaEntry entry = new X509ChangeCaEntry(caName);
 
         if (snSize != null) {
@@ -296,8 +295,7 @@ public class CaUpdateCmd extends CaCommandSupport {
     } // method getChangeCaEntry
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         boolean bo = caManager.changeCa(getChangeCaEntry());
         output(bo, "updated", "could not update", "CA " + caName);
         return null;

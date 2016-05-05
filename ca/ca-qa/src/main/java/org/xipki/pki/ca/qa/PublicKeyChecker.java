@@ -82,8 +82,7 @@ public class PublicKeyChecker {
 
     private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
-    public PublicKeyChecker(final X509ProfileType conf)
-    throws CertprofileException {
+    public PublicKeyChecker(final X509ProfileType conf) throws CertprofileException {
         ParamUtil.requireNonNull("conf", conf);
         try {
             // KeyAlgorithms

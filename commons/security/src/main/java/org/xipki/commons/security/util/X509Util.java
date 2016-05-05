@@ -454,8 +454,7 @@ public class X509Util {
     }
 
     public static byte[] getCoreExtValue(final X509Certificate cert,
-            final ASN1ObjectIdentifier type)
-    throws CertificateEncodingException {
+            final ASN1ObjectIdentifier type) throws CertificateEncodingException {
         ParamUtil.requireNonNull("cert", cert);
         ParamUtil.requireNonNull("type", type);
         byte[] fullExtValue = cert.getExtensionValue(type.getId());
@@ -521,8 +520,7 @@ public class X509Util {
     } // method buildCertPath
 
     private static X509Certificate getCaCertOf(final X509Certificate cert,
-            final Set<? extends Certificate> caCerts)
-    throws CertificateEncodingException {
+            final Set<? extends Certificate> caCerts) throws CertificateEncodingException {
         ParamUtil.requireNonNull("cert", cert);
         if (isSelfSigned(cert)) {
             return null;
@@ -658,8 +656,7 @@ public class X509Util {
     }
 
     public static Extension createExtensionSubjectAltName(final List<String> taggedValues,
-            final boolean critical)
-    throws BadInputException {
+            final boolean critical) throws BadInputException {
         GeneralNames names = createGeneralNames(taggedValues);
         if (names == null) {
             return null;
@@ -735,8 +732,7 @@ public class X509Util {
     * @param taggedValue [tag]value, and the value for tags otherName and ediPartyName is
     *     type=value.
     */
-    public static GeneralName createGeneralName(final String taggedValue)
-    throws BadInputException {
+    public static GeneralName createGeneralName(final String taggedValue) throws BadInputException {
         ParamUtil.requireNonBlank("taggedValue", taggedValue);
 
         int tag = -1;

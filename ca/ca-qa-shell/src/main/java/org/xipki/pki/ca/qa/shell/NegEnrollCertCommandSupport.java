@@ -111,12 +111,10 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
     private String caName;
 
     protected abstract ConcurrentContentSigner getSigner(
-            @Nonnull SignatureAlgoControl signatureAlgoControl)
-    throws ObjectCreationException;
+            @Nonnull SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         EnrollCertRequest request = new EnrollCertRequest(
                 EnrollCertRequest.Type.CERT_REQ);
 

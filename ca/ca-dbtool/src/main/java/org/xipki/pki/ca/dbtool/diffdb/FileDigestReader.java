@@ -82,8 +82,7 @@ public class FileDigestReader implements DigestReader {
 
     private DbDigestEntry next;
 
-    public FileDigestReader(final String caDirname)
-    throws IOException, CertificateException {
+    public FileDigestReader(final String caDirname) throws IOException, CertificateException {
         this.caDirname = ParamUtil.requireNonBlank("caDirname", caDirname);
 
         this.caCert = X509Util.parseCert(new File(caDirname, "ca.der"));
@@ -146,8 +145,7 @@ public class FileDigestReader implements DigestReader {
                 : new CertsBundle(certs, serialNumbers);
     } // method nextCerts
 
-    private DbDigestEntry nextCert()
-    throws IOException {
+    private DbDigestEntry nextCert() throws IOException {
         if (next == null) {
             throw new IllegalStateException("reach end of the stream");
         }
@@ -158,8 +156,7 @@ public class FileDigestReader implements DigestReader {
         return ret;
     }
 
-    private DbDigestEntry retrieveNext(final boolean firstTime)
-    throws IOException {
+    private DbDigestEntry retrieveNext(final boolean firstTime) throws IOException {
         String line = firstTime
                 ? null
                 : certsReader.readLine();

@@ -132,8 +132,7 @@ class StoreConf {
      */
     private String certsDir;
 
-    StoreConf(final String propsConf)
-    throws OcspStoreException {
+    StoreConf(final String propsConf) throws OcspStoreException {
         Properties props = new Properties();
         try {
             props.load(new ByteArrayInputStream(propsConf.getBytes()));

@@ -98,8 +98,7 @@ public class CaDbImportWorker extends DbPortWorker {
     }
 
     @Override
-    public void doRun()
-    throws Exception {
+    public void doRun() throws Exception {
         File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if (resume) {
             if (!processLogFile.exists()) {

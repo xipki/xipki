@@ -49,13 +49,11 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CaCertsWriter extends DbiXmlWriter {
 
-    public CaCertsWriter()
-    throws IOException, XMLStreamException {
+    public CaCertsWriter() throws IOException, XMLStreamException {
         super("certs", "1");
     }
 
-    public void add(final CaCertType cert)
-    throws InvalidDataObjectException, XMLStreamException {
+    public void add(final CaCertType cert) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("cert", cert);
         cert.validate();
         cert.writeTo(this);

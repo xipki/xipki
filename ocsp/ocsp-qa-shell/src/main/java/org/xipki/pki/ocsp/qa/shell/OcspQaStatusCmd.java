@@ -182,8 +182,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
     @Override
     protected Object processResponse(final OCSPResp response, final X509Certificate respIssuer,
             final IssuerHash issuerHash, final List<BigInteger> serialNumbers, final Map<BigInteger,
-            byte[]> encodedCerts)
-    throws Exception {
+            byte[]> encodedCerts) throws Exception {
         OcspResponseOption responseOption = new OcspResponseOption();
         responseOption.setNextUpdateOccurrence(expectedNextUpdateOccurrence);
         responseOption.setCerthashOccurrence(expectedCerthashOccurrence);
@@ -242,8 +241,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
         }
     }
 
-    private static Occurrence getOccurrence(final String text)
-    throws IllegalCmdParamException {
+    private static Occurrence getOccurrence(final String text) throws IllegalCmdParamException {
         Occurrence ret = Occurrence.getInstance(text);
         if (ret == null) {
             throw new IllegalCmdParamException("invalid occurrence '" + text + "'");

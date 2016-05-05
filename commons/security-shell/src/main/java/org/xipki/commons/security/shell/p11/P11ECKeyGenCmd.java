@@ -63,8 +63,7 @@ public class P11ECKeyGenCmd extends P11KeyGenCommandSupport {
     private String curveName;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objId = slot.generateECKeypair(curveName, label);
         finalize("EC", objId);

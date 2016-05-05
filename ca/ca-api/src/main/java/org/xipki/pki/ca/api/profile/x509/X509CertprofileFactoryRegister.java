@@ -53,7 +53,6 @@ public interface X509CertprofileFactoryRegister {
      * @return new certificate profile.
      * @throws ObjectCreationException if certificate profile could not be created.
      */
-    X509Certprofile newCertprofile(@Nonnull String type)
-    throws ObjectCreationException;
+    X509Certprofile newCertprofile(@Nonnull String type) throws ObjectCreationException;
 
 }

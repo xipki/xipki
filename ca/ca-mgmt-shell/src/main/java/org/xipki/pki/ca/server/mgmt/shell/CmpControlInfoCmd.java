@@ -64,8 +64,7 @@ public class CmpControlInfoCmd extends CaCommandSupport {
     private String name;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         StringBuilder sb = new StringBuilder();
 
         if (name == null) {

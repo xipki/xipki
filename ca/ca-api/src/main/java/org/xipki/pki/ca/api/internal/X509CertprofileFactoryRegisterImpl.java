@@ -60,8 +60,7 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
             new ConcurrentLinkedDeque<X509CertprofileFactory>();
 
     @Override
-    public X509Certprofile newCertprofile(final String type)
-    throws ObjectCreationException {
+    public X509Certprofile newCertprofile(final String type) throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
 
         for (X509CertprofileFactory service : services) {

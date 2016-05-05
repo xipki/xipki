@@ -52,8 +52,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 public class CaSystemUnlockCmd extends CaCommandSupport {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         boolean unlocked = caManager.unlockCa();
 
         if (unlocked) {

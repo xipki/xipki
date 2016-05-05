@@ -110,8 +110,7 @@ public class PasswordResolverImpl implements PasswordResolver {
     }
 
     @Override
-    public char[] resolvePassword(final String passwordHint)
-    throws PasswordResolverException {
+    public char[] resolvePassword(final String passwordHint) throws PasswordResolverException {
         Objects.requireNonNull(passwordHint, "passwordHint must not be null");
         int index = passwordHint.indexOf(':');
         if (index == -1) {

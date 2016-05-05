@@ -69,8 +69,7 @@ public class Asn1P11SlotIdentifier extends ASN1Object {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
     }
 
-    private Asn1P11SlotIdentifier(final ASN1Sequence seq)
-    throws BadAsn1ObjectException {
+    private Asn1P11SlotIdentifier(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
         long id = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();

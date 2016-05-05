@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.cert.UnrevokeCertCmd;
 public class NegUnrevokeCertCmd extends UnrevokeCertCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-unrevoke-cert");
 
         try {

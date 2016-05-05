@@ -63,11 +63,9 @@ public abstract class DbPortCommandSupport extends XipkiCommandSupport {
         datasourceFactory = new DataSourceFactory();
     }
 
-    protected abstract DbPortWorker getDbPortWorker()
-    throws Exception;
+    protected abstract DbPortWorker getDbPortWorker() throws Exception;
 
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         ExecutorService executor = Executors.newFixedThreadPool(1);
         DbPortWorker myRun = getDbPortWorker();
         executor.execute(myRun);

@@ -178,8 +178,7 @@ public abstract class DataSourceWrapper {
 
         @Override
         protected String getSqlToDropForeignKeyConstraint(final String constraintName,
-                final String baseTable)
-        throws DataAccessException {
+                final String baseTable) throws DataAccessException {
             StringBuilder sb = new StringBuilder(baseTable.length() + constraintName.length() + 30);
             return sb.append("ALTER TABLE ").append(baseTable)
                     .append(" DROP FOREIGN KEY ").append(constraintName)
@@ -616,8 +615,7 @@ public abstract class DataSourceWrapper {
         return service.getMaximumPoolSize();
     }
 
-    public final Connection getConnection()
-    throws DataAccessException {
+    public final Connection getConnection() throws DataAccessException {
         try {
             return service.getConnection();
         } catch (Exception ex) {
@@ -660,13 +658,11 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public final PrintWriter getLogWriter()
-    throws SQLException {
+    public final PrintWriter getLogWriter() throws SQLException {
         return service.getLogWriter();
     }
 
-    public Statement createStatement(final Connection conn)
-    throws DataAccessException {
+    public Statement createStatement(final Connection conn) throws DataAccessException {
         ParamUtil.requireNonNull("conn", conn);
         try {
             return conn.createStatement();
@@ -745,8 +741,7 @@ public abstract class DataSourceWrapper {
     }
 
     public long getMin(final Connection conn, final String table, final String column,
-            final String condition)
-    throws DataAccessException {
+            final String condition) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
@@ -783,8 +778,7 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public int getCount(final Connection conn, final String table)
-    throws DataAccessException {
+    public int getCount(final Connection conn, final String table) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
 
         StringBuilder sqlBuilder = new StringBuilder(table.length() + 21);
@@ -817,8 +811,7 @@ public abstract class DataSourceWrapper {
     }
 
     public long getMax(final Connection conn, final String table, final String column,
-            final String condition)
-    throws DataAccessException {
+            final String condition) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
         int size = column.length() + table.length() + 20;
@@ -902,8 +895,7 @@ public abstract class DataSourceWrapper {
     }
 
     public boolean columnExists(final Connection conn, final String table, final String column,
-            final Object value)
-    throws DataAccessException {
+            final Object value) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
         ParamUtil.requireNonNull("value", value);
@@ -1044,8 +1036,7 @@ public abstract class DataSourceWrapper {
 
     }
 
-    public void dropSequence(final String sequenceName)
-    throws DataAccessException {
+    public void dropSequence(final String sequenceName) throws DataAccessException {
         ParamUtil.requireNonBlank("sequenceName", sequenceName);
         final String sql = buildDropSequenceSql(sequenceName);
         Connection conn = getConnection();
@@ -1127,8 +1118,7 @@ public abstract class DataSourceWrapper {
     }
 
     public void dropPrimaryKey(final Connection conn, final String primaryKeyName,
-            final String table)
-    throws DataAccessException {
+            final String table) throws DataAccessException {
         executeUpdate(conn, getSqlToDropPrimaryKey(primaryKeyName, table));
     }
 
@@ -1154,14 +1144,12 @@ public abstract class DataSourceWrapper {
     }
 
     public void addPrimaryKey(final Connection conn, final String primaryKeyName,
-            final String table, final String... columns)
-    throws DataAccessException {
+            final String table, final String... columns) throws DataAccessException {
         executeUpdate(conn, getSqlToAddPrimaryKey(primaryKeyName, table, columns));
     }
 
     protected String getSqlToDropForeignKeyConstraint(final String constraintName,
-            final String baseTable)
-    throws DataAccessException {
+            final String baseTable) throws DataAccessException {
         ParamUtil.requireNonBlank("constraintName", constraintName);
         ParamUtil.requireNonBlank("baseTable", baseTable);
 
@@ -1173,8 +1161,7 @@ public abstract class DataSourceWrapper {
     }
 
     public void dropForeignKeyConstraint(final Connection conn, final String constraintName,
-            final String baseTable)
-    throws DataAccessException {
+            final String baseTable) throws DataAccessException {
         executeUpdate(conn, getSqlToDropForeignKeyConstraint(constraintName, baseTable));
     }
 
@@ -1241,8 +1228,7 @@ public abstract class DataSourceWrapper {
     }
 
     public void createIndex(final Connection conn, final String indexName, final String table,
-            final String... columns)
-    throws DataAccessException {
+            final String... columns) throws DataAccessException {
         executeUpdate(conn, getSqlToCreateIndex(indexName, table, columns));
     }
 
@@ -1258,8 +1244,7 @@ public abstract class DataSourceWrapper {
     }
 
     public void dropUniqueConstrain(final Connection conn, final String constraintName,
-            final String table)
-    throws DataAccessException {
+            final String table) throws DataAccessException {
         executeUpdate(conn, getSqlToDropUniqueConstraint(constraintName, table));
     }
 
@@ -1284,8 +1269,7 @@ public abstract class DataSourceWrapper {
     }
 
     public void addUniqueConstrain(final Connection conn, final String constraintName,
-            final String table, final String... columns)
-    throws DataAccessException {
+            final String table, final String... columns) throws DataAccessException {
         executeUpdate(conn, getSqlToAddUniqueConstrain(constraintName, table, columns));
     }
 
@@ -1416,8 +1400,7 @@ public abstract class DataSourceWrapper {
                 .append("]; ").append(ex.getMessage()).toString();
     }
 
-    private void executeUpdate(Connection conn, String sql)
-    throws DataAccessException {
+    private void executeUpdate(Connection conn, String sql) throws DataAccessException {
         Statement stmt = null;
         try {
             stmt = (conn != null)

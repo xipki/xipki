@@ -492,8 +492,7 @@ public class DecodedPkiMessage extends PkiMessage {
     } // method decode
 
     private static String getPrintableStringAttrValue(final AttributeTable attrs,
-            final ASN1ObjectIdentifier type)
-    throws MessageDecodingException {
+            final ASN1ObjectIdentifier type) throws MessageDecodingException {
         ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
         if (value instanceof DERPrintableString) {
             return ((DERPrintableString) value).getString();
@@ -506,8 +505,7 @@ public class DecodedPkiMessage extends PkiMessage {
     }
 
     private static Integer getIntegerPrintStringAttrValue(final AttributeTable attrs,
-            final ASN1ObjectIdentifier type)
-    throws MessageDecodingException {
+            final ASN1ObjectIdentifier type) throws MessageDecodingException {
         String str = getPrintableStringAttrValue(attrs, type);
         if (str == null) {
             return null;
@@ -521,8 +519,7 @@ public class DecodedPkiMessage extends PkiMessage {
     }
 
     private static Nonce getNonceAttrValue(final AttributeTable attrs,
-            final ASN1ObjectIdentifier type)
-    throws MessageDecodingException {
+            final ASN1ObjectIdentifier type) throws MessageDecodingException {
         ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
         if (value instanceof ASN1OctetString) {
             byte[] bytes = ((ASN1OctetString) value).getOctets();

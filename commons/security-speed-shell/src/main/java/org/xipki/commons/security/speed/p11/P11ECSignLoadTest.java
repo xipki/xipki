@@ -49,8 +49,7 @@ import org.xipki.commons.security.pkcs11.P11Slot;
 public class P11ECSignLoadTest extends P11SignLoadTest {
 
     public P11ECSignLoadTest(final SecurityFactory securityFactory, final P11Slot slot,
-            final String signatureAlgorithm, final String curveNameOrOid)
-    throws Exception {
+            final String signatureAlgorithm, final String curveNameOrOid) throws Exception {
         super(securityFactory, slot, signatureAlgorithm,
                 generateKey(slot, curveNameOrOid),
                 "PKCS#11 EC signature creation\n"

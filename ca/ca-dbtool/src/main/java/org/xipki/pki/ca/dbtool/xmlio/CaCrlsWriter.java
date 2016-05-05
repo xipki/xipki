@@ -49,13 +49,11 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CaCrlsWriter extends DbiXmlWriter {
 
-    public CaCrlsWriter()
-    throws IOException, XMLStreamException {
+    public CaCrlsWriter() throws IOException, XMLStreamException {
         super("crls", "1");
     }
 
-    public void add(final CaCrlType crl)
-    throws InvalidDataObjectException, XMLStreamException {
+    public void add(final CaCrlType crl) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("crl", crl);
         crl.validate();
         crl.writeTo(this);

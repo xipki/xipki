@@ -57,8 +57,7 @@ public class UserRemoveCmd extends CaCommandSupport {
     private String name;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         boolean bo = caManager.removeUser(name);
         output(bo, "removed", "could not remove", "user " + name);
         return null;

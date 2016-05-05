@@ -75,7 +75,6 @@ public abstract class DbPortWorker implements Runnable {
         }
     }
 
-    protected abstract void doRun()
-    throws Exception;
+    protected abstract void doRun() throws Exception;
 
 }

@@ -88,8 +88,7 @@ public class ResponderUpdateCmd extends CaCommandSupport {
             description = "conf of the responder signer or 'NULL'")
     private String signerConf;
 
-    protected String getSignerConf()
-    throws Exception {
+    protected String getSignerConf() throws Exception {
         if (signerConf == null) {
             return signerConf;
         }
@@ -107,8 +106,7 @@ public class ResponderUpdateCmd extends CaCommandSupport {
     }
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         String cert = null;
         if (CaManager.NULL.equalsIgnoreCase(certFile)) {
             cert = CaManager.NULL;

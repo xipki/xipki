@@ -70,8 +70,7 @@ public class CaEntryContainer {
         ce.addDigestEntry(id, reportEntry);
     }
 
-    public void close()
-    throws IOException {
+    public void close() throws IOException {
         StringBuilder sb = new StringBuilder();
 
         for (CaEntry m : caEntryMap.values()) {

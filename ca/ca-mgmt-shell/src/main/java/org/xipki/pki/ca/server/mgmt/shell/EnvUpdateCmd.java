@@ -63,8 +63,7 @@ public class EnvUpdateCmd extends CaCommandSupport {
     protected String value;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         boolean bo = caManager.changeEnvParam(name, value);
         output(bo, "updated", "could not update",
                 "the environment " + name + "=" + getRealString(value));

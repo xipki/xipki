@@ -223,8 +223,7 @@ public class HttpCmpServlet extends HttpServlet {
         }
     } // method doPost
 
-    protected PKIMessage generatePkiMessage(final InputStream is)
-    throws IOException {
+    protected PKIMessage generatePkiMessage(final InputStream is) throws IOException {
         ParamUtil.requireNonNull("is", is);
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 

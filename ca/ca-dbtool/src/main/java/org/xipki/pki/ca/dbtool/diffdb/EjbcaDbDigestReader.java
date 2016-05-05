@@ -77,8 +77,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
     private EjbcaDbDigestReader(final DataSourceWrapper datasource, final X509Certificate caCert,
             final int totalAccount, final int minId, final int maxId, final int numThreads,
-            final int caId, final int numCertsToPredicate, final StopMe stopMe)
-    throws Exception {
+            final int caId, final int numCertsToPredicate, final StopMe stopMe) throws Exception {
         super(datasource, caCert, totalAccount, minId, maxId, numThreads,
                 numCertsToPredicate, stopMe);
 
@@ -104,8 +103,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
 
         private PreparedStatement selectBase64CertStmt;
 
-        EjbcaDbRetriever()
-        throws DataAccessException {
+        EjbcaDbRetriever() throws DataAccessException {
             this.conn = datasource.getConnection();
             try {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
@@ -212,15 +210,13 @@ public class EjbcaDbDigestReader extends DbDigestReader {
     }
 
     @Override
-    protected Retriever getRetriever()
-    throws DataAccessException {
+    protected Retriever getRetriever() throws DataAccessException {
         return new EjbcaDbRetriever();
     }
 
     public static EjbcaDbDigestReader getInstance(final DataSourceWrapper datasource,
             final int caId, final boolean dbContainsOtherCa, final int numThreads,
-            final int numCertsToPredicate, final StopMe stopMe)
-    throws Exception {
+            final int numCertsToPredicate, final StopMe stopMe) throws Exception {
         ParamUtil.requireNonNull("datasource", datasource);
 
         Connection conn = datasource.getConnection();
@@ -286,8 +282,7 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                 numCertsToPredicate, stopMe);
     } // method getInstance
 
-    private static X509Certificate readBase64Cert(String b64Cert)
-    throws DataAccessException {
+    private static X509Certificate readBase64Cert(String b64Cert) throws DataAccessException {
         try {
             return X509Util.parseBase64EncodedCert(b64Cert);
         } catch (Exception ex) {

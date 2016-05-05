@@ -73,8 +73,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
     private String pkcs11ConfFile;
 
-    public synchronized void init()
-    throws InvalidConfException, IOException {
+    public synchronized void init() throws InvalidConfException, IOException {
         if (p11Conf != null) {
             return;
         }

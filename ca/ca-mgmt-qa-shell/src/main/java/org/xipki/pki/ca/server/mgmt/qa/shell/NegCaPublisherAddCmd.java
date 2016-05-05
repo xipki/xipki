@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaPublisherAddCmd;
 public class NegCaPublisherAddCmd extends CaPublisherAddCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-capub-add");
 
         try {

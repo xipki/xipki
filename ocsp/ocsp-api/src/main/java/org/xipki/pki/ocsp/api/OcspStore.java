@@ -85,14 +85,12 @@ public abstract class OcspStore {
     throws OcspStoreException;
 
     public abstract void init(@Nullable String conf, @Nullable DataSourceWrapper datasource,
-            @Nonnull Set<HashAlgoType> certHashAlgos)
-    throws OcspStoreException;
+            @Nonnull Set<HashAlgoType> certHashAlgos) throws OcspStoreException;
 
     public abstract CertRevocationInfo getCaRevocationInfo(@Nonnull HashAlgoType hashAlgo,
             @Nonnull byte[] issuerNameHash, @Nonnull byte[] issuerKeyHash);
 
-    public abstract void shutdown()
-    throws OcspStoreException;
+    public abstract void shutdown() throws OcspStoreException;
 
     public abstract boolean isHealthy();
 

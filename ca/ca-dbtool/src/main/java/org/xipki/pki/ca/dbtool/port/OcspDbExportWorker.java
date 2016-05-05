@@ -134,8 +134,7 @@ public class OcspDbExportWorker extends DbPortWorker {
     } // constructor
 
     @Override
-    public void doRun()
-    throws Exception {
+    public void doRun() throws Exception {
         long start = System.currentTimeMillis();
         try {
             // CertStore

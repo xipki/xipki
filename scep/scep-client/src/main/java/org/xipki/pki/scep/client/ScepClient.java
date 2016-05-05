@@ -59,8 +59,7 @@ public class ScepClient extends Client {
     }
 
     @Override
-    protected ScepHttpResponse httpGet(final String url)
-    throws ScepClientException {
+    protected ScepHttpResponse httpGet(final String url) throws ScepClientException {
         ParamUtil.requireNonNull("url", url);
         try {
             URL tmpUrl = new URL(url);
@@ -74,8 +73,7 @@ public class ScepClient extends Client {
 
     @Override
     protected ScepHttpResponse httpPost(final String url, final String requestContentType,
-            final byte[] request)
-    throws ScepClientException {
+            final byte[] request) throws ScepClientException {
         ParamUtil.requireNonNull("url", url);
         try {
             URL tmpUrl = new URL(url);

@@ -82,8 +82,7 @@ public class GetCertQaCmd extends ClientCommandSupport {
     private String outputFile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (!(serialNumber == null ^ certFile == null)) {
             throw new IllegalCmdParamException("exactly one of serial or cert must be specified");
         }

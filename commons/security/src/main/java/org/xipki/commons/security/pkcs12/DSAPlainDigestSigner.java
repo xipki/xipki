@@ -161,9 +161,8 @@ class DSAPlainDigestSigner implements Signer {
     }
 
     // CHECKSTYLE:OFF
-    private byte[] encode(final BigInteger r, final BigInteger s)
+    private byte[] encode(final BigInteger r, final BigInteger s) throws IOException {
     // CHECKSTYLE:ON
-    throws IOException {
         int blockSize = (keyBitLen + 7) / 8;
         if ((r.bitLength() + 7) / 8 > blockSize) {
             throw new IOException("r is too long");
@@ -185,8 +184,7 @@ class DSAPlainDigestSigner implements Signer {
         return ret;
     }
 
-    private BigInteger[] decode(final byte[] encoding)
-    throws IOException {
+    private BigInteger[] decode(final byte[] encoding) throws IOException {
         int blockSize = (keyBitLen + 7) / 8;
         if (encoding.length != 2 * blockSize) {
             throw new IOException("invalid length of signature");

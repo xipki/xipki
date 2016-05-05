@@ -144,8 +144,7 @@ class OcspStoreQueryExecutor {
         this.maxX500nameLen = Integer.parseInt(str);
     } // constructor
 
-    private IssuerStore initIssuerStore()
-    throws DataAccessException {
+    private IssuerStore initIssuerStore() throws DataAccessException {
         final String sql = "SELECT ID,SUBJECT,S1C,CERT FROM ISSUER";
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
@@ -441,8 +440,7 @@ class OcspStoreQueryExecutor {
 
     } // method unrevokeCert
 
-    void removeCert(final X509Cert issuer, final X509CertWithDbId cert)
-    throws DataAccessException {
+    void removeCert(final X509Cert issuer, final X509CertWithDbId cert) throws DataAccessException {
         ParamUtil.requireNonNull("issuer", issuer);
         ParamUtil.requireNonNull("cert", cert);
 
@@ -693,8 +691,7 @@ class OcspStoreQueryExecutor {
         }
     } // method isHealthy
 
-    private int nextCertId()
-    throws DataAccessException {
+    private int nextCertId() throws DataAccessException {
         Connection conn = datasource.getConnection();
         try {
             while (true) {

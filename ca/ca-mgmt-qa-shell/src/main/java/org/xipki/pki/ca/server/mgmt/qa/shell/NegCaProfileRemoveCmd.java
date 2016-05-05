@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaProfileRemoveCmd;
 public class NegCaProfileRemoveCmd extends CaProfileRemoveCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-caprofile-rm");
 
         try {

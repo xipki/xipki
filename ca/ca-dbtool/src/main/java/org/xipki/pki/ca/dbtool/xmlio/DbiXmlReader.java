@@ -95,8 +95,7 @@ public abstract class DbiXmlReader {
         return next != null;
     }
 
-    public DbDataObject next()
-    throws InvalidDataObjectException, XMLStreamException {
+    public DbDataObject next() throws InvalidDataObjectException, XMLStreamException {
         if (next == null) {
             throw new IllegalStateException("no more next element exists");
         }

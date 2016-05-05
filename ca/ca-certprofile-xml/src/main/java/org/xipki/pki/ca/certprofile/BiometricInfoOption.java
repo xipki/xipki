@@ -63,8 +63,7 @@ public class BiometricInfoOption {
 
     private final TripleState sourceDataUriOccurrence;
 
-    public BiometricInfoOption(final BiometricInfo jaxb)
-    throws NoSuchAlgorithmException {
+    public BiometricInfoOption(final BiometricInfo jaxb) throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("jaxb", jaxb);
 
         this.sourceDataUriOccurrence = jaxb.getIncludeSourceDataUri();

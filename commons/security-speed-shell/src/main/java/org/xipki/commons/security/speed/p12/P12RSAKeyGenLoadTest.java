@@ -53,8 +53,7 @@ public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest {
     private final BigInteger publicExponent;
 
     public P12RSAKeyGenLoadTest(final int keysize, final BigInteger publicExponent,
-            final SecurityFactory securityFactory)
-    throws Exception {
+            final SecurityFactory securityFactory) throws Exception {
         super("PKCS#12 RSA key generation\n"
                 + "keysize: " + keysize + "\n"
                 + "public exponent: " + publicExponent,
@@ -65,8 +64,7 @@ public class P12RSAKeyGenLoadTest extends P12KeyGenLoadTest {
     }
 
     @Override
-    protected void generateKeypair(final SecureRandom random)
-    throws Exception {
+    protected void generateKeypair(final SecureRandom random) throws Exception {
         KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
     }
 

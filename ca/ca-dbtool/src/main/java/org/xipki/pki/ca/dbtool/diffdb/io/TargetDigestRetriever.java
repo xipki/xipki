@@ -79,8 +79,7 @@ public class TargetDigestRetriever {
 
         private PreparedStatement rangeSelectStmt;
 
-        Retriever(final boolean revokedOnly)
-        throws DataAccessException {
+        Retriever(final boolean revokedOnly) throws DataAccessException {
             this.revokedOnly = revokedOnly;
             conn = datasource.getConnection();
 
@@ -154,8 +153,7 @@ public class TargetDigestRetriever {
             datasource.returnConnection(conn);
         } // method run
 
-        private Map<Long, DbDigestEntry> query(CertsBundle bundle)
-        throws DataAccessException {
+        private Map<Long, DbDigestEntry> query(CertsBundle bundle) throws DataAccessException {
             List<Long> serialNumbers = bundle.getSerialNumbers();
             int size = serialNumbers.size();
 
@@ -360,8 +358,7 @@ public class TargetDigestRetriever {
     }
 
     private DbDigestEntry getSingleCert(final PreparedStatement singleSelectStmt,
-            final long serialNumber)
-    throws DataAccessException {
+            final long serialNumber) throws DataAccessException {
         ResultSet rs = null;
         try {
             singleSelectStmt.setLong(1, serialNumber);
@@ -395,8 +392,7 @@ public class TargetDigestRetriever {
         DbToolBase.releaseResources(datasource, ps, rs);
     }
 
-    public void awaitTerminiation()
-    throws Exception {
+    public void awaitTerminiation() throws Exception {
         executor.shutdown();
 
         while (!executor.awaitTermination(1000, TimeUnit.MILLISECONDS)) {

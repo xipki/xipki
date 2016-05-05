@@ -57,8 +57,7 @@ import org.xipki.pki.ca.server.mgmt.shell.RequestorUpdateCmd;
 public class RequestorCheckCmd extends RequestorUpdateCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("checking requestor " + name);
 
         CmpRequestorEntry cr = caManager.getCmpRequestor(name);

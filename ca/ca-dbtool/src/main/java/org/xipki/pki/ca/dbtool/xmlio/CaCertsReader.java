@@ -54,8 +54,7 @@ public class CaCertsReader extends DbiXmlReader {
     }
 
     @Override
-    protected DbDataObject retrieveNext()
-    throws InvalidDataObjectException, XMLStreamException {
+    protected DbDataObject retrieveNext() throws InvalidDataObjectException, XMLStreamException {
         CaCertType ret = null;
 
         StringBuilder buffer = new StringBuilder();

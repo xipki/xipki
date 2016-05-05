@@ -124,8 +124,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     CaCertStoreDbExporter(final DataSourceWrapper datasource, final Marshaller marshaller,
             final Unmarshaller unmarshaller, final String baseDir, final int numCertsInBundle,
             final int numCertsPerSelect, final boolean resume, final AtomicBoolean stopMe,
-            final boolean evaluateOnly)
-    throws DataAccessException {
+            final boolean evaluateOnly) throws DataAccessException {
         super(datasource, baseDir, stopMe, evaluateOnly);
         this.marshaller = ParamUtil.requireNonNull("marshaller", marshaller);
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
@@ -139,8 +138,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     }
 
     @SuppressWarnings("unchecked")
-    public void export()
-    throws Exception {
+    public void export() throws Exception {
         CertStoreType certstore;
         if (resume) {
             JAXBElement<CertStoreType> root;
@@ -388,8 +386,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(getExportedText() + sum + " CRLs from table CRL");
     } // method doExportCrl
 
-    private void exportCa(final CertStoreType certstore)
-    throws DataAccessException, IOException {
+    private void exportCa(final CertStoreType certstore) throws DataAccessException, IOException {
         System.out.println("exporting table CS_CA");
         Cas cas = new Cas();
         final String sql = "SELECT ID, CERT FROM CS_CA";
@@ -420,8 +417,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" exported table CS_CA");
     } // method exportCa
 
-    private void exportRequestor(final CertStoreType certstore)
-    throws DataAccessException {
+    private void exportRequestor(final CertStoreType certstore) throws DataAccessException {
         System.out.println("exporting table CS_REQUESTOR");
         Requestors infos = new Requestors();
         final String sql = "SELECT ID, NAME FROM CS_REQUESTOR";
@@ -449,8 +445,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" exported table CS_REQUESTOR");
     } // method exportRequestor
 
-    private void exportPublisherinfo(final CertStoreType certstore)
-    throws DataAccessException {
+    private void exportPublisherinfo(final CertStoreType certstore) throws DataAccessException {
         System.out.println("exporting table CS_PUBLISHER");
         Publishers infos = new Publishers();
         final String sql = "SELECT ID, NAME FROM CS_PUBLISHER";
@@ -620,8 +615,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         System.out.println(getExportedText() + sum + " users from table USERNAME");
     } // method doExportUser
 
-    private void exportCertprofileinfo(final CertStoreType certstore)
-    throws DataAccessException {
+    private void exportCertprofileinfo(final CertStoreType certstore) throws DataAccessException {
         System.out.println("exporting table CS_PROFILE");
         Profiles infos = new Profiles();
         final String sql = "SELECT ID, NAME FROM CS_PROFILE";
@@ -676,8 +670,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     } // method exportCert
 
     private void doExportCert(final CertStoreType certstore, final File processLogFile,
-            final FileOutputStream filenameListOs)
-    throws Exception {
+            final FileOutputStream filenameListOs) throws Exception {
         final int numEntriesPerSelect = numCertsPerSelect;
         final int numEntriesPerZip = numCertsInBundle;
         final String entriesDir = certsDir;
@@ -987,8 +980,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     } // method exportDeltaCRLCache
 
     private void finalizeZip(final ZipOutputStream zipOutStream, final String filename,
-            final DbiXmlWriter os)
-    throws JAXBException, IOException, XMLStreamException {
+            final DbiXmlWriter os) throws JAXBException, IOException, XMLStreamException {
         ZipEntry certZipEntry = new ZipEntry(filename);
         zipOutStream.putNextEntry(certZipEntry);
         try {

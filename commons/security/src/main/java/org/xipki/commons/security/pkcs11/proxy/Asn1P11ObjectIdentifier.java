@@ -70,8 +70,7 @@ public class Asn1P11ObjectIdentifier extends ASN1Object {
         this.objectId = ParamUtil.requireNonNull("objectId", objectId);
     }
 
-    private Asn1P11ObjectIdentifier(final ASN1Sequence seq)
-    throws BadAsn1ObjectException {
+    private Asn1P11ObjectIdentifier(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
         byte[] id = Asn1Util.getOctetStringBytes(seq.getObjectAt(idx++));

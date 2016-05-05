@@ -98,8 +98,7 @@ public class CaUserType extends DbDataObject {
     }
 
     @Override
-    public void validate()
-    throws InvalidDataObjectException {
+    public void validate() throws InvalidDataObjectException {
         assertNotNull("id", id);
         assertNotBlank("name", name);
         assertNotBlank("password", password);

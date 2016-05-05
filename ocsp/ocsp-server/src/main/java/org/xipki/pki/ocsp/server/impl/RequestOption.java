@@ -106,8 +106,7 @@ class RequestOption {
 
     private final CertpathValidationModel certpathValidationModel;
 
-    RequestOption(final RequestOptionType conf)
-    throws InvalidConfException {
+    RequestOption(final RequestOptionType conf) throws InvalidConfException {
         ParamUtil.requireNonNull("conf", conf);
 
         supportsHttpGet = conf.isSupportsHttpGet();

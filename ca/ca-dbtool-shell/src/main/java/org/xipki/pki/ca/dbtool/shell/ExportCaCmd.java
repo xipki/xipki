@@ -85,8 +85,7 @@ public class ExportCaCmd extends DbPortCommandSupport {
     private Boolean onlyTest = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbPortWorker()
-    throws Exception {
+    protected DbPortWorker getDbPortWorker() throws Exception {
         return new CaDbExportWorker(datasourceFactory, passwordResolver, dbconfFile, outdir, resume,
                 numCertsInBundle, numCertsPerCommit, onlyTest);
     }

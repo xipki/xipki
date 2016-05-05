@@ -110,8 +110,7 @@ public class ScepServlet extends HttpServlet {
     }
 
     private void service(final HttpServletRequest request, final HttpServletResponse response,
-            final boolean post)
-    throws ServletException, IOException {
+            final boolean post) throws ServletException, IOException {
         String requestUri = request.getRequestURI();
         String servletPath = request.getServletPath();
 
@@ -294,8 +293,7 @@ public class ScepServlet extends HttpServlet {
         }
     } // method service
 
-    protected PKIMessage generatePkiMessage(final InputStream is)
-    throws IOException {
+    protected PKIMessage generatePkiMessage(final InputStream is) throws IOException {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 
         try {

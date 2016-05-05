@@ -89,8 +89,7 @@ class PublicCaInfo {
 
     PublicCaInfo(final X509Certificate caCertificate, final List<String> caCertUris,
             final List<String> ocspUris, final List<String> crlUris,
-            final List<String> deltaCrlUris)
-    throws OperationException {
+            final List<String> deltaCrlUris) throws OperationException {
         ParamUtil.requireNonNull("caCertificate", caCertificate);
 
         this.caCertificate = new X509Cert(caCertificate);
@@ -126,8 +125,7 @@ class PublicCaInfo {
     PublicCaInfo(final X500Name subject, final BigInteger serialNumber,
             final GeneralNames subjectAltName, final byte[] subjectKeyIdentifier,
             final List<String> caCertUris, final List<String> ocspUris, final List<String> crlUris,
-            final List<String> deltaCrlUris)
-    throws OperationException {
+            final List<String> deltaCrlUris) throws OperationException {
         this.x500Subject = ParamUtil.requireNonNull("subject", subject);
         this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
 

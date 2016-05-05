@@ -129,8 +129,7 @@ class X509SelfSignedCertBuilder {
             final IdentifiedX509Certprofile certprofile, final CertificationRequest p10Request,
             final BigInteger serialNumber, final List<String> cacertUris,
             final List<String> ocspUris, final List<String> crlUris,
-            final List<String> deltaCrlUris)
-    throws OperationException, InvalidConfException {
+            final List<String> deltaCrlUris) throws OperationException, InvalidConfException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         ParamUtil.requireNonBlank("signerType", signerType);
         ParamUtil.requireNonNull("certprofile", certprofile);
@@ -227,8 +226,7 @@ class X509SelfSignedCertBuilder {
             final IdentifiedX509Certprofile certprofile, final CertificationRequest p10Request,
             final BigInteger serialNumber, final SubjectPublicKeyInfo publicKeyInfo,
             final List<String> cacertUris, final List<String> ocspUris, final List<String> crlUris,
-            final List<String> deltaCrlUris)
-    throws OperationException {
+            final List<String> deltaCrlUris) throws OperationException {
 
         SubjectPublicKeyInfo tmpPublicKeyInfo;
         try {

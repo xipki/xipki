@@ -93,8 +93,7 @@ public class ScepUpdateCmd extends CaCommandSupport {
     @Reference
     private PasswordResolver passwordResolver;
 
-    private String getResponderConf()
-    throws Exception {
+    private String getResponderConf() throws Exception {
         if (responderConf == null) {
             return responderConf;
         }
@@ -112,8 +111,7 @@ public class ScepUpdateCmd extends CaCommandSupport {
     }
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         String certConf = null;
         if (CaManager.NULL.equalsIgnoreCase(certFile)) {
             certConf = CaManager.NULL;

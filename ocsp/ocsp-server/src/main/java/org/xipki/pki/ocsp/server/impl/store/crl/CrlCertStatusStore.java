@@ -560,8 +560,7 @@ public class CrlCertStatusStore extends OcspStore {
     } // method initializeStore
 
     private Map<BigInteger, CertWithInfo> extractCertsFromExtCrlCertSet(
-            final byte[] encodedExtCrlCertSet, final X500Name caName)
-    throws OcspStoreException {
+            final byte[] encodedExtCrlCertSet, final X500Name caName) throws OcspStoreException {
         Map<BigInteger, CertWithInfo> certsMap = new HashMap<>();
         ASN1Set asn1Set = DERSet.getInstance(encodedExtCrlCertSet);
         final int n = asn1Set.size();
@@ -627,8 +626,7 @@ public class CrlCertStatusStore extends OcspStore {
     public CertStatusInfo getCertStatus(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
             final byte[] issuerKeyHash, final BigInteger serialNumber,
             final boolean includeCertHash, final HashAlgoType certHashAlg,
-            final CertprofileOption certprofileOption)
-    throws OcspStoreException {
+            final CertprofileOption certprofileOption) throws OcspStoreException {
         // wait for max. 0.5 second
         int num = 5;
         while (!initialized && (num-- > 0)) {
@@ -754,8 +752,7 @@ public class CrlCertStatusStore extends OcspStore {
 
     @Override
     public void init(final String conf, final DataSourceWrapper datasource,
-            final Set<HashAlgoType> certHashAlgos)
-    throws OcspStoreException {
+            final Set<HashAlgoType> certHashAlgos) throws OcspStoreException {
         ParamUtil.requireNonBlank("conf", conf);
         this.certHashAlgos = ParamUtil.requireNonNull("certHashAlgos", certHashAlgos);
 
@@ -786,8 +783,7 @@ public class CrlCertStatusStore extends OcspStore {
     }
 
     @Override
-    public void shutdown()
-    throws OcspStoreException {
+    public void shutdown() throws OcspStoreException {
         if (scheduledThreadPoolExecutor == null) {
             return;
         }
@@ -805,8 +801,7 @@ public class CrlCertStatusStore extends OcspStore {
     }
 
     private void readCertWithInfosFromDir(final X509Certificate caCert, final String certsDirname,
-            final Map<BigInteger, CertWithInfo> certsMap)
-    throws CertificateEncodingException {
+            final Map<BigInteger, CertWithInfo> certsMap) throws CertificateEncodingException {
         File certsDir = new File(certsDirname);
 
         if (!certsDir.exists()) {
@@ -884,8 +879,7 @@ public class CrlCertStatusStore extends OcspStore {
         } // end for
     } // method readCertWithInfosFromDir
 
-    private byte[] sha1Fp(final File file)
-    throws IOException {
+    private byte[] sha1Fp(final File file) throws IOException {
         synchronized (sha1) {
             sha1.reset();
             FileInputStream in = new FileInputStream(file);
@@ -973,8 +967,7 @@ public class CrlCertStatusStore extends OcspStore {
         return ASN1OctetString.getInstance(encodedExtensionValue).getOctets();
     }
 
-    private static X509Certificate parseCert(final String certFile)
-    throws OcspStoreException {
+    private static X509Certificate parseCert(final String certFile) throws OcspStoreException {
         try {
             return X509Util.parseCert(certFile);
         } catch (CertificateException | IOException ex) {

@@ -121,13 +121,11 @@ public class X509CertprofileQa {
 
     private final int maxSize;
 
-    public X509CertprofileQa(final String data)
-    throws CertprofileException {
+    public X509CertprofileQa(final String data) throws CertprofileException {
         this(ParamUtil.requireNonNull("data", data).getBytes());
     }
 
-    public X509CertprofileQa(final byte[] dataBytes)
-    throws CertprofileException {
+    public X509CertprofileQa(final byte[] dataBytes) throws CertprofileException {
         ParamUtil.requireNonNull("dataBytes", dataBytes);
         try {
             X509ProfileType conf = XmlX509CertprofileUtil.parse(
@@ -368,8 +366,7 @@ public class X509CertprofileQa {
     }
 
     public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
-            final ExtensionsType extensionsType)
-    throws CertprofileException {
+            final ExtensionsType extensionsType) throws CertprofileException {
         if (extensionsType == null) {
             return null;
         }

@@ -83,8 +83,7 @@ public class CaEntry implements Serializable {
     private String extraControl;
 
     public CaEntry(final String name, final String signerType, final String signerConf,
-            final int expirationPeriod)
-    throws CaMgmtException {
+            final int expirationPeriod) throws CaMgmtException {
         this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
         this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
         this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);

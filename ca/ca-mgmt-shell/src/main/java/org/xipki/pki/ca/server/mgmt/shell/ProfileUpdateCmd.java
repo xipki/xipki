@@ -76,8 +76,7 @@ public class ProfileUpdateCmd extends CaCommandSupport {
     protected String confFile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (type == null && conf == null && confFile == null) {
             throw new IllegalCmdParamException("nothing to update");
         }

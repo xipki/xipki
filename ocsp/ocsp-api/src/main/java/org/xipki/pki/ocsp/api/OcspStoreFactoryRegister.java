@@ -53,7 +53,6 @@ public interface OcspStoreFactoryRegister {
      * @return new OcspStore.
      * @throws ObjectCreationException if OcspStore could not be created.
      */
-    OcspStore newOcspStore(@Nonnull String type)
-    throws ObjectCreationException;
+    OcspStore newOcspStore(@Nonnull String type) throws ObjectCreationException;
 
 }

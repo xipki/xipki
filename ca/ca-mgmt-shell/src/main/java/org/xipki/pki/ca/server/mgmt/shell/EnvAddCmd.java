@@ -63,8 +63,7 @@ public class EnvAddCmd extends CaCommandSupport {
     private String value;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         boolean bo = caManager.addEnvParam(name, value);
         output(bo, "added", "could not add", "environment parameter " + name);
         return null;

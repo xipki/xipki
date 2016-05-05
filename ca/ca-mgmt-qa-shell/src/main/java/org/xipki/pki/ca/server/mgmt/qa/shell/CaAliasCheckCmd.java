@@ -68,8 +68,7 @@ public class CaAliasCheckCmd extends CaCommandSupport {
     private String aliasName;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("checking CA alias='" + aliasName + "', CA='" + caName + "'");
         String tmpCaName = caManager.getCaNameForAlias(aliasName);
         if (tmpCaName == null) {

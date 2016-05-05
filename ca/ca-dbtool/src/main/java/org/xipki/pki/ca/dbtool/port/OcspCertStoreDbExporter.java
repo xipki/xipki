@@ -95,8 +95,7 @@ class OcspCertStoreDbExporter extends DbPorter {
     OcspCertStoreDbExporter(final DataSourceWrapper datasource, final Marshaller marshaller,
             final Unmarshaller unmarshaller, final String baseDir, final int numCertsInBundle,
             final int numCertsPerSelect, final boolean resume, final AtomicBoolean stopMe,
-            final boolean evaluateOnly)
-    throws Exception {
+            final boolean evaluateOnly) throws Exception {
         super(datasource, baseDir, stopMe, evaluateOnly);
 
         this.numCertsInBundle = ParamUtil.requireMin("numCertsInBundle", numCertsInBundle, 1);
@@ -112,8 +111,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         this.resume = resume;
     } // constructor
 
-    public void export()
-    throws Exception {
+    public void export() throws Exception {
         CertStoreType certstore;
         if (resume) {
             try {
@@ -231,8 +229,7 @@ class OcspCertStoreDbExporter extends DbPorter {
     } // method exportCert
 
     private void doExportCert(final CertStoreType certstore, final File processLogFile,
-            final FileOutputStream certsFileOs)
-    throws Exception {
+            final FileOutputStream certsFileOs) throws Exception {
         Integer minCertId = null;
         if (processLogFile.exists()) {
             byte[] content = IoUtil.read(processLogFile);

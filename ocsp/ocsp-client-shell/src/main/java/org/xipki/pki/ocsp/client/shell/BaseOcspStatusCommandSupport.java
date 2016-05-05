@@ -138,8 +138,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     throws Exception;
 
     @Override
-    protected final Object doExecute()
-    throws Exception {
+    protected final Object doExecute() throws Exception {
         if (isEmpty(serialNumberList) && isEmpty(certFiles)) {
             throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
         }

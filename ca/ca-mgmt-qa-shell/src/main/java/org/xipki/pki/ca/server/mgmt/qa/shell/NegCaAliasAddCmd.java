@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaAliasAddCmd;
 public class NegCaAliasAddCmd extends CaAliasAddCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-caalias-add");
 
         try {

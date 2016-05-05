@@ -76,8 +76,7 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCommandSupport {
     private String invalidityDateS;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
             throw new IllegalCmdParamException("either cert or (cacert, serial) must be specified");
         }

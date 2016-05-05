@@ -280,8 +280,7 @@ public class DbCertStatusStore extends OcspStore {
     public CertStatusInfo getCertStatus(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
             final byte[] issuerKeyHash, final BigInteger serialNumber,
             final boolean includeCertHash, final HashAlgoType certHashAlg,
-            final CertprofileOption certprofileOption)
-    throws OcspStoreException {
+            final CertprofileOption certprofileOption) throws OcspStoreException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
@@ -472,8 +471,7 @@ public class DbCertStatusStore extends OcspStore {
 
     @Override
     public void init(final String conf, final DataSourceWrapper datasource,
-            final Set<HashAlgoType> certHashAlgos)
-    throws OcspStoreException {
+            final Set<HashAlgoType> certHashAlgos) throws OcspStoreException {
         ParamUtil.requireNonNull("conf", conf);
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
@@ -505,8 +503,7 @@ public class DbCertStatusStore extends OcspStore {
     }
 
     @Override
-    public void shutdown()
-    throws OcspStoreException {
+    public void shutdown() throws OcspStoreException {
         if (scheduledThreadPoolExecutor != null) {
             scheduledThreadPoolExecutor.shutdown();
             scheduledThreadPoolExecutor = null;

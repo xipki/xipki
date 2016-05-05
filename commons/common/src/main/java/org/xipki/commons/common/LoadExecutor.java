@@ -79,8 +79,7 @@ public abstract class LoadExecutor {
         this.processLog = new ProcessLog(0);
     }
 
-    protected abstract Runnable getTestor()
-    throws Exception;
+    protected abstract Runnable getTestor() throws Exception;
 
     public void test() {
         System.getProperties().setProperty(PROPKEY_LOADTEST, "true");

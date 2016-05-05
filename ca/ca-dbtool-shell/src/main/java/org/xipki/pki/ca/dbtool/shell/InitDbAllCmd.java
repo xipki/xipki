@@ -57,8 +57,7 @@ public class InitDbAllCmd extends LiquibaseCommandSupport {
     private static final String OCSP_SCHEMA_FILE = "xipki/sql/ocsp-init.xml";
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
         LiquibaseDatabaseConf dbConf = dbConfs.get("ca");

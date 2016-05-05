@@ -145,8 +145,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
     } // constructor DbDigestDiffWorker
 
     @Override
-    public void doRun()
-    throws Exception {
+    public void doRun() throws Exception {
         long start = System.currentTimeMillis();
 
         try {

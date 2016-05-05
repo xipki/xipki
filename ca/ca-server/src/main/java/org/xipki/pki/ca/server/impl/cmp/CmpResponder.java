@@ -99,14 +99,11 @@ abstract class CmpResponder {
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
     }
 
-    protected abstract ConcurrentContentSigner getSigner()
-    throws InvalidConfException;
+    protected abstract ConcurrentContentSigner getSigner() throws InvalidConfException;
 
-    protected abstract GeneralName getSender()
-    throws InvalidConfException;
+    protected abstract GeneralName getSender() throws InvalidConfException;
 
-    protected abstract boolean intendsMe(GeneralName requestRecipient)
-    throws InvalidConfException;
+    protected abstract boolean intendsMe(GeneralName requestRecipient) throws InvalidConfException;
 
     public boolean isInService() {
         try {
@@ -401,16 +398,14 @@ abstract class CmpResponder {
         return new PKIStatusInfo(PKIStatus.rejection, statusMessage, failureInfo);
     } // method generateCmpRejectionStatus
 
-    public X500Name getResponderSubject()
-    throws InvalidConfException {
+    public X500Name getResponderSubject() throws InvalidConfException {
         GeneralName sender = getSender();
         return (sender == null)
                 ? null
                 : (X500Name) sender.getName();
     }
 
-    public X509Certificate getResponderCert()
-    throws InvalidConfException {
+    public X509Certificate getResponderCert() throws InvalidConfException {
         ConcurrentContentSigner signer = getSigner();
         return (signer == null)
                 ? null

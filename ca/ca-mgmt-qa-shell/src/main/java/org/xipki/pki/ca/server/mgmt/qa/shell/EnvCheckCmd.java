@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.EnvUpdateCmd;
 public class EnvCheckCmd extends EnvUpdateCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("checking environment " + name);
 
         String is = caManager.getEnvParam(name);

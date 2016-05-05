@@ -106,8 +106,7 @@ public class CaDbExportWorker extends DbPortWorker {
         checkDestFolder();
     }
 
-    private void checkDestFolder()
-    throws IOException {
+    private void checkDestFolder() throws IOException {
         File file = new File(destFolder);
         if (!file.exists()) {
             file.mkdirs();
@@ -135,8 +134,7 @@ public class CaDbExportWorker extends DbPortWorker {
     } // method checkDestFolder
 
     @Override
-    public void doRun()
-    throws Exception {
+    public void doRun() throws Exception {
         long start = System.currentTimeMillis();
         try {
             if (!resume) {
@@ -164,8 +162,7 @@ public class CaDbExportWorker extends DbPortWorker {
         }
     } // method doRun
 
-    private static Marshaller getMarshaller()
-    throws JAXBException {
+    private static Marshaller getMarshaller() throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -173,8 +170,7 @@ public class CaDbExportWorker extends DbPortWorker {
         return marshaller;
     }
 
-    private static Unmarshaller getUnmarshaller()
-    throws JAXBException {
+    private static Unmarshaller getUnmarshaller() throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));

@@ -67,8 +67,7 @@ public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCommandSupport {
     }
 
     @Override
-    protected LoadExecutor nextTester()
-    throws Exception {
+    protected LoadExecutor nextTester() throws Exception {
         RSAControl control = queue.takeFirst();
         if (control == null) {
             return null;

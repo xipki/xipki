@@ -63,8 +63,7 @@ class ResponseOption {
 
     private final Long cacheMaxAge;
 
-    ResponseOption(final ResponseOptionType conf)
-    throws InvalidConfException {
+    ResponseOption(final ResponseOptionType conf) throws InvalidConfException {
         ParamUtil.requireNonNull("conf", conf);
         this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
         this.includeRevReason = getBoolean(conf.isIncludeRevReason(), true);

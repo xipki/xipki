@@ -60,8 +60,7 @@ public class EnrollCertCmd extends EnrollCertCommandSupport {
     @Override
     protected EnrollmentResponse requestCertificate(final Client client,
             final PKCS10CertificationRequest csr, final PrivateKey identityKey,
-            final X509Certificate identityCert)
-    throws ClientException, TransactionException {
+            final X509Certificate identityCert) throws ClientException, TransactionException {
         return client.enrol(identityCert, identityKey, csr);
     }
 

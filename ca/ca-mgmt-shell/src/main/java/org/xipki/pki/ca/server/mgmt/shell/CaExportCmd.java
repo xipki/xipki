@@ -130,8 +130,7 @@ public class CaExportCmd extends CaCommandSupport {
     private String confFile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         CaEntry entry = caManager.getCa(name);
         if (entry == null) {
             throw new UnexpectedException("no CA named " + name + " is defined");

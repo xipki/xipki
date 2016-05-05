@@ -76,8 +76,7 @@ public class X509CrlSignerEntry implements Serializable {
     private String crlControl;
 
     public X509CrlSignerEntry(final String name, final String signerType, final String signerConf,
-            final String base64Cert, final String crlControl)
-    throws InvalidConfException {
+            final String base64Cert, final String crlControl) throws InvalidConfException {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
         this.signerConf = signerConf;

@@ -49,13 +49,11 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class OcspCertsWriter extends DbiXmlWriter {
 
-    public OcspCertsWriter()
-    throws IOException, XMLStreamException {
+    public OcspCertsWriter() throws IOException, XMLStreamException {
         super("certs", "1");
     }
 
-    public void add(final OcspCertType cert)
-    throws InvalidDataObjectException, XMLStreamException {
+    public void add(final OcspCertType cert) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("cert", cert);
 
         cert.validate();

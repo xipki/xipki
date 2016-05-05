@@ -100,8 +100,7 @@ public class NextCaMessage {
     }
 
     public ContentInfo encode(final PrivateKey signingKey, final X509Certificate signerCert,
-            final X509Certificate[] cmsCertSet)
-    throws MessageEncodingException {
+            final X509Certificate[] cmsCertSet) throws MessageEncodingException {
         ParamUtil.requireNonNull("signingKey", signingKey);
         ParamUtil.requireNonNull("signerCert", signerCert);
 

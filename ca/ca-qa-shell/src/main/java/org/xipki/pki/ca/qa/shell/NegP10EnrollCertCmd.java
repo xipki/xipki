@@ -84,8 +84,7 @@ public class NegP10EnrollCertCmd extends ClientCommandSupport {
     private String caName;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
 
         EnrollCertResult result;

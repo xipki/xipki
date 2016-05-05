@@ -78,18 +78,15 @@ public class IoUtil {
         }
     }
 
-    public static byte[] read(final String fileName)
-    throws IOException {
+    public static byte[] read(final String fileName) throws IOException {
         return read(new File(expandFilepath(fileName)));
     }
 
-    public static byte[] read(final File file)
-    throws IOException {
+    public static byte[] read(final File file) throws IOException {
         return read(new FileInputStream(expandFilepath(file)));
     }
 
-    public static byte[] read(final InputStream in)
-    throws IOException {
+    public static byte[] read(final InputStream in) throws IOException {
         try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             int readed = 0;
@@ -110,13 +107,11 @@ public class IoUtil {
         }
     }
 
-    public static void save(final String fileName, final byte[] encoded)
-    throws IOException {
+    public static void save(final String fileName, final byte[] encoded) throws IOException {
         save(new File(expandFilepath(fileName)), encoded);
     }
 
-    public static void save(final File file, final byte[] content)
-    throws IOException {
+    public static void save(final File file, final byte[] content) throws IOException {
         File tmpFile = expandFilepath(file);
 
         File parent = tmpFile.getParentFile();
@@ -132,8 +127,7 @@ public class IoUtil {
         }
     }
 
-    public static String getHostAddress()
-    throws SocketException {
+    public static String getHostAddress() throws SocketException {
         List<String> addresses = new LinkedList<>();
 
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();

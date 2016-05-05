@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CrlSignerRemoveCmd;
 public class NegCrlSignerRemoveCmd extends CrlSignerRemoveCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-crlsigner-rm");
 
         try {

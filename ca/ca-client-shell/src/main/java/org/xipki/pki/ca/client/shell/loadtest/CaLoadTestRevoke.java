@@ -108,8 +108,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
 
     public CaLoadTestRevoke(final CaClient caClient, final Certificate caCert,
             final DataSourceWrapper caDataSource, final int maxCerts, final int num,
-            final String description)
-    throws Exception {
+            final String description) throws Exception {
         super(description);
         ParamUtil.requireNonNull("caCert", caCert);
         this.num = ParamUtil.requireMin("num", num, 1);
@@ -212,13 +211,11 @@ public class CaLoadTestRevoke extends LoadExecutor {
     } // class Testor
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
+    protected Runnable getTestor() throws Exception {
         return new Testor();
     }
 
-    private List<Long> nextSerials()
-    throws DataAccessException {
+    private List<Long> nextSerials() throws DataAccessException {
         List<Long> ret = new ArrayList<>(num);
         for (int i = 0; i < num; i++) {
             Long serial = nextSerial();
@@ -231,8 +228,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
         return ret;
     }
 
-    private Long nextSerial()
-    throws DataAccessException {
+    private Long nextSerial() throws DataAccessException {
         synchronized (caDataSource) {
             if (maxCerts > 0) {
                 int num = processedCerts.getAndAdd(1);

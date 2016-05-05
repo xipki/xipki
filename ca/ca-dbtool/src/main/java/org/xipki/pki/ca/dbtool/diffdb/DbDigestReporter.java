@@ -113,20 +113,17 @@ public class DbDigestReporter {
         return reportDirname;
     }
 
-    public void addMissing(final long serialNumber)
-    throws IOException {
+    public void addMissing(final long serialNumber) throws IOException {
         numMissing.incrementAndGet();
         writeSerialNumberLine(missingWriter, serialNumber);
     }
 
-    public void addGood(final long serialNumber)
-    throws IOException {
+    public void addGood(final long serialNumber) throws IOException {
         numGood.incrementAndGet();
         writeSerialNumberLine(goodWriter, serialNumber);
     }
 
-    public void addUnexpected(final long serialNumber)
-    throws IOException {
+    public void addUnexpected(final long serialNumber) throws IOException {
         numUnexpected.incrementAndGet();
         writeSerialNumberLine(unexpectedWriter, serialNumber);
     }
@@ -152,8 +149,7 @@ public class DbDigestReporter {
         }
     }
 
-    public void addError(final String errorMessage)
-    throws IOException {
+    public void addError(final String errorMessage) throws IOException {
         ParamUtil.requireNonNull("errorMessage", errorMessage);
 
         numError.incrementAndGet();
@@ -165,8 +161,7 @@ public class DbDigestReporter {
         }
     }
 
-    public void addNoCaMatch()
-    throws IOException {
+    public void addNoCaMatch() throws IOException {
         synchronized (errorWriter) {
             errorWriter.write("Cound not find corresponding CA in target to diff\n");
         }

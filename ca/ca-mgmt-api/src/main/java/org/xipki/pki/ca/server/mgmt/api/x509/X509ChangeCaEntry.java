@@ -68,8 +68,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry implements Serializable {
 
     private String extraControl;
 
-    public X509ChangeCaEntry(final String name)
-    throws CaMgmtException {
+    public X509ChangeCaEntry(final String name) throws CaMgmtException {
         super(name);
     }
 

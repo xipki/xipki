@@ -129,8 +129,7 @@ public class HttpOcspServlet extends HttpServlet {
 
     private void processRequest(final HttpServletRequest request,
             final HttpServletResponse response, final ResponderAndRelativeUri respAndUri,
-            final boolean getMethod)
-    throws ServletException, IOException {
+            final boolean getMethod) throws ServletException, IOException {
         Responder responder = respAndUri.getResponder();
         AuditEvent auditEvent = null;
 

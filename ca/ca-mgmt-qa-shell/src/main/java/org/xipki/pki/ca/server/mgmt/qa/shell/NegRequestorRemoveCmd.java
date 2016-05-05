@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.RequestorRemoveCmd;
 public class NegRequestorRemoveCmd extends RequestorRemoveCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-requestor-rm");
 
         try {

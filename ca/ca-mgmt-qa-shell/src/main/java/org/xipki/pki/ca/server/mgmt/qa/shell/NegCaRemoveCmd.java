@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaRemoveCmd;
 public class NegCaRemoveCmd extends CaRemoveCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-ca-rm");
 
         try {

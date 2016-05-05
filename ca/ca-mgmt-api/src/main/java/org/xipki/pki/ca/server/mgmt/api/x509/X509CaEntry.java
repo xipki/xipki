@@ -83,15 +83,13 @@ public class X509CaEntry extends CaEntry implements Serializable {
 
     public X509CaEntry(final String name, final int serialNoSize, final int nextCrlNumber,
             final String signerType, final String signerConf, final X509CaUris caUris,
-            final int numCrls, final int expirationPeriod)
-    throws CaMgmtException {
+            final int numCrls, final int expirationPeriod) throws CaMgmtException {
         super(name, signerType, signerConf, expirationPeriod);
         init(serialNoSize, nextCrlNumber, caUris, numCrls);
     }
 
     private void init(final int serialNoSize, final int nextCrlNumber, final X509CaUris caUris,
-            final int numCrls)
-    throws CaMgmtException {
+            final int numCrls) throws CaMgmtException {
         this.numCrls = ParamUtil.requireMin("numCrls", numCrls, 0);
         this.serialNoSize = ParamUtil.requireRange("serialNoSize", serialNoSize, 8, 20);
         this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 0);
@@ -102,8 +100,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
         this.deltaCrlUris = caUris.getDeltaCrlUris();
     }
 
-    public void setCertificate(final X509Certificate certificate)
-    throws CaMgmtException {
+    public void setCertificate(final X509Certificate certificate) throws CaMgmtException {
         if (certificate == null) {
             this.cert = null;
             this.subject = null;

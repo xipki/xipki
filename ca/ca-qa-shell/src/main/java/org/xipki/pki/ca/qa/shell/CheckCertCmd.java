@@ -105,8 +105,7 @@ public class CheckCertCmd extends XipkiCommandSupport {
     private QaSystemManager qaSystemManager;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         Set<String> issuerNames = qaSystemManager.getIssuerNames();
         if (isEmpty(issuerNames)) {
             throw new IllegalCmdParamException("no issuer is configured");

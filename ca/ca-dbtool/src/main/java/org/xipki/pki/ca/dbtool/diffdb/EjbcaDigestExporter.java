@@ -92,8 +92,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
     public EjbcaDigestExporter(final DataSourceWrapper datasource, final String baseDir,
             final AtomicBoolean stopMe, final int numCertsPerSelect,
-            final DbSchemaType dbSchemaType, final int numThreads)
-    throws Exception {
+            final DbSchemaType dbSchemaType, final int numThreads) throws Exception {
         super(datasource, baseDir, stopMe);
         this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
 
@@ -143,8 +142,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
     } // constructor
 
     @Override
-    public void digest()
-    throws Exception {
+    public void digest() throws Exception {
         System.out.println("digesting database");
 
         final long total = getCount("CertificateData");
@@ -187,8 +185,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         }
     } // method digest
 
-    private Map<String, EjbcaCaInfo> getCas()
-    throws Exception {
+    private Map<String, EjbcaCaInfo> getCas() throws Exception {
         Map<String, EjbcaCaInfo> cas = new HashMap<>();
         final String selectSql = "SELECT NAME, DATA FROM CAData";
 
@@ -364,8 +361,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
     private void doDigestWithTableId(final EjbcaDigestExportReader certsReader,
             final ProcessLog processLog, final CaEntryContainer caEntryContainer,
-            final Map<String, EjbcaCaInfo> caInfos)
-    throws Exception {
+            final Map<String, EjbcaCaInfo> caInfos) throws Exception {
         final int minCertId = (int) getMin("CertificateData", "id");
         final int maxCertId = (int) getMax("CertificateData", "id");
         System.out.println("digesting certificates from id " + minCertId);

@@ -162,11 +162,9 @@ public abstract class CmpRequestor {
         this.recipientName = subject;
     }
 
-    protected abstract byte[] send(final byte[] request)
-    throws IOException;
+    protected abstract byte[] send(final byte[] request) throws IOException;
 
-    protected PKIMessage sign(final PKIMessage request)
-    throws CmpRequestorException {
+    protected PKIMessage sign(final PKIMessage request) throws CmpRequestorException {
         ParamUtil.requireNonNull("request", request);
         if (requestor == null) {
             throw new CmpRequestorException("no request signer is configured");
@@ -254,8 +252,7 @@ public abstract class CmpRequestor {
     } // method signAndSend
 
     protected ASN1Encodable extractGeneralRepContent(final PkiResponse response,
-            final String expectedType)
-    throws CmpRequestorException, PkiErrorException {
+            final String expectedType) throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonNull("expectedType", expectedType);
         return extractGeneralRepContent(response, expectedType, true);
@@ -304,8 +301,7 @@ public abstract class CmpRequestor {
     } // method extractGeneralRepContent
 
     protected ASN1Encodable extractXipkiActionRepContent(final PkiResponse response,
-            final int action)
-    throws CmpRequestorException, PkiErrorException {
+            final int action) throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("response", response);
         ASN1Encodable itvValue = extractGeneralRepContent(response,
                 ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId(), true);
@@ -313,8 +309,7 @@ public abstract class CmpRequestor {
     }
 
     protected ASN1Encodable extractXipkiActionContent(final ASN1Encodable itvValue,
-            final int action)
-    throws CmpRequestorException {
+            final int action) throws CmpRequestorException {
         ParamUtil.requireNonNull("itvValue", itvValue);
         ASN1Sequence seq;
         try {
@@ -488,8 +483,7 @@ public abstract class CmpRequestor {
     }
 
     protected PKIMessage buildMessageWithGeneralMsgContent(final ASN1ObjectIdentifier type,
-            final ASN1Encodable value)
-    throws CmpRequestorException {
+            final ASN1Encodable value) throws CmpRequestorException {
         ParamUtil.requireNonNull("type", type);
 
         PKIHeader header = buildPkiHeader(null);
@@ -506,8 +500,7 @@ public abstract class CmpRequestor {
         return pkiMessage;
     }
 
-    protected void checkProtection(final PkiResponse response)
-    throws PkiErrorException {
+    protected void checkProtection(final PkiResponse response) throws PkiErrorException {
         ParamUtil.requireNonNull("response", response);
 
         if (!response.hasProtection()) {

@@ -81,8 +81,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
     private XipkiDbDigestReader(final DataSourceWrapper datasource, final X509Certificate caCert,
             final int totalAccount, final int minId, final int maxId, final int numThreads,
-            final int numCertsToPredicate, final StopMe stopMe)
-    throws Exception {
+            final int numCertsToPredicate, final StopMe stopMe) throws Exception {
         super(datasource, caCert, totalAccount, minId, maxId, numThreads,
                 numCertsToPredicate, stopMe);
     } // constructor
@@ -91,8 +90,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
         private Connection conn;
         private PreparedStatement selectCertStmt;
 
-        XipkiDbRetriever()
-        throws DataAccessException {
+        XipkiDbRetriever() throws DataAccessException {
             this.conn = datasource.getConnection();
             try {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
@@ -166,8 +164,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
     } // class XipkiDbRetriever
 
-    private void init(final DbSchemaType dbSchemaType, final int caId)
-    throws Exception {
+    private void init(final DbSchemaType dbSchemaType, final int caId) throws Exception {
         this.caId = caId;
         this.conn = datasource.getConnection();
         this.dbControl = new XipkiDbControl(dbSchemaType);
@@ -209,15 +206,13 @@ public class XipkiDbDigestReader extends DbDigestReader {
     }
 
     @Override
-    protected Retriever getRetriever()
-    throws DataAccessException {
+    protected Retriever getRetriever() throws DataAccessException {
         return new XipkiDbRetriever();
     }
 
     public static XipkiDbDigestReader getInstance(final DataSourceWrapper datasource,
             final DbSchemaType dbSchemaType, final int caId, final int numThreads,
-            final int numCertsToPredicate, final StopMe stopMe)
-    throws Exception {
+            final int numCertsToPredicate, final StopMe stopMe) throws Exception {
         ParamUtil.requireNonNull("datasource", datasource);
 
         Connection conn = datasource.getConnection();

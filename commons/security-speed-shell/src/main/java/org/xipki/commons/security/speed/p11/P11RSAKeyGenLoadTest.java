@@ -53,8 +53,7 @@ public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest {
     private final BigInteger publicExponent;
 
     public P11RSAKeyGenLoadTest(final P11Slot slot, final int keysize,
-            final BigInteger publicExponent)
-    throws Exception {
+            final BigInteger publicExponent) throws Exception {
         super(slot,
                 "PKCS#11 RSA key generation\n"
                         + "keysize: " + keysize + "\n"
@@ -64,8 +63,7 @@ public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest {
     }
 
     @Override
-    protected void genKeypair()
-    throws Exception {
+    protected void genKeypair() throws Exception {
         P11ObjectIdentifier objId = slot.generateRSAKeypair(keysize, publicExponent,
                 getDummyLabel());
         slot.removeIdentity(objId);

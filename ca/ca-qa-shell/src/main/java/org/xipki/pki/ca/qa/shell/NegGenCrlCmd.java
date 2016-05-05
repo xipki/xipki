@@ -55,8 +55,7 @@ import org.xipki.pki.ca.client.api.PkiErrorException;
 public class NegGenCrlCmd extends NegCrlCommandSupport {
 
     @Override
-    protected X509CRL retrieveCrl()
-    throws CaClientException, PkiErrorException {
+    protected X509CRL retrieveCrl() throws CaClientException, PkiErrorException {
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
             return caClient.generateCrl(caName, debug);

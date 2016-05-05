@@ -84,19 +84,16 @@ public class DbiXmlWriter {
         return rootElementName;
     }
 
-    public void writeStartElement(final String localName)
-    throws XMLStreamException {
+    public void writeStartElement(final String localName) throws XMLStreamException {
         ParamUtil.requireNonNull("localName", localName);
         writer.writeStartElement(localName);
     }
 
-    public void writeEndElement()
-    throws XMLStreamException {
+    public void writeEndElement() throws XMLStreamException {
         writer.writeEndElement();
     }
 
-    public void writeElement(final String localName, final String value)
-    throws XMLStreamException {
+    public void writeElement(final String localName, final String value) throws XMLStreamException {
         ParamUtil.requireNonNull("localName", localName);
         ParamUtil.requireNonNull("value", value);
         writer.writeStartElement(localName);
@@ -104,13 +101,11 @@ public class DbiXmlWriter {
         writer.writeEndElement();
     }
 
-    public void writeNewline()
-    throws XMLStreamException {
+    public void writeNewline() throws XMLStreamException {
         writer.writeCharacters("\n");
     }
 
-    public void flush()
-    throws IOException, XMLStreamException {
+    public void flush() throws IOException, XMLStreamException {
         if (flushed) {
             return;
         }

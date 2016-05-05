@@ -76,8 +76,7 @@ public class ProfileAddCmd extends CaCommandSupport {
     private String confFile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (conf == null && confFile != null) {
             conf = new String(IoUtil.read(confFile));
         }

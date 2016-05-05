@@ -131,8 +131,7 @@ public class X509CaInfo {
         this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
     } // constructor
 
-    public void commitNextCrlNo()
-    throws OperationException {
+    public void commitNextCrlNo() throws OperationException {
         certStore.commitNextCrlNo(caEntry.getName(), caEntry.getNextCrlNumber());
     }
 
@@ -321,13 +320,11 @@ public class X509CaInfo {
         return caEntry.getCrlBaseTime();
     }
 
-    public BigInteger nextSerial()
-    throws OperationException {
+    public BigInteger nextSerial() throws OperationException {
         return randomSnGenerator.nextSerialNumber(caEntry.getSerialNoSize());
     }
 
-    public BigInteger nextCrlNumber()
-    throws OperationException {
+    public BigInteger nextCrlNumber() throws OperationException {
         int crlNo = caEntry.getNextCrlNumber();
         int currentMaxNo = certStore.getMaxCrlNumber(getCertificate());
         if (crlNo <= currentMaxNo) {
@@ -351,8 +348,7 @@ public class X509CaInfo {
         return null;
     }
 
-    public boolean initSigner(final SecurityFactory securityFactory)
-    throws XiSecurityException {
+    public boolean initSigner(final SecurityFactory securityFactory) throws XiSecurityException {
         if (signers != null) {
             return true;
         }

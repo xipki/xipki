@@ -80,8 +80,7 @@ public abstract class KeyEntry {
 
         private final BigInteger baseN;
 
-        public RSAKeyEntry(final int keysize)
-        throws Exception {
+        public RSAKeyEntry(final int keysize) throws Exception {
             if (keysize % 1024 != 0) {
                 throw new IllegalArgumentException("invalid RSA keysize " + keysize);
             }
@@ -200,8 +199,7 @@ public abstract class KeyEntry {
 
         private BigInteger baseY;
 
-        public DSAKeyEntry(final int plength)
-        throws Exception {
+        public DSAKeyEntry(final int plength) throws Exception {
             if (plength == 1024) {
                 init(P_1024, Q_1024, G_1024, Y_1024);
             } else if (plength == 2048) {
@@ -274,8 +272,7 @@ public abstract class KeyEntry {
 
         private final BigInteger basePublicKey;
 
-        public ECKeyEntry(final String curveNameOrOid)
-        throws Exception {
+        public ECKeyEntry(final String curveNameOrOid) throws Exception {
             ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
 
             ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(

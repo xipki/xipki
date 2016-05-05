@@ -91,8 +91,7 @@ public class XmlDocumentReader {
         });
     }
 
-    public String getValue(final String xpathExpression)
-    throws XPathExpressionException {
+    public String getValue(final String xpathExpression) throws XPathExpressionException {
         ParamUtil.requireNonNull("xpathExpression", xpathExpression);
 
         Node node = getNode(xpathExpression);
@@ -101,8 +100,7 @@ public class XmlDocumentReader {
                 : null;
     }
 
-    private Node getNode(final String xpathExpression)
-    throws XPathExpressionException {
+    private Node getNode(final String xpathExpression) throws XPathExpressionException {
         XPath xpath = xpathfactory.newXPath();
         XPathExpression xpathE = xpath.compile(xpathExpression);
         NodeList nl = (NodeList) xpathE.evaluate(doc.getDocumentElement(), XPathConstants.NODESET);

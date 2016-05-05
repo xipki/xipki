@@ -89,8 +89,7 @@ public class LiquibaseDatabaseConf {
     }
 
     public static LiquibaseDatabaseConf getInstance(final Properties dbProps,
-            final PasswordResolver passwordResolver)
-    throws PasswordResolverException {
+            final PasswordResolver passwordResolver) throws PasswordResolverException {
         Objects.requireNonNull(dbProps, "dbProps must no be null");
 
         String schema = dbProps.getProperty("liquibase.schema");

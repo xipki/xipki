@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.EnvUpdateCmd;
 public class NegEnvUpdateCmd extends EnvUpdateCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-env-up");
 
         try {

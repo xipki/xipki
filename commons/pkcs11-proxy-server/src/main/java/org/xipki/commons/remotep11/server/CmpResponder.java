@@ -386,8 +386,7 @@ class CmpResponder {
     }
 
     private P11Slot getSlot(final P11CryptService p11Service,
-            final Asn1P11EntityIdentifier entityId)
-    throws P11TokenException {
+            final Asn1P11EntityIdentifier entityId) throws P11TokenException {
         return p11Service.getModule().getSlot(entityId.getSlotId().getSlotId());
     }
 

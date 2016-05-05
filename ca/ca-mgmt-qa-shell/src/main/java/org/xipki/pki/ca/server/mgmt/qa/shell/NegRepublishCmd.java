@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.RepublishCmd;
 public class NegRepublishCmd extends RepublishCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-republish");
 
         try {

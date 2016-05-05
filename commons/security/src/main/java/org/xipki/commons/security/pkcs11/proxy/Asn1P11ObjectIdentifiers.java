@@ -66,8 +66,7 @@ public class Asn1P11ObjectIdentifiers extends ASN1Object {
         this.objectIds = ParamUtil.requireNonNull("objectIds", objectIds);
     }
 
-    private Asn1P11ObjectIdentifiers(final ASN1Sequence seq)
-    throws BadAsn1ObjectException {
+    private Asn1P11ObjectIdentifiers(final ASN1Sequence seq) throws BadAsn1ObjectException {
         this.objectIds = new LinkedList<>();
         final int size = seq.size();
         for (int i = 0; i < size; i++) {

@@ -54,8 +54,7 @@ public class CaUsersReader extends DbiXmlReader {
     }
 
     @Override
-    protected DbDataObject retrieveNext()
-    throws InvalidDataObjectException, XMLStreamException {
+    protected DbDataObject retrieveNext() throws InvalidDataObjectException, XMLStreamException {
         CaUserType ret = null;
         StringBuilder buffer = new StringBuilder();
         int lastEvent = -1;

@@ -55,8 +55,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CrlSignerUpdateCmd;
 public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
         String name = ey.getName();
         println("checking CRL signer " + name);

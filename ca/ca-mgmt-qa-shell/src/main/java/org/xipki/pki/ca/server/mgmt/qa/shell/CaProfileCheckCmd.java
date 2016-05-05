@@ -73,8 +73,7 @@ public class CaProfileCheckCmd extends CaCommandSupport {
     private String profileName;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("checking CA profile CA='" + caName + "', profile='" + profileName + "'");
 
         if (caManager.getCa(caName) == null) {

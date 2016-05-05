@@ -74,8 +74,7 @@ class PrivateKeyCryptor {
     private OutputEncryptor encryptor;
     private InputDecryptorProvider decryptorProvider;
 
-    PrivateKeyCryptor(final char[] password)
-    throws P11TokenException {
+    PrivateKeyCryptor(final char[] password) throws P11TokenException {
         ParamUtil.requireNonNull("password", password);
         JcePKCSPBEOutputEncryptorBuilder eb = new JcePKCSPBEOutputEncryptorBuilder(ALGO);
         eb.setIterationCount(ITERATION_COUNT);

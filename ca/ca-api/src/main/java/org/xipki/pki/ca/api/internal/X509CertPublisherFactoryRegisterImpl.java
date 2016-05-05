@@ -60,8 +60,7 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
             new ConcurrentLinkedDeque<X509CertPublisherFactory>();
 
     @Override
-    public X509CertPublisher newPublisher(final String type)
-    throws ObjectCreationException {
+    public X509CertPublisher newPublisher(final String type) throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
 
         for (X509CertPublisherFactory service : services) {

@@ -66,8 +66,7 @@ public class BSpeedP11ECSignCmd extends BSpeedP11SignCommandSupport {
     }
 
     @Override
-    protected LoadExecutor nextTester()
-    throws Exception {
+    protected LoadExecutor nextTester() throws Exception {
         ECControl control = queue.takeFirst();
         if (control == null) {
             return null;

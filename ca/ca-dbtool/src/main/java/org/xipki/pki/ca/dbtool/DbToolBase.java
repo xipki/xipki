@@ -84,8 +84,7 @@ public class DbToolBase {
     private boolean connectionAutoCommit;
 
     public DbToolBase(final DataSourceWrapper datasource, final String baseDir,
-            final AtomicBoolean stopMe)
-    throws DataAccessException {
+            final AtomicBoolean stopMe) throws DataAccessException {
         super();
         ParamUtil.requireNonBlank("baseDir", baseDir);
         this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
@@ -99,8 +98,7 @@ public class DbToolBase {
         this.baseDir = IoUtil.expandFilepath(baseDir);
     }
 
-    protected Statement createStatement()
-    throws DataAccessException {
+    protected Statement createStatement() throws DataAccessException {
         try {
             return connection.createStatement();
         } catch (SQLException ex) {
@@ -108,8 +106,7 @@ public class DbToolBase {
         }
     }
 
-    protected PreparedStatement prepareStatement(final String sql)
-    throws DataAccessException {
+    protected PreparedStatement prepareStatement(final String sql) throws DataAccessException {
         ParamUtil.requireNonBlank("sql", sql);
 
         try {
@@ -154,8 +151,7 @@ public class DbToolBase {
         connection = null;
     }
 
-    public long getMin(final String table, final String column)
-    throws DataAccessException {
+    public long getMin(final String table, final String column) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
@@ -170,8 +166,7 @@ public class DbToolBase {
         return datasource.getMin(connection, table, column, condition);
     }
 
-    public long getMax(final String table, final String column)
-    throws DataAccessException {
+    public long getMax(final String table, final String column) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
@@ -186,8 +181,7 @@ public class DbToolBase {
         return datasource.getMax(connection, table, column, condition);
     }
 
-    public int getCount(final String table)
-    throws DataAccessException {
+    public int getCount(final String table) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
 
         return datasource.getCount(connection, table);
@@ -201,15 +195,13 @@ public class DbToolBase {
         return datasource.tableHasColumn(connection, table, column);
     }
 
-    public boolean tableExists(final String table)
-    throws DataAccessException {
+    public boolean tableExists(final String table) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
 
         return datasource.tableExists(connection, table);
     }
 
-    protected Savepoint setSavepoint()
-    throws DataAccessException {
+    protected Savepoint setSavepoint() throws DataAccessException {
         try {
             return connection.setSavepoint();
         } catch (SQLException ex) {
@@ -217,8 +209,7 @@ public class DbToolBase {
         }
     }
 
-    protected void rollback()
-    throws DataAccessException {
+    protected void rollback() throws DataAccessException {
         try {
             connection.rollback();
         } catch (SQLException ex) {
@@ -231,8 +222,7 @@ public class DbToolBase {
         return datasource.translate(sql, ex);
     }
 
-    protected void disableAutoCommit()
-    throws DataAccessException {
+    protected void disableAutoCommit() throws DataAccessException {
         try {
             connection.setAutoCommit(false);
         } catch (SQLException ex) {
@@ -250,8 +240,7 @@ public class DbToolBase {
         }
     }
 
-    protected void commit(final String task)
-    throws DataAccessException {
+    protected void commit(final String task) throws DataAccessException {
         ParamUtil.requireNonBlank("task", task);
         try {
             connection.commit();
@@ -283,8 +272,7 @@ public class DbToolBase {
     }
 
     protected static void setBoolean(final PreparedStatement ps, final int index,
-            final boolean value)
-    throws SQLException {
+            final boolean value) throws SQLException {
         ParamUtil.requireNonNull("ps", ps);
 
         int intValue = value
@@ -293,8 +281,7 @@ public class DbToolBase {
         ps.setInt(index, intValue);
     }
 
-    public static Properties getDbConfProperties(final InputStream is)
-    throws IOException {
+    public static Properties getDbConfProperties(final InputStream is) throws IOException {
         ParamUtil.requireNonNull("is", is);
 
         Properties props = new Properties();
@@ -332,8 +319,7 @@ public class DbToolBase {
         }
     }
 
-    protected static void writeLine(final OutputStream os, final String text)
-    throws IOException {
+    protected static void writeLine(final OutputStream os, final String text) throws IOException {
         ParamUtil.requireNonNull("os", os);
         ParamUtil.requireNonNull("text", text);
 

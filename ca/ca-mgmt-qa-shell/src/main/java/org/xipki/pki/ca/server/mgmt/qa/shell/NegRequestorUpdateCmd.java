@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.RequestorUpdateCmd;
 public class NegRequestorUpdateCmd extends RequestorUpdateCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-requestor-up");
 
         try {

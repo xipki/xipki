@@ -63,8 +63,7 @@ public class SpeedP12ECSignCmd extends SpeedP12SignCommandSupport {
     private String curveName;
 
     @Override
-    protected LoadExecutor getTester()
-    throws Exception {
+    protected LoadExecutor getTester() throws Exception {
         return new P12ECSignLoadTest(securityFactory, sigAlgo, curveName);
     }
 

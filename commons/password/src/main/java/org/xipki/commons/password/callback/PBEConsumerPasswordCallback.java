@@ -91,8 +91,7 @@ public class PBEConsumerPasswordCallback implements PasswordCallback {
     }
 
     @Override
-    public void init(final String conf)
-    throws PasswordResolverException {
+    public void init(final String conf) throws PasswordResolverException {
         ParamUtil.requireNonBlank("conf", conf);
         ConfPairs pairs = new ConfPairs(conf);
         String str = pairs.getValue("name");

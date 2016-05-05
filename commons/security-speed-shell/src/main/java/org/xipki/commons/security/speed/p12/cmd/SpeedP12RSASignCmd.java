@@ -62,8 +62,7 @@ public class SpeedP12RSASignCmd extends SpeedP12SignCommandSupport {
     private String publicExponent = "0x10001";
 
     @Override
-    protected LoadExecutor getTester()
-    throws Exception {
+    protected LoadExecutor getTester() throws Exception {
         return new P12RSASignLoadTest(securityFactory, sigAlgo, keysize, toBigInt(publicExponent));
     }
 

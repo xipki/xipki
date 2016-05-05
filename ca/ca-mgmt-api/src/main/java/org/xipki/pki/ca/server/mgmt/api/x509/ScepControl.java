@@ -69,8 +69,7 @@ public class ScepControl implements Serializable {
 
     private boolean includeSignerCert = true;
 
-    public ScepControl(final String conf)
-    throws InvalidConfException {
+    public ScepControl(final String conf) throws InvalidConfException {
         if (StringUtil.isBlank(conf)) {
             return;
         }
@@ -136,8 +135,7 @@ public class ScepControl implements Serializable {
     }
 
     private static boolean getBoolean(final ConfPairs props, final String propKey,
-            final boolean dfltValue)
-    throws InvalidConfException {
+            final boolean dfltValue) throws InvalidConfException {
         String str = props.getValue(propKey);
         if (str != null) {
             str = str.trim();

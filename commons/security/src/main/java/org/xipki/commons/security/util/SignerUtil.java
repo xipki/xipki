@@ -375,8 +375,7 @@ public class SignerUtil {
         }
     }
 
-    public static Digest getDigest(final HashAlgoType hashAlgo)
-    throws XiSecurityException {
+    public static Digest getDigest(final HashAlgoType hashAlgo) throws XiSecurityException {
         try {
             return BcDefaultDigestProvider.INSTANCE.get(
                     new AlgorithmIdentifier(hashAlgo.getOid(), DERNull.INSTANCE));
@@ -386,8 +385,7 @@ public class SignerUtil {
         }
     }
 
-    public static Digest getDigest(final AlgorithmIdentifier hashAlgo)
-    throws XiSecurityException {
+    public static Digest getDigest(final AlgorithmIdentifier hashAlgo) throws XiSecurityException {
         try {
             return BcDefaultDigestProvider.INSTANCE.get(hashAlgo);
         } catch (OperatorCreationException ex) {

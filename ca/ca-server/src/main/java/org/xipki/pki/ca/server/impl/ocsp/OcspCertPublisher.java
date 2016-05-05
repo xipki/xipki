@@ -88,8 +88,7 @@ public class OcspCertPublisher extends X509CertPublisher {
 
     @Override
     public void initialize(final String conf, final PasswordResolver passwordResolver,
-            final Map<String, DataSourceWrapper> datasources)
-    throws CertPublisherException {
+            final Map<String, DataSourceWrapper> datasources) throws CertPublisherException {
         ParamUtil.requireNonNull("conf", conf);
         ParamUtil.requireNonEmpty("datasources", datasources);
 

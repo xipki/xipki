@@ -53,8 +53,7 @@ import org.xipki.pki.ca.server.mgmt.api.CaSystemStatus;
 public class CaSystemStatusCmd extends CaCommandSupport {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         CaSystemStatus status = caManager.getCaSystemStatus();
         if (status != null) {
             println(status.toString());

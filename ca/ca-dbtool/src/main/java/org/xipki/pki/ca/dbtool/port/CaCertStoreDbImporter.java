@@ -131,8 +131,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
     CaCertStoreDbImporter(final DataSourceWrapper datasource, final Unmarshaller unmarshaller,
             final String srcDir, final int numCertsPerCommit, final boolean resume,
-            final AtomicBoolean stopMe, final boolean evaluateOnly)
-    throws Exception {
+            final AtomicBoolean stopMe, final boolean evaluateOnly) throws Exception {
         super(datasource, srcDir, stopMe, evaluateOnly);
 
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
@@ -154,8 +153,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
     }
 
-    public void importToDb()
-    throws Exception {
+    public void importToDb() throws Exception {
         CertStoreType certstore;
         try {
             @SuppressWarnings("unchecked")
@@ -237,8 +235,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" imported table CS_CA");
     } // method importCa
 
-    private void importRequestor(final Requestors requestors)
-    throws DataAccessException {
+    private void importRequestor(final Requestors requestors) throws DataAccessException {
         final String sql = "INSERT INTO CS_REQUESTOR (ID, NAME) VALUES (?, ?)";
         System.out.println("importing table CS_REQUESTOR");
 
@@ -267,8 +264,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" imported table CS_REQUESTOR");
     } // method importRequestor
 
-    private void importPublisher(final Publishers publishers)
-    throws DataAccessException {
+    private void importPublisher(final Publishers publishers) throws DataAccessException {
         final String sql = "INSERT INTO CS_PUBLISHER (ID, NAME) VALUES (?, ?)";
 
         System.out.println("importing table CS_PUBLISHER");
@@ -298,8 +294,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" imported table CS_PUBLISHER");
     } // method importPublisher
 
-    private void importProfile(final Profiles profiles)
-    throws DataAccessException {
+    private void importProfile(final Profiles profiles) throws DataAccessException {
         final String sql = "INSERT INTO CS_PROFILE (ID, NAME) VALUES (?, ?)";
         System.out.println("importing table CS_PROFILE");
 
@@ -326,8 +321,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" imported table CS_PROFILE");
     } // method importProfile
 
-    private void importUser(final CertStoreType certstore)
-    throws Exception {
+    private void importUser(final CertStoreType certstore) throws Exception {
         System.out.println(getImportingText() + "table USERNAME");
 
         PreparedStatement ps = prepareStatement(SQL_ADD_USER);
@@ -364,8 +358,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     } // method importUser
 
     private int doImportUser(final PreparedStatement psAdduser, final String usersZipFile,
-            final ProcessLog processLog)
-    throws Exception {
+            final ProcessLog processLog) throws Exception {
         final int numEntriesPerCommit = numUsersPerCommit;
 
         ZipFile zipFile = new ZipFile(new File(usersZipFile));
@@ -447,8 +440,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
     } // method doImportUser
 
-    private void importPublishQueue(final PublishQueue publishQueue)
-    throws DataAccessException {
+    private void importPublishQueue(final PublishQueue publishQueue) throws DataAccessException {
         final String sql = "INSERT INTO PUBLISHQUEUE (CID, PID, CA_ID) VALUES (?, ?, ?)";
         System.out.println("importing table PUBLISHQUEUE");
         PreparedStatement ps = prepareStatement(sql);
@@ -475,8 +467,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" imported table PUBLISHQUEUE");
     } // method importPublishQueue
 
-    private void importDeltaCrlCache(final DeltaCRLCache deltaCrlCache)
-    throws DataAccessException {
+    private void importDeltaCrlCache(final DeltaCRLCache deltaCrlCache) throws DataAccessException {
         final String sql = "INSERT INTO DELTACRL_CACHE (ID, SN, CA_ID) VALUES (?, ?, ?)";
         System.out.println("importing table DELTACRL_CACHE");
         PreparedStatement ps = prepareStatement(sql);
@@ -507,8 +498,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" imported table DELTACRL_CACHE");
     } // method importDeltaCRLCache
 
-    private void importCrl(final CertStoreType certstore)
-    throws Exception {
+    private void importCrl(final CertStoreType certstore) throws Exception {
         System.out.println(getImportingText() + "table CRL");
 
         PreparedStatement ps = prepareStatement(SQL_ADD_CRL);
@@ -546,8 +536,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
     @SuppressWarnings("resource")
     private int doImportCrl(final PreparedStatement psAddCrl, final String crlsZipFile,
-            final ProcessLog processLog)
-    throws Exception {
+            final ProcessLog processLog) throws Exception {
         final int numEntriesPerCommit = numCrlsPerCommit;
 
         ZipFile zipFile = new ZipFile(new File(crlsZipFile));
@@ -761,8 +750,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
     private int doImportCert(final PreparedStatement psCert, final PreparedStatement psRawcert,
             final String certsZipFile, final int minId, final File processLogFile,
-            final ProcessLog processLog, final int numProcessedInLastProcess)
-    throws Exception {
+            final ProcessLog processLog, final int numProcessedInLastProcess) throws Exception {
         final int numEntriesPerCommit = numCertsPerCommit;
 
         ZipFile zipFile = new ZipFile(new File(certsZipFile));
@@ -947,8 +935,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         deleteFromTableWithLargerId("CERT", "ID", id, LOG);
     }
 
-    private void dropIndexes()
-    throws DataAccessException {
+    private void dropIndexes() throws DataAccessException {
         long start = System.currentTimeMillis();
 
         datasource.dropIndex(null, "CERT", "IDX_CA_FPK");
@@ -968,8 +955,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
     }
 
-    private void recoverIndexes()
-    throws DataAccessException {
+    private void recoverIndexes() throws DataAccessException {
         long start = System.currentTimeMillis();
 
         datasource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");

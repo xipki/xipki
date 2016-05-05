@@ -89,8 +89,7 @@ public class PBEPasswordService {
     } // method resolvePassword
 
     public static String encryptPassword(final int iterationCount, final char[] masterPassword,
-            final char[] password)
-    throws PasswordResolverException {
+            final char[] password) throws PasswordResolverException {
         ParamUtil.requireRange("iterationCount", iterationCount, 1, 65535);
         ParamUtil.requireNonNull("masterPassword", masterPassword);
         ParamUtil.requireNonNull("password", password);

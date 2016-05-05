@@ -403,8 +403,7 @@ public class XmlX509CertprofileUtil {
     }
 
     public static Map<ASN1ObjectIdentifier, KeyParametersOption> buildKeyAlgorithms(
-            final KeyAlgorithms keyAlgos)
-    throws CertprofileException {
+            final KeyAlgorithms keyAlgos) throws CertprofileException {
         ParamUtil.requireNonNull("keyAlgos", keyAlgos);
         Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = new HashMap<>();
         for (AlgorithmType type : keyAlgos.getAlgorithm()) {
@@ -428,8 +427,7 @@ public class XmlX509CertprofileUtil {
     } // method buildKeyAlgorithms
 
     public static Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls(
-            final ExtensionsType extensionsType)
-    throws CertprofileException {
+            final ExtensionsType extensionsType) throws CertprofileException {
         ParamUtil.requireNonNull("extensionsType", extensionsType);
         // Extension controls
         Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>();
@@ -520,8 +518,7 @@ public class XmlX509CertprofileUtil {
     } // method buildExtKeyUsageOptions
 
     public static Map<ASN1ObjectIdentifier, ExtensionValue> buildConstantExtesions(
-            final ExtensionsType extensionsType)
-    throws CertprofileException {
+            final ExtensionsType extensionsType) throws CertprofileException {
         if (extensionsType == null) {
             return null;
         }
@@ -706,8 +703,7 @@ public class XmlX509CertprofileUtil {
     }
 
     public static org.bouncycastle.asn1.x509.CertificatePolicies createCertificatePolicies(
-            final List<CertificatePolicyInformation> policyInfos)
-    throws CertprofileException {
+            final List<CertificatePolicyInformation> policyInfos) throws CertprofileException {
         ParamUtil.requireNonEmpty("policyInfos", policyInfos);
 
         int size = policyInfos.size();

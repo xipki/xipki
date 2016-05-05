@@ -114,14 +114,12 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     }
 
     protected abstract byte[] send(@Nonnull byte[] request, @Nonnull URL responderUrl,
-            @Nonnull RequestOptions requestOptions)
-    throws IOException;
+            @Nonnull RequestOptions requestOptions) throws IOException;
 
     @Override
     public OCSPResp ask(final X509Certificate issuerCert, final X509Certificate cert,
             final URL responderUrl, final RequestOptions requestOptions,
-            final RequestResponseDebug debug)
-    throws OcspResponseException, OcspRequestorException {
+            final RequestResponseDebug debug) throws OcspResponseException, OcspRequestorException {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
         ParamUtil.requireNonNull("cert", cert);
 
@@ -140,8 +138,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     @Override
     public OCSPResp ask(final X509Certificate issuerCert, final X509Certificate[] certs,
             final URL responderUrl, final RequestOptions requestOptions,
-            final RequestResponseDebug debug)
-    throws OcspResponseException, OcspRequestorException {
+            final RequestResponseDebug debug) throws OcspResponseException, OcspRequestorException {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
         ParamUtil.requireNonNull("certs", certs);
         ParamUtil.requireMin("certs.length", certs.length, 1);
@@ -166,16 +163,14 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     @Override
     public OCSPResp ask(final X509Certificate issuerCert, final BigInteger serialNumber,
             final URL responderUrl, final RequestOptions requestOptions,
-            final RequestResponseDebug debug)
-    throws OcspResponseException, OcspRequestorException {
+            final RequestResponseDebug debug) throws OcspResponseException, OcspRequestorException {
         return ask(issuerCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions, debug);
     }
 
     @Override
     public OCSPResp ask(final X509Certificate issuerCert, final BigInteger[] serialNumbers,
             final URL responderUrl, final RequestOptions requestOptions,
-            final RequestResponseDebug debug)
-    throws OcspResponseException, OcspRequestorException {
+            final RequestResponseDebug debug) throws OcspResponseException, OcspRequestorException {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
         ParamUtil.requireNonNull("requestOptions", requestOptions);
         ParamUtil.requireNonNull("responderUrl", responderUrl);
@@ -317,8 +312,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     } // method ask
 
     private OCSPReq buildRequest(final X509Certificate caCert, final BigInteger[] serialNumbers,
-            final byte[] nonce, final RequestOptions requestOptions)
-    throws OcspRequestorException {
+            final byte[] nonce, final RequestOptions requestOptions) throws OcspRequestorException {
         HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(requestOptions.getHashAlgorithmId());
         if (hashAlgo == null) {
             throw new OcspRequestorException("unknown HashAlgo "

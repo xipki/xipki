@@ -60,8 +60,7 @@ public class ChangeScepEntry implements Serializable {
 
     private String control;
 
-    public ChangeScepEntry(final String caName)
-    throws InvalidConfException {
+    public ChangeScepEntry(final String caName) throws InvalidConfException {
         this.caName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
     }
 

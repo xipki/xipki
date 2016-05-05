@@ -81,8 +81,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
     private String serverUrlS;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         List<Long> tmpSerialNumbers = new LinkedList<>();
 
         try {

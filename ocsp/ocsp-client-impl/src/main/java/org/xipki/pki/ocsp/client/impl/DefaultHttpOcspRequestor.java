@@ -67,8 +67,7 @@ public class DefaultHttpOcspRequestor extends AbstractOcspRequestor {
 
     @Override
     protected byte[] send(final byte[] request, final URL responderUrl,
-            final RequestOptions requestOptions)
-    throws IOException {
+            final RequestOptions requestOptions) throws IOException {
         ParamUtil.requireNonNull("request", request);
         ParamUtil.requireNonNull("responderUrl", responderUrl);
         ParamUtil.requireNonNull("requestOptions", requestOptions);

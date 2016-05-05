@@ -63,8 +63,7 @@ public class SpeedP12RSAKeyGenCmd extends SingleSpeedCommandSupport {
     private String publicExponent = "0x10001";
 
     @Override
-    protected LoadExecutor getTester()
-    throws Exception {
+    protected LoadExecutor getTester() throws Exception {
         return new P12RSAKeyGenLoadTest(keysize, toBigInt(publicExponent), securityFactory);
     }
 

@@ -57,8 +57,7 @@ public class CmpControlRemoveCmd extends CaCommandSupport {
     private String name;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         boolean bo = caManager.removeCmpControl(name);
         output(bo, "removed", "could not remove", "CMP control");
         return null;

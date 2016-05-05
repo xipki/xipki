@@ -93,8 +93,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
     private PrivateKey identityKey;
     private X509Certificate identityCert;
 
-    protected ScepClient getScepClient()
-    throws CertificateException, IOException {
+    protected ScepClient getScepClient() throws CertificateException, IOException {
         if (scepClient == null) {
             X509Certificate caCert = X509Util.parseCert(caCertFile);
             CaIdentifier tmpCaId = new CaIdentifier(url, caId);
@@ -104,16 +103,14 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
         return scepClient;
     }
 
-    protected PrivateKey getIdentityKey()
-    throws Exception {
+    protected PrivateKey getIdentityKey() throws Exception {
         if (identityKey == null) {
             readIdentity();
         }
         return identityKey;
     }
 
-    protected X509Certificate getIdentityCert()
-    throws Exception {
+    protected X509Certificate getIdentityCert() throws Exception {
         if (identityCert == null) {
             readIdentity();
         }
@@ -121,8 +118,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
         return identityCert;
     }
 
-    private void readIdentity()
-    throws Exception {
+    private void readIdentity() throws Exception {
         char[] pwd = readPasswordIfNotSet(password);
 
         KeyStore ks = KeyStore.getInstance("PKCS12", "BC");

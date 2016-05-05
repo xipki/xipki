@@ -85,8 +85,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
     OcspCertStoreDbImporter(final DataSourceWrapper datasource, final Unmarshaller unmarshaller,
             final String srcDir, final int numCertsPerCommit, final boolean resume,
-            final AtomicBoolean stopMe, final boolean evaluateOnly)
-    throws Exception {
+            final AtomicBoolean stopMe, final boolean evaluateOnly) throws Exception {
         super(datasource, srcDir, stopMe, evaluateOnly);
 
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
@@ -105,8 +104,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         this.resume = resume;
     }
 
-    public void importToDb()
-    throws Exception {
+    public void importToDb() throws Exception {
         CertStoreType certstore;
         try {
             File file = new File(baseDir + File.separator + FILENAME_OCSP_CERTSTORE);
@@ -296,8 +294,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
     private int doImportCert(final PreparedStatement psCert, final PreparedStatement psCerthash,
             final PreparedStatement psRawcert, final String certsZipFile, final int minId,
             final File processLogFile, final ProcessLog processLog,
-            final int numProcessedInLastProcess)
-    throws Exception {
+            final int numProcessedInLastProcess) throws Exception {
         ZipFile zipFile = new ZipFile(new File(certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
 

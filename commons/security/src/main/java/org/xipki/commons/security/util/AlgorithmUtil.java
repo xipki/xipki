@@ -337,8 +337,7 @@ public class AlgorithmUtil {
     } // method getSignatureAlgoId
 
     public static AlgorithmIdentifier getSignatureAlgoId(final PublicKey pubKey,
-            final SignerConf signerConf)
-    throws NoSuchAlgorithmException {
+            final SignerConf signerConf) throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("signerConf", signerConf);
         if (signerConf.getHashAlgo() == null) {
             return getSignatureAlgoId(signerConf.getConfValue("algo"));
@@ -558,8 +557,7 @@ public class AlgorithmUtil {
     } // method getECDSASignatureAlgoId
 
     public static AlgorithmIdentifier extractDigesetAlgorithmIdentifier(
-            final AlgorithmIdentifier sigAlgId)
-    throws NoSuchAlgorithmException {
+            final AlgorithmIdentifier sigAlgId) throws NoSuchAlgorithmException {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
 
         ASN1ObjectIdentifier digestAlgOid;

@@ -99,8 +99,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
     }
 
     @Override
-    public void digest()
-    throws Exception {
+    public void digest() throws Exception {
         System.out.println("digesting database");
 
         final long total = getCount("CERT");
@@ -139,8 +138,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         }
     } // method digest
 
-    private Map<Integer, String> getCaIds()
-    throws DataAccessException, IOException {
+    private Map<Integer, String> getCaIds() throws DataAccessException, IOException {
         Map<Integer, String> caIdDirMap = new HashMap<>();
         final String sql = dbControl.getCaSql();
 
@@ -180,8 +178,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
     } // method getCaIds
 
     private void doDigest(final XipkiDigestExportReader certsReader, final ProcessLog processLog,
-            final CaEntryContainer caEntryContainer)
-    throws Exception {
+            final CaEntryContainer caEntryContainer) throws Exception {
         int minCertId = (int) getMin("CERT", "ID");
         final int maxCertId = (int) getMax("CERT", "ID");
         System.out.println("digesting certificates from ID " + minCertId);

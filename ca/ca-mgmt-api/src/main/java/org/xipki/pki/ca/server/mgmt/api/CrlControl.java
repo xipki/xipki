@@ -259,8 +259,7 @@ public class CrlControl implements Serializable {
 
     private final Set<String> extensionOids;
 
-    public CrlControl(final String conf)
-    throws InvalidConfException {
+    public CrlControl(final String conf) throws InvalidConfException {
         ConfPairs props;
         try {
             props = new ConfPairs(conf);
@@ -452,8 +451,7 @@ public class CrlControl implements Serializable {
         return invalidityDateMode;
     }
 
-    public void validate()
-    throws InvalidConfException {
+    public void validate() throws InvalidConfException {
         if (onlyContainsCaCerts && onlyContainsUserCerts) {
             throw new InvalidConfException(
                     "onlyContainsCACerts and onlyContainsUserCerts can not be both true");
@@ -553,8 +551,7 @@ public class CrlControl implements Serializable {
     }
 
     private static boolean getBoolean(final ConfPairs props, final String propKey,
-            final boolean dfltValue)
-    throws InvalidConfException {
+            final boolean dfltValue) throws InvalidConfException {
         String str = props.getValue(propKey);
         if (str != null) {
             str = str.trim();

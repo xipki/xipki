@@ -59,8 +59,7 @@ public class ConfirmCmd extends XipkiCommandSupport {
     private String prompt;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         boolean toContinue = confirm(
                 prompt + "\nDo you want to contine [yes/no]?", 3);
         if (!toContinue) {

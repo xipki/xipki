@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaRequestorRemoveCmd;
 public class NegCaRequestorRemoveCmd extends CaRequestorRemoveCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-careq-rm");
 
         try {

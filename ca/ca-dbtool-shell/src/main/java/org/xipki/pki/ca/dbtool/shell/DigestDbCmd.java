@@ -77,8 +77,7 @@ public class DigestDbCmd extends DbPortCommandSupport {
     private Integer numThreads = 10;
 
     @Override
-    protected DbPortWorker getDbPortWorker()
-    throws Exception {
+    protected DbPortWorker getDbPortWorker() throws Exception {
         return new DbDigestExportWorker(
                 datasourceFactory,
                 passwordResolver,

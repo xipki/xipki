@@ -57,8 +57,7 @@ import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 public class DbSchemaInfo {
     private final Map<String, String> variables = new HashMap<>();
 
-    public DbSchemaInfo(DataSourceWrapper datasource)
-    throws DataAccessException {
+    public DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
         ParamUtil.requireNonNull("datasource", datasource);
         final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
         Connection conn = datasource.getConnection();

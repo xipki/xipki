@@ -99,8 +99,7 @@ public class DbPorter extends DbToolBase {
     protected final int maxX500nameLen;
 
     public DbPorter(final DataSourceWrapper datasource, final String baseDir,
-            final AtomicBoolean stopMe, final boolean evaluateOnly)
-    throws DataAccessException {
+            final AtomicBoolean stopMe, final boolean evaluateOnly) throws DataAccessException {
         super(datasource, baseDir, stopMe);
 
         this.evaulateOnly = evaluateOnly;
@@ -140,8 +139,7 @@ public class DbPorter extends DbToolBase {
         return ret;
     }
 
-    protected String getValue(final FileOrValueType fileOrValue)
-    throws IOException {
+    protected String getValue(final FileOrValueType fileOrValue) throws IOException {
         if (fileOrValue == null) {
             return null;
         }
@@ -178,8 +176,7 @@ public class DbPorter extends DbToolBase {
                 : " exported ";
     }
 
-    public static final Schema retrieveSchema(final String schemaPath)
-    throws JAXBException {
+    public static final Schema retrieveSchema(final String schemaPath) throws JAXBException {
         ParamUtil.requireNonNull("schemaPath", schemaPath);
 
         URL schemaUrl = DbPorter.class.getResource(schemaPath);
@@ -194,8 +191,7 @@ public class DbPorter extends DbToolBase {
         }
     }
 
-    public static void echoToFile(final String content, final File file)
-    throws IOException {
+    public static void echoToFile(final String content, final File file) throws IOException {
         ParamUtil.requireNonNull("content", content);
         ParamUtil.requireNonNull("file", file);
 

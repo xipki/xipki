@@ -257,8 +257,7 @@ public class ExtensionsChecker {
 
     private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
-    public ExtensionsChecker(final X509ProfileType conf)
-    throws CertprofileException {
+    public ExtensionsChecker(final X509ProfileType conf) throws CertprofileException {
         ParamUtil.requireNonNull("conf", conf);
         try {
             this.version = X509CertVersion.getInstance(conf.getVersion());
@@ -2766,8 +2765,7 @@ public class ExtensionsChecker {
     } // method getExtensionValue
 
     public static Map<ASN1ObjectIdentifier, QaExtensionValue> buildConstantExtesions(
-            final ExtensionsType extensionsType)
-    throws CertprofileException {
+            final ExtensionsType extensionsType) throws CertprofileException {
         if (extensionsType == null) {
             return null;
         }
@@ -2849,8 +2847,7 @@ public class ExtensionsChecker {
     }
 
     private static GeneralName createGeneralName(final GeneralName reqName,
-            final Set<GeneralNameMode> modes)
-    throws BadCertTemplateException {
+            final Set<GeneralNameMode> modes) throws BadCertTemplateException {
         int tag = reqName.getTagNo();
         GeneralNameMode mode = null;
         for (GeneralNameMode m : modes) {

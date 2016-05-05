@@ -81,8 +81,7 @@ public class ImportCaCmd extends DbPortCommandSupport {
     private Boolean testOnly = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbPortWorker()
-    throws Exception {
+    protected DbPortWorker getDbPortWorker() throws Exception {
         return new CaDbImportWorker(datasourceFactory, passwordResolver, dbconfFile, resume,
                 indir, numCertsPerCommit.intValue(), testOnly);
     }

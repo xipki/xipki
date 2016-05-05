@@ -70,8 +70,7 @@ class ResponderOption {
 
     private final List<String> servletPaths;
 
-    ResponderOption(final ResponderType conf)
-    throws InvalidConfException {
+    ResponderOption(final ResponderType conf) throws InvalidConfException {
         ParamUtil.requireNonNull("conf", conf);
         String str = conf.getMode();
         if (str == null || "RFC6960".equalsIgnoreCase(str) || "RFC 6960".equalsIgnoreCase(str)) {

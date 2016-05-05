@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaPublishRcaCertCmd;
 public class NegCaPublishRcaCertCmd extends CaPublishRcaCertCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-publish-self");
 
         try {

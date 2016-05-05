@@ -79,8 +79,7 @@ public class CmpResponderEntryWrapper {
         return signer;
     }
 
-    public void initSigner(final SecurityFactory securityFactory)
-    throws ObjectCreationException {
+    public void initSigner(final SecurityFactory securityFactory) throws ObjectCreationException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         if (signer != null) {
             return;

@@ -299,8 +299,7 @@ public class OcspServer {
         new Thread(initRun).start();
     }
 
-    public void init()
-    throws InvalidConfException, PasswordResolverException, DataAccessException {
+    public void init() throws InvalidConfException, PasswordResolverException, DataAccessException {
         LOG.info("starting OCSPResponder server ...");
         if (initialized.get()) {
             LOG.info("already started, skipping ...");
@@ -1138,8 +1137,7 @@ public class OcspServer {
         }
     }
 
-    private ResponderSigner initSigner(final SignerType signerType)
-    throws InvalidConfException {
+    private ResponderSigner initSigner(final SignerType signerType) throws InvalidConfException {
         X509Certificate[] explicitCertificateChain = null;
 
         X509Certificate explicitResponderCert = null;
@@ -1404,8 +1402,7 @@ public class OcspServer {
                 : bo.booleanValue();
     }
 
-    private static InputStream getInputStream(final FileOrValueType conf)
-    throws IOException {
+    private static InputStream getInputStream(final FileOrValueType conf) throws IOException {
         if (conf.getFile() != null) {
             return new FileInputStream(IoUtil.expandFilepath(conf.getFile()));
         } else {
@@ -1413,8 +1410,7 @@ public class OcspServer {
         }
     }
 
-    private static InputStream getInputStream(final FileOrPlainValueType conf)
-    throws IOException {
+    private static InputStream getInputStream(final FileOrPlainValueType conf) throws IOException {
         if (conf.getFile() != null) {
             return new FileInputStream(IoUtil.expandFilepath(conf.getFile()));
         } else {
@@ -1449,8 +1445,7 @@ public class OcspServer {
         }
     }
 
-    private static OCSPServer parseConf(final String confFilename)
-    throws InvalidConfException {
+    private static OCSPServer parseConf(final String confFilename) throws InvalidConfException {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();

@@ -64,8 +64,7 @@ public class SpeedP12ECKeyGenCmd extends SingleSpeedCommandSupport {
     private String curveName;
 
     @Override
-    protected LoadExecutor getTester()
-    throws Exception {
+    protected LoadExecutor getTester() throws Exception {
         return new P12ECKeyGenLoadTest(curveName, securityFactory);
     }
 

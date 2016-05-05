@@ -49,7 +49,6 @@ public interface OcspStoreFactory {
 
     boolean canCreateOcspStore(@Nonnull String type);
 
-    OcspStore newOcspStore(@Nonnull String type)
-    throws ObjectCreationException;
+    OcspStore newOcspStore(@Nonnull String type) throws ObjectCreationException;
 
 }

@@ -96,8 +96,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
     private PrivateKey identityKey;
     private X509Certificate identityCert;
 
-    protected Client getScepClient()
-    throws CertificateException, IOException {
+    protected Client getScepClient() throws CertificateException, IOException {
         if (scepClient == null) {
             X509Certificate caCert = X509Util.parseCert(caCertFile);
             URL tmpUrl = new URL(url);
@@ -106,16 +105,14 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
         return scepClient;
     }
 
-    protected PrivateKey getIdentityKey()
-    throws Exception {
+    protected PrivateKey getIdentityKey() throws Exception {
         if (identityKey == null) {
             readIdentity();
         }
         return identityKey;
     }
 
-    protected X509Certificate getIdentityCert()
-    throws Exception {
+    protected X509Certificate getIdentityCert() throws Exception {
         if (identityCert == null) {
             readIdentity();
         }
@@ -123,8 +120,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
         return identityCert;
     }
 
-    private void readIdentity()
-    throws Exception {
+    private void readIdentity() throws Exception {
         char[] pwd = readPasswordIfNotSet(password);
 
         KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
@@ -148,8 +144,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
         this.identityCert = (X509Certificate) ks.getCertificate(keyname);
     }
 
-    protected X509Certificate extractEeCerts(final CertStore certstore)
-    throws CertStoreException {
+    protected X509Certificate extractEeCerts(final CertStore certstore) throws CertStoreException {
         ParamUtil.requireNonNull("certstore", certstore);
 
         Iterator<?> it = certstore.getCertificates(null).iterator();

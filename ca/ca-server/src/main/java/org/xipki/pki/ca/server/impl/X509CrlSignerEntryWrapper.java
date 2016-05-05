@@ -75,8 +75,7 @@ class X509CrlSignerEntryWrapper {
     X509CrlSignerEntryWrapper() {
     }
 
-    public void setDbEntry(final X509CrlSignerEntry dbEntry)
-    throws InvalidConfException {
+    public void setDbEntry(final X509CrlSignerEntry dbEntry) throws InvalidConfException {
         this.dbEntry = dbEntry;
         this.crlControl = new CrlControl(dbEntry.getCrlControl());
     }

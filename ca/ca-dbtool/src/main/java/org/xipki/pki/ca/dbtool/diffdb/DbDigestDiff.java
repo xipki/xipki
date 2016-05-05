@@ -100,8 +100,7 @@ public class DbDigestDiff {
     private DbDigestDiff(final String refDir, final DataSourceWrapper refDatasource,
             final DataSourceWrapper targetDatasource, final String reportDirName,
             final boolean revokedOnly, final AtomicBoolean stopMe, final int numPerSelect,
-            final NumThreads numThreads)
-    throws IOException, DataAccessException {
+            final NumThreads numThreads) throws IOException, DataAccessException {
         if (refDir == null) {
             if (refDatasource == null) {
                 throw new IllegalArgumentException(
@@ -151,8 +150,7 @@ public class DbDigestDiff {
         this.includeCaCerts = includeCaCerts;
     }
 
-    public void diff()
-    throws Exception {
+    public void diff() throws Exception {
         Map<Integer, byte[]> caIdCertMap = getCas(targetDatasource, targetDbControl);
 
         if (refDirname != null) {
@@ -302,8 +300,7 @@ public class DbDigestDiff {
     public static DbDigestDiff getInstanceForDirRef(final String refDirname,
             final DataSourceWrapper targetDatasource, final String reportDirName,
             final boolean revokedOnly, final AtomicBoolean stopMe, final int numPerSelect,
-            final NumThreads numThreads)
-    throws IOException, DataAccessException {
+            final NumThreads numThreads) throws IOException, DataAccessException {
         return new DbDigestDiff(refDirname, null,
                 targetDatasource, reportDirName, revokedOnly, stopMe,
                 numPerSelect, numThreads);
@@ -312,15 +309,13 @@ public class DbDigestDiff {
     public static DbDigestDiff getInstanceForDbRef(final DataSourceWrapper refDatasource,
             final DataSourceWrapper targetDatasource, final String reportDirName,
             final boolean revokedOnly, final AtomicBoolean stopMe, final int numPerSelect,
-            final NumThreads numThreads)
-    throws IOException, DataAccessException {
+            final NumThreads numThreads) throws IOException, DataAccessException {
         return new DbDigestDiff(null, refDatasource, targetDatasource, reportDirName, revokedOnly,
                 stopMe, numPerSelect, numThreads);
     }
 
     private static Map<Integer, byte[]> getCas(final DataSourceWrapper datasource,
-            final XipkiDbControl dbControl)
-    throws DataAccessException {
+            final XipkiDbControl dbControl) throws DataAccessException {
         // get a list of available CAs in the target database
         String sql = "SELECT ID, CERT FROM " + dbControl.getTblCa();
         Connection conn = datasource.getConnection();

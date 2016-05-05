@@ -53,8 +53,7 @@ import org.xipki.pki.ca.server.mgmt.shell.PublisherUpdateCmd;
 public class PublisherCheckCmd extends PublisherUpdateCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("checking publisher " + name);
 
         PublisherEntry cp = caManager.getPublisher(name);

@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.cert.RemoveCertCmd;
 public class NegRemoveCertCmd extends RemoveCertCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-remove-cert");
 
         try {

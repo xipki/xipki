@@ -75,8 +75,7 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         "DELETE FROM CRAW WHERE ID>?";
 
     AbstractOcspCertStoreDbImporter(final DataSourceWrapper datasource, final String srcDir,
-            final AtomicBoolean stopMe, final boolean evaluateOnly)
-    throws Exception {
+            final AtomicBoolean stopMe, final boolean evaluateOnly) throws Exception {
         super(datasource, srcDir, stopMe, evaluateOnly);
     }
 
@@ -106,8 +105,7 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         deleteFromTableWithLargerId("CERT", "ID", id, log);
     }
 
-    protected void dropIndexes()
-    throws DataAccessException {
+    protected void dropIndexes() throws DataAccessException {
         System.out.println("dropping indexes");
         long start = System.currentTimeMillis();
 
@@ -125,8 +123,7 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
     }
 
-    protected void recoverIndexes()
-    throws DataAccessException {
+    protected void recoverIndexes() throws DataAccessException {
         System.out.println("recovering indexes");
         long start = System.currentTimeMillis();
 

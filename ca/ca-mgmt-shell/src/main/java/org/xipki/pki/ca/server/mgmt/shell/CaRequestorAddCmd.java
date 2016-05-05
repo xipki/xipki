@@ -96,8 +96,7 @@ public class CaRequestorAddCmd extends CaCommandSupport {
     private Set<String> profiles;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         boolean ra = isEnabled(raS, false, "ra");
 
         CaHasRequestorEntry entry = new CaHasRequestorEntry(requestorName);

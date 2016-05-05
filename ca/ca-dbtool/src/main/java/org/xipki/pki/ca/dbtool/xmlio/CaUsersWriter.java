@@ -49,13 +49,11 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CaUsersWriter extends DbiXmlWriter {
 
-    public CaUsersWriter()
-    throws IOException, XMLStreamException {
+    public CaUsersWriter() throws IOException, XMLStreamException {
         super("users", "1");
     }
 
-    public void add(final CaUserType user)
-    throws InvalidDataObjectException, XMLStreamException {
+    public void add(final CaUserType user) throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("user", user);
         user.validate();
         user.writeTo(this);

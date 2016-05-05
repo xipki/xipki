@@ -65,8 +65,7 @@ public class Asn1P11Params extends ASN1Object {
         this.p11Params = ParamUtil.requireNonNull("p11Params", p11Params);
     }
 
-    private Asn1P11Params(final ASN1TaggedObject taggedObject)
-    throws BadAsn1ObjectException {
+    private Asn1P11Params(final ASN1TaggedObject taggedObject) throws BadAsn1ObjectException {
         int tagNo = taggedObject.getTagNo();
         if (tagNo == 0) {
             this.p11Params = Asn1RSAPkcsPssParams.getInstance(taggedObject.getObject());
@@ -75,8 +74,7 @@ public class Asn1P11Params extends ASN1Object {
         }
     }
 
-    public static Asn1P11Params getInstance(final Object obj)
-    throws BadAsn1ObjectException {
+    public static Asn1P11Params getInstance(final Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1P11Params) {
             return (Asn1P11Params) obj;
         }

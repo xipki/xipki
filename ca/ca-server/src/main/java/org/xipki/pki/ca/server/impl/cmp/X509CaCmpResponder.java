@@ -245,8 +245,7 @@ public class X509CaCmpResponder extends CmpResponder {
         return result;
     }
 
-    public String getResponderName()
-    throws InvalidConfException {
+    public String getResponderName() throws InvalidConfException {
         String name = getCa().getCaInfo().getResponderName();
         if (name == null) {
             throw new InvalidConfException("No responder is configured for CA " + caName);
@@ -578,8 +577,7 @@ public class X509CaCmpResponder extends CmpResponder {
     private CertResponse generateCertificate(final CertTemplateData certTemplate,
             final CmpRequestorInfo requestor, final String user, final ASN1OctetString tid,
             final ASN1Integer certReqId, final boolean keyUpdate, final long confirmWaitTime,
-            final AuditChildEvent childAuditEvent)
-    throws InsuffientPermissionException {
+            final AuditChildEvent childAuditEvent) throws InsuffientPermissionException {
         checkPermission(requestor, certTemplate.getCertprofileName());
 
         try {
@@ -1028,8 +1026,7 @@ public class X509CaCmpResponder extends CmpResponder {
     }
 
     private void checkPermission(final CmpRequestorInfo requestor,
-            final Permission requiredPermission)
-    throws InsuffientPermissionException {
+            final Permission requiredPermission) throws InsuffientPermissionException {
         X509Ca ca = getCa();
         Set<Permission> permissions = ca.getCaInfo().getPermissions();
         boolean granted = false;
@@ -1051,8 +1048,7 @@ public class X509CaCmpResponder extends CmpResponder {
     } // method checkPermission
 
     private String getSystemInfo(final CmpRequestorInfo requestor,
-            final Set<Integer> acceptVersions)
-    throws OperationException {
+            final Set<Integer> acceptVersions) throws OperationException {
         X509Ca ca = getCa();
         StringBuilder sb = new StringBuilder(2000);
         // current maximal support version is 2
@@ -1128,21 +1124,18 @@ public class X509CaCmpResponder extends CmpResponder {
     } // method getSystemInfo
 
     @Override
-    protected ConcurrentContentSigner getSigner()
-    throws InvalidConfException {
+    protected ConcurrentContentSigner getSigner() throws InvalidConfException {
         String name = getResponderName();
         return caManager.getCmpResponderWrapper(name).getSigner();
     }
 
     @Override
-    protected GeneralName getSender()
-    throws InvalidConfException {
+    protected GeneralName getSender() throws InvalidConfException {
         return caManager.getCmpResponderWrapper(getResponderName()).getSubjectAsGeneralName();
     }
 
     @Override
-    protected boolean intendsMe(final GeneralName requestRecipient)
-    throws InvalidConfException {
+    protected boolean intendsMe(final GeneralName requestRecipient) throws InvalidConfException {
         if (requestRecipient == null) {
             return false;
         }
@@ -1234,8 +1227,7 @@ public class X509CaCmpResponder extends CmpResponder {
     private PKIBody cmpRevokeOrUnrevokeOrRemoveCertificates(final PKIHeaderBuilder respHeader,
             final CmpControl cmpControl, final PKIHeader reqHeader, final PKIBody reqBody,
             final CmpRequestorInfo requestor, final String user, final ASN1OctetString tid,
-            final AuditEvent auditEvent)
-    throws InsuffientPermissionException {
+            final AuditEvent auditEvent) throws InsuffientPermissionException {
         Permission requiredPermission = null;
         boolean allRevdetailsOfSameType = true;
 

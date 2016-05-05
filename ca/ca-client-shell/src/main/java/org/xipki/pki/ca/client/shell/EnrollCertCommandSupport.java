@@ -217,12 +217,10 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     private List<String> wantExtensionTypes;
 
     protected abstract ConcurrentContentSigner getSigner(
-            @Nonnull SignatureAlgoControl signatureAlgoControl)
-    throws ObjectCreationException;
+            @Nonnull SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
         ConcurrentContentSigner signer = getSigner(
@@ -403,8 +401,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     } // method doExecute
 
     private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
-            final List<String> oidTexts)
-    throws InvalidOidOrNameException {
+            final List<String> oidTexts) throws InvalidOidOrNameException {
         if (oidTexts == null) {
             return null;
         }
@@ -423,8 +420,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         return ret;
     }
 
-    private static ASN1ObjectIdentifier toOid(final String str)
-    throws InvalidOidOrNameException {
+    private static ASN1ObjectIdentifier toOid(final String str) throws InvalidOidOrNameException {
         final int n = str.length();
         boolean isName = false;
         for (int i = 0; i < n; i++) {

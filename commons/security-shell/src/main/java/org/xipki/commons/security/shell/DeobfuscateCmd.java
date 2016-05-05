@@ -72,8 +72,7 @@ public class DeobfuscateCmd extends SecurityCommandSupport {
     private String outFile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (!(passwordHint == null ^ passwordFile == null)) {
             throw new IllegalCmdParamException(
                     "exactly one of password and password-file must be specified");

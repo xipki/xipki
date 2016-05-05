@@ -49,7 +49,6 @@ public interface X509CertPublisherFactory {
 
     boolean canCreatePublisher(@Nonnull String type);
 
-    X509CertPublisher newPublisher(@Nonnull String type)
-    throws ObjectCreationException;
+    X509CertPublisher newPublisher(@Nonnull String type) throws ObjectCreationException;
 
 }

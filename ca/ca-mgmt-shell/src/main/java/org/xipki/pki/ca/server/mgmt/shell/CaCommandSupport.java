@@ -85,8 +85,7 @@ public abstract class CaCommandSupport extends XipkiCommandSupport {
     }
 
     protected void output(final boolean successful, final String posPrefix, final String negPrefix,
-            final String message)
-    throws CmdFailure {
+            final String message) throws CmdFailure {
         if (successful) {
             println(posPrefix + " " + message);
         } else {

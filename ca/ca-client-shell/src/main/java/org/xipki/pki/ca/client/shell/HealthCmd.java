@@ -67,8 +67,7 @@ public class HealthCmd extends ClientCommandSupport {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         Set<String> caNames = caClient.getCaNames();
         if (isEmpty(caNames)) {
             throw new IllegalCmdParamException("no CA is configured");

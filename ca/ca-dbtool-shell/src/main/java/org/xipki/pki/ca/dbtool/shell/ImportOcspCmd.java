@@ -81,8 +81,7 @@ public class ImportOcspCmd extends DbPortCommandSupport {
     private Boolean testOnly = Boolean.FALSE;
 
     @Override
-    protected DbPortWorker getDbPortWorker()
-    throws Exception {
+    protected DbPortWorker getDbPortWorker() throws Exception {
         return new OcspDbImportWorker(datasourceFactory, passwordResolver, dbconfFile, resume,
                 indir, numCertsPerCommit.intValue(), testOnly);
     }

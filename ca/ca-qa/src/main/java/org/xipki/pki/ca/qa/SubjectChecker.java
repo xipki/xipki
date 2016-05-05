@@ -86,8 +86,7 @@ public class SubjectChecker {
 
     private final SubjectControl subjectControl;
 
-    public SubjectChecker(final X509ProfileType conf)
-    throws CertprofileException {
+    public SubjectChecker(final X509ProfileType conf) throws CertprofileException {
         ParamUtil.requireNonNull("conf", conf);
         this.specialBehavior = conf.getSpecialBehavior();
 
@@ -401,8 +400,7 @@ public class SubjectChecker {
     private void checkAttributeTypeAndValue(final String name, final ASN1ObjectIdentifier type,
             final String atvTextValue, final RdnControl rdnControl,
             final List<String> requestedCoreAtvTextValues, final int index,
-            final StringBuilder failureMsg)
-    throws BadCertTemplateException {
+            final StringBuilder failureMsg) throws BadCertTemplateException {
         String tmpAtvTextValue = atvTextValue;
         if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
             if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(tmpAtvTextValue).matches()) {

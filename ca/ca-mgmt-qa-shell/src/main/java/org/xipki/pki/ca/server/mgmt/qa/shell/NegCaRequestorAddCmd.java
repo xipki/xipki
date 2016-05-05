@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaRequestorAddCmd;
 public class NegCaRequestorAddCmd extends CaRequestorAddCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-careq-add");
 
         try {

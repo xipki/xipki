@@ -53,8 +53,7 @@ public interface DigestReader {
 
     int getTotalAccount();
 
-    CertsBundle nextCerts(int numCerts)
-    throws Exception;
+    CertsBundle nextCerts(int numCerts) throws Exception;
 
     void close();
 

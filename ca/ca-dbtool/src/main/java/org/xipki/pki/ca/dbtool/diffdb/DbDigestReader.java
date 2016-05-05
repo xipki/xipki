@@ -217,8 +217,7 @@ abstract class DbDigestReader implements DigestReader {
         }
     }
 
-    protected abstract Retriever getRetriever()
-    throws DataAccessException;
+    protected abstract Retriever getRetriever() throws DataAccessException;
 
     @Override
     public X509Certificate getCaCert() {
@@ -236,8 +235,7 @@ abstract class DbDigestReader implements DigestReader {
     }
 
     @Override
-    public synchronized CertsBundle nextCerts(final int numCerts)
-    throws Exception {
+    public synchronized CertsBundle nextCerts(final int numCerts) throws Exception {
         if (endReached.get() && fixedSizedCerts.isEmpty()) {
             return null;
         }

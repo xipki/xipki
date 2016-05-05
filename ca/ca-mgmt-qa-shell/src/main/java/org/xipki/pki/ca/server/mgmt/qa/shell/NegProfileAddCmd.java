@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.ProfileAddCmd;
 public class NegProfileAddCmd extends ProfileAddCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-profile-add");
 
         try {

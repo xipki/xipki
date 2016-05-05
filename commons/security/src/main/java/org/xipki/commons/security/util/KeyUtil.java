@@ -206,8 +206,7 @@ public class KeyUtil {
         }
     }
 
-    private static KeyFactory getKeyFactory(final String algorithm)
-    throws InvalidKeySpecException {
+    private static KeyFactory getKeyFactory(final String algorithm) throws InvalidKeySpecException {
         String alg = algorithm.toUpperCase();
         if ("ECDSA".equals(alg)) {
             alg = "EC";

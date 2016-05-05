@@ -60,8 +60,7 @@ public class UpdateReqCmd extends EnrollCertCommandSupport {
     @Override
     protected EnrolmentResponse requestCertificate(final ScepClient client,
             final CertificationRequest csr, final PrivateKey identityKey,
-            final X509Certificate identityCert)
-    throws ScepClientException {
+            final X509Certificate identityCert) throws ScepClientException {
         ParamUtil.requireNonNull("client", client);
         return client.scepUpdateReq(csr, identityKey, identityCert);
     }

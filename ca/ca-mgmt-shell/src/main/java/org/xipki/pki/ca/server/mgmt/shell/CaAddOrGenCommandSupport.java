@@ -187,8 +187,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
     @Reference
     private PasswordResolver passwordResolver;
 
-    protected X509CaEntry getCaEntry()
-    throws Exception {
+    protected X509CaEntry getCaEntry() throws Exception {
         ParamUtil.requireRange("sn-size", snSize, 8, 20);
 
         if (nextCrlNumber < 1) {

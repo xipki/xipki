@@ -60,8 +60,7 @@ public abstract class X509CertPublisher {
 
     public abstract void initialize(@Nullable String conf,
             @Nullable PasswordResolver passwordResolver,
-            @Nonnull Map<String, DataSourceWrapper> datasources)
-    throws CertPublisherException;
+            @Nonnull Map<String, DataSourceWrapper> datasources) throws CertPublisherException;
 
     public void shutdown() {
     }

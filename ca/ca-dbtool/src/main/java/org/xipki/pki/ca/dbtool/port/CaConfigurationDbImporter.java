@@ -101,8 +101,7 @@ class CaConfigurationDbImporter extends DbPorter {
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
     }
 
-    public void importToDb()
-    throws Exception {
+    public void importToDb() throws Exception {
         CAConfigurationType caconf;
         try {
             @SuppressWarnings("unchecked")
@@ -141,8 +140,7 @@ class CaConfigurationDbImporter extends DbPorter {
         System.out.println(" imported CA configuration to database");
     } // method importToDb
 
-    private void importCmpcontrol(final Cmpcontrols controls)
-    throws DataAccessException {
+    private void importCmpcontrol(final Cmpcontrols controls) throws DataAccessException {
         System.out.println("importing table CMPCONTROL");
         final String sql = "INSERT INTO CMPCONTROL (NAME, CONF) VALUES (?, ?)";
 
@@ -205,8 +203,7 @@ class CaConfigurationDbImporter extends DbPorter {
         System.out.println(" imported table RESPONDER");
     } // method importResponder
 
-    private void importEnvironment(final Environments environments)
-    throws DataAccessException {
+    private void importEnvironment(final Environments environments) throws DataAccessException {
         System.out.println("importing table ENVIRONMENT");
         final String sql = "INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)";
         PreparedStatement ps = null;
@@ -314,8 +311,7 @@ class CaConfigurationDbImporter extends DbPorter {
         System.out.println(" imported table PUBLISHER");
     } // method importPublisher
 
-    private void importProfile(final Profiles profiles)
-    throws DataAccessException, IOException {
+    private void importProfile(final Profiles profiles) throws DataAccessException, IOException {
         System.out.println("importing table PROFILE");
         final String sql = "INSERT INTO PROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)";
         PreparedStatement ps = null;
@@ -430,8 +426,7 @@ class CaConfigurationDbImporter extends DbPorter {
         System.out.println(" imported table CA");
     } // method importCa
 
-    private void importCaalias(final Caaliases caaliases)
-    throws DataAccessException {
+    private void importCaalias(final Caaliases caaliases) throws DataAccessException {
         System.out.println("importing table CAALIAS");
         final String sql = "INSERT INTO CAALIAS (NAME, CA_NAME) VALUES (?, ?)";
         PreparedStatement ps = prepareStatement(sql);
@@ -485,8 +480,7 @@ class CaConfigurationDbImporter extends DbPorter {
         System.out.println(" imported table CA_HAS_REQUESTOR");
     } // method importCaHasRequestor
 
-    private void importCaHasPublisher(final CaHasPublishers caHasPublishers)
-    throws Exception {
+    private void importCaHasPublisher(final CaHasPublishers caHasPublishers) throws Exception {
         System.out.println("importing table CA_HAS_PUBLISHER");
         final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME, PUBLISHER_NAME) VALUES (?, ?)";
         PreparedStatement ps = prepareStatement(sql);
@@ -536,8 +530,7 @@ class CaConfigurationDbImporter extends DbPorter {
         System.out.println(" imported table CA_HAS_PROFILE");
     } // method importCaHasCertprofile
 
-    private void importScep(final Sceps sceps)
-    throws DataAccessException, IOException {
+    private void importScep(final Sceps sceps) throws DataAccessException, IOException {
         System.out.println("importing table SCEP");
         final String sql = "INSERT INTO SCEP (CA_NAME, RESPONDER_TYPE, "
                 + "RESPONDER_CERT, CONTROL, RESPONDER_CONF) VALUES (?, ?, ?, ?, ?)";

@@ -64,8 +64,7 @@ public class CaPublishRcaCertCmd extends CaCommandSupport {
     private String certprofile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         boolean bo = caManager.publishRootCa(caName, certprofile);
         output(bo, "published", "could not publish", "CA certificate of root CA " + caName);
         return null;

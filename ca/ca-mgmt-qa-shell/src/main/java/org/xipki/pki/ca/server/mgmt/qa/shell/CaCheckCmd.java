@@ -65,8 +65,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
 public class CaCheckCmd extends CaUpdateCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         X509ChangeCaEntry ey = getChangeCaEntry();
         String caName = ey.getName();
         println("checking CA" + caName);

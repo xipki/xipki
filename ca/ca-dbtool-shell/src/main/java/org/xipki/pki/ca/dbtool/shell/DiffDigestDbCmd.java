@@ -108,8 +108,7 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
     @Completion(FilePathCompleter.class)
     private List<String> caCertFiles;
 
-    protected DbPortWorker getDbPortWorker()
-    throws Exception {
+    protected DbPortWorker getDbPortWorker() throws Exception {
         Set<byte[]> caCerts = null;
         if (caCertFiles != null && !caCertFiles.isEmpty()) {
             caCerts = new HashSet<>(caCertFiles.size());

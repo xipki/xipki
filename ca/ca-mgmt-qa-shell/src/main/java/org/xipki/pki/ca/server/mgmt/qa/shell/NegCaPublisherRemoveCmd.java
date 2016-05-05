@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaPublisherRemoveCmd;
 public class NegCaPublisherRemoveCmd extends CaPublisherRemoveCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-capub-rm");
 
         try {

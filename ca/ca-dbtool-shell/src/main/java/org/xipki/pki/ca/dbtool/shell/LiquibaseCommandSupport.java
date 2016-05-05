@@ -187,14 +187,12 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
         System.out.println(msg);
     }
 
-    private boolean confirm(final String command)
-    throws IOException {
+    private boolean confirm(final String command) throws IOException {
         String text = read("\nDo you wish to " + command + " the database", YES_NO);
         return "yes".equalsIgnoreCase(text);
     }
 
-    private String read(final String prompt, final List<String> validValues)
-    throws IOException {
+    private String read(final String prompt, final List<String> validValues) throws IOException {
         String tmpPrompt = prompt;
         List<String> tmpValidValues = validValues;
         if (tmpValidValues == null) {

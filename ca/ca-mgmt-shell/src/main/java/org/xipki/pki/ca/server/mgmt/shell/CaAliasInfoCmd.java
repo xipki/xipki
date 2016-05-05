@@ -63,8 +63,7 @@ public class CaAliasInfoCmd extends CaCommandSupport {
     private String caAlias;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         Set<String> aliasNames = caManager.getCaAliasNames();
 
         StringBuilder sb = new StringBuilder();

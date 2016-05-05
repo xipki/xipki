@@ -246,8 +246,7 @@ public class ProfileConfCreatorDemo {
     } // method main
 
     private static void marshall(final Marshaller marshaller, final X509ProfileType profile,
-            final String filename)
-    throws Exception {
+            final String filename) throws Exception {
         File file = new File("tmp", filename);
         file.getParentFile().mkdirs();
         JAXBElement<X509ProfileType> root = new ObjectFactory().createX509Profile(profile);
@@ -261,8 +260,7 @@ public class ProfileConfCreatorDemo {
         }
     } // method marshall
 
-    private static X509ProfileType certprofileRootCa()
-    throws Exception {
+    private static X509ProfileType certprofileRootCa() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile RootCA", X509CertLevel.RootCA,
                 "10y", false, new String[]{"SHA256", "SHA1"});
 
@@ -304,8 +302,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileRootCa
 
-    private static X509ProfileType certprofileCross()
-    throws Exception {
+    private static X509ProfileType certprofileCross() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile Cross", X509CertLevel.SubCA,
                 "10y", false, new String[]{"SHA256", "SHA1"});
 
@@ -350,8 +347,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileCross
 
-    private static X509ProfileType certprofileSubCa()
-    throws Exception {
+    private static X509ProfileType certprofileSubCa() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile SubCA", X509CertLevel.SubCA,
                 "8y", false, new String[]{"SHA256", "SHA1"});
 
@@ -398,8 +394,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileSubCa
 
-    private static X509ProfileType certprofileSubCaComplex()
-    throws Exception {
+    private static X509ProfileType certprofileSubCaComplex() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile SubCA with most extensions",
                 X509CertLevel.SubCA, "8y", false, new String[]{"SHA256", "SHA1"});
 
@@ -511,8 +506,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileSubCaComplex
 
-    private static X509ProfileType certprofileOcsp()
-    throws Exception {
+    private static X509ProfileType certprofileOcsp() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile OCSP", X509CertLevel.EndEntity,
                 "5y", false, new String[]{"SHA256"});
 
@@ -566,8 +560,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileOcsp
 
-    private static X509ProfileType certprofileScep()
-    throws Exception {
+    private static X509ProfileType certprofileScep() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile SCEP", X509CertLevel.EndEntity,
                 "5y", false, new String[]{"SHA256"});
 
@@ -614,8 +607,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileScep
 
-    private static X509ProfileType certprofileTls()
-    throws Exception {
+    private static X509ProfileType certprofileTls() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile TLS", X509CertLevel.EndEntity,
                 "5y", true, new String[]{"SHA1"});
 
@@ -690,8 +682,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileTls
 
-    private static X509ProfileType certprofileTlsC()
-    throws Exception {
+    private static X509ProfileType certprofileTlsC() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile TLS_C", X509CertLevel.EndEntity,
                 "5y", false, new String[]{"SHA1"});
 
@@ -743,8 +734,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileTlsC
 
-    private static X509ProfileType certprofileTlsWithIncSerial()
-    throws Exception {
+    private static X509ProfileType certprofileTlsWithIncSerial() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile TLSwithIncSN",
                 X509CertLevel.EndEntity, "5y", false, new String[]{"SHA1"});
 
@@ -803,8 +793,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileTlsWithIncSerial
 
-    private static X509ProfileType certprofileGsmcK()
-    throws Exception {
+    private static X509ProfileType certprofileGsmcK() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile gSMC_K", X509CertLevel.EndEntity,
                 "5y", false, new String[]{"SHA256"});
 
@@ -896,8 +885,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileGsmcK
 
-    private static X509ProfileType certprofileMultipleOus()
-    throws Exception {
+    private static X509ProfileType certprofileMultipleOus() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile Multiple OUs DEMO",
                 X509CertLevel.EndEntity, "5y", false, new String[]{"SHA1"});
 
@@ -951,8 +939,7 @@ public class ProfileConfCreatorDemo {
     /*
      * O and OU in one RDN
      */
-    private static X509ProfileType certprofileMultipleValuedRdn()
-    throws Exception {
+    private static X509ProfileType certprofileMultipleValuedRdn() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile Multiple Valued RDN",
                 X509CertLevel.EndEntity, "5y", false, new String[]{"SHA1"});
 
@@ -999,8 +986,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileMultipleValuedRdn
 
-    private static X509ProfileType certprofileEeComplex()
-    throws Exception {
+    private static X509ProfileType certprofileEeComplex() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile EE complex", X509CertLevel.EndEntity,
                 "5y", true, new String[]{"SHA1"});
 
@@ -1097,8 +1083,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileEeComplex
 
-    private static X509ProfileType certprofileMaxTime()
-    throws Exception {
+    private static X509ProfileType certprofileMaxTime() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile MaxTime", X509CertLevel.EndEntity,
                 "9999y", false, new String[]{"SHA1"});
 

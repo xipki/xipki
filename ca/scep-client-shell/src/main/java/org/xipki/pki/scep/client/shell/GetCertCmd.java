@@ -74,8 +74,7 @@ public class GetCertCmd extends ClientCommandSupport {
     private String outputFile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         ScepClient client = getScepClient();
         BigInteger serial = toBigInt(serialNumber);
         X509Certificate caCert = client.getAuthorityCertStore().getCaCert();

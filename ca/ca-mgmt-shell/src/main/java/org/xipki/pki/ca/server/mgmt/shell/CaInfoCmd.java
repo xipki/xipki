@@ -70,8 +70,7 @@ public class CaInfoCmd extends CaCommandSupport {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         StringBuilder sb = new StringBuilder();
 
         if (caName == null) {

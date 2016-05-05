@@ -165,8 +165,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
         }
     }
 
-    private void engineLoad(final String moduleName)
-    throws P11TokenException, XiSecurityException {
+    private void engineLoad(final String moduleName) throws P11TokenException, XiSecurityException {
         P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
         P11Module module = p11Service.getModule();
         List<P11SlotIdentifier> slotIds = module.getSlotIdentifiers();
@@ -238,8 +237,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
     @Override
     public void engineSetKeyEntry(final String alias, final Key key, final char[] password,
-            final Certificate[] chain)
-    throws KeyStoreException {
+            final Certificate[] chain) throws KeyStoreException {
         throw new KeyStoreException("keystore is read only");
     }
 
@@ -256,8 +254,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
     }
 
     @Override
-    public void engineDeleteEntry(final String alias)
-    throws KeyStoreException {
+    public void engineDeleteEntry(final String alias) throws KeyStoreException {
         throw new KeyStoreException("keystore is read only");
     }
 

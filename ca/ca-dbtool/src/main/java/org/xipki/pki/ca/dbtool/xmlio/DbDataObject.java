@@ -66,8 +66,7 @@ public abstract class DbDataObject {
     }
 
     protected static void writeIfNotNull(final DbiXmlWriter writer, final String tag,
-            final Object value)
-    throws XMLStreamException, InvalidDataObjectException {
+            final Object value) throws XMLStreamException, InvalidDataObjectException {
         if (value == null) {
             return;
         }
@@ -86,8 +85,7 @@ public abstract class DbDataObject {
         writer.writeElement(tag, valueS);
     }
 
-    public abstract void validate()
-    throws InvalidDataObjectException;
+    public abstract void validate() throws InvalidDataObjectException;
 
     public abstract void writeTo(@Nonnull DbiXmlWriter os)
     throws InvalidDataObjectException, XMLStreamException;

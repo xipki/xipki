@@ -161,8 +161,7 @@ public class Scep {
         AES_ENC_ALGOS.add(CMSAlgorithm.AES256_GCM);
     }
 
-    public Scep(final ScepEntry dbEntry, final CaManagerImpl caManager)
-    throws CaMgmtException {
+    public Scep(final ScepEntry dbEntry, final CaManagerImpl caManager) throws CaMgmtException {
         this.caManager = ParamUtil.requireNonNull("caManager", caManager);
         this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
         this.caName = dbEntry.getCaName();
@@ -184,8 +183,7 @@ public class Scep {
         this.maxSigningTimeBiasInMs = ms;
     }
 
-    public void refreshCa()
-    throws CaMgmtException {
+    public void refreshCa() throws CaMgmtException {
         String type = dbEntry.getResponderType();
         if (!"PKCS12".equalsIgnoreCase(type) && !"JKS".equalsIgnoreCase(type)) {
             throw new CaMgmtException("unsupported SCEP responder type '" + type + "'");
@@ -260,13 +258,11 @@ public class Scep {
         return caCertRespBytes;
     }
 
-    public boolean supportsCertProfile(final String profileName)
-    throws CaMgmtException {
+    public boolean supportsCertProfile(final String profileName) throws CaMgmtException {
         return caManager.getX509Ca(caName).supportsCertProfile(profileName);
     }
 
-    public CaStatus getStatus()
-    throws CaMgmtException {
+    public CaStatus getStatus() throws CaMgmtException {
         return caManager.getX509Ca(caName).getCaInfo().getStatus();
     }
 
@@ -625,8 +621,7 @@ public class Scep {
         return buildSignedData(certs.get(0));
     } // method pollCert
 
-    private SignedData buildSignedData(final X509Certificate cert)
-    throws OperationException {
+    private SignedData buildSignedData(final X509Certificate cert) throws OperationException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         try {
             X509CertificateHolder certHolder = new X509CertificateHolder(cert.getEncoded());
@@ -715,8 +710,7 @@ public class Scep {
     } // method getSignatureAlgorithm
 
     private static void ensureIssuedByThisCa(final X500Name thisCaX500Name,
-            final X500Name caX500Name)
-    throws FailInfoException {
+            final X500Name caX500Name) throws FailInfoException {
         if (!thisCaX500Name.equals(caX500Name)) {
             throw FailInfoException.BAD_CERTID;
         }

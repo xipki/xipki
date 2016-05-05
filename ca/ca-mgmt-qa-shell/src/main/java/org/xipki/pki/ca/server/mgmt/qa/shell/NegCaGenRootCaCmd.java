@@ -52,8 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaGenRcaCmd;
 public class NegCaGenRootCaCmd extends CaGenRcaCmd {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         println("neg-gen-rca");
 
         try {

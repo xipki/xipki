@@ -54,8 +54,7 @@ public class OcspCertsReader extends DbiXmlReader {
     }
 
     @Override
-    protected DbDataObject retrieveNext()
-    throws InvalidDataObjectException, XMLStreamException {
+    protected DbDataObject retrieveNext() throws InvalidDataObjectException, XMLStreamException {
         OcspCertType ret = null;
         StringBuilder buffer = new StringBuilder();
         int lastEvent = -1;

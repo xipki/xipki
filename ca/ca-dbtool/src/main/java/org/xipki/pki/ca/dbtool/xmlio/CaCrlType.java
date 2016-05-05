@@ -96,8 +96,7 @@ public class CaCrlType extends DbDataObject {
     }
 
     @Override
-    public void validate()
-    throws InvalidDataObjectException {
+    public void validate() throws InvalidDataObjectException {
         assertNotNull("id", id);
         assertNotNull("caId", caId);
         assertNotBlank("crlNo", crlNo);

@@ -154,8 +154,7 @@ public class CaEmulator {
         return generateCrl;
     }
 
-    public Certificate generateCert(final CertificationRequest p10ReqInfo)
-    throws Exception {
+    public Certificate generateCert(final CertificationRequest p10ReqInfo) throws Exception {
         if (!verifyPopo(p10ReqInfo)) {
             throw new Exception("PKCS#10 request invalid");
         }
@@ -170,8 +169,7 @@ public class CaEmulator {
     }
 
     public Certificate generateCert(final SubjectPublicKeyInfo pubKeyInfo, final X500Name subjectDn,
-            final Date notBefore)
-    throws Exception {
+            final Date notBefore) throws Exception {
         ParamUtil.requireNonNull("pubKeyInfo", pubKeyInfo);
         ParamUtil.requireNonNull("subjectDn", subjectDn);
         ParamUtil.requireNonNull("notBefore", notBefore);
