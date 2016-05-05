@@ -55,8 +55,7 @@ public class P11CryptService {
 
     private P11Module module;
 
-    public P11CryptService(
-            final P11Module module)
+    public P11CryptService(final P11Module module)
     throws P11TokenException {
         this.module = ParamUtil.requireNonNull("module", module);
     }
@@ -89,14 +88,12 @@ public class P11CryptService {
         return module;
     }
 
-    public P11Slot getSlot(
-            final P11SlotIdentifier slotId)
+    public P11Slot getSlot(final P11SlotIdentifier slotId)
     throws P11TokenException {
         return module.getSlot(slotId);
     }
 
-    public P11Identity getIdentity(
-            final P11EntityIdentifier identityId)
+    public P11Identity getIdentity(final P11EntityIdentifier identityId)
     throws P11TokenException {
         ParamUtil.requireNonNull("identityId", identityId);
         return module.getSlot(identityId.getSlotId()).getIdentity(identityId.getObjectId());

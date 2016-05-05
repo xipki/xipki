@@ -56,9 +56,8 @@ public final class PreprovisionedHashCaCertValidator implements CaCertValidator 
 
     private final Set<byte[]> hashValues;
 
-    public PreprovisionedHashCaCertValidator(
-        final ScepHashAlgoType hashAlgo,
-        final Set<byte[]> hashValues) {
+    public PreprovisionedHashCaCertValidator(final ScepHashAlgoType hashAlgo,
+            final Set<byte[]> hashValues) {
         this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         ParamUtil.requireNonEmpty("hashValues", hashValues);
 
@@ -77,8 +76,7 @@ public final class PreprovisionedHashCaCertValidator implements CaCertValidator 
     }
 
     @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
+    public boolean isTrusted(final X509Certificate cert) {
         ParamUtil.requireNonNull("cert", cert);
         byte[] actual;
         try {

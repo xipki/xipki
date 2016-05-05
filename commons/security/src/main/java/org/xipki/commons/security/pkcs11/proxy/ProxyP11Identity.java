@@ -56,19 +56,13 @@ import org.xipki.commons.security.pkcs11.P11Slot;
 
 class ProxyP11Identity extends P11Identity {
 
-    ProxyP11Identity(
-            final P11Slot slot,
-            final P11EntityIdentifier entityId,
-            final PublicKey publicKey,
-            final X509Certificate[] certificateChain) {
+    ProxyP11Identity(final P11Slot slot, final P11EntityIdentifier entityId,
+            final PublicKey publicKey, final X509Certificate[] certificateChain) {
         super(slot, entityId, publicKey, certificateChain);
     }
 
     @Override
-    protected byte[] doSign(
-            final long mechanism,
-            final P11Params parameters,
-            final byte[] content)
+    protected byte[] doSign(final long mechanism, final P11Params parameters, final byte[] content)
     throws P11TokenException {
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
         Asn1P11Params p11Param = null;

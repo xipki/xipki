@@ -48,8 +48,7 @@ public class OcspResponseUnsuccessfulException extends OcspResponseException {
 
     private int status;
 
-    public OcspResponseUnsuccessfulException(
-            final int status) {
+    public OcspResponseUnsuccessfulException(final int status) {
         super(getOcspResponseStatus(status));
         this.status = status;
     }
@@ -62,8 +61,7 @@ public class OcspResponseUnsuccessfulException extends OcspResponseException {
         return getOcspResponseStatus(status);
     }
 
-    private static String getOcspResponseStatus(
-            final int statusCode) {
+    private static String getOcspResponseStatus(final int statusCode) {
         switch (statusCode) {
         case 1:
             return "malformedRequest";

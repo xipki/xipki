@@ -54,9 +54,7 @@ public class AuthorityCertStore {
 
     private final X509Certificate encryptionCert;
 
-    private AuthorityCertStore(
-            final X509Certificate caCert,
-            final X509Certificate signatureCert,
+    private AuthorityCertStore(final X509Certificate caCert, final X509Certificate signatureCert,
             final X509Certificate encryptionCert) {
         this.caCert = caCert;
         this.signatureCert = signatureCert;
@@ -75,8 +73,7 @@ public class AuthorityCertStore {
         return caCert;
     }
 
-    public static AuthorityCertStore getInstance(
-            final X509Certificate caCert,
+    public static AuthorityCertStore getInstance(final X509Certificate caCert,
             final X509Certificate... raCerts) {
         ParamUtil.requireNonNull("caCert", caCert);
 
@@ -121,9 +118,7 @@ public class AuthorityCertStore {
         return new AuthorityCertStore(caCert, signatureCert, encryptionCert);
     } // method getInstance
 
-    private static boolean hasKeyusage(
-            final boolean[] keyusage,
-            final KeyUsage usage) {
+    private static boolean hasKeyusage(final boolean[] keyusage, final KeyUsage usage) {
         if (keyusage != null && keyusage.length > usage.getBit()) {
             return keyusage[usage.getBit()];
         }

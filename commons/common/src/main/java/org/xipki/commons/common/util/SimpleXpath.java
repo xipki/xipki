@@ -70,9 +70,7 @@ public class SimpleXpath {
          * @param nsPrefixUriMap Prefix and URI map of namespace. Set it to null if
          *        namespace will not be evaluated.
          */
-        SimpleXpathStep(
-                final String step,
-                final Map<String, String> nsPrefixUriMap)
+        SimpleXpathStep(final String step, final Map<String, String> nsPrefixUriMap)
         throws XPathExpressionException {
             String tmpStep = ParamUtil.requireNonBlank("step", step);
             if (tmpStep.charAt(0) == '@') {
@@ -129,9 +127,7 @@ public class SimpleXpath {
      *        namespace will not be evaluated.
      * @throws XPathExpressionException if the XPath expression is invalid
      */
-    public SimpleXpath(
-            final String relativeXpath,
-            final Map<String, String> nsPrefixUriMap)
+    public SimpleXpath(final String relativeXpath, final Map<String, String> nsPrefixUriMap)
     throws XPathExpressionException {
         ParamUtil.requireNonBlank("relativeXpath", relativeXpath);
         if (relativeXpath.startsWith("/")) {
@@ -165,19 +161,14 @@ public class SimpleXpath {
         }
     }
 
-    public List<Node> select(
-            final Element context) {
+    public List<Node> select(final Element context) {
         List<Node> rv = new LinkedList<Node>();
         select(rv, context, this.steps, 0, false);
         return rv;
     }
 
-    private static void select(
-            final List<Node> results,
-            final Element context,
-            final List<SimpleXpathStep> steps,
-            final int stepIndex,
-            final boolean onlyFirst) {
+    private static void select(final List<Node> results, final Element context,
+            final List<SimpleXpathStep> steps, final int stepIndex, final boolean onlyFirst) {
         if (onlyFirst && CollectionUtil.isNonEmpty(results)) {
             return;
         }
@@ -206,8 +197,7 @@ public class SimpleXpath {
         }
     }
 
-    public Node selectFirstMatch(
-            final Element context) {
+    public Node selectFirstMatch(final Element context) {
         List<Node> rv = new LinkedList<Node>();
         select(rv, context, this.steps, 0, true);
         return CollectionUtil.isEmpty(rv)

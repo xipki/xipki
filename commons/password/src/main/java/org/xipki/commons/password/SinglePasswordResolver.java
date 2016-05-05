@@ -45,11 +45,9 @@ import javax.annotation.Nonnull;
 
 public interface SinglePasswordResolver {
 
-    boolean canResolveProtocol(
-            @Nonnull String protocol);
+    boolean canResolveProtocol(@Nonnull String protocol);
 
-    char[] resolvePassword(
-            @Nonnull String passwordHint)
+    char[] resolvePassword(@Nonnull String passwordHint)
     throws PasswordResolverException;
 
 }

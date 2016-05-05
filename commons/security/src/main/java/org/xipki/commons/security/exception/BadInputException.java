@@ -48,19 +48,15 @@ public class BadInputException extends Exception {
     public BadInputException() {
     }
 
-    public BadInputException(
-            final String message) {
+    public BadInputException(final String message) {
         super(message);
     }
 
-    public BadInputException(
-            final Throwable cause) {
+    public BadInputException(final Throwable cause) {
         super(cause);
     }
 
-    public BadInputException(
-            final String message,
-            final Throwable cause) {
+    public BadInputException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

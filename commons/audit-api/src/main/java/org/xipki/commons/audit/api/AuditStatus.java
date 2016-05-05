@@ -53,8 +53,7 @@ public enum AuditStatus {
     UNDEFINED;
 
     @Nullable
-    public static final AuditStatus getAuditStatus(
-            @Nonnull final String name) {
+    public static final AuditStatus getAuditStatus(@Nonnull final String name) {
         Objects.requireNonNull(name, "name must not be null");
 
         for (AuditStatus v : values()) {

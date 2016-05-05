@@ -34,8 +34,7 @@ public class DataIntegrityViolationException extends NonTransientDataAccessExcep
      * Constructor for DataIntegrityViolationException.
      * @param msg the detail message
      */
-    public DataIntegrityViolationException(
-            final String msg) {
+    public DataIntegrityViolationException(final String msg) {
         super(msg);
     }
 
@@ -44,9 +43,7 @@ public class DataIntegrityViolationException extends NonTransientDataAccessExcep
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public DataIntegrityViolationException(
-            final String msg,
-            final Throwable cause) {
+    public DataIntegrityViolationException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 

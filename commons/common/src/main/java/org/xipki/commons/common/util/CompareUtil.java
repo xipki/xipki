@@ -46,9 +46,7 @@ public class CompareUtil {
     private CompareUtil() {
     }
 
-    public static boolean equalsObject(
-            final Object oa,
-            final Object ob) {
+    public static boolean equalsObject(final Object oa, final Object ob) {
         if (oa == null) {
             return ob == null;
         } else {

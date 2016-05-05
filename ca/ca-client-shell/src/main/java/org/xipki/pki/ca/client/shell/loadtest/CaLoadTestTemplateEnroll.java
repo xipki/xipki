@@ -91,9 +91,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
 
         private final CertRequest certRequest;
 
-        CertRequestWithProfile(
-                final String certprofile,
-                final CertRequest certRequest) {
+        CertRequestWithProfile(final String certprofile, final CertRequest certRequest) {
             this.certprofile = certprofile;
             this.certRequest = certRequest;
         }
@@ -118,8 +116,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
             }
         }
 
-        private boolean testNext(
-                final Map<Integer, CertRequestWithProfile> certRequests) {
+        private boolean testNext(final Map<Integer, CertRequestWithProfile> certRequests) {
             EnrollCertResult result;
             try {
                 EnrollCertRequest request = new EnrollCertRequest(Type.CERT_REQ);
@@ -183,9 +180,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
 
     private final AtomicLong index;
 
-    public CaLoadTestTemplateEnroll(
-            final CaClient caClient,
-            final EnrollTemplateType template,
+    public CaLoadTestTemplateEnroll(final CaClient caClient, final EnrollTemplateType template,
             final String description)
     throws Exception {
         super(description);
@@ -264,8 +259,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
         return certRequests;
     } // method nextCertRequests
 
-    public static EnrollTemplateType parse(
-            final InputStream configStream)
+    public static EnrollTemplateType parse(final InputStream configStream)
     throws InvalidConfException {
         ParamUtil.requireNonNull("configStream", configStream);
 

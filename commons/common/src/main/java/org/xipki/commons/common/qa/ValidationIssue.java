@@ -53,9 +53,7 @@ public class ValidationIssue {
 
     private String failureMessage;
 
-    public ValidationIssue(
-            final String code,
-            final String description) {
+    public ValidationIssue(final String code, final String description) {
         this.code = ParamUtil.requireNonBlank("code", code);
         this.description = ParamUtil.requireNonBlank("description", description);
         this.failed = false;
@@ -69,8 +67,7 @@ public class ValidationIssue {
         return failureMessage;
     }
 
-    public void setFailureMessage(
-            final String failureMessage) {
+    public void setFailureMessage(final String failureMessage) {
         this.failureMessage = ParamUtil.requireNonNull("failureMessage", failureMessage);
         this.failed = true;
     }

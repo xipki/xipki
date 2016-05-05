@@ -49,9 +49,7 @@ public class AuditEventData {
 
     private final String value;
 
-    public AuditEventData(
-            final String name,
-            final String value) {
+    public AuditEventData(final String name, final String value) {
         Objects.requireNonNull(name, "name must not be null");
         if (name.isEmpty()) {
             throw new IllegalArgumentException("name must not be empty");

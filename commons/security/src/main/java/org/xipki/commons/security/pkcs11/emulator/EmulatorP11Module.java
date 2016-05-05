@@ -67,8 +67,7 @@ public class EmulatorP11Module extends AbstractP11Module {
 
     private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Module.class);
 
-    private EmulatorP11Module(
-            final P11ModuleConf moduleConf)
+    private EmulatorP11Module(final P11ModuleConf moduleConf)
     throws P11TokenException {
         super(moduleConf);
         final String modulePath = moduleConf.getNativeLibrary();
@@ -169,8 +168,7 @@ public class EmulatorP11Module extends AbstractP11Module {
         setSlots(slots);
     } // constructor
 
-    public static P11Module getInstance(
-            final P11ModuleConf moduleConf)
+    public static P11Module getInstance(final P11ModuleConf moduleConf)
     throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
         return new EmulatorP11Module(moduleConf);

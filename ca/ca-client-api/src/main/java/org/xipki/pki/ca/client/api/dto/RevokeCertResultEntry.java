@@ -47,9 +47,7 @@ public class RevokeCertResultEntry extends ResultEntry {
 
     private final CertId certId;
 
-    public RevokeCertResultEntry(
-            final String id,
-            final CertId certId) {
+    public RevokeCertResultEntry(final String id, final CertId certId) {
         super(id);
         this.certId = certId;
     }

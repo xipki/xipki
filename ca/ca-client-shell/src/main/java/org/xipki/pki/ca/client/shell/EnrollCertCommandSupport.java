@@ -423,8 +423,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         return ret;
     }
 
-    private static ASN1ObjectIdentifier toOid(
-            final String str)
+    private static ASN1ObjectIdentifier toOid(final String str)
     throws InvalidOidOrNameException {
         final int n = str.length();
         boolean isName = false;

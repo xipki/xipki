@@ -95,8 +95,7 @@ public class ScepServlet extends HttpServlet {
 
     private ScepResponder responder;
 
-    public ScepServlet(
-            final ScepResponder responder) {
+    public ScepServlet(final ScepResponder responder) {
         this.responder = ParamUtil.requireNonNull("responder", responder);
     }
 
@@ -104,30 +103,23 @@ public class ScepServlet extends HttpServlet {
         return auditService;
     }
 
-    public void setAuditService(
-            final AuditService auditService) {
+    public void setAuditService(final AuditService auditService) {
         this.auditService = auditService;
     }
 
     @Override
-    public void doGet(
-            final HttpServletRequest request,
-            final HttpServletResponse response)
+    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
         service(request, response, false);
     }
 
     @Override
-    public void doPost(
-            final HttpServletRequest request,
-            final HttpServletResponse response)
+    public void doPost(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
         service(request, response, true);
     }
 
-    private void service(
-            final HttpServletRequest request,
-            final HttpServletResponse response,
+    private void service(final HttpServletRequest request, final HttpServletResponse response,
             final boolean post)
     throws ServletException, IOException {
         String servletPath = request.getServletPath();
@@ -265,8 +257,8 @@ public class ScepServlet extends HttpServlet {
 
                 try {
                     NextCaMessage nextCaMsg = new NextCaMessage();
-                    nextCaMsg.setCaCert(
-                            new X509CertificateObject(responder.getNextCaAndRa().getCaCert()));
+                    nextCaMsg.setCaCert(new X509CertificateObject(
+                            responder.getNextCaAndRa().getCaCert()));
                     if (responder.getNextCaAndRa().getRaCert() != null) {
                         X509Certificate raCert = new X509CertificateObject(
                                 responder.getNextCaAndRa().getRaCert());
@@ -318,8 +310,7 @@ public class ScepServlet extends HttpServlet {
         } // end try
     } // method service
 
-    protected PKIMessage generatePkiMessage(
-            final InputStream is)
+    protected PKIMessage generatePkiMessage(final InputStream is)
     throws IOException {
         ParamUtil.requireNonNull("is", is);
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
@@ -335,12 +326,8 @@ public class ScepServlet extends HttpServlet {
         }
     }
 
-    static void audit(
-            final AuditService auditService,
-            final AuditEvent auditEvent,
-            final AuditLevel auditLevel,
-            final AuditStatus auditStatus,
-            final String auditMessage) {
+    static void audit(final AuditService auditService, final AuditEvent auditEvent,
+            final AuditLevel auditLevel, final AuditStatus auditStatus, final String auditMessage) {
         if (auditLevel != null) {
             auditEvent.setLevel(auditLevel);
         }

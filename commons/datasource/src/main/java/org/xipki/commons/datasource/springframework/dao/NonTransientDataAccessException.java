@@ -34,8 +34,7 @@ public abstract class NonTransientDataAccessException extends DataAccessExceptio
      * Constructor for NonTransientDataAccessException.
      * @param msg the detail message
      */
-    public NonTransientDataAccessException(
-            final String msg) {
+    public NonTransientDataAccessException(final String msg) {
         super(msg);
     }
 
@@ -44,9 +43,7 @@ public abstract class NonTransientDataAccessException extends DataAccessExceptio
      * @param msg the detail message
      * @param cause the root cause (usually from using a underlying data access API such as JDBC)
      */
-    public NonTransientDataAccessException(
-            final String msg,
-            final Throwable cause) {
+    public NonTransientDataAccessException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 

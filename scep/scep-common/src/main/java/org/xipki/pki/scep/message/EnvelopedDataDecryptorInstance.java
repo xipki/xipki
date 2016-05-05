@@ -56,9 +56,8 @@ public final class EnvelopedDataDecryptorInstance {
 
     private final KeyTransRecipient recipient;
 
-    public EnvelopedDataDecryptorInstance(
-        final X509Certificate recipientCert,
-        final PrivateKey privKey) {
+    public EnvelopedDataDecryptorInstance(final X509Certificate recipientCert,
+            final PrivateKey privKey) {
         ParamUtil.requireNonNull("recipientCert", recipientCert);
         ParamUtil.requireNonNull("privKey", privKey);
 

@@ -63,8 +63,7 @@ public class SignatureSigner implements ContentSigner {
         }
 
         @Override
-        public void write(
-                final int singleByte)
+        public void write(final int singleByte)
         throws IOException {
             try {
                 signer.update((byte) singleByte);
@@ -74,8 +73,7 @@ public class SignatureSigner implements ContentSigner {
         }
 
         @Override
-        public void write(
-                final byte[] bytes)
+        public void write(final byte[] bytes)
         throws IOException {
             try {
                 signer.update(bytes);
@@ -85,10 +83,7 @@ public class SignatureSigner implements ContentSigner {
         }
 
         @Override
-        public void write(
-                final byte[] bytes,
-                final int off,
-                final int len)
+        public void write(final byte[] bytes, final int off, final int len)
         throws IOException {
             try {
                 signer.update(bytes, off, len);
@@ -107,9 +102,7 @@ public class SignatureSigner implements ContentSigner {
 
     private final PrivateKey key;
 
-    public SignatureSigner(
-            final AlgorithmIdentifier sigAlgId,
-            final Signature signer,
+    public SignatureSigner(final AlgorithmIdentifier sigAlgId, final Signature signer,
             final PrivateKey key) {
         this.sigAlgId = ParamUtil.requireNonNull("sigAlgId", sigAlgId);
         this.signer = ParamUtil.requireNonNull("signer", signer);

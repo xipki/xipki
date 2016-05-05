@@ -47,9 +47,7 @@ class P11SlotIdFilter {
 
     private final Long id;
 
-    P11SlotIdFilter(
-            final Integer index,
-            final Long id) {
+    P11SlotIdFilter(final Integer index, final Long id) {
         if (index == null && id == null) {
             throw new IllegalArgumentException("at least one of index and id must not be null");
         }
@@ -57,8 +55,7 @@ class P11SlotIdFilter {
         this.id = id;
     }
 
-    boolean match(
-            P11SlotIdentifier slotId) {
+    boolean match(final P11SlotIdentifier slotId) {
         if (index != null) {
             if (index.intValue() != slotId.getIndex()) {
                 return false;

@@ -59,12 +59,7 @@ public class LiquibaseDatabaseConf {
 
     private final String schema;
 
-    private LiquibaseDatabaseConf(
-            final String driver,
-            final String username,
-            final String password,
-            final String url,
-            final String schema) {
+    private LiquibaseDatabaseConf(final String driver, final String username, final String password, final String url, final String schema) {
         this.driver = Objects.requireNonNull(driver, "driver must not be null");
         this.username = Objects.requireNonNull(username, "username must not be null");
         this.password = password;
@@ -92,9 +87,7 @@ public class LiquibaseDatabaseConf {
         return schema;
     }
 
-    public static LiquibaseDatabaseConf getInstance(
-            final Properties dbProps,
-            final PasswordResolver passwordResolver)
+    public static LiquibaseDatabaseConf getInstance(final Properties dbProps, final PasswordResolver passwordResolver)
     throws PasswordResolverException {
         Objects.requireNonNull(dbProps, "dbProps must no be null");
 
@@ -207,8 +200,7 @@ public class LiquibaseDatabaseConf {
         return new LiquibaseDatabaseConf(driverClassName, user, password, url, schema);
     } // method getInstance
 
-    public static boolean isNotBlank(
-            final String str) {
+    public static boolean isNotBlank(final String str) {
         return str != null && !str.isEmpty();
     }
 

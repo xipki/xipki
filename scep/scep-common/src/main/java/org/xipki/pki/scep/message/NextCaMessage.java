@@ -82,8 +82,7 @@ public class NextCaMessage {
         return caCert;
     }
 
-    public void setCaCert(
-            final X509Certificate caCert) {
+    public void setCaCert(final X509Certificate caCert) {
         this.caCert = caCert;
     }
 
@@ -91,8 +90,7 @@ public class NextCaMessage {
         return raCerts;
     }
 
-    public void setRaCerts(
-            final List<X509Certificate> raCerts) {
+    public void setRaCerts(final List<X509Certificate> raCerts) {
         if (raCerts == null || raCerts.isEmpty()) {
             this.raCerts = null;
         } else {
@@ -101,9 +99,7 @@ public class NextCaMessage {
         }
     }
 
-    public ContentInfo encode(
-            final PrivateKey signingKey,
-            final X509Certificate signerCert,
+    public ContentInfo encode(final PrivateKey signingKey, final X509Certificate signerCert,
             final X509Certificate[] cmsCertSet)
     throws MessageEncodingException {
         ParamUtil.requireNonNull("signingKey", signingKey);
@@ -161,8 +157,7 @@ public class NextCaMessage {
         }
     } // method encode
 
-    private static String getSignatureAlgorithm(
-            final PrivateKey key,
+    private static String getSignatureAlgorithm(final PrivateKey key,
             final ScepHashAlgoType hashAlgo) {
         String algorithm = key.getAlgorithm();
         if ("RSA".equalsIgnoreCase(algorithm)) {

@@ -103,8 +103,7 @@ public class CanonicalizeCode {
         this.baseDirLen = this.baseDir.length();
     }
 
-    public static void main(
-            final String[] args) {
+    public static void main(final String[] args) {
         try {
             String baseDir = args[0];
             CanonicalizeCode canonicalizer = new CanonicalizeCode(baseDir);
@@ -120,8 +119,7 @@ public class CanonicalizeCode {
         canonicalizeDir(new File(baseDir));
     }
 
-    private void canonicalizeDir(
-            final File dir)
+    private void canonicalizeDir(final File dir)
     throws Exception {
         File[] files = dir.listFiles();
         if (files == null) {
@@ -149,8 +147,7 @@ public class CanonicalizeCode {
         }
     } // method canonicalizeDir
 
-    private void canonicalizeFile(
-            final File file)
+    private void canonicalizeFile(final File file)
     throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
@@ -222,8 +219,7 @@ public class CanonicalizeCode {
         checkWarningsInDir(new File(baseDir));
     }
 
-    private void checkWarningsInDir(
-            final File dir)
+    private void checkWarningsInDir(final File dir)
     throws Exception {
         File[] files = dir.listFiles();
         if (files == null) {
@@ -254,8 +250,7 @@ public class CanonicalizeCode {
         }
     } // method checkWarningsInDir
 
-    private void checkWarningsInFile(
-            final File file)
+    private void checkWarningsInFile(final File file)
     throws Exception {
         if (file.getName().equals("package-info.java")) {
             return;
@@ -379,8 +374,7 @@ public class CanonicalizeCode {
     /**
      * replace tab by 4 spaces, delete white spaces at the end.
      */
-    private static String canonicalizeLine(
-            final String line) {
+    private static String canonicalizeLine(final String line) {
         if (line.trim().startsWith("//")) {
             // comments
             String nline = line.replace("\t", "    ");
@@ -415,8 +409,7 @@ public class CanonicalizeCode {
         return sb.toString();
     } // end canonicalizeJavaLine
 
-    private static String removeTrailingSpaces(
-            final String line) {
+    private static String removeTrailingSpaces(final String line) {
         final int n = line.length();
         int idx;
         for (idx = n - 1; idx >= 0; idx--) {
@@ -432,9 +425,7 @@ public class CanonicalizeCode {
         }
     } // method removeTrailingSpaces
 
-    private void addLineNumber(
-            final String line,
-            final int lineNumber,
+    private void addLineNumber(final String line, final int lineNumber,
             final List<Integer> lineNumbers) {
         if (!line.endsWith("XIPKI-CODECHECK:IGNORE")) {
             lineNumbers.add(lineNumber);

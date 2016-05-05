@@ -53,8 +53,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
 
     private final Set<String> fpOfCerts;
 
-    public PreprovisionedCaCertValidator(
-            final X509Certificate cert) {
+    public PreprovisionedCaCertValidator(final X509Certificate cert) {
         ParamUtil.requireNonNull("cert", cert);
         fpOfCerts = new HashSet<String>(1);
         String hexFp;
@@ -67,8 +66,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
         fpOfCerts.add(hexFp);
     }
 
-    public PreprovisionedCaCertValidator(
-            final Set<X509Certificate> certs) {
+    public PreprovisionedCaCertValidator(final Set<X509Certificate> certs) {
         ParamUtil.requireNonNull("certs", certs);
         fpOfCerts = new HashSet<String>(certs.size());
         for (X509Certificate m : certs) {
@@ -84,8 +82,7 @@ public final class PreprovisionedCaCertValidator implements CaCertValidator {
     }
 
     @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
+    public boolean isTrusted(final X509Certificate cert) {
         ParamUtil.requireNonNull("cert", cert);
         String hextFp;
         try {

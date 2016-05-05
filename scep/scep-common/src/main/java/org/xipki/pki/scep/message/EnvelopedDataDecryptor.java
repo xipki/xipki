@@ -55,21 +55,18 @@ public final class EnvelopedDataDecryptor {
 
     private final List<EnvelopedDataDecryptorInstance> decryptors;
 
-    public EnvelopedDataDecryptor(
-            final List<EnvelopedDataDecryptorInstance> decryptors) {
+    public EnvelopedDataDecryptor(final List<EnvelopedDataDecryptorInstance> decryptors) {
         ParamUtil.requireNonEmpty("decryptors", decryptors);
         this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(decryptors);
     }
 
-    public EnvelopedDataDecryptor(
-            final EnvelopedDataDecryptorInstance decryptor) {
+    public EnvelopedDataDecryptor(final EnvelopedDataDecryptorInstance decryptor) {
         ParamUtil.requireNonNull("decryptor", decryptor);
         this.decryptors = new ArrayList<EnvelopedDataDecryptorInstance>(1);
         this.decryptors.add(decryptor);
     }
 
-    public byte[] decrypt(
-            final CMSEnvelopedData envData)
+    public byte[] decrypt(final CMSEnvelopedData envData)
     throws MessageDecodingException {
         ParamUtil.requireNonNull("envData", envData);
         final RecipientInformationStore recipientInfos = envData.getRecipientInfos();

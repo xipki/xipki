@@ -74,11 +74,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     @Completion(FilePathCompleter.class)
     private String outputFile;
 
-    protected abstract EnrollmentResponse requestCertificate(
-            @Nonnull Client client,
-            @Nonnull PKCS10CertificationRequest csr,
-            @Nonnull PrivateKey identityKey,
-            @Nonnull X509Certificate identityCert)
+    protected abstract EnrollmentResponse requestCertificate(@Nonnull Client client, @Nonnull PKCS10CertificationRequest csr, @Nonnull PrivateKey identityKey, @Nonnull X509Certificate identityCert)
     throws ClientException, TransactionException;
 
     @Override

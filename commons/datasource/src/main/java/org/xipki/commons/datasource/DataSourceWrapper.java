@@ -81,23 +81,16 @@ public abstract class DataSourceWrapper {
     // CHECKSTYLE:SKIP
     private static class MySQL extends DataSourceWrapper {
 
-        MySQL(
-                final String name,
-                final HikariDataSource service) {
+        MySQL(final String name, final HikariDataSource service) {
             super(name, service, DatabaseType.MYSQL);
         }
 
-        MySQL(
-                final String name,
-                final HikariDataSource service,
-                final DatabaseType type) {
+        MySQL(final String name, final HikariDataSource service, final DatabaseType type) {
             super(name, service, type);
         }
 
         @Override
-        public String createFetchFirstSelectSql(
-                final String coreSql,
-                final int rows,
+        public String createFetchFirstSelectSql(final String coreSql, final int rows,
                 final String orderBy) {
             // 'SELECT ': 7
             // ' LIMIT ': 7
@@ -118,9 +111,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildCreateSequenceSql(
-                final String sequenceName,
-                final long startValue) {
+        protected String buildCreateSequenceSql(final String sequenceName, final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 75);
             sql.append("INSERT INTO SEQ_TBL (SEQ_NAME, SEQ_VALUE) VALUES('");
             sql.append(sequenceName).append("', ").append(startValue).append(")");
@@ -128,16 +119,14 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildDropSequenceSql(
-                final String sequenceName) {
+        protected String buildDropSequenceSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 40);
             sql.append("DELETE FROM SEQ_TBL WHERE SEQ_NAME='").append(sequenceName).append("'");
             return sql.toString();
         }
 
         @Override
-        protected String buildNextSeqValueSql(
-                final String sequenceName) {
+        protected String buildNextSeqValueSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 75);
             sql.append("UPDATE SEQ_TBL SET SEQ_VALUE=(@cur_value:=SEQ_VALUE)+1 WHERE SEQ_NAME = '");
             sql.append(sequenceName).append("'");
@@ -145,9 +134,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        public long nextSeqValue(
-                final Connection conn,
-                final String sequenceName)
+        public long nextSeqValue(final Connection conn, final String sequenceName)
         throws DataAccessException {
             final String sqlUpdate = buildNextSeqValueSql(sequenceName);
             final String sqlSelect = "SELECT @cur_value";
@@ -190,8 +177,7 @@ public abstract class DataSourceWrapper {
         } // method nextSeqValue
 
         @Override
-        protected String getSqlToDropForeignKeyConstraint(
-                final String constraintName,
+        protected String getSqlToDropForeignKeyConstraint(final String constraintName,
                 final String baseTable)
         throws DataAccessException {
             StringBuilder sb = new StringBuilder(baseTable.length() + constraintName.length() + 30);
@@ -201,17 +187,14 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String getSqlToDropIndex(
-                final String table,
-                final String indexName) {
+        protected String getSqlToDropIndex(final String table, final String indexName) {
             StringBuilder sb = new StringBuilder(indexName.length() + table.length() + 15);
             return sb.append("DROP INDEX ").append(indexName).append(" ON ").append(table)
                     .toString();
         }
 
         @Override
-        protected String getSqlToDropUniqueConstraint(
-                final String constraintName,
+        protected String getSqlToDropUniqueConstraint(final String constraintName,
                 final String table) {
             StringBuilder sb = new StringBuilder(constraintName.length() + table.length() + 22);
             return sb.append("ALTER TABLE ").append(table)
@@ -233,16 +216,12 @@ public abstract class DataSourceWrapper {
     // CHECKSTYLE:SKIP
     private static class DB2 extends DataSourceWrapper {
 
-        DB2(
-                final String name,
-                final HikariDataSource service) {
+        DB2(final String name, final HikariDataSource service) {
             super(name, service, DatabaseType.DB2);
         }
 
         @Override
-        public String createFetchFirstSelectSql(
-                final String coreSql,
-                final int rows,
+        public String createFetchFirstSelectSql(final String coreSql, final int rows,
                 final String orderBy) {
             // 'SELECT ': 7
             // ' FETCH FIRST ': 15
@@ -267,9 +246,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildCreateSequenceSql(
-                final String sequenceName,
-                final long startValue) {
+        protected String buildCreateSequenceSql(final String sequenceName, final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" AS BIGINT START WITH ").append(startValue);
@@ -278,15 +255,13 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildDropSequenceSql(
-                final String sequenceName) {
+        protected String buildDropSequenceSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
             return sql.append("DROP SEQUENCE ").append(sequenceName).toString();
         }
 
         @Override
-        protected String buildNextSeqValueSql(
-                final String sequenceName) {
+        protected String buildNextSeqValueSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 44);
             sql.append("SELECT NEXT VALUE FOR ")
                 .append(sequenceName)
@@ -299,16 +274,12 @@ public abstract class DataSourceWrapper {
     // CHECKSTYLE:SKIP
     private static class PostgreSQL extends DataSourceWrapper {
 
-        PostgreSQL(
-                final String name,
-                final HikariDataSource service) {
+        PostgreSQL(final String name, final HikariDataSource service) {
             super(name, service, DatabaseType.POSTGRES);
         }
 
         @Override
-        public String createFetchFirstSelectSql(
-                final String coreSql,
-                final int rows,
+        public String createFetchFirstSelectSql(final String coreSql, final int rows,
                 final String orderBy) {
             // 'SELECT ': 7
             // ' FETCH FIRST ': 13
@@ -333,9 +304,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildCreateSequenceSql(
-                final String sequenceName,
-                final long startValue) {
+        protected String buildCreateSequenceSql(final String sequenceName, final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 70);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" START WITH ").append(startValue);
@@ -344,16 +313,14 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildDropSequenceSql(
-                final String sequenceName) {
+        protected String buildDropSequenceSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
             sql.append("DROP SEQUENCE ").append(sequenceName);
             return sql.toString();
         }
 
         @Override
-        protected String buildNextSeqValueSql(
-                final String sequenceName) {
+        protected String buildNextSeqValueSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
             return sql.toString();
@@ -365,9 +332,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String getSqlToDropPrimaryKey(
-                final String primaryKeyName,
-                final String table) {
+        protected String getSqlToDropPrimaryKey(final String primaryKeyName, final String table) {
             StringBuilder sb = new StringBuilder(500);
             sb.append("DO $$ DECLARE constraint_name varchar;\n");
             sb.append("BEGIN\n");
@@ -386,9 +351,7 @@ public abstract class DataSourceWrapper {
 
     private static class Oracle extends DataSourceWrapper {
 
-        Oracle(
-                final String name,
-                final HikariDataSource service) {
+        Oracle(final String name, final HikariDataSource service) {
             super(name, service, DatabaseType.ORACLE);
         }
 
@@ -397,9 +360,7 @@ public abstract class DataSourceWrapper {
          *
          */
         @Override
-        public String createFetchFirstSelectSql(
-                final String coreSql,
-                final int rows,
+        public String createFetchFirstSelectSql(final String coreSql, final int rows,
                 final String orderBy) {
             int size = coreSql.length() + 18;
             if (StringUtil.isBlank(orderBy)) {
@@ -431,9 +392,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildCreateSequenceSql(
-                final String sequenceName,
-                final long startValue) {
+        protected String buildCreateSequenceSql(final String sequenceName, final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 59);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" START WITH ").append(startValue);
@@ -442,31 +401,26 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildDropSequenceSql(
-                final String sequenceName) {
+        protected String buildDropSequenceSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
             sql.append("DROP SEQUENCE ").append(sequenceName);
             return sql.toString();
         }
 
         @Override
-        protected String buildNextSeqValueSql(
-                final String sequenceName) {
+        protected String buildNextSeqValueSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 21);
             sql.append("SELECT ").append(sequenceName).append(".NEXTVAL FROM DUAL");
             return sql.toString();
         }
 
         @Override
-        protected String getSqlToDropPrimaryKey(
-                final String primaryKeyName,
-                final String table) {
+        protected String getSqlToDropPrimaryKey(final String primaryKeyName, final String table) {
             return getSqlToDropUniqueConstraint(primaryKeyName, table);
         }
 
         @Override
-        protected String getSqlToDropUniqueConstraint(
-                final String contraintName,
+        protected String getSqlToDropUniqueConstraint(final String contraintName,
                 final String table) {
             StringBuilder sql = new StringBuilder(table.length() + contraintName.length() + 40);
             return sql.append("ALTER TABLE ").append(table)
@@ -475,13 +429,9 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String getSqlToAddForeignKeyConstraint(
-                final String constraintName,
-                final String baseTable,
-                final String baseColumn,
-                final String referencedTable,
-                final String referencedColumn,
-                final String onDeleteAction,
+        protected String getSqlToAddForeignKeyConstraint(final String constraintName,
+                final String baseTable, final String baseColumn, final String referencedTable,
+                final String referencedColumn, final String onDeleteAction,
                 final String onUpdateAction) {
             final StringBuilder sb = new StringBuilder(100);
             sb.append("ALTER TABLE ").append(baseTable);
@@ -494,9 +444,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String getSqlToAddPrimaryKey(
-                final String primaryKeyName,
-                final String table,
+        protected String getSqlToAddPrimaryKey(final String primaryKeyName, final String table,
                 final String... columns) {
             StringBuilder sb = new StringBuilder(100);
             sb.append("ALTER TABLE ").append(table);
@@ -517,16 +465,12 @@ public abstract class DataSourceWrapper {
 
     private static class H2 extends DataSourceWrapper {
 
-        H2(
-                final String name,
-                final HikariDataSource service) {
+        H2(final String name, final HikariDataSource service) {
             super(name, service, DatabaseType.H2);
         }
 
         @Override
-        public String createFetchFirstSelectSql(
-                final String coreSql,
-                final int rows,
+        public String createFetchFirstSelectSql(final String coreSql, final int rows,
                 final String orderBy) {
             // 'SELECT ': 7
             // ' LIMIT ': 7
@@ -550,9 +494,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildCreateSequenceSql(
-                final String sequenceName,
-                final long startValue) {
+        protected String buildCreateSequenceSql(final String sequenceName, final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" START WITH ").append(startValue);
@@ -561,16 +503,14 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildDropSequenceSql(
-                final String sequenceName) {
+        protected String buildDropSequenceSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
             sql.append("DROP SEQUENCE ").append(sequenceName);
             return sql.toString();
         }
 
         @Override
-        protected String buildNextSeqValueSql(
-                final String sequenceName) {
+        protected String buildNextSeqValueSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
             return sql.toString();
@@ -581,16 +521,12 @@ public abstract class DataSourceWrapper {
     // CHECKSTYLE:SKIP
     private static class HSQL extends DataSourceWrapper {
 
-        HSQL(
-                final String name,
-                final HikariDataSource service) {
+        HSQL(final String name, final HikariDataSource service) {
             super(name, service, DatabaseType.HSQL);
         }
 
         @Override
-        public String createFetchFirstSelectSql(
-                final String coreSql,
-                final int rows,
+        public String createFetchFirstSelectSql(final String coreSql, final int rows,
                 final String orderBy) {
             // 'SELECT ': 7
             // ' LIMIT ': 7
@@ -614,9 +550,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildCreateSequenceSql(
-                final String sequenceName,
-                final long startValue) {
+        protected String buildCreateSequenceSql(final String sequenceName, final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 70);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" AS BIGINT START WITH ").append(startValue);
@@ -625,16 +559,14 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        protected String buildDropSequenceSql(
-                final String sequenceName) {
+        protected String buildDropSequenceSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
             sql.append("DROP SEQUENCE ").append(sequenceName);
             return sql.toString();
         }
 
         @Override
-        protected String buildNextSeqValueSql(
-                final String sequenceName) {
+        protected String buildNextSeqValueSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
             return sql.toString();
@@ -663,9 +595,7 @@ public abstract class DataSourceWrapper {
 
     private final DatabaseType databaseType;
 
-    private DataSourceWrapper(
-            final String name,
-            final HikariDataSource service,
+    private DataSourceWrapper(final String name, final HikariDataSource service,
             final DatabaseType dbType) {
         this.service = ParamUtil.requireNonNull("service", service);
         this.databaseType = ParamUtil.requireNonNull("dbType", dbType);
@@ -705,8 +635,7 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public void returnConnection(
-            final Connection conn) {
+    public void returnConnection(final Connection conn) {
         if (conn == null) {
             return;
         }
@@ -736,8 +665,7 @@ public abstract class DataSourceWrapper {
         return service.getLogWriter();
     }
 
-    public Statement createStatement(
-            final Connection conn)
+    public Statement createStatement(final Connection conn)
     throws DataAccessException {
         ParamUtil.requireNonNull("conn", conn);
         try {
@@ -747,9 +675,7 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public PreparedStatement prepareStatement(
-            final Connection conn,
-            final String sqlQuery)
+    public PreparedStatement prepareStatement(final Connection conn, final String sqlQuery)
     throws DataAccessException {
         ParamUtil.requireNonNull("conn", conn);
         try {
@@ -759,9 +685,7 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public void releaseResources(
-            final Statement ps,
-            final ResultSet rs) {
+    public void releaseResources(final Statement ps, final ResultSet rs) {
         if (rs != null) {
             try {
                 rs.close();
@@ -790,9 +714,7 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    private void releaseStatementAndResultSet(
-            final Statement ps,
-            final ResultSet rs) {
+    private void releaseStatementAndResultSet(final Statement ps, final ResultSet rs) {
         if (rs != null) {
             try {
                 rs.close();
@@ -810,29 +732,19 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public String createFetchFirstSelectSql(
-            final String coreSql,
-            final int rows) {
+    public String createFetchFirstSelectSql(final String coreSql, final int rows) {
         return createFetchFirstSelectSql(coreSql, rows, null);
     }
 
-    public abstract String createFetchFirstSelectSql(
-            final String coreSql,
-            final int rows,
+    public abstract String createFetchFirstSelectSql(final String coreSql, final int rows,
             final String orderBy);
 
-    public long getMin(
-            final Connection conn,
-            final String table,
-            final String column)
+    public long getMin(final Connection conn, final String table, final String column)
     throws DataAccessException {
         return getMin(conn, table, column, null);
     }
 
-    public long getMin(
-            final Connection conn,
-            final String table,
-            final String column,
+    public long getMin(final Connection conn, final String table, final String column,
             final String condition)
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
@@ -871,9 +783,7 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public int getCount(
-            final Connection conn,
-            final String table)
+    public int getCount(final Connection conn, final String table)
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
 
@@ -901,18 +811,12 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public long getMax(
-            final Connection conn,
-            final String table,
-            final String column)
+    public long getMax(final Connection conn, final String table, final String column)
     throws DataAccessException {
         return getMax(conn, table, column, null);
     }
 
-    public long getMax(
-            final Connection conn,
-            final String table,
-            final String column,
+    public long getMax(final Connection conn, final String table, final String column,
             final String condition)
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
@@ -949,10 +853,7 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public boolean deleteFromTable(
-            final Connection conn,
-            final String table,
-            final String idColumn,
+    public boolean deleteFromTable(final Connection conn, final String table, final String idColumn,
             final int id) {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("idColumn", idColumn);
@@ -1000,10 +901,7 @@ public abstract class DataSourceWrapper {
         return true;
     }
 
-    public boolean columnExists(
-            final Connection conn,
-            final String table,
-            final String column,
+    public boolean columnExists(final Connection conn, final String table, final String column,
             final Object value)
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
@@ -1044,10 +942,7 @@ public abstract class DataSourceWrapper {
         }
     } // method columnExists
 
-    public boolean tableHasColumn(
-            final Connection conn,
-            final String table,
-            final String column)
+    public boolean tableHasColumn(final Connection conn, final String table, final String column)
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
@@ -1079,9 +974,7 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public boolean tableExists(
-            final Connection conn,
-            final String table)
+    public boolean tableExists(final Connection conn, final String table)
     throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
 
@@ -1112,23 +1005,17 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    protected abstract String buildCreateSequenceSql(
-            String sequenceName,
-            long startValue);
+    protected abstract String buildCreateSequenceSql(String sequenceName, long startValue);
 
-    protected abstract String buildDropSequenceSql(
-            String sequenceName);
+    protected abstract String buildDropSequenceSql(String sequenceName);
 
-    protected abstract String buildNextSeqValueSql(
-            String sequenceName);
+    protected abstract String buildNextSeqValueSql(String sequenceName);
 
     protected boolean isUseSqlStateAsCode() {
         return false;
     }
 
-    public void dropAndCreateSequence(
-            final String sequenceName,
-            final long startValue)
+    public void dropAndCreateSequence(final String sequenceName, final long startValue)
     throws DataAccessException {
         try {
             dropSequence(sequenceName);
@@ -1139,9 +1026,7 @@ public abstract class DataSourceWrapper {
         createSequence(sequenceName, startValue);
     }
 
-    public void createSequence(
-            final String sequenceName,
-            final long startValue)
+    public void createSequence(final String sequenceName, final long startValue)
     throws DataAccessException {
         ParamUtil.requireNonBlank("sequenceName", sequenceName);
         final String sql = buildCreateSequenceSql(sequenceName, startValue);
@@ -1159,8 +1044,7 @@ public abstract class DataSourceWrapper {
 
     }
 
-    public void dropSequence(
-            final String sequenceName)
+    public void dropSequence(final String sequenceName)
     throws DataAccessException {
         ParamUtil.requireNonBlank("sequenceName", sequenceName);
         final String sql = buildDropSequenceSql(sequenceName);
@@ -1177,16 +1061,12 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public void setLastUsedSeqValue(
-            final String sequenceName,
-            final long sequenceValue) {
+    public void setLastUsedSeqValue(final String sequenceName, final long sequenceValue) {
         ParamUtil.requireNonBlank("sequenceName", sequenceName);
         lastUsedSeqValues.put(sequenceName, sequenceValue);
     }
 
-    public long nextSeqValue(
-            final Connection conn,
-            final String sequenceName)
+    public long nextSeqValue(final Connection conn, final String sequenceName)
     throws DataAccessException {
         ParamUtil.requireNonBlank("sequenceName", sequenceName);
         final String sql = buildNextSeqValueSql(sequenceName);
@@ -1236,9 +1116,7 @@ public abstract class DataSourceWrapper {
         return next;
     } // method nextSeqValue
 
-    protected String getSqlToDropPrimaryKey(
-            final String primaryKeyName,
-            final String table) {
+    protected String getSqlToDropPrimaryKey(final String primaryKeyName, final String table) {
         ParamUtil.requireNonBlank("primaryKeyName", primaryKeyName);
         ParamUtil.requireNonBlank("table", table);
         StringBuilder sql = new StringBuilder(table.length() + 30);
@@ -1248,17 +1126,13 @@ public abstract class DataSourceWrapper {
                 .toString();
     }
 
-    public void dropPrimaryKey(
-            final Connection conn,
-            final String primaryKeyName,
+    public void dropPrimaryKey(final Connection conn, final String primaryKeyName,
             final String table)
     throws DataAccessException {
         executeUpdate(conn, getSqlToDropPrimaryKey(primaryKeyName, table));
     }
 
-    protected String getSqlToAddPrimaryKey(
-            final String primaryKeyName,
-            final String table,
+    protected String getSqlToAddPrimaryKey(final String primaryKeyName, final String table,
             final String... columns) {
         ParamUtil.requireNonBlank("primaryKeyName", primaryKeyName);
         ParamUtil.requireNonBlank("table", table);
@@ -1279,17 +1153,13 @@ public abstract class DataSourceWrapper {
         return sb.toString();
     }
 
-    public void addPrimaryKey(
-            final Connection conn,
-            final String primaryKeyName,
-            final String table,
-            final String... columns)
+    public void addPrimaryKey(final Connection conn, final String primaryKeyName,
+            final String table, final String... columns)
     throws DataAccessException {
         executeUpdate(conn, getSqlToAddPrimaryKey(primaryKeyName, table, columns));
     }
 
-    protected String getSqlToDropForeignKeyConstraint(
-            final String constraintName,
+    protected String getSqlToDropForeignKeyConstraint(final String constraintName,
             final String baseTable)
     throws DataAccessException {
         ParamUtil.requireNonBlank("constraintName", constraintName);
@@ -1302,21 +1172,15 @@ public abstract class DataSourceWrapper {
                 .append(constraintName).toString();
     }
 
-    public void dropForeignKeyConstraint(
-            final Connection conn,
-            final String constraintName,
+    public void dropForeignKeyConstraint(final Connection conn, final String constraintName,
             final String baseTable)
     throws DataAccessException {
         executeUpdate(conn, getSqlToDropForeignKeyConstraint(constraintName, baseTable));
     }
 
-    protected String getSqlToAddForeignKeyConstraint(
-            final String constraintName,
-            final String baseTable,
-            final String baseColumn,
-            final String referencedTable,
-            final String referencedColumn,
-            final String onDeleteAction,
+    protected String getSqlToAddForeignKeyConstraint(final String constraintName,
+            final String baseTable, final String baseColumn, final String referencedTable,
+            final String referencedColumn, final String onDeleteAction,
             final String onUpdateAction) {
         ParamUtil.requireNonBlank("constraintName", constraintName);
         ParamUtil.requireNonBlank("baseTable", baseTable);
@@ -1337,42 +1201,26 @@ public abstract class DataSourceWrapper {
         return sb.toString();
     }
 
-    public void addForeignKeyConstraint(
-            final Connection conn,
-            final String constraintName,
-            final String baseTable,
-            final String baseColumn,
-            final String referencedTable,
-            final String referencedColumn,
-            final String onDeleteAction,
-            final String onUpdateAction)
+    public void addForeignKeyConstraint(final Connection conn, final String constraintName,
+            final String baseTable, final String baseColumn, final String referencedTable,
+            final String referencedColumn, final String onDeleteAction, final String onUpdateAction)
     throws DataAccessException {
-        executeUpdate(conn,
-                getSqlToAddForeignKeyConstraint(
-                        constraintName,
-                        baseTable, baseColumn,
-                        referencedTable, referencedColumn,
-                        onDeleteAction, onUpdateAction));
+        final String sql = getSqlToAddForeignKeyConstraint(constraintName, baseTable, baseColumn,
+                referencedTable, referencedColumn, onDeleteAction, onUpdateAction);
+        executeUpdate(conn, sql);
     }
 
-    protected String getSqlToDropIndex(
-            final String table,
-            final String indexName) {
+    protected String getSqlToDropIndex(final String table, final String indexName) {
         ParamUtil.requireNonBlank("indexName", indexName);
         return "DROP INDEX " + indexName;
     }
 
-    public void dropIndex(
-            final Connection conn,
-            final String table,
-            final String indexName)
+    public void dropIndex(final Connection conn, final String table, final String indexName)
     throws DataAccessException {
         executeUpdate(conn, getSqlToDropIndex(table, indexName));
     }
 
-    protected String getSqlToCreateIndex(
-            final String indexName,
-            final String table,
+    protected String getSqlToCreateIndex(final String indexName, final String table,
             final String... columns) {
         ParamUtil.requireNonBlank("indexName", indexName);
         ParamUtil.requireNonBlank("table", table);
@@ -1392,18 +1240,13 @@ public abstract class DataSourceWrapper {
         return sb.toString();
     }
 
-    public void createIndex(
-            final Connection conn,
-            final String indexName,
-            final String table,
+    public void createIndex(final Connection conn, final String indexName, final String table,
             final String... columns)
     throws DataAccessException {
         executeUpdate(conn, getSqlToCreateIndex(indexName, table, columns));
     }
 
-    protected String getSqlToDropUniqueConstraint(
-            final String constraintName,
-            final String table) {
+    protected String getSqlToDropUniqueConstraint(final String constraintName, final String table) {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("constraintName", constraintName);
 
@@ -1414,17 +1257,13 @@ public abstract class DataSourceWrapper {
                 .append(constraintName).toString();
     }
 
-    public void dropUniqueConstrain(
-            final Connection conn,
-            final String constraintName,
+    public void dropUniqueConstrain(final Connection conn, final String constraintName,
             final String table)
     throws DataAccessException {
         executeUpdate(conn, getSqlToDropUniqueConstraint(constraintName, table));
     }
 
-    protected String getSqlToAddUniqueConstrain(
-            final String constraintName,
-            final String table,
+    protected String getSqlToAddUniqueConstrain(final String constraintName, final String table,
             final String... columns) {
         ParamUtil.requireNonBlank("constraintName", constraintName);
         ParamUtil.requireNonBlank("table", table);
@@ -1444,18 +1283,13 @@ public abstract class DataSourceWrapper {
         return sb.toString();
     }
 
-    public void addUniqueConstrain(
-            final Connection conn,
-            final String constraintName,
-            final String table,
-            final String... columns)
+    public void addUniqueConstrain(final Connection conn, final String constraintName,
+            final String table, final String... columns)
     throws DataAccessException {
         executeUpdate(conn, getSqlToAddUniqueConstrain(constraintName, table, columns));
     }
 
-    public DataAccessException translate(
-            final String sql,
-            final SQLException ex) {
+    public DataAccessException translate(final String sql, final SQLException ex) {
         ParamUtil.requireNonNull("ex", ex);
 
         String tmpSql = sql;
@@ -1506,15 +1340,13 @@ public abstract class DataSourceWrapper {
                 return new DataIntegrityViolationException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getPermissionDeniedCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
-                return new PermissionDeniedDataAccessException(
-                        buildMessage(tmpSql, sqlEx), sqlEx);
+                return new PermissionDeniedDataAccessException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getDataAccessResourceFailureCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new DataAccessResourceFailureException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getTransientDataAccessResourceCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
-                return new TransientDataAccessResourceException(
-                        buildMessage(tmpSql, sqlEx), sqlEx);
+                return new TransientDataAccessResourceException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getCannotAcquireLockCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new CannotAcquireLockException(buildMessage(tmpSql, sqlEx), sqlEx);
@@ -1523,8 +1355,7 @@ public abstract class DataSourceWrapper {
                 return new DeadlockLoserDataAccessException(buildMessage(tmpSql, sqlEx), sqlEx);
             } else if (sqlErrorCodes.getCannotSerializeTransactionCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
-                return new CannotSerializeTransactionException(
-                        buildMessage(tmpSql, sqlEx), sqlEx);
+                return new CannotSerializeTransactionException(buildMessage(tmpSql, sqlEx), sqlEx);
             }
         } // end if (errorCode)
 
@@ -1568,9 +1399,7 @@ public abstract class DataSourceWrapper {
         return new UncategorizedSqlException(buildMessage(tmpSql, sqlEx), sqlEx);
     } // method translate
 
-    private void logTranslation(
-            final String sql,
-            final SQLException sqlEx) {
+    private void logTranslation(final String sql, final SQLException sqlEx) {
         if (!LOG.isDebugEnabled()) {
             return;
         }
@@ -1580,9 +1409,7 @@ public abstract class DataSourceWrapper {
             sqlEx.getSQLState(), sqlEx.getErrorCode(), sqlEx.getMessage(), sql);
     }
 
-    private String buildMessage(
-            final String sql,
-            final SQLException ex) {
+    private String buildMessage(final String sql, final SQLException ex) {
         String msg = ex.getMessage();
         StringBuilder sb = new StringBuilder(msg.length() + sql.length() + 8);
         return sb.append("SQL [").append(sql)
@@ -1608,9 +1435,7 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    static DataSourceWrapper createDataSource(
-            final String name,
-            final Properties props,
+    static DataSourceWrapper createDataSource(final String name, final Properties props,
             final DatabaseType databaseType) {
         ParamUtil.requireNonNull("props", props);
         ParamUtil.requireNonNull("databaseType", databaseType);

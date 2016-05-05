@@ -52,10 +52,7 @@ public class CertprofileInfo {
 
     private final String conf;
 
-    public CertprofileInfo(
-            final String name,
-            final String type,
-            final String conf) {
+    public CertprofileInfo(final String name, final String type, final String conf) {
         this.name = ParamUtil.requireNonBlank("name", name);
         if (StringUtil.isBlank(type)) {
             this.type = null;

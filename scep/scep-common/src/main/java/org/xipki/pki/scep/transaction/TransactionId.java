@@ -56,13 +56,11 @@ public class TransactionId {
 
     private final String id;
 
-    public TransactionId(
-            final String id) {
+    public TransactionId(final String id) {
         this.id = ParamUtil.requireNonBlank("id", id);
     }
 
-    private TransactionId(
-            final byte[] bytes) {
+    private TransactionId(final byte[] bytes) {
         ParamUtil.requireNonNull("bytes", bytes);
         ParamUtil.requireMin("bytes.length", bytes.length, 1);
         this.id = Hex.toHexString(bytes);
@@ -78,8 +76,7 @@ public class TransactionId {
         return new TransactionId(bytes);
     }
 
-    public static TransactionId sha1TransactionId(
-            final SubjectPublicKeyInfo spki)
+    public static TransactionId sha1TransactionId(final SubjectPublicKeyInfo spki)
     throws InvalidKeySpecException {
         ParamUtil.requireNonNull("spki", spki);
 
@@ -93,8 +90,7 @@ public class TransactionId {
         return sha1TransactionId(encoded);
     }
 
-    public static TransactionId sha1TransactionId(
-            final byte[] content) {
+    public static TransactionId sha1TransactionId(final byte[] content) {
         ParamUtil.requireNonNull("content", content);
 
         SHA1Digest dgst = new SHA1Digest();

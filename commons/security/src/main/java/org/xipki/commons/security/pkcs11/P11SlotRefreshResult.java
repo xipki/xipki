@@ -74,27 +74,22 @@ public class P11SlotRefreshResult {
         return mechanisms;
     }
 
-    public void addIdentity(
-            final P11Identity identity) {
+    public void addIdentity(final P11Identity identity) {
         ParamUtil.requireNonNull("identity", identity);
         this.identities.put(identity.getIdentityId().getObjectId(), identity);
     }
 
-    public void addMechanism(
-            final long mechanism) {
+    public void addMechanism(final long mechanism) {
         this.mechanisms.add(mechanism);
     }
 
-    public void addCertificate(
-            final P11ObjectIdentifier objectId,
-            final X509Cert certificate) {
+    public void addCertificate(final P11ObjectIdentifier objectId, final X509Cert certificate) {
         ParamUtil.requireNonNull("objectId", objectId);
         ParamUtil.requireNonNull("certificate", certificate);
         this.certificates.put(objectId, certificate);
     }
 
-    public X509Cert getCertForId(
-            @Nonnull final byte[] id) {
+    public X509Cert getCertForId(@Nonnull final byte[] id) {
         for (P11ObjectIdentifier objId : certificates.keySet()) {
             if (objId.matchesId(id)) {
                 return certificates.get(objId);

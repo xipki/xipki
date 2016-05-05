@@ -61,15 +61,12 @@ public class ServerCaps {
 
     private final boolean readOnly;
 
-    public ServerCaps(
-            final boolean readOnly,
-            final Set<Integer> versions) {
+    public ServerCaps(final boolean readOnly, final Set<Integer> versions) {
         this.readOnly = readOnly;
         this.versions = ParamUtil.requireNonEmpty("versions", versions);
     }
 
-    public ServerCaps(
-            final byte[] caps) {
+    public ServerCaps(final byte[] caps) {
         Properties props = new Properties();
         try {
             props.load(new ByteArrayInputStream(caps));

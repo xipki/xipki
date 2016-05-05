@@ -54,15 +54,13 @@ public final class CachingCertificateValidator implements CaCertValidator {
 
     private final CaCertValidator delegate;
 
-    public CachingCertificateValidator(
-            final CaCertValidator delegate) {
+    public CachingCertificateValidator(final CaCertValidator delegate) {
         this.delegate = ParamUtil.requireNonNull("delegate", delegate);
         this.cachedAnswers = new ConcurrentHashMap<String, Boolean>();
     }
 
     @Override
-    public boolean isTrusted(
-            final X509Certificate cert) {
+    public boolean isTrusted(final X509Certificate cert) {
         ParamUtil.requireNonNull("cert", cert);
         String hexFp;
         try {

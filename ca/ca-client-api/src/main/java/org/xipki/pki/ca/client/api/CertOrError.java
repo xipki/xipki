@@ -52,14 +52,12 @@ public class CertOrError {
 
     private final PkiStatusInfo error;
 
-    public CertOrError(
-            final Certificate certificate) {
+    public CertOrError(final Certificate certificate) {
         this.certificate = ParamUtil.requireNonNull("certificate", certificate);
         this.error = null;
     }
 
-    public CertOrError(
-            final PkiStatusInfo error) {
+    public CertOrError(final PkiStatusInfo error) {
         this.certificate = null;
         this.error = ParamUtil.requireNonNull("error", error);
     }

@@ -84,9 +84,7 @@ public abstract class UnRevRemoveCertCommandSupport extends ClientCommandSupport
         return serialNumber;
     }
 
-    protected String checkCertificate(
-            final X509Certificate cert,
-            final X509Certificate caCert)
+    protected String checkCertificate(final X509Certificate cert, final X509Certificate caCert)
     throws CertificateEncodingException {
         ParamUtil.requireNonNull("cert", cert);
         ParamUtil.requireNonNull("caCert", caCert);

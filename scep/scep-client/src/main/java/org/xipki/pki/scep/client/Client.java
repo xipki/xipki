@@ -112,30 +112,24 @@ public abstract class Client {
 
     private boolean useInsecureAlgorithms;
 
-    public Client(
-            final CaIdentifier caId,
-            final CaCertValidator caCertValidator)
+    public Client(final CaIdentifier caId, final CaCertValidator caCertValidator)
     throws MalformedURLException {
         this.caId = ParamUtil.requireNonNull("caId", caId);
         this.caCertValidator = ParamUtil.requireNonNull("caCertValidator", caCertValidator);
     }
 
-    protected abstract ScepHttpResponse httpPost(
-            @Nonnull final String url,
-            @Nonnull final String requestContentType,
-            @Nonnull final byte[] request)
+    protected abstract ScepHttpResponse httpPost(@Nonnull final String url,
+            @Nonnull final String requestContentType, @Nonnull final byte[] request)
     throws ScepClientException;
 
-    protected abstract ScepHttpResponse httpGet(
-            @Nonnull final String url)
+    protected abstract ScepHttpResponse httpGet(@Nonnull final String url)
     throws ScepClientException;
 
     public boolean isHttpGetOnly() {
         return httpGetOnly;
     }
 
-    public void setHttpGetOnly(
-            final boolean httpGetOnly) {
+    public void setHttpGetOnly(final boolean httpGetOnly) {
         this.httpGetOnly = httpGetOnly;
     }
 
@@ -143,8 +137,7 @@ public abstract class Client {
         return useInsecureAlgorithms;
     }
 
-    public void setUseInsecureAlgorithms(
-            final boolean useInsecureAlgorithms) {
+    public void setUseInsecureAlgorithms(final boolean useInsecureAlgorithms) {
         this.useInsecureAlgorithms = useInsecureAlgorithms;
     }
 
@@ -156,14 +149,11 @@ public abstract class Client {
      * Set the maximal signing time bias in milliseconds.
      * @param maxSigningTimeBiasInMs zero or negative value deactivates the message time check
      */
-    public void setMaxSigningTimeBiasInMs(
-            final long maxSigningTimeBiasInMs) {
+    public void setMaxSigningTimeBiasInMs(final long maxSigningTimeBiasInMs) {
         this.maxSigningTimeBiasInMs = maxSigningTimeBiasInMs;
     }
 
-    private ScepHttpResponse httpSend(
-            final Operation operation,
-            final ContentInfo pkiMessage)
+    private ScepHttpResponse httpSend(final Operation operation, final ContentInfo pkiMessage)
     throws ScepClientException {
         byte[] request = null;
         if (pkiMessage != null) {
@@ -192,8 +182,7 @@ public abstract class Client {
         } // end if
     }
 
-    private ScepHttpResponse httpSend(
-            final Operation operation)
+    private ScepHttpResponse httpSend(final Operation operation)
     throws ScepClientException {
         return httpSend(operation, null);
     }
@@ -250,11 +239,8 @@ public abstract class Client {
         return authorityCertStore;
     }
 
-    public X509CRL scepGetCrl(
-            final PrivateKey identityKey,
-            final X509Certificate identityCert,
-            final X500Name issuer,
-            final BigInteger serialNumber)
+    public X509CRL scepGetCrl(final PrivateKey identityKey, final X509Certificate identityCert,
+            final X500Name issuer, final BigInteger serialNumber)
     throws ScepClientException {
         ParamUtil.requireNonNull("identityKey", identityKey);
         ParamUtil.requireNonNull("identityCert", identityCert);
@@ -279,10 +265,8 @@ public abstract class Client {
         }
     }
 
-    public List<X509Certificate> scepGetCert(
-            final PrivateKey identityKey,
-            final X509Certificate identityCert,
-            final X500Name issuer,
+    public List<X509Certificate> scepGetCert(final PrivateKey identityKey,
+            final X509Certificate identityCert, final X500Name issuer,
             final BigInteger serialNumber)
     throws ScepClientException {
         ParamUtil.requireNonNull("identityKey", identityKey);
@@ -311,10 +295,8 @@ public abstract class Client {
         }
     }
 
-    public EnrolmentResponse scepCertPoll(
-            final PrivateKey identityKey,
-            final X509Certificate identityCert,
-            final CertificationRequest csr,
+    public EnrolmentResponse scepCertPoll(final PrivateKey identityKey,
+            final X509Certificate identityCert, final CertificationRequest csr,
             final X500Name issuer)
     throws ScepClientException {
         ParamUtil.requireNonNull("csr", csr);
@@ -331,12 +313,9 @@ public abstract class Client {
                 csr.getCertificationRequestInfo().getSubject());
     }
 
-    public EnrolmentResponse scepCertPoll(
-            final PrivateKey identityKey,
-            final X509Certificate identityCert,
-            final TransactionId transactionId,
-            final X500Name issuer,
-            final X500Name subject)
+    public EnrolmentResponse scepCertPoll(final PrivateKey identityKey,
+            final X509Certificate identityCert, final TransactionId transactionId,
+            final X500Name issuer, final X500Name subject)
     throws ScepClientException {
         ParamUtil.requireNonNull("identityKey", identityKey);
         ParamUtil.requireNonNull("identityCert", identityCert);
@@ -357,9 +336,7 @@ public abstract class Client {
         return new EnrolmentResponse(response);
     }
 
-    public EnrolmentResponse scepEnrol(
-            final CertificationRequest csr,
-            final PrivateKey identityKey,
+    public EnrolmentResponse scepEnrol(final CertificationRequest csr, final PrivateKey identityKey,
             final X509Certificate identityCert)
     throws ScepClientException {
         ParamUtil.requireNonNull("csr", csr);
@@ -390,10 +367,8 @@ public abstract class Client {
         return scepPkcsReq(csr, identityKey, identityCert);
     }
 
-    public EnrolmentResponse scepPkcsReq(
-            final CertificationRequest csr,
-            final PrivateKey identityKey,
-            final X509Certificate identityCert)
+    public EnrolmentResponse scepPkcsReq(final CertificationRequest csr,
+            final PrivateKey identityKey, final X509Certificate identityCert)
     throws ScepClientException {
         ParamUtil.requireNonNull("csr", csr);
         ParamUtil.requireNonNull("identityKey", identityKey);
@@ -409,10 +384,8 @@ public abstract class Client {
         return doEnrol(MessageType.PKCSReq, csr, identityKey, identityCert);
     }
 
-    public EnrolmentResponse scepRenewalReq(
-            final CertificationRequest csr,
-            final PrivateKey identityKey,
-            final X509Certificate identityCert)
+    public EnrolmentResponse scepRenewalReq(final CertificationRequest csr,
+            final PrivateKey identityKey, final X509Certificate identityCert)
     throws ScepClientException {
         initIfNotInited();
 
@@ -428,10 +401,8 @@ public abstract class Client {
         return doEnrol(MessageType.RenewalReq, csr, identityKey, identityCert);
     }
 
-    public EnrolmentResponse scepUpdateReq(
-            final CertificationRequest csr,
-            final PrivateKey identityKey,
-            final X509Certificate identityCert)
+    public EnrolmentResponse scepUpdateReq(final CertificationRequest csr,
+            final PrivateKey identityKey, final X509Certificate identityCert)
     throws ScepClientException {
         initIfNotInited();
 
@@ -447,11 +418,8 @@ public abstract class Client {
         return doEnrol(MessageType.UpdateReq, csr, identityKey, identityCert);
     }
 
-    private EnrolmentResponse doEnrol(
-            final MessageType messageType,
-            final CertificationRequest csr,
-            final PrivateKey identityKey,
-            final X509Certificate identityCert)
+    private EnrolmentResponse doEnrol(final MessageType messageType, final CertificationRequest csr,
+            final PrivateKey identityKey, final X509Certificate identityCert)
     throws ScepClientException {
         TransactionId tid;
         try {
@@ -485,9 +453,7 @@ public abstract class Client {
         return retrieveNextCaAuthorityCertStore(resp);
     }
 
-    private ContentInfo encryptThenSign(
-            final PkiMessage request,
-            final PrivateKey identityKey,
+    private ContentInfo encryptThenSign(final PkiMessage request, final PrivateKey identityKey,
             final X509Certificate identityCert)
     throws ScepClientException {
         ScepHashAlgoType hashAlgo = caCaps.getMostSecureHashAlgo();
@@ -523,8 +489,7 @@ public abstract class Client {
     public void destroy() {
     }
 
-    private AuthorityCertStore retrieveNextCaAuthorityCertStore(
-            final ScepHttpResponse httpResp)
+    private AuthorityCertStore retrieveNextCaAuthorityCertStore(final ScepHttpResponse httpResp)
     throws ScepClientException {
         String ct = httpResp.getContentType();
 
@@ -588,9 +553,7 @@ public abstract class Client {
         }
     }
 
-    private DecodedPkiMessage decode(
-            final CMSSignedData pkiMessage,
-            final PrivateKey recipientKey,
+    private DecodedPkiMessage decode(final CMSSignedData pkiMessage, final PrivateKey recipientKey,
             final X509Certificate recipientCert)
     throws ScepClientException {
         DecodedPkiMessage resp;
@@ -643,8 +606,7 @@ public abstract class Client {
                 || caCaps.containsCapability(CaCapability.Update);
     }
 
-    private static X509Certificate parseCert(
-            final byte[] certBytes)
+    private static X509Certificate parseCert(final byte[] certBytes)
     throws ScepClientException {
         try {
             return ScepUtil.parseCert(certBytes);
@@ -655,8 +617,7 @@ public abstract class Client {
         }
     }
 
-    private static CMSSignedData parsePkiMessage(
-            final byte[] messageBytes)
+    private static CMSSignedData parsePkiMessage(final byte[] messageBytes)
     throws ScepClientException {
         try {
             return new CMSSignedData(messageBytes);
@@ -665,8 +626,7 @@ public abstract class Client {
         }
     }
 
-    private static AuthorityCertStore retrieveCaCertStore(
-            final ScepHttpResponse resp,
+    private static AuthorityCertStore retrieveCaCertStore(final ScepHttpResponse resp,
             final CaCertValidator caValidator)
     throws ScepClientException {
         String ct = resp.getContentType();
@@ -749,9 +709,7 @@ public abstract class Client {
         }
     } // method retrieveCaCertStore
 
-    private static void assertSameNonce(
-            final PkiMessage request,
-            final PkiMessage response)
+    private static void assertSameNonce(final PkiMessage request, final PkiMessage response)
     throws ScepClientException {
         if (request.getSenderNonce().equals(response.getRecipientNonce())) {
             throw new ScepClientException(

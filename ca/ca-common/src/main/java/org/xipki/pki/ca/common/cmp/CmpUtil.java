@@ -68,18 +68,14 @@ public class CmpUtil {
     private CmpUtil() {
     }
 
-    public static PKIMessage addProtection(
-            final PKIMessage pkiMessage,
-            final ConcurrentContentSigner signer,
-            final GeneralName signerName)
+    public static PKIMessage addProtection(final PKIMessage pkiMessage,
+            final ConcurrentContentSigner signer, final GeneralName signerName)
     throws CMPException, NoIdleSignerException {
         return addProtection(pkiMessage, signer, signerName, true);
     }
 
-    public static PKIMessage addProtection(
-            final PKIMessage pkiMessage,
-            final ConcurrentContentSigner signer,
-            final GeneralName signerName,
+    public static PKIMessage addProtection(final PKIMessage pkiMessage,
+            final ConcurrentContentSigner signer, final GeneralName signerName,
             final boolean addSignerCert)
     throws CMPException, NoIdleSignerException {
         ParamUtil.requireNonNull("pkiMessage", pkiMessage);
@@ -150,8 +146,7 @@ public class CmpUtil {
         return signedMessage.toASN1Structure();
     } // method addProtection
 
-    public static boolean isImplictConfirm(
-            final PKIHeader header) {
+    public static boolean isImplictConfirm(final PKIHeader header) {
         ParamUtil.requireNonNull("header", header);
 
         InfoTypeAndValue[] regInfos = header.getGeneralInfo();
@@ -171,8 +166,7 @@ public class CmpUtil {
         return new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE);
     }
 
-    public static CmpUtf8Pairs extract(
-            final InfoTypeAndValue[] regInfos) {
+    public static CmpUtf8Pairs extract(final InfoTypeAndValue[] regInfos) {
         if (regInfos == null) {
             return null;
         }
@@ -187,8 +181,7 @@ public class CmpUtil {
         return null;
     }
 
-    public static CmpUtf8Pairs extract(
-            final AttributeTypeAndValue[] atvs) {
+    public static CmpUtf8Pairs extract(final AttributeTypeAndValue[] atvs) {
         if (atvs == null) {
             return null;
         }
@@ -203,15 +196,13 @@ public class CmpUtil {
         return null;
     }
 
-    public static InfoTypeAndValue buildInfoTypeAndValue(
-            final CmpUtf8Pairs utf8Pairs) {
+    public static InfoTypeAndValue buildInfoTypeAndValue(final CmpUtf8Pairs utf8Pairs) {
         ParamUtil.requireNonNull("utf8Pairs", utf8Pairs);
         return new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
                 new DERUTF8String(utf8Pairs.getEncoded()));
     }
 
-    public static AttributeTypeAndValue buildAttributeTypeAndValue(
-            final CmpUtf8Pairs utf8Pairs) {
+    public static AttributeTypeAndValue buildAttributeTypeAndValue(final CmpUtf8Pairs utf8Pairs) {
         ParamUtil.requireNonNull("utf8Pairs", utf8Pairs);
         return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
                 new DERUTF8String(utf8Pairs.getEncoded()));

@@ -117,21 +117,18 @@ public enum CrlReason {
     AA_COMPROMISE(10, "aACompromise");
 
     public static final List<CrlReason> PERMITTED_CLIENT_CRLREASONS = Collections.unmodifiableList(
-        Arrays.asList(
-            new CrlReason[] {
-                CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE,
-                CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED,
-                CrlReason.CESSATION_OF_OPERATION,
-                CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN}));
+        Arrays.asList(new CrlReason[] {
+            CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE,
+            CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED,
+            CrlReason.CESSATION_OF_OPERATION,
+            CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN}));
 
     private static final Map<Integer, CrlReason> REASONS = new HashMap<>();
 
     private final int code;
     private final String desription;
 
-    CrlReason(
-            final int code,
-            final String description) {
+    CrlReason(final int code, final String description) {
         this.code = code;
         this.desription = description;
     }
@@ -150,13 +147,11 @@ public enum CrlReason {
         }
     }
 
-    public static CrlReason forReasonCode(
-            final int reasonCode) {
+    public static CrlReason forReasonCode(final int reasonCode) {
         return REASONS.get(reasonCode);
     }
 
-    public static CrlReason getInstance(
-            final String text) {
+    public static CrlReason getInstance(final String text) {
         ParamUtil.requireNonNull("text", text);
         for (CrlReason value : values()) {
             if (value.desription.equalsIgnoreCase(text)

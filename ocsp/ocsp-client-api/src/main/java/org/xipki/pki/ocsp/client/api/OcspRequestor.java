@@ -53,35 +53,23 @@ import org.xipki.commons.common.RequestResponseDebug;
 
 public interface OcspRequestor {
 
-    OCSPResp ask(
-            @Nonnull X509Certificate issuerCert,
-            @Nonnull X509Certificate cert,
-            @Nonnull URL responderUrl,
-            @Nonnull RequestOptions requestOptions,
+    OCSPResp ask(@Nonnull X509Certificate issuerCert, @Nonnull X509Certificate cert,
+            @Nonnull URL responderUrl, @Nonnull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException;
 
-    OCSPResp ask(
-            @Nonnull X509Certificate issuerCert,
-            @Nonnull X509Certificate[] certs,
-            @Nonnull URL responderUrl,
-            @Nonnull RequestOptions requestOptions,
+    OCSPResp ask(@Nonnull X509Certificate issuerCert, @Nonnull X509Certificate[] certs,
+            @Nonnull URL responderUrl, @Nonnull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException;
 
-    OCSPResp ask(
-            @Nonnull X509Certificate issuerCert,
-            @Nonnull BigInteger serialNumber,
-            @Nonnull URL responderUrl,
-            @Nonnull RequestOptions requestOptions,
+    OCSPResp ask(@Nonnull X509Certificate issuerCert, @Nonnull BigInteger serialNumber,
+            @Nonnull URL responderUrl, @Nonnull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException;
 
-    OCSPResp ask(
-            @Nonnull X509Certificate issuerCert,
-            @Nonnull BigInteger[] serialNumbers,
-            @Nonnull URL responderUrl,
-            @Nonnull RequestOptions requestOptions,
+    OCSPResp ask(@Nonnull X509Certificate issuerCert, @Nonnull BigInteger[] serialNumbers,
+            @Nonnull URL responderUrl, @Nonnull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException;
 

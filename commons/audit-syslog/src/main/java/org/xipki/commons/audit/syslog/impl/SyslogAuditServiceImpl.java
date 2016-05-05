@@ -126,8 +126,7 @@ public class SyslogAuditServiceImpl implements AuditService {
     }
 
     @Override
-    public void logEvent(
-            @Nonnull final AuditEvent event) {
+    public void logEvent(@Nonnull final AuditEvent event) {
         if (!initialized) {
             LOG.error("Syslog audit not initialiazed");
             return;
@@ -190,8 +189,7 @@ public class SyslogAuditServiceImpl implements AuditService {
     } // method logEvent(AuditEvent)
 
     @Override
-    public void logEvent(
-            @Nonnull final PciAuditEvent event) {
+    public void logEvent(@Nonnull final PciAuditEvent event) {
         if (!initialized) {
             LOG.error("Syslog audit not initialiazed");
             return;
@@ -288,44 +286,36 @@ public class SyslogAuditServiceImpl implements AuditService {
         LOG.info("destroyed: {}", SyslogAuditServiceImpl.class);
     }
 
-    public void setFacility(
-            final String facility) {
+    public void setFacility(final String facility) {
         this.facility = facility;
     }
 
-    public void setHost(
-            final String host) {
+    public void setHost(final String host) {
         this.host = Objects.requireNonNull(host, "host must not be null");
     }
 
-    public void setPort(
-            final int port) {
+    public void setPort(final int port) {
         this.port = port;
     }
 
-    public void setProtocol(
-            final String protocol) {
+    public void setProtocol(final String protocol) {
         this.protocol = Objects.requireNonNull(protocol, "protocol must not be null");
     }
 
-    public void setLocalname(
-            final String localname) {
+    public void setLocalname(final String localname) {
         this.localname = localname;
     }
 
-    public void setMessageFormat(
-            final String messageFormat) {
+    public void setMessageFormat(final String messageFormat) {
         this.messageFormat = Objects.requireNonNull(messageFormat,
                 "messageFormat must not be null");
     }
 
-    public void setWriteRetries(
-            final int writeRetries) {
+    public void setWriteRetries(final int writeRetries) {
         this.writeRetries = writeRetries;
     }
 
-    public void setPrefix(
-            final String prefix) {
+    public void setPrefix(final String prefix) {
         if (notEmpty(prefix)) {
             if (prefix.charAt(prefix.length() - 1) != ' ') {
                 this.prefix = prefix + " ";
@@ -335,8 +325,7 @@ public class SyslogAuditServiceImpl implements AuditService {
         }
     }
 
-    public void setMaxMessageLength(
-            final int maxMessageLength) {
+    public void setMaxMessageLength(final int maxMessageLength) {
         if (maxMessageLength <= 0) {
             this.maxMessageLength = 1023;
         } else {
@@ -344,18 +333,15 @@ public class SyslogAuditServiceImpl implements AuditService {
         }
     }
 
-    public void setSsl(
-            final boolean ssl) {
+    public void setSsl(final boolean ssl) {
         this.ssl = ssl;
     }
 
-    private static boolean notEmpty(
-            final String text) {
+    private static boolean notEmpty(final String text) {
         return text != null && !text.isEmpty();
     }
 
-    private static Severity getSeverity(
-            final AuditLevel auditLevel) {
+    private static Severity getSeverity(final AuditLevel auditLevel) {
         if (auditLevel == null) {
             return Severity.INFORMATIONAL;
         }
@@ -370,8 +356,7 @@ public class SyslogAuditServiceImpl implements AuditService {
         case ERROR:
             return Severity.ERROR;
         default:
-            throw new RuntimeException(
-                String.format("unknown auditLevel '%s'", auditLevel));
+            throw new RuntimeException(String.format("unknown auditLevel '%s'", auditLevel));
         }
     }
 

@@ -49,19 +49,15 @@ public class CmpRequestorException extends Exception {
         super();
     }
 
-    public CmpRequestorException(
-            final String message,
-            final Throwable cause) {
+    public CmpRequestorException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public CmpRequestorException(
-            final String message) {
+    public CmpRequestorException(final String message) {
         super(message);
     }
 
-    public CmpRequestorException(
-            final Throwable cause) {
+    public CmpRequestorException(final Throwable cause) {
         super(cause);
     }
 

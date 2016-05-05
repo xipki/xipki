@@ -49,19 +49,15 @@ public class SignerException extends XiSecurityException {
         super();
     }
 
-    public SignerException(
-            final String message,
-            final Throwable cause) {
+    public SignerException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public SignerException(
-            final String message) {
+    public SignerException(final String message) {
         super(message);
     }
 
-    public SignerException(
-            final Throwable cause) {
+    public SignerException(final Throwable cause) {
         super(cause);
     }
 

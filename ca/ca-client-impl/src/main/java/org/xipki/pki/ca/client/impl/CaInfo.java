@@ -53,9 +53,7 @@ class CaInfo {
 
     private final Set<CertprofileInfo> certprofiles;
 
-    CaInfo(
-            final X509Certificate cert,
-            final Set<CertprofileInfo> certprofiles) {
+    CaInfo(final X509Certificate cert, final Set<CertprofileInfo> certprofiles) {
         this.cert = ParamUtil.requireNonNull("cert", cert);
         this.certprofiles = ParamUtil.requireNonNull("certprofiles", certprofiles);
     }

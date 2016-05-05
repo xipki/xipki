@@ -63,18 +63,14 @@ public class ScepHttpResponse {
 
     private String contentEncoding;
 
-    public ScepHttpResponse(
-            final String contentType,
-            final int contentLength,
+    public ScepHttpResponse(final String contentType, final int contentLength,
             final InputStream content) {
         this.contentType = ParamUtil.requireNonNull("contentType", contentType);
         this.content = ParamUtil.requireNonNull("content", content);
         this.contentLength = contentLength;
     }
 
-    public ScepHttpResponse(
-            final String contentType,
-            final int contentLength,
+    public ScepHttpResponse(final String contentType, final int contentLength,
             final byte[] contentBytes) {
         this(contentType, contentLength,
                 new ByteArrayInputStream(ParamUtil.requireNonNull("contentBytes", contentBytes)));
@@ -92,8 +88,7 @@ public class ScepHttpResponse {
         return contentEncoding;
     }
 
-    public void setContentEncoding(
-            final String contentEncoding) {
+    public void setContentEncoding(final String contentEncoding) {
         this.contentEncoding = contentEncoding;
     }
 

@@ -51,8 +51,7 @@ public class UnrevokeOrRemoveCertRequest {
 
     private final List<IssuerSerialEntry> requestEntries = new LinkedList<>();
 
-    public boolean addRequestEntry(
-            final IssuerSerialEntry requestEntry) {
+    public boolean addRequestEntry(final IssuerSerialEntry requestEntry) {
         ParamUtil.requireNonNull("requestEntry", requestEntry);
         for (IssuerSerialEntry re : requestEntries) {
             if (re.getId().equals(requestEntry.getId())) {

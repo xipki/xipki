@@ -112,8 +112,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
     }
 
     @Override
-    protected ConcurrentContentSigner getSigner(
-            final SignatureAlgoControl signatureAlgoControl)
+    protected ConcurrentContentSigner getSigner(final SignatureAlgoControl signatureAlgoControl)
     throws ObjectCreationException {
         ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
         char[] pwd;
@@ -128,8 +127,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
     }
 
     @Override
-    protected X500Name getSubject(
-            final String subject) {
+    protected X500Name getSubject(final String subject) {
         X500Name name = new X500Name(subject);
         List<RDN> list = new LinkedList<>();
         RDN[] rs = name.getRDNs();

@@ -125,15 +125,11 @@ public class PkiMessage {
         SCEP_ATTR_TYPES.add(CMSAttributes.signingTime);
     }
 
-    public PkiMessage(
-            final TransactionId transactionId,
-            final MessageType messageType) {
+    public PkiMessage(final TransactionId transactionId, final MessageType messageType) {
         this(transactionId, messageType, Nonce.randomNonce());
     }
 
-    public PkiMessage(
-            final TransactionId transactionId,
-            final MessageType messageType,
+    public PkiMessage(final TransactionId transactionId, final MessageType messageType,
             final Nonce senderNonce) {
         this.transactionId = ParamUtil.requireNonNull("transactionId", transactionId);
         this.messageType = ParamUtil.requireNonNull("messageType", messageType);
@@ -156,8 +152,7 @@ public class PkiMessage {
         return recipientNonce;
     }
 
-    public void setRecipientNonce(
-            final Nonce recipientNonce) {
+    public void setRecipientNonce(final Nonce recipientNonce) {
         this.recipientNonce = recipientNonce;
     }
 
@@ -165,8 +160,7 @@ public class PkiMessage {
         return pkiStatus;
     }
 
-    public void setPkiStatus(
-            final PkiStatus pkiStatus) {
+    public void setPkiStatus(final PkiStatus pkiStatus) {
         this.pkiStatus = pkiStatus;
     }
 
@@ -174,8 +168,7 @@ public class PkiMessage {
         return failInfo;
     }
 
-    public void setFailInfo(
-            final FailInfo failInfo) {
+    public void setFailInfo(final FailInfo failInfo) {
         this.failInfo = failInfo;
     }
 
@@ -183,13 +176,11 @@ public class PkiMessage {
         return messageData;
     }
 
-    public void setMessageData(
-            final ASN1Encodable messageData) {
+    public void setMessageData(final ASN1Encodable messageData) {
         this.messageData = messageData;
     }
 
-    public ASN1Encodable addSignendAttribute(
-            final ASN1ObjectIdentifier type,
+    public ASN1Encodable addSignendAttribute(final ASN1ObjectIdentifier type,
             final ASN1Encodable value) {
         if (SCEP_ATTR_TYPES.contains(type)) {
             throw new IllegalArgumentException(
@@ -198,29 +189,24 @@ public class PkiMessage {
         return signedAttributes.put(type, value);
     }
 
-    public ASN1Encodable addUnsignendAttribute(
-            final ASN1ObjectIdentifier type,
+    public ASN1Encodable addUnsignendAttribute(final ASN1ObjectIdentifier type,
             final ASN1Encodable value) {
         return unsignedAttributes.put(type, value);
     }
 
-    public ASN1Encodable removeSignedAttribute(
-            final ASN1ObjectIdentifier type) {
+    public ASN1Encodable removeSignedAttribute(final ASN1ObjectIdentifier type) {
         return signedAttributes.remove(type);
     }
 
-    public ASN1Encodable removeUnsignedAttribute(
-            final ASN1ObjectIdentifier type) {
+    public ASN1Encodable removeUnsignedAttribute(final ASN1ObjectIdentifier type) {
         return unsignedAttributes.remove(type);
     }
 
-    public ASN1Encodable getSignedAtrributeValue(
-            final ASN1ObjectIdentifier type) {
+    public ASN1Encodable getSignedAtrributeValue(final ASN1ObjectIdentifier type) {
         return signedAttributes.get(type);
     }
 
-    public ASN1Encodable getUnsignedAtrributeValue(
-            final ASN1ObjectIdentifier type) {
+    public ASN1Encodable getUnsignedAtrributeValue(final ASN1ObjectIdentifier type) {
         return unsignedAttributes.get(type);
     }
 
@@ -277,13 +263,9 @@ public class PkiMessage {
         return new AttributeTable(vec);
     }
 
-    public ContentInfo encode(
-            final PrivateKey signerKey,
-            final String signatureAlgorithm,
-            final X509Certificate signerCert,
-            final X509Certificate[] signerCertSet,
-            final X509Certificate recipientCert,
-            final ASN1ObjectIdentifier encAlgId)
+    public ContentInfo encode(final PrivateKey signerKey, final String signatureAlgorithm,
+            final X509Certificate signerCert, final X509Certificate[] signerCertSet,
+            final X509Certificate recipientCert, final ASN1ObjectIdentifier encAlgId)
     throws MessageEncodingException {
         ParamUtil.requireNonNull("signerKey", signerKey);
         ContentSigner signer;
@@ -295,11 +277,8 @@ public class PkiMessage {
         return encode(signer, signerCert, signerCertSet, recipientCert, encAlgId);
     }
 
-    public ContentInfo encode(
-            final ContentSigner signer,
-            final X509Certificate signerCert,
-            final X509Certificate[] cmsCertSet,
-            final X509Certificate recipientCert,
+    public ContentInfo encode(final ContentSigner signer, final X509Certificate signerCert,
+            final X509Certificate[] cmsCertSet, final X509Certificate recipientCert,
             final ASN1ObjectIdentifier encAlgId)
     throws MessageEncodingException {
         ParamUtil.requireNonNull("signer", signer);
@@ -359,8 +338,7 @@ public class PkiMessage {
         }
     } // method encode
 
-    private CMSEnvelopedData encrypt(
-            final X509Certificate recipient,
+    private CMSEnvelopedData encrypt(final X509Certificate recipient,
             final ASN1ObjectIdentifier encAlgId)
     throws MessageEncodingException {
         ParamUtil.requireNonNull("recipient", recipient);
@@ -393,10 +371,8 @@ public class PkiMessage {
         }
     }
 
-    private static void addAttribute(
-            final ASN1EncodableVector vector,
-            final ASN1ObjectIdentifier attrType,
-            final ASN1Encodable attrValue) {
+    private static void addAttribute(final ASN1EncodableVector vector,
+            final ASN1ObjectIdentifier attrType, final ASN1Encodable attrValue) {
         vector.add(new Attribute(attrType, new DERSet(attrValue)));
     }
 

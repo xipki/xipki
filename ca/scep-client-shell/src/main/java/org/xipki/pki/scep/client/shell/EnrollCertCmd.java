@@ -58,11 +58,7 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
 public class EnrollCertCmd extends EnrollCertCommandSupport {
 
     @Override
-    protected EnrolmentResponse requestCertificate(
-            final ScepClient client,
-            final CertificationRequest csr,
-            final PrivateKey identityKey,
-            final X509Certificate identityCert)
+    protected EnrolmentResponse requestCertificate(final ScepClient client, final CertificationRequest csr, final PrivateKey identityKey, final X509Certificate identityCert)
     throws ScepClientException {
         ParamUtil.requireNonNull("client", client);
         return client.scepEnrol(csr, identityKey, identityCert);

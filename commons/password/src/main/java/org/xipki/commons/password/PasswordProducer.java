@@ -57,23 +57,20 @@ public class PasswordProducer {
     private static ConcurrentHashMap<String, BlockingQueue<char[]>> namePasswordsMap =
             new ConcurrentHashMap<>();
 
-    public static void registerPasswordConsumer(
-            final String name) {
+    public static void registerPasswordConsumer(final String name) {
         assertNameNotBlank(name);
         BlockingQueue<char[]> queue = new LinkedBlockingQueue<>(1);
         namePasswordsMap.put(name, queue);
         LOG.info("registered passoword consumer '{}'", name);
     }
 
-    public static void unregisterPasswordConsumer(
-            final String name) {
+    public static void unregisterPasswordConsumer(final String name) {
         assertNameNotBlank(name);
         namePasswordsMap.remove(name);
         LOG.info("unregistered passoword consumer '{}'", name);
     }
 
-    public static char[] takePassword(
-            final String name)
+    public static char[] takePassword(final String name)
     throws InterruptedException, PasswordResolverException {
         assertNameNotBlank(name);
         if (!namePasswordsMap.containsKey(name)) {
@@ -83,9 +80,7 @@ public class PasswordProducer {
         return namePasswordsMap.get(name).take();
     }
 
-    public static void putPassword(
-            final String name,
-            final char[] password)
+    public static void putPassword(final String name, final char[] password)
     throws InterruptedException, PasswordResolverException {
         assertNameNotBlank(name);
         if (!namePasswordsMap.containsKey(name)) {
@@ -97,8 +92,7 @@ public class PasswordProducer {
         LOG.info("provided passoword for consumer '{}'", name);
     }
 
-    public static boolean needsPassword(
-            final String name) {
+    public static boolean needsPassword(final String name) {
         assertNameNotBlank(name);
         if (!namePasswordsMap.containsKey(name)) {
             return false;
@@ -110,8 +104,7 @@ public class PasswordProducer {
         return Collections.unmodifiableSet(namePasswordsMap.keySet());
     }
 
-    private static void assertNameNotBlank(
-            final String name) {
+    private static void assertNameNotBlank(final String name) {
         if (name == null) {
             throw new NullPointerException("name must not be null");
         }

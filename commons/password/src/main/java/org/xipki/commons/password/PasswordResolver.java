@@ -45,8 +45,7 @@ import javax.annotation.Nonnull;
 
 public interface PasswordResolver {
 
-    char[] resolvePassword(
-            @Nonnull String passwordHint)
+    char[] resolvePassword(@Nonnull String passwordHint)
     throws PasswordResolverException;
 
 }

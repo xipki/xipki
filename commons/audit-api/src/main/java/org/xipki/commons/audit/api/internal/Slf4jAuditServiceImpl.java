@@ -62,8 +62,7 @@ public class Slf4jAuditServiceImpl implements AuditService {
     }
 
     @Override
-    public void logEvent(
-            final AuditEvent event) {
+    public void logEvent(final AuditEvent event) {
         if (event == null) {
             return;
         }
@@ -81,8 +80,7 @@ public class Slf4jAuditServiceImpl implements AuditService {
     }
 
     @Override
-    public void logEvent(
-            final PciAuditEvent event) {
+    public void logEvent(final PciAuditEvent event) {
         if (event == null) {
             return;
         }
@@ -101,8 +99,7 @@ public class Slf4jAuditServiceImpl implements AuditService {
         } // end switch
     }
 
-    private static String createMessage(
-            final AuditEvent event) {
+    private static String createMessage(final AuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
         String applicationName = event.getApplicationName();
         if (applicationName == null) {

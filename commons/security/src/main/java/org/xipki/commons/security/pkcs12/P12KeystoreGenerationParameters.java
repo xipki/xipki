@@ -51,8 +51,7 @@ public class P12KeystoreGenerationParameters {
 
     private SecureRandom random;
 
-    public P12KeystoreGenerationParameters(
-            final char[] password) {
+    public P12KeystoreGenerationParameters(final char[] password) {
         this.password = ParamUtil.requireNonNull("password", password);
     }
 
@@ -60,8 +59,7 @@ public class P12KeystoreGenerationParameters {
         return random;
     }
 
-    public void setRandom(
-            final SecureRandom random) {
+    public void setRandom(final SecureRandom random) {
         this.random = random;
     }
 

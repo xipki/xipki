@@ -33,8 +33,7 @@ public class InvalidDataAccessResourceUsageException extends NonTransientDataAcc
      * Constructor for InvalidDataAccessResourceUsageException.
      * @param msg the detail message
      */
-    public InvalidDataAccessResourceUsageException(
-            final String msg) {
+    public InvalidDataAccessResourceUsageException(final String msg) {
         super(msg);
     }
 
@@ -43,9 +42,7 @@ public class InvalidDataAccessResourceUsageException extends NonTransientDataAcc
      * @param msg the detail message
      * @param cause the root cause from the data access API in use
      */
-    public InvalidDataAccessResourceUsageException(
-            final String msg,
-            final Throwable cause) {
+    public InvalidDataAccessResourceUsageException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 

@@ -77,8 +77,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
         return null;
     }
 
-    protected void saveRequestResponse(
-            final RequestResponseDebug debug) {
+    protected void saveRequestResponse(final RequestResponseDebug debug) {
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
         if (!saveReq && !saveResp) {
@@ -122,9 +121,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
         }
     } // method saveRequestResponse
 
-    private static String appendIndex(
-            final String filename,
-            final int index) {
+    private static String appendIndex(final String filename, final int index) {
         int idx = filename.lastIndexOf('.');
         if (idx == -1 || idx == filename.length() - 1) {
             return filename + "-" + index;

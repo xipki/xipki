@@ -148,8 +148,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
         this.identityCert = (X509Certificate) ks.getCertificate(keyname);
     }
 
-    protected X509Certificate extractEeCerts(
-            final CertStore certstore)
+    protected X509Certificate extractEeCerts(final CertStore certstore)
     throws CertStoreException {
         ParamUtil.requireNonNull("certstore", certstore);
 

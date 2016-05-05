@@ -119,13 +119,11 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         }
     }
 
-    public DefaultConcurrentContentSigner(
-            final List<ContentSigner> signers) {
+    public DefaultConcurrentContentSigner(final List<ContentSigner> signers) {
         this(signers, null);
     }
 
-    public DefaultConcurrentContentSigner(
-            final List<ContentSigner> signers,
+    public DefaultConcurrentContentSigner(final List<ContentSigner> signers,
             final PrivateKey privateKey) {
         ParamUtil.requireNonEmpty("signers", signers);
 
@@ -150,8 +148,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     /**
      * @param timeout timeout in milliseconds, 0 for infinitely.
      */
-    private ContentSigner borrowContentSigner(
-            final int soTimeout)
+    private ContentSigner borrowContentSigner(final int soTimeout)
     throws NoIdleSignerException {
         ContentSigner signer = null;
         try {
@@ -171,8 +168,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         return signer;
     }
 
-    private void returnContentSigner(
-            final ContentSigner signer) {
+    private void returnContentSigner(final ContentSigner signer) {
         ParamUtil.requireNonNull("signer", signer);
 
         boolean isBusySigner = busySigners.remove(signer);
@@ -188,9 +184,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public void initialize(
-            final String conf,
-            final PasswordResolver passwordResolver)
+    public void initialize(final String conf, final PasswordResolver passwordResolver)
     throws XiSecurityException {
     }
 
@@ -200,8 +194,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public void setCertificateChain(
-            final X509Certificate[] certificateChain) {
+    public void setCertificateChain(final X509Certificate[] certificateChain) {
         if (certificateChain == null || certificateChain.length == 0) {
             this.certificateChain = null;
             this.certificateChainAsBcObjects = null;
@@ -232,8 +225,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public void setPublicKey(
-            final PublicKey publicKey) {
+    public void setPublicKey(final PublicKey publicKey) {
         this.publicKey = publicKey;
     }
 
@@ -294,8 +286,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public POPOSigningKey build(
-            final ProofOfPossessionSigningKeyBuilder builder)
+    public POPOSigningKey build(final ProofOfPossessionSigningKeyBuilder builder)
     throws NoIdleSignerException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
@@ -306,8 +297,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public ProtectedPKIMessage build(
-            final ProtectedPKIMessageBuilder builder)
+    public ProtectedPKIMessage build(final ProtectedPKIMessageBuilder builder)
     throws NoIdleSignerException, CMPException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
@@ -318,8 +308,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public X509CRLHolder build(
-            final X509v2CRLBuilder builder)
+    public X509CRLHolder build(final X509v2CRLBuilder builder)
     throws NoIdleSignerException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
@@ -330,8 +319,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public X509CertificateHolder build(
-            final X509v3CertificateBuilder builder)
+    public X509CertificateHolder build(final X509v3CertificateBuilder builder)
     throws NoIdleSignerException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
@@ -342,9 +330,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public OCSPReq build(
-            final OCSPReqBuilder builder,
-            final X509CertificateHolder[] chain)
+    public OCSPReq build(final OCSPReqBuilder builder, final X509CertificateHolder[] chain)
     throws NoIdleSignerException, OCSPException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
@@ -355,10 +341,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public BasicOCSPResp build(
-            final BasicOCSPRespBuilder builder,
-            final X509CertificateHolder[] chain,
-            final Date producedAt)
+    public BasicOCSPResp build(final BasicOCSPRespBuilder builder,
+            final X509CertificateHolder[] chain, final Date producedAt)
     throws NoIdleSignerException, OCSPException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
@@ -369,8 +353,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public PKCS10CertificationRequest build(
-            final PKCS10CertificationRequestBuilder builder)
+    public PKCS10CertificationRequest build(final PKCS10CertificationRequestBuilder builder)
     throws NoIdleSignerException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
@@ -381,8 +364,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public byte[] sign(
-            final byte[] data)
+    public byte[] sign(final byte[] data)
     throws NoIdleSignerException, IOException {
         ContentSigner contentSigner = borrowContentSigner();
         try {

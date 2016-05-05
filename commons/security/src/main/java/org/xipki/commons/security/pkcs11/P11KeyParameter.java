@@ -54,9 +54,7 @@ public class P11KeyParameter extends AsymmetricKeyParameter {
 
     private final P11ObjectIdentifier objectId;
 
-    private P11KeyParameter(
-            final P11CryptService p11CryptService,
-            final P11SlotIdentifier slot,
+    private P11KeyParameter(final P11CryptService p11CryptService, final P11SlotIdentifier slot,
             final P11ObjectIdentifier objectId) {
         super(true);
 
@@ -77,10 +75,8 @@ public class P11KeyParameter extends AsymmetricKeyParameter {
         return objectId;
     }
 
-    public static P11KeyParameter getInstance(
-            final P11CryptService p11CryptService,
-            final P11SlotIdentifier slot,
-            final P11ObjectIdentifier objectId)
+    public static P11KeyParameter getInstance(final P11CryptService p11CryptService,
+            final P11SlotIdentifier slot, final P11ObjectIdentifier objectId)
     throws InvalidKeyException {
         return new P11KeyParameter(p11CryptService, slot, objectId);
     }

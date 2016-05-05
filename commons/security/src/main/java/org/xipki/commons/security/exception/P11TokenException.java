@@ -45,19 +45,15 @@ public class P11TokenException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public P11TokenException(
-            final String message,
-            final Throwable cause) {
+    public P11TokenException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public P11TokenException(
-            final String message) {
+    public P11TokenException(final String message) {
         super(message);
     }
 
-    public P11TokenException(
-            final Throwable cause) {
+    public P11TokenException(final Throwable cause) {
         super(cause);
     }
 

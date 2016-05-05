@@ -62,8 +62,7 @@ public class LoadTestEntry {
         OU,
         CN;
 
-        public static RandomDn getInstance(
-                final String text) {
+        public static RandomDn getInstance(final String text) {
             ParamUtil.requireNonNull("text", text);
             for (RandomDn value : values()) {
                 if (value.name().equalsIgnoreCase(text)) {
@@ -81,9 +80,7 @@ public class LoadTestEntry {
 
         private final ASN1ObjectIdentifier subjectRdnForIncrement;
 
-        private IncreasableSubject(
-                final String subjectTemplate,
-                final RandomDn randomDn) {
+        private IncreasableSubject(final String subjectTemplate, final RandomDn randomDn) {
             ParamUtil.requireNonBlank("subjectTemplate", subjectTemplate);
             ParamUtil.requireNonNull("randomDn", randomDn);
 
@@ -123,8 +120,7 @@ public class LoadTestEntry {
             }
         }
 
-        private X500Name getX500Name(
-                final long index) {
+        private X500Name getX500Name(final long index) {
             RDN[] baseRdns = subjectTemplate.getRDNs();
 
             final int n = baseRdns.length;
@@ -154,23 +150,18 @@ public class LoadTestEntry {
 
     private final IncreasableSubject subject;
 
-    public LoadTestEntry(
-            final String certprofile,
-            final KeyEntry keyEntry,
-            final String subjectTemplate,
-            final RandomDn randomDn) {
+    public LoadTestEntry(final String certprofile, final KeyEntry keyEntry,
+            final String subjectTemplate, final RandomDn randomDn) {
         this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
         this.keyEntry = ParamUtil.requireNonNull("keyEntry", keyEntry);
         this.subject = new IncreasableSubject(subjectTemplate, randomDn);
     }
 
-    public SubjectPublicKeyInfo getSubjectPublicKeyInfo(
-            final long index) {
+    public SubjectPublicKeyInfo getSubjectPublicKeyInfo(final long index) {
         return keyEntry.getSubjectPublicKeyInfo(index);
     }
 
-    public X500Name getX500Name(
-            final long index) {
+    public X500Name getX500Name(final long index) {
         return subject.getX500Name(index);
     }
 

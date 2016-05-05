@@ -80,15 +80,11 @@ public abstract class XipkiCommandSupport implements Action {
         }
     }
 
-    protected boolean isTrue(
-            final Boolean bo) {
+    protected boolean isTrue(final Boolean bo) {
         return bo != null && bo.booleanValue();
     }
 
-    protected void saveVerbose(
-            final String promptPrefix,
-            final File file,
-            final byte[] encoded)
+    protected void saveVerbose(final String promptPrefix, final File file, final byte[] encoded)
     throws IOException {
         File saveTo = expandFilepath(file);
 
@@ -153,9 +149,7 @@ public abstract class XipkiCommandSupport implements Action {
         println(tmpPromptPrefix + " " + saveTo.getPath());
     } // method saveVerbose
 
-    protected void save(
-            final File file,
-            final byte[] encoded)
+    protected void save(final File file, final byte[] encoded)
     throws IOException {
         File tmpFile = expandFilepath(file);
         File parent = tmpFile.getParentFile();
@@ -171,17 +165,14 @@ public abstract class XipkiCommandSupport implements Action {
         }
     }
 
-    private static String randomHex(
-            final int numOfBytes) {
+    private static String randomHex(final int numOfBytes) {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[numOfBytes];
         random.nextBytes(bytes);
         return new BigInteger(1, bytes).toString(16);
     }
 
-    protected static boolean isEnabled(
-            final String enabledS,
-            final boolean defaultEnabled,
+    protected static boolean isEnabled(final String enabledS, final boolean defaultEnabled,
             final String optionName) {
         if (enabledS == null) {
             return defaultEnabled;
@@ -190,9 +181,7 @@ public abstract class XipkiCommandSupport implements Action {
         return internIsEnabled(enabledS, optionName);
     }
 
-    private static boolean internIsEnabled(
-            final String enabledS,
-            final String optionName) {
+    private static boolean internIsEnabled(final String enabledS, final String optionName) {
         if ("yes".equalsIgnoreCase(enabledS)
                 || "enabled".equalsIgnoreCase(enabledS)
                 || "true".equalsIgnoreCase(enabledS)) {
@@ -206,8 +195,7 @@ public abstract class XipkiCommandSupport implements Action {
         }
     }
 
-    protected String readPrompt(
-            final String prompt)
+    protected String readPrompt(final String prompt)
     throws IOException {
         String tmpPrompt = prompt;
         if (StringUtil.isNotBlank(prompt)) {
@@ -218,8 +206,7 @@ public abstract class XipkiCommandSupport implements Action {
         return readLine(tmpPrompt, null);
     }
 
-    protected char[] readPasswordIfNotSet(
-            final String password)
+    protected char[] readPasswordIfNotSet(final String password)
     throws IOException {
         if (password != null) {
             return password.toCharArray();
@@ -233,8 +220,7 @@ public abstract class XipkiCommandSupport implements Action {
         return readPassword(null);
     }
 
-    protected char[] readPassword(
-            final String prompt)
+    protected char[] readPassword(final String prompt)
     throws IOException {
         String tmpPrompt = (prompt == null)
                 ? "Password:"
@@ -267,54 +253,43 @@ public abstract class XipkiCommandSupport implements Action {
         }
     }
 
-    protected static String expandFilepath(
-            final String path) {
+    protected static String expandFilepath(final String path) {
         return IoUtil.expandFilepath(path);
     }
 
-    protected static File expandFilepath(
-            final File file) {
+    protected static File expandFilepath(final File file) {
         return IoUtil.expandFilepath(file);
     }
 
-    protected void println(
-            final String message) {
+    protected void println(final String message) {
         System.out.println(message);
     }
 
-    protected void print(
-            final String message) {
+    protected void print(final String message) {
         System.out.print(message);
     }
 
-    protected static boolean isBlank(
-            final String str) {
+    protected static boolean isBlank(final String str) {
         return StringUtil.isBlank(str);
     }
 
-    protected static boolean isNotBlank(
-            final String str) {
+    protected static boolean isNotBlank(final String str) {
         return StringUtil.isNotBlank(str);
     }
 
-    protected static boolean isEmpty(
-            final Collection<?> col) {
+    protected static boolean isEmpty(final Collection<?> col) {
         return CollectionUtil.isEmpty(col);
     }
 
-    protected static boolean isNotEmpty(
-            final Collection<?> col) {
+    protected static boolean isNotEmpty(final Collection<?> col) {
         return CollectionUtil.isNonEmpty(col);
     }
 
-    protected static List<String> split(
-            final String str,
-            final String delim) {
+    protected static List<String> split(final String str, final String delim) {
         return StringUtil.split(str, delim);
     }
 
-    protected static BigInteger toBigInt(
-            final String str) {
+    protected static BigInteger toBigInt(final String str) {
         String tmpStr = str.trim();
         if (tmpStr.startsWith("0x") || tmpStr.startsWith("0X")) {
             if (tmpStr.length() > 2) {
@@ -326,9 +301,7 @@ public abstract class XipkiCommandSupport implements Action {
         return new BigInteger(tmpStr);
     }
 
-    protected boolean confirm(
-            final String prompt,
-            final int maxTries)
+    protected boolean confirm(final String prompt, final int maxTries)
     throws IOException {
         String tmpPrompt = prompt;
         if (prompt != null && !prompt.endsWith("\n")) {

@@ -48,19 +48,15 @@ public class OcspRequestorException extends Exception {
     public OcspRequestorException() {
     }
 
-    public OcspRequestorException(
-            final String message) {
+    public OcspRequestorException(final String message) {
         super(message);
     }
 
-    public OcspRequestorException(
-            final Throwable cause) {
+    public OcspRequestorException(final Throwable cause) {
         super(cause);
     }
 
-    public OcspRequestorException(
-            final String message,
-            final Throwable cause) {
+    public OcspRequestorException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

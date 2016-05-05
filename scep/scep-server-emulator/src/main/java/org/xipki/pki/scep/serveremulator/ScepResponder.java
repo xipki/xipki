@@ -123,12 +123,8 @@ public class ScepResponder {
         AES_ENC_ALGS.add(CMSAlgorithm.AES256_GCM);
     }
 
-    public ScepResponder(
-            final CaCaps caCaps,
-            final CaEmulator caEmulator,
-            final RaEmulator raEmulator,
-            final NextCaAndRa nextCaAndRa,
-            final ScepControl control)
+    public ScepResponder(final CaCaps caCaps, final CaEmulator caEmulator,
+            final RaEmulator raEmulator, final NextCaAndRa nextCaAndRa, final ScepControl control)
     throws Exception {
         this.caCaps = ParamUtil.requireNonNull("caCaps", caCaps);
         this.caEmulator = ParamUtil.requireNonNull("caEmulator", caEmulator);
@@ -149,13 +145,11 @@ public class ScepResponder {
     * @param ms signing time bias in milliseconds. non-positive value deactivate
     *        the check of signing time.
     */
-    public void setMaxSigningTimeBias(
-            final long ms) {
+    public void setMaxSigningTimeBias(final long ms) {
         this.maxSigningTimeBiasInMs = ms;
     }
 
-    public ContentInfo servicePkiOperation(
-            final CMSSignedData requestContent,
+    public ContentInfo servicePkiOperation(final CMSSignedData requestContent,
             final AuditEvent auditEvent)
     throws MessageDecodingException, CaException {
         ParamUtil.requireNonNull("requestContent", requestContent);
@@ -214,8 +208,7 @@ public class ScepResponder {
         }
     } // method servicePkiOperation
 
-    public ContentInfo encode(
-            final NextCaMessage nextCaMsg)
+    public ContentInfo encode(final NextCaMessage nextCaMsg)
     throws CaException {
         ParamUtil.requireNonNull("nextCAMsg", nextCaMsg);
         try {
@@ -233,8 +226,7 @@ public class ScepResponder {
         }
     }
 
-    private PkiMessage doServicePkiOperation(
-            final DecodedPkiMessage req,
+    private PkiMessage doServicePkiOperation(final DecodedPkiMessage req,
             final AuditEvent auditEvent)
     throws MessageDecodingException, CaException {
 
@@ -462,8 +454,7 @@ public class ScepResponder {
         return rep;
     } // method doServicePkiOperation
 
-    private ContentInfo createSignedData(
-            final CertificateList crl)
+    private ContentInfo createSignedData(final CertificateList crl)
     throws CaException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         cmsSignedDataGen.addCRL(new X509CRLHolder(crl));
@@ -479,8 +470,7 @@ public class ScepResponder {
 
     }
 
-    private ContentInfo createSignedData(
-            final Certificate cert)
+    private ContentInfo createSignedData(final Certificate cert)
     throws CaException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
 
@@ -527,8 +517,7 @@ public class ScepResponder {
         return nextCaAndRa;
     }
 
-    private static String getChallengePassword(
-            final CertificationRequestInfo p10Req) {
+    private static String getChallengePassword(final CertificationRequestInfo p10Req) {
         ASN1Set attrs = p10Req.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));

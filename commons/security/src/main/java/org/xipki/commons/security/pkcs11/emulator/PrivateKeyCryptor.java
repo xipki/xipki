@@ -74,8 +74,7 @@ class PrivateKeyCryptor {
     private OutputEncryptor encryptor;
     private InputDecryptorProvider decryptorProvider;
 
-    PrivateKeyCryptor(
-            final char[] password)
+    PrivateKeyCryptor(final char[] password)
     throws P11TokenException {
         ParamUtil.requireNonNull("password", password);
         JcePKCSPBEOutputEncryptorBuilder eb = new JcePKCSPBEOutputEncryptorBuilder(ALGO);
@@ -90,8 +89,7 @@ class PrivateKeyCryptor {
         decryptorProvider = db.build(password);
     }
 
-    PrivateKey decrypt(
-            PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo)
+    PrivateKey decrypt(final PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo)
     throws P11TokenException {
         ParamUtil.requireNonNull("encryptedPrivateKeyInfo", encryptedPrivateKeyInfo);
         PrivateKeyInfo privateKeyInfo;
@@ -128,8 +126,7 @@ class PrivateKeyCryptor {
         }
     }
 
-    PKCS8EncryptedPrivateKeyInfo encrypt(
-            final PrivateKey privateKey) {
+    PKCS8EncryptedPrivateKeyInfo encrypt(final PrivateKey privateKey) {
         ParamUtil.requireNonNull("privateKey", privateKey);
         PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(privateKey.getEncoded());
         PKCS8EncryptedPrivateKeyInfoBuilder builder = new PKCS8EncryptedPrivateKeyInfoBuilder(

@@ -44,8 +44,7 @@ package org.xipki.commons.security.exception;
 @SuppressWarnings("serial")
 public class InvalidOidOrNameException extends Exception {
 
-    public InvalidOidOrNameException(
-            final String declaredOidOrName) {
+    public InvalidOidOrNameException(final String declaredOidOrName) {
         super("invalid ObjectIdentifer or name '" + declaredOidOrName + "'");
     }
 

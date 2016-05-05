@@ -121,8 +121,7 @@ public class RequestOptions {
         return useNonce;
     }
 
-    public void setUseNonce(
-            final boolean useNonce) {
+    public void setUseNonce(final boolean useNonce) {
         this.useNonce = useNonce;
     }
 
@@ -130,8 +129,7 @@ public class RequestOptions {
         return nonceLen;
     }
 
-    public void setNonceLen(
-            final int nonceLen) {
+    public void setNonceLen(final int nonceLen) {
         this.nonceLen = ParamUtil.requireMin("nonceLen", nonceLen, 1);
     }
 
@@ -139,8 +137,7 @@ public class RequestOptions {
         return hashAlgorithmId;
     }
 
-    public void setHashAlgorithmId(
-            final ASN1ObjectIdentifier hashAlgorithmId) {
+    public void setHashAlgorithmId(final ASN1ObjectIdentifier hashAlgorithmId) {
         this.hashAlgorithmId = hashAlgorithmId;
     }
 
@@ -153,8 +150,7 @@ public class RequestOptions {
         this.preferredSignatureAlgorithms = Arrays.asList(preferredSignatureAlgorithms);
     }
 
-    public void setPreferredSignatureAlgorithms(
-            final String[] preferredSignatureAlgoNames) {
+    public void setPreferredSignatureAlgorithms(final String[] preferredSignatureAlgoNames) {
         if (preferredSignatureAlgoNames == null || preferredSignatureAlgoNames.length == 0) {
             this.preferredSignatureAlgorithms = null;
             return;
@@ -179,8 +175,7 @@ public class RequestOptions {
         return useHttpGetForRequest;
     }
 
-    public void setUseHttpGetForRequest(
-            final boolean useHttpGetForRequest) {
+    public void setUseHttpGetForRequest(final boolean useHttpGetForRequest) {
         this.useHttpGetForRequest = useHttpGetForRequest;
     }
 
@@ -188,13 +183,11 @@ public class RequestOptions {
         return signRequest;
     }
 
-    public void setSignRequest(
-            final boolean signRequest) {
+    public void setSignRequest(final boolean signRequest) {
         this.signRequest = signRequest;
     }
 
-    private static AlgorithmIdentifier createAlgId(
-            final String algoName) {
+    private static AlgorithmIdentifier createAlgId(final String algoName) {
         ASN1ObjectIdentifier algOid = null;
         if ("SHA1withRSA".equalsIgnoreCase(algoName)) {
             algOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
@@ -242,8 +235,7 @@ public class RequestOptions {
     } // method createAlgId
 
     // CHECKSTYLE:SKIP
-    public static RSASSAPSSparams createPSSRSAParams(
-            final ASN1ObjectIdentifier digestAlgOid) {
+    public static RSASSAPSSparams createPSSRSAParams(final ASN1ObjectIdentifier digestAlgOid) {
         int saltSize;
         if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOid)) {
             saltSize = 20;
