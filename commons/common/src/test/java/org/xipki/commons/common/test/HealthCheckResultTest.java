@@ -166,7 +166,8 @@ public class HealthCheckResultTest {
         check(result, noPrettyJson, prettyJson);
     }
 
-    private static void check(final HealthCheckResult result, final String expNoPrettyJson, final String expPrettyJson) {
+    private static void check(final HealthCheckResult result, final String expNoPrettyJson,
+            final String expPrettyJson) {
         Assert.assertEquals("non-pretty JSON", expNoPrettyJson, result.toJsonMessage(false));
         Assert.assertEquals("pretty JSON", expPrettyJson, result.toJsonMessage(true));
     }

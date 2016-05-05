@@ -125,7 +125,8 @@ public class ConfPairsTest {
         check(pairs, expEncoded, expNameValues);
     }
 
-    private static void check(final ConfPairs confPairs, final String expEncoded, final Map<String, String> expNameValues) {
+    private static void check(final ConfPairs confPairs, final String expEncoded,
+            final Map<String, String> expNameValues) {
         String isEncoded = confPairs.getEncoded();
         Assert.assertEquals("encoded", expEncoded, isEncoded);
 

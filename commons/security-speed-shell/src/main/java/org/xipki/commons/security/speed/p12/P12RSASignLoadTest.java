@@ -51,7 +51,8 @@ import org.xipki.commons.security.pkcs12.P12KeystoreGenerationParameters;
 // CHECKSTYLE:SKIP
 public class P12RSASignLoadTest extends P12SignLoadTest {
 
-    public P12RSASignLoadTest(final SecurityFactory securityFactory, final String signatureAlgorithm, final int keysize, final BigInteger publicExponent)
+    public P12RSASignLoadTest(final SecurityFactory securityFactory,
+            final String signatureAlgorithm, final int keysize, final BigInteger publicExponent)
     throws Exception {
         super(securityFactory, signatureAlgorithm,
                 generateKeystore(keysize, publicExponent),

@@ -198,7 +198,8 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     @Completion(ExtensionNameCompleter.class)
     private List<String> wantExtensionTypes;
 
-    protected abstract ConcurrentContentSigner getSigner(@Nonnull SignatureAlgoControl signatureAlgoControl)
+    protected abstract ConcurrentContentSigner getSigner(
+             @Nonnull SignatureAlgoControl signatureAlgoControl)
     throws Exception;
 
     @Override
@@ -370,7 +371,8 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         return new X500Name(subjectText);
     }
 
-    private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(final List<String> oidTexts)
+    private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
+            final List<String> oidTexts)
     throws InvalidOidOrNameException {
         if (oidTexts == null) {
             return null;
@@ -415,7 +417,9 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         return oid;
     }
 
-    private PKCS10CertificationRequest generateRequest(final ConcurrentContentSigner signer, final SubjectPublicKeyInfo subjectPublicKeyInfo, final X500Name subjectDn, final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
+    private PKCS10CertificationRequest generateRequest(final ConcurrentContentSigner signer,
+            final SubjectPublicKeyInfo subjectPublicKeyInfo, final X500Name subjectDn,
+            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
     throws XiSecurityException {
         ParamUtil.requireNonNull("signer", signer);
         ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);

@@ -50,7 +50,8 @@ import org.xipki.commons.security.pkcs11.P11Slot;
 // CHECKSTYLE:SKIP
 public class P11RSASignLoadTest extends P11SignLoadTest {
 
-    public P11RSASignLoadTest(final SecurityFactory securityFactory, final P11Slot slot, final String signatureAlgorithm, final int keysize, final BigInteger publicExponent)
+    public P11RSASignLoadTest(final SecurityFactory securityFactory, final P11Slot slot,
+            final String signatureAlgorithm, final int keysize, final BigInteger publicExponent)
     throws Exception {
         super(securityFactory, slot, signatureAlgorithm,
                 generateKey(slot, keysize, publicExponent),
@@ -59,7 +60,8 @@ public class P11RSASignLoadTest extends P11SignLoadTest {
                         + "public exponent: " + publicExponent);
     }
 
-    private static P11ObjectIdentifier generateKey(final P11Slot slot, final int keysize, final BigInteger publicExponent)
+    private static P11ObjectIdentifier generateKey(final P11Slot slot, final int keysize,
+            final BigInteger publicExponent)
     throws Exception {
         ParamUtil.requireNonNull("slot", slot);
         return slot.generateRSAKeypair(
