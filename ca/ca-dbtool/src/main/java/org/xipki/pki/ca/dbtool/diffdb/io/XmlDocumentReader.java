@@ -85,7 +85,7 @@ public class XmlDocumentReader {
         db.setEntityResolver(new EntityResolver() {
             @Override
             public InputSource resolveEntity(final String publicId, final String systemId)
-            throws SAXException, IOException { // XIPKI-CODECHECK:IGNORE
+            throws SAXException, IOException {
                 return new InputSource(new StringReader(""));
             }
         });
