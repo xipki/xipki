@@ -77,8 +77,7 @@ public class CopyFileCmd extends XipkiCommandSupport {
     private Boolean recursive = Boolean.FALSE;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         File sourceFile = new File(expandFilepath(source));
         if (!sourceFile.exists()) {
             System.err.println(source + " does not exist");

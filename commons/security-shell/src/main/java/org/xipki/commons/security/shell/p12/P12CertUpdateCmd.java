@@ -80,8 +80,7 @@ public class P12CertUpdateCmd extends P12SecurityCommandSupport {
     private Set<String> caCertFiles;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         KeyStore ks = getKeyStore();
 
         char[] pwd = getPassword();

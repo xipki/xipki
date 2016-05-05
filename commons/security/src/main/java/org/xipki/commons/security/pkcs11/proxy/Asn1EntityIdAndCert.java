@@ -83,16 +83,14 @@ public class Asn1EntityIdAndCert extends ASN1Object {
         this.certificate = Certificate.getInstance(encoded);
     }
 
-    private Asn1EntityIdAndCert(final ASN1Sequence seq)
-    throws BadAsn1ObjectException {
+    private Asn1EntityIdAndCert(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
         this.entityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
         this.certificate = Asn1Util.getCertificate(seq.getObjectAt(idx++));
     }
 
-    public static Asn1EntityIdAndCert getInstance(final Object obj)
-    throws BadAsn1ObjectException {
+    public static Asn1EntityIdAndCert getInstance(final Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1EntityIdAndCert) {
             return (Asn1EntityIdAndCert) obj;
         }

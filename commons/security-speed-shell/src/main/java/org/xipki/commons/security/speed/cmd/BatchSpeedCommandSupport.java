@@ -66,12 +66,10 @@ public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
             description = "number of threads")
     private Integer numThreads = 5;
 
-    protected abstract LoadExecutor nextTester()
-    throws Exception;
+    protected abstract LoadExecutor nextTester() throws Exception;
 
     @Override
-    protected Object doExecute()
-    throws InterruptedException {
+    protected Object doExecute() throws InterruptedException {
         while (true) {
             println("============================================");
             LoadExecutor tester;

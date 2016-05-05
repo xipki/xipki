@@ -90,8 +90,6 @@ public class CanonicalizeCode {
             + " * address: lijun.liao@gmail.com\n"
             + " */\n\n";
 
-    private static final String THROWS_PREFIX = "    ";
-
     private final String baseDir;
 
     private final int baseDirLen;
@@ -114,13 +112,11 @@ public class CanonicalizeCode {
         }
     }
 
-    private void canonicalize()
-    throws Exception {
+    private void canonicalize() throws Exception {
         canonicalizeDir(new File(baseDir));
     }
 
-    private void canonicalizeDir(final File dir)
-    throws Exception {
+    private void canonicalizeDir(final File dir) throws Exception {
         File[] files = dir.listFiles();
         if (files == null) {
             return;
@@ -147,8 +143,7 @@ public class CanonicalizeCode {
         }
     } // method canonicalizeDir
 
-    private void canonicalizeFile(final File file)
-    throws Exception {
+    private void canonicalizeFile(final File file) throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
@@ -214,13 +209,11 @@ public class CanonicalizeCode {
         }
     } // method canonicalizeJavaFile
 
-    private void checkWarnings()
-    throws Exception {
+    private void checkWarnings() throws Exception {
         checkWarningsInDir(new File(baseDir));
     }
 
-    private void checkWarningsInDir(final File dir)
-    throws Exception {
+    private void checkWarningsInDir(final File dir) throws Exception {
         File[] files = dir.listFiles();
         if (files == null) {
             return;
@@ -250,8 +243,7 @@ public class CanonicalizeCode {
         }
     } // method checkWarningsInDir
 
-    private void checkWarningsInFile(final File file)
-    throws Exception {
+    private void checkWarningsInFile(final File file) throws Exception {
         if (file.getName().equals("package-info.java")) {
             return;
         }
@@ -265,7 +257,6 @@ public class CanonicalizeCode {
 
         int lineNumber = 0;
         try {
-            String lastLine = null;
             String line;
             while ((line = reader.readLine()) != null) {
                 if (lineNumber == 0 && line.startsWith("// #THIRDPARTY")) {
@@ -275,86 +266,6 @@ public class CanonicalizeCode {
                 if (!authorsLineAvailable && line.contains("* @author")) {
                     authorsLineAvailable = true;
                 }
-
-                lineNumber++;
-                int idx = line.indexOf("throws");
-                if (idx == -1) {
-                    lastLine = line;
-
-                    if (line.endsWith("+") || line.endsWith("|")
-                            || line.endsWith("&")) {
-                        addLineNumber(line, lineNumber, lineNumbers);
-                        continue;
-                    } else if (line.contains("?")
-                            && line.contains(" :")) {
-                        addLineNumber(line, lineNumber, lineNumbers);
-                        continue;
-                    } else {
-                        // check whether the number of leading spaces is multiple of 4
-                        int numLeadingSpaces = 0;
-                        char ch = 'Z';
-                        for (int i = 0; i < line.length(); i++) {
-                            if (line.charAt(i) == ' ') {
-                                numLeadingSpaces++;
-                            } else {
-                                ch = line.charAt(i);
-                                break;
-                            }
-                        }
-
-                        if (ch != '*' && numLeadingSpaces % 4 != 0) {
-                            addLineNumber(line, lineNumber, lineNumbers);
-                        }
-                    }
-
-                    String trimmedLine = line.trim();
-                    if (trimmedLine.startsWith("extends") || trimmedLine.startsWith("implements")) {
-                        addLineNumber(line, lineNumber, lineNumbers);
-                    } else if (trimmedLine.endsWith(";;")) {
-                        addLineNumber(line, lineNumber, lineNumbers);
-
-                    } else {
-                        int idxSpaces = trimmedLine.indexOf("  ");
-                        if (idxSpaces != -1) {
-                            char pc = trimmedLine.charAt(idxSpaces - 1);
-                            if (pc != '"' && pc != '*') {
-                                addLineNumber(line, lineNumber, lineNumbers);
-
-                            }
-                        }
-                    }
-
-                    continue;
-                } // end if (idx == -1)
-
-                if (idx > 0 && line.charAt(idx - 1) == '@' || line.charAt(idx - 1) == '"'
-                        || line.endsWith("XIPKI-CODECHECK:IGNORE")) {
-                    lastLine = line;
-                    continue;
-                }
-
-                String prefix = line.substring(0, idx);
-
-                if (!prefix.equals(THROWS_PREFIX)) {
-                    // consider inner-class
-                    if ((THROWS_PREFIX + THROWS_PREFIX).equals(prefix)) {
-                        if (lastLine != null) {
-                            String trimmedLastLine = lastLine.trim();
-                            int idx2 = lastLine.indexOf(trimmedLastLine);
-                            if (idx2 == 2 * THROWS_PREFIX.length()) {
-                                continue;
-                            }
-
-                            if (idx2 == 4 * THROWS_PREFIX.length()
-                                    && trimmedLastLine.startsWith("final ")) {
-                                continue;
-                            }
-                        }
-                    }
-                    addLineNumber(line, lineNumber, lineNumbers);
-                }
-
-                lastLine = line;
             } // end while
         } finally {
             reader.close();
@@ -424,12 +335,5 @@ public class CanonicalizeCode {
             return line.substring(0, idx + 1);
         }
     } // method removeTrailingSpaces
-
-    private void addLineNumber(final String line, final int lineNumber,
-            final List<Integer> lineNumbers) {
-        if (!line.endsWith("XIPKI-CODECHECK:IGNORE")) {
-            lineNumbers.add(lineNumber);
-        }
-    }
 
 }

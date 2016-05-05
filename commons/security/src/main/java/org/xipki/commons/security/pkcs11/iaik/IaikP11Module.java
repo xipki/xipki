@@ -131,8 +131,7 @@ public class IaikP11Module extends AbstractP11Module {
         setSlots(slots);
     }
 
-    public static P11Module getInstance(final P11ModuleConf moduleConf)
-    throws P11TokenException {
+    public static P11Module getInstance(final P11ModuleConf moduleConf) throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
 
         Module module;

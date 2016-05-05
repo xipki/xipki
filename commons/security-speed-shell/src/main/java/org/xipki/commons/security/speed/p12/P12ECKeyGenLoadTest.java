@@ -67,8 +67,7 @@ public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
     }
 
     @Override
-    protected void generateKeypair(final SecureRandom random)
-    throws Exception {
+    protected void generateKeypair(final SecureRandom random) throws Exception {
         KeyUtil.generateECKeypair(curveOid, random);
 
     }

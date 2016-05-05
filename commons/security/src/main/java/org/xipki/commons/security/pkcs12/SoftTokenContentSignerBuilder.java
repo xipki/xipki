@@ -107,8 +107,7 @@ public class SoftTokenContentSignerBuilder {
         }
 
         protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
-                final AlgorithmIdentifier digAlgId)
-        throws OperatorCreationException {
+                final AlgorithmIdentifier digAlgId) throws OperatorCreationException {
             if (!AlgorithmUtil.isRSASignatureAlgoId(sigAlgId)) {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid RSA signature algirthm '"
@@ -153,15 +152,13 @@ public class SoftTokenContentSignerBuilder {
         private final boolean plain;
 
         private DSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
-                final boolean plain)
-        throws NoSuchAlgorithmException {
+                final boolean plain) throws NoSuchAlgorithmException {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
             this.plain = plain;
         }
 
         protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
-                final AlgorithmIdentifier digAlgId)
-        throws OperatorCreationException {
+                final AlgorithmIdentifier digAlgId) throws OperatorCreationException {
             if (!AlgorithmUtil.isDSASigAlg(sigAlgId)) {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid DSA signature algirthm '"
@@ -185,15 +182,13 @@ public class SoftTokenContentSignerBuilder {
         private final boolean plain;
 
         private ECDSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
-                final boolean plain)
-        throws NoSuchAlgorithmException {
+                final boolean plain) throws NoSuchAlgorithmException {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
             this.plain = plain;
         }
 
         protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
-                final AlgorithmIdentifier digAlgId)
-        throws OperatorCreationException {
+                final AlgorithmIdentifier digAlgId) throws OperatorCreationException {
             if (!AlgorithmUtil.isECSigAlg(sigAlgId)) {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid EC signature algirthm '"

@@ -82,8 +82,7 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
         this.publicExponent = publicExponent;
     }
 
-    private Asn1GenRSAKeypairParams(final ASN1Sequence seq)
-    throws BadAsn1ObjectException {
+    private Asn1GenRSAKeypairParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 3, 4);
         final int size = seq.size();
         int idx = 0;

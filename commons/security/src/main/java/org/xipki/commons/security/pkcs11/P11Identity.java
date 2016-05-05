@@ -118,8 +118,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     }
 
     protected abstract byte[] doSign(final long mechanism, @Nullable final P11Params parameters,
-            @Nonnull final byte[] content)
-    throws P11TokenException, XiSecurityException;
+            @Nonnull final byte[] content) throws P11TokenException, XiSecurityException;
 
     public P11EntityIdentifier getIdentityId() {
         return identityId;
@@ -141,8 +140,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         return publicKey;
     }
 
-    public void setCertificates(final X509Certificate[] certificateChain)
-    throws P11TokenException {
+    public void setCertificates(final X509Certificate[] certificateChain) throws P11TokenException {
         if (certificateChain == null || certificateChain.length == 0) {
             this.certificateChain = null;
         } else {

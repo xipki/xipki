@@ -77,8 +77,7 @@ public class P11ObjectsDeleteCmd extends SecurityCommandSupport {
     protected String moduleName = DEFAULT_P11MODULE_NAME;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         P11Slot slot = getSlot(moduleName, slotIndex);
         byte[] idBytes = null;
         if (id != null) {

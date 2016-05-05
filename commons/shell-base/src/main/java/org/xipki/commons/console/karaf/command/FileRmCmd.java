@@ -73,8 +73,7 @@ public class FileRmCmd extends XipkiCommandSupport {
     private Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         File target = new File(expandFilepath(targetPath));
         if (!target.exists()) {
             return null;

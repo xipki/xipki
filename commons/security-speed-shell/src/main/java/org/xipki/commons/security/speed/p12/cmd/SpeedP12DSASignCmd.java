@@ -62,8 +62,7 @@ public class SpeedP12DSASignCmd extends SpeedP12SignCommandSupport {
     private Integer qlen;
 
     @Override
-    protected LoadExecutor getTester()
-    throws Exception {
+    protected LoadExecutor getTester() throws Exception {
         if (qlen == null) {
             if (plen >= 2048) {
                 qlen = 256;

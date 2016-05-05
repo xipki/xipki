@@ -126,8 +126,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     @Override
     public ConcurrentContentSigner createSigner(final String type, final SignerConf conf,
-            final X509Certificate[] certificateChain)
-    throws ObjectCreationException {
+            final X509Certificate[] certificateChain) throws ObjectCreationException {
         ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf,
                 certificateChain);
         validateSigner(signer, type, conf);
@@ -220,8 +219,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     @Override
     public KeyCertPair createPrivateKeyAndCert(final String type, final SignerConf conf,
-            final X509Certificate cert)
-    throws ObjectCreationException {
+            final X509Certificate cert) throws ObjectCreationException {
         conf.putConfEntry("parallelism", Integer.toString(1));
 
         X509Certificate[] certs = null;
@@ -330,8 +328,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     private static void validateSigner(final ConcurrentContentSigner signer,
-            final String signerType, final SignerConf signerConf)
-    throws ObjectCreationException {
+            final String signerType, final SignerConf signerConf) throws ObjectCreationException {
         if (signer.getPublicKey() == null) {
             return;
         }

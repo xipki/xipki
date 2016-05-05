@@ -279,8 +279,7 @@ public class PkiMessage {
 
     public ContentInfo encode(final ContentSigner signer, final X509Certificate signerCert,
             final X509Certificate[] cmsCertSet, final X509Certificate recipientCert,
-            final ASN1ObjectIdentifier encAlgId)
-    throws MessageEncodingException {
+            final ASN1ObjectIdentifier encAlgId) throws MessageEncodingException {
         ParamUtil.requireNonNull("signer", signer);
         ParamUtil.requireNonNull("signerCert", signerCert);
         ParamUtil.requireNonNull("recipientCert", recipientCert);
@@ -339,8 +338,7 @@ public class PkiMessage {
     } // method encode
 
     private CMSEnvelopedData encrypt(final X509Certificate recipient,
-            final ASN1ObjectIdentifier encAlgId)
-    throws MessageEncodingException {
+            final ASN1ObjectIdentifier encAlgId) throws MessageEncodingException {
         ParamUtil.requireNonNull("recipient", recipient);
         ParamUtil.requireNonNull("encAlgId", encAlgId);
 

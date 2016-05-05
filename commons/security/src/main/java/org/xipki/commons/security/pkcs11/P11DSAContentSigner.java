@@ -159,8 +159,7 @@ class P11DSAContentSigner implements ContentSigner {
         }
     }
 
-    private byte[] getPlainSignature()
-    throws XiSecurityException, P11TokenException {
+    private byte[] getPlainSignature() throws XiSecurityException, P11TokenException {
         byte[] dataToSign;
         if (outputStream instanceof ByteArrayOutputStream) {
             dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();

@@ -103,8 +103,7 @@ public class FilePasswordCallback implements PasswordCallback {
     } // method getPassword
 
     @Override
-    public void init(final String conf)
-    throws PasswordResolverException {
+    public void init(final String conf) throws PasswordResolverException {
         ParamUtil.requireNonBlank("conf", conf);
         ConfPairs pairs = new ConfPairs(conf);
         passwordFile = pairs.getValue("file");

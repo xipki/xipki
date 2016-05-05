@@ -62,7 +62,6 @@ public interface SignerFactory {
      * @throws ObjectCreationException if signer could not be created.
      */
     ConcurrentContentSigner newSigner(@Nonnull String type, @Nullable SignerConf conf,
-            @Nullable X509Certificate[] certificateChain)
-    throws ObjectCreationException;
+            @Nullable X509Certificate[] certificateChain) throws ObjectCreationException;
 
 }

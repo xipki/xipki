@@ -66,8 +66,7 @@ public class BSpeedP12ECKeyGenCmd extends BatchSpeedCommandSupport {
     }
 
     @Override
-    protected LoadExecutor nextTester()
-    throws Exception {
+    protected LoadExecutor nextTester() throws Exception {
         ECControl control = queue.takeFirst();
         if (control == null) {
             return null;

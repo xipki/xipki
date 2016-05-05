@@ -59,20 +59,17 @@ public class DigestOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(final byte[] bytes, final int off, final int len)
-    throws IOException {
+    public void write(final byte[] bytes, final int off, final int len) throws IOException {
         digest.update(bytes, off, len);
     }
 
     @Override
-    public void write(final byte[] bytes)
-    throws IOException {
+    public void write(final byte[] bytes) throws IOException {
         digest.update(bytes, 0, bytes.length);
     }
 
     @Override
-    public void write(final int oneByte)
-    throws IOException {
+    public void write(final int oneByte) throws IOException {
         digest.update((byte) oneByte);
     }
 

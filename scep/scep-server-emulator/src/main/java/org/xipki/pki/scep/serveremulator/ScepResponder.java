@@ -150,8 +150,7 @@ public class ScepResponder {
     }
 
     public ContentInfo servicePkiOperation(final CMSSignedData requestContent,
-            final AuditEvent auditEvent)
-    throws MessageDecodingException, CaException {
+            final AuditEvent auditEvent) throws MessageDecodingException, CaException {
         ParamUtil.requireNonNull("requestContent", requestContent);
         PrivateKey recipientKey = (raEmulator != null)
                 ? raEmulator.getRaKey()
@@ -208,8 +207,7 @@ public class ScepResponder {
         }
     } // method servicePkiOperation
 
-    public ContentInfo encode(final NextCaMessage nextCaMsg)
-    throws CaException {
+    public ContentInfo encode(final NextCaMessage nextCaMsg) throws CaException {
         ParamUtil.requireNonNull("nextCAMsg", nextCaMsg);
         try {
             X509Certificate jceSignerCert = new X509CertificateObject(getSigningCert());
@@ -227,8 +225,7 @@ public class ScepResponder {
     }
 
     private PkiMessage doServicePkiOperation(final DecodedPkiMessage req,
-            final AuditEvent auditEvent)
-    throws MessageDecodingException, CaException {
+            final AuditEvent auditEvent) throws MessageDecodingException, CaException {
 
         TransactionId tid = req.getTransactionId();
         PkiMessage rep = new PkiMessage(tid, MessageType.CertRep, Nonce.randomNonce());
@@ -454,8 +451,7 @@ public class ScepResponder {
         return rep;
     } // method doServicePkiOperation
 
-    private ContentInfo createSignedData(final CertificateList crl)
-    throws CaException {
+    private ContentInfo createSignedData(final CertificateList crl) throws CaException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         cmsSignedDataGen.addCRL(new X509CRLHolder(crl));
 
@@ -470,8 +466,7 @@ public class ScepResponder {
 
     }
 
-    private ContentInfo createSignedData(final Certificate cert)
-    throws CaException {
+    private ContentInfo createSignedData(final Certificate cert) throws CaException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
 
         CMSSignedData cmsSigneddata;

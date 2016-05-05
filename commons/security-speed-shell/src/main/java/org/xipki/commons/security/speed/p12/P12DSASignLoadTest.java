@@ -60,8 +60,7 @@ public class P12DSASignLoadTest extends P12SignLoadTest {
                     + "qlength: " + qlength);
     }
 
-    private static byte[] generateKeystore(final int plength, final int qlength)
-    throws Exception {
+    private static byte[] generateKeystore(final int plength, final int qlength) throws Exception {
         byte[] keystoreBytes = getPrecomputedDSAKeystore(plength, qlength);
         if (keystoreBytes == null) {
             P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(

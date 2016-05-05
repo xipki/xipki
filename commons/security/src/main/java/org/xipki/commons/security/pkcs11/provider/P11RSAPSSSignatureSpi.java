@@ -228,8 +228,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
         setupContentDigest();
     }
 
-    protected void engineInitVerify(final PublicKey publicKey)
-    throws InvalidKeyException {
+    protected void engineInitVerify(final PublicKey publicKey) throws InvalidKeyException {
         throw new UnsupportedOperationException("engineInitVerify unsupported");
     }
 
@@ -260,14 +259,12 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected void engineInitSign(final PrivateKey privateKey)
-    throws InvalidKeyException {
+    protected void engineInitSign(final PrivateKey privateKey) throws InvalidKeyException {
         engineInitSign(privateKey, null);
     }
 
     @Override
-    protected void engineUpdate(final byte input)
-    throws SignatureException {
+    protected void engineUpdate(final byte input) throws SignatureException {
         pss.update(input);
     }
 
@@ -278,8 +275,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected byte[] engineSign()
-    throws SignatureException {
+    protected byte[] engineSign() throws SignatureException {
         try {
             return pss.generateSignature();
         } catch (CryptoException ex) {
@@ -288,8 +284,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     }
 
     @Override
-    protected boolean engineVerify(final byte[] sigBytes)
-    throws SignatureException {
+    protected boolean engineVerify(final byte[] sigBytes) throws SignatureException {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 

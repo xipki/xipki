@@ -78,20 +78,17 @@ class P11RSAPSSContentSigner implements ContentSigner {
         }
 
         @Override
-        public void write(final int oneByte)
-        throws IOException {
+        public void write(final int oneByte) throws IOException {
             pssSigner.update((byte) oneByte);
         }
 
         @Override
-        public void write(final byte[] bytes)
-        throws IOException {
+        public void write(final byte[] bytes) throws IOException {
             pssSigner.update(bytes, 0, bytes.length);
         }
 
         @Override
-        public void write(final byte[] bytes, final int off, final int len)
-        throws IOException {
+        public void write(final byte[] bytes, final int off, final int len) throws IOException {
             pssSigner.update(bytes, off, len);
         }
 
@@ -100,17 +97,14 @@ class P11RSAPSSContentSigner implements ContentSigner {
         }
 
         @Override
-        public void flush()
-        throws IOException {
+        public void flush() throws IOException {
         }
 
         @Override
-        public void close()
-        throws IOException {
+        public void close() throws IOException {
         }
 
-        byte[] generateSignature()
-        throws DataLengthException, CryptoException {
+        byte[] generateSignature() throws DataLengthException, CryptoException {
             byte[] signature = pssSigner.generateSignature();
             pssSigner.reset();
             return signature;

@@ -65,8 +65,7 @@ public class ObfuscateCmd extends SecurityCommandSupport {
     private Integer quorum = 1;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         ParamUtil.requireRange("k", quorum, 1, 10);
 
         char[] password;

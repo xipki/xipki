@@ -71,8 +71,7 @@ public class Asn1RSAPkcsPssParams extends ASN1Object {
         this.pkcsPssParams = ParamUtil.requireNonNull("pkcsPssParams", pkcsPssParams);
     }
 
-    private Asn1RSAPkcsPssParams(final ASN1Sequence seq)
-    throws BadAsn1ObjectException {
+    private Asn1RSAPkcsPssParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 3, 3);
         int idx = 0;
         long contentHash = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
@@ -81,8 +80,7 @@ public class Asn1RSAPkcsPssParams extends ASN1Object {
         this.pkcsPssParams = new P11RSAPkcsPssParams(contentHash, mgfHash, saltLength);
     } // constructor
 
-    public static Asn1RSAPkcsPssParams getInstance(final Object obj)
-    throws BadAsn1ObjectException {
+    public static Asn1RSAPkcsPssParams getInstance(final Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1RSAPkcsPssParams) {
             return (Asn1RSAPkcsPssParams) obj;
         }

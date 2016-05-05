@@ -63,16 +63,13 @@ public interface SecurityFactory {
     PasswordResolver getPasswordResolver();
 
     KeyCertPair createPrivateKeyAndCert(@Nonnull String type, @Nullable SignerConf conf,
-            @Nullable X509Certificate cert)
-    throws ObjectCreationException;
+            @Nullable X509Certificate cert) throws ObjectCreationException;
 
     ConcurrentContentSigner createSigner(@Nonnull String type, @Nullable SignerConf conf,
-            @Nullable X509Certificate cert)
-    throws ObjectCreationException;
+            @Nullable X509Certificate cert) throws ObjectCreationException;
 
     ConcurrentContentSigner createSigner(@Nonnull String type, @Nullable SignerConf conf,
-            @Nullable X509Certificate[] certs)
-    throws ObjectCreationException;
+            @Nullable X509Certificate[] certs) throws ObjectCreationException;
 
     ContentVerifierProvider getContentVerifierProvider(@Nonnull PublicKey publicKey)
     throws InvalidKeyException;
@@ -92,8 +89,7 @@ public interface SecurityFactory {
 
     byte[] extractMinimalKeyStore(@Nonnull String keystoreType, @Nonnull byte[] keystoreBytes,
             @Nullable String keyname, @Nonnull char[] password,
-            @Nullable X509Certificate[] newCertChain)
-    throws KeyStoreException;
+            @Nullable X509Certificate[] newCertChain) throws KeyStoreException;
 
     SecureRandom getRandom4Sign();
 

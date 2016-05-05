@@ -61,8 +61,7 @@ public class OBFPasswordCallback implements PasswordCallback {
     }
 
     @Override
-    public void init(final String conf)
-    throws PasswordResolverException {
+    public void init(final String conf) throws PasswordResolverException {
         ParamUtil.requireNonBlank("conf", conf);
         this.password = OBFPasswordService.deobfuscate(conf).toCharArray();
     }
