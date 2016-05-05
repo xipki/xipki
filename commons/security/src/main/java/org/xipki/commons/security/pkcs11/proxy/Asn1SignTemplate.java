@@ -69,8 +69,7 @@ public class Asn1SignTemplate extends ASN1Object {
 
     private final byte[] message;
 
-    private Asn1SignTemplate(final ASN1Sequence seq)
-    throws BadAsn1ObjectException {
+    private Asn1SignTemplate(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 3, 3);
         int idx = 0;
         this.identityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
@@ -85,8 +84,7 @@ public class Asn1SignTemplate extends ASN1Object {
         this.mechanism = new Asn1Mechanism(mechanism, parameter);
     }
 
-    public static Asn1SignTemplate getInstance(final Object obj)
-    throws BadAsn1ObjectException {
+    public static Asn1SignTemplate getInstance(final Object obj) throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1SignTemplate) {
             return (Asn1SignTemplate) obj;
         }

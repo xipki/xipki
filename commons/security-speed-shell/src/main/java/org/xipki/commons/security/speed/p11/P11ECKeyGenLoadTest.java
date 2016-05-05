@@ -49,8 +49,7 @@ public class P11ECKeyGenLoadTest extends P11KeyGenLoadTest {
 
     private final String curveNameOrOid;
 
-    public P11ECKeyGenLoadTest(final P11Slot slot, final String curveNameOrOid)
-    throws Exception {
+    public P11ECKeyGenLoadTest(final P11Slot slot, final String curveNameOrOid) throws Exception {
         super(slot,
                 "PKCS#11 EC key generation\n"
                         + "curve: " + curveNameOrOid);
@@ -58,8 +57,7 @@ public class P11ECKeyGenLoadTest extends P11KeyGenLoadTest {
     }
 
     @Override
-    protected void genKeypair()
-    throws Exception {
+    protected void genKeypair() throws Exception {
         P11ObjectIdentifier objId = slot.generateECKeypair(curveNameOrOid, getDummyLabel());
         slot.removeIdentity(objId);
     }

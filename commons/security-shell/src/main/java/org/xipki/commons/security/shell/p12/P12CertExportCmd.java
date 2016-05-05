@@ -66,8 +66,7 @@ public class P12CertExportCmd extends P12SecurityCommandSupport {
     private String outFile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         KeyStore ks = getKeyStore();
 
         String keyname = null;

@@ -55,8 +55,7 @@ import org.xipki.pki.ca.client.api.PkiErrorException;
 public class GenCrlCmd extends CrlCommandSupport {
 
     @Override
-    protected X509CRL retrieveCrl()
-    throws CaClientException, PkiErrorException {
+    protected X509CRL retrieveCrl() throws CaClientException, PkiErrorException {
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
             return caClient.generateCrl(caName, debug);

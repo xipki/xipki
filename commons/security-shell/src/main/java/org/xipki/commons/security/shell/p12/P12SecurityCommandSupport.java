@@ -67,8 +67,7 @@ public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
             description = "password of the PKCS#12 file")
     protected String password;
 
-    protected char[] getPassword()
-    throws IOException {
+    protected char[] getPassword() throws IOException {
         char[] pwdInChar = readPasswordIfNotSet(password);
         if (pwdInChar != null) {
             password = new String(pwdInChar);

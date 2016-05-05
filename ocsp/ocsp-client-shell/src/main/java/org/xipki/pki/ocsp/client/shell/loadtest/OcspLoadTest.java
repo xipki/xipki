@@ -170,8 +170,7 @@ public class OcspLoadTest extends LoadExecutor {
     }
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
+    protected Runnable getTestor() throws Exception {
         return new Testor();
     }
 

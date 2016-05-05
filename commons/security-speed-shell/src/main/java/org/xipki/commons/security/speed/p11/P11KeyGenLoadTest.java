@@ -74,16 +74,14 @@ public abstract class P11KeyGenLoadTest extends LoadExecutor {
         this.slot = ParamUtil.requireNonNull("slot", slot);
     }
 
-    protected abstract void genKeypair()
-    throws Exception;
+    protected abstract void genKeypair() throws Exception;
 
     protected String getDummyLabel() {
         return "loadtest-" + idx.getAndIncrement();
     }
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
+    protected Runnable getTestor() throws Exception {
         return new Testor();
     }
 

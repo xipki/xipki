@@ -87,8 +87,7 @@ public class Asn1Util {
         }
     }
 
-    public static BigInteger getInteger(final ASN1Encodable object)
-    throws BadAsn1ObjectException {
+    public static BigInteger getInteger(final ASN1Encodable object) throws BadAsn1ObjectException {
         try {
             return ASN1Integer.getInstance(object).getValue();
         } catch (IllegalArgumentException ex) {
@@ -97,8 +96,7 @@ public class Asn1Util {
         }
     }
 
-    public static String getUtf8String(final ASN1Encodable object)
-    throws BadAsn1ObjectException {
+    public static String getUtf8String(final ASN1Encodable object) throws BadAsn1ObjectException {
         try {
             return DERUTF8String.getInstance(object).getString();
         } catch (IllegalArgumentException ex) {

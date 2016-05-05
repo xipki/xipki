@@ -69,12 +69,10 @@ public abstract class CrlCommandSupport extends ClientCommandSupport {
     @Completion(FilePathCompleter.class)
     protected String outFile;
 
-    protected abstract X509CRL retrieveCrl()
-    throws CaClientException, PkiErrorException;
+    protected abstract X509CRL retrieveCrl() throws CaClientException, PkiErrorException;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         Set<String> caNames = caClient.getCaNames();
         if (isEmpty(caNames)) {
             throw new CmdFailure("no CA is configured");

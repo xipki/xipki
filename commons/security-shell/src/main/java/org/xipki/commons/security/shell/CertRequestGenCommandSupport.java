@@ -199,12 +199,10 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     private List<String> wantExtensionTypes;
 
     protected abstract ConcurrentContentSigner getSigner(
-             @Nonnull SignatureAlgoControl signatureAlgoControl)
-    throws Exception;
+             @Nonnull SignatureAlgoControl signatureAlgoControl) throws Exception;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         hashAlgo = hashAlgo.trim().toUpperCase();
         if (hashAlgo.indexOf('-') != -1) {
             hashAlgo = hashAlgo.replaceAll("-", "");
@@ -372,8 +370,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     }
 
     private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
-            final List<String> oidTexts)
-    throws InvalidOidOrNameException {
+            final List<String> oidTexts) throws InvalidOidOrNameException {
         if (oidTexts == null) {
             return null;
         }
@@ -392,8 +389,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         return ret;
     }
 
-    private static ASN1ObjectIdentifier toOid(final String str)
-    throws InvalidOidOrNameException {
+    private static ASN1ObjectIdentifier toOid(final String str) throws InvalidOidOrNameException {
         final int n = str.length();
         boolean isName = false;
         for (int i = 0; i < n; i++) {
@@ -419,8 +415,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
     private PKCS10CertificationRequest generateRequest(final ConcurrentContentSigner signer,
             final SubjectPublicKeyInfo subjectPublicKeyInfo, final X500Name subjectDn,
-            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
-    throws XiSecurityException {
+            final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes) throws XiSecurityException {
         ParamUtil.requireNonNull("signer", signer);
         ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
         ParamUtil.requireNonNull("subjectDn", subjectDn);

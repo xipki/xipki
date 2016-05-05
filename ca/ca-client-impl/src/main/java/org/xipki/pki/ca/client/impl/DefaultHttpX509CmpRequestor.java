@@ -89,8 +89,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
     }
 
     @Override
-    public byte[] send(final byte[] request)
-    throws IOException {
+    public byte[] send(final byte[] request) throws IOException {
         ParamUtil.requireNonNull("request", request);
 
         HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();

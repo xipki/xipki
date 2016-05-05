@@ -91,8 +91,7 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
             description = "password of the PKCS#12 file")
     private String password;
 
-    private char[] getPassword()
-    throws IOException {
+    private char[] getPassword() throws IOException {
         char[] pwdInChar = readPasswordIfNotSet(password);
         if (pwdInChar != null) {
             password = new String(pwdInChar);

@@ -75,12 +75,10 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
     protected abstract EnrolmentResponse requestCertificate(@Nonnull ScepClient client,
             @Nonnull CertificationRequest csr, @Nonnull PrivateKey identityKey,
-            @Nonnull X509Certificate identityCert)
-    throws ScepClientException;
+            @Nonnull X509Certificate identityCert) throws ScepClientException;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         ScepClient client = getScepClient();
 
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));

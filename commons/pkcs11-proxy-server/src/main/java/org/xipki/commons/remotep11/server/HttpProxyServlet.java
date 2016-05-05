@@ -191,8 +191,7 @@ public class HttpProxyServlet extends HttpServlet {
         }
     } // method doPost
 
-    protected PKIMessage generatePkiMessage(final InputStream is)
-    throws BadAsn1ObjectException {
+    protected PKIMessage generatePkiMessage(final InputStream is) throws BadAsn1ObjectException {
         ParamUtil.requireNonNull("is", is);
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 

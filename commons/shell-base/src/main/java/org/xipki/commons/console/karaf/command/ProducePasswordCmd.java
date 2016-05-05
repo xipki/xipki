@@ -64,8 +64,7 @@ public class ProducePasswordCmd extends XipkiCommandSupport {
     private Integer quorum = 1;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (!PasswordProducer.needsPassword(name)) {
             throw new IllegalCmdParamException("password named '" + name
                     + "' will not be requested");

@@ -66,8 +66,7 @@ public class P11CertExportCmd extends P11SecurityCommandSupport {
     private String outFile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objIdentifier = getObjectIdentifier();
         X509Certificate cert = slot.exportCert(objIdentifier);

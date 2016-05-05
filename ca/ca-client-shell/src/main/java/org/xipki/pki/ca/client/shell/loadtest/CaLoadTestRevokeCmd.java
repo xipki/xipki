@@ -97,8 +97,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
     private SecurityFactory securityFactory;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (numThreads < 1) {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }

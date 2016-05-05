@@ -63,8 +63,7 @@ public class P12RSAKeyGenCmd extends P12KeyGenCommandSupport {
     private String publicExponent = "0x10001";
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (keysize % 1024 != 0) {
             throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
         }

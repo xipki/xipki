@@ -62,8 +62,7 @@ public class CertRequestValidateCmd extends SecurityCommandSupport {
     private String p10File;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         CertificationRequest p10Req = CertificationRequest.getInstance(
                 IoUtil.read(p10File));
         boolean bo = securityFactory.verifyPopo(p10Req);

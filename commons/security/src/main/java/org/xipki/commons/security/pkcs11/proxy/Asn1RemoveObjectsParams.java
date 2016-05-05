@@ -87,8 +87,7 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
         this.slotId = new Asn1P11SlotIdentifier(slotId);
     }
 
-    private Asn1RemoveObjectsParams(final ASN1Sequence seq)
-    throws BadAsn1ObjectException {
+    private Asn1RemoveObjectsParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 3);
         int idx = 0;
         slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));

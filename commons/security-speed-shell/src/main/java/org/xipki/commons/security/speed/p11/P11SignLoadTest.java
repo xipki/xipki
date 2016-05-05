@@ -87,8 +87,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
 
     public P11SignLoadTest(final SecurityFactory securityFactory, final P11Slot slot,
             final String signatureAlgorithm, final P11ObjectIdentifier objectId,
-            final String description)
-    throws ObjectCreationException {
+            final String description) throws ObjectCreationException {
         super(description + "\nsignature algorithm: " + signatureAlgorithm);
 
         ParamUtil.requireNonNull("securityFactory", securityFactory);
@@ -122,8 +121,7 @@ public abstract class P11SignLoadTest extends LoadExecutor {
     }
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
+    protected Runnable getTestor() throws Exception {
         return new Testor();
     }
 

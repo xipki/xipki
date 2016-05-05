@@ -118,8 +118,7 @@ public class ProxyP11Module extends AbstractP11Module {
 
     private boolean readOnly;
 
-    private ProxyP11Module(final P11ModuleConf moduleConf)
-    throws P11TokenException {
+    private ProxyP11Module(final P11ModuleConf moduleConf) throws P11TokenException {
         super(moduleConf);
 
         final String modulePath = moduleConf.getNativeLibrary();
@@ -145,8 +144,7 @@ public class ProxyP11Module extends AbstractP11Module {
         refresh();
     }
 
-    public static P11Module getInstance(final P11ModuleConf moduleConf)
-    throws P11TokenException {
+    public static P11Module getInstance(final P11ModuleConf moduleConf) throws P11TokenException {
         ParamUtil.requireNonNull("moduleConf", moduleConf);
         return new ProxyP11Module(moduleConf);
     }
@@ -156,8 +154,7 @@ public class ProxyP11Module extends AbstractP11Module {
         return readOnly || super.isReadOnly();
     }
 
-    void refresh()
-    throws P11TokenException {
+    void refresh() throws P11TokenException {
         ServerCaps caps = getServerCaps();
         if (caps.getVersions().contains(1)) {
             version = 1;
@@ -214,8 +211,7 @@ public class ProxyP11Module extends AbstractP11Module {
         }
     }
 
-    byte[] send(final byte[] request)
-    throws IOException {
+    byte[] send(final byte[] request) throws IOException {
         ParamUtil.requireNonNull("request", request);
         HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
         httpUrlConnection.setDoOutput(true);
@@ -271,8 +267,7 @@ public class ProxyP11Module extends AbstractP11Module {
         }
     } // method send
 
-    ASN1Encodable send(final int action, final ASN1Encodable content)
-    throws P11TokenException {
+    ASN1Encodable send(final int action, final ASN1Encodable content) throws P11TokenException {
         ASN1EncodableVector vec = new ASN1EncodableVector();
         vec.add(new ASN1Integer(version));
         vec.add(new ASN1Integer(action));
@@ -353,8 +348,7 @@ public class ProxyP11Module extends AbstractP11Module {
         return tid;
     }
 
-    private ServerCaps getServerCaps()
-    throws P11TokenException {
+    private ServerCaps getServerCaps() throws P11TokenException {
         byte[] respBytes;
         try {
             HttpURLConnection conn = (HttpURLConnection) getCapsUrl.openConnection();
@@ -465,8 +459,7 @@ public class ProxyP11Module extends AbstractP11Module {
         }
     } // method extractItvInfoValue
 
-    private void checkResponseCode(final HttpURLConnection conn)
-    throws P11TokenException {
+    private void checkResponseCode(final HttpURLConnection conn) throws P11TokenException {
         ParamUtil.requireNonNull("conn", conn);
         try {
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {

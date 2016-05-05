@@ -61,8 +61,7 @@ public class P11RSASignLoadTest extends P11SignLoadTest {
     }
 
     private static P11ObjectIdentifier generateKey(final P11Slot slot, final int keysize,
-            final BigInteger publicExponent)
-    throws Exception {
+            final BigInteger publicExponent) throws Exception {
         ParamUtil.requireNonNull("slot", slot);
         return slot.generateRSAKeypair(
                 keysize, publicExponent, "loadtest-" + System.currentTimeMillis());

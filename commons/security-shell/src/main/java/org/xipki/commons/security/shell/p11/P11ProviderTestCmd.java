@@ -85,8 +85,7 @@ public class P11ProviderTestCmd extends P11SecurityCommandSupport {
     private Boolean ecdsaPlain = Boolean.FALSE;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         KeyStore ks = KeyStore.getInstance("PKCS11", XiSecurityConstants.PROVIDER_NAME_XIPKI);
         ks.load(null, null);
         if (verbose.booleanValue()) {
@@ -142,8 +141,7 @@ public class P11ProviderTestCmd extends P11SecurityCommandSupport {
         return sb.toString();
     }
 
-    private String getSignatureAlgo(final PublicKey pubKey)
-    throws NoSuchAlgorithmException {
+    private String getSignatureAlgo(final PublicKey pubKey) throws NoSuchAlgorithmException {
         SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, ecdsaPlain);
         AlgorithmIdentifier sigAlgoId = AlgorithmUtil.getSignatureAlgoId(pubKey,
                 HashAlgoType.getNonNullHashAlgoType(hashAlgo), algoControl);

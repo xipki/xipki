@@ -89,8 +89,7 @@ public class P12KeypairGenerator {
         private SubjectPublicKeyInfo subjectPublicKeyInfo;
 
         KeyPairWithSubjectPublicKeyInfo(final KeyPair keypair,
-                final SubjectPublicKeyInfo subjectPublicKeyInfo)
-        throws InvalidKeySpecException {
+                final SubjectPublicKeyInfo subjectPublicKeyInfo) throws InvalidKeySpecException {
             super();
             this.keypair = keypair;
             this.subjectPublicKeyInfo = X509Util.toRfc3279Style(subjectPublicKeyInfo);
@@ -139,8 +138,7 @@ public class P12KeypairGenerator {
 
     private static final long DAY = 24L * 60 * 60 * 1000;
 
-    public P12KeypairGenerator()
-    throws Exception {
+    public P12KeypairGenerator() throws Exception {
     }
 
     // CHECKSTYLE:SKIP
@@ -154,24 +152,21 @@ public class P12KeypairGenerator {
 
     // CHECKSTYLE:SKIP
     public P12KeypairGenerationResult generateDSAKeypair(final int plength, final int qlength,
-            final P12KeystoreGenerationParameters params)
-    throws Exception {
+            final P12KeystoreGenerationParameters params) throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genDSAKeypair(plength, qlength, params.getRandom());
         return generateIdentity(kp, params);
     }
 
     // CHECKSTYLE:SKIP
     public P12KeypairGenerationResult generateECKeypair(final String curveNameOrOid,
-            final P12KeystoreGenerationParameters params)
-    throws Exception {
+            final P12KeystoreGenerationParameters params) throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genECKeypair(curveNameOrOid, params.getRandom());
         return generateIdentity(kp, params);
     }
 
     // CHECKSTYLE:SKIP
     private KeyPairWithSubjectPublicKeyInfo genECKeypair(final String curveNameOrOid,
-            final SecureRandom random)
-    throws Exception {
+            final SecureRandom random) throws Exception {
         ASN1ObjectIdentifier curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (curveOid == null) {
             throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
@@ -188,8 +183,7 @@ public class P12KeypairGenerator {
 
     // CHECKSTYLE:SKIP
     private KeyPairWithSubjectPublicKeyInfo genRSAKeypair(final int keysize,
-            final BigInteger publicExponent, final SecureRandom random)
-    throws Exception {
+            final BigInteger publicExponent, final SecureRandom random) throws Exception {
         KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
         java.security.interfaces.RSAPublicKey rsaPubKey =
                 (java.security.interfaces.RSAPublicKey) kp.getPublic();
@@ -202,8 +196,7 @@ public class P12KeypairGenerator {
 
     // CHECKSTYLE:SKIP
     private KeyPairWithSubjectPublicKeyInfo genDSAKeypair(final int plength, final int qlength,
-            final SecureRandom random)
-    throws Exception {
+            final SecureRandom random) throws Exception {
         KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, random);
         SubjectPublicKeyInfo spki = KeyUtil.createSubjectPublicKeyInfo(
                 (DSAPublicKey) kp.getPublic());
@@ -247,8 +240,7 @@ public class P12KeypairGenerator {
         return result;
     } // method generateIdentity
 
-    private static ContentSigner getContentSigner(final PrivateKey key)
-    throws Exception {
+    private static ContentSigner getContentSigner(final PrivateKey key) throws Exception {
         BcContentSignerBuilder builder;
 
         if (key instanceof RSAPrivateKey) {

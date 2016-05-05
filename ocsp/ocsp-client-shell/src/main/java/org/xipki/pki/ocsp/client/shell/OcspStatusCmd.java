@@ -102,8 +102,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
     @Override
     protected Object processResponse(final OCSPResp response, final X509Certificate respIssuer,
             final IssuerHash issuerHash, final List<BigInteger> serialNumbers,
-            final Map<BigInteger, byte[]> encodedCerts)
-    throws Exception {
+            final Map<BigInteger, byte[]> encodedCerts) throws Exception {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonNull("issuerHash", issuerHash);
         ParamUtil.requireNonNull("serialNumbers", serialNumbers);

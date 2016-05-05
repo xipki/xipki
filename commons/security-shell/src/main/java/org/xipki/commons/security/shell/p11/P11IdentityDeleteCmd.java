@@ -52,8 +52,7 @@ import org.xipki.commons.security.pkcs11.P11Slot;
 public class P11IdentityDeleteCmd extends P11SecurityCommandSupport {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objIdentifier = getObjectIdentifier();
         if (objIdentifier == null) {

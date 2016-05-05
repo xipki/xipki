@@ -83,8 +83,7 @@ public class PBEDecryptCmd extends SecurityCommandSupport {
     private String outFile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         ParamUtil.requireRange("mk", mquorum, 1, 10);
         if (!(passwordHint == null ^ passwordFile == null)) {
             throw new IllegalCmdParamException(

@@ -63,8 +63,7 @@ public class SpeedP12DSAKeyGenCmd extends SingleSpeedCommandSupport {
     private Integer qlen;
 
     @Override
-    protected LoadExecutor getTester()
-    throws Exception {
+    protected LoadExecutor getTester() throws Exception {
         if (qlen == null) {
             if (plen >= 2048) {
                 qlen = 256;

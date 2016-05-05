@@ -140,16 +140,14 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         return name;
     }
 
-    private ContentSigner borrowContentSigner()
-    throws NoIdleSignerException {
+    private ContentSigner borrowContentSigner() throws NoIdleSignerException {
         return borrowContentSigner(defaultSignServiceTimeout);
     }
 
     /**
      * @param timeout timeout in milliseconds, 0 for infinitely.
      */
-    private ContentSigner borrowContentSigner(final int soTimeout)
-    throws NoIdleSignerException {
+    private ContentSigner borrowContentSigner(final int soTimeout) throws NoIdleSignerException {
         ContentSigner signer = null;
         try {
             if (soTimeout == 0) {
@@ -308,8 +306,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public X509CRLHolder build(final X509v2CRLBuilder builder)
-    throws NoIdleSignerException {
+    public X509CRLHolder build(final X509v2CRLBuilder builder) throws NoIdleSignerException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
             return builder.build(contentSigner);
@@ -364,8 +361,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public byte[] sign(final byte[] data)
-    throws NoIdleSignerException, IOException {
+    public byte[] sign(final byte[] data) throws NoIdleSignerException, IOException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
             OutputStream signatureStream = contentSigner.getOutputStream();

@@ -82,8 +82,7 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
     }
 
     public static P11RSAKeyParameter getInstance(final P11CryptService p11CryptService,
-            final P11EntityIdentifier identityId)
-    throws InvalidKeyException {
+            final P11EntityIdentifier identityId) throws InvalidKeyException {
         ParamUtil.requireNonNull("p11CryptService", p11CryptService);
         ParamUtil.requireNonNull("identityId", identityId);
 

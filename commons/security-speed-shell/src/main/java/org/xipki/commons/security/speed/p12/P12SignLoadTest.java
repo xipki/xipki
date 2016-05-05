@@ -81,8 +81,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
     private final ConcurrentContentSigner signer;
 
     public P12SignLoadTest(final SecurityFactory securityFactory, final String signatureAlgorithm,
-            final byte[] keystore, final String description)
-    throws Exception {
+            final byte[] keystore, final String description) throws Exception {
         super(description);
 
         ParamUtil.requireNonNull("securityFactory", securityFactory);
@@ -95,15 +94,13 @@ public abstract class P12SignLoadTest extends LoadExecutor {
     }
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
+    protected Runnable getTestor() throws Exception {
         return new Testor();
     }
 
     // CHECKSTYLE:SKIP
     protected static byte[] getPrecomputedRSAKeystore(final int keysize,
-            final BigInteger publicExponent)
-    throws IOException {
+            final BigInteger publicExponent) throws IOException {
         return getPrecomputedKeystore("rsa-" + keysize + "-0x" + publicExponent.toString(16)
             + ".p12");
     }
@@ -125,8 +122,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
         return getPrecomputedKeystore("ec-" + oid.getId() + ".p12");
     }
 
-    private static byte[] getPrecomputedKeystore(final String filename)
-    throws IOException {
+    private static byte[] getPrecomputedKeystore(final String filename) throws IOException {
         InputStream in = P12ECSignLoadTest.class.getResourceAsStream("/testkeys/" + filename);
         return (in == null)
                 ? null

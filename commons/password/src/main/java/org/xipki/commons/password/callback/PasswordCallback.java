@@ -47,10 +47,8 @@ import org.xipki.commons.password.PasswordResolverException;
 
 public interface PasswordCallback {
 
-    void init(@Nullable String conf)
-    throws PasswordResolverException;
+    void init(@Nullable String conf) throws PasswordResolverException;
 
-    char[] getPassword(@Nullable String prompt, String testToken)
-    throws PasswordResolverException;
+    char[] getPassword(@Nullable String prompt, String testToken) throws PasswordResolverException;
 
 }

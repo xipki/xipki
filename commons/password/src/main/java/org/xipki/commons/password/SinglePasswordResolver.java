@@ -47,7 +47,6 @@ public interface SinglePasswordResolver {
 
     boolean canResolveProtocol(@Nonnull String protocol);
 
-    char[] resolvePassword(@Nonnull String passwordHint)
-    throws PasswordResolverException;
+    char[] resolvePassword(@Nonnull String passwordHint) throws PasswordResolverException;
 
 }

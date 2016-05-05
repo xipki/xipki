@@ -134,8 +134,7 @@ public class CertRevocationInfo implements Serializable {
         this.invalidityTime = invalidityTime;
     }
 
-    private void writeObject(final java.io.ObjectOutputStream out)
-    throws IOException {
+    private void writeObject(final java.io.ObjectOutputStream out) throws IOException {
         final Map<String, Object> serialMap = new HashMap<String, Object>();
 
         serialMap.put(SR_SERIAL_VERSION, serialVersion);

@@ -72,8 +72,7 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
     private Integer numThreads = 5;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (numThreads < 1) {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }

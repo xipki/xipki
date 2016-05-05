@@ -106,8 +106,7 @@ public interface ConcurrentContentSigner {
     ProtectedPKIMessage build(@Nonnull ProtectedPKIMessageBuilder builder)
     throws NoIdleSignerException, CMPException;
 
-    X509CRLHolder build(@Nonnull X509v2CRLBuilder builder)
-    throws NoIdleSignerException;
+    X509CRLHolder build(@Nonnull X509v2CRLBuilder builder) throws NoIdleSignerException;
 
     X509CertificateHolder build(@Nonnull X509v3CertificateBuilder builder)
     throws NoIdleSignerException;
@@ -122,8 +121,7 @@ public interface ConcurrentContentSigner {
     PKCS10CertificationRequest build(@Nonnull PKCS10CertificationRequestBuilder builder)
     throws NoIdleSignerException;
 
-    byte[] sign(@Nonnull byte[] data)
-    throws NoIdleSignerException, IOException;
+    byte[] sign(@Nonnull byte[] data) throws NoIdleSignerException, IOException;
 
     boolean isHealthy();
 

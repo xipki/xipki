@@ -92,8 +92,7 @@ public class GuiPasswordCallback implements PasswordCallback {
     }
 
     @Override
-    public void init(final String conf)
-    throws PasswordResolverException {
+    public void init(final String conf) throws PasswordResolverException {
         if (StringUtil.isBlank(conf)) {
             quorum = 1;
             return;

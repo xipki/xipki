@@ -88,8 +88,7 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
         this.g = ParamUtil.requireNonNull("g", g);
     }
 
-    private Asn1GenDSAKeypairParams(final ASN1Sequence seq)
-    throws BadAsn1ObjectException {
+    private Asn1GenDSAKeypairParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 5, 5);
         int idx = 0;
         slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));

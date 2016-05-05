@@ -72,8 +72,7 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
     private Integer slotIndex;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         P11Module module = getP11Module(moduleName);
         println("module: " + moduleName);
         List<P11SlotIdentifier> slots = module.getSlotIdentifiers();

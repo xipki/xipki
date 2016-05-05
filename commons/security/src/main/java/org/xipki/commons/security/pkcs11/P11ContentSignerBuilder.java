@@ -134,8 +134,7 @@ public class P11ContentSignerBuilder {
     } // constructor
 
     public ConcurrentContentSigner createSigner(final AlgorithmIdentifier signatureAlgId,
-            final int parallelism)
-    throws XiSecurityException, P11TokenException {
+            final int parallelism) throws XiSecurityException, P11TokenException {
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
         if (publicKey instanceof RSAPublicKey) {

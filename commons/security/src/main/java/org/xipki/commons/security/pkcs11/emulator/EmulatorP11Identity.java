@@ -208,8 +208,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     private byte[] rsaPkcsPssSign(final P11Params parameters, final byte[] contentToSign,
-            final HashAlgoType hashAlgo)
-    throws XiSecurityException {
+            final HashAlgoType hashAlgo) throws XiSecurityException {
         if (!(parameters instanceof P11RSAPkcsPssParams)) {
             throw new XiSecurityException("the parameters is not of "
                     + P11RSAPkcsPssParams.class.getName());
@@ -257,8 +256,7 @@ public class EmulatorP11Identity extends P11Identity {
         return rsaX509Sign(paddedHash);
     }
 
-    private byte[] rsaX509Sign(final byte[] dataToSign)
-    throws XiSecurityException {
+    private byte[] rsaX509Sign(final byte[] dataToSign) throws XiSecurityException {
         Cipher cipher;
         try {
             cipher = rsaCiphers.takeFirst();

@@ -76,8 +76,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCommandSupport {
     private String invalidityDateS;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
             throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
         }

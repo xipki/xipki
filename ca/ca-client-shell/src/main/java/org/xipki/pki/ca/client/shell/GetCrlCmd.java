@@ -76,8 +76,7 @@ public class GetCrlCmd extends CrlCommandSupport {
     private String baseCrlOut;
 
     @Override
-    protected X509CRL retrieveCrl()
-    throws CaClientException, PkiErrorException {
+    protected X509CRL retrieveCrl() throws CaClientException, PkiErrorException {
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
             return caClient.downloadCrl(caName, debug);
@@ -87,8 +86,7 @@ public class GetCrlCmd extends CrlCommandSupport {
     }
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         Set<String> caNames = caClient.getCaNames();
         if (isEmpty(caNames)) {
             throw new IllegalCmdParamException("no CA is configured");

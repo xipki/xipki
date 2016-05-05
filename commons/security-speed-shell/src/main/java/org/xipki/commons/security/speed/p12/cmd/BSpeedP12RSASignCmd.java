@@ -66,8 +66,7 @@ public class BSpeedP12RSASignCmd extends BSpeedP12SignCommandSupport {
     }
 
     @Override
-    protected LoadExecutor nextTester()
-    throws Exception {
+    protected LoadExecutor nextTester() throws Exception {
         RSAControl control = queue.takeFirst();
         if (control == null) {
             return null;

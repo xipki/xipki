@@ -153,8 +153,7 @@ public class CaLoadTestEnroll extends LoadExecutor {
     } // class Testor
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
+    protected Runnable getTestor() throws Exception {
         return new Testor();
     }
 

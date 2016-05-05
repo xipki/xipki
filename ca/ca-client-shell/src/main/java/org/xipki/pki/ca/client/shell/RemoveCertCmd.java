@@ -60,8 +60,7 @@ import org.xipki.pki.ca.common.cmp.PkiStatusInfo;
 public class RemoveCertCmd extends UnRevRemoveCertCommandSupport {
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
             throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
         }

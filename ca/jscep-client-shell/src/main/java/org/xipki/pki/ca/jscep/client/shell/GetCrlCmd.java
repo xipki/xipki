@@ -74,8 +74,7 @@ public class GetCrlCmd extends ClientCommandSupport {
     private String outputFile;
 
     @Override
-    protected Object doExecute()
-    throws Exception {
+    protected Object doExecute() throws Exception {
         X509Certificate cert = X509Util.parseCert(new File(certFile));
         Client client = getScepClient();
         X509CRL crl = client.getRevocationList(getIdentityCert(),

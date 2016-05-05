@@ -97,8 +97,7 @@ public class LiquibaseMain {
         }
     }
 
-    public void init(final String logLevel, String logFile)
-    throws Exception {
+    public void init(final String logLevel, String logFile) throws Exception {
         changeLogLevel(logLevel, logFile);
 
         FileSystemResourceAccessor fsOpener = new FileSystemResourceAccessor();
@@ -157,21 +156,18 @@ public class LiquibaseMain {
         }
     } // method init
 
-    public void releaseLocks()
-    throws Exception {
+    public void releaseLocks() throws Exception {
         LockService lockService = LockServiceFactory.getInstance().getLockService(database);
         lockService.forceReleaseLock();
         System.out.println("successfully released the database"); // XIPKI-CODECHECK:IGNORE
     }
 
-    public void dropAll()
-    throws Exception {
+    public void dropAll() throws Exception {
         liquibase.dropAll();
         System.out.println("successfully  dropped the database"); // XIPKI-CODECHECK:IGNORE
     }
 
-    public void update()
-    throws Exception {
+    public void update() throws Exception {
         liquibase.update((String) null);
         System.out.println("successfully  updated the database"); // XIPKI-CODECHECK:IGNORE
     }

@@ -80,8 +80,7 @@ public abstract class Pkcs12RSATest {
         return "1234";
     }
 
-    private ConcurrentContentSigner getSigner()
-    throws Exception {
+    private ConcurrentContentSigner getSigner() throws Exception {
         if (signer != null) {
             return signer;
         }
@@ -98,8 +97,7 @@ public abstract class Pkcs12RSATest {
     }
 
     @Test
-    public void testSignAndVerify()
-    throws Exception {
+    public void testSignAndVerify() throws Exception {
         byte[] data = new byte[1234];
         for (int i = 0; i < data.length; i++) {
             data[i] = (byte) (i & 0xFF);
@@ -110,14 +108,12 @@ public abstract class Pkcs12RSATest {
         Assert.assertTrue("Signature invalid", signatureValid);
     }
 
-    protected byte[] sign(final byte[] data)
-    throws Exception {
+    protected byte[] sign(final byte[] data) throws Exception {
         return getSigner().sign(data);
     }
 
     protected boolean verify(final byte[] data, final byte[] signatureValue,
-            final X509Certificate cert)
-    throws Exception {
+            final X509Certificate cert) throws Exception {
         Signature signature = Signature.getInstance(getSignatureAlgorithm().getAlgorithm().getId());
         signature.initVerify(cert.getPublicKey());
         signature.update(data);

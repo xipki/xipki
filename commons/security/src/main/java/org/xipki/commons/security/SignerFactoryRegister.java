@@ -60,7 +60,6 @@ public interface SignerFactoryRegister {
      */
     ConcurrentContentSigner newSigner(@Nonnull SecurityFactory securityFactory,
             @Nonnull String type, @Nullable SignerConf conf,
-            @Nullable X509Certificate[] certificateChain)
-    throws ObjectCreationException;
+            @Nullable X509Certificate[] certificateChain) throws ObjectCreationException;
 
 }

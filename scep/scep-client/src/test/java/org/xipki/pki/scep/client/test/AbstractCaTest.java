@@ -134,8 +134,7 @@ public abstract class AbstractCaTest {
     }
 
     @Before
-    public synchronized void startScepServer()
-    throws Exception {
+    public synchronized void startScepServer() throws Exception {
         if (scepServerContainer == null) {
             CaCaps caCaps = getExpectedCaCaps();
 
@@ -156,16 +155,14 @@ public abstract class AbstractCaTest {
     }
 
     @After
-    public synchronized void stopScepServer()
-    throws Exception {
+    public synchronized void stopScepServer() throws Exception {
         if (this.scepServerContainer != null) {
             this.scepServerContainer.stop();
         }
     }
 
     @Test
-    public void test()
-    throws Exception {
+    public void test() throws Exception {
         CaIdentifier caId = new CaIdentifier("http://localhost:8080/scep/pkiclient.exe", null);
         CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(
                 new X509CertificateObject(scepServer.getCaCert()));

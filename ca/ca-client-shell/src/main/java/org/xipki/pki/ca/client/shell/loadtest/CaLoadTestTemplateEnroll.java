@@ -181,8 +181,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
     private final AtomicLong index;
 
     public CaLoadTestTemplateEnroll(final CaClient caClient, final EnrollTemplateType template,
-            final String description)
-    throws Exception {
+            final String description) throws Exception {
         super(description);
 
         ParamUtil.requireNonNull("template", template);
@@ -223,8 +222,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
     } // constructor
 
     @Override
-    protected Runnable getTestor()
-    throws Exception {
+    protected Runnable getTestor() throws Exception {
         return new Testor();
     }
 

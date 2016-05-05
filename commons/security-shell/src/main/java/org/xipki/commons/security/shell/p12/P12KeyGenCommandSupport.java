@@ -66,15 +66,13 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
             description = "password of the PKCS#12 file")
     protected String password;
 
-    protected void saveKeypair(final P12KeypairGenerationResult keypair)
-    throws IOException {
+    protected void saveKeypair(final P12KeypairGenerationResult keypair) throws IOException {
         ParamUtil.requireNonNull("keypair", keypair);
         File p12File = new File(keyOutFile);
         saveVerbose("saved PKCS#12 keystore to file", p12File, keypair.getKeystore());
     }
 
-    protected P12KeystoreGenerationParameters getKeyGenParameters()
-    throws IOException {
+    protected P12KeystoreGenerationParameters getKeyGenParameters() throws IOException {
         P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
                 getPassword());
 
@@ -86,8 +84,7 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
         return params;
     }
 
-    private char[] getPassword()
-    throws IOException {
+    private char[] getPassword() throws IOException {
         char[] pwdInChar = readPasswordIfNotSet(password);
         if (pwdInChar != null) {
             password = new String(pwdInChar);
