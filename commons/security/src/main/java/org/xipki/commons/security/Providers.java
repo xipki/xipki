@@ -88,7 +88,7 @@ public class Providers {
 
         try {
             StringBuilder sb = new StringBuilder();
-            sb.append("name=").append(provName).append("\n");
+            sb.append("name=").append(XiSecurityConstants.PROVIDER_CORENAME_NSS).append("\n");
             sb.append("nssDbMode=noDb\n");
             sb.append("attributes=compatibility\n");
             String nssLib = System.getProperty("NSSLIB");
