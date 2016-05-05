@@ -53,16 +53,12 @@ public class ScepServerContainer {
 
     private Server server;
 
-    public ScepServerContainer(
-            final int port,
-            final ScepServer scepServer)
+    public ScepServerContainer(final int port, final ScepServer scepServer)
     throws Exception {
         this(port, Arrays.asList(ParamUtil.requireNonNull("scepServer", scepServer)));
     }
 
-    public ScepServerContainer(
-            final int port,
-            final List<ScepServer> scepServers)
+    public ScepServerContainer(final int port, final List<ScepServer> scepServers)
     throws Exception {
         ParamUtil.requireNonEmpty("scepServers", scepServers);
         Server tmpServer = new Server(port);

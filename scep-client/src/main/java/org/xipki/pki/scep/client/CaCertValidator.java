@@ -47,7 +47,6 @@ import javax.annotation.Nonnull;
 
 public interface CaCertValidator {
 
-    boolean isTrusted(
-            @Nonnull X509Certificate cert);
+    boolean isTrusted(@Nonnull X509Certificate cert);
 
 }

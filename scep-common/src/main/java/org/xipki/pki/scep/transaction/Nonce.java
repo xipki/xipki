@@ -54,9 +54,7 @@ public class Nonce {
 
     private final byte[] bytes;
 
-    private Nonce(
-            final byte[] bytes,
-            final boolean cloneBytes) {
+    private Nonce(final byte[] bytes, final boolean cloneBytes) {
         ParamUtil.requireNonNull("bytes", bytes);
         ParamUtil.requireRange("bytes.length", bytes.length, 16, 16);
         this.bytes = cloneBytes
@@ -64,8 +62,7 @@ public class Nonce {
                 : bytes;
     }
 
-    public Nonce(
-            final byte[] bytes) {
+    public Nonce(final byte[] bytes) {
         this(bytes, true);
     }
 

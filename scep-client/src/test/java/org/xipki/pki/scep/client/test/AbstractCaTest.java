@@ -318,9 +318,7 @@ public abstract class AbstractCaTest {
         return caCaps;
     }
 
-    private boolean equals(
-            final Certificate bcCert,
-            final X509Certificate cert)
+    private boolean equals(final Certificate bcCert, final X509Certificate cert)
     throws CertificateException, IOException {
         return Arrays.equals(cert.getEncoded(), bcCert.getEncoded());
     }

@@ -53,16 +53,13 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
 
 public class ScepClient extends Client {
 
-    public ScepClient(
-            final CaIdentifier caId,
-            final CaCertValidator caCertValidator)
+    public ScepClient(final CaIdentifier caId, final CaCertValidator caCertValidator)
     throws MalformedURLException {
         super(caId, caCertValidator);
     }
 
     @Override
-    protected ScepHttpResponse httpGet(
-            final String url)
+    protected ScepHttpResponse httpGet(final String url)
     throws ScepClientException {
         ParamUtil.requireNonNull("url", url);
         try {
@@ -76,9 +73,7 @@ public class ScepClient extends Client {
     }
 
     @Override
-    protected ScepHttpResponse httpPost(
-            final String url,
-            final String requestContentType,
+    protected ScepHttpResponse httpPost(final String url, final String requestContentType,
             final byte[] request)
     throws ScepClientException {
         ParamUtil.requireNonNull("url", url);
@@ -106,8 +101,7 @@ public class ScepClient extends Client {
         }
     }
 
-    protected ScepHttpResponse parseResponse(
-            final HttpURLConnection conn)
+    protected ScepHttpResponse parseResponse(final HttpURLConnection conn)
     throws ScepClientException {
         ParamUtil.requireNonNull("conn", conn);
         try {
