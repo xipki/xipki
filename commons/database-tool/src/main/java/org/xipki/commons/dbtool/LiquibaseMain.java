@@ -159,17 +159,17 @@ public class LiquibaseMain {
     public void releaseLocks() throws Exception {
         LockService lockService = LockServiceFactory.getInstance().getLockService(database);
         lockService.forceReleaseLock();
-        System.out.println("successfully released the database"); // XIPKI-CODECHECK:IGNORE
+        System.out.println("successfully released the database");
     }
 
     public void dropAll() throws Exception {
         liquibase.dropAll();
-        System.out.println("successfully  dropped the database"); // XIPKI-CODECHECK:IGNORE
+        System.out.println("successfully  dropped the database");
     }
 
     public void update() throws Exception {
         liquibase.update((String) null);
-        System.out.println("successfully  updated the database"); // XIPKI-CODECHECK:IGNORE
+        System.out.println("successfully  updated the database");
     }
 
     public void shutdown() {
