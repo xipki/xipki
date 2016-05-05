@@ -54,7 +54,6 @@ import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.jcajce.provider.util.DigestFactory;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.commons.security.pkcs11.P11PlainRSASigner;
 import org.xipki.commons.security.pkcs11.P11RSAKeyParameter;
 
@@ -348,8 +347,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
         if (engineParams == null) {
             if (paramSpec != null) {
                 try {
-                    engineParams = AlgorithmParameters.getInstance("PSS",
-                            BouncyCastleProvider.PROVIDER_NAME);
+                    engineParams = AlgorithmParameters.getInstance("PSS", "BC");
                     engineParams.init(paramSpec);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex.getMessage(), ex);
