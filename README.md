@@ -222,7 +222,7 @@ Install
     #pkcs11.confFile = xipki/security/pkcs11-conf-emulator.xml
     ```
   * In file xipki/security/pkcs11-conf-hsm.xml, change the PKCS#11 configuration.
-    
+
 Run Demo
 -----
 
@@ -239,6 +239,13 @@ Run Demo
     ```sh
     preload bin/karaf
     ```
+
+    If you get error like
+    ```sh
+    Error occurred during initialization of VM
+    Could not reserve enough space for 2097152KB object heap
+    ```
+    please change the value of JAVA_MAX_MEM in the file `bin/setenv` or `bin/setenv.bat`.
 
     If you have changed the content within folder `$XIPKI_HOME/etc` or `$XIPKI_HOME/system`, please delete the folder `$XIPKI_HOME/data` before starting XiPKI.
 
