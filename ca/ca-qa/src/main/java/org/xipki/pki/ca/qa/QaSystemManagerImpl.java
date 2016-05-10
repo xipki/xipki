@@ -109,20 +109,6 @@ public class QaSystemManagerImpl implements QaSystemManager {
         return initialized.get();
     }
 
-    public void asynInit() {
-        Runnable initRun = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    init();
-                } catch (Throwable th) {
-                    LogUtil.error(LOG, th, "could not init");
-                }
-            }
-        };
-        new Thread(initRun).start();
-    }
-
     public void init() {
         if (StringUtil.isBlank(confFile)) {
             throw new IllegalStateException("confFile must not be null and empty");
