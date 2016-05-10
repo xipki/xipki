@@ -59,18 +59,11 @@ public class Providers {
     }
 
     public void shutdown() {
-        String provName = "BC";
-        Security.removeProvider(provName);
-        LOG.info("removed provider {}", provName);
-
-        provName = XiSecurityConstants.PROVIDER_NAME_NSS;
-        Security.removeProvider(provName);
-        LOG.info("removed provider {}", provName);
     }
 
     private void addBcProvider() {
         final String provName = "BC";
-        if (Security.getProvider(provName) == null) {
+        if (Security.getProvider(provName) != null) {
             LOG.info("security provider {} already initialized by other service", provName);
             return;
         }
