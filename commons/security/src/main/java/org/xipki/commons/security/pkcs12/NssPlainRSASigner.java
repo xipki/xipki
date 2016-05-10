@@ -57,6 +57,9 @@ import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.security.XiSecurityConstants;
 
 /**
@@ -65,6 +68,8 @@ import org.xipki.commons.security.XiSecurityConstants;
  */
 // CHECKSTYLE:SKIP
 class NssPlainRSASigner implements AsymmetricBlockCipher {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NssPlainRSASigner.class);
 
     private static final String ALGORITHM = "RSA/ECB/NoPadding";
 
@@ -98,7 +103,7 @@ class NssPlainRSASigner implements AsymmetricBlockCipher {
             RSAPrivateCrtKeyParameters params = (RSAPrivateCrtKeyParameters) key;
             keySpec = new RSAPrivateCrtKeySpec(params.getModulus(), // modulus
                     params.getPublicExponent(), // publicExponent
-                    params.getModulus(), // privateExponent
+                    params.getExponent(), // privateExponent
                     params.getP(), // primeP
                     params.getQ(), // primeQ
                     params.getDP(), // primeExponentP
@@ -119,6 +124,7 @@ class NssPlainRSASigner implements AsymmetricBlockCipher {
         try {
             cipher.init(Cipher.ENCRYPT_MODE, signingKey);
         } catch (InvalidKeyException ex) {
+            LogUtil.error(LOG, ex);
             throw new RuntimeCryptoException("could not initialize the cipher: "
                     + ex.getMessage());
         }

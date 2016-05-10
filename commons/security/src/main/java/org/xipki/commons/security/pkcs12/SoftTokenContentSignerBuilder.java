@@ -81,6 +81,7 @@ import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.DefaultConcurrentContentSigner;
@@ -119,26 +120,18 @@ public class SoftTokenContentSignerBuilder {
                 return new RSADigestSigner(dig);
             }
 
-            if (Security.getProvider(XiSecurityConstants.PROVIDER_NAME_NSS) == null) {
+            if (Security.getProvider(XiSecurityConstants.PROVIDER_NAME_NSS) != null) {
                 try {
-                    return SignerUtil.createPSSRSASigner(sigAlgId);
-                } catch (XiSecurityException ex) {
-                    throw new OperatorCreationException(ex.getMessage(), ex);
+                    NssPlainRSASigner plainSigner = new NssPlainRSASigner();
+                    return SignerUtil.createPSSRSASigner(sigAlgId, plainSigner);
+                } catch (Exception ex) {
+                    LogUtil.warn(LOG, ex, "could not create PSS signer using underlying provider "
+                            + XiSecurityConstants.PROVIDER_NAME_NSS);
                 }
             }
 
-            NssPlainRSASigner plainSigner;
             try {
-                plainSigner = new NssPlainRSASigner();
-            } catch (NoSuchAlgorithmException ex) {
-                throw new OperatorCreationException(ex.getMessage(), ex);
-            } catch (NoSuchProviderException ex) {
-                throw new OperatorCreationException(ex.getMessage(), ex);
-            } catch (NoSuchPaddingException ex) {
-                throw new OperatorCreationException(ex.getMessage(), ex);
-            }
-            try {
-                return SignerUtil.createPSSRSASigner(sigAlgId, plainSigner);
+                return SignerUtil.createPSSRSASigner(sigAlgId);
             } catch (XiSecurityException ex) {
                 throw new OperatorCreationException(ex.getMessage(), ex);
             }
