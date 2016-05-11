@@ -78,10 +78,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.crypto.generators.DSAParametersGenerator;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.params.DSAParameterGenerationParameters;
 import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
@@ -138,20 +135,8 @@ public class KeyUtil {
     public static KeyPair generateDSAKeypair(final int plength, final int qlength,
             final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-        return generateDSAKeypair(plength, qlength, 80, random);
-    }
-
-    // CHECKSTYLE:SKIP
-    public static KeyPair generateDSAKeypair(final int plength, final int qlength,
-            final int certainty, final SecureRandom random)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-        DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
-        DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
-                plength, qlength, certainty, random);
-        paramGen.init(genParams);
-        DSAParameters dsaParams = paramGen.generateParameters();
-        DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
-                dsaParams.getG());
+        DSAParameterSpec dsaParamSpec = DSAParameterCache.getDSAParameterSpec(plength, qlength,
+                random);
         KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
         synchronized (kpGen) {
             kpGen.initialize(dsaParamSpec, random);
