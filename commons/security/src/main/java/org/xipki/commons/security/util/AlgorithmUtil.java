@@ -457,7 +457,8 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier getRSASignatureAlgoId(final HashAlgoType hashAlgo, final boolean mgf1)
+    public static AlgorithmIdentifier getRSASignatureAlgoId(final HashAlgoType hashAlgo,
+            final boolean mgf1)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         if (mgf1) {
@@ -518,7 +519,8 @@ public class AlgorithmUtil {
     } // method getDSASignatureAlgoId
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier getECDSASignatureAlgoId(final HashAlgoType hashAlgo, final boolean plainSignature)
+    public static AlgorithmIdentifier getECDSASignatureAlgoId(final HashAlgoType hashAlgo,
+            final boolean plainSignature)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 

@@ -244,7 +244,8 @@ public class PublicKeyChecker {
     } // method checkPublicKey
 
     // CHECKSTYLE:SKIP
-    private static void checkECSubjectPublicKeyInfo(final ASN1ObjectIdentifier curveOid, final byte[] encoded)
+    private static void checkECSubjectPublicKeyInfo(final ASN1ObjectIdentifier curveOid,
+            final byte[] encoded)
     throws BadCertTemplateException {
         Integer expectedLength = EC_CURVEFIELD_SIZES.get(curveOid);
         if (expectedLength == null) {

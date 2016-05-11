@@ -237,7 +237,8 @@ public abstract class KeyEntry {
         }
 
         // CHECKSTYLE:OFF
-        private void init(final BigInteger p, final BigInteger q, final BigInteger g, final BigInteger y) {
+        private void init(final BigInteger p, final BigInteger q, final BigInteger g,
+                final BigInteger y) {
             // CHECKSTYLE:ON
             ASN1EncodableVector vec = new ASN1EncodableVector();
             vec.add(new ASN1Integer(p));
