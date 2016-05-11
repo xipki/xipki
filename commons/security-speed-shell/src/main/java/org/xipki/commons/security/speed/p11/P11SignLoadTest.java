@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.ObjectCreationException;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.SecurityFactory;
@@ -71,8 +72,6 @@ public abstract class P11SignLoadTest extends LoadExecutor {
                     account(1, 1);
                 }
             }
-
-            close();
         }
 
     } // class Testor
@@ -106,17 +105,17 @@ public abstract class P11SignLoadTest extends LoadExecutor {
             this.signer = securityFactory.createSigner("PKCS11", signerConf,
                     (X509Certificate) null);
         } catch (ObjectCreationException ex) {
-            close();
+            shutdown();
             throw ex;
         }
-
     }
 
-    public void close() {
+    @Override
+    protected void shutdown() {
         try {
             slot.removeIdentity(objectId);
         } catch (Exception ex) {
-            LOG.error("could not delete PKCS#11 key {}", objectId);
+            LogUtil.error(LOG, ex, "could not delete PKCS#11 key " + objectId);
         }
     }
 
