@@ -218,7 +218,7 @@ public abstract class KeyEntry {
                     qlength = 160;
                 }
 
-                KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, 10, new SecureRandom());
+                KeyPair kp = KeyUtil.generateDSAKeypair(plength, qlength, new SecureRandom());
                 DSAPublicKey pk = (DSAPublicKey) kp.getPublic();
 
                 init(pk.getParams().getP(), pk.getParams().getQ(), pk.getParams().getG(),
