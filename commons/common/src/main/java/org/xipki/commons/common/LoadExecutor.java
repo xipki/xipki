@@ -81,6 +81,9 @@ public abstract class LoadExecutor {
 
     protected abstract Runnable getTestor() throws Exception;
 
+    protected void shutdown() {
+    }
+
     public void test() {
         System.getProperties().setProperty(PROPKEY_LOADTEST, "true");
         List<Runnable> runnables = new ArrayList<>(threads);
@@ -132,6 +135,7 @@ public abstract class LoadExecutor {
         printStatus();
         printSummary();
 
+        shutdown();
         System.getProperties().remove(PROPKEY_LOADTEST);
     } // method test
 
