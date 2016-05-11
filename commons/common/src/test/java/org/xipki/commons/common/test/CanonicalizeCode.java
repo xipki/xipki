@@ -259,12 +259,17 @@ public class CanonicalizeCode {
         try {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (lineNumber == 0 && line.startsWith("// #THIRDPARTY")) {
+                lineNumber++;
+                if (lineNumber == 1 && line.startsWith("// #THIRDPARTY")) {
                     return;
                 }
 
                 if (!authorsLineAvailable && line.contains("* @author")) {
                     authorsLineAvailable = true;
+                }
+
+                if (line.length() > 100 && !line.contains("http")) {
+                    lineNumbers.add(lineNumber);
                 }
             } // end while
         } finally {

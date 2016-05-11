@@ -135,13 +135,15 @@ public class KeyUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static KeyPair generateDSAKeypair(final int plength, final int qlength, final SecureRandom random)
+    public static KeyPair generateDSAKeypair(final int plength, final int qlength,
+            final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         return generateDSAKeypair(plength, qlength, 80, random);
     }
 
     // CHECKSTYLE:SKIP
-    public static KeyPair generateDSAKeypair(final int plength, final int qlength, final int certainty, final SecureRandom random)
+    public static KeyPair generateDSAKeypair(final int plength, final int qlength,
+            final int certainty, final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
         DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
@@ -158,7 +160,8 @@ public class KeyUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static KeyPair generateDSAKeypair(final DSAParameters dsaParams, final SecureRandom random)
+    public static KeyPair generateDSAKeypair(final DSAParameters dsaParams,
+            final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
                 dsaParams.getG());
@@ -180,7 +183,8 @@ public class KeyUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static KeyPair generateECKeypairForCurveNameOrOid(final String curveNameOrOid, final SecureRandom random)
+    public static KeyPair generateECKeypairForCurveNameOrOid(final String curveNameOrOid,
+            final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (oid == null) {
@@ -190,7 +194,8 @@ public class KeyUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static KeyPair generateECKeypair(final ASN1ObjectIdentifier curveId, final SecureRandom random)
+    public static KeyPair generateECKeypair(final ASN1ObjectIdentifier curveId,
+            final SecureRandom random)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         ParamUtil.requireNonNull("curveId", curveId);
 
@@ -286,7 +291,8 @@ public class KeyUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static ECPublicKey generateECPublicKeyForNameOrOid(final String curveNameOrOid, final byte[] encodedQ)
+    public static ECPublicKey generateECPublicKeyForNameOrOid(final String curveNameOrOid,
+            final byte[] encodedQ)
     throws InvalidKeySpecException {
         ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (oid == null) {
@@ -296,7 +302,8 @@ public class KeyUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static ECPublicKey generateECPublicKey(final ASN1ObjectIdentifier curveOid, final byte[] encodedQ)
+    public static ECPublicKey generateECPublicKey(final ASN1ObjectIdentifier curveOid,
+            final byte[] encodedQ)
     throws InvalidKeySpecException {
         ParamUtil.requireNonNull("curveOid", curveOid);
         ParamUtil.requireNonNull("encoded", encodedQ);
@@ -423,7 +430,8 @@ public class KeyUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static ECPublicKey createECPublicKey(final byte[] encodedAlgorithmIdParameters, final byte[] encodedPoint)
+    public static ECPublicKey createECPublicKey(final byte[] encodedAlgorithmIdParameters,
+            final byte[] encodedPoint)
     throws InvalidKeySpecException {
         ParamUtil.requireNonNull("encodedAlgorithmIdParameters", encodedAlgorithmIdParameters);
         ParamUtil.requireNonNull("encodedPoint", encodedPoint);
