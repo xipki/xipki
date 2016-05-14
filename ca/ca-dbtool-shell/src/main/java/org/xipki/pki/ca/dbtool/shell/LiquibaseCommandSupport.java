@@ -73,9 +73,9 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
     @Reference
     private PasswordResolver passwordResolver;
 
-    @Option(name = "--quiet", aliases = "-q",
-            description = "quiet mode")
-    private Boolean quiet = Boolean.FALSE;
+    @Option(name = "--force", aliases = "-f",
+            description = "never prompt for confirmation")
+    private Boolean force = Boolean.FALSE;
 
     @Option(name = "--log-level",
             description = "log level, valid values are debug, info, warning, severe, off")
@@ -98,7 +98,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
         ParamUtil.requireNonNull("schemaFile", schemaFile);
 
         printDatabaseInfo(dbConf, schemaFile);
-        if (!quiet) {
+        if (!force) {
             if (!confirm("reset and initialize")) {
                 println("cancelled");
                 return;
@@ -123,7 +123,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
         ParamUtil.requireNonNull("schemaFile", schemaFile);
 
         printDatabaseInfo(dbConf, schemaFile);
-        if (!quiet) {
+        if (!force) {
             if (!confirm("update")) {
                 println("cancelled");
                 return;

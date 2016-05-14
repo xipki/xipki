@@ -1,7 +1,7 @@
 SCEP_URL = http://localhost:8080/scep/SubCAwithCRL/OCSP/pkiclient.exe
 
 #################################################################
-#              MANAGE CERTIFICATE WITH RA CLIENT                #
+#              Enroll CERTIFICATE WITH SCEP                     #
 #################################################################
 feature:install xipki-security-shell
 

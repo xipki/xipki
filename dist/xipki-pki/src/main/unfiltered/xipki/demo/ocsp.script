@@ -17,7 +17,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, DB)"
 xipki-qa:ocsp-status \
@@ -26,7 +26,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
   
 echo "QA: Revoked, reason = affiliationChanged (POST, DB)"
 xipki-qa:ocsp-status \
@@ -35,7 +35,7 @@ xipki-qa:ocsp-status \
   --exp-status affiliationChanged \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
   
 echo "QA: Good (POST, DB)"
 xipki-qa:ocsp-status \
@@ -44,7 +44,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = affiliationChanged (POST, DB)"
 xipki-qa:ocsp-status \
@@ -53,7 +53,7 @@ xipki-qa:ocsp-status \
   --exp-status affiliationChanged \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, CRL)"
 xipki-qa:ocsp-status \
@@ -62,7 +62,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = keyCompromise (POST, CRL)"
 xipki-qa:ocsp-status \
@@ -71,7 +71,7 @@ xipki-qa:ocsp-status \
   --exp-status keyCompromise \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, CRL)"
 xipki-qa:ocsp-status \
@@ -81,7 +81,7 @@ xipki-qa:ocsp-status \
   --exp-certhash forbidden \
   --exp-sig-alg SHA256withRSA \
   --url $URL_CRL \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC6960) (POST, DB)"
 xipki-qa:ocsp-status \
@@ -90,7 +90,7 @@ xipki-qa:ocsp-status \
   --exp-status unknown \
   --exp-sig-alg SHA256withRSA \
   --url $URL \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC2560) (POST, ISSUER UNKNOWN)"
 xipki-qa:ocsp-status \
@@ -99,7 +99,7 @@ xipki-qa:ocsp-status \
   --exp-status issuerUnknown \
   --exp-sig-alg SHA256withRSA \
   --url $URL \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 ## GET
 echo "QA: Good (GET, DB)"
@@ -110,7 +110,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Good (GET, DB)"
 xipki-qa:ocsp-status \
@@ -120,7 +120,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = affiliationChanged (GET, DB)"
 xipki-qa:ocsp-status \
@@ -130,7 +130,7 @@ xipki-qa:ocsp-status \
   --exp-status affiliationChanged \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Good (GET,DB)"
 xipki-qa:ocsp-status \
@@ -140,7 +140,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = affiliationChanged (GET, DB)"
 xipki-qa:ocsp-status \
@@ -150,7 +150,7 @@ xipki-qa:ocsp-status \
   --exp-status affiliationChanged \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Good (GET, CRL)"
 xipki-qa:ocsp-status \
@@ -160,7 +160,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = keyCompromise (GET, CRL)"
 xipki-qa:ocsp-status \
@@ -170,7 +170,7 @@ xipki-qa:ocsp-status \
   --exp-status keyCompromise \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Good (GET, CRL)"
 xipki-qa:ocsp-status \
@@ -181,7 +181,7 @@ xipki-qa:ocsp-status \
   --exp-certhash forbidden \
   --exp-sig-alg SHA256withRSA \
   --url $URL_CRL \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC6960) (GET, DB)"
 xipki-qa:ocsp-status \
@@ -191,7 +191,7 @@ xipki-qa:ocsp-status \
   --exp-status unknown \
   --exp-sig-alg SHA256withRSA \
   --url $URL \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC2560) (GET, ISSUER UNKNOWN)"
 xipki-qa:ocsp-status \
@@ -201,7 +201,7 @@ xipki-qa:ocsp-status \
   --exp-status issuerUnknown \
   --exp-sig-alg SHA256withRSA \
   --url $URL \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
  
 ## POST, SIGNED
 echo "QA: Good (POST, SIGNED, DB)"
@@ -212,7 +212,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, SIGNED, DB)"
 xipki-qa:ocsp-status \
@@ -222,7 +222,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = affiliationChanged (POST, SIGNED, DB)"
 xipki-qa:ocsp-status \
@@ -232,7 +232,7 @@ xipki-qa:ocsp-status \
   --exp-status affiliationChanged \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, SIGNED, DB)"
 xipki-qa:ocsp-status \
@@ -242,7 +242,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = affiliationChanged (POST, SIGNED, DB)"
 xipki-qa:ocsp-status \
@@ -252,7 +252,7 @@ xipki-qa:ocsp-status \
   --exp-status affiliationChanged \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, SIGNED, CRL)"
 xipki-qa:ocsp-status \
@@ -262,7 +262,7 @@ xipki-qa:ocsp-status \
   --exp-status good \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
  
 echo "QA: Revoked, reason = keyCompromise (POST, SIGNED, CRL)"
 xipki-qa:ocsp-status \
@@ -271,7 +271,7 @@ xipki-qa:ocsp-status \
   --exp-status keyCompromise \
   --exp-certhash required \
   --exp-sig-alg SHA256withRSA \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
  
 echo "QA: Good (POST, SIGNED, CRL)"
 xipki-qa:ocsp-status \
@@ -282,7 +282,7 @@ xipki-qa:ocsp-status \
   --exp-certhash forbidden \
   --exp-sig-alg SHA256withRSA \
   --url $URL_CRL \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC6960) (POST, SIGNED, DB)"
 xipki-qa:ocsp-status \
@@ -292,7 +292,7 @@ xipki-qa:ocsp-status \
   --exp-status unknown \
   --exp-sig-alg SHA256withRSA \
   --url $URL \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (RFC2560) (POST, SIGNED, ISSUER UNKNOWN)"
 xipki-qa:ocsp-status \
@@ -302,6 +302,6 @@ xipki-qa:ocsp-status \
   --exp-status issuerUnknown \
   --exp-sig-alg SHA256withRSA \
   --url $URL \
-  --resp-issuer output/SubCAwithCRL1.der
+  --resp-issuer output/RCA1.der
 
 feature:uninstall xipki-ocspqa-shell

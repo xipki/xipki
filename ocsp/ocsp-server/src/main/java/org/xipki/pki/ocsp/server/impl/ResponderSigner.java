@@ -37,7 +37,7 @@
 package org.xipki.pki.ocsp.server.impl;
 
 import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
@@ -76,9 +76,12 @@ class ResponderSigner {
     private final X500Name responderId;
 
     ResponderSigner(final List<ConcurrentContentSigner> signers)
-    throws CertificateEncodingException, IOException {
+    throws CertificateException, IOException {
         this.signers = ParamUtil.requireNonEmpty("signers", signers);
         X509Certificate[] tmpCertificateChain = signers.get(0).getCertificateChain();
+        if (tmpCertificateChain == null || tmpCertificateChain.length == 0) {
+            throw new CertificateException("no certificate is bound with the signer");
+        }
         int len = tmpCertificateChain.length;
         if (len > 1) {
             X509Certificate cert = tmpCertificateChain[len - 1];

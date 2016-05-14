@@ -46,7 +46,6 @@ import java.net.URLDecoder;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
@@ -1177,7 +1176,7 @@ public class OcspServer {
 
         try {
             return new ResponderSigner(singleSigners);
-        } catch (CertificateEncodingException | IOException ex) {
+        } catch (CertificateException | IOException ex) {
             throw new InvalidConfException(ex.getMessage(), ex);
         }
     } // method initSigner

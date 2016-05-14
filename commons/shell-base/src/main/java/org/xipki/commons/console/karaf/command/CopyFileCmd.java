@@ -72,9 +72,9 @@ public class CopyFileCmd extends XipkiCommandSupport {
     @Completion(DirPathCompleter.class)
     private String dest;
 
-    @Option(name = "--recursive", aliases = "-r",
-            description = "copy directories and their contents recursively")
-    private Boolean recursive = Boolean.FALSE;
+    @Option(name = "--force", aliases = "-f",
+            description = "override existing file, never prompt")
+    private Boolean force = Boolean.FALSE;
 
     @Override
     protected Object doExecute() throws Exception {
@@ -95,7 +95,8 @@ public class CopyFileCmd extends XipkiCommandSupport {
                 System.err.println("cannot override an existing directory by a file");
                 return null;
             } else {
-                if (!confirm("Do you want to override the file " + dest, 3)) {
+                if (!force.booleanValue()
+                        && !confirm("Do you want to override the file " + dest, 3)) {
                     return null;
                 }
             }

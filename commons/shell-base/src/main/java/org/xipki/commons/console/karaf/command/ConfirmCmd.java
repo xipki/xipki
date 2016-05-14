@@ -61,7 +61,7 @@ public class ConfirmCmd extends XipkiCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         boolean toContinue = confirm(
-                prompt + "\nDo you want to contine [yes/no]?", 3);
+                prompt + "\nDo you want to contine", 3);
         if (!toContinue) {
             throw new CmdFailure("User cancelled");
         }

@@ -1,0 +1,258 @@
+printUsage = "false"
+argsValid = "false"
+
+if { "$1" equals "" } {
+  printUsage = "true"
+  argsValid = "true"
+} {
+  if { "$1" equals "help" } {
+    printUsage = "true"
+    argsValid = "true"
+  } {
+    list = [pkcs11 pkcs12]; each ($list) {
+      if { "$1" equals $it } {
+        argsValid = "true"
+      }
+    }
+  }
+}
+
+list = [rsa rsapss ec plainec dsa]; each ($list) {
+  if { "$1" equals $it } {
+    argsValid = "true"
+  }
+}
+
+if { $argsValid equals "false" } {
+  echo "invalid arguments $args"
+  echo ""
+  printUsage = "true"
+}
+
+if { $printUsage equals "true" } {
+  echo "Usage: "
+  echo ""
+  echo "source demo.script <token type> <signature type>"
+  echo "token type:      pkcs11, pkcs12"
+  echo "signature type:  rsa, rsapss, ec, plainec, dsa"
+} {
+
+feature:install xipki-security-shell
+
+xipki-cmd:rm -r -f output
+
+xipki-cmd:mkdir output
+
+P12_DIR = xipki/demo/p12
+
+xipki-cmd:copy-dir $P12_DIR/ee output
+
+TOKEN_TYPE = "$1"
+
+SIG_TYPE = "$2"
+
+echo "========================================================"
+echo "TOKEN_TYPE: $1
+echo "SIG_TYPE:   $2
+echo "========================================================"
+
+KEY_TYPE = ""
+
+if { $SIG_TYPE equals "rsa" } {
+  KEY_TYPE = "rsa"
+
+  # Valid signer algos are SHA<n>withRSA where n is 1, 224, 256, 384 and 512
+  ALGO1 = "SHA256withRSA"
+  ALGO2 = "SHA1withRSA"
+}
+
+if { $SIG_TYPE equals "rsapss" } {
+  KEY_TYPE = "rsa"
+
+  # Valid signer algos are SHA<n>withRSAandMGF1 where n is 1, 224, 256, 384 and 512
+  ALGO1 = "SHA256withRSAandMGF1"
+  ALGO2 = "SHA1withRSAandMGF1"
+}
+
+if { $SIG_TYPE equals "ec" } {
+  KEY_TYPE = "ec"
+
+  # Curve name or OID, e.g. secp256r1, brainpoolp256r1
+  EC_CURVE = secp256r1
+
+  # Valid signer algos are SHA<n>withECDSA, where n is 1, 224, 256, 384 and 512
+  ALGO1 = "SHA256withECDSA"
+  ALGO2 = "SHA1withECDSA"
+}
+
+if { $SIG_TYPE equals "plainec" } {
+  KEY_TYPE = "ec"
+
+  # Curve name or OID, e.g. secp256r1, brainpoolp256r1
+  EC_CURVE = secp256r1
+
+  # Valid signer algos are SHA<n>withPlainECDSA, where n is 1, 224, 256, 384 and 512
+  ALGO1 = "SHA256withPlainECDSA"
+  ALGO2 = "SHA1withPlainECDSA"
+}
+
+if { $SIG_TYPE equals "dsa" } {
+  KEY_TYPE = "dsa"
+
+  # Valid signer algos are SHA<n>withDSA, where n is 1, 256, 384 and 512
+  ALGO1 = "SHA256withDSA"
+  ALGO2 = "SHA1withDSA"
+}
+
+if { $TOKEN_TYPE equals "pkcs11" } {
+  SLOT = "0"
+  RCA_KEY_LABEL = "RCA1"
+  SubCA_KEY_LABEL = "SubCA1"
+  SubCAwithCRL_KEY_LABEL = "SubCAwithCRL1"
+
+  OCSP_KEYCONF = "slot=$SLOT,key-label=OCSP99"
+
+  xipki-tk:delete-key \
+    --slot $SLOT \
+    --label $RCA_KEY_LABEL
+
+  xipki-tk:delete-key \
+    --slot $SLOT \
+    --label $SubCA_KEY_LABEL
+
+  xipki-tk:delete-key \
+    --slot $SLOT \
+    --label $SubCAwithCRL_KEY_LABEL
+
+  xipki-tk:delete-key \
+    --slot $SLOT \
+    --label OCSP99
+
+  if { $KEY_TYPE equals "rsa" } {
+
+    xipki-tk:rsa \
+      --slot $SLOT \
+      --label $RCA_KEY_LABEL
+
+    xipki-tk:rsa \
+      --slot $SLOT \
+      --label $SubCA_KEY_LABEL
+
+    xipki-tk:rsa \
+      --slot $SLOT \
+      --label $SubCAwithCRL_KEY_LABEL
+
+    xipki-tk:rsa \
+      --slot $SLOT \
+      --label OCSP99
+
+  }
+
+  if { $KEY_TYPE equals "ec" } {
+
+    xipki-tk:ec \
+      --curve $EC_CURVE \
+      --slot $SLOT \
+      --label $RCA_KEY_LABEL
+
+    xipki-tk:ec \
+      --curve $EC_CURVE \
+      --slot $SLOT \
+      --label $SubCA_KEY_LABEL
+
+    xipki-tk:ec \
+      --curve $EC_CURVE \
+      --slot $SLOT \
+      --label $SubCAwithCRL_KEY_LABEL
+
+    xipki-tk:ec \
+      --curve $EC_CURVE \
+      --slot $SLOT \
+      --label OCSP99
+  }
+
+  if { $KEY_TYPE equals "dsa" } {
+
+    xipki-tk:dsa \
+      --plen $PLEN \
+      --slot $SLOT \
+      --label $RCA_KEY_LABEL
+
+    xipki-tk:dsa \
+      --plen $PLEN \
+      --slot $SLOT \
+      --label $SubCA_KEY_LABEL
+
+    xipki-tk:dsa \
+      --plen $PLEN \
+      --slot $SLOT \
+      --label $SubCAwithCRL_KEY_LABEL
+
+    xipki-tk:dsa \
+      --plen $PLEN \
+      --slot $SLOT \
+      --label OCSP99
+
+  }
+
+}
+
+if { $TOKEN_TYPE equals "pkcs12" } {
+
+  OCSP_KEYCONF = "password=1234,keystore=file:output/OCSP99.p12"
+
+  if { $SIG_TYPE equals "rsa" } {
+    P12_CA_DIR = ca-rsa
+  }
+
+  if { $SIG_TYPE equals "rsapss" } {
+    P12_CA_DIR = ca-rsa
+  }
+
+  if { $SIG_TYPE equals "ec" } {
+    P12_CA_DIR = ca-ec
+  }
+
+  if { $SIG_TYPE equals "plainec" } {
+    P12_CA_DIR = ca-ec
+  }
+
+  if { $SIG_TYPE equals "dsa" } {
+    P12_CA_DIR = ca-dsa
+  }
+
+  xipki-cmd:copy-dir $P12_DIR/$P12_CA_DIR output
+
+}
+
+## OCSP responder configuration
+xipki-cmd:copy-file -f xipki/ocsp-config/ocsp-responder-template.xml \
+  xipki/ocsp-config/ocsp-responder.xml
+
+xipki-cmd:replace --old "replaceme-type" --new "$1" \
+  xipki/ocsp-config/ocsp-responder.xml
+
+xipki-cmd:replace --old "replaceme-key" --new "$OCSP_KEYCONF" \
+  xipki/ocsp-config/ocsp-responder.xml
+
+xipki-cmd:replace --old "replaceme-algo1" --new "$ALGO1" \
+  xipki/ocsp-config/ocsp-responder.xml
+
+xipki-cmd:replace --old "replaceme-algo2" --new "$ALGO2" \
+  xipki/ocsp-config/ocsp-responder.xml
+
+CA_SIGNER_ALGO = "$ALGO1:$ALGO2"
+
+source ./xipki/demo/demo.d/ca.script "$1" "$2"
+
+source ./xipki/demo/demo.d/ra.script
+
+source ./xipki/demo//ca-qa.script
+
+feature:install xipki-ocspserver
+
+source ./xipki/demo/ocsp.script
+
+feature:uninstall xipki-ocspserver
+
+}
