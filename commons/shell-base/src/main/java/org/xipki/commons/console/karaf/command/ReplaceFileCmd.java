@@ -36,68 +36,97 @@
 
 package org.xipki.commons.console.karaf.command;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileReader;
 
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.console.karaf.intern.FileUtils;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cmd", name = "rm",
-        description = "remove file or directory")
+@Command(scope = "xipki-cmd", name = "replace",
+        description = "Replace text in file")
 @Service
-public class FileRmCmd extends XipkiCommandSupport {
+public class ReplaceFileCmd extends XipkiCommandSupport {
 
     @Argument(index = 0, name = "file",
             required = true,
-            description = "file or directory to be deleted\n"
+            description = "file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String targetPath;
+    private String source;
 
-    @Option(name = "--recursive", aliases = "-r",
-            description = "remove directories and their contents recursively")
-    private Boolean recursive = Boolean.FALSE;
+    @Option(name = "--old",
+            required = true,
+            description = "text to be replaced")
+    private String oldText;
 
-    @Option(name = "--force", aliases = "-f",
-            description = "ignore nonexistent files, never prompt")
-    private Boolean force = Boolean.FALSE;
+    @Option(name = "--new",
+            required = true,
+            description = "next text")
+    private String newText;
 
     @Override
     protected Object doExecute() throws Exception {
-        File target = new File(expandFilepath(targetPath));
-        if (!target.exists()) {
+        File sourceFile = new File(expandFilepath(source));
+        if (!sourceFile.exists()) {
+            System.err.println(source + " does not exist");
             return null;
         }
 
-        if (target.isDirectory()) {
-            if (!recursive) {
-                println("Please use option --recursive to delete directory");
-                return null;
-            }
-
-            if (force
-                    || confirm("Do you want to remove directory " + targetPath, 3)) {
-                FileUtils.deleteDirectory(target);
-                println("removed directory " + targetPath);
-            }
-        } else {
-            if (force || confirm("Do you want o remove file " + targetPath, 3)) {
-                target.delete();
-                println("removed file " + targetPath);
-            }
+        if (!sourceFile.isFile()) {
+            System.err.println(source + " is not a file");
+            return null;
         }
 
+        ParamUtil.requireNonBlank("old", oldText);
+
+        replaceFile(sourceFile, oldText, newText);
+
         return null;
+    }
+
+    private void replaceFile(final File file, final String oldText, final String newText)
+    throws Exception {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
+
+        boolean changed = false;
+        try {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains(oldText)) {
+                    changed = true;
+                    writer.write(line.replace(oldText, newText).getBytes());
+                } else {
+                    writer.write(line.getBytes());
+                }
+                writer.write('\n');
+            }
+        } finally {
+            writer.close();
+            reader.close();
+        }
+
+        if (changed) {
+            File newFile = new File(file.getPath() + "-new");
+            byte[] newBytes = writer.toByteArray();
+            IoUtil.save(file, newBytes);
+            newFile.renameTo(file);
+        }
     }
 
 }

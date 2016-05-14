@@ -294,11 +294,19 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected boolean confirm(final String prompt, final int maxTries) throws IOException {
-        String tmpPrompt = prompt;
-        if (prompt != null && !prompt.endsWith("\n")) {
-            tmpPrompt += "\n";
+        String tmpPrompt;
+        if (prompt == null || prompt.isEmpty()) {
+            tmpPrompt = "[yes/no]? ";
+        } else {
+            if ('?' == prompt.charAt(prompt.length() - 1)) {
+                tmpPrompt = prompt.substring(0, prompt.length() - 1);
+            } else {
+                tmpPrompt = prompt;
+            }
+            tmpPrompt += " [yes/no]? ";
         }
-        String answer = session.readLine(tmpPrompt, null);
+
+        String answer = readLine(tmpPrompt, null);
         if (answer == null) {
             throw new IOException("interrupted");
         }
@@ -306,7 +314,6 @@ public abstract class XipkiCommandSupport implements Action {
         int tries = 1;
 
         while (tries < maxTries) {
-            answer = session.readLine("Please answer with yes or no\n", null);
             if ("yes".equalsIgnoreCase(answer)) {
                 return true;
             } else if ("no".equalsIgnoreCase(answer)) {
@@ -314,6 +321,7 @@ public abstract class XipkiCommandSupport implements Action {
             } else {
                 tries++;
             }
+            answer = readLine("Please answer with yes or no: ", null);
         }
 
         return false;
