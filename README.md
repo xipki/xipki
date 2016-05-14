@@ -108,11 +108,6 @@ Highly scalable and high-performance open source PKI (Certification Authority an
      - All passwords can be encrypted by the master password
   - Embedded support of OBF (as in jetty) password resolver
 
-Version
-----
-
-2.1
-
 License
 -----------
 
@@ -139,7 +134,7 @@ Tested Platforms
  * MariaDB
  * H2
  * HSQLDB
- 
+
 * HSM
  * Thales nCipher Solo (PCI Card)
  * Thales nCipher Connect (network)
@@ -175,14 +170,14 @@ Build and Assembly from Source Code
       ```
 
   * Compile and install the artifacts
-    
+
     In folder `xipki`
     ```sh
     mvn clean install
     ```
-    
+
   * Assembly
-  
+
     In folder `xipki/dist/xipki-pki`
     ```sh
     mvn clean package
@@ -199,7 +194,7 @@ Install
 * Copy the file `xipki-pki-<version>.tar.gz` to the destination folder
 
 * Unpack the assembled file
- 
+
     In destination folder of the installation
     ```sh
     tar xvf xipki-pki-<version>.tar.gz
@@ -215,7 +210,7 @@ Install
 * In case if the real PKCS#11 device instead of the emulator is used:
 
   * In file etc/org.xipki.commons.security.pkcs11.cfg, change the pkcs11.confFile as follows:
-  
+
     ```sh
     pkcs11.confFile = xipki/security/pkcs11-conf-hsm.xml
 
@@ -229,7 +224,7 @@ Run Demo
 * Delete folders `$XIPKI_HOME/data` and `$XIPKI_HOME/output`
 
 * Start XiPKI
-  
+
     In folder `$XIPKI_HOME`
     ```sh
     bin/karaf
@@ -251,12 +246,4 @@ Run Demo
 
 * Run the pre-configured OSGi-commands in OSGi console
 
-In the OSGi console, call `source <OSGi batch script file>`, the demo script files are in folder `xipki/demo` and can be retrieved from the following table. The generated keys, certificates and CRLs are saved in folder `output`.
-
-|Signature Algorithm \ Key container |  PKCS#12  | PKCS#11                |
-|:----------------:|:----------------------:|:-----------------------:|
-|RSA PKCS#1v1.5    | p12-rsa-demo.script    | p11-rsa-demo.script     |
-|RSA PSS           | p12-rsapss-demo.script | p11-rsapss-demo.script  |
-|DSA               | p12-dsa-demo.script    | p11-dsa-demo.script     |
-|ECDSA             | p12-ec-demo.script     | p11-ec-demo.script      |
-|PlainECDSA (BSI)  | p12-plainec-demo.script| p11-plainec-demo.script |
+In the OSGi console, call `source xipki/demo/demo.script` to demonstrate the whole life-cycle (key generation, database initialization, CA installation, certificate enrollment, OCSP server installation, OCSP status, etc.). The generated keys, certificates and CRLs are saved in folder `output`, and the log files are located in the folder data/log.
