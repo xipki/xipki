@@ -91,12 +91,14 @@ public abstract class XipkiCommandSupport implements Action {
             try {
                 boolean bo = true;
                 while (saveTo.exists()) {
+                    String answer;
                     if (bo) {
-                        readPrompt("A file named '" + saveTo.getPath()
+                        answer = readPrompt("A file named '" + saveTo.getPath()
                             + "' already exists. Do you want to replace it [yes/no]? ");
+                    } else {
+                        answer = session.readLine(null, null);
                     }
-
-                    String answer = session.readLine(null, null);
+                    
                     if (answer == null) {
                         throw new IOException("interrupted");
                     }
