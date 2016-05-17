@@ -1,0 +1,179 @@
+P12_DIR = p12
+DSA_PLEN = 1024
+RSA_NLEN = 2048
+# Curve name or OID, e.g. secp256r1, brainpoolp256r1
+EC_CURVE = secp256r1
+
+## SCEP responder
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/SCEP1.p12
+
+echo "========================================================"
+echo "||                     CA DSA Key                     ||"
+echo "========================================================"
+
+# Wait one second
+sleep 1000
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --plen $DSA_PLEN \
+  --out p12/ca-dsa/RCA1.p12
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --plen $DSA_PLEN \
+  --out p12/ca-dsa/SubCA1.p12
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --plen $DSA_PLEN \
+  --out p12/ca-dsa/SubCAwithCRL1.p12
+
+echo "========================================================"
+echo "||                     CA RSA Key                     ||"
+echo "========================================================"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --key-size $RSA_NLEN \
+  --out p12/ca-rsa/RCA1.p12
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --key-size $RSA_NLEN \
+  --out p12/ca-rsa/SubCA1.p12
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --key-size $RSA_NLEN \
+  --out p12/ca-rsa/SubCAwithCRL1.p12
+
+echo "========================================================"
+echo "||                      CA EC Key                     ||"
+echo "========================================================"
+
+xipki-tk:ec-p12 \
+  --curve $EC_CURVE \
+  --password 1234 \
+  --out p12/ca-ec/RCA1.p12
+
+xipki-tk:ec-p12 \
+  --curve $EC_CURVE \
+  --password 1234 \
+  --out p12/ca-ec/SubCA1.p12
+
+xipki-tk:ec-p12 \
+  --curve $EC_CURVE \
+  --password 1234 \
+  --out p12/ca-ec/SubCAwithCRL1.p12
+
+echo "========================================================"
+echo "||                       EE Keys                      ||"
+echo "========================================================"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/Cross1.p12
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/OCSP1.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/OCSP2.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/multipleOUs1.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/multipleOUs2.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/multiValuedRDN1.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/EE.Complex1.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/TLS1.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/TLS-neg.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/TLSwithIncSN1.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/TLSwithIncSN1-1.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/TLSwithIncSN1-2.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/TLS2.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/TLS_C1.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/TLS_C2.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/gSMC_K1.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/gSMC_K2.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/MaxTime1.p12 \
+
+## SCEP
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/SCEP-OCSP1.p12 \
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/SCEP-OCSP1-2.p12 \
+  --subject "CN=DUMMY"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/SCEP-OCSP2.p12 \
+  --subject "CN=DUMMY"
+
+## JSCEP
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/JSCEP-OCSP1.p12 \
+  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/JSCEP-OCSP1-2.p12 \
+  --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/ee/JSCEP-OCSP2.p12 \
+  --subject "CN=JSCEP-OCSP2,O=xipki,C=DE"

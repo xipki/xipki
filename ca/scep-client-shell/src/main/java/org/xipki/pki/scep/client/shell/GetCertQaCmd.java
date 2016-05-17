@@ -47,7 +47,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.scep.client.ScepClient;
@@ -62,15 +61,9 @@ import org.xipki.pki.scep.client.ScepClient;
 @Service
 public class GetCertQaCmd extends ClientCommandSupport {
 
-    @Option(name = "--serial", aliases = "-s",
-            description = "serial number\n"
-                    + "(exactly one of serial or cert must be specified)")
-    private String serialNumber;
-
     @Option(name = "--cert",
             required = true,
-            description = "certificate file\n"
-                    + "(exactly one of serial or cert must be specified)")
+            description = "certificate file")
     @Completion(FilePathCompleter.class)
     private String certFile;
 
@@ -83,17 +76,7 @@ public class GetCertQaCmd extends ClientCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        if (!(serialNumber == null ^ certFile == null)) {
-            throw new IllegalCmdParamException("exactly one of serial or cert must be specified");
-        }
-
-        BigInteger serial;
-        if (serialNumber != null) {
-            serial = toBigInt(serialNumber);
-        } else {
-            serial = X509Util.parseCert(certFile).getSerialNumber();
-        }
-
+        BigInteger serial = X509Util.parseCert(certFile).getSerialNumber();
         ScepClient client = getScepClient();
 
         X509Certificate caCert = client.getAuthorityCertStore().getCaCert();

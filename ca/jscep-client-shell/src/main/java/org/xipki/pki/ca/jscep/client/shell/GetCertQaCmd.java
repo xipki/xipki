@@ -34,40 +34,57 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.shell.p12;
+package org.xipki.pki.ca.jscep.client.shell;
+
+import java.io.File;
+import java.math.BigInteger;
+import java.security.cert.CertStore;
+import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.completer.ECCurveNameCompleter;
-import org.xipki.commons.security.pkcs12.P12KeypairGenerationResult;
-import org.xipki.commons.security.pkcs12.P12KeypairGenerator;
+import org.jscep.client.Client;
+import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.security.util.X509Util;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "ec-p12",
-        description = "generate EC keypair in PKCS#12 keystore")
+@Command(scope = "jscep", name = "getcert-qa",
+        description = "download certificate (only used for QA)")
 @Service
-// CHECKSTYLE:SKIP
-public class P12ECKeyGenCmd extends P12KeyGenCommandSupport {
+public class GetCertQaCmd extends ClientCommandSupport {
 
-    @Option(name = "--curve",
+    @Option(name = "--cert",
             required = true,
-            description = "EC curve name or OID\n"
+            description = "certificate file")
+    @Completion(FilePathCompleter.class)
+    private String certFile;
+
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
                     + "(required)")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName;
+    @Completion(FilePathCompleter.class)
+    private String outputFile;
 
     @Override
     protected Object doExecute() throws Exception {
-        P12KeypairGenerationResult keypair = new P12KeypairGenerator().generateECKeypair(curveName,
-                getKeyGenParameters(), subject);
-        saveKeypair(keypair);
+        BigInteger serial = X509Util.parseCert(certFile).getSerialNumber();
+        Client client = getScepClient();
+        CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);
+        X509Certificate cert = extractEeCerts(certs);
 
+        if (cert == null) {
+            throw new CmdFailure("received no certficate from server");
+        }
+
+        saveVerbose("saved returned certificate to file", new File(outputFile), cert.getEncoded());
         return null;
     }
 

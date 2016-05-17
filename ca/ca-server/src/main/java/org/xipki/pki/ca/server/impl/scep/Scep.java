@@ -575,6 +575,7 @@ public class Scep {
             rep.setMessageData(ci);
             rep.setPkiStatus(PkiStatus.SUCCESS);
         } catch (FailInfoException ex) {
+            LogUtil.error(LOG, ex);
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(ex.getFailInfo());
         }

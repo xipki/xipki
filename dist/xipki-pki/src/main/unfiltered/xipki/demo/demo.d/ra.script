@@ -415,6 +415,6 @@ xipki-cli:getcrl \
 #################################################################
 feature:uninstall xipki-caclient-shell
 feature:uninstall xipki-camgmt-shell
-feature:uninstall xipki-security-shell
 
 source ./xipki/demo/scep.script
+source ./xipki/demo/jscep.script

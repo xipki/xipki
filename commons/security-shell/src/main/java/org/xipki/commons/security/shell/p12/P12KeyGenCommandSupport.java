@@ -66,6 +66,11 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
             description = "password of the PKCS#12 file")
     protected String password;
 
+    @Option(name = "--subject", aliases = "-s",
+            description = "subject of the self-signed certificate\n"
+                    + "(required)")
+    protected String subject;
+
     protected void saveKeypair(final P12KeypairGenerationResult keypair) throws IOException {
         ParamUtil.requireNonNull("keypair", keypair);
         File p12File = new File(keyOutFile);
