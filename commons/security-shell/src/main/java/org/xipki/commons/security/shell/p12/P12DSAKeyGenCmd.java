@@ -77,7 +77,7 @@ public class P12DSAKeyGenCmd extends P12KeyGenCommandSupport {
         }
 
         P12KeypairGenerationResult keypair = new P12KeypairGenerator().generateDSAKeypair(plen,
-                qlen, getKeyGenParameters());
+                qlen, getKeyGenParameters(), subject);
         saveKeypair(keypair);
 
         return null;

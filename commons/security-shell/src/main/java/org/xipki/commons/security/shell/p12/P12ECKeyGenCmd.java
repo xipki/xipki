@@ -65,7 +65,7 @@ public class P12ECKeyGenCmd extends P12KeyGenCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         P12KeypairGenerationResult keypair = new P12KeypairGenerator().generateECKeypair(curveName,
-                getKeyGenParameters());
+                getKeyGenParameters(), subject);
         saveKeypair(keypair);
 
         return null;

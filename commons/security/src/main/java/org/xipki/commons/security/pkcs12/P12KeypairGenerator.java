@@ -143,25 +143,28 @@ public class P12KeypairGenerator {
 
     // CHECKSTYLE:SKIP
     public P12KeypairGenerationResult generateRSAKeypair(final int keysize,
-            final BigInteger publicExponent, final P12KeystoreGenerationParameters params)
+            final BigInteger publicExponent, final P12KeystoreGenerationParameters params,
+            final String selfSignedCertSubject)
     throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genRSAKeypair(keysize, publicExponent,
                 params.getRandom());
-        return generateIdentity(kp, params);
+        return generateIdentity(kp, params, selfSignedCertSubject);
     }
 
     // CHECKSTYLE:SKIP
     public P12KeypairGenerationResult generateDSAKeypair(final int plength, final int qlength,
-            final P12KeystoreGenerationParameters params) throws Exception {
+            final P12KeystoreGenerationParameters params, final String selfSignedCertSubject)
+    throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genDSAKeypair(plength, qlength, params.getRandom());
-        return generateIdentity(kp, params);
+        return generateIdentity(kp, params, selfSignedCertSubject);
     }
 
     // CHECKSTYLE:SKIP
     public P12KeypairGenerationResult generateECKeypair(final String curveNameOrOid,
-            final P12KeystoreGenerationParameters params) throws Exception {
+            final P12KeystoreGenerationParameters params, final String selfSignedCertSubject)
+    throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genECKeypair(curveNameOrOid, params.getRandom());
-        return generateIdentity(kp, params);
+        return generateIdentity(kp, params, selfSignedCertSubject);
     }
 
     // CHECKSTYLE:SKIP
@@ -204,13 +207,16 @@ public class P12KeypairGenerator {
     }
 
     private static P12KeypairGenerationResult generateIdentity(
-            final KeyPairWithSubjectPublicKeyInfo kp, final P12KeystoreGenerationParameters params)
+            final KeyPairWithSubjectPublicKeyInfo kp, final P12KeystoreGenerationParameters params,
+            final String selfSignedCertSubject)
     throws Exception {
         Date now = new Date();
         Date notBefore = new Date(now.getTime() - 10 * MIN); // 10 minutes past
         Date notAfter = new Date(notBefore.getTime() + 3650 * DAY);
 
-        X500Name subjectDn = new X500Name("CN=DUMMY");
+        X500Name subjectDn = new X500Name(selfSignedCertSubject == null
+                ? "CN=DUMMY"
+                : selfSignedCertSubject);
         SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
         ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate());
 
