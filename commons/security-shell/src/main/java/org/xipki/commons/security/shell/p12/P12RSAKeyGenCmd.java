@@ -69,7 +69,7 @@ public class P12RSAKeyGenCmd extends P12KeyGenCommandSupport {
         }
 
         P12KeypairGenerationResult keypair = new P12KeypairGenerator().generateRSAKeypair(keysize,
-                toBigInt(publicExponent), getKeyGenParameters());
+                toBigInt(publicExponent), getKeyGenParameters(), subject);
         saveKeypair(keypair);
 
         return null;
