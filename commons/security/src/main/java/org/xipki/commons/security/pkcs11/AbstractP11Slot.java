@@ -61,6 +61,7 @@ import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.X509Cert;
@@ -706,7 +707,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
         String issuer = X509Util.getRfc4519Name(cert.getIssuerX500Principal());
         sb.append("\t\t\tIssuer: ").append(issuer).append("\n");
-        sb.append("\t\t\tSerial: ").append(cert.getSerialNumber()).append("\n");
+        sb.append("\t\t\tSerial: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append("\n");
         sb.append("\t\t\tStart time: ").append(cert.getNotBefore()).append("\n");
         sb.append("\t\t\tEnd time: ").append(cert.getNotAfter()).append("\n");
         sb.append("\t\t\tSHA1 Sum: ");

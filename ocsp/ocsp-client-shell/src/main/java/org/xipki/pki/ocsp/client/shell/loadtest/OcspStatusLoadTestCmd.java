@@ -96,14 +96,14 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
                     int endSerial = Integer.parseInt(subtokens.get(1).trim());
                     if (startSerial < 1 || endSerial < 1 || startSerial > endSerial) {
                         throw new IllegalCmdParamException(
-                                "invalid serial number " + this.serialNumbers);
+                                "invalid serial numbers " + this.serialNumbers);
                     }
                     for (long i = startSerial; i <= endSerial; i++) {
                         tmpSerialNumbers.add(i);
                     }
                 } else {
                     throw new IllegalCmdParamException(
-                            "invalid serial number " + this.serialNumbers);
+                            "invalid serial numbers " + this.serialNumbers);
                 }
             } // end for
         } catch (Exception ex) {
