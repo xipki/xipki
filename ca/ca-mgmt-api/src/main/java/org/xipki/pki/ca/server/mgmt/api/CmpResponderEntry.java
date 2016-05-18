@@ -41,6 +41,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.commons.security.util.X509Util;
@@ -147,7 +148,8 @@ public class CmpResponderEntry implements Serializable {
             if (certificate != null) {
                 sb.append("\tissuer: ").append(X509Util.getRfc4519Name(
                         certificate.getIssuerX500Principal())).append('\n');
-                sb.append("\tserialNumber: ").append(certificate.getSerialNumber()).append('\n');
+                sb.append("\tserialNumber: ")
+                        .append(LogUtil.formatCsn(certificate.getSerialNumber())).append('\n');
                 sb.append("\tsubject: ").append(X509Util.getRfc4519Name(
                         certificate.getSubjectX500Principal())).append('\n');
             }

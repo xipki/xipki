@@ -71,6 +71,7 @@ import org.bouncycastle.operator.DigestCalculator;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.RequestResponsePair;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.ConcurrentContentSigner;
@@ -297,12 +298,13 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                 BigInteger serialNumber = cid.getSerialNumber();
                 if (!tmpSerials2.remove(serialNumber)) {
                     if (tmpSerials1.contains(serialNumber)) {
-                        throw new OcspTargetUnmatchedException("serialNumber " + serialNumber
+                        throw new OcspTargetUnmatchedException("serialNumber "
+                                + LogUtil.formatCsn(serialNumber)
                                 + "is contained in at least two singleResponses");
                     } else {
                         throw new OcspTargetUnmatchedException(
-                                "the serialNumber specified in singleResponse[" + i
-                                + "] is not requested");
+                                "serialNumber " + LogUtil.formatCsn(serialNumber)
+                                + " specified in singleResponse[" + i + "] is not requested");
                     }
                 }
             } // end for

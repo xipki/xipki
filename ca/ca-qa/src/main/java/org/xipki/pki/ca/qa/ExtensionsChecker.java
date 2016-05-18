@@ -1073,9 +1073,9 @@ public class ExtensionsChecker {
             } else {
                 if (!issuerInfo.getCert().getSerialNumber().equals(serialNumber)) {
                     failureMsg.append("authorityCertSerialNumber is '")
-                        .append(serialNumber);
+                        .append(LogUtil.formatCsn(serialNumber));
                     failureMsg.append("' but expected '")
-                        .append(issuerInfo.getCert().getSerialNumber())
+                        .append(LogUtil.formatCsn(issuerInfo.getCert().getSerialNumber()))
                         .append("'");
                     failureMsg.append("; ");
                 }

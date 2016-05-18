@@ -44,6 +44,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.commons.security.util.X509Util;
@@ -159,7 +160,8 @@ public class ScepEntry implements Serializable {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
                     X509Util.getRfc4519Name(certificate.getIssuerX500Principal())).append('\n');
-            sb.append("\tserialNumber: ").append(certificate.getSerialNumber()).append('\n');
+            sb.append("\tserialNumber: ").append(LogUtil.formatCsn(certificate.getSerialNumber()))
+                    .append('\n');
             sb.append("\tsubject: ").append(
                     X509Util.getRfc4519Name(certificate.getSubjectX500Principal())).append('\n');
 

@@ -108,6 +108,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.common.util.XmlUtil;
@@ -351,7 +352,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
             if (certId == null) {
                 LOG.warn("certId is not present in response for (issuer='{}', serialNumber={})",
-                        X509Util.getRfc4519Name(re.getIssuer()), re.getSerialNumber());
+                        X509Util.getRfc4519Name(re.getIssuer()),
+                        LogUtil.formatCsn(re.getSerialNumber()));
                 certId = new CertId(new GeneralName(re.getIssuer()), re.getSerialNumber());
                 continue;
             }

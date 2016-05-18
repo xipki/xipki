@@ -970,7 +970,8 @@ public class OcspServer {
                             Hex.toHexString(certId.getIssuerKeyHash()) .toUpperCase()).append(", ");
                     sb.append("issuerNameHash: ").append(
                             Hex.toHexString(certId.getIssuerNameHash()).toUpperCase()).append(", ");
-                    sb.append("serialNumber: ").append(certId.getSerialNumber()).append(", ");
+                    sb.append("serialNumber: ").append(LogUtil.formatCsn(certId.getSerialNumber()))
+                            .append(", ");
                     sb.append("certStatus: ").append(certStatusText).append(", ");
                     sb.append("thisUpdate: ").append(thisUpdate).append(", ");
                     sb.append("nextUpdate: ").append(nextUpdate).append(", ");

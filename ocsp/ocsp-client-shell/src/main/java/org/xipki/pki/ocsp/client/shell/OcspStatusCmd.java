@@ -68,6 +68,7 @@ import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.security.CrlReason;
@@ -242,7 +243,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
             BigInteger serialNumber = certId.getSerialNumber();
 
             msg.append("issuer matched: ").append(issuerMatch);
-            msg.append("serialNumber: ").append(serialNumber);
+            msg.append("serialNumber: ").append(LogUtil.formatCsn(serialNumber));
             msg.append("\nCertificate status: ").append(status);
 
             if (verbose.booleanValue()) {

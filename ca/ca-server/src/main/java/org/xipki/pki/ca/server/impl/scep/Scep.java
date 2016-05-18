@@ -551,7 +551,7 @@ public class Scep {
                 BigInteger serial = isn.getSerialNumber().getPositiveValue();
                 if (auditEvent != null) {
                     audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
-                    audit(auditEvent, "serialNumber", serial.toString());
+                    audit(auditEvent, "serialNumber", LogUtil.formatCsn(serial));
                 }
                 ensureIssuedByThisCa(caX500Name, isn.getName());
                 signedData = getCert(ca, isn.getSerialNumber().getPositiveValue());
@@ -561,7 +561,7 @@ public class Scep {
                 serial = isn.getSerialNumber().getPositiveValue();
                 if (auditEvent != null) {
                     audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
-                    audit(auditEvent, "serialNumber", serial.toString());
+                    audit(auditEvent, "serialNumber", LogUtil.formatCsn(serial));
                 }
                 ensureIssuedByThisCa(caX500Name, isn.getName());
                 signedData = getCrl(ca, serial);
@@ -590,7 +590,7 @@ public class Scep {
             cert = ca.getCertificate(serialNumber);
         } catch (CertificateException ex) {
             final String message = "could not get certificate (CA='" + caName
-                    + "' and serialNumber='" + serialNumber + "')";
+                    + "' and serialNumber=" + LogUtil.formatCsn(serialNumber) + ")";
             LogUtil.error(LOG, ex, message);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }

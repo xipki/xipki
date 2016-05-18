@@ -50,6 +50,7 @@ import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.ConfPairs;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
@@ -181,7 +182,7 @@ public class OcspCertPublisher extends X509CertPublisher {
     private void logAndAudit(final String issuer, final X509Cert cert, final Exception ex,
             final String messagePrefix) {
         String subjectText = cert.getSubject();
-        String serialText = cert.getCert().getSerialNumber().toString();
+        String serialText = LogUtil.formatCsn(cert.getCert().getSerialNumber());
 
         LOG.error("{} (issuser='{}': subject='{}', serialNumber={}). Message: {}",
                 new Object[]{messagePrefix, issuer, subjectText, serialText, ex.getMessage()});

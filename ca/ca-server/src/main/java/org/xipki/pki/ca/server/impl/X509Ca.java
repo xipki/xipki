@@ -933,7 +933,8 @@ public class X509Ca {
             LOG.info("{} generateCertificate: CA={}, profile={},"
                     + " subject='{}', serialNumber={}",
                     new Object[]{prefix, caInfo.getName(), certprofileName,
-                        ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
+                        ret.getCert().getSubject(),
+                        LogUtil.formatCsn(ret.getCert().getCert().getSerialNumber())});
             return ret;
         } catch (RuntimeException ex) {
             LogUtil.warn(LOG, ex);
@@ -965,7 +966,8 @@ public class X509Ca {
             LOG.info("SUCCESSFUL generateCertificate: CA={}, profile={},"
                     + " subject='{}', serialNumber={}",
                     new Object[]{caInfo.getName(), certprofileName,
-                        ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
+                        ret.getCert().getSubject(),
+                        LogUtil.formatCsn(ret.getCert().getCert().getSerialNumber())});
 
             return ret;
         } catch (RuntimeException ex) {
@@ -1125,7 +1127,7 @@ public class X509Ca {
                         boolean successful = publisher.certificateAdded(certInfo);
                         if (!successful) {
                             LOG.error("republish certificate serial={} to publisher {} failed",
-                                    sid.getSerial(), publisher.getName());
+                                    LogUtil.formatCsn(sid.getSerial()), publisher.getName());
                             return false;
                         }
                     }
@@ -1340,7 +1342,7 @@ public class X509Ca {
                     + "from publisher {} failed.",
                     new Object[] {
                             X509Util.getRfc4519Name(cert.getIssuerX500Principal()),
-                            cert.getSerialNumber(),
+                            LogUtil.formatCsn(cert.getSerialNumber()),
                             X509Util.getRfc4519Name(cert.getSubjectX500Principal()),
                             publisher.getName()});
         } // end for
@@ -1359,7 +1361,8 @@ public class X509Ca {
         ParamUtil.requireNonNull("reason", reason);
         LOG.info(
             "     START revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
-            new Object[]{caInfo.getName(), serialNumber, reason.getDescription(), invalidityTime});
+            new Object[]{caInfo.getName(), LogUtil.formatCsn(serialNumber),
+                    reason.getDescription(), invalidityTime});
 
         X509CertWithRevocationInfo revokedCert = null;
 
@@ -1404,7 +1407,8 @@ public class X509Ca {
                 : "REVOKED";
         LOG.info("SUCCESSFUL revokeCertificate: ca={}, serialNumber={}, reason={},"
                 + " invalidityTime={}, revocationResult={}",
-                new Object[]{caInfo.getName(), serialNumber, reason.getDescription(),
+                new Object[]{caInfo.getName(), LogUtil.formatCsn(serialNumber),
+                        reason.getDescription(),
                     invalidityTime, resultText});
 
         return revokedCert;
@@ -1412,8 +1416,9 @@ public class X509Ca {
 
     private X509CertWithDbId doUnrevokeCertificate(final BigInteger serialNumber,
             final boolean force) throws OperationException {
+        String hexSerial = LogUtil.formatCsn(serialNumber);
         LOG.info("     START unrevokeCertificate: ca={}, serialNumber={}", caInfo.getName(),
-                serialNumber);
+                hexSerial);
 
         X509CertWithDbId unrevokedCert = null;
 
@@ -1454,7 +1459,7 @@ public class X509Ca {
                 ? "CERT_NOT_EXIST"
                 : "UNREVOKED";
         LOG.info("SUCCESSFUL unrevokeCertificate: ca={}, serialNumber={}, revocationResult={}",
-                new Object[]{caInfo.getName(), serialNumber, resultText});
+                new Object[]{caInfo.getName(), hexSerial, resultText});
 
         return unrevokedCert;
     } // doUnrevokeCertificate
@@ -2059,7 +2064,7 @@ public class X509Ca {
                                     : AuditStatus.FAILED);
                         auditEvent.addEventData(new AuditEventData("CA", caName));
                         auditEvent.addEventData(
-                                new AuditEventData("serialNumber", serial.toString()));
+                                new AuditEventData("serialNumber", LogUtil.formatCsn(serial)));
                         auditEvent.addEventData(
                                 new AuditEventData("eventType", "REMOVE_EXPIRED_CERT"));
                         audit.logEvent(auditEvent);

@@ -171,10 +171,10 @@ public class CertificateStore {
                     caCert, serialNumber, revInfo, force, publishToDeltaCrlCache);
             if (revokedCert == null) {
                 LOG.info("could not revoke non-existing certificate issuer='{}', serialNumber={}",
-                    caCert.getSubject(), serialNumber);
+                    caCert.getSubject(), LogUtil.formatCsn(serialNumber));
             } else {
                 LOG.info("revoked certificate issuer='{}', serialNumber={}",
-                    caCert.getSubject(), serialNumber);
+                    caCert.getSubject(), LogUtil.formatCsn(serialNumber));
             }
 
             return revokedCert;
@@ -194,10 +194,10 @@ public class CertificateStore {
                     caCert, serialNumber, force, publishToDeltaCrlCache);
             if (unrevokedCert == null) {
                 LOG.info("could not unrevoke non-existing certificate issuer='{}', serialNumber={}",
-                    caCert.getSubject(), serialNumber);
+                    caCert.getSubject(), LogUtil.formatCsn(serialNumber));
             } else {
                 LOG.info("unrevoked certificate issuer='{}', serialNumber={}",
-                        caCert.getSubject(), serialNumber);
+                        caCert.getSubject(), LogUtil.formatCsn(serialNumber));
             }
 
             return unrevokedCert;

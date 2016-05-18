@@ -36,6 +36,8 @@
 
 package org.xipki.commons.common.util;
 
+import java.math.BigInteger;
+
 import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
@@ -118,6 +120,15 @@ public class LogUtil {
         log.debug(msg, th);
     }
 
+    /**
+     * Formats certificate serial number.
+     * @param serialNumber certificate serial number
+     * @return formatted certificate serial number
+     */
+    public static String formatCsn(final BigInteger serialNumber) {
+        return "0x" + serialNumber.toString(16);
+    }
+
     private static String getMessage(final Throwable th) {
         if (th instanceof JAXBException) {
             return XmlUtil.getMessage((JAXBException) th);
@@ -125,4 +136,5 @@ public class LogUtil {
             return th.getMessage();
         }
     }
+
 }

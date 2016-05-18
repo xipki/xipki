@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.KeyUsage;
@@ -195,7 +196,8 @@ public class X509CaEntry extends CaEntry implements Serializable {
         } else {
             sb.append("\tissuer: ").append(
                     X509Util.getRfc4519Name(cert.getIssuerX500Principal())).append("\n");
-            sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
+            sb.append("\tserialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber()))
+                    .append("\n");
             sb.append("\tsubject: ").append(subject).append("\n");
             sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");
             sb.append("\tnotAfter: ").append(cert.getNotAfter()).append("\n");

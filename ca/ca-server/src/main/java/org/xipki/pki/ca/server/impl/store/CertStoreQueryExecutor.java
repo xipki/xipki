@@ -71,6 +71,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
@@ -684,7 +685,7 @@ class CertStoreQueryExecutor {
                 = getCertWithRevocationInfo(caCert, serialNumber);
         if (certWithRevInfo == null) {
             LOG.warn("certificate with issuer='{}' and serialNumber={} does not exist",
-                    caCert.getSubject(), serialNumber);
+                    caCert.getSubject(), LogUtil.formatCsn(serialNumber));
             return null;
         }
 
@@ -763,7 +764,7 @@ class CertStoreQueryExecutor {
                 = getCertWithRevocationInfo(caCert, serialNumber);
         if (certWithRevInfo == null) {
             LOG.warn("certificate with issuer='{}' and serialNumber={} does not exist",
-                    caCert.getSubject(), serialNumber);
+                    caCert.getSubject(), LogUtil.formatCsn(serialNumber));
             return null;
         }
 

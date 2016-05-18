@@ -484,7 +484,7 @@ public class CrlCertStatusStore extends OcspStore {
                         cert = certsMap.remove(serialNumber);
                         if (cert == null) {
                             LOG.info("could not find certificate (serialNumber='{}')",
-                                    serialNumber);
+                                    LogUtil.formatCsn(serialNumber));
                         }
                     }
 
@@ -596,13 +596,13 @@ public class CrlCertStatusStore extends OcspStore {
             if (bcCert != null) {
                 if (!caName.equals(bcCert.getIssuer())) {
                     throw new OcspStoreException(
-                        "issuer not match (serial=" + serialNumber
+                        "issuer not match (serial=" + LogUtil.formatCsn(serialNumber)
                         + ") in CRL Extension Xipki-CertSet");
                 }
 
                 if (!serialNumber.equals(bcCert.getSerialNumber().getValue())) {
                     throw new OcspStoreException(
-                            "serialNumber not match (serial=" + serialNumber
+                            "serialNumber not match (serial=" + LogUtil.formatCsn(serialNumber)
                             + ") in CRL Extension Xipki-CertSet");
                 }
             }

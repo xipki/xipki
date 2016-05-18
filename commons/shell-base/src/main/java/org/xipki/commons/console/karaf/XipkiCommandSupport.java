@@ -98,7 +98,7 @@ public abstract class XipkiCommandSupport implements Action {
                     } else {
                         answer = session.readLine(null, null);
                     }
-                    
+
                     if (answer == null) {
                         throw new IOException("interrupted");
                     }

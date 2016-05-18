@@ -166,7 +166,8 @@ public class X509CaCmpResponder extends CmpResponder {
                             invalidityDate);
                 } catch (Throwable th) {
                     LOG.error("could not revoke certificate (CA={}, serialNumber={}): {}",
-                            ca.getCaInfo().getName(), serialNumber, th.getMessage());
+                            ca.getCaInfo().getName(), LogUtil.formatCsn(serialNumber),
+                            th.getMessage());
                 }
             }
         } // method run
@@ -761,7 +762,8 @@ public class X509CaCmpResponder extends CmpResponder {
             CertId certId = new CertId(new GeneralName(caSubject), serialNumber);
 
             if (childAuditEvent != null) {
-                AuditEventData eventData = new AuditEventData("serialNumber", snBigInt.toString());
+                AuditEventData eventData = new AuditEventData("serialNumber",
+                        LogUtil.formatCsn(snBigInt));
                 childAuditEvent.addEventData(eventData);
             }
 
@@ -929,7 +931,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 ca.revokeCertificate(serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date());
             } catch (OperationException ex) {
                 LogUtil.warn(LOG, ex, "could not revoke certificate ca=" + ca.getCaInfo().getName()
-                        + " serialNumber=" + serialNumber);
+                        + " serialNumber=" + LogUtil.formatCsn(serialNumber));
             }
 
             successful = false;
