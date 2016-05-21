@@ -299,7 +299,10 @@ public class X509CertprofileQa {
             }
 
             if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND) {
-                issue.setFailureMessage("cert validity is not within " + validity.toString());
+                Date caNotAfter = issuerInfo.getCert().getNotAfter();
+                if (! caNotAfter.equals(cert.getNotAfter())) {
+                    issue.setFailureMessage("cert validity is not within " + validity.toString());
+                }
             }
         }
 
