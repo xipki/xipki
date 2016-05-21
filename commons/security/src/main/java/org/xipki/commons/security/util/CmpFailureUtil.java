@@ -92,10 +92,7 @@ public class CmpFailureUtil {
         int status = pkiStatusInfo.getStatus().intValue();
         int failureInfo = pkiStatusInfo.getFailInfo().intValue();
         PKIFreeText text = pkiStatusInfo.getStatusString();
-        String statusMessage = (text == null)
-                ? null
-                : text.getStringAt(0).getString();
-
+        String statusMessage = (text == null) ? null : text.getStringAt(0).getString();
         return formatPkiStatusInfo(status, failureInfo, statusMessage);
     }
 
@@ -121,9 +118,7 @@ public class CmpFailureUtil {
             }
         }
 
-        return (sb.length() < 3)
-                ? ""
-                : sb.substring(2);
+        return (sb.length() < 3) ? "" : sb.substring(2);
     }
 
 }

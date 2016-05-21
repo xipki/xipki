@@ -337,9 +337,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
         // unsignedAttributes
         AttributeTable unsignedAttrs = signerInfo.getUnsignedAttributes();
-        attrs = (unsignedAttrs == null)
-                ? null
-                : unsignedAttrs.toASN1Structure().getAttributes();
+        attrs = (unsignedAttrs == null) ? null : unsignedAttrs.toASN1Structure().getAttributes();
         if (attrs != null) {
             for (Attribute attr : attrs) {
                 ASN1ObjectIdentifier type = attr.getAttrType();

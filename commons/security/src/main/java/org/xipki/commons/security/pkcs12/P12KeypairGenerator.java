@@ -214,9 +214,8 @@ public class P12KeypairGenerator {
         Date notBefore = new Date(now.getTime() - 10 * MIN); // 10 minutes past
         Date notAfter = new Date(notBefore.getTime() + 3650 * DAY);
 
-        X500Name subjectDn = new X500Name(selfSignedCertSubject == null
-                ? "CN=DUMMY"
-                : selfSignedCertSubject);
+        String dnStr = (selfSignedCertSubject == null) ? "CN=DUMMY" : selfSignedCertSubject;
+        X500Name subjectDn = new X500Name(dnStr);
         SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
         ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate());
 
@@ -240,8 +239,7 @@ public class P12KeypairGenerator {
             ksStream.flush();
         }
 
-        P12KeypairGenerationResult result = new P12KeypairGenerationResult(
-                ksStream.toByteArray());
+        P12KeypairGenerationResult result = new P12KeypairGenerationResult(ksStream.toByteArray());
         result.setKeystoreObject(ks);
         return result;
     } // method generateIdentity

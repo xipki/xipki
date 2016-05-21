@@ -328,8 +328,7 @@ public class AlgorithmUtil {
                 throw new NoSuchAlgorithmException("unsupported signature algorithm " + algoS);
             }
 
-            signatureAlgId = withNullParam
-                    ? new AlgorithmIdentifier(algOid, DERNull.INSTANCE)
+            signatureAlgId = withNullParam ? new AlgorithmIdentifier(algOid, DERNull.INSTANCE)
                     : new AlgorithmIdentifier(algOid);
         }
 
@@ -344,12 +343,8 @@ public class AlgorithmUtil {
         } else {
             SignatureAlgoControl algoControl = signerConf.getSignatureAlgoControl();
             HashAlgoType hashAlgo = signerConf.getHashAlgo();
-            boolean rsaMgf1 = (algoControl == null)
-                    ? false
-                    : algoControl.isRsaMgf1();
-            boolean ecdsaPlain = (algoControl == null)
-                    ? false
-                    : algoControl.isEcdsaPlain();
+            boolean rsaMgf1 = (algoControl == null) ? false : algoControl.isRsaMgf1();
+            boolean ecdsaPlain = (algoControl == null) ? false : algoControl.isEcdsaPlain();
 
             if (pubKey instanceof RSAPublicKey) {
                 return getRSASignatureAlgoId(hashAlgo, rsaMgf1);
@@ -368,12 +363,8 @@ public class AlgorithmUtil {
             final HashAlgoType hashAlgo, final SignatureAlgoControl algoControl)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-        boolean rsaMgf1 = (algoControl == null)
-                ? false
-                : algoControl.isRsaMgf1();
-        boolean ecdsaPlain = (algoControl == null)
-                ? false
-                : algoControl.isEcdsaPlain();
+        boolean rsaMgf1 = (algoControl == null) ? false : algoControl.isRsaMgf1();
+        boolean ecdsaPlain = (algoControl == null) ? false : algoControl.isEcdsaPlain();
 
         if (pubKey instanceof RSAPublicKey) {
             return getRSASignatureAlgoId(hashAlgo, rsaMgf1);
@@ -527,28 +518,23 @@ public class AlgorithmUtil {
         ASN1ObjectIdentifier sigAlgoOid;
         switch (hashAlgo) {
         case SHA1:
-            sigAlgoOid = plainSignature
-                    ? BSIObjectIdentifiers.ecdsa_plain_SHA1
+            sigAlgoOid = plainSignature ? BSIObjectIdentifiers.ecdsa_plain_SHA1
                     : X9ObjectIdentifiers.ecdsa_with_SHA1;
             break;
         case SHA224:
-            sigAlgoOid = plainSignature
-                    ? BSIObjectIdentifiers.ecdsa_plain_SHA224
+            sigAlgoOid = plainSignature ? BSIObjectIdentifiers.ecdsa_plain_SHA224
                     : X9ObjectIdentifiers.ecdsa_with_SHA224;
             break;
         case SHA256:
-            sigAlgoOid = plainSignature
-                    ? BSIObjectIdentifiers.ecdsa_plain_SHA256
+            sigAlgoOid = plainSignature ? BSIObjectIdentifiers.ecdsa_plain_SHA256
                     : X9ObjectIdentifiers.ecdsa_with_SHA256;
             break;
         case SHA384:
-            sigAlgoOid = plainSignature
-                    ? BSIObjectIdentifiers.ecdsa_plain_SHA384
+            sigAlgoOid = plainSignature ? BSIObjectIdentifiers.ecdsa_plain_SHA384
                     : X9ObjectIdentifiers.ecdsa_with_SHA384;
             break;
         case SHA512:
-            sigAlgoOid = plainSignature
-                    ? BSIObjectIdentifiers.ecdsa_plain_SHA512
+            sigAlgoOid = plainSignature ? BSIObjectIdentifiers.ecdsa_plain_SHA512
                     : X9ObjectIdentifiers.ecdsa_with_SHA512;
             break;
         default:

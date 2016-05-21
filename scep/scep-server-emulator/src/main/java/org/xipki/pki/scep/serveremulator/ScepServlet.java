@@ -123,9 +123,7 @@ public class ScepServlet extends HttpServlet {
             final boolean post) throws ServletException, IOException {
         String servletPath = request.getServletPath();
 
-        AuditEvent auditEvent = (auditService != null)
-                ? new AuditEvent(new Date())
-                : null;
+        AuditEvent auditEvent = (auditService != null) ? new AuditEvent(new Date()) : null;
         if (auditEvent != null) {
             auditEvent.setApplicationName("SCEP");
             auditEvent.setName("PERF");

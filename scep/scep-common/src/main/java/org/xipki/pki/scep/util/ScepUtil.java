@@ -122,11 +122,9 @@ public class ScepUtil {
         if (publicKey instanceof java.security.interfaces.RSAPublicKey) {
             java.security.interfaces.RSAPublicKey rsaPubKey =
                     (java.security.interfaces.RSAPublicKey) publicKey;
-            SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(
-                    new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption,
-                            DERNull.INSTANCE),
+            return new SubjectPublicKeyInfo(
+                    new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
                     new RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
-            return spki;
         } else {
             throw new IllegalArgumentException("unsupported public key " + publicKey);
         }
@@ -206,14 +204,11 @@ public class ScepUtil {
         Date notBefore = new Date(System.currentTimeMillis() - 5 * MIN_IN_MS);
         Date notAfter = new Date(notBefore.getTime() + 30 * DAY_IN_MS);
 
-        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-                subjectDn, BigInteger.ONE, notBefore, notAfter, subjectDn,
-                pubKeyInfo);
+        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
+                BigInteger.ONE, notBefore, notAfter, subjectDn, pubKeyInfo);
 
-        X509KeyUsage ku = new X509KeyUsage(
-                    X509KeyUsage.digitalSignature
-                    | X509KeyUsage.dataEncipherment
-                    | X509KeyUsage.keyAgreement
+        X509KeyUsage ku = new X509KeyUsage( X509KeyUsage.digitalSignature
+                    | X509KeyUsage.dataEncipherment | X509KeyUsage.keyAgreement
                     | X509KeyUsage.keyEncipherment);
         try {
             certGenerator.addExtension(Extension.keyUsage, true, ku);
@@ -388,11 +383,7 @@ public class ScepUtil {
             byte[] ski = extractSki(cert);
             byte[] aki = extractAki(cert);
 
-            if (ski != null && aki != null) {
-                return Arrays.equals(ski, aki);
-            } else {
-                return true;
-            }
+            return (ski != null && aki != null) ? Arrays.equals(ski, aki) : true;
         } catch (CertificateEncodingException ex) {
             return false;
         }
@@ -464,9 +455,7 @@ public class ScepUtil {
             return null;
         }
         ASN1Set set = attr.getAttrValues();
-        return (set.size() == 0)
-                ? null
-                : set.getObjectAt(0);
+        return (set.size() == 0) ? null : set.getObjectAt(0);
     }
 
     public static byte[] read(final InputStream in) throws IOException {

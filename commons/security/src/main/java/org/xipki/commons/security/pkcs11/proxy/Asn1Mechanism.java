@@ -75,11 +75,7 @@ public class Asn1Mechanism extends ASN1Object {
         int size = seq.size();
         int idx = 0;
         this.mechanism = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
-        if (size > 1) {
-            this.params = Asn1P11Params.getInstance(seq.getObjectAt(idx++));
-        } else {
-            this.params = null;
-        }
+        this.params = (size > 1)  ? Asn1P11Params.getInstance(seq.getObjectAt(idx++)) : null;
     }
 
     public static Asn1Mechanism getInstance(final Object obj) throws BadAsn1ObjectException {

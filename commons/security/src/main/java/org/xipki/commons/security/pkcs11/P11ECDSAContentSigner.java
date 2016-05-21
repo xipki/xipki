@@ -148,11 +148,7 @@ class P11ECDSAContentSigner implements ContentSigner {
     public byte[] getSignature() {
         try {
             byte[] plainSignature = getPlainSignature();
-            if (plain) {
-                return plainSignature;
-            } else {
-                return SignerUtil.convertPlainDSASigToX962(plainSignature);
-            }
+            return plain ? plainSignature : SignerUtil.convertPlainDSASigToX962(plainSignature);
         } catch (XiSecurityException ex) {
             LOG.warn("SignerException: {}", ex.getMessage());
             LOG.debug("SignerException", ex);

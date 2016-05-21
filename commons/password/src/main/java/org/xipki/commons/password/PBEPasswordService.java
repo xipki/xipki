@@ -73,8 +73,7 @@ public class PBEPasswordService {
         int iterationCount = new BigInteger(1, iterationCounntBytes).intValue();
         byte[] pwd;
         try {
-            pwd = PasswordBasedEncryption.decrypt(cipherText, masterPassword, iterationCount,
-                    salt);
+            pwd = PasswordBasedEncryption.decrypt(cipherText, masterPassword, iterationCount, salt);
         } catch (GeneralSecurityException ex) {
             throw new PasswordResolverException("could not decrypt the password: "
                     + ex.getMessage());
@@ -114,8 +113,7 @@ public class PBEPasswordService {
         System.arraycopy(iterationCountBytes, 0, encryptedWithSalt, 0, 2);
         System.arraycopy(salt, 0, encryptedWithSalt, 2, salt.length);
         System.arraycopy(encrypted, 0, encryptedWithSalt, 2 + salt.length, encrypted.length);
-        String pbeText = "PBE:" + Base64.getEncoder().encodeToString(encryptedWithSalt);
-        return pbeText;
+        return "PBE:" + Base64.getEncoder().encodeToString(encryptedWithSalt);
     }
 
 }

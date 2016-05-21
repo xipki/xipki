@@ -72,8 +72,7 @@ public class Asn1Util {
         try {
             return ASN1Sequence.getInstance(object);
         } catch (IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException(
-                    "invalid object Sequence: " + ex.getMessage(), ex);
+            throw new BadAsn1ObjectException("invalid object Sequence: " + ex.getMessage(), ex);
         }
     }
 
@@ -82,8 +81,7 @@ public class Asn1Util {
         try {
             return Certificate.getInstance(object);
         } catch (IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException(
-                    "invalid object Certificate: " + ex.getMessage(), ex);
+            throw new BadAsn1ObjectException("invalid object Certificate: " + ex.getMessage(), ex);
         }
     }
 
@@ -91,8 +89,7 @@ public class Asn1Util {
         try {
             return ASN1Integer.getInstance(object).getValue();
         } catch (IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException(
-                    "invalid object ASN1Integer: " + ex.getMessage(), ex);
+            throw new BadAsn1ObjectException("invalid object ASN1Integer: " + ex.getMessage(), ex);
         }
     }
 
@@ -100,8 +97,7 @@ public class Asn1Util {
         try {
             return DERUTF8String.getInstance(object).getString();
         } catch (IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException(
-                    "invalid object UTF8String: " + ex.getMessage(), ex);
+            throw new BadAsn1ObjectException("invalid object UTF8String: " + ex.getMessage(), ex);
         }
     }
 
@@ -110,8 +106,7 @@ public class Asn1Util {
         try {
             return DEROctetString.getInstance(object).getOctets();
         } catch (IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException(
-                    "invalid object OctetString: " + ex.getMessage(), ex);
+            throw new BadAsn1ObjectException("invalid object OctetString: " + ex.getMessage(), ex);
         }
     }
 
@@ -120,8 +115,8 @@ public class Asn1Util {
         try {
             return ASN1ObjectIdentifier.getInstance(object);
         } catch (IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException(
-                    "invalid object ObjectIdentifier: " + ex.getMessage(), ex);
+            throw new BadAsn1ObjectException("invalid object ObjectIdentifier: " + ex.getMessage(),
+                    ex);
         }
     }
 

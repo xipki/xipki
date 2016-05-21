@@ -51,13 +51,11 @@ public class HealthCheckResultTest {
     @Test
     public void test1() {
         String encoded = "{\"healthy\":true}";
-        HealthCheckResult result = HealthCheckResult.getInstanceFromJsonMessage("default",
-                encoded);
+        HealthCheckResult result = HealthCheckResult.getInstanceFromJsonMessage("default", encoded);
 
         String noPrettyJson = "{\"healthy\":true}";
 
-        String prettyJson =
-            "{\n"
+        String prettyJson = "{\n"
             + "    \"healthy\":true\n"
             + "}";
         check(result, noPrettyJson, prettyJson);
@@ -76,8 +74,7 @@ public class HealthCheckResultTest {
                 + "\"checks\":{\"childChildCheck\":{\"healthy\":false}}},"
                 + "\"childcheck2\":{\"healthy\":false}}}";
 
-        String prettyJson =
-                "{\n"
+        String prettyJson = "{\n"
                 + "    \"healthy\":true,\n"
                 + "    \"checks\":{\n"
                 + "        \"childcheck\":{\n"
@@ -104,8 +101,7 @@ public class HealthCheckResultTest {
 
         String noPrettyJson = "{\"healthy\":false}";
 
-        String prettyJson =
-                "{\n"
+        String prettyJson = "{\n"
                 + "    \"healthy\":false\n"
                 + "}";
         check(result, noPrettyJson, prettyJson);
@@ -118,8 +114,7 @@ public class HealthCheckResultTest {
 
         String noPrettyJson = "{\"healthy\":true}";
 
-        String prettyJson =
-                "{\n"
+        String prettyJson = "{\n"
                 + "    \"healthy\":true\n"
                 + "}";
         check(result, noPrettyJson, prettyJson);
@@ -146,8 +141,7 @@ public class HealthCheckResultTest {
                 + "\"checks\":{\"childChildCheck\":{\"healthy\":false}}},\"childcheck2\":"
                 + "{\"healthy\":false}}}";
 
-        String prettyJson =
-                "{\n"
+        String prettyJson = "{\n"
                 + "    \"healthy\":true,\n"
                 + "    \"checks\":{\n"
                 + "        \"childcheck\":{\n"

@@ -165,9 +165,7 @@ public class XmlUtil {
     public static String getValueOfFirstElementChild(final Element element, final String namespace,
             final String localname) {
         Node node = getFirstElementChild(element, namespace, localname);
-        return (node == null)
-                ? null
-                : getNodeValue(node);
+        return (node == null) ? null : getNodeValue(node);
     }
 
     public static String getNodeValue(final Node node) {
@@ -297,17 +295,13 @@ public class XmlUtil {
     public static String getValueOfFirstMatch(final Element contextNode, final String relativeXpath,
             final Map<String, String> nsPrefixUriMap) {
         Node node = getFirstMatch(contextNode, relativeXpath, nsPrefixUriMap);
-        return (node == null)
-                ? null
-                : getNodeValue(node);
+        return (node == null) ? null : getNodeValue(node);
     }
 
     public static Node getFirstMatch(final Element contextNode, final String relativeXPath,
             final Map<String, String> nsPrefixUriMap) {
         List<Node> nodes = getMatch(contextNode, relativeXPath, nsPrefixUriMap, true);
-        return CollectionUtil.isEmpty(nodes)
-                ? null
-                : nodes.get(0);
+        return CollectionUtil.isEmpty(nodes) ? null : nodes.get(0);
     }
 
     public static List<Node> getMatch(final Element contextNode, final String relativeXPath,
@@ -321,11 +315,7 @@ public class XmlUtil {
             SimpleXpath simpleXpath = new SimpleXpath(relativeXpath, nsPrefixUriMap);
             if (onlyFirstMatch) {
                 Node node = simpleXpath.selectFirstMatch(contextNode);
-                if (node == null) {
-                    return Collections.emptyList();
-                } else {
-                    return Arrays.asList(node);
-                }
+                return (node == null) ? Collections.emptyList() : Arrays.asList(node);
             } else {
                 return simpleXpath.select(contextNode);
             }

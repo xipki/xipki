@@ -177,10 +177,7 @@ public class LiquibaseDatabaseConf {
             }
             driverClassName = "org.postgresql.Driver";
             urlBuilder.append("jdbc:postgresql://");
-            urlBuilder.append(serverName)
-                .append(":")
-                .append(portNumber)
-                .append("/")
+            urlBuilder.append(serverName).append(":").append(portNumber).append("/")
                 .append(databaseName);
         } else if (datasourceClassName.contains("hsqldb.")) {
             driverClassName = "org.hsqldb.jdbc.JDBCDriver";

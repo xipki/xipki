@@ -61,11 +61,7 @@ public class P11PasswordsRetriever {
 
         private SingleRetriever(final Set<P11SlotIdFilter> slots, final List<String> passwords) {
             this.slots = slots;
-            if (CollectionUtil.isEmpty(passwords)) {
-                this.passwords = null;
-            } else {
-                this.passwords = passwords;
-            }
+            this.passwords = CollectionUtil.isEmpty(passwords) ? null : passwords;
         }
 
         public boolean match(final P11SlotIdentifier slot) {

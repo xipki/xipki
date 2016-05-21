@@ -246,9 +246,8 @@ public class ProxyP11Module extends AbstractP11Module {
                 }
             }
             if (!isValidContentType) {
-                throw new IOException("bad response: mime type "
-                        + responseContentType
-                        + " not supported!");
+                throw new IOException("bad response: mime type " + responseContentType
+                        + " is not supported!");
             }
 
             byte[] buf = new byte[4096];
@@ -271,11 +270,7 @@ public class ProxyP11Module extends AbstractP11Module {
         ASN1EncodableVector vec = new ASN1EncodableVector();
         vec.add(new ASN1Integer(version));
         vec.add(new ASN1Integer(action));
-        if (content != null) {
-            vec.add(content);
-        } else {
-            vec.add(DERNull.INSTANCE);
-        }
+        vec.add((content != null) ? content : DERNull.INSTANCE);
         InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
                 new DERSequence(vec));
 
@@ -307,8 +302,7 @@ public class ProxyP11Module extends AbstractP11Module {
             response = new GeneralPKIMessage(encodedResponse);
         } catch (IOException ex) {
             final String msg = "could not decode the received PKI message";
-            LOG.error(msg + ": {}",
-                    Hex.toHexString(encodedResponse));
+            LOG.error(msg + ": {}", Hex.toHexString(encodedResponse));
             throw new P11TokenException(msg + ": " + ex.getMessage(), ex);
         }
 
@@ -323,18 +317,10 @@ public class ProxyP11Module extends AbstractP11Module {
     } // method send
 
     private PKIHeader buildPkiHeader(final ASN1OctetString tid) {
-        PKIHeaderBuilder hdrBuilder = new PKIHeaderBuilder(
-                PKIHeader.CMP_2000,
-                sender,
-                recipient);
+        PKIHeaderBuilder hdrBuilder = new PKIHeaderBuilder(PKIHeader.CMP_2000, sender, recipient);
         hdrBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
-        ASN1OctetString tmpTid;
-        if (tid == null) {
-            tmpTid = new DEROctetString(randomTransactionId());
-        } else {
-            tmpTid = tid;
-        }
+        ASN1OctetString tmpTid = (tid == null) ? new DEROctetString(randomTransactionId()) : tid;
         hdrBuilder.setTransactionID(tmpTid);
 
         return hdrBuilder.build();
@@ -449,11 +435,7 @@ public class ProxyP11Module extends AbstractP11Module {
                         + receivedAction + "' is not the expected '" + action + "'");
             }
 
-            if (seq.size() > 2) {
-                return seq.getObjectAt(2);
-            } else {
-                return null;
-            }
+            return (seq.size() > 2) ? seq.getObjectAt(2) : null;
         } catch (BadAsn1ObjectException ex) {
             throw new P11TokenException("bad ASN1 object: " + ex.getMessage(), ex);
         }

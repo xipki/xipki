@@ -99,12 +99,9 @@ public class EmulatorP11Identity extends P11Identity {
         this.random = ParamUtil.requireNonNull("random", random);
 
         if (this.publicKey instanceof RSAPublicKey) {
-            String providerName;
-            if (Security.getProvider(XiSecurityConstants.PROVIDER_NAME_NSS) != null) {
-                providerName = XiSecurityConstants.PROVIDER_NAME_NSS;
-            } else {
-                providerName = "BC";
-            }
+            String providerName =
+                    (Security.getProvider(XiSecurityConstants.PROVIDER_NAME_NSS) != null)
+                        ? XiSecurityConstants.PROVIDER_NAME_NSS : "BC";
 
             LOG.info("use provider {}", providerName);
 
@@ -231,13 +228,7 @@ public class EmulatorP11Identity extends P11Identity {
                     "unsupported MaskGenerationFunction " + pssParam.getHashAlgorithm());
         }
 
-        byte[] hashValue;
-        if (hashAlgo == null) {
-            hashValue = contentToSign;
-        } else {
-            hashValue = hashAlgo.hash(contentToSign);
-        }
-
+        byte[] hashValue = (hashAlgo == null) ? contentToSign : hashAlgo.hash(contentToSign);
         byte[] encodedHashValue = SignerUtil.EMSA_PSS_ENCODE(contentHash, hashValue, mgfHash,
                 (int) pssParam.getSaltLength(), getSignatureKeyBitLength(), random);
         return rsaX509Sign(encodedHashValue);
@@ -261,8 +252,7 @@ public class EmulatorP11Identity extends P11Identity {
         try {
             cipher = rsaCiphers.takeFirst();
         } catch (InterruptedException ex) {
-            throw new XiSecurityException(
-                    "could not take any idle signer");
+            throw new XiSecurityException("could not take any idle signer");
         }
 
         try {
@@ -276,9 +266,7 @@ public class EmulatorP11Identity extends P11Identity {
 
     private byte[] dsaAndEcdsaSign(final byte[] dataToSign, final HashAlgoType hashAlgo)
     throws XiSecurityException {
-        byte[] hash = (hashAlgo == null)
-                ? dataToSign
-                : hashAlgo.hash(dataToSign);
+        byte[] hash = (hashAlgo == null) ? dataToSign : hashAlgo.hash(dataToSign);
 
         Signature sig;
         try {

@@ -83,9 +83,7 @@ public class AuditEvent {
     private final List<AuditChildEvent> childAuditEvents = new LinkedList<>();
 
     public AuditEvent(final Date timestamp) {
-        this.timestamp = (timestamp == null)
-                ? new Date()
-                : timestamp;
+        this.timestamp = (timestamp == null) ? new Date() : timestamp;
         this.level = AuditLevel.INFO;
     }
 
@@ -175,18 +173,8 @@ public class AuditEvent {
             AuditEvent event = new AuditEvent(timestamp);
             event.setApplicationName(applicationName);
             event.setName(name);
-
-            if (child.getLevel() != null) {
-                event.setLevel(child.getLevel());
-            } else {
-                event.setLevel(level);
-            }
-
-            if (child.getStatus() != null) {
-                event.setStatus(child.getStatus());
-            } else {
-                event.setStatus(status);
-            }
+            event.setLevel((child.getLevel() != null) ? child.getLevel() : level);
+            event.setStatus((child.getStatus() != null) ? child.getStatus() : status);
 
             for (AuditEventData eventData : eventDatas) {
                 event.addEventData(eventData);

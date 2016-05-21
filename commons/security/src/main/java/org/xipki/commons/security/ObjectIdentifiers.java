@@ -518,9 +518,7 @@ public class ObjectIdentifiers {
     public static String oidToDisplayName(final ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("type", type);
         String name = getName(type);
-        return name == null
-                ? type.getId()
-                : type.getId() + " (" + name + ")";
+        return (name == null) ? type.getId() : type.getId() + " (" + name + ")";
     }
 
     public static String getName(final ASN1ObjectIdentifier type) {

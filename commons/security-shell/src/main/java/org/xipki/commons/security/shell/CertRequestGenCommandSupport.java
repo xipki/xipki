@@ -285,16 +285,11 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
         // biometricInfo
         if (biometricType != null && biometricHashAlgo != null && biometricFile != null) {
-            TypeOfBiometricData tmpBiometricType;
-            if (StringUtil.isNumber(biometricType)) {
-                tmpBiometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
-            } else {
-                tmpBiometricType = new TypeOfBiometricData(
-                        new ASN1ObjectIdentifier(biometricType));
-            }
+            TypeOfBiometricData tmpBiometricType = StringUtil.isNumber(biometricType)
+                    ? new TypeOfBiometricData(Integer.parseInt(biometricType))
+                    : new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
 
-            ASN1ObjectIdentifier tmpBiometricHashAlgo
-                    = AlgorithmUtil.getHashAlg(biometricHashAlgo);
+            ASN1ObjectIdentifier tmpBiometricHashAlgo = AlgorithmUtil.getHashAlg(biometricHashAlgo);
             byte[] biometricBytes = IoUtil.read(biometricFile);
             MessageDigest md = MessageDigest.getInstance(tmpBiometricHashAlgo.getId());
             md.reset();
@@ -306,8 +301,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
             }
             BiometricData biometricData = new BiometricData(tmpBiometricType,
                     new AlgorithmIdentifier(tmpBiometricHashAlgo),
-                    new DEROctetString(tmpBiometricDataHash),
-                    tmpSourceDataUri);
+                    new DEROctetString(tmpBiometricDataHash), tmpSourceDataUri);
 
             ASN1EncodableVector vec = new ASN1EncodableVector();
             vec.add(biometricData);
@@ -331,8 +325,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     ee.toASN1Primitive().getEncoded()));
         }
 
-        ConcurrentContentSigner signer = getSigner(
-                new SignatureAlgoControl(rsaMgf1, ecdsaPlain));
+        ConcurrentContentSigner signer = getSigner(new SignatureAlgoControl(rsaMgf1, ecdsaPlain));
 
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
         if (CollectionUtil.isNonEmpty(extensions)) {
@@ -347,17 +340,15 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
         SubjectPublicKeyInfo subjectPublicKeyInfo;
         if (signer.getCertificate() != null) {
-            Certificate cert = Certificate.getInstance(
-                    signer.getCertificate().getEncoded());
+            Certificate cert = Certificate.getInstance(signer.getCertificate().getEncoded());
             subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
         } else {
-            subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(
-                    signer.getPublicKey());
+            subjectPublicKeyInfo = KeyUtil.createSubjectPublicKeyInfo(signer.getPublicKey());
         }
 
         X500Name subjectDn = getSubject(subject);
-        PKCS10CertificationRequest p10Req = generateRequest(signer, subjectPublicKeyInfo,
-                subjectDn, attributes);
+        PKCS10CertificationRequest p10Req = generateRequest(signer, subjectPublicKeyInfo, subjectDn,
+                attributes);
 
         File file = new File(outputFilename);
         saveVerbose("saved PKCS#10 request to file", file, p10Req.getEncoded());

@@ -90,8 +90,8 @@ public abstract class Pkcs12RSATest {
 
         InputStream ks = new FileInputStream(getPkcs12File());
         char[] password = getPassword().toCharArray();
-        SoftTokenContentSignerBuilder builder = new SoftTokenContentSignerBuilder(
-                "PKCS12", ks, password, null, password, new X509Certificate[]{cert});
+        SoftTokenContentSignerBuilder builder = new SoftTokenContentSignerBuilder("PKCS12", ks,
+                password, null, password, new X509Certificate[]{cert});
         signer = builder.createSigner(getSignatureAlgorithm(), 1, new SecureRandom());
         return signer;
     }

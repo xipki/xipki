@@ -50,11 +50,8 @@ public class P11DSASignLoadTest extends P11SignLoadTest {
     public P11DSASignLoadTest(final SecurityFactory securityFactory, final P11Slot slot,
             final String signatureAlgorithm, final int plength, final int qlength)
     throws Exception {
-        super(securityFactory, slot, signatureAlgorithm,
-                generateKey(slot, plength, qlength),
-                "PKCS#11 DSA signature creation\n"
-                        + "pLength: " + plength + "\n"
-                        + "qLength: " + qlength);
+        super(securityFactory, slot, signatureAlgorithm, generateKey(slot, plength, qlength),
+                "PKCS#11 DSA signature creation\npLength: " + plength + "\nqLength: " + qlength);
     }
 
     private static P11ObjectIdentifier generateKey(final P11Slot slot, final int plength,

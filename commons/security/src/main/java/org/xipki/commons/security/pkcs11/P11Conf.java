@@ -84,8 +84,7 @@ public class P11Conf {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             SchemaFactory schemaFact = SchemaFactory.newInstance(
                     javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = schemaFact.newSchema(getClass().getResource(
-                    "/xsd/pkcs11-conf.xsd"));
+            Schema schema = schemaFact.newSchema(getClass().getResource( "/xsd/pkcs11-conf.xsd"));
             unmarshaller.setSchema(schema);
             @SuppressWarnings("unchecked")
             JAXBElement<PKCS11ConfType> rootElement = (JAXBElement<PKCS11ConfType>)
@@ -106,12 +105,8 @@ public class P11Conf {
             this.moduleConfs = Collections.unmodifiableMap(confs);
             this.moduleNames = Collections.unmodifiableSet(new HashSet<>(confs.keySet()));
         } catch (JAXBException | SAXException ex) {
-            final String exceptionMsg;
-            if (ex instanceof JAXBException) {
-                exceptionMsg = getMessage((JAXBException) ex);
-            } else {
-                exceptionMsg = ex.getMessage();
-            }
+            final String exceptionMsg = (ex instanceof JAXBException)
+                    ? getMessage((JAXBException) ex) : ex.getMessage();
             LogUtil.error(LOG, ex, exceptionMsg);
             throw new InvalidConfException("invalid PKCS#11 configuration");
         } finally {

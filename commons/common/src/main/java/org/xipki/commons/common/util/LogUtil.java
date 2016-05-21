@@ -130,11 +130,8 @@ public class LogUtil {
     }
 
     private static String getMessage(final Throwable th) {
-        if (th instanceof JAXBException) {
-            return XmlUtil.getMessage((JAXBException) th);
-        } else {
-            return th.getMessage();
-        }
+        return (th instanceof JAXBException)
+            ? XmlUtil.getMessage((JAXBException) th) : th.getMessage();
     }
 
 }
