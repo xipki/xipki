@@ -117,11 +117,8 @@ public class HealthCheckServlet extends HttpServlet {
             }
 
             HealthCheckResult healthResult = responder.healthCheck();
-            if (healthResult.isHealthy()) {
-                response.setStatus(HttpServletResponse.SC_OK);
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            }
+            response.setStatus(healthResult.isHealthy() ? HttpServletResponse.SC_OK
+                    : HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
             response.setContentType(HealthCheckServlet.CT_RESPONSE);
             byte[] respBytes = healthResult.toJsonMessage(true).getBytes();

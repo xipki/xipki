@@ -95,8 +95,7 @@ public class TransactionId {
 
         SHA1Digest dgst = new SHA1Digest();
         dgst.update(content, 0, content.length);
-        final int size = 20;
-        byte[] digest = new byte[size];
+        byte[] digest = new byte[20];
         dgst.doFinal(digest, 0);
         return new TransactionId(digest);
     }

@@ -180,10 +180,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             int idx = 1;
             ps.setInt(idx++, issuer.getId());
             ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
-            ps.setLong(idx++,
-                    cert.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
-            ps.setLong(idx++,
-                    cert.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
+            ps.setLong(idx++, cert.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+            ps.setLong(idx++, cert.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
             ps.setString(idx++, sha1(encodedName));
             ps.setString(idx++, sha1(encodedKey));
             ps.setString(idx++, sha224(encodedName));
@@ -269,8 +267,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                             processLogFile, processLog, numProcessedBefore);
                     minId = lastId + 1;
                 } catch (Exception ex) {
-                    System.err.println("\ncould not import certificates from file "
-                            + certsFile + ".\nplease continue with the option '--resume'");
+                    System.err.println("\ncould not import certificates from file " + certsFile
+                            + ".\nplease continue with the option '--resume'");
                     LOG.error("Exception", ex);
                     throw ex;
                 }
@@ -330,7 +328,6 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                 }
 
                 numEntriesInBatch++;
-
                 String filename = cert.getFile();
 
                 // rawcert
@@ -433,8 +430,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     processLog.addNumProcessed(numEntriesInBatch);
                     numEntriesInBatch = 0;
                     echoToFile((numProcessedInLastProcess + processLog.getNumProcessed())
-                            + ":" + lastSuccessfulCertId,
-                            processLogFile);
+                            + ":" + lastSuccessfulCertId, processLogFile);
                     processLog.printStatus();
                 }
             } // end for

@@ -83,9 +83,7 @@ public class X509CertprofileFactoryRegisterImpl implements X509CertprofileFactor
         boolean replaced = services.remove(service);
         services.add(service);
 
-        String action = replaced
-                ? "replaced"
-                : "added";
+        String action = replaced ? "replaced" : "added";
         LOG.info("{} X509CertprofileFactory binding for {}", action, service);
     }
 

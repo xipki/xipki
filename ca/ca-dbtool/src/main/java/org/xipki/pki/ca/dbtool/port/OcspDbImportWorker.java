@@ -102,9 +102,8 @@ public class OcspDbImportWorker extends DbPortWorker {
         long start = System.currentTimeMillis();
         // CertStore
         try {
-            OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(
-                    datasource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe,
-                    evaluateOnly);
+            OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(datasource,
+                    unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
             certStoreImporter.importToDb();
             certStoreImporter.shutdown();
         } finally {

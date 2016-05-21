@@ -72,9 +72,7 @@ public class PublisherInfoCmd extends CaCommandSupport {
             int size = names.size();
 
             if (size == 0 || size == 1) {
-                sb.append((size == 0)
-                        ? "no"
-                        : "1");
+                sb.append((size == 0) ? "no" : "1");
                 sb.append(" publisher is configured\n");
             } else {
                 sb.append(size).append(" publishers are configured:\n");

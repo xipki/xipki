@@ -214,17 +214,12 @@ public class X509CaEntry extends CaEntry implements Serializable {
 
         sb.append("crlsignerName: ").append(crlSignerName).append('\n');
         sb.append("revocation: ");
-        sb.append(revocationInfo == null
-                ? "not revoked"
-                : "revoked");
+        sb.append(revocationInfo == null ? "not revoked" : "revoked");
         sb.append("\n");
         if (revocationInfo != null) {
-            sb.append("\treason: ")
-                .append(revocationInfo.getReason().getDescription())
+            sb.append("\treason: ").append(revocationInfo.getReason().getDescription())
                 .append("\n");
-            sb.append("\trevoked at ")
-                .append(revocationInfo.getRevocationTime())
-                .append("\n");
+            sb.append("\trevoked at ").append(revocationInfo.getRevocationTime()).append("\n");
         }
 
         return sb.toString();
@@ -239,9 +234,7 @@ public class X509CaEntry extends CaEntry implements Serializable {
     }
 
     public Date getCrlBaseTime() {
-        return (cert == null)
-                ? null
-                : cert.getNotBefore();
+        return (cert == null) ? null : cert.getNotBefore();
     }
 
     public String getSubject() {

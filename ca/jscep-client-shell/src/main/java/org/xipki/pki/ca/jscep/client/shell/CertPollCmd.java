@@ -86,10 +86,8 @@ public class CertPollCmd extends ClientCommandSupport {
 
         TransactionId transId = TransactionId.createTransactionId(
                 CertificationRequestUtils.getPublicKey(csr), "SHA-1");
-        EnrollmentResponse resp = client.poll(getIdentityCert(),
-                getIdentityKey(),
-                new X500Principal(csr.getSubject().getEncoded()),
-                transId);
+        EnrollmentResponse resp = client.poll(getIdentityCert(), getIdentityKey(),
+                new X500Principal(csr.getSubject().getEncoded()), transId);
         if (resp.isFailure()) {
             throw new CmdFailure("server returned 'failure'");
         }

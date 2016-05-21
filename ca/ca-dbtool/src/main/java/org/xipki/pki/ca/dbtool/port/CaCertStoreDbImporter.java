@@ -455,8 +455,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     ps.execute();
                 } catch (SQLException ex) {
                     System.err.println("could not import PUBLISHQUEUE with CID="
-                            + tbp.getCertId()
-                            + " and PID=" + tbp.getPubId() + ", message: " + ex.getMessage());
+                            + tbp.getCertId() + " and PID=" + tbp.getPubId() + ", message: "
+                            + ex.getMessage());
                     throw translate(sql, ex);
                 }
             }
@@ -631,8 +631,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                     psAddCrl.addBatch();
                 } catch (SQLException ex) {
-                    System.err.println("could not import CRL with ID="
-                            + crl.getId() + ", message: " + ex.getMessage());
+                    System.err.println("could not import CRL with ID=" + crl.getId() + ", message: "
+                            + ex.getMessage());
                     throw ex;
                 }
 
@@ -786,17 +786,12 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     continue;
                 }
 
-                int certArt = (cert.getArt() == null)
-                        ? 1
-                        : cert.getArt();
-
+                int certArt = (cert.getArt() == null) ? 1 : cert.getArt();
                 numEntriesInBatch++;
 
                 String filename = cert.getFile();
-
                 // rawcert
                 ZipEntry certZipEnty = zipFile.getEntry(filename);
-
                 // rawcert
                 byte[] encodedCert = IoUtil.read(zipFile.getInputStream(certZipEnty));
 
@@ -856,11 +851,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                         ee = !BasicConstraints.getInstance(asn1).isCA();
                     }
 
-                    int intEe = ee
-                            ? 1
-                            : 0;
-                    psCert.setInt(idx++, intEe);
-
+                    psCert.setInt(idx++, ee ? 1 : 0);
                     psCert.setInt(idx++, cert.getReqType());
                     String tidS = null;
                     if (cert.getTid() != null) {

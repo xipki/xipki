@@ -95,9 +95,7 @@ public class CanonicalizeCode {
     private final int baseDirLen;
 
     private CanonicalizeCode(String baseDir) {
-        this.baseDir = baseDir.endsWith(File.separator)
-                ? baseDir
-                : baseDir + File.separator;
+        this.baseDir = baseDir.endsWith(File.separator) ? baseDir : baseDir + File.separator;
         this.baseDirLen = this.baseDir.length();
     }
 
@@ -125,15 +123,12 @@ public class CanonicalizeCode {
         for (File file : files) {
             String filename = file.getName();
             if (file.isDirectory()) {
-                if (!"target".equals(filename)
-                        && !"tbd".equals(filename)) {
+                if (!"target".equals(filename) && !"tbd".equals(filename)) {
                     canonicalizeDir(file);
                 }
             } else {
                 int idx = filename.lastIndexOf('.');
-                String extension = (idx == -1)
-                        ? filename
-                        : filename.substring(idx + 1);
+                String extension = (idx == -1) ? filename : filename.substring(idx + 1);
                 extension = extension.toLowerCase();
 
                 if ("java".equals(extension)) {
@@ -229,11 +224,8 @@ public class CanonicalizeCode {
                 continue;
             } else {
                 String filename = file.getName();
-
                 int idx = filename.lastIndexOf('.');
-                String extension = (idx == -1)
-                        ? filename
-                        : filename.substring(idx + 1);
+                String extension = (idx == -1) ? filename : filename.substring(idx + 1);
                 extension = extension.toLowerCase();
 
                 if ("java".equals(extension)) {
@@ -334,11 +326,7 @@ public class CanonicalizeCode {
                 break;
             }
         }
-        if (idx == n - 1) {
-            return line;
-        } else {
-            return line.substring(0, idx + 1);
-        }
+        return (idx == n - 1) ?  line : line.substring(0, idx + 1);
     } // method removeTrailingSpaces
 
 }

@@ -163,8 +163,8 @@ public class XmlX509CertprofileUtil {
                     LOG.warn("could not close xmlConfStream: {}", ex.getMessage());
                 }
             } catch (SAXException ex) {
-                throw new CertprofileException(
-                        "parse profile failed, message: " + ex.getMessage(), ex);
+                throw new CertprofileException("parse profile failed, message: " + ex.getMessage(),
+                        ex);
             } catch (JAXBException ex) {
                 throw new CertprofileException(
                         "parse profile failed, message: " + XmlUtil.getMessage(ex), ex);
@@ -201,19 +201,15 @@ public class XmlX509CertprofileUtil {
                     String elementValue = element.getValue();
                     CertificatePolicyQualifier qualifier = null;
                     String elementName = element.getName().getLocalPart();
-                    if ("cpsUri".equals(elementName)) {
-                        qualifier = CertificatePolicyQualifier.getInstanceForCpsUri(elementValue);
-                    } else {
-                        qualifier = CertificatePolicyQualifier.getInstanceForUserNotice(
-                                elementValue);
-                    }
+                    qualifier = "cpsUri".equals(elementName)
+                        ? CertificatePolicyQualifier.getInstanceForCpsUri(elementValue)
+                        : CertificatePolicyQualifier.getInstanceForUserNotice(elementValue);
                     qualifiers.add(qualifier);
                 }
             }
 
             CertificatePolicyInformation cpi = new CertificatePolicyInformation(
                     policyPair.getPolicyIdentifier().getValue(), qualifiers);
-
             policies.add(cpi);
         }
 
@@ -248,8 +244,7 @@ public class XmlX509CertprofileUtil {
         ParamUtil.requireNonNull("type", type);
         GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
         GeneralSubtree[] excluded = buildGeneralSubtrees(type.getExcludedSubtrees());
-        return (permitted == null && excluded == null)
-                ? null
+        return (permitted == null && excluded == null) ? null
                 : new NameConstraints(permitted, excluded);
     } // method buildNameConstrains
 
@@ -293,19 +288,13 @@ public class XmlX509CertprofileUtil {
         if (min != null && min < 0) {
             throw new CertprofileException("negative minimum is not allowed: " + min);
         }
-
-        BigInteger minimum = (min == null)
-                ? null
-                : BigInteger.valueOf(min.intValue());
+        BigInteger minimum = (min == null) ? null : BigInteger.valueOf(min.intValue());
 
         Integer max = type.getMaximum();
         if (max != null && max < 0) {
             throw new CertprofileException("negative maximum is not allowed: " + max);
         }
-
-        BigInteger maximum = (max == null)
-                ? null
-                : BigInteger.valueOf(max.intValue());
+        BigInteger maximum = (max == null) ? null : BigInteger.valueOf(max.intValue());
 
         return new GeneralSubtree(base, minimum, maximum);
     } // method buildGeneralSubtree
@@ -437,9 +426,9 @@ public class XmlX509CertprofileUtil {
                 throw new CertprofileException(
                         "duplicated definition of extension " + oid.getId());
             }
-            controls.put(oid,
-                    new ExtensionControl(
-                            m.isCritical(), m.isRequired(), m.isPermittedInRequest()));
+            ExtensionControl ctrl = new ExtensionControl(m.isCritical(), m.isRequired(),
+                    m.isPermittedInRequest());
+            controls.put(oid, ctrl);
         }
 
         return Collections.unmodifiableMap(controls);
@@ -720,12 +709,8 @@ public class XmlX509CertprofileUtil {
             }
 
             ASN1ObjectIdentifier policyOid = new ASN1ObjectIdentifier(policyId);
-            if (policyQualifiers == null) {
-                infos[idx] = new PolicyInformation(policyOid);
-            } else {
-                infos[idx] = new PolicyInformation(policyOid, policyQualifiers);
-            }
-            idx++;
+            infos[idx++] = (policyQualifiers == null) ? new PolicyInformation(policyOid)
+                    : new PolicyInformation(policyOid, policyQualifiers);
         }
 
         return new org.bouncycastle.asn1.x509.CertificatePolicies(infos);

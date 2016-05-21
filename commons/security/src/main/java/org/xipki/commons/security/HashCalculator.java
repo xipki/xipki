@@ -105,16 +105,12 @@ class HashCalculator {
 
     public static String hexHash(final HashAlgoType hashAlgoType, final byte[] data) {
         byte[] bytes = hash(hashAlgoType, data);
-        return (bytes == null)
-                ? null
-                : Hex.toHexString(bytes).toUpperCase();
+        return (bytes == null) ? null : Hex.toHexString(bytes).toUpperCase();
     }
 
     public static String base64Hash(final HashAlgoType hashAlgoType, final byte[] data) {
         byte[] bytes = hash(hashAlgoType, data);
-        return (bytes == null)
-                ? null
-                : Base64.getEncoder().encodeToString(bytes);
+        return (bytes == null) ? null : Base64.getEncoder().encodeToString(bytes);
     }
 
     public static byte[] hash(final HashAlgoType hashAlgoType, final byte[] data) {

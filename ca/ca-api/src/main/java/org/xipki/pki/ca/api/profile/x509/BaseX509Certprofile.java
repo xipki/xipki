@@ -139,11 +139,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     @Override
     public Date getNotBefore(final Date notBefore) {
         Date now = new Date();
-        if (notBefore != null && notBefore.after(now)) {
-            return notBefore;
-        } else {
-            return now;
-        }
+        return (notBefore != null && notBefore.after(now)) ? notBefore : now;
     }
 
     @Override
@@ -165,9 +161,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             }
 
             RDN[] thisRdns = getRdns(requstedRdns, type);
-            int len = (thisRdns == null)
-                    ? 0
-                    : thisRdns.length;
+            int len = (thisRdns == null) ? 0 : thisRdns.length;
             if (len == 0) {
                 continue;
             }
@@ -370,8 +364,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             }
         } else {
             throw new RuntimeException(String.format(
-                    "should not reach here, unknown KeyParametersOption %s",
-                    keyParamsOption));
+                    "should not reach here, unknown KeyParametersOption %s", keyParamsOption));
         }
 
         throw new BadCertTemplateException("the given publicKey is not permitted");
@@ -402,11 +395,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             if (rdns.length > occu.getMaxOccurs() || rdns.length < occu.getMinOccurs()) {
                 throw new BadCertTemplateException(String.format(
                         "occurrence of subject DN of type %s not within the allowed range. "
-                        + "%d is not within [%d, %d]",
-                        oidToDisplayName(type),
-                        rdns.length,
-                        occu.getMinOccurs(),
-                        occu.getMaxOccurs()));
+                        + "%d is not within [%d, %d]", oidToDisplayName(type),  rdns.length,
+                        occu.getMinOccurs(), occu.getMaxOccurs()));
             }
         }
 
@@ -435,9 +425,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     protected RDN createSubjectRdn(final String text, final ASN1ObjectIdentifier type,
             final RdnControl option, final int index) throws BadCertTemplateException {
         ASN1Encodable rdnValue = createRdnValue(text, type, option, index);
-        return (rdnValue == null)
-                ? null
-                : new RDN(type, rdnValue);
+        return (rdnValue == null) ? null : new RDN(type, rdnValue);
     }
 
     private static RDN createDateOfBirthRdn(final ASN1ObjectIdentifier type,
@@ -514,9 +502,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             }
         }
 
-        return CollectionUtil.isEmpty(ret)
-                ? null
-                : ret.toArray(new RDN[0]);
+        return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
     }
 
     private static ASN1Encodable createRdnValue(final String text, final ASN1ObjectIdentifier type,
@@ -551,8 +537,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 if (!pattern.matcher(tmpText).matches()) {
                     throw new BadCertTemplateException(
                         String.format("invalid subject %s '%s' against regex '%s'",
-                                ObjectIdentifiers.oidToDisplayName(type),
-                                tmpText, pattern.pattern()));
+                                ObjectIdentifiers.oidToDisplayName(type), tmpText,
+                                pattern.pattern()));
                 }
             }
 
@@ -568,9 +554,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
             int len = tmpText.length();
             Range range = option.getStringLengthRange();
-            Integer minLen = (range == null)
-                    ? null
-                    : range.getMin();
+            Integer minLen = (range == null) ? null : range.getMin();
 
             if (minLen != null && len < minLen) {
                 throw new BadCertTemplateException(
@@ -578,9 +562,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                         ObjectIdentifiers.oidToDisplayName(type), tmpText, len, minLen));
             }
 
-            Integer maxLen = (range == null)
-                    ? null
-                    : range.getMax();
+            Integer maxLen = (range == null) ? null : range.getMax();
 
             if (maxLen != null && len > maxLen) {
                 throw new BadCertTemplateException(

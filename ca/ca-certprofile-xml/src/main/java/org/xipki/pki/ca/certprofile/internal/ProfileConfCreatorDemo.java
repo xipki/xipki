@@ -261,20 +261,19 @@ public class ProfileConfCreatorDemo {
     } // method marshall
 
     private static X509ProfileType certprofileRootCa() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile RootCA", X509CertLevel.RootCA,
-                "10y", false, new String[]{"SHA256", "SHA1"});
+        X509ProfileType profile = getBaseProfile("Certprofile RootCA", X509CertLevel.RootCA, "10y",
+                false, new String[]{"SHA256", "SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
@@ -294,8 +293,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
 
         // Extensions - keyUsage
-        extensionValue = createKeyUsages(
-                new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN},
+        extensionValue = createKeyUsages(new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN},
                 new KeyUsageEnum[]{KeyUsageEnum.CRL_SIGN});
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
@@ -303,20 +301,19 @@ public class ProfileConfCreatorDemo {
     } // method certprofileRootCa
 
     private static X509ProfileType certprofileCross() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile Cross", X509CertLevel.SubCA,
-                "10y", false, new String[]{"SHA256", "SHA1"});
+        X509ProfileType profile = getBaseProfile("Certprofile Cross", X509CertLevel.SubCA, "10y",
+                false, new String[]{"SHA256", "SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
@@ -340,28 +337,26 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        extensionValue = createKeyUsages(
-                new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN}, null);
+        extensionValue = createKeyUsages(new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN}, null);
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
     } // method certprofileCross
 
     private static X509ProfileType certprofileSubCa() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile SubCA", X509CertLevel.SubCA,
-                "8y", false, new String[]{"SHA256", "SHA1"});
+        X509ProfileType profile = getBaseProfile("Certprofile SubCA", X509CertLevel.SubCA, "8y",
+                false, new String[]{"SHA256", "SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
@@ -386,8 +381,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        extensionValue = createKeyUsages(
-                new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN},
+        extensionValue = createKeyUsages(new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN},
                 new KeyUsageEnum[]{KeyUsageEnum.CRL_SIGN});
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
@@ -507,21 +501,20 @@ public class ProfileConfCreatorDemo {
     } // method certprofileSubCaComplex
 
     private static X509ProfileType certprofileOcsp() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile OCSP", X509CertLevel.EndEntity,
-                "5y", false, new String[]{"SHA256"});
+        X509ProfileType profile = getBaseProfile("Certprofile OCSP", X509CertLevel.EndEntity, "5y",
+                false, new String[]{"SHA256"});
 
         // Subject
         Subject subject = profile.getSubject();
         subject.setIncSerialNumber(true);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_organizationIdentifier, 0, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
@@ -531,8 +524,8 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
-        list.add(createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck,
-                false, false, null));
+        list.add(createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, false, false,
+                null));
 
         // Extensions - basicConstraints
         ExtensionValueType extensionValue = null;
@@ -547,9 +540,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        extensionValue = createKeyUsages(
-                new KeyUsageEnum[]{KeyUsageEnum.CONTENT_COMMITMENT},
-                null);
+        extensionValue = createKeyUsages(new KeyUsageEnum[]{KeyUsageEnum.CONTENT_COMMITMENT}, null);
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         // Extensions - extenedKeyUsage
@@ -561,8 +552,8 @@ public class ProfileConfCreatorDemo {
     } // method certprofileOcsp
 
     private static X509ProfileType certprofileScep() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile SCEP", X509CertLevel.EndEntity,
-                "5y", false, new String[]{"SHA256"});
+        X509ProfileType profile = getBaseProfile("Certprofile SCEP", X509CertLevel.EndEntity, "5y",
+                false, new String[]{"SHA256"});
 
         profile.setKeyAlgorithms(createRSAKeyAlgorithms());
 
@@ -574,8 +565,8 @@ public class ProfileConfCreatorDemo {
         rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
@@ -608,8 +599,8 @@ public class ProfileConfCreatorDemo {
     } // method certprofileScep
 
     private static X509ProfileType certprofileTls() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile TLS", X509CertLevel.EndEntity,
-                "5y", true, new String[]{"SHA1"});
+        X509ProfileType profile = getBaseProfile("Certprofile TLS", X509CertLevel.EndEntity, "5y",
+                true, new String[]{"SHA1"});
 
         profile.setDuplicateKey(true);
 
@@ -619,14 +610,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1,
-                new String[]{REGEX_FQDN}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null,
+                null));
 
         // Extensions
         // Extensions - general
@@ -683,20 +673,19 @@ public class ProfileConfCreatorDemo {
     } // method certprofileTls
 
     private static X509ProfileType certprofileTlsC() throws Exception {
-        X509ProfileType profile = getBaseProfile("Certprofile TLS_C", X509CertLevel.EndEntity,
-                "5y", false, new String[]{"SHA1"});
+        X509ProfileType profile = getBaseProfile("Certprofile TLS_C", X509CertLevel.EndEntity, "5y",
+                false, new String[]{"SHA1"});
 
         // Subject
         Subject subject = profile.getSubject();
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
@@ -870,13 +859,13 @@ public class ProfileConfCreatorDemo {
         extensionValue = createExtensionValueType(policies);
         list.add(createExtension(Extension.certificatePolicies, true, false, extensionValue));
 
-        // Extension - Adminssion
+        // Extension - Admission
         Admission admission = new Admission();
         admission.getProfessionOid().add(createOidType(ID_GEMATIK.branch("103")));
         admission.getProfessionItem().add("Anwendungskonnektor");
         extensionValue = createExtensionValueType(admission);
-        list.add(createExtension(ObjectIdentifiers.id_extension_admission,
-                true, false, extensionValue));
+        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false,
+                extensionValue));
 
         // SubjectAltNames
         extensionValue = null;
@@ -894,16 +883,15 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
 
         final String regexOu1 = "[A-Z]{1,1}[\\d]{5,5}";
         final String regexOu2 = "[\\d]{5,5}";
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 2, 2,
-                new String[]{regexOu1, regexOu2}, null, null));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 2, 2, new String[]{regexOu1, regexOu2},
+                null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
@@ -928,9 +916,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        extensionValue = createKeyUsages(
-                new KeyUsageEnum[]{KeyUsageEnum.CONTENT_COMMITMENT},
-                null);
+        extensionValue = createKeyUsages(new KeyUsageEnum[]{KeyUsageEnum.CONTENT_COMMITMENT}, null);
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
@@ -948,12 +934,11 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1, null, null, null, "group1"));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 1, 1, null, null, null, "group1"));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
@@ -978,9 +963,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        extensionValue = createKeyUsages(
-                new KeyUsageEnum[]{KeyUsageEnum.CONTENT_COMMITMENT},
-                null);
+        extensionValue = createKeyUsages(new KeyUsageEnum[]{KeyUsageEnum.CONTENT_COMMITMENT}, null);
         list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
@@ -995,12 +978,11 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_DATE_OF_BIRTH, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_POSTAL_ADDRESS, 1, 1));
@@ -1043,25 +1025,25 @@ public class ProfileConfCreatorDemo {
 
         // Admission
         extensionValue = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
-        list.add(createExtension(ObjectIdentifiers.id_extension_admission,
-                true, false, extensionValue));
+        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false,
+                extensionValue));
 
         // restriction
         extensionValue = createRestriction(DirectoryStringType.UTF_8_STRING, "demo restriction");
-        list.add(createExtension(ObjectIdentifiers.id_extension_restriction,
-                true, false, extensionValue));
+        list.add(createExtension(ObjectIdentifiers.id_extension_restriction, true, false,
+                extensionValue));
 
         // additionalInformation
         extensionValue = createAdditionalInformation(DirectoryStringType.UTF_8_STRING,
                 "demo additional information");
-        list.add(createExtension(ObjectIdentifiers.id_extension_additionalInformation,
-                true, false, extensionValue));
+        list.add(createExtension(ObjectIdentifiers.id_extension_additionalInformation, true, false,
+                extensionValue));
 
         // validationModel
         extensionValue = createConstantExtValue(
                 new ASN1ObjectIdentifier("1.3.6.1.4.1.8301.3.5.1").getEncoded(), "chain");
-        list.add(createExtension(ObjectIdentifiers.id_extension_validityModel,
-                true, false, extensionValue));
+        list.add(createExtension(ObjectIdentifiers.id_extension_validityModel, true, false,
+                extensionValue));
 
         // privateKeyUsagePeriod
         extensionValue = createPrivateKeyUsagePeriod("3y");
@@ -1077,8 +1059,8 @@ public class ProfileConfCreatorDemo {
 
         // authorizationTemplate
         extensionValue = createAuthorizationTemplate();
-        list.add(createExtension(ObjectIdentifiers.id_xipki_ext_authorizationTemplate,
-                true, false, extensionValue));
+        list.add(createExtension(ObjectIdentifiers.id_xipki_ext_authorizationTemplate, true, false,
+                extensionValue));
 
         return profile;
     } // method certprofileEeComplex
@@ -1093,14 +1075,13 @@ public class ProfileConfCreatorDemo {
         subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1,
-                new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1,
-                new String[]{REGEX_SN}, null, null));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1,
-                new String[]{REGEX_FQDN}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null,
+                null));
 
         // Extensions
         ExtensionsType extensions = profile.getExtensions();
@@ -1259,8 +1240,8 @@ public class ProfileConfCreatorDemo {
         return createExtensionValueType(extValue);
     }
 
-    private static Usage createSingleExtKeyUsage(
-            final ASN1ObjectIdentifier usage, final boolean required) {
+    private static Usage createSingleExtKeyUsage(final ASN1ObjectIdentifier usage,
+            final boolean required) {
         Usage type = new Usage();
         type.setValue(usage.getId());
         type.setRequired(required);
@@ -1271,16 +1252,16 @@ public class ProfileConfCreatorDemo {
         return type;
     }
 
-    private static ExtensionValueType createAdmission(
-            final ASN1ObjectIdentifier oid, final String item) {
+    private static ExtensionValueType createAdmission(final ASN1ObjectIdentifier oid,
+            final String item) {
         Admission extValue = new Admission();
         extValue.getProfessionItem().add(item);
         extValue.getProfessionOid().add(createOidType(oid));
         return createExtensionValueType(extValue);
     }
 
-    private static ExtensionValueType createRestriction(
-            final DirectoryStringType type, final String text) {
+    private static ExtensionValueType createRestriction(final DirectoryStringType type,
+            final String text) {
         Restriction extValue = new Restriction();
         extValue.setType(type);
         extValue.setText(text);
@@ -1484,9 +1465,7 @@ public class ProfileConfCreatorDemo {
         OidWithDescType ret = new OidWithDescType();
         ret.setValue(oid.getId());
 
-        String desc = (description == null)
-                ? getDescription(oid)
-                : description;
+        String desc = (description == null) ? getDescription(oid) : description;
         if (desc != null) {
             ret.setDescription(desc);
         }
@@ -1513,9 +1492,7 @@ public class ProfileConfCreatorDemo {
         profile.setMaxSize(5000);
         profile.setVersion(X509CertVersion.v3.name());
         profile.setValidity(validity);
-        profile.setNotBeforeTime(useMidnightNotBefore
-                ? "midnight"
-                : "current");
+        profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
 
         profile.setDuplicateKey(false);
         profile.setSerialNumberInReq(false);
@@ -1526,8 +1503,8 @@ public class ProfileConfCreatorDemo {
             profile.setSignatureAlgorithms(sigAlgosType);
 
             List<String> algos = sigAlgosType.getAlgorithm();
-            String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA",
-                "withPlainECDSA", "withRSAandMGF1"};
+            String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA", "withPlainECDSA",
+                    "withRSAandMGF1"};
             for (String part2 : algoPart2s) {
                 for (String hashAlgo : sigHashAlgos) {
                     algos.add(hashAlgo + part2);
@@ -1539,7 +1516,6 @@ public class ProfileConfCreatorDemo {
         Subject subject = new Subject();
         subject.setDuplicateSubjectPermitted(false);
         profile.setSubject(subject);
-
         subject.setDnBackwards(false);
 
         // Key
@@ -1605,8 +1581,7 @@ public class ProfileConfCreatorDemo {
         ecParams.setCurves(curves);
 
         ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[] {
-            SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1
-        };
+            SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1};
 
         for (ASN1ObjectIdentifier curveId : curveIds) {
             String name = AlgorithmUtil.getCurveName(curveId);
@@ -1708,22 +1683,22 @@ public class ProfileConfCreatorDemo {
         // DES-EDE3-CBC
         SMIMECapability cap = new SMIMECapability();
         caps.getSMIMECapability().add(cap);
-        cap.setCapabilityID(createOidType(
-                new ASN1ObjectIdentifier("1.2.840.113549.3.7"), "DES-EDE3-CBC"));
+        cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.7"),
+                "DES-EDE3-CBC"));
 
         // RC2-CBC keysize 128
         cap = new SMIMECapability();
         caps.getSMIMECapability().add(cap);
-        cap.setCapabilityID(createOidType(
-                new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
+        cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"),
+                "RC2-CBC"));
         cap.setParameters(new org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters());
         cap.getParameters().setInteger(BigInteger.valueOf(128));
 
         // RC2-CBC keysize 64
         cap = new SMIMECapability();
         caps.getSMIMECapability().add(cap);
-        cap.setCapabilityID(createOidType(
-                new ASN1ObjectIdentifier("1.2.840.113549.3.2"), "RC2-CBC"));
+        cap.setCapabilityID(createOidType(new ASN1ObjectIdentifier("1.2.840.113549.3.2"),
+                "RC2-CBC"));
         cap.setParameters(new org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters());
 
         Base64BinaryWithDescType binary = new Base64BinaryWithDescType();

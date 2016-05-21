@@ -88,16 +88,10 @@ public class FileUtils {
         if (Configuration.isWindows()) {
             return false;
         }
-        File fileInCanonicalDir = null;
-        if (file.getParent() == null) {
-            fileInCanonicalDir = file;
-        } else {
-            final File canonicalDir = file.getParentFile().getCanonicalFile();
-            fileInCanonicalDir = new File(canonicalDir, file.getName());
-        }
+        File fileInCanonicalDir = (file.getParent() == null) ? file
+                : new File(file.getParentFile().getCanonicalFile(), file.getName());
 
-        return !fileInCanonicalDir.getCanonicalFile().equals(
-                fileInCanonicalDir.getAbsoluteFile());
+        return !fileInCanonicalDir.getCanonicalFile().equals(fileInCanonicalDir.getAbsoluteFile());
     }
 
     /**
@@ -158,14 +152,15 @@ public class FileUtils {
     public static void forceDelete(final File file) throws IOException {
         if (file.isDirectory()) {
             deleteDirectory(file);
-        } else {
-            final boolean filePresent = file.exists();
-            if (!file.delete()) {
-                if (!filePresent) {
-                    throw new FileNotFoundException("File does not exist: " + file);
-                }
-                throw new IOException("Unable to delete file: " + file);
+            return;
+        }
+
+        final boolean filePresent = file.exists();
+        if (!file.delete()) {
+            if (!filePresent) {
+                throw new FileNotFoundException("File does not exist: " + file);
             }
+            throw new IOException("Unable to delete file: " + file);
         }
     }
 
@@ -209,9 +204,7 @@ public class FileUtils {
             long count = 0;
             while (pos < size) {
                 final long remain = size - pos;
-                count = (remain > FILE_COPY_BUFFER_SIZE)
-                        ? FILE_COPY_BUFFER_SIZE
-                        : remain;
+                count = (remain > FILE_COPY_BUFFER_SIZE) ? FILE_COPY_BUFFER_SIZE : remain;
                 final long bytesCopied = output.transferFrom(input, pos, count);
                 if (bytesCopied == 0) {
                     // IO-385 - can happen if file is truncated after caching the size
@@ -226,9 +219,8 @@ public class FileUtils {
         final long srcLen = srcFile.length(); // See IO-386
         final long dstLen = destFile.length(); // See IO-386
         if (srcLen != dstLen) {
-            throw new IOException("Failed to copy full contents from '"
-                    + srcFile + "' to '" + destFile + "' Expected length: " + srcLen
-                    + " Actual: " + dstLen);
+            throw new IOException("Failed to copy full contents from '" + srcFile + "' to '"
+                    + destFile + "' Expected length: " + srcLen + " Actual: " + dstLen);
         }
         if (preserveFileDate) {
             destFile.setLastModified(srcFile.lastModified());

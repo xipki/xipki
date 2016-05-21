@@ -340,8 +340,8 @@ class IdentifiedX509Certprofile {
                 }
             }
 
-            addExtension(values, extType, value, extControl,
-                    neededExtensionTypes, wantedExtensionTypes);
+            addExtension(values, extType, value, extControl, neededExtensionTypes,
+                    wantedExtensionTypes);
         }
 
         // IssuerAltName
@@ -350,8 +350,8 @@ class IdentifiedX509Certprofile {
         if (extControl != null
                 && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes)) {
             GeneralNames value = publicCaInfo.getSubjectAltName();
-            addExtension(values, extType, value, extControl,
-                    neededExtensionTypes, wantedExtensionTypes);
+            addExtension(values, extType, value, extControl, neededExtensionTypes,
+                    wantedExtensionTypes);
         }
 
         // AuthorityInfoAccess
@@ -374,8 +374,8 @@ class IdentifiedX509Certprofile {
             if (CollectionUtil.isNonEmpty(caIssuers) || CollectionUtil.isNonEmpty(ocspUris)) {
                 AuthorityInformationAccess value = CaUtil.createAuthorityInformationAccess(
                         caIssuers, ocspUris);
-                addExtension(values, extType, value, extControl,
-                        neededExtensionTypes, wantedExtensionTypes);
+                addExtension(values, extType, value, extControl, neededExtensionTypes,
+                        wantedExtensionTypes);
             }
         }
 
@@ -414,10 +414,9 @@ class IdentifiedX509Certprofile {
                 try {
                     if (CollectionUtil.isNonEmpty(publicCaInfo.getDeltaCrlUris())) {
                         CRLDistPoint value = CaUtil.createCrlDistributionPoints(
-                            publicCaInfo.getDeltaCrlUris(),
-                            x500CaPrincipal, crlSignerSubject);
-                        addExtension(values, extType, value, extControl,
-                                neededExtensionTypes, wantedExtensionTypes);
+                            publicCaInfo.getDeltaCrlUris(),x500CaPrincipal, crlSignerSubject);
+                        addExtension(values, extType, value, extControl, neededExtensionTypes,
+                                wantedExtensionTypes);
                     }
                 } catch (IOException ex) {
                     throw new CertprofileException(ex.getMessage(), ex);
@@ -432,8 +431,8 @@ class IdentifiedX509Certprofile {
                 && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes)) {
             BasicConstraints value = CaUtil.createBasicConstraints(certprofile.getCertLevel(),
                     certprofile.getPathLenBasicConstraint());
-            addExtension(values, extType, value, extControl,
-                    neededExtensionTypes, wantedExtensionTypes);
+            addExtension(values, extType, value, extControl, neededExtensionTypes,
+                    wantedExtensionTypes);
         }
 
         // KeyUsage
@@ -455,8 +454,8 @@ class IdentifiedX509Certprofile {
             }
 
             org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(usages);
-            addExtension(values, extType, value, extControl,
-                    neededExtensionTypes, wantedExtensionTypes);
+            addExtension(values, extType, value, extControl, neededExtensionTypes,
+                    wantedExtensionTypes);
         }
 
         // ExtendedKeyUsage
@@ -484,8 +483,8 @@ class IdentifiedX509Certprofile {
             }
 
             ExtendedKeyUsage value = X509Util.createExtendedUsage(usages);
-            addExtension(values, extType, value, extControl,
-                    neededExtensionTypes, wantedExtensionTypes);
+            addExtension(values, extType, value, extControl, neededExtensionTypes,
+                    wantedExtensionTypes);
         }
 
         // ocsp-nocheck
@@ -495,8 +494,8 @@ class IdentifiedX509Certprofile {
                 && addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes)) {
             // the extension ocsp-nocheck will only be set if requested explicitly
             DERNull value = DERNull.INSTANCE;
-            addExtension(values, extType, value, extControl,
-                    neededExtensionTypes, wantedExtensionTypes);
+            addExtension(values, extType, value, extControl, neededExtensionTypes,
+                    wantedExtensionTypes);
         }
 
         // SubjectAltName
@@ -509,8 +508,8 @@ class IdentifiedX509Certprofile {
                 value = createRequestedSubjectAltNames(requestExtensions,
                         certprofile.getSubjectAltNameModes());
             }
-            addExtension(values, extType, value, extControl,
-                    neededExtensionTypes, wantedExtensionTypes);
+            addExtension(values, extType, value, extControl, neededExtensionTypes,
+                    wantedExtensionTypes);
         }
 
         // SubjectInfoAccess
@@ -523,8 +522,8 @@ class IdentifiedX509Certprofile {
                 value = createSubjectInfoAccess(requestExtensions,
                         certprofile.getSubjectInfoAccessModes());
             }
-            addExtension(values, extType, value, extControl,
-                    neededExtensionTypes, wantedExtensionTypes);
+            addExtension(values, extType, value, extControl, neededExtensionTypes,
+                    wantedExtensionTypes);
         }
 
         ExtensionValues subvalues = certprofile.getExtensions(
@@ -548,8 +547,8 @@ class IdentifiedX509Certprofile {
                     value = subvalues.getExtensionValue(type);
                 }
 
-                addExtension(values, type, value, extControl,
-                        neededExtensionTypes, wantedExtensionTypes);
+                addExtension(values, type, value, extControl, neededExtensionTypes,
+                        wantedExtensionTypes);
             }
         }
 
@@ -656,8 +655,7 @@ class IdentifiedX509Certprofile {
         }
 
         if (CollectionUtil.isNonEmpty(set)) {
-            msg.append("extensions ")
-                .append(toString(set))
+            msg.append("extensions ").append(toString(set))
                 .append(" must not be contained in request, ");
         }
 
@@ -675,8 +673,7 @@ class IdentifiedX509Certprofile {
             }
 
             if (CollectionUtil.isNonEmpty(set)) {
-                msg.append("EE profile contains CA-only extensions ")
-                    .append(toString(set))
+                msg.append("EE profile contains CA-only extensions ").append(toString(set))
                     .append(", ");
             }
         }
@@ -715,15 +712,13 @@ class IdentifiedX509Certprofile {
         }
 
         if (CollectionUtil.isNonEmpty(set)) {
-            msg.append("non-critical extensions are marked as critical ")
-                .append(toString(set))
+            msg.append("non-critical extensions are marked as critical ").append(toString(set))
                 .append(", ");
         }
 
         // make sure that required extensions are present
         set.clear();
-        Set<ASN1ObjectIdentifier> requiredTypes = ca
-                ? REQUIRED_CA_EXTENSION_TYPES
+        Set<ASN1ObjectIdentifier> requiredTypes = ca ? REQUIRED_CA_EXTENSION_TYPES
                 : REQUIRED_EE_EXTENSION_TYPES;
 
         for (ASN1ObjectIdentifier type : requiredTypes) {
@@ -767,8 +762,7 @@ class IdentifiedX509Certprofile {
             }
 
             if (CollectionUtil.isNonEmpty(set)) {
-                msg.append("EE profile contains CA-only keyUsage ")
-                    .append(setUsages).append(", ");
+                msg.append("EE profile contains CA-only keyUsage ").append(setUsages).append(", ");
             }
         }
 
@@ -995,9 +989,7 @@ class IdentifiedX509Certprofile {
             vec.add(new AccessDescription(accessMethod, accessLocation));
         } // end for
 
-        return vec.size() > 0
-                ? new DERSequence(vec)
-                : null;
+        return vec.size() > 0 ? new DERSequence(vec) : null;
     } // method createSubjectInfoAccess
 
     private static void addExtension(final ExtensionValues values,

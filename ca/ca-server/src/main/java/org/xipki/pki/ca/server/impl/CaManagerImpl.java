@@ -221,13 +221,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             inProcess = true;
             try {
                 SystemEvent event = queryExecutor.getSystemEvent(EVENT_CACHAGNE);
-                long caChangedTime = (event == null)
-                        ? 0
-                        : event.getEventTime();
+                long caChangedTime = (event == null) ? 0 : event.getEventTime();
 
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                            "check the restart CA system event: CA changed at={}, lastStartTime={}",
+                    LOG.debug("check the restart CA system event: changed at={}, lastStartTime={}",
                             new Date(caChangedTime * 1000L), lastStartTime);
                 }
 
@@ -381,9 +378,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             LOG.warn("could not get host address: {}", ex.getMessage());
         }
 
-        this.lockInstanceId = (hostAddress == null)
-                ? calockId
-                : hostAddress + "/" + calockId;
+        this.lockInstanceId = (hostAddress == null) ? calockId : hostAddress + "/" + calockId;
     } // constructor
 
     public SecurityFactory getSecurityFactory() {
@@ -498,9 +493,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public CaSystemStatus getCaSystemStatus() {
         if (caSystemSetuped) {
-            return masterMode
-                    ? CaSystemStatus.STARTED_AS_MASTER
-                    : CaSystemStatus.STARTED_AS_SLAVE;
+            return masterMode ? CaSystemStatus.STARTED_AS_MASTER : CaSystemStatus.STARTED_AS_SLAVE;
         } else if (initializing) {
             return CaSystemStatus.INITIALIZING;
         } else if (!caLockedByMe) {
@@ -543,7 +536,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         caLockedByMe = false;
-
         boolean successful = false;
         try {
             queryExecutor.unlockCa();
@@ -760,7 +752,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         X509CaCmpResponder caResponder = new X509CaCmpResponder(this, caName);
         x509Responders.put(caName, caResponder);
 
-        // referesh the SCEP
+        // refresh the SCEP
         if (sceps.containsKey(caName)) {
             try {
                 sceps.get(caName).refreshCa();
@@ -1160,8 +1152,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 List<String[]> signerConfs = splitCaSignerConfs(tmpCaEntry.getSignerConf());
                 for (String[] m : signerConfs) {
                     SignerConf signerConf = new SignerConf(m[1]);
-                    signer = securityFactory.createSigner(
-                            tmpCaEntry.getSignerType(), signerConf, tmpCaEntry.getCertificate());
+                    signer = securityFactory.createSigner(tmpCaEntry.getSignerType(), signerConf,
+                            tmpCaEntry.getCertificate());
                     if (tmpCaEntry.getCertificate() == null) {
                         if (signer.getCertificate() == null) {
                             throw new CaMgmtException(
@@ -1186,9 +1178,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     public X509CaEntry getCa(final String name) {
         ParamUtil.requireNonBlank("name", name);
         X509CaInfo caInfo = caInfos.get(name.toUpperCase());
-        return (caInfo == null)
-                ? null
-                : caInfo.getCaEntry();
+        return (caInfo == null) ? null : caInfo.getCaEntry();
     }
 
     @Override
@@ -1338,7 +1328,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         requestor.setDbEntry(dbEntry);
 
         queryExecutor.addCmpRequestor(dbEntry);
-
         requestorDbEntries.put(name, dbEntry);
         requestors.put(name, requestor);
 
@@ -1575,8 +1564,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return false;
         }
 
-        CmpResponderEntryWrapper newResponder = queryExecutor.changeCmpResponder(
-                name, type, conf, base64Cert, this);
+        CmpResponderEntryWrapper newResponder = queryExecutor.changeCmpResponder(name, type, conf,
+                base64Cert, this);
         if (newResponder == null) {
             return false;
         }
@@ -1646,8 +1635,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         String signerCert = dbEntry.getBase64Cert();
         String crlControl = dbEntry.getCrlControl();
 
-        X509CrlSignerEntryWrapper crlSigner = queryExecutor.changeCrlSigner(
-                name, signerType, signerConf, signerCert, crlControl, this);
+        X509CrlSignerEntryWrapper crlSigner = queryExecutor.changeCrlSigner(name, signerType,
+                signerConf, signerCert, crlControl, this);
         if (crlSigner == null) {
             return false;
         }
@@ -1796,9 +1785,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         CmpControlEntry tmpDbEntry = cmpControl.getDbEntry();
-
         queryExecutor.addCmpControl(tmpDbEntry);
-
         cmpControls.put(name, cmpControl);
         cmpControlDbEntries.put(name, tmpDbEntry);
         return true;
@@ -2014,11 +2001,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         byte[] encodedSubjectPublicKey = certInfo.getCert().getPublicKey().getEncoded();
         X509CertificateInfo ci;
         try {
-            ci = new X509CertificateInfo(
-                    certInfoWithId, certInfoWithId, encodedSubjectPublicKey,
-                    (certprofile == null)
-                        ? "UNKNOWN"
-                        : certprofile);
+            ci = new X509CertificateInfo(certInfoWithId, certInfoWithId, encodedSubjectPublicKey,
+                    (certprofile == null) ? "UNKNOWN" : certprofile);
             ci.setReqType(RequestType.CA);
         } catch (CertificateEncodingException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
@@ -2150,8 +2134,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     private void auditLogPciEvent(final boolean successful, final String eventType) {
-        AuditService auditService = (auditServiceRegister == null)
-                ? null
+        AuditService auditService = (auditServiceRegister == null) ? null
                 : auditServiceRegister.getAuditService();
         if (auditService == null) {
             return;
@@ -2376,10 +2359,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         GenerateSelfSignedResult result;
         try {
-            result = X509SelfSignedCertBuilder.generateSelfSigned(securityFactory,
-                    signerType, caEntry.getSignerConf(),
-                    certprofile, p10Request, serialOfThisCert,
-                    cacertUris, ocspUris, crlUris, deltaCrlUris);
+            result = X509SelfSignedCertBuilder.generateSelfSigned(securityFactory, signerType,
+                    caEntry.getSignerConf(), certprofile, p10Request, serialOfThisCert, cacertUris,
+                    ocspUris, crlUris, deltaCrlUris);
         } catch (OperationException | InvalidConfException ex) {
             throw new CaMgmtException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
@@ -2690,23 +2672,17 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public ScepEntry getScepEntry(final String caName) {
-        return (scepDbEntries == null)
-                ? null
-                : scepDbEntries.get(caName.toUpperCase());
+        return (scepDbEntries == null) ? null : scepDbEntries.get(caName.toUpperCase());
     }
 
     @Override
     public Scep getScep(final String caName) {
-        return (sceps == null)
-                ? null
-                : sceps.get(caName.toUpperCase());
+        return (sceps == null) ? null : sceps.get(caName.toUpperCase());
     }
 
     @Override
     public Set<String> getScepNames() {
-        return (scepDbEntries == null)
-                ? null
-                : Collections.unmodifiableSet(scepDbEntries.keySet());
+        return (scepDbEntries == null) ? null : Collections.unmodifiableSet(scepDbEntries.keySet());
     }
 
     private static void assertNotNull(final String parameterName, final String parameterValue) {

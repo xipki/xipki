@@ -78,13 +78,8 @@ public class DigestDbCmd extends DbPortCommandSupport {
 
     @Override
     protected DbPortWorker getDbPortWorker() throws Exception {
-        return new DbDigestExportWorker(
-                datasourceFactory,
-                passwordResolver,
-                dbconfFile,
-                outdir,
-                numCertsPerSelect,
-                numThreads);
+        return new DbDigestExportWorker(datasourceFactory, passwordResolver, dbconfFile, outdir,
+                numCertsPerSelect, numThreads);
     }
 
 }

@@ -95,14 +95,10 @@ public class OcspCertPublisher extends X509CertPublisher {
 
         ConfPairs utf8pairs = new ConfPairs(conf);
         String str = utf8pairs.getValue("publish.goodcerts");
-        this.publishsGoodCert = (str == null)
-                ? true
-                : Boolean.parseBoolean(str);
+        this.publishsGoodCert = (str == null) ? true : Boolean.parseBoolean(str);
 
         str = utf8pairs.getValue("asyn");
-        this.asyn = (str == null)
-                ? false
-                : Boolean.parseBoolean(str);
+        this.asyn = (str == null) ? false : Boolean.parseBoolean(str);
 
         ConfPairs confPairs = new ConfPairs(conf);
         String datasourceName = confPairs.getValue("datasource");
@@ -189,8 +185,7 @@ public class OcspCertPublisher extends X509CertPublisher {
 
         LOG.debug("error", ex);
 
-        AuditService auditService = (auditServiceRegister == null)
-                ? null
+        AuditService auditService = (auditServiceRegister == null) ? null
                 : auditServiceRegister.getAuditService();
 
         if (auditService == null) {
@@ -248,8 +243,7 @@ public class OcspCertPublisher extends X509CertPublisher {
             queryExecutor.unrevokeCa(caCert);
             return true;
         } catch (Exception ex) {
-            String issuerText = X509Util.getRfc4519Name(
-                    caCert.getCert().getIssuerX500Principal());
+            String issuerText = X509Util.getRfc4519Name(caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, ex, "could not publish unrevocation of CA");
             return false;
         }

@@ -218,9 +218,7 @@ public class P11Constants {
 
     public static long getMechanism(@Nonnull final String mechanismName) {
         Long mech = nameMechanismNameMap.get(mechanismName);
-        return mech == null
-                ? -1
-                : mech.longValue();
+        return mech == null ? -1 : mech.longValue();
     }
 
     public static String getMechanismDesc(final long mechanism) {

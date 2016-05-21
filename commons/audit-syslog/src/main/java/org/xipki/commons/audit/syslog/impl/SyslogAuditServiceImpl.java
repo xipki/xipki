@@ -326,11 +326,7 @@ public class SyslogAuditServiceImpl implements AuditService {
     }
 
     public void setMaxMessageLength(final int maxMessageLength) {
-        if (maxMessageLength <= 0) {
-            this.maxMessageLength = 1023;
-        } else {
-            this.maxMessageLength = maxMessageLength;
-        }
+        this.maxMessageLength = (maxMessageLength <= 0) ? 1023 : maxMessageLength;
     }
 
     public void setSsl(final boolean ssl) {

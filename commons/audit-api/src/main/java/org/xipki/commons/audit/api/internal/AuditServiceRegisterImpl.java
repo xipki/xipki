@@ -62,9 +62,7 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
     @Override
     public AuditService getAuditService() {
         if (auditEnabled) {
-            return services.isEmpty()
-                    ? defaultAuditService
-                    : services.getLast();
+            return services.isEmpty() ? defaultAuditService : services.getLast();
         } else {
             return null;
         }
@@ -80,9 +78,7 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
         boolean replaced = services.remove(service);
         services.add(service);
 
-        String action = replaced
-                ? "replaced"
-                : "added";
+        String action = replaced ? "replaced" : "added";
         LOG.info("{} AuditService binding for {}", action, service);
     }
 

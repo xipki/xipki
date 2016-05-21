@@ -83,15 +83,10 @@ public class CertificateStore {
     public boolean addCertificate(final X509CertificateInfo certInfo) {
         ParamUtil.requireNonNull("certInfo", certInfo);
         try {
-            queryExecutor.addCert(certInfo.getIssuerCert(),
-                    certInfo.getCert(),
-                    certInfo.getSubjectPublicKey(),
-                    certInfo.getProfileName(),
-                    certInfo.getRequestor(),
-                    certInfo.getUser(),
-                    certInfo.getReqType(),
-                    certInfo.getTransactionId(),
-                    certInfo.getRequestedSubject());
+            queryExecutor.addCert(certInfo.getIssuerCert(), certInfo.getCert(),
+                    certInfo.getSubjectPublicKey(), certInfo.getProfileName(),
+                    certInfo.getRequestor(), certInfo.getUser(), certInfo.getReqType(),
+                    certInfo.getTransactionId(), certInfo.getRequestedSubject());
         } catch (Exception ex) {
             LOG.error("could not save certificate {}: {}. Message: {}",
                     new Object[]{certInfo.getCert().getSubject(),
@@ -167,14 +162,14 @@ public class CertificateStore {
             final BigInteger serialNumber, final CertRevocationInfo revInfo, final boolean force,
             final boolean publishToDeltaCrlCache) throws OperationException {
         try {
-            X509CertWithRevocationInfo revokedCert = queryExecutor.revokeCert(
-                    caCert, serialNumber, revInfo, force, publishToDeltaCrlCache);
+            X509CertWithRevocationInfo revokedCert = queryExecutor.revokeCert(caCert, serialNumber,
+                    revInfo, force, publishToDeltaCrlCache);
             if (revokedCert == null) {
                 LOG.info("could not revoke non-existing certificate issuer='{}', serialNumber={}",
                     caCert.getSubject(), LogUtil.formatCsn(serialNumber));
             } else {
-                LOG.info("revoked certificate issuer='{}', serialNumber={}",
-                    caCert.getSubject(), LogUtil.formatCsn(serialNumber));
+                LOG.info("revoked certificate issuer='{}', serialNumber={}", caCert.getSubject(),
+                        LogUtil.formatCsn(serialNumber));
             }
 
             return revokedCert;
@@ -190,14 +185,14 @@ public class CertificateStore {
             final BigInteger serialNumber, final boolean force,
             final boolean publishToDeltaCrlCache) throws OperationException {
         try {
-            X509CertWithDbId unrevokedCert = queryExecutor.unrevokeCert(
-                    caCert, serialNumber, force, publishToDeltaCrlCache);
+            X509CertWithDbId unrevokedCert = queryExecutor.unrevokeCert(caCert, serialNumber, force,
+                    publishToDeltaCrlCache);
             if (unrevokedCert == null) {
                 LOG.info("could not unrevoke non-existing certificate issuer='{}', serialNumber={}",
                     caCert.getSubject(), LogUtil.formatCsn(serialNumber));
             } else {
-                LOG.info("unrevoked certificate issuer='{}', serialNumber={}",
-                        caCert.getSubject(), LogUtil.formatCsn(serialNumber));
+                LOG.info("unrevoked certificate issuer='{}', serialNumber={}", caCert.getSubject(),
+                        LogUtil.formatCsn(serialNumber));
             }
 
             return unrevokedCert;
@@ -239,8 +234,7 @@ public class CertificateStore {
             return true;
         } catch (Exception ex) {
             LOG.error("could not add CRL ca={}, thisUpdate={}: {}, ",
-                new Object[]{caCert.getSubject(),
-                    crl.getThisUpdate(), ex.getMessage()});
+                new Object[]{caCert.getSubject(), crl.getThisUpdate(), ex.getMessage()});
             LOG.debug("Exception", ex);
             return false;
         }
@@ -283,8 +277,7 @@ public class CertificateStore {
         try {
             return queryExecutor.getEncodedCrl(caCert, crlNumber);
         } catch (Exception ex) {
-            LOG.error("could not get CRL ca={}: error message: {}",
-                    caCert.getSubject(),
+            LOG.error("could not get CRL ca={}: error message: {}", caCert.getSubject(),
                     ex.getMessage());
             LOG.debug("Exception", ex);
             return null;
@@ -295,8 +288,7 @@ public class CertificateStore {
         try {
             return queryExecutor.cleanupCrls(caCert, numCrls);
         } catch (Exception ex) {
-            LOG.error("could not cleanup CRLs ca={}: error message: {}",
-                    caCert.getSubject(),
+            LOG.error("could not cleanup CRLs ca={}: error message: {}", caCert.getSubject(),
                     ex.getMessage());
             LOG.debug("Exception", ex);
             return 0;
@@ -359,9 +351,8 @@ public class CertificateStore {
             final int startId, final int numEntries, final boolean onlyRevoked,
             final boolean onlyCaCerts, final boolean onlyUserCerts) throws OperationException {
         try {
-            return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startId,
-                    numEntries, onlyRevoked,
-                    onlyCaCerts, onlyUserCerts);
+            return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startId, numEntries,
+                    onlyRevoked, onlyCaCerts, onlyUserCerts);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());

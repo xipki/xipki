@@ -183,9 +183,7 @@ class IaikP11Slot extends AbstractP11Slot {
             maxSessionCount2 = DEFAULT_MAX_COUNT_SESSION;
         } else {
             // 2 sessions as buffer, they may be used elsewhere.
-            maxSessionCount2 = (maxSessionCount2 < 3)
-                    ? 1
-                    : maxSessionCount2 - 2;
+            maxSessionCount2 = (maxSessionCount2 < 3) ? 1 : maxSessionCount2 - 2;
         }
         this.maxSessionCount = (int) maxSessionCount2;
         LOG.info("maxSessionCount: {}", this.maxSessionCount);
@@ -303,9 +301,7 @@ class IaikP11Slot extends AbstractP11Slot {
         P11ObjectIdentifier objectId = new P11ObjectIdentifier(privKey.getId().getByteArrayValue(),
                 toString(privKey.getLabel()));
 
-        X509Certificate[] certs = (cert == null)
-                ? null
-                : new X509Certificate[]{cert.getCert()};
+        X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
         IaikP11Identity identity = new IaikP11Identity(this,
                 new P11EntityIdentifier(slotId, objectId), privKey, pubKey, certs);
         refreshResult.addIdentity(identity);
@@ -402,8 +398,8 @@ class IaikP11Slot extends AbstractP11Slot {
     private Session openSession(final boolean rwSession) throws P11TokenException {
         Session session;
         try {
-            session = slot.getToken().openSession(Token.SessionType.SERIAL_SESSION, rwSession,
-                    null, null);
+            session = slot.getToken().openSession(Token.SessionType.SERIAL_SESSION, rwSession, null,
+                    null);
         } catch (TokenException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
         }
@@ -580,8 +576,8 @@ class IaikP11Slot extends AbstractP11Slot {
             }
             int size = tmpObjects.size();
             if (size > 1) {
-                LOG.warn("found {} public key identified by {}, use the first one",
-                        size, getDescription(keyId, keyLabel));
+                LOG.warn("found {} public key identified by {}, use the first one", size,
+                        getDescription(keyId, keyLabel));
             }
 
             return (Key) tmpObjects.get(0);

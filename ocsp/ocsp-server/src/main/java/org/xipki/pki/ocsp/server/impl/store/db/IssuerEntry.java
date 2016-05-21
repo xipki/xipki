@@ -76,8 +76,7 @@ public class IssuerEntry {
     public boolean matchHash(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {
         IssuerHashNameAndKey issuerHash = issuerHashMap.get(hashAlgo);
-        return (issuerHash == null)
-                ? false
+        return (issuerHash == null) ? false
                 : issuerHash.match(hashAlgo, issuerNameHash, issuerKeyHash);
     }
 

@@ -105,11 +105,8 @@ public class CaUtil {
             final Integer pathLen) {
         BasicConstraints basicConstraints;
         if (level == X509CertLevel.RootCA || level == X509CertLevel.SubCA) {
-            if (pathLen != null) {
-                basicConstraints = new BasicConstraints(pathLen);
-            } else {
-                basicConstraints = new BasicConstraints(true);
-            }
+            basicConstraints = (pathLen != null)  ? new BasicConstraints(pathLen)
+                    : new BasicConstraints(true);
         } else if (level == X509CertLevel.EndEntity) {
             basicConstraints = new BasicConstraints(false);
         } else {
@@ -182,9 +179,7 @@ public class CaUtil {
         for (int i = 0; i < size; i++) {
             ASN1ObjectIdentifier type = sortedDNs.get(i);
             RDN[] thisRdns = getRdns(requstedRdns, type);
-            int len = (thisRdns == null)
-                    ? 0
-                    : thisRdns.length;
+            int len = (thisRdns == null) ? 0 : thisRdns.length;
             if (len == 0) {
                 continue;
             }
@@ -208,11 +203,7 @@ public class CaUtil {
             }
         }
 
-        if (CollectionUtil.isEmpty(ret)) {
-            return null;
-        } else {
-            return ret.toArray(new RDN[0]);
-        }
+        return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
     }
 
 }

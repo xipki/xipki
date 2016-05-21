@@ -178,16 +178,10 @@ public class DbCertStatusStore extends OcspStore {
 
                     // no change in the issuerStore
                     Set<Integer> newIds = newIssuers.keySet();
+                    Set<Integer> ids = (issuerStore != null) ? issuerStore.getIds()
+                            : Collections.emptySet();
 
-                    Set<Integer> ids;
-                    if (issuerStore != null) {
-                        ids = issuerStore.getIds();
-                    } else {
-                        ids = Collections.emptySet();
-                    }
-
-                    boolean issuersUnchanged =
-                            ids.size() == newIds.size()
+                    boolean issuersUnchanged = (ids.size() == newIds.size())
                             && ids.containsAll(newIds)
                             && newIds.containsAll(ids);
 
@@ -308,9 +302,7 @@ public class DbCertStatusStore extends OcspStore {
         String coreSql;
         HashAlgoType certHashAlgo = null;
         if (includeCertHash) {
-            certHashAlgo = (certHashAlg == null)
-                    ? hashAlgo
-                    : certHashAlg;
+            certHashAlgo = (certHashAlg == null) ? hashAlgo : certHashAlg;
             coreSql = SQL_CS_HASHMAP.get(certHashAlgo);
         } else {
             coreSql = SQL_CS;
@@ -525,9 +517,7 @@ public class DbCertStatusStore extends OcspStore {
     public CertRevocationInfo getCaRevocationInfo(final HashAlgoType hashAlgo,
             final byte[] issuerNameHash, final byte[] issuerKeyHash) {
         IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
-        return (issuer == null)
-                ? null
-                : issuer.getRevocationInfo();
+        return (issuer == null) ? null : issuer.getRevocationInfo();
     }
 
     private static Set<X509Certificate> parseCerts(final Set<String> certFiles)

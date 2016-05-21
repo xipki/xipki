@@ -52,10 +52,8 @@ public class P12ECSignLoadTest extends P12SignLoadTest {
 
     public P12ECSignLoadTest(final SecurityFactory securityFactory, final String signatureAlgorithm,
             final String curveNameOrOid) throws Exception {
-        super(securityFactory, signatureAlgorithm,
-                generateKeystore(curveNameOrOid),
-                "PKCS#12 EC signature creation\n"
-                        + "curve: " + curveNameOrOid);
+        super(securityFactory, signatureAlgorithm, generateKeystore(curveNameOrOid),
+                "PKCS#12 EC signature creation\ncurve: " + curveNameOrOid);
     }
 
     private static byte[] generateKeystore(final String curveNameOrOid) throws Exception {

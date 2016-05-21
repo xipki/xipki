@@ -195,9 +195,8 @@ public class CaAddFromFileCmd extends CaCommandSupport {
 
         X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
         // CHECKSTYLE:SKIP
-        X509CaEntry entry = new X509CaEntry(
-                caName, serialSize, nextCrlNumber, signerType, signerConf,
-                caUris, numCrls, expirationPeriod);
+        X509CaEntry entry = new X509CaEntry(caName, serialSize, nextCrlNumber, signerType,
+                signerConf, caUris, numCrls, expirationPeriod);
 
         // STATUS
         key = CaExportCmd.KEY_STATUS;
@@ -298,8 +297,8 @@ public class CaAddFromFileCmd extends CaCommandSupport {
             if (longValue != null) {
                 invalidityTime = new Date(longValue.longValue() * 1000);
             }
-            CertRevocationInfo revInfo = new CertRevocationInfo(
-                    reasonCode, revocationTime, invalidityTime);
+            CertRevocationInfo revInfo = new CertRevocationInfo(reasonCode, revocationTime,
+                    invalidityTime);
             entry.setRevocationInfo(revInfo);
         }
 
@@ -309,11 +308,8 @@ public class CaAddFromFileCmd extends CaCommandSupport {
             str = getStrProp(props, key, false);
             byte[] certBytes = null;
             if (str != null) {
-                if (StringUtil.startsWithIgnoreCase(str, "file:")) {
-                    certBytes = IoUtil.read(str.substring("file:".length()));
-                } else {
-                    certBytes = Base64.decode(str);
-                }
+                certBytes = StringUtil.startsWithIgnoreCase(str, "file:")
+                    ? IoUtil.read(str.substring("file:".length())) : Base64.decode(str);
             }
 
             X509Certificate caCert = null;
@@ -329,11 +325,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
     private String getStrProp(final Properties props, final String propKey, final boolean required)
     throws IllegalCmdParamException {
         String str = props.getProperty(propKey);
-        if (StringUtil.isBlank(str)) {
-            str = "";
-        } else {
-            str = str.trim();
-        }
+        str = StringUtil.isBlank(str) ? "" : str.trim();
 
         if (!str.isEmpty()) {
             return str;
@@ -355,9 +347,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
     private Integer getIntProp(final Properties props, final String propKey, final boolean required)
     throws IllegalCmdParamException {
         String str = getStrProp(props, propKey, required);
-        return (str == null)
-                ? null
-                : Integer.parseInt(str);
+        return (str == null) ? null : Integer.parseInt(str);
     }
 
     private long getRequiredLongProp(final Properties props, final String propKey)
@@ -368,9 +358,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
     private Long getLongProp(final Properties props, final String propKey, final boolean required)
     throws IllegalCmdParamException {
         String str = getStrProp(props, propKey, required);
-        return (str == null)
-                ? null
-                : Long.parseLong(str);
+        return (str == null) ? null : Long.parseLong(str);
     }
 
     private static void assertNotNull(final Object obj, final String key, final String value)

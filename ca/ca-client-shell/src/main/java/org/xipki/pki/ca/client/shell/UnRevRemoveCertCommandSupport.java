@@ -105,9 +105,7 @@ public abstract class UnRevRemoveCertCommandSupport extends ClientCommandSupport
             cert.verify(caCert.getPublicKey(), "BC");
         } catch (SignatureException ex) {
             return "could not verify the signaure of given certificate by the issuer";
-        } catch (InvalidKeyException
-                | CertificateException
-                | NoSuchAlgorithmException
+        } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException
                 | NoSuchProviderException ex) {
             return "could not verify the signaure of given certificate by the issuer: "
                     + ex.getMessage();

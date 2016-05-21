@@ -61,8 +61,7 @@ public class MonetaryValueOption {
         this.amountRange = ParamUtil.requireNonNull("amountRange", amountRange);
         this.exponentRange = ParamUtil.requireNonNull("exponentRange", exponentRange);
 
-        this.currencyString = currency.isAlphabetic()
-                ? currency.getAlphabetic().toUpperCase()
+        this.currencyString = currency.isAlphabetic() ? currency.getAlphabetic().toUpperCase()
                 : Integer.toString(currency.getNumeric());
     }
 

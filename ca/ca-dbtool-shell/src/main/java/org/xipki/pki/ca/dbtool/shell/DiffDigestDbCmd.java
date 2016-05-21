@@ -118,17 +118,8 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
         }
 
         NumThreads numThreads = new NumThreads(numRefThreads, numTargetThreads);
-        return new DbDigestDiffWorker(
-                datasourceFactory,
-                passwordResolver,
-                revokedOnly,
-                refDir,
-                refDbConf,
-                dbconfFile,
-                reportDir,
-                numCertsPerSelect,
-                numThreads,
-                caCerts);
+        return new DbDigestDiffWorker(datasourceFactory, passwordResolver, revokedOnly, refDir,
+                refDbConf, dbconfFile, reportDir, numCertsPerSelect, numThreads, caCerts);
     }
 
 }

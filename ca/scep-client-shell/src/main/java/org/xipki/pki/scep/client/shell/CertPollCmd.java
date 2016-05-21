@@ -84,8 +84,8 @@ public class CertPollCmd extends ClientCommandSupport {
         X509Certificate caCert = client.getAuthorityCertStore().getCaCert();
         X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
-        EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(),
-                csr, caSubject);
+        EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(), csr,
+                caSubject);
         if (resp.isFailure()) {
             throw new CmdFailure("server returned 'failure'");
         }

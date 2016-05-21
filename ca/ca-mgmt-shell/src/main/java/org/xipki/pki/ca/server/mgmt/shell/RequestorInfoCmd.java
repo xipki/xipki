@@ -77,9 +77,7 @@ public class RequestorInfoCmd extends CaCommandSupport {
             int size = names.size();
 
             if (size == 0 || size == 1) {
-                sb.append((size == 0)
-                        ? "no"
-                        : "1");
+                sb.append((size == 0) ? "no" : "1");
                 sb.append(" CMP requestor is configured\n");
             } else {
                 sb.append(size).append(" CMP requestors are configured:\n");

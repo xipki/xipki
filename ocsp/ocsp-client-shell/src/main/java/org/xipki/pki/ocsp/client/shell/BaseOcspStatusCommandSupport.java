@@ -124,8 +124,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
                 "ArchiveCutoff");
         EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");
         EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
-        EXTENSION_OIDNAME_MAP.put(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke,
-                "ExtendedRevoke");
+        EXTENSION_OIDNAME_MAP.put(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
     }
 
     protected abstract void checkParameters(@Nullable X509Certificate respIssuer,
@@ -199,11 +198,8 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
         }
 
         URL serverUrlObj = new URL(serverUrl);
-
         RequestOptions options = getRequestOptions();
-
         checkParameters(respIssuer, sns, encodedCerts);
-
         boolean saveReq = isNotBlank(reqout);
         boolean saveResp = isNotBlank(respout);
         RequestResponseDebug debug = null;

@@ -68,9 +68,7 @@ public class EnvInfoCmd extends CaCommandSupport {
             int size = paramNames.size();
 
             if (size == 0 || size == 1) {
-                sb.append((size == 0)
-                        ? "no"
-                        : "1");
+                sb.append((size == 0) ? "no" : "1");
                 sb.append(" environment parameter is configured\n");
             } else {
                 sb.append(size).append(" enviroment paramters are configured:\n");

@@ -169,11 +169,8 @@ public class SoftTokenContentSignerBuilder {
 
             Digest dig = digestProvider.get(digAlgId);
             DSASigner dsaSigner = new DSASigner();
-            if (plain) {
-                return new DSAPlainDigestSigner(dsaSigner, dig);
-            } else {
-                return new DSADigestSigner(dsaSigner, dig);
-            }
+            return plain ? new DSAPlainDigestSigner(dsaSigner, dig)
+                    : new DSADigestSigner(dsaSigner, dig);
         }
 
     } // class DSAContentSignerBuilder
@@ -200,11 +197,8 @@ public class SoftTokenContentSignerBuilder {
             Digest dig = digestProvider.get(digAlgId);
             ECDSASigner dsaSigner = new ECDSASigner();
 
-            if (plain) {
-                return new DSAPlainDigestSigner(dsaSigner, dig);
-            } else {
-                return new DSADigestSigner(dsaSigner, dig);
-            }
+            return plain ? new DSAPlainDigestSigner(dsaSigner, dig)
+                    : new DSADigestSigner(dsaSigner, dig);
         }
 
     } // class ECDSAContentSignerBuilder
@@ -236,12 +230,9 @@ public class SoftTokenContentSignerBuilder {
         ParamUtil.requireNonNull("keyPassword", keyPassword);
 
         try {
-            KeyStore ks;
-            if ("JKS".equalsIgnoreCase(keystoreType)) {
-                ks = KeyStore.getInstance(keystoreType);
-            } else {
-                ks = KeyStore.getInstance(keystoreType, "BC");
-            }
+            KeyStore ks = "JKS".equalsIgnoreCase(keystoreType) ? KeyStore.getInstance(keystoreType)
+                    : KeyStore.getInstance(keystoreType, "BC");
+
             ks.load(keystoreStream, keystorePassword);
 
             String tmpKeyname = keyname;
@@ -270,9 +261,7 @@ public class SoftTokenContentSignerBuilder {
             Set<Certificate> caCerts = new HashSet<>();
 
             X509Certificate cert;
-            final int n = (certificateChain == null)
-                    ? 0
-                    : certificateChain.length;
+            final int n = (certificateChain == null) ? 0 : certificateChain.length;
             if (n > 0) {
                 cert = certificateChain[0];
                 if (n > 1) {
@@ -307,7 +296,6 @@ public class SoftTokenContentSignerBuilder {
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
         List<ContentSigner> signers = new ArrayList<>(parallelism);
-
         ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
 
         final String provName = XiSecurityConstants.PROVIDER_NAME_NSS;
@@ -421,11 +409,8 @@ public class SoftTokenContentSignerBuilder {
     } // createSigner
 
     public X509Certificate getCert() {
-        if (certificateChain != null && certificateChain.length > 0) {
-            return certificateChain[0];
-        } else {
-            return null;
-        }
+        return (certificateChain != null && certificateChain.length > 0)
+                ? certificateChain[0] : null;
     }
 
     public X509Certificate[] getCertificateChain() {

@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.dbtool.diffdb;
 
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -82,8 +83,8 @@ public class XipkiDbDigestReader extends DbDigestReader {
     private XipkiDbDigestReader(final DataSourceWrapper datasource, final X509Certificate caCert,
             final int totalAccount, final int minId, final int maxId, final int numThreads,
             final int numCertsToPredicate, final StopMe stopMe) throws Exception {
-        super(datasource, caCert, totalAccount, minId, maxId, numThreads,
-                numCertsToPredicate, stopMe);
+        super(datasource, caCert, totalAccount, minId, maxId, numThreads,  numCertsToPredicate,
+                stopMe);
     } // constructor
 
     private class XipkiDbRetriever implements Retriever {
@@ -129,7 +130,8 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
                 while (rs.next()) {
                     String hash = rs.getString(dbControl.getColCerthash());
-                    long serial = rs.getLong(dbControl.getColSerialNumber());
+                    BigInteger serial = new BigInteger(rs.getString(dbControl.getColSerialNumber()),
+                            16);
                     boolean revoked = rs.getBoolean(dbControl.getColRevoked());
 
                     Integer revReason = null;
@@ -184,9 +186,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
             .append(".").append(dbControl.getColCertId());
 
         this.selectCertSql = sb.toString();
-
         this.numCertSql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=" + caId + " AND ID>=? AND ID<=?";
-
         this.numCertStmt = datasource.prepareStatement(conn, this.numCertSql);
 
         if (!super.init()) {
@@ -243,24 +243,18 @@ public class XipkiDbDigestReader extends DbDigestReader {
             sql = "SELECT COUNT(*) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
             rs = stmt.executeQuery(sql);
 
-            totalAccount = rs.next()
-                    ? rs.getInt(1)
-                    : 0;
+            totalAccount = rs.next() ? rs.getInt(1) : 0;
             rs.close();
 
             sql = "SELECT MAX(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
 
             rs = stmt.executeQuery(sql);
-            maxId = rs.next()
-                    ? rs.getInt(1)
-                    : 0;
+            maxId = rs.next() ? rs.getInt(1) : 0;
             rs.close();
 
             sql = "SELECT MIN(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
             rs = stmt.executeQuery(sql);
-            minId = rs.next()
-                    ? rs.getInt(1)
-                    : 1;
+            minId = rs.next() ? rs.getInt(1) : 1;
 
             XipkiDbDigestReader reader = new XipkiDbDigestReader(datasource, caCert,
                     totalAccount, minId, maxId, numThreads, numCertsToPredicate, stopMe);

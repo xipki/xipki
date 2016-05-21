@@ -85,9 +85,7 @@ public class ProcessLog {
         StringBuilder sb = new StringBuilder();
 
         // first header line
-        final int n = hasTotal
-                ? 7
-                : 4;
+        final int n = hasTotal ? 7 : 4;
         for (int i = 0; i < n * MIN_LEN; i++) {
             sb.append('-');
         }
@@ -141,9 +139,7 @@ public class ProcessLog {
         StringBuilder sb = new StringBuilder();
         sb.append('\n');
 
-        final int n = hasTotal
-                ? 7
-                : 4;
+        final int n = hasTotal ? 7 : 4;
         for (int i = 0; i < n * MIN_LEN; i++) {
             sb.append('-');
         }
@@ -191,13 +187,9 @@ public class ProcessLog {
         measureDeque.addLast(new MeasurePoint(nowMs, numProcessed.get()));
         lastPrintTimeMs.set(nowMs);
 
-        MeasurePoint referenceMeasurePoint;
         int numMeasurePoints = measureDeque.size();
-        if (numMeasurePoints > 10) {
-            referenceMeasurePoint = measureDeque.removeFirst();
-        } else {
-            referenceMeasurePoint = measureDeque.getFirst();
-        }
+        MeasurePoint referenceMeasurePoint = (numMeasurePoints > 10) ? measureDeque.removeFirst()
+                : measureDeque.getFirst();
 
         StringBuilder sb = new StringBuilder("\r");
 

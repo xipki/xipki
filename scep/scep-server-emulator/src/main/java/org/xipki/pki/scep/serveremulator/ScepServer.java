@@ -126,12 +126,7 @@ public class ScepServer {
 
         SubjectPublicKeyInfo pkInfo = ScepUtil.createSubjectPublicKeyInfo(keypair.getPublic());
         X500Name subject = new X500Name("CN=CA1, OU=emulator, O=xipki.org, C=DE");
-        this.caCert = issueSubCaCert(
-                rcaKey,
-                rcaSubject,
-                pkInfo,
-                subject,
-                BigInteger.valueOf(2),
+        this.caCert = issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject, BigInteger.valueOf(2),
                 new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
         CaEmulator ca = new CaEmulator(keypair.getPrivate(), this.caCert, generateCrl);
 
@@ -155,13 +150,8 @@ public class ScepServer {
             subject = new X500Name("CN=CA2, OU=emulator, O=xipki.org, C=DE");
 
             Date startTime = new Date(System.currentTimeMillis() + 365 * CaEmulator.DAY_IN_MS);
-            this.nextCaCert = issueSubCaCert(
-                    rcaKey,
-                    rcaSubject,
-                    pkInfo,
-                    subject,
-                    BigInteger.valueOf(2),
-                    startTime);
+            this.nextCaCert = issueSubCaCert(rcaKey, rcaSubject, pkInfo, subject,
+                    BigInteger.valueOf(2), startTime);
             CaEmulator tmpCa = new CaEmulator(keypair.getPrivate(), this.nextCaCert, generateCrl);
 
             if (withRa) {
@@ -220,16 +210,9 @@ public class ScepServer {
             final BigInteger serialNumber, final Date startTime)
     throws CertIOException, OperatorCreationException {
         Date notAfter = new Date(startTime.getTime() + CaEmulator.DAY_IN_MS * 3650);
-        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-                issuer,
-                serialNumber,
-                startTime,
-                notAfter,
-                subject,
-                pubKeyInfo);
-
-        X509KeyUsage ku = new X509KeyUsage(
-                    X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
+        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(issuer,
+                serialNumber, startTime, notAfter, subject, pubKeyInfo);
+        X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
         certGenerator.addExtension(Extension.keyUsage, true, ku);
         BasicConstraints bc = new BasicConstraints(0);
         certGenerator.addExtension(Extension.basicConstraints, true, bc);

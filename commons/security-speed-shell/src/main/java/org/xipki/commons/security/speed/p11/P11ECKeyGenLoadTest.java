@@ -50,9 +50,7 @@ public class P11ECKeyGenLoadTest extends P11KeyGenLoadTest {
     private final String curveNameOrOid;
 
     public P11ECKeyGenLoadTest(final P11Slot slot, final String curveNameOrOid) throws Exception {
-        super(slot,
-                "PKCS#11 EC key generation\n"
-                        + "curve: " + curveNameOrOid);
+        super(slot, "PKCS#11 EC key generation\ncurve: " + curveNameOrOid);
         this.curveNameOrOid = ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
     }
 

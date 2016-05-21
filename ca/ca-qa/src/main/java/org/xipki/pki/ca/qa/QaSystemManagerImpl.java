@@ -145,8 +145,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
                 X509IssuerInfo issuerInfo;
                 try {
                     issuerInfo = new X509IssuerInfo(issuerType.getCaIssuerUrl(),
-                            issuerType.getOcspUrl(),
-                            issuerType.getCrlUrl(),
+                            issuerType.getOcspUrl(), issuerType.getCrlUrl(),
                             issuerType.getDeltaCrlUrl(), certBytes);
                 } catch (CertificateException ex) {
                     LogUtil.error(LOG, ex,

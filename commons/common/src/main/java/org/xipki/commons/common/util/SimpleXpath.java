@@ -84,9 +84,7 @@ public class SimpleXpath {
                 prefix = tmpStep.substring(0, idx);
                 this.localPart = tmpStep.substring(idx + 1);
             } else {
-                prefix = isElement
-                        ? ""
-                        : null;
+                prefix = isElement ? "" : null;
                 this.localPart = tmpStep;
             }
 
@@ -104,15 +102,9 @@ public class SimpleXpath {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append(isElement
-                    ? "Element"
-                    : "Attribute");
-            sb.append(" localPart='");
-            sb.append(localPart);
-            sb.append("'");
-            sb.append(" namespace='");
-            sb.append(namespaceUri);
-            sb.append("'");
+            sb.append(isElement ? "Element" : "Attribute");
+            sb.append(" localPart='").append(localPart).append("'");
+            sb.append(" namespace='").append(namespaceUri).append("'");
             return sb.toString();
         }
 
@@ -200,9 +192,7 @@ public class SimpleXpath {
     public Node selectFirstMatch(final Element context) {
         List<Node> rv = new LinkedList<Node>();
         select(rv, context, this.steps, 0, true);
-        return CollectionUtil.isEmpty(rv)
-                ? null
-                : rv.get(0);
+        return CollectionUtil.isEmpty(rv) ? null : rv.get(0);
     }
 
 }

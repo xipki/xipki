@@ -77,9 +77,7 @@ public class CrlSignerInfoCmd extends CaCommandSupport {
             int size = names.size();
 
             if (size == 0 || size == 1) {
-                sb.append((size == 0)
-                        ? "no"
-                        : "1");
+                sb.append((size == 0) ? "no" : "1");
                 sb.append(" CRL signer is configured\n");
             } else {
                 sb.append(size).append(" CRL signers are configured:\n");

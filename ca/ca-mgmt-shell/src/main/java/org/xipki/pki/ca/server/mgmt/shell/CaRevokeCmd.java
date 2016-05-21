@@ -106,11 +106,8 @@ public class CaRevokeCmd extends CaCommandSupport {
         }
 
         Date revocationDate = null;
-        if (isNotBlank(revocationDateS)) {
-            revocationDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(revocationDateS);
-        } else {
-            revocationDate = new Date();
-        }
+        revocationDate = isNotBlank(revocationDateS)
+                ? DateUtil.parseUtcTimeyyyyMMddhhmmss(revocationDateS) : new Date();
 
         Date invalidityDate = null;
         if (isNotBlank(invalidityDateS)) {

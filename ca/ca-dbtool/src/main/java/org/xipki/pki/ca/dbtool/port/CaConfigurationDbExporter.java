@@ -167,7 +167,6 @@ class CaConfigurationDbExporter extends DbPorter {
         ResultSet rs = null;
         try {
             stmt = createStatement();
-
             rs = stmt.executeQuery(sql);
 
             while (rs.next()) {

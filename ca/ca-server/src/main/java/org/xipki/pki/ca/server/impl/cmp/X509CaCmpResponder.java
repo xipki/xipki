@@ -271,9 +271,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
         PKIHeader reqHeader = message.getHeader();
         PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
-                reqHeader.getPvno().getValue().intValue(),
-                getSender(),
-                reqHeader.getSender());
+                reqHeader.getPvno().getValue().intValue(), getSender(), reqHeader.getSender());
         respHeader.setTransactionID(tid);
 
         PKIBody respBody;
@@ -288,8 +286,8 @@ public class X509CaCmpResponder extends CmpResponder {
             case PKIBody.TYPE_KEY_UPDATE_REQ:
             case PKIBody.TYPE_P10_CERT_REQ:
             case PKIBody.TYPE_CROSS_CERT_REQ:
-                respBody = cmpEnrollCert(respHeader, cmpControl, reqHeader, reqBody,
-                        tmpRequestor, user, tid, auditEvent);
+                respBody = cmpEnrollCert(respHeader, cmpControl, reqHeader, reqBody, tmpRequestor,
+                        user, tid, auditEvent);
                 break;
             case PKIBody.TYPE_CERT_CONFIRM:
                 addAutitEventType(auditEvent, "CERT_CONFIRM");
@@ -298,8 +296,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 break;
             case PKIBody.TYPE_REVOCATION_REQ:
                 respBody = cmpRevokeOrUnrevokeOrRemoveCertificates(respHeader, cmpControl,
-                        reqHeader, reqBody,
-                        tmpRequestor, user, tid, auditEvent);
+                        reqHeader, reqBody, tmpRequestor, user, tid, auditEvent);
                 break;
             case PKIBody.TYPE_CONFIRM:
                 addAutitEventType(auditEvent, "CONFIRM");
@@ -322,8 +319,7 @@ public class X509CaCmpResponder extends CmpResponder {
             } // end switch (type)
         } catch (InsuffientPermissionException ex) {
             ErrorMsgContent emc = new ErrorMsgContent(
-                    new PKIStatusInfo(PKIStatus.rejection,
-                            new PKIFreeText(ex.getMessage()),
+                    new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(ex.getMessage()),
                             new PKIFailureInfo(PKIFailureInfo.notAuthorized)));
 
             respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
@@ -445,8 +441,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
             try {
                 CmpUtf8Pairs keyvalues = CmpUtil.extract(reqMsg.getRegInfo());
-                String certprofileName = (keyvalues == null)
-                        ? null
+                String certprofileName = (keyvalues == null) ? null
                         : keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
                 if (certprofileName == null) {
                     throw new CMPException("no certificate profile is specified");
@@ -490,8 +485,7 @@ public class X509CaCmpResponder extends CmpResponder {
         } // end for
 
         CMPCertificate[] caPubs = sendCaCert
-                ? new CMPCertificate[]{getCa().getCaInfo().getCertInCmpFormat()}
-                : null;
+                ? new CMPCertificate[]{getCa().getCaInfo().getCertInCmpFormat()} : null;
         return new CertRepMessage(caPubs, certResponses);
     } // method processCertReqMessages
 
@@ -538,8 +532,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
             try {
                 CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
-                String certprofileName = (keyvalues == null)
-                        ? null
+                String certprofileName = (keyvalues == null) ? null
                         : keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
                 if (certprofileName == null) {
                     throw new CMPException("no certificate profile is specified");
@@ -568,8 +561,7 @@ public class X509CaCmpResponder extends CmpResponder {
         }
 
         CMPCertificate[] caPubs = sendCaCert
-                ? new CMPCertificate[]{getCa().getCaInfo().getCertInCmpFormat()}
-                : null;
+                ? new CMPCertificate[]{getCa().getCaInfo().getCertInCmpFormat()} : null;
         CertRepMessage repMessage = new CertRepMessage(caPubs, new CertResponse[]{certResp});
 
         return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
@@ -599,18 +591,16 @@ public class X509CaCmpResponder extends CmpResponder {
                         certInfo.getCert().getSubject()));
             }
 
-            pendingCertPool.addCertificate(tid.getOctets(), certReqId.getPositiveValue(),
-                    certInfo, System.currentTimeMillis() + confirmWaitTime);
+            pendingCertPool.addCertificate(tid.getOctets(), certReqId.getPositiveValue(), certInfo,
+                    System.currentTimeMillis() + confirmWaitTime);
             String warningMsg = certInfo.getWarningMessage();
 
             PKIStatusInfo statusInfo;
             if (StringUtil.isBlank(warningMsg)) {
-                if (certInfo.isAlreadyIssued()) {
-                    statusInfo = new PKIStatusInfo(PKIStatus.grantedWithMods,
-                            new PKIFreeText("ALREADY_ISSUED"));
-                } else {
-                    statusInfo = new PKIStatusInfo(PKIStatus.granted);
-                }
+                statusInfo = certInfo.isAlreadyIssued()
+                        ? new PKIStatusInfo(PKIStatus.grantedWithMods,
+                            new PKIFreeText("ALREADY_ISSUED"))
+                        : new PKIStatusInfo(PKIStatus.granted);
             } else {
                 statusInfo = new PKIStatusInfo(PKIStatus.grantedWithMods,
                         new PKIFreeText(warningMsg));
@@ -623,8 +613,7 @@ public class X509CaCmpResponder extends CmpResponder {
             CertOrEncCert cec = new CertOrEncCert(
                     CMPCertificate.getInstance(certInfo.getCert().getEncodedCert()));
             CertifiedKeyPair kp = new CertifiedKeyPair(cec);
-            CertResponse certResp = new CertResponse(certReqId, statusInfo, kp, null);
-            return certResp;
+            return new CertResponse(certReqId, statusInfo, kp, null);
         } catch (OperationException ex) {
             ErrorCode code = ex.getErrorCode();
             LOG.warn("generate certificate, OperationException: code={}, message={}",
@@ -716,16 +705,13 @@ public class X509CaCmpResponder extends CmpResponder {
 
                 if (issuer == null) {
                     return createErrorMsgPkiBody(PKIStatus.rejection,
-                            PKIFailureInfo.badCertTemplate,
-                            "issuer is not present");
+                            PKIFailureInfo.badCertTemplate, "issuer is not present");
                 } else if (!issuer.equals(caSubject)) {
                     return createErrorMsgPkiBody(PKIStatus.rejection,
-                            PKIFailureInfo.badCertTemplate,
-                            "issuer not targets at the CA");
+                            PKIFailureInfo.badCertTemplate, "issuer not targets at the CA");
                 } else if (serialNumber == null) {
                     return createErrorMsgPkiBody(PKIStatus.rejection,
-                            PKIFailureInfo.badCertTemplate,
-                            "serialNumber is not present");
+                            PKIFailureInfo.badCertTemplate, "serialNumber is not present");
                 } else if (certDetails.getSigningAlg() != null
                         || certDetails.getValidity() != null
                         || certDetails.getSubject() != null
@@ -1181,29 +1167,29 @@ public class X509CaCmpResponder extends CmpResponder {
             addAutitEventType(auditEvent, "CERT_REQ");
             checkPermission(requestor, Permission.ENROLL_CERT);
             respBody = processCr(requestor, user, tid, reqHeader,
-                    (CertReqMessages) reqBody.getContent(), confirmWaitTime,
-                    sendCaCert, auditEvent);
+                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert,
+                    auditEvent);
             break;
         case PKIBody.TYPE_KEY_UPDATE_REQ:
             addAutitEventType(auditEvent, "KEY_UPDATE");
             checkPermission(requestor, Permission.KEY_UPDATE);
             respBody = processKur(requestor, user, tid, reqHeader,
-                    (CertReqMessages) reqBody.getContent(), confirmWaitTime,
-                    sendCaCert, auditEvent);
+                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert,
+                    auditEvent);
             break;
         case PKIBody.TYPE_P10_CERT_REQ:
             addAutitEventType(auditEvent, "CERT_REQ");
             checkPermission(requestor, Permission.ENROLL_CERT);
             respBody = processP10cr(requestor, user, tid, reqHeader,
-                    (CertificationRequest) reqBody.getContent(), confirmWaitTime,
-                    sendCaCert, auditEvent);
+                    (CertificationRequest) reqBody.getContent(), confirmWaitTime, sendCaCert,
+                    auditEvent);
             break;
         case PKIBody.TYPE_CROSS_CERT_REQ:
             addAutitEventType(auditEvent, "CROSS_CERT_REQ");
             checkPermission(requestor, Permission.CROSS_CERT_ENROLL);
             respBody = processCcp(requestor, user, tid, reqHeader,
-                    (CertReqMessages) reqBody.getContent(), confirmWaitTime,
-                    sendCaCert, auditEvent);
+                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert,
+                    auditEvent);
             break;
         default:
             throw new RuntimeException("should not reach here");
@@ -1216,8 +1202,7 @@ public class X509CaCmpResponder extends CmpResponder {
         } else {
             Date now = new Date();
             respHeader.setMessageTime(new ASN1GeneralizedTime(now));
-            tv = new InfoTypeAndValue(
-                    CMPObjectIdentifiers.it_confirmWaitTime,
+            tv = new InfoTypeAndValue(CMPObjectIdentifiers.it_confirmWaitTime,
                     new ASN1GeneralizedTime(
                             new Date(System.currentTimeMillis() + confirmWaitTime)));
         }
@@ -1309,8 +1294,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
         if (itv == null) {
             String statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG
-                    + " is only supported with the sub-types "
-                    + KNOWN_GENMSG_IDS.toString();
+                    + " is only supported with the sub-types " + KNOWN_GENMSG_IDS.toString();
             return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                     statusMessage);
         }
@@ -1450,15 +1434,9 @@ public class X509CaCmpResponder extends CmpResponder {
 
     private static PKIBody createErrorMsgPkiBody(final PKIStatus pkiStatus, final int failureInfo,
             final String statusMessage) {
-        PKIFreeText pkiStatusMsg = (statusMessage == null)
-                ? null
-                : new PKIFreeText(statusMessage);
-
+        PKIFreeText pkiStatusMsg = (statusMessage == null) ? null : new PKIFreeText(statusMessage);
         ErrorMsgContent emc = new ErrorMsgContent(
-                new PKIStatusInfo(pkiStatus,
-                        pkiStatusMsg,
-                        new PKIFailureInfo(failureInfo)));
-
+                new PKIStatusInfo(pkiStatus, pkiStatusMsg, new PKIFailureInfo(failureInfo)));
         return new PKIBody(PKIBody.TYPE_ERROR, emc);
     }
 

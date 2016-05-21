@@ -140,8 +140,7 @@ public class DbDigestExportWorker extends DbPortWorker {
     throws DataAccessException {
         Connection conn = datasource.getConnection();
         try {
-            if (datasource.tableExists(conn, "CAINFO")
-                    && datasource.tableExists(conn, "RAWCERT")) {
+            if (datasource.tableExists(conn, "CAINFO") && datasource.tableExists(conn, "RAWCERT")) {
                 return DbSchemaType.XIPKI_CA_v1;
             } else if (datasource.tableExists(conn, "ISSUER")
                     && datasource.tableExists(conn, "CERTHASH")) {

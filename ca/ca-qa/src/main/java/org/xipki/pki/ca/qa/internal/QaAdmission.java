@@ -68,11 +68,8 @@ public class QaAdmission extends QaExtension {
         this.addProfessionInfo = jaxb.getAddProfessionInfo();
 
         List<String> items = jaxb.getProfessionItem();
-        if (CollectionUtil.isEmpty(items)) {
-            professionItems = null;
-        } else {
-            professionItems = Collections.unmodifiableList(items);
-        }
+        professionItems =  (CollectionUtil.isEmpty(items)) ? null
+                : Collections.unmodifiableList(items);
 
         List<OidWithDescType> oids = jaxb.getProfessionOid();
         if (oids == null) {

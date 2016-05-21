@@ -94,9 +94,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
             if (saveReq) {
                 byte[] bytes = reqResp.getRequest();
                 if (bytes != null) {
-                    String fn = (n == 1)
-                            ? reqout
-                            : appendIndex(reqout, i);
+                    String fn = (n == 1) ? reqout : appendIndex(reqout, i);
                     try {
                         IoUtil.save(fn, bytes);
                     } catch (IOException ex) {
@@ -108,9 +106,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
             if (saveResp) {
                 byte[] bytes = reqResp.getResponse();
                 if (bytes != null) {
-                    String fn = (n == 1)
-                            ? respout
-                            : appendIndex(respout, i);
+                    String fn = (n == 1) ? respout : appendIndex(respout, i);
                     try {
                         IoUtil.save(fn, bytes);
                     } catch (IOException ex) {

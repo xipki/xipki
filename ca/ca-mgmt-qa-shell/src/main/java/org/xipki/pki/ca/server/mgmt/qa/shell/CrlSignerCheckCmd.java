@@ -82,8 +82,8 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
             CrlControl is = new CrlControl(cs.getCrlControl());
 
             if (!ex.equals(is)) {
-                throw new CmdFailure("CRL control: is '" + is.getConf()
-                    + "', but expected '" + ex.getConf() + "'");
+                throw new CmdFailure("CRL control: is '" + is.getConf() + "', but expected '"
+                        + ex.getConf() + "'");
             }
         }
 

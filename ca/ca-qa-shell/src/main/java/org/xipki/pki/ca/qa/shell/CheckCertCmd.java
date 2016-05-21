@@ -150,9 +150,7 @@ public class CheckCertCmd extends XipkiCommandSupport {
 
         sb.append(certFile).append(" (certprofile ").append(profileName).append(")\n");
         sb.append("\tcertificate is ");
-        sb.append(result.isAllSuccessful()
-                ? "valid"
-                : "invalid");
+        sb.append(result.isAllSuccessful() ? "valid" : "invalid");
 
         if (verbose.booleanValue()) {
             for (ValidationIssue issue : result.getValidationIssues()) {
@@ -170,12 +168,9 @@ public class CheckCertCmd extends XipkiCommandSupport {
 
     private static void format(final ValidationIssue issue, final String prefix,
             final StringBuilder sb) {
-        sb.append(prefix);
-        sb.append(issue.getCode());
+        sb.append(prefix).append(issue.getCode());
         sb.append(", ").append(issue.getDescription());
-        sb.append(", ").append(issue.isFailed()
-                    ? "failed"
-                    : "successful");
+        sb.append(", ").append(issue.isFailed() ? "failed" : "successful");
         if (issue.getFailureMessage() != null) {
             sb.append(", ").append(issue.getFailureMessage());
         }

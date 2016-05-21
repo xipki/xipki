@@ -82,8 +82,8 @@ public class ImportCaCmd extends DbPortCommandSupport {
 
     @Override
     protected DbPortWorker getDbPortWorker() throws Exception {
-        return new CaDbImportWorker(datasourceFactory, passwordResolver, dbconfFile, resume,
-                indir, numCertsPerCommit.intValue(), testOnly);
+        return new CaDbImportWorker(datasourceFactory, passwordResolver, dbconfFile, resume, indir,
+                numCertsPerCommit.intValue(), testOnly);
     }
 
 }

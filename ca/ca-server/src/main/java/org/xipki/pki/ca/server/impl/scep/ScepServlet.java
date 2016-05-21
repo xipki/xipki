@@ -136,9 +136,7 @@ public class ScepServlet extends HttpServlet {
         }
 
         AuditService auditService = auditServiceRegister.getAuditService();
-        AuditEvent auditEvent = (auditService != null)
-                ? new AuditEvent(new Date())
-                : null;
+        AuditEvent auditEvent = (auditService == null) ? null : new AuditEvent(new Date());
         if (auditEvent != null) {
             auditEvent.setApplicationName("SCEP");
             auditEvent.setName("PERF");

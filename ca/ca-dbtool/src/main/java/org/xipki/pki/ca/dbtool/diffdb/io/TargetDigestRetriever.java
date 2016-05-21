@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.dbtool.diffdb.io;
 
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -112,13 +113,13 @@ public class TargetDigestRetriever {
                 }
 
                 try {
-                    Map<Long, DbDigestEntry> refCerts = bundle.getCerts();
-                    Map<Long, DbDigestEntry> resp = query(bundle);
+                    Map<BigInteger, DbDigestEntry> refCerts = bundle.getCerts();
+                    Map<BigInteger, DbDigestEntry> resp = query(bundle);
 
-                    List<Long> serialNumbers = bundle.getSerialNumbers();
+                    List<BigInteger> serialNumbers = bundle.getSerialNumbers();
                     int size = serialNumbers.size();
 
-                    for (Long serialNumber : serialNumbers) {
+                    for (BigInteger serialNumber : serialNumbers) {
                         DbDigestEntry refCert = refCerts.get(serialNumber);
                         DbDigestEntry targetCert = resp.get(serialNumber);
 
@@ -153,21 +154,15 @@ public class TargetDigestRetriever {
             datasource.returnConnection(conn);
         } // method run
 
-        private Map<Long, DbDigestEntry> query(CertsBundle bundle) throws DataAccessException {
-            List<Long> serialNumbers = bundle.getSerialNumbers();
+        private Map<BigInteger, DbDigestEntry> query(CertsBundle bundle)
+        throws DataAccessException {
+            List<BigInteger> serialNumbers = bundle.getSerialNumbers();
             int size = serialNumbers.size();
-
-            Map<Long, DbDigestEntry> certsInB;
             boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
-            if (batchSupported && size == numPerSelect) {
-                certsInB = getCertsViaInArraySelectInB(inArraySelectStmt,
-                        serialNumbers);
-            } else {
-                certsInB = getCertsViaSingleSelectInB(
-                        singleSelectStmt, serialNumbers);
-            }
 
-            return certsInB;
+            return (batchSupported && size == numPerSelect)
+                ? getCertsViaInArraySelectInB(inArraySelectStmt, serialNumbers)
+                : getCertsViaSingleSelectInB(singleSelectStmt, serialNumbers);
         } // method query
 
     } // class Retriever
@@ -284,12 +279,12 @@ public class TargetDigestRetriever {
         }
     }
 
-    private Map<Long, DbDigestEntry> getCertsViaSingleSelectInB(
-            final PreparedStatement singleSelectStmt, final List<Long> serialNumbers)
+    private Map<BigInteger, DbDigestEntry> getCertsViaSingleSelectInB(
+            final PreparedStatement singleSelectStmt, final List<BigInteger> serialNumbers)
     throws DataAccessException {
-        Map<Long, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
+        Map<BigInteger, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
 
-        for (Long serialNumber : serialNumbers) {
+        for (BigInteger serialNumber : serialNumbers) {
             DbDigestEntry certB = getSingleCert(singleSelectStmt, serialNumber);
             if (certB != null) {
                 ret.put(serialNumber, certB);
@@ -299,8 +294,8 @@ public class TargetDigestRetriever {
         return ret;
     }
 
-    private Map<Long, DbDigestEntry> getCertsViaInArraySelectInB(
-            final PreparedStatement batchSelectStmt, final List<Long> serialNumbers)
+    private Map<BigInteger, DbDigestEntry> getCertsViaInArraySelectInB(
+            final PreparedStatement batchSelectStmt, final List<BigInteger> serialNumbers)
     throws DataAccessException {
         final int n = serialNumbers.size();
         if (n != numPerSelect) {
@@ -309,12 +304,11 @@ public class TargetDigestRetriever {
         }
 
         Collections.sort(serialNumbers);
-
         ResultSet rs = null;
 
         try {
             for (int i = 0; i < n; i++) {
-                batchSelectStmt.setLong(i + 1, serialNumbers.get(i));
+                batchSelectStmt.setString(i + 1, serialNumbers.get(i).toString(16));
             }
 
             rs = batchSelectStmt.executeQuery();
@@ -326,12 +320,13 @@ public class TargetDigestRetriever {
         }
     }
 
-    private Map<Long, DbDigestEntry> buildResult(final ResultSet rs, final List<Long> serialNumbers)
-    throws SQLException {
-        Map<Long, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
+    private Map<BigInteger, DbDigestEntry> buildResult(final ResultSet rs,
+            final List<BigInteger> serialNumbers) throws SQLException {
+        Map<BigInteger, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
 
         while (rs.next()) {
-            long serialNumber = rs.getLong(dbControl.getColSerialNumber());
+            BigInteger serialNumber = new BigInteger(rs.getString(dbControl.getColSerialNumber()),
+                    16);
             if (!serialNumbers.contains(serialNumber)) {
                 continue;
             }
@@ -349,8 +344,8 @@ public class TargetDigestRetriever {
                 }
             }
             String sha1Fp = rs.getString(dbControl.getColCerthash());
-            DbDigestEntry certB = new DbDigestEntry(serialNumber,
-                    revoked, revReason, revTime, revInvTime, sha1Fp);
+            DbDigestEntry certB = new DbDigestEntry(serialNumber, revoked, revReason, revTime,
+                    revInvTime, sha1Fp);
             ret.put(serialNumber, certB);
         }
 
@@ -358,10 +353,10 @@ public class TargetDigestRetriever {
     }
 
     private DbDigestEntry getSingleCert(final PreparedStatement singleSelectStmt,
-            final long serialNumber) throws DataAccessException {
+            final BigInteger serialNumber) throws DataAccessException {
         ResultSet rs = null;
         try {
-            singleSelectStmt.setLong(1, serialNumber);
+            singleSelectStmt.setString(1, serialNumber.toString(16));
             rs = singleSelectStmt.executeQuery();
             if (!rs.next()) {
                 return null;
@@ -379,8 +374,7 @@ public class TargetDigestRetriever {
                 }
             }
             String sha1Fp = rs.getString(dbControl.getColCerthash());
-            return new DbDigestEntry(serialNumber,
-                    revoked, revReason, revTime, revInvTime, sha1Fp);
+            return new DbDigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
         } catch (SQLException ex) {
             throw datasource.translate(singleCertSql, ex);
         } finally {

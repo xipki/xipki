@@ -101,7 +101,9 @@ if { $printUsage equals "true" } {
     echo "Loadtest OCSP status (database based cert source)"
     xipki-ocsp:loadtest-status \
       --issuer output/SubCA1.der \
-      --serial 1-500 \
+      --serial 99999 \
+      --cert output/TLS_C1.der \
+      --cert output/TLS_C2.der \
       --url $URL \
       --duration $duration \
       --thread $threads
@@ -109,7 +111,9 @@ if { $printUsage equals "true" } {
     echo "Loadtest OCSP status (CRL based cert source)"
     xipki-ocsp:loadtest-status \
       --issuer output/SubCAwithCRL1.der \
-      --serial 1-2 \
+      --serial 99999 \
+      --cert output/OCSP1.der \
+      --cert output/OCSP2.der \
       --url $URL_CRL \
       --duration $duration \
       --thread $threads

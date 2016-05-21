@@ -72,8 +72,7 @@ public class SubjectControl {
         this.typeGroups = new HashMap<>();
         Set<ASN1ObjectIdentifier> oidSet = controls.keySet();
         List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
-        List<ASN1ObjectIdentifier> oids = backwardsSubject
-                ? SubjectDnSpec.getBackwardDNs()
+        List<ASN1ObjectIdentifier> oids = backwardsSubject ? SubjectDnSpec.getBackwardDNs()
                 : SubjectDnSpec.getForwardDNs();
         for (ASN1ObjectIdentifier oid : oids) {
             if (oidSet.contains(oid)) {
@@ -113,10 +112,7 @@ public class SubjectControl {
 
     public RdnControl getControl(final ASN1ObjectIdentifier type) {
         ParamUtil.requireNonNull("type", type);
-
-        return controls.isEmpty()
-                ? SubjectDnSpec.getRdnControl(type)
-                : controls.get(type);
+        return controls.isEmpty() ? SubjectDnSpec.getRdnControl(type) : controls.get(type);
     }
 
     public String getGroup(final ASN1ObjectIdentifier type) {

@@ -62,8 +62,7 @@ public class GeneralNameMode {
 
     public GeneralNameMode(final GeneralNameTag tag, final Set<ASN1ObjectIdentifier> allowedTypes) {
         this.tag = ParamUtil.requireNonNull("tag", tag);
-        this.allowedTypes = CollectionUtil.isEmpty(allowedTypes)
-                ? Collections.emptySet()
+        this.allowedTypes = CollectionUtil.isEmpty(allowedTypes) ? Collections.emptySet()
                 : CollectionUtil.unmodifiableSet(allowedTypes);
     }
 

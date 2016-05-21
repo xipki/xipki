@@ -106,16 +106,14 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
             unit = Unit.DAY;
             numValdityS = validityS;
         } else {
-            throw new IllegalArgumentException(String.format(
-                    "invalid validityS: %s", validityS));
+            throw new IllegalArgumentException(String.format("invalid validityS: %s", validityS));
         }
 
         int validity;
         try {
             validity = Integer.parseInt(numValdityS);
         } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException(String.format(
-                    "invalid validityS: %s", validityS));
+            throw new IllegalArgumentException(String.format("invalid validityS: %s", validityS));
         }
         return new CertValidity(validity, unit);
     } // method getInstance
@@ -146,11 +144,7 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
                 int day = cal.get(Calendar.DAY_OF_MONTH);
                 if (day > 28) {
                     int year = cal.get(Calendar.YEAR);
-                    if (isLeapYear(year)) {
-                        day = 29;
-                    } else {
-                        day = 28;
-                    }
+                    day = isLeapYear(year) ? 29 : 28;
                 }
             }
 
@@ -188,18 +182,14 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
                 return 0;
             }
 
-            return (validity < obj.validity)
-                    ? -1
-                    : 1;
+            return (validity < obj.validity) ? -1 : 1;
         } else {
             int thisHours = getApproxHours();
             int thatHours = obj.getApproxHours();
             if (thisHours == thatHours) {
                 return 0;
             } else {
-                return (thisHours < thatHours)
-                        ? -1
-                        : 1;
+                return (thisHours < thatHours) ? -1 : 1;
             }
         }
     }

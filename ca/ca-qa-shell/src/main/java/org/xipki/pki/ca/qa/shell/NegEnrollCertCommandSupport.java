@@ -115,17 +115,13 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        EnrollCertRequest request = new EnrollCertRequest(
-                EnrollCertRequest.Type.CERT_REQ);
+        EnrollCertRequest request = new EnrollCertRequest(EnrollCertRequest.Type.CERT_REQ);
 
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
-        ConcurrentContentSigner signer = getSigner(
-                new SignatureAlgoControl(rsaMgf1, dsaPlain));
+        ConcurrentContentSigner signer = getSigner(new SignatureAlgoControl(rsaMgf1, dsaPlain));
         X509CertificateHolder ssCert = signer.getCertificateAsBcObject();
 
-        X500Name x500Subject = (subject == null)
-                ? ssCert.getSubject()
-                : new X500Name(subject);
+        X500Name x500Subject = (subject == null) ? ssCert.getSubject() : new X500Name(subject);
         certTemplateBuilder.setSubject(x500Subject);
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
         CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
@@ -135,8 +131,8 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
         POPOSigningKey popoSk = signer.build(popoBuilder);
         ProofOfPossession popo = new ProofOfPossession(popoSk);
 
-        EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry("id-1", profile,
-                certReq, popo);
+        EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry("id-1", profile, certReq,
+                popo);
         request.addRequestEntry(reqEntry);
 
         EnrollCertResult result;

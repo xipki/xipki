@@ -176,18 +176,11 @@ public class CaEmulator {
 
         Date notAfter = new Date(notBefore.getTime() + 730 * DAY_IN_MS);
         BigInteger tmpSerialNumber = BigInteger.valueOf(serialNumber.getAndAdd(1));
-        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-                caSubject,
-                tmpSerialNumber,
-                notBefore,
-                notAfter,
-                subjectDn,
-                pubKeyInfo);
+        X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(caSubject,
+                tmpSerialNumber, notBefore, notAfter, subjectDn, pubKeyInfo);
 
-        X509KeyUsage ku = new X509KeyUsage(
-                    X509KeyUsage.digitalSignature
-                    | X509KeyUsage.dataEncipherment
-                    | X509KeyUsage.keyAgreement
+        X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.digitalSignature
+                    | X509KeyUsage.dataEncipherment | X509KeyUsage.keyAgreement
                     | X509KeyUsage.keyEncipherment);
         certGenerator.addExtension(Extension.keyUsage, true, ku);
         BasicConstraints bc = new BasicConstraints(false);
@@ -241,9 +234,8 @@ public class CaEmulator {
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(caKey, ScepHashAlgoType.SHA256);
         ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
-        X509CRLHolder tmpCrl = crlBuilder.build(contentSigner);
-        crl = tmpCrl.toASN1Structure();
-        return crl;
+        X509CRLHolder crl = crlBuilder.build(contentSigner);
+        return crl.toASN1Structure();
     }
 
     private boolean verifyPopo(final CertificationRequest p10Request) {
@@ -280,8 +272,7 @@ public class CaEmulator {
             } else if ("ECDSA".equals(keyAlg)) {
                 builder = new BcECContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
             } else {
-                throw new InvalidKeyException("unknown key algorithm of the public key "
-                        + keyAlg);
+                throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
             }
             VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
         }

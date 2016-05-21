@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.dbtool.diffdb.io;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +51,7 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class DbDigestEntry {
 
-    private final long serialNumber;
+    private final BigInteger serialNumber;
 
     private final boolean revoked;
 
@@ -62,8 +63,9 @@ public class DbDigestEntry {
 
     private final String base64Sha1;
 
-    public DbDigestEntry(final long serialNumber, final boolean revoked, final Integer revReason,
-            final Long revTime, final Long revInvTime, final String sha1Fp) {
+    public DbDigestEntry(final BigInteger serialNumber, final boolean revoked,
+            final Integer revReason, final Long revTime, final Long revInvTime,
+            final String sha1Fp) {
         ParamUtil.requireNonNull("sha1Fp", sha1Fp);
         if (revoked) {
             ParamUtil.requireNonNull("revReason", revReason);
@@ -85,7 +87,7 @@ public class DbDigestEntry {
         this.revInvTime = revInvTime;
     }
 
-    public long getSerialNumber() {
+    public BigInteger getSerialNumber() {
         return serialNumber;
     }
 
@@ -125,12 +127,10 @@ public class DbDigestEntry {
     private String getEncoded(final boolean withSerialNumber) {
         StringBuilder sb = new StringBuilder();
         if (withSerialNumber) {
-            sb.append(serialNumber).append(";");
+            sb.append(serialNumber.toString(16)).append(";");
         }
         sb.append(base64Sha1).append(";");
-        sb.append(revoked
-                ? "1"
-                : "0").append(";");
+        sb.append(revoked ? "1" : "0").append(";");
 
         if (revReason != null) {
             sb.append(revReason);
@@ -190,7 +190,7 @@ public class DbDigestEntry {
         }
 
         String str = encoded.substring(0, indexes.get(0));
-        Long serialNumber = Long.parseLong(str);
+        BigInteger serialNumber = new BigInteger(str, 16);
 
         String sha1Fp = encoded.substring(indexes.get(0) + 1, indexes.get(1));
 
@@ -231,11 +231,7 @@ public class DbDigestEntry {
     }
 
     private static boolean equals(final Object obj1, final Object obj2) {
-        if (obj1 == null) {
-            return obj2 == null;
-        } else {
-            return obj1.equals(obj2);
-        }
+        return (obj1 == null) ? (obj2 == null) : obj1.equals(obj2);
     }
 
 }

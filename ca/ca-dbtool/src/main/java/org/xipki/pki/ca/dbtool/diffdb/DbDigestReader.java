@@ -37,6 +37,7 @@
 package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.ResultSet;
@@ -161,8 +162,7 @@ abstract class DbDigestReader implements DigestReader {
                 for (DigestDbEntrySet result : results) {
                     if (result.getException() != null) {
                         exception = new DataAccessException(
-                                String.format(
-                                        "could not read from ID %d: %s",
+                                String.format("could not read from ID %d: %s",
                                         result.getStartId(), result.getException().getMessage()),
                                 result.getException());
                         return;
@@ -270,10 +270,10 @@ abstract class DbDigestReader implements DigestReader {
             return null;
         }
 
-        List<Long> serialNumbers = new ArrayList<>(ik);
-        Map<Long, DbDigestEntry> certsMap = new HashMap<>(ik);
+        List<BigInteger> serialNumbers = new ArrayList<>(ik);
+        Map<BigInteger, DbDigestEntry> certsMap = new HashMap<>(ik);
         for (IdentifiedDbDigestEntry m : entries) {
-            long sn = m.getContent().getSerialNumber();
+            BigInteger sn = m.getContent().getSerialNumber();
             serialNumbers.add(sn);
             certsMap.put(sn, m.getContent());
         }

@@ -75,9 +75,7 @@ class PendingCertificatePool {
 
         @Override
         public int hashCode() {
-            return certReqId.hashCode()
-                    + 31 * 31 * (int) waitForConfirmTill
-                    + 31 * certInfo.hashCode();
+            return certReqId.hashCode() + 961 * (int) waitForConfirmTill + 31 * certInfo.hashCode();
         }
 
         @Override
@@ -87,8 +85,7 @@ class PendingCertificatePool {
             }
 
             MyEntry another = (MyEntry) obj;
-            return certReqId.equals(another.certReqId)
-                    && certInfo.equals(another.certInfo);
+            return certReqId.equals(another.certReqId) && certInfo.equals(another.certInfo);
         }
 
     } // class MyEntry
@@ -147,9 +144,7 @@ class PendingCertificatePool {
             }
         }
 
-        return (retEntry == null)
-                ? null
-                : retEntry.certInfo;
+        return (retEntry == null) ? null : retEntry.certInfo;
     }
 
     synchronized Set<X509CertificateInfo> removeCertificates(final byte[] transactionId) {

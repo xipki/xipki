@@ -184,10 +184,7 @@ final class DSAParameterCache {
     public static DSAParameterSpec getNewDSAParameterSpec(final int plength, final int qlength,
             final SecureRandom random) {
         final int certainty = 80;
-        SecureRandom tmpRandom = (random == null)
-                ? new SecureRandom()
-                : random;
-
+        SecureRandom tmpRandom = (random == null) ? new SecureRandom() : random;
         DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
         DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
                 plength, qlength, certainty, tmpRandom);

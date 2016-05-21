@@ -66,6 +66,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ProcessLog;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.common.util.XmlUtil;
@@ -288,8 +289,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                     try {
                         x509Crl = X509Util.parseCrl(new ByteArrayInputStream(crlBytes));
                     } catch (Exception ex) {
-                        LOG.error("could not parse CRL with id {}", id);
-                        LOG.debug("could not parse CRL with id " + id, ex);
+                        LogUtil.error(LOG, ex, "could not parse CRL with id " + id);
                         if (ex instanceof CRLException) {
                             throw (CRLException) ex;
                         } else {
@@ -513,15 +513,12 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         if (total < 1) {
             total = 1; // to avoid exception
         }
+
         ProcessLog processLog = new ProcessLog(total);
-
         PreparedStatement ps = prepareStatement(sql);
-
         int numUsersInCurrentFile = 0;
         CaUsersWriter usersInCurrentFile = new CaUsersWriter();
-
         int sum = 0;
-
         int minIdOfCurrentFile = -1;
         int maxIdOfCurrentFile = -1;
 
@@ -896,9 +893,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     throws DataAccessException, IOException, JAXBException {
         System.out.println("exporting table PUBLISHQUEUE");
 
-        StringBuilder sqlBuilder = new StringBuilder("SELECT");
-        sqlBuilder.append(" CID, PID, ");
-        sqlBuilder.append("CA_ID");
+        StringBuilder sqlBuilder = new StringBuilder("SELECT CID, PID, CA_ID");
         sqlBuilder.append(" FROM PUBLISHQUEUE WHERE CID >= ? AND CID < ? ORDER BY CID ASC");
         final String sql = sqlBuilder.toString();
         final int minId = (int) getMin("PUBLISHQUEUE", "CID");

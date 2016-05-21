@@ -132,15 +132,13 @@ public class HttpOcspServlet extends HttpServlet {
             final boolean getMethod) throws ServletException, IOException {
         Responder responder = respAndUri.getResponder();
         AuditEvent auditEvent = null;
-
         AuditLevel auditLevel = AuditLevel.INFO;
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
         String auditMessage = null;
 
         long start = 0;
 
-        AuditService auditService = (auditServiceRegister == null)
-                ? null
+        AuditService auditService = (auditServiceRegister == null) ? null
                 : auditServiceRegister.getAuditService();
 
         if (auditService != null && responder.getAuditOption() != null) {

@@ -138,11 +138,8 @@ class PublicCaInfo {
                     "invalid SubjectAltName extension in CA certificate");
         }
 
-        if (subjectKeyIdentifier == null) {
-            this.subjectKeyIdentifier = null;
-        } else {
-            this.subjectKeyIdentifier = Arrays.clone(subjectKeyIdentifier);
-        }
+        this.subjectKeyIdentifier = (subjectKeyIdentifier == null) ? null
+                : Arrays.clone(subjectKeyIdentifier);
 
         this.subjectAltName = subjectAltName;
         this.caCertUris = CollectionUtil.unmodifiableList(caCertUris);
@@ -172,11 +169,8 @@ class PublicCaInfo {
     }
 
     public void setCrlSignerCertificate(final X509Certificate crlSignerCert) {
-        if (caCertificate.getCert().equals(crlSignerCert)) {
-            this.crlSignerCertificate = null;
-        } else {
-            this.crlSignerCertificate = crlSignerCert;
-        }
+        this.crlSignerCertificate = caCertificate.getCert().equals(crlSignerCert)
+                ? null : crlSignerCert;
     }
 
     public X500Principal getSubject() {
@@ -199,9 +193,7 @@ class PublicCaInfo {
         if (caCertificate != null) {
             return caCertificate.getSubjectKeyIdentifier();
         } else {
-            return (subjectKeyIdentifier == null)
-                    ? null
-                    : Arrays.clone(subjectKeyIdentifier);
+            return (subjectKeyIdentifier == null) ? null : Arrays.clone(subjectKeyIdentifier);
         }
     }
 

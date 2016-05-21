@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.dbtool.diffdb.io;
 
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -110,7 +111,8 @@ public class XipkiDigestExportReader {
                     int caId = rs.getInt(dbControl.getColCaId());
                     int id = rs.getInt("ID");
                     String hash = rs.getString(dbControl.getColCerthash());
-                    long serial = rs.getLong(dbControl.getColSerialNumber());
+                    BigInteger serial = new BigInteger(rs.getString(dbControl.getColSerialNumber()),
+                            16);
                     boolean revoked = rs.getBoolean(dbControl.getColRevoked());
 
                     Integer revReason = null;
@@ -212,8 +214,7 @@ public class XipkiDigestExportReader {
         for (DigestDbEntrySet result : results) {
             if (result.getException() != null) {
                 throw new DataAccessException(
-                        String.format(
-                                "could not read from ID %d: %s", result.getStartId(),
+                        String.format("could not read from ID %d: %s", result.getStartId(),
                                 result.getException().getMessage()),
                         result.getException());
             }

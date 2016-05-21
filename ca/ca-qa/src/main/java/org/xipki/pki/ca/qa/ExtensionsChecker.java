@@ -627,8 +627,7 @@ public class ExtensionsChecker {
 
             if (extControl.isCritical() != ext.isCritical()) {
                 failureMsg.append("critical is '").append(ext.isCritical());
-                failureMsg.append("' but expected '").append(extControl.isCritical()).append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected '").append(extControl.isCritical()).append("'; ");
             }
 
             byte[] extensionValue = ext.getExtnValue().getOctets();
@@ -741,14 +740,10 @@ public class ExtensionsChecker {
                     }
 
                     if (!Arrays.equals(expected, extensionValue)) {
-                        failureMsg.append("extension valus is '")
-                            .append(hex(extensionValue));
+                        failureMsg.append("extension valus is '").append(hex(extensionValue));
                         failureMsg.append("' but expected '");
-                        failureMsg.append((expected == null)
-                                ? "not present"
-                                : hex(expected));
-                        failureMsg.append("'");
-                        failureMsg.append("; ");
+                        failureMsg.append((expected == null) ? "not present" : hex(expected));
+                        failureMsg.append("'; ");
                     }
                 }
 
@@ -756,8 +751,7 @@ public class ExtensionsChecker {
                     issue.setFailureMessage(failureMsg.toString());
                 }
 
-            } catch (IllegalArgumentException
-                    | ClassCastException
+            } catch (IllegalArgumentException | ClassCastException
                     | ArrayIndexOutOfBoundsException ex) {
                 LOG.debug("extension value does not have correct syntax", ex);
                 issue.setFailureMessage("extension value does not have correct syntax");
@@ -1003,8 +997,7 @@ public class ExtensionsChecker {
         boolean ca = (X509CertLevel.RootCA == certLevel) || (X509CertLevel.SubCA == certLevel);
         if (ca != bc.isCA()) {
             failureMsg.append("ca is '").append(bc.isCA());
-            failureMsg.append("' but expected '").append(ca).append("'");
-            failureMsg.append("; ");
+            failureMsg.append("' but expected '").append(ca).append("'; ");
         }
 
         if (bc.isCA()) {
@@ -1012,19 +1005,15 @@ public class ExtensionsChecker {
             if (pathLen == null) {
                 if (tmpPathLen != null) {
                     failureMsg.append("pathLen is '").append(tmpPathLen);
-                    failureMsg.append("' but expected 'absent'");
-                    failureMsg.append("; ");
+                    failureMsg.append("' but expected 'absent'; ");
                 }
             } else {
                 if (tmpPathLen == null) {
-                    failureMsg.append("pathLen is 'null' but expected '")
-                        .append(pathLen)
-                        .append("'");
-                    failureMsg.append("; ");
+                    failureMsg.append("pathLen is 'null' but expected '").append(pathLen)
+                        .append("'; ");
                 } else if (!BigInteger.valueOf(pathLen).equals(tmpPathLen)) {
                     failureMsg.append("pathLen is '").append(tmpPathLen);
-                    failureMsg.append("' but expected '").append(pathLen).append("'");
-                    failureMsg.append("; ");
+                    failureMsg.append("' but expected '").append(pathLen).append("'; ");
                 }
             }
         }
@@ -1038,12 +1027,8 @@ public class ExtensionsChecker {
         byte[] pkData = subjectPublicKeyInfo.getPublicKeyData().getBytes();
         byte[] expectedSki = HashAlgoType.SHA1.hash(pkData);
         if (!Arrays.equals(expectedSki, ski)) {
-            failureMsg.append("SKI is '")
-                .append(hex(ski));
-            failureMsg.append("' but expected is '")
-                .append(hex(expectedSki))
-                .append("'");
-            failureMsg.append("; ");
+            failureMsg.append("SKI is '").append(hex(ski));
+            failureMsg.append("' but expected is '").append(hex(expectedSki)).append("'; ");
         }
     } // method checkExtensionSubjectKeyIdentifier
 
@@ -1052,15 +1037,11 @@ public class ExtensionsChecker {
         AuthorityKeyIdentifier asn1 = AuthorityKeyIdentifier.getInstance(extensionValue);
         byte[] keyIdentifier = asn1.getKeyIdentifier();
         if (keyIdentifier == null) {
-            failureMsg.append("keyIdentifier is 'absent' but expected 'present'");
-            failureMsg.append("; ");
+            failureMsg.append("keyIdentifier is 'absent' but expected 'present'; ");
         } else if (!Arrays.equals(issuerInfo.getSubjectKeyIdentifier(), keyIdentifier)) {
-            failureMsg.append("keyIdentifier is '")
-                .append(hex(keyIdentifier));
+            failureMsg.append("keyIdentifier is '").append(hex(keyIdentifier));
             failureMsg.append("' but expected '")
-                .append(hex(issuerInfo.getSubjectKeyIdentifier()))
-                .append("'");
-            failureMsg.append("; ");
+                .append(hex(issuerInfo.getSubjectKeyIdentifier())).append("'; ");
         }
 
         BigInteger serialNumber = asn1.getAuthorityCertSerialNumber();
@@ -1068,22 +1049,19 @@ public class ExtensionsChecker {
 
         if (includeIssuerAndSerialInAki) {
             if (serialNumber == null) {
-                failureMsg.append("authorityCertSerialNumber is 'absent' but expected 'present'");
-                failureMsg.append("; ");
+                failureMsg.append("authorityCertSerialNumber is 'absent' but expected 'present'; ");
             } else {
                 if (!issuerInfo.getCert().getSerialNumber().equals(serialNumber)) {
                     failureMsg.append("authorityCertSerialNumber is '")
                         .append(LogUtil.formatCsn(serialNumber));
                     failureMsg.append("' but expected '")
                         .append(LogUtil.formatCsn(issuerInfo.getCert().getSerialNumber()))
-                        .append("'");
-                    failureMsg.append("; ");
+                        .append("'; ");
                 }
             }
 
             if (names == null) {
-                failureMsg.append("authorityCertIssuer is 'absent' but expected 'present'");
-                failureMsg.append("; ");
+                failureMsg.append("authorityCertIssuer is 'absent' but expected 'present'; ");
             } else {
                 GeneralName[] genNames = names.getNames();
                 X500Name x500GenName = null;
@@ -1094,8 +1072,7 @@ public class ExtensionsChecker {
 
                     if (x500GenName != null) {
                         failureMsg.append("authorityCertIssuer contains at least two ");
-                        failureMsg.append("directoryName but expected one");
-                        failureMsg.append("; ");
+                        failureMsg.append("directoryName but expected one; ");
                         break;
                     } else {
                         x500GenName = (X500Name) genName.getName();
@@ -1104,29 +1081,24 @@ public class ExtensionsChecker {
 
                 if (x500GenName == null) {
                     failureMsg.append(
-                            "authorityCertIssuer does not contain directoryName but expected one");
-                    failureMsg.append("; ");
+                        "authorityCertIssuer does not contain directoryName but expected one; ");
                 } else {
                     X500Name caSubject = issuerInfo.getBcCert().getTBSCertificate().getSubject();
                     if (!caSubject.equals(x500GenName)) {
                         failureMsg.append("authorityCertIssuer is '")
                             .append(x500GenName.toString());
-                        failureMsg.append("' but expected '")
-                            .append(caSubject.toString())
-                            .append("'");
-                        failureMsg.append("; ");
+                        failureMsg.append("' but expected '").append(caSubject.toString())
+                            .append("'; ");
                     }
                 }
             }
         } else {
             if (serialNumber != null) {
-                failureMsg.append("authorityCertSerialNumber is 'absent' but expected 'present'");
-                failureMsg.append("; ");
+                failureMsg.append("authorityCertSerialNumber is 'absent' but expected 'present'; ");
             }
 
             if (names != null) {
-                failureMsg.append("authorityCertIssuer is 'absent' but expected 'present'");
-                failureMsg.append("; ");
+                failureMsg.append("authorityCertIssuer is 'absent' but expected 'present'; ");
             }
         }
     } // method checkExtensionIssuerKeyIdentifier
@@ -1140,14 +1112,9 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(Extension.nameConstraints, requestExtensions,
                     extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                failureMsg.append("extension valus is '")
-                    .append(hex(extensionValue));
+                failureMsg.append("extension valus is '").append(hex(extensionValue));
                 failureMsg.append("' but expected '");
-                failureMsg.append((expected == null)
-                        ? "not present"
-                        : hex(expected));
-                failureMsg.append("'");
-                failureMsg.append("; ");
+                failureMsg.append((expected == null) ? "not present" : hex(expected)).append("'; ");
             }
             return;
         }
@@ -1156,31 +1123,19 @@ public class ExtensionsChecker {
                 org.bouncycastle.asn1.x509.NameConstraints.getInstance(extensionValue);
 
         checkExtensionNameConstraintsSubtrees(failureMsg, "PermittedSubtrees",
-                tmpNameConstraints.getPermittedSubtrees(),
-                conf.getPermittedSubtrees());
+                tmpNameConstraints.getPermittedSubtrees(),  conf.getPermittedSubtrees());
         checkExtensionNameConstraintsSubtrees(failureMsg, "ExcludedSubtrees",
-                tmpNameConstraints.getExcludedSubtrees(),
-                conf.getExcludedSubtrees());
+                tmpNameConstraints.getExcludedSubtrees(), conf.getExcludedSubtrees());
     } // method checkExtensionNameConstraints
 
     private void checkExtensionNameConstraintsSubtrees(final StringBuilder failureMsg,
             final String description, final GeneralSubtree[] subtrees,
             final List<QaGeneralSubtree> expectedSubtrees) {
-        int isSize = (subtrees == null)
-                ? 0
-                : subtrees.length;
-        int expSize = (expectedSubtrees == null)
-                ? 0
-                : expectedSubtrees.size();
+        int isSize = (subtrees == null) ? 0 : subtrees.length;
+        int expSize = (expectedSubtrees == null) ? 0 : expectedSubtrees.size();
         if (isSize != expSize) {
-            failureMsg.append("size of ")
-                .append(description)
-                .append(" is '")
-                .append(isSize);
-            failureMsg.append("' but expected '")
-                .append(expSize)
-                .append("'");
-            failureMsg.append("; ");
+            failureMsg.append("size of ").append(description).append(" is '").append(isSize);
+            failureMsg.append("' but expected '").append(expSize).append("'; ");
             return;
         }
 
@@ -1188,38 +1143,21 @@ public class ExtensionsChecker {
             GeneralSubtree isSubtree = subtrees[i];
             QaGeneralSubtree expSubtree = expectedSubtrees.get(i);
             BigInteger bigInt = isSubtree.getMinimum();
-            int isMinimum = (bigInt == null)
-                    ? 0
-                    : bigInt.intValue();
+            int isMinimum = (bigInt == null) ? 0 : bigInt.intValue();
             Integer minimum = expSubtree.getMinimum();
-            int expMinimum = (minimum == null)
-                    ? 0
-                    : minimum.intValue();
+            int expMinimum = (minimum == null) ? 0 : minimum.intValue();
             String desc = description + " [" + i + "]";
             if (isMinimum != expMinimum) {
-                failureMsg.append("minimum of ")
-                    .append(desc)
-                    .append(" is '").append(isMinimum);
-                failureMsg.append("' but expected '")
-                    .append(expMinimum)
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("minimum of ").append(desc).append(" is '").append(isMinimum);
+                failureMsg.append("' but expected '").append(expMinimum).append("'; ");
             }
 
             bigInt = isSubtree.getMaximum();
-            Integer isMaximum = (bigInt == null)
-                    ? null
-                    : bigInt.intValue();
+            Integer isMaximum = (bigInt == null) ? null : bigInt.intValue();
             Integer expMaximum = expSubtree.getMaximum();
             if (!CompareUtil.equalsObject(isMaximum, expMaximum)) {
-                failureMsg.append("maxmum of ")
-                    .append(desc)
-                    .append(" is '")
-                    .append(isMaximum);
-                failureMsg.append("' but expected '")
-                    .append(expMaximum)
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("maxmum of ").append(desc).append(" is '").append(isMaximum);
+                failureMsg.append("' but expected '").append(expMaximum).append("'; ");
             }
 
             GeneralName isBase = isSubtree.getBase();
@@ -1242,14 +1180,8 @@ public class ExtensionsChecker {
             }
 
             if (!isBase.equals(expBase)) {
-                failureMsg.append("base of ")
-                    .append(desc)
-                    .append(" is '")
-                    .append(isBase);
-                failureMsg.append("' but expected '")
-                    .append(expBase)
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("base of ").append(desc).append(" is '").append(isBase);
+                failureMsg.append("' but expected '").append(expBase).append("'; ");
             }
         }
     } // method checkExtensionNameConstraintsSubtrees
@@ -1262,14 +1194,9 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(Extension.policyConstraints,
                     requestExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                failureMsg.append("extension valus is '")
-                    .append(hex(extensionValue));
+                failureMsg.append("extension valus is '").append(hex(extensionValue));
                 failureMsg.append("' but expected '");
-                failureMsg.append((expected == null)
-                        ? "not present"
-                        : hex(expected));
-                failureMsg.append("'");
-                failureMsg.append("; ");
+                failureMsg.append((expected == null) ? "not present" : hex(expected)).append("'; ");
             }
             return;
         }
@@ -1278,9 +1205,7 @@ public class ExtensionsChecker {
                 org.bouncycastle.asn1.x509.PolicyConstraints.getInstance(extensionValue);
         Integer expRequireExplicitPolicy = conf.getRequireExplicitPolicy();
         BigInteger bigInt = isPolicyConstraints.getRequireExplicitPolicyMapping();
-        Integer isRequreExplicitPolicy = (bigInt == null)
-                ? null
-                : bigInt.intValue();
+        Integer isRequreExplicitPolicy = (bigInt == null) ? null : bigInt.intValue();
 
         boolean match = true;
         if (expRequireExplicitPolicy == null) {
@@ -1292,19 +1217,13 @@ public class ExtensionsChecker {
         }
 
         if (!match) {
-            failureMsg.append("requreExplicitPolicy is '")
-                .append(isRequreExplicitPolicy);
-            failureMsg.append("' but expected '")
-                .append(expRequireExplicitPolicy)
-                .append("'");
-            failureMsg.append("; ");
+            failureMsg.append("requreExplicitPolicy is '").append(isRequreExplicitPolicy);
+            failureMsg.append("' but expected '").append(expRequireExplicitPolicy).append("'; ");
         }
 
         Integer expInhibitPolicyMapping = conf.getInhibitPolicyMapping();
         bigInt = isPolicyConstraints.getInhibitPolicyMapping();
-        Integer isInhibitPolicyMapping = (bigInt == null)
-                ? null
-                : bigInt.intValue();
+        Integer isInhibitPolicyMapping = (bigInt == null) ? null : bigInt.intValue();
 
         match = true;
         if (expInhibitPolicyMapping == null) {
@@ -1316,18 +1235,14 @@ public class ExtensionsChecker {
         }
 
         if (!match) {
-            failureMsg.append("inhibitPolicyMapping is '")
-                .append(isInhibitPolicyMapping)
-                .append("' but expected '");
-            failureMsg.append(expInhibitPolicyMapping)
-                .append("'");
-            failureMsg.append("; ");
+            failureMsg.append("inhibitPolicyMapping is '").append(isInhibitPolicyMapping);
+            failureMsg.append("' but expected '").append(expInhibitPolicyMapping).append("'; ");
         }
     } // method checkExtensionPolicyConstraints
 
-    private void checkExtensionKeyUsage(final StringBuilder failureMsg,
-            final byte[] extensionValue, final boolean[] usages,
-            final Extensions requestExtensions, final ExtensionControl extControl) {
+    private void checkExtensionKeyUsage(final StringBuilder failureMsg, final byte[] extensionValue,
+            final boolean[] usages, final Extensions requestExtensions,
+            final ExtensionControl extControl) {
         int len = usages.length;
 
         if (len > 9) {
@@ -1372,18 +1287,14 @@ public class ExtensionsChecker {
 
         Set<String> diffs = strInBnotInA(expectedUsages, isUsages);
         if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append("usages ")
-                .append(diffs.toString())
-                .append(" are present but not expected");
-            failureMsg.append("; ");
+            failureMsg.append("usages ").append(diffs.toString())
+                .append(" are present but not expected; ");
         }
 
         diffs = strInBnotInA(isUsages, expectedUsages);
         if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append("usages ")
-                .append(diffs.toString())
-                .append(" are absent but are required");
-            failureMsg.append("; ");
+            failureMsg.append("usages ").append(diffs.toString())
+                .append(" are absent but are required; ");
         }
     } // method checkExtensionKeyUsage
 
@@ -1433,18 +1344,14 @@ public class ExtensionsChecker {
 
         Set<String> diffs = strInBnotInA(expectedUsages, isUsages);
         if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append("usages ")
-                .append(diffs.toString())
-                .append(" are present but not expected");
-            failureMsg.append("; ");
+            failureMsg.append("usages ").append(diffs.toString())
+                .append(" are present but not expected; ");
         }
 
         diffs = strInBnotInA(isUsages, expectedUsages);
         if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append("usages ")
-                .append(diffs.toString())
-                .append(" are absent but are required");
-            failureMsg.append("; ");
+            failureMsg.append("usages ").append(diffs.toString())
+                .append(" are absent but are required; ");
         }
     } // method checkExtensionExtendedKeyUsage
 
@@ -1456,14 +1363,9 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_pe_tlsfeature,
                     requestExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                failureMsg.append("extension valus is '")
-                    .append(hex(extensionValue));
+                failureMsg.append("extension valus is '").append(hex(extensionValue));
                 failureMsg.append("' but expected '");
-                failureMsg.append((expected == null)
-                        ? "not present"
-                        : hex(expected));
-                failureMsg.append("'");
-                failureMsg.append("; ");
+                failureMsg.append((expected == null) ? "not present" : hex(expected)).append("'; ");
             }
             return;
         }
@@ -1484,18 +1386,14 @@ public class ExtensionsChecker {
 
         Set<String> diffs = strInBnotInA(expFeatures, isFeatures);
         if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append("features ")
-                .append(diffs.toString())
-                .append(" are present but not expected");
-            failureMsg.append("; ");
+            failureMsg.append("features ").append(diffs.toString())
+                .append(" are present but not expected; ");
         }
 
         diffs = strInBnotInA(isFeatures, expFeatures);
         if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append("features ")
-                .append(diffs.toString())
-                .append(" are absent but are required");
-            failureMsg.append("; ");
+            failureMsg.append("features ").append(diffs.toString())
+                .append(" are absent but are required; ");
         }
     } // method checkExtensionTlsFeature
 
@@ -1507,14 +1405,9 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(Extension.certificatePolicies,
                     requestExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                failureMsg.append("extension valus is '")
-                    .append(hex(extensionValue));
-                failureMsg.append("' but expected '")
-                    .append((expected == null)
-                        ? "not present"
-                        : hex(expected))
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("extension valus is '").append(hex(extensionValue));
+                failureMsg.append("' but expected '");
+                failureMsg.append((expected == null) ? "not present" : hex(expected)).append("'; ");
             }
             return;
         }
@@ -1527,10 +1420,8 @@ public class ExtensionsChecker {
             ASN1ObjectIdentifier isPolicyId = isPolicyInformation.getPolicyIdentifier();
             QaCertificatePolicyInformation expCp = conf.getPolicyInformation(isPolicyId.getId());
             if (expCp == null) {
-                failureMsg.append("certificate policy '")
-                    .append(isPolicyId)
-                    .append("' is not expected");
-                failureMsg.append("; ");
+                failureMsg.append("certificate policy '").append(isPolicyId);
+                failureMsg.append("' is not expected; ");
                 continue;
             }
 
@@ -1566,19 +1457,15 @@ public class ExtensionsChecker {
                 if (qualifierInfo instanceof QaCpsUriPolicyQualifier) {
                     String value = ((QaCpsUriPolicyQualifier) qualifierInfo).getCpsUri();
                     if (!isCpsUris.contains(value)) {
-                        failureMsg.append("CPSUri '")
-                            .append(value)
-                            .append("' is absent but is required");
-                        failureMsg.append("; ");
+                        failureMsg.append("CPSUri '").append(value);
+                        failureMsg.append("' is absent but is required; ");
                     }
                 } else if (qualifierInfo instanceof QaUserNoticePolicyQualifierInfo) {
                     String value =
                             ((QaUserNoticePolicyQualifierInfo) qualifierInfo).getUserNotice();
                     if (!isUserNotices.contains(value)) {
-                        failureMsg.append("userNotice '")
-                            .append(value)
-                            .append("' is absent but is required");
-                        failureMsg.append("; ");
+                        failureMsg.append("userNotice '").append(value);
+                        failureMsg.append("' is absent but is required; ");
                     }
                 } else {
                     throw new RuntimeException("should not reach here");
@@ -1599,10 +1486,8 @@ public class ExtensionsChecker {
                 continue;
             }
 
-            failureMsg.append("certificate policy '")
-                .append(cp.getPolicyId())
-                .append("' is absent but is required");
-            failureMsg.append("; ");
+            failureMsg.append("certificate policy '").append(cp.getPolicyId());
+            failureMsg.append("' is absent but is required; ");
         }
     } // method checkExtensionCertificatePolicies
 
@@ -1614,14 +1499,9 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(Extension.policyMappings, requestExtensions,
                     extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                failureMsg.append("extension valus is '")
-                    .append(hex(extensionValue));
-                failureMsg.append("' but expected '")
-                    .append((expected == null)
-                            ? "not present"
-                            : hex(expected))
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("extension valus is '").append(hex(extensionValue));
+                failureMsg.append("' but expected '");
+                failureMsg.append((expected == null) ? "not present" : hex(expected)).append("'; ");
             }
             return;
         }
@@ -1631,7 +1511,6 @@ public class ExtensionsChecker {
         int size = isPolicyMappings.size();
         for (int i = 0; i < size; i++) {
             ASN1Sequence seq = (ASN1Sequence) isPolicyMappings.getObjectAt(i);
-
             CertPolicyId issuerDomainPolicy = CertPolicyId.getInstance(seq.getObjectAt(0));
             CertPolicyId subjectDomainPolicy = CertPolicyId.getInstance(seq.getObjectAt(1));
             isMap.put(issuerDomainPolicy.getId(), subjectDomainPolicy.getId());
@@ -1643,25 +1522,18 @@ public class ExtensionsChecker {
 
             String isSubjectDomainPolicy = isMap.remove(expIssuerDomainPolicy);
             if (isSubjectDomainPolicy == null) {
-                failureMsg.append("issuerDomainPolicy '")
-                    .append(expIssuerDomainPolicy)
-                    .append("' is absent but is required");
-                failureMsg.append("; ");
+                failureMsg.append("issuerDomainPolicy '").append(expIssuerDomainPolicy)
+                    .append("' is absent but is required; ");
             } else if (!isSubjectDomainPolicy.equals(expSubjectDomainPolicy)) {
                 failureMsg.append("subjectDomainPolicy for issuerDomainPolicy is '")
                     .append(isSubjectDomainPolicy);
-                failureMsg.append("' but expected '")
-                    .append(expSubjectDomainPolicy)
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected '").append(expSubjectDomainPolicy).append("'; ");
             }
         }
 
         if (CollectionUtil.isNonEmpty(isMap)) {
-            failureMsg.append("issuerDomainPolicies '")
-                .append(isMap.keySet())
-                .append("' are present but not expected");
-            failureMsg.append("; ");
+            failureMsg.append("issuerDomainPolicies '").append(isMap.keySet());
+            failureMsg.append("' are present but not expected; ");
         }
     } // method checkExtensionPolicyMappings
 
@@ -1674,12 +1546,8 @@ public class ExtensionsChecker {
                     requestExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
                 failureMsg.append("extension valus is '").append(hex(extensionValue));
-                failureMsg.append("' but expected '")
-                    .append((expected == null)
-                            ? "not present"
-                            : hex(expected))
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected '");
+                failureMsg.append((expected == null) ? "not present" : hex(expected)).append("'; ");
             }
             return;
         }
@@ -1687,12 +1555,8 @@ public class ExtensionsChecker {
         ASN1Integer asn1Int = ASN1Integer.getInstance(extensionValue);
         int isSkipCerts = asn1Int.getPositiveValue().intValue();
         if (isSkipCerts != conf.getSkipCerts()) {
-            failureMsg.append("skipCerts is '")
-                .append(isSkipCerts);
-            failureMsg.append("' but expected '")
-                .append(conf.getSkipCerts())
-                .append("'");
-            failureMsg.append("; ");
+            failureMsg.append("skipCerts is '").append(isSkipCerts);
+            failureMsg.append("' but expected '").append(conf.getSkipCerts()).append("'; ");
         }
     } // method checkExtensionInhibitAnyPolicy
 
@@ -1701,8 +1565,7 @@ public class ExtensionsChecker {
             final ExtensionControl extControl) {
         Set<GeneralNameMode> conf = allowedSubjectAltNameModes;
         if (conf == null) {
-            failureMsg.append("extension is present but not expected");
-            failureMsg.append("; ");
+            failureMsg.append("extension is present but not expected; ");
             return;
         }
 
@@ -1713,8 +1576,7 @@ public class ExtensionsChecker {
         }
 
         if (extInRequest == null) {
-            failureMsg.append("extension is present but not expected");
-            failureMsg.append("; ");
+            failureMsg.append("extension is present but not expected; ");
             return;
         }
 
@@ -1727,30 +1589,21 @@ public class ExtensionsChecker {
             try {
                 expected[i] = createGeneralName(is[i], conf);
             } catch (BadCertTemplateException ex) {
-                failureMsg.append("could not process ")
-                    .append(i + 1)
-                    .append("-th name: ")
-                    .append(ex.getMessage());
-                failureMsg.append("; ");
+                failureMsg.append("could not process ").append(i + 1).append("-th name: ")
+                    .append(ex.getMessage()).append("; ");
                 return;
             }
         }
 
         if (is.length != expected.length) {
-            failureMsg.append("size of GeneralNames is '")
-                .append(is.length);
-            failureMsg.append("' but expected '")
-                .append(expected.length)
-                .append("'");
-            failureMsg.append("; ");
+            failureMsg.append("size of GeneralNames is '").append(is.length);
+            failureMsg.append("' but expected '").append(expected.length).append("'; ");
             return;
         }
 
         for (int i = 0; i < is.length; i++) {
             if (!is[i].equals(expected[i])) {
-                failureMsg.append(i + 1)
-                    .append("-th name does not match the requested one");
-                failureMsg.append("; ");
+                failureMsg.append(i + 1).append("-th name does not match the requested one; ");
             }
         }
     } // method checkExtensionSubjectAltName
@@ -1760,8 +1613,7 @@ public class ExtensionsChecker {
             final ExtensionControl extControl) {
         Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> conf = allowedSubjectInfoAccessModes;
         if (conf == null) {
-            failureMsg.append("extension is present but not expected");
-            failureMsg.append("; ");
+            failureMsg.append("extension is present but not expected; ");
             return;
         }
 
@@ -1771,8 +1623,7 @@ public class ExtensionsChecker {
                     Extension.subjectInfoAccess);
         }
         if (requestExtValue == null) {
-            failureMsg.append("extension is present but not expected");
-            failureMsg.append("; ");
+            failureMsg.append("extension is present but not expected; ");
             return;
         }
 
@@ -1782,12 +1633,8 @@ public class ExtensionsChecker {
         int size = requestSeq.size();
 
         if (certSeq.size() != size) {
-            failureMsg.append("size of GeneralNames is '")
-                .append(certSeq.size());
-            failureMsg.append("' but expected '")
-                .append(size)
-                .append("'");
-            failureMsg.append("; ");
+            failureMsg.append("size of GeneralNames is '").append(certSeq.size());
+            failureMsg.append("' but expected '").append(size).append("'; ");
             return;
         }
 
@@ -1804,11 +1651,8 @@ public class ExtensionsChecker {
 
             if (generalNameModes == null) {
                 failureMsg.append("accessMethod in requestExtension ");
-                failureMsg.append((accessMethod == null)
-                        ? "NULL"
-                        : accessMethod.getId());
-                failureMsg.append(" is not allowed");
-                failureMsg.append("; ");
+                failureMsg.append((accessMethod == null) ? "NULL" : accessMethod.getId());
+                failureMsg.append(" is not allowed; ");
                 continue;
             }
 
@@ -1816,22 +1660,14 @@ public class ExtensionsChecker {
                     certSeq.getObjectAt(i));
             ASN1ObjectIdentifier certAccessMethod = certAccessDesc.getAccessMethod();
 
-            boolean bo;
-            if (accessMethod == null) {
-                bo = certAccessDesc == null;
-            } else {
-                bo = accessMethod.equals(certAccessMethod);
-            }
+            boolean bo = (accessMethod == null) ? (certAccessDesc == null)
+                    : accessMethod.equals(certAccessMethod);
 
             if (!bo) {
                 failureMsg.append("accessMethod is '")
-                    .append((certAccessMethod == null)
-                            ? "null"
-                            : certAccessMethod.getId());
-                failureMsg.append("' but expected '")
-                    .append((accessMethod == null)
-                            ? "null"
-                            : accessMethod.getId());
+                    .append((certAccessMethod == null) ? "null" : certAccessMethod.getId());
+                failureMsg.append("' but expected '");
+                failureMsg.append((accessMethod == null) ? "null" : accessMethod.getId());
                 failureMsg.append("; ");
                 continue;
             }
@@ -1840,16 +1676,14 @@ public class ExtensionsChecker {
             try {
                 accessLocation = createGeneralName(ad.getAccessLocation(), generalNameModes);
             } catch (BadCertTemplateException ex) {
-                failureMsg.append("invalid requestExtension: ")
-                    .append(ex.getMessage());
+                failureMsg.append("invalid requestExtension: ").append(ex.getMessage());
                 failureMsg.append("; ");
                 continue;
             }
 
             GeneralName certAccessLocation = certAccessDesc.getAccessLocation();
             if (!certAccessLocation.equals(accessLocation)) {
-                failureMsg.append("accessLocation does not match the requested one");
-                failureMsg.append("; ");
+                failureMsg.append("accessLocation does not match the requested one; ");
             }
         }
     } // method checkExtensionSubjectInfoAccess
@@ -1859,18 +1693,15 @@ public class ExtensionsChecker {
         Extension caSubjectAltExtension = issuerInfo.getBcCert().getTBSCertificate().getExtensions()
                 .getExtension(Extension.subjectAlternativeName);
         if (caSubjectAltExtension == null) {
-            failureMsg.append("issuerAlternativeName is present but expected 'none'");
-            failureMsg.append("; ");
+            failureMsg.append("issuerAlternativeName is present but expected 'none'; ");
             return;
         }
 
         byte[] caSubjectAltExtensionValue = caSubjectAltExtension.getExtnValue().getOctets();
         if (!Arrays.equals(caSubjectAltExtensionValue, extensionValue)) {
             failureMsg.append("is '").append(hex(extensionValue));
-            failureMsg.append("' but expected '")
-                .append(hex(caSubjectAltExtensionValue))
-                .append("'");
-            failureMsg.append("; ");
+            failureMsg.append("' but expected '") .append(hex(caSubjectAltExtensionValue))
+                .append("'; ");
         }
     } // method checkExtensionIssuerAltNames
 
@@ -1878,14 +1709,10 @@ public class ExtensionsChecker {
             final byte[] extensionValue, final X509IssuerInfo issuerInfo) {
         CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
         DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
-        int len = (isDistributionPoints == null)
-                ? 0
-                : isDistributionPoints.length;
+        int len = (isDistributionPoints == null) ? 0 : isDistributionPoints.length;
         if (len != 1) {
-            failureMsg.append("size of CRLDistributionPoints is '")
-                .append(len)
-                .append("' but expected is '1'");
-            failureMsg.append("; ");
+            failureMsg.append("size of CRLDistributionPoints is '").append(len)
+                .append("' but expected is '1'; ");
             return;
         }
 
@@ -1895,10 +1722,8 @@ public class ExtensionsChecker {
             if (asn1Type != DistributionPointName.FULL_NAME) {
                 failureMsg.append("tag of DistributionPointName of CRLDistibutionPoints is '")
                     .append(asn1Type);
-                failureMsg.append("' but expected is '")
-                    .append(DistributionPointName.FULL_NAME)
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected is '").append(DistributionPointName.FULL_NAME)
+                    .append("'; ");
                 continue;
             }
 
@@ -1911,9 +1736,7 @@ public class ExtensionsChecker {
                 if (name.getTagNo() != GeneralName.uniformResourceIdentifier) {
                     failureMsg.append("tag of CRL URL is '").append(name.getTagNo());
                     failureMsg.append("' but expected is '")
-                        .append(GeneralName.uniformResourceIdentifier)
-                        .append("'");
-                    failureMsg.append("; ");
+                        .append(GeneralName.uniformResourceIdentifier).append("'; ");
                 } else {
                     String uri = ((ASN1String) name.getName()).getString();
                     isCrlUrls.add(uri);
@@ -1923,18 +1746,14 @@ public class ExtensionsChecker {
             Set<String> expCrlUrls = issuerInfo.getCrlUrls();
             Set<String> diffs = strInBnotInA(expCrlUrls, isCrlUrls);
             if (CollectionUtil.isNonEmpty(diffs)) {
-                failureMsg.append("CRL URLs ")
-                    .append(diffs.toString())
-                    .append(" are present but not expected");
-                failureMsg.append("; ");
+                failureMsg.append("CRL URLs ").append(diffs.toString())
+                    .append(" are present but not expected; ");
             }
 
             diffs = strInBnotInA(isCrlUrls, expCrlUrls);
             if (CollectionUtil.isNonEmpty(diffs)) {
-                failureMsg.append("CRL URLs ")
-                    .append(diffs.toString())
-                    .append(" are absent but are required");
-                failureMsg.append("; ");
+                failureMsg.append("CRL URLs ").append(diffs.toString())
+                    .append(" are absent but are required; ");
             }
         }
     } // method checkExtensionCrlDistributionPoints
@@ -1943,14 +1762,10 @@ public class ExtensionsChecker {
             final byte[] extensionValue, final X509IssuerInfo issuerInfo) {
         CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
         DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
-        int len = (isDistributionPoints == null)
-                ? 0
-                : isDistributionPoints.length;
+        int len = (isDistributionPoints == null) ? 0 : isDistributionPoints.length;
         if (len != 1) {
-            failureMsg.append("size of CRLDistributionPoints (deltaCRL) is '")
-                .append(len)
-                .append("' but expected is '1'");
-            failureMsg.append("; ");
+            failureMsg.append("size of CRLDistributionPoints (deltaCRL) is '").append(len)
+                .append("' but expected is '1'; ");
             return;
         }
 
@@ -1961,10 +1776,8 @@ public class ExtensionsChecker {
                 failureMsg
                     .append("tag of DistributionPointName of CRLDistibutionPoints (deltaCRL) is '")
                     .append(asn1Type);
-                failureMsg.append("' but expected is '")
-                    .append(DistributionPointName.FULL_NAME)
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected is '").append(DistributionPointName.FULL_NAME)
+                    .append("'; ");
                 continue;
             }
 
@@ -1975,12 +1788,9 @@ public class ExtensionsChecker {
             for (int i = 0; i < names.length; i++) {
                 GeneralName name = names[i];
                 if (name.getTagNo() != GeneralName.uniformResourceIdentifier) {
-                    failureMsg.append("tag of deltaCRL URL is '")
-                        .append(name.getTagNo());
+                    failureMsg.append("tag of deltaCRL URL is '").append(name.getTagNo());
                     failureMsg.append("' but expected is '")
-                        .append(GeneralName.uniformResourceIdentifier)
-                        .append("'");
-                    failureMsg.append("; ");
+                        .append(GeneralName.uniformResourceIdentifier).append("'; ");
                 } else {
                     String uri = ((ASN1String) name.getName()).getString();
                     isCrlUrls.add(uri);
@@ -1990,18 +1800,14 @@ public class ExtensionsChecker {
             Set<String> expCrlUrls = issuerInfo.getCrlUrls();
             Set<String> diffs = strInBnotInA(expCrlUrls, isCrlUrls);
             if (CollectionUtil.isNonEmpty(diffs)) {
-                failureMsg.append("deltaCRL URLs ")
-                    .append(diffs.toString())
-                    .append(" are present but not expected");
-                failureMsg.append("; ");
+                failureMsg.append("deltaCRL URLs ").append(diffs.toString())
+                    .append(" are present but not expected; ");
             }
 
             diffs = strInBnotInA(isCrlUrls, expCrlUrls);
             if (CollectionUtil.isNonEmpty(diffs)) {
-                failureMsg.append("deltaCRL URLs ")
-                    .append(diffs.toString())
-                    .append(" are absent but are required");
-                failureMsg.append("; ");
+                failureMsg.append("deltaCRL URLs ").append(diffs.toString())
+                    .append(" are absent but are required; ");
             }
         }
     } // method checkExtensionDeltaCrlDistributionPoints
@@ -2015,12 +1821,8 @@ public class ExtensionsChecker {
                     requestExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
                 failureMsg.append("extension valus is '").append(hex(extensionValue));
-                failureMsg.append("' but expected '")
-                    .append((expected == null)
-                            ? "not present"
-                            : hex(expected))
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected '");
+                failureMsg.append((expected == null) ? "not present" : hex(expected)).append("'; ");
             }
             return;
         }
@@ -2028,26 +1830,19 @@ public class ExtensionsChecker {
         ASN1Sequence seq = ASN1Sequence.getInstance(extensionValue);
         AdmissionSyntax isAdmissionSyntax = AdmissionSyntax.getInstance(seq);
         Admissions[] isAdmissions = isAdmissionSyntax.getContentsOfAdmissions();
-        int len = (isAdmissions == null)
-                ? 0
-                : isAdmissions.length;
+        int len = (isAdmissions == null) ? 0 : isAdmissions.length;
         if (len != 1) {
-            failureMsg.append("size of Admissions is '")
-                .append(len);
-            failureMsg.append("' but expected is '1'");
-            failureMsg.append("; ");
+            failureMsg.append("size of Admissions is '").append(len);
+            failureMsg.append("' but expected is '1'; ");
             return;
         }
 
         Admissions isAdmission = isAdmissions[0];
         ProfessionInfo[] isProfessionInfos = isAdmission.getProfessionInfos();
-        len = (isProfessionInfos == null)
-                ? 0
-                : isProfessionInfos.length;
+        len = (isProfessionInfos == null) ? 0 : isProfessionInfos.length;
         if (len != 1) {
-            failureMsg.append("size of ProfessionInfo is '")
-                .append(len).append("' but expected is '1'");
-            failureMsg.append("; ");
+            failureMsg.append("size of ProfessionInfo is '").append(len)
+                .append("' but expected is '1'; ");
             return;
         }
 
@@ -2057,13 +1852,11 @@ public class ExtensionsChecker {
         if (expRegistrationNumber == null) {
             if (isRegistrationNumber != null) {
                 failureMsg.append("RegistrationNumber is '").append(isRegistrationNumber);
-                failureMsg.append("' but expected is 'null'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected is 'null'; ");
             }
         } else if (!expRegistrationNumber.equals(isRegistrationNumber)) {
             failureMsg.append("RegistrationNumber is '").append(isRegistrationNumber);
-            failureMsg.append("' but expected is '").append(expRegistrationNumber).append("'");
-            failureMsg.append("; ");
+            failureMsg.append("' but expected is '").append(expRegistrationNumber).append("'; ");
         }
 
         byte[] isAddProfessionInfo = null;
@@ -2074,20 +1867,16 @@ public class ExtensionsChecker {
         if (expAddProfessionInfo == null) {
             if (isAddProfessionInfo != null) {
                 failureMsg.append("AddProfessionInfo is '").append(hex(isAddProfessionInfo));
-                failureMsg.append("' but expected is 'null'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected is 'null'; ");
             }
         } else {
             if (isAddProfessionInfo == null) {
                 failureMsg.append("AddProfessionInfo is 'null' but expected is '")
-                    .append(hex(expAddProfessionInfo));
-                failureMsg.append("'");
-                failureMsg.append("; ");
+                    .append(hex(expAddProfessionInfo)).append("'; ");
             } else if (!Arrays.equals(expAddProfessionInfo, isAddProfessionInfo)) {
                 failureMsg.append("AddProfessionInfo is '").append(hex(isAddProfessionInfo));
-                failureMsg.append("' but expected is '")
-                    .append(hex(expAddProfessionInfo)).append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected is '").append(hex(expAddProfessionInfo))
+                    .append("'; ");
             }
         }
 
@@ -2103,15 +1892,13 @@ public class ExtensionsChecker {
         Set<String> diffs = strInBnotInA(expProfessionOids, isProfessionOids);
         if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionOIDs ").append(diffs.toString())
-                .append(" are present but not expected");
-            failureMsg.append("; ");
+                .append(" are present but not expected; ");
         }
 
         diffs = strInBnotInA(isProfessionOids, expProfessionOids);
         if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionOIDs ").append(diffs.toString())
-                .append(" are absent but are required");
-            failureMsg.append("; ");
+                .append(" are absent but are required; ");
         }
 
         List<String> expProfessionItems = conf.getProfessionItems();
@@ -2126,37 +1913,26 @@ public class ExtensionsChecker {
         diffs = strInBnotInA(expProfessionItems, isProfessionItems);
         if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionItems ").append(diffs.toString())
-                .append(" are present but not expected");
-            failureMsg.append("; ");
+                .append(" are present but not expected; ");
         }
 
         diffs = strInBnotInA(isProfessionItems, expProfessionItems);
         if (CollectionUtil.isNonEmpty(diffs)) {
             failureMsg.append("ProfessionItems ").append(diffs.toString())
-                .append(" are absent but are required");
-            failureMsg.append("; ");
+                .append(" are absent but are required; ");
         }
     } // method checkExtensionAdmission
 
     private void checkExtensionAuthorityInfoAccess(final StringBuilder failureMsg,
             final byte[] extensionValue, final X509IssuerInfo issuerInfo) {
-        Set<String> expCaIssuerUris;
-        if (aiaControl == null || aiaControl.includesCaIssuers()) {
-            expCaIssuerUris = issuerInfo.getCaIssuerUrls();
-        } else {
-            expCaIssuerUris = Collections.emptySet();
-        }
+        Set<String> expCaIssuerUris = (aiaControl == null || aiaControl.includesCaIssuers())
+                ? issuerInfo.getCaIssuerUrls() : Collections.emptySet();
 
-        Set<String> expOcspUris;
-        if (aiaControl == null || aiaControl.includesOcsp()) {
-            expOcspUris = issuerInfo.getOcspUrls();
-        } else {
-            expOcspUris = Collections.emptySet();
-        }
+        Set<String> expOcspUris = (aiaControl == null || aiaControl.includesOcsp())
+                ? issuerInfo.getOcspUrls() : Collections.emptySet();
 
         if (CollectionUtil.isEmpty(expCaIssuerUris) && CollectionUtil.isEmpty(expOcspUris)) {
-            failureMsg.append("AIA is present but expected is 'none'");
-            failureMsg.append("; ");
+            failureMsg.append("AIA is present but expected is 'none'; ");
             return;
         }
 
@@ -2168,8 +1944,7 @@ public class ExtensionsChecker {
     private void checkExtensionOcspNocheck(final StringBuilder failureMsg,
             final byte[] extensionValue) {
         if (!Arrays.equals(DER_NULL, extensionValue)) {
-            failureMsg.append("value is not DER NULL");
-            failureMsg.append("; ");
+            failureMsg.append("value is not DER NULL; ");
         }
     }
 
@@ -2184,8 +1959,7 @@ public class ExtensionsChecker {
             final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
         checkDirectoryString(ObjectIdentifiers.id_extension_additionalInformation,
-                additionalInformation,
-                failureMsg, extensionValue, requestExtensions, extControl);
+                additionalInformation, failureMsg, extensionValue, requestExtensions, extControl);
     }
 
     private void checkDirectoryString(final ASN1ObjectIdentifier extType,
@@ -2197,12 +1971,8 @@ public class ExtensionsChecker {
                     requestExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
                 failureMsg.append("extension valus is '").append(hex(extensionValue));
-                failureMsg.append("' but expected '")
-                    .append((expected == null)
-                            ? "not present"
-                            : hex(expected))
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected '");
+                failureMsg.append((expected == null) ? "not present" : hex(expected)).append("'; ");
             }
             return;
         }
@@ -2211,8 +1981,7 @@ public class ExtensionsChecker {
         try {
             asn1 = ASN1Primitive.fromByteArray(extensionValue);
         } catch (IOException ex) {
-            failureMsg.append("invalid syntax of extension value");
-            failureMsg.append("; ");
+            failureMsg.append("invalid syntax of extension value; ");
             return;
         }
 
@@ -2237,16 +2006,14 @@ public class ExtensionsChecker {
 
         if (!correctStringType) {
             failureMsg.append("extension value is not of type DirectoryString.")
-                .append(conf.getText());
-            failureMsg.append("; ");
+                .append(conf.getText()).append("; ");
             return;
         }
 
         String extTextValue = ((ASN1String) asn1).getString();
         if (!conf.getText().equals(extTextValue)) {
             failureMsg.append("content '").append(extTextValue);
-            failureMsg.append("' but expected '").append(conf.getText()).append("'");
-            failureMsg.append("; ");
+            failureMsg.append("' but expected '").append(conf.getText()).append("'; ");
         }
     } // method checkDirectoryString
 
@@ -2258,14 +2025,9 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_extension_validityModel,
                     requestExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                failureMsg.append("extension valus is '")
-                    .append(hex(extensionValue));
-                failureMsg.append("' but expected '")
-                    .append((expected == null)
-                            ? "not present"
-                            : hex(expected))
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("extension valus is '").append(hex(extensionValue));
+                failureMsg.append("' but expected '");
+                failureMsg.append((expected == null) ? "not present" : hex(expected)).append("'; ");
             }
             return;
         }
@@ -2273,8 +2035,7 @@ public class ExtensionsChecker {
         ASN1ObjectIdentifier extValue = ASN1ObjectIdentifier.getInstance(extensionValue);
         if (!conf.equals(extValue)) {
             failureMsg.append("content is '").append(extValue);
-            failureMsg.append("' but expected '").append(conf).append("'");
-            failureMsg.append("; ");
+            failureMsg.append("' but expected '").append(conf).append("'; ");
         }
     } // method checkExtensionValidityModel
 
@@ -2297,22 +2058,18 @@ public class ExtensionsChecker {
 
         ASN1GeneralizedTime time = extValue.getNotBefore();
         if (time == null) {
-            failureMsg.append("notBefore is absent but expected present");
-            failureMsg.append("; ");
+            failureMsg.append("notBefore is absent but expected present; ");
         } else if (!time.equals(notBefore)) {
             failureMsg.append("notBefore is '").append(time.getTimeString());
-            failureMsg.append("' but expected '").append(notBefore.getTimeString()).append("'");
-            failureMsg.append("; ");
+            failureMsg.append("' but expected '").append(notBefore.getTimeString()).append("'; ");
         }
 
         time = extValue.getNotAfter();
         if (time == null) {
-            failureMsg.append("notAfter is absent but expected present");
-            failureMsg.append("; ");
+            failureMsg.append("notAfter is absent but expected present; ");
         } else if (!time.equals(notAfter)) {
             failureMsg.append("notAfter is '").append(time.getTimeString());
-            failureMsg.append("' but expected '").append(notAfter.getTimeString()).append("'");
-            failureMsg.append("; ");
+            failureMsg.append("' but expected '").append(notAfter.getTimeString()).append("'; ");
         }
     } // method checkExtensionPrivateKeyUsagePeriod
 
@@ -2325,12 +2082,8 @@ public class ExtensionsChecker {
                     requestExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
                 failureMsg.append("extension valus is '").append(hex(extensionValue));
-                failureMsg.append("' but expected '")
-                    .append((expected == null)
-                            ? "not present"
-                            : hex(expected))
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected '");
+                failureMsg.append((expected == null) ? "not present" : hex(expected)).append("'; ");
             }
             return;
         }
@@ -2340,8 +2093,7 @@ public class ExtensionsChecker {
         final int isSize = extValue.size();
         if (isSize != expSize) {
             failureMsg.append("number of statements is '").append(isSize);
-            failureMsg.append("' but expected '").append(expSize).append("'");
-            failureMsg.append("; ");
+            failureMsg.append("' but expected '").append(expSize).append("'; ");
             return;
         }
 
@@ -2376,24 +2128,21 @@ public class ExtensionsChecker {
                 failureMsg.append("statmentId[")
                     .append(i).append("] is '").append(is.getStatementId().getId());
                 failureMsg.append("' but expected '").append(exp.getStatementId().getValue())
-                    .append("'");
-                failureMsg.append("; ");
+                    .append("'; ");
                 continue;
             }
 
             if (exp.getStatementValue() == null) {
                 if (is.getStatementInfo() != null) {
                     failureMsg.append("statmentInfo[").append(i)
-                        .append("] is 'present' but expected 'absent'");
-                    failureMsg.append("; ");
+                        .append("] is 'present' but expected 'absent'; ");
                 }
                 continue;
             }
 
             if (is.getStatementInfo() == null) {
                 failureMsg.append("statmentInfo[").append(i)
-                    .append("] is 'absent' but expected 'present'");
-                failureMsg.append("; ");
+                    .append("] is 'absent' but expected 'present'; ");
                 continue;
             }
 
@@ -2405,21 +2154,15 @@ public class ExtensionsChecker {
                     if (!Arrays.equals(isValue, expValue)) {
                         failureMsg.append("statementInfo[").append(i)
                             .append("] is '").append(hex(isValue));
-                        failureMsg.append("' but expected '").append(hex(expValue)).append("'");
-                        failureMsg.append("; ");
+                        failureMsg.append("' but expected '").append(hex(expValue)).append("'; ");
                     }
                 } else if (expStatementValue.getQcRetentionPeriod() != null) {
                     String isValue = ASN1Integer.getInstance(is.getStatementInfo()).toString();
                     String expValue = expStatementValue.getQcRetentionPeriod().toString();
                     if (!isValue.equals(expValue)) {
-                        failureMsg.append("statementInfo[")
-                            .append(i)
-                            .append("] is '")
+                        failureMsg.append("statementInfo[").append(i).append("] is '")
                             .append(isValue);
-                        failureMsg.append("' but expected '")
-                            .append(expValue)
-                            .append("'");
-                        failureMsg.append("; ");
+                        failureMsg.append("' but expected '").append(expValue).append("'; ");
                     }
                 } else if (expStatementValue.getQcEuLimitValue() != null) {
                     QcEuLimitValueType euLimitConf = expStatementValue.getQcEuLimitValue();
@@ -2433,10 +2176,8 @@ public class ExtensionsChecker {
                     } else if (expAmountExp != null) {
                         value = expAmountExp[0];
                     } else {
-                        failureMsg.append("found no QcEuLimit for currency '")
-                            .append(expCurrency)
-                            .append("'");
-                        failureMsg.append("; ");
+                        failureMsg.append("found no QcEuLimit for currency '").append(expCurrency)
+                            .append("'; ");
                         return;
                     }
                     // CHECKSTYLE:SKIP
@@ -2448,60 +2189,39 @@ public class ExtensionsChecker {
                     } else if (expAmountExp != null) {
                         value = expAmountExp[1];
                     } else {
-                        failureMsg.append("found no QcEuLimit for currency '")
-                            .append(expCurrency)
-                            .append("'");
-                        failureMsg.append("; ");
+                        failureMsg.append("found no QcEuLimit for currency '").append(expCurrency)
+                            .append("'; ");
                         return;
                     }
                     String expExponent = Integer.toString(value);
 
                     MonetaryValue monterayValue = MonetaryValue.getInstance(is.getStatementInfo());
                     Iso4217CurrencyCode currency = monterayValue.getCurrency();
-                    String isCurrency = currency.isAlphabetic()
-                            ? currency.getAlphabetic()
+                    String isCurrency = currency.isAlphabetic() ? currency.getAlphabetic()
                             : Integer.toString(currency.getNumeric());
                     String isAmount = monterayValue.getAmount().toString();
                     String isExponent = monterayValue.getExponent().toString();
                     if (!isCurrency.equals(expCurrency)) {
-                        failureMsg.append("statementInfo[")
-                            .append(i)
-                            .append("].qcEuLimit.currency is '")
-                            .append(isCurrency);
-                        failureMsg.append("' but expected '")
-                            .append(expCurrency)
-                            .append("'");
-                        failureMsg.append("; ");
+                        failureMsg.append("statementInfo[").append(i)
+                            .append("].qcEuLimit.currency is '").append(isCurrency);
+                        failureMsg.append("' but expected '").append(expCurrency).append("'; ");
                     }
                     if (!isAmount.equals(expAmount)) {
-                        failureMsg.append("statementInfo[")
-                            .append(i)
-                            .append("].qcEuLimit.amount is '")
-                            .append(isAmount);
+                        failureMsg.append("statementInfo[").append(i)
+                            .append("].qcEuLimit.amount is '").append(isAmount);
 
-                        failureMsg.append("' but expected '")
-                            .append(expAmount)
-                            .append("'");
-                        failureMsg.append("; ");
+                        failureMsg.append("' but expected '").append(expAmount).append("'; ");
                     }
                     if (!isExponent.equals(expExponent)) {
-                        failureMsg.append("statementInfo[")
-                            .append(i)
-                            .append("].qcEuLimit.exponent is '")
-                            .append(isExponent);
-                        failureMsg.append("' but expected '")
-                            .append(expExponent)
-                            .append("'");
-                        failureMsg.append("; ");
+                        failureMsg.append("statementInfo[").append(i)
+                            .append("].qcEuLimit.exponent is '").append(isExponent);
+                        failureMsg.append("' but expected '").append(expExponent).append("'; ");
                     }
                 } else {
                     throw new RuntimeException("statementInfo[" + i + "]should not reach here");
                 }
             } catch (IOException ex) {
-                failureMsg.append("statementInfo[")
-                    .append(i)
-                    .append("] has incorrect syntax");
-                failureMsg.append("; ");
+                failureMsg.append("statementInfo[").append(i).append("] has incorrect syntax; ");
             }
         }
     } // method checkExtensionQcStatements
@@ -2512,8 +2232,7 @@ public class ExtensionsChecker {
         BiometricInfoOption conf = biometricInfo;
 
         if (conf == null) {
-            failureMsg.append("extension is present but not expected");
-            failureMsg.append("; ");
+            failureMsg.append("extension is present but not expected; ");
             return;
         }
 
@@ -2523,8 +2242,7 @@ public class ExtensionsChecker {
         }
 
         if (extInRequest == null) {
-            failureMsg.append("extension is present but not expected");
-            failureMsg.append("; ");
+            failureMsg.append("extension is present but not expected; ");
             return;
         }
 
@@ -2534,12 +2252,8 @@ public class ExtensionsChecker {
         ASN1Sequence extValue = ASN1Sequence.getInstance(extensionValue);
         final int isSize = extValue.size();
         if (isSize != expSize) {
-            failureMsg.append("number of biometricData is '")
-                .append(isSize);
-            failureMsg.append("' but expected '")
-                .append(expSize)
-                .append("'");
-            failureMsg.append("; ");
+            failureMsg.append("number of biometricData is '").append(isSize);
+            failureMsg.append("' but expected '").append(expSize).append("'; ");
             return;
         }
 
@@ -2557,106 +2271,70 @@ public class ExtensionsChecker {
                         ? Integer.toString(expType.getPredefinedBiometricType())
                         : expType.getBiometricDataOid().getId();
 
-                failureMsg.append("biometricData[")
-                    .append(i)
-                    .append("].typeOfBiometricData is '")
+                failureMsg.append("biometricData[").append(i).append("].typeOfBiometricData is '")
                     .append(isStr);
-                failureMsg.append("' but expected '")
-                    .append(expStr)
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected '").append(expStr).append("'; ");
             }
 
             ASN1ObjectIdentifier is = isData.getHashAlgorithm().getAlgorithm();
             ASN1ObjectIdentifier exp = expData.getHashAlgorithm().getAlgorithm();
             if (!is.equals(exp)) {
-                failureMsg.append("biometricData[")
-                    .append(i)
-                    .append("].hashAlgorithm is '")
+                failureMsg.append("biometricData[").append(i).append("].hashAlgorithm is '")
                     .append(is.getId());
-                failureMsg.append("' but expected '")
-                    .append(exp.getId())
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected '").append(exp.getId()).append("'; ");
             }
 
             ASN1Encodable isHashAlgoParam = isData.getHashAlgorithm().getParameters();
             if (isHashAlgoParam == null) {
-                failureMsg.append("biometricData[")
-                    .append(i)
+                failureMsg.append("biometricData[").append(i)
                     .append("].hashAlgorithm.parameters is 'present'");
-                failureMsg.append(" but expected 'absent'");
-                failureMsg.append("; ");
+                failureMsg.append(" but expected 'absent'; ");
             } else {
                 try {
                     byte[] isBytes = isHashAlgoParam.toASN1Primitive().getEncoded();
                     if (!Arrays.equals(isBytes, DER_NULL)) {
-                        failureMsg.append("biometricData[")
-                            .append(i)
-                            .append("].biometricDataHash.parameters is '")
-                            .append(hex(isBytes));
-                        failureMsg.append("' but expected '")
-                            .append(hex(DER_NULL))
-                            .append("'");
-                        failureMsg.append("; ");
+                        failureMsg.append("biometricData[").append(i)
+                            .append("].biometricDataHash.parameters is '").append(hex(isBytes));
+                        failureMsg.append("' but expected '").append(hex(DER_NULL)).append("'; ");
                     }
                 } catch (IOException ex) {
-                    failureMsg.append("biometricData[")
-                        .append(i)
-                        .append("].biometricDataHash.parameters has incorrect syntax");
-                    failureMsg.append("; ");
+                    failureMsg.append("biometricData[").append(i)
+                        .append("].biometricDataHash.parameters has incorrect syntax; ");
                 }
             }
 
             byte[] isBytes = isData.getBiometricDataHash().getOctets();
             byte[] expBytes = expData.getBiometricDataHash().getOctets();
             if (!Arrays.equals(isBytes, expBytes)) {
-                failureMsg.append("biometricData[")
-                    .append(i)
-                    .append("].biometricDataHash is '")
+                failureMsg.append("biometricData[").append(i).append("].biometricDataHash is '")
                     .append(hex(isBytes));
-                failureMsg.append("' but expected '")
-                    .append(hex(expBytes))
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("' but expected '").append(hex(expBytes)).append("'; ");
             }
 
             DERIA5String str = isData.getSourceDataUri();
-            String isSourceDataUri = (str == null)
-                    ? null
-                    : str.getString();
+            String isSourceDataUri = (str == null) ? null : str.getString();
 
             String expSourceDataUri = null;
             if (biometricInfo.getSourceDataUriOccurrence() != TripleState.FORBIDDEN) {
                 str = expData.getSourceDataUri();
-                expSourceDataUri = (str == null)
-                        ? null
-                        : str.getString();
+                expSourceDataUri = (str == null) ? null : str.getString();
             }
 
             if (expSourceDataUri == null) {
                 if (isSourceDataUri != null) {
-                    failureMsg.append("biometricData[")
-                        .append(i)
+                    failureMsg.append("biometricData[").append(i)
                         .append("].sourceDataUri is 'present'");
-                    failureMsg.append(" but expected 'absent'");
-                    failureMsg.append("; ");
+                    failureMsg.append(" but expected 'absent'; ");
                 }
             } else {
                 if (isSourceDataUri == null) {
-                    failureMsg.append("biometricData[")
-                        .append(i)
+                    failureMsg.append("biometricData[").append(i)
                         .append("].sourceDataUri is 'absent'");
-                    failureMsg.append(" but expected 'present'");
-                    failureMsg.append("; ");
+                    failureMsg.append(" but expected 'present'; ");
                 } else if (!isSourceDataUri.equals(expSourceDataUri)) {
-                    failureMsg.append("biometricData[")
-                        .append(i)
-                        .append("].sourceDataUri is '")
+                    failureMsg.append("biometricData[").append(i).append("].sourceDataUri is '")
                         .append(isSourceDataUri);
-                    failureMsg.append("' but expected '")
-                        .append(expSourceDataUri).append("'");
-                    failureMsg.append("; ");
+                    failureMsg.append("' but expected '").append(expSourceDataUri).append("'; ");
                 }
             }
         }
@@ -2672,14 +2350,9 @@ public class ExtensionsChecker {
                     ObjectIdentifiers.id_xipki_ext_authorizationTemplate,
                     requestExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                failureMsg.append("extension valus is '")
-                    .append(hex(extensionValue));
-                failureMsg.append("' but expected '")
-                    .append((expected == null)
-                            ? "not present"
-                            : hex(expected))
-                    .append("'");
-                failureMsg.append("; ");
+                failureMsg.append("extension valus is '").append(hex(extensionValue));
+                failureMsg.append("' but expected '");
+                failureMsg.append((expected == null) ? "not present" : hex(expected)).append("'; ");
             }
             return;
         }
@@ -2689,15 +2362,13 @@ public class ExtensionsChecker {
         ASN1OctetString accessRights = DEROctetString.getInstance(seq.getObjectAt(1));
         if (!conf.getType().equals(type.getId())) {
             failureMsg.append("type is '").append(type.getId());
-            failureMsg.append("' but expected '").append(conf.getType()).append("'");
-            failureMsg.append("; ");
+            failureMsg.append("' but expected '").append(conf.getType()).append("'; ");
         }
 
         byte[] isRights = accessRights.getOctets();
         if (!Arrays.equals(conf.getAccessRights(), isRights)) {
             failureMsg.append("accessRights is '" + hex(isRights)
-                    + "' but expected '" + hex(conf.getAccessRights()) + "'");
-            failureMsg.append("; ");
+                    + "' but expected '" + hex(conf.getAccessRights()) + "'; ");
         }
     } // method checkExtensionAuthorizationTemplate
 
@@ -2730,9 +2401,7 @@ public class ExtensionsChecker {
     }
 
     private byte[] getConstantExtensionValue(final ASN1ObjectIdentifier type) {
-        return (constantExtensions == null)
-                ? null
-                : constantExtensions.get(type).getValue();
+        return (constantExtensions == null) ? null : constantExtensions.get(type).getValue();
     }
 
     private Object getExtensionValue(final ASN1ObjectIdentifier type,
@@ -2964,8 +2633,7 @@ public class ExtensionsChecker {
         int size = isAccessDescriptions.size();
         if (size != expectedUris.size()) {
             failureMsg.append("number of AIA ").append(typeDesc).append(" URIs is '").append(size);
-            failureMsg.append("' but expected is '").append(expectedUris.size()).append("'");
-            failureMsg.append("; ");
+            failureMsg.append("' but expected is '").append(expectedUris.size()).append("'; ");
             return;
         }
 
@@ -2974,12 +2642,9 @@ public class ExtensionsChecker {
             GeneralName isAccessLocation = isAccessDescriptions.get(i).getAccessLocation();
             if (isAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier) {
                 failureMsg.append("tag of accessLocation of AIA ")
-                    .append(typeDesc)
-                    .append(" is '").append(isAccessLocation.getTagNo());
+                    .append(typeDesc).append(" is '").append(isAccessLocation.getTagNo());
                 failureMsg.append("' but expected is '")
-                    .append(GeneralName.uniformResourceIdentifier)
-                    .append("'");
-                failureMsg.append("; ");
+                    .append(GeneralName.uniformResourceIdentifier).append("'; ");
             } else {
                 String isOcspUri = ((ASN1String) isAccessLocation.getName()).getString();
                 isUris.add(isOcspUri);
@@ -2988,20 +2653,14 @@ public class ExtensionsChecker {
 
         Set<String> diffs = strInBnotInA(expectedUris, isUris);
         if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append(typeDesc)
-                .append(" URIs ")
-                .append(diffs.toString())
-                .append(" are present but not expected");
-            failureMsg.append("; ");
+            failureMsg.append(typeDesc).append(" URIs ").append(diffs.toString());
+            failureMsg.append(" are present but not expected; ");
         }
 
         diffs = strInBnotInA(isUris, expectedUris);
         if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append(typeDesc)
-                .append(" URIs ")
-                .append(diffs.toString())
-                .append(" are absent but are required");
-            failureMsg.append("; ");
+            failureMsg.append(typeDesc).append(" URIs ").append(diffs.toString());
+            failureMsg.append(" are absent but are required; ");
         }
     } // method checkAia
 

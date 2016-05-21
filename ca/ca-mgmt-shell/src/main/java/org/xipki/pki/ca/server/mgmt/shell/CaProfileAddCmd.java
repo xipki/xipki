@@ -74,8 +74,7 @@ public class CaProfileAddCmd extends CaCommandSupport {
         sb.append(" to CA ").append(caName);
 
         boolean bo = caManager.addCertprofileToCa(profileName, caName);
-        output(bo, "associated", "could not associate",
-                sb.toString());
+        output(bo, "associated", "could not associate", sb.toString());
         return null;
     }
 

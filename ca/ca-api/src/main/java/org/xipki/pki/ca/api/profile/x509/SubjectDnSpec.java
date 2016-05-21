@@ -535,9 +535,7 @@ public class SubjectDnSpec {
         }
 
         Range specRange = RANGES.get(type);
-        Range isRange = (specRange == null)
-                ? null
-                : control.getStringLengthRange();
+        Range isRange = (specRange == null) ? null : control.getStringLengthRange();
         if (isRange == null) {
             control.setStringLengthRange(specRange);
             return;
@@ -579,9 +577,7 @@ public class SubjectDnSpec {
 
     public static boolean isValidCountryAreaCode(String code) {
         ParamUtil.requireNonBlank("code", code);
-        return countryAreaCodes.isEmpty()
-                ? true
-                : countryAreaCodes.contains(code.toUpperCase());
+        return countryAreaCodes.isEmpty() ? true : countryAreaCodes.contains(code.toUpperCase());
     }
 
     private static BufferedReader getReader(final String propKey, final String fallbackResource) {

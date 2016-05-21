@@ -91,7 +91,6 @@ public class SubjectChecker {
         this.specialBehavior = conf.getSpecialBehavior();
 
         Subject subject = conf.getSubject();
-
         Map<ASN1ObjectIdentifier, RdnControl> subjectDnControls = new HashMap<>();
 
         for (RdnType t : subject.getRdn()) {
@@ -113,12 +112,8 @@ public class SubjectChecker {
                 }
             }
 
-            Range range;
-            if (t.getMinLen() != null || t.getMaxLen() != null) {
-                range = new Range(t.getMinLen(), t.getMaxLen());
-            } else {
-                range = null;
-            }
+            Range range = (t.getMinLen() != null || t.getMaxLen() != null)
+                    ? new Range(t.getMinLen(), t.getMaxLen()) : null;
 
             StringType stringType = XmlX509CertprofileUtil.convertStringType(t.getStringType());
 
@@ -222,20 +217,12 @@ public class SubjectChecker {
         ValidationIssue issue = createSubjectIssue(type);
 
         // control
-        int minOccurs;
-        int maxOccurs;
         RdnControl rdnControl = subjectControl.getControl(type);
-        if (rdnControl == null) {
-            minOccurs = 0;
-            maxOccurs = 0;
-        } else {
-            minOccurs = rdnControl.getMinOccurs();
-            maxOccurs = rdnControl.getMaxOccurs();
-        }
+        int minOccurs = (rdnControl == null) ? 0 : rdnControl.getMinOccurs();
+        int maxOccurs = (rdnControl == null) ? 0 : rdnControl.getMaxOccurs();
+
         RDN[] rdns = subject.getRDNs(type);
-        int rdnsSize = (rdns == null)
-                ? 0
-                : rdns.length;
+        int rdnsSize = (rdns == null) ? 0 : rdns.length;
 
         if (rdnsSize < minOccurs || rdnsSize > maxOccurs) {
             issue.setFailureMessage("number of RDNs '" + rdnsSize
@@ -309,22 +296,8 @@ public class SubjectChecker {
     throws BadCertTemplateException {
         ValidationIssue issue = createSubjectIssue(type);
 
-        // control
-        int minOccurs;
-        int maxOccurs;
-        RdnControl rdnControl = subjectControl.getControl(type);
-        if (rdnControl == null) {
-            minOccurs = 0;
-            maxOccurs = 0;
-        } else {
-            minOccurs = rdnControl.getMinOccurs();
-            maxOccurs = rdnControl.getMaxOccurs();
-        }
-
         RDN[] rdns = subject.getRDNs(type);
-        int rdnsSize = (rdns == null)
-                ? 0
-                : rdns.length;
+        int rdnsSize = (rdns == null) ? 0 : rdns.length;
 
         RDN[] requestedRdns = requestedSubject.getRDNs(type);
 
@@ -339,6 +312,9 @@ public class SubjectChecker {
             }
             return issue;
         }
+
+        // control
+        final RdnControl rdnControl = subjectControl.getControl(type);
 
         // check the encoding
         StringType stringType = null;
@@ -370,6 +346,10 @@ public class SubjectChecker {
         }
 
         final int atvsSize = atvs.size();
+
+        int minOccurs = (rdnControl == null) ? 0 : rdnControl.getMinOccurs();
+        int maxOccurs = (rdnControl == null) ? 0 : rdnControl.getMaxOccurs();
+
         if (atvsSize < minOccurs || atvsSize > maxOccurs) {
             issue.setFailureMessage("number of AttributeTypeAndValuess '" + atvsSize
                     + "' is not within [" + minOccurs + ", " + maxOccurs + "]");
@@ -378,14 +358,14 @@ public class SubjectChecker {
 
         for (int i = 0; i < atvsSize; i++) {
             AttributeTypeAndValue atv = atvs.get(i);
-            String atvTextValue = getAtvValueString("AttributeTypeAndValue[" + i + "]",
-                    atv, stringType, failureMsg);
+            String atvTextValue = getAtvValueString("AttributeTypeAndValue[" + i + "]", atv,
+                    stringType, failureMsg);
             if (atvTextValue == null) {
                 continue;
             }
 
-            checkAttributeTypeAndValue("AttributeTypeAndValue[" + i + "]", type,
-                    atvTextValue, rdnControl, requestedCoreAtvTextValues, i, failureMsg);
+            checkAttributeTypeAndValue("AttributeTypeAndValue[" + i + "]", type, atvTextValue,
+                    rdnControl, requestedCoreAtvTextValues, i, failureMsg);
         }
 
         int len = failureMsg.length();
@@ -412,8 +392,7 @@ public class SubjectChecker {
             if (prefix != null) {
                 if (!tmpAtvTextValue.startsWith(prefix)) {
                     failureMsg.append(name).append(" '").append(tmpAtvTextValue)
-                        .append("' does not start with prefix '").append(prefix).append("'");
-                    failureMsg.append("; ");
+                        .append("' does not start with prefix '").append(prefix).append("'; ");
                     return;
                 } else {
                     tmpAtvTextValue = tmpAtvTextValue.substring(prefix.length());
@@ -424,8 +403,7 @@ public class SubjectChecker {
             if (suffix != null) {
                 if (!tmpAtvTextValue.endsWith(suffix)) {
                     failureMsg.append(name).append(" '").append(tmpAtvTextValue)
-                        .append("' does not end with suffx '").append(suffix).append("'");
-                    failureMsg.append("; ");
+                        .append("' does not end with suffx '").append(suffix).append("'; ");
                     return;
                 } else {
                     tmpAtvTextValue = tmpAtvTextValue.substring(0,
@@ -440,8 +418,7 @@ public class SubjectChecker {
                 if (!matches) {
                     failureMsg.append(name).append(" '").append(tmpAtvTextValue)
                         .append("' is not valid against regex '")
-                        .append(pattern.pattern()).append("'");
-                    failureMsg.append("; ");
+                        .append(pattern.pattern()).append("'; ");
                     return;
                 }
             }
@@ -454,23 +431,17 @@ public class SubjectChecker {
             }
         } else {
             String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
-            if (ObjectIdentifiers.DN_CN.equals(type)
-                    && specialBehavior != null
+            if (ObjectIdentifiers.DN_CN.equals(type) && specialBehavior != null
                     && "gematik_gSMC_K".equals(specialBehavior)) {
                 if (!tmpAtvTextValue.startsWith(requestedCoreAtvTextValue + "-")) {
-                    failureMsg.append("content '")
-                        .append(tmpAtvTextValue)
+                    failureMsg.append("content '").append(tmpAtvTextValue)
                         .append("' does not start with '")
-                        .append(requestedCoreAtvTextValue).append("-'");
-                    failureMsg.append("; ");
+                        .append(requestedCoreAtvTextValue).append("-'; ");
                 }
             } else if (!type.equals(ObjectIdentifiers.DN_SERIALNUMBER)) {
                 if (!tmpAtvTextValue.equals(requestedCoreAtvTextValue)) {
-                    failureMsg.append("content '")
-                        .append(tmpAtvTextValue)
-                        .append("' but expected '")
-                        .append(requestedCoreAtvTextValue).append("'");
-                    failureMsg.append("; ");
+                    failureMsg.append("content '").append(tmpAtvTextValue)
+                        .append("' but expected '").append(requestedCoreAtvTextValue).append("'; ");
                 }
             }
         }
@@ -570,15 +541,13 @@ public class SubjectChecker {
 
         if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {
             if (!(atvValue instanceof ASN1GeneralizedTime)) {
-                failureMsg.append(name).append(" is not of type GeneralizedTime");
-                failureMsg.append("; ");
+                failureMsg.append(name).append(" is not of type GeneralizedTime; ");
                 return null;
             }
             return ((ASN1GeneralizedTime) atvValue).getTimeString();
         } else if (ObjectIdentifiers.DN_POSTAL_ADDRESS.equals(type)) {
             if (!(atvValue instanceof ASN1Sequence)) {
-                failureMsg.append(name).append(" is not of type Sequence");
-                failureMsg.append("; ");
+                failureMsg.append(name).append(" is not of type Sequence; ");
                 return null;
             }
 
@@ -590,12 +559,8 @@ public class SubjectChecker {
             for (int i = 0; i < n; i++) {
                 ASN1Encodable obj = seq.getObjectAt(i);
                 if (!matchStringType(obj, stringType)) {
-                    failureMsg.append(name)
-                        .append(".[")
-                        .append(i)
-                        .append("] is not of type ")
-                        .append(stringType.name());
-                    failureMsg.append("; ");
+                    failureMsg.append(name).append(".[").append(i).append("] is not of type ")
+                        .append(stringType.name()).append("; ");
                     validEncoding = false;
                     break;
                 }
@@ -611,8 +576,7 @@ public class SubjectChecker {
             return sb.toString();
         } else {
             if (!matchStringType(atvValue, stringType)) {
-                failureMsg.append(name).append(" is not of type " + stringType.name());
-                failureMsg.append("; ");
+                failureMsg.append(name).append(" is not of type " + stringType.name()).append("; ");
                 return null;
             }
 

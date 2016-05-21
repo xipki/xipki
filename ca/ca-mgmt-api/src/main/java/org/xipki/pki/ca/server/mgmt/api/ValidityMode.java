@@ -44,6 +44,7 @@ import org.xipki.commons.common.util.ParamUtil;
  */
 
 public enum ValidityMode {
+
     STRICT,
     LAX,
     CUTOFF;

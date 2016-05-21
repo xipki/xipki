@@ -64,11 +64,7 @@ public class SpeedP11DSASignCmd extends SpeedP11SignCommandSupport {
     @Override
     protected LoadExecutor getTester() throws Exception {
         if (qlen == null) {
-            if (plen >= 2048) {
-                qlen = 256;
-            } else {
-                qlen = 160;
-            }
+            qlen = (plen >= 2048) ? 256 : 160;
         }
 
         return new P11DSASignLoadTest(securityFactory, getSlot(), sigAlgo, plen, qlen);

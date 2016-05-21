@@ -110,7 +110,7 @@ class OcspStoreQueryExecutor {
         this.issuerStore = initIssuerStore();
         this.publishGoodCerts = publishGoodCerts;
 
-        final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
+        final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
         Connection conn = datasource.getConnection();
         if (conn == null) {
             throw new DataAccessException("could not get connection");
@@ -202,9 +202,7 @@ class OcspStoreQueryExecutor {
             return;
         }
 
-        final String sqlAddCert = revoked
-                ? SQL_ADD_REVOKED_CERT
-                : SQL_ADD_CERT;
+        final String sqlAddCert = revoked ? SQL_ADD_REVOKED_CERT : SQL_ADD_CERT;
 
         int certId = nextCertId();
         byte[] encodedCert = certificate.getEncodedCert();
@@ -246,10 +244,8 @@ class OcspStoreQueryExecutor {
                 } else {
                     psAddcert.setNull(idx++, Types.BIGINT);
                 }
-                psAddcert.setInt(idx++,
-                        (revInfo.getReason() == null)
-                            ? 0
-                            : revInfo.getReason().getCode());
+                int reasonCode = (revInfo.getReason() == null) ? 0 : revInfo.getReason().getCode();
+                psAddcert.setInt(idx++, reasonCode);
             }
 
             // CRAW
@@ -707,10 +703,7 @@ class OcspStoreQueryExecutor {
 
     private static void setBoolean(final PreparedStatement ps, final int index, final boolean value)
     throws SQLException {
-        int intValue = value
-                ? 1
-                : 0;
-        ps.setInt(index, intValue);
+        ps.setInt(index, value ? 1 : 0);
     }
 
 }

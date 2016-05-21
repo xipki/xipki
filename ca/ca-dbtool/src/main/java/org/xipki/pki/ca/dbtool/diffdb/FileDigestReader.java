@@ -42,6 +42,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -120,8 +121,8 @@ public class FileDigestReader implements DigestReader {
             return null;
         }
 
-        List<Long> serialNumbers = new ArrayList<>(numCerts);
-        Map<Long, DbDigestEntry> certs = new HashMap<>(numCerts);
+        List<BigInteger> serialNumbers = new ArrayList<>(numCerts);
+        Map<BigInteger, DbDigestEntry> certs = new HashMap<>(numCerts);
 
         int ik = 0;
         while (hasNext()) {
@@ -140,9 +141,7 @@ public class FileDigestReader implements DigestReader {
             }
         }
 
-        return (ik == 0)
-                ? null
-                : new CertsBundle(certs, serialNumbers);
+        return (ik == 0) ? null : new CertsBundle(certs, serialNumbers);
     } // method nextCerts
 
     private DbDigestEntry nextCert() throws IOException {
@@ -157,9 +156,7 @@ public class FileDigestReader implements DigestReader {
     }
 
     private DbDigestEntry retrieveNext(final boolean firstTime) throws IOException {
-        String line = firstTime
-                ? null
-                : certsReader.readLine();
+        String line = firstTime ? null : certsReader.readLine();
         if (line == null) {
             closeReader(certsReader);
             String nextFileName = certsFilesReader.readLine();
@@ -171,9 +168,7 @@ public class FileDigestReader implements DigestReader {
             line = certsReader.readLine();
         }
 
-        return (line == null)
-                ? null
-                : DbDigestEntry.decode(line);
+        return (line == null) ? null : DbDigestEntry.decode(line);
     }
 
     @Override

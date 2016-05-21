@@ -236,8 +236,7 @@ public class HttpProxyServlet extends HttpServlet {
 
         if (moduleName == null) {
             int moduleNameEndIndex = constructedPath.indexOf('/');
-            moduleName = (moduleNameEndIndex == -1)
-                    ? constructedPath
+            moduleName = (moduleNameEndIndex == -1) ? constructedPath
                     : constructedPath.substring(0, moduleNameEndIndex);
         }
 

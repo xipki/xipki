@@ -197,19 +197,12 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
             ocspQa = new OcspQa(securityFactory);
         }
 
-        ValidationResult result = ocspQa.checkOcsp(response,
-                issuerHash,
-                serialNumbers,
-                encodedCerts,
-                expectedOcspError,
-                expectedStatuses,
-                responseOption);
+        ValidationResult result = ocspQa.checkOcsp(response, issuerHash, serialNumbers,
+                encodedCerts, expectedOcspError, expectedStatuses, responseOption);
 
         StringBuilder sb = new StringBuilder(50);
         sb.append("OCSP response is ");
-        String txt = result.isAllSuccessful()
-                ? "valid"
-                : "invalid";
+        String txt = result.isAllSuccessful() ? "valid" : "invalid";
         sb.append(txt);
 
         if (verbose.booleanValue()) {
@@ -232,10 +225,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
         sb.append(issue.getCode());
         sb.append(", ").append(issue.getDescription());
         sb.append(", ");
-        String txt = issue.isFailed()
-                ? "failed"
-                : "successful";
-        sb.append(txt);
+        sb.append( issue.isFailed() ? "failed" : "successful");
         if (issue.getFailureMessage() != null) {
             sb.append(", ").append(issue.getFailureMessage());
         }

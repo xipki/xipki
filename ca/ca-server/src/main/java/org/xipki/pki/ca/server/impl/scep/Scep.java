@@ -170,8 +170,8 @@ public class Scep {
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex);
         }
-        LOG.info("SCEP {}: caCert.included={}, signerCert.included={}",
-                this.caName, this.control.isIncludeCaCert(), this.control.isIncludeSignerCert());
+        LOG.info("SCEP {}: caCert.included={}, signerCert.included={}", this.caName,
+                this.control.isIncludeCaCert(), this.control.isIncludeSignerCert());
     }
 
     /**
@@ -464,8 +464,7 @@ public class Scep {
                         }
                     } else {
                         LOG.warn("tid={}: ignore challengePassword since it does not has the"
-                                + " format <user>:<password>",
-                                tid);
+                                + " format <user>:<password>", tid);
                     }
                 } // end if
 
@@ -476,9 +475,8 @@ public class Scep {
                         throw FailInfoException.BAD_REQUEST;
                     }
                     if (user == null) {
-                        LOG.warn("tid={}: could not extract user and password from"
-                                + " challengePassword, which are required for self-signed"
-                                + " signature certificate",
+                        LOG.warn("tid={}: could not extract user & password from challengePassword"
+                                + ", which are required for self-signed signature certificate",
                             tid);
                         throw FailInfoException.BAD_REQUEST;
                     }
@@ -489,16 +487,11 @@ public class Scep {
                         // certificate via MessageType PKCSReq
                         KnowCertResult knowCertRes = ca.knowsCertificate(reqSignatureCert);
                         if (!knowCertRes.isKnown()) {
-                            LOG.warn("tid={}: signature certiciate is not trusted by the CA",
-                                    tid);
+                            LOG.warn("tid={}: signature certiciate is not trusted by the CA", tid);
                             throw FailInfoException.BAD_REQUEST;
                         }
                         user = knowCertRes.getUser();
-                        audit(auditEvent,
-                                "user",
-                                (user == null)
-                                    ? "null"
-                                    : user);
+                        audit(auditEvent, "user", (user == null) ? "null" : user);
                     } // end if
 
                     // only the same subject is permitted
@@ -519,16 +512,11 @@ public class Scep {
                 byte[] tidBytes = getTransactionIdBytes(tid);
 
                 Extensions extensions = CaUtil.getExtensions(p10ReqInfo);
-                CertTemplateData certTemplateData = new CertTemplateData(
-                        p10ReqInfo.getSubject(), p10ReqInfo.getSubjectPublicKeyInfo(),
-                        (Date) null, (Date) null, extensions, certProfileName);
-                X509CertificateInfo cert = ca.generateCertificate(
-                        certTemplateData,
-                        true,
-                        null,
-                        user,
-                        RequestType.SCEP,
-                        tidBytes);
+                CertTemplateData certTemplateData = new CertTemplateData(p10ReqInfo.getSubject(),
+                        p10ReqInfo.getSubjectPublicKeyInfo(), (Date) null, (Date) null, extensions,
+                        certProfileName);
+                X509CertificateInfo cert = ca.generateCertificate(certTemplateData, true, null,
+                        user, RequestType.SCEP, tidBytes);
 
                 if (auditEvent != null) {
                     audit(auditEvent, "subject", cert.getCert().getSubject());
@@ -666,12 +654,8 @@ public class Scep {
                 request.getDigestAlgorithm());
         ContentInfo ci;
         try {
-            X509Certificate[] cmsCertSet;
-            if (control.isIncludeSignerCert()) {
-                cmsCertSet = new X509Certificate[]{responderCert};
-            } else {
-                cmsCertSet = null;
-            }
+            X509Certificate[] cmsCertSet = control.isIncludeSignerCert()
+                    ? new X509Certificate[]{responderCert} : null;
 
             ci = response.encode(responderKey,
                     signatureAlgorithm, responderCert, cmsCertSet,
@@ -755,10 +739,7 @@ public class Scep {
             return;
         }
 
-        audit.addEventData(new AuditEventData(name,
-                (value == null)
-                    ? "null"
-                    : value));
+        audit.addEventData(new AuditEventData(name, (value == null) ? "null" : value));
     } // method audit
 
 }

@@ -214,8 +214,7 @@ public class PkiMessage {
         ASN1EncodableVector vec = new ASN1EncodableVector();
         // messageType
         addAttribute(vec, ScepObjectIdentifiers.ID_MESSAGE_TYPE,
-                new DERPrintableString(
-                        Integer.toString(messageType.getCode())));
+                new DERPrintableString(Integer.toString(messageType.getCode())));
 
         // senderNonce
         addAttribute(vec, ScepObjectIdentifiers.ID_SENDER_NONCE,
@@ -228,15 +227,13 @@ public class PkiMessage {
         // failInfo
         if (failInfo != null) {
             addAttribute(vec, ScepObjectIdentifiers.ID_FAILINFO,
-                    new DERPrintableString(
-                            Integer.toString(failInfo.getCode())));
+                    new DERPrintableString(Integer.toString(failInfo.getCode())));
         }
 
         // pkiStatus
         if (pkiStatus != null) {
             addAttribute(vec, ScepObjectIdentifiers.ID_PKI_STATUS,
-                    new DERPrintableString(
-                            Integer.toString(pkiStatus.getCode())));
+                    new DERPrintableString(Integer.toString(pkiStatus.getCode())));
         }
 
         // recipientNonce
@@ -296,8 +293,7 @@ public class PkiMessage {
             } catch (IOException ex) {
                 throw new MessageEncodingException(ex);
             }
-            content = new CMSProcessableByteArray(
-                    CMSObjectIdentifiers.envelopedData, encoded);
+            content = new CMSProcessableByteArray(CMSObjectIdentifiers.envelopedData, encoded);
         }
 
         try {

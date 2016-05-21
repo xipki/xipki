@@ -77,10 +77,8 @@ public class GetCrlCmd extends ClientCommandSupport {
     protected Object doExecute() throws Exception {
         X509Certificate cert = X509Util.parseCert(new File(certFile));
         Client client = getScepClient();
-        X509CRL crl = client.getRevocationList(getIdentityCert(),
-                getIdentityKey(),
-                cert.getIssuerX500Principal(),
-                cert.getSerialNumber());
+        X509CRL crl = client.getRevocationList(getIdentityCert(), getIdentityKey(),
+                cert.getIssuerX500Principal(), cert.getSerialNumber());
         if (crl == null) {
             throw new CmdFailure("received no CRL from server");
         }

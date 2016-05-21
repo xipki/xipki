@@ -77,9 +77,7 @@ public class ProfileInfoCmd extends CaCommandSupport {
             int size = names.size();
 
             if (size == 0 || size == 1) {
-                sb.append((size == 0)
-                        ? "no"
-                        : "1");
+                sb.append((size == 0) ? "no" : "1");
                 sb.append(" profile is configured\n");
             } else {
                 sb.append(size).append(" profiles are configured:\n");

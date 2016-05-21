@@ -138,9 +138,7 @@ public class OcspQa {
         issue = new ValidationIssue("OCSP.RESPONSES.NUM", "number of single responses");
         resultIssues.add(issue);
 
-        final int n = (singleResponses == null)
-                ? 0
-                : singleResponses.length;
+        final int n = (singleResponses == null) ? 0 : singleResponses.length;
         if (n == 0) {
             issue.setFailureMessage("received no status from server");
         } else if (n != serialNumbers.size()) {
@@ -214,8 +212,7 @@ public class OcspQa {
                 if (!issue.isFailed() && respIssuer != null) {
                     X509Certificate jceRespSigner;
                     try {
-                        jceRespSigner = new X509CertificateObject(
-                                respSigner.toASN1Structure());
+                        jceRespSigner = new X509CertificateObject(respSigner.toASN1Structure());
                         if (X509Util.issues(respIssuer, jceRespSigner)) {
                             jceRespSigner.verify(respIssuer.getPublicKey());
                         } else {
@@ -259,12 +256,10 @@ public class OcspQa {
                 encodedCert = encodedCerts.get(serialNumber);
             }
 
-            List<ValidationIssue> issues = checkSingleCert(
-                    i, singleResp, issuerHash,
+            List<ValidationIssue> issues = checkSingleCert(i, singleResp, issuerHash,
                     expectedStatus, encodedCert, extendedRevoke,
                     responseOption.getNextUpdateOccurrence(),
-                    responseOption.getCerthashOccurrence(),
-                    responseOption.getCerthashAlgId());
+                    responseOption.getCerthashOccurrence(), responseOption.getCerthashAlgId());
             resultIssues.addAll(issues);
         } // end for
 
@@ -295,8 +290,7 @@ public class OcspQa {
         }
 
         // status
-        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".STATUS",
-                "certificate status");
+        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".STATUS", "certificate status");
         issues.add(issue);
 
         CertificateStatus singleCertStatus = singleResp.getCertStatus();
@@ -310,8 +304,7 @@ public class OcspQa {
 
             if (revStatus.hasRevocationReason()) {
                 int reason = revStatus.getRevocationReason();
-                if (extendedRevoke
-                        && reason == CrlReason.CERTIFICATE_HOLD.getCode()
+                if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.getCode()
                         && revTime.getTime() == 0) {
                     status = OcspCertStatus.unknown;
                 } else {
@@ -365,8 +358,7 @@ public class OcspQa {
 
         // nextUpdate
         Date nextUpdate = singleResp.getNextUpdate();
-        checkOccurrence("OCSP.RESPONSE." + index + ".NEXTUPDATE", nextUpdate,
-                nextupdateOccurrence);
+        checkOccurrence("OCSP.RESPONSE." + index + ".NEXTUPDATE", nextUpdate, nextupdateOccurrence);
 
         Extension extension = singleResp.getExtension(
                 ISISMTTObjectIdentifiers.id_isismtt_at_certHash);

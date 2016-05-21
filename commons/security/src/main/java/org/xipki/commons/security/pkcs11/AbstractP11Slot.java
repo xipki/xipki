@@ -116,19 +116,8 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     protected static String getDescription(final byte[] keyId, final char[] keyLabel) {
         StringBuilder sb = new StringBuilder();
-        sb.append("id ");
-        if (keyId == null) {
-            sb.append("null");
-        } else {
-            sb.append(Hex.toHexString(keyId));
-        }
-
-        sb.append(" and label ");
-        if (keyLabel == null) {
-            sb.append("null");
-        } else {
-            sb.append(new String(keyLabel));
-        }
+        sb.append("id ").append((keyId == null) ? "null" : Hex.toHexString(keyId));
+        sb.append(" and label ").append((keyLabel == null) ? "null" : new String(keyLabel));
         return sb.toString();
     }
 

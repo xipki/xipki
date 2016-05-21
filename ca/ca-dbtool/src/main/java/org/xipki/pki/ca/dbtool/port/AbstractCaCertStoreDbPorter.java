@@ -71,7 +71,6 @@ class AbstractCaCertStoreDbPorter extends DbPorter {
 
         this.crlsDir = super.baseDir + File.separator + CRLS_DIRNAME;
         this.crlsListFile = super.baseDir + File.separator + CRLS_MANIFEST_FILENAME;
-
         this.usersDir = super.baseDir + File.separator + USERS_DIRNAME;
         this.usersListFile = super.baseDir + File.separator + USERS_MANIFEST_FILENAME;
     }

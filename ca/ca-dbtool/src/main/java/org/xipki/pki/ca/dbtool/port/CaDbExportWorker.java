@@ -146,9 +146,9 @@ public class CaDbExportWorker extends DbPortWorker {
             }
 
             // CertStore
-            CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
-                    datasource, marshaller, unmarshaller, destFolder,
-                    numCertsInBundle, numCertsPerSelect, resume, stopMe, evaluateOnly);
+            CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(datasource,
+                    marshaller, unmarshaller, destFolder, numCertsInBundle, numCertsPerSelect,
+                    resume, stopMe, evaluateOnly);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         } finally {

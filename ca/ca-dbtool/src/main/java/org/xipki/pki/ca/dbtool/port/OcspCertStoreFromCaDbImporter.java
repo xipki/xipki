@@ -224,12 +224,9 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                 profileMap.put(ni.getId(), ni.getName());
             }
 
-            List<Integer> relatedCaIds;
-            if (resume) {
-                relatedCaIds = getIssuerIds(certstore.getCas(), relatedCas);
-            } else {
-                relatedCaIds = importIssuer(certstore.getCas(), relatedCas);
-            }
+            List<Integer> relatedCaIds = resume
+                ? getIssuerIds(certstore.getCas(), relatedCas)
+                : importIssuer(certstore.getCas(), relatedCas);
 
             File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
             importCert(certstore, profileMap, revokedOnly, relatedCaIds, processLogFile);
@@ -326,34 +323,20 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
             int idx = 1;
             ps.setInt(idx++, issuer.getId());
-            ps.setString(idx++,
-                    X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
-            ps.setLong(idx++,
-                    cert.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
-            ps.setLong(idx++,
-                    cert.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-            ps.setString(idx++,
-                    HashAlgoType.SHA1.base64Hash(encodedName));
-            ps.setString(idx++,
-                    HashAlgoType.SHA1.base64Hash(encodedKey));
-            ps.setString(idx++,
-                    HashAlgoType.SHA224.base64Hash(encodedName));
-            ps.setString(idx++,
-                    HashAlgoType.SHA224.base64Hash(encodedKey));
-            ps.setString(idx++,
-                    HashAlgoType.SHA256.base64Hash(encodedName));
-            ps.setString(idx++,
-                    HashAlgoType.SHA256.base64Hash(encodedKey));
-            ps.setString(idx++,
-                    HashAlgoType.SHA384.base64Hash(encodedName));
-            ps.setString(idx++,
-                    HashAlgoType.SHA384.base64Hash(encodedKey));
-            ps.setString(idx++,
-                    HashAlgoType.SHA512.base64Hash(encodedName));
-            ps.setString(idx++,
-                    HashAlgoType.SHA512.base64Hash(encodedKey));
-            ps.setString(idx++,
-                    HashAlgoType.SHA1.base64Hash(encodedCert));
+            ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
+            ps.setLong(idx++, cert.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+            ps.setLong(idx++, cert.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
+            ps.setString(idx++, HashAlgoType.SHA1.base64Hash(encodedName));
+            ps.setString(idx++, HashAlgoType.SHA1.base64Hash(encodedKey));
+            ps.setString(idx++, HashAlgoType.SHA224.base64Hash(encodedName));
+            ps.setString(idx++, HashAlgoType.SHA224.base64Hash(encodedKey));
+            ps.setString(idx++, HashAlgoType.SHA256.base64Hash(encodedName));
+            ps.setString(idx++, HashAlgoType.SHA256.base64Hash(encodedKey));
+            ps.setString(idx++, HashAlgoType.SHA384.base64Hash(encodedName));
+            ps.setString(idx++, HashAlgoType.SHA384.base64Hash(encodedKey));
+            ps.setString(idx++, HashAlgoType.SHA512.base64Hash(encodedName));
+            ps.setString(idx++, HashAlgoType.SHA512.base64Hash(encodedKey));
+            ps.setString(idx++, HashAlgoType.SHA1.base64Hash(encodedCert));
             ps.setString(idx++, b64Cert);
 
             setBoolean(ps, idx++, ca.isRevoked());
@@ -428,13 +411,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                 }
 
                 try {
-                    int lastId = doImportCert(statments,
-                            certsFile, profileMap, revokedOnly, caIds, minId,
-                            processLogFile, processLog, numProcessedBefore, importLog);
+                    int lastId = doImportCert(statments, certsFile, profileMap, revokedOnly, caIds,
+                            minId, processLogFile, processLog, numProcessedBefore, importLog);
                     minId = lastId + 1;
                 } catch (Exception ex) {
-                    System.err.println("\ncould not import certificates from file "
-                            + certsFile + ".\nplease continue with the option '--resume'");
+                    System.err.println("\ncould not import certificates from file " + certsFile
+                            + ".\nplease continue with the option '--resume'");
                     LOG.error("Exception", ex);
                     throw ex;
                 }

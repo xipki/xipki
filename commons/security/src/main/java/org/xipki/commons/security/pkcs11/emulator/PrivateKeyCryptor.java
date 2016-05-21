@@ -94,8 +94,7 @@ class PrivateKeyCryptor {
         PrivateKeyInfo privateKeyInfo;
         synchronized (decryptorProvider) {
             try {
-                privateKeyInfo = encryptedPrivateKeyInfo.decryptPrivateKeyInfo(
-                        decryptorProvider);
+                privateKeyInfo = encryptedPrivateKeyInfo.decryptPrivateKeyInfo(decryptorProvider);
             } catch (PKCSException ex) {
                 throw new P11TokenException(ex.getMessage(), ex);
             }

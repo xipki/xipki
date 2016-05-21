@@ -153,27 +153,19 @@ public class DbPorter extends DbToolBase {
     }
 
     protected String getImportingText() {
-        return evaulateOnly
-                ? "evaluating import "
-                : "importing ";
+        return evaulateOnly ? "evaluating import " : "importing ";
     }
 
     protected String getImportedText() {
-        return evaulateOnly
-                ? " evaluated import "
-                : " imported ";
+        return evaulateOnly ? " evaluated import " : " imported ";
     }
 
     protected String getExportingText() {
-        return evaulateOnly
-                ? "evaluating export "
-                : "exporting ";
+        return evaulateOnly ? "evaluating export " : "exporting ";
     }
 
     protected String getExportedText() {
-        return evaulateOnly
-                ? " evaluated export "
-                : " exported ";
+        return evaulateOnly ? " evaluated export " : " exported ";
     }
 
     public static final Schema retrieveSchema(final String schemaPath) throws JAXBException {
@@ -185,8 +177,7 @@ public class DbPorter extends DbToolBase {
         try {
             return schemaFact.newSchema(schemaUrl);
         } catch (SAXException ex) {
-            throw new JAXBException(
-                    "could not load schemas for the specified classes\nDetails:\n"
+            throw new JAXBException("could not load schemas for the specified classes\nDetails:\n"
                     + ex.getMessage());
         }
     }

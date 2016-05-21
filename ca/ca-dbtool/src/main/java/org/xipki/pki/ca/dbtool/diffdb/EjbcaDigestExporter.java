@@ -37,6 +37,7 @@
 package org.xipki.pki.ca.dbtool.diffdb;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -162,8 +163,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         Exception exception = null;
         try {
             if (tblCertHasId) {
-                EjbcaDigestExportReader certsReader = new EjbcaDigestExportReader(datasource,
-                        cas, numThreads);
+                EjbcaDigestExportReader certsReader = new EjbcaDigestExportReader(datasource, cas,
+                        numThreads);
                 doDigestWithTableId(certsReader, processLog, caEntryContainer, cas);
             } else {
                 doDigestNoTableId(processLog, caEntryContainer, cas);
@@ -294,7 +295,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                     }
 
                     if (caInfo == null) {
-                        LOG.error("FOUND no CA for Cert with fingerprint '{}'", hexCertFp);
+                        LOG.error("found no CA for Cert with fingerprint '{}'", hexCertFp);
                         skippedAccount++;
                         processLog.addNumProcessed(1);
                         continue;
@@ -303,7 +304,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                     String hash = Base64.toBase64String(Hex.decode(hexCertFp));
 
                     String str = rs.getString("serialNumber");
-                    long serial = Long.parseLong(str);
+                    BigInteger serial = new BigInteger(str);
 
                     int status = rs.getInt("status");
                     boolean revoked = (status == EjbcaConstants.CERT_REVOKED
@@ -348,12 +349,10 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         processLog.printTrailer();
 
         StringBuilder sb = new StringBuilder(200);
-        sb.append(" digested ")
-            .append((processLog.getNumProcessed() - skippedAccount))
+        sb.append(" digested ").append((processLog.getNumProcessed() - skippedAccount))
             .append(" certificates");
         if (skippedAccount > 0) {
-            sb.append(", ignored ")
-                .append(skippedAccount)
+            sb.append(", ignored ").append(skippedAccount)
                 .append(" certificates (see log for details)");
         }
         System.out.println(sb.toString());
@@ -369,7 +368,6 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         processLog.printHeader();
 
         List<IdRange> idRanges = new ArrayList<>(numThreads);
-
         boolean interrupted = false;
 
         for (int i = minCertId; i <= maxCertId;) {
@@ -391,8 +389,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
             List<IdentifiedDbDigestEntry> certs = certsReader.readCerts(idRanges);
             for (IdentifiedDbDigestEntry cert : certs) {
-                caEntryContainer.addDigestEntry(cert.getCaId().intValue(),
-                        cert.getId(), cert.getContent());
+                caEntryContainer.addDigestEntry(cert.getCaId().intValue(), cert.getId(),
+                        cert.getContent());
             }
             processLog.addNumProcessed(certs.size());
             processLog.printStatus();
@@ -405,14 +403,11 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         processLog.printTrailer();
 
         StringBuilder sb = new StringBuilder(200);
-        sb.append(" digested ")
-            .append((processLog.getNumProcessed()))
-            .append(" certificates");
+        sb.append(" digested ").append((processLog.getNumProcessed())).append(" certificates");
 
         int skippedAccount = certsReader.getNumSkippedCerts();
         if (skippedAccount > 0) {
-            sb.append(", ignored ")
-                .append(skippedAccount)
+            sb.append(", ignored ").append(skippedAccount)
                 .append(" certificates (see log for details)");
         }
         System.out.println(sb.toString());

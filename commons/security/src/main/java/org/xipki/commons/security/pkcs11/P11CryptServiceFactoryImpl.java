@@ -122,17 +122,11 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     }
 
     private String getModuleName(final String moduleName) {
-        return (moduleName == null)
-                ? DEFAULT_P11MODULE_NAME
-                : moduleName;
+        return (moduleName == null) ? DEFAULT_P11MODULE_NAME : moduleName;
     }
 
     public void setPkcs11ConfFile(final String confFile) {
-        if (StringUtil.isBlank(confFile)) {
-            this.pkcs11ConfFile = null;
-        } else {
-            this.pkcs11ConfFile = confFile;
-        }
+        this.pkcs11ConfFile = StringUtil.isBlank(confFile) ? null : confFile;
     }
 
     public void setPasswordResolver(final PasswordResolver passwordResolver) {

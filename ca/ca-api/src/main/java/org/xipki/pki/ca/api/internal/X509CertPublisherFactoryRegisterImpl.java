@@ -83,9 +83,7 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
         boolean replaced = services.remove(service);
         services.add(service);
 
-        String action = replaced
-                ? "replaced"
-                : "added";
+        String action = replaced ? "replaced" : "added";
         LOG.info("{} X509CertPublisherFactory binding for {}", action, service);
     }
 

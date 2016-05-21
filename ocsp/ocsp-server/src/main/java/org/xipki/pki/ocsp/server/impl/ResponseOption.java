@@ -117,9 +117,7 @@ class ResponseOption {
     }
 
     private static boolean getBoolean(final Boolean bo, final boolean dflt) {
-        return (bo == null)
-                ? dflt
-                : bo.booleanValue();
+        return (bo == null) ? dflt : bo.booleanValue();
     }
 
 }

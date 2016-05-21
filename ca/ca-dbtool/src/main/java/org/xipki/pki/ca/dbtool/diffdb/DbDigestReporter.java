@@ -41,12 +41,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
@@ -113,17 +115,17 @@ public class DbDigestReporter {
         return reportDirname;
     }
 
-    public void addMissing(final long serialNumber) throws IOException {
+    public void addMissing(final BigInteger serialNumber) throws IOException {
         numMissing.incrementAndGet();
         writeSerialNumberLine(missingWriter, serialNumber);
     }
 
-    public void addGood(final long serialNumber) throws IOException {
+    public void addGood(final BigInteger serialNumber) throws IOException {
         numGood.incrementAndGet();
         writeSerialNumberLine(goodWriter, serialNumber);
     }
 
-    public void addUnexpected(final long serialNumber) throws IOException {
+    public void addUnexpected(final BigInteger serialNumber) throws IOException {
         numUnexpected.incrementAndGet();
         writeSerialNumberLine(unexpectedWriter, serialNumber);
     }
@@ -133,14 +135,14 @@ public class DbDigestReporter {
         ParamUtil.requireNonNull("refCert", refCert);
         ParamUtil.requireNonNull("targetCert", targetCert);
 
-        if (refCert.getSerialNumber() != targetCert.getSerialNumber()) {
+        if (refCert.getSerialNumber().equals(targetCert.getSerialNumber())) {
             throw new IllegalArgumentException(
                     "refCert and targetCert do not have the same serialNumber");
         }
 
         numDiff.incrementAndGet();
         StringBuilder sb = new StringBuilder(140);
-        sb.append(refCert.getSerialNumber()).append('\t');
+        sb.append(refCert.getSerialNumber().toString(16)).append('\t');
         sb.append(refCert.getEncodedOmitSeriaNumber()).append('\t');
         sb.append(targetCert.getEncodedOmitSeriaNumber()).append('\n');
         String msg = sb.toString();
@@ -163,7 +165,7 @@ public class DbDigestReporter {
 
     public void addNoCaMatch() throws IOException {
         synchronized (errorWriter) {
-            errorWriter.write("Cound not find corresponding CA in target to diff\n");
+            errorWriter.write("cound not find corresponding CA in target to diff\n");
         }
     }
 
@@ -212,10 +214,11 @@ public class DbDigestReporter {
         }
     } // method close
 
-    private static void writeSerialNumberLine(final BufferedWriter writer, final long serialNumber)
+    private static void writeSerialNumberLine(final BufferedWriter writer,
+            final BigInteger serialNumber)
     throws IOException {
         StringBuilder sb = new StringBuilder();
-        sb.append(serialNumber).append('\n');
+        sb.append(serialNumber.toString(16)).append('\n');
         String msg = sb.toString();
         synchronized (writer) {
             writer.write(msg);
@@ -226,8 +229,7 @@ public class DbDigestReporter {
         try {
             writer.close();
         } catch (Exception ex) {
-            LOG.warn("could not close writer: {}", ex.getMessage());
-            LOG.debug("could not close writer", ex);
+            LogUtil.warn(LOG, ex, "could not close writer");
         }
     }
 

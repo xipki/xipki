@@ -91,15 +91,8 @@ public class DbDigestDiffWorker extends DbPortWorker {
         ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
         this.reportDir = ParamUtil.requireNonBlank("reportDirName", reportDirName);
         this.numThreads = ParamUtil.requireNonNull("numThreads", numThreads);
-
         this.numCertsPerSelect = numCertsPerSelect;
-
-        boolean validRef = false;
-        if (refDirname == null) {
-            validRef = (refDbConfFile != null);
-        } else {
-            validRef = (refDbConfFile == null);
-        }
+        boolean validRef = (refDirname == null) ? (refDbConfFile != null) : (refDbConfFile == null);
 
         if (!validRef) {
             throw new IllegalArgumentException(
@@ -149,14 +142,11 @@ public class DbDigestDiffWorker extends DbPortWorker {
         long start = System.currentTimeMillis();
 
         try {
-            DbDigestDiff diff;
-            if (refDirname != null) {
-                diff = DbDigestDiff.getInstanceForDirRef(refDirname, datasource, reportDir,
+            DbDigestDiff diff = (refDirname != null)
+                ? DbDigestDiff.getInstanceForDirRef(refDirname, datasource, reportDir,
+                        revokedOnly, stopMe, numCertsPerSelect, numThreads)
+                : DbDigestDiff.getInstanceForDbRef(refDatasource, datasource, reportDir,
                         revokedOnly, stopMe, numCertsPerSelect, numThreads);
-            } else {
-                diff = DbDigestDiff.getInstanceForDbRef(refDatasource, datasource, reportDir,
-                        revokedOnly, stopMe, numCertsPerSelect, numThreads);
-            }
             diff.setIncludeCaCerts(includeCaCerts);
             diff.diff();
         } finally {

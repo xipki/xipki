@@ -84,9 +84,7 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
         boolean replaced = services.remove(service);
         services.add(service);
 
-        String action = replaced
-                ? "replaced"
-                : "added";
+        String action = replaced ? "replaced" : "added";
         LOG.info("{} CertStatusStoreFactory binding for {}", action, service);
     }
 

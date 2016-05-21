@@ -92,17 +92,15 @@ class CrlCertStatusInfo {
         case REVOKED:
             byte[] certHash = null;
             if (hashAlgo != null) {
-                certHash = (certHashes == null)
-                        ? null
-                        : certHashes.get(hashAlgo);
+                certHash = (certHashes == null) ? null : certHashes.get(hashAlgo);
             }
 
             if (certStatus == CertStatus.GOOD) {
                 return CertStatusInfo.getGoodCertStatusInfo(hashAlgo, certHash, thisUpdate,
                         nextUpdate, certprofile);
             } else {
-                return CertStatusInfo.getRevokedCertStatusInfo(revocationInfo, hashAlgo,
-                        certHash, thisUpdate, nextUpdate, certprofile);
+                return CertStatusInfo.getRevokedCertStatusInfo(revocationInfo, hashAlgo, certHash,
+                        thisUpdate, nextUpdate, certprofile);
             }
         default:
             throw new RuntimeException("unknown certStatus: " + certStatus);

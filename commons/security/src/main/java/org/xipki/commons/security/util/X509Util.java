@@ -139,9 +139,7 @@ public class X509Util {
             } else {
                 atv = rdn.getFirst();
             }
-            return (atv == null)
-                    ? null
-                    : rdnValueToString(atv.getValue());
+            return (atv == null) ? null : rdnValueToString(atv.getValue());
         }
         return null;
     }
@@ -360,9 +358,7 @@ public class X509Util {
         try {
             AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.fromExtensions(
                     cert.getTBSCertificate().getExtensions());
-            return (aki == null)
-                    ? null
-                    : aki.getKeyIdentifier();
+            return (aki == null) ? null : aki.getKeyIdentifier();
         } catch (IllegalArgumentException ex) {
             throw new CertificateEncodingException("invalid extension AuthorityKeyIdentifier: "
                     + ex.getMessage());
@@ -780,9 +776,7 @@ public class X509Util {
             if (idxSep == -1 || idxSep == value.length() - 1) {
                 throw new BadInputException("invalid ediPartyName " + value);
             }
-            String nameAssigner = (idxSep == 0)
-                    ? null
-                    : value.substring(0, idxSep);
+            String nameAssigner = (idxSep == 0) ? null : value.substring(0, idxSep);
             String partyName = value.substring(idxSep + 1);
             vector = new ASN1EncodableVector();
             if (nameAssigner != null) {

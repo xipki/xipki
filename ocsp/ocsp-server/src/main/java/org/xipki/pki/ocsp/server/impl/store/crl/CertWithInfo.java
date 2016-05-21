@@ -60,9 +60,7 @@ class CertWithInfo {
     }
 
     public void setProfileName(final String profileName) {
-        this.profileName = StringUtil.isBlank(profileName)
-                ? null
-                : profileName;
+        this.profileName = StringUtil.isBlank(profileName) ? null : profileName;
     }
 
     public void setCert(Certificate cert) {

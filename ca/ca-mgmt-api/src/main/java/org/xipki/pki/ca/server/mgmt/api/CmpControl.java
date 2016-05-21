@@ -126,34 +126,23 @@ public class CmpControl {
 
         ConfPairs pairs = new ConfPairs();
 
-        this.confirmCert = (confirmCert == null)
-                ? false
-                : confirmCert;
+        this.confirmCert = (confirmCert == null) ? false : confirmCert;
         pairs.putPair(KEY_CONFIRM_CERT, Boolean.toString(this.confirmCert));
 
-        this.sendCaCert = (sendCaCert == null)
-                ? false
-                : sendCaCert;
+        this.sendCaCert = (sendCaCert == null) ? false : sendCaCert;
         pairs.putPair(KEY_SEND_CA, Boolean.toString(this.sendCaCert));
 
-        this.messageTimeRequired = (messageTimeRequired == null)
-                ? true
-                : messageTimeRequired;
+        this.messageTimeRequired = (messageTimeRequired == null) ? true : messageTimeRequired;
         pairs.putPair(KEY_MESSAGETIME_REQUIRED, Boolean.toString(this.messageTimeRequired));
 
-        this.sendResponderCert = (sendResponderCert == null)
-                ? true
+        this.sendResponderCert = (sendResponderCert == null) ? true
                 : sendResponderCert.booleanValue();
         pairs.putPair(KEY_SEND_RESPONDER, Boolean.toString(this.sendResponderCert));
 
-        this.messageTimeBias = (messageTimeBias == null)
-                ? DFLT_MESSAGE_TIME_BIAS
-                : messageTimeBias;
+        this.messageTimeBias = (messageTimeBias == null) ? DFLT_MESSAGE_TIME_BIAS : messageTimeBias;
         pairs.putPair(KEY_MESSAGETIME_BIAS, Integer.toString(this.messageTimeBias));
 
-        this.confirmWaitTime = (confirmWaitTime == null)
-                ? DFLT_CONFIRM_WAIT_TIME
-                : confirmWaitTime;
+        this.confirmWaitTime = (confirmWaitTime == null) ? DFLT_CONFIRM_WAIT_TIME : confirmWaitTime;
         pairs.putPair(KEY_CONFIRM_WAITTIME, Integer.toString(this.confirmWaitTime));
 
         if (CollectionUtil.isEmpty(sigAlgos)) {
@@ -249,26 +238,20 @@ public class CmpControl {
     private static boolean getBoolean(final ConfPairs pairs, final String key,
             final boolean defaultValue) {
         String str = pairs.getValue(key);
-        boolean ret = StringUtil.isBlank(str)
-                ? defaultValue
-                : Boolean.parseBoolean(str);
+        boolean ret = StringUtil.isBlank(str) ? defaultValue : Boolean.parseBoolean(str);
         pairs.putPair(key, Boolean.toString(ret));
         return ret;
     }
 
     private static int getInt(final ConfPairs pairs, final String key, final int defaultValue) {
         String str = pairs.getValue(key);
-        int ret = StringUtil.isBlank(str)
-                ? defaultValue
-                : Integer.parseInt(str);
+        int ret = StringUtil.isBlank(str) ? defaultValue : Integer.parseInt(str);
         pairs.putPair(key, Integer.toString(ret));
         return ret;
     }
 
     private static String getYesNo(boolean bo) {
-        return bo
-                ? "yes"
-                : "no";
+        return bo ? "yes" : "no";
     }
 
 }

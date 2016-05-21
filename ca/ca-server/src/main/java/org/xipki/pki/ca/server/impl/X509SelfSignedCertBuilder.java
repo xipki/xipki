@@ -272,16 +272,10 @@ class X509SelfSignedCertBuilder {
 
         X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
-        X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-                grantedSubject,
-                serialNumber,
-                notBefore,
-                notAfter,
-                grantedSubject,
-                tmpPublicKeyInfo);
+        X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(grantedSubject,
+                serialNumber, notBefore, notAfter, grantedSubject, tmpPublicKeyInfo);
 
-        PublicCaInfo publicCaInfo = new PublicCaInfo(
-                grantedSubject, serialNumber, null, null,
+        PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject, serialNumber, null, null,
                 cacertUris, ocspUris, crlUris, deltaCrlUris);
 
         Extensions extensions = null;
@@ -316,9 +310,8 @@ class X509SelfSignedCertBuilder {
             final Extensions extensions, final SubjectPublicKeyInfo requestedPublicKeyInfo,
             final PublicCaInfo publicCaInfo, final Date notBefore, final Date notAfter)
     throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException {
-        ExtensionValues extensionTuples = profile.getExtensions(
-                requestedSubject, extensions, requestedPublicKeyInfo,
-                publicCaInfo, null, notBefore, notAfter);
+        ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, extensions,
+                requestedPublicKeyInfo, publicCaInfo, null, notBefore, notAfter);
         if (extensionTuples == null) {
             return;
         }

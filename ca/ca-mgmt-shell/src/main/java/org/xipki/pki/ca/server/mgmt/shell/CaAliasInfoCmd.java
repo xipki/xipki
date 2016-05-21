@@ -72,9 +72,7 @@ public class CaAliasInfoCmd extends CaCommandSupport {
             int size = aliasNames.size();
 
             if (size == 0 || size == 1) {
-                sb.append((size == 0)
-                        ? "no"
-                        : "1");
+                sb.append((size == 0) ? "no" : "1");
                 sb.append(" CA alias is configured\n");
             } else {
                 sb.append(size).append(" CA aliases are configured:\n");

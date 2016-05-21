@@ -316,11 +316,7 @@ public class CaUpdateCmd extends CaCommandSupport {
             }
         }
 
-        if (clearUris) {
-            return Collections.emptyList();
-        } else {
-            return new ArrayList<>(uris);
-        }
+        return clearUris ? Collections.emptyList() : new ArrayList<>(uris);
     }
 
 }

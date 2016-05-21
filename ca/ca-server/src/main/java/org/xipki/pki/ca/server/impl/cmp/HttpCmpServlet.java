@@ -93,14 +93,10 @@ public class HttpCmpServlet extends HttpServlet {
     throws ServletException, IOException {
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
                 "javax.servlet.request.X509Certificate");
-        X509Certificate clientCert = (certs == null || certs.length < 1)
-                ? null
-                : certs[0];
+        X509Certificate clientCert = (certs == null || certs.length < 1) ? null : certs[0];
 
         AuditService auditService = auditServiceRegister.getAuditService();
-        AuditEvent auditEvent = (auditService != null)
-                ? new AuditEvent(new Date())
-                : null;
+        AuditEvent auditEvent = (auditService == null) ? null : new AuditEvent(new Date());
         if (auditEvent != null) {
             auditEvent.setApplicationName("CA");
             auditEvent.setName("PERF");
@@ -115,7 +111,6 @@ public class HttpCmpServlet extends HttpServlet {
                 LOG.error(message);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);
-
                 auditLevel = AuditLevel.ERROR;
                 auditStatus = AuditStatus.FAILED;
                 auditMessage = message;
@@ -125,7 +120,6 @@ public class HttpCmpServlet extends HttpServlet {
             if (!CT_REQUEST.equalsIgnoreCase(request.getContentType())) {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-
                 auditStatus = AuditStatus.FAILED;
                 auditMessage = "unsupported media type " + request.getContentType();
                 return;
@@ -175,10 +169,8 @@ public class HttpCmpServlet extends HttpServlet {
             } catch (Exception ex) {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
                 auditStatus = AuditStatus.FAILED;
                 auditMessage = "bad request";
-
                 LogUtil.error(LOG, ex, "could not parse the request (PKIMessage)");
                 return;
             }
@@ -187,13 +179,11 @@ public class HttpCmpServlet extends HttpServlet {
             ASN1OctetString tid = reqHeader.getTransactionID();
 
             PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
-                    reqHeader.getPvno().getValue().intValue(),
-                    reqHeader.getRecipient(),
+                    reqHeader.getPvno().getValue().intValue(), reqHeader.getRecipient(),
                     reqHeader.getSender());
             respHeader.setTransactionID(tid);
 
             PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, auditEvent);
-
             response.setContentType(HttpCmpServlet.CT_RESPONSE);
             response.setStatus(HttpServletResponse.SC_OK);
             ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());

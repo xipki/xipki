@@ -62,11 +62,8 @@ public class KeyParametersOption {
         }
 
         public void setModulusLengths(final Set<Range> modulusLengths) {
-            if (CollectionUtil.isEmpty(modulusLengths)) {
-                this.modulusLengths = null;
-            } else {
-                this.modulusLengths = new HashSet<>(modulusLengths);
-            }
+            this.modulusLengths = (CollectionUtil.isEmpty(modulusLengths)) ? null
+                    : new HashSet<>(modulusLengths);
         }
 
         public boolean allowsModulusLength(final int modulusLength) {
@@ -99,67 +96,38 @@ public class KeyParametersOption {
         }
 
         public void setHashAlgs(final Set<ASN1ObjectIdentifier> hashAlgs) {
-            if (CollectionUtil.isEmpty(hashAlgs)) {
-                this.hashAlgs = null;
-            } else {
-                this.hashAlgs = new HashSet<>(hashAlgs);
-            }
+            this.hashAlgs = CollectionUtil.isEmpty(hashAlgs) ? null : new HashSet<>(hashAlgs);
         }
 
         public void setMaskGenAlgs(final Set<ASN1ObjectIdentifier> maskGenAlgs) {
-            if (CollectionUtil.isEmpty(maskGenAlgs)) {
-                this.maskGenAlgs = null;
-            } else {
-                this.maskGenAlgs = new HashSet<>(maskGenAlgs);
-            }
+            this.maskGenAlgs = CollectionUtil.isEmpty(maskGenAlgs) ? null
+                    : new HashSet<>(maskGenAlgs);
         }
 
         public void setSaltLengths(final Set<Integer> saltLengths) {
-            if (CollectionUtil.isEmpty(saltLengths)) {
-                this.saltLengths = null;
-            } else {
-                this.saltLengths = new HashSet<>(saltLengths);
-            }
+            this.saltLengths = CollectionUtil.isEmpty(saltLengths) ? null
+                    : new HashSet<>(saltLengths);
         }
 
         public void setTrailerFields(final Set<Integer> trailerFields) {
-            if (CollectionUtil.isEmpty(trailerFields)) {
-                this.trailerFields = null;
-            } else {
-                this.trailerFields = new HashSet<>(trailerFields);
-            }
+            this.trailerFields = CollectionUtil.isEmpty(trailerFields) ? null
+                    : new HashSet<>(trailerFields);
         }
 
         public boolean allowsHashAlg(final ASN1ObjectIdentifier hashAlg) {
-            if (hashAlgs == null) {
-                return true;
-            }
-
-            return hashAlgs.contains(hashAlg);
+            return (hashAlgs == null) ? true : hashAlgs.contains(hashAlg);
         }
 
         public boolean allowsMaskGenAlg(final ASN1ObjectIdentifier maskGenAlg) {
-            if (maskGenAlgs == null) {
-                return true;
-            }
-
-            return maskGenAlgs.contains(maskGenAlg);
+            return (maskGenAlgs == null) ? true : maskGenAlgs.contains(maskGenAlg);
         }
 
         public boolean allowsSaltLength(final int saltLength) {
-            if (saltLengths == null) {
-                return true;
-            }
-
-            return saltLengths.contains(saltLength);
+            return (saltLengths == null) ? true : saltLengths.contains(saltLength);
         }
 
         public boolean allowsTrailerField(final int trailerField) {
-            if (trailerFields == null) {
-                return true;
-            }
-
-            return trailerFields.contains(trailerField);
+            return (trailerFields == null) ? true : trailerFields.contains(trailerField);
         }
 
     } // class RSAPSSParametersOption
@@ -175,19 +143,11 @@ public class KeyParametersOption {
         }
 
         public void setPlengths(final Set<Range> plengths) {
-            if (CollectionUtil.isEmpty(plengths)) {
-                this.plengths = null;
-            } else {
-                this.plengths = new HashSet<>(plengths);
-            }
+            this.plengths = CollectionUtil.isEmpty(plengths) ? null : new HashSet<>(plengths);
         }
 
         public void setQlengths(final Set<Range> qlengths) {
-            if (CollectionUtil.isEmpty(qlengths)) {
-                this.qlengths = null;
-            } else {
-                this.qlengths = new HashSet<>(qlengths);
-            }
+            this.qlengths = CollectionUtil.isEmpty(qlengths) ? null : new HashSet<>(qlengths);
         }
 
         public boolean allowsPlength(final int plength) {
@@ -281,19 +241,13 @@ public class KeyParametersOption {
         }
 
         public void setDigestParamSets(final Set<ASN1ObjectIdentifier> digestParamSets) {
-            if (CollectionUtil.isEmpty(digestParamSets)) {
-                this.digestParamSets = null;
-            } else {
-                this.digestParamSets = new HashSet<>(digestParamSets);
-            }
+            this.digestParamSets = CollectionUtil.isEmpty(digestParamSets) ? null
+                    : new HashSet<>(digestParamSets);
         }
 
         public void setEncryptionParamSets(final Set<ASN1ObjectIdentifier> encryptionParamSets) {
-            if (CollectionUtil.isEmpty(encryptionParamSets)) {
-                this.encryptionParamSets = null;
-            } else {
-                this.encryptionParamSets = new HashSet<>(encryptionParamSets);
-            }
+            this.encryptionParamSets =  CollectionUtil.isEmpty(encryptionParamSets) ? null
+                    : new HashSet<>(encryptionParamSets);
         }
 
         public boolean allowsPublicKeyParamSet(final ASN1ObjectIdentifier oid) {

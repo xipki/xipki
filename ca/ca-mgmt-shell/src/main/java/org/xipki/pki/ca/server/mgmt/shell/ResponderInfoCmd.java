@@ -77,10 +77,7 @@ public class ResponderInfoCmd extends CaCommandSupport {
             int size = names.size();
 
             if (size == 0 || size == 1) {
-                sb.append((size == 0)
-                        ? "no"
-                        : "1");
-                sb.append(" responder is configured\n");
+                sb.append((size == 0) ? "no" : "1").append(" responder is configured\n");
             } else {
                 sb.append(size).append(" responders are configured:\n");
             }

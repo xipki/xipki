@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.dbtool.diffdb.io;
 
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -62,6 +63,7 @@ import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.IdRange;
+import org.xipki.pki.ca.dbtool.diffdb.EjbcaConstants;
 
 /**
  * @author Lijun Liao
@@ -160,10 +162,11 @@ public class EjbcaDigestExportReader {
                     String hash = Base64.toBase64String(Hex.decode(hexCertFp));
 
                     String str = rs.getString("serialNumber");
-                    long serial = Long.parseLong(str);
+                    BigInteger serial = new BigInteger(str); // decimal
 
                     int status = rs.getInt("status");
-                    boolean revoked = (status == 40);
+                    boolean revoked = (status == EjbcaConstants.CERT_REVOKED
+                            || status == EjbcaConstants.CERT_TEMP_REVOKED);
 
                     Integer revReason = null;
                     Long revTime = null;

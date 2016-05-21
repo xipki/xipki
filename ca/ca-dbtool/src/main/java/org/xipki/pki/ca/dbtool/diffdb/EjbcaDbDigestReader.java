@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.dbtool.diffdb;
 
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -78,8 +79,8 @@ public class EjbcaDbDigestReader extends DbDigestReader {
     private EjbcaDbDigestReader(final DataSourceWrapper datasource, final X509Certificate caCert,
             final int totalAccount, final int minId, final int maxId, final int numThreads,
             final int caId, final int numCertsToPredicate, final StopMe stopMe) throws Exception {
-        super(datasource, caCert, totalAccount, minId, maxId, numThreads,
-                numCertsToPredicate, stopMe);
+        super(datasource, caCert, totalAccount, minId, maxId, numThreads, numCertsToPredicate,
+                stopMe);
 
         this.caId = caId;
         this.caFingerprint = HashAlgoType.SHA1.hexHash(caCert.getEncoded()).toLowerCase();
@@ -171,7 +172,8 @@ public class EjbcaDbDigestReader extends DbDigestReader {
                         continue;
                     }
 
-                    long serial = rs.getLong("serialNumber");
+                    String serialStr = rs.getString("serialNumber");
+                    BigInteger serial = new BigInteger(serialStr);
                     int status = rs.getInt("status");
                     boolean revoked = (status == EjbcaConstants.CERT_REVOKED
                             || status == EjbcaConstants.CERT_TEMP_REVOKED);
@@ -250,25 +252,19 @@ public class EjbcaDbDigestReader extends DbDigestReader {
             } else {
                 sql = "SELECT COUNT(*) FROM CertificateData";
                 rs = stmt.executeQuery(sql);
-                totalAccount = rs.next()
-                        ? rs.getInt(1)
-                        : 0;
+                totalAccount = rs.next() ? rs.getInt(1) : 0;
                 rs.close();
             }
 
             // maxId
             sql = "SELECT MAX(id) FROM CertificateData";
             rs = stmt.executeQuery(sql);
-            maxId = rs.next()
-                    ? rs.getInt(1)
-                    : 0;
+            maxId = rs.next() ? rs.getInt(1) : 0;
             rs.close();
 
             sql = "SELECT MIN(id) FROM CertificateData";
             rs = stmt.executeQuery(sql);
-            minId = rs.next()
-                    ? rs.getInt(1)
-                    : 1;
+            minId = rs.next() ? rs.getInt(1) : 1;
 
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);

@@ -84,8 +84,8 @@ public class CaPublisherCheckCmd extends CaCommandSupport {
         List<PublisherEntry> entries = caManager.getPublishersForCa(caName);
         for (PublisherEntry m : entries) {
             if (m.getName().equals(publisherName)) {
-                println(" checked CA publisher CA='" + caName
-                        + "', publisher='" + publisherName + "'");
+                println(" checked CA publisher CA='" + caName + "', publisher='" + publisherName
+                        + "'");
                 return null;
             }
         }

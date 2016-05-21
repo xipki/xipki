@@ -171,7 +171,7 @@ class CaManagerQueryExecutor {
     } // method prepareStatement
 
     SystemEvent getSystemEvent(final String eventName) throws CaMgmtException {
-        final String sql = "SELECT EVENT_TIME, EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?";
+        final String sql = "SELECT EVENT_TIME,EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?";
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -212,8 +212,8 @@ class CaManagerQueryExecutor {
     } // method deleteSystemEvent
 
     void addSystemEvent(final SystemEvent systemEvent) throws CaMgmtException {
-        final String sql = "INSERT INTO SYSTEM_EVENT (NAME, EVENT_TIME, EVENT_TIME2, EVENT_OWNER)"
-                + " VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO SYSTEM_EVENT (NAME,EVENT_TIME,EVENT_TIME2,EVENT_OWNER)"
+                + " VALUES (?,?,?,?)";
 
         PreparedStatement ps = null;
         try {
@@ -239,7 +239,7 @@ class CaManagerQueryExecutor {
 
     Map<String, String> createEnvParameters() throws CaMgmtException {
         Map<String, String> map = new HashMap<>();
-        final String sql = "SELECT NAME, VALUE2 FROM ENVIRONMENT";
+        final String sql = "SELECT NAME,VALUE2 FROM ENVIRONMENT";
         Statement stmt = null;
         ResultSet rs = null;
 
@@ -265,7 +265,7 @@ class CaManagerQueryExecutor {
     Map<String, String> createCaAliases() throws CaMgmtException {
         Map<String, String> map = new HashMap<>();
 
-        final String sql = "SELECT NAME, CA_NAME FROM CAALIAS";
+        final String sql = "SELECT NAME,CA_NAME FROM CAALIAS";
         Statement stmt = null;
         ResultSet rs = null;
 
@@ -291,7 +291,7 @@ class CaManagerQueryExecutor {
     CertprofileEntry createCertprofile(final String name) throws CaMgmtException {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        final String sql = "TYPE, CONF FROM PROFILE WHERE NAME=?";
+        final String sql = "TYPE,CONF FROM PROFILE WHERE NAME=?";
         try {
             stmt = prepareFetchFirstStatement(sql);
             stmt.setString(1, name);
@@ -346,7 +346,7 @@ class CaManagerQueryExecutor {
     } // method getNamesFromTable
 
     PublisherEntry createPublisher(final String name) throws CaMgmtException {
-        final String sql = "TYPE, CONF FROM PUBLISHER WHERE NAME=?";
+        final String sql = "TYPE,CONF FROM PUBLISHER WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -395,7 +395,7 @@ class CaManagerQueryExecutor {
 
     X509CrlSignerEntry createCrlSigner(final String name) throws CaMgmtException {
         final String sql =
-                "SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL, SIGNER_CONF FROM CRLSIGNER WHERE NAME=?";
+                "SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,SIGNER_CONF FROM CRLSIGNER WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -412,8 +412,7 @@ class CaManagerQueryExecutor {
             String signerConf = rs.getString("SIGNER_CONF");
             String signerCert = rs.getString("SIGNER_CERT");
             String crlControlConf = rs.getString("CRL_CONTROL");
-            return new X509CrlSignerEntry(name, signerType, signerConf, signerCert,
-                    crlControlConf);
+            return new X509CrlSignerEntry(name, signerType, signerConf, signerCert, crlControlConf);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -449,7 +448,7 @@ class CaManagerQueryExecutor {
     } // method createCmpControl
 
     CmpResponderEntry createResponder(final String name) throws CaMgmtException {
-        final String sql = "TYPE, CERT, CONF FROM RESPONDER WHERE NAME=?";
+        final String sql = "TYPE,CERT,CONF FROM RESPONDER WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -476,12 +475,11 @@ class CaManagerQueryExecutor {
 
     X509CaInfo createCaInfo(final String name, final boolean masterMode,
             final CertificateStore certstore) throws CaMgmtException {
-        final String sql = "NAME, ART, SN_SIZE, NEXT_CRLNO, STATUS, MAX_VALIDITY"
-                + ", CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME"
-                + ", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS"
-                + ", KEEP_EXPIRED_CERT_DAYS, EXPIRATION_PERIOD, REV, RR, RT, RIT, VALIDITY_MODE"
-                + ", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, EXTRA_CONTROL, SIGNER_CONF"
-                + " FROM CA WHERE NAME=?";
+        final String sql = "NAME,ART,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
+                + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT"
+                + ",PERMISSIONS,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,EXPIRATION_PERIOD,REV,RR,RT,RIT"
+                + ",VALIDITY_MODE,CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,EXTRA_CONTROL"
+                + ",SIGNER_CONF FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -508,8 +506,7 @@ class CaManagerQueryExecutor {
                 int revReason = rs.getInt("RR");
                 long revTime = rs.getInt("RT");
                 long revInvalidityTime = rs.getInt("RIT");
-                Date revInvTime = (revInvalidityTime == 0)
-                        ? null
+                Date revInvTime = (revInvalidityTime == 0) ? null
                         : new Date(revInvalidityTime * 1000);
                 revocationInfo = new CertRevocationInfo(revReason, new Date(revTime * 1000),
                         revInvTime);
@@ -547,8 +544,8 @@ class CaManagerQueryExecutor {
             int numCrls = rs.getInt("NUM_CRLS");
             int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
 
-            X509CaEntry entry = new X509CaEntry(name, serialNoSize, nextCrlNo,
-                    signerType, signerConf, caUris, numCrls, expirationPeriod);
+            X509CaEntry entry = new X509CaEntry(name, serialNoSize, nextCrlNo, signerType,
+                    signerConf, caUris, numCrls, expirationPeriod);
             String b64cert = rs.getString("CERT");
             X509Certificate cert = generateCert(b64cert);
             entry.setCertificate(cert);
@@ -627,8 +624,8 @@ class CaManagerQueryExecutor {
     } // method createCaInfo
 
     Set<CaHasRequestorEntry> createCaHasRequestors(final String caName) throws CaMgmtException {
-        final String sql = "SELECT REQUESTOR_NAME, RA, PERMISSIONS, "
-                + "PROFILES FROM CA_HAS_REQUESTOR WHERE CA_NAME=?";
+        final String sql = "SELECT REQUESTOR_NAME,RA,PERMISSIONS,PROFILES FROM CA_HAS_REQUESTOR"
+                + " WHERE CA_NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -645,9 +642,7 @@ class CaManagerQueryExecutor {
 
                 str = rs.getString("PROFILES");
                 List<String> list = StringUtil.split(str, ",");
-                Set<String> profiles = (list == null)
-                        ? null
-                        : new HashSet<>(list);
+                Set<String> profiles = (list == null) ? null : new HashSet<>(list);
                 CaHasRequestorEntry entry = new CaHasRequestorEntry(requestorName);
                 entry.setRa(ra);
                 entry.setPermissions(permissions);
@@ -666,9 +661,7 @@ class CaManagerQueryExecutor {
     } // method createCaHasRequestors
 
     Set<String> createCaHasProfiles(final String caName) throws CaMgmtException {
-        final String sql = new StringBuilder("SELECT PROFILE_NAME")
-                .append(" FROM CA_HAS_PROFILE")
-                .append(" WHERE CA_NAME=?").toString();
+        final String sql = "SELECT PROFILE_NAME FROM CA_HAS_PROFILE WHERE CA_NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -722,8 +715,7 @@ class CaManagerQueryExecutor {
     } // method createCaHasNames
 
     boolean deleteRowWithName(final String name, final String table) throws CaMgmtException {
-        final String sql = new StringBuilder("DELETE FROM ")
-                .append(table)
+        final String sql = new StringBuilder("DELETE FROM ").append(table)
                 .append(" WHERE NAME=?").toString();
         PreparedStatement ps = null;
         try {
@@ -762,16 +754,12 @@ class CaManagerQueryExecutor {
         String name = entry.getName();
 
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CA (");
-        sqlBuilder.append("NAME, ART, SUBJECT, SN_SIZE, NEXT_CRLNO, STATUS");
-        sqlBuilder.append(", CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS");
-        sqlBuilder.append(", MAX_VALIDITY, CERT, SIGNER_TYPE");
-        sqlBuilder.append(", CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME");
-        sqlBuilder.append(", DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS");
-        sqlBuilder.append(", NUM_CRLS, EXPIRATION_PERIOD, KEEP_EXPIRED_CERT_DAYS");
-        sqlBuilder.append(", VALIDITY_MODE, EXTRA_CONTROL, SIGNER_CONF");
-        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
-        sqlBuilder.append(", ?, ?, ?, ?, ?, ?, ?, ?)");
+        sqlBuilder.append("INSERT INTO CA (NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS");
+        sqlBuilder.append(",DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE");
+        sqlBuilder.append(",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY");
+        sqlBuilder.append(",DUPLICATE_SUBJECT,PERMISSIONS,NUM_CRLS,EXPIRATION_PERIOD");
+        sqlBuilder.append(",KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
+        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         final String sql = sqlBuilder.toString();
 
         // insert to table ca
@@ -825,7 +813,7 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonNull("aliasName", aliasName);
         ParamUtil.requireNonNull("caName", caName);
 
-        final String sql = "INSERT INTO CAALIAS (NAME, CA_NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO CAALIAS (NAME,CA_NAME) VALUES (?,?)";
 
         PreparedStatement ps = null;
         try {
@@ -844,7 +832,7 @@ class CaManagerQueryExecutor {
 
     void addCertprofile(final CertprofileEntry dbEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
-        final String sql = "INSERT INTO PROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO PROFILE (NAME,ART,TYPE,CONF) VALUES (?,?,?,?)";
         final String name = dbEntry.getName();
 
         PreparedStatement ps = null;
@@ -871,8 +859,7 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonNull("profileName", profileName);
         ParamUtil.requireNonNull("caName", caName);
 
-        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME)"
-                + " VALUES (?, ?)";
+        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME,PROFILE_NAME) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -891,7 +878,7 @@ class CaManagerQueryExecutor {
     void addCmpControl(final CmpControlEntry dbEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         final String name = dbEntry.getName();
-        final String sql = "INSERT INTO CMPCONTROL (NAME, CONF) VALUES (?, ?)";
+        final String sql = "INSERT INTO CMPCONTROL (NAME,CONF) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -912,7 +899,7 @@ class CaManagerQueryExecutor {
     void addCmpRequestor(final CmpRequestorEntry dbEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         String name = dbEntry.getName();
-        final String sql = "INSERT INTO REQUESTOR (NAME, CERT) VALUES (?, ?)";
+        final String sql = "INSERT INTO REQUESTOR (NAME,CERT) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -941,8 +928,8 @@ class CaManagerQueryExecutor {
         final String requestorName = requestor.getRequestorName();
 
         PreparedStatement ps = null;
-        final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_NAME, REQUESTOR_NAME, RA,"
-                + " PERMISSIONS, PROFILES) VALUES (?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_NAME,REQUESTOR_NAME,RA,"
+                + " PERMISSIONS,PROFILES) VALUES (?,?,?,?,?)";
         try {
             ps = prepareStatement(sql);
             int idx = 1;
@@ -983,9 +970,8 @@ class CaManagerQueryExecutor {
 
         String name = dbEntry.getName();
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL,");
-        sqlBuilder.append("SIGNER_CONF)");
-        sqlBuilder.append(" VALUES (?, ?, ?, ?, ?)");
+        sqlBuilder.append("INSERT INTO CRLSIGNER (NAME,SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,");
+        sqlBuilder.append("SIGNER_CONF) VALUES (?,?,?,?,?)");
         final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
@@ -994,9 +980,7 @@ class CaManagerQueryExecutor {
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, dbEntry.getType());
-            ps.setString(idx++,
-                    dbEntry.getCertificate() == null
-                        ? null
+            ps.setString(idx++, (dbEntry.getCertificate() == null) ? null
                         : Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
             ps.setString(idx++, crlControl);
             ps.setString(idx++, dbEntry.getConf());
@@ -1016,7 +1000,7 @@ class CaManagerQueryExecutor {
     void addEnvParam(final String name, final String value) throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         ParamUtil.requireNonNull("value", value);
-        final String sql = "INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)";
+        final String sql = "INSERT INTO ENVIRONMENT (NAME,VALUE2) VALUES (?,?)";
 
         PreparedStatement ps = null;
         try {
@@ -1036,7 +1020,7 @@ class CaManagerQueryExecutor {
     void addPublisher(final PublisherEntry dbEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         String name = dbEntry.getName();
-        final String sql = "INSERT INTO PUBLISHER (NAME, TYPE, CONF) VALUES (?, ?, ?)";
+        final String sql = "INSERT INTO PUBLISHER (NAME,TYPE,CONF) VALUES (?,?,?)";
 
         PreparedStatement ps = null;
         try {
@@ -1057,7 +1041,7 @@ class CaManagerQueryExecutor {
     } // method addPublisher
 
     void addPublisherToCa(final String publisherName, final String caName) throws CaMgmtException {
-        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME, PUBLISHER_NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME,PUBLISHER_NAME) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -1107,7 +1091,7 @@ class CaManagerQueryExecutor {
         String extraControl = entry.getExtraControl();
 
         if (signerType != null || signerConf != null || cert != null) {
-            final String sql = "SELECT SIGNER_TYPE, CERT, SIGNER_CONF FROM CA WHERE NAME=?";
+            final String sql = "SELECT SIGNER_TYPE,CERT,SIGNER_CONF FROM CA WHERE NAME=?";
             PreparedStatement stmt = null;
             ResultSet rs = null;
 
@@ -1137,9 +1121,8 @@ class CaManagerQueryExecutor {
                     try {
                         tmpCert = X509Util.parseBase64EncodedCert(tmpB64Cert);
                     } catch (CertificateException | IOException ex) {
-                        throw new CaMgmtException(
-                                "could not parse the stored certificate for CA '" + name + "'"
-                                + ex.getMessage(), ex);
+                        throw new CaMgmtException("could not parse the stored certificate for CA '"
+                                + name + "'" + ex.getMessage(), ex);
                     }
                 }
 
@@ -1170,34 +1153,32 @@ class CaManagerQueryExecutor {
         Integer idxSubject = addToSqlIfNotNull(sqlBuilder, index, cert, "SUBJECT");
         Integer idxCert = addToSqlIfNotNull(sqlBuilder, index, cert, "CERT");
         Integer idxCrlUris = addToSqlIfNotNull(sqlBuilder, index, crlUris, "CRL_URIS");
-        Integer idxDeltaCrlUris =
-                addToSqlIfNotNull(sqlBuilder, index, deltaCrlUris, "DELTACRL_URIS");
+        Integer idxDeltaCrlUris = addToSqlIfNotNull(sqlBuilder, index, deltaCrlUris,
+                "DELTACRL_URIS");
         Integer idxOcspUris = addToSqlIfNotNull(sqlBuilder, index, ocspUris, "OCSP_URIS");
         Integer idxCacertUris = addToSqlIfNotNull(sqlBuilder, index, cacertUris, "CACERT_URIS");
-        Integer idxMaxValidity =
-                addToSqlIfNotNull(sqlBuilder, index, maxValidity, "MAX_VALIDITY");
+        Integer idxMaxValidity = addToSqlIfNotNull(sqlBuilder, index, maxValidity, "MAX_VALIDITY");
         Integer idxSignerType = addToSqlIfNotNull(sqlBuilder, index, signerType, "SIGNER_TYPE");
-        Integer idxCrlsignerName =
-                addToSqlIfNotNull(sqlBuilder, index, crlsignerName, "CRLSIGNER_NAME");
-        Integer idxResponderName =
-                addToSqlIfNotNull(sqlBuilder, index, responderName, "RESPONDER_NAME");
-        Integer idxCmpcontrolName =
-                addToSqlIfNotNull(sqlBuilder, index, cmpcontrolName, "CMPCONTROL_NAME");
-        Integer idxDuplicateKey =
-                addToSqlIfNotNull(sqlBuilder, index, duplicateKeyPermitted, "DUPLICATE_KEY");
-        Integer idxDuplicateSubject =
-                addToSqlIfNotNull(sqlBuilder, index, duplicateKeyPermitted, "DUPLICATE_SUBJECT");
+        Integer idxCrlsignerName = addToSqlIfNotNull(sqlBuilder, index, crlsignerName,
+                "CRLSIGNER_NAME");
+        Integer idxResponderName = addToSqlIfNotNull(sqlBuilder, index, responderName,
+                "RESPONDER_NAME");
+        Integer idxCmpcontrolName = addToSqlIfNotNull(sqlBuilder, index, cmpcontrolName,
+                "CMPCONTROL_NAME");
+        Integer idxDuplicateKey = addToSqlIfNotNull(sqlBuilder, index, duplicateKeyPermitted,
+                "DUPLICATE_KEY");
+        Integer idxDuplicateSubject = addToSqlIfNotNull(sqlBuilder, index, duplicateKeyPermitted,
+                "DUPLICATE_SUBJECT");
         Integer idxPermissions = addToSqlIfNotNull(sqlBuilder, index, permissions, "PERMISSIONS");
         Integer idxNumCrls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
-        Integer idxExpirationPeriod =
-                addToSqlIfNotNull(sqlBuilder, index, expirationPeriod, "EXPIRATION_PERIOD");
-        Integer idxExpiredCerts =
-                addToSqlIfNotNull(sqlBuilder, index, keepExpiredCertInDays,
-                        "KEEP_EXPIRED_CERT_DAYS");
-        Integer idxValidityMode =
-                addToSqlIfNotNull(sqlBuilder, index, validityMode, "VALIDITY_MODE");
-        Integer idxExtraControl =
-                addToSqlIfNotNull(sqlBuilder, index, extraControl, "EXTRA_CONTROL");
+        Integer idxExpirationPeriod = addToSqlIfNotNull(sqlBuilder, index, expirationPeriod,
+                "EXPIRATION_PERIOD");
+        Integer idxExpiredCerts = addToSqlIfNotNull(sqlBuilder, index, keepExpiredCertInDays,
+                 "KEEP_EXPIRED_CERT_DAYS");
+        Integer idxValidityMode = addToSqlIfNotNull(sqlBuilder, index, validityMode,
+                "VALIDITY_MODE");
+        Integer idxExtraControl = addToSqlIfNotNull(sqlBuilder, index, extraControl,
+                "EXTRA_CONTROL");
         Integer idxSignerConf = addToSqlIfNotNull(sqlBuilder, index, signerConf, "SIGNER_CONF");
 
         // delete the last ','
@@ -1270,9 +1251,8 @@ class CaManagerQueryExecutor {
             }
 
             if (idxSignerConf != null) {
-                sb.append("signerConf: '");
-                sb.append(SignerConf.toString(signerConf, false, true));
-                sb.append("'; ");
+                sb.append("signerConf: '").append(SignerConf.toString(signerConf, false, true))
+                    .append("'; ");
                 ps.setString(idxSignerConf, signerConf);
             }
 
@@ -1682,8 +1662,7 @@ class CaManagerQueryExecutor {
 
             if (idxSignerConf != null) {
                 String txt = getRealString(tmpSignerConf);
-                sb.append("signerConf: '")
-                    .append(SignerConf.toString(txt, false, true))
+                sb.append("signerConf: '").append(SignerConf.toString(txt, false, true))
                     .append("'; ");
                 ps.setString(idxSignerConf, txt);
             }
@@ -1779,11 +1758,8 @@ class CaManagerQueryExecutor {
             throw new CaMgmtException(ex);
         }
         Scep scep = new Scep(newDbEntry, caManager);
-
         final String sql = sqlBuilder.toString();
-
         StringBuilder sb = new StringBuilder();
-
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -1795,8 +1771,7 @@ class CaManagerQueryExecutor {
 
             if (idxConf != null) {
                 String txt = getRealString(tmpResponderConf);
-                sb.append("responder conf: '")
-                    .append(SignerConf.toString(txt, false, true));
+                sb.append("responder conf: '").append(SignerConf.toString(txt, false, true));
                 ps.setString(idxConf, txt);
             }
 
@@ -2315,8 +2290,8 @@ class CaManagerQueryExecutor {
 
     boolean addScep(final ScepEntry scepEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("scepEntry", scepEntry);
-        final String sql = "INSERT INTO SCEP (CA_NAME, CONTROL, RESPONDER_TYPE, "
-                + "RESPONDER_CERT, RESPONDER_CONF) VALUES (?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO SCEP (CA_NAME,CONTROL,RESPONDER_TYPE,RESPONDER_CERT"
+                + ",RESPONDER_CONF) VALUES (?,?,?,?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -2359,7 +2334,7 @@ class CaManagerQueryExecutor {
     ScepEntry getScep(final String caName) throws CaMgmtException {
         ParamUtil.requireNonNull("caName", caName);
         final String sql = datasource.createFetchFirstSelectSql(
-            "CONTROL, RESPONDER_TYPE, RESPONDER_CERT, RESPONDER_CONF FROM SCEP WHERE CA_NAME=?",
+            "CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF FROM SCEP WHERE CA_NAME=?",
             1);
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -2393,10 +2368,7 @@ class CaManagerQueryExecutor {
 
     private static void setBoolean(final PreparedStatement ps, final int index, final boolean bo)
     throws SQLException {
-        int value = bo
-                ? 1
-                : 0;
-        ps.setInt(index, value);
+        ps.setInt(index, bo ? 1 : 0);
     }
 
     private static Integer addToSqlIfNotNull(final StringBuilder sqlBuilder,
@@ -2437,9 +2409,7 @@ class CaManagerQueryExecutor {
     }
 
     private static String getRealString(final String str) {
-        return CaManager.NULL.equalsIgnoreCase(str)
-                ? null
-                : str;
+        return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
     }
 
     public static String canonicalizName(final X500Principal prin) {

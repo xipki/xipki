@@ -123,21 +123,19 @@ public class LiquibaseMain {
             (String) null, // databaseChangeLogTableName
             (String) null); // databaseChangeLogLockTableName
         try {
-            CompositeResourceAccessor fileOpener =
-                    new CompositeResourceAccessor(fsOpener, clOpener);
+            CompositeResourceAccessor fileOpener = new CompositeResourceAccessor(fsOpener,
+                    clOpener);
 
             boolean includeCatalog = false;
             boolean includeSchema = false;
             boolean includeTablespace = false;
-            DiffOutputControl diffOutputControl =
-                    new DiffOutputControl(includeCatalog, includeSchema, includeTablespace);
+            DiffOutputControl diffOutputControl = new DiffOutputControl(includeCatalog,
+                    includeSchema, includeTablespace);
 
             CompareControl.SchemaComparison[] finalSchemaComparisons;
             finalSchemaComparisons = new CompareControl.SchemaComparison[] {
-                new CompareControl.SchemaComparison(
-                        new CatalogAndSchema(null, defaultSchemaName),
-                        new CatalogAndSchema(null, defaultSchemaName))
-                };
+                new CompareControl.SchemaComparison(new CatalogAndSchema(null, defaultSchemaName),
+                        new CatalogAndSchema(null, defaultSchemaName))};
 
             for (CompareControl.SchemaComparison schema : finalSchemaComparisons) {
                 diffOutputControl.addIncludedSchema(schema.getReferenceSchema());

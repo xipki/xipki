@@ -208,13 +208,12 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
         }
 
         if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf,
-                    passwordResolver, securityFactory);
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver,
+                    securityFactory);
         }
 
         X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
-        X509CaEntry entry = new X509CaEntry(
-                caName, snSize, nextCrlNumber, signerType, signerConf,
+        X509CaEntry entry = new X509CaEntry(caName, snSize, nextCrlNumber, signerType, signerConf,
                 caUris, numCrls.intValue(), expirationPeriod.intValue());
 
         entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());

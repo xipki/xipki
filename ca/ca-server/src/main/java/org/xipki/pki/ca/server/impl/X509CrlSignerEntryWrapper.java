@@ -145,17 +145,11 @@ class X509CrlSignerEntryWrapper {
     }
 
     public X509Certificate getCert() {
-        if (signer == null) {
-            return dbEntry.getCertificate();
-        } else {
-            return signer.getCertificate();
-        }
+        return (signer == null) ? dbEntry.getCertificate() : signer.getCertificate();
     }
 
     public byte[] getSubjectKeyIdentifier() {
-        return (subjectKeyIdentifier == null)
-                ? null
-                : Arrays.clone(subjectKeyIdentifier);
+        return (subjectKeyIdentifier == null) ? null : Arrays.clone(subjectKeyIdentifier);
     }
 
     public ConcurrentContentSigner getSigner() {

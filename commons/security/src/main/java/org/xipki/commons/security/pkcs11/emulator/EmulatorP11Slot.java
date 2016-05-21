@@ -277,8 +277,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
                 P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
                 X509Cert cert = ret.getCertForId(id);
-                java.security.PublicKey publicKey = (cert == null)
-                        ? readPublicKey(id)
+                java.security.PublicKey publicKey = (cert == null) ? readPublicKey(id)
                         : cert.getCert().getPublicKey();
 
                 if (publicKey == null) {
@@ -287,19 +286,17 @@ class EmulatorP11Slot extends AbstractP11Slot {
                     continue;
                 }
 
-                byte[] encodedValue = IoUtil.read(
-                        new File(privKeyDir, hexId + VALUE_FILE_SUFFIX));
+                byte[] encodedValue = IoUtil.read(new File(privKeyDir, hexId + VALUE_FILE_SUFFIX));
 
                 PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(encodedValue);
                 PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
 
-                X509Certificate[] certs = (cert == null)
-                        ? null
+                X509Certificate[] certs = (cert == null) ? null
                         : new X509Certificate[]{cert.getCert()};
 
                 EmulatorP11Identity identity = new EmulatorP11Identity(this,
-                        new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey,
-                        certs, maxSessions, random);
+                        new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey, certs,
+                        maxSessions, random);
                 LOG.info("added PKCS#11 key {}", p11ObjId);
                 ret.addIdentity(identity);
             } catch (InvalidKeyException ex) {
@@ -415,11 +412,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
             } else {
                 Properties props = loadProperties(infoFile);
 
-                if (label.equals(props.getProperty("label"))) {
-                    return deletePkcs11Entry(dir, id);
-                } else {
-                    return false;
-                }
+                return label.equals(props.getProperty("label")) ? deletePkcs11Entry(dir, id)
+                        : false;
             }
         }
 
@@ -464,9 +458,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     private int deletePkcs11Entry(final File dir, final byte[] id, final String label)
     throws P11TokenException {
         if (StringUtil.isBlank(label)) {
-            return deletePkcs11Entry(dir, id)
-                    ? 1
-                    : 0;
+            return deletePkcs11Entry(dir, id) ? 1 : 0;
         }
 
         if (id != null && id.length > 0) {
@@ -481,9 +473,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
                 return 0;
             }
 
-            return deletePkcs11Entry(dir, id)
-                    ? 1
-                    : 0;
+            return deletePkcs11Entry(dir, id) ? 1 : 0;
         }
 
         File[] infoFiles = dir.listFiles(INFO_FILENAME_FILTER);

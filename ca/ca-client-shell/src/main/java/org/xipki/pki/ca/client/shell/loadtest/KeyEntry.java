@@ -288,8 +288,7 @@ public abstract class KeyEntry {
                 curveName = curveOid.getId();
             }
 
-            algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
-                    curveOid);
+            algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveOid);
 
             KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDSA", "BC");
             ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveName);

@@ -60,11 +60,8 @@ public class QaCertificatePolicies extends QaExtension {
         public QaCertificatePolicyInformation(final CertificatePolicyInformationType jaxb) {
             ParamUtil.requireNonNull("jaxb", jaxb);
             this.policyId = jaxb.getPolicyIdentifier().getValue();
-            if (jaxb.getPolicyQualifiers() == null) {
-                this.policyQualifiers = null;
-            } else {
-                this.policyQualifiers = new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
-            }
+            this.policyQualifiers = (jaxb.getPolicyQualifiers() == null) ? null
+                    : new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
         }
 
         public String getPolicyId() {

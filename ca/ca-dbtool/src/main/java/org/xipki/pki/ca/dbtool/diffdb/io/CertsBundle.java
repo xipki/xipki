@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.dbtool.diffdb.io;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -48,20 +49,21 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CertsBundle {
 
-    private Map<Long, DbDigestEntry> certs;
+    private Map<BigInteger, DbDigestEntry> certs;
 
-    private List<Long> serialNumbers;
+    private List<BigInteger> serialNumbers;
 
-    public CertsBundle(final Map<Long, DbDigestEntry> certs, final List<Long> serialNumbers) {
+    public CertsBundle(final Map<BigInteger, DbDigestEntry> certs,
+            final List<BigInteger> serialNumbers) {
         this.certs = ParamUtil.requireNonEmpty("certs", certs);
         this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
     }
 
-    public Map<Long, DbDigestEntry> getCerts() {
+    public Map<BigInteger, DbDigestEntry> getCerts() {
         return certs;
     }
 
-    public List<Long> getSerialNumbers() {
+    public List<BigInteger> getSerialNumbers() {
         return serialNumbers;
     }
 

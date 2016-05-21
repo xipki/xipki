@@ -85,11 +85,8 @@ public class CaHasRequestorEntry implements Serializable {
     }
 
     public void setProfiles(final Set<String> profiles) {
-        if (profiles == null) {
-            this.profiles = Collections.emptySet();
-        } else {
-            this.profiles = CollectionUtil.unmodifiableSet(profiles);
-        }
+        this.profiles = (profiles == null) ? Collections.emptySet()
+                : CollectionUtil.unmodifiableSet(profiles);
     }
 
     public Set<String> getProfiles() {
@@ -99,9 +96,9 @@ public class CaHasRequestorEntry implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
-        sb.append("requestor: ").append(requestorName).append(", ");
-        sb.append("ra: ").append(ra).append(", ");
-        sb.append("profiles: ").append(profiles).append(", ");
+        sb.append("requestor: ").append(requestorName).append("\n");
+        sb.append("ra: ").append(ra).append("\n");
+        sb.append("profiles: ").append(profiles).append("\n");
         sb.append("permissions: ").append(Permission.toString(permissions));
         return sb.toString();
     }

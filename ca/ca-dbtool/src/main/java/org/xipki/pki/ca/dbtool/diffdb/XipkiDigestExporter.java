@@ -185,11 +185,9 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         processLog.printHeader();
 
         List<IdRange> idRanges = new ArrayList<>(numThreads);
-
         boolean interrupted = false;
 
         for (int i = minCertId; i <= maxCertId;) {
-
             if (stopMe.get()) {
                 interrupted = true;
                 break;

@@ -52,9 +52,7 @@ public class P12DSAKeyGenLoadTest extends P12KeyGenLoadTest {
 
     public P12DSAKeyGenLoadTest(final int plength, final int qlength,
             final SecurityFactory securityFactory) throws Exception {
-        super("PKCS#12 DSA key generation\n"
-                + "plength: " + plength + "\n"
-                + "qlength: " + qlength,
+        super("PKCS#12 DSA key generation\nplength: " + plength + "\nqlength: " + qlength,
                 securityFactory);
 
         this.plength = plength;

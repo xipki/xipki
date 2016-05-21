@@ -55,19 +55,11 @@ public class CertprofileOption {
     private final Set<String> excludes;
 
     public CertprofileOption(final Collection<String> includes, final Collection<String> excludes) {
-        if (CollectionUtil.isEmpty(includes)) {
-            this.includes = null;
-        } else {
-            this.includes = Collections.unmodifiableSet(
-                    new HashSet<>(includes));
-        }
+        this.includes = CollectionUtil.isEmpty(includes) ? null
+                : Collections.unmodifiableSet(new HashSet<>(includes));
 
-        if (CollectionUtil.isEmpty(excludes)) {
-            this.excludes = null;
-        } else {
-            this.excludes = Collections.unmodifiableSet(
-                    new HashSet<>(excludes));
-        }
+        this.excludes = CollectionUtil.isEmpty(excludes) ? null
+                : Collections.unmodifiableSet(new HashSet<>(excludes));
     }
 
     public Set<String> getIncludes() {
@@ -80,18 +72,14 @@ public class CertprofileOption {
 
     public boolean include(final String certprofile) {
         if (includes == null) {
-            return (excludes == null)
-                    ? true
-                    : !excludes.contains(certprofile);
+            return (excludes == null) ? true : !excludes.contains(certprofile);
         }
 
         if (!includes.contains(certprofile)) {
             return false;
         }
 
-        return (excludes == null)
-                ? true
-                : !excludes.contains(certprofile);
+        return (excludes == null) ? true : !excludes.contains(certprofile);
     }
 
 }

@@ -137,9 +137,7 @@ public class X509CertprofileQa {
             }
 
             Integer size = conf.getMaxSize();
-            this.maxSize = (size == null)
-                    ? 0
-                    : size;
+            this.maxSize = (size == null) ? 0 : size;
 
             if (conf.getSignatureAlgorithms() == null) {
                 this.signatureAlgorithms = null;
@@ -310,8 +308,7 @@ public class X509CertprofileQa {
                 requestedPublicKey));
 
         // Signature
-        issue = new ValidationIssue("X509.SIG",
-                "whether certificate is signed by CA");
+        issue = new ValidationIssue("X509.SIG", "whether certificate is signed by CA");
         resultIssues.add(issue);
         try {
             cert.verify(issuerInfo.getCert().getPublicKey(), "BC");

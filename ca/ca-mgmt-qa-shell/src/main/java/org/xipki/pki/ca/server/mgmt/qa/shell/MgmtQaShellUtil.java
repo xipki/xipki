@@ -59,13 +59,7 @@ public class MgmtQaShellUtil {
             tmpEx = null;
         }
 
-        boolean bo;
-        if (tmpEx == null) {
-            bo = (is == null);
-        } else {
-            bo = tmpEx.equals(is);
-        }
-
+        boolean bo = (tmpEx == null) ? (is == null) : tmpEx.equals(is);
         if (!bo) {
             throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
         }
@@ -73,13 +67,7 @@ public class MgmtQaShellUtil {
 
     public static void assertEquals(final String desc, final Collection<?> ex, Collection<?> is)
     throws CmdFailure {
-        boolean bo;
-        if (ex == null) {
-            bo = (is == null);
-        } else {
-            bo = ex.equals(is);
-        }
-
+        boolean bo = (ex == null) ? (is == null) : ex.equals(is);
         if (!bo) {
             throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
         }

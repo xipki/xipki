@@ -92,8 +92,8 @@ class ShellUtil {
         }
 
         String keyLabel = pairs.getValue("key-label");
-        keystoreBytes = securityFactory.extractMinimalKeyStore(keystoreType,
-                keystoreBytes, keyLabel, password, null);
+        keystoreBytes = securityFactory.extractMinimalKeyStore(keystoreType, keystoreBytes,
+                keyLabel, password, null);
 
         pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
         return pairs.getEncoded();

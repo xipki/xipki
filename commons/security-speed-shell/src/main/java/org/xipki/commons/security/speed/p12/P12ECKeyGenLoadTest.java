@@ -54,9 +54,7 @@ public class P12ECKeyGenLoadTest extends P12KeyGenLoadTest {
 
     public P12ECKeyGenLoadTest(final String curveNameOrOid, final SecurityFactory securityFactory)
     throws Exception {
-        super("PKCS#12 EC key generation\n"
-                + "curve: " + curveNameOrOid,
-                securityFactory);
+        super("PKCS#12 EC key generation\ncurve: " + curveNameOrOid, securityFactory);
 
         ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (oid == null) {

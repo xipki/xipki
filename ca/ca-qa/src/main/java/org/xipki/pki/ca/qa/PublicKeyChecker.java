@@ -234,9 +234,7 @@ public class PublicKeyChecker {
                 return;
             }
         } else {
-            String txt = (keyParamsOption == null)
-                    ? "null"
-                    : keyParamsOption.getClass().getName();
+            String txt = (keyParamsOption == null) ? "null" : keyParamsOption.getClass().getName();
             throw new RuntimeException("should not reach here, unknown keyParamsOption " + txt);
         }
 

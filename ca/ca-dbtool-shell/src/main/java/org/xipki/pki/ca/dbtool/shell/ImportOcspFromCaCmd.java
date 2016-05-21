@@ -88,9 +88,9 @@ public class ImportOcspFromCaCmd extends DbPortCommandSupport {
 
     @Override
     protected DbPortWorker getDbPortWorker() throws Exception {
-        return new OcspFromCaDbImportWorker(
-                datasourceFactory, passwordResolver, dbconfFile, publisherName, resume,
-                indir, numCertsPerCommit.intValue(), testOnly.booleanValue());
+        return new OcspFromCaDbImportWorker(datasourceFactory, passwordResolver, dbconfFile,
+                publisherName, resume, indir, numCertsPerCommit.intValue(),
+                testOnly.booleanValue());
     }
 
 }

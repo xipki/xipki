@@ -91,8 +91,8 @@ public class CmpResponderEntryWrapper {
 
         X509Certificate responderCert = dbEntry.getCertificate();
         dbEntry.setConfFaulty(true);
-        signer = securityFactory.createSigner(
-                dbEntry.getType(), new SignerConf(dbEntry.getConf()), responderCert);
+        signer = securityFactory.createSigner(dbEntry.getType(), new SignerConf(dbEntry.getConf()),
+                responderCert);
         if (signer.getCertificate() == null) {
             throw new ObjectCreationException("signer without certificate is not allowed");
         }
@@ -111,9 +111,7 @@ public class CmpResponderEntryWrapper {
     }
 
     public boolean isHealthy() {
-        return (signer == null)
-                ? false
-                : signer.isHealthy();
+        return (signer == null) ? false : signer.isHealthy();
     }
 
     public GeneralName getSubjectAsGeneralName() {

@@ -321,9 +321,7 @@ class CaConfigurationDbImporter extends DbPorter {
                 try {
                     int idx = 1;
                     ps.setString(idx++, certprofile.getName());
-                    int art = (certprofile.getArt() == null)
-                            ? 1
-                            : certprofile.getArt();
+                    int art = (certprofile.getArt() == null) ? 1 : certprofile.getArt();
                     ps.setInt(idx++, art);
                     ps.setString(idx++, certprofile.getType());
 
@@ -366,9 +364,7 @@ class CaConfigurationDbImporter extends DbPorter {
             ps = prepareStatement(sql);
 
             for (CaType ca : cas.getCa()) {
-                int art = (ca.getArt() == null)
-                        ? 1
-                        : ca.getArt();
+                int art = (ca.getArt() == null) ? 1 : ca.getArt();
 
                 try {
                     String b64Cert = getValue(ca.getCert());
@@ -396,9 +392,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setInt(idx++, ca.getDuplicateSubject());
                     ps.setString(idx++, ca.getPermissions());
                     Integer numCrls = ca.getNumCrls();
-                    int tmpNumCrls = (numCrls == null)
-                            ? 30
-                            : numCrls.intValue();
+                    int tmpNumCrls = (numCrls == null) ? 30 : numCrls.intValue();
                     ps.setInt(idx++, tmpNumCrls);
                     ps.setInt(idx++, ca.getExpirationPeriod());
                     ps.setInt(idx++, ca.getKeepExpiredCertDays());
@@ -438,8 +432,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, caalias.getCaName().toUpperCase());
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("could not import CAALIAS with NAME="
-                            + caalias.getName());
+                    System.err.println("could not import CAALIAS with NAME=" + caalias.getName());
                     throw translate(sql, ex);
                 }
             }
@@ -507,8 +500,7 @@ class CaConfigurationDbImporter extends DbPorter {
     private void importCaHasCertprofile(final CaHasProfiles caHasCertprofiles)
     throws DataAccessException {
         System.out.println("importing table CA_HAS_PROFILE");
-        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME)"
-                + " VALUES (?, ?)";
+        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME) VALUES (?, ?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (CaHasProfileType entry : caHasCertprofiles.getCaHasProfile()) {
@@ -519,8 +511,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.executeUpdate();
                 } catch (SQLException ex) {
                     System.err.println("could not import CA_HAS_PROFILE with CA_NAME="
-                            + entry.getCaName()
-                            + " and profile_name=" + entry.getProfileName());
+                            + entry.getCaName() + " and profile_name=" + entry.getProfileName());
                     throw translate(sql, ex);
                 }
             }

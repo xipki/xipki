@@ -115,16 +115,15 @@ public class CaDbImportWorker extends DbPortWorker {
         try {
             if (!resume) {
                 // CAConfiguration
-                CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(
-                        datasource, unmarshaller, srcFolder, stopMe, evaluateOnly);
+                CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(datasource,
+                        unmarshaller, srcFolder, stopMe, evaluateOnly);
                 caConfImporter.importToDb();
                 caConfImporter.shutdown();
             }
 
             // CertStore
-            CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(
-                    datasource, unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe,
-                    evaluateOnly);
+            CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(datasource,
+                    unmarshaller, srcFolder, batchEntriesPerCommit, resume, stopMe, evaluateOnly);
             certStoreImporter.importToDb();
             certStoreImporter.shutdown();
         } finally {

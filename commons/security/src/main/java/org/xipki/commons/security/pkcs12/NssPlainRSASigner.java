@@ -125,8 +125,7 @@ class NssPlainRSASigner implements AsymmetricBlockCipher {
             cipher.init(Cipher.ENCRYPT_MODE, signingKey);
         } catch (InvalidKeyException ex) {
             LogUtil.error(LOG, ex);
-            throw new RuntimeCryptoException("could not initialize the cipher: "
-                    + ex.getMessage());
+            throw new RuntimeCryptoException("could not initialize the cipher: " + ex.getMessage());
         }
     }
 

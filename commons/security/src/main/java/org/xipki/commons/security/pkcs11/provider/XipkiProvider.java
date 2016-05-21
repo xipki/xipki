@@ -111,12 +111,10 @@ public class XipkiProvider extends Provider {
         public Object run() {
             provider.put("KeyStore.PKCS11", XipkiKeyStoreSpi.class.getName());
 
-            provider.put("Signature.NONEwithRSA",
-                    P11RSADigestSignatureSpi.NoneRSA.class.getName());
+            provider.put("Signature.NONEwithRSA", P11RSADigestSignatureSpi.NoneRSA.class.getName());
             provider.put("Alg.Alias.Signature.RSAwithNONE", "NONEwithRSA");
 
-            provider.put("Signature.SHA1withRSA",
-                    P11RSADigestSignatureSpi.SHA1.class.getName());
+            provider.put("Signature.SHA1withRSA",  P11RSADigestSignatureSpi.SHA1.class.getName());
             provider.put("Alg.Alias.Signature.RSAwithSHA1", "SHA1withRSA");
 
             provider.put("Signature.SHA224withRSA",
@@ -135,52 +133,41 @@ public class XipkiProvider extends Provider {
                     P11RSADigestSignatureSpi.SHA512.class.getName());
             provider.put("Alg.Alias.Signature.RSAwithSHA512", "SHA512withRSA");
 
-            provider.put("Signature.NONEwithDSA",
-                    P11DSASignatureSpi.NONE.class.getName());
+            provider.put("Signature.NONEwithDSA", P11DSASignatureSpi.NONE.class.getName());
             provider.put("Alg.Alias.Signature.DSAwithNONE", "NONEwithDSA");
 
-            provider.put("Signature.SHA1withDSA",
-                    P11DSASignatureSpi.SHA1.class.getName());
+            provider.put("Signature.SHA1withDSA", P11DSASignatureSpi.SHA1.class.getName());
             provider.put("Alg.Alias.Signature.DSAwithSHA1", "SHA1withDSA");
 
-            provider.put("Signature.SHA224withDSA",
-                    P11DSASignatureSpi.SHA224.class.getName());
+            provider.put("Signature.SHA224withDSA", P11DSASignatureSpi.SHA224.class.getName());
             provider.put("Alg.Alias.Signature.DSAwithSHA224", "SHA224withDSA");
 
-            provider.put("Signature.SHA256withDSA",
-                    P11DSASignatureSpi.SHA256.class.getName());
+            provider.put("Signature.SHA256withDSA", P11DSASignatureSpi.SHA256.class.getName());
             provider.put("Alg.Alias.Signature.DSAwithSHA256", "SHA256withDSA");
 
             provider.put("Signature.SHA384withDSA",
                     P11ECDSASignatureSpi.SHA384.class.getName());
             provider.put("Alg.Alias.Signature.DSAwithSHA384", "SHA384withDSA");
 
-            provider.put("Signature.SHA512withDSA",
-                    P11DSASignatureSpi.SHA512.class.getName());
+            provider.put("Signature.SHA512withDSA", P11DSASignatureSpi.SHA512.class.getName());
             provider.put("Alg.Alias.Signature.DSAwithSHA512", "SHA512withDSA");
 
-            provider.put("Signature.NONEwithECDSA",
-                    P11ECDSASignatureSpi.NONE.class.getName());
+            provider.put("Signature.NONEwithECDSA", P11ECDSASignatureSpi.NONE.class.getName());
             provider.put("Alg.Alias.Signature.ECDSAwithNONE", "NONEwithECDSA");
 
-            provider.put("Signature.SHA1withECDSA",
-                    P11ECDSASignatureSpi.SHA1.class.getName());
+            provider.put("Signature.SHA1withECDSA", P11ECDSASignatureSpi.SHA1.class.getName());
             provider.put("Alg.Alias.Signature.ECDSAwithSHA1", "SHA1withECDSA");
 
-            provider.put("Signature.SHA224withECDSA",
-                    P11ECDSASignatureSpi.SHA224.class.getName());
+            provider.put("Signature.SHA224withECDSA", P11ECDSASignatureSpi.SHA224.class.getName());
             provider.put("Alg.Alias.Signature.ECDSAwithSHA224", "SHA224withECDSA");
 
-            provider.put("Signature.SHA256withECDSA",
-                    P11ECDSASignatureSpi.SHA256.class.getName());
+            provider.put("Signature.SHA256withECDSA", P11ECDSASignatureSpi.SHA256.class.getName());
             provider.put("Alg.Alias.Signature.ECDSAwithSHA256", "SHA256withECDSA");
 
-            provider.put("Signature.SHA384withECDSA",
-                    P11ECDSASignatureSpi.SHA384.class.getName());
+            provider.put("Signature.SHA384withECDSA", P11ECDSASignatureSpi.SHA384.class.getName());
             provider.put("Alg.Alias.Signature.ECDSAwithSHA384", "SHA384withECDSA");
 
-            provider.put("Signature.SHA512withECDSA",
-                    P11ECDSASignatureSpi.SHA512.class.getName());
+            provider.put("Signature.SHA512withECDSA", P11ECDSASignatureSpi.SHA512.class.getName());
             provider.put("Alg.Alias.Signature.ECDSAwithSHA512", "SHA512withECDSA");
 
             provider.put("Signature.NONEwithPlain-ECDSA",

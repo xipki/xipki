@@ -83,11 +83,7 @@ public class X509CrlSignerEntry implements Serializable {
         this.signerConf = signerConf;
         this.crlControl = ParamUtil.requireNonNull("crlControl", crlControl);
 
-        if ("CA".equalsIgnoreCase(name)) {
-            this.base64Cert = null;
-        } else {
-            this.base64Cert = base64Cert;
-        }
+        this.base64Cert = "CA".equalsIgnoreCase(name) ? null : base64Cert;
 
         if (this.base64Cert != null) {
             try {

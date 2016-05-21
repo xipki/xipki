@@ -84,8 +84,8 @@ public class RevokeCertCmd extends UnRevRmCertCommandSupport {
             invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
         }
 
-        boolean successful = caManager.revokeCertificate(caName, getSerialNumber(),
-                crlReason, invalidityDate);
+        boolean successful = caManager.revokeCertificate(caName, getSerialNumber(), crlReason,
+                invalidityDate);
         output(successful, "revoked", "could not revoke", "certificate");
 
         return null;

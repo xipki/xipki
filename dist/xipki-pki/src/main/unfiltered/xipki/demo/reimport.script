@@ -35,7 +35,7 @@ echo "||                             IMPORT CA DATABASE                         
 echo "============================================================================"
 
 xipki-db:initdb-ca \
-  --quiet
+  --force
 
 xipki-db:import-ca \
   --in-dir output/dbexport/ca
@@ -47,7 +47,7 @@ echo "||                            IMPORT OCSP DATABASE                        
 echo "============================================================================"
 
 xipki-db:initdb-ocsp \
-  --quiet
+  --force
 
 xipki-db:import-ocsp \
   --in-dir output/dbexport/ocsp
@@ -59,7 +59,7 @@ echo "||                        IMPORT OCSP DATABASE FROM CA                    
 echo "============================================================================"
 
 xipki-db:initdb-ocsp \
-  --quiet
+  --force
 
 xipki-db:import-ocspfromca \
   --in-dir output/dbexport/ca

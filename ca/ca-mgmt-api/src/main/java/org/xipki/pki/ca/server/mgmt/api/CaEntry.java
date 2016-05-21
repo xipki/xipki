@@ -202,11 +202,7 @@ public class CaEntry implements Serializable {
     public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(500);
         sb.append("name: ").append(name).append('\n');
-        sb.append("status: ");
-        sb.append((status == null)
-                ? "null"
-                : status.getStatus());
-        sb.append('\n');
+        sb.append("status: ").append((status == null) ? "null" : status.getStatus()).append('\n');
         sb.append("maxValidity: ").append(maxValidity).append("\n");
         sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
         sb.append("signerType: ").append(signerType).append('\n');

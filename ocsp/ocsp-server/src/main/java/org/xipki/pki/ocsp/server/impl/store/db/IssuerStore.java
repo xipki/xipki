@@ -85,9 +85,7 @@ public class IssuerStore {
     public Integer getIssuerIdForFp(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {
         IssuerEntry issuerEntry = getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
-        return (issuerEntry == null)
-                ? null
-                : issuerEntry.getId();
+        return (issuerEntry == null) ? null : issuerEntry.getId();
     }
 
     public IssuerEntry getIssuerForId(final int id) {

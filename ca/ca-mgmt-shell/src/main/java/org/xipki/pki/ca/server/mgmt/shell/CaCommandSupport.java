@@ -58,9 +58,7 @@ public abstract class CaCommandSupport extends XipkiCommandSupport {
     protected SecurityFactory securityFactory;
 
     protected static String getRealString(final String str) {
-        return CaManager.NULL.equalsIgnoreCase(str)
-                ? null
-                : str;
+        return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
     }
 
     protected static String toString(final Collection<? extends Object> col) {

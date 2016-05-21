@@ -59,11 +59,7 @@ public class P11MechanismFilter {
 
         private SingleFilter(final Set<P11SlotIdFilter> slots, final Collection<Long> mechanisms) {
             this.slots = slots;
-            if (CollectionUtil.isEmpty(mechanisms)) {
-                this.mechanisms = null;
-            } else {
-                this.mechanisms = mechanisms;
-            }
+            this.mechanisms = CollectionUtil.isEmpty(mechanisms) ? null : mechanisms;
         }
 
         public boolean match(final P11SlotIdentifier slot) {

@@ -93,11 +93,7 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
         keysize = Asn1Util.getInteger(seq.getObjectAt(idx++)).intValue();
         ParamUtil.requireMin("keysize", keysize, 1);
 
-        if (size > 3) {
-            publicExponent = Asn1Util.getInteger(seq.getObjectAt(idx++));
-        } else {
-            publicExponent = null;
-        }
+        publicExponent = (size > 3) ? Asn1Util.getInteger(seq.getObjectAt(idx++)) : null;
     }
 
     public static Asn1GenRSAKeypairParams getInstance(final Object obj)

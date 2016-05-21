@@ -103,8 +103,7 @@ public abstract class X509Certprofile {
     public String incSerialNumber(@Nullable final String currentSerialNumber)
     throws BadFormatException {
         try {
-            int currentSn = (currentSerialNumber == null)
-                    ? 0
+            int currentSn = (currentSerialNumber == null) ? 0
                     : Integer.parseInt(currentSerialNumber.trim());
             return Integer.toString(currentSn + 1);
         } catch (NumberFormatException ex) {

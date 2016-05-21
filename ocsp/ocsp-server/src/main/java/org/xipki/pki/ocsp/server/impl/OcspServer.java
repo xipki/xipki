@@ -186,9 +186,7 @@ public class OcspServer {
                 return 0;
             }
 
-            return (diff > 0)
-                    ? 1
-                    : -1;
+            return (diff > 0) ? 1 : -1;
         }
 
     } // class ServletPathResponderName
@@ -615,22 +613,15 @@ public class OcspServer {
                 statusStores.add(stores.get(storeName));
             }
 
-            AuditOption auditOption = (aoName == null)
-                    ? null
-                    : auditOptions.get(aoName);
+            AuditOption auditOption = (aoName == null) ? null : auditOptions.get(aoName);
 
-            CertprofileOption certprofileOption = (cfoName == null)
-                    ? null
+            CertprofileOption certprofileOption = (cfoName == null) ? null
                     : certprofileOptions.get(cfoName);
 
-            Responder responder = new Responder(
-                    option,
+            Responder responder = new Responder(option,
                     requestOptions.get(option.getRequestOptionName()),
-                    responseOptions.get(option.getResponseOptionName()),
-                    auditOption,
-                    certprofileOption,
-                    signers.get(option.getSignerName()),
-                    statusStores);
+                    responseOptions.get(option.getResponseOptionName()), auditOption,
+                    certprofileOption, signers.get(option.getSignerName()), statusStores);
             responders.put(name, responder);
         } // end for
     } // method doInit
@@ -709,8 +700,8 @@ public class OcspServer {
                         StringBuilder sb = new StringBuilder(50);
                         sb.append("length of nonce ").append(len);
                         sb.append(" not within [").append(min).append(", ").append(max);
-                        fillAuditEvent(auditEvent, AuditLevel.INFO,
-                                AuditStatus.FAILED, sb.toString());
+                        fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED,
+                                sb.toString());
                     }
                     return createUnsuccessfulOcspResp(OcspResponseStatus.malformedRequest);
                 }
@@ -763,14 +754,10 @@ public class OcspServer {
 
                 for (OcspStore store : responder.getStores()) {
                     try {
-                        certStatusInfo = store.getCertStatus(
-                                reqHashAlgo,
-                                certId.getIssuerNameHash(),
-                                certId.getIssuerKeyHash(),
-                                certId.getSerialNumber(),
-                                responseOption.isIncludeCerthash(),
-                                responseOption.getCertHashAlgo(),
-                                certprofileOption);
+                        certStatusInfo = store.getCertStatus(reqHashAlgo,
+                                certId.getIssuerNameHash(), certId.getIssuerKeyHash(),
+                                certId.getSerialNumber(),  responseOption.isIncludeCerthash(),
+                                responseOption.getCertHashAlgo(), certprofileOption);
                         if (certStatusInfo.getCertStatus() != CertStatus.ISSUER_UNKNOWN) {
                             answeredStore = store;
                             break;
@@ -790,8 +777,8 @@ public class OcspServer {
                     if (exceptionOccurs) {
                         return createUnsuccessfulOcspResp(OcspResponseStatus.tryLater);
                     } else {
-                        certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(
-                                new Date(), null);
+                        certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(new Date(),
+                                null);
                     }
                 } else if (answeredStore != null && responderOption.isInheritCaRevocation()) {
                     CertRevocationInfo caRevInfo = answeredStore.getCaRevocationInfo(
@@ -813,17 +800,13 @@ public class OcspServer {
                             if (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) {
                                 newRevInfo = caRevInfo;
                             } else {
-                                newRevInfo = new CertRevocationInfo(
-                                        CrlReason.CA_COMPROMISE,
+                                newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
                                         caRevInfo.getRevocationTime(),
                                         caRevInfo.getInvalidityTime());
                             }
-                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(
-                                    newRevInfo,
-                                    certStatusInfo.getCertHashAlgo(),
-                                    certStatusInfo.getCertHash(),
-                                    certStatusInfo.getThisUpdate(),
-                                    certStatusInfo.getNextUpdate(),
+                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
+                                    certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
+                                    certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
                                     certStatusInfo.getCertprofile());
                         } // end if(replaced)
                     } // end if
@@ -931,8 +914,7 @@ public class OcspServer {
 
                 if (certStatusInfo.getArchiveCutOff() != null) {
                     Extension extension = new Extension(
-                            OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff,
-                            false,
+                            OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, false,
                             new ASN1GeneralizedTime(certStatusInfo.getArchiveCutOff())
                                 .getEncoded());
                     extensions.add(extension);
@@ -942,9 +924,7 @@ public class OcspServer {
                 if (bcCertStatus instanceof UnknownStatus) {
                     certStatusText = "unknown";
                 } else if (bcCertStatus instanceof RevokedStatus) {
-                    certStatusText = unknownAsRevoked
-                            ? "unknown_as_revoked"
-                            : "revoked";
+                    certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
                 } else if (bcCertStatus == null) {
                     certStatusText = "good";
                 } else {
@@ -1118,8 +1098,7 @@ public class OcspServer {
     }
 
     private void auditLogPciEvent(final boolean successful, final String eventType) {
-        AuditService auditService = (auditServiceRegister == null)
-                ? null
+        AuditService auditService = (auditServiceRegister == null) ? null
                 : auditServiceRegister.getAuditService();
         if (auditService != null) {
             PciAuditEvent auditEvent = new PciAuditEvent(new Date());
@@ -1202,9 +1181,7 @@ public class OcspServer {
         store.setName(conf.getName());
 
         Integer interval = conf.getRetentionInterval();
-        int retentionInterva = (interval == null)
-                ? -1
-                : interval.intValue();
+        int retentionInterva = (interval == null) ? -1 : interval.intValue();
         store.setRetentionInterval(retentionInterva);
         store.setUnknownSerialAsGood(getBoolean(conf.isUnknownSerialAsGood(), false));
 
@@ -1397,25 +1374,19 @@ public class OcspServer {
     }
 
     private static boolean getBoolean(final Boolean bo, final boolean defaultValue) {
-        return (bo == null)
-                ? defaultValue
-                : bo.booleanValue();
+        return (bo == null) ? defaultValue : bo.booleanValue();
     }
 
     private static InputStream getInputStream(final FileOrValueType conf) throws IOException {
-        if (conf.getFile() != null) {
-            return new FileInputStream(IoUtil.expandFilepath(conf.getFile()));
-        } else {
-            return new ByteArrayInputStream(conf.getValue());
-        }
+        return (conf.getFile() != null)
+                ? new FileInputStream(IoUtil.expandFilepath(conf.getFile()))
+                : new ByteArrayInputStream(conf.getValue());
     }
 
     private static InputStream getInputStream(final FileOrPlainValueType conf) throws IOException {
-        if (conf.getFile() != null) {
-            return new FileInputStream(IoUtil.expandFilepath(conf.getFile()));
-        } else {
-            return new ByteArrayInputStream(conf.getValue().getBytes());
-        }
+        return (conf.getFile() != null)
+                ? new FileInputStream(IoUtil.expandFilepath(conf.getFile()))
+                : new ByteArrayInputStream(conf.getValue().getBytes());
     }
 
     private static void close(final InputStream stream) {

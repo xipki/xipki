@@ -168,9 +168,7 @@ abstract class CmpResponder {
         }
 
         GeneralName recipient = reqHeader.getRecipient();
-        boolean intentMe = (recipient == null)
-                ? true
-                : intendsMe(recipient);
+        boolean intentMe = (recipient == null) ? true : intendsMe(recipient);
         if (!intentMe) {
             LOG.warn("tid={}: I am not the intented recipient, but '{}'", tid,
                     reqHeader.getRecipient());
@@ -233,9 +231,8 @@ abstract class CmpResponder {
                         "request is protected by signature but the requestor is not authorized";
                     break;
                 case SIGALGO_FORBIDDEN:
-                    errorStatus =
-                        "request is protected by signature but the protection algorithm is"
-                        + " forbidden";
+                    errorStatus = "request is protected by signature but the protection algorithm"
+                        + " is forbidden";
                     break;
                 default:
                     throw new RuntimeException(
@@ -259,8 +256,8 @@ abstract class CmpResponder {
             if (authorized) {
                 errorStatus = null;
             } else {
-                LOG.warn("tid={}: not authorized requestor (TLS client '{}')",
-                        tid, X509Util.getRfc4519Name(tlsClientCert.getSubjectX500Principal()));
+                LOG.warn("tid={}: not authorized requestor (TLS client '{}')", tid,
+                        X509Util.getRfc4519Name(tlsClientCert.getSubjectX500Principal()));
                 errorStatus = "requestor (TLS client certificate) is not authorized";
             }
         } else {
@@ -269,9 +266,7 @@ abstract class CmpResponder {
         }
 
         CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
-        String username = (keyvalues == null)
-                ? null
-                : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
+        String username = (keyvalues == null) ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
         if (username != null) {
             if (username.indexOf('*') != -1 || username.indexOf('%') != -1) {
                 errorStatus = "user could not contains characters '*' and '%'";
@@ -340,16 +335,12 @@ abstract class CmpResponder {
 
         boolean signatureValid = protectedMsg.verify(verifierProvider);
         return new ProtectionVerificationResult(requestor,
-                signatureValid
-                    ? ProtectionResult.VALID
-                    : ProtectionResult.INVALID);
+                signatureValid ? ProtectionResult.VALID : ProtectionResult.INVALID);
     } // method verifyProtection
 
     private PKIMessage addProtection(final PKIMessage pkiMessage, final AuditEvent auditEvent) {
         try {
-            return CmpUtil.addProtection(pkiMessage,
-                    getSigner(),
-                    getSender(),
+            return CmpUtil.addProtection(pkiMessage, getSigner(), getSender(),
                     getCmpControl().isSendResponderCert());
         } catch (Exception ex) {
             LogUtil.error(LOG, ex, "could not add protection to the PKI message");
@@ -373,8 +364,7 @@ abstract class CmpResponder {
         GeneralName respRecipient = requestHeader.getSender();
 
         PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
-                requestHeader.getPvno().getValue().intValue(),
-                getSender(), respRecipient);
+                requestHeader.getPvno().getValue().intValue(), getSender(), respRecipient);
         respHeader.setMessageTime(new ASN1GeneralizedTime(new Date()));
         if (tid != null) {
             respHeader.setTransactionID(tid);
@@ -389,27 +379,19 @@ abstract class CmpResponder {
 
     protected PKIStatusInfo generateCmpRejectionStatus(final Integer info,
             final String errorMessage) {
-        PKIFreeText statusMessage = (errorMessage == null)
-                ? null
-                : new PKIFreeText(errorMessage);
-        PKIFailureInfo failureInfo = (info == null)
-                ? null
-                : new PKIFailureInfo(info);
+        PKIFreeText statusMessage = (errorMessage == null) ? null : new PKIFreeText(errorMessage);
+        PKIFailureInfo failureInfo = (info == null) ? null : new PKIFailureInfo(info);
         return new PKIStatusInfo(PKIStatus.rejection, statusMessage, failureInfo);
     } // method generateCmpRejectionStatus
 
     public X500Name getResponderSubject() throws InvalidConfException {
         GeneralName sender = getSender();
-        return (sender == null)
-                ? null
-                : (X500Name) sender.getName();
+        return (sender == null) ? null : (X500Name) sender.getName();
     }
 
     public X509Certificate getResponderCert() throws InvalidConfException {
         ConcurrentContentSigner signer = getSigner();
-        return (signer == null)
-                ? null
-                : signer.getCertificate();
+        return (signer == null) ? null : signer.getCertificate();
     }
 
 }

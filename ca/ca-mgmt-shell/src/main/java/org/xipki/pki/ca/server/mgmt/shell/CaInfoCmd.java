@@ -77,9 +77,7 @@ public class CaInfoCmd extends CaCommandSupport {
             Set<String> names = caManager.getCaNames();
             int size = names.size();
             if (size == 0 || size == 1) {
-                sb.append((size == 0)
-                        ? "no"
-                        : "1");
+                sb.append((size == 0) ? "no" : "1");
                 sb.append(" CA is configured\n");
             } else {
                 sb.append(size).append(" CAs are configured:\n");

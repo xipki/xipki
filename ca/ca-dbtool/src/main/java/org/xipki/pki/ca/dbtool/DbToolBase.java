@@ -122,8 +122,8 @@ public class DbToolBase {
         ParamUtil.requireNonBlank("idColumn", idColumn);
 
         StringBuilder sb = new StringBuilder(50);
-        sb.append("DELETE FROM ").append(tableName).append(" WHERE ")
-            .append(idColumn).append(" > ").append(id);
+        sb.append("DELETE FROM ").append(tableName).append(" WHERE ");
+        sb.append(idColumn).append(" > ").append(id);
 
         Statement stmt;
         try {
@@ -135,8 +135,8 @@ public class DbToolBase {
         try {
             stmt.execute(sb.toString());
         } catch (Throwable th) {
-            String msg = String.format(
-                    "could not delete columns from table %s with %s > %s", tableName, idColumn, id);
+            String msg = String.format("could not delete columns from table %s with %s > %s",
+                    tableName, idColumn, id);
             log.error(msg, th);
             return false;
         } finally {
@@ -274,11 +274,7 @@ public class DbToolBase {
     protected static void setBoolean(final PreparedStatement ps, final int index,
             final boolean value) throws SQLException {
         ParamUtil.requireNonNull("ps", ps);
-
-        int intValue = value
-                ? 1
-                : 0;
-        ps.setInt(index, intValue);
+        ps.setInt(index, value ? 1 : 0);
     }
 
     public static Properties getDbConfProperties(final InputStream is) throws IOException {

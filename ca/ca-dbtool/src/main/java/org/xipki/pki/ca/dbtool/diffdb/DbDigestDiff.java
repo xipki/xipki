@@ -101,21 +101,15 @@ public class DbDigestDiff {
             final DataSourceWrapper targetDatasource, final String reportDirName,
             final boolean revokedOnly, final AtomicBoolean stopMe, final int numPerSelect,
             final NumThreads numThreads) throws IOException, DataAccessException {
-        if (refDir == null) {
-            if (refDatasource == null) {
-                throw new IllegalArgumentException(
-                        "refDir and refDataSource must not be both null");
-            }
-        } else if (refDatasource != null) {
+        if (refDir == null && refDatasource == null) {
+            throw new IllegalArgumentException("refDir and refDatasource must not be both null");
+        } else if (refDir != null && refDatasource != null) {
             throw new IllegalArgumentException(
-                    "refDir and refDataSource must not be both non-null");
+                    "refDir and refDatasource must not be both non-null");
         }
 
         this.revokedOnly = revokedOnly;
-        this.refDirname = (refDir == null)
-                ? null
-                : IoUtil.expandFilepath(refDir);
-
+        this.refDirname = (refDir == null) ? null : IoUtil.expandFilepath(refDir);
         this.refDatasource = refDatasource;
         this.targetDatasource = ParamUtil.requireNonNull("targetDatasource", targetDatasource);
         this.reportDirName = ParamUtil.requireNonNull("reportDirName", reportDirName);
@@ -126,8 +120,7 @@ public class DbDigestDiff {
         this.targetDbControl = new XipkiDbControl(dbSchemaType);
 
         // number of threads
-        this.numRefThreads = (refDatasource == null)
-                ? 1
+        this.numRefThreads = (refDatasource == null) ? 1
                 : Math.min(numThreads.getNumRefThreads(), refDatasource.getMaximumPoolSize() - 1);
         if (this.numRefThreads != numThreads.getNumRefThreads()) {
             LOG.info("adapted the numRefThreads from {} to {}", numRefThreads, this.numRefThreads);
@@ -212,12 +205,12 @@ public class DbDigestDiff {
             for (Integer refCaId : refCaIds) {
                 DigestReader refReader;
                 if (refDbSchemaType == DbSchemaType.EJBCA_CA_v3) {
-                    refReader = EjbcaDbDigestReader.getInstance(refDatasource,
-                                refCaId, dbContainsMultipleCAs, numRefThreads,
-                                numCertsToPredicate, new StopMe(stopMe));
+                    refReader = EjbcaDbDigestReader.getInstance(refDatasource, refCaId,
+                            dbContainsMultipleCAs, numRefThreads, numCertsToPredicate,
+                            new StopMe(stopMe));
                 } else {
                     refReader = XipkiDbDigestReader.getInstance(refDatasource, refDbSchemaType,
-                                refCaId, numRefThreads, numCertsToPredicate, new StopMe(stopMe));
+                            refCaId, numRefThreads, numCertsToPredicate, new StopMe(stopMe));
                 }
                 diffSingleCa(refReader, caIdCertMap);
             }
@@ -272,8 +265,8 @@ public class DbDigestDiff {
         try {
             reporter.start();
             ProcessLog processLog = new ProcessLog(refReader.getTotalAccount());
-            System.out.println("Processing certifiates of CA \n\t'"
-                    + refReader.getCaSubjectName() + "'");
+            System.out.println("Processing certifiates of CA \n\t'" + refReader.getCaSubjectName()
+                + "'");
             processLog.printHeader();
 
             target = new TargetDigestRetriever(revokedOnly, processLog, refReader, reporter,
@@ -301,9 +294,8 @@ public class DbDigestDiff {
             final DataSourceWrapper targetDatasource, final String reportDirName,
             final boolean revokedOnly, final AtomicBoolean stopMe, final int numPerSelect,
             final NumThreads numThreads) throws IOException, DataAccessException {
-        return new DbDigestDiff(refDirname, null,
-                targetDatasource, reportDirName, revokedOnly, stopMe,
-                numPerSelect, numThreads);
+        return new DbDigestDiff(refDirname, null, targetDatasource, reportDirName, revokedOnly,
+                stopMe, numPerSelect, numThreads);
     }
 
     public static DbDigestDiff getInstanceForDbRef(final DataSourceWrapper refDatasource,

@@ -278,17 +278,13 @@ class RequestOption {
         if (conf.getKeystore() != null) {
             Keystore ksConf = conf.getKeystore();
             KeyStore trustStore = KeyStore.getInstance(ksConf.getType());
-            InputStream is = null;
 
             String fileName = ksConf.getKeystore().getFile();
-            if (fileName != null) {
-                is = new FileInputStream(IoUtil.expandFilepath(fileName));
-            } else {
-                is = new ByteArrayInputStream(ksConf.getKeystore().getValue());
-            }
+            InputStream is = (fileName != null)
+                    ? new FileInputStream(IoUtil.expandFilepath(fileName))
+                    : new ByteArrayInputStream(ksConf.getKeystore().getValue());
 
-            char[] password = (ksConf.getPassword() == null)
-                    ? null
+            char[] password = (ksConf.getPassword() == null)  ? null
                     : ksConf.getPassword().toCharArray();
             trustStore.load(is, password);
 
