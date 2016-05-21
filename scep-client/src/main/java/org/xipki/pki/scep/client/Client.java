@@ -174,9 +174,7 @@ public abstract class Client {
                 return httpPost(url, REQ_CONTENT_TYPE, request);
             } else {
                 String url = caId.buildGetUrl(operation,
-                        (request == null)
-                            ? null
-                            : Base64.toBase64String(request));
+                        (request == null) ? null : Base64.toBase64String(request));
                 return httpGet(url);
             }
         } // end if
@@ -460,12 +458,8 @@ public abstract class Client {
         }
 
         try {
-            return request.encode(
-                    identityKey,
-                    signatureAlgorithm,
-                    identityCert,
-                    new X509Certificate[]{identityCert},
-                    authorityCertStore.getEncryptionCert(),
+            return request.encode(identityKey, signatureAlgorithm, identityCert,
+                    new X509Certificate[]{identityCert}, authorityCertStore.getEncryptionCert(),
                     encAlgId);
         } catch (MessageEncodingException ex) {
             throw new ScepClientException(ex);
@@ -676,13 +670,11 @@ public abstract class Client {
             try {
                 if (!ScepUtil.issues(caCert, raEncCert)) {
                     throw new ScepClientException("RA certificate '"
-                            + raEncCert.getSubjectX500Principal()
-                            + " is not issued by the CA");
+                            + raEncCert.getSubjectX500Principal() + " is not issued by the CA");
                 }
                 if (raSignCert != raEncCert && ScepUtil.issues(caCert, raSignCert)) {
                     throw new ScepClientException("RA certificate '"
-                            + raSignCert.getSubjectX500Principal()
-                            + " is not issued by the CA");
+                            + raSignCert.getSubjectX500Principal() + " is not issued by the CA");
                 }
             } catch (CertificateException ex) {
                 throw new ScepClientException("invalid certificate: " + ex.getMessage(), ex);

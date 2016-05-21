@@ -141,13 +141,8 @@ public abstract class AbstractCaTest {
             ScepControl control = new ScepControl(isSendCaCert(), isPendingCert(),
                     sendSignerCert(), useInsecureAlgorithms(), secret);
 
-            this.scepServer = new ScepServer(
-                    "scep",
-                    caCaps,
-                    isWithRa(),
-                    isWithNextCa(),
-                    isGenerateCrl(),
-                    control);
+            this.scepServer = new ScepServer("scep", caCaps, isWithRa(), isWithNextCa(),
+                    isGenerateCrl(), control);
             this.scepServerContainer = new ScepServerContainer(8080, scepServer);
         }
 
@@ -235,8 +230,8 @@ public abstract class AbstractCaTest {
             X500Name subject = new X500Name("CN=EE1, OU=emulator, O=xipki.org, C=DE");
 
             // first try without secret
-            PKCS10CertificationRequest p10Req = ScepUtil.generateRequest(
-                    privKey, subjectPublicKeyInfo, subject, null, null);
+            PKCS10CertificationRequest p10Req = ScepUtil.generateRequest(privKey,
+                    subjectPublicKeyInfo, subject, null, null);
             csr = p10Req.toASN1Structure();
 
             selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
@@ -246,8 +241,8 @@ public abstract class AbstractCaTest {
             Assert.assertEquals("PkiStatus without secret", PkiStatus.FAILURE, status);
 
             // first try invalid secret
-            p10Req = ScepUtil.generateRequest(
-                    privKey, subjectPublicKeyInfo, subject, "invalid-" + secret, null);
+            p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject,
+                    "invalid-" + secret, null);
             csr = p10Req.toASN1Structure();
 
             selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
@@ -256,13 +251,11 @@ public abstract class AbstractCaTest {
             status = enrolResp.getPkcsRep().getPkiStatus();
             Assert.assertEquals("PkiStatus with invalid secret", PkiStatus.FAILURE, status);
 
-            p10Req = ScepUtil.generateRequest(
-                    privKey, subjectPublicKeyInfo, subject, secret, null);
+            p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
             csr = p10Req.toASN1Structure();
 
             selfSignedCert = ScepUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
-            enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey,
-                    selfSignedCert);
+            enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
 
             List<X509Certificate> certs = enrolResp.getCertificates();
             Assert.assertTrue("number of received certificates", certs.size() > 0);
@@ -272,8 +265,7 @@ public abstract class AbstractCaTest {
         }
 
         // certPoll
-        EnrolmentResponse enrolResp = client.scepCertPoll(
-                privKey, selfSignedCert, csr, issuerName);
+        EnrolmentResponse enrolResp = client.scepCertPoll(privKey, selfSignedCert, csr, issuerName);
 
         List<X509Certificate> certs = enrolResp.getCertificates();
         Assert.assertTrue("number of received certificates", certs.size() > 0);
@@ -281,8 +273,8 @@ public abstract class AbstractCaTest {
         Assert.assertNotNull("enroled certificate", cert);
 
         // getCert
-        certs = client.scepGetCert(
-                privKey, selfSignedCert, issuerName, enroledCert.getSerialNumber());
+        certs = client.scepGetCert(privKey, selfSignedCert, issuerName,
+                enroledCert.getSerialNumber());
         Assert.assertTrue("number of received certificates", certs.size() > 0);
         cert = certs.get(0);
         Assert.assertNotNull("received certificate", cert);

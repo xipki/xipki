@@ -86,8 +86,7 @@ public class ScepClient extends Client {
                 if (requestContentType != null) {
                     conn.setRequestProperty("Content-Type", requestContentType);
                 }
-                conn.setRequestProperty("Content-Length",
-                        java.lang.Integer.toString(request.length));
+                conn.setRequestProperty("Content-Length", Integer.toString(request.length));
                 OutputStream outputstream = conn.getOutputStream();
                 outputstream.write(request);
                 outputstream.flush();
@@ -107,8 +106,7 @@ public class ScepClient extends Client {
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 inputstream.close();
 
-                throw new ScepClientException("bad response: "
-                        + conn.getResponseCode() + "    "
+                throw new ScepClientException("bad response: " + conn.getResponseCode() + "    "
                         + conn.getResponseMessage());
             }
             String contentType = conn.getContentType();
