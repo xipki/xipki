@@ -217,20 +217,16 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected char[] readPassword(final String prompt) throws IOException {
-        String tmpPrompt = (prompt == null)
-                ? "Password:"
-                : prompt.trim();
+        String tmpPrompt = (prompt == null) ? "Password:" : prompt.trim();
 
         if (!tmpPrompt.endsWith(":")) {
             tmpPrompt += ":";
         }
 
         String passwordUi = System.getProperty("org.xipki.console.passwordui");
-        if ("gui".equalsIgnoreCase(passwordUi)) {
-            return SecurePasswordInputPanel.readPassword(tmpPrompt);
-        } else {
-            return readLine(tmpPrompt, '*').toCharArray();
-        }
+        return "gui".equalsIgnoreCase(passwordUi)
+                ? SecurePasswordInputPanel.readPassword(tmpPrompt)
+                : readLine(tmpPrompt, '*').toCharArray();
     }
 
     private String readLine(String prompt, Character ch) throws IOException {

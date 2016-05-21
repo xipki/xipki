@@ -97,9 +97,7 @@ public class CaLoadTestEnroll extends LoadExecutor {
                 Map<Integer, CertRequest> certReqs = nextCertRequests();
                 if (certReqs != null) {
                     boolean successful = testNext(certReqs);
-                    int numFailed = successful
-                            ? 0
-                            : 1;
+                    int numFailed = successful ? 0 : 1;
                     account(1, numFailed);
                 } else {
                     account(1, 1);
@@ -113,12 +111,8 @@ public class CaLoadTestEnroll extends LoadExecutor {
                 EnrollCertRequest request = new EnrollCertRequest(Type.CERT_REQ);
                 for (Integer certId : certRequests.keySet()) {
                     String id = "id-" + certId;
-                    EnrollCertRequestEntry requestEntry = new EnrollCertRequestEntry(
-                            id,
-                            loadtestEntry.getCertprofile(),
-                            certRequests.get(certId),
-                            RA_VERIFIED);
-
+                    EnrollCertRequestEntry requestEntry = new EnrollCertRequestEntry(id,
+                            loadtestEntry.getCertprofile(), certRequests.get(certId), RA_VERIFIED);
                     request.addRequestEntry(requestEntry);
                 }
 
@@ -172,7 +166,6 @@ public class CaLoadTestEnroll extends LoadExecutor {
             }
 
             certTempBuilder.setPublicKey(spki);
-
             CertTemplate certTemplate = certTempBuilder.build();
             CertRequest certRequest = new CertRequest(certId, certTemplate, null);
             certRequests.put(certId, certRequest);

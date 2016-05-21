@@ -252,11 +252,9 @@ public class RequestOptions {
         }
 
         AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
-        return new RSASSAPSSparams(
-                digAlgId,
+        return new RSASSAPSSparams(digAlgId,
                 new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
-                new ASN1Integer(saltSize),
-                RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
+                new ASN1Integer(saltSize), RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
     } // method createPSSRSAParams
 
 }

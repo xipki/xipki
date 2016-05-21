@@ -100,9 +100,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         boolean replaced = services.remove(service);
         services.add(service);
 
-        String action = replaced
-                ? "replaced"
-                : "added";
+        String action = replaced ? "replaced" : "added";
         LOG.info("{} SignerFactory binding for {}", action, service);
     }
 
@@ -213,8 +211,8 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
                     securityFactory.getRandom4Sign());
         } catch (NoSuchAlgorithmException | OperatorCreationException | NoSuchPaddingException
                 | XiSecurityException ex) {
-            throw new ObjectCreationException(String.format("%s: %s",
-                    ex.getClass().getName(), ex.getMessage()));
+            throw new ObjectCreationException(String.format("%s: %s", ex.getClass().getName(),
+                    ex.getMessage()));
         }
     }
 
@@ -241,14 +239,10 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
         String moduleName = conf.getConfValue("module");
         str = conf.getConfValue("slot");
-        Integer slotIndex = (str == null)
-                ? null
-                : Integer.parseInt(str);
+        Integer slotIndex = (str == null) ? null : Integer.parseInt(str);
 
         str = conf.getConfValue("slot-id");
-        Long slotId = (str == null)
-                ? null
-                : Long.parseLong(str);
+        Long slotId = (str == null) ? null : Long.parseLong(str);
 
         if ((slotIndex == null && slotId == null)
                 || (slotIndex != null && slotId != null)) {
@@ -274,8 +268,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         try {
             p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
             P11Module module = p11Service.getModule();
-            P11SlotIdentifier p11SlotId = (slotId != null)
-                    ? module.getSlotIdForId(slotId)
+            P11SlotIdentifier p11SlotId = (slotId != null) ? module.getSlotIdForId(slotId)
                     : module.getSlotIdForIndex(slotIndex);
             slot = module.getSlot(p11SlotId);
         } catch (P11TokenException | XiSecurityException ex) {
@@ -286,9 +279,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
                 ? slot.getObjectIdForId(keyId)
                 : slot.getObjectIdForLabel(keyLabel);
         if (p11ObjId == null) {
-            String str2 = (keyId != null)
-                    ? "id " + Hex.toHexString(keyId)
-                    : "label " + keyLabel;
+            String str2 = (keyId != null) ? "id " + Hex.toHexString(keyId) : "label " + keyLabel;
             throw new ObjectCreationException("cound not find identity with " + str2);
         }
         P11EntityIdentifier entityId = new P11EntityIdentifier(slot.getSlotId(), p11ObjId);
@@ -302,8 +293,8 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
                 signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, conf);
             }
 
-            P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
-                    p11Service, securityFactory, entityId, certificateChain);
+            P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(p11Service,
+                    securityFactory, entityId, certificateChain);
             return signerBuilder.createSigner(signatureAlgId, parallelism);
         } catch (P11TokenException | NoSuchAlgorithmException | XiSecurityException ex) {
             throw new ObjectCreationException(ex.getMessage(), ex);

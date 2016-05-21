@@ -97,8 +97,7 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
         Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
         this.slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
-        this.objectId = Asn1P11ObjectIdentifier.getInstance(
-                seq.getObjectAt(idx++));
+        this.objectId = Asn1P11ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
         this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
     }
 

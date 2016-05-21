@@ -68,11 +68,8 @@ abstract class AbstractPathCompleter implements Completer {
                 }
             }
 
-            if (ignoreRegex == null || ignoreRegex.isEmpty()) {
-                IGNORE_PATTERN = null;
-            } else {
-                IGNORE_PATTERN = Pattern.compile(ignoreRegex);
-            }
+            IGNORE_PATTERN = (ignoreRegex == null || ignoreRegex.isEmpty()) ? null
+                    : Pattern.compile(ignoreRegex);
         }
 
         @Override
@@ -101,16 +98,14 @@ abstract class AbstractPathCompleter implements Completer {
         }
 
         String buffer = commandLine.getCursorArgument();
-        buffer = (buffer != null)
-                ? buffer.substring(0, commandLine.getArgumentPosition())
-                : "";
+        buffer = (buffer == null) ? ""
+                : buffer.substring(0, commandLine.getArgumentPosition());
 
         if (OS_IS_WINDOWS) {
             buffer = buffer.replace('/', '\\');
         }
 
         String translated = buffer;
-
         File homeDir = getUserHome();
 
         // Special character: ~ maps to the user's home directory
@@ -124,20 +119,10 @@ abstract class AbstractPathCompleter implements Completer {
         }
 
         File file = new File(translated);
-        final File dir;
+        final File dir = translated.endsWith(SEP) ? file : file.getParentFile();
 
-        if (translated.endsWith(SEP)) {
-            dir = file;
-        } else {
-            dir = file.getParentFile();
-        }
-
-        File[] entries = (dir == null)
-                ? new File[0]
-                : dir.listFiles(FILENAME_FILTER);
-        if (isDirOnly()
-                && entries != null
-                && entries.length > 0) {
+        File[] entries = (dir == null) ? new File[0] : dir.listFiles(FILENAME_FILTER);
+        if (isDirOnly() && entries != null && entries.length > 0) {
             List<File> list = new LinkedList<File>();
             for (File f : entries) {
                 if (f.isDirectory()) {
@@ -192,9 +177,7 @@ abstract class AbstractPathCompleter implements Completer {
         }
 
         int index = buffer.lastIndexOf(SEP);
-        return index == -1
-                ? 0
-                : index + SEP_LEN;
+        return (index == -1) ? 0 : index + SEP_LEN;
     }
 
 }

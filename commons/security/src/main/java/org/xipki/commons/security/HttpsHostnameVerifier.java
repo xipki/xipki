@@ -125,9 +125,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
         }
 
         Set<String> hostnames = hostnameMap.get(commonName);
-        return (hostnames == null)
-                ? false
-                : hostnames.contains(hostname);
+        return (hostnames == null) ? false : hostnames.contains(hostname);
     }
 
     public void setCommonnameHostMap(final String commonnameHostMap) {

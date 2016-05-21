@@ -152,11 +152,9 @@ public class ScepResponder {
     public ContentInfo servicePkiOperation(final CMSSignedData requestContent,
             final AuditEvent auditEvent) throws MessageDecodingException, CaException {
         ParamUtil.requireNonNull("requestContent", requestContent);
-        PrivateKey recipientKey = (raEmulator != null)
-                ? raEmulator.getRaKey()
+        PrivateKey recipientKey = (raEmulator != null) ? raEmulator.getRaKey()
                 : caEmulator.getCaKey();
-        Certificate recipientCert = (raEmulator != null)
-                ? raEmulator.getRaCert()
+        Certificate recipientCert = (raEmulator != null) ? raEmulator.getRaCert()
                 : caEmulator.getCaCert();
         X509CertificateObject recipientX509Obj;
         try {
@@ -192,16 +190,10 @@ public class ScepResponder {
         try {
             X509Certificate jceSignerCert = new X509CertificateObject(getSigningCert());
             X509Certificate[] certs = control.isSendSignerCert()
-                    ? new X509Certificate[]{jceSignerCert}
-                    : null;
+                    ? new X509Certificate[]{jceSignerCert} : null;
 
-            return rep.encode(
-                    getSigningKey(),
-                    signatureAlgorithm,
-                    jceSignerCert,
-                    certs,
-                    req.getSignatureCert(),
-                    req.getContentEncryptionAlgorithm());
+            return rep.encode(getSigningKey(), signatureAlgorithm, jceSignerCert, certs,
+                    req.getSignatureCert(), req.getContentEncryptionAlgorithm());
         } catch (Exception ex) {
             throw new CaException(ex);
         }
@@ -213,12 +205,8 @@ public class ScepResponder {
             X509Certificate jceSignerCert = new X509CertificateObject(getSigningCert());
 
             X509Certificate[] certs = control.isSendSignerCert()
-                    ? new X509Certificate[]{jceSignerCert}
-                    : null;
-            return nextCaMsg.encode(
-                    getSigningKey(),
-                    jceSignerCert,
-                    certs);
+                    ? new X509Certificate[]{jceSignerCert} : null;
+            return nextCaMsg.encode(getSigningKey(), jceSignerCert, certs);
         } catch (Exception ex) {
             throw new CaException(ex);
         }
@@ -314,15 +302,13 @@ public class ScepResponder {
             }
         } else if (AES_ENC_ALGS.contains(encOid)) {
             if (!caCaps.containsCapability(CaCapability.AES)) {
-                LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid,
-                        encOid);
+                LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
             }
         } else if (CMSAlgorithm.DES_CBC.equals(encOid)) {
             if (!control.isUseInsecureAlg()) {
-                LOG.warn("tid={}: encryption with DES algorithm {} is not permitted", tid,
-                        encOid);
+                LOG.warn("tid={}: encryption with DES algorithm {} is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
             }
@@ -485,15 +471,11 @@ public class ScepResponder {
     }
 
     public PrivateKey getSigningKey() {
-        return (raEmulator != null)
-                ? raEmulator.getRaKey()
-                : caEmulator.getCaKey();
+        return (raEmulator != null) ? raEmulator.getRaKey() : caEmulator.getCaKey();
     }
 
     public Certificate getSigningCert() {
-        return (raEmulator != null)
-                ? raEmulator.getRaCert()
-                : caEmulator.getCaCert();
+        return (raEmulator != null) ? raEmulator.getRaCert() : caEmulator.getCaCert();
     }
 
     public CaCaps getCaCaps() {

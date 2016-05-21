@@ -96,8 +96,7 @@ public class DefaultHttpOcspRequestor extends AbstractOcspRequestor {
 
             httpUrlConnection.setRequestMethod("POST");
             httpUrlConnection.setRequestProperty("Content-Type", CT_REQUEST);
-            httpUrlConnection.setRequestProperty("Content-Length",
-                    java.lang.Integer.toString(size));
+            httpUrlConnection.setRequestProperty("Content-Length", Integer.toString(size));
             OutputStream outputstream = httpUrlConnection.getOutputStream();
             outputstream.write(request);
             outputstream.flush();

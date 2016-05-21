@@ -115,9 +115,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
 
         SingleResp[] singleResponses = basicResp.getResponses();
 
-        final int n = (singleResponses == null)
-                ? 0
-                : singleResponses.length;
+        final int n = (singleResponses == null) ? 0 : singleResponses.length;
         if (n == 0) {
             throw new CmdFailure("received no status from server");
         }
@@ -210,18 +208,15 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
 
                 if (revStatus.hasRevocationReason()) {
                     int reason = revStatus.getRevocationReason();
-                    if (extendedRevoke
-                            && reason == CrlReason.CERTIFICATE_HOLD.getCode()
+                    if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.getCode()
                             && revTime.getTime() == 0) {
                         status = "unknown (RFC6960)";
                     } else {
                         StringBuilder sb = new StringBuilder("revoked, reason = ");
                         sb.append(CrlReason.forReasonCode(reason).getDescription());
-                        sb.append(", revocationTime = ");
-                        sb.append(revTime);
+                        sb.append(", revocationTime = ").append(revTime);
                         if (invTime != null) {
-                            sb.append(", invalidityTime = ");
-                            sb.append(invTime);
+                            sb.append(", invalidityTime = ").append(invTime);
                         }
                         status = sb.toString();
                     }
@@ -247,8 +242,8 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
             msg.append("\nCertificate status: ").append(status);
 
             if (verbose.booleanValue()) {
-                msg.append("\nthisUpdate: " + singleResp.getThisUpdate());
-                msg.append("\nnextUpdate: " + singleResp.getNextUpdate());
+                msg.append("\nthisUpdate: ").append(singleResp.getThisUpdate());
+                msg.append("\nnextUpdate: ").append(singleResp.getNextUpdate());
 
                 Extension extension = singleResp.getExtension(
                         ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
@@ -315,7 +310,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
                             msg.append(", ");
                         }
                     }
-                } // end if(extensionOIDs)
+                }
             } // end if (verbose.booleanValue())
 
             println(msg.toString());

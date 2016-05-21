@@ -113,8 +113,9 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     protected String hashAlgo = "SHA256";
 
     @Option(name = "--subject", aliases = "-s",
+            required = true,
             description = "subject to be requested\n"
-                    + "(defaults to subject of self-signed certifite)")
+                    + "(required)")
     private String subject;
 
     @Option(name = "--profile", aliases = "-p",
@@ -227,9 +228,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
                 new SignatureAlgoControl(rsaMgf1, dsaPlain));
         X509CertificateHolder ssCert = signer.getCertificateAsBcObject();
 
-        X500Name x500Subject = (subject == null)
-                ? ssCert.getSubject()
-                : new X500Name(subject);
+        X500Name x500Subject = new X500Name(subject);
         certTemplateBuilder.setSubject(x500Subject);
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
 
@@ -309,12 +308,9 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
         // biometricInfo
         if (biometricType != null && biometricHashAlgo != null && biometricFile != null) {
-            TypeOfBiometricData objBiometricType;
-            if (StringUtil.isNumber(biometricType)) {
-                objBiometricType = new TypeOfBiometricData(Integer.parseInt(biometricType));
-            } else {
-                objBiometricType = new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
-            }
+            TypeOfBiometricData objBiometricType = StringUtil.isNumber(biometricType)
+                    ? new TypeOfBiometricData(Integer.parseInt(biometricType))
+                    : new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
 
             ASN1ObjectIdentifier objBiometricHashAlgo = AlgorithmUtil.getHashAlg(biometricHashAlgo);
             byte[] biometricBytes = IoUtil.read(biometricFile);
@@ -328,8 +324,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
             }
             BiometricData biometricData = new BiometricData(objBiometricType,
                     new AlgorithmIdentifier(objBiometricHashAlgo),
-                    new DEROctetString(biometricDataHash),
-                    sourceDataUri);
+                    new DEROctetString(biometricDataHash), sourceDataUri);
 
             ASN1EncodableVector vec = new ASN1EncodableVector();
             vec.add(biometricData);
@@ -349,10 +344,9 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
             ExtensionExistence ee = new ExtensionExistence(
                     textToAsn1ObjectIdentifers(needExtensionTypes),
                     textToAsn1ObjectIdentifers(wantExtensionTypes));
-            extensions.add(new Extension(
-                    ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions,
-                    false,
-                    ee.toASN1Primitive().getEncoded()));
+            extensions.add(
+                    new Extension(ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions, false,
+                            ee.toASN1Primitive().getEncoded()));
         }
 
         if (isNotEmpty(extensions)) {
@@ -367,12 +361,9 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         POPOSigningKey popoSk = signer.build(popoBuilder);
 
         ProofOfPossession popo = new ProofOfPossession(popoSk);
-
-        EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry("id-1", profile,
-                certReq, popo);
-
-        EnrollCertRequest request = new EnrollCertRequest(
-                EnrollCertRequest.Type.CERT_REQ);
+        EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry("id-1", profile, certReq,
+                popo);
+        EnrollCertRequest request = new EnrollCertRequest(EnrollCertRequest.Type.CERT_REQ);
         request.addRequestEntry(reqEntry);
 
         RequestResponseDebug debug = getRequestResponseDebug();

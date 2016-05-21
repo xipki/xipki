@@ -154,9 +154,7 @@ public class StringUtil {
     }
 
     public static String formatAccount(final long account, final boolean withPrefix) {
-        int minLen = withPrefix
-                ? 12
-                : 0;
+        int minLen = withPrefix ? 12 : 0;
         return formatAccount(account, minLen);
     }
 
@@ -190,9 +188,7 @@ public class StringUtil {
     }
 
     public static String formatTime(final long seconds, final boolean withPrefix) {
-        int minLen = withPrefix
-                ? 12
-                : 0;
+        int minLen = withPrefix ? 12 : 0;
         return formatTime(seconds, minLen);
     }
 

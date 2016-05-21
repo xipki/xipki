@@ -422,16 +422,15 @@ public final class CaClientImpl implements CaClient {
 
             X509CmpRequestor cmpRequestor;
             if (requestorSigners.containsKey(requestorName)) {
-                cmpRequestor = new DefaultHttpX509CmpRequestor(
-                        requestorSigners.get(requestorName), ca.getResponder(), ca.getUrl(),
-                        securityFactory, requestorSignRequests.get(requestorName));
+                cmpRequestor = new DefaultHttpX509CmpRequestor(requestorSigners.get(requestorName),
+                        ca.getResponder(), ca.getUrl(), securityFactory,
+                        requestorSignRequests.get(requestorName));
             } else if (requestorCerts.containsKey(requestorName)) {
-                cmpRequestor = new DefaultHttpX509CmpRequestor(
-                        requestorCerts.get(requestorName), ca.getResponder(), ca.getUrl(),
-                        securityFactory);
+                cmpRequestor = new DefaultHttpX509CmpRequestor(requestorCerts.get(requestorName),
+                        ca.getResponder(), ca.getUrl(), securityFactory);
             } else {
-                throw new CaClientException("could not find requestor named "
-                        + requestorName + " for CA " + ca.getName());
+                throw new CaClientException("could not find requestor named " + requestorName
+                        + " for CA " + ca.getName());
             }
 
             ca.setRequestor(cmpRequestor);
@@ -574,11 +573,11 @@ public final class CaClientImpl implements CaClient {
             CaConf ca = casMap.get(tmpCaName.trim());
             if (ca == null) {
                 throw new CaClientException("unknown ca: " + tmpCaName);
-            } else {
-                if (!ca.supportsProfile(certprofile)) {
-                    throw new CaClientException("cert profile " + certprofile
-                            + " is not supported by the CA " + tmpCaName);
-                }
+            }
+
+            if (!ca.supportsProfile(certprofile)) {
+                throw new CaClientException("cert profile " + certprofile
+                        + " is not supported by the CA " + tmpCaName);
             }
             return;
         }
@@ -622,14 +621,12 @@ public final class CaClientImpl implements CaClient {
         ParamUtil.requireNonNull("serial", serial);
 
         final String id = "cert-1";
-        RevokeCertRequestEntry entry =
-                new RevokeCertRequestEntry(id, issuer, serial, reason, invalidityDate);
+        RevokeCertRequestEntry entry = new RevokeCertRequestEntry(id, issuer, serial, reason,
+                invalidityDate);
         RevokeCertRequest request = new RevokeCertRequest();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = revokeCerts(request, debug);
-        return (result == null)
-                ? null
-                : result.get(id);
+        return (result == null) ? null : result.get(id);
     }
 
     @Override
@@ -645,8 +642,7 @@ public final class CaClientImpl implements CaClient {
         X500Name issuer = requestEntries.get(0).getIssuer();
         for (int i = 1; i < requestEntries.size(); i++) {
             if (!issuer.equals(requestEntries.get(i).getIssuer())) {
-                throw new PkiErrorException(
-                        PKIStatus.REJECTION, PKIFailureInfo.badRequest,
+                throw new PkiErrorException(PKIStatus.REJECTION, PKIFailureInfo.badRequest,
                         "revoking certificates issued by more than one CA is not allowed");
             }
         }
@@ -706,11 +702,8 @@ public final class CaClientImpl implements CaClient {
         X509CmpRequestor requestor = ca.getRequestor();
         X509CRL result;
         try {
-            if (crlNumber == null) {
-                result = requestor.downloadCurrentCrl(debug);
-            } else {
-                result = requestor.downloadCrl(crlNumber, debug);
-            }
+            result = (crlNumber == null) ? requestor.downloadCurrentCrl(debug)
+                    : requestor.downloadCrl(crlNumber, debug);
         } catch (CmpRequestorException ex) {
             throw new CaClientException(ex.getMessage(), ex);
         }
@@ -779,9 +772,7 @@ public final class CaClientImpl implements CaClient {
     private java.security.cert.Certificate getCertificate(final CMPCertificate cmpCert)
     throws CertificateException {
         Certificate bcCert = cmpCert.getX509v3PKCert();
-        return (bcCert == null)
-                ? null
-                : new X509CertificateObject(bcCert);
+        return (bcCert == null) ? null : new X509CertificateObject(bcCert);
     }
 
     public String getConfFile() {
@@ -913,8 +904,7 @@ public final class CaClientImpl implements CaClient {
 
         init(false);
         final String id = "cert-1";
-        RevokeCertRequestEntry entry =
-                new RevokeCertRequestEntry(id, issuer, serial, reason, null);
+        RevokeCertRequestEntry entry = new RevokeCertRequestEntry(id, issuer, serial, reason, null);
         RevokeCertRequest request = new RevokeCertRequest();
         request.addRequestEntry(entry);
 
@@ -943,14 +933,11 @@ public final class CaClientImpl implements CaClient {
         ParamUtil.requireNonNull("issuer", issuer);
         ParamUtil.requireNonNull("serial", serial);
         final String id = "cert-1";
-        IssuerSerialEntry entry =
-                new IssuerSerialEntry(id, issuer, serial);
+        IssuerSerialEntry entry = new IssuerSerialEntry(id, issuer, serial);
         UnrevokeOrRemoveCertRequest request = new UnrevokeOrRemoveCertRequest();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = unrevokeCerts(request, debug);
-        return (result == null)
-                ? null
-                : result.get(id);
+        return (result == null) ? null : result.get(id);
     }
 
     @Override
@@ -975,8 +962,7 @@ public final class CaClientImpl implements CaClient {
         X500Name issuer = requestEntries.get(0).getIssuer();
         for (int i = 1; i < requestEntries.size(); i++) {
             if (!issuer.equals(requestEntries.get(i).getIssuer())) {
-                throw new PkiErrorException(
-                        PKIStatus.REJECTION, PKIFailureInfo.badRequest,
+                throw new PkiErrorException(PKIStatus.REJECTION, PKIFailureInfo.badRequest,
                         "unrevoking certificates issued by more than one CA is not allowed");
             }
         }
@@ -1003,9 +989,7 @@ public final class CaClientImpl implements CaClient {
         UnrevokeOrRemoveCertRequest request = new UnrevokeOrRemoveCertRequest();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = removeCerts(request, debug);
-        return (result == null)
-                ? null
-                : result.get(id);
+        return (result == null) ? null : result.get(id);
     }
 
     @Override
@@ -1030,8 +1014,7 @@ public final class CaClientImpl implements CaClient {
         X500Name issuer = requestEntries.get(0).getIssuer();
         for (int i = 1; i < requestEntries.size(); i++) {
             if (!issuer.equals(requestEntries.get(i).getIssuer())) {
-                throw new PkiErrorException(
-                        PKIStatus.REJECTION, PKIFailureInfo.badRequest,
+                throw new PkiErrorException(PKIStatus.REJECTION, PKIFailureInfo.badRequest,
                         "removing certificates issued by more than one CA is not allowed");
             }
         }
@@ -1106,8 +1089,7 @@ public final class CaClientImpl implements CaClient {
             if (responseCode != HttpURLConnection.HTTP_OK
                     && responseCode != HttpURLConnection.HTTP_INTERNAL_ERROR) {
                 inputStream.close();
-                throw new IOException(String.format(
-                        "bad response: code='%s', message='%s'",
+                throw new IOException(String.format("bad response: code='%s', message='%s'",
                         httpUrlConnection.getResponseCode(),
                         httpUrlConnection.getResponseMessage()));
             }
@@ -1218,8 +1200,8 @@ public final class CaClientImpl implements CaClient {
             }
 
             if (!verify(caCert, cert)) {
-                LOG.warn("not all certificates are issued by CA embedded in caPubs,"
-                        + " ignore the caPubs");
+                LOG.warn(
+                    "not all certificates are issued by CA embedded in caPubs, ignore the caPubs");
                 return new EnrollCertResult(null, certOrErrors);
             }
         }
@@ -1243,10 +1225,10 @@ public final class CaClientImpl implements CaClient {
 
                 root = jaxbUnmarshaller.unmarshal(configStream);
             } catch (SAXException ex) {
-                throw new CaClientException("parse profile failed, message: " + ex.getMessage(),
+                throw new CaClientException("parsing profile failed, message: " + ex.getMessage(),
                         ex);
             } catch (JAXBException ex) {
-                throw new CaClientException("parse profile failed, message: "
+                throw new CaClientException("parsing profile failed, message: "
                         + XmlUtil.getMessage((JAXBException) ex), ex);
             }
 

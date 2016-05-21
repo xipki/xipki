@@ -69,15 +69,10 @@ public class PkiStatusInfo {
         ParamUtil.requireNonNull("bcPkiStatusInfo", bcPkiStatusInfo);
 
         this.status = bcPkiStatusInfo.getStatus().intValue();
-        if (bcPkiStatusInfo.getFailInfo() != null) {
-            this.pkiFailureInfo = bcPkiStatusInfo.getFailInfo().intValue();
-        } else {
-            this.pkiFailureInfo = 0;
-        }
+        this.pkiFailureInfo = (bcPkiStatusInfo.getFailInfo() == null)
+                ? 0 : bcPkiStatusInfo.getFailInfo().intValue();
         PKIFreeText text = bcPkiStatusInfo.getStatusString();
-        this.statusMessage = (text == null)
-                ? null
-                : text.getStringAt(0).getString();
+        this.statusMessage = (text == null) ? null : text.getStringAt(0).getString();
     }
 
     public int getStatus() {

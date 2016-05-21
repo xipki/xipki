@@ -97,11 +97,9 @@ public class Configuration {
     static String extractEncodingFromCtype(final String ctype) {
         if (ctype != null && ctype.indexOf('.') > 0) {
             String encodingAndModifier = ctype.substring(ctype.indexOf('.') + 1);
-            if (encodingAndModifier.indexOf('@') > 0) {
-                return encodingAndModifier.substring(0, encodingAndModifier.indexOf('@'));
-            } else {
-                return encodingAndModifier;
-            }
+            return (encodingAndModifier.indexOf('@') > 0)
+                ? encodingAndModifier.substring(0, encodingAndModifier.indexOf('@'))
+                : encodingAndModifier;
         }
         return null;
     }

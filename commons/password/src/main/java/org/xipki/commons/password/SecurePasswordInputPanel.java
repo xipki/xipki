@@ -73,9 +73,7 @@ public class SecurePasswordInputPanel extends Panel {
             if (CAPS.equals(pressedKey)) {
                 for (JButton button : buttons) {
                     String text = button.getText();
-                    text = caps
-                            ? text.toLowerCase()
-                            : text.toUpperCase();
+                    text = caps ? text.toLowerCase() : text.toUpperCase();
                     button.setText(text);
                 }
                 caps = !caps;
@@ -193,9 +191,8 @@ public class SecurePasswordInputPanel extends Panel {
                 tmpPrompt = "Password required";
             }
 
-            int option = JOptionPane.showOptionDialog(null, gui, tmpPrompt,
-                    JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-                    null, options, options[0]);
+            int option = JOptionPane.showOptionDialog(null, gui, tmpPrompt,  JOptionPane.NO_OPTION,
+                    JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
             if (option == 0) { // pressing OK button
                 return gui.getPassword();

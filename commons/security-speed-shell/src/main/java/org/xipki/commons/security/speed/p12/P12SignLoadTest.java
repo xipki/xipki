@@ -124,9 +124,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
 
     private static byte[] getPrecomputedKeystore(final String filename) throws IOException {
         InputStream in = P12ECSignLoadTest.class.getResourceAsStream("/testkeys/" + filename);
-        return (in == null)
-                ? null
-                : IoUtil.read(in);
+        return (in == null) ? null : IoUtil.read(in);
     }
 
 }

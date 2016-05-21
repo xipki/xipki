@@ -108,13 +108,8 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
             asn1Label = seq.getObjectAt(idx++);
         }
 
-        objectId = (asn1Id == null)
-                ? null
-                : Asn1Util.getOctetStringBytes(asn1Id);
-
-        objectLabel = (asn1Label == null)
-                ? null
-                : Asn1Util.getUtf8String(seq.getObjectAt(idx++));
+        objectId = (asn1Id == null) ? null : Asn1Util.getOctetStringBytes(asn1Id);
+        objectLabel = (asn1Label == null) ? null : Asn1Util.getUtf8String(seq.getObjectAt(idx++));
 
         if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
             throw new BadAsn1ObjectException("invalid object Asn1RemoveObjectsParams: "

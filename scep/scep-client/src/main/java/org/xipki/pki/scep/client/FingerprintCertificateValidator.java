@@ -64,9 +64,7 @@ public abstract class FingerprintCertificateValidator implements CaCertValidator
 
     @Override
     public boolean isTrusted(final X509Certificate cert) {
-        ScepHashAlgoType algo = (hashAlgo == null)
-                ? DEFAULT_HASHALGO
-                : hashAlgo;
+        ScepHashAlgoType algo = (hashAlgo == null) ? DEFAULT_HASHALGO : hashAlgo;
         byte[] actual;
         try {
             actual = algo.digest(cert.getEncoded());

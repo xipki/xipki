@@ -106,9 +106,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
                 Map<Integer, CertRequestWithProfile> certReqs = nextCertRequests();
                 if (certReqs != null) {
                     boolean successful = testNext(certReqs);
-                    int numFailed = successful
-                            ? 0
-                            : 1;
+                    int numFailed = successful ? 0 : 1;
                     account(1, numFailed);
                 } else {
                     account(1, 1);
@@ -122,12 +120,8 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
                 EnrollCertRequest request = new EnrollCertRequest(Type.CERT_REQ);
                 for (Integer certId : certRequests.keySet()) {
                     CertRequestWithProfile certRequest = certRequests.get(certId);
-                    EnrollCertRequestEntry requestEntry = new EnrollCertRequestEntry(
-                            "id-" + certId,
-                            certRequest.certprofile,
-                            certRequest.certRequest,
-                            RA_VERIFIED);
-
+                    EnrollCertRequestEntry requestEntry = new EnrollCertRequestEntry("id-" + certId,
+                            certRequest.certprofile, certRequest.certRequest, RA_VERIFIED);
                     request.addRequestEntry(requestEntry);
                 }
 
@@ -215,8 +209,8 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
                 throw new InvalidConfException("invalid randomDN " + randomDnStr);
             }
 
-            LoadTestEntry loadtestEntry = new LoadTestEntry(entry.getCertprofile(),
-                    keyEntry, entry.getSubject(), randomDn);
+            LoadTestEntry loadtestEntry = new LoadTestEntry(entry.getCertprofile(), keyEntry,
+                    entry.getSubject(), randomDn);
             loadtestEntries.add(loadtestEntry);
         }
     } // constructor
@@ -277,12 +271,10 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
                 root = jaxbUnmarshaller.unmarshal(configStream);
             } catch (SAXException ex) {
                 throw new InvalidConfException(
-                        "parse profile failed, message: " + ex.getMessage(),
-                        ex);
+                        "parsing profile failed, message: " + ex.getMessage(), ex);
             } catch (JAXBException ex) {
-                throw new InvalidConfException(
-                        "parse profile failed, message: " + XmlUtil.getMessage((JAXBException) ex),
-                        ex);
+                throw new InvalidConfException("parsing profile failed, message: "
+                        + XmlUtil.getMessage((JAXBException) ex), ex);
             }
 
             if (root instanceof JAXBElement) {

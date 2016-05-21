@@ -108,8 +108,7 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
         InputStream inputStream = httpUrlConnection.getInputStream();
         if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
             inputStream.close();
-            throw new IOException("bad response: "
-                    + httpUrlConnection.getResponseCode() + "    "
+            throw new IOException("bad response: " + httpUrlConnection.getResponseCode() + "    "
                     + httpUrlConnection.getResponseMessage());
         }
         String responseContentType = httpUrlConnection.getContentType();
@@ -121,8 +120,8 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
         }
         if (!isValidContentType) {
             inputStream.close();
-            throw new IOException("bad response: mime type "
-                    + responseContentType + " not supported!");
+            throw new IOException("bad response: mime type " + responseContentType
+                    + " not supported!");
         }
 
         return IoUtil.read(inputStream);

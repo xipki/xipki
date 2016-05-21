@@ -54,10 +54,8 @@ public class P12RSASignLoadTest extends P12SignLoadTest {
     public P12RSASignLoadTest(final SecurityFactory securityFactory,
             final String signatureAlgorithm, final int keysize, final BigInteger publicExponent)
     throws Exception {
-        super(securityFactory, signatureAlgorithm,
-                generateKeystore(keysize, publicExponent),
-                "PKCS#12 RSA signature creation\n"
-                        + "keysize: " + keysize + "\n"
+        super(securityFactory, signatureAlgorithm, generateKeystore(keysize, publicExponent),
+                "PKCS#12 RSA signature creation\nkeysize: " + keysize + "\n"
                         + "public exponent: " + publicExponent);
     }
 

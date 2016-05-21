@@ -149,9 +149,7 @@ class CmpResponder {
         String tidStr = Hex.toHexString(tid.getOctets());
 
         PKIHeaderBuilder respHeaderBuilder = new PKIHeaderBuilder(
-                reqHeader.getPvno().getValue().intValue(),
-                sender,
-                reqHeader.getSender());
+                reqHeader.getPvno().getValue().intValue(), sender, reqHeader.getSender());
         respHeaderBuilder.setTransactionID(tid);
 
         PKIBody reqBody = message.getBody();

@@ -211,9 +211,7 @@ public class ConfPairs {
             String value = pairs.get(name);
             sb.append(encodeNameOrValue(name));
             sb.append(NAME_TERM);
-            sb.append(value == null
-                    ? ""
-                    : encodeNameOrValue(value));
+            sb.append(value == null ? "" : encodeNameOrValue(value));
             sb.append(TOKEN_TERM);
         }
 

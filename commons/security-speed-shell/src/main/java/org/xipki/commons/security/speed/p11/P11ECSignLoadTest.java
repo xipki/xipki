@@ -50,10 +50,8 @@ public class P11ECSignLoadTest extends P11SignLoadTest {
 
     public P11ECSignLoadTest(final SecurityFactory securityFactory, final P11Slot slot,
             final String signatureAlgorithm, final String curveNameOrOid) throws Exception {
-        super(securityFactory, slot, signatureAlgorithm,
-                generateKey(slot, curveNameOrOid),
-                "PKCS#11 EC signature creation\n"
-                        + "curve: " + curveNameOrOid);
+        super(securityFactory, slot, signatureAlgorithm, generateKey(slot, curveNameOrOid),
+                "PKCS#11 EC signature creation\ncurve: " + curveNameOrOid);
     }
 
     private static P11ObjectIdentifier generateKey(final P11Slot slot, final String curveNameOrOid)

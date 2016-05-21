@@ -150,10 +150,7 @@ public class SignerUtil {
 
         int saltSize = param.getSaltLength().intValue();
         int trailerField = param.getTrailerField().intValue();
-
-        AsymmetricBlockCipher tmpCipher = (cipher == null)
-                ? new RSABlindedEngine()
-                : cipher;
+        AsymmetricBlockCipher tmpCipher = (cipher == null) ? new RSABlindedEngine() : cipher;
 
         return new PSSSigner(tmpCipher, dig, mfgDig, saltSize, getTrailer(trailerField));
     }

@@ -245,9 +245,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         }
 
         SingleResp[] singleResponses = basicOcspResp.getResponses();
-        final int countSingleResponses = (singleResponses == null)
-                ? 0
-                : singleResponses.length;
+        final int countSingleResponses = (singleResponses == null) ? 0 : singleResponses.length;
 
         if (countSingleResponses != serialNumbers.length) {
             StringBuilder sb = new StringBuilder(100);
@@ -375,10 +373,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
         try {
             for (BigInteger serialNumber : serialNumbers) {
-                CertificateID certId = new CertificateID(
-                        digestCalculator,
-                        new X509CertificateHolder(caCert.getEncoded()),
-                        serialNumber);
+                CertificateID certId = new CertificateID(digestCalculator,
+                        new X509CertificateHolder(caCert.getEncoded()), serialNumber);
 
                 reqBuilder.addRequest(certId);
             }

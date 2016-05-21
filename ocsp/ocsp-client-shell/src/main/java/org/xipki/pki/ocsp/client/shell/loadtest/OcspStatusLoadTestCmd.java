@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ocsp.client.shell.loadtest;
 
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
@@ -43,9 +44,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 import org.xipki.pki.ocsp.client.shell.OcspStatusCommandSupport;
@@ -59,12 +62,18 @@ import org.xipki.pki.ocsp.client.shell.OcspStatusCommandSupport;
         description = "OCSP Load test")
 @Service
 public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
-
     @Option(name = "--serial",
-            required = true,
-            description = "serial numbers, comma-separated serial numbers or ranges\n"
-                    + "required")
-    private String serialNumbers;
+            multiValued = true,
+            description = "serial number\n"
+                    + "(multi-valued, at least one of serial and cert must be specified)")
+    private List<String> serialNumberList;
+
+    @Option(name = "--cert",
+            multiValued = true,
+            description = "certificate\n"
+                    + "(multi-valued)")
+    @Completion(FilePathCompleter.class)
+    private List<String> certFiles;
 
     @Option(name = "--duration",
             description = "duration in seconds")
@@ -82,32 +91,30 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        List<Long> tmpSerialNumbers = new LinkedList<>();
+        List<BigInteger> serialNumbers = new LinkedList<>();
 
-        try {
-            List<String> tokens = split(this.serialNumbers, ",");
-            for (String token : tokens) {
-                List<String> subtokens = split(token.trim(), "- ");
-                int countTokens = subtokens.size();
-                if (countTokens == 1) {
-                    tmpSerialNumbers.add(Long.parseLong(subtokens.get(0)));
-                } else if (countTokens == 2) {
-                    int startSerial = Integer.parseInt(subtokens.get(0).trim());
-                    int endSerial = Integer.parseInt(subtokens.get(1).trim());
-                    if (startSerial < 1 || endSerial < 1 || startSerial > endSerial) {
-                        throw new IllegalCmdParamException(
-                                "invalid serial numbers " + this.serialNumbers);
-                    }
-                    for (long i = startSerial; i <= endSerial; i++) {
-                        tmpSerialNumbers.add(i);
-                    }
-                } else {
+        if (serialNumberList != null) {
+            for (String serialNumber : serialNumberList) {
+                try {
+                    serialNumbers.add(toBigInt(serialNumber));
+                } catch (Exception ex) {
                     throw new IllegalCmdParamException(
-                            "invalid serial numbers " + this.serialNumbers);
+                            "invalid serial number '" + serialNumber + "'", ex);
                 }
-            } // end for
-        } catch (Exception ex) {
-            throw new IllegalCmdParamException("invalid serial numbers " + this.serialNumbers);
+            }
+        }
+
+        if (certFiles != null) {
+            for (String certFile : certFiles) {
+                X509Certificate cert;
+                try {
+                    cert = X509Util.parseCert(certFile);
+                } catch (Exception ex) {
+                    throw new IllegalCmdParamException(
+                            "invalid certificate file  '" + certFile + "'", ex);
+                }
+                serialNumbers.add(cert.getSerialNumber());
+            }
         }
 
         if (numThreads < 1) {
@@ -122,7 +129,6 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
         }
 
         StringBuilder description = new StringBuilder();
-        description.append("serial numbers: ").append(this.serialNumbers).append("\n");
         description.append("issuer cert: ").append(issuerCertFile).append("\n");
         description.append("server URL: ").append(serverUrl.toString()).append("\n");
         description.append("hash: ").append(hashAlgo);
@@ -131,7 +137,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
         RequestOptions options = getRequestOptions();
 
-        OcspLoadTest loadTest = new OcspLoadTest(requestor, tmpSerialNumbers,
+        OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
                 issuerCert, serverUrl, options, description.toString());
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);

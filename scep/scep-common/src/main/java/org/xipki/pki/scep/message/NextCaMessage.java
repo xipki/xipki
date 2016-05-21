@@ -91,12 +91,8 @@ public class NextCaMessage {
     }
 
     public void setRaCerts(final List<X509Certificate> raCerts) {
-        if (raCerts == null || raCerts.isEmpty()) {
-            this.raCerts = null;
-        } else {
-            this.raCerts = Collections.unmodifiableList(
-                    new ArrayList<X509Certificate>(raCerts));
-        }
+        this.raCerts = (raCerts == null || raCerts.isEmpty()) ? null
+                : Collections.unmodifiableList(new ArrayList<X509Certificate>(raCerts));
     }
 
     public ContentInfo encode(final PrivateKey signingKey, final X509Certificate signerCert,
@@ -138,8 +134,7 @@ public class NextCaMessage {
             SignerInfoGenerator signerInfo = signerInfoBuilder.build(signer, signerCert);
             generator.addSignerInfoGenerator(signerInfo);
 
-            CMSTypedData cmsContent = new CMSProcessableByteArray(
-                    CMSObjectIdentifiers.signedData,
+            CMSTypedData cmsContent = new CMSProcessableByteArray(CMSObjectIdentifiers.signedData,
                     degenratedSignedDataBytes);
 
             // certificateSet

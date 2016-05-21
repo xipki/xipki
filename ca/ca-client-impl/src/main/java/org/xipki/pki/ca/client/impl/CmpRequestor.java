@@ -140,10 +140,8 @@ public abstract class CmpRequestor {
         this(requestor, responderCert, securityFactory, true);
     }
 
-    public CmpRequestor(ConcurrentContentSigner requestor,
-            final X509Certificate responderCert,
-            final SecurityFactory securityFactory,
-            final boolean signRequest) {
+    public CmpRequestor(ConcurrentContentSigner requestor, final X509Certificate responderCert,
+            final SecurityFactory securityFactory, final boolean signRequest) {
         this.requestor = ParamUtil.requireNonNull("requestor", requestor);
         if (requestor.getCertificate() == null) {
             throw new IllegalArgumentException("requestor without certifiate is not allowed");
@@ -181,12 +179,7 @@ public abstract class CmpRequestor {
     throws CmpRequestorException {
         ParamUtil.requireNonNull("request", request);
 
-        PKIMessage tmpRequest;
-        if (signRequest) {
-            tmpRequest = sign(request);
-        } else {
-            tmpRequest = request;
-        }
+        PKIMessage tmpRequest = (signRequest) ? sign(request) : request;
 
         byte[] encodedRequest;
         try {
@@ -276,8 +269,8 @@ public abstract class CmpRequestor {
                     content.getPKIStatusInfo()));
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new CmpRequestorException(String.format(
-                        "unknown PKI body type %s instead the exceptected [%s, %s]",
-                    bodyType, PKIBody.TYPE_GEN_REP, PKIBody.TYPE_ERROR));
+                        "unknown PKI body type %s instead the exceptected [%s, %s]", bodyType,
+                        PKIBody.TYPE_GEN_REP, PKIBody.TYPE_ERROR));
         }
 
         GenRepContent genRep = (GenRepContent) respBody.getContent();
@@ -334,9 +327,7 @@ public abstract class CmpRequestor {
                     + "' instead the exceptected '" + action + "'");
         }
 
-        return (size == 1)
-                ? null
-                : seq.getObjectAt(1);
+        return (size == 1) ? null : seq.getObjectAt(1);
     } // method extractXipkiActionContent
 
     protected PKIHeader buildPkiHeader(final ASN1OctetString tid) {
@@ -376,10 +367,7 @@ public abstract class CmpRequestor {
         PKIHeaderBuilder hdrBuilder = new PKIHeaderBuilder(PKIHeader.CMP_2000, sender, recipient);
         hdrBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
-        ASN1OctetString tmpTid = (tid == null)
-                ? new DEROctetString(randomTransactionId())
-                : tid;
-
+        ASN1OctetString tmpTid = (tid == null) ? new DEROctetString(randomTransactionId()) : tid;
         hdrBuilder.setTransactionID(tmpTid);
 
         List<InfoTypeAndValue> itvs = new ArrayList<>(2);
@@ -450,16 +438,14 @@ public abstract class CmpRequestor {
             }
         }
 
-        ContentVerifierProvider verifierProvider =
-                securityFactory.getContentVerifierProvider(cert);
+        ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(cert);
         if (verifierProvider == null) {
             LOG.warn("tid={}: not authorized responder '{}'", tid, header.getSender());
             return new ProtectionVerificationResult(cert, ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 
         boolean signatureValid = protectedMsg.verify(verifierProvider);
-        ProtectionResult protRes = signatureValid
-                ? ProtectionResult.VALID
+        ProtectionResult protRes = signatureValid ? ProtectionResult.VALID
                 : ProtectionResult.INVALID;
         return new ProtectionVerificationResult(cert, protRes);
     } // method verifyProtection
@@ -487,12 +473,8 @@ public abstract class CmpRequestor {
         ParamUtil.requireNonNull("type", type);
 
         PKIHeader header = buildPkiHeader(null);
-        InfoTypeAndValue itv;
-        if (value != null) {
-            itv = new InfoTypeAndValue(type, value);
-        } else {
-            itv = new InfoTypeAndValue(type);
-        }
+        InfoTypeAndValue itv = (value != null) ? new InfoTypeAndValue(type, value)
+                : new InfoTypeAndValue(type);
         GenMsgContent genMsgContent = new GenMsgContent(itv);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
 

@@ -249,11 +249,8 @@ public class P11ModuleConf {
             if (slotType.getId() != null) {
                 String str = slotType.getId().trim();
                 try {
-                    if (StringUtil.startsWithIgnoreCase(str, "0X")) {
-                        slotId = Long.parseLong(str.substring(2), 16);
-                    } else {
-                        slotId = Long.parseLong(str);
-                    }
+                    slotId = StringUtil.startsWithIgnoreCase(str, "0X")
+                            ? Long.parseLong(str.substring(2), 16) : Long.parseLong(str);
                 } catch (NumberFormatException ex) {
                     String message = "invalid slotId '" + str + "'";
                     LOG.error(message);

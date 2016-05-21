@@ -47,11 +47,7 @@ public class CompareUtil {
     }
 
     public static boolean equalsObject(final Object oa, final Object ob) {
-        if (oa == null) {
-            return ob == null;
-        } else {
-            return oa.equals(ob);
-        }
+        return (oa == null) ? (ob == null) : oa.equals(ob);
     }
 
 }

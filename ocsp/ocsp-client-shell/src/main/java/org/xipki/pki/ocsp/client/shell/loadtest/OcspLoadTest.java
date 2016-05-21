@@ -70,20 +70,16 @@ public class OcspLoadTest extends LoadExecutor {
         @Override
         public void run() {
             while (!stop() && getErrorAccout() < 10) {
-                long sn = nextSerialNumber();
-                int numFailed = testNext(sn)
-                        ? 0
-                        : 1;
-
+                BigInteger sn = nextSerialNumber();
+                int numFailed = testNext(sn) ? 0 : 1;
                 account(1, numFailed);
             }
         }
 
-        private boolean testNext(final long sn) {
+        private boolean testNext(final BigInteger sn) {
             BasicOCSPResp basicResp;
             try {
-                OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl,
-                        options, null);
+                OCSPResp response = requestor.ask(caCert, sn, serverUrl, options, null);
                 basicResp = OcspUtils.extractBasicOcspResp(response);
             } catch (OcspRequestorException ex) {
                 LOG.warn("OCSPRequestorException: {}", ex.getMessage());
@@ -98,16 +94,14 @@ public class OcspLoadTest extends LoadExecutor {
 
             SingleResp[] singleResponses = basicResp.getResponses();
 
-            final int n = (singleResponses == null)
-                    ? 0
-                    : singleResponses.length;
+            final int n = (singleResponses == null) ? 0 : singleResponses.length;
 
             if (n == 0) {
                 LOG.warn("received no status from server");
                 return false;
             } else if (n != 1) {
-                LOG.warn("received status with {} single responses from server, {}",
-                        n, "but 1 was requested");
+                LOG.warn("received status with {} single responses from server, {}", n,
+                        "but 1 was requested");
                 return false;
             } else {
                 SingleResp singleResp = singleResponses[0];
@@ -144,7 +138,7 @@ public class OcspLoadTest extends LoadExecutor {
 
     private final OcspRequestor requestor;
 
-    private final List<Long> serials;
+    private final List<BigInteger> serials;
 
     private final int numSerials;
 
@@ -156,7 +150,7 @@ public class OcspLoadTest extends LoadExecutor {
 
     private RequestOptions options;
 
-    public OcspLoadTest(final OcspRequestor requestor, final List<Long> serials,
+    public OcspLoadTest(final OcspRequestor requestor, final List<BigInteger> serials,
             final X509Certificate caCert, final URL serverUrl, final RequestOptions options,
             final String description) {
         super(description);
@@ -174,7 +168,7 @@ public class OcspLoadTest extends LoadExecutor {
         return new Testor();
     }
 
-    private synchronized long nextSerialNumber() {
+    private synchronized BigInteger nextSerialNumber() {
         serialIndex++;
         if (serialIndex >= numSerials) {
             serialIndex = 0;

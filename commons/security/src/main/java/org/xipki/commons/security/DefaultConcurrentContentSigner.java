@@ -150,11 +150,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     private ContentSigner borrowContentSigner(final int soTimeout) throws NoIdleSignerException {
         ContentSigner signer = null;
         try {
-            if (soTimeout == 0) {
-                signer = idleSigners.takeFirst();
-            } else {
-                signer = idleSigners.pollFirst(soTimeout, TimeUnit.MILLISECONDS);
-            }
+            signer = (soTimeout == 0) ? idleSigners.takeFirst()
+                    : idleSigners.pollFirst(soTimeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
         }
 
@@ -211,8 +208,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             } catch (CertificateEncodingException | IOException ex) {
                 throw new IllegalArgumentException(
                         String.format("%s occured while parsing certificate at index %d: %s",
-                                ex.getClass().getName(), i, ex.getMessage()),
-                        ex);
+                                ex.getClass().getName(), i, ex.getMessage()), ex);
             }
         }
     }
@@ -229,20 +225,14 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public X509Certificate getCertificate() {
-        if (certificateChain != null && certificateChain.length > 0) {
-            return certificateChain[0];
-        } else {
-            return null;
-        }
+        return (certificateChain != null && certificateChain.length > 0)
+                ? certificateChain[0] : null;
     }
 
     @Override
     public X509CertificateHolder getCertificateAsBcObject() {
-        if (certificateChainAsBcObjects != null && certificateChainAsBcObjects.length > 0) {
-            return certificateChainAsBcObjects[0];
-        } else {
-            return null;
-        }
+        return (certificateChainAsBcObjects != null && certificateChainAsBcObjects.length > 0)
+                ? certificateChainAsBcObjects[0] : null;
     }
 
     @Override

@@ -92,9 +92,7 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
         final int n = slots.size();
 
         if (n == 0 || n == 1) {
-            String numText = (n == 0)
-                    ? "no"
-                    : "1";
+            String numText = (n == 0) ? "no" : "1";
             println(numText + " slot is configured");
         } else {
             println(n + " slots are configured");

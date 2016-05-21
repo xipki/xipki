@@ -126,11 +126,8 @@ public class DataSourceFactory {
     } // method createDataSource
 
     private static String expandFilepath(final String path) {
-        if (path.startsWith("~" + File.separator)) {
-            return System.getProperty("user.home") + path.substring(1);
-        } else {
-            return path;
-        }
+        return path.startsWith("~" + File.separator)
+                ? System.getProperty("user.home") + path.substring(1) : path;
     }
 
 }

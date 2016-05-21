@@ -109,8 +109,7 @@ public class LoadTestEntry {
                 this.subjectRdnForIncrement = ObjectIdentifiers.DN_CN;
                 break;
             default:
-                throw new RuntimeException("should not reach here, unknown RandomDn "
-                        + randomDn);
+                throw new RuntimeException("should not reach here, unknown RandomDn " + randomDn);
             }
 
             if (this.subjectRdnForIncrement != null

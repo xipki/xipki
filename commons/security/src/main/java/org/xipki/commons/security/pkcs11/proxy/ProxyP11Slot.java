@@ -131,9 +131,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
                 }
             }
 
-            X509Certificate[] certs = (cert == null)
-                    ? null
-                    : new X509Certificate[]{cert.getCert()};
+            X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
 
             ProxyP11Identity identity = new ProxyP11Identity(this,
                     new P11EntityIdentifier(slotId, keyId), pubKey, certs);
@@ -219,8 +217,8 @@ public class ProxyP11Slot extends AbstractP11Slot {
     @Override
     protected P11Identity doGenerateRSAKeypair(final int keysize, final BigInteger publicExponent,
             final String label) throws P11TokenException {
-        Asn1GenRSAKeypairParams asn1 = new Asn1GenRSAKeypairParams(
-                asn1SlotId, label, keysize, publicExponent);
+        Asn1GenRSAKeypairParams asn1 = new Asn1GenRSAKeypairParams(asn1SlotId, label, keysize,
+                publicExponent);
         ASN1Encodable resp = module.send(P11ProxyConstants.ACTION_genKeypair_RSA, asn1);
         return parseGenerateKeypairResult(resp);
     }

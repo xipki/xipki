@@ -80,20 +80,16 @@ public abstract class P11Identity implements Comparable<P11Identity> {
             throw new IllegalArgumentException("neither certificate nor publicKey is non-null");
         }
 
-        this.certificateChain =
-                (certificateChain != null && certificateChain.length > 0)
-                        ? certificateChain
-                        : null;
+        this.certificateChain = (certificateChain != null && certificateChain.length > 0)
+                        ? certificateChain : null;
 
-        this.publicKey = (publicKey == null)
-                ? certificateChain[0].getPublicKey()
-                : publicKey;
+        this.publicKey = (publicKey == null) ? certificateChain[0].getPublicKey() : publicKey;
 
         if (this.publicKey instanceof RSAPublicKey) {
             signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
         } else if (this.publicKey instanceof ECPublicKey) {
-            signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams()
-                    .getOrder().bitLength();
+            signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getOrder()
+                    .bitLength();
         } else if (this.publicKey instanceof DSAPublicKey) {
             signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
         } else {
@@ -125,14 +121,12 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     }
 
     public X509Certificate getCertificate() {
-        return (certificateChain != null && certificateChain.length > 0)
-                ? certificateChain[0]
+        return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0]
                 : null;
     }
 
     public X509Certificate[] getCertificateChain() {
-        return (certificateChain == null)
-                ? null
+        return (certificateChain == null) ? null
                 : java.util.Arrays.copyOf(certificateChain, certificateChain.length);
     }
 

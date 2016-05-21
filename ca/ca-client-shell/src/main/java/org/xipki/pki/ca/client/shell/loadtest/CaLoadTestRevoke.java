@@ -42,10 +42,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -86,15 +84,15 @@ public class CaLoadTestRevoke extends LoadExecutor {
 
     private final X500Name caSubject;
 
-    private final Set<Long> excludeSerials = new HashSet<>();
+    private final BigInteger caSerial;
 
-    private final ConcurrentLinkedDeque<Long> serials = new ConcurrentLinkedDeque<>();
+    private final ConcurrentLinkedDeque<BigInteger> serials = new ConcurrentLinkedDeque<>();
 
     private final int caInfoId;
 
-    private final long minSerial;
+    private final int minId;
 
-    private final long maxSerial;
+    private final int maxId;
 
     private final int maxCerts;
 
@@ -102,7 +100,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
 
     private AtomicInteger processedCerts = new AtomicInteger(0);
 
-    private long nextStartSerial;
+    private int nextStartId;
 
     private boolean noUnrevokedCerts;
 
@@ -116,10 +114,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
         this.caDataSource = ParamUtil.requireNonNull("caDataSource", caDataSource);
         this.caSubject = caCert.getSubject();
         this.maxCerts = maxCerts;
-
-        if (caCert.getIssuer().equals(caCert.getSubject())) {
-            this.excludeSerials.add(caCert.getSerialNumber().getPositiveValue().longValue());
-        }
+        this.caSerial = caCert.getSerialNumber().getPositiveValue();
 
         String b64Sha1Fp = HashAlgoType.SHA1.base64Hash(caCert.getEncoded());
         String sql = "SELECT ID FROM CS_CA WHERE SHA1_CERT='" + b64Sha1Fp + "'";
@@ -133,16 +128,16 @@ public class CaLoadTestRevoke extends LoadExecutor {
             }
             rs.close();
 
-            sql = "SELECT MIN(SN) FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId;
+            sql = "SELECT MIN(ID) FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId;
             rs = stmt.executeQuery(sql);
             rs.next();
-            minSerial = rs.getLong(1);
-            nextStartSerial = minSerial;
+            minId = rs.getInt(1);
+            nextStartId = minId;
 
-            sql = "SELECT MAX(SN) FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId;
+            sql = "SELECT MAX(ID) FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId;
             rs = stmt.executeQuery(sql);
             rs.next();
-            maxSerial = rs.getLong(1);
+            maxId = rs.getInt(1);
         } finally {
             caDataSource.releaseResources(stmt, null);
         }
@@ -153,7 +148,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
         @Override
         public void run() {
             while (!stop() && getErrorAccout() < 1) {
-                List<Long> serialNumbers;
+                List<BigInteger> serialNumbers;
                 try {
                     serialNumbers = nextSerials();
                 } catch (DataAccessException ex) {
@@ -166,21 +161,18 @@ public class CaLoadTestRevoke extends LoadExecutor {
                 }
 
                 boolean successful = testNext(serialNumbers);
-                int numFailed = successful
-                        ? 0
-                        : 1;
+                int numFailed = successful ? 0 : 1;
                 account(1, numFailed);
             }
         }
 
-        private boolean testNext(final List<Long> serialNumbers) {
+        private boolean testNext(final List<BigInteger> serialNumbers) {
             RevokeCertRequest request = new RevokeCertRequest();
             int id = 1;
-            for (Long serialNumber : serialNumbers) {
-                CrlReason reason = REASONS[(int) (serialNumber % REASONS.length)];
-                RevokeCertRequestEntry entry = new RevokeCertRequestEntry(
-                        Integer.toString(id++), caSubject, BigInteger.valueOf(serialNumber),
-                        reason.getCode(), null);
+            for (BigInteger serialNumber : serialNumbers) {
+                CrlReason reason = REASONS[Math.abs(serialNumber.intValue()) % REASONS.length];
+                RevokeCertRequestEntry entry = new RevokeCertRequestEntry(Integer.toString(id++),
+                        caSubject, serialNumber, reason.getCode(), null);
                 request.addRequestEntry(entry);
             }
 
@@ -215,10 +207,10 @@ public class CaLoadTestRevoke extends LoadExecutor {
         return new Testor();
     }
 
-    private List<Long> nextSerials() throws DataAccessException {
-        List<Long> ret = new ArrayList<>(num);
+    private List<BigInteger> nextSerials() throws DataAccessException {
+        List<BigInteger> ret = new ArrayList<>(num);
         for (int i = 0; i < num; i++) {
-            Long serial = nextSerial();
+            BigInteger serial = nextSerial();
             if (serial != null) {
                 ret.add(serial);
             } else {
@@ -228,7 +220,7 @@ public class CaLoadTestRevoke extends LoadExecutor {
         return ret;
     }
 
-    private Long nextSerial() throws DataAccessException {
+    private BigInteger nextSerial() throws DataAccessException {
         synchronized (caDataSource) {
             if (maxCerts > 0) {
                 int num = processedCerts.getAndAdd(1);
@@ -237,18 +229,18 @@ public class CaLoadTestRevoke extends LoadExecutor {
                 }
             }
 
-            Long firstSerial = serials.pollFirst();
+            BigInteger firstSerial = serials.pollFirst();
             if (firstSerial != null) {
                 return firstSerial;
             }
 
             if (noUnrevokedCerts) {
-                return serials.pollFirst();
+                return null;
             }
 
-            String sql = "SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
-                    + " AND SN > " + (nextStartSerial - 1) + " AND SN < " + (maxSerial + 1);
-            sql = caDataSource.createFetchFirstSelectSql(sql, 1000, "SN");
+            String sql = "ID, SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
+                    + " AND ID > " + (nextStartId - 1) + " AND ID < " + (maxId + 1);
+            sql = caDataSource.createFetchFirstSelectSql(sql, 1000, "ID");
             PreparedStatement stmt = null;
             ResultSet rs = null;
 
@@ -258,11 +250,14 @@ public class CaLoadTestRevoke extends LoadExecutor {
                 rs = stmt.executeQuery();
                 while (rs.next()) {
                     idx++;
-                    long serial = rs.getLong("SN");
-                    if (serial + 1 > nextStartSerial) {
-                        nextStartSerial = serial + 1;
+                    int id = rs.getInt("ID");
+                    if (id + 1 > nextStartId) {
+                        nextStartId = id + 1;
                     }
-                    if (!excludeSerials.contains(serial)) {
+
+                    String serialStr = rs.getString("SN");
+                    BigInteger serial = new BigInteger(serialStr, 16);
+                    if (!caSerial.equals(serial)) {
                         serials.addLast(serial);
                     }
                 }
@@ -270,11 +265,6 @@ public class CaLoadTestRevoke extends LoadExecutor {
                 throw caDataSource.translate(sql, ex);
             } finally {
                 caDataSource.releaseResources(stmt, rs);
-            }
-
-            if (idx == 0) {
-                System.out.println("no unrevoked certificate");
-                System.out.flush();
             }
 
             if (idx < 1000) {

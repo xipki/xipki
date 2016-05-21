@@ -82,12 +82,7 @@ class CaConf {
         this.url = ParamUtil.requireNonBlank("url", url);
         this.requestorName = ParamUtil.requireNonNull("requestorName", requestorName);
         this.responder = ParamUtil.requireNonNull("responder", responder);
-
-        if (StringUtil.isBlank(healthUrl)) {
-            this.healthUrl = url.replace("cmp", "health");
-        } else {
-            this.healthUrl = healthUrl;
-        }
+        this.healthUrl = StringUtil.isBlank(healthUrl) ? url.replace("cmp", "health") : healthUrl;
     }
 
     public String getName() {
@@ -104,8 +99,7 @@ class CaConf {
 
     public void setCert(final X509Certificate cert) {
         this.cert = cert;
-        this.subject = (cert == null)
-                ? null
+        this.subject = (cert == null) ? null
                 : X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
     }
 

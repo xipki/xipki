@@ -70,8 +70,8 @@ class ProxyP11Identity extends P11Identity {
             p11Param = new Asn1P11Params(
                     new Asn1RSAPkcsPssParams((P11RSAPkcsPssParams) parameters));
         }
-        Asn1SignTemplate signTemplate = new Asn1SignTemplate(asn1EntityId, mechanism,
-                p11Param, content);
+        Asn1SignTemplate signTemplate = new Asn1SignTemplate(asn1EntityId, mechanism, p11Param,
+                content);
         ASN1Encodable result = ((ProxyP11Slot) slot).getModule().send(P11ProxyConstants.ACTION_sign,
                 signTemplate);
 
@@ -82,9 +82,7 @@ class ProxyP11Identity extends P11Identity {
             throw new P11TokenException("the returned result is not OCTET STRING");
         }
 
-        return (octetString == null)
-                ? null
-                : octetString.getOctets();
+        return (octetString == null) ? null : octetString.getOctets();
     }
 
 }

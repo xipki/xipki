@@ -70,8 +70,7 @@ public class PciAuditEvent {
     private static final DateTimeFormatter DATE_FORMATTER
             = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 
-    private static final DateTimeFormatter TIME_FORMATTER
-            = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /**
      * 10.3.1 "User Identification"
@@ -207,18 +206,14 @@ public class PciAuditEvent {
             buffer.append(prefix);
         }
 
-        buffer.append(replaceDelimiter(getUserId(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
-        buffer.append(replaceDelimiter(getEventType(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
-        buffer.append(replaceDelimiter(getDate(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
-        buffer.append(replaceDelimiter(getTime(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
-        buffer.append(replaceDelimiter(getStatus(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
-        buffer.append(replaceDelimiter(getOrigination(), delimiter, replaceDelimiter));
-        buffer.append(delimiter);
+        buffer.append(replaceDelimiter(getUserId(), delimiter, replaceDelimiter)).append(delimiter);
+        buffer.append(replaceDelimiter(getEventType(), delimiter, replaceDelimiter))
+                .append(delimiter);
+        buffer.append(replaceDelimiter(getDate(), delimiter, replaceDelimiter)).append(delimiter);
+        buffer.append(replaceDelimiter(getTime(), delimiter, replaceDelimiter)).append(delimiter);
+        buffer.append(replaceDelimiter(getStatus(), delimiter, replaceDelimiter)).append(delimiter);
+        buffer.append(replaceDelimiter(getOrigination(), delimiter, replaceDelimiter))
+                .append(delimiter);
         buffer.append(replaceDelimiter(getAffectedResource(), delimiter, replaceDelimiter));
 
         return buffer;

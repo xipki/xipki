@@ -94,8 +94,8 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
         }
         description.append("\n");
 
-        CaLoadTestTemplateEnroll loadTest = new CaLoadTestTemplateEnroll(caClient,
-                template, description.toString());
+        CaLoadTestTemplateEnroll loadTest = new CaLoadTestTemplateEnroll(caClient, template,
+                description.toString());
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);
         loadTest.test();

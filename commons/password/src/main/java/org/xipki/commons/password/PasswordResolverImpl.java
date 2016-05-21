@@ -84,11 +84,8 @@ public class PasswordResolverImpl implements PasswordResolver {
 
         boolean replaced = resolvers.remove(service);
         resolvers.add(service);
-        String txt = replaced
-                ? "replaced"
-                : "added";
-        LOG.debug("{} SinglePasswordResolver binding for {}",
-                txt, service);
+        String txt = replaced ? "replaced" : "added";
+        LOG.debug("{} SinglePasswordResolver binding for {}", txt, service);
     }
 
     public void unbindService(final SinglePasswordResolver service) {

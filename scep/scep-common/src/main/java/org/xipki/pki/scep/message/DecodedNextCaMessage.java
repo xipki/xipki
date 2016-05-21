@@ -234,8 +234,7 @@ public class DecodedNextCaMessage {
         // validate the signature
         SignerInformationVerifier verifier;
         try {
-            verifier = new JcaSimpleSignerInfoVerifierBuilder().build(
-                    signerCert.getPublicKey());
+            verifier = new JcaSimpleSignerInfoVerifierBuilder().build(signerCert.getPublicKey());
         } catch (OperatorCreationException ex) {
             final String msg = "could not build signature verifier: " + ex.getMessage();
             LOG.error(msg);

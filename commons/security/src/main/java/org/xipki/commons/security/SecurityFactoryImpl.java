@@ -149,8 +149,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             } else if ("EC".equals(keyAlg) || "ECDSA".equals(keyAlg)) {
                 builder = new BcECContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
             } else {
-                throw new InvalidKeyException("unknown key algorithm of the public key "
-                        + keyAlg);
+                throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
             }
             VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
         }
@@ -249,12 +248,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         ParamUtil.requireNonNull("keystoreBytes", keystoreBytes);
 
         try {
-            KeyStore ks;
-            if ("JKS".equalsIgnoreCase(keystoreType)) {
-                ks = KeyStore.getInstance(keystoreType);
-            } else {
-                ks = KeyStore.getInstance(keystoreType, "BC");
-            }
+            KeyStore ks = "JKS".equalsIgnoreCase(keystoreType) ? KeyStore.getInstance(keystoreType)
+                    : KeyStore.getInstance(keystoreType, "BC");
             ks.load(new ByteArrayInputStream(keystoreBytes), password);
 
             String tmpKeyname = keyname;
@@ -290,12 +285,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 certs = newCertChain;
             }
 
-            KeyStore newKs;
-            if ("JKS".equalsIgnoreCase(keystoreType)) {
-                newKs = KeyStore.getInstance(keystoreType);
-            } else {
-                newKs = KeyStore.getInstance(keystoreType, "BC");
-            }
+            KeyStore newKs = ("JKS".equalsIgnoreCase(keystoreType))
+                    ? KeyStore.getInstance(keystoreType) : KeyStore.getInstance(keystoreType, "BC");
             newKs.load(null, password);
 
             PrivateKey key = (PrivateKey) ks.getKey(tmpKeyname, password);

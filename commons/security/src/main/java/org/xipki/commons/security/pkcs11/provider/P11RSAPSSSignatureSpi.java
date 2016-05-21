@@ -166,14 +166,11 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
                 System.arraycopy(res, 0, out, outOff, res.length);
             } else {
                 baseDigest.update(res, 0, res.length);
-
                 baseDigest.doFinal(out, outOff);
             }
 
             reset();
-
             oddTime = !oddTime;
-
             return res.length;
         }
 
@@ -212,13 +209,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
     protected P11RSAPSSSignatureSpi(final PSSParameterSpec baseParamSpec, final boolean isRaw) {
         this.originalSpec = baseParamSpec;
-
-        if (baseParamSpec == null) {
-            this.paramSpec = PSSParameterSpec.DEFAULT;
-        } else {
-            this.paramSpec = baseParamSpec;
-        }
-
+        this.paramSpec = (baseParamSpec == null) ? PSSParameterSpec.DEFAULT : baseParamSpec;
         this.mgfDigest = DigestFactory.getDigest(paramSpec.getDigestAlgorithm());
         this.saltLength = paramSpec.getSaltLength();
         this.trailer = getTrailer(paramSpec.getTrailerField());
@@ -245,8 +236,8 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
         this.signingKey = (P11PrivateKey) privateKey;
 
-        pss = new org.bouncycastle.crypto.signers.PSSSigner(
-                signer, contentDigest, mgfDigest, saltLength, trailer);
+        pss = new org.bouncycastle.crypto.signers.PSSSigner(signer, contentDigest, mgfDigest,
+                saltLength, trailer);
 
         P11RSAKeyParameter p11KeyParam = P11RSAKeyParameter.getInstance(
                 signingKey.getP11CryptService(), signingKey.getIdentityId());
@@ -372,11 +363,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     }
 
     private void setupContentDigest() {
-        if (isRaw) {
-            this.contentDigest = new NullPssDigest(mgfDigest);
-        } else {
-            this.contentDigest = mgfDigest;
-        }
+       this.contentDigest = isRaw ? new NullPssDigest(mgfDigest) : mgfDigest;
     }
 
 }

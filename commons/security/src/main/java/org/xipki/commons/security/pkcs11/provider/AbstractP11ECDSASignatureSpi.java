@@ -158,11 +158,7 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
 
         try {
             byte[] plainSignature = signingKey.sign(mechanism, null, dataToSign);
-            if (plain) {
-                return plainSignature;
-            } else {
-                return SignerUtil.convertPlainDSASigToX962(plainSignature);
-            }
+            return plain ? plainSignature : SignerUtil.convertPlainDSASigToX962(plainSignature);
         } catch (XiSecurityException | P11TokenException ex) {
             throw new SignatureException(ex.getMessage(), ex);
         }

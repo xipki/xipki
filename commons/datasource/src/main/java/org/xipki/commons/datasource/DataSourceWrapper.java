@@ -141,9 +141,7 @@ public abstract class DataSourceWrapper {
             String sql = null;
 
             boolean newConn = (conn == null);
-            Connection tmpConn = newConn
-                    ? getConnection()
-                    : conn;
+            Connection tmpConn = newConn ? getConnection() : conn;
 
             Statement stmt = null;
             ResultSet rs = null;
@@ -180,9 +178,8 @@ public abstract class DataSourceWrapper {
         protected String getSqlToDropForeignKeyConstraint(final String constraintName,
                 final String baseTable) throws DataAccessException {
             StringBuilder sb = new StringBuilder(baseTable.length() + constraintName.length() + 30);
-            return sb.append("ALTER TABLE ").append(baseTable)
-                    .append(" DROP FOREIGN KEY ").append(constraintName)
-                    .toString();
+            return sb.append("ALTER TABLE ").append(baseTable).append(" DROP FOREIGN KEY ")
+                    .append(constraintName).toString();
         }
 
         @Override
@@ -196,9 +193,8 @@ public abstract class DataSourceWrapper {
         protected String getSqlToDropUniqueConstraint(final String constraintName,
                 final String table) {
             StringBuilder sb = new StringBuilder(constraintName.length() + table.length() + 22);
-            return sb.append("ALTER TABLE ").append(table)
-                    .append(" DROP KEY ").append(constraintName)
-                    .toString();
+            return sb.append("ALTER TABLE ").append(table).append(" DROP KEY ")
+                    .append(constraintName).toString();
         }
 
     } // class MySQL
@@ -262,8 +258,7 @@ public abstract class DataSourceWrapper {
         @Override
         protected String buildNextSeqValueSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 44);
-            sql.append("SELECT NEXT VALUE FOR ")
-                .append(sequenceName)
+            sql.append("SELECT NEXT VALUE FOR ").append(sequenceName)
                 .append(" FROM sysibm.sysdummy1");
             return sql.toString();
         }
@@ -362,11 +357,7 @@ public abstract class DataSourceWrapper {
         public String createFetchFirstSelectSql(final String coreSql, final int rows,
                 final String orderBy) {
             int size = coreSql.length() + 18;
-            if (StringUtil.isBlank(orderBy)) {
-                size += 14;
-            } else {
-                size += orderBy.length() + 40;
-            }
+            size += StringUtil.isBlank(orderBy) ? 14 : orderBy.length() + 40;
 
             // ' ROWNUM < ': 10
             // rows (till 9999): 4
@@ -761,9 +752,7 @@ public abstract class DataSourceWrapper {
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            stmt = (conn != null)
-                    ? conn.createStatement()
-                    : getConnection().createStatement();
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
@@ -788,9 +777,7 @@ public abstract class DataSourceWrapper {
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            stmt = (conn != null)
-                    ? conn.createStatement()
-                    : getConnection().createStatement();
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getInt(1);
@@ -829,9 +816,7 @@ public abstract class DataSourceWrapper {
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            stmt = (conn != null)
-                    ? conn.createStatement()
-                    : getConnection().createStatement();
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
             rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
@@ -851,12 +836,8 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("idColumn", idColumn);
         final StringBuilder sb = new StringBuilder(table.length() + idColumn.length() + 35);
-        sb.append("DELETE FROM ")
-            .append(table)
-            .append(" WHERE ")
-            .append(idColumn)
-            .append(" = ")
-            .append(id);
+        sb.append("DELETE FROM ").append(table).append(" WHERE ")
+            .append(idColumn).append(" = ").append(id);
         final String sql = sb.toString();
 
         Connection tmpConn;
@@ -901,16 +882,14 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonNull("value", value);
 
         StringBuilder sb = new StringBuilder(2 * column.length() + 15);
-        sb.append(column);
-        sb.append(" FROM ").append(table);
+        sb.append(column).append(" FROM ").append(table);
         sb.append(" WHERE ").append(column).append("=?");
         String sql = createFetchFirstSelectSql(sb.toString(), 1);
 
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
-            stmt = (conn != null)
-                    ? conn.prepareStatement(sql)
+            stmt = (conn != null) ? conn.prepareStatement(sql)
                     : getConnection().prepareStatement(sql);
             if (value instanceof Integer) {
                 stmt.setInt(1, (Integer) value);
@@ -941,9 +920,7 @@ public abstract class DataSourceWrapper {
 
         Statement stmt;
         try {
-            stmt = (conn != null)
-                    ? conn.createStatement()
-                    : getConnection().createStatement();
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
         } catch (SQLException ex) {
             throw translate(null, ex);
         }
@@ -972,9 +949,7 @@ public abstract class DataSourceWrapper {
 
         Statement stmt;
         try {
-            stmt = (conn != null)
-                    ? conn.createStatement()
-                    : getConnection().createStatement();
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
         } catch (SQLException ex) {
             throw translate(null, ex);
         }
@@ -1063,10 +1038,7 @@ public abstract class DataSourceWrapper {
         final String sql = buildNextSeqValueSql(sequenceName);
         boolean newConn = (conn == null);
 
-        Connection tmpConn = newConn
-                ? getConnection()
-                : conn;
-
+        Connection tmpConn = newConn ? getConnection() : conn;
         Statement stmt = null;
 
         long next;
@@ -1111,10 +1083,7 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonBlank("primaryKeyName", primaryKeyName);
         ParamUtil.requireNonBlank("table", table);
         StringBuilder sql = new StringBuilder(table.length() + 30);
-        return sql.append("ALTER TABLE ")
-                .append(table)
-                .append(" DROP PRIMARY KEY ")
-                .toString();
+        return sql.append("ALTER TABLE ").append(table).append(" DROP PRIMARY KEY ").toString();
     }
 
     public void dropPrimaryKey(final Connection conn, final String primaryKeyName,
@@ -1154,9 +1123,7 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonBlank("baseTable", baseTable);
 
         StringBuilder sb = new StringBuilder(baseTable.length() + constraintName.length() + 30);
-        return sb.append("ALTER TABLE ")
-                .append(baseTable)
-                .append(" DROP CONSTRAINT ")
+        return sb.append("ALTER TABLE ").append(baseTable).append(" DROP CONSTRAINT ")
                 .append(constraintName).toString();
     }
 
@@ -1237,9 +1204,7 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonBlank("constraintName", constraintName);
 
         StringBuilder sb = new StringBuilder(table.length() + constraintName.length() + 30);
-        return sb.append("ALTER TABLE ")
-                .append(table)
-                .append(" DROP CONSTRAINT ")
+        return sb.append("ALTER TABLE ").append(table).append(" DROP CONSTRAINT ")
                 .append(constraintName).toString();
     }
 
@@ -1369,11 +1334,8 @@ public abstract class DataSourceWrapper {
         if (LOG.isDebugEnabled()) {
             String codes;
             if (sqlErrorCodes.isUseSqlStateForTranslation()) {
-                codes = new StringBuilder(60)
-                        .append("SQL state '")
-                        .append(sqlEx.getSQLState())
-                        .append("', error code '")
-                        .append(sqlEx.getErrorCode()).toString();
+                codes = new StringBuilder(60).append("SQL state '").append(sqlEx.getSQLState())
+                        .append("', error code '").append(sqlEx.getErrorCode()).toString();
             } else {
                 codes = "Error code '" + sqlEx.getErrorCode() + "'";
             }
@@ -1396,16 +1358,13 @@ public abstract class DataSourceWrapper {
     private String buildMessage(final String sql, final SQLException ex) {
         String msg = ex.getMessage();
         StringBuilder sb = new StringBuilder(msg.length() + sql.length() + 8);
-        return sb.append("SQL [").append(sql)
-                .append("]; ").append(ex.getMessage()).toString();
+        return sb.append("SQL [").append(sql).append("]; ").append(ex.getMessage()).toString();
     }
 
     private void executeUpdate(Connection conn, String sql) throws DataAccessException {
         Statement stmt = null;
         try {
-            stmt = (conn != null)
-                    ? conn.createStatement()
-                            : getConnection().createStatement();
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
             stmt.executeUpdate(sql);
         } catch (SQLException ex) {
             throw translate(sql, ex);
@@ -1457,12 +1416,9 @@ public abstract class DataSourceWrapper {
             }
         } // end if
 
-        if (databaseType == DatabaseType.DB2
-                || databaseType == DatabaseType.H2
-                || databaseType == DatabaseType.HSQL
-                || databaseType == DatabaseType.MYSQL
-                || databaseType == DatabaseType.MARIADB
-                || databaseType == DatabaseType.ORACLE
+        if (databaseType == DatabaseType.DB2 || databaseType == DatabaseType.H2
+                || databaseType == DatabaseType.HSQL || databaseType == DatabaseType.MYSQL
+                || databaseType == DatabaseType.MARIADB || databaseType == DatabaseType.ORACLE
                 || databaseType == DatabaseType.POSTGRES) {
             HikariConfig conf = new HikariConfig(props);
             HikariDataSource service = new HikariDataSource(conf);
