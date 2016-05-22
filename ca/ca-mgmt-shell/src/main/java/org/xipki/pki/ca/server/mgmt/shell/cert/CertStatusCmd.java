@@ -34,10 +34,16 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.impl.store;
+package org.xipki.pki.ca.server.mgmt.shell.cert;
 
-import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.pki.ca.api.X509CertWithDbId;
+import java.io.File;
+import java.security.cert.X509Certificate;
+
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 
 /**
@@ -45,51 +51,40 @@ import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
  * @since 2.0.0
  */
 
-public class X509CertWithRevocationInfo {
+@Command(scope = "xipki-ca", name = "cert-status",
+        description = "show certificate status")
+@Service
+public class CertStatusCmd extends UnRevRmCertCommandSupport {
 
-    private X509CertWithDbId cert;
+    @Option(name = "--out", aliases = "-o",
+            description = "where to save the certificate")
+    @Completion(FilePathCompleter.class)
+    private String outputFile;
 
-    private CertRevocationInfo revInfo;
+    @Override
+    protected Object doExecute() throws Exception {
+        CertWithStatusInfo certInfo = caManager.getCert(caName, getSerialNumber());
+        X509Certificate cert = (X509Certificate) certInfo.getCert();
 
-    private String certprofile;
+        if (cert == null) {
+            System.out.println("certificate unknown");
+            return null;
+        }
 
-    public X509CertWithRevocationInfo() {
-    }
+        StringBuilder sb = new StringBuilder();
+        sb.append("certificate profile: ").append(certInfo.getCertprofile()).append("\n");
+        sb.append("status: ");
+        if (certInfo.getRevocationInfo() == null) {
+            sb.append("good");
+        } else {
+            sb.append(certInfo.getRevocationInfo());
+        }
+        println(sb.toString());
 
-    public X509CertWithDbId getCert() {
-        return cert;
-    }
-
-    public boolean isRevoked() {
-        return revInfo != null;
-    }
-
-    public CertRevocationInfo getRevInfo() {
-        return revInfo;
-    }
-
-    public void setCert(final X509CertWithDbId cert) {
-        this.cert = cert;
-    }
-
-    public void setRevInfo(final CertRevocationInfo revInfo) {
-        this.revInfo = revInfo;
-    }
-
-    public String getCertprofile() {
-        return certprofile;
-    }
-
-    public void setCertprofile(final String certprofile) {
-        this.certprofile = certprofile;
-    }
-
-    public CertWithStatusInfo toCertWithStatusInfo() {
-        CertWithStatusInfo ret = new CertWithStatusInfo();
-        ret.setCert(cert.getCert());
-        ret.setCertprofile(certprofile);
-        ret.setRevocationInfo(revInfo);
-        return ret;
+        if (outputFile != null) {
+            saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());
+        }
+        return null;
     }
 
 }

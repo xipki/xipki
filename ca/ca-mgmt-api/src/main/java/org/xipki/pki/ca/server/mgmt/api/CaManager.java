@@ -48,6 +48,7 @@ import javax.annotation.Nullable;
 
 import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.CrlReason;
+import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
@@ -242,4 +243,6 @@ public interface CaManager {
 
     ScepEntry getScepEntry(@Nonnull String name) throws CaMgmtException;
 
+    CertWithStatusInfo getCert(@Nonnull String caName, @Nonnull BigInteger serialNumber)
+    throws CaMgmtException;
 }

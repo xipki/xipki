@@ -44,6 +44,7 @@ import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
@@ -123,6 +124,7 @@ import org.xipki.pki.ca.server.impl.ocsp.OcspCertPublisher;
 import org.xipki.pki.ca.server.impl.scep.Scep;
 import org.xipki.pki.ca.server.impl.scep.ScepManager;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
+import org.xipki.pki.ca.server.impl.store.X509CertWithRevocationInfo;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
@@ -139,6 +141,7 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 import org.xipki.pki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
@@ -2770,5 +2773,25 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         return signerConfs;
     } // method splitCaSignerConfs
+
+    @Override
+    public CertWithStatusInfo getCert(String caName, BigInteger serialNumber)
+    throws CaMgmtException {
+        ParamUtil.requireNonBlank("caName", caName);
+        ParamUtil.requireNonNull("serialNumber", serialNumber);
+
+        X509Ca ca = getX509Ca(caName);
+        X509CertWithRevocationInfo certInfo;
+        try {
+            certInfo = ca.getCertWithRevocationInfo(serialNumber);
+        } catch (CertificateException | OperationException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        }
+        if (certInfo != null) {
+            return certInfo.toCertWithStatusInfo();
+        } else {
+            return new CertWithStatusInfo();
+        }
+    }
 
 }

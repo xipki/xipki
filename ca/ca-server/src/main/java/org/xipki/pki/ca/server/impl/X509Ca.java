@@ -526,6 +526,11 @@ public class X509Ca {
         return certstore.knowsCertForSerial(caInfo.getCertificate(), cert.getSerialNumber());
     }
 
+    public X509CertWithRevocationInfo getCertWithRevocationInfo(final BigInteger serialNumber)
+    throws CertificateException, OperationException {
+        return certstore.getCertWithRevocationInfo(caInfo.getCertificate(), serialNumber);
+    }
+
     public boolean authenticateUser(final String user, final byte[] password)
     throws OperationException {
         return certstore.authenticateUser(user, password);
@@ -2130,8 +2135,6 @@ public class X509Ca {
     } // method removeExpirtedCerts
 
     private int revokeSuspendedCerts() throws OperationException {
-        // TODO: if not configured, ignore it
-
         if (!masterMode) {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
                     "CA could not remove expired certificates at slave mode");

@@ -34,62 +34,51 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.impl.store;
+package org.xipki.pki.ca.server.mgmt.api.x509;
 
+import java.security.cert.Certificate;
+
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.pki.ca.api.X509CertWithDbId;
-import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class X509CertWithRevocationInfo {
+public class CertWithStatusInfo {
 
-    private X509CertWithDbId cert;
-
-    private CertRevocationInfo revInfo;
+    private Certificate cert;
 
     private String certprofile;
 
-    public X509CertWithRevocationInfo() {
+    private CertRevocationInfo revocationInfo;
+
+    public CertWithStatusInfo() {
     }
 
-    public X509CertWithDbId getCert() {
+    public Certificate getCert() {
         return cert;
     }
 
-    public boolean isRevoked() {
-        return revInfo != null;
-    }
-
-    public CertRevocationInfo getRevInfo() {
-        return revInfo;
-    }
-
-    public void setCert(final X509CertWithDbId cert) {
+    public void setCert(Certificate cert) {
         this.cert = cert;
-    }
-
-    public void setRevInfo(final CertRevocationInfo revInfo) {
-        this.revInfo = revInfo;
     }
 
     public String getCertprofile() {
         return certprofile;
     }
 
-    public void setCertprofile(final String certprofile) {
+    public void setCertprofile(String certprofile) {
         this.certprofile = certprofile;
     }
 
-    public CertWithStatusInfo toCertWithStatusInfo() {
-        CertWithStatusInfo ret = new CertWithStatusInfo();
-        ret.setCert(cert.getCert());
-        ret.setCertprofile(certprofile);
-        ret.setRevocationInfo(revInfo);
-        return ret;
+    public CertRevocationInfo getRevocationInfo() {
+        return revocationInfo;
+    }
+
+    public void setRevocationInfo(CertRevocationInfo revocationInfo) {
+        this.revocationInfo = revocationInfo;
     }
 
 }

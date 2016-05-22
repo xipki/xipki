@@ -48,8 +48,8 @@ import org.xipki.pki.ca.api.profile.CertValidity;
  *   [revokeSuspendedCerts.targetReason=&lt;CRL reason&gt;,\
  *    revokeSuspendedCerts.unchangedSince=&lt;duration&gt;]
  *</pre>
- * where duration is of format &lt;n&gt;h, &lt;n&gt;d, &lt;n&gt;y. 
- * 
+ * where duration is of format &lt;n&gt;h, &lt;n&gt;d, &lt;n&gt;y.
+ *
  * @author Lijun Liao
  * @since 2.0.0
  */
