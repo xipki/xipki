@@ -1504,7 +1504,7 @@ public class ProfileConfCreatorDemo {
 
             List<String> algos = sigAlgosType.getAlgorithm();
             String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA", "withPlainECDSA",
-                    "withRSAandMGF1"};
+                "withRSAandMGF1"};
             for (String part2 : algoPart2s) {
                 for (String hashAlgo : sigHashAlgos) {
                     algos.add(hashAlgo + part2);

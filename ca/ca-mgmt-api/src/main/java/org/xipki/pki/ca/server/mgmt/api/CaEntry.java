@@ -44,6 +44,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.pki.ca.api.profile.CertValidity;
+import org.xipki.pki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
 
 /**
  * @author Lijun Liao
@@ -81,6 +82,8 @@ public class CaEntry implements Serializable {
     private int keepExpiredCertInDays;
 
     private String extraControl;
+
+    private RevokeSuspendedCertsControl revokeSuspendedCertsControl;
 
     public CaEntry(final String name, final String signerType, final String signerConf,
             final int expirationPeriod) throws CaMgmtException {
@@ -188,6 +191,10 @@ public class CaEntry implements Serializable {
 
     public void setExtraControl(final String extraControl) {
         this.extraControl = extraControl;
+    }
+
+    public RevokeSuspendedCertsControl getRevokeSuspendedCertsControl() {
+        return revokeSuspendedCertsControl;
     }
 
     @Override

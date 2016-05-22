@@ -374,6 +374,40 @@ public class X509Ca {
 
     } // class ScheduledCrlGenerationService
 
+    private class ScheduledSuspendedCertsRevoker implements Runnable {
+
+        private boolean inProcess;
+
+        @Override
+        public void run() {
+            if (caInfo.getRevokeSuspendedCertsControl() == null) {
+                return;
+            }
+
+            if (inProcess) {
+                return;
+            }
+
+            inProcess = true;
+            try {
+                LOG.debug("revoking suspended certificates");
+                int num = revokeSuspendedCerts();
+                if (num == 0) {
+                    LOG.debug("revokend {} suspended certificates of CA '{}'", num,
+                            caInfo.getCaEntry().getName());
+                } else {
+                    LOG.info("revokend {} suspended certificates of CA '{}'", num,
+                            caInfo.getCaEntry().getName());
+                }
+            } catch (Throwable th) {
+                LogUtil.error(LOG, th, "could not revoke suspended certificates");
+            } finally {
+                inProcess = false;
+            }
+        } // method run
+
+    } // class ScheduledSuspendedCertsRevoker
+
     private static final long MS_PER_SECOND = 1000L;
 
     private static final int SECOND_PER_MIN = 60;
@@ -405,6 +439,8 @@ public class X509Ca {
     private ScheduledFuture<?> crlGenerationService;
 
     private ScheduledFuture<?> expiredCertsRemover;
+
+    private ScheduledFuture<?> suspendedCertsRevoker;
 
     private AuditServiceRegister auditServiceRegister;
 
@@ -455,6 +491,9 @@ public class X509Ca {
 
         this.expiredCertsRemover = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
                 new ScheduledExpiredCertsRemover(), 1, 1, TimeUnit.DAYS);
+
+        this.suspendedCertsRevoker = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
+                new ScheduledSuspendedCertsRevoker(), 1, 1, TimeUnit.HOURS);
     } // constructor
 
     public X509CaInfo getCaInfo() {
@@ -1348,9 +1387,8 @@ public class X509Ca {
         X509CertWithRevocationInfo revokedCert = null;
 
         CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(), invalidityTime);
-        revokedCert = certstore.revokeCertificate(
-                caInfo.getCertificate(),
-                serialNumber, revInfo, force, shouldPublishToDeltaCrlCache());
+        revokedCert = certstore.revokeCertificate(caInfo.getCertificate(), serialNumber, revInfo,
+                force, shouldPublishToDeltaCrlCache());
         if (revokedCert == null) {
             return null;
         }
@@ -1392,6 +1430,57 @@ public class X509Ca {
 
         return revokedCert;
     } // method doRevokeCertificate
+
+    private X509CertWithRevocationInfo doRevokeSuspendedCert(final BigInteger serialNumber,
+            final CrlReason reason)
+    throws OperationException {
+        ParamUtil.requireNonNull("serialNumber", serialNumber);
+        ParamUtil.requireNonNull("reason", reason);
+        LOG.info(
+            "     START revokeSuspendedCert: ca={}, serialNumber={}, reason={}",
+            new Object[]{caInfo.getName(), LogUtil.formatCsn(serialNumber),
+                    reason.getDescription()});
+
+        X509CertWithRevocationInfo revokedCert = certstore.revokeSuspendedCert(
+                caInfo.getCertificate(), serialNumber, reason, shouldPublishToDeltaCrlCache());
+        if (revokedCert == null) {
+            return null;
+        }
+
+        for (IdentifiedX509CertPublisher publisher : getPublishers()) {
+            if (!publisher.isAsyn()) {
+                boolean successful;
+                try {
+                    successful = publisher.certificateRevoked(caInfo.getCertificate(),
+                            revokedCert.getCert(), revokedCert.getCertprofile(),
+                            revokedCert.getRevInfo());
+                } catch (RuntimeException ex) {
+                    successful = false;
+                    LogUtil.error(LOG, ex,
+                            "could not publish revocation of certificate to the publisher "
+                            + publisher.getName());
+                }
+
+                if (successful) {
+                    continue;
+                }
+            } // end if
+
+            Integer certId = revokedCert.getCert().getCertId();
+            try {
+                certstore.addToPublishQueue(publisher.getName(), certId.intValue(),
+                        caInfo.getCertificate());
+            } catch (Throwable th) {
+                LogUtil.error(LOG, th, "could not add entry to PublishQueue");
+            }
+        } // end for
+
+        LOG.info("SUCCESSFUL revokeSuspendedCert: ca={}, serialNumber={}, reason={}",
+                new Object[]{caInfo.getName(), LogUtil.formatCsn(serialNumber),
+                        reason.getDescription()});
+
+        return revokedCert;
+    } // method doRevokeSuspendedCert
 
     private X509CertWithDbId doUnrevokeCertificate(final BigInteger serialNumber,
             final boolean force) throws OperationException {
@@ -2036,7 +2125,74 @@ public class X509Ca {
                         audit.logEvent(auditEvent);
                     } // end if (audit != null)
                 } // end finally
-            } // end try
+            } // end for
+        } // end while (true)
+    } // method removeExpirtedCerts
+
+    private int revokeSuspendedCerts() throws OperationException {
+        // TODO: if not configured, ignore it
+
+        if (!masterMode) {
+            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+                    "CA could not remove expired certificates at slave mode");
+        }
+
+        final String caName = caInfo.getName();
+        final int numEntries = 100;
+
+        X509Cert caCert = caInfo.getCertificate();
+
+        CertValidity val = caInfo.getRevokeSuspendedCertsControl().getUnchangedSince();
+        long ms;
+        switch (val.getUnit()) {
+        case DAY:
+            ms = val.getValidity() * DAY_IN_MS;
+            break;
+        case HOUR:
+            ms = val.getValidity() * DAY_IN_MS / 24;
+            break;
+        case YEAR:
+            ms = val.getValidity() * 365 * DAY_IN_MS;
+            break;
+        default:
+            throw new RuntimeException("should not reach here, unknown Valditiy Unit "
+                    + val.getUnit());
+        }
+        final long latestLastUpdatedAt = (System.currentTimeMillis() - ms) / 1000; // seconds
+        final CrlReason reason = caInfo.getRevokeSuspendedCertsControl().getTargetReason();
+
+        int sum = 0;
+        while (true) {
+            List<BigInteger> serials = certstore.getSuspendedCertSerials(caCert,
+                    latestLastUpdatedAt, numEntries);
+            if (CollectionUtil.isEmpty(serials)) {
+                return sum;
+            }
+
+            for (BigInteger serial : serials) {
+                boolean revoked = false;
+                try {
+                    revoked = doRevokeSuspendedCert(serial, reason) != null;
+                } catch (Throwable th) {
+                    LogUtil.error(LOG, th, "could not remove expired certificate");
+                    if (!revoked) {
+                        return sum;
+                    }
+                } finally {
+                    AuditService audit = getAuditService();
+                    if (audit != null) {
+                        AuditEvent auditEvent = newAuditEvent();
+                        auditEvent.setLevel(revoked ? AuditLevel.INFO : AuditLevel.ERROR);
+                        auditEvent.setStatus(revoked ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED);
+                        auditEvent.addEventData(new AuditEventData("CA", caName));
+                        auditEvent.addEventData(
+                                new AuditEventData("serialNumber", LogUtil.formatCsn(serial)));
+                        auditEvent.addEventData(
+                                new AuditEventData("eventType", "REVOKE_SUSPENDED_CERT"));
+                        audit.logEvent(auditEvent);
+                    } // end if (audit != null)
+                } // end finally
+            } // end for
         } // end while (true)
     } // method removeExpirtedCerts
 
@@ -2169,6 +2325,11 @@ public class X509Ca {
         if (expiredCertsRemover != null) {
             expiredCertsRemover.cancel(false);
             expiredCertsRemover = null;
+        }
+
+        if (suspendedCertsRevoker != null) {
+            suspendedCertsRevoker.cancel(false);
+            suspendedCertsRevoker = null;
         }
 
         ScheduledThreadPoolExecutor executor = caManager.getScheduledThreadPoolExecutor();

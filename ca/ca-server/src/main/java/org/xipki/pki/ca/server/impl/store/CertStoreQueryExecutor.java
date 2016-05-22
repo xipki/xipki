@@ -117,6 +117,9 @@ class CertStoreQueryExecutor {
     private static final String SQL_REVOKE_CERT =
             "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
+    private static final String SQL_REVOKE_SUSPENDED_CERT =
+            "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
+
     private static final String SQL_INSERT_PUBLISHQUEUE =
             "INSERT INTO PUBLISHQUEUE (PID,CA_ID,CID) VALUES (?,?,?)";
 
@@ -734,6 +737,65 @@ class CertStoreQueryExecutor {
         return certWithRevInfo;
     } // method revokeCert
 
+    X509CertWithRevocationInfo revokeSuspendedCert(final X509Cert caCert,
+            final BigInteger serialNumber, final CrlReason reason,
+            final boolean publishToDeltaCrlCache)
+    throws OperationException, DataAccessException {
+        ParamUtil.requireNonNull("caCert", caCert);
+        ParamUtil.requireNonNull("serialNumber", serialNumber);
+        ParamUtil.requireNonNull("reason", reason);
+
+        X509CertWithRevocationInfo certWithRevInfo
+                = getCertWithRevocationInfo(caCert, serialNumber);
+        if (certWithRevInfo == null) {
+            LOG.warn("certificate with issuer='{}' and serialNumber={} does not exist",
+                    caCert.getSubject(), LogUtil.formatCsn(serialNumber));
+            return null;
+        }
+
+        CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
+        if (currentRevInfo == null) {
+            throw new OperationException(ErrorCode.CERT_UNREVOKED, "certificate is not revoked");
+        }
+
+        CrlReason currentReason = currentRevInfo.getReason();
+        if (currentReason != CrlReason.CERTIFICATE_HOLD) {
+            throw new OperationException(ErrorCode.CERT_REVOKED,
+                    "certificate is revoked but not with reason "
+                    + CrlReason.CERTIFICATE_HOLD.getDescription());
+        }
+
+        int certId = certWithRevInfo.getCert().getCertId().intValue();
+
+        PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_SUSPENDED_CERT);
+        try {
+            int idx = 1;
+            ps.setLong(idx++, System.currentTimeMillis() / 1000);
+            ps.setInt(idx++, reason.getCode());
+            ps.setLong(idx++, certId);
+
+            int count = ps.executeUpdate();
+            if (count != 1) {
+                String message = (count > 1)
+                        ? count + " rows modified, but exactly one is expected"
+                        : "no row is modified, but exactly one is expected";
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
+            }
+        } catch (SQLException ex) {
+            throw datasource.translate(SQL_REVOKE_CERT, ex);
+        } finally {
+            releaseDbResources(ps, null);
+        }
+
+        int caId = getCaId(caCert);
+        if (publishToDeltaCrlCache) {
+            publishToDeltaCrlCache(caId, certWithRevInfo.getCert().getCert().getSerialNumber());
+        }
+
+        currentRevInfo.setReason(reason);
+        return certWithRevInfo;
+    } // method revokeSuspendedCert
+
     X509CertWithDbId unrevokeCert(final X509Cert caCert, final BigInteger serialNumber,
             final boolean force, final boolean publishToDeltaCrlCache)
     throws OperationException, DataAccessException {
@@ -990,6 +1052,36 @@ class CertStoreQueryExecutor {
             releaseDbResources(ps, rs);
         }
     } // method getExpiredSerialNumbers
+
+    List<BigInteger> getSuspendedCertSerials(final X509Cert caCert, final long latestLastUpdate,
+            final int numEntries) throws DataAccessException, OperationException {
+        ParamUtil.requireNonNull("caCert", caCert);
+        ParamUtil.requireMin("numEntries", numEntries, 1);
+
+        int caId = getCaId(caCert);
+        final String coreSql = "SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?";
+        final String sql = datasource.createFetchFirstSelectSql(coreSql, numEntries);
+        ResultSet rs = null;
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        try {
+            int idx = 1;
+            ps.setInt(idx++, caId);
+            ps.setLong(idx++, latestLastUpdate + 1);
+            ps.setInt(idx++, CrlReason.CERTIFICATE_HOLD.getCode());
+            rs = ps.executeQuery();
+            List<BigInteger> ret = new ArrayList<>();
+            while (rs.next() && ret.size() < numEntries) {
+                String str = rs.getString("SN");
+                ret.add(new BigInteger(str, 16));
+            }
+            return ret;
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            releaseDbResources(ps, rs);
+        }
+    } // method getSuspendedCertIds
 
     byte[] getEncodedCrl(final X509Cert caCert, final BigInteger crlNumber)
     throws DataAccessException, OperationException {

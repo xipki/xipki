@@ -241,4 +241,8 @@ public class X509CaEntry extends CaEntry implements Serializable {
         return subject;
     }
 
+    @Override
+    public void setExtraControl(final String extraControl) {
+        super.setExtraControl(extraControl);
+    }
 }

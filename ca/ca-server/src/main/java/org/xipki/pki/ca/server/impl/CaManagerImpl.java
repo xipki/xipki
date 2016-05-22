@@ -106,6 +106,8 @@ import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.profile.CertprofileException;
+import org.xipki.pki.ca.api.profile.CertValidity;
+import org.xipki.pki.ca.api.profile.CertValidity.Unit;
 import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegister;
 import org.xipki.pki.ca.api.publisher.CertPublisherException;
@@ -137,6 +139,7 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaUris;
@@ -718,6 +721,30 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private boolean startCa(final String caName) {
         X509CaInfo caEntry = caInfos.get(caName);
+
+        String extraControl = caEntry.getCaEntry().getExtraControl();
+        if (StringUtil.isNotBlank(extraControl)) {
+            ConfPairs cp = new ConfPairs(extraControl);
+            String str = cp.getValue(RevokeSuspendedCertsControl.KEY_REVOCATION_ENABLED);
+            boolean enabled = false;
+            if (str != null) {
+                enabled = Boolean.parseBoolean(str);
+            }
+
+            if (enabled) {
+                str = cp.getValue(RevokeSuspendedCertsControl.KEY_REVOCATION_REASON);
+                CrlReason reason = (str == null) ? CrlReason.CESSATION_OF_OPERATION
+                        : CrlReason.getInstance(str);
+
+                str = cp.getValue(RevokeSuspendedCertsControl.KEY_UNCHANGED_SINCE);
+                CertValidity unchangedSince = (str == null) ? new CertValidity(15, Unit.DAY)
+                        : CertValidity.getInstance(str);
+                RevokeSuspendedCertsControl control = new RevokeSuspendedCertsControl(reason,
+                        unchangedSince);
+                caEntry.setRevokeSuspendedCertsControl(control);
+            }
+        }
+
         boolean signerRequired = caEntry.isSignerRequired();
 
         X509CrlSignerEntryWrapper crlSignerEntry = null;

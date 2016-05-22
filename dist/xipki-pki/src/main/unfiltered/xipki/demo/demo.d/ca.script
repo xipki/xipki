@@ -377,7 +377,8 @@ xipki-ca:ca-add \
   --cmp-control cmpcontrol1 \
   --responder responder1 \
   --duplicate-subject yes \
-  --duplicate-key yes
+  --duplicate-key yes \
+  --extra-control revokeSuspendedCerts.enabled=true,revokeSuspendedCerts.targetReason=cessationOfOperation,revokeSuspendedCerts.unchangedSince=15d
 
 xipki-ca:caalias-add \
   --ca SubCA1.complex-Name \

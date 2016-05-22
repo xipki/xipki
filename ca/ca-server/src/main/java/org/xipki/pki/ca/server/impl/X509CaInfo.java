@@ -63,6 +63,7 @@ import org.xipki.pki.ca.server.impl.store.CertificateStore;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.pki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 
 /**
@@ -97,6 +98,8 @@ public class X509CaInfo {
     private Map<String, ConcurrentContentSigner> signers;
 
     private ConcurrentContentSigner dfltSigner;
+
+    private RevokeSuspendedCertsControl revokeSuspendedCertsControl;
 
     public X509CaInfo(final X509CaEntry caEntry, final CertificateStore certStore)
     throws OperationException {
@@ -406,5 +409,14 @@ public class X509CaInfo {
 
         return signerRequired;
     } // method isSignerRequired
+
+    public RevokeSuspendedCertsControl getRevokeSuspendedCertsControl() {
+        return revokeSuspendedCertsControl;
+    }
+
+    public void setRevokeSuspendedCertsControl(
+            RevokeSuspendedCertsControl revokeSuspendedCertsControl) {
+        this.revokeSuspendedCertsControl = revokeSuspendedCertsControl;
+    }
 
 }
