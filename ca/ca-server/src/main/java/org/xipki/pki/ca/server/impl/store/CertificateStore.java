@@ -54,6 +54,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 import org.xipki.commons.security.CertRevocationInfo;
+import org.xipki.commons.security.CrlReason;
 import org.xipki.commons.security.X509Cert;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
@@ -170,6 +171,29 @@ public class CertificateStore {
             } else {
                 LOG.info("revoked certificate issuer='{}', serialNumber={}", caCert.getSubject(),
                         LogUtil.formatCsn(serialNumber));
+            }
+
+            return revokedCert;
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+        }
+    }
+
+    public X509CertWithRevocationInfo revokeSuspendedCert(final X509Cert caCert,
+            final BigInteger serialNumber, final CrlReason reason,
+            final boolean publishToDeltaCrlCache) throws OperationException {
+        try {
+            X509CertWithRevocationInfo revokedCert = queryExecutor.revokeSuspendedCert(caCert,
+                    serialNumber, reason, publishToDeltaCrlCache);
+            if (revokedCert == null) {
+                LOG.info("could not revoke non-existing certificate issuer='{}', serialNumber={}",
+                    caCert.getSubject(), LogUtil.formatCsn(serialNumber));
+            } else {
+                LOG.info("revoked suspended certificate issuer='{}', serialNumber={}",
+                        caCert.getSubject(), LogUtil.formatCsn(serialNumber));
             }
 
             return revokedCert;
@@ -365,6 +389,18 @@ public class CertificateStore {
             final int numEntries) throws OperationException {
         try {
             return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, numEntries);
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+        }
+    }
+
+    public List<BigInteger> getSuspendedCertSerials(final X509Cert caCert,
+            final long latestLastUpdate, final int numEntries) throws OperationException {
+        try {
+            return queryExecutor.getSuspendedCertSerials(caCert, latestLastUpdate, numEntries);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
