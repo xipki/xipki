@@ -142,10 +142,10 @@ import org.xipki.pki.ca.server.impl.store.X509CertWithRevocationInfo;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
-import org.xipki.pki.ca.server.mgmt.api.CrlControl;
-import org.xipki.pki.ca.server.mgmt.api.CrlControl.HourMinute;
-import org.xipki.pki.ca.server.mgmt.api.CrlControl.UpdateMode;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl;
+import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl.HourMinute;
+import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl.UpdateMode;
 
 /**
  * @author Lijun Liao

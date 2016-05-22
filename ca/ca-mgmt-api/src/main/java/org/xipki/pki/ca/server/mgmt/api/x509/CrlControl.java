@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.mgmt.api;
+package org.xipki.pki.ca.server.mgmt.api.x509;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -47,6 +47,7 @@ import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
+import org.xipki.pki.ca.server.mgmt.api.TripleState;
 
 /**
  *<pre>
