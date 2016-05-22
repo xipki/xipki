@@ -290,19 +290,21 @@ public class X509CertprofileQa {
 
         if (cert.getNotAfter().before(cert.getNotBefore())) {
             issue.setFailureMessage("notAfter must not be before notBefore");
-        }
-
-        if (!issue.isFailed()) {
+        } else if (cert.getNotBefore().before(issuerInfo.getCaNotBefore())) {
+            issue.setFailureMessage("notBefore must not be before CA's notBefore");
+        } else {
             Date expectedNotAfter = validity.add(cert.getNotBefore());
             if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS) {
                 expectedNotAfter = new Date(MAX_CERT_TIME_MS);
             }
 
+            if (issuerInfo.isCutoffNotAfter()
+                    && expectedNotAfter.after(issuerInfo.getCaNotAfter())) {
+                expectedNotAfter = issuerInfo.getCaNotAfter();
+            }
+
             if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND) {
-                Date caNotAfter = issuerInfo.getCert().getNotAfter();
-                if (! caNotAfter.equals(cert.getNotAfter())) {
-                    issue.setFailureMessage("cert validity is not within " + validity.toString());
-                }
+                issue.setFailureMessage("cert validity is not within " + validity.toString());
             }
         }
 

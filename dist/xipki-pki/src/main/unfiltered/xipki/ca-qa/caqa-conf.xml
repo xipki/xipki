@@ -5,6 +5,7 @@
       <cert>
         <file>output/RCA1.der</file>
       </cert>
+      <validityMode>cutoff</validityMode>
       <caIssuerUrl>http://example.org/RCA1.der</caIssuerUrl>
       <ocspUrl>http://localhost:8080/ocsp/responder1</ocspUrl>
     </X509Issuer>
@@ -12,6 +13,7 @@
       <cert>
         <file>output/SubCA1.der</file>
       </cert>
+      <validityMode>cutoff</validityMode>
       <caIssuerUrl>http://example.org/SubCA1.der</caIssuerUrl>
       <ocspUrl>http://localhost:8080/ocsp/responder1</ocspUrl>
     </X509Issuer>
@@ -19,6 +21,7 @@
       <cert>
         <file>output/SubCAwithCRL1.der</file>
       </cert>
+      <validityMode>lax</validityMode>
       <caIssuerUrl>http://example.org/SubCAwithCRL1.der</caIssuerUrl>
       <ocspUrl>http://localhost:8080/ocsp/responder2</ocspUrl>
       <crlUrl>http://example.org/crl</crlUrl>

@@ -142,11 +142,22 @@ public class QaSystemManagerImpl implements QaSystemManager {
                     continue;
                 }
 
+                String str = issuerType.getValidityMode();
+                boolean cutoffNotAfter;
+                if (StringUtil.isBlank(str) || "CUTOFF".equalsIgnoreCase(str)) {
+                    cutoffNotAfter = true;
+                } else if ("LAX".equalsIgnoreCase(str)) {
+                    cutoffNotAfter = false;
+                } else {
+                    LOG.error("invalid validityMode {}", str);
+                    return;
+                }
+
                 X509IssuerInfo issuerInfo;
                 try {
                     issuerInfo = new X509IssuerInfo(issuerType.getCaIssuerUrl(),
                             issuerType.getOcspUrl(), issuerType.getCrlUrl(),
-                            issuerType.getDeltaCrlUrl(), certBytes);
+                            issuerType.getDeltaCrlUrl(), certBytes, cutoffNotAfter);
                 } catch (CertificateException ex) {
                     LogUtil.error(LOG, ex,
                             "could not parse certificate of issuer " + issuerType.getName());

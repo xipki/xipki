@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -69,12 +70,21 @@ public class X509IssuerInfo {
 
     private final Certificate bcCert;
 
+    private final boolean cutoffNotAfter;
+
+    private final Date caNotBefore;
+
+    private final Date caNotAfter;
+
     private final byte[] ski;
 
     public X509IssuerInfo(final List<String> caIssuerUrls, final List<String> ocspUrls,
-            final List<String> crlUrls, final List<String> deltaCrlUrls, final byte[] certBytes)
+            final List<String> crlUrls, final List<String> deltaCrlUrls, final byte[] certBytes,
+            final boolean cutoffNotAfter)
     throws CertificateException {
         ParamUtil.requireNonNull("certBytes", certBytes);
+
+        this.cutoffNotAfter = cutoffNotAfter;
 
         if (CollectionUtil.isEmpty(caIssuerUrls)) {
             this.caIssuerUrls = null;
@@ -115,6 +125,8 @@ public class X509IssuerInfo {
         }
         this.bcCert = Certificate.getInstance(certBytes);
         this.ski = X509Util.extractSki(cert);
+        this.caNotBefore = this.cert.getNotBefore();
+        this.caNotAfter = this.cert.getNotAfter();
     } // constructor
 
     public Set<String> getCaIssuerUrls() {
@@ -143,6 +155,18 @@ public class X509IssuerInfo {
 
     public Certificate getBcCert() {
         return bcCert;
+    }
+
+    public boolean isCutoffNotAfter() {
+        return cutoffNotAfter;
+    }
+
+    public Date getCaNotBefore() {
+        return caNotBefore;
+    }
+
+    public Date getCaNotAfter() {
+        return caNotAfter;
     }
 
 }
