@@ -155,4 +155,13 @@ public class CertRevocationInfo implements Serializable {
         invalidityTime = (Date) serialMap.get(SR_INVALIDITY_TIME);
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("reason: ").append(reason).append("\n");
+        sb.append("revocationTime: ").append(revocationTime).append("\n");
+        sb.append("invalidityTime: ").append(invalidityTime);
+        return sb.toString();
+    }
+
 }
