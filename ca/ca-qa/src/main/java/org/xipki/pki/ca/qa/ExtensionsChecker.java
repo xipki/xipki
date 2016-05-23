@@ -164,6 +164,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.pki.ca.qa.internal.QaAdmission;
 import org.xipki.pki.ca.qa.internal.QaAuthorizationTemplate;
 import org.xipki.pki.ca.qa.internal.QaCertificatePolicies;
+import org.xipki.pki.ca.qa.internal.QaCertificatePolicies.QaCertificatePolicyInformation;
 import org.xipki.pki.ca.qa.internal.QaDirectoryString;
 import org.xipki.pki.ca.qa.internal.QaExtensionValue;
 import org.xipki.pki.ca.qa.internal.QaGeneralSubtree;
@@ -172,11 +173,10 @@ import org.xipki.pki.ca.qa.internal.QaNameConstraints;
 import org.xipki.pki.ca.qa.internal.QaPolicyConstraints;
 import org.xipki.pki.ca.qa.internal.QaPolicyMappingsOption;
 import org.xipki.pki.ca.qa.internal.QaPolicyQualifierInfo;
-import org.xipki.pki.ca.qa.internal.QaPolicyQualifiers;
-import org.xipki.pki.ca.qa.internal.QaTlsFeature;
-import org.xipki.pki.ca.qa.internal.QaCertificatePolicies.QaCertificatePolicyInformation;
 import org.xipki.pki.ca.qa.internal.QaPolicyQualifierInfo.QaCpsUriPolicyQualifier;
 import org.xipki.pki.ca.qa.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
+import org.xipki.pki.ca.qa.internal.QaPolicyQualifiers;
+import org.xipki.pki.ca.qa.internal.QaTlsFeature;
 
 /**
  * @author Lijun Liao

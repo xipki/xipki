@@ -363,7 +363,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     }
 
     private void setupContentDigest() {
-       this.contentDigest = isRaw ? new NullPssDigest(mgfDigest) : mgfDigest;
+        this.contentDigest = isRaw ? new NullPssDigest(mgfDigest) : mgfDigest;
     }
 
 }
