@@ -36,11 +36,10 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.rmi.UnexpectedException;
-
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
@@ -62,7 +61,7 @@ public class UserInfoCmd extends CaCommandSupport {
 
         UserEntry userEntry = caManager.getUser(name);
         if (userEntry == null) {
-            throw new UnexpectedException("\tno user named '" + name + "' is configured");
+            throw new CmdFailure("\tno user named '" + name + "' is configured");
         } else {
             sb.append(name).append("\n\t").append(userEntry);
         }

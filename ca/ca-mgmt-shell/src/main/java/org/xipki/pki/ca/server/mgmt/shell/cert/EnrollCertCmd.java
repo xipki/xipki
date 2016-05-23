@@ -37,7 +37,6 @@
 package org.xipki.pki.ca.server.mgmt.shell.cert;
 
 import java.io.File;
-import java.rmi.UnexpectedException;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -45,6 +44,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
@@ -97,7 +97,7 @@ public class EnrollCertCmd extends CaCommandSupport {
     protected Object doExecute() throws Exception {
         CaEntry ca = caManager.getCa(caName);
         if (ca == null) {
-            throw new UnexpectedException("CA " + caName + " not available");
+            throw new CmdFailure("CA " + caName + " not available");
         }
 
         byte[] encodedP10Request = IoUtil.read(p10File);

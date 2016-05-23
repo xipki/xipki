@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +45,7 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CmpControlNameCompleter;
 
@@ -87,7 +87,7 @@ public class CmpControlInfoCmd extends CaCommandSupport {
         } else {
             CmpControlEntry entry = caManager.getCmpControl(name);
             if (entry == null) {
-                throw new UnexpectedException("\tno CMP control named '" + name + " is configured");
+                throw new CmdFailure("\tno CMP control named '" + name + " is configured");
             } else {
                 sb.append(entry.toString());
             }

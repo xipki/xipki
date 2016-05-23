@@ -36,12 +36,11 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.rmi.UnexpectedException;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 
@@ -66,7 +65,7 @@ public class ScepInfoCmd extends CaCommandSupport {
     protected Object doExecute() throws Exception {
         ScepEntry scep = caManager.getScepEntry(name);
         if (scep == null) {
-            throw new UnexpectedException("could not find SCEP '" + name + "'");
+            throw new CmdFailure("could not find SCEP '" + name + "'");
         }
 
         System.out.println(scep.toString());

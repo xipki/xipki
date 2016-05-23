@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +46,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.RequestorNameCompleter;
 
@@ -92,7 +92,7 @@ public class RequestorInfoCmd extends CaCommandSupport {
         } else {
             CmpRequestorEntry entry = caManager.getCmpRequestor(name);
             if (entry == null) {
-                throw new UnexpectedException("could not find CMP requestor '" + name + "'");
+                throw new CmdFailure("could not find CMP requestor '" + name + "'");
             } else {
                 sb.append(entry.toString(verbose.booleanValue()));
             }

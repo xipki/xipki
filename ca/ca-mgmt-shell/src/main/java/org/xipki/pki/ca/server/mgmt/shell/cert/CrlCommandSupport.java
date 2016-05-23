@@ -37,7 +37,6 @@
 package org.xipki.pki.ca.server.mgmt.shell.cert;
 
 import java.io.File;
-import java.rmi.UnexpectedException;
 import java.security.cert.X509CRL;
 
 import org.apache.karaf.shell.api.action.Completion;
@@ -75,7 +74,7 @@ public abstract class CrlCommandSupport extends CaCommandSupport {
     protected Object doExecute() throws Exception {
         CaEntry ca = caManager.getCa(caName);
         if (ca == null) {
-            throw new UnexpectedException("CA " + caName + " not available");
+            throw new CmdFailure("CA " + caName + " not available");
         }
 
         X509CRL crl = null;

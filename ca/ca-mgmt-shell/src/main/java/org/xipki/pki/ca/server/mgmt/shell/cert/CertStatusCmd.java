@@ -77,7 +77,7 @@ public class CertStatusCmd extends UnRevRmCertCommandSupport {
         if (certInfo.getRevocationInfo() == null) {
             sb.append("good");
         } else {
-            sb.append(certInfo.getRevocationInfo());
+            sb.append("revoked with ").append(certInfo.getRevocationInfo());
         }
         println(sb.toString());
 

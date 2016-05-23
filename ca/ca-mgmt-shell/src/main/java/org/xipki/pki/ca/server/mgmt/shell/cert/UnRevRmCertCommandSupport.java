@@ -45,6 +45,7 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.util.X509Util;
@@ -79,14 +80,14 @@ public abstract class UnRevRmCertCommandSupport extends CaCommandSupport {
     private String serialNumberS;
 
     protected BigInteger getSerialNumber()
-    throws UnexpectedException, IllegalCmdParamException, CertificateException, IOException {
+    throws CmdFailure, IllegalCmdParamException, CertificateException, IOException {
         CaEntry ca = caManager.getCa(caName);
         if (ca == null) {
-            throw new UnexpectedException("CA " + caName + " not available");
+            throw new CmdFailure("CA " + caName + " not available");
         }
 
         if (!(ca instanceof X509CaEntry)) {
-            throw new UnexpectedException("CA " + caName + " is not an X.509-CA");
+            throw new CmdFailure("CA " + caName + " is not an X.509-CA");
         }
 
         BigInteger serialNumber;

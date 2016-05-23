@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +47,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
@@ -96,7 +96,7 @@ public class CaInfoCmd extends CaCommandSupport {
         } else {
             CaEntry entry = caManager.getCa(caName);
             if (entry == null) {
-                throw new UnexpectedException("could not find CA '" + caName + "'");
+                throw new CmdFailure("could not find CA '" + caName + "'");
             } else {
                 Set<String> aliases = caManager.getAliasesForCa(caName);
                 sb.append("aliases: ").append(toString(aliases)).append("\n");

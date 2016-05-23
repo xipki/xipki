@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import java.rmi.UnexpectedException;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -77,7 +76,7 @@ public class CaProfileCheckCmd extends CaCommandSupport {
         println("checking CA profile CA='" + caName + "', profile='" + profileName + "'");
 
         if (caManager.getCa(caName) == null) {
-            throw new UnexpectedException("could not find CA '" + caName + "'");
+            throw new CmdFailure("could not find CA '" + caName + "'");
         }
 
         Set<String> entries = caManager.getCertprofilesForCa(caName);

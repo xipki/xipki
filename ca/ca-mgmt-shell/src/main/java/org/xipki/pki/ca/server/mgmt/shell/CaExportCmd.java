@@ -38,7 +38,6 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.rmi.UnexpectedException;
 import java.util.Properties;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -46,6 +45,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
@@ -133,12 +133,11 @@ public class CaExportCmd extends CaCommandSupport {
     protected Object doExecute() throws Exception {
         CaEntry entry = caManager.getCa(name);
         if (entry == null) {
-            throw new UnexpectedException("no CA named " + name + " is defined");
+            throw new CmdFailure("no CA named " + name + " is defined");
         }
 
         if (!(entry instanceof X509CaEntry)) {
-            throw new UnexpectedException(
-                    "unsupported CAEntry type " + entry.getClass().getName());
+            throw new CmdFailure("unsupported CAEntry type " + entry.getClass().getName());
         }
 
         X509CaEntry x509Entry = (X509CaEntry) entry;

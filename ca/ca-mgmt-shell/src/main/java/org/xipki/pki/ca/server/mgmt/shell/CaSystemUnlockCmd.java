@@ -36,10 +36,9 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.rmi.UnexpectedException;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -58,7 +57,7 @@ public class CaSystemUnlockCmd extends CaCommandSupport {
         if (unlocked) {
             println("unlocked CA system, calling xipki-ca:restart to restart CA system");
         } else {
-            throw new UnexpectedException("could not unlock CA system");
+            throw new CmdFailure("could not unlock CA system");
         }
 
         return null;

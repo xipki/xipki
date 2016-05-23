@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +46,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter;
 
@@ -92,7 +92,7 @@ public class CrlSignerInfoCmd extends CaCommandSupport {
         } else {
             X509CrlSignerEntry entry = caManager.getCrlSigner(name);
             if (entry == null) {
-                throw new UnexpectedException("\tno CRL signer named '" + name + " is configured");
+                throw new CmdFailure("\tno CRL signer named '" + name + " is configured");
             } else {
                 sb.append(entry.toString(verbose.booleanValue()));
             }

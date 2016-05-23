@@ -138,7 +138,7 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
             }
 
             if (!tmpPermissions.equals(entry.getPermissions())) {
-                throw new UnexpectedException("permissions: is '" + entry.getPermissions()
+                throw new CmdFailure("permissions: is '" + entry.getPermissions()
                         + "', but expected '" + tmpPermissions + "'");
             }
         }
@@ -151,7 +151,7 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
             }
 
             if (!profiles.equals(entry.getProfiles())) {
-                throw new UnexpectedException("profiles: is '" + entry.getProfiles()
+                throw new CmdFailure("profiles: is '" + entry.getProfiles()
                         + "', but expected '" + profiles + "'");
             }
         }

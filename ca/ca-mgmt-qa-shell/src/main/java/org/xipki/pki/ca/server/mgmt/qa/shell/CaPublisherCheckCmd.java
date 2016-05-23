@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import java.rmi.UnexpectedException;
 import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -78,7 +77,7 @@ public class CaPublisherCheckCmd extends CaCommandSupport {
         println("checking CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
 
         if (caManager.getCa(caName) == null) {
-            throw new UnexpectedException("could not find CA '" + caName + "'");
+            throw new CmdFailure("could not find CA '" + caName + "'");
         }
 
         List<PublisherEntry> entries = caManager.getPublishersForCa(caName);

@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.qa.shell;
 
-import java.rmi.UnexpectedException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Set;
@@ -72,11 +71,11 @@ public class CaCheckCmd extends CaUpdateCmd {
 
         CaEntry entry = caManager.getCa(caName);
         if (entry == null) {
-            throw new UnexpectedException("could not find CA '" + caName + "'");
+            throw new CmdFailure("could not find CA '" + caName + "'");
         }
 
         if (!(entry instanceof X509CaEntry)) {
-            throw new UnexpectedException("CA '" + caName + "' is not an X509-CA");
+            throw new CmdFailure("CA '" + caName + "' is not an X509-CA");
         }
 
         X509CaEntry ca = (X509CaEntry) entry;

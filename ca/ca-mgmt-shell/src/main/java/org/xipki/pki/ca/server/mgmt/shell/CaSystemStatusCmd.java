@@ -36,10 +36,9 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.rmi.UnexpectedException;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.CaSystemStatus;
 
 /**
@@ -58,7 +57,7 @@ public class CaSystemStatusCmd extends CaCommandSupport {
         if (status != null) {
             println(status.toString());
         } else {
-            throw new UnexpectedException("status is NULL");
+            throw new CmdFailure("status is NULL");
         }
         return null;
     }

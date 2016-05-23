@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +44,7 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao
@@ -83,7 +83,7 @@ public class EnvInfoCmd extends CaCommandSupport {
         } else {
             String paramValue = caManager.getEnvParam(name);
             if (paramValue == null) {
-                throw new UnexpectedException("\tno environment named '" + name + " is configured");
+                throw new CmdFailure("\tno environment named '" + name + " is configured");
             } else {
                 sb.append(name).append("\n\t").append(paramValue);
             }
