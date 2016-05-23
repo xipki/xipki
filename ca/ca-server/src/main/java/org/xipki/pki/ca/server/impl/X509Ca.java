@@ -493,7 +493,7 @@ public class X509Ca {
                 new ScheduledExpiredCertsRemover(), 1, 1, TimeUnit.DAYS);
 
         this.suspendedCertsRevoker = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
-                new ScheduledSuspendedCertsRevoker(), 1, 1, TimeUnit.HOURS);
+                new ScheduledSuspendedCertsRevoker(), 30, 60, TimeUnit.MINUTES);
     } // constructor
 
     public X509CaInfo getCaInfo() {
@@ -2176,6 +2176,9 @@ public class X509Ca {
                 boolean revoked = false;
                 try {
                     revoked = doRevokeSuspendedCert(serial, reason) != null;
+                    if (revoked) {
+                        sum++;
+                    }
                 } catch (Throwable th) {
                     LogUtil.error(LOG, th, "could not remove expired certificate");
                     if (!revoked) {
