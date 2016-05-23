@@ -417,4 +417,6 @@ feature:uninstall xipki-caclient-shell
 feature:uninstall xipki-camgmt-shell
 
 source ./xipki/demo/scep.script
-source ./xipki/demo/jscep.script
+
+# JSCEP works only in case of RSA
+#source ./xipki/demo/jscep.script

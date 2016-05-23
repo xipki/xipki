@@ -174,22 +174,18 @@ if { $TOKEN_TYPE equals "pkcs11" } {
   if { $KEY_TYPE equals "dsa" } {
 
     xipki-tk:dsa \
-      --plen $PLEN \
       --slot $SLOT \
       --label $RCA_KEY_LABEL
 
     xipki-tk:dsa \
-      --plen $PLEN \
       --slot $SLOT \
       --label $SubCA_KEY_LABEL
 
     xipki-tk:dsa \
-      --plen $PLEN \
       --slot $SLOT \
       --label $SubCAwithCRL_KEY_LABEL
 
     xipki-tk:dsa \
-      --plen $PLEN \
       --slot $SLOT \
       --label OCSP99
 
