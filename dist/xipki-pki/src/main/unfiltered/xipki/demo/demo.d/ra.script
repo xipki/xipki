@@ -419,4 +419,6 @@ feature:uninstall xipki-camgmt-shell
 source ./xipki/demo/scep.script
 
 # JSCEP works only in case of RSA
-#source ./xipki/demo/jscep.script
+if { $KEY_TYPE equals "rsa" } {
+  source ./xipki/demo/jscep.script
+}
