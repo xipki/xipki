@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.api.x509;
 
-import java.io.Serializable;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -48,9 +47,7 @@ import org.xipki.pki.ca.server.mgmt.api.ChangeCaEntry;
  * @since 2.0.0
  */
 
-public class X509ChangeCaEntry extends ChangeCaEntry implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class X509ChangeCaEntry extends ChangeCaEntry {
 
     private List<String> crlUris;
 

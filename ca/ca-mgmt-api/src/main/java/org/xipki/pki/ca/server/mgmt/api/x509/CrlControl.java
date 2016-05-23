@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.api.x509;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -121,9 +120,9 @@ import org.xipki.pki.ca.server.mgmt.api.TripleState;
  * @since 2.0.0
  */
 
-public class CrlControl implements Serializable {
+public class CrlControl {
 
-    public enum UpdateMode implements Serializable {
+    public enum UpdateMode {
 
         interval,
         onDemand;
@@ -141,9 +140,7 @@ public class CrlControl implements Serializable {
 
     } // enum UpdateMode
 
-    public static class HourMinute implements Serializable {
-
-        private static final long serialVersionUID = 1L;
+    public static class HourMinute {
 
         private final int hour;
 
@@ -225,8 +222,6 @@ public class CrlControl implements Serializable {
     public static final String KEY_EXCLUDE_REASON = "excludeReason";
 
     public static final String KEY_INVALIDITY_DATE = "invalidityDate";
-
-    private static final long serialVersionUID = 1L;
 
     private UpdateMode updateMode = UpdateMode.interval;
 

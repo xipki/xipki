@@ -36,8 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.api.x509;
 
-import java.io.Serializable;
-
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.StringUtil;
@@ -57,13 +55,11 @@ import org.xipki.commons.common.util.StringUtil;
  * @since 2.0.0
  */
 
-public class ScepControl implements Serializable {
+public class ScepControl {
 
     public static final String KEY_CACERT_INCLUDED = "caCert.included";
 
     public static final String KEY_SIGNERCERT_INCLUDED = "signerCert.included";
-
-    private static final long serialVersionUID = 1L;
 
     private boolean includeCaCert = true;
 

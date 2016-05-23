@@ -36,8 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
-import java.io.Serializable;
-
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -45,9 +43,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class CertprofileEntry implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class CertprofileEntry {
 
     private final String name;
 

@@ -36,8 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.api.x509;
 
-import java.io.Serializable;
-
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.ParamUtil;
 
@@ -46,9 +44,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class X509ChangeCrlSignerEntry implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class X509ChangeCrlSignerEntry {
 
     private final String name;
 

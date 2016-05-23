@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
 
@@ -48,9 +47,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class CaHasRequestorEntry implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class CaHasRequestorEntry {
 
     private final String requestorName;
 

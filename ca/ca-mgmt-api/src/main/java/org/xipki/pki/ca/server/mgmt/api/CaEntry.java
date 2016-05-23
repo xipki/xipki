@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 
@@ -51,9 +50,7 @@ import org.xipki.pki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
  * @since 2.0.0
  */
 
-public class CaEntry implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class CaEntry {
 
     private String name;
 

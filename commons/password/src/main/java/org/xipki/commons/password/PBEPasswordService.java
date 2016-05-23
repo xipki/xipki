@@ -43,7 +43,6 @@ import java.util.Arrays;
 import java.util.Base64;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.password.PasswordResolverException;
 
 /**
  * @author Lijun Liao

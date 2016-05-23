@@ -36,11 +36,7 @@
 
 package org.xipki.commons.security;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.xipki.commons.common.util.ParamUtil;
 
@@ -49,21 +45,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class CertRevocationInfo implements Serializable {
-
-    //------------------------------------------------
-    // Customized serialization
-    //------------------------------------------------
-    private static final long serialVersionUID = 1L;
-
-    private static final String SR_SERIAL_VERSION = "serialVersion";
-    private static final double SERIAL_VERSION = 1.0;
-
-    private static final String SR_REASON = "reason";
-    private static final String SR_REVOCATION_TIME = "revocationTime";
-    private static final String SR_INVALIDITY_TIME = "invalidityTime";
-
-    private double serialVersion;
+public class CertRevocationInfo {
 
     private CrlReason reason;
 
@@ -84,7 +66,6 @@ public class CertRevocationInfo implements Serializable {
         this.reason = ParamUtil.requireNonNull("reason", reason);
         this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
         this.invalidityTime = invalidityTime;
-        this.serialVersion = SERIAL_VERSION;
     }
 
     public CertRevocationInfo(final int reasonCode, final Date revocationTime,
@@ -96,7 +77,6 @@ public class CertRevocationInfo implements Serializable {
             throw new IllegalArgumentException("invalid reason " + reasonCode);
         }
         this.invalidityTime = invalidityTime;
-        this.serialVersion = SERIAL_VERSION;
     }
 
     public void setReason(final CrlReason reason) {
@@ -132,27 +112,6 @@ public class CertRevocationInfo implements Serializable {
 
     public void setInvalidityTime(final Date invalidityTime) {
         this.invalidityTime = invalidityTime;
-    }
-
-    private void writeObject(final java.io.ObjectOutputStream out) throws IOException {
-        final Map<String, Object> serialMap = new HashMap<String, Object>();
-
-        serialMap.put(SR_SERIAL_VERSION, serialVersion);
-        serialMap.put(SR_REASON, reason);
-        serialMap.put(SR_REVOCATION_TIME, revocationTime);
-        serialMap.put(SR_INVALIDITY_TIME, invalidityTime);
-
-        out.writeObject(serialMap);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void readObject(final java.io.ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
-        final Map<String, Object> serialMap = (Map<String, Object>) in.readObject();
-        serialVersion = (double) serialMap.get(SR_SERIAL_VERSION);
-        reason = (CrlReason) serialMap.get(SR_REASON);
-        revocationTime = (Date) serialMap.get(SR_REVOCATION_TIME);
-        invalidityTime = (Date) serialMap.get(SR_INVALIDITY_TIME);
     }
 
     @Override

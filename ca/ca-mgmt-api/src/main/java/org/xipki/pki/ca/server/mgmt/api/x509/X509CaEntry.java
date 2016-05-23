@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.api.x509;
 
-import java.io.Serializable;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -56,9 +55,7 @@ import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
  * @since 2.0.0
  */
 
-public class X509CaEntry extends CaEntry implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class X509CaEntry extends CaEntry {
 
     private List<String> crlUris;
 

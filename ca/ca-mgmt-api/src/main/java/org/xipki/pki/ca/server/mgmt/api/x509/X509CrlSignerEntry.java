@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.api.x509;
 
-import java.io.Serializable;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
@@ -54,11 +53,9 @@ import org.xipki.commons.security.util.X509Util;
  * @since 2.0.0
  */
 
-public class X509CrlSignerEntry implements Serializable {
+public class X509CrlSignerEntry {
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CrlSignerEntry.class);
-
-    private static final long serialVersionUID = 1L;
 
     private final String name;
 

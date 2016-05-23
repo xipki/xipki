@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.api.profile;
 
-import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -48,7 +47,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class CertValidity implements Comparable<CertValidity>, Serializable {
+public class CertValidity implements Comparable<CertValidity> {
 
     public enum Unit {
 
@@ -67,8 +66,6 @@ public class CertValidity implements Comparable<CertValidity>, Serializable {
         }
 
     } // enum Unit
-
-    private static final long serialVersionUID = 1917871166917453960L;
 
     private static final long SECOND = 1000L;
 

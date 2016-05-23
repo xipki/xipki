@@ -38,7 +38,6 @@ package org.xipki.pki.ca.server.mgmt.api.x509;
 
 import java.security.cert.Certificate;
 
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.CertRevocationInfo;
 
 /**

@@ -50,8 +50,6 @@ import org.xipki.commons.security.CrlReason;
 
 public class CertRevInfoWithSerial extends CertRevocationInfo {
 
-    private static final long serialVersionUID = 1L;
-
     private final int id;
 
     private final BigInteger serial;
