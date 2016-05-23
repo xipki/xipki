@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" name="pki-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
@@ -78,8 +77,8 @@
   </feature>
   <feature name="xipki-jscepclient-shell" version="${project.version}">
     <feature>xipki-shell-base</feature>
-    <bundle>wrap:mvn:com.google.code.jscep/jscep/${jscep.version}</bundle>
-    <bundle>wrap:mvn:net.jcip/jcip-annotations/1.0</bundle>
+    <bundle><![CDATA[wrap:mvn:com.google.code.jscep/jscep/${jscep.version}/$Bundle-SymbolicName=jscep&Bundle-Version=2.4.0]]></bundle>
+    <bundle><![CDATA[wrap:mvn:net.jcip/jcip-annotations/1.0/$Bundle-SymbolicName=jcip-annotations&Bundle-Version=1.0]]></bundle>
     <bundle>mvn:commons-codec/commons-codec/1.7</bundle>
     <bundle>mvn:commons-io/commons-io/2.4</bundle>
     <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
