@@ -482,7 +482,7 @@ public class X509Ca {
         }
 
         for (IdentifiedX509CertPublisher publisher : getPublishers()) {
-            publisher.issuerAdded(caCert);
+            publisher.caAdded(caCert);
         }
 
         // CRL generation services
@@ -817,8 +817,7 @@ public class X509Ca {
                             onlyCaCerts, // onlyContainsCACerts,
                             (ReasonFlags) null, // onlySomeReasons,
                             !directCrl, // indirectCRL,
-                            false // onlyContainsAttributeCerts
-                            );
+                            false); // onlyContainsAttributeCerts
 
                     crlBuilder.addExtension(Extension.issuingDistributionPoint, true, idp);
                 }
@@ -843,8 +842,8 @@ public class X509Ca {
                 List<SerialWithId> serials;
 
                 do {
-                    serials = certstore.getCertSerials(caCert, notExpireAt, startId,
-                            numEntries, false, onlyCaCerts, onlyUserCerts);
+                    serials = certstore.getCertSerials(caCert, notExpireAt, startId, numEntries,
+                            false, onlyCaCerts, onlyUserCerts);
 
                     int maxId = 1;
                     for (SerialWithId sid : serials) {
@@ -1089,10 +1088,10 @@ public class X509Ca {
 
         caInfo.setStatus(CaStatus.INACTIVE);
 
-        boolean allPublishersOnlyForRevokedCerts = true;
+        boolean onlyRevokedCerts = true;
         for (IdentifiedX509CertPublisher publisher : publishers) {
             if (publisher.publishsGoodCert()) {
-                allPublishersOnlyForRevokedCerts = false;
+                onlyRevokedCerts = false;
             }
 
             String name = publisher.getName();
@@ -1107,13 +1106,19 @@ public class X509Ca {
 
         try {
             X509Cert caCert = caInfo.getCertificate();
+            for (IdentifiedX509CertPublisher publisher : publishers) {
+                boolean successful = publisher.caAdded(caCert);
+                if (!successful) {
+                    LOG.error("republish CA certificate {} to publisher {} failed",
+                            caInfo.getName(), publisher.getName());
+                    return false;
+                }
+            }
 
             Date notExpiredAt = null;
 
             int startId = 1;
             int numEntries = 100;
-
-            boolean onlyRevokedCerts = false;
 
             List<SerialWithId> serials;
             int sum = 0;
@@ -1124,13 +1129,6 @@ public class X509Ca {
                 } catch (OperationException ex) {
                     LogUtil.error(LOG, ex);
                     return false;
-                }
-
-                // Even if only revoked certificates will be published, good certificates will
-                // be republished at the first round. This is required to publish CA
-                // information if there is no revoked certs
-                if (allPublishersOnlyForRevokedCerts) {
-                    onlyRevokedCerts = true;
                 }
 
                 int maxId = 1;
@@ -1149,6 +1147,10 @@ public class X509Ca {
                     }
 
                     for (IdentifiedX509CertPublisher publisher : publishers) {
+                        if (!certInfo.isRevoked() && !publisher.publishsGoodCert()) {
+                            continue;
+                        }
+
                         boolean successful = publisher.certificateAdded(certInfo);
                         if (!successful) {
                             LOG.error("republish certificate serial={} to publisher {} failed",
