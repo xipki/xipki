@@ -267,8 +267,8 @@ source ./xipki/demo//ca-qa.script
 
 feature:install xipki-ocspserver
 
-source ./xipki/demo/ocsp.script
+source ./xipki/demo/ocsp.script "$ALGO1"
 
-feature:uninstall xipki-ocspserver "$ALGO1"
+feature:uninstall xipki-ocspserver
 
 }
