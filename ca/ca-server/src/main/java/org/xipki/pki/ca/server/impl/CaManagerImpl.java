@@ -2044,7 +2044,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean republishCertificates(final String caName, final List<String> publisherNames)
     throws CaMgmtException {
-        ParamUtil.requireNonEmpty("publisherNames", publisherNames);
         asssertMasterMode();
 
         String tmpCaName = caName;
