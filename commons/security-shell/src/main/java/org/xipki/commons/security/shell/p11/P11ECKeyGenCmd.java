@@ -56,11 +56,9 @@ import org.xipki.commons.security.pkcs11.P11Slot;
 public class P11ECKeyGenCmd extends P11KeyGenCommandSupport {
 
     @Option(name = "--curve",
-            required = true,
-            description = "EC curve name\n"
-                    + "(required)")
+            description = "EC curve name")
     @Completion(ECCurveNameCompleter.class)
-    private String curveName;
+    private String curveName = "secp256r1";
 
     @Override
     protected Object doExecute() throws Exception {
