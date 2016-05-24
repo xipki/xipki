@@ -126,7 +126,7 @@ public class OcspCertPublisher extends X509CertPublisher {
     }
 
     @Override
-    public boolean issuerAdded(final X509Cert issuer) {
+    public boolean caAdded(final X509Cert issuer) {
         try {
             queryExecutor.addIssuer(issuer);
             return true;

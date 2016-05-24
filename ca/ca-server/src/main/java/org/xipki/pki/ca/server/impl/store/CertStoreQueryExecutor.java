@@ -315,24 +315,13 @@ class CertStoreQueryExecutor {
             psAddcert.setString(idx++, serialNumber.toString(16));
             psAddcert.setString(idx++, subjectText);
             psAddcert.setLong(idx++, fpSubject);
-            if (fpReqSubject != null) {
-                psAddcert.setLong(idx++, fpReqSubject);
-            } else {
-                psAddcert.setNull(idx++, Types.BIGINT);
-            }
-
+            setLong(psAddcert, idx++, fpReqSubject);
             psAddcert.setLong(idx++, notBeforeSeconds);
             psAddcert.setLong(idx++, notAfterSeconds);
             setBoolean(psAddcert, idx++, false);
             psAddcert.setInt(idx++, certprofileId);
             psAddcert.setInt(idx++, caId);
-
-            if (requestorId != null) {
-                psAddcert.setInt(idx++, requestorId.intValue());
-            } else {
-                psAddcert.setNull(idx++, Types.INTEGER);
-            }
-
+            setInt(psAddcert, idx++, requestorId);
             psAddcert.setString(idx++, user);
             psAddcert.setLong(idx++, fpPk);
             boolean isEeCert = cert.getBasicConstraints() == -1;
@@ -579,7 +568,7 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        final String sql = datasource.createFetchFirstSelectSql("ID FROM CRL WHERE CA_ID = ?", 1);
+        final String sql = datasource.buildSelectFirstSql("ID FROM CRL WHERE CA_ID = ?", 1);
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -600,17 +589,17 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("crl", crl);
 
         byte[] encodedExtnValue = crl.getExtensionValue(Extension.cRLNumber.getId());
-        Long crlNumber = null;
+        Integer crlNumber = null;
         if (encodedExtnValue != null) {
             byte[] extnValue = DEROctetString.getInstance(encodedExtnValue).getOctets();
-            crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
+            crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().intValue();
         }
 
         encodedExtnValue = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
-        Long baseCrlNumber = null;
+        Integer baseCrlNumber = null;
         if (encodedExtnValue != null) {
             byte[] extnValue = DEROctetString.getInstance(encodedExtnValue).getOctets();
-            baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
+            baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().intValue();
         }
 
         final String sql = SQL_ADD_CRL;
@@ -628,28 +617,12 @@ class CertStoreQueryExecutor {
             int idx = 1;
             ps.setInt(idx++, crlId);
             ps.setInt(idx++, caId);
-            if (crlNumber != null) {
-                ps.setInt(idx++, crlNumber.intValue());
-            } else {
-                ps.setNull(idx++, Types.INTEGER);
-            }
+            setInt(ps, idx++, crlNumber);
             Date date = crl.getThisUpdate();
             ps.setLong(idx++, date.getTime() / 1000);
-            date = crl.getNextUpdate();
-            if (date != null) {
-                ps.setLong(idx++, date.getTime() / 1000);
-            } else {
-                ps.setNull(idx++, Types.BIGINT);
-            }
-
-            ps.setInt(idx++, (baseCrlNumber != null) ? 1 : 0);
-
-            if (baseCrlNumber != null) {
-                ps.setLong(idx++, baseCrlNumber);
-            } else {
-                ps.setNull(idx++, Types.BIGINT);
-            }
-
+            setDateSeconds(ps, idx++, crl.getNextUpdate());
+            setBoolean(ps, idx++, (baseCrlNumber != null));
+            setInt(ps, idx++, baseCrlNumber);
             ps.setString(idx++, b64Crl);
 
             ps.executeUpdate();
@@ -706,12 +679,7 @@ class CertStoreQueryExecutor {
             ps.setLong(idx++, System.currentTimeMillis() / 1000);
             setBoolean(ps, idx++, true);
             ps.setLong(idx++, revTimeSeconds);
-            if (invTimeSeconds != null) {
-                ps.setLong(idx++, invTimeSeconds);
-            } else {
-                ps.setNull(idx++, Types.BIGINT);
-            }
-
+            setLong(ps, idx++, invTimeSeconds);
             ps.setInt(idx++, revInfo.getReason().getCode());
             ps.setLong(idx++, certId);
 
@@ -930,7 +898,7 @@ class CertStoreQueryExecutor {
             return Collections.emptyList();
         }
 
-        final String sql = datasource.createFetchFirstSelectSql(
+        final String sql = datasource.buildSelectFirstSql(
                 "CID FROM PUBLISHQUEUE WHERE PID=? AND CA_ID=?", numEntries, "CID ASC");
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -959,8 +927,7 @@ class CertStoreQueryExecutor {
     throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
 
-        final String sql = datasource.createFetchFirstSelectSql(
-                "ID FROM CERT WHERE CA_ID=? AND EE=?", 1);
+        final String sql = datasource.buildSelectFirstSql("ID FROM CERT WHERE CA_ID=? AND EE=?", 1);
         int caId = getCaId(caCert);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -997,8 +964,7 @@ class CertStoreQueryExecutor {
         } else if (onlyUserCerts) {
             sb.append(" AND EE=1");
         }
-        final String sql = datasource.createFetchFirstSelectSql(sb.toString(), numEntries,
-                "ID ASC");
+        final String sql = datasource.buildSelectFirstSql(sb.toString(), numEntries, "ID ASC");
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1031,7 +997,7 @@ class CertStoreQueryExecutor {
 
         int caId = getCaId(caCert);
         final String coreSql = "SN FROM CERT WHERE CA_ID=? AND NAFTER<?";
-        final String sql = datasource.createFetchFirstSelectSql(coreSql, numEntries);
+        final String sql = datasource.buildSelectFirstSql(coreSql, numEntries);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1060,7 +1026,7 @@ class CertStoreQueryExecutor {
 
         int caId = getCaId(caCert);
         final String coreSql = "SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?";
-        final String sql = datasource.createFetchFirstSelectSql(coreSql, numEntries);
+        final String sql = datasource.buildSelectFirstSql(coreSql, numEntries);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1093,8 +1059,7 @@ class CertStoreQueryExecutor {
         if (crlNumber != null) {
             sqlBuilder.append(" AND CRL_NO=?");
         }
-        String sql = datasource.createFetchFirstSelectSql(sqlBuilder.toString(), 1,
-                "THISUPDATE DESC");
+        String sql = datasource.buildSelectFirstSql(sqlBuilder.toString(), 1, "THISUPDATE DESC");
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1185,7 +1150,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("caCert", caCert);
 
         final String coreSql = CORESQL_CERT_FOR_ID;
-        final String sql = datasource.createFetchFirstSelectSql(coreSql, 1);
+        final String sql = datasource.buildSelectFirstSql(coreSql, 1);
 
         String b64Cert;
         int certprofileId;
@@ -1239,7 +1204,7 @@ class CertStoreQueryExecutor {
     } // method getCertForId
 
     X509CertWithDbId getCertForId(final int certId) throws DataAccessException, OperationException {
-        final String sql = datasource.createFetchFirstSelectSql(CORESQL_RAWCERT_FOR_ID, 1);
+        final String sql = datasource.buildSelectFirstSql(CORESQL_RAWCERT_FOR_ID, 1);
 
         String b64Cert;
         ResultSet rs = null;
@@ -1280,7 +1245,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("serial", serial);
 
         int caId = getCaId(caCert);
-        final String sql = datasource.createFetchFirstSelectSql(CORESQL_CERT_WITH_REVINFO, 1);
+        final String sql = datasource.buildSelectFirstSql(CORESQL_CERT_WITH_REVINFO, 1);
 
         int certId;
         String b64Cert;
@@ -1349,7 +1314,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("serial", serial);
 
         int caId = getCaId(caCert);
-        final String sql = datasource.createFetchFirstSelectSql(CORESQL_CERTINFO, 1);
+        final String sql = datasource.buildSelectFirstSql(CORESQL_CERTINFO, 1);
 
         String b64Cert;
         boolean revoked;
@@ -1416,8 +1381,7 @@ class CertStoreQueryExecutor {
     throws OperationException, DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
 
-        final String sql = datasource.createFetchFirstSelectSql(
-                "PID, CA_ID FROM CERT WHERE ID=?", 1);
+        final String sql = datasource.buildSelectFirstSql("PID, CA_ID FROM CERT WHERE ID=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1451,7 +1415,7 @@ class CertStoreQueryExecutor {
 
         int caId = getCaId(caCert);
 
-        final String sql = datasource.createFetchFirstSelectSql(
+        final String sql = datasource.buildSelectFirstSql(
                 "PID FROM CERT WHERE SN=? AND CA_ID=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1529,8 +1493,7 @@ class CertStoreQueryExecutor {
 
     boolean authenticateUser(final String user, final byte[] password)
     throws DataAccessException, OperationException {
-        final String sql = datasource.createFetchFirstSelectSql(
-                "PASSWORD FROM USERNAME WHERE NAME=?", 1);
+        final String sql = datasource.buildSelectFirstSql("PASSWORD FROM USERNAME WHERE NAME=?", 1);
 
         String expPasswordText = null;
         ResultSet rs = null;
@@ -1565,8 +1528,7 @@ class CertStoreQueryExecutor {
     String getCnRegexForUser(final String user) throws DataAccessException, OperationException {
         ParamUtil.requireNonBlank("user", user);
 
-        final String sql = datasource.createFetchFirstSelectSql(
-                "CN_REGEX FROM USERNAME WHERE NAME=?", 1);
+        final String sql = datasource.buildSelectFirstSql("CN_REGEX FROM USERNAME WHERE NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1591,7 +1553,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("serial", serial);
         int caId = getCaId(caCert);
 
-        final String sql = datasource.createFetchFirstSelectSql(
+        final String sql = datasource.buildSelectFirstSql(
                 "UNAME FROM CERT WHERE SN=? AND CA_ID=?", 1);
 
         String user = null;
@@ -1636,8 +1598,7 @@ class CertStoreQueryExecutor {
             sqlBuiler.append(" AND EE=1");
         }
 
-        String sql = datasource.createFetchFirstSelectSql(sqlBuiler.toString(), numEntries,
-                "ID ASC");
+        String sql = datasource.buildSelectFirstSql(sqlBuiler.toString(), numEntries, "ID ASC");
 
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1682,7 +1643,7 @@ class CertStoreQueryExecutor {
 
         int caId = getCaId(caCert);
 
-        String sql = datasource.createFetchFirstSelectSql(
+        String sql = datasource.buildSelectFirstSql(
                 "ID FROM DELTACRL_CACHE WHERE ID>? AND CA_ID=?", numEntries, "ID ASC");
         List<Integer> ids = new LinkedList<>();
         ResultSet rs = null;
@@ -1706,7 +1667,7 @@ class CertStoreQueryExecutor {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("SN,EE,REV,RR,RT,RIT FROM CERT WHERE ID=?");
 
-        sql = datasource.createFetchFirstSelectSql(sqlBuilder.toString(), 1);
+        sql = datasource.buildSelectFirstSql(sqlBuilder.toString(), 1);
         ps = borrowPreparedStatement(sql);
 
         List<CertRevInfoWithSerial> ret = new ArrayList<>();
@@ -1780,7 +1741,7 @@ class CertStoreQueryExecutor {
             return CertStatus.Unknown;
         }
 
-        final String sql = datasource.createFetchFirstSelectSql(
+        final String sql = datasource.buildSelectFirstSql(
                 "REV FROM CERT WHERE FP_S=? AND CA_ID=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1811,7 +1772,7 @@ class CertStoreQueryExecutor {
         }
 
         String coreSql = CORESQL_CERT_FOR_SUBJECT_ISSUED;
-        String sql = datasource.createFetchFirstSelectSql(coreSql, 1);
+        String sql = datasource.buildSelectFirstSql(coreSql, 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1837,7 +1798,7 @@ class CertStoreQueryExecutor {
         }
 
         String coreSql = CORESQL_CERT_FOR_KEY_ISSUED;
-        String sql = datasource.createFetchFirstSelectSql(coreSql, 1);
+        String sql = datasource.buildSelectFirstSql(coreSql, 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -2063,7 +2024,7 @@ class CertStoreQueryExecutor {
 
         String namePattern = X509Util.getRfc4519Name(new X500Name(rdns2));
 
-        final String sql = datasource.createFetchFirstSelectSql(
+        final String sql = datasource.buildSelectFirstSql(
                 "SUBJECT FROM CERT WHERE SUBJECT LIKE ?", 1, "NBEFORE DESC");
         ResultSet rs = null;
         PreparedStatement ps;
@@ -2105,7 +2066,7 @@ class CertStoreQueryExecutor {
             return null;
         }
 
-        final String sql = datasource.createFetchFirstSelectSql(
+        final String sql = datasource.buildSelectFirstSql(
                 "NBEFORE FROM CERT WHERE PID=? AND SUBJECT LIKE ?", 1, "NBEFORE ASC");
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -2273,6 +2234,33 @@ class CertStoreQueryExecutor {
     private static void setBoolean(final PreparedStatement ps, final int index, final boolean value)
     throws SQLException {
         ps.setInt(index, value ? 1 : 0);
+    }
+
+    private static void setLong(final PreparedStatement ps, final int index, final Long value)
+    throws SQLException {
+        if (value != null) {
+            ps.setLong(index, value.longValue());
+        } else {
+            ps.setNull(index, Types.BIGINT);
+        }
+    }
+
+    private static void setInt(final PreparedStatement ps, final int index, final Integer value)
+    throws SQLException {
+        if (value != null) {
+            ps.setLong(index, value.intValue());
+        } else {
+            ps.setNull(index, Types.INTEGER);
+        }
+    }
+
+    private static void setDateSeconds(final PreparedStatement ps, final int index, final Date date)
+    throws SQLException {
+        if (date != null) {
+            ps.setLong(index, date.getTime() / 1000);
+        } else {
+            ps.setNull(index, Types.BIGINT);
+        }
     }
 
 }

@@ -218,7 +218,7 @@ public class TargetDigestRetriever {
         buffer.append(" AND CERT.ID=").append(dbControl.getTblCerthash()).append('.');
         buffer.append(dbControl.getColCertId());
 
-        singleCertSql = datasource.createFetchFirstSelectSql(buffer.toString(), 1);
+        singleCertSql = datasource.buildSelectFirstSql(buffer.toString(), 1);
 
         buffer = new StringBuilder(200);
         buffer.append(dbControl.getColSerialNumber()).append(',');
@@ -236,7 +236,7 @@ public class TargetDigestRetriever {
         buffer.append(") AND CERT.ID=").append(dbControl.getTblCerthash());
         buffer.append(".").append(dbControl.getColCertId());
 
-        inArrayCertsSql = datasource.createFetchFirstSelectSql(buffer.toString(), numPerSelect);
+        inArrayCertsSql = datasource.buildSelectFirstSql(buffer.toString(), numPerSelect);
 
         buffer = new StringBuilder(200);
         buffer.append("SELECT ");

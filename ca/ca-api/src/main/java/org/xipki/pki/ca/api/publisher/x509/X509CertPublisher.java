@@ -71,21 +71,21 @@ public abstract class X509CertPublisher {
 
     public abstract void setEnvParameterResolver(@Nullable EnvParameterResolver parameterResolver);
 
-    public abstract boolean issuerAdded(@Nonnull X509Cert issuerCert);
+    public abstract boolean caAdded(@Nonnull X509Cert caCert);
 
     public abstract boolean certificateAdded(@Nonnull X509CertificateInfo certInfo);
 
-    public abstract boolean certificateRevoked(@Nonnull X509Cert issuerCert,
+    public abstract boolean certificateRevoked(@Nonnull X509Cert caCert,
             @Nonnull X509CertWithDbId cert, @Nullable String certprofile,
             @Nonnull CertRevocationInfo revInfo);
 
-    public abstract boolean certificateUnrevoked(@Nonnull X509Cert issuerCert,
+    public abstract boolean certificateUnrevoked(@Nonnull X509Cert caCert,
             @Nonnull X509CertWithDbId cert);
 
-    public abstract boolean certificateRemoved(@Nonnull X509Cert issuerCert,
+    public abstract boolean certificateRemoved(@Nonnull X509Cert caCert,
             @Nonnull X509CertWithDbId cert);
 
-    public abstract boolean crlAdded(@Nonnull X509Cert issuerCert, @Nonnull X509CRL crl);
+    public abstract boolean crlAdded(@Nonnull X509Cert caCert, @Nonnull X509CRL crl);
 
     public abstract boolean caRevoked(@Nonnull X509Cert caCert,
             @Nonnull CertRevocationInfo revocationInfo);

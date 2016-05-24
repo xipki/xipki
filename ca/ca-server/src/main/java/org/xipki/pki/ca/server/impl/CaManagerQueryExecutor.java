@@ -152,7 +152,7 @@ class CaManagerQueryExecutor {
     } // method createStatement
 
     private PreparedStatement prepareFetchFirstStatement(final String sql) throws CaMgmtException {
-        return prepareStatement(datasource.createFetchFirstSelectSql(sql, 1));
+        return prepareStatement(datasource.buildSelectFirstSql(sql, 1));
     }
 
     private PreparedStatement prepareStatement(final String sql) throws CaMgmtException {
@@ -2147,7 +2147,7 @@ class CaManagerQueryExecutor {
 
     private Integer executeGetUserIdSql(final String user) throws CaMgmtException {
         ParamUtil.requireNonBlank("user", user);
-        final String sql = datasource.createFetchFirstSelectSql("ID FROM USERNAME WHERE NAME=?", 1);
+        final String sql = datasource.buildSelectFirstSql("ID FROM USERNAME WHERE NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {
@@ -2264,7 +2264,7 @@ class CaManagerQueryExecutor {
 
     UserEntry getUser(final String username) throws CaMgmtException {
         ParamUtil.requireNonNull("username", username);
-        final String sql = datasource.createFetchFirstSelectSql(
+        final String sql = datasource.buildSelectFirstSql(
                 "PASSWORD, CN_REGEX FROM USERNAME WHERE NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -2333,9 +2333,8 @@ class CaManagerQueryExecutor {
 
     ScepEntry getScep(final String caName) throws CaMgmtException {
         ParamUtil.requireNonNull("caName", caName);
-        final String sql = datasource.createFetchFirstSelectSql(
-            "CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF FROM SCEP WHERE CA_NAME=?",
-            1);
+        final String sql = datasource.buildSelectFirstSql(
+            "CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF FROM SCEP WHERE CA_NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {

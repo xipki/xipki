@@ -330,7 +330,7 @@ public class DbCertStatusStore extends OcspStore {
             long invalidatityTime = 0;
 
             PreparedStatement ps = borrowPreparedStatement(
-                    datasource.createFetchFirstSelectSql(coreSql, 1));
+                    datasource.buildSelectFirstSql(coreSql, 1));
 
             try {
                 int idx = 1;

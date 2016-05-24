@@ -77,17 +77,17 @@ class IdentifiedX509CertPublisher {
         certPublisher.setEnvParameterResolver(parameterResolver);
     }
 
-    public boolean issuerAdded(final X509Cert issuerCert) {
-        return certPublisher.issuerAdded(issuerCert);
+    public boolean caAdded(final X509Cert caCert) {
+        return certPublisher.caAdded(caCert);
     }
 
     public boolean certificateAdded(final X509CertificateInfo certInfo) {
         return certPublisher.certificateAdded(certInfo);
     }
 
-    public boolean certificateRevoked(final X509Cert issuerCert, final X509CertWithDbId cert,
+    public boolean certificateRevoked(final X509Cert caCert, final X509CertWithDbId cert,
             final String certprofile, final CertRevocationInfo revInfo) {
-        return certPublisher.certificateRevoked(issuerCert, cert, certprofile, revInfo);
+        return certPublisher.certificateRevoked(caCert, cert, certprofile, revInfo);
     }
 
     public boolean crlAdded(final X509Cert caCert, final X509CRL crl) {
@@ -118,12 +118,12 @@ class IdentifiedX509CertPublisher {
         return certPublisher.caUnrevoked(caCert);
     }
 
-    public boolean certificateUnrevoked(final X509Cert issuerCert, final X509CertWithDbId cert) {
-        return certPublisher.certificateUnrevoked(issuerCert, cert);
+    public boolean certificateUnrevoked(final X509Cert caCert, final X509CertWithDbId cert) {
+        return certPublisher.certificateUnrevoked(caCert, cert);
     }
 
-    public boolean certificateRemoved(final X509Cert issuerCert, final X509CertWithDbId cert) {
-        return certPublisher.certificateRemoved(issuerCert, cert);
+    public boolean certificateRemoved(final X509Cert caCert, final X509CertWithDbId cert) {
+        return certPublisher.certificateRemoved(caCert, cert);
     }
 
     public boolean isAsyn() {

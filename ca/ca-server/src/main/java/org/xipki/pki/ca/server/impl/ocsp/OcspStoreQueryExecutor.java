@@ -649,8 +649,7 @@ class OcspStoreQueryExecutor {
 
     private boolean certRegistered(final int issuerId, final BigInteger serialNumber)
     throws DataAccessException {
-        final String sql = datasource.createFetchFirstSelectSql(
-                "ID FROM CERT WHERE SN=? AND IID=?", 1);
+        final String sql = datasource.buildSelectFirstSql("ID FROM CERT WHERE SN=? AND IID=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 

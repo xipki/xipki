@@ -130,8 +130,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
             tblCertHasId = false;
             String coreSql = "fingerprint, serialNumber, cAFingerprint, status, revocationReason, "
                     + "revocationDate FROM CertificateData WHERE fingerprint > ?";
-            sql = datasource.createFetchFirstSelectSql(coreSql, numCertsPerSelect,
-                    "fingerprint ASC");
+            sql = datasource.buildSelectFirstSql(coreSql, numCertsPerSelect, "fingerprint ASC");
             certSql = "SELECT base64Cert FROM CertificateData WHERE fingerprint=?";
 
             this.numThreads = 1;

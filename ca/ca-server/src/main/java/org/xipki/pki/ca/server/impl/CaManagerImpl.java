@@ -1318,7 +1318,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         publisherNames.add(publisherName);
         caHasPublishers.get(tmpCaName).add(publisherName);
 
-        publisher.issuerAdded(caInfos.get(tmpCaName).getCertificate());
+        publisher.caAdded(caInfos.get(tmpCaName).getCertificate());
         return true;
     } // method addPublisherToCa
 
