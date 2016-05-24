@@ -90,7 +90,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        public String createFetchFirstSelectSql(final String coreSql, final int rows,
+        public String buildSelectFirstSql(final String coreSql, final int rows,
                 final String orderBy) {
             // 'SELECT ': 7
             // ' LIMIT ': 7
@@ -216,7 +216,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        public String createFetchFirstSelectSql(final String coreSql, final int rows,
+        public String buildSelectFirstSql(final String coreSql, final int rows,
                 final String orderBy) {
             // 'SELECT ': 7
             // ' FETCH FIRST ': 15
@@ -273,7 +273,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        public String createFetchFirstSelectSql(final String coreSql, final int rows,
+        public String buildSelectFirstSql(final String coreSql, final int rows,
                 final String orderBy) {
             // 'SELECT ': 7
             // ' FETCH FIRST ': 13
@@ -354,7 +354,7 @@ public abstract class DataSourceWrapper {
          *
          */
         @Override
-        public String createFetchFirstSelectSql(final String coreSql, final int rows,
+        public String buildSelectFirstSql(final String coreSql, final int rows,
                 final String orderBy) {
             int size = coreSql.length() + 18;
             size += StringUtil.isBlank(orderBy) ? 14 : orderBy.length() + 40;
@@ -460,7 +460,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        public String createFetchFirstSelectSql(final String coreSql, final int rows,
+        public String buildSelectFirstSql(final String coreSql, final int rows,
                 final String orderBy) {
             // 'SELECT ': 7
             // ' LIMIT ': 7
@@ -516,7 +516,7 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        public String createFetchFirstSelectSql(final String coreSql, final int rows,
+        public String buildSelectFirstSql(final String coreSql, final int rows,
                 final String orderBy) {
             // 'SELECT ': 7
             // ' LIMIT ': 7
@@ -719,11 +719,11 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public String createFetchFirstSelectSql(final String coreSql, final int rows) {
-        return createFetchFirstSelectSql(coreSql, rows, null);
+    public String buildSelectFirstSql(final String coreSql, final int rows) {
+        return buildSelectFirstSql(coreSql, rows, null);
     }
 
-    public abstract String createFetchFirstSelectSql(final String coreSql, final int rows,
+    public abstract String buildSelectFirstSql(final String coreSql, final int rows,
             final String orderBy);
 
     public long getMin(final Connection conn, final String table, final String column)
@@ -884,7 +884,7 @@ public abstract class DataSourceWrapper {
         StringBuilder sb = new StringBuilder(2 * column.length() + 15);
         sb.append(column).append(" FROM ").append(table);
         sb.append(" WHERE ").append(column).append("=?");
-        String sql = createFetchFirstSelectSql(sb.toString(), 1);
+        String sql = buildSelectFirstSql(sb.toString(), 1);
 
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -927,7 +927,7 @@ public abstract class DataSourceWrapper {
 
         StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
         sqlBuilder.append(column).append(" FROM ").append(table);
-        final String sql = createFetchFirstSelectSql(sqlBuilder.toString(), 1);
+        final String sql = buildSelectFirstSql(sqlBuilder.toString(), 1);
 
         try {
             stmt.execute(sql);
@@ -956,7 +956,7 @@ public abstract class DataSourceWrapper {
 
         StringBuilder sqlBuilder = new StringBuilder(table.length() + 10);
         sqlBuilder.append("1 FROM ").append(table);
-        final String sql = createFetchFirstSelectSql(sqlBuilder.toString(), 1);
+        final String sql = buildSelectFirstSql(sqlBuilder.toString(), 1);
 
         try {
             stmt.execute(sql);
