@@ -32,11 +32,12 @@ if { $argsValid equals "false" } {
 if { $printUsage equals "true" } {
   echo "Usage: "
   echo ""
-  echo "source demo.script <token type> <signature type>"
+  echo "source demo.script <token type> <signature type> [<keyspec for token type pkcs11>]"
   echo "token type:      pkcs11, pkcs12"
   echo "signature type:  rsa, rsapss, ec, plainec, dsa"
+  echo "keyspec:         keysize for signature types rsa, rsapss and dsa,"
+  echo "                 curve name for signature types ec and plainec"
 } {
-
 feature:install xipki-security-shell
 
 xipki-cmd:rm -r -f output
@@ -51,9 +52,14 @@ TOKEN_TYPE = "$1"
 
 SIG_TYPE = "$2"
 
+KEYSPEC = "$3"
+
 echo "========================================================"
 echo "TOKEN_TYPE: $1
 echo "SIG_TYPE:   $2
+if { $TOKEN_TYPE equals "pkcs11" } {
+  echo "keyspec:    $3"
+}
 echo "========================================================"
 
 KEY_TYPE = ""
@@ -77,9 +83,6 @@ if { $SIG_TYPE equals "rsapss" } {
 if { $SIG_TYPE equals "ec" } {
   KEY_TYPE = "ec"
 
-  # Curve name or OID, e.g. secp256r1, brainpoolp256r1
-  EC_CURVE = secp256r1
-
   # Valid signer algos are SHA<n>withECDSA, where n is 1, 224, 256, 384 and 512
   ALGO1 = "SHA256withECDSA"
   ALGO2 = "SHA1withECDSA"
@@ -87,9 +90,6 @@ if { $SIG_TYPE equals "ec" } {
 
 if { $SIG_TYPE equals "plainec" } {
   KEY_TYPE = "ec"
-
-  # Curve name or OID, e.g. secp256r1, brainpoolp256r1
-  EC_CURVE = secp256r1
 
   # Valid signer algos are SHA<n>withPlainECDSA, where n is 1, 224, 256, 384 and 512
   ALGO1 = "SHA256withPlainECDSA"
@@ -130,19 +130,27 @@ if { $TOKEN_TYPE equals "pkcs11" } {
 
   if { $KEY_TYPE equals "rsa" } {
 
+    if { $KEYSPEC equals "" } {
+      KEYSPEC = "2048"
+    }
+
     xipki-tk:rsa \
+	  --key-size $KEYSPEC \
       --slot $SLOT \
       --label $RCA_KEY_LABEL
 
     xipki-tk:rsa \
+	  --key-size $KEYSPEC \
       --slot $SLOT \
       --label $SubCA_KEY_LABEL
 
     xipki-tk:rsa \
+	  --key-size $KEYSPEC \
       --slot $SLOT \
       --label $SubCAwithCRL_KEY_LABEL
 
     xipki-tk:rsa \
+	  --key-size $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
 
@@ -150,42 +158,54 @@ if { $TOKEN_TYPE equals "pkcs11" } {
 
   if { $KEY_TYPE equals "ec" } {
 
+    if { $KEYSPEC equals "" } {
+      KEYSPEC = "secp256r1"
+    }
+
     xipki-tk:ec \
-      --curve $EC_CURVE \
+	  --curve $KEYSPEC \
       --slot $SLOT \
       --label $RCA_KEY_LABEL
 
     xipki-tk:ec \
-      --curve $EC_CURVE \
+	  --curve $KEYSPEC \
       --slot $SLOT \
       --label $SubCA_KEY_LABEL
 
     xipki-tk:ec \
-      --curve $EC_CURVE \
+	  --curve $KEYSPEC \
       --slot $SLOT \
       --label $SubCAwithCRL_KEY_LABEL
 
     xipki-tk:ec \
-      --curve $EC_CURVE \
+	  --curve $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
   }
 
   if { $KEY_TYPE equals "dsa" } {
 
+    if { $KEYSPEC equals "" } {
+      KEYSPEC = "2048"
+    }
+
     xipki-tk:dsa \
+	  --plen $KEYSPEC \
       --slot $SLOT \
       --label $RCA_KEY_LABEL
 
     xipki-tk:dsa \
+	  --plen $KEYSPEC \
       --slot $SLOT \
       --label $SubCA_KEY_LABEL
 
     xipki-tk:dsa \
+	  --plen $KEYSPEC \
       --slot $SLOT \
       --label $SubCAwithCRL_KEY_LABEL
 
     xipki-tk:dsa \
+	  --plen $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
 
@@ -241,7 +261,7 @@ CA_SIGNER_ALGO = "$ALGO1:$ALGO2"
 
 source ./xipki/demo/demo.d/ca.script "$1" "$2"
 
-source ./xipki/demo/demo.d/ra.script
+source ./xipki/demo/demo.d/ra.script "$KEY_TYPE"
 
 source ./xipki/demo//ca-qa.script
 
@@ -249,6 +269,6 @@ feature:install xipki-ocspserver
 
 source ./xipki/demo/ocsp.script
 
-feature:uninstall xipki-ocspserver
+feature:uninstall xipki-ocspserver "$ALGO1"
 
 }

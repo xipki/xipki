@@ -1,6 +1,6 @@
-P12_DIR = p12
 DSA_PLEN = 1024
 RSA_NLEN = 2048
+
 # Curve name or OID, e.g. secp256r1, brainpoolp256r1
 EC_CURVE = secp256r1
 

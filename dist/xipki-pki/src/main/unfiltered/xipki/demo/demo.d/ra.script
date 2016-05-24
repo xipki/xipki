@@ -1,3 +1,5 @@
+KEY_TYPE = "$1"
+
 ## Generate CRL
 xipki-ca:gencrl \
   --ca SubCAwithCRL1 \
