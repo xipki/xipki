@@ -42,6 +42,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.security.spec.DSAParameterSpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -72,6 +73,8 @@ import org.xipki.commons.security.exception.P11UnknownEntityException;
 import org.xipki.commons.security.exception.P11UnsupportedMechanismException;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.commons.security.util.DSAParameterCache;
+import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.X509Util;
 
 /**
@@ -545,12 +548,8 @@ public abstract class AbstractP11Slot implements P11Slot {
         assertWritable("generateDSAKeypair");
         assertMechanismSupported(P11Constants.CKM_DSA_KEY_PAIR_GEN);
 
-        DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
-        DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
-                plength, qlength, 80, new SecureRandom());
-        paramGen.init(genParams);
-        DSAParameters dsaParams = paramGen.generateParameters();
-
+        DSAParameterSpec dsaParams = DSAParameterCache.getDSAParameterSpec(plength, qlength,
+                random);
         P11Identity identity = doGenerateDSAKeypair(dsaParams.getP(), dsaParams.getQ(),
                 dsaParams.getG(), label);
         addIdentity(identity);

@@ -54,7 +54,7 @@ import org.bouncycastle.crypto.params.DSAParameters;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-final class DSAParameterCache {
+public final class DSAParameterCache {
     private static final Map<String, DSAParameterSpec> cache = new HashMap<>();
 
     static {
