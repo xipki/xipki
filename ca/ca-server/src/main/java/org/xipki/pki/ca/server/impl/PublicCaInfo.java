@@ -100,7 +100,7 @@ class PublicCaInfo {
         try {
             this.subjectKeyIdentifier = X509Util.extractSki(caCertificate);
         } catch (CertificateEncodingException ex) {
-            throw new OperationException(ErrorCode.INVALID_EXTENSION, ex.getMessage());
+            throw new OperationException(ErrorCode.INVALID_EXTENSION, ex);
         }
         this.caCertUris = CollectionUtil.unmodifiableList(caCertUris);
         this.ocspUris = CollectionUtil.unmodifiableList(ocspUris);

@@ -80,12 +80,30 @@ public class OperationException extends Exception {
         this.errorMessage = errorMessage;
     }
 
+    public OperationException(final ErrorCode errorCode, final Throwable throwable) {
+        this(errorCode, getMessage(throwable));
+    }
+
     public ErrorCode getErrorCode() {
         return errorCode;
     }
 
     public String getErrorMessage() {
         return errorMessage;
+    }
+
+    private static final String getMessage(final Throwable throwable) {
+        if (throwable == null) {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(throwable.getClass().getSimpleName());
+        String msg = throwable.getMessage();
+        if (msg != null) {
+            sb.append(": ").append(msg);
+        }
+        return sb.toString();
     }
 
 }

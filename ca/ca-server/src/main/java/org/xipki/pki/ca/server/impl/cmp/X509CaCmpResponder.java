@@ -821,7 +821,7 @@ public class X509CaCmpResponder extends CmpResponder {
             } catch (OperationException ex) {
                 ErrorCode code = ex.getErrorCode();
                 LOG.warn("{} certificate, OperationException: code={}, message={}",
-                        new Object[]{permission.name(), code.name(), ex.getErrorMessage()});
+                        permission.name(), code.name(), ex.getErrorMessage());
 
                 int failureInfo;
                 switch (code) {
@@ -892,9 +892,10 @@ public class X509CaCmpResponder extends CmpResponder {
             X509CertificateInfo certInfo = pendingCertPool.removeCertificate(
                     transactionId.getOctets(), certReqId.getPositiveValue(), certHash);
             if (certInfo == null) {
-                LOG.warn("no cert under transactionId={}, certReqId={} and certHash=0X{}",
-                        new Object[]{transactionId, certReqId.getPositiveValue(),
-                                Hex.toHexString(certHash)});
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("no cert under transactionId={}, certReqId={} and certHash=0X{}",
+                            transactionId, certReqId.getPositiveValue(), Hex.toHexString(certHash));
+                }
                 continue;
             }
 

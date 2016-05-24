@@ -407,7 +407,7 @@ public class Scep {
             ca = caManager.getX509Ca(caName);
         } catch (CaMgmtException ex) {
             LogUtil.error(LOG, ex, tid + "=" + tid + ",could not get X509CA");
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
 
         X500Name caX500Name = ca.getCaInfo().getCertificate().getSubjectAsX500Name();
@@ -580,7 +580,7 @@ public class Scep {
             final String message = "could not get certificate (CA='" + caName
                     + "' and serialNumber=" + LogUtil.formatCsn(serialNumber) + ")";
             LogUtil.error(LOG, ex, message);
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
         if (cert == null) {
             throw FailInfoException.BAD_CERTID;
@@ -622,7 +622,7 @@ public class Scep {
             return (SignedData) signedData.toASN1Structure().getContent();
         } catch (CMSException | IOException | CertificateEncodingException ex) {
             LogUtil.error(LOG, ex);
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
     } // method buildSignedData
 
@@ -640,7 +640,7 @@ public class Scep {
             signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
         } catch (CMSException ex) {
             LogUtil.error(LOG, ex, "could not generate CMSSignedData");
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
         return (SignedData) signedData.toASN1Structure().getContent();
     } // method getCRL
@@ -662,7 +662,7 @@ public class Scep {
                     request.getSignatureCert(), request.getContentEncryptionAlgorithm());
         } catch (MessageEncodingException ex) {
             LogUtil.error(LOG, ex, "could not encode response");
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
         return ci;
     } // method encodeResponse

@@ -307,8 +307,7 @@ class OcspStoreQueryExecutor {
                                 datasource.getDatasourceName(), certId, th.getMessage());
                         throw ex;
                     } else {
-                        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                                th.getClass().getName() + ": " + th.getMessage());
+                        throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
                     }
                 } finally {
                     conn.setAutoCommit(origAutoCommit);

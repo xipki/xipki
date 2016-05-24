@@ -695,7 +695,7 @@ public class OcspServer {
                 int max = requestOption.getNonceMaxLen();
 
                 if (len < min || len > max) {
-                    LOG.warn("length of nonce {} not within [{},{}]", new Object[]{len, min, max});
+                    LOG.warn("length of nonce {} not within [{},{}]", len, min, max);
                     if (auditEvent != null) {
                         StringBuilder sb = new StringBuilder(50);
                         sb.append("length of nonce ").append(len);

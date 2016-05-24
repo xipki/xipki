@@ -376,8 +376,7 @@ class CertStoreQueryExecutor {
                             datasource.getDatasourceName(), certId, th.getMessage());
                         throw ex;
                     } else {
-                        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                                th.getClass().getName() + ": " + th.getMessage());
+                        throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
                     }
                 } finally {
                     conn.setAutoCommit(origAutoCommit);
@@ -1198,8 +1197,7 @@ class CertStoreQueryExecutor {
             certInfo.setRevocationInfo(revInfo);
             return certInfo;
         } catch (IOException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "IOException: " + ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
     } // method getCertForId
 
@@ -1230,11 +1228,9 @@ class CertStoreQueryExecutor {
         try {
             cert = X509Util.parseCert(encodedCert);
         } catch (CertificateException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "CertificateException: " + ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         } catch (IOException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "IOException: " + ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
         return new X509CertWithDbId(cert, encodedCert);
     } // method getCertForId
@@ -1287,8 +1283,7 @@ class CertStoreQueryExecutor {
         try {
             cert = X509Util.parseCert(certBytes);
         } catch (CertificateException | IOException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    ex.getClass().getName() + ": " + ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
 
         CertRevocationInfo revInfo = null;
@@ -1372,8 +1367,7 @@ class CertStoreQueryExecutor {
             return certInfo;
         } catch (IOException ex) {
             LOG.warn("getCertificateInfo()", ex);
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "IOException: " + ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
     } // method getCertificateInfo
 
@@ -1521,7 +1515,7 @@ class CertStoreQueryExecutor {
         try {
             return PasswordHash.validatePassword(password, expPasswordText);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
     } // method authenticateUser
 

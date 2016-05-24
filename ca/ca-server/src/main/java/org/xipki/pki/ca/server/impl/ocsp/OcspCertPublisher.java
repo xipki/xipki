@@ -181,7 +181,7 @@ public class OcspCertPublisher extends X509CertPublisher {
         String serialText = LogUtil.formatCsn(cert.getCert().getSerialNumber());
 
         LOG.error("{} (issuser='{}': subject='{}', serialNumber={}). Message: {}",
-                new Object[]{messagePrefix, issuer, subjectText, serialText, ex.getMessage()});
+                messagePrefix, issuer, subjectText, serialText, ex.getMessage());
 
         LOG.debug("error", ex);
 

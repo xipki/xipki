@@ -190,8 +190,7 @@ class X509SelfSignedCertBuilder {
             signer = securityFactory.createSigner(signerType, new SignerConf(thisSignerConf),
                     (X509Certificate[]) null);
         } catch (XiSecurityException | ObjectCreationException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    ex.getClass().getName() + ": " + ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
 
         SubjectPublicKeyInfo publicKeyInfo;
@@ -233,14 +232,14 @@ class X509SelfSignedCertBuilder {
             tmpPublicKeyInfo = X509Util.toRfc3279Style(publicKeyInfo);
         } catch (InvalidKeySpecException ex) {
             LOG.warn("SecurityUtil.toRfc3279Style", ex);
-            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
         }
 
         try {
             certprofile.checkPublicKey(tmpPublicKeyInfo);
         } catch (BadCertTemplateException ex) {
             LOG.warn("certprofile.checkPublicKey", ex);
-            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
         }
 
         X500Name requestedSubject = p10Request.getCertificationRequestInfo().getSubject();
@@ -254,7 +253,7 @@ class X509SelfSignedCertBuilder {
                     "exception in cert profile " + certprofile.getName());
         } catch (BadCertTemplateException ex) {
             LOG.warn("certprofile.getSubject", ex);
-            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
         }
 
         Date notBefore = certprofile.getNotBefore(null);
@@ -297,11 +296,10 @@ class X509SelfSignedCertBuilder {
             CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
             return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encodedCert));
         } catch (BadCertTemplateException ex) {
-            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex.getMessage());
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
         } catch (NoIdleSignerException | CertificateException | IOException
                 | CertprofileException | NoSuchAlgorithmException | NoSuchProviderException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    ex.getClass().getName() + ": " + ex.getMessage());
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
     } // method generateCertificate
 
