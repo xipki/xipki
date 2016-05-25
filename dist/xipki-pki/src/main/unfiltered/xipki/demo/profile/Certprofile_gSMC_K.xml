@@ -32,6 +32,7 @@
       <parameters>
         <RSAParameters>
           <modulusLength>
+            <range min="1024" max="1024"/>
             <range min="2048" max="2048"/>
             <range min="3072" max="3072"/>
             <range min="4096" max="4096"/>
@@ -46,6 +47,7 @@
           <pLength>
             <range min="1024" max="1024"/>
             <range min="2048" max="2048"/>
+            <range min="3072" max="3072"/>
           </pLength>
           <qLength>
             <range min="160" max="160"/>

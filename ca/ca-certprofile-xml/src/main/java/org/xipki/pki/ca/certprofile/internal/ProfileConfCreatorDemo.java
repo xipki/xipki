@@ -1518,8 +1518,12 @@ public class ProfileConfCreatorDemo {
         profile.setSubject(subject);
         subject.setDnBackwards(false);
 
+        ASN1ObjectIdentifier[] curveIds = (X509CertLevel.EndEntity != certLevel) ? null :
+            new ASN1ObjectIdentifier[] {
+                SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1};
+
         // Key
-        profile.setKeyAlgorithms(createKeyAlgorithms());
+        profile.setKeyAlgorithms(createKeyAlgorithms(curveIds));
 
         // Extensions
         ExtensionsType extensions = new ExtensionsType();
@@ -1528,7 +1532,7 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method getBaseProfile
 
-    private static KeyAlgorithms createKeyAlgorithms() {
+    private static KeyAlgorithms createKeyAlgorithms(ASN1ObjectIdentifier[] curveIds) {
         KeyAlgorithms ret = new KeyAlgorithms();
         List<AlgorithmType> list = ret.getAlgorithm();
         // RSA
@@ -1543,6 +1547,7 @@ public class ProfileConfCreatorDemo {
         RangesType ranges = new RangesType();
         rsaParams.setModulusLength(ranges);
         List<RangeType> modulusLengths = ranges.getRange();
+        modulusLengths.add(createRange(1024));
         modulusLengths.add(createRange(2048));
         modulusLengths.add(createRange(3072));
         modulusLengths.add(createRange(4096));
@@ -1561,6 +1566,7 @@ public class ProfileConfCreatorDemo {
         List<RangeType> plengths = ranges.getRange();
         plengths.add(createRange(1024));
         plengths.add(createRange(2048));
+        plengths.add(createRange(3072));
 
         ranges = new RangesType();
         dsaParams.setQLength(ranges);
@@ -1577,15 +1583,14 @@ public class ProfileConfCreatorDemo {
         ECParameters ecParams = new ECParameters();
         algorithm.setParameters(createKeyParametersType(ecParams));
 
-        Curves curves = new Curves();
-        ecParams.setCurves(curves);
+        if (curveIds != null && curveIds.length > 0) {
+            Curves curves = new Curves();
+            ecParams.setCurves(curves);
 
-        ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[] {
-            SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1};
-
-        for (ASN1ObjectIdentifier curveId : curveIds) {
-            String name = AlgorithmUtil.getCurveName(curveId);
-            curves.getCurve().add(createOidType(curveId, name));
+            for (ASN1ObjectIdentifier curveId : curveIds) {
+                String name = AlgorithmUtil.getCurveName(curveId);
+                curves.getCurve().add(createOidType(curveId, name));
+            }
         }
 
         ecParams.setPointEncodings(new PointEncodings());
