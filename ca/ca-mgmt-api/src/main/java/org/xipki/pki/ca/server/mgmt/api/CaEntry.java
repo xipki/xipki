@@ -80,8 +80,6 @@ public class CaEntry {
 
     private String extraControl;
 
-    private RevokeSuspendedCertsControl revokeSuspendedCertsControl;
-
     public CaEntry(final String name, final String signerType, final String signerConf,
             final int expirationPeriod) throws CaMgmtException {
         this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
@@ -188,10 +186,6 @@ public class CaEntry {
 
     public void setExtraControl(final String extraControl) {
         this.extraControl = extraControl;
-    }
-
-    public RevokeSuspendedCertsControl getRevokeSuspendedCertsControl() {
-        return revokeSuspendedCertsControl;
     }
 
     @Override

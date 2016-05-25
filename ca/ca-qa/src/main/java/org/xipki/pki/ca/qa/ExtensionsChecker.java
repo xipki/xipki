@@ -1660,7 +1660,7 @@ public class ExtensionsChecker {
                     certSeq.getObjectAt(i));
             ASN1ObjectIdentifier certAccessMethod = certAccessDesc.getAccessMethod();
 
-            boolean bo = (accessMethod == null) ? (certAccessDesc == null)
+            boolean bo = (accessMethod == null) ? (certAccessMethod == null)
                     : accessMethod.equals(certAccessMethod);
 
             if (!bo) {
