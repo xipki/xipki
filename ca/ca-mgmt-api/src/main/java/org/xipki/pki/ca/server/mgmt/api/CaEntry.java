@@ -43,7 +43,6 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.pki.ca.api.profile.CertValidity;
-import org.xipki.pki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
 
 /**
  * @author Lijun Liao
