@@ -56,11 +56,9 @@ import org.xipki.commons.security.pkcs12.P12KeypairGenerator;
 public class P12ECKeyGenCmd extends P12KeyGenCommandSupport {
 
     @Option(name = "--curve",
-            required = true,
-            description = "EC curve name or OID\n"
-                    + "(required)")
+            description = "EC curve name or OID")
     @Completion(ECCurveNameCompleter.class)
-    private String curveName;
+    private String curveName = "secp256r1";
 
     @Override
     protected Object doExecute() throws Exception {
