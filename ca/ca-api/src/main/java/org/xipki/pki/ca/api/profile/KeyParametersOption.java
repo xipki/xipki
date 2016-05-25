@@ -212,11 +212,11 @@ public class KeyParametersOption {
 
         public boolean allowsCurve(final ASN1ObjectIdentifier curveOid) {
             ParamUtil.requireNonNull("curveOid", curveOid);
-            return curveOids.contains(curveOid);
+            return (curveOids == null) ? true : curveOids.contains(curveOid);
         }
 
         public boolean allowsPointEncoding(final byte encoding) {
-            return pointEncodings.contains(encoding);
+            return (pointEncodings == null) ? true : pointEncodings.contains(encoding);
         }
 
     } // class ECParamatersOption
