@@ -1,26 +1,47 @@
-CA_SIGNER_ALGO = SHA256withRSA:SHA1withRSA
+printUsage = "false"
+argsValid = "false"
 
-P12_DIR = xipki/demo/p12
+if { "$1" equals "" } {
+  printUsage = "true"
+  argsValid = "true"
+} {
+  if { "$1" equals "help" } {
+    printUsage = "true"
+    argsValid = "true"
+  } {
+    list = [pkcs11 pkcs12]; each ($list) {
+      if { "$1" equals $it } {
+        argsValid = "true"
+      }
+    }
+  }
+}
 
-echo "========================================================"
-echo "||                      CA-MGMT QA                    ||"
-echo "========================================================"
+list = [rsa rsapss ec plainec dsa]; each ($list) {
+  if { "$1" equals $it } {
+    argsValid = "true"
+  }
+}
 
+if { $argsValid equals "false" } {
+  echo "invalid arguments $args"
+  echo ""
+  printUsage = "true"
+}
+
+if { $printUsage equals "true" } {
+  echo "Usage: "
+  echo ""
+  echo "source camgmt-qa.script <token type> <signature type> [<keyspec>]"
+  echo "token type:      pkcs11, pkcs12"
+  echo "signature type:  rsa, rsapss, ec, plainec, dsa"
+  echo "keyspec:         keysize for signature types rsa, rsapss and dsa,"
+  echo "                 curve name for signature types ec and plainec"
+} {
 feature:install xipki-security-shell
+source xipki/demo/demo.d/prepare-keys.script $1 $2 $3
 
-# Wait one second
-sleep 1000
-
-xipki-cmd:rm -r -f output
-xipki-cmd:mkdir output
-xipki-cmd:copy-dir $P12_DIR/ca-rsa output
-xipki-cmd:copy-dir $P12_DIR/ee output
-
-source ./xipki/demo/demo.d/initdb.script
-
-source ./xipki/demo/demo.d/prepare.script
-
-source ./xipki/demo/demo.d/p12.script
+source xipki/demo/demo.d/ca.script
 
 feature:install xipki-camgmt-qa-shell
 
@@ -34,7 +55,7 @@ sleep 1000
 xipki-ca:env-add \
   --name qa-env1 \
   --value value1
-  
+
 xipki-caqa:env-check \
   --name qa-env1 \
   --value value1
@@ -42,7 +63,7 @@ xipki-caqa:env-check \
 xipki-ca:env-up \
   --name qa-env1 \
   --value value2
-  
+
 xipki-caqa:env-check \
   --name qa-env1 \
   --value value2
@@ -136,7 +157,7 @@ xipki-caqa:requestor-check \
 
 xipki-ca:requestor-rm \
   qa-requestor1
-  
+
 # name does not exist
 xipki-caqa:neg-requestor-rm \
   qa-requestor1
@@ -147,7 +168,7 @@ xipki-caqa:neg-requestor-rm \
 xipki-caqa:responder-check \
   --name responder1 \
   --signer-type JKS \
-  --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
+  --signer-conf password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:xipki/security/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA
 
 xipki-ca:responder-add \
   --name qa-responder1 \
@@ -188,7 +209,7 @@ xipki-caqa:responder-check \
 
 xipki-ca:responder-rm \
   qa-responder1
-  
+
 # name does not exist
 xipki-caqa:neg-responder-rm \
   qa-responder1
@@ -221,12 +242,12 @@ xipki-caqa:neg-profile-add \
 xipki-caqa:neg-profile-add \
   --name qa-SubCA \
   --type XML \
-  --conf invalid-profile-conf 
+  --conf invalid-profile-conf
 
 # invalid type
 xipki-caqa:neg-profile-up \
   --name qa-SubCA \
-  --type java:packagename.classname
+  --type invalid-type
 
 # invalid conf
 xipki-caqa:neg-profile-up \
@@ -253,19 +274,22 @@ xipki-caqa:crlsigner-check \
   --signer-type CA \
   --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00
 
-# direct CRL signer (signed by CA)
+echo "direct CRL signer (signed by CA)"
+
 xipki-ca:crlsigner-add \
   --name qa-direct-crlsigner1 \
   --signer-type CA \
   --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
-# name already exists
+echo "neg-crlsigner-add: name already exists"
+
 xipki-caqa:neg-crlsigner-add \
   --name qa-direct-crlsigner1 \
   --signer-type CA \
   --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
-# invalid control
+echo "neg-crlsigner-add: invalid control"
+
 xipki-caqa:neg-crlsigner-add \
   --name qa-direct-crlsigner2 \
   --signer-type CA \
@@ -284,7 +308,8 @@ xipki-caqa:crlsigner-check \
   --name qa-direct-crlsigner1 \
   --control updateMode=interval,fullCRL.intervals=2,overlap.minutes=90,interval.time=03:00
 
-# invalid fullCRL.intervals
+echo "neg-crlsigner-up: invalid fullCRL.intervals"
+
 xipki-caqa:neg-crlsigner-up \
   --name qa-direct-crlsigner1 \
   --control updateMode=interval,fullCRL.intervals=abc,overlap.minutes=90,interval.time=03:00
@@ -296,25 +321,29 @@ xipki-caqa:crlsigner-check \
 xipki-ca:crlsigner-rm \
   qa-direct-crlsigner1
 
-# name does not exist
+echo "neg-crlsigner-rm: name does not exist"
+
 xipki-caqa:neg-crlsigner-rm \
   qa-direct-crlsigner1
 
 # indrect CRL signer
+
 xipki-ca:crlsigner-add \
   --name qa-indirect-crlsigner1 \
   --signer-type PKCS12 \
   --signer-conf password=1234,keystore=file:xipki/demo/keys/crlsigner.p12,algo=SHA256withRSA \
   --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=03:00
 
-# No keyusage CRLSign
+echo "neg-crlsigner-add: No keyusage CRLSign"
+
 xipki-caqa:neg-crlsigner-add \
   --name qa-indirect-crlsigner2 \
   --signer-type JKS \
   --signer-conf password=1234,keystore=file:xipki/security/tlskeys/tls-server-keystore.jks,algo=SHA1withRSA \
   --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00
 
-# Unknown signature algorithm
+echo "neg-crlsigner-add: Unknown signature algorithm"
+
 xipki-caqa:neg-crlsigner-add \
   --name qa-indirect-crlsigner2 \
   --signer-type PKCS12 \
@@ -332,8 +361,7 @@ xipki-caqa:ca-check \
   --name SUBCA1.COMPLEX-NAME \
   --permission all \
   --max-validity 5y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/SubCA1.p12,algo=$CA_SIGNER_ALGO \
+  --signer-type $TOKEN_TYPE \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/SubCA1.der \
   --cmp-control cmpcontrol1 \
@@ -344,8 +372,7 @@ xipki-caqa:ca-check \
 xipki-caqa:ca-check --name RCA1 \
   --permission all \
   --max-validity 10y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
+  --signer-type $TOKEN_TYPE \
   --cert output/RCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
@@ -356,11 +383,11 @@ xipki-caqa:ca-check --name RCA1 \
   --validity-mode CUTOFF
 
 # change the CA configuration
+
 xipki-ca:ca-up --name RCA1 \
   --permission enroll \
   --permission revoke \
   --max-validity 8y \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://example.org/RCA1-2.der \
   --duplicate-subject no \
@@ -371,8 +398,7 @@ xipki-caqa:ca-check --name RCA1 \
   --permission enroll \
   --permission revoke \
   --max-validity 8y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
+  --signer-type $TOKEN_TYPE \
   --cert output/RCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://example.org/RCA1-2.der \
@@ -386,46 +412,17 @@ xipki-caqa:ca-check --name RCA1 \
 xipki-ca:profile-add --name RCA --type XML --conf-file xipki/demo/profile/Certprofile_RootCA.xml
 
 # The CA named RCA2 exists. No new CA with the same name is allowed
-xipki-caqa:neg-gen-rca \
-  --name RCA1 \
-  --p10 output/RCA1.p10 \
-  --profile RCA \
-  --out output/RCA1-2.der \
-  --permission all \
-  --sn-size 16 \
-  --next-crl-no 2 \
-  --max-validity 10y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO \
-  --ocsp-uri http://localhost:8080/ocsp/responder1 \
-  --ca-cert-uri http://example.org/RCA1.der \
-  --cmp-control cmpcontrol1 \
-  --responder responder1 \
-  --duplicate-subject  yes \
-  --duplicate-key yes \
-  --validity-mode CUTOFF
 
-# invalid signer conf (password invalid)
-xipki-caqa:neg-gen-rca \
-  --name RCA1 \
-  --p10 output/RCA1.p10 \
-  --profile RCA \
-  --out output/RCA1-2.der \
-  --permission all \
-  --sn-size 16 \
-  --next-crl-no 2 \
-  --max-validity 10y \
-  --signer-type PKCS12 \
-  --signer-conf password=123456,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
-  --ocsp-uri http://localhost:8080/ocsp/responder1 \
-  --ca-cert-uri http://example.org/RCA1.der \
-  --cmp-control cmpcontrol1 \
-  --responder responder1 \
-  --duplicate-subject  yes \
-  --duplicate-key yes \
-  --validity-mode CUTOFF
+if { $TOKEN_TYPE equals "pkcs11" } {
+  CA_SIGNER_CONF_RCA = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=RCA1"
+}
 
-# invalid signer conf (key and algo do not match)
+if { $TOKEN_TYPE equals "pkcs12" } {
+  CA_SIGNER_CONF_RCA = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO"
+}
+
+echo "neg-gen-rca: CA named RCA1 already exists"
+
 xipki-caqa:neg-gen-rca \
   --name RCA1 \
   --p10 output/RCA1.p10 \
@@ -435,8 +432,8 @@ xipki-caqa:neg-gen-rca \
   --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withDSA \
+  --signer-type $TOKEN_TYPE \
+  --signer-conf $CA_SIGNER_CONF_RCA \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
@@ -447,15 +444,16 @@ xipki-caqa:neg-gen-rca \
 
 xipki-ca:profile-rm RCA
 
-# certificate and key do not match
+echo "neg-ca-add: certificate and key do not match"
+
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
   --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
+  --signer-type $TOKEN_TYPE \
+  --signer-conf $CA_SIGNER_CONF_RCA \
   --cert output/SubCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
@@ -465,16 +463,17 @@ xipki-caqa:neg-ca-add \
   --duplicate-key yes \
   --validity-mode CUTOFF
 
-# CMP control name does not exist
+echo "neg-ca-add: CMP control name does not exist"
+
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
   --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
-  --cert output/SubCA1.der \
+  --signer-type $TOKEN_TYPE \
+  --signer-conf $CA_SIGNER_CONF_RCA \
+  --cert output/RCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol2 \
@@ -483,16 +482,17 @@ xipki-caqa:neg-ca-add \
   --duplicate-key yes \
   --validity-mode CUTOFF
 
-# CRL signer name does not exist
+echo "neg-ca-add: CRL signer name does not exist"
+
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
   --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
-  --cert output/SubCA1.der \
+  --signer-type $TOKEN_TYPE \
+  --signer-conf $CA_SIGNER_CONF_RCA \
+  --cert output/RCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --crl-signer crlsigner2 \
@@ -502,20 +502,21 @@ xipki-caqa:neg-ca-add \
   --duplicate-key yes \
   --validity-mode CUTOFF
 
-# responder name does not exist
+echo "neg-ca-add: responder name does not exist"
+
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
   --sn-size 16 \
   --next-crl-no 2 \
   --max-validity 10y \
-  --signer-type PKCS12 \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
-  --cert output/SubCA1.der \
+  --signer-type $TOKEN_TYPE \
+  --signer-conf $CA_SIGNER_CONF_RCA \
+  --cert output/RCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --cmp-control cmpcontrol1 \
-  --responder responder1 \
+  --responder responder2 \
   --duplicate-subject  yes \
   --duplicate-key yes \
   --validity-mode CUTOFF
@@ -525,27 +526,27 @@ xipki-caqa:neg-ca-add \
 #################################################################
 xipki-caqa:caalias-check \
   --ca RCA1 \
-  --alias RCA 
+  --alias RCA
 
 xipki-caqa:caalias-check \
   --ca SUBCA1.COMPLEX-NAME \
-  --alias SubCA 
+  --alias SubCA
 
 xipki-caqa:caalias-check \
   --ca SUBCAWITHCRL1 \
-  --alias SubCAwithCRL 
+  --alias SubCAwithCRL
 
 xipki-ca:caalias-add \
   --ca RCA1 \
   --alias RCA-1
-  
+
 xipki-caqa:caalias-check \
   --ca RCA1 \
-  --alias RCA-1 
-  
+  --alias RCA-1
+
 xipki-ca:caalias-rm \
   RCA-1
-  
+
 #################################################################
 #                          CA HAS PROFILE                       #
 #################################################################
@@ -553,7 +554,7 @@ xipki-ca:caalias-rm \
 xipki-caqa:caprofile-check \
   --ca RCA1 \
   --profile Cross
-  
+
 xipki-caqa:caprofile-check \
   --ca RCA1 \
   --profile SubCA
@@ -561,7 +562,7 @@ xipki-caqa:caprofile-check \
 xipki-caqa:caprofile-check \
   --ca RCA1 \
   --profile SubCA.Complex
-  
+
 xipki-ca:caprofile-add \
   --ca RCA1 \
   --profile TLS \
@@ -571,16 +572,19 @@ xipki-caqa:caprofile-check \
   --profile TLS \
 
 # CA name does not exist
+
 xipki-caqa:neg-caprofile-add \
   --ca RCA10 \
   --profile PROFILE-DUMMY
 
 # profile name does not exist
+
 xipki-caqa:neg-caprofile-add \
   --ca RCA1 \
   --profile PROFILE-DUMMY
 
 # invalid permission
+
 xipki-caqa:neg-caprofile-rm \
   --ca RCA1 \
   --profile PROFILE-DUMMY
@@ -595,22 +599,22 @@ xipki-caqa:capub-check \
 # CA name does not exist
 xipki-caqa:neg-capub-add \
   --ca RCA10 \
-  --publisher PUBLISHER-DUMMY 
+  --publisher PUBLISHER-DUMMY
 
 # CA name does not exist
 xipki-caqa:neg-capub-rm \
   --ca RCA10 \
-  --publisher PUBLISHER-DUMMY 
+  --publisher PUBLISHER-DUMMY
 
 # Publisher name does not exist
 xipki-caqa:neg-capub-add \
   --ca RCA1 \
-  --publisher PUBLISHER-DUMMY 
+  --publisher PUBLISHER-DUMMY
 
 # Publisher name does not exist
 xipki-caqa:neg-capub-rm \
   --ca RCA1 \
-  --publisher PUBLISHER-DUMMY 
+  --publisher PUBLISHER-DUMMY
 
 #################################################################
 #                         CA HAS REQUESTOR                      #
@@ -663,7 +667,7 @@ xipki-caqa:neg-careq-add \
 # Requestor name does not exist
 xipki-caqa:neg-careq-rm \
   --ca RCA1 \
-  --requestor REQUESTOR-DUMMY 
+  --requestor REQUESTOR-DUMMY
 
 # Requestor name does not exist
 xipki-caqa:neg-careq-add \
@@ -676,12 +680,12 @@ xipki-caqa:neg-careq-add \
 
 ##### caalias #####
 
-xipki-ca:caalias-info 
+xipki-ca:caalias-info
 
 xipki-ca:caalias-info RCA
 
 xipki-ca:caalias-rm RCA
- 
+
 xipki-ca:caalias-add --alias RCA --ca RCA1
 
 xipki-ca:ca-export --name RCA1 --out output/RCA1.export
@@ -708,7 +712,7 @@ xipki-ca:careq-info --ca RCA1
 
 xipki-ca:careq-rm --requestor requestor1 --ca RCA1
 
-xipki-ca:careq-add --requestor requestor1 --ca RCA1 --profile all --ra yes --permission all 
+xipki-ca:careq-add --requestor requestor1 --ca RCA1 --profile all --ra yes --permission all
 
 ##### clear-publishqueue #####
 
@@ -756,13 +760,13 @@ xipki-ca:env-rm ENV2
 
 xipki-ca:profile-info
 
-xipki-ca:profile-info DEMO
+xipki-ca:profile-info OCSP
 
 xipki-ca:profile-export --name SubCA --out output/Certprofile_SubCA.export
 
 xipki-ca:profile-up --name SubCA --conf-file output/Certprofile_SubCA.export
 
-xipki-ca:profile-rm DEMO
+xipki-ca:profile-rm OCSP
 
 ##### publisher #####
 
@@ -806,22 +810,19 @@ xipki-ca:responder-rm responder2
 
 ##### cert #####
 
-# Serial 2: SubCA1.der
-# Serial 3: SubCAwithCRL1.der
+xipki-ca:revoke-cert --ca RCA1 --reason certificateHold --cert output/SubCAwithCRL1.der
 
-xipki-ca:revoke-cert --ca RCA1 --reason certificateHold --serial 3
-
-xipki-ca:unrevoke-cert --ca RCA1 --serial 3
+xipki-ca:unrevoke-cert --ca RCA1 --cert output/SubCAwithCRL1.der
 
 xipki-ca:revoke-cert --ca RCA1 --reason certificateHold --cert output/SubCAwithCRL1.der
 
 xipki-ca:unrevoke-cert --ca RCA1 --cert output/SubCAwithCRL1.der
 
-xipki-ca:revoke-cert --ca RCA1 --reason keyCompromise --serial 3
+xipki-ca:revoke-cert --ca RCA1 --reason keyCompromise --cert output/SubCAwithCRL1.der
 
 xipki-ca:revoke-cert --ca RCA1 --reason keyCompromise --cert output/SubCA1.der
 
-xipki-ca:remove-cert --ca RCA1 --serial  3
+xipki-ca:remove-cert --ca RCA1 --cert output/SubCAwithCRL1.der
 
 xipki-ca:remove-cert --ca RCA1 --cert output/SubCA1.der
 
@@ -829,7 +830,7 @@ xipki-ca:remove-cert --ca RCA1 --cert output/SubCA1.der
 
 xipki-ca:ca-revoke --reason keyCompromise RCA1
 
-xipki-ca:ca-unrevoke RCA1 
+xipki-ca:ca-unrevoke RCA1
 
 xipki-ca:notify-change
 
@@ -846,7 +847,7 @@ xipki-ca:ca-rm SUBCAWITHCRL1
 xipki-ca:ca-up --name RCA1 \
   --permission enroll --permission revoke \
   --max-validity 8y \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
+  --signer-conf $CA_SIGNER_CONF_RCA \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://example.org/RCA1-2.der \
   --duplicate-subject no \
@@ -856,16 +857,15 @@ xipki-ca:ca-up --name RCA1 \
 xipki-ca:ca-up --name RCA1 \
   --permission all \
   --max-validity 10y \
-  --signer-conf password=1234,keystore=file:output/RCA1.p12,algo=SHA256withRSA \
+  --signer-conf $CA_SIGNER_CONF_RCA \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/RCA1.der \
   --duplicate-subject yes \
   --duplicate-key yes \
   --validity-mode CUTOFF
 
-
-
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################
 feature:uninstall xipki-camgmt-qa-shell
+}

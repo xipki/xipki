@@ -1,0 +1,244 @@
+xipki-cmd:rm -r -f output
+
+xipki-cmd:mkdir output
+
+TOKEN_TYPE = "$1"
+
+SIG_TYPE = "$2"
+
+KEYSPEC = "$3"
+
+echo "========================================================"
+echo "TOKEN_TYPE: $1"
+echo "SIG_TYPE:   $2"
+echo "keyspec:    $3"
+echo "========================================================"
+
+KEY_TYPE = ""
+
+if { $SIG_TYPE equals "rsa" } {
+  KEY_TYPE = "rsa"
+
+  # Valid signer algos are SHA<n>withRSA where n is 1, 224, 256, 384 and 512
+  ALGO1 = "SHA256withRSA"
+  ALGO2 = "SHA1withRSA"
+}
+
+if { $SIG_TYPE equals "rsapss" } {
+  KEY_TYPE = "rsa"
+
+  # Valid signer algos are SHA<n>withRSAandMGF1 where n is 1, 224, 256, 384 and 512
+  ALGO1 = "SHA256withRSAandMGF1"
+  ALGO2 = "SHA1withRSAandMGF1"
+}
+
+if { $SIG_TYPE equals "ec" } {
+  KEY_TYPE = "ec"
+
+  # Valid signer algos are SHA<n>withECDSA, where n is 1, 224, 256, 384 and 512
+  ALGO1 = "SHA256withECDSA"
+  ALGO2 = "SHA1withECDSA"
+}
+
+if { $SIG_TYPE equals "plainec" } {
+  KEY_TYPE = "ec"
+
+  # Valid signer algos are SHA<n>withPlainECDSA, where n is 1, 224, 256, 384 and 512
+  ALGO1 = "SHA256withPlainECDSA"
+  ALGO2 = "SHA1withPlainECDSA"
+}
+
+if { $SIG_TYPE equals "dsa" } {
+  KEY_TYPE = "dsa"
+
+  # Valid signer algos are SHA<n>withDSA, where n is 1, 256, 384 and 512
+  ALGO1 = "SHA256withDSA"
+  ALGO2 = "SHA1withDSA"
+}
+
+xipki-cmd:copy-dir xipki/demo/p12/shared output
+
+xipki-cmd:copy-dir xipki/demo/p12/$KEY_TYPE output
+
+if { $KEY_TYPE equals "rsa" } {
+  if { $KEYSPEC equals "" } {
+    KEYSPEC = "2048"
+  }
+}
+
+if { $KEY_TYPE equals "ec" } {
+  if { $KEYSPEC equals "" } {
+    KEYSPEC = "secp256r1"
+  }
+}
+
+if { $KEY_TYPE equals "dsa" } {
+  if { $KEYSPEC equals "" } {
+    KEYSPEC = "2048"
+  }
+}
+
+if { $TOKEN_TYPE equals "pkcs11" } {
+  SLOT = "0"
+
+  OCSP_KEYCONF = "slot=$SLOT,key-label=OCSP99"
+
+  xipki-tk:delete-key \
+    --slot $SLOT \
+    --label RCA1
+
+  xipki-tk:delete-key \
+    --slot $SLOT \
+    --label SubCA1
+
+  xipki-tk:delete-key \
+    --slot $SLOT \
+    --label SubCAwithCRL1
+
+  xipki-tk:delete-key \
+    --slot $SLOT \
+    --label OCSP99
+
+  if { $KEY_TYPE equals "rsa" } {
+    xipki-tk:rsa \
+	  --key-size $KEYSPEC \
+      --slot $SLOT \
+      --label RCA1
+
+    xipki-tk:rsa \
+	  --key-size $KEYSPEC \
+      --slot $SLOT \
+      --label SubCA1
+
+    xipki-tk:rsa \
+	  --key-size $KEYSPEC \
+      --slot $SLOT \
+      --label SubCAwithCRL1
+
+    xipki-tk:rsa \
+	  --key-size $KEYSPEC \
+      --slot $SLOT \
+      --label OCSP99
+
+  }
+
+  if { $KEY_TYPE equals "ec" } {
+    xipki-tk:ec \
+	  --curve $KEYSPEC \
+      --slot $SLOT \
+      --label RCA1
+
+    xipki-tk:ec \
+	  --curve $KEYSPEC \
+      --slot $SLOT \
+      --label SubCA1
+
+    xipki-tk:ec \
+	  --curve $KEYSPEC \
+      --slot $SLOT \
+      --label SubCAwithCRL1
+
+    xipki-tk:ec \
+	  --curve $KEYSPEC \
+      --slot $SLOT \
+      --label OCSP99
+  }
+
+  if { $KEY_TYPE equals "dsa" } {
+    xipki-tk:dsa \
+	  --plen $KEYSPEC \
+      --slot $SLOT \
+      --label RCA1
+
+    xipki-tk:dsa \
+	  --plen $KEYSPEC \
+      --slot $SLOT \
+      --label SubCA1
+
+    xipki-tk:dsa \
+	  --plen $KEYSPEC \
+      --slot $SLOT \
+      --label SubCAwithCRL1
+
+    xipki-tk:dsa \
+	  --plen $KEYSPEC \
+      --slot $SLOT \
+      --label OCSP99
+
+  }
+
+}
+
+if { $TOKEN_TYPE equals "pkcs12" } {
+
+  OCSP_KEYCONF = "password=1234,keystore=file:output/OCSP99.p12"
+
+  if { $KEY_TYPE equals "rsa" } {
+    xipki-tk:rsa-p12 \
+      --password 1234 \
+      --key-size $KEYSPEC \
+      --out output/RCA1.p12
+
+    xipki-tk:rsa-p12 \
+      --password 1234 \
+      --key-size $KEYSPEC \
+      --out output/SubCA1.p12
+
+    xipki-tk:rsa-p12 \
+      --password 1234 \
+      --key-size $KEYSPEC \
+      --out output/SubCAwithCRL1.p12
+  
+    xipki-tk:rsa-p12 \
+      --password 1234 \
+      --key-size $KEYSPEC \
+      --out output/OCSP99.p12 \
+
+  }
+  
+  if { $KEY_TYPE equals "dsa" } {
+    xipki-tk:dsa-p12 \
+      --password 1234 \
+      --plen $KEYSPEC \
+      --out output/RCA1.p12
+
+    xipki-tk:dsa-p12 \
+      --password 1234 \
+      --plen $KEYSPEC \
+      --out output/SubCA1.p12
+
+    xipki-tk:dsa-p12 \
+      --password 1234 \
+      --plen $KEYSPEC \
+      --out output/SubCAwithCRL1.p12
+
+    xipki-tk:dsa-p12 \
+      --password 1234 \
+      --plen $KEYSPEC \
+      --out output/OCSP99.p12
+
+  }
+    
+  if { $KEY_TYPE equals "ec" } {
+    xipki-tk:ec-p12 \
+      --curve $KEYSPEC \
+      --password 1234 \
+      --out output/RCA1.p12
+
+    xipki-tk:ec-p12 \
+      --curve $KEYSPEC \
+      --password 1234 \
+      --out output/SubCA1.p12
+
+    xipki-tk:ec-p12 \
+      --curve $KEYSPEC \
+      --password 1234 \
+      --out output/SubCAwithCRL1.p12
+
+    xipki-tk:ec-p12 \
+      --curve $KEYSPEC \
+      --password 1234 \
+      --out output/OCSP99.p12
+  }
+
+}

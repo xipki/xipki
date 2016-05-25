@@ -1,3 +1,5 @@
+CA_SIGNER_ALGO = "$ALGO1:$ALGO2"
+
 #################################################################
 #                      Initialize the database                  #
 #################################################################
@@ -132,7 +134,7 @@ xipki-ca:profile-add \
 if { $TOKEN_TYPE equals "pkcs11" } {
   xipki-tk:req \
     --slot $SLOT \
-    --label $RCA_KEY_LABEL \
+    --label RCA1 \
     --out output/RCA1.p10 \
     --subject "CN=RCA1,O=xipki,C=DE"
 } {
@@ -146,7 +148,7 @@ if { $TOKEN_TYPE equals "pkcs11" } {
 ## Generate selfsigned RCA
 
 if { $TOKEN_TYPE equals "pkcs11" } {
-  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=$RCA_KEY_LABEL"
+  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=RCA1"
 }
 
 if { $TOKEN_TYPE equals "pkcs12" } {
@@ -176,7 +178,7 @@ xipki-ca:gen-rca \
 if { $TOKEN_TYPE equals "pkcs11" } {
   xipki-tk:update-cert \
     --slot $SLOT \
-    --label $RCA_KEY_LABEL \
+    --label RCA1 \
     --cert output/RCA1.der
 } {
   xipki-tk:update-cert-p12 \
@@ -232,7 +234,7 @@ xipki-ca:publish-self \
 if { $TOKEN_TYPE equals "pkcs11" } {
   xipki-tk:req \
     --slot $SLOT \
-    --label $SubCA_KEY_LABEL \
+    --label SubCA1 \
     --out output/SubCA1.p10 \
     --subject "CN=SubCA1,O=xipki,C=DE"
 } {
@@ -252,7 +254,7 @@ xipki-ca:enroll-cert \
 if { $TOKEN_TYPE equals "pkcs11" } {
   xipki-tk:update-cert \
     --slot $SLOT \
-    --label $SubCA_KEY_LABEL \
+    --label SubCA1 \
     --cert output/SubCA1.der \
 } {
   xipki-tk:update-cert-p12 \
@@ -266,7 +268,7 @@ if { $TOKEN_TYPE equals "pkcs11" } {
 if { $TOKEN_TYPE equals "pkcs11" } {
   xipki-tk:req \
     --slot $SLOT \
-    --label $SubCAwithCRL_KEY_LABEL --out output/SubCAwithCRL1.p10 \
+    --label SubCAwithCRL1 --out output/SubCAwithCRL1.p10 \
     --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
     --subject-alt-name "[1]info@xipki.org" \
     --subject-alt-name "[2]xipki.org" \
@@ -303,7 +305,7 @@ xipki-ca:enroll-cert \
 if { $TOKEN_TYPE equals "pkcs11" } {
   xipki-tk:update-cert \
     --slot $SLOT \
-    --label $SubCAwithCRL_KEY_LABEL \
+    --label SubCAwithCRL1 \
     --cert output/SubCAwithCRL1.der \
 } {
   xipki-tk:update-cert-p12 \
@@ -357,7 +359,7 @@ xipki-ca:caprofile-rm \
 ## Add CA
 
 if { $TOKEN_TYPE equals "pkcs11" } {
-  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=$SubCA_KEY_LABEL"
+  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=SubCA1"
 }
 
 if { $TOKEN_TYPE equals "pkcs12" } {
@@ -427,7 +429,7 @@ xipki-ca:careq-add \
 ## Add CA
 
 if { $TOKEN_TYPE equals "pkcs11" } {
-  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=$SubCAwithCRL_KEY_LABEL"
+  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=SubCAwithCRL1"
 }
 
 if { $TOKEN_TYPE equals "pkcs12" } {

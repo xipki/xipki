@@ -1,179 +1,291 @@
-DSA_PLEN = 1024
-RSA_NLEN = 2048
-
-# Curve name or OID, e.g. secp256r1, brainpoolp256r1
-EC_CURVE = secp256r1
+echo " ----- generate SCEP keys (RSA only) -----"
 
 ## SCEP responder
 xipki-tk:rsa-p12 \
   --password 1234 \
-  --out p12/ee/SCEP1.p12
-
-echo "========================================================"
-echo "||                     CA DSA Key                     ||"
-echo "========================================================"
-
-# Wait one second
-sleep 1000
-
-xipki-tk:dsa-p12 \
-  --password 1234 \
-  --plen $DSA_PLEN \
-  --out p12/ca-dsa/RCA1.p12
-
-xipki-tk:dsa-p12 \
-  --password 1234 \
-  --plen $DSA_PLEN \
-  --out p12/ca-dsa/SubCA1.p12
-
-xipki-tk:dsa-p12 \
-  --password 1234 \
-  --plen $DSA_PLEN \
-  --out p12/ca-dsa/SubCAwithCRL1.p12
-
-echo "========================================================"
-echo "||                     CA RSA Key                     ||"
-echo "========================================================"
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --key-size $RSA_NLEN \
-  --out p12/ca-rsa/RCA1.p12
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --key-size $RSA_NLEN \
-  --out p12/ca-rsa/SubCA1.p12
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --key-size $RSA_NLEN \
-  --out p12/ca-rsa/SubCAwithCRL1.p12
-
-echo "========================================================"
-echo "||                      CA EC Key                     ||"
-echo "========================================================"
-
-xipki-tk:ec-p12 \
-  --curve $EC_CURVE \
-  --password 1234 \
-  --out p12/ca-ec/RCA1.p12
-
-xipki-tk:ec-p12 \
-  --curve $EC_CURVE \
-  --password 1234 \
-  --out p12/ca-ec/SubCA1.p12
-
-xipki-tk:ec-p12 \
-  --curve $EC_CURVE \
-  --password 1234 \
-  --out p12/ca-ec/SubCAwithCRL1.p12
-
-echo "========================================================"
-echo "||                       EE Keys                      ||"
-echo "========================================================"
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/Cross1.p12
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/OCSP1.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/OCSP2.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/multipleOUs1.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/multipleOUs2.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/multiValuedRDN1.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/EE.Complex1.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/TLS1.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/TLS-neg.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/TLSwithIncSN1.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/TLSwithIncSN1-1.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/TLSwithIncSN1-2.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/TLS2.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/TLS_C1.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/TLS_C2.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/gSMC_K1.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/gSMC_K2.p12 \
-
-xipki-tk:rsa-p12 \
-  --password 1234 \
-  --out p12/ee/MaxTime1.p12 \
+  --out p12/shared/SCEP1.p12
 
 ## SCEP
 
 xipki-tk:rsa-p12 \
   --password 1234 \
-  --out p12/ee/SCEP-OCSP1.p12 \
+  --out p12/shared/SCEP-OCSP1.p12 \
 
 xipki-tk:rsa-p12 \
   --password 1234 \
-  --out p12/ee/SCEP-OCSP1-2.p12 \
+  --out p12/shared/SCEP-OCSP1-2.p12 \
   --subject "CN=DUMMY"
 
 xipki-tk:rsa-p12 \
   --password 1234 \
-  --out p12/ee/SCEP-OCSP2.p12 \
+  --out p12/shared/SCEP-OCSP2.p12 \
   --subject "CN=DUMMY"
 
 ## JSCEP
 
 xipki-tk:rsa-p12 \
   --password 1234 \
-  --out p12/ee/JSCEP-OCSP1.p12 \
+  --out p12/shared/JSCEP-OCSP1.p12 \
   --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
 
 xipki-tk:rsa-p12 \
   --password 1234 \
-  --out p12/ee/JSCEP-OCSP1-2.p12 \
+  --out p12/shared/JSCEP-OCSP1-2.p12 \
   --subject "CN=JSCEP-OCSP1,O=xipki,C=DE"
 
 xipki-tk:rsa-p12 \
   --password 1234 \
-  --out p12/ee/JSCEP-OCSP2.p12 \
+  --out p12/shared/JSCEP-OCSP2.p12 \
   --subject "CN=JSCEP-OCSP2,O=xipki,C=DE"
+
+echo " ----- generate keys for Cross1 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/Cross1.p12
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/Cross1.p12
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/Cross1.p12
+
+echo " ----- generate keys for OCSP1 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/OCSP1.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/OCSP1.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/OCSP1.p12 \
+
+echo " ----- generate keys for OCSP2 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/OCSP2.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/OCSP2.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/OCSP2.p12 \
+
+echo " ----- generate keys for multipleOUs1 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/multipleOUs1.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/multipleOUs1.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/multipleOUs1.p12 \
+
+echo " ----- generate keys for multipleOUs2 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/multipleOUs2.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/multipleOUs2.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/multipleOUs2.p12 \
+
+echo " ----- generate keys for multiValuedRDN1 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/multiValuedRDN1.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/multiValuedRDN1.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/multiValuedRDN1.p12 \
+
+echo " ----- generate keys for EE.Complex1 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/EE.Complex1.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/EE.Complex1.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/EE.Complex1.p12 \
+
+echo " ----- generate keys for TLS1 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/TLS1.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/TLS1.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/TLS1.p12 \
+
+echo " ----- generate keys for TLS-neg -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/TLS-neg.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/TLS-neg.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/TLS-neg.p12 \
+
+echo " ----- generate keys for TLSwithIncSN1 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/TLSwithIncSN1.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/TLSwithIncSN1.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/TLSwithIncSN1.p12 \
+
+echo " ----- generate keys for TLSwithIncSN1-1 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/TLSwithIncSN1-1.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/TLSwithIncSN1-1.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/TLSwithIncSN1-1.p12 \
+
+echo " ----- generate keys for TLSwithIncSN1-2 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/TLSwithIncSN1-2.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/TLSwithIncSN1-2.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/TLSwithIncSN1-2.p12 \
+
+echo " ----- generate keys for TLS2 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/TLS2.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/TLS2.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/TLS2.p12 \
+
+echo " ----- generate keys for TLS_C1 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/TLS_C1.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/TLS_C1.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/TLS_C1.p12 \
+
+echo " ----- generate keys for TLS_C2 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/TLS_C2.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/TLS_C2.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/TLS_C2.p12 \
+
+echo " ----- generate keys for gSMC_K1 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/gSMC_K1.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/gSMC_K1.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/gSMC_K1.p12 \
+
+echo " ----- generate keys for gSMC_K2 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/gSMC_K2.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/gSMC_K2.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/gSMC_K2.p12 \
+
+echo " ----- generate keys for MaxTime1 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/MaxTime1.p12 \
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/MaxTime1.p12 \
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/MaxTime1.p12 \
