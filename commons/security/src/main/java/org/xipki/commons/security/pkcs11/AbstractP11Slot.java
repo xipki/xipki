@@ -55,10 +55,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.crypto.generators.DSAParametersGenerator;
-import org.bouncycastle.crypto.params.DSAParameterGenerationParameters;
-import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +70,6 @@ import org.xipki.commons.security.exception.P11UnsupportedMechanismException;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.commons.security.util.DSAParameterCache;
-import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.X509Util;
 
 /**
