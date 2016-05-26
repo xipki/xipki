@@ -123,12 +123,10 @@ public class ScepServlet extends HttpServlet {
             final boolean post) throws ServletException, IOException {
         String servletPath = request.getServletPath();
 
-        AuditEvent auditEvent = (auditService != null) ? new AuditEvent(new Date()) : null;
-        if (auditEvent != null) {
-            auditEvent.setApplicationName("SCEP");
-            auditEvent.setName("PERF");
-            auditEvent.addEventData(new AuditEventData("servletPath", servletPath));
-        }
+        AuditEvent auditEvent = new AuditEvent(new Date());
+        auditEvent.setApplicationName("SCEP");
+        auditEvent.setName("PERF");
+        auditEvent.addEventData(new AuditEventData("servletPath", servletPath));
 
         AuditLevel auditLevel = AuditLevel.INFO;
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
@@ -300,9 +298,7 @@ public class ScepServlet extends HttpServlet {
             try {
                 response.flushBuffer();
             } finally {
-                if (auditEvent != null) {
-                    audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
-                }
+                audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
             }
         } // end try
     } // method service
