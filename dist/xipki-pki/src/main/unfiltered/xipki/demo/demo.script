@@ -42,19 +42,29 @@ if { $printUsage equals "true" } {
   source xipki/demo/demo.d/prepare-keys.script $1 $2 $3
 
   ## OCSP responder configuration
-  xipki-cmd:copy-file -f xipki/ocsp-config/ocsp-responder-template.xml \
+  xipki-cmd:copy-file \
+    -f \
+    xipki/ocsp-config/ocsp-responder-template.xml \
     xipki/ocsp-config/ocsp-responder.xml
 
-  xipki-cmd:replace --old "replaceme-type" --new "$TOKEN_TYPE" \
+  xipki-cmd:replace \
+    --old "replaceme-type" \
+    --new "$TOKEN_TYPE" \
     xipki/ocsp-config/ocsp-responder.xml
 
-  xipki-cmd:replace --old "replaceme-key" --new "$OCSP_KEYCONF" \
+  xipki-cmd:replace \
+    --old "replaceme-key" \
+    --new "$OCSP_KEYCONF" \
     xipki/ocsp-config/ocsp-responder.xml
 
-  xipki-cmd:replace --old "replaceme-algo1" --new "$ALGO1" \
+  xipki-cmd:replace \
+    --old "replaceme-algo1" \
+    --new "$ALGO1" \
     xipki/ocsp-config/ocsp-responder.xml
 
-  xipki-cmd:replace --old "replaceme-algo2" --new "$ALGO2" \
+  xipki-cmd:replace \
+    --old "replaceme-algo2" \
+    --new "$ALGO2" \
     xipki/ocsp-config/ocsp-responder.xml
 
   source ./xipki/demo/demo.d/ca.script
