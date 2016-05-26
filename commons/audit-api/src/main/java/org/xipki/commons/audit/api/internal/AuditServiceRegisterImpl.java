@@ -57,15 +57,9 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
 
     private Slf4jAuditServiceImpl defaultAuditService = new Slf4jAuditServiceImpl();
 
-    private boolean auditEnabled;
-
     @Override
     public AuditService getAuditService() {
-        if (auditEnabled) {
-            return services.isEmpty() ? defaultAuditService : services.getLast();
-        } else {
-            return null;
-        }
+        return services.isEmpty() ? defaultAuditService : services.getLast();
     }
 
     public void bindService(final AuditService service) {
@@ -94,15 +88,6 @@ public class AuditServiceRegisterImpl implements AuditServiceRegister {
         } else {
             LOG.info("no AuditService binding found to remove for '{}'", service);
         }
-    }
-
-    public void setAuditEnabled(final boolean auditEnabled) {
-        this.auditEnabled = auditEnabled;
-    }
-
-    @Override
-    public boolean isAuditEnabled() {
-        return auditEnabled;
     }
 
 }
