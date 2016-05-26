@@ -171,17 +171,14 @@ public class ScepResponder {
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
 
         PkiMessage rep = doServicePkiOperation(req, auditEvent);
-        if (auditEvent != null) {
-            AuditEventData eventData = new AuditEventData("pkiStatus",
-                    rep.getPkiStatus().toString());
+        AuditEventData eventData = new AuditEventData("pkiStatus", rep.getPkiStatus().toString());
+        auditEvent.addEventData(eventData);
+        if (rep.getPkiStatus() == PkiStatus.FAILURE) {
+            auditEvent.setStatus(AuditStatus.FAILED);
+        }
+        if (rep.getFailInfo() != null) {
+            eventData = new AuditEventData("failInfo", rep.getFailInfo().toString());
             auditEvent.addEventData(eventData);
-            if (rep.getPkiStatus() == PkiStatus.FAILURE) {
-                auditEvent.setStatus(AuditStatus.FAILED);
-            }
-            if (rep.getFailInfo() != null) {
-                eventData = new AuditEventData("failInfo", rep.getFailInfo().toString());
-                auditEvent.addEventData(eventData);
-            }
         }
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(getSigningKey(),
