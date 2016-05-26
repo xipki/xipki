@@ -1481,8 +1481,8 @@ public class X509Ca {
 
         X509CertWithDbId unrevokedCert = null;
 
-        unrevokedCert = certstore.unrevokeCertificate(
-                caInfo.getCertificate(), serialNumber, force, shouldPublishToDeltaCrlCache());
+        unrevokedCert = certstore.unrevokeCertificate(caInfo.getCertificate(), serialNumber, force,
+                shouldPublishToDeltaCrlCache());
         if (unrevokedCert == null) {
             return null;
         }
@@ -1533,11 +1533,7 @@ public class X509Ca {
         }
 
         int deltaCrlInterval = control.getDeltaCrlIntervals();
-        if (deltaCrlInterval == 0 || deltaCrlInterval >= control.getFullCrlIntervals()) {
-            return false;
-        }
-
-        return true;
+        return deltaCrlInterval != 0 && deltaCrlInterval < control.getFullCrlIntervals();
     } // method shouldPublishToDeltaCrlCache
 
     public void revoke(final CertRevocationInfo revocationInfo) throws OperationException {
@@ -1984,11 +1980,8 @@ public class X509Ca {
         }
 
         Set<String> profileNames = caManager.getCertprofilesForCa(caInfo.getName());
-        if (profileNames == null || !profileNames.contains(certprofileName)) {
-            return null;
-        }
-
-        return caManager.getIdentifiedCertprofile(certprofileName);
+        return (profileNames == null || !profileNames.contains(certprofileName))
+                ? null : caManager.getIdentifiedCertprofile(certprofileName);
     } // method getX509Certprofile
 
     public boolean supportsCertProfile(final String certprofileLocalName) {
@@ -2067,7 +2060,7 @@ public class X509Ca {
         ParamUtil.requireNonNull("expiredtime", expiredAtTime);
         if (!masterMode) {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
-                    "CA could not remove expired certificates at slave mode");
+                    "CA could not remove expired certificates in slave mode");
         }
 
         final String caName = caInfo.getName();
@@ -2085,7 +2078,7 @@ public class X509Ca {
             }
 
             for (BigInteger serial : serials) {
-                // don'd delete CA's own certificate
+                // do not delete CA's own certificate
                 if ((caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serial))) {
                     continue;
                 }
@@ -2115,7 +2108,7 @@ public class X509Ca {
     private int revokeSuspendedCerts() throws OperationException {
         if (!masterMode) {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
-                    "CA could not remove expired certificates at slave mode");
+                    "CA could not remove expired certificates in slave mode");
         }
 
         final String caName = caInfo.getName();
@@ -2137,7 +2130,7 @@ public class X509Ca {
             break;
         default:
             throw new RuntimeException("should not reach here, unknown Valditiy Unit "
-                    + val.getUnit());
+ + val.getUnit());
         }
         final long latestLastUpdatedAt = (System.currentTimeMillis() - ms) / 1000; // seconds
         final CrlReason reason = caInfo.getRevokeSuspendedCertsControl().getTargetReason();
@@ -2172,7 +2165,7 @@ public class X509Ca {
                     auditEvent.addEventData(
                             new AuditEventData("eventType", "REVOKE_SUSPENDED_CERT"));
                     getAuditService().logEvent(auditEvent);
-                } // end finally
+                } // end try
             } // end for
         } // end while (true)
     } // method removeExpirtedCerts
@@ -2342,9 +2335,8 @@ public class X509Ca {
 
     private static Extension createCertificateIssuerExtension(final X500Name certificateIssuer) {
         try {
-            GeneralName generalName = new GeneralName(certificateIssuer);
-            return new Extension(Extension.certificateIssuer, true,
-                    new GeneralNames(generalName).getEncoded());
+            GeneralNames generalNames = new GeneralNames(new GeneralName(certificateIssuer));
+            return new Extension(Extension.certificateIssuer, true, generalNames.getEncoded());
         } catch (IOException ex) {
             throw new IllegalArgumentException("error encoding reason: " + ex.getMessage(), ex);
         }

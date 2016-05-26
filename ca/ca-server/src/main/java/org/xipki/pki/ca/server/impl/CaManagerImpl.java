@@ -1278,8 +1278,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonBlank("publisherName", publisherName);
         String tmpCaName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
         asssertMasterMode();
-        boolean bo = queryExecutor.removePublisherFromCa(publisherName, tmpCaName);
-        if (!bo) {
+        if (!queryExecutor.removePublisherFromCa(publisherName, tmpCaName)) {
             return false;
         }
 
@@ -2480,7 +2479,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         try {
             signer.initSigner(securityFactory);
         } catch (XiSecurityException | OperationException | InvalidConfException ex) {
-            String message = "could not creat CRL signer " + dbEntry.getName();
+            String message = "could not create CRL signer " + dbEntry.getName();
             LogUtil.error(LOG, ex, message);
 
             if (ex instanceof OperationException) {
@@ -2771,11 +2770,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         } catch (CertificateException | OperationException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
-        if (certInfo != null) {
-            return certInfo.toCertWithStatusInfo();
-        } else {
-            return new CertWithStatusInfo();
-        }
+        return (certInfo != null) ? certInfo.toCertWithStatusInfo() : new CertWithStatusInfo();
     }
 
 }
