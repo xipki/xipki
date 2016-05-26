@@ -96,11 +96,9 @@ public class HttpCmpServlet extends HttpServlet {
         X509Certificate clientCert = (certs == null || certs.length < 1) ? null : certs[0];
 
         AuditService auditService = auditServiceRegister.getAuditService();
-        AuditEvent auditEvent = (auditService == null) ? null : new AuditEvent(new Date());
-        if (auditEvent != null) {
-            auditEvent.setApplicationName("CA");
-            auditEvent.setName("PERF");
-        }
+        AuditEvent auditEvent = new AuditEvent(new Date());
+        auditEvent.setApplicationName("CA");
+        auditEvent.setName("PERF");
 
         AuditLevel auditLevel = AuditLevel.INFO;
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
@@ -158,10 +156,8 @@ public class HttpCmpServlet extends HttpServlet {
                 return;
             }
 
-            if (auditEvent != null) {
-                auditEvent.addEventData(new AuditEventData("CA",
-                        responder.getCa().getCaInfo().getName()));
-            }
+            auditEvent.addEventData(
+                    new AuditEventData("CA",responder.getCa().getCaInfo().getName()));
 
             PKIMessage pkiReq;
             try {
@@ -206,9 +202,7 @@ public class HttpCmpServlet extends HttpServlet {
             try {
                 response.flushBuffer();
             } finally {
-                if (auditEvent != null) {
-                    audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
-                }
+                audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
             }
         }
     } // method doPost

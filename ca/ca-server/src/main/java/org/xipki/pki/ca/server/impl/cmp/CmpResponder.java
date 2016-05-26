@@ -42,6 +42,9 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
@@ -130,14 +133,16 @@ abstract class CmpResponder {
         return getRequestor((X500Name) requestSender.getName());
     } // method getRequestor
 
-    protected abstract PKIMessage doProcessPkiMessage(RequestorInfo requestor, String user,
-            ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, AuditEvent auditEvent)
+    protected abstract PKIMessage doProcessPkiMessage(@Nonnull RequestorInfo requestor,
+            @Nullable String user, @Nonnull ASN1OctetString transactionId,
+            @Nonnull GeneralPKIMessage pkiMessage, @Nonnull AuditEvent auditEvent)
     throws InvalidConfException;
 
     public PKIMessage processPkiMessage(final PKIMessage pkiMessage,
             final X509Certificate tlsClientCert, final AuditEvent auditEvent)
     throws InvalidConfException {
         ParamUtil.requireNonNull("pkiMessage", pkiMessage);
+        ParamUtil.requireNonNull("auditEvent", auditEvent);
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
         PKIHeader reqHeader = message.getHeader();
@@ -148,9 +153,7 @@ abstract class CmpResponder {
             tid = new DEROctetString(randomBytes);
         }
         String tidStr = Hex.toHexString(tid.getOctets());
-        if (auditEvent != null) {
-            auditEvent.addEventData(new AuditEventData("tid", tidStr));
-        }
+        auditEvent.addEventData(new AuditEventData("tid", tidStr));
 
         CmpControl cmpControl = getCmpControl();
 
@@ -198,11 +201,9 @@ abstract class CmpResponder {
         }
 
         if (failureCode != null) {
-            if (auditEvent != null) {
-                auditEvent.setLevel(AuditLevel.INFO);
-                auditEvent.setStatus(AuditStatus.FAILED);
-                auditEvent.addEventData(new AuditEventData("message", statusText));
-            }
+            auditEvent.setLevel(AuditLevel.INFO);
+            auditEvent.setStatus(AuditStatus.FAILED);
+            auditEvent.addEventData(new AuditEventData("message", statusText));
             return buildErrorPkiMessage(tid, reqHeader, failureCode, statusText);
         }
 
@@ -274,11 +275,9 @@ abstract class CmpResponder {
         }
 
         if (errorStatus != null) {
-            if (auditEvent != null) {
-                auditEvent.setLevel(AuditLevel.INFO);
-                auditEvent.setStatus(AuditStatus.FAILED);
-                auditEvent.addEventData(new AuditEventData("message", errorStatus));
-            }
+            auditEvent.setLevel(AuditLevel.INFO);
+            auditEvent.setStatus(AuditStatus.FAILED);
+            auditEvent.addEventData(new AuditEventData("message", errorStatus));
             return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck,
                     errorStatus);
         }
@@ -346,14 +345,11 @@ abstract class CmpResponder {
             LogUtil.error(LOG, ex, "could not add protection to the PKI message");
             PKIStatusInfo status = generateCmpRejectionStatus(
                     PKIFailureInfo.systemFailure, "could not sign the PKIMessage");
-            PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status));
 
-            if (auditEvent != null) {
-                auditEvent.setLevel(AuditLevel.ERROR);
-                auditEvent.setStatus(AuditStatus.FAILED);
-                auditEvent.addEventData(
-                        new AuditEventData("message", "could not sign the PKIMessage"));
-            }
+            auditEvent.setLevel(AuditLevel.ERROR);
+            auditEvent.setStatus(AuditStatus.FAILED);
+            auditEvent.addEventData(new AuditEventData("message", "could not sign the PKIMessage"));
+            PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status));
             return new PKIMessage(pkiMessage.getHeader(), body);
         }
     } // method addProtection

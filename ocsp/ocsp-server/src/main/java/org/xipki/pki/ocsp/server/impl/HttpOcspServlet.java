@@ -63,6 +63,7 @@ import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.pki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
@@ -141,7 +142,7 @@ public class HttpOcspServlet extends HttpServlet {
         AuditService auditService = (auditServiceRegister == null) ? null
                 : auditServiceRegister.getAuditService();
 
-        if (auditService != null && responder.getAuditOption() != null) {
+        if (responder.getAuditOption() != null) {
             start = System.currentTimeMillis();
             auditEvent = new AuditEvent(new Date());
             auditEvent.setApplicationName("OCSP");
@@ -304,36 +305,35 @@ public class HttpOcspServlet extends HttpServlet {
             try {
                 response.flushBuffer();
             } finally {
-                if (auditEvent != null) {
-                    if (auditLevel != null) {
-                        auditEvent.setLevel(auditLevel);
-                    }
+                if (auditLevel != null) {
+                    auditEvent.setLevel(auditLevel);
+                }
 
-                    if (auditStatus != null) {
-                        auditEvent.setStatus(auditStatus);
-                    }
+                if (auditStatus != null) {
+                    auditEvent.setStatus(auditStatus);
+                }
 
-                    if (auditMessage != null) {
-                        auditEvent.addEventData(new AuditEventData("message", auditMessage));
-                    }
+                if (auditMessage != null) {
+                    auditEvent.addEventData(new AuditEventData("message", auditMessage));
+                }
 
-                    auditEvent.setDuration(System.currentTimeMillis() - start);
+                auditEvent.setDuration(System.currentTimeMillis() - start);
 
-                    if (!auditEvent.containsChildAuditEvents()) {
-                        auditService.logEvent(auditEvent);
-                    } else {
-                        List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
-                        for (AuditEvent event : expandedAuditEvents) {
-                            auditService.logEvent(event);
-                        }
+                if (!auditEvent.containsChildAuditEvents()) {
+                    auditService.logEvent(auditEvent);
+                } else {
+                    List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
+                    for (AuditEvent event : expandedAuditEvents) {
+                        auditService.logEvent(event);
                     }
-                } // end if (auditEvent != null)
+                }
             } // end inner try
         } // end external try
     } // method processRequest
 
     public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
-        this.auditServiceRegister = auditServiceRegister;
+        this.auditServiceRegister = ParamUtil.requireNonNull("auditServiceRegister",
+                auditServiceRegister);
     }
 
 }

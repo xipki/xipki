@@ -273,14 +273,12 @@ public class Scep {
                 envelopedDataDecryptor, null);
 
         PkiMessage rep = doServicePkiOperation(req, certProfileName, auditEvent);
-        if (auditEvent != null) {
-            audit(auditEvent, "pkiStatus", rep.getPkiStatus().toString());
-            if (rep.getPkiStatus() == PkiStatus.FAILURE) {
-                auditEvent.setStatus(AuditStatus.FAILED);
-            }
-            if (rep.getFailInfo() != null) {
-                audit(auditEvent, "failInfo", rep.getFailInfo().toString());
-            }
+        audit(auditEvent, "pkiStatus", rep.getPkiStatus().toString());
+        if (rep.getPkiStatus() == PkiStatus.FAILURE) {
+            auditEvent.setStatus(AuditStatus.FAILED);
+        }
+        if (rep.getFailInfo() != null) {
+            audit(auditEvent, "failInfo", rep.getFailInfo().toString());
         }
         return encodeResponse(rep, req);
     } // method servicePkiOperation
@@ -292,19 +290,17 @@ public class Scep {
 
         String tid = req.getTransactionId().getId();
         // verify and decrypt the request
-        if (auditEvent != null) {
-            audit(auditEvent, "tid", tid);
-            if (req.getFailureMessage() != null) {
-                audit(auditEvent, "failureMessage", req.getFailureMessage());
-            }
-            Boolean bo = req.isSignatureValid();
-            if (bo != null && !bo.booleanValue()) {
-                audit(auditEvent, "signature", "invalid");
-            }
-            bo = req.isDecryptionSuccessful();
-            if (bo != null && !bo.booleanValue()) {
-                audit(auditEvent, "decryption", "failed");
-            }
+        audit(auditEvent, "tid", tid);
+        if (req.getFailureMessage() != null) {
+            audit(auditEvent, "failureMessage", req.getFailureMessage());
+        }
+        Boolean bo = req.isSignatureValid();
+        if (bo != null && !bo.booleanValue()) {
+            audit(auditEvent, "signature", "invalid");
+        }
+        bo = req.isDecryptionSuccessful();
+        if (bo != null && !bo.booleanValue()) {
+            audit(auditEvent, "decryption", "failed");
         }
 
         PkiMessage rep = new PkiMessage(req.getTransactionId(), MessageType.CertRep,
@@ -316,7 +312,7 @@ public class Scep {
             rep.setFailInfo(FailInfo.badRequest);
         }
 
-        Boolean bo = req.isSignatureValid();
+        bo = req.isSignatureValid();
         if (bo != null && !bo.booleanValue()) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badMessageCheck);
@@ -416,9 +412,7 @@ public class Scep {
             SignedData signedData;
 
             MessageType mt = req.getMessageType();
-            if (auditEvent != null) {
-                audit(auditEvent, "messageType", mt.toString());
-            }
+            audit(auditEvent, "messageType", mt.toString());
 
             switch (mt) {
             case PKCSReq:
@@ -518,18 +512,13 @@ public class Scep {
                 X509CertificateInfo cert = ca.generateCertificate(certTemplateData, true, null,
                         user, RequestType.SCEP, tidBytes);
 
-                if (auditEvent != null) {
-                    audit(auditEvent, "subject", cert.getCert().getSubject());
-                }
-
+                audit(auditEvent, "subject", cert.getCert().getSubject());
                 signedData = buildSignedData(cert.getCert().getCert());
                 break;
             case CertPoll:
                 IssuerAndSubject is = (IssuerAndSubject) req.getMessageData();
-                if (auditEvent != null) {
-                    audit(auditEvent, "isser", X509Util.getRfc4519Name(is.getIssuer()));
-                    audit(auditEvent, "subject", X509Util.getRfc4519Name(is.getSubject()));
-                }
+                audit(auditEvent, "isser", X509Util.getRfc4519Name(is.getIssuer()));
+                audit(auditEvent, "subject", X509Util.getRfc4519Name(is.getSubject()));
 
                 ensureIssuedByThisCa(caX500Name, is.getIssuer());
                 signedData = pollCert(ca, is.getSubject(), req.getTransactionId());
@@ -537,20 +526,16 @@ public class Scep {
             case GetCert:
                 IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
                 BigInteger serial = isn.getSerialNumber().getPositiveValue();
-                if (auditEvent != null) {
-                    audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
-                    audit(auditEvent, "serialNumber", LogUtil.formatCsn(serial));
-                }
+                audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
+                audit(auditEvent, "serialNumber", LogUtil.formatCsn(serial));
                 ensureIssuedByThisCa(caX500Name, isn.getName());
                 signedData = getCert(ca, isn.getSerialNumber().getPositiveValue());
                 break;
             case GetCRL:
                 isn = (IssuerAndSerialNumber) req.getMessageData();
                 serial = isn.getSerialNumber().getPositiveValue();
-                if (auditEvent != null) {
-                    audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
-                    audit(auditEvent, "serialNumber", LogUtil.formatCsn(serial));
-                }
+                audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
+                audit(auditEvent, "serialNumber", LogUtil.formatCsn(serial));
                 ensureIssuedByThisCa(caX500Name, isn.getName());
                 signedData = getCrl(ca, serial);
                 break;
@@ -735,10 +720,6 @@ public class Scep {
     } // method getTransactionIdBytes
 
     private static void audit(final AuditEvent audit, final String name, final String value) {
-        if (audit == null) {
-            return;
-        }
-
         audit.addEventData(new AuditEventData(name, (value == null) ? "null" : value));
     } // method audit
 

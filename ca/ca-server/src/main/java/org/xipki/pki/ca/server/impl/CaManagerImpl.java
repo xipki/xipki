@@ -78,7 +78,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
 import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
-import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.audit.api.PciAuditEvent;
@@ -769,9 +768,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         X509Ca ca;
         try {
             ca = new X509Ca(this, caEntry, certstore, securityFactory, masterMode);
-            if (auditServiceRegister != null) {
-                ca.setAuditServiceRegister(auditServiceRegister);
-            }
+            ca.setAuditServiceRegister(auditServiceRegister);
         } catch (OperationException ex) {
             LogUtil.error(LOG, ex, "X509CA.<init> (ca=" + caName + ")");
             return false;
@@ -2149,7 +2146,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     public void setAuditServiceRegister(final AuditServiceRegister serviceRegister) {
-        this.auditServiceRegister = serviceRegister;
+        this.auditServiceRegister = ParamUtil.requireNonNull("serviceRegister", serviceRegister);
 
         for (String name : publishers.keySet()) {
             IdentifiedX509CertPublisher publisherEntry = publishers.get(name);
@@ -2163,12 +2160,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     private void auditLogPciEvent(final boolean successful, final String eventType) {
-        AuditService auditService = (auditServiceRegister == null) ? null
-                : auditServiceRegister.getAuditService();
-        if (auditService == null) {
-            return;
-        }
-
         PciAuditEvent auditEvent = new PciAuditEvent(new Date());
         auditEvent.setUserId("CA-SYSTEM");
         auditEvent.setEventType(eventType);
@@ -2180,7 +2171,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             auditEvent.setStatus(AuditStatus.FAILED.name());
             auditEvent.setLevel(AuditLevel.ERROR);
         }
-        auditService.logEvent(auditEvent);
+        auditServiceRegister.getAuditService().logEvent(auditEvent);
     } // method auditLogPciEvent
 
     @Override
@@ -2577,9 +2568,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             auditEvent.addEventData(new AuditEventData("message", ex.getErrorCode().name()));
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
-            if (auditServiceRegister != null && auditServiceRegister.getAuditService() != null) {
-                auditServiceRegister.getAuditService().logEvent(auditEvent);
-            }
+            auditServiceRegister.getAuditService().logEvent(auditEvent);
         }
     } // method generateCrlOnDemand
 
@@ -2608,9 +2597,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             auditEvent.addEventData(new AuditEventData("message", "CRLException"));
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
-            if (auditServiceRegister != null && auditServiceRegister.getAuditService() != null) {
-                auditServiceRegister.getAuditService().logEvent(auditEvent);
-            }
+            auditServiceRegister.getAuditService().logEvent(auditEvent);
         }
     } // method getCrl
 
@@ -2637,9 +2624,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             auditEvent.addEventData(new AuditEventData("message", "CRLException"));
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
-            if (auditServiceRegister != null && auditServiceRegister.getAuditService() != null) {
-                auditServiceRegister.getAuditService().logEvent(auditEvent);
-            }
+            auditServiceRegister.getAuditService().logEvent(auditEvent);
         }
     } // method getCurrentCrl
 

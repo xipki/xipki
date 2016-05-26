@@ -45,6 +45,4 @@ public interface AuditServiceRegister {
 
     AuditService getAuditService();
 
-    boolean isAuditEnabled();
-
 }

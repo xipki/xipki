@@ -136,12 +136,10 @@ public class ScepServlet extends HttpServlet {
         }
 
         AuditService auditService = auditServiceRegister.getAuditService();
-        AuditEvent auditEvent = (auditService == null) ? null : new AuditEvent(new Date());
-        if (auditEvent != null) {
-            auditEvent.setApplicationName("SCEP");
-            auditEvent.setName("PERF");
-            auditEvent.addEventData(new AuditEventData("NAME", scepName + "/" + certProfileName));
-        }
+        AuditEvent auditEvent = new AuditEvent(new Date());
+        auditEvent.setApplicationName("SCEP");
+        auditEvent.setName("PERF");
+        auditEvent.addEventData(new AuditEventData("NAME", scepName + "/" + certProfileName));
 
         AuditLevel auditLevel = AuditLevel.INFO;
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
@@ -284,9 +282,7 @@ public class ScepServlet extends HttpServlet {
             try {
                 response.flushBuffer();
             } finally {
-                if (auditEvent != null) {
-                    audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
-                }
+                audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
             }
         }
     } // method service
@@ -315,9 +311,7 @@ public class ScepServlet extends HttpServlet {
 
     private static void audit(final AuditService auditService, final AuditEvent auditEvent,
             final AuditLevel auditLevel, final AuditStatus auditStatus, final String auditMessage) {
-        if (auditLevel != null) {
-            auditEvent.setLevel(auditLevel);
-        }
+        auditEvent.setLevel(auditLevel);
 
         if (auditStatus != null) {
             auditEvent.setStatus(auditStatus);

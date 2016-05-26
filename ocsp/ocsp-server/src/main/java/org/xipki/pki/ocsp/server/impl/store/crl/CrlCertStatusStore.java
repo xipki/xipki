@@ -84,7 +84,6 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditLevel;
-import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.audit.api.PciAuditEvent;
 import org.xipki.commons.common.util.CollectionUtil;
@@ -710,18 +709,13 @@ public class CrlCertStatusStore extends OcspStore {
 
     private void auditPciEvent(final AuditLevel auditLevel, final String eventType,
             final String auditStatus) {
-        AuditService auditService = getAuditService();
-        if (auditService == null) {
-            return;
-        }
-
         PciAuditEvent auditEvent = new PciAuditEvent(new Date());
         auditEvent.setUserId("SYSTEM");
         auditEvent.setEventType(eventType);
         auditEvent.setAffectedResource("CRL-Updater");
         auditEvent.setStatus(auditStatus);
         auditEvent.setLevel(auditLevel);
-        auditService.logEvent(auditEvent);
+        getAuditService().logEvent(auditEvent);
     }
 
     @Override

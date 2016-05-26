@@ -107,7 +107,7 @@ public abstract class OcspStore {
     }
 
     public AuditService getAuditService() {
-        return (auditServiceRegister == null) ? null : auditServiceRegister.getAuditService();
+        return auditServiceRegister.getAuditService();
     }
 
     public boolean isUnknownSerialAsGood() {

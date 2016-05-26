@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
 import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
-import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.ConfPairs;
@@ -185,13 +184,6 @@ public class OcspCertPublisher extends X509CertPublisher {
 
         LOG.debug("error", ex);
 
-        AuditService auditService = (auditServiceRegister == null) ? null
-                : auditServiceRegister.getAuditService();
-
-        if (auditService == null) {
-            return;
-        }
-
         AuditEvent auditEvent = new AuditEvent(new Date());
         auditEvent.setApplicationName("CAPublisher");
         auditEvent.setName("SYSTEM");
@@ -207,7 +199,7 @@ public class OcspCertPublisher extends X509CertPublisher {
         auditEvent.addEventData(new AuditEventData("subject", subjectText));
         auditEvent.addEventData(new AuditEventData("serialNumber", serialText));
         auditEvent.addEventData(new AuditEventData("message", messagePrefix));
-        auditService.logEvent(auditEvent);
+        auditServiceRegister.getAuditService().logEvent(auditEvent);
     } // method logAndAudit
 
     @Override
@@ -222,7 +214,8 @@ public class OcspCertPublisher extends X509CertPublisher {
 
     @Override
     public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
-        this.auditServiceRegister = auditServiceRegister;
+        this.auditServiceRegister = ParamUtil.requireNonNull("auditServiceRegister",
+                auditServiceRegister);
     }
 
     @Override

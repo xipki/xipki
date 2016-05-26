@@ -94,6 +94,7 @@ public abstract class X509CertPublisher {
 
     public abstract boolean isHealthy();
 
-    public abstract void setAuditServiceRegister(AuditServiceRegister auditServiceRegister);
+    public abstract void setAuditServiceRegister(
+            @Nonnull AuditServiceRegister auditServiceRegister);
 
 }

@@ -182,25 +182,21 @@ public class X509Ca {
                 successful = false;
                 LogUtil.error(LOG, th, "could not remove expired certificates");
             } finally {
-                AuditService audit = getAuditService();
-                if (audit != null) {
-                    AuditEvent auditEvent = newAuditEvent();
-                    auditEvent.setDuration(System.currentTimeMillis() - startTime);
-                    auditEvent.addEventData(new AuditEventData("CA", caInfo.getName()));
-                    auditEvent.addEventData(new AuditEventData("expiredAt", expiredAt.toString()));
-                    auditEvent.addEventData(new AuditEventData("eventType",
-                            "REMOVE_EXPIRED_CERTS"));
-                    auditEvent.addEventData(new AuditEventData("numCerts", Integer.toString(num)));
+                AuditEvent auditEvent = newAuditEvent();
+                auditEvent.setDuration(System.currentTimeMillis() - startTime);
+                auditEvent.addEventData(new AuditEventData("CA", caInfo.getName()));
+                auditEvent.addEventData(new AuditEventData("expiredAt", expiredAt.toString()));
+                auditEvent.addEventData(new AuditEventData("eventType", "REMOVE_EXPIRED_CERTS"));
+                auditEvent.addEventData(new AuditEventData("numCerts", Integer.toString(num)));
 
-                    if (successful) {
-                        auditEvent.setLevel(AuditLevel.INFO);
-                        auditEvent.setStatus(AuditStatus.SUCCESSFUL);
-                    } else {
-                        auditEvent.setLevel(AuditLevel.ERROR);
-                        auditEvent.setStatus(AuditStatus.FAILED);
-                    }
-                    audit.logEvent(auditEvent);
+                if (successful) {
+                    auditEvent.setLevel(AuditLevel.INFO);
+                    auditEvent.setStatus(AuditStatus.SUCCESSFUL);
+                } else {
+                    auditEvent.setLevel(AuditLevel.ERROR);
+                    auditEvent.setStatus(AuditStatus.FAILED);
                 }
+                getAuditService().logEvent(auditEvent);
 
                 inProcess = false;
             }
@@ -365,9 +361,7 @@ public class X509Ca {
                 auditEvent.setDuration(System.currentTimeMillis() - start.getTime());
             }
 
-            if (auditServiceRegister != null) {
-                auditServiceRegister.getAuditService().logEvent(auditEvent);
-            }
+            getAuditService().logEvent(auditEvent);
             LOG.info("CRL_GEN_INTERVAL: {}", auditEvent.getStatus().name());
         } // method doRun
 
@@ -645,20 +639,16 @@ public class X509Ca {
 
         LOG.info("     START generateCrl: ca={}, deltaCRL={}, nextUpdate={}",
                 caInfo.getName(), deltaCrl, nextUpdate);
+        auditEvent.addEventData(new AuditEventData("crlType", deltaCrl ? "DELTA_CRL" : "FULL_CRL"));
 
-        if (auditEvent != null) {
-            auditEvent.addEventData(new AuditEventData("crlType",
-                            deltaCrl ? "DELTA_CRL" : "FULL_CRL"));
-
-            if (nextUpdate != null) {
-                String value;
-                synchronized (dateFormat) {
-                    value = dateFormat.format(nextUpdate);
-                }
-                auditEvent.addEventData(new AuditEventData("nextUpdate", value));
-            } else {
-                auditEvent.addEventData(new AuditEventData("nextUpdate", "NULL"));
+        if (nextUpdate != null) {
+            String value;
+            synchronized (dateFormat) {
+                value = dateFormat.format(nextUpdate);
             }
+            auditEvent.addEventData(new AuditEventData("nextUpdate", value));
+        } else {
+            auditEvent.addEventData(new AuditEventData("nextUpdate", "NULL"));
         }
 
         if (nextUpdate != null) {
@@ -783,9 +773,7 @@ public class X509Ca {
             // end do
 
             BigInteger crlNumber = caInfo.nextCrlNumber();
-            if (auditEvent != null) {
-                auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber.toString()));
-            }
+            auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber.toString()));
 
             boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
             boolean onlyCaCerts = crlControl.isOnlyContainsCaCerts();
@@ -2111,18 +2099,14 @@ public class X509Ca {
                         return sum;
                     }
                 } finally {
-                    AuditService audit = getAuditService();
-                    if (audit != null) {
-                        AuditEvent auditEvent = newAuditEvent();
-                        auditEvent.setLevel(removed ? AuditLevel.INFO : AuditLevel.ERROR);
-                        auditEvent.setStatus(removed ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED);
-                        auditEvent.addEventData(new AuditEventData("CA", caName));
-                        auditEvent.addEventData(
-                                new AuditEventData("serialNumber", LogUtil.formatCsn(serial)));
-                        auditEvent.addEventData(
-                                new AuditEventData("eventType", "REMOVE_EXPIRED_CERT"));
-                        audit.logEvent(auditEvent);
-                    } // end if (audit != null)
+                    AuditEvent auditEvent = newAuditEvent();
+                    auditEvent.setLevel(removed ? AuditLevel.INFO : AuditLevel.ERROR);
+                    auditEvent.setStatus(removed ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED);
+                    auditEvent.addEventData(new AuditEventData("CA", caName));
+                    auditEvent.addEventData(
+                            new AuditEventData("serialNumber", LogUtil.formatCsn(serial)));
+                    auditEvent.addEventData(new AuditEventData("eventType", "REMOVE_EXPIRED_CERT"));
+                    getAuditService().logEvent(auditEvent);
                 } // end finally
             } // end for
         } // end while (true)
@@ -2179,18 +2163,15 @@ public class X509Ca {
                         return sum;
                     }
                 } finally {
-                    AuditService audit = getAuditService();
-                    if (audit != null) {
-                        AuditEvent auditEvent = newAuditEvent();
-                        auditEvent.setLevel(revoked ? AuditLevel.INFO : AuditLevel.ERROR);
-                        auditEvent.setStatus(revoked ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED);
-                        auditEvent.addEventData(new AuditEventData("CA", caName));
-                        auditEvent.addEventData(
-                                new AuditEventData("serialNumber", LogUtil.formatCsn(serial)));
-                        auditEvent.addEventData(
-                                new AuditEventData("eventType", "REVOKE_SUSPENDED_CERT"));
-                        audit.logEvent(auditEvent);
-                    } // end if (audit != null)
+                    AuditEvent auditEvent = newAuditEvent();
+                    auditEvent.setLevel(revoked ? AuditLevel.INFO : AuditLevel.ERROR);
+                    auditEvent.setStatus(revoked ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED);
+                    auditEvent.addEventData(new AuditEventData("CA", caName));
+                    auditEvent.addEventData(
+                            new AuditEventData("serialNumber", LogUtil.formatCsn(serial)));
+                    auditEvent.addEventData(
+                            new AuditEventData("eventType", "REVOKE_SUSPENDED_CERT"));
+                    getAuditService().logEvent(auditEvent);
                 } // end finally
             } // end for
         } // end while (true)
@@ -2243,11 +2224,12 @@ public class X509Ca {
     } // method healthCheck
 
     public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
-        this.auditServiceRegister = auditServiceRegister;
+        this.auditServiceRegister = ParamUtil.requireNonNull("auditServiceRegister",
+                auditServiceRegister);
     }
 
     private AuditService getAuditService() {
-        return (auditServiceRegister == null) ? null : auditServiceRegister.getAuditService();
+        return auditServiceRegister.getAuditService();
     }
 
     private AuditEvent newAuditEvent() {
