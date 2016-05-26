@@ -85,8 +85,7 @@ public class PublicKeyChecker {
         ParamUtil.requireNonNull("conf", conf);
         // KeyAlgorithms
         if (conf.getKeyAlgorithms() != null) {
-            this.keyAlgorithms = XmlX509CertprofileUtil.buildKeyAlgorithms(
-                    conf.getKeyAlgorithms());
+            this.keyAlgorithms = XmlX509CertprofileUtil.buildKeyAlgorithms(conf.getKeyAlgorithms());
         }
     }
 
@@ -107,8 +106,8 @@ public class PublicKeyChecker {
             }
         }
 
-        ValidationIssue issue = new ValidationIssue(
-                "X509.PUBKEY.REQ", "whether public key matches the request one");
+        ValidationIssue issue = new ValidationIssue("X509.PUBKEY.REQ",
+                "whether public key matches the request one");
         resultIssues.add(issue);
         SubjectPublicKeyInfo c14nRequestedPublicKey;
         try {
