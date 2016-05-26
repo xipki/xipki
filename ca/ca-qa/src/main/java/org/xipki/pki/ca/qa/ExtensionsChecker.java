@@ -259,320 +259,313 @@ public class ExtensionsChecker {
 
     public ExtensionsChecker(final X509ProfileType conf) throws CertprofileException {
         ParamUtil.requireNonNull("conf", conf);
-        try {
-            this.version = X509CertVersion.getInstance(conf.getVersion());
-            if (this.version == null) {
-                throw new CertprofileException("invalid version " + conf.getVersion());
-            }
-
-            if (conf.getSignatureAlgorithms() != null) {
-                this.signatureAlgorithms = new HashSet<>();
-                for (String algo :conf.getSignatureAlgorithms().getAlgorithm()) {
-                    String c14nAlgo;
-                    try {
-                        c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(algo);
-                    } catch (NoSuchAlgorithmException ex) {
-                        throw new CertprofileException(ex.getMessage(), ex);
-                    }
-                    this.signatureAlgorithms.add(c14nAlgo);
-                }
-            }
-
-            String str = conf.getCertLevel();
-            if ("RootCA".equalsIgnoreCase(str)) {
-                this.certLevel = X509CertLevel.RootCA;
-            } else if ("SubCA".equalsIgnoreCase(str)) {
-                this.certLevel = X509CertLevel.SubCA;
-            } else if ("EndEntity".equalsIgnoreCase(str)) {
-                this.certLevel = X509CertLevel.EndEntity;
-            } else {
-                throw new CertprofileException("invalid CertLevel '" + str + "'");
-            }
-
-            this.specialBehavior = conf.getSpecialBehavior();
-            if (this.specialBehavior != null
-                    && !"gematik_gSMC_K".equalsIgnoreCase(this.specialBehavior)) {
-                throw new CertprofileException("unknown special bahavior " + this.specialBehavior);
-            }
-
-            // Extensions
-            ExtensionsType extensionsType = conf.getExtensions();
-
-            // Extension controls
-            this.extensionControls = XmlX509CertprofileUtil.buildExtensionControls(extensionsType);
-
-            // BasicConstrains
-            ASN1ObjectIdentifier type = Extension.basicConstraints;
-            if (extensionControls.containsKey(type)) {
-                org.xipki.pki.ca.certprofile.x509.jaxb.BasicConstraints extConf =
-                        (org.xipki.pki.ca.certprofile.x509.jaxb.BasicConstraints)
-                            getExtensionValue(type, extensionsType,
-                                    org.xipki.pki.ca.certprofile.x509.jaxb.BasicConstraints.class);
-                if (extConf != null) {
-                    this.pathLen = extConf.getPathLen();
-                }
-            }
-
-            // Extension KeyUsage
-            type = Extension.keyUsage;
-            if (extensionControls.containsKey(type)) {
-                org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage extConf =
-                        (org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage)
-                            getExtensionValue(type, extensionsType,
-                                    org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage.class);
-                if (extConf != null) {
-                    this.keyusages = XmlX509CertprofileUtil.buildKeyUsageOptions(extConf);
-                }
-            }
-
-            // ExtendedKeyUsage
-            type = Extension.extendedKeyUsage;
-            if (extensionControls.containsKey(type)) {
-                ExtendedKeyUsage extConf = (ExtendedKeyUsage) getExtensionValue(
-                        type, extensionsType, ExtendedKeyUsage.class);
-                if (extConf != null) {
-                    this.extendedKeyusages =
-                            XmlX509CertprofileUtil.buildExtKeyUsageOptions(extConf);
-                }
-            }
-
-            // AuthorityKeyIdentifier
-            type = Extension.authorityKeyIdentifier;
-            if (extensionControls.containsKey(type)) {
-                org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier extConf =
-                    (org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier)
-                        getExtensionValue(type, extensionsType,
-                            org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier.class);
-                if (extConf != null) {
-                    this.includeIssuerAndSerialInAki = extConf.isIncludeIssuerAndSerial();
-                }
-            }
-
-            // Certificate Policies
-            type = Extension.certificatePolicies;
-            if (extensionControls.containsKey(type)) {
-                org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicies extConf =
-                    (org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicies)
-                        getExtensionValue(type, extensionsType,
-                            org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicies.class);
-                if (extConf != null) {
-                    this.certificatePolicies = new QaCertificatePolicies(extConf);
-                }
-            }
-
-            // Policy Mappings
-            type = Extension.policyMappings;
-            if (extensionControls.containsKey(type)) {
-                PolicyMappings extConf = (PolicyMappings) getExtensionValue(
-                        type, extensionsType, PolicyMappings.class);
-                if (extConf != null) {
-                    this.policyMappings = new QaPolicyMappingsOption(extConf);
-                }
-            }
-
-            // Name Constrains
-            // Name Constrains
-            type = Extension.nameConstraints;
-            if (extensionControls.containsKey(type)) {
-                org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints extConf =
-                    (org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints) getExtensionValue(
-                            type, extensionsType,
-                            org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints.class);
-                if (extConf != null) {
-                    this.nameConstraints = new QaNameConstraints(extConf);
-                }
-            }
-
-            // Policy Constraints
-            type = Extension.policyConstraints;
-            if (extensionControls.containsKey(type)) {
-                PolicyConstraints extConf = (PolicyConstraints) getExtensionValue(
-                        type, extensionsType, PolicyConstraints.class);
-                if (extConf != null) {
-                    this.policyConstraints = new QaPolicyConstraints(extConf);
-                }
-            }
-
-            // Inhibit anyPolicy
-            type = Extension.inhibitAnyPolicy;
-            if (extensionControls.containsKey(type)) {
-                InhibitAnyPolicy extConf = (InhibitAnyPolicy) getExtensionValue(
-                        type, extensionsType, InhibitAnyPolicy.class);
-                if (extConf != null) {
-                    this.inhibitAnyPolicy = new QaInhibitAnyPolicy(extConf);
-                }
-            }
-
-            // admission
-            type = ObjectIdentifiers.id_extension_admission;
-            if (extensionControls.containsKey(type)) {
-                Admission extConf = (Admission) getExtensionValue(
-                        type, extensionsType, Admission.class);
-                if (extConf != null) {
-                    this.admission = new QaAdmission(extConf);
-                }
-            }
-
-            // SubjectAltNameMode
-            type = Extension.subjectAlternativeName;
-            if (extensionControls.containsKey(type)) {
-                SubjectAltName extConf = (SubjectAltName) getExtensionValue(
-                        type, extensionsType, SubjectAltName.class);
-                if (extConf != null) {
-                    this.allowedSubjectAltNameModes =
-                            XmlX509CertprofileUtil.buildGeneralNameMode(extConf);
-                }
-            }
-
-            // SubjectInfoAccess
-            type = Extension.subjectInfoAccess;
-            if (extensionControls.containsKey(type)) {
-                SubjectInfoAccess extConf = (SubjectInfoAccess) getExtensionValue(
-                        type, extensionsType, SubjectInfoAccess.class);
-                if (extConf != null) {
-                    List<Access> list = extConf.getAccess();
-                    this.allowedSubjectInfoAccessModes = new HashMap<>();
-                    for (Access entry : list) {
-                        this.allowedSubjectInfoAccessModes.put(
-                                new ASN1ObjectIdentifier(entry.getAccessMethod().getValue()),
-                                XmlX509CertprofileUtil.buildGeneralNameMode(
-                                        entry.getAccessLocation()));
-                    }
-                }
-            }
-
-            // restriction
-            type = ObjectIdentifiers.id_extension_restriction;
-            if (extensionControls.containsKey(type)) {
-                Restriction extConf = (Restriction) getExtensionValue(
-                        type, extensionsType, Restriction.class);
-                if (extConf != null) {
-                    restriction = new QaDirectoryString(
-                            XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType()),
-                            extConf.getText());
-                }
-            }
-
-            // additionalInformation
-            type = ObjectIdentifiers.id_extension_additionalInformation;
-            if (extensionControls.containsKey(type)) {
-                AdditionalInformation extConf = (AdditionalInformation) getExtensionValue(
-                        type, extensionsType, AdditionalInformation.class);
-                if (extConf != null) {
-                    additionalInformation = new QaDirectoryString(
-                            XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType()),
-                            extConf.getText());
-                }
-            }
-
-            // validityModel
-            type = ObjectIdentifiers.id_extension_validityModel;
-            if (extensionControls.containsKey(type)) {
-                ValidityModel extConf = (ValidityModel) getExtensionValue(
-                        type, extensionsType, ValidityModel.class);
-                if (extConf != null) {
-                    validityModelId = new ASN1ObjectIdentifier(extConf.getModelId().getValue());
-                }
-            }
-
-            // PrivateKeyUsagePeriod
-            type = Extension.privateKeyUsagePeriod;
-            if (extensionControls.containsKey(type)) {
-                PrivateKeyUsagePeriod extConf = (PrivateKeyUsagePeriod) getExtensionValue(
-                        type, extensionsType, PrivateKeyUsagePeriod.class);
-                if (extConf != null) {
-                    privateKeyUsagePeriod = CertValidity.getInstance(extConf.getValidity());
-                }
-            }
-
-            // QCStatements
-            type = Extension.qCStatements;
-            if (extensionControls.containsKey(type)) {
-                QcStatements extConf = (QcStatements) getExtensionValue(
-                        type, extensionsType, QcStatements.class);
-                if (extConf != null) {
-                    qcStatements = extConf;
-                }
-            }
-
-            // biometricInfo
-            type = Extension.biometricInfo;
-            if (extensionControls.containsKey(type)) {
-                BiometricInfo extConf = (BiometricInfo) getExtensionValue(
-                        type, extensionsType, BiometricInfo.class);
-                if (extConf != null) {
-                    try {
-                        biometricInfo = new BiometricInfoOption(extConf);
-                    } catch (NoSuchAlgorithmException ex) {
-                        throw new CertprofileException(
-                                "NoSuchAlgorithmException: " + ex.getMessage());
-                    }
-                }
-            }
-
-            // tlsFeature
-            type = ObjectIdentifiers.id_pe_tlsfeature;
-            if (extensionControls.containsKey(type)) {
-                TlsFeature extConf = (TlsFeature) getExtensionValue(
-                        type, extensionsType, TlsFeature.class);
-                if (extConf != null) {
-                    tlsFeature = new QaTlsFeature(extConf);
-                }
-            }
-
-            // AuthorizationTemplate
-            type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
-            if (extensionControls.containsKey(type)) {
-                AuthorizationTemplate extConf = (AuthorizationTemplate) getExtensionValue(
-                        type, extensionsType, AuthorizationTemplate.class);
-                if (extConf != null) {
-                    authorizationTemplate = new QaAuthorizationTemplate(extConf);
-                }
-            }
-
-            // SMIMECapabilities
-            type = ObjectIdentifiers.id_smimeCapabilities;
-            if (extensionControls.containsKey(type)) {
-                SMIMECapabilities extConf = (SMIMECapabilities) getExtensionValue(
-                        type, extensionsType, SMIMECapabilities.class);
-                List<SMIMECapability> list = extConf.getSMIMECapability();
-
-                ASN1EncodableVector vec = new ASN1EncodableVector();
-                for (SMIMECapability m : list) {
-                    ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
-                            m.getCapabilityID().getValue());
-                    ASN1Encodable params = null;
-                    org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters capParams =
-                            m.getParameters();
-                    if (capParams != null) {
-                        if (capParams.getInteger() != null) {
-                            params = new ASN1Integer(capParams.getInteger());
-                        } else if (capParams.getBase64Binary() != null) {
-                            params = readAsn1Encodable(capParams.getBase64Binary().getValue());
-                        }
-                    }
-                    org.bouncycastle.asn1.smime.SMIMECapability cap =
-                            new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
-                    vec.add(cap);
-                }
-
-                DERSequence extValue = new DERSequence(vec);
-                try {
-                    smimeCapabilities = new QaExtensionValue(
-                            extensionControls.get(type).isCritical(), extValue.getEncoded());
-                } catch (IOException ex) {
-                    throw new CertprofileException(
-                            "Cannot encode SMIMECapabilities: " + ex.getMessage());
-                }
-            }
-
-            // constant extensions
-            this.constantExtensions = buildConstantExtesions(extensionsType);
-        } catch (RuntimeException ex) {
-            LogUtil.error(LOG, ex);
-            throw new CertprofileException(
-                    "RuntimeException thrown while initializing certprofile: " + ex.getMessage());
+        this.version = X509CertVersion.getInstance(conf.getVersion());
+        if (this.version == null) {
+            throw new CertprofileException("invalid version " + conf.getVersion());
         }
+
+        if (conf.getSignatureAlgorithms() != null) {
+            this.signatureAlgorithms = new HashSet<>();
+            for (String algo :conf.getSignatureAlgorithms().getAlgorithm()) {
+                String c14nAlgo;
+                try {
+                    c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(algo);
+                } catch (NoSuchAlgorithmException ex) {
+                    throw new CertprofileException(ex.getMessage(), ex);
+                }
+                this.signatureAlgorithms.add(c14nAlgo);
+            }
+        }
+
+        String str = conf.getCertLevel();
+        if ("RootCA".equalsIgnoreCase(str)) {
+            this.certLevel = X509CertLevel.RootCA;
+        } else if ("SubCA".equalsIgnoreCase(str)) {
+            this.certLevel = X509CertLevel.SubCA;
+        } else if ("EndEntity".equalsIgnoreCase(str)) {
+            this.certLevel = X509CertLevel.EndEntity;
+        } else {
+            throw new CertprofileException("invalid CertLevel '" + str + "'");
+        }
+
+        this.specialBehavior = conf.getSpecialBehavior();
+        if (this.specialBehavior != null
+                && !"gematik_gSMC_K".equalsIgnoreCase(this.specialBehavior)) {
+            throw new CertprofileException("unknown special bahavior " + this.specialBehavior);
+        }
+
+        // Extensions
+        ExtensionsType extensionsType = conf.getExtensions();
+
+        // Extension controls
+        this.extensionControls = XmlX509CertprofileUtil.buildExtensionControls(extensionsType);
+
+        // BasicConstrains
+        ASN1ObjectIdentifier type = Extension.basicConstraints;
+        if (extensionControls.containsKey(type)) {
+            org.xipki.pki.ca.certprofile.x509.jaxb.BasicConstraints extConf =
+                    (org.xipki.pki.ca.certprofile.x509.jaxb.BasicConstraints)
+                        getExtensionValue(type, extensionsType,
+                                org.xipki.pki.ca.certprofile.x509.jaxb.BasicConstraints.class);
+            if (extConf != null) {
+                this.pathLen = extConf.getPathLen();
+            }
+        }
+
+        // Extension KeyUsage
+        type = Extension.keyUsage;
+        if (extensionControls.containsKey(type)) {
+            org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage extConf =
+                    (org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage)
+                        getExtensionValue(type, extensionsType,
+                                org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage.class);
+            if (extConf != null) {
+                this.keyusages = XmlX509CertprofileUtil.buildKeyUsageOptions(extConf);
+            }
+        }
+
+        // ExtendedKeyUsage
+        type = Extension.extendedKeyUsage;
+        if (extensionControls.containsKey(type)) {
+            ExtendedKeyUsage extConf = (ExtendedKeyUsage) getExtensionValue(
+                    type, extensionsType, ExtendedKeyUsage.class);
+            if (extConf != null) {
+                this.extendedKeyusages =
+                        XmlX509CertprofileUtil.buildExtKeyUsageOptions(extConf);
+            }
+        }
+
+        // AuthorityKeyIdentifier
+        type = Extension.authorityKeyIdentifier;
+        if (extensionControls.containsKey(type)) {
+            org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier extConf =
+                (org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier)
+                    getExtensionValue(type, extensionsType,
+                        org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier.class);
+            if (extConf != null) {
+                this.includeIssuerAndSerialInAki = extConf.isIncludeIssuerAndSerial();
+            }
+        }
+
+        // Certificate Policies
+        type = Extension.certificatePolicies;
+        if (extensionControls.containsKey(type)) {
+            org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicies extConf =
+                (org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicies)
+                    getExtensionValue(type, extensionsType,
+                        org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicies.class);
+            if (extConf != null) {
+                this.certificatePolicies = new QaCertificatePolicies(extConf);
+            }
+        }
+
+        // Policy Mappings
+        type = Extension.policyMappings;
+        if (extensionControls.containsKey(type)) {
+            PolicyMappings extConf = (PolicyMappings) getExtensionValue(
+                    type, extensionsType, PolicyMappings.class);
+            if (extConf != null) {
+                this.policyMappings = new QaPolicyMappingsOption(extConf);
+            }
+        }
+
+        // Name Constrains
+        type = Extension.nameConstraints;
+        if (extensionControls.containsKey(type)) {
+            org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints extConf =
+                (org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints) getExtensionValue(
+                        type, extensionsType,
+                        org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints.class);
+            if (extConf != null) {
+                this.nameConstraints = new QaNameConstraints(extConf);
+            }
+        }
+
+        // Policy Constraints
+        type = Extension.policyConstraints;
+        if (extensionControls.containsKey(type)) {
+            PolicyConstraints extConf = (PolicyConstraints) getExtensionValue(
+                    type, extensionsType, PolicyConstraints.class);
+            if (extConf != null) {
+                this.policyConstraints = new QaPolicyConstraints(extConf);
+            }
+        }
+
+        // Inhibit anyPolicy
+        type = Extension.inhibitAnyPolicy;
+        if (extensionControls.containsKey(type)) {
+            InhibitAnyPolicy extConf = (InhibitAnyPolicy) getExtensionValue(
+                    type, extensionsType, InhibitAnyPolicy.class);
+            if (extConf != null) {
+                this.inhibitAnyPolicy = new QaInhibitAnyPolicy(extConf);
+            }
+        }
+
+        // admission
+        type = ObjectIdentifiers.id_extension_admission;
+        if (extensionControls.containsKey(type)) {
+            Admission extConf = (Admission) getExtensionValue(
+                    type, extensionsType, Admission.class);
+            if (extConf != null) {
+                this.admission = new QaAdmission(extConf);
+            }
+        }
+
+        // SubjectAltNameMode
+        type = Extension.subjectAlternativeName;
+        if (extensionControls.containsKey(type)) {
+            SubjectAltName extConf = (SubjectAltName) getExtensionValue(
+                    type, extensionsType, SubjectAltName.class);
+            if (extConf != null) {
+                this.allowedSubjectAltNameModes =
+                        XmlX509CertprofileUtil.buildGeneralNameMode(extConf);
+            }
+        }
+
+        // SubjectInfoAccess
+        type = Extension.subjectInfoAccess;
+        if (extensionControls.containsKey(type)) {
+            SubjectInfoAccess extConf = (SubjectInfoAccess) getExtensionValue(
+                    type, extensionsType, SubjectInfoAccess.class);
+            if (extConf != null) {
+                List<Access> list = extConf.getAccess();
+                this.allowedSubjectInfoAccessModes = new HashMap<>();
+                for (Access entry : list) {
+                    this.allowedSubjectInfoAccessModes.put(
+                            new ASN1ObjectIdentifier(entry.getAccessMethod().getValue()),
+                            XmlX509CertprofileUtil.buildGeneralNameMode(
+                                    entry.getAccessLocation()));
+                }
+            }
+        }
+
+        // restriction
+        type = ObjectIdentifiers.id_extension_restriction;
+        if (extensionControls.containsKey(type)) {
+            Restriction extConf = (Restriction) getExtensionValue(
+                    type, extensionsType, Restriction.class);
+            if (extConf != null) {
+                restriction = new QaDirectoryString(
+                        XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType()),
+                        extConf.getText());
+            }
+        }
+
+        // additionalInformation
+        type = ObjectIdentifiers.id_extension_additionalInformation;
+        if (extensionControls.containsKey(type)) {
+            AdditionalInformation extConf = (AdditionalInformation) getExtensionValue(
+                    type, extensionsType, AdditionalInformation.class);
+            if (extConf != null) {
+                additionalInformation = new QaDirectoryString(
+                        XmlX509CertprofileUtil.convertDirectoryStringType(extConf.getType()),
+                        extConf.getText());
+            }
+        }
+
+        // validityModel
+        type = ObjectIdentifiers.id_extension_validityModel;
+        if (extensionControls.containsKey(type)) {
+            ValidityModel extConf = (ValidityModel) getExtensionValue(
+                    type, extensionsType, ValidityModel.class);
+            if (extConf != null) {
+                validityModelId = new ASN1ObjectIdentifier(extConf.getModelId().getValue());
+            }
+        }
+
+        // PrivateKeyUsagePeriod
+        type = Extension.privateKeyUsagePeriod;
+        if (extensionControls.containsKey(type)) {
+            PrivateKeyUsagePeriod extConf = (PrivateKeyUsagePeriod) getExtensionValue(
+                    type, extensionsType, PrivateKeyUsagePeriod.class);
+            if (extConf != null) {
+                privateKeyUsagePeriod = CertValidity.getInstance(extConf.getValidity());
+            }
+        }
+
+        // QCStatements
+        type = Extension.qCStatements;
+        if (extensionControls.containsKey(type)) {
+            QcStatements extConf = (QcStatements) getExtensionValue(
+                    type, extensionsType, QcStatements.class);
+            if (extConf != null) {
+                qcStatements = extConf;
+            }
+        }
+
+        // biometricInfo
+        type = Extension.biometricInfo;
+        if (extensionControls.containsKey(type)) {
+            BiometricInfo extConf = (BiometricInfo) getExtensionValue(
+                    type, extensionsType, BiometricInfo.class);
+            if (extConf != null) {
+                try {
+                    biometricInfo = new BiometricInfoOption(extConf);
+                } catch (NoSuchAlgorithmException ex) {
+                    throw new CertprofileException(
+                            "NoSuchAlgorithmException: " + ex.getMessage());
+                }
+            }
+        }
+
+        // tlsFeature
+        type = ObjectIdentifiers.id_pe_tlsfeature;
+        if (extensionControls.containsKey(type)) {
+            TlsFeature extConf = (TlsFeature) getExtensionValue(
+                    type, extensionsType, TlsFeature.class);
+            if (extConf != null) {
+                tlsFeature = new QaTlsFeature(extConf);
+            }
+        }
+
+        // AuthorizationTemplate
+        type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
+        if (extensionControls.containsKey(type)) {
+            AuthorizationTemplate extConf = (AuthorizationTemplate) getExtensionValue(
+                    type, extensionsType, AuthorizationTemplate.class);
+            if (extConf != null) {
+                authorizationTemplate = new QaAuthorizationTemplate(extConf);
+            }
+        }
+
+        // SMIMECapabilities
+        type = ObjectIdentifiers.id_smimeCapabilities;
+        if (extensionControls.containsKey(type)) {
+            SMIMECapabilities extConf = (SMIMECapabilities) getExtensionValue(
+                    type, extensionsType, SMIMECapabilities.class);
+            List<SMIMECapability> list = extConf.getSMIMECapability();
+
+            ASN1EncodableVector vec = new ASN1EncodableVector();
+            for (SMIMECapability m : list) {
+                ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(
+                        m.getCapabilityID().getValue());
+                ASN1Encodable params = null;
+                org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability.Parameters capParams =
+                        m.getParameters();
+                if (capParams != null) {
+                    if (capParams.getInteger() != null) {
+                        params = new ASN1Integer(capParams.getInteger());
+                    } else if (capParams.getBase64Binary() != null) {
+                        params = readAsn1Encodable(capParams.getBase64Binary().getValue());
+                    }
+                }
+                org.bouncycastle.asn1.smime.SMIMECapability cap =
+                        new org.bouncycastle.asn1.smime.SMIMECapability(oid, params);
+                vec.add(cap);
+            }
+
+            DERSequence extValue = new DERSequence(vec);
+            try {
+                smimeCapabilities = new QaExtensionValue(
+                        extensionControls.get(type).isCritical(), extValue.getEncoded());
+            } catch (IOException ex) {
+                throw new CertprofileException(
+                        "Cannot encode SMIMECapabilities: " + ex.getMessage());
+            }
+        }
+
+        // constant extensions
+        this.constantExtensions = buildConstantExtesions(extensionsType);
     } // constructor
 
     public List<ValidationIssue> checkExtensions(final Certificate cert,

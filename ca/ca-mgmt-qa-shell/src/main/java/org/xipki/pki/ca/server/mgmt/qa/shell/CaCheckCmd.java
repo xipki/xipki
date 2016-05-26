@@ -129,8 +129,7 @@ public class CaCheckCmd extends CaUpdateCmd {
             boolean ex = ey.getDuplicateKeyPermitted().booleanValue();
             boolean is = ca.isDuplicateKeyPermitted();
             if (ex != is) {
-                throw new CmdFailure("Duplicate key permitted: is '" + is
-                        + "', but expected '" + ex + "'");
+                throw buildUnexpectedException("Duplicate key permitted", is, ex);
             }
         }
 
@@ -139,8 +138,7 @@ public class CaCheckCmd extends CaUpdateCmd {
             boolean ex = ey.getDuplicateSubjectPermitted().booleanValue();
             boolean is = ca.isDuplicateSubjectPermitted();
             if (ex != is) {
-                throw new CmdFailure("Duplicate subject mode: is '" + is
-                        + "', but expected '" + ex + "'");
+                throw buildUnexpectedException("Duplicate subject mode", is, ex);
             }
         }
 
@@ -149,8 +147,7 @@ public class CaCheckCmd extends CaUpdateCmd {
             Integer ex = ey.getExpirationPeriod();
             Integer is = ca.getExpirationPeriod();
             if (!ex.equals(is)) {
-                throw new CmdFailure("Expiration period: is '" + is
-                        + "', but expected '" + ex + "'");
+                throw buildUnexpectedException("Expiration period", is, ex);
             }
         }
 
@@ -159,7 +156,7 @@ public class CaCheckCmd extends CaUpdateCmd {
             String ex = ey.getExtraControl();
             String is = ca.getExtraControl();
             if (!ex.equals(is)) {
-                throw new CmdFailure("Extra control: is '" + is + "', but expected '" + ex + "'");
+                throw buildUnexpectedException("Extra control", is, ex);
             }
         }
 
@@ -168,7 +165,7 @@ public class CaCheckCmd extends CaUpdateCmd {
             CertValidity ex = ey.getMaxValidity();
             CertValidity is = ca.getMaxValidity();
             if (!ex.equals(is)) {
-                throw new CmdFailure("Max validity: is '" + is + "', but expected '" + ex + "'");
+                throw buildUnexpectedException("Max validity", is, ex);
             }
         }
 
@@ -177,8 +174,7 @@ public class CaCheckCmd extends CaUpdateCmd {
             Integer ex = ey.getKeepExpiredCertInDays();
             int is = ca.getKeepExpiredCertInDays();
             if (ex.intValue() != is) {
-                throw new CmdFailure("KeepExiredCertInDays: is '" + is
-                        + "', but expected '" + ex + "'");
+                throw buildUnexpectedException("KeepExiredCertInDays", is, ex);
             }
         }
 
@@ -187,7 +183,7 @@ public class CaCheckCmd extends CaUpdateCmd {
             int ex = ey.getNumCrls();
             int is = ca.getNumCrls();
             if (ex != is) {
-                throw new CmdFailure("num CRLs: is '" + is + "', but expected '" + ex + "'");
+                throw buildUnexpectedException("num CRLs", is, ex);
             }
         }
 
@@ -225,7 +221,7 @@ public class CaCheckCmd extends CaUpdateCmd {
             ConfPairs is = new ConfPairs(ca.getSignerConf());
             is.removePair("keystore");
             if (!ex.equals(is)) {
-                throw new CmdFailure("signer conf: is '" + is + "', but expected '" + ex + "'");
+                throw buildUnexpectedException("signer conf", is, ex);
             }
         }
 
@@ -234,7 +230,7 @@ public class CaCheckCmd extends CaUpdateCmd {
             CaStatus ex = ey.getStatus();
             CaStatus is = ca.getStatus();
             if (!ex.equals(is)) {
-                throw new CmdFailure("status: is '" + is + "', but expected '" + ex + "'");
+                throw buildUnexpectedException("status", is, ex);
             }
         }
 
@@ -243,12 +239,17 @@ public class CaCheckCmd extends CaUpdateCmd {
             ValidityMode ex = ey.getValidityMode();
             ValidityMode is = ca.getValidityMode();
             if (!ex.equals(is)) {
-                throw new CmdFailure("validity mode: is '" + is + "', but expected '" + ex + "'");
+                throw buildUnexpectedException("validity mode", is, ex);
             }
         }
 
         println(" checked CA" + caName);
         return null;
     } // method doExecute
+
+    private CmdFailure buildUnexpectedException(final String field, final Object is,
+            final Object expected) {
+        return new CmdFailure(field + ": is '" + is + "', but expected '" + expected + "'");
+    }
 
 }

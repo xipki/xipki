@@ -54,7 +54,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LruCache;
 import org.xipki.commons.common.qa.ValidationIssue;
 import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.commons.security.util.X509Util;
@@ -84,17 +83,10 @@ public class PublicKeyChecker {
 
     public PublicKeyChecker(final X509ProfileType conf) throws CertprofileException {
         ParamUtil.requireNonNull("conf", conf);
-        try {
-            // KeyAlgorithms
-            if (conf.getKeyAlgorithms() != null) {
-                this.keyAlgorithms = XmlX509CertprofileUtil.buildKeyAlgorithms(
-                        conf.getKeyAlgorithms());
-            }
-
-        } catch (RuntimeException ex) {
-            LogUtil.error(LOG, ex);
-            throw new CertprofileException(
-                    "RuntimeException thrown while initializing certprofile: " + ex.getMessage());
+        // KeyAlgorithms
+        if (conf.getKeyAlgorithms() != null) {
+            this.keyAlgorithms = XmlX509CertprofileUtil.buildKeyAlgorithms(
+                    conf.getKeyAlgorithms());
         }
     }
 
