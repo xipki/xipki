@@ -53,7 +53,7 @@
 # XiPKI configuration
 #
 
-export JAVA_MAX_MEM=2048M
+# export JAVA_MAX_MEM=2048M
 
 #KARAF_OPTS="$KARAF_OPTS -DNSSLIB=/point/to/firefox"
 

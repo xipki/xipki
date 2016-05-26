@@ -67,6 +67,6 @@ rem
 rem XiPKI configuration
 rem
 
-SET JAVA_MAX_MEM=2048M
+rem SET JAVA_MAX_MEM=2048M
 
 rem SET KARAF_OPTS=%KARAF_OPTS% -DNSSLIB=point\to\firefox
