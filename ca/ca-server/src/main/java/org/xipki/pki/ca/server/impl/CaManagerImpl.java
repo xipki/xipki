@@ -2375,7 +2375,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         BigInteger serialOfThisCert = RandomSerialNumberGenerator.getInstance().nextSerialNumber(
-                caEntry.getSerialNoSize());
+                caEntry.getSerialNoBitLen());
 
         GenerateSelfSignedResult result;
         try {
@@ -2404,7 +2404,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         int nextCrlNumber = caEntry.getNextCrlNumber();
         CaStatus status = caEntry.getStatus();
 
-        X509CaEntry entry = new X509CaEntry(name, caEntry.getSerialNoSize(), nextCrlNumber,
+        X509CaEntry entry = new X509CaEntry(name, caEntry.getSerialNoBitLen(), nextCrlNumber,
                 signerType, signerConf, caUris, numCrls, expirationPeriod);
         entry.setCertificate(caCert);
         entry.setCmpControlName(caEntry.getCmpControlName());

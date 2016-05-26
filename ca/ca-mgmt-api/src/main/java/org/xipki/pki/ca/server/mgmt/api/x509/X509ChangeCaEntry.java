@@ -39,6 +39,7 @@ package org.xipki.pki.ca.server.mgmt.api.x509;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.ChangeCaEntry;
 
@@ -63,10 +64,23 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
 
     private Integer numCrls;
 
+    private Integer serialNoBitLen;
+
     private String extraControl;
 
     public X509ChangeCaEntry(final String name) throws CaMgmtException {
         super(name);
+    }
+
+    public Integer getSerialNoBitLen() {
+        return serialNoBitLen;
+    }
+
+    public void setSerialNoBitLen(final Integer serialNoBitLen) {
+        if (serialNoBitLen != null) {
+            ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
+        }
+        this.serialNoBitLen = serialNoBitLen;
     }
 
     public List<String> getCrlUris() {

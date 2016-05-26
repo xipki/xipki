@@ -148,7 +148,7 @@ public class CaExportCmd extends CaCommandSupport {
         propsput(props, KEY_ART, CertArt.X509PKC.name());
 
         // NEXT_SN
-        propsput(props, KEY_SN_SIZE, x509Entry.getSerialNoSize());
+        propsput(props, KEY_SN_SIZE, x509Entry.getSerialNoBitLen());
 
         // NEXT_CRLNO
         propsput(props, KEY_NEXT_CRLNO, x509Entry.getNextCrlNumber());

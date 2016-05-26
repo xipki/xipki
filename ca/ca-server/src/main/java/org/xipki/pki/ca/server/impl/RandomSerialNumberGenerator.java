@@ -46,6 +46,14 @@ import java.security.SecureRandom;
 
 class RandomSerialNumberGenerator {
 
+    private static int MASK_1 = 1;
+    private static int MASK_2 = 3;
+    private static int MASK_3 = 7;
+    private static int MASK_4 = 15;
+    private static int MASK_5 = 31;
+    private static int MASK_6 = 63;
+    private static int MASK_7 = 127;
+
     private static RandomSerialNumberGenerator instance;
 
     private final SecureRandom random;
@@ -54,13 +62,38 @@ class RandomSerialNumberGenerator {
         this.random = new SecureRandom();
     }
 
-    public BigInteger nextSerialNumber(int size) {
-        byte[] rdnBytes = new byte[size];
+    public BigInteger nextSerialNumber(int bitLen) {
+        byte[] rdnBytes = new byte[(bitLen + 7) / 8];
         random.nextBytes(rdnBytes);
-        if (rdnBytes[0] < 0) {
-            rdnBytes[0] = (byte) (255 + rdnBytes[0]); // clear the first bit
+        int ci = bitLen % 8;
+
+        switch (ci) {
+        case 1:
+            rdnBytes[0] = (byte) (rdnBytes[0] & MASK_1);
+            break;
+        case 2:
+            rdnBytes[0] = (byte) (rdnBytes[0] & MASK_2);
+            break;
+        case 3:
+            rdnBytes[0] = (byte) (rdnBytes[0] & MASK_3);
+            break;
+        case 4:
+            rdnBytes[0] = (byte) (rdnBytes[0] & MASK_4);
+            break;
+        case 5:
+            rdnBytes[0] = (byte) (rdnBytes[0] & MASK_5);
+            break;
+        case 6:
+            rdnBytes[0] = (byte) (rdnBytes[0] & MASK_6);
+            break;
+        case 7:
+            rdnBytes[0] = (byte) (rdnBytes[0] & MASK_7);
+            break;
+        default:
+            break;
         }
-        return new java.math.BigInteger(1, rdnBytes);
+
+        return new BigInteger(1, rdnBytes);
     }
 
     public static synchronized RandomSerialNumberGenerator getInstance() {

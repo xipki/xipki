@@ -96,6 +96,15 @@ public class CaCheckCmd extends CaUpdateCmd {
             }
         }
 
+        // SN size
+        if (ey.getSerialNoBitLen() != null) {
+            Integer ex = ey.getSerialNoBitLen();
+            int is = ca.getSerialNoBitLen();
+            if (!ex.equals(is)) {
+                throw buildUnexpectedException("serial number bit length", is, ex);
+            }
+        }
+
         // CMP control name
         if (ey.getCmpControlName() != null) {
             String ex = ey.getCmpControlName();

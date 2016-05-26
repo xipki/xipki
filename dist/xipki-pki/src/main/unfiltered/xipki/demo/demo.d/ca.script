@@ -161,7 +161,7 @@ xipki-ca:gen-rca \
   --profile RCA \
   --out output/RCA1.der \
   --permission all \
-  --sn-size 16 \
+  --sn-bitlen 63 \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type $TOKEN_TYPE \
@@ -369,7 +369,7 @@ if { $TOKEN_TYPE equals "pkcs12" } {
 xipki-ca:ca-add \
   --name SubCA1.complex-Name \
   --permission all \
-  --sn-size 16 \
+  --sn-bitlen 63 \
   --next-crl-no 2 \
   --max-validity 5y \
   --signer-type $TOKEN_TYPE \
@@ -439,7 +439,7 @@ if { $TOKEN_TYPE equals "pkcs12" } {
 xipki-ca:ca-add \
   --name SubCAwithCRL1 \
   --permission all \
-  --sn-size 16 \
+  --sn-bitlen 63 \
   --next-crl-no 2 \
   --max-validity 8000y \
   --signer-type $TOKEN_TYPE \

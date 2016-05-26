@@ -770,7 +770,7 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, name);
             ps.setInt(idx++, CertArt.X509PKC.getCode());
             ps.setString(idx++, entry.getSubject());
-            ps.setInt(idx++, entry.getSerialNoSize());
+            ps.setInt(idx++, entry.getSerialNoBitLen());
             ps.setInt(idx++, entry.getNextCrlNumber());
             ps.setString(idx++, entry.getStatus().getStatus());
             ps.setString(idx++, entry.getCrlUrisAsString());
@@ -1068,7 +1068,7 @@ class CaManagerQueryExecutor {
 
         X509ChangeCaEntry entry = (X509ChangeCaEntry) changeCaEntry;
         String name = entry.getName();
-        Integer serialNumberSize = entry.getSerialNumberSize();
+        Integer serialNoBitLen = entry.getSerialNoBitLen();
         CaStatus status = entry.getStatus();
         X509Certificate cert = entry.getCert();
         List<String> crlUris = entry.getCrlUris();
@@ -1148,7 +1148,7 @@ class CaManagerQueryExecutor {
 
         AtomicInteger index = new AtomicInteger(1);
 
-        Integer idxSnSize = addToSqlIfNotNull(sqlBuilder, index, serialNumberSize, "SN_SIZE");
+        Integer idxSnSize = addToSqlIfNotNull(sqlBuilder, index, serialNoBitLen, "SN_SIZE");
         Integer idxStatus = addToSqlIfNotNull(sqlBuilder, index, status, "STATUS");
         Integer idxSubject = addToSqlIfNotNull(sqlBuilder, index, cert, "SUBJECT");
         Integer idxCert = addToSqlIfNotNull(sqlBuilder, index, cert, "CERT");
@@ -1198,8 +1198,8 @@ class CaManagerQueryExecutor {
             ps = prepareStatement(sql);
 
             if (idxSnSize != null) {
-                sb.append("sn_size: '").append(serialNumberSize).append("'; ");
-                ps.setInt(idxSnSize, serialNumberSize.intValue());
+                sb.append("sn_size: '").append(serialNoBitLen).append("'; ");
+                ps.setInt(idxSnSize, serialNoBitLen.intValue());
             }
 
             if (idxStatus != null) {

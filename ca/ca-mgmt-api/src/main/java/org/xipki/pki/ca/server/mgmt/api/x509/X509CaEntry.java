@@ -69,7 +69,7 @@ public class X509CaEntry extends CaEntry {
 
     private String crlSignerName;
 
-    private int serialNoSize;
+    private int serialNoBitLen;
 
     private int nextCrlNumber;
 
@@ -79,17 +79,17 @@ public class X509CaEntry extends CaEntry {
 
     private String subject;
 
-    public X509CaEntry(final String name, final int serialNoSize, final int nextCrlNumber,
+    public X509CaEntry(final String name, final int serialNoBitLen, final int nextCrlNumber,
             final String signerType, final String signerConf, final X509CaUris caUris,
             final int numCrls, final int expirationPeriod) throws CaMgmtException {
         super(name, signerType, signerConf, expirationPeriod);
-        init(serialNoSize, nextCrlNumber, caUris, numCrls);
+        init(serialNoBitLen, nextCrlNumber, caUris, numCrls);
     }
 
-    private void init(final int serialNoSize, final int nextCrlNumber, final X509CaUris caUris,
+    private void init(final int serialNoBitLen, final int nextCrlNumber, final X509CaUris caUris,
             final int numCrls) throws CaMgmtException {
         this.numCrls = ParamUtil.requireMin("numCrls", numCrls, 0);
-        this.serialNoSize = ParamUtil.requireRange("serialNoSize", serialNoSize, 8, 20);
+        this.serialNoBitLen = ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
         this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 0);
 
         this.cacertUris = caUris.getCacertUris();
@@ -111,12 +111,12 @@ public class X509CaEntry extends CaEntry {
         }
     }
 
-    public int getSerialNoSize() {
-        return serialNoSize;
+    public int getSerialNoBitLen() {
+        return serialNoBitLen;
     }
 
-    public void setSerialNoSize(final int serialNoSize) {
-        this.serialNoSize = ParamUtil.requireMin("serialNoSize", serialNoSize, 8);
+    public void setSerialNoBitLen(final int serialNoBitLen) {
+        this.serialNoBitLen = ParamUtil.requireMin("serialNoBitLen", serialNoBitLen, 63);
     }
 
     public int getNextCrlNumber() {
@@ -181,7 +181,7 @@ public class X509CaEntry extends CaEntry {
         if (sb.charAt(sb.length() - 1) != '\n') {
             sb.append('\n');
         }
-        sb.append("serialNoSize: ").append(serialNoSize).append('\n');
+        sb.append("serialNoBitLen: ").append(serialNoBitLen).append('\n');
         sb.append("nextCrlNumber: ").append(nextCrlNumber).append('\n');
         sb.append("deltaCrlUris: ").append(getDeltaCrlUrisAsString()).append('\n');
         sb.append("crlUris: ").append(getCrlUrisAsString()).append('\n');

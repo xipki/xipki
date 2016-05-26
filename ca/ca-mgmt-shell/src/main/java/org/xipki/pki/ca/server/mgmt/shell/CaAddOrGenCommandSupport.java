@@ -111,9 +111,9 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
     @Completion(PermissionCompleter.class)
     private Set<String> permissions;
 
-    @Option(name = "--sn-size",
-            description = "number of octets of the serial number, between 8 and 20")
-    private int snSize = 16;
+    @Option(name = "--sn-bitlen",
+            description = "number of bits of the serial number, between 63 and 159")
+    private int snBitLen = 127;
 
     @Option(name = "--next-crl-no",
             required = true,
@@ -188,7 +188,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
     private PasswordResolver passwordResolver;
 
     protected X509CaEntry getCaEntry() throws Exception {
-        ParamUtil.requireRange("sn-size", snSize, 8, 20);
+        ParamUtil.requireRange("sn-bitlen", snBitLen, 63, 159);
 
         if (nextCrlNumber < 1) {
             throw new IllegalCmdParamException("invalid CRL number: " + nextCrlNumber);
@@ -213,7 +213,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
         }
 
         X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
-        X509CaEntry entry = new X509CaEntry(caName, snSize, nextCrlNumber, signerType, signerConf,
+        X509CaEntry entry = new X509CaEntry(caName, snBitLen, nextCrlNumber, signerType, signerConf,
                 caUris, numCrls.intValue(), expirationPeriod.intValue());
 
         entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());

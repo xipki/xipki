@@ -361,6 +361,7 @@ xipki-caqa:ca-check \
   --name SUBCA1.COMPLEX-NAME \
   --permission all \
   --max-validity 5y \
+  --sn-bitlen 63  \
   --signer-type $TOKEN_TYPE \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://example.org/SubCA1.der \
@@ -372,6 +373,7 @@ xipki-caqa:ca-check \
 xipki-caqa:ca-check --name RCA1 \
   --permission all \
   --max-validity 10y \
+  --sn-bitlen 63  \
   --signer-type $TOKEN_TYPE \
   --cert output/RCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
@@ -398,6 +400,7 @@ xipki-caqa:ca-check --name RCA1 \
   --permission enroll \
   --permission revoke \
   --max-validity 8y \
+  --sn-bitlen 63  \
   --signer-type $TOKEN_TYPE \
   --cert output/RCA1.der \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
@@ -429,7 +432,7 @@ xipki-caqa:neg-gen-rca \
   --profile RCA \
   --out output/RCA1-2.der \
   --permission all \
-  --sn-size 16 \
+  --sn-bitlen 63  \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type $TOKEN_TYPE \
@@ -449,7 +452,7 @@ echo "neg-ca-add: certificate and key do not match"
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
-  --sn-size 16 \
+  --sn-bitlen 63  \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type $TOKEN_TYPE \
@@ -468,7 +471,7 @@ echo "neg-ca-add: CMP control name does not exist"
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
-  --sn-size 16 \
+  --sn-bitlen 63  \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type $TOKEN_TYPE \
@@ -487,7 +490,7 @@ echo "neg-ca-add: CRL signer name does not exist"
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
-  --sn-size 16 \
+  --sn-bitlen 63  \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type $TOKEN_TYPE \
@@ -507,7 +510,7 @@ echo "neg-ca-add: responder name does not exist"
 xipki-caqa:neg-ca-add \
   --name RCA2 \
   --permission all \
-  --sn-size 16 \
+  --sn-bitlen 63  \
   --next-crl-no 2 \
   --max-validity 10y \
   --signer-type $TOKEN_TYPE \

@@ -47,6 +47,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
@@ -85,9 +86,9 @@ public class CaUpdateCmd extends CaCommandSupport {
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--sn-size",
-            description = "number of octets of the serial number, between 8 and 20")
-    private Integer snSize;
+    @Option(name = "--sn-bitlen",
+            description = "number of bits of the serial number, between 63 and 159")
+    private Integer snBitLen;
 
     @Option(name = "--status",
             description = "CA status")
@@ -195,8 +196,9 @@ public class CaUpdateCmd extends CaCommandSupport {
     protected X509ChangeCaEntry getChangeCaEntry() throws Exception {
         X509ChangeCaEntry entry = new X509ChangeCaEntry(caName);
 
-        if (snSize != null) {
-            entry.setSerialNumberSize(snSize);
+        if (snBitLen != null) {
+            ParamUtil.requireRange("sn-bitlen", snBitLen, 63, 159);
+            entry.setSerialNoBitLen(snBitLen);
         }
 
         if (caStatus != null) {
