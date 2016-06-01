@@ -102,7 +102,7 @@ public class HealthCheckServlet extends HttpServlet {
             if (caName == null || responder == null || !responder.isInService()) {
                 String auditMessage;
                 if (caName == null) {
-                    auditMessage = "n CA is specified";
+                    auditMessage = "no CA is specified";
                 } else if (responder == null) {
                     auditMessage = "unknown CA '" + caName + "'";
                 } else {
