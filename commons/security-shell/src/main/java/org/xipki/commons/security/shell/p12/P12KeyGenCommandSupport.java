@@ -67,8 +67,7 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
     protected String password;
 
     @Option(name = "--subject", aliases = "-s",
-            description = "subject of the self-signed certificate\n"
-                    + "(required)")
+            description = "subject of the self-signed certificate")
     protected String subject;
 
     protected void saveKeypair(final P12KeypairGenerationResult keypair) throws IOException {
