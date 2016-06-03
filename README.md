@@ -4,6 +4,153 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
 
 Highly scalable and high-performance open source PKI (Certification Authority and OCSP responder), especially suitable for IoT, M2M and V2X.
 
+License
+-----------
+
+* XiPKI Commercial License
+* GNU AFFERO GENERAL PUBLIC LICENSE (AGPL) version 3
+
+Owner
+-----------
+Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com), [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
+
+Community Support
+-----------
+Just drop me an email.
+
+Prerequisite
+------------
+* JRE / JDK 8
+  * OpenJDK: none
+  * Oracle: [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+
+Tested Platforms
+----------------
+* Database
+  * DB2
+  * Oracle
+  * Oracle RAC
+  * PostgreSQL
+  * MySQL
+  * MariaDB
+  * H2
+  * HSQLDB
+
+* HSM
+  * Thales nCipher Solo (PCI Card)
+  * Thales nCipher Connect (network)
+  * Utimaco Se
+  * [Softhsm v2](https://www.opendnssec.org/download/packages/)
+
+* JVM
+  * OpenJDK 8
+  * Oracle JRE/JDK 8
+* OS
+  * CentOS
+  * Fedora
+  * Redhat
+  * SLES
+  * Ubuntu
+  * Windows
+  * Mac OS
+  * Raspbian (tested on Raspberry Pi 2 Model B)
+
+Alternative: Download the Released Binary Package
+------
+
+Download the released binary package `xipki-pki-<version>.tar.gz` from the URL https://github.com/xipki/xipki/releases
+
+Alternative: Build and Assembly from Source Code
+------------------
+* Get a copy of XiPKI code
+  ```sh
+  git clone git://github.com/xipki/xipki
+  ```
+
+* Build
+  * Install the third party artifacts that are not availablle in maven repositories
+
+    * In folder `xipki/ext`
+      ```sh
+      ./install.sh
+      ```
+
+  * Compile and install the artifacts
+
+    In folder `xipki`
+    ```sh
+    mvn clean install
+    ```
+
+  * Assembly
+
+    In folder `xipki/dist/xipki-pki`
+    ```sh
+    mvn clean package
+    ```
+
+Install
+-------
+
+* Copy the file `xipki-pki-<version>.tar.gz` to the destination folder
+
+* Unpack the assembled file
+
+    In destination folder of the installation
+    ```sh
+    tar xvf xipki-pki-<version>.tar.gz
+    ```
+    The following steps use `$XIPKI_HOME` to point to the unpacked folder
+
+* Adapt the database configuration (access rights read and write of database are required)
+
+    ```sh
+    $XIPKI_HOME/xipki/ca-config/ca-db.properties
+    $XIPKI_HOME/xipki/ca-config/ocsp-db.properties
+    ```
+* In case if the real PKCS#11 device instead of the emulator is used:
+
+  * In file etc/org.xipki.commons.security.pkcs11.cfg, change the pkcs11.confFile as follows:
+
+    ```sh
+    pkcs11.confFile = xipki/security/pkcs11-conf-hsm.xml
+
+    #pkcs11.confFile = xipki/security/pkcs11-conf-emulator.xml
+    ```
+  * In file xipki/security/pkcs11-conf-hsm.xml, change the PKCS#11 configuration.
+
+Run Demo
+-----
+
+* Delete folders `$XIPKI_HOME/data` and `$XIPKI_HOME/output`
+
+* Start XiPKI
+
+    In folder `$XIPKI_HOME`
+    ```sh
+    bin/karaf
+    ```
+
+    HSM devices of Thales, e.g. nCipher, uses Thales preload to manage the PKCS#11 session. In this case, XiPKI should be started as follows
+    ```sh
+    preload bin/karaf
+    ```
+
+    If you get error like
+    ```sh
+    Error occurred during initialization of VM
+    Could not reserve enough space for 2097152KB object heap
+    ```
+    please change the value of JAVA_MAX_MEM in the file `bin/setenv` or `bin/setenv.bat`.
+
+    If you have changed the content within folder `$XIPKI_HOME/etc` or `$XIPKI_HOME/system`, please delete the folder `$XIPKI_HOME/data` before starting XiPKI.
+
+* Run the pre-configured OSGi-commands in OSGi console
+
+In the OSGi console, call `source xipki/demo/demo.script` to demonstrate the whole life-cycle (key generation, database initialization, CA installation, certificate enrollment, OCSP server installation, OCSP status, etc.). The generated keys, certificates and CRLs are saved in folder `output`, and the log files are located in the folder data/log.
+
+Components
+-----
 - CA (Certification Authority)
 
   - X.509 Certificate v3 (RFC 5280)
@@ -109,148 +256,3 @@ Highly scalable and high-performance open source PKI (Certification Authority an
   - Embedded support of PBE (password based encryption) password resolver
      - All passwords can be encrypted by the master password
   - Embedded support of OBF (as in jetty) password resolver
-
-License
------------
-
-* XiPKI Commercial License
-* GNU AFFERO GENERAL PUBLIC LICENSE (AGPL) version 3
-
-Owner
------------
-Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com), [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
-
-Community Support
------------
-Just drop me an email.
-
-Prerequisite
-------------
-* JRE / JDK 8
- * OpenJDK: none
- * Oracle: [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-
-Tested Platforms
-----------------
-* Database
- * DB2
- * Oracle
- * Oracle RAC
- * PostgreSQL
- * MySQL
- * MariaDB
- * H2
- * HSQLDB
-
-* HSM
- * Thales nCipher Solo (PCI Card)
- * Thales nCipher Connect (network)
- * Utimaco Se
- * [Softhsm v2](https://www.opendnssec.org/download/packages/)
-
-* JVM
- * OpenJDK 8
- * Oracle JRE/JDK 8
-* OS
- * CentOS
- * Fedora
- * Redhat
- * SLES
- * Ubuntu
- * Windows
- * Mac OS
- * Raspbian (tested on Raspberry Pi 2 Model B)
-
-Build and Assembly from Source Code
-------------------
-* Get a copy of XiPKI code
-  ```sh
-  git clone git://github.com/xipki/xipki
-  ```
-
-* Build
-  * Install the third party artifacts that are not availablle in maven repositories
-
-    * In folder `xipki/ext`
-      ```sh
-      ./install.sh
-      ```
-
-  * Compile and install the artifacts
-
-    In folder `xipki`
-    ```sh
-    mvn clean install
-    ```
-
-  * Assembly
-
-    In folder `xipki/dist/xipki-pki`
-    ```sh
-    mvn clean package
-    ```
-
-Download the Released Binary Package
-------
-
-Download the released binary package `xipki-pki-<version>.tar.gz` from the URL https://github.com/xipki/xipki/releases
-
-Install
--------
-
-* Copy the file `xipki-pki-<version>.tar.gz` to the destination folder
-
-* Unpack the assembled file
-
-    In destination folder of the installation
-    ```sh
-    tar xvf xipki-pki-<version>.tar.gz
-    ```
-    The following steps use `$XIPKI_HOME` to point to the unpacked folder
-
-* Adapt the database configuration (access rights read and write of database are required)
-
-    ```sh
-    $XIPKI_HOME/xipki/ca-config/ca-db.properties
-    $XIPKI_HOME/xipki/ca-config/ocsp-db.properties
-    ```
-* In case if the real PKCS#11 device instead of the emulator is used:
-
-  * In file etc/org.xipki.commons.security.pkcs11.cfg, change the pkcs11.confFile as follows:
-
-    ```sh
-    pkcs11.confFile = xipki/security/pkcs11-conf-hsm.xml
-
-    #pkcs11.confFile = xipki/security/pkcs11-conf-emulator.xml
-    ```
-  * In file xipki/security/pkcs11-conf-hsm.xml, change the PKCS#11 configuration.
-
-Run Demo
------
-
-* Delete folders `$XIPKI_HOME/data` and `$XIPKI_HOME/output`
-
-* Start XiPKI
-
-    In folder `$XIPKI_HOME`
-    ```sh
-    bin/karaf
-    ```
-
-    HSM devices of Thales, e.g. nCipher, uses Thales preload to manage the PKCS#11 session. In this case, XiPKI should be started as follows
-    ```sh
-    preload bin/karaf
-    ```
-
-    If you get error like
-    ```sh
-    Error occurred during initialization of VM
-    Could not reserve enough space for 2097152KB object heap
-    ```
-    please change the value of JAVA_MAX_MEM in the file `bin/setenv` or `bin/setenv.bat`.
-
-    If you have changed the content within folder `$XIPKI_HOME/etc` or `$XIPKI_HOME/system`, please delete the folder `$XIPKI_HOME/data` before starting XiPKI.
-
-* Run the pre-configured OSGi-commands in OSGi console
-
-In the OSGi console, call `source xipki/demo/demo.script` to demonstrate the whole life-cycle (key generation, database initialization, CA installation, certificate enrollment, OCSP server installation, OCSP status, etc.). The generated keys, certificates and CRLs are saved in folder `output`, and the log files are located in the folder data/log.
