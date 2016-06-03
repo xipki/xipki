@@ -52,7 +52,7 @@ Highly scalable and high-performance open source PKI (Certification Authority an
     - PolicyConstrains (RFC 5280)
     - PolicyMappings (RFC 5280)
     - PrivateKeyUsagePeriod (RFC 5280)
-    - QCStatements (RFC 3739, EN 319 412)
+    - QCStatements (RFC 3739, eIDAS standard EN 319 412)
     - Restriction (German national standard CommonPKI)
     - SMIMECapabilities (RFC 4262)
     - SubjectAltName (RFC 5280)
@@ -118,7 +118,12 @@ License
 
 Owner
 -----------
-Dr. Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com), [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
+Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com), [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
+
+Community Support
+-----------
+Just drop me an email.
+
 Prerequisite
 ------------
 * JRE / JDK 8
@@ -141,7 +146,7 @@ Tested Platforms
  * Thales nCipher Solo (PCI Card)
  * Thales nCipher Connect (network)
  * Utimaco Se
- * [Softhsm](https://www.opendnssec.org/softhsm/)
+ * [Softhsm v2](https://www.opendnssec.org/download/packages/)
 
 * JVM
  * OpenJDK 8
