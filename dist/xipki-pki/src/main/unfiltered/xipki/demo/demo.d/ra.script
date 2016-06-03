@@ -169,6 +169,30 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/SubCAwithCRL1.der \
   --ca-cert output/RCA1.der
 
+# Certificate QC
+
+xipki-tk:req-p12 \
+  --p12 output/QC1.p12 \
+  --password 1234 \
+  --out output/QC1.p10 \
+  --subject "CN=QC1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
+  --need-extension authorityInfoAccess
+
+xipki-cli:enroll-p12 \
+  --p12 output/QC1.p12 \
+  --password 1234 \
+  --out output/QC1.der \
+  --profile QC \
+  --subject "CN=QC1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
+  --need-extension authorityInfoAccess
+
+xipki-tk:update-cert-p12 \
+  --p12 output/QC1.p12 \
+  --password 1234 \
+  --cert output/QC1.der \
+  --ca-cert output/SubCAwithCRL1.der \
+  --ca-cert output/RCA1.der
+
 # Certificate EE.Complex1
 
 xipki-tk:req-p12-complex \

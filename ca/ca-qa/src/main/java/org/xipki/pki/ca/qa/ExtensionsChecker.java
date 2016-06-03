@@ -141,6 +141,8 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.ExtendedKeyUsage;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ExtensionType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ExtensionsType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
+import org.xipki.pki.ca.certprofile.x509.jaxb.PdsLocationType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.PdsLocationsType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
@@ -2036,27 +2038,26 @@ public class ExtensionsChecker {
             return;
         }
 
-        // extract the euLimit data from request
+        // extract the euLimit and pdsLocations data from request
         Map<String, int[]> reqQcEuLimits = new HashMap<>();
-        Extension extension = requestExtensions.getExtension(Extension.qCStatements);
-        if (extension != null) {
-            ASN1Sequence seq = ASN1Sequence.getInstance(extension.getParsedValue());
+        Extension reqExtension = requestExtensions.getExtension(Extension.qCStatements);
+        if (reqExtension != null) {
+            ASN1Sequence seq = ASN1Sequence.getInstance(reqExtension.getParsedValue());
 
             final int n = seq.size();
             for (int j = 0; j < n; j++) {
                 QCStatement stmt = QCStatement.getInstance(seq.getObjectAt(j));
-                if (!ObjectIdentifiers.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId())) {
-                    continue;
+                if (ObjectIdentifiers.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId())) {
+                    MonetaryValue monetaryValue = MonetaryValue.getInstance(
+                            stmt.getStatementInfo());
+                    int amount = monetaryValue.getAmount().intValue();
+                    int exponent = monetaryValue.getExponent().intValue();
+                    Iso4217CurrencyCode currency = monetaryValue.getCurrency();
+                    String currencyS = currency.isAlphabetic()
+                            ? currency.getAlphabetic().toUpperCase()
+                            : Integer.toString(currency.getNumeric());
+                    reqQcEuLimits.put(currencyS, new int[]{amount, exponent});
                 }
-
-                MonetaryValue monetaryValue = MonetaryValue.getInstance(stmt.getStatementInfo());
-                int amount = monetaryValue.getAmount().intValue();
-                int exponent = monetaryValue.getExponent().intValue();
-                Iso4217CurrencyCode currency = monetaryValue.getCurrency();
-                String currencyS = currency.isAlphabetic()
-                        ? currency.getAlphabetic().toUpperCase()
-                        : Integer.toString(currency.getNumeric());
-                reqQcEuLimits.put(currencyS, new int[]{amount, exponent});
             }
         }
 
@@ -2095,6 +2096,41 @@ public class ExtensionsChecker {
                     String expValue = expStatementValue.getQcRetentionPeriod().toString();
                     if (!isValue.equals(expValue)) {
                         addViolation(failureMsg, "statementInfo[" + i + "]", isValue, expValue);
+                    }
+                } else if (expStatementValue.getPdsLocations() != null) {
+                    Set<String> pdsLocations = new HashSet<>();
+                    ASN1Sequence pdsLocsSeq = ASN1Sequence.getInstance(is.getStatementInfo());
+                    int size = pdsLocsSeq.size();
+                    for (int k = 0; k < size; k++) {
+                        ASN1Sequence pdsLocSeq = ASN1Sequence.getInstance(
+                                pdsLocsSeq.getObjectAt(k));
+                        int size2 = pdsLocSeq.size();
+                        if (size2 != 2) {
+                            throw new IllegalArgumentException("sequence size is " + size2
+                                    + " but expected 2");
+                        }
+                        String url = DERIA5String.getInstance(pdsLocSeq.getObjectAt(0)).getString();
+                        String lang = DERPrintableString.getInstance(pdsLocSeq.getObjectAt(1))
+                                .getString();
+                        pdsLocations.add("url=" + url + ",lang=" + lang);
+                    }
+
+                    PdsLocationsType pdsLocationsConf = expStatementValue.getPdsLocations();
+                    Set<String> expectedPdsLocations = new HashSet<>();
+                    for (PdsLocationType m : pdsLocationsConf.getPdsLocation()) {
+                        expectedPdsLocations.add("url=" + m.getUrl() + ",lang=" + m.getLanguage());
+                    }
+
+                    Set<String> diffs = strInBnotInA(expectedPdsLocations, pdsLocations);
+                    if (CollectionUtil.isNonEmpty(diffs)) {
+                        failureMsg.append("statementInfo[" + i + "]: ").append(diffs.toString());
+                        failureMsg.append(" are present but not expected; ");
+                    }
+
+                    diffs = strInBnotInA(pdsLocations, expectedPdsLocations);
+                    if (CollectionUtil.isNonEmpty(diffs)) {
+                        failureMsg.append("statementInfo[" + i + "]: ").append(diffs.toString());
+                        failureMsg.append(" are absent but are required; ");
                     }
                 } else if (expStatementValue.getQcEuLimitValue() != null) {
                     QcEuLimitValueType euLimitConf = expStatementValue.getQcEuLimitValue();

@@ -132,6 +132,12 @@ xipki-qa:check-cert \
 
 xipki-qa:check-cert \
   --issuer SubCA \
+  --profile QC \
+  --p10 output/QC1.p10 \
+  --cert output/QC1.der
+
+xipki-qa:check-cert \
+  --issuer SubCA \
   --profile EE.Complex \
   --p10 output/EE.Complex1.p10 \
   --cert output/EE.Complex1.der

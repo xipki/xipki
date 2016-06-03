@@ -415,6 +415,8 @@ public class ObjectIdentifiers {
 
     public static final ASN1ObjectIdentifier id_etsi_qcs_QcSSCD = id_etsi_qcs.branch("4");
 
+    public static final ASN1ObjectIdentifier id_etsi_qcs_QcPDS = id_etsi_qcs.branch("5");
+
     // RFC 7633: X.509v3 Transport Layer Security (TLS) Feature Extension
     private static final ASN1ObjectIdentifier id_pe = new ASN1ObjectIdentifier("1.3.6.1.5.5.7.1");
 

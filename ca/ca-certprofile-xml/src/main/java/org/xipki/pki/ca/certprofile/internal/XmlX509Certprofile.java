@@ -64,6 +64,7 @@ import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
@@ -129,6 +130,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage;
 import org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.NameValueType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.OidWithDescType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.PdsLocationType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
@@ -833,8 +835,8 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                 if (r1.getMin() == r1.getMax() && r2.getMin() == r2.getMax()) {
                     MonetaryValue monetaryValue = new MonetaryValue(currency, r1.getMin(),
                             r2.getMin());
-                    QCStatement qcStatment = new QCStatement(qcStatementId, monetaryValue);
-                    qcStatementOption = new QcStatementOption(qcStatment);
+                    QCStatement qcStatement = new QCStatement(qcStatementId, monetaryValue);
+                    qcStatementOption = new QcStatementOption(qcStatement);
                 } else {
                     MonetaryValueOption monetaryValueOption = new MonetaryValueOption(currency, r1,
                             r2);
@@ -842,6 +844,21 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                     requireInfoFromReq = true;
                 }
                 currencyCodes.add(tmpCurrency);
+            } else if (statementValue.getPdsLocations() != null) {
+                ASN1EncodableVector vec = new ASN1EncodableVector();
+                for (PdsLocationType pl : statementValue.getPdsLocations().getPdsLocation()) {
+                    ASN1EncodableVector vec2 = new ASN1EncodableVector();
+                    vec2.add(new DERIA5String(pl.getUrl()));
+                    String lang = pl.getLanguage();
+                    if (lang.length() != 2) {
+                        throw new RuntimeException("invalid language '" + lang + "'");
+                    }
+                    vec2.add(new DERPrintableString(lang));
+                    DERSequence seq = new DERSequence(vec2);
+                    vec.add(seq);
+                }
+                QCStatement qcStatement = new QCStatement(qcStatementId, new DERSequence(vec));
+                qcStatementOption = new QcStatementOption(qcStatement);
             } else {
                 throw new RuntimeException("unknown value of qcStatment");
             }
@@ -1232,7 +1249,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
             Extension extension = requestedExtensions.getExtension(type);
             if (extension == null) {
                 throw new BadCertTemplateException(
-                        "No biometricInfo extension is contained in the request");
+                        "no biometricInfo extension is contained in the request");
             }
             ASN1Sequence seq = ASN1Sequence.getInstance(extension.getParsedValue());
             final int n = seq.size();

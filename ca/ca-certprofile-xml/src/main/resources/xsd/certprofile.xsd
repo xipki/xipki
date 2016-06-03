@@ -468,6 +468,7 @@
       <xs:element name="constant" type="constantValueType"/>
       <xs:element name="qcRetentionPeriod" type="xs:int"/>
       <xs:element name="qcEuLimitValue" type="qcEuLimitValueType"/>
+      <xs:element name="pdsLocations" type="PdsLocationsType"/>
     </xs:choice>
   </xs:complexType>
   <xs:complexType name="qcEuLimitValueType">
@@ -475,6 +476,17 @@
       <xs:element name="currency" type="xs:string"/>
       <xs:element name="amount" type="range2Type"/>
       <xs:element name="exponent" type="range2Type"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PdsLocationsType">
+    <xs:sequence>
+      <xs:element name="pdsLocation" type="PdsLocationType" maxOccurs="99"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PdsLocationType">
+    <xs:sequence>
+      <xs:element name="url" type="xs:string"/>
+      <xs:element name="language" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="authorizationTemplate">

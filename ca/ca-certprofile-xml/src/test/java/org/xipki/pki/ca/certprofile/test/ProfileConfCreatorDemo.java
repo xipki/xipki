@@ -34,7 +34,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.certprofile.internal;
+package org.xipki.pki.ca.certprofile.test;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -111,6 +111,8 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.NameValueType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.pki.ca.certprofile.x509.jaxb.OidWithDescType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.PdsLocationType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.PdsLocationsType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyIdMappingType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings;
@@ -212,6 +214,10 @@ public class ProfileConfCreatorDemo {
             // EE_Complex
             profile = certprofileEeComplex();
             marshall(ms, profile, "Certprofile_EE_Complex.xml");
+
+            // EE_Complex
+            profile = certprofileQc();
+            marshall(ms, profile, "Certprofile_QC.xml");
 
             // TLS
             profile = certprofileTls();
@@ -969,6 +975,67 @@ public class ProfileConfCreatorDemo {
         return profile;
     } // method certprofileMultipleValuedRdn
 
+    private static X509ProfileType certprofileQc() throws Exception {
+        X509ProfileType profile = getBaseProfile("Certprofile QC", X509CertLevel.EndEntity,
+                "5y", false, new String[]{"SHA1"});
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setIncSerialNumber(false);
+
+        List<RdnType> rdnControls = subject.getRdn();
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_organizationIdentifier, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
+                null));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_CN, 1, 1));
+
+        // Extensions
+        // Extensions - general
+        ExtensionsType extensions = profile.getExtensions();
+
+        // Extensions - controls
+        List<ExtensionType> list = extensions.getExtension();
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, false, extensionValue));
+
+        // Extensions - AuthorityInfoAccess
+        extensionValue = createAuthorityInfoAccess();
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
+
+        // Extensions - keyUsage
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.CONTENT_COMMITMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
+
+        // Extensions - extenedKeyUsage
+        extensionValue = createExtendedKeyUsage(
+                new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_timeStamping}, null);
+        list.add(createExtension(Extension.extendedKeyUsage, true, true, extensionValue));
+
+        // privateKeyUsagePeriod
+        extensionValue = createPrivateKeyUsagePeriod("3y");
+        list.add(createExtension(Extension.privateKeyUsagePeriod, true, false, extensionValue));
+
+        // QcStatements
+        extensionValue = createQcStatements(false);
+        list.add(createExtension(Extension.qCStatements, true, false, extensionValue));
+
+        return profile;
+    } // method certprofileEeComplex
+
     private static X509ProfileType certprofileEeComplex() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile EE complex", X509CertLevel.EndEntity,
                 "5y", true, new String[]{"SHA1"});
@@ -1050,7 +1117,7 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.privateKeyUsagePeriod, true, false, extensionValue));
 
         // QcStatements
-        extensionValue = createQcStatements();
+        extensionValue = createQcStatements(true);
         list.add(createExtension(Extension.qCStatements, true, false, extensionValue));
 
         // biometricInfo
@@ -1282,16 +1349,20 @@ public class ProfileConfCreatorDemo {
         return createExtensionValueType(extValue);
     }
 
-    private static ExtensionValueType createQcStatements() {
+    private static ExtensionValueType createQcStatements(final boolean requireRequestExt) {
         QcStatements extValue = new QcStatements();
         QcStatementType statement = new QcStatementType();
+
+        // QcCompliance
         statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcCompliance));
         extValue.getQcStatement().add(statement);
 
+        // QC SCD
         statement = new QcStatementType();
         statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcSSCD));
         extValue.getQcStatement().add(statement);
 
+        // QC RetentionPeriod
         statement = new QcStatementType();
         statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcRetentionPeriod));
         QcStatementValueType statementValue = new QcStatementValueType();
@@ -1299,26 +1370,49 @@ public class ProfileConfCreatorDemo {
         statement.setStatementValue(statementValue);
         extValue.getQcStatement().add(statement);
 
+        // QC LimitValue
+        if (requireRequestExt) {
+            statement = new QcStatementType();
+            statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcLimitValue));
+            statementValue = new QcStatementValueType();
+
+            QcEuLimitValueType euLimit = new QcEuLimitValueType();
+            euLimit.setCurrency("EUR");
+            Range2Type rangeAmount = new Range2Type();
+            rangeAmount.setMin(100);
+            rangeAmount.setMax(200);
+            euLimit.setAmount(rangeAmount);
+
+            Range2Type rangeExponent = new Range2Type();
+            rangeExponent.setMin(10);
+            rangeExponent.setMax(20);
+            euLimit.setExponent(rangeExponent);
+
+            statementValue.setQcEuLimitValue(euLimit);
+            statement.setStatementValue(statementValue);
+            extValue.getQcStatement().add(statement);
+        }
+
+        // QC PDS
         statement = new QcStatementType();
-        statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcLimitValue));
-        statementValue = new QcStatementValueType();
-
-        QcEuLimitValueType euLimit = new QcEuLimitValueType();
-        euLimit.setCurrency("EUR");
-        Range2Type rangeAmount = new Range2Type();
-        rangeAmount.setMin(100);
-        rangeAmount.setMax(200);
-        euLimit.setAmount(rangeAmount);
-
-        Range2Type rangeExponent = new Range2Type();
-        rangeExponent.setMin(10);
-        rangeExponent.setMax(20);
-        euLimit.setExponent(rangeExponent);
-
-        statementValue.setQcEuLimitValue(euLimit);
-        statement.setStatementValue(statementValue);
+        statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcPDS));
         extValue.getQcStatement().add(statement);
+        statementValue = new QcStatementValueType();
+        statement.setStatementValue(statementValue);
+        PdsLocationsType pdsLocations = new PdsLocationsType();
+        statementValue.setPdsLocations(pdsLocations);
 
+        PdsLocationType pdsLocation = new PdsLocationType();
+        pdsLocations.getPdsLocation().add(pdsLocation);
+        pdsLocation.setUrl("http://pki.example.org/pds/en");
+        pdsLocation.setLanguage("en");
+
+        pdsLocation = new PdsLocationType();
+        pdsLocations.getPdsLocation().add(pdsLocation);
+        pdsLocation.setUrl("http://pki.example.org/pds/de");
+        pdsLocation.setLanguage("de");
+
+        // QC Constant value
         statement = new QcStatementType();
         statement.setStatementId(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5"), "dummy"));
         statementValue = new QcStatementValueType();

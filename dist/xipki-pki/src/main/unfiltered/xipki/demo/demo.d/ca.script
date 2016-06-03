@@ -65,6 +65,11 @@ xipki-ca:profile-add \
   --conf-file xipki/demo/profile/Certprofile_multiValuedRDN.xml
 
 xipki-ca:profile-add \
+  --name QC \
+  --type XML \
+  --conf-file xipki/demo/profile/Certprofile_QC.xml
+
+xipki-ca:profile-add \
   --name EE.Complex \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_EE_Complex.xml
@@ -389,7 +394,11 @@ xipki-ca:caalias-add \
 ## Add cert profile to CA
 xipki-ca:caprofile-add \
   --ca SubCA1.complex-Name \
-  --profile EE.Complex \
+  --profile QC
+
+xipki-ca:caprofile-add \
+  --ca SubCA1.complex-Name \
+  --profile EE.Complex
 
 xipki-ca:caprofile-add \
   --ca SubCA1.complex-Name \
