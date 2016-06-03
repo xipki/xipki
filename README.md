@@ -9,6 +9,8 @@ Highly scalable and high-performance open source PKI (Certification Authority an
   - X.509 Certificate v3 (RFC 5280)
   - X.509 CRL v2 (RFC 5280)
   - SCEP (draft-gutmann-scep-00, draft-nourse-scep-23)
+  - EN 319 411 (eIDAS)
+  - EN 319 412 (eIDAS)
   - Supported databases
     - Oracle
     - DB2
@@ -50,7 +52,7 @@ Highly scalable and high-performance open source PKI (Certification Authority an
     - PolicyConstrains (RFC 5280)
     - PolicyMappings (RFC 5280)
     - PrivateKeyUsagePeriod (RFC 5280)
-    - QCStatements (RFC 3739)
+    - QCStatements (RFC 3739, EN 319 412)
     - Restriction (German national standard CommonPKI)
     - SMIMECapabilities (RFC 4262)
     - SubjectAltName (RFC 5280)
