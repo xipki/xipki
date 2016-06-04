@@ -105,7 +105,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     private X509CertificateHolder[] certificateChainAsBcObjects;
 
     static {
-        final String propKey = "org.xipki.security.signservice.timeout";
+        final String propKey = "org.xipki.commons.security.signservice.timeout";
         String str = System.getProperty(propKey);
         if (str != null) {
             int vi = Integer.parseInt(str);
