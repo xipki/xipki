@@ -98,14 +98,10 @@ public class DbCertStatusStore extends OcspStore {
 
             if (revocationTimeMs == null) {
                 return issuer.getRevocationInfo() == null;
-            } else {
-                if (issuer.getRevocationInfo() == null) {
-                    return false;
-                } else {
-                    return revocationTimeMs
-                            == issuer.getRevocationInfo().getRevocationTime().getTime();
-                }
             }
+
+            return (issuer.getRevocationInfo() == null) ? false
+                    : revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
         }
 
     } // class SimpleIssuerEntry
@@ -128,8 +124,7 @@ public class DbCertStatusStore extends OcspStore {
     static {
         for (HashAlgoType h : HashAlgoType.values()) {
             StringBuilder sb = new StringBuilder();
-            sb.append("ID,REV,RR,RT,RIT,PN,");
-            sb.append(h.getShortName()).append(" ");
+            sb.append("ID,REV,RR,RT,RIT,PN,").append(h.getShortName());
             sb.append(" FROM CERT INNER JOIN CHASH ON ");
             sb.append(" CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID");
             SQL_CS_HASHMAP.put(h, sb.toString());
@@ -167,11 +162,7 @@ public class DbCertStatusStore extends OcspStore {
 
                         int id = rs.getInt("ID");
                         boolean revoked = rs.getBoolean("REV");
-                        Long revTimeMs = null;
-                        if (revoked) {
-                            revTimeMs = rs.getLong("RT") * 1000;
-                        }
-
+                        Long revTimeMs = revoked ? rs.getLong("RT") * 1000 : null;
                         SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revTimeMs);
                         newIssuers.put(id, issuerEntry);
                     }

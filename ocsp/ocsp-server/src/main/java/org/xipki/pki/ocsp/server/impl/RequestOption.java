@@ -136,7 +136,7 @@ class RequestOption {
         }
 
         if (tmpMaxSize < 255) {
-            tmpMaxSize = 4 * 1024; // 4 KB
+            tmpMaxSize = 4096;
         }
         this.maxRequestSize = tmpMaxSize;
 
@@ -206,16 +206,12 @@ class RequestOption {
         }
 
         CertCollectionType certsType = certpathConf.getCerts();
-        if (certsType == null) {
-            this.certs = null;
-        } else {
-            try {
-                this.certs = doGetCerts(certsType);
-            } catch (Exception ex) {
-                throw new InvalidConfException(
-                        "could not initialize the certs: " + ex.getMessage(), ex);
-            }
-        } // end if
+        try {
+            this.certs = (certsType == null) ? null : doGetCerts(certsType);
+        } catch (Exception ex) {
+            throw new InvalidConfException(
+                    "could not initialize the certs: " + ex.getMessage(), ex);
+        }
     } // constructor
 
     public Set<HashAlgoType> getHashAlgos() {

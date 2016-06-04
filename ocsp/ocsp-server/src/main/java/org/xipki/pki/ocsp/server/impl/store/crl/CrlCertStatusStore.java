@@ -41,6 +41,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.cert.CRLReason;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
@@ -219,23 +220,21 @@ public class CrlCertStatusStore extends OcspStore {
             }
 
             if (crlFileChanged) {
-                LOG.info("CRL file {} has changed, updating of the CertStore required",
-                        crlFilename);
+                LOG.info("CRL file {} has changed, update of the CertStore required", crlFilename);
             }
             if (deltaCrlFileChanged) {
-                LOG.info("DeltaCRL file {} has changed, updating of the CertStore required",
+                LOG.info("DeltaCRL file {} has changed, update of the CertStore required",
                         deltaCrlFilename);
             }
 
-            auditPciEvent(AuditLevel.INFO, "UPDATE_CERTSTORE",
-                    "a newer version of CRL is available");
+            auditPciEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "a newer CRL is available");
             updateCrlSuccessful = false;
 
             X509CRL crl = X509Util.parseCrl(crlFilename);
 
             byte[] octetString = crl.getExtensionValue(Extension.cRLNumber.getId());
             if (octetString == null) {
-                throw new OcspStoreException("CRL withour CRLNumber is not supported");
+                throw new OcspStoreException("CRL without CRLNumber is not supported");
             }
             BigInteger newCrlNumber = ASN1Integer.getInstance(
                     DEROctetString.getInstance(octetString).getOctets()).getPositiveValue();
@@ -255,7 +254,7 @@ public class CrlCertStatusStore extends OcspStore {
                 }
 
                 if (!issuerCert.getSubjectX500Principal().equals(issuer)) {
-                    throw new IllegalArgumentException("The issuerCert and CRL do not match");
+                    throw new IllegalArgumentException("issuerCert and CRL do not match");
                 }
             }
 
@@ -314,8 +313,8 @@ public class CrlCertStatusStore extends OcspStore {
                 vec.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
             }
 
-            X509CRL tmpCrl = deltaCrlExists ? deltaCrl : crl;
-            byte[] extValue = tmpCrl.getExtensionValue(Extension.cRLNumber.getId());
+            byte[] extValue = (deltaCrlExists ? deltaCrl : crl).getExtensionValue(
+                    Extension.cRLNumber.getId());
             if (extValue != null) {
                 ASN1Integer asn1CrlNumber = ASN1Integer.getInstance(
                         removeTagAndLenFromExtensionValue(extValue));
@@ -345,8 +344,8 @@ public class CrlCertStatusStore extends OcspStore {
             for (HashAlgoType hashAlgo : HashAlgoType.values()) {
                 byte[] issuerNameHash = hashAlgo.hash(encodedName);
                 byte[] issuerKeyHash = hashAlgo.hash(encodedKey);
-                IssuerHashNameAndKey issuerHash =
-                        new IssuerHashNameAndKey(hashAlgo, issuerNameHash, issuerKeyHash);
+                IssuerHashNameAndKey issuerHash = new IssuerHashNameAndKey(hashAlgo, issuerNameHash,
+                        issuerKeyHash);
                 newIssuerHashMap.put(hashAlgo, issuerHash);
             }
 
@@ -390,19 +389,17 @@ public class CrlCertStatusStore extends OcspStore {
                 }
             }
 
-            Set<? extends X509CRLEntry> revokedCertListInDeltaCrl = null;
-            if (deltaCrl != null) {
-                revokedCertListInDeltaCrl = deltaCrl.getRevokedCertificates();
-                if (revokedCertListInDeltaCrl != null) {
-                    for (X509CRLEntry revokedCert : revokedCertListInDeltaCrl) {
-                        X500Principal thisIssuer = revokedCert.getCertificateIssuer();
-                        if (thisIssuer != null
-                                && !caCert.getSubjectX500Principal().equals(thisIssuer)) {
-                            throw new OcspStoreException("invalid CRLEntry");
-                        }
-                    } // end for
-                } // end if
-            } // end if(deltaCrl != null)
+            Set<? extends X509CRLEntry> revokedCertListInDeltaCrl = (deltaCrl == null) ? null
+                    : deltaCrl.getRevokedCertificates();
+            if (revokedCertListInDeltaCrl != null) {
+                for (X509CRLEntry revokedCert : revokedCertListInDeltaCrl) {
+                    X500Principal thisIssuer = revokedCert.getCertificateIssuer();
+                    if (thisIssuer != null
+                            && !caCert.getSubjectX500Principal().equals(thisIssuer)) {
+                        throw new OcspStoreException("invalid CRLEntry");
+                    }
+                }
+            }
 
             Map<BigInteger, X509CRLEntry> revokedCertMap = null;
 
@@ -415,14 +412,14 @@ public class CrlCertStatusStore extends OcspStore {
 
                 for (X509CRLEntry entry : revokedCertListInDeltaCrl) {
                     BigInteger serialNumber = entry.getSerialNumber();
-                    java.security.cert.CRLReason reason = entry.getRevocationReason();
-                    if (reason == java.security.cert.CRLReason.REMOVE_FROM_CRL) {
+                    CRLReason reason = entry.getRevocationReason();
+                    if (reason == CRLReason.REMOVE_FROM_CRL) {
                         revokedCertMap.remove(serialNumber);
                     } else {
                         revokedCertMap.put(serialNumber, entry);
                     }
-                } // end for
-            } // end if
+                }
+            }
 
             Iterator<? extends X509CRLEntry> it = null;
             if (revokedCertMap != null) {
