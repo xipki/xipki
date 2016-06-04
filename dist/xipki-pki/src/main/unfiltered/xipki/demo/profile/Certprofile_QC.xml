@@ -170,6 +170,16 @@
             </statementValue>
           </qcStatement>
           <qcStatement>
+            <statementId description="etsi-qcs-QcLimitValue">0.4.0.1862.1.2</statementId>
+            <statementValue>
+              <qcEuLimitValue>
+<currency>EUR</currency>
+<amount min="100" max="100"/>
+<exponent min="10" max="10"/>
+              </qcEuLimitValue>
+            </statementValue>
+          </qcStatement>
+          <qcStatement>
             <statementId>0.4.0.1862.1.5</statementId>
             <statementValue>
               <pdsLocations>

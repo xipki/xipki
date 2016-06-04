@@ -1371,27 +1371,27 @@ public class ProfileConfCreatorDemo {
         extValue.getQcStatement().add(statement);
 
         // QC LimitValue
-        if (requireRequestExt) {
-            statement = new QcStatementType();
-            statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcLimitValue));
-            statementValue = new QcStatementValueType();
+        statement = new QcStatementType();
+        statement.setStatementId(createOidType(ObjectIdentifiers.id_etsi_qcs_QcLimitValue));
+        statementValue = new QcStatementValueType();
 
-            QcEuLimitValueType euLimit = new QcEuLimitValueType();
-            euLimit.setCurrency("EUR");
-            Range2Type rangeAmount = new Range2Type();
-            rangeAmount.setMin(100);
-            rangeAmount.setMax(200);
-            euLimit.setAmount(rangeAmount);
+        QcEuLimitValueType euLimit = new QcEuLimitValueType();
+        euLimit.setCurrency("EUR");
+        Range2Type rangeAmount = new Range2Type();
+        int min = 100;
+        rangeAmount.setMin(min);
+        rangeAmount.setMax(requireRequestExt ? 200 : min);
+        euLimit.setAmount(rangeAmount);
 
-            Range2Type rangeExponent = new Range2Type();
-            rangeExponent.setMin(10);
-            rangeExponent.setMax(20);
-            euLimit.setExponent(rangeExponent);
+        Range2Type rangeExponent = new Range2Type();
+        min = 10;
+        rangeExponent.setMin(min);
+        rangeExponent.setMax(requireRequestExt ? 20 : min);
+        euLimit.setExponent(rangeExponent);
 
-            statementValue.setQcEuLimitValue(euLimit);
-            statement.setStatementValue(statementValue);
-            extValue.getQcStatement().add(statement);
-        }
+        statementValue.setQcEuLimitValue(euLimit);
+        statement.setStatementValue(statementValue);
+        extValue.getQcStatement().add(statement);
 
         // QC PDS
         statement = new QcStatementType();
