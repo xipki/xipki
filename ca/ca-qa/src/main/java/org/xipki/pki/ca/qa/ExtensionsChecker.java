@@ -129,7 +129,6 @@ import org.xipki.pki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
-import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.pki.ca.certprofile.BiometricInfoOption;
 import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AdditionalInformation;
@@ -1608,18 +1607,11 @@ public class ExtensionsChecker {
         for (int i = 0; i < size; i++) {
             AccessDescription ad = AccessDescription.getInstance(requestSeq.getObjectAt(i));
             ASN1ObjectIdentifier accessMethod = ad.getAccessMethod();
-
-            Set<GeneralNameMode> generalNameModes;
-            if (accessMethod == null) {
-                generalNameModes = conf.get(X509Certprofile.OID_ZERO);
-            } else {
-                generalNameModes = conf.get(accessMethod);
-            }
+            Set<GeneralNameMode> generalNameModes = conf.get(accessMethod);
 
             if (generalNameModes == null) {
                 failureMsg.append("accessMethod in requestExtension ");
-                failureMsg.append((accessMethod == null) ? "NULL" : accessMethod.getId());
-                failureMsg.append(" is not allowed; ");
+                failureMsg.append(accessMethod.getId()).append(" is not allowed; ");
                 continue;
             }
 
