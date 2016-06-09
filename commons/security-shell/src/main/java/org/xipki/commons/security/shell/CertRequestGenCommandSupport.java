@@ -54,6 +54,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
@@ -88,6 +89,7 @@ import org.xipki.commons.security.ExtensionExistence;
 import org.xipki.commons.security.KeyUsage;
 import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.SignatureAlgoControl;
+import org.xipki.commons.security.exception.BadInputException;
 import org.xipki.commons.security.exception.InvalidOidOrNameException;
 import org.xipki.commons.security.exception.NoIdleSignerException;
 import org.xipki.commons.security.exception.XiSecurityException;
@@ -106,6 +108,18 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
             description = "hash algorithm name")
     @Completion(HashAlgCompleter.class)
     protected String hashAlgo = "SHA256";
+
+    @Option(name = "--subject-alt-name",
+            multiValued = true,
+            description = "subjectAltName\n"
+                    + "(multi-valued)")
+    protected List<String> subjectAltNames;
+
+    @Option(name = "--subject-info-access",
+            multiValued = true,
+            description = "subjectInfoAccess\n"
+                    + "(multi-valued)")
+    protected List<String> subjectInfoAccesses;
 
     @Option(name = "--subject", aliases = "-s",
             required = true,
@@ -146,18 +160,6 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     + "(multi-valued)")
     @Completion(ExtKeyusageCompleter.class)
     private List<String> extkeyusages;
-
-    @Option(name = "--subject-alt-name",
-            multiValued = true,
-            description = "subjectAltName\n"
-                    + "(multi-valued)")
-    private List<String> subjectAltNames;
-
-    @Option(name = "--subject-info-access",
-            multiValued = true,
-            description = "subjectInfoAccess\n"
-                    + "(multi-valued)")
-    private List<String> subjectInfoAccesses;
 
     @Option(name = "--qc-eu-limit",
             multiValued = true,
@@ -215,15 +217,19 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         // SubjectAltNames
         List<Extension> extensions = new LinkedList<>();
 
-        if (isNotEmpty(subjectAltNames)) {
-            extensions.add(X509Util.createExtensionSubjectAltName(subjectAltNames, false));
-            needExtensionTypes.add(Extension.subjectAlternativeName.getId());
+        ASN1OctetString extnValue = createExtnValueSubjectAltName();
+        if (extnValue != null) {
+            ASN1ObjectIdentifier oid = Extension.subjectAlternativeName;
+            extensions.add(new Extension(oid, false, extnValue));
+            needExtensionTypes.add(oid.getId());
         }
 
         // SubjectInfoAccess
-        if (isNotEmpty(subjectInfoAccesses)) {
-            extensions.add(X509Util.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
-            needExtensionTypes.add(Extension.subjectInfoAccess.getId());
+        extnValue = createExtnValueSubjectInfoAccess();
+        if (extnValue != null) {
+            ASN1ObjectIdentifier oid = Extension.subjectInfoAccess;
+            extensions.add(new Extension(oid, false, extnValue));
+            needExtensionTypes.add(oid.getId());
         }
 
         // Keyusage
@@ -358,6 +364,17 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     protected X500Name getSubject(final String subjectText) {
         ParamUtil.requireNonBlank("subjectText", subjectText);
         return new X500Name(subjectText);
+    }
+
+    protected ASN1OctetString createExtnValueSubjectAltName() throws BadInputException {
+        return isEmpty(subjectAltNames) ? null
+                : X509Util.createExtensionSubjectAltName(subjectAltNames, false).getExtnValue();
+    }
+
+    protected ASN1OctetString createExtnValueSubjectInfoAccess() throws BadInputException {
+        return isEmpty(subjectInfoAccesses) ? null
+                : X509Util.createExtensionSubjectInfoAccess(subjectInfoAccesses, false)
+                    .getExtnValue();
     }
 
     private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(

@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -1129,6 +1130,57 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(ObjectIdentifiers.id_xipki_ext_authorizationTemplate, true, false,
                 extensionValue));
 
+        // SubjectAltName
+        SubjectAltName subjectAltNameMode = new SubjectAltName();
+
+        OtherName otherName = new OtherName();
+        otherName.getType().add(createOidType(new ASN1ObjectIdentifier("1.2.3.1"), "dummy oid 1"));
+        otherName.getType().add(createOidType(new ASN1ObjectIdentifier("1.2.3.2"), "dummy oid 2"));
+        subjectAltNameMode.setOtherName(otherName);
+        subjectAltNameMode.setRfc822Name("");
+        subjectAltNameMode.setDnsName("");
+        subjectAltNameMode.setDirectoryName("");
+        subjectAltNameMode.setEdiPartyName("");
+        subjectAltNameMode.setUniformResourceIdentifier("");
+        subjectAltNameMode.setIpAddress("");
+        subjectAltNameMode.setRegisteredID("");
+
+        extensionValue = createExtensionValueType(subjectAltNameMode);
+        list.add(createExtension(Extension.subjectAlternativeName, true, false, extensionValue));
+
+        // SubjectInfoAccess
+        List<ASN1ObjectIdentifier> accessMethods = new LinkedList<>();
+        accessMethods.add(ObjectIdentifiers.id_ad_caRepository);
+        for (int i = 0; i < 10; i++) {
+            accessMethods.add(new ASN1ObjectIdentifier("2.3.4." + (i + 1)));
+        }
+
+        SubjectInfoAccess subjectInfoAccessMode = new SubjectInfoAccess();
+        for (ASN1ObjectIdentifier accessMethod : accessMethods) {
+            SubjectInfoAccess.Access access = new SubjectInfoAccess.Access();
+            subjectInfoAccessMode.getAccess().add(access);
+            access.setAccessMethod(createOidType(accessMethod));
+
+            GeneralNameType accessLocation = new GeneralNameType();
+            access.setAccessLocation(accessLocation);
+
+            otherName = new OtherName();
+            otherName.getType().add(createOidType(new ASN1ObjectIdentifier("1.2.3.1"),
+                    "dummy oid 1"));
+            otherName.getType().add(createOidType(new ASN1ObjectIdentifier("1.2.3.2"),
+                    "dummy oid 2"));
+            accessLocation.setOtherName(otherName);
+            accessLocation.setRfc822Name("");
+            accessLocation.setDnsName("");
+            accessLocation.setDirectoryName("");
+            accessLocation.setEdiPartyName("");
+            accessLocation.setUniformResourceIdentifier("");
+            accessLocation.setIpAddress("");
+            accessLocation.setRegisteredID("");
+        }
+
+        extensionValue = createExtensionValueType(subjectInfoAccessMode);
+        list.add(createExtension(Extension.subjectInfoAccess, true, false, extensionValue));
         return profile;
     } // method certprofileEeComplex
 

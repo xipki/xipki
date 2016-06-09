@@ -57,12 +57,10 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -830,33 +828,42 @@ class IdentifiedX509Certprofile {
         case GeneralName.uniformResourceIdentifier:
         case GeneralName.iPAddress:
         case GeneralName.registeredID:
+        case GeneralName.directoryName:
             return new GeneralName(tag, reqName.getName());
         case GeneralName.otherName:
             ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
+            int size = reqSeq.size();
+            if (size != 2) {
+                throw new BadCertTemplateException("invalid otherName sequence: size is not 2: "
+                        + size);
+            }
+
             ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
             if (!mode.getAllowedTypes().contains(type)) {
                 throw new BadCertTemplateException(
                         "otherName.type " + type.getId() + " is not allowed");
             }
 
-            ASN1Encodable value = ((ASN1TaggedObject) reqSeq.getObjectAt(1)).getObject();
-            String text;
-            if (!(value instanceof ASN1String)) {
-                throw new BadCertTemplateException("otherName.value is not a String");
-            } else {
-                text = ((ASN1String) value).getString();
+            ASN1Encodable asn1 = reqSeq.getObjectAt(1);
+            if (! (asn1 instanceof ASN1TaggedObject)) {
+                throw new BadCertTemplateException("otherName.value is not tagged Object");
+            }
+
+            int tagNo = ((ASN1TaggedObject) asn1).getTagNo();
+            if (tagNo != 0) {
+                throw new BadCertTemplateException("otherName.value does not have tag 0: " + tagNo);
             }
 
             ASN1EncodableVector vector = new ASN1EncodableVector();
             vector.add(type);
-            vector.add(new DERTaggedObject(true, 0, new DERUTF8String(text)));
+            vector.add(new DERTaggedObject(true, 0, ((ASN1TaggedObject) asn1).getObject()));
             DERSequence seq = new DERSequence(vector);
 
             return new GeneralName(GeneralName.otherName, seq);
         case GeneralName.ediPartyName:
             reqSeq = ASN1Sequence.getInstance(reqName.getName());
 
-            int size = reqSeq.size();
+            size = reqSeq.size();
             String nameAssigner = null;
             int idx = 0;
             if (size > 1) {
@@ -974,9 +981,6 @@ class IdentifiedX509Certprofile {
         for (int i = 0; i < size; i++) {
             AccessDescription ad = AccessDescription.getInstance(reqSeq.getObjectAt(i));
             ASN1ObjectIdentifier accessMethod = ad.getAccessMethod();
-            if (accessMethod == null) {
-                accessMethod = X509Certprofile.OID_ZERO;
-            }
             Set<GeneralNameMode> generalNameModes = modes.get(accessMethod);
 
             if (generalNameModes == null) {

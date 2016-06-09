@@ -279,5 +279,208 @@
         </authorizationTemplate>
       </value>
     </extension>
+    <extension required="true" permittedInRequest="true">
+      <type description="subjectAlternativeName">2.5.29.17</type>
+      <critical>false</critical>
+      <value>
+        <subjectAltName>
+          <rfc822Name></rfc822Name>
+          <dnsName></dnsName>
+          <directoryName></directoryName>
+          <ediPartyName></ediPartyName>
+          <uniformResourceIdentifier></uniformResourceIdentifier>
+          <ipAddress></ipAddress>
+          <registeredID></registeredID>
+          <otherName>
+            <type description="dummy oid 1">1.2.3.1</type>
+            <type description="dummy oid 2">1.2.3.2</type>
+          </otherName>
+        </subjectAltName>
+      </value>
+    </extension>
+    <extension required="true" permittedInRequest="true">
+      <type description="subjectInfoAccess">1.3.6.1.5.5.7.1.11</type>
+      <critical>false</critical>
+      <value>
+        <subjectInfoAccess>
+          <access>
+            <accessMethod description="ad-caRepository">1.3.6.1.5.5.7.48.5</accessMethod>
+            <accessLocation>
+              <rfc822Name></rfc822Name>
+              <dnsName></dnsName>
+              <directoryName></directoryName>
+              <ediPartyName></ediPartyName>
+              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <ipAddress></ipAddress>
+              <registeredID></registeredID>
+              <otherName>
+<type description="dummy oid 1">1.2.3.1</type>
+<type description="dummy oid 2">1.2.3.2</type>
+              </otherName>
+            </accessLocation>
+          </access>
+          <access>
+            <accessMethod>2.3.4.1</accessMethod>
+            <accessLocation>
+              <rfc822Name></rfc822Name>
+              <dnsName></dnsName>
+              <directoryName></directoryName>
+              <ediPartyName></ediPartyName>
+              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <ipAddress></ipAddress>
+              <registeredID></registeredID>
+              <otherName>
+<type description="dummy oid 1">1.2.3.1</type>
+<type description="dummy oid 2">1.2.3.2</type>
+              </otherName>
+            </accessLocation>
+          </access>
+          <access>
+            <accessMethod>2.3.4.2</accessMethod>
+            <accessLocation>
+              <rfc822Name></rfc822Name>
+              <dnsName></dnsName>
+              <directoryName></directoryName>
+              <ediPartyName></ediPartyName>
+              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <ipAddress></ipAddress>
+              <registeredID></registeredID>
+              <otherName>
+<type description="dummy oid 1">1.2.3.1</type>
+<type description="dummy oid 2">1.2.3.2</type>
+              </otherName>
+            </accessLocation>
+          </access>
+          <access>
+            <accessMethod>2.3.4.3</accessMethod>
+            <accessLocation>
+              <rfc822Name></rfc822Name>
+              <dnsName></dnsName>
+              <directoryName></directoryName>
+              <ediPartyName></ediPartyName>
+              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <ipAddress></ipAddress>
+              <registeredID></registeredID>
+              <otherName>
+<type description="dummy oid 1">1.2.3.1</type>
+<type description="dummy oid 2">1.2.3.2</type>
+              </otherName>
+            </accessLocation>
+          </access>
+          <access>
+            <accessMethod>2.3.4.4</accessMethod>
+            <accessLocation>
+              <rfc822Name></rfc822Name>
+              <dnsName></dnsName>
+              <directoryName></directoryName>
+              <ediPartyName></ediPartyName>
+              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <ipAddress></ipAddress>
+              <registeredID></registeredID>
+              <otherName>
+<type description="dummy oid 1">1.2.3.1</type>
+<type description="dummy oid 2">1.2.3.2</type>
+              </otherName>
+            </accessLocation>
+          </access>
+          <access>
+            <accessMethod>2.3.4.5</accessMethod>
+            <accessLocation>
+              <rfc822Name></rfc822Name>
+              <dnsName></dnsName>
+              <directoryName></directoryName>
+              <ediPartyName></ediPartyName>
+              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <ipAddress></ipAddress>
+              <registeredID></registeredID>
+              <otherName>
+<type description="dummy oid 1">1.2.3.1</type>
+<type description="dummy oid 2">1.2.3.2</type>
+              </otherName>
+            </accessLocation>
+          </access>
+          <access>
+            <accessMethod>2.3.4.6</accessMethod>
+            <accessLocation>
+              <rfc822Name></rfc822Name>
+              <dnsName></dnsName>
+              <directoryName></directoryName>
+              <ediPartyName></ediPartyName>
+              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <ipAddress></ipAddress>
+              <registeredID></registeredID>
+              <otherName>
+<type description="dummy oid 1">1.2.3.1</type>
+<type description="dummy oid 2">1.2.3.2</type>
+              </otherName>
+            </accessLocation>
+          </access>
+          <access>
+            <accessMethod>2.3.4.7</accessMethod>
+            <accessLocation>
+              <rfc822Name></rfc822Name>
+              <dnsName></dnsName>
+              <directoryName></directoryName>
+              <ediPartyName></ediPartyName>
+              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <ipAddress></ipAddress>
+              <registeredID></registeredID>
+              <otherName>
+<type description="dummy oid 1">1.2.3.1</type>
+<type description="dummy oid 2">1.2.3.2</type>
+              </otherName>
+            </accessLocation>
+          </access>
+          <access>
+            <accessMethod>2.3.4.8</accessMethod>
+            <accessLocation>
+              <rfc822Name></rfc822Name>
+              <dnsName></dnsName>
+              <directoryName></directoryName>
+              <ediPartyName></ediPartyName>
+              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <ipAddress></ipAddress>
+              <registeredID></registeredID>
+              <otherName>
+<type description="dummy oid 1">1.2.3.1</type>
+<type description="dummy oid 2">1.2.3.2</type>
+              </otherName>
+            </accessLocation>
+          </access>
+          <access>
+            <accessMethod>2.3.4.9</accessMethod>
+            <accessLocation>
+              <rfc822Name></rfc822Name>
+              <dnsName></dnsName>
+              <directoryName></directoryName>
+              <ediPartyName></ediPartyName>
+              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <ipAddress></ipAddress>
+              <registeredID></registeredID>
+              <otherName>
+<type description="dummy oid 1">1.2.3.1</type>
+<type description="dummy oid 2">1.2.3.2</type>
+              </otherName>
+            </accessLocation>
+          </access>
+          <access>
+            <accessMethod>2.3.4.10</accessMethod>
+            <accessLocation>
+              <rfc822Name></rfc822Name>
+              <dnsName></dnsName>
+              <directoryName></directoryName>
+              <ediPartyName></ediPartyName>
+              <uniformResourceIdentifier></uniformResourceIdentifier>
+              <ipAddress></ipAddress>
+              <registeredID></registeredID>
+              <otherName>
+<type description="dummy oid 1">1.2.3.1</type>
+<type description="dummy oid 2">1.2.3.2</type>
+              </otherName>
+            </accessLocation>
+          </access>
+        </subjectInfoAccess>
+      </value>
+    </extension>
   </extensions>
 </X509Profile>

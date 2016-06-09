@@ -54,12 +54,18 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERGeneralizedTime;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
@@ -68,6 +74,7 @@ import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.SignatureAlgoControl;
 import org.xipki.commons.security.SignerConf;
+import org.xipki.commons.security.exception.BadInputException;
 import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
 
 /**
@@ -171,6 +178,88 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
         }
 
         return new X500Name(list.toArray(new RDN[0]));
+    }
+
+    @Override
+    protected ASN1OctetString createExtnValueSubjectAltName() throws BadInputException {
+        if (!isEmpty(subjectAltNames)) {
+            throw new BadInputException("subjectAltNames must be null");
+        }
+        GeneralNames names = createComplexGeneralNames("SAN-");
+        try {
+            return new DEROctetString(names);
+        } catch (IOException ex) {
+            throw new BadInputException(ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    protected ASN1OctetString createExtnValueSubjectInfoAccess() throws BadInputException {
+        if (!isEmpty(subjectInfoAccesses)) {
+            throw new BadInputException("subjectInfoAccess must be null");
+        }
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+
+        GeneralName[] names = createComplexGeneralNames("SIA-").getNames();
+
+        ASN1EncodableVector vec2 = new ASN1EncodableVector();
+        vec2.add(ObjectIdentifiers.id_ad_caRepository);
+        vec2.add(names[0]);
+        vec.add(new DERSequence(vec2));
+
+        for (int i = 1; i < names.length; i++) {
+            vec2 = new ASN1EncodableVector();
+            vec2.add(new ASN1ObjectIdentifier("2.3.4." + i));
+            vec2.add(names[i]);
+            vec.add(new DERSequence(vec2));
+        }
+
+        try {
+            return new DEROctetString(new DERSequence(vec));
+        } catch (IOException ex) {
+            throw new BadInputException(ex.getMessage(), ex);
+        }
+    }
+
+    private static GeneralNames createComplexGeneralNames(String prefix) {
+        List<GeneralName> list = new LinkedList<>();
+        // otherName
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        vec.add(new ASN1ObjectIdentifier("1.2.3.1"));
+        vec.add(new DERTaggedObject(true, 0, new DERUTF8String(prefix + "I am otherName 1.2.3.1")));
+        list.add(new GeneralName(GeneralName.otherName, new DERSequence(vec)));
+
+        vec = new ASN1EncodableVector();
+        vec.add(new ASN1ObjectIdentifier("1.2.3.2"));
+        vec.add(new DERTaggedObject(true, 0, new DERUTF8String(prefix + "I am otherName 1.2.3.2")));
+        list.add(new GeneralName(GeneralName.otherName, new DERSequence(vec)));
+
+        // rfc822Name
+        list.add(new GeneralName(GeneralName.rfc822Name, prefix + "info@example.org"));
+
+        // dNSName
+        list.add(new GeneralName(GeneralName.dNSName, prefix + "dns.example.org"));
+
+        // directoryName
+        list.add(new GeneralName(GeneralName.directoryName, new X500Name("CN=demo,C=DE")));
+
+        // ediPartyName
+        vec = new ASN1EncodableVector();
+        vec.add(new DERTaggedObject(false, 0, new DirectoryString(prefix + "assigner1")));
+        vec.add(new DERTaggedObject(false, 1, new DirectoryString(prefix + "party1")));
+        list.add(new GeneralName(GeneralName.ediPartyName, new DERSequence(vec)));
+
+        // uniformResourceIdentifier
+        list.add(new GeneralName(GeneralName.uniformResourceIdentifier,
+                prefix + "uri.example.org"));
+
+        // iPAddress
+        list.add(new GeneralName(GeneralName.iPAddress, "69.1.2.190"));
+
+        // registeredID
+        list.add(new GeneralName(GeneralName.registeredID, "2.3.4.5"));
+
+        return new GeneralNames(list.toArray(new GeneralName[0]));
     }
 
 }

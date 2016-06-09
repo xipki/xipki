@@ -65,8 +65,6 @@ import org.xipki.pki.ca.api.profile.GeneralNameMode;
 
 public abstract class X509Certprofile {
 
-    public static final ASN1ObjectIdentifier OID_ZERO = new ASN1ObjectIdentifier("0.0.0.0");
-
     private TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
     public boolean isOnlyForRa() {
