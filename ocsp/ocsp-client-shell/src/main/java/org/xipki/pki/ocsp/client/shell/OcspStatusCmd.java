@@ -141,7 +141,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
             if (responderCerts == null || responderCerts.length < 1) {
                 throw new CmdFailure("no responder certificate is contained in the response");
             }
-            
+
             ResponderID respId = basicResp.getResponderId().toASN1Primitive();
             X500Name respIdByName = respId.getName();
             byte[] respIdByKey = respId.getKeyHash();
@@ -164,7 +164,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
                     break;
                 }
             }
-            
+
             if (respSigner == null) {
                 throw new CmdFailure("no responder certificate match the ResponderId");
             }
