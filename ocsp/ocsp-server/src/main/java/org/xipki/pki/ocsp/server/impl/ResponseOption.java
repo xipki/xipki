@@ -51,6 +51,8 @@ import org.xipki.pki.ocsp.server.impl.jaxb.ResponseOptionType;
 
 class ResponseOption {
 
+    private final boolean responderIdByName;
+
     private final boolean includeInvalidityDate;
 
     private final boolean includeRevReason;
@@ -65,6 +67,7 @@ class ResponseOption {
 
     ResponseOption(final ResponseOptionType conf) throws InvalidConfException {
         ParamUtil.requireNonNull("conf", conf);
+        this.responderIdByName = getBoolean(conf.isResponderIdByName(), true);
         this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
         this.includeRevReason = getBoolean(conf.isIncludeRevReason(), true);
         this.embedCertsMode = conf.getEmbedCertsMode();
@@ -90,6 +93,10 @@ class ResponseOption {
             }
         }
         this.certHashAlgo = tmpCertHashAlgo;
+    }
+
+    public boolean isResponderIdByName() {
+        return responderIdByName;
     }
 
     public boolean isIncludeInvalidityDate() {

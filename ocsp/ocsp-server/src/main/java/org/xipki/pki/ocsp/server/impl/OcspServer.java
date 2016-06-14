@@ -680,7 +680,7 @@ public class OcspServer {
                 }
             }
 
-            RespID respId = new RespID(signer.getResponderId());
+            RespID respId = signer.getResponder(responseOption.isResponderIdByName());
             BasicOCSPRespBuilder basicOcspBuilder = new BasicOCSPRespBuilder(respId);
             ASN1ObjectIdentifier extensionType = OCSPObjectIdentifiers.id_pkix_ocsp_nonce;
             criticalExtensionOids.remove(extensionType);

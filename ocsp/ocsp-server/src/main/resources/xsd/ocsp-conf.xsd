@@ -162,6 +162,7 @@
   </xs:complexType>
   <xs:complexType name="responseOptionType">
     <xs:all>
+      <xs:element name="responderIdByName" type="xs:boolean" default="true" minOccurs="0"/>
       <xs:element name="embedCertsMode" type="embedCertsMode" minOccurs="0">
         <xs:annotation>
           <xs:documentation>

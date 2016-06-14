@@ -46,13 +46,16 @@ import java.util.Map;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.ocsp.ResponderID;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.ocsp.RespID;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.ConcurrentContentSigner;
+import org.xipki.commons.security.HashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -73,7 +76,9 @@ class ResponderSigner {
 
     private final X509Certificate[] certificateChain;
 
-    private final X500Name responderId;
+    private final RespID responderIdByName;
+
+    private final RespID responderIdByKey;
 
     ResponderSigner(final List<ConcurrentContentSigner> signers)
     throws CertificateException, IOException {
@@ -101,7 +106,11 @@ class ResponderSigner {
                     this.certificateChain[i].getEncoded());
         }
 
-        this.responderId = this.bcCertificate.getSubject();
+        this.responderIdByName = new RespID(this.bcCertificate.getSubject());
+        byte[] keySha1 = HashAlgoType.SHA1.hash(
+                this.bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
+        this.responderIdByKey = new RespID(new ResponderID(new DEROctetString(keySha1)));
+
         algoSignerMap = new HashMap<>();
         for (ConcurrentContentSigner signer : signers) {
             String algoName = getSignatureAlgorithmName(signer.getAlgorithmIdentifier());
@@ -131,8 +140,8 @@ class ResponderSigner {
         return null;
     }
 
-    public X500Name getResponderId() {
-        return responderId;
+    public RespID getResponder(final boolean byName) {
+        return byName ? responderIdByName :  responderIdByKey;
     }
 
     public X509Certificate getCertificate() {

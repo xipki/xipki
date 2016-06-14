@@ -142,6 +142,7 @@ certs.dir = output
   <!-- responseOptions -->
   <responseOptions>
     <responseOption name="response1">
+      <responderIdByName>true</responderIdByName>
       <embedCertsMode>SIGNER_AND_CA</embedCertsMode>
       <includeRevReason>true</includeRevReason>
       <includeInvalidityDate>true</includeInvalidityDate>
