@@ -52,6 +52,8 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
+import org.bouncycastle.asn1.ocsp.ResponderID;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -187,14 +189,45 @@ public class OcspQa {
                     "signature validation");
             resultIssues.add(sigValIssue);
 
+            X509CertificateHolder respSigner = null;
+
             X509CertificateHolder[] responderCerts = basicResp.getCerts();
             if (responderCerts == null || responderCerts.length < 1) {
                 sigSignerCertIssue.setFailureMessage(
-                        "No responder certificate is contained in the response");
+                        "no responder certificate is contained in the response");
                 sigValIssue.setFailureMessage("could not find certificate to validate signature");
             } else {
-                X509CertificateHolder respSigner = responderCerts[0];
+                ResponderID respId = basicResp.getResponderId().toASN1Primitive();
+                X500Name respIdByName = respId.getName();
+                byte[] respIdByKey = respId.getKeyHash();
 
+                for (X509CertificateHolder cert : responderCerts) {
+                    if (respIdByName != null) {
+                        if (cert.getSubject().equals(respIdByName)) {
+                            respSigner = cert;
+                        }
+                    } else {
+                        byte[] spkiSha1 = HashAlgoType.SHA1.hash(
+                                cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
+                        if (Arrays.equals(respIdByKey, spkiSha1)) {
+                            respSigner = cert;
+                        }
+                    }
+
+                    if (respSigner != null) {
+                        break;
+                    }
+                }
+
+                if (respSigner == null) {
+                    sigSignerCertIssue.setFailureMessage(
+                            "no responder certificate match the ResponderId");
+                    sigValIssue.setFailureMessage("could not find certificate matching the"
+                            + " ResponderId to validate signature");
+                }
+            }
+
+            if (respSigner != null) {
                 issue = new ValidationIssue("OCSP.SIGNERCERT.TRUST",
                         "signer certificate validation");
                 resultIssues.add(issue);

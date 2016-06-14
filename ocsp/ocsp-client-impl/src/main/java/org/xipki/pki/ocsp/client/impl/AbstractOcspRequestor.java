@@ -205,7 +205,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         }
 
         if (debug != null) {
-            msgPair.setRequest(encodedResp);
+            msgPair.setResponse(encodedResp);
         }
 
         OCSPResp ocspResp;
