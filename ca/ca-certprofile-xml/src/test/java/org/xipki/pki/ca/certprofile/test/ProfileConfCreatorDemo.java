@@ -61,7 +61,9 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.w3c.dom.Element;
 import org.xipki.commons.common.util.ParamUtil;
@@ -74,8 +76,10 @@ import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
+import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AdditionalInformation;
-import org.xipki.pki.ca.certprofile.x509.jaxb.Admission;
+import org.xipki.pki.ca.certprofile.x509.jaxb.AdmissionSyntax;
+import org.xipki.pki.ca.certprofile.x509.jaxb.AdmissionsType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AlgorithmType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AnyType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
@@ -110,6 +114,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage;
 import org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsageEnum;
 import org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.NameValueType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.NamingAuthorityType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.pki.ca.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PdsLocationType;
@@ -118,6 +123,8 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyIdMappingType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PrivateKeyUsagePeriod;
+import org.xipki.pki.ca.certprofile.x509.jaxb.ProfessionInfoType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.ProfessionInfoType.RegistrationNumber;
 import org.xipki.pki.ca.certprofile.x509.jaxb.QcEuLimitValueType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.QcStatementType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.QcStatementValueType;
@@ -671,11 +678,6 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(ObjectIdentifiers.id_smimeCapabilities, true, false,
                 extensionValue));
 
-        // Admission - just DEMO, does not belong to TLS certificate
-        extensionValue = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
-        list.add(createExtension(ObjectIdentifiers.id_extension_admission,
-                true, false, extensionValue));
-
         return profile;
     } // method certprofileTls
 
@@ -867,10 +869,20 @@ public class ProfileConfCreatorDemo {
         list.add(createExtension(Extension.certificatePolicies, true, false, extensionValue));
 
         // Extension - Admission
-        Admission admission = new Admission();
-        admission.getProfessionOid().add(createOidType(ID_GEMATIK.branch("103")));
-        admission.getProfessionItem().add("Anwendungskonnektor");
-        extensionValue = createExtensionValueType(admission);
+        AdmissionSyntax admissionSyntax = new AdmissionSyntax();
+        AdmissionsType admissions = new AdmissionsType();
+        admissionSyntax.getContentsOfAdmissions().add(admissions);
+
+        ProfessionInfoType pi = new ProfessionInfoType();
+        admissions.getProfessionInfo().add(pi);
+
+        pi.getProfessionOid().add(createOidType(ID_GEMATIK.branch("103")));
+        pi.getProfessionItem().add("Anwendungskonnektor");
+        extensionValue = createExtensionValueType(admissionSyntax);
+
+        // check the syntax
+        XmlX509CertprofileUtil.buildAdmissionSyntax(false, admissionSyntax);
+
         list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false,
                 extensionValue));
 
@@ -1091,8 +1103,44 @@ public class ProfileConfCreatorDemo {
                 new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
         list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
-        // Admission
-        extensionValue = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
+        // Extension - Admission
+        AdmissionSyntax admissionSyntax = new AdmissionSyntax();
+        admissionSyntax.setAdmissionAuthority(
+                new GeneralName(new X500Name("C=DE,CN=admissionAuthority level 1")).getEncoded());
+
+        AdmissionsType admissions = new AdmissionsType();
+        admissions.setAdmissionAuthority(
+                new GeneralName(new X500Name("C=DE,CN=admissionAuthority level 2")).getEncoded());
+
+        NamingAuthorityType namingAuthorityL2 = new NamingAuthorityType();
+        namingAuthorityL2.setOid(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5")));
+        namingAuthorityL2.setUrl("http://naming-authority-level2.example.org");
+        namingAuthorityL2.setText("namingAuthrityText level 2");
+        admissions.setNamingAuthority(namingAuthorityL2);
+
+        admissionSyntax.getContentsOfAdmissions().add(admissions);
+
+        ProfessionInfoType pi = new ProfessionInfoType();
+        admissions.getProfessionInfo().add(pi);
+
+        pi.getProfessionOid().add(createOidType(new ASN1ObjectIdentifier("1.2.3.4"), "demo oid"));
+        pi.getProfessionItem().add("demo item");
+
+        NamingAuthorityType namingAuthorityL3 = new NamingAuthorityType();
+        namingAuthorityL3.setOid(createOidType(new ASN1ObjectIdentifier("1.2.3.4.5")));
+        namingAuthorityL3.setUrl("http://naming-authority-level3.example.org");
+        namingAuthorityL3.setText("namingAuthrityText level 3");
+        pi.setNamingAuthority(namingAuthorityL3);
+        pi.setAddProfessionInfo(new byte[]{1, 2, 3, 4});
+
+        RegistrationNumber regNum = new RegistrationNumber();
+        pi.setRegistrationNumber(regNum);
+        regNum.setRegex("a*b");
+
+        // check the syntax
+        XmlX509CertprofileUtil.buildAdmissionSyntax(false, admissionSyntax);
+
+        extensionValue = createExtensionValueType(admissionSyntax);
         list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false,
                 extensionValue));
 
@@ -1369,14 +1417,6 @@ public class ProfileConfCreatorDemo {
             type.setDescription(desc);
         }
         return type;
-    }
-
-    private static ExtensionValueType createAdmission(final ASN1ObjectIdentifier oid,
-            final String item) {
-        Admission extValue = new Admission();
-        extValue.getProfessionItem().add(item);
-        extValue.getProfessionOid().add(createOidType(oid));
-        return createExtensionValueType(extValue);
     }
 
     private static ExtensionValueType createRestriction(final DirectoryStringType type,

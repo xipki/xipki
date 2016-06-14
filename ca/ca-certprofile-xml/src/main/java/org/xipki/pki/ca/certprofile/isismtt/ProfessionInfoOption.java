@@ -34,69 +34,66 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.qa.internal;
+package org.xipki.pki.ca.certprofile.isismtt;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.bouncycastle.util.Arrays;
-import org.xipki.commons.common.util.CollectionUtil;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ca.certprofile.x509.jaxb.Admission;
-import org.xipki.pki.ca.certprofile.x509.jaxb.OidWithDescType;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class QaAdmission extends QaExtension {
+public class ProfessionInfoOption {
 
-    private final String registrationNumber;
-
-    private final byte[] addProfessionInfo;
-
-    private final List<String> professionOids;
+    private final NamingAuthority namingAuthority;
 
     private final List<String> professionItems;
 
-    public QaAdmission(final Admission jaxb) {
-        ParamUtil.requireNonNull("jaxb", jaxb);
+    private final List<ASN1ObjectIdentifier> professionOids;
 
-        this.registrationNumber = jaxb.getRegistrationNumber();
-        this.addProfessionInfo = jaxb.getAddProfessionInfo();
+    private final RegistrationNumberOption registrationNumberOption;
 
-        List<String> items = jaxb.getProfessionItem();
-        professionItems =  (CollectionUtil.isEmpty(items)) ? null
-                : Collections.unmodifiableList(items);
+    private byte[] addProfessionalInfo;
 
-        List<OidWithDescType> oids = jaxb.getProfessionOid();
-        if (oids == null) {
-            this.professionOids = null;
-        } else {
-            List<String> list = new LinkedList<>();
-            for (OidWithDescType oid : oids) {
-                list.add(oid.getValue());
-            }
-            this.professionOids = Collections.unmodifiableList(list);
-        }
+    public ProfessionInfoOption(
+            final NamingAuthority namingAuthority,
+            final List<String> professionItems,
+            final List<ASN1ObjectIdentifier> professionOids,
+            final RegistrationNumberOption registrationNumberOption,
+            final byte[] addProfessionalInfo) {
+        this.namingAuthority = namingAuthority;
+        this.professionItems = ParamUtil.requireNonEmpty("professionItems", professionItems);
+        this.professionOids = professionOids;
+        this.registrationNumberOption = registrationNumberOption;
+        this.addProfessionalInfo = addProfessionalInfo;
     }
 
-    public String getRegistrationNumber() {
-        return registrationNumber;
+    public byte[] getAddProfessionalInfo() {
+        return addProfessionalInfo;
     }
 
-    public byte[] getAddProfessionInfo() {
-        return Arrays.clone(addProfessionInfo);
+    public void setAddProfessionalInfo(byte[] addProfessionalInfo) {
+        this.addProfessionalInfo = addProfessionalInfo;
     }
 
-    public List<String> getProfessionOids() {
-        return professionOids;
+    public NamingAuthority getNamingAuthority() {
+        return namingAuthority;
     }
 
     public List<String> getProfessionItems() {
         return professionItems;
+    }
+
+    public List<ASN1ObjectIdentifier> getProfessionOids() {
+        return professionOids;
+    }
+
+    public RegistrationNumberOption getRegistrationNumberOption() {
+        return registrationNumberOption;
     }
 
 }

@@ -41,6 +41,7 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,7 +72,6 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERT61String;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
 import org.bouncycastle.asn1.x500.DirectoryString;
@@ -131,8 +131,8 @@ import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.certprofile.BiometricInfoOption;
 import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
+import org.xipki.pki.ca.certprofile.isismtt.AdmissionSyntaxOption;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AdditionalInformation;
-import org.xipki.pki.ca.certprofile.x509.jaxb.Admission;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
 import org.xipki.pki.ca.certprofile.x509.jaxb.BiometricInfo;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ConstantExtValue;
@@ -162,7 +162,6 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TripleState;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ValidityModel;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
-import org.xipki.pki.ca.qa.internal.QaAdmission;
 import org.xipki.pki.ca.qa.internal.QaAuthorizationTemplate;
 import org.xipki.pki.ca.qa.internal.QaCertificatePolicies;
 import org.xipki.pki.ca.qa.internal.QaCertificatePolicies.QaCertificatePolicyInformation;
@@ -236,7 +235,7 @@ public class ExtensionsChecker {
 
     private QaInhibitAnyPolicy inhibitAnyPolicy;
 
-    private QaAdmission admission;
+    private AdmissionSyntaxOption admission;
 
     private QaDirectoryString restriction;
 
@@ -405,10 +404,12 @@ public class ExtensionsChecker {
         // admission
         type = ObjectIdentifiers.id_extension_admission;
         if (extensionControls.containsKey(type)) {
-            Admission extConf = (Admission) getExtensionValue(
-                    type, extensionsType, Admission.class);
+            org.xipki.pki.ca.certprofile.x509.jaxb.AdmissionSyntax extConf =
+                    (org.xipki.pki.ca.certprofile.x509.jaxb.AdmissionSyntax) getExtensionValue(
+                            type, extensionsType,
+                            org.xipki.pki.ca.certprofile.x509.jaxb.AdmissionSyntax.class);
             if (extConf != null) {
-                this.admission = new QaAdmission(extConf);
+                this.admission = XmlX509CertprofileUtil.buildAdmissionSyntax(false, extConf);
             }
         }
 
@@ -1763,105 +1764,59 @@ public class ExtensionsChecker {
     private void checkExtensionAdmission(final StringBuilder failureMsg,
             final byte[] extensionValue, final Extensions requestExtensions,
             final ExtensionControl extControl) {
-        QaAdmission conf = admission;
+        AdmissionSyntaxOption conf = admission;
+        ASN1ObjectIdentifier type = ObjectIdentifiers.id_extension_admission;
         if (conf == null) {
-            byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_extension_admission,
-                    requestExtensions, extControl);
+            byte[] expected = getExpectedExtValue(type, requestExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                addViolation(failureMsg, "extension valus", hex(extensionValue),
+                addViolation(failureMsg, "extension value", hex(extensionValue),
                         (expected == null) ? "not present" : hex(expected));
             }
             return;
         }
 
-        ASN1Sequence seq = ASN1Sequence.getInstance(extensionValue);
-        AdmissionSyntax isAdmissionSyntax = AdmissionSyntax.getInstance(seq);
-        Admissions[] isAdmissions = isAdmissionSyntax.getContentsOfAdmissions();
-        int len = (isAdmissions == null) ? 0 : isAdmissions.length;
-        if (len != 1) {
-            addViolation(failureMsg, "size of Admissions", len, 1);
+        List<List<String>> reqRegNumsList = null;
+        if (conf.isInputFromRequestRequired()) {
+            Extension extension = requestExtensions.getExtension(type);
+            if (extension == null) {
+                failureMsg.append("no Admission extension is contained in the request;");
+                return;
+            }
+
+            Admissions[] reqAdmissions =
+                    org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax.getInstance(
+                            extension.getParsedValue()).getContentsOfAdmissions();
+
+            final int n = reqAdmissions.length;
+            reqRegNumsList = new ArrayList<>(n);
+            for (int i = 0; i < n; i++) {
+                Admissions reqAdmission = reqAdmissions[i];
+                ProfessionInfo[] reqPis = reqAdmission.getProfessionInfos();
+                List<String> reqNums = new ArrayList<>(reqPis.length);
+                reqRegNumsList.add(reqNums);
+                for (ProfessionInfo reqPi : reqPis) {
+                    String reqNum = reqPi.getRegistrationNumber();
+                    reqNums.add(reqNum);
+                }
+            }
+        }
+
+        try {
+            byte[] expected = admission.getExtensionValue(reqRegNumsList).getValue()
+                    .toASN1Primitive().getEncoded();
+            if (!Arrays.equals(expected, extensionValue)) {
+                addViolation(failureMsg, "extension valus", hex(extensionValue), hex(expected));
+            }
+        } catch (IOException ex) {
+            LogUtil.error(LOG, ex);
+            failureMsg.append("IOException while computing the expected extension value;");
             return;
+        } catch (BadCertTemplateException ex) {
+            LogUtil.error(LOG, ex);
+            failureMsg.append(
+                    "BadCertTemplateException while computing the expected extension value;");
         }
 
-        Admissions isAdmission = isAdmissions[0];
-        ProfessionInfo[] isProfessionInfos = isAdmission.getProfessionInfos();
-        len = (isProfessionInfos == null) ? 0 : isProfessionInfos.length;
-        if (len != 1) {
-            addViolation(failureMsg, "size of ProfessionInfo", len, 1);
-            return;
-        }
-
-        ProfessionInfo isProfessionInfo = isProfessionInfos[0];
-        String isRegistrationNumber = isProfessionInfo.getRegistrationNumber();
-        String expRegistrationNumber = conf.getRegistrationNumber();
-        if (expRegistrationNumber == null) {
-            if (isRegistrationNumber != null) {
-                addViolation(failureMsg, "RegistrationNumber", isRegistrationNumber, "null");
-            }
-        } else if (!expRegistrationNumber.equals(isRegistrationNumber)) {
-            addViolation(failureMsg, "RegistrationNumber", isRegistrationNumber,
-                    expRegistrationNumber);
-        }
-
-        byte[] isAddProfessionInfo = null;
-        if (isProfessionInfo.getAddProfessionInfo() != null) {
-            isAddProfessionInfo = isProfessionInfo.getAddProfessionInfo().getOctets();
-        }
-        byte[] expAddProfessionInfo = conf.getAddProfessionInfo();
-        if (expAddProfessionInfo == null) {
-            if (isAddProfessionInfo != null) {
-                addViolation(failureMsg, "AddProfessionInfo", hex(isAddProfessionInfo), "null");
-            }
-        } else {
-            if (isAddProfessionInfo == null) {
-                addViolation(failureMsg, "AddProfessionInfo", "null", hex(expAddProfessionInfo));
-            } else if (!Arrays.equals(expAddProfessionInfo, isAddProfessionInfo)) {
-                addViolation(failureMsg, "AddProfessionInfo", hex(isAddProfessionInfo),
-                        hex(expAddProfessionInfo));
-            }
-        }
-
-        List<String> expProfessionOids = conf.getProfessionOids();
-        ASN1ObjectIdentifier[] tmpIProfessionOids = isProfessionInfo.getProfessionOIDs();
-        List<String> isProfessionOids = new LinkedList<>();
-        if (tmpIProfessionOids != null) {
-            for (ASN1ObjectIdentifier entry : tmpIProfessionOids) {
-                isProfessionOids.add(entry.getId());
-            }
-        }
-
-        Set<String> diffs = strInBnotInA(expProfessionOids, isProfessionOids);
-        if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append("ProfessionOIDs ").append(diffs.toString())
-                .append(" are present but not expected; ");
-        }
-
-        diffs = strInBnotInA(isProfessionOids, expProfessionOids);
-        if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append("ProfessionOIDs ").append(diffs.toString())
-                .append(" are absent but are required; ");
-        }
-
-        List<String> expProfessionItems = conf.getProfessionItems();
-        DirectoryString[] items = isProfessionInfo.getProfessionItems();
-        List<String> isProfessionItems = new LinkedList<>();
-        if (items != null) {
-            for (DirectoryString item : items) {
-                isProfessionItems.add(item.getString());
-            }
-        }
-
-        diffs = strInBnotInA(expProfessionItems, isProfessionItems);
-        if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append("ProfessionItems ").append(diffs.toString())
-                .append(" are present but not expected; ");
-        }
-
-        diffs = strInBnotInA(isProfessionItems, expProfessionItems);
-        if (CollectionUtil.isNonEmpty(diffs)) {
-            failureMsg.append("ProfessionItems ").append(diffs.toString())
-                .append(" are absent but are required; ");
-        }
     } // method checkExtensionAdmission
 
     private void checkExtensionAuthorityInfoAccess(final StringBuilder failureMsg,

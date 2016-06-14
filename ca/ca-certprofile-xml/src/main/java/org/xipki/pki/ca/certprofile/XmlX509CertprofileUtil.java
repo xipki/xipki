@@ -59,11 +59,14 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.isismtt.x509.NamingAuthority;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.bouncycastle.asn1.x509.Extension;
@@ -78,6 +81,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.KeyUsage;
 import org.xipki.commons.security.util.X509Util;
@@ -94,6 +98,12 @@ import org.xipki.pki.ca.api.profile.x509.CertificatePolicyInformation;
 import org.xipki.pki.ca.api.profile.x509.CertificatePolicyQualifier;
 import org.xipki.pki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
+import org.xipki.pki.ca.certprofile.isismtt.AdmissionSyntaxOption;
+import org.xipki.pki.ca.certprofile.isismtt.AdmissionsOption;
+import org.xipki.pki.ca.certprofile.isismtt.ProfessionInfoOption;
+import org.xipki.pki.ca.certprofile.isismtt.RegistrationNumberOption;
+import org.xipki.pki.ca.certprofile.x509.jaxb.AdmissionSyntax;
+import org.xipki.pki.ca.certprofile.x509.jaxb.AdmissionsType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AlgorithmType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicies;
 import org.xipki.pki.ca.certprofile.x509.jaxb.CertificatePolicyInformationType;
@@ -111,10 +121,13 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.GeneralNameType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.GeneralSubtreeBaseType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.GeneralSubtreesType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.GostParameters;
+import org.xipki.pki.ca.certprofile.x509.jaxb.NamingAuthorityType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.pki.ca.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyIdMappingType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.ProfessionInfoType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.ProfessionInfoType.RegistrationNumber;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RSAPSSParameters;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RSAParameters;
 import org.xipki.pki.ca.certprofile.x509.jaxb.RangeType;
@@ -559,6 +572,70 @@ public class XmlX509CertprofileUtil {
         return Collections.unmodifiableSet(oids);
     }
 
+    public static AdmissionSyntaxOption buildAdmissionSyntax(final boolean critical,
+            final AdmissionSyntax type)
+    throws CertprofileException {
+        List<AdmissionsOption> admissionsList = new LinkedList<>();
+        for (AdmissionsType at : type.getContentsOfAdmissions()) {
+            List<ProfessionInfoOption> professionInfos = new LinkedList<>();
+            for (ProfessionInfoType pi : at.getProfessionInfo()) {
+                NamingAuthority namingAuthorityL3 = null;
+                if (pi.getNamingAuthority() != null) {
+                    namingAuthorityL3 = buildNamingAuthority(pi.getNamingAuthority());
+                }
+
+                List<OidWithDescType> oidTypes = pi.getProfessionOid();
+                List<ASN1ObjectIdentifier> oids = null;
+                if (CollectionUtil.isNonEmpty(oidTypes) ) {
+                    oids = new LinkedList<>();
+                    for (OidWithDescType k : oidTypes) {
+                        oids.add(new ASN1ObjectIdentifier(k.getValue()));
+                    }
+                }
+
+                RegistrationNumber rnType = pi.getRegistrationNumber();
+                RegistrationNumberOption rno = (rnType == null) ? null
+                        : new RegistrationNumberOption(rnType.getRegex(), rnType.getConstant());
+
+                ProfessionInfoOption pio = new ProfessionInfoOption(namingAuthorityL3,
+                        pi.getProfessionItem(), oids, rno, pi.getAddProfessionInfo());
+
+                professionInfos.add(pio);
+            }
+
+            GeneralName admissionAuthority = null;
+            if (at.getNamingAuthority() != null) {
+                admissionAuthority = GeneralName.getInstance(
+                        asn1PrimitivefromByteArray(at.getAdmissionAuthority()));
+            }
+
+            NamingAuthority namingAuthority = null;
+            if (at.getNamingAuthority() != null) {
+                namingAuthority = buildNamingAuthority(at.getNamingAuthority());
+            }
+
+            AdmissionsOption admissionsOption = new AdmissionsOption(admissionAuthority,
+                    namingAuthority, professionInfos);
+            admissionsList.add(admissionsOption);
+        }
+
+        GeneralName admissionAuthority = null;
+        if (type.getAdmissionAuthority() != null) {
+            admissionAuthority = GeneralName.getInstance(type.getAdmissionAuthority());
+        }
+
+        return new AdmissionSyntaxOption(critical, admissionAuthority, admissionsList);
+    }
+
+    private static ASN1Primitive asn1PrimitivefromByteArray(final byte[] encoded)
+    throws CertprofileException {
+        try {
+            return ASN1Primitive.fromByteArray(encoded);
+        } catch (IOException ex) {
+            throw new CertprofileException(ex.getMessage(), ex);
+        }
+    }
+
     private static KeyParametersOption convertKeyParametersOption(final AlgorithmType type)
     throws CertprofileException {
         ParamUtil.requireNonNull("type", type);
@@ -739,6 +816,16 @@ public class XmlX509CertprofileUtil {
         }
 
         return new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));
+    }
+
+    private static NamingAuthority buildNamingAuthority(final NamingAuthorityType jaxb) {
+        ASN1ObjectIdentifier oid = (jaxb.getOid() == null) ? null
+                : new ASN1ObjectIdentifier(jaxb.getOid().getValue());
+        String url = StringUtil.isBlank(jaxb.getUrl()) ? null
+                : jaxb.getUrl();
+        DirectoryString text = StringUtil.isBlank(jaxb.getText()) ? null
+                : new DirectoryString(jaxb.getText());
+        return new NamingAuthority(oid, url, text);
     }
 
 }

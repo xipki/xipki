@@ -61,9 +61,13 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
+import org.bouncycastle.asn1.isismtt.x509.Admissions;
+import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.xipki.commons.common.ObjectCreationException;
@@ -260,6 +264,27 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
         list.add(new GeneralName(GeneralName.registeredID, "2.3.4.5"));
 
         return new GeneralNames(list.toArray(new GeneralName[0]));
+    }
+
+    @Override
+    protected List<Extension> getAdditionalExtensions() throws BadInputException {
+        List<Extension> extensions = new LinkedList<>();
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+
+        DirectoryString[] dummyItems = new DirectoryString[]{new DirectoryString("dummy")};
+        ProfessionInfo pi = new ProfessionInfo(null, dummyItems, null, "aaaab", null);
+        Admissions admissions = new Admissions(null, null, new ProfessionInfo[]{pi});
+        vec.add(admissions);
+
+        AdmissionSyntax adSyn = new AdmissionSyntax(null, new DERSequence(vec));
+
+        try {
+            extensions.add(new Extension(ObjectIdentifiers.id_extension_admission, false,
+                    adSyn.getEncoded()));
+        } catch (IOException ex) {
+            throw new BadInputException(ex.getMessage(), ex);
+        }
+        return extensions;
     }
 
 }

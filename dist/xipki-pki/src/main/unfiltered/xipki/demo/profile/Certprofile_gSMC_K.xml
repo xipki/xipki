@@ -172,10 +172,14 @@
       <type description="admission">1.3.36.8.3.3</type>
       <critical>false</critical>
       <value>
-        <admission>
-          <professionOid>1.2.276.0.76.4.103</professionOid>
-          <professionItem>Anwendungskonnektor</professionItem>
-        </admission>
+        <admissionSyntax>
+          <contentsOfAdmissions>
+            <professionInfo>
+              <professionOid>1.2.276.0.76.4.103</professionOid>
+              <professionItem>Anwendungskonnektor</professionItem>
+            </professionInfo>
+          </contentsOfAdmissions>
+        </admissionSyntax>
       </value>
     </extension>
     <extension required="false" permittedInRequest="true">

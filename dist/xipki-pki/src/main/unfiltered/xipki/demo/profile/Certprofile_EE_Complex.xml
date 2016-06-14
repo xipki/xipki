@@ -156,10 +156,30 @@
       <type description="admission">1.3.36.8.3.3</type>
       <critical>false</critical>
       <value>
-        <admission>
-          <professionOid>1.1.1.2</professionOid>
-          <professionItem>demo item</professionItem>
-        </admission>
+        <admissionSyntax>
+          <admissionAuthority>pDQwMjELMAkGA1UEBhMCREUxIzAhBgNVBAMMGmFkbWlzc2lvbkF1dGhvcml0eSBsZXZlbCAx</admissionAuthority>
+          <contentsOfAdmissions>
+            <admissionAuthority>pDQwMjELMAkGA1UEBhMCREUxIzAhBgNVBAMMGmFkbWlzc2lvbkF1dGhvcml0eSBsZXZlbCAy</admissionAuthority>
+            <namingAuthority>
+              <oid>1.2.3.4.5</oid>
+              <url>http://naming-authority-level2.example.org</url>
+              <text>namingAuthrityText level 2</text>
+            </namingAuthority>
+            <professionInfo>
+              <namingAuthority>
+<oid>1.2.3.4.5</oid>
+<url>http://naming-authority-level3.example.org</url>
+<text>namingAuthrityText level 3</text>
+              </namingAuthority>
+              <professionOid description="demo oid">1.2.3.4</professionOid>
+              <professionItem>demo item</professionItem>
+              <registrationNumber>
+<regex>a*b</regex>
+              </registrationNumber>
+              <addProfessionInfo>AQIDBA==</addProfessionInfo>
+            </professionInfo>
+          </contentsOfAdmissions>
+        </admissionSyntax>
       </value>
     </extension>
     <extension required="true" permittedInRequest="false">

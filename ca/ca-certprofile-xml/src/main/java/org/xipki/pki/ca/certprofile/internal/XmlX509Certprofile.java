@@ -57,7 +57,6 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.DERGeneralizedTime;
@@ -67,10 +66,8 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
-import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
@@ -112,8 +109,9 @@ import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.certprofile.BiometricInfoOption;
 import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
+import org.xipki.pki.ca.certprofile.isismtt.AdmissionSyntaxOption;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AdditionalInformation;
-import org.xipki.pki.ca.certprofile.x509.jaxb.Admission;
+import org.xipki.pki.ca.certprofile.x509.jaxb.AdmissionSyntax;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityKeyIdentifier;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorizationTemplate;
@@ -129,7 +127,6 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.IntWithDescType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.KeyUsage;
 import org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.NameValueType;
-import org.xipki.pki.ca.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PdsLocationType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyConstraints;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings;
@@ -164,7 +161,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
     private ExtensionValue additionalInformation;
 
-    private ExtensionValue admission;
+    private AdmissionSyntaxOption admission;
 
     private AuthorityInfoAccessControl aiaControl;
 
@@ -527,22 +524,14 @@ class XmlX509Certprofile extends BaseX509Certprofile {
             return;
         }
 
-        Admission extConf = (Admission) getExtensionValue(type, extensionsType, Admission.class);
+        AdmissionSyntax extConf = (AdmissionSyntax) getExtensionValue(type, extensionsType,
+                AdmissionSyntax.class);
         if (extConf == null) {
             return;
         }
 
-        List<ASN1ObjectIdentifier> professionOids;
-        List<String> professionItems;
-
-        List<String> items = (type == null) ? null : extConf.getProfessionItem();
-        professionItems = CollectionUtil.unmodifiableList(items);
-
-        List<OidWithDescType> oidWithDescs = (type == null) ? null : extConf.getProfessionOid();
-        professionOids = XmlX509CertprofileUtil.toOidList(oidWithDescs);
-
-        this.admission = createAdmission(extensionControls.get(type).isCritical(), professionOids,
-                professionItems, extConf.getRegistrationNumber(), extConf.getAddProfessionInfo());
+        this.admission = XmlX509CertprofileUtil.buildAdmissionSyntax(
+                extensionControls.get(type).isCritical(), extConf);
     }
 
     private void initAuthorityInfoAccess(ExtensionsType extensionsType)
@@ -1117,7 +1106,33 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         // Admission
         type = ObjectIdentifiers.id_extension_admission;
         if (admission != null && occurences.remove(type) != null) {
-            values.addExtension(type, admission);
+            if (admission.isInputFromRequestRequired()) {
+                Extension extension = requestedExtensions.getExtension(type);
+                if (extension == null) {
+                    throw new BadCertTemplateException(
+                            "No Admission extension is contained in the request");
+                }
+
+                Admissions[] reqAdmissions =
+                        org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax.getInstance(
+                                extension.getParsedValue()).getContentsOfAdmissions();
+
+                final int n = reqAdmissions.length;
+                List<List<String>> reqRegNumsList = new ArrayList<>(n);
+                for (int i = 0; i < n; i++) {
+                    Admissions reqAdmission = reqAdmissions[i];
+                    ProfessionInfo[] reqPis = reqAdmission.getProfessionInfos();
+                    List<String> reqNums = new ArrayList<>(reqPis.length);
+                    reqRegNumsList.add(reqNums);
+                    for (ProfessionInfo reqPi : reqPis) {
+                        String reqNum = reqPi.getRegistrationNumber();
+                        reqNums.add(reqNum);
+                    }
+                }
+                values.addExtension(type, admission.getExtensionValue(reqRegNumsList));
+            } else {
+                values.addExtension(type, admission.getExtensionValue(null));
+            }
         }
 
         // OCSP Nocheck
@@ -1412,47 +1427,6 @@ class XmlX509Certprofile extends BaseX509Certprofile {
     public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior() {
         return specialBehavior;
     }
-
-    private ExtensionValue createAdmission(final boolean critical,
-            final List<ASN1ObjectIdentifier> professionOids, final List<String> professionItems,
-            final String registrationNumber, final byte[] addProfessionInfo)
-    throws CertprofileException {
-        if (CollectionUtil.isEmpty(professionItems) && CollectionUtil.isEmpty(professionOids)
-                && StringUtil.isBlank(registrationNumber)
-                && (addProfessionInfo == null || addProfessionInfo.length == 0)) {
-            return null;
-        }
-
-        DirectoryString[] tmpProfessionItems = null;
-        if (CollectionUtil.isNonEmpty(professionItems)) {
-            int size = professionItems.size();
-            tmpProfessionItems = new DirectoryString[size];
-            for (int i = 0; i < size; i++) {
-                tmpProfessionItems[i] = new DirectoryString(professionItems.get(i));
-            }
-        }
-
-        ASN1ObjectIdentifier[] tmpProfessionOids = null;
-        if (CollectionUtil.isNonEmpty(professionOids)) {
-            tmpProfessionOids = professionOids.toArray(new ASN1ObjectIdentifier[0]);
-        }
-
-        ASN1OctetString tmpAddProfessionInfo = null;
-        if (addProfessionInfo != null && addProfessionInfo.length > 0) {
-            tmpAddProfessionInfo = new DEROctetString(addProfessionInfo);
-        }
-
-        ProfessionInfo professionInfo = new ProfessionInfo(null, tmpProfessionItems,
-                tmpProfessionOids, registrationNumber, tmpAddProfessionInfo);
-
-        Admissions admissions = new Admissions(null, null, new ProfessionInfo[]{professionInfo});
-
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(admissions);
-
-        AdmissionSyntax value = new AdmissionSyntax(null, new DERSequence(vector));
-        return new ExtensionValue(critical, value);
-    } // method createAdmission
 
     @Override
     public boolean isDuplicateKeyPermitted() {

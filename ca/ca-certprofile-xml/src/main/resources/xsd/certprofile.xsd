@@ -375,17 +375,48 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="admission">
+  <xs:element name="admissionSyntax">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="professionOid" type="oidWithDescType" minOccurs="0"
-            maxOccurs="unbounded"/>
-        <xs:element name="professionItem" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        <xs:element name="registrationNumber" type="xs:string" minOccurs="0"/>
-        <xs:element name="addProfessionInfo" type="xs:hexBinary" minOccurs="0"/>
+        <xs:element name="admissionAuthority" type="xs:base64Binary" minOccurs="0"/>
+        <xs:element name="contentsOfAdmissions" type="admissionsType" maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:complexType name="admissionsType">
+    <xs:sequence>
+      <xs:element name="admissionAuthority" type="xs:base64Binary" minOccurs="0"/>
+      <xs:element name="namingAuthority" type="namingAuthorityType" minOccurs="0"/>
+      <xs:element name="professionInfo" type="professionInfoType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="namingAuthorityType">
+    <xs:annotation>
+      <xs:documentation>at least one of oid, url and text must be specified</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="oid" type="oidWithDescType" minOccurs="0"/>
+      <xs:element name="url" type="xs:string" minOccurs="0"/>
+      <xs:element name="text" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="professionInfoType">
+    <xs:sequence>
+      <xs:element name="namingAuthority" type="namingAuthorityType" minOccurs="0"/>
+      <xs:element name="professionOid" type="oidWithDescType" minOccurs="0"
+          maxOccurs="unbounded"/>
+      <xs:element name="professionItem" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="registrationNumber" minOccurs="0">
+        <xs:complexType>
+          <xs:choice>
+            <xs:element name="regex" type="xs:string"/>
+            <xs:element name="constant" type="xs:string"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="addProfessionInfo" type="xs:base64Binary" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:element name="subjectAltName">
     <xs:complexType>
       <xs:complexContent>

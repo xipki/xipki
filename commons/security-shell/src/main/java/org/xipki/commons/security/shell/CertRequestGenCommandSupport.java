@@ -39,6 +39,7 @@ package org.xipki.commons.security.shell;
 import java.io.File;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -214,6 +215,10 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
             needExtensionTypes = new LinkedList<>();
         }
 
+        if (wantExtensionTypes == null) {
+            wantExtensionTypes = new LinkedList<>();
+        }
+
         // SubjectAltNames
         List<Extension> extensions = new LinkedList<>();
 
@@ -323,6 +328,13 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
                     + " must be set or none of them should be set");
         }
 
+        for (Extension addExt : getAdditionalExtensions()) {
+            extensions.add(addExt);
+        }
+
+        needExtensionTypes.addAll(getAdditionalNeedExtensionTypes());
+        wantExtensionTypes.addAll(getAdditionalWantExtensionTypes());
+
         if (isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes)) {
             ExtensionExistence ee = new ExtensionExistence(
                     textToAsn1ObjectIdentifers(needExtensionTypes),
@@ -364,6 +376,18 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     protected X500Name getSubject(final String subjectText) {
         ParamUtil.requireNonBlank("subjectText", subjectText);
         return new X500Name(subjectText);
+    }
+
+    protected List<String> getAdditionalNeedExtensionTypes() {
+        return Collections.emptyList();
+    }
+
+    protected List<String> getAdditionalWantExtensionTypes() {
+        return Collections.emptyList();
+    }
+
+    protected List<Extension> getAdditionalExtensions() throws BadInputException {
+        return Collections.emptyList();
     }
 
     protected ASN1OctetString createExtnValueSubjectAltName() throws BadInputException {
