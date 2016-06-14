@@ -382,7 +382,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
             duplicateSubjectPermitted = bo.booleanValue();
         }
 
-        Map<ASN1ObjectIdentifier, RdnControl> subjectDnControls = new HashMap<>();
+        List<RdnControl> subjectDnControls = new LinkedList<>();
 
         for (RdnType rdn : subject.getRdn()) {
             ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(rdn.getType().getValue());
@@ -407,7 +407,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                     ? new Range(rdn.getMinLen(), rdn.getMaxLen()) :  null;
 
             RdnControl rdnControl = new RdnControl(type, rdn.getMinOccurs(), rdn.getMaxOccurs());
-            subjectDnControls.put(type, rdnControl);
+            subjectDnControls.add(rdnControl);
 
             StringType stringType = XmlX509CertprofileUtil.convertStringType(
                     rdn.getStringType());
@@ -419,7 +419,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
             rdnControl.setGroup(rdn.getGroup());
             SubjectDnSpec.fixRdnControl(rdnControl);
         }
-        this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDnControls);
+        this.subjectControl = new SubjectControl(subjectDnControls, subject.isKeepRdnOrder());
         this.incSerialNoIfSubjectExists = subject.isIncSerialNumber();
 
         // Extensions

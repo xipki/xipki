@@ -82,10 +82,14 @@
       <xs:element name="subject">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="dnBackwards" type="xs:boolean" default="false" minOccurs="0"/>
             <xs:element name="incSerialNumber" type="xs:boolean" default="false" minOccurs="0"/>
             <xs:element name="rdn" type="rdnType" maxOccurs="unbounded"/>
           </xs:sequence>
+          <xs:attribute name="keepRdnOrder" type="xs:boolean" default="false" use="optional">
+            <xs:annotation>
+              <xs:documentation>whether the RDNs occurs as in the defined ASN.1 order</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
           <xs:attribute name="duplicateSubjectPermitted" type="xs:boolean" use="optional"/>
         </xs:complexType>
       </xs:element>

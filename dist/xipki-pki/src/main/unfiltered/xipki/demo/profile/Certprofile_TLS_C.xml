@@ -65,8 +65,7 @@
       </parameters>
     </algorithm>
   </keyAlgorithms>
-  <subject duplicateSubjectPermitted="false">
-    <dnBackwards>false</dnBackwards>
+  <subject keepRdnOrder="false" duplicateSubjectPermitted="false">
     <incSerialNumber>false</incSerialNumber>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="c">2.5.4.6</type>

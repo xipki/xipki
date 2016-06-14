@@ -38,11 +38,9 @@ package org.xipki.pki.ca.qa;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -91,7 +89,7 @@ public class SubjectChecker {
         this.specialBehavior = conf.getSpecialBehavior();
 
         Subject subject = conf.getSubject();
-        Map<ASN1ObjectIdentifier, RdnControl> subjectDnControls = new HashMap<>();
+        List<RdnControl> subjectDnControls = new LinkedList<>();
 
         for (RdnType t : subject.getRdn()) {
             ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
@@ -126,10 +124,10 @@ public class SubjectChecker {
             rdnControl.setGroup(t.getGroup());
             SubjectDnSpec.fixRdnControl(rdnControl);
 
-            subjectDnControls.put(type, rdnControl);
+            subjectDnControls.add(rdnControl);
         }
 
-        this.subjectControl = new SubjectControl(subject.isDnBackwards(), subjectDnControls);
+        this.subjectControl = new SubjectControl(subjectDnControls, subject.isKeepRdnOrder());
     } // constructor
 
     public List<ValidationIssue> checkSubject(final X500Name subject,

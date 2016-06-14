@@ -124,8 +124,6 @@ public class SubjectDnSpec {
 
     private static final List<ASN1ObjectIdentifier> forwardDNs;
 
-    private static final List<ASN1ObjectIdentifier> backwardDNs;
-
     private static final Set<String> countryAreaCodes = new HashSet<>();
 
     static {
@@ -170,19 +168,6 @@ public class SubjectDnSpec {
         int size = tmpForwardDNs.size();
         for (int i = size - 1; i >= 0; i--) {
             tmpBackwardDNs.add(tmpForwardDNs.get(i));
-        }
-
-        backwardDNs = Collections.unmodifiableList(tmpBackwardDNs);
-        if (LOG.isInfoEnabled()) {
-            StringBuilder sb = new StringBuilder(500);
-            sb.append("backward RDNs: ");
-            for (ASN1ObjectIdentifier oid : backwardDNs) {
-                sb.append(oid.getId()).append(", ");
-            }
-            if (!backwardDNs.isEmpty()) {
-                sb.delete(sb.length() - 2, sb.length());
-            }
-            LOG.info(sb.toString());
         }
 
         // ----- country/area code -----
@@ -569,10 +554,6 @@ public class SubjectDnSpec {
 
     public static List<ASN1ObjectIdentifier> getForwardDNs() {
         return forwardDNs;
-    }
-
-    public static List<ASN1ObjectIdentifier> getBackwardDNs() {
-        return backwardDNs;
     }
 
     public static boolean isValidCountryAreaCode(String code) {

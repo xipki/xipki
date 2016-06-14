@@ -66,23 +66,33 @@ public class SubjectControl {
 
     private final List<ASN1ObjectIdentifier> types;
 
-    public SubjectControl(final boolean backwardsSubject,
-            final Map<ASN1ObjectIdentifier, RdnControl> controls) {
-        this.controls = ParamUtil.requireNonEmpty("controls", controls);
+    public SubjectControl(final List<RdnControl> controls, final boolean keepRdnOrder) {
+        ParamUtil.requireNonEmpty("controls", controls);
         this.typeGroups = new HashMap<>();
-        Set<ASN1ObjectIdentifier> oidSet = controls.keySet();
-        List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
-        List<ASN1ObjectIdentifier> oids = backwardsSubject ? SubjectDnSpec.getBackwardDNs()
-                : SubjectDnSpec.getForwardDNs();
-        for (ASN1ObjectIdentifier oid : oids) {
-            if (oidSet.contains(oid)) {
-                sortedOids.add(oid);
-            }
-        }
 
-        for (ASN1ObjectIdentifier oid : oidSet) {
-            if (!sortedOids.contains(oid)) {
-                sortedOids.add(oid);
+        List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
+        if (keepRdnOrder) {
+            for (RdnControl m : controls) {
+                sortedOids.add(m.getType());
+            }
+        } else {
+            Set<ASN1ObjectIdentifier> oidSet = new HashSet<>();
+            for (RdnControl m : controls) {
+                oidSet.add(m.getType());
+            }
+
+            List<ASN1ObjectIdentifier> oids = SubjectDnSpec.getForwardDNs();
+
+            for (ASN1ObjectIdentifier oid : oids) {
+                if (oidSet.contains(oid)) {
+                    sortedOids.add(oid);
+                }
+            }
+
+            for (ASN1ObjectIdentifier oid : oidSet) {
+                if (!sortedOids.contains(oid)) {
+                    sortedOids.add(oid);
+                }
             }
         }
 
@@ -90,9 +100,12 @@ public class SubjectControl {
 
         Set<String> groupSet = new HashSet<>();
         this.groupTypes = new HashMap<>();
+        this.controls = new HashMap<>();
 
-        for (ASN1ObjectIdentifier type : controls.keySet()) {
-            String group = controls.get(type).getGroup();
+        for (RdnControl control : controls) {
+            ASN1ObjectIdentifier type = control.getType();
+            this.controls.put(type, control);
+            String group = control.getGroup();
             if (StringUtil.isBlank(group)) {
                 continue;
             }
