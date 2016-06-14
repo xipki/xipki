@@ -240,7 +240,7 @@
       <column name="RESPONDER_TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="RESPONDER_CERT" type="VARCHAR(3000)"/>
+      <column name="RESPONDER_CERT" type="VARCHAR(4000)"/>
       <column name="RESPONDER_CONF" type="CLOB"/>
     </createTable>
   </changeSet>
@@ -254,7 +254,7 @@
       <column name="SUBJECT" type="${x500name.type}">
         <constraints nullable="false"/>
       </column>
-      <column name="CERT" type="VARCHAR(3000)">
+      <column name="CERT" type="VARCHAR(4000)">
         <constraints nullable="false"/>
       </column>
       <column name="SHA1_CERT" type="CHAR(28)">
@@ -424,7 +424,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="REQ_SUBJECT" type="${x500name.type}"/>
-      <column name="CERT" type="VARCHAR(3000)"
+      <column name="CERT" type="VARCHAR(4000)"
           remarks="Base64 encoded certificate">
         <constraints nullable="false"/>
       </column>

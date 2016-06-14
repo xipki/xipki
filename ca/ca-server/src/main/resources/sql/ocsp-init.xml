@@ -95,7 +95,7 @@
           remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"/>
       <column name="RIT" type="BIGINT" 
           remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
-      <column name="CERT" type="VARCHAR(3000)">
+      <column name="CERT" type="VARCHAR(4000)">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -178,7 +178,7 @@
           remarks="subject of the certificate">
         <constraints nullable="false"/>
       </column>
-      <column name="CERT" type="VARCHAR(3000)"
+      <column name="CERT" type="VARCHAR(4000)"
           remarks="Base64 encoded Certificate">
         <constraints nullable="false"/>
       </column>
