@@ -106,16 +106,14 @@ public abstract class DataSourceWrapper {
             if (StringUtil.isNotBlank(orderBy)) {
                 sql.append(" ORDER BY ").append(orderBy);
             }
-            sql.append(" LIMIT ").append(rows);
-            return sql.toString();
+            return sql.append(" LIMIT ").append(rows).toString();
         }
 
         @Override
         protected String buildCreateSequenceSql(final String sequenceName, final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 75);
-            sql.append("INSERT INTO SEQ_TBL (SEQ_NAME, SEQ_VALUE) VALUES('");
-            sql.append(sequenceName).append("', ").append(startValue).append(")");
-            return sql.toString();
+            sql.append("INSERT INTO SEQ_TBL (SEQ_NAME,SEQ_VALUE) VALUES('");
+            return sql.append(sequenceName).append("', ").append(startValue).append(")").toString();
         }
 
         @Override
@@ -128,9 +126,8 @@ public abstract class DataSourceWrapper {
         @Override
         protected String buildNextSeqValueSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 75);
-            sql.append("UPDATE SEQ_TBL SET SEQ_VALUE=(@cur_value:=SEQ_VALUE)+1 WHERE SEQ_NAME = '");
-            sql.append(sequenceName).append("'");
-            return sql.toString();
+            sql.append("UPDATE SEQ_TBL SET SEQ_VALUE=(@cur_value:=SEQ_VALUE)+1 WHERE SEQ_NAME='");
+            return sql.append(sequenceName).append("'").toString();
         }
 
         @Override
@@ -236,17 +233,14 @@ public abstract class DataSourceWrapper {
                 sql.append(" ORDER BY ").append(orderBy);
             }
 
-            sql.append(" FETCH FIRST ").append(rows).append(" ROWS ONLY");
-            return sql.toString();
+            return sql.append(" FETCH FIRST ").append(rows).append(" ROWS ONLY").toString();
         }
 
         @Override
         protected String buildCreateSequenceSql(final String sequenceName, final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
-            sql.append("CREATE SEQUENCE ").append(sequenceName);
-            sql.append(" AS BIGINT START WITH ").append(startValue);
-            sql.append(" INCREMENT BY 1 NO CYCLE NO CACHE");
-            return sql.toString();
+            sql.append("CREATE SEQUENCE ").append(sequenceName).append(" AS BIGINT START WITH ");
+            return sql.append(startValue).append(" INCREMENT BY 1 NO CYCLE NO CACHE").toString();
         }
 
         @Override
@@ -293,31 +287,26 @@ public abstract class DataSourceWrapper {
                 sql.append(" ORDER BY ").append(orderBy);
             }
 
-            sql.append(" FETCH FIRST ").append(rows).append(" ROWS ONLY");
-            return sql.toString();
+            return sql.append(" FETCH FIRST ").append(rows).append(" ROWS ONLY").toString();
         }
 
         @Override
         protected String buildCreateSequenceSql(final String sequenceName, final long startValue) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 70);
-            sql.append("CREATE SEQUENCE ").append(sequenceName);
-            sql.append(" START WITH ").append(startValue);
-            sql.append(" INCREMENT BY 1 NO CYCLE");
-            return sql.toString();
+            sql.append("CREATE SEQUENCE ").append(sequenceName).append(" START WITH ");
+            return sql.append(startValue).append(" INCREMENT BY 1 NO CYCLE").toString();
         }
 
         @Override
         protected String buildDropSequenceSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
-            sql.append("DROP SEQUENCE ").append(sequenceName);
-            return sql.toString();
+            return sql.append("DROP SEQUENCE ").append(sequenceName).toString();
         }
 
         @Override
         protected String buildNextSeqValueSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
-            sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
-            return sql.toString();
+            return sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')").toString();
         }
 
         @Override
@@ -330,13 +319,13 @@ public abstract class DataSourceWrapper {
             StringBuilder sb = new StringBuilder(500);
             sb.append("DO $$ DECLARE constraint_name varchar;\n");
             sb.append("BEGIN\n");
-            sb.append("    SELECT tc.CONSTRAINT_NAME into strict constraint_name\n");
-            sb.append("    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc\n");
-            sb.append("    WHERE CONSTRAINT_TYPE = 'PRIMARY KEY'\n");
-            sb.append("        AND TABLE_NAME = '").append(table.toLowerCase())
-                .append("' AND TABLE_SCHEMA = 'public';\n");
-            sb.append("    EXECUTE 'alter table public.").append(table.toLowerCase())
-                .append(" drop constraint ' || constraint_name;\n");
+            sb.append("  SELECT tc.CONSTRAINT_NAME into strict constraint_name\n");
+            sb.append("  FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc\n");
+            sb.append("  WHERE CONSTRAINT_TYPE='PRIMARY KEY'\n");
+            sb.append("  AND TABLE_NAME='").append(table.toLowerCase())
+                    .append("' AND TABLE_SCHEMA='public';\n");
+            sb.append("  EXECUTE 'alter table public.").append(table.toLowerCase())
+                    .append(" drop constraint ' || constraint_name;\n");
             sb.append("END $$;");
             return sb.toString();
         }
@@ -377,8 +366,7 @@ public abstract class DataSourceWrapper {
                 sql.append(" ORDER BY ").append(orderBy).append(" ) WHERE");
             }
 
-            sql.append(" ROWNUM < ").append(rows + 1);
-            return sql.toString();
+            return sql.append(" ROWNUM<").append(rows + 1).toString();
         }
 
         @Override
@@ -386,15 +374,13 @@ public abstract class DataSourceWrapper {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 59);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" START WITH ").append(startValue);
-            sql.append(" INCREMENT BY 1 NOCYCLE NOCACHE");
-            return sql.toString();
+            return sql.append(" INCREMENT BY 1 NOCYCLE NOCACHE").toString();
         }
 
         @Override
         protected String buildDropSequenceSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
-            sql.append("DROP SEQUENCE ").append(sequenceName);
-            return sql.toString();
+            return sql.append("DROP SEQUENCE ").append(sequenceName).toString();
         }
 
         @Override
@@ -429,8 +415,7 @@ public abstract class DataSourceWrapper {
             sb.append(" FOREIGN KEY (").append(baseColumn).append(")");
             sb.append(" REFERENCES ").append(referencedTable);
             sb.append(" (").append(referencedColumn).append(")");
-            sb.append(" ON DELETE ").append(onDeleteAction);
-            return sb.toString();
+            return sb.append(" ON DELETE ").append(onDeleteAction).toString();
         }
 
         @Override
@@ -488,22 +473,19 @@ public abstract class DataSourceWrapper {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" START WITH ").append(startValue);
-            sql.append(" INCREMENT BY 1 NO CYCLE NO CACHE");
-            return sql.toString();
+            return sql.append(" INCREMENT BY 1 NO CYCLE NO CACHE").toString();
         }
 
         @Override
         protected String buildDropSequenceSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
-            sql.append("DROP SEQUENCE ").append(sequenceName);
-            return sql.toString();
+            return sql.append("DROP SEQUENCE ").append(sequenceName).toString();
         }
 
         @Override
         protected String buildNextSeqValueSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
-            sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
-            return sql.toString();
+            return sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')").toString();
         }
 
     } // class H2
@@ -535,8 +517,7 @@ public abstract class DataSourceWrapper {
                 sql.append(" ORDER BY ").append(orderBy);
             }
 
-            sql.append(" LIMIT ").append(rows);
-            return sql.toString();
+            return sql.append(" LIMIT ").append(rows).toString();
         }
 
         @Override
@@ -544,22 +525,19 @@ public abstract class DataSourceWrapper {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 70);
             sql.append("CREATE SEQUENCE ").append(sequenceName);
             sql.append(" AS BIGINT START WITH ").append(startValue);
-            sql.append(" INCREMENT BY 1");
-            return sql.toString();
+            return sql.append(" INCREMENT BY 1").toString();
         }
 
         @Override
         protected String buildDropSequenceSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 14);
-            sql.append("DROP SEQUENCE ").append(sequenceName);
-            return sql.toString();
+            return sql.append("DROP SEQUENCE ").append(sequenceName).toString();
         }
 
         @Override
         protected String buildNextSeqValueSql(final String sequenceName) {
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
-            sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
-            return sql.toString();
+            return sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')").toString();
         }
 
     } // class HSQL
