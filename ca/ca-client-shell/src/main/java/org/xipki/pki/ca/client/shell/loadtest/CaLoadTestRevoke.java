@@ -238,8 +238,8 @@ public class CaLoadTestRevoke extends LoadExecutor {
                 return null;
             }
 
-            String sql = "ID, SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
-                    + " AND ID > " + (nextStartId - 1) + " AND ID < " + (maxId + 1);
+            String sql = "ID,SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId
+                    + " AND ID>" + (nextStartId - 1) + " AND ID<" + (maxId + 1);
             sql = caDataSource.buildSelectFirstSql(sql, 1000, "ID");
             PreparedStatement stmt = null;
             ResultSet rs = null;

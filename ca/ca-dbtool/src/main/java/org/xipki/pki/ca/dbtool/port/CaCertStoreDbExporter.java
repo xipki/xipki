@@ -235,8 +235,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
         ProcessLog processLog = new ProcessLog(total);
 
-        final String sql =
-                "SELECT ID, CA_ID, CRL FROM CRL WHERE ID >= ? AND ID < ? ORDER BY ID ASC";
+        final String sql = "SELECT ID,CA_ID,CRL FROM CRL WHERE ID>=? AND ID<? ORDER BY ID ASC";
         PreparedStatement ps = prepareStatement(sql);
 
         int numCrlsInCurrentFile = 0;
@@ -389,7 +388,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     private void exportCa(final CertStoreType certstore) throws DataAccessException, IOException {
         System.out.println("exporting table CS_CA");
         Cas cas = new Cas();
-        final String sql = "SELECT ID, CERT FROM CS_CA";
+        final String sql = "SELECT ID,CERT FROM CS_CA";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -420,7 +419,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     private void exportRequestor(final CertStoreType certstore) throws DataAccessException {
         System.out.println("exporting table CS_REQUESTOR");
         Requestors infos = new Requestors();
-        final String sql = "SELECT ID, NAME FROM CS_REQUESTOR";
+        final String sql = "SELECT ID,NAME FROM CS_REQUESTOR";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -448,7 +447,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     private void exportPublisherinfo(final CertStoreType certstore) throws DataAccessException {
         System.out.println("exporting table CS_PUBLISHER");
         Publishers infos = new Publishers();
-        final String sql = "SELECT ID, NAME FROM CS_PUBLISHER";
+        final String sql = "SELECT ID,NAME FROM CS_PUBLISHER";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -502,8 +501,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         final int numEntriesPerZip = numUsersInBundle;
         final String entriesDir = usersDir;
 
-        final String sql = "SELECT ID, NAME, PASSWORD, CN_REGEX FROM USERNAME"
-                + " WHERE ID >= ? AND ID < ? ORDER BY ID ASC";
+        final String sql = "SELECT ID,NAME,PASSWORD,CN_REGEX FROM USERNAME"
+                + " WHERE ID>=? AND ID<? ORDER BY ID ASC";
 
         final int minId = (int) getMin("USERNAME", "ID");
         final int maxId = (int) getMax("USERNAME", "ID");
@@ -615,7 +614,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     private void exportCertprofileinfo(final CertStoreType certstore) throws DataAccessException {
         System.out.println("exporting table CS_PROFILE");
         Profiles infos = new Profiles();
-        final String sql = "SELECT ID, NAME FROM CS_PROFILE";
+        final String sql = "SELECT ID,NAME FROM CS_PROFILE";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -695,9 +694,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             total = 1; // to avoid exception
         }
 
-        StringBuilder certSql = new StringBuilder("SELECT ID, SN, CA_ID, PID, RID, ");
-        certSql.append("ART, RTYPE, TID, UNAME, LUPDATE, REV, RR, RT, RIT, FP_RS ");
-        certSql.append("REQ_SUBJECT, CERT ");
+        StringBuilder certSql = new StringBuilder("SELECT ID,SN,CA_ID,PID,RID,");
+        certSql.append("ART,RTYPE,TID,UNAME,LUPDATE,REV,RR,RT,RIT,FP_RS,REQ_SUBJECT,CERT ");
         certSql.append("FROM CERT INNER JOIN CRAW ");
         certSql.append("ON CERT.ID>=? AND CERT.ID<? AND CERT.ID=CRAW.CID ORDER BY CERT.ID ASC");
 
@@ -893,8 +891,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     throws DataAccessException, IOException, JAXBException {
         System.out.println("exporting table PUBLISHQUEUE");
 
-        StringBuilder sqlBuilder = new StringBuilder("SELECT CID, PID, CA_ID");
-        sqlBuilder.append(" FROM PUBLISHQUEUE WHERE CID >= ? AND CID < ? ORDER BY CID ASC");
+        StringBuilder sqlBuilder = new StringBuilder("SELECT CID,PID,CA_ID");
+        sqlBuilder.append(" FROM PUBLISHQUEUE WHERE CID>=? AND CID<? ORDER BY CID ASC");
         final String sql = sqlBuilder.toString();
         final int minId = (int) getMin("PUBLISHQUEUE", "CID");
         final int maxId = (int) getMax("PUBLISHQUEUE", "CID");
@@ -943,7 +941,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     throws DataAccessException, IOException, JAXBException {
         System.out.println("exporting table DELTACRL_CACHE");
 
-        final String sql = "SELECT SN, CA_ID FROM DELTACRL_CACHE";
+        final String sql = "SELECT SN,CA_ID FROM DELTACRL_CACHE";
 
         DeltaCRLCache deltaCache = new DeltaCRLCache();
         certstore.setDeltaCRLCache(deltaCache);

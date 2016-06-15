@@ -169,7 +169,7 @@ class CertStoreQueryExecutor {
             "DELETE FROM CERT_IN_PROCESS WHERE FP_K=? AND FP_S=?";
 
     private static final String SQL_DELETE_CERT_INPROCESS_OLDER_THAN =
-            "DELETE FROM CERT_IN_PROCESS WHERE TIME2 < ?";
+            "DELETE FROM CERT_IN_PROCESS WHERE TIME2<?";
 
     private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED =
             "ID FROM CERT WHERE CA_ID=? AND FP_S=?";
@@ -567,7 +567,7 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        final String sql = datasource.buildSelectFirstSql("ID FROM CRL WHERE CA_ID = ?", 1);
+        final String sql = datasource.buildSelectFirstSql("ID FROM CRL WHERE CA_ID=?", 1);
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -1375,7 +1375,7 @@ class CertStoreQueryExecutor {
     throws OperationException, DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
 
-        final String sql = datasource.buildSelectFirstSql("PID, CA_ID FROM CERT WHERE ID=?", 1);
+        final String sql = datasource.buildSelectFirstSql("PID,CA_ID FROM CERT WHERE ID=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -2089,7 +2089,7 @@ class CertStoreQueryExecutor {
         Connection conn = datasource.getConnection();
         PreparedStatement ps = null;
         try {
-            final String sql = new StringBuilder("SELECT NEXT_CRLNO FROM CA WHERE NAME = '")
+            final String sql = new StringBuilder("SELECT NEXT_CRLNO FROM CA WHERE NAME='")
                 .append(caName).append("'").toString();
             ResultSet rs = null;
             int nextCrlNoInDb;

@@ -61,7 +61,7 @@ public class DbSchemaInfo {
     public DbSchemaInfo(final DataSourceWrapper datasource) throws DataAccessException {
         ParamUtil.requireNonNull("datasource", datasource);
 
-        final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
+        final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
         Connection connection = datasource.getConnection();
         if (connection == null) {
             throw new DataAccessException("could not get connection");

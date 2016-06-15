@@ -2022,7 +2022,7 @@ class CaManagerQueryExecutor {
     throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonNull("revocationInfo", revocationInfo);
-        String sql = "UPDATE CA SET REV=?, RR=?, RT=?, RIT=? WHERE NAME=?";
+        String sql = "UPDATE CA SET REV=?,RR=?,RT=?,RIT=? WHERE NAME=?";
         PreparedStatement ps = null;
         try {
             if (revocationInfo.getInvalidityTime() == null) {
@@ -2051,7 +2051,7 @@ class CaManagerQueryExecutor {
 
     void addCmpResponder(final CmpResponderEntry dbEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
-        final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CERT, CONF) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO RESPONDER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)";
 
         PreparedStatement ps = null;
         try {
@@ -2098,7 +2098,7 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonBlank("caName", caName);
         LOG.info("Unrevoking of CA '{}'", caName);
 
-        final String sql = "UPDATE CA SET REV=?, RR=?, RT=?, RIT=? WHERE NAME=?";
+        final String sql = "UPDATE CA SET REV=?,RR=?,RT=?,RIT=? WHERE NAME=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -2170,8 +2170,7 @@ class CaManagerQueryExecutor {
     private void executeAddUserSql(final int id, final UserEntry userEntry)
     throws DataAccessException, CaMgmtException {
         ParamUtil.requireNonNull("userEntry", userEntry);
-        final String sql =
-                "INSERT INTO USERNAME (ID, NAME, PASSWORD, CN_REGEX) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO USERNAME (ID,NAME,PASSWORD,CN_REGEX) VALUES (?,?,?,?)";
 
         PreparedStatement ps = null;
 
@@ -2265,7 +2264,7 @@ class CaManagerQueryExecutor {
     UserEntry getUser(final String username) throws CaMgmtException {
         ParamUtil.requireNonNull("username", username);
         final String sql = datasource.buildSelectFirstSql(
-                "PASSWORD, CN_REGEX FROM USERNAME WHERE NAME=?", 1);
+                "PASSWORD,CN_REGEX FROM USERNAME WHERE NAME=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {

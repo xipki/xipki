@@ -59,7 +59,7 @@ public class DbSchemaInfo {
 
     public DbSchemaInfo(DataSourceWrapper datasource) throws DataAccessException {
         ParamUtil.requireNonNull("datasource", datasource);
-        final String sql = "SELECT NAME, VALUE2 FROM DBSCHEMA";
+        final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
         Connection conn = datasource.getConnection();
         if (conn == null) {
             throw new DataAccessException("could not get connection");

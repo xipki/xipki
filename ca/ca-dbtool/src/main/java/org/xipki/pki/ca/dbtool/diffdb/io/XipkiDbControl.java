@@ -117,7 +117,7 @@ public class XipkiDbControl {
 
         // CA SQL
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT ID, CERT FROM ").append(tblCa);
+        sb.append("SELECT ID,CERT FROM ").append(tblCa);
         this.caSql = sb.toString();
 
         // CERT SQL

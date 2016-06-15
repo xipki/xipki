@@ -142,7 +142,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
     private void importCmpcontrol(final Cmpcontrols controls) throws DataAccessException {
         System.out.println("importing table CMPCONTROL");
-        final String sql = "INSERT INTO CMPCONTROL (NAME, CONF) VALUES (?, ?)";
+        final String sql = "INSERT INTO CMPCONTROL (NAME,CONF) VALUES (?,?)";
 
         if (controls != null && CollectionUtil.isNonEmpty(controls.getCmpcontrol())) {
             PreparedStatement ps = null;
@@ -175,7 +175,7 @@ class CaConfigurationDbImporter extends DbPorter {
             System.out.println(" imported table RESPONDER: nothing to import");
             return;
         }
-        final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CERT, CONF) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO RESPONDER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)";
 
         PreparedStatement ps = null;
         try {
@@ -205,7 +205,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
     private void importEnvironment(final Environments environments) throws DataAccessException {
         System.out.println("importing table ENVIRONMENT");
-        final String sql = "INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)";
+        final String sql = "INSERT INTO ENVIRONMENT (NAME,VALUE2) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -230,8 +230,8 @@ class CaConfigurationDbImporter extends DbPorter {
     private void importCrlsigner(final Crlsigners crlsigners)
     throws DataAccessException, IOException {
         System.out.println("importing table CRLSIGNER");
-        final String sql = "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CERT, CRL_CONTROL,"
-                + " SIGNER_CONF) VALUES (?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO CRLSIGNER (NAME,SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,"
+                + "SIGNER_CONF) VALUES (?,?,?,?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -260,7 +260,7 @@ class CaConfigurationDbImporter extends DbPorter {
     private void importRequestor(final Requestors requestors)
     throws DataAccessException, IOException {
         System.out.println("importing table REQUESTOR");
-        final String sql = "INSERT INTO REQUESTOR (NAME, CERT) VALUES (?, ?)";
+        final String sql = "INSERT INTO REQUESTOR (NAME,CERT) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -287,7 +287,7 @@ class CaConfigurationDbImporter extends DbPorter {
     private void importPublisher(final Publishers publishers)
     throws DataAccessException, IOException {
         System.out.println("importing table PUBLISHER");
-        final String sql = "INSERT INTO PUBLISHER (NAME, TYPE, CONF) VALUES (?, ?, ?)";
+        final String sql = "INSERT INTO PUBLISHER (NAME,TYPE,CONF) VALUES (?,?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -313,7 +313,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
     private void importProfile(final Profiles profiles) throws DataAccessException, IOException {
         System.out.println("importing table PROFILE");
-        final String sql = "INSERT INTO PROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO PROFILE (NAME,ART,TYPE,CONF) VALUES (?,?,?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -349,14 +349,13 @@ class CaConfigurationDbImporter extends DbPorter {
     throws DataAccessException, CertificateException, IOException {
         System.out.println("importing table CA");
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CA (NAME, ART, SUBJECT, SN_SIZE, NEXT_CRLNO, STATUS,");
-        sqlBuilder.append(" CRL_URIS, DELTACRL_URIS, OCSP_URIS, CACERT_URIS, MAX_VALIDITY,");
-        sqlBuilder.append(" CERT, SIGNER_TYPE, CRLSIGNER_NAME, RESPONDER_NAME, CMPCONTROL_NAME,");
-        sqlBuilder.append(" DUPLICATE_KEY, DUPLICATE_SUBJECT, PERMISSIONS,");
-        sqlBuilder.append(" NUM_CRLS, EXPIRATION_PERIOD, KEEP_EXPIRED_CERT_DAYS,");
-        sqlBuilder.append(" REV, RR, RT, RIT, VALIDITY_MODE, EXTRA_CONTROL, SIGNER_CONF)");
-        sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,");
-        sqlBuilder.append(" ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        sqlBuilder.append("INSERT INTO CA (NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,");
+        sqlBuilder.append("CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,");
+        sqlBuilder.append("CERT,SIGNER_TYPE,CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,");
+        sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,PERMISSIONS,");
+        sqlBuilder.append("NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,");
+        sqlBuilder.append("REV,RR,RT,RIT,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
+        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
@@ -422,7 +421,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
     private void importCaalias(final Caaliases caaliases) throws DataAccessException {
         System.out.println("importing table CAALIAS");
-        final String sql = "INSERT INTO CAALIAS (NAME, CA_NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO CAALIAS (NAME,CA_NAME) VALUES (?,?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (CaaliasType caalias : caaliases.getCaalias()) {
@@ -446,8 +445,8 @@ class CaConfigurationDbImporter extends DbPorter {
     throws DataAccessException {
         System.out.println("importing table CA_HAS_REQUESTOR");
         final String sql =
-                "INSERT INTO CA_HAS_REQUESTOR (CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES)"
-                + " VALUES (?, ?, ?, ?, ?)";
+                "INSERT INTO CA_HAS_REQUESTOR (CA_NAME,REQUESTOR_NAME,RA,PERMISSIONS,PROFILES)"
+                + " VALUES (?,?,?,?,?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (CaHasRequestorType entry : caHasRequestors.getCaHasRequestor()) {
@@ -475,7 +474,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
     private void importCaHasPublisher(final CaHasPublishers caHasPublishers) throws Exception {
         System.out.println("importing table CA_HAS_PUBLISHER");
-        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME, PUBLISHER_NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME,PUBLISHER_NAME) VALUES (?,?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (CaHasPublisherType entry : caHasPublishers.getCaHasPublisher()) {
@@ -500,7 +499,7 @@ class CaConfigurationDbImporter extends DbPorter {
     private void importCaHasCertprofile(final CaHasProfiles caHasCertprofiles)
     throws DataAccessException {
         System.out.println("importing table CA_HAS_PROFILE");
-        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME, PROFILE_NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME,PROFILE_NAME) VALUES (?,?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (CaHasProfileType entry : caHasCertprofiles.getCaHasProfile()) {
@@ -523,8 +522,8 @@ class CaConfigurationDbImporter extends DbPorter {
 
     private void importScep(final Sceps sceps) throws DataAccessException, IOException {
         System.out.println("importing table SCEP");
-        final String sql = "INSERT INTO SCEP (CA_NAME, RESPONDER_TYPE, "
-                + "RESPONDER_CERT, CONTROL, RESPONDER_CONF) VALUES (?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO SCEP (CA_NAME,RESPONDER_TYPE,"
+                + "RESPONDER_CERT,CONTROL,RESPONDER_CONF) VALUES (?,?,?,?,?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (ScepType entry : sceps.getScep()) {

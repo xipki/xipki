@@ -103,21 +103,19 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
 
     private static final String SQL_ADD_CERT =
-            "INSERT INTO CERT "
-            + "(ID, ART, LUPDATE, SN, SUBJECT, FP_S, FP_RS," // 8
-            + " NBEFORE, NAFTER, REV, RR, RT, RIT, PID, CA_ID," // 8
-            + " RID, UNAME, FP_K, EE, RTYPE, TID)" + // 6
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO CERT (ID,ART,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
+            + "PID,CA_ID,RID,UNAME,FP_K,EE,RTYPE,TID)"
+            + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     private static final String SQL_ADD_CRAW =
-            "INSERT INTO CRAW (CID, SHA1, REQ_SUBJECT, CERT) VALUES (?, ?, ?, ?)";
+            "INSERT INTO CRAW (CID,SHA1,REQ_SUBJECT,CERT) VALUES (?,?,?,?)";
 
     private static final String SQL_ADD_CRL =
-            "INSERT INTO CRL (ID, CA_ID, CRL_NO, THISUPDATE, NEXTUPDATE, DELTACRL, BASECRL_NO, CRL)"
-            + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL)"
+            + " VALUES (?,?,?,?,?,?,?,?)";
 
     private static final String SQL_ADD_USER =
-            "INSERT INTO USERNAME (ID, NAME, PASSWORD,CN_REGEX) VALUES (?, ?, ?, ?)";
+            "INSERT INTO USERNAME (ID,NAME,PASSWORD,CN_REGEX) VALUES (?,?,?,?)";
 
     private final Unmarshaller unmarshaller;
 
@@ -199,7 +197,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
     private void importCa(final Cas cas)
     throws DataAccessException, CertificateException, IOException {
-        final String sql = "INSERT INTO CS_CA (ID, SUBJECT, SHA1_CERT, CERT) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO CS_CA (ID,SUBJECT,SHA1_CERT,CERT) VALUES (?,?,?,?)";
         System.out.println("importing table CS_CA");
         PreparedStatement ps = prepareStatement(sql);
 
@@ -236,7 +234,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     } // method importCa
 
     private void importRequestor(final Requestors requestors) throws DataAccessException {
-        final String sql = "INSERT INTO CS_REQUESTOR (ID, NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO CS_REQUESTOR (ID,NAME) VALUES (?,?)";
         System.out.println("importing table CS_REQUESTOR");
 
         PreparedStatement ps = prepareStatement(sql);
@@ -265,7 +263,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     } // method importRequestor
 
     private void importPublisher(final Publishers publishers) throws DataAccessException {
-        final String sql = "INSERT INTO CS_PUBLISHER (ID, NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO CS_PUBLISHER (ID,NAME) VALUES (?,?)";
 
         System.out.println("importing table CS_PUBLISHER");
 
@@ -295,7 +293,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     } // method importPublisher
 
     private void importProfile(final Profiles profiles) throws DataAccessException {
-        final String sql = "INSERT INTO CS_PROFILE (ID, NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO CS_PROFILE (ID,NAME) VALUES (?,?)";
         System.out.println("importing table CS_PROFILE");
 
         PreparedStatement ps = prepareStatement(sql);
@@ -441,7 +439,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     } // method doImportUser
 
     private void importPublishQueue(final PublishQueue publishQueue) throws DataAccessException {
-        final String sql = "INSERT INTO PUBLISHQUEUE (CID, PID, CA_ID) VALUES (?, ?, ?)";
+        final String sql = "INSERT INTO PUBLISHQUEUE (CID,PID,CA_ID) VALUES (?,?,?)";
         System.out.println("importing table PUBLISHQUEUE");
         PreparedStatement ps = prepareStatement(sql);
 
@@ -468,7 +466,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     } // method importPublishQueue
 
     private void importDeltaCrlCache(final DeltaCRLCache deltaCrlCache) throws DataAccessException {
-        final String sql = "INSERT INTO DELTACRL_CACHE (ID, SN, CA_ID) VALUES (?, ?, ?)";
+        final String sql = "INSERT INTO DELTACRL_CACHE (ID,SN,CA_ID) VALUES (?,?,?)";
         System.out.println("importing table DELTACRL_CACHE");
         PreparedStatement ps = prepareStatement(sql);
 

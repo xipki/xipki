@@ -309,7 +309,7 @@ public class DbDigestDiff {
     private static Map<Integer, byte[]> getCas(final DataSourceWrapper datasource,
             final XipkiDbControl dbControl) throws DataAccessException {
         // get a list of available CAs in the target database
-        String sql = "SELECT ID, CERT FROM " + dbControl.getTblCa();
+        String sql = "SELECT ID,CERT FROM " + dbControl.getTblCa();
         Connection conn = datasource.getConnection();
         Statement stmt = datasource.createStatement(conn);
         Map<Integer, byte[]> caIdCertMap = new HashMap<>(5);

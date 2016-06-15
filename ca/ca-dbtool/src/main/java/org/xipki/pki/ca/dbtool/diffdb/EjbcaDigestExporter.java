@@ -128,8 +128,8 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
             }
 
             tblCertHasId = false;
-            String coreSql = "fingerprint, serialNumber, cAFingerprint, status, revocationReason, "
-                    + "revocationDate FROM CertificateData WHERE fingerprint > ?";
+            String coreSql = "fingerprint,serialNumber,cAFingerprint,status,revocationReason, "
+                    + "revocationDate FROM CertificateData WHERE fingerprint>?";
             sql = datasource.buildSelectFirstSql(coreSql, numCertsPerSelect, "fingerprint ASC");
             certSql = "SELECT base64Cert FROM CertificateData WHERE fingerprint=?";
 
@@ -187,7 +187,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
     private Map<String, EjbcaCaInfo> getCas() throws Exception {
         Map<String, EjbcaCaInfo> cas = new HashMap<>();
-        final String selectSql = "SELECT NAME, DATA FROM CAData";
+        final String selectSql = "SELECT NAME,DATA FROM CAData";
 
         Statement stmt = null;
         ResultSet rs = null;
