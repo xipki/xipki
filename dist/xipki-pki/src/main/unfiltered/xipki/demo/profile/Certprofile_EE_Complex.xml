@@ -65,8 +65,9 @@
       </parameters>
     </algorithm>
   </keyAlgorithms>
-  <subject keepRdnOrder="true" duplicateSubjectPermitted="false">
+  <subject duplicateSubjectPermitted="false">
     <incSerialNumber>false</incSerialNumber>
+    <keepRdnOrder>true</keepRdnOrder>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="cn">2.5.4.3</type>
     </rdn>

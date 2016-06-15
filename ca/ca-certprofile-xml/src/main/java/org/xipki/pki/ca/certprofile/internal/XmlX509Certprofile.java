@@ -342,20 +342,23 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         } else {
             throw new CertprofileException("invalid CertLevel '" + str + "'");
         }
-        this.notBeforeMidnight = "midnight".equalsIgnoreCase(conf.getNotBeforeTime());
+
+        str = conf.getNotBeforeTime();
+        if ("midnight".equalsIgnoreCase(str)) {
+            this.notBeforeMidnight = true;
+        } else if ("current".equalsIgnoreCase(str)) {
+            this.notBeforeMidnight = false;
+        } else {
+            throw new CertprofileException("invalid notBefore '" + str + "'");
+        }
 
         String specBehavior = conf.getSpecialBehavior();
         if (specBehavior != null) {
             this.specialBehavior = SpecialX509CertprofileBehavior.getInstance(specBehavior);
         }
 
-        if (conf.isDuplicateKey() != null) {
-            duplicateKeyPermitted = conf.isDuplicateKey().booleanValue();
-        }
-
-        if (conf.isSerialNumberInReq() != null) {
-            serialNumberInReqPermitted = conf.isSerialNumberInReq().booleanValue();
-        }
+        this.duplicateKeyPermitted = conf.isDuplicateKey();
+        this.serialNumberInReqPermitted = conf.isSerialNumberInReq();
 
         // KeyAlgorithms
         KeyAlgorithms keyAlgos = conf.getKeyAlgorithms();
@@ -377,10 +380,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // Subject
         Subject subject = conf.getSubject();
-        Boolean bo = subject.isDuplicateSubjectPermitted();
-        if (bo != null) {
-            duplicateSubjectPermitted = bo.booleanValue();
-        }
+        duplicateSubjectPermitted = subject.isDuplicateSubjectPermitted();
 
         List<RdnControl> subjectDnControls = new LinkedList<>();
 
@@ -547,13 +547,8 @@ class XmlX509Certprofile extends BaseX509Certprofile {
             return;
         }
 
-        Boolean bo = extConf.isIncludeCaIssuers();
-        boolean includesCaIssuers = (bo == null) ? true : bo.booleanValue();
-
-        bo = extConf.isIncludeOcsp();
-        boolean includesOcsp = (bo == null) ? true : bo.booleanValue();
-
-        this.aiaControl = new AuthorityInfoAccessControl(includesCaIssuers, includesOcsp);
+        this.aiaControl = new AuthorityInfoAccessControl(extConf.isIncludeCaIssuers(),
+                extConf.isIncludeOcsp());
     }
 
     private void initAuthorityKeyIdentifier(ExtensionsType extensionsType)
@@ -1065,7 +1060,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         // processed by the CA
 
         // Subject Directory Attributes
-        // Will not supported
+        // not supported
 
         // Basic Constraints
         // processed by the CA

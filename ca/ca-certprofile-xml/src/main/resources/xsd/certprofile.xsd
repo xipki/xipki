@@ -11,7 +11,7 @@
   <xs:complexType name="X509ProfileType">
     <xs:sequence>
       <xs:element name="appInfo" type="anyType" minOccurs="0"/>
-      <xs:element name="version" type="xs:string" minOccurs="0">
+      <xs:element name="version" type="xs:string">
         <xs:annotation>
           <xs:documentation>
             version of the certificate, current support values are v1, v2 and v3
@@ -40,8 +40,8 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="validity" type="xs:string" minOccurs="0"/>
-      <xs:element name="notBeforeTime" type="xs:string" minOccurs="0">
+      <xs:element name="validity" type="xs:string"/>
+      <xs:element name="notBeforeTime" type="xs:string">
         <xs:annotation>
           <xs:documentation>
             Format of the notBefore field.
@@ -50,8 +50,8 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="duplicateKey" type="xs:boolean" minOccurs="0"/>
-      <xs:element name="serialNumberInReq" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="duplicateKey" type="xs:boolean"/>
+      <xs:element name="serialNumberInReq" type="xs:boolean"/>
       <xs:element name="specialBehavior" type="xs:string" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
@@ -82,15 +82,15 @@
       <xs:element name="subject">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="incSerialNumber" type="xs:boolean" default="false" minOccurs="0"/>
+            <xs:element name="incSerialNumber" type="xs:boolean"/>
+            <xs:element name="keepRdnOrder" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>whether the RDNs occurs as in the defined ASN.1 order</xs:documentation>
+              </xs:annotation>
+            </xs:element>
             <xs:element name="rdn" type="rdnType" maxOccurs="unbounded"/>
           </xs:sequence>
-          <xs:attribute name="keepRdnOrder" type="xs:boolean" default="false" use="optional">
-            <xs:annotation>
-              <xs:documentation>whether the RDNs occurs as in the defined ASN.1 order</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute name="duplicateSubjectPermitted" type="xs:boolean" use="optional"/>
+          <xs:attribute name="duplicateSubjectPermitted" type="xs:boolean" use="required"/>
         </xs:complexType>
       </xs:element>
       <xs:element name="extensions" type="extensionsType"/>
@@ -289,15 +289,15 @@
   <xs:element name="authorityKeyIdentifier">
     <xs:complexType>
       <xs:all>
-        <xs:element name="includeIssuerAndSerial" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="includeIssuerAndSerial" type="xs:boolean"/>
       </xs:all>
     </xs:complexType>
   </xs:element>
   <xs:element name="authorityInfoAccess">
     <xs:complexType>
       <xs:all>
-        <xs:element name="includeCaIssuers" type="xs:boolean" minOccurs="0"/>
-        <xs:element name="includeOcsp" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="includeCaIssuers" type="xs:boolean"/>
+        <xs:element name="includeOcsp" type="xs:boolean"/>
       </xs:all>
     </xs:complexType>
   </xs:element>

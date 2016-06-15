@@ -65,8 +65,9 @@
       </parameters>
     </algorithm>
   </keyAlgorithms>
-  <subject keepRdnOrder="false" duplicateSubjectPermitted="true">
+  <subject duplicateSubjectPermitted="true">
     <incSerialNumber>false</incSerialNumber>
+    <keepRdnOrder>false</keepRdnOrder>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="c">2.5.4.6</type>
       <regex>DE|FR</regex>
