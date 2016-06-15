@@ -175,16 +175,15 @@
           remarks="revocation time, seconds since January 1, 1970, 00:00:00 GMT"/>
       <column name="RIT" type="BIGINT"
           remarks="revocation invalidity time, seconds since January 1, 1970, 00:00:00 GMT"/>
-
       <column name="SIGNER_TYPE" type="VARCHAR(100)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="CERT" type="CLOB">
         <constraints nullable="false"/>
       </column>
       <column name="KEEP_EXPIRED_CERT_DAYS" type="SMALLINT" defaultValueNumeric="-1" 
           remarks="How long in days should certificates after the expiration be kept. Negative value for kept-for-ever"/>
       <column name="EXTRA_CONTROL" type="VARCHAR(500)"/>
+      <column name="CERT" type="CLOB">
+        <constraints nullable="false"/>
+      </column>
       <column name="SIGNER_CONF" type="CLOB">
         <constraints nullable="false"/>
       </column>
