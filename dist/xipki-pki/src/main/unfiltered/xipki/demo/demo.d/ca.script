@@ -141,13 +141,15 @@ if { $TOKEN_TYPE equals "pkcs11" } {
     --slot $SLOT \
     --label RCA1 \
     --out output/RCA1.p10 \
-    --subject "CN=RCA1,O=xipki,C=DE"
+    --subject "CN=RCA1,O=xipki,C=DE" \
+    --keyusage cRLSign
 } {
   xipki-tk:req-p12 \
     --p12 output/RCA1.p12 \
     --password 1234 \
     --out output/RCA1.p10 \
-    --subject "CN=RCA1,O=xipki,C=DE"
+    --subject "CN=RCA1,O=xipki,C=DE" \
+    --keyusage cRLSign
 }
 
 ## Generate selfsigned RCA
