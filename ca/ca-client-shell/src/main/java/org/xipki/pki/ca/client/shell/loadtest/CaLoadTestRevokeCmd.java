@@ -58,7 +58,7 @@ import org.xipki.commons.security.SecurityFactory;
  */
 
 @Command(scope = "xipki-cli", name = "loadtest-revoke",
-        description = "CA Client Revoke Load test")
+        description = "CA client revoke load test")
 @Service
 public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
 
