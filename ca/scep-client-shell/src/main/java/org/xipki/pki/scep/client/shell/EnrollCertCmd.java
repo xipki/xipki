@@ -52,7 +52,7 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
  * @since 2.0.0
  */
 
-@Command(scope = "scep", name = "enroll",
+@Command(scope = "xipki-scep", name = "enroll",
         description = "enroll certificate via automic selected messageType")
 @Service
 public class EnrollCertCmd extends EnrollCertCommandSupport {

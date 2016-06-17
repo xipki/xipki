@@ -19,7 +19,7 @@ xipki-tk:req-p12 \
   --out output/JSCEP-OCSP1.p10
 
 ## Enroll certificate via PKCSReq
-jscep:enroll \
+xipki-jscep:enroll \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
@@ -28,7 +28,7 @@ jscep:enroll \
   --out output/JSCEP-OCSP1.der
 
 ## Poll Cert
-jscep:certpoll \
+xipki-jscep:certpoll \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
@@ -38,7 +38,7 @@ jscep:certpoll \
   
 ## Get Cert
 
-jscep:getcert-qa \
+xipki-jscep:getcert-qa \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
@@ -55,7 +55,7 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
 
 ## Get CRL
-jscep:getcrl \
+xipki-jscep:getcrl \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --cert output/JSCEP-OCSP1.der \
@@ -72,7 +72,7 @@ xipki-tk:req-p12 \
   --out output/JSCEP-OCSP1-2.p10
 
 ## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12
-jscep:enroll \
+xipki-jscep:enroll \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
@@ -97,7 +97,7 @@ xipki-tk:req-p12 \
   --out output/JSCEP-OCSP2.p10
 
 ## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12
-jscep:enroll \
+xipki-jscep:enroll \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \

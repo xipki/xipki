@@ -55,7 +55,7 @@ import org.xipki.pki.scep.client.ScepClient;
  * @since 2.0.0
  */
 
-@Command(scope = "scep", name = "getcert",
+@Command(scope = "xipki-scep", name = "getcert",
         description = "download certificate")
 @Service
 public class GetCertCmd extends ClientCommandSupport {

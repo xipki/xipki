@@ -19,7 +19,7 @@ xipki-tk:req-p12 \
   --out output/SCEP-OCSP1.p10
 
 ## Enroll certificate via PKCSReq
-scep:pkcs-req \
+xipki-scep:pkcs-req \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
@@ -28,7 +28,7 @@ scep:pkcs-req \
   --out output/SCEP-OCSP1.der
 
 ## Poll Cert
-scep:certpoll \
+xipki-scep:certpoll \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
@@ -38,7 +38,7 @@ scep:certpoll \
   
 ## Get Cert
 
-scep:getcert-qa \
+xipki-scep:getcert-qa \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
@@ -55,7 +55,7 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
 
 ## Get CRL
-scep:getcrl \
+xipki-scep:getcrl \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --cert output/SCEP-OCSP1.der \
@@ -72,7 +72,7 @@ xipki-tk:req-p12 \
   --out output/SCEP-OCSP1-2.p10
 
 ## Enroll certificate via Renewal, hence signed by the old key SCEP-OCSP1.p12
-scep:renewal-req \
+xipki-scep:renewal-req \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
@@ -97,7 +97,7 @@ xipki-tk:req-p12 \
   --out output/SCEP-OCSP2.p10
 
 ## Enroll certificate via Renewal, hence signed by the old key SCEP-OCSP1.p12
-scep:renewal-req \
+xipki-scep:renewal-req \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
