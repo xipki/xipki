@@ -268,7 +268,7 @@ auto-completed by typing the `TAB` key.
 Some features in XiPKI are listed below, a list of all available features can be retrieved via the
 command `feature:list  | grep xipki` in OSGi console.
 
-For the usage of OSGi commands, just use the option `--help``. Most XiPKI commands can 
+For the usage of OSGi commands, just use the option `--help`. Most XiPKI commands can 
 auto-completing the options and arguments by the `TAB` key.
 
 * xipki-caserver
