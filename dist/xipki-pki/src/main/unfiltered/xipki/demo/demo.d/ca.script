@@ -13,6 +13,8 @@ xipki-db:initdb \
 
 feature:uninstall xipki-database-tool
 
+feature:install xipki-caserver
+
 feature:install xipki-camgmt-shell
 
 sleep 1000
