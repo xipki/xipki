@@ -55,7 +55,7 @@ import org.xipki.commons.security.util.X509Util;
  * @since 2.0.0
  */
 
-@Command(scope = "jscep", name = "getcert-qa",
+@Command(scope = "xipki-jscep", name = "getcert-qa",
         description = "download certificate (only used for QA)")
 @Service
 public class GetCertQaCmd extends ClientCommandSupport {

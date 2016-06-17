@@ -54,7 +54,7 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "jscep", name = "getcert",
+@Command(scope = "xipki-jscep", name = "getcert",
         description = "download certificate")
 @Service
 public class GetCertCmd extends ClientCommandSupport {

@@ -52,7 +52,7 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
  * @since 2.0.0
  */
 
-@Command(scope = "scep", name = "renewal-req",
+@Command(scope = "xipki-scep", name = "renewal-req",
         description = "enroll certificate via messageType RenewalReq")
 @Service
 public class RenewalReqCmd extends EnrollCertCommandSupport {
