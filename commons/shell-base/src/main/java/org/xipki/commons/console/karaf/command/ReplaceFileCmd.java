@@ -57,7 +57,7 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
  */
 
 @Command(scope = "xipki-cmd", name = "replace",
-        description = "Replace text in file")
+        description = "replace text in file")
 @Service
 public class ReplaceFileCmd extends XipkiCommandSupport {
 
