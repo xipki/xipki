@@ -47,7 +47,7 @@ import org.xipki.pki.ca.server.mgmt.shell.ClearPublishQueueCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-clear-publishqueue",
-        description = "clear publish queue")
+        description = "clear publish queue (negative, QA)")
 @Service
 public class NegClearPublishQueueCmd extends ClearPublishQueueCmd {
 

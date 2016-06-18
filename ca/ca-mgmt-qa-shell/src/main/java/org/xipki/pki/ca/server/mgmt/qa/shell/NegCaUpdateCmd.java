@@ -47,7 +47,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-ca-up",
-        description = "update CA")
+        description = "update CA (negative, QA)")
 @Service
 public class NegCaUpdateCmd extends CaUpdateCmd {
 

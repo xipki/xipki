@@ -47,7 +47,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaRequestorRemoveCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-careq-rm",
-        description = "remove requestor in CA")
+        description = "remove requestor in CA (negative, QA)")
 @Service
 public class NegCaRequestorRemoveCmd extends CaRequestorRemoveCmd {
 

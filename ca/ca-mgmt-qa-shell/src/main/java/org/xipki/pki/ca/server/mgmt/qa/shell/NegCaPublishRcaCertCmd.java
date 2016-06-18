@@ -47,7 +47,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaPublishRcaCertCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-publish-self",
-        description = "publish the certificate of root CA")
+        description = "publish the certificate of root CA (negative, QA)")
 @Service
 public class NegCaPublishRcaCertCmd extends CaPublishRcaCertCmd {
 

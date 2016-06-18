@@ -47,7 +47,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaRevokeCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-ca-revoke",
-        description = "revoke CA")
+        description = "revoke CA (negative, QA)")
 @Service
 public class NegCaRevokeCmd extends CaRevokeCmd {
 

@@ -47,7 +47,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaRequestorAddCmd;
  */
 
 @Command(scope = "xipki-caqa", name = "neg-careq-add",
-        description = "add requestor to CA")
+        description = "add requestor to CA (negative, QA)")
 @Service
 public class NegCaRequestorAddCmd extends CaRequestorAddCmd {
 
