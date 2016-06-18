@@ -50,7 +50,7 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
  */
 
 @Command(scope = "xipki-tk", name = "validate-req",
-        description = "Validate PKCS#10 request")
+        description = "validate PKCS#10 request")
 @Service
 public class CertRequestValidateCmd extends SecurityCommandSupport {
 
