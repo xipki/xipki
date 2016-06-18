@@ -15,6 +15,5 @@
   <modules>
     <module>xipki-pki</module>
     <module>xipki-pkcs11proxy</module>
-    <module>xipki-dbtool</module>
   </modules>
 </project>

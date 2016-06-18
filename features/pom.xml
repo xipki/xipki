@@ -15,7 +15,6 @@
   <modules>
     <module>pki</module>
     <module>pkcs11proxy</module>
-    <module>dbtool</module>
   </modules>
   <profiles>
     <profile>
