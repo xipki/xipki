@@ -46,6 +46,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -53,12 +54,15 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
@@ -67,9 +71,11 @@ import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Attribute;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.SubjectDirectoryAttributes;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
@@ -269,6 +275,8 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
     @Override
     protected List<Extension> getAdditionalExtensions() throws BadInputException {
         List<Extension> extensions = new LinkedList<>();
+
+        // extension admission (Germany standard commonpki)
         ASN1EncodableVector vec = new ASN1EncodableVector();
 
         DirectoryString[] dummyItems = new DirectoryString[]{new DirectoryString("dummy")};
@@ -284,6 +292,40 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
         } catch (IOException ex) {
             throw new BadInputException(ex.getMessage(), ex);
         }
+
+        // extension subjectDirectoryAttributes (RFC 3739)
+        Vector<Attribute> attrs = new Vector<>();
+        ASN1GeneralizedTime dateOfBirth = new ASN1GeneralizedTime("19800122120000Z");
+        attrs.add(new Attribute(ObjectIdentifiers.DN_DATE_OF_BIRTH, new DERSet(dateOfBirth)));
+
+        DERPrintableString gender = new DERPrintableString("M");
+        attrs.add(new Attribute(ObjectIdentifiers.DN_GENDER, new DERSet(gender)));
+
+        DERUTF8String placeOfBirth = new DERUTF8String("Berlin");
+        attrs.add(new Attribute(ObjectIdentifiers.DN_PLACE_OF_BIRTH, new DERSet(placeOfBirth)));
+
+        String[] countryOfCitizenshipList = new String[]{"DE", "FR"};
+        for (String country : countryOfCitizenshipList) {
+            DERPrintableString val = new DERPrintableString(country);
+            attrs.add(new Attribute(ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP,
+                    new DERSet(val)));
+        }
+
+        String[] countryOfResidenceList = new String[]{"DE"};
+        for (String country : countryOfResidenceList) {
+            DERPrintableString val = new DERPrintableString(country);
+            attrs.add(new Attribute(ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE,
+                    new DERSet(val)));
+        }
+
+        SubjectDirectoryAttributes subjectDirAttrs = new SubjectDirectoryAttributes(attrs);
+        try {
+            extensions.add(new Extension(Extension.subjectDirectoryAttributes, false,
+                    subjectDirAttrs.getEncoded()));
+        } catch (IOException ex) {
+            throw new BadInputException(ex.getMessage(), ex);
+        }
+
         return extensions;
     }
 
