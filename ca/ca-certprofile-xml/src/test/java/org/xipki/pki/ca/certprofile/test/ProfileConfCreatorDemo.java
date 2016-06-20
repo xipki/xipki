@@ -1065,8 +1065,8 @@ public class ProfileConfCreatorDemo {
         rdnControls.add(createRdn(ObjectIdentifiers.DN_OU, 0, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null,
                 null));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_DATE_OF_BIRTH, 1, 1));
-        rdnControls.add(createRdn(ObjectIdentifiers.DN_POSTAL_ADDRESS, 1, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_DATE_OF_BIRTH, 0, 1));
+        rdnControls.add(createRdn(ObjectIdentifiers.DN_POSTAL_ADDRESS, 0, 1));
         rdnControls.add(createRdn(ObjectIdentifiers.DN_UNIQUE_IDENTIFIER, 1, 1));
 
         // Extensions

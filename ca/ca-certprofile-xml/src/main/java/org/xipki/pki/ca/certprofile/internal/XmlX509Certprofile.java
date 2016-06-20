@@ -1142,7 +1142,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                 if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(attrType) ) {
                     if (dateOfBirth != null) {
                         String timeStirng = dateOfBirth.getTimeString();
-                        if (!timeStirng.endsWith("120000Z")) {
+                        if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(timeStirng).matches()) {
                             throw new BadCertTemplateException("invalid dateOfBirth " + timeStirng);
                         }
                         attrs.add(new Attribute(attrType, new DERSet(dateOfBirth)));

@@ -193,7 +193,7 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/SubCAwithCRL1.der \
   --ca-cert output/RCA1.der
 
-# Certificate EE.Complex1
+# Certificate EE.Complex1 with complex subject (parsable in openssl)
 
 xipki-tk:req-p12-complex \
   --subject "CN=EE.Complex1,O=xipki,C=DE" \
@@ -205,7 +205,7 @@ xipki-tk:req-p12-complex \
   --biometric-hash SHA256 \
   --biometric-file xipki/README.md \
   --biometric-uri https://example.org/?id=123
-  
+
 xipki-cli:p10-enroll \
   --p10 output/EE.Complex1.p10 \
   --out output/EE.Complex1.der \
@@ -218,7 +218,34 @@ xipki-tk:update-cert-p12 \
   --cert output/EE.Complex1.der \
   --ca-cert output/SubCA1.der \
   --ca-cert output/RCA1.der
- 
+
+# Certificate EE.Complex1 with complex subject (not parsable in openssl due to complex subject)
+
+xipki-tk:req-p12-complex \
+  --subject "CN=EE.Complex2,O=xipki,C=DE" \
+  --p12 output/EE.Complex2.p12 \
+  --password 1234 \
+  --out output/EE.Complex2.p10 \
+  --qc-eu-limit EUR:150:15 \
+  --biometric-type 0 \
+  --biometric-hash SHA256 \
+  --biometric-file xipki/README.md \
+  --biometric-uri https://example.org/?id=123 \
+  --complex-subject
+
+xipki-cli:p10-enroll \
+  --p10 output/EE.Complex2.p10 \
+  --out output/EE.Complex2.der \
+  --profile EE.Complex \
+  --user USER-T
+
+xipki-tk:update-cert-p12 \
+  --p12 output/EE.Complex2.p12 \
+  --password 1234 \
+  --cert output/EE.Complex2.der \
+  --ca-cert output/SubCA1.der \
+  --ca-cert output/RCA1.der
+
 # Certificate TLS1
 
 xipki-tk:req-p12 \

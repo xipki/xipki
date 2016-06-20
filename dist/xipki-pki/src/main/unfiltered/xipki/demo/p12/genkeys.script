@@ -148,6 +148,20 @@ xipki-tk:ec-p12 \
   --password 1234 \
   --out p12/ec/EE.Complex1.p12
 
+echo " ----- generate keys for EE.Complex2 -----"
+
+xipki-tk:rsa-p12 \
+  --password 1234 \
+  --out p12/rsa/EE.Complex2.p12
+
+xipki-tk:dsa-p12 \
+  --password 1234 \
+  --out p12/dsa/EE.Complex2.p12
+
+xipki-tk:ec-p12 \
+  --password 1234 \
+  --out p12/ec/EE.Complex2.p12
+
 echo " ----- generate keys for TLS1 -----"
 
 xipki-tk:rsa-p12 \

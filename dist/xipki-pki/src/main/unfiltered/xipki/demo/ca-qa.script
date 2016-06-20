@@ -142,6 +142,12 @@ xipki-qa:check-cert \
   --p10 output/EE.Complex1.p10 \
   --cert output/EE.Complex1.der
 
+xipki-qa:check-cert \
+  --issuer SubCA \
+  --profile EE.Complex \
+  --p10 output/EE.Complex2.p10 \
+  --cert output/EE.Complex2.der
+
 echo "#################################################################"
 echo "#                        NEGITIVE TESTS                         #"
 echo "#################################################################"

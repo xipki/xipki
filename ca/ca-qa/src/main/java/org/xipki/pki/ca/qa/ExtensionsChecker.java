@@ -131,6 +131,7 @@ import org.xipki.pki.ca.api.profile.x509.AuthorityInfoAccessControl;
 import org.xipki.pki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.SubjectDirectoryAttributesControl;
+import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.certprofile.BiometricInfoOption;
@@ -1694,7 +1695,7 @@ public class ExtensionsChecker {
 
         if (dateOfBirth != null) {
             String timeStirng = dateOfBirth.getTimeString();
-            if (!timeStirng.endsWith("120000Z")) {
+            if (!SubjectDnSpec.PATTERN_DATE_OF_BIRTH.matcher(timeStirng).matches()) {
                 failureMsg.append("invalid dateOfBirth: " + timeStirng + "; ");
             }
 
