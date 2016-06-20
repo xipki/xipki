@@ -73,7 +73,7 @@ public class SubjectDnSpec {
     private static final Logger LOG = LoggerFactory.getLogger(SubjectDnSpec.class);
 
     public static final Pattern PATTERN_DATE_OF_BIRTH =
-            Pattern.compile("^(19|20)\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])000000Z");
+            Pattern.compile("^(19|20)\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])120000Z");
 
     /**
      * ranges.
