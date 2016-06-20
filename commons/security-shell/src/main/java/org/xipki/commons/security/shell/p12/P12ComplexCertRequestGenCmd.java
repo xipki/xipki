@@ -108,6 +108,10 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
             description = "password of the PKCS#12 file")
     private String password;
 
+    @Option(name = "--complex-subject",
+            description = "whether complex subject should be used")
+    private Boolean complexSubject = Boolean.FALSE;
+
     private char[] getPassword() throws IOException {
         char[] pwdInChar = readPasswordIfNotSet(password);
         if (pwdInChar != null) {
@@ -154,32 +158,36 @@ public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
         ASN1ObjectIdentifier id;
 
         // dateOfBirth
-        id = ObjectIdentifiers.DN_DATE_OF_BIRTH;
-        RDN[] rdns = name.getRDNs(id);
+        if (complexSubject.booleanValue()) {
+            id = ObjectIdentifiers.DN_DATE_OF_BIRTH;
+            RDN[] rdns = name.getRDNs(id);
 
-        if (rdns == null || rdns.length == 0) {
-            ASN1Encodable atvValue = new DERGeneralizedTime("19950102000000Z");
-            RDN rdn = new RDN(id, atvValue);
-            list.add(rdn);
+            if (rdns == null || rdns.length == 0) {
+                ASN1Encodable atvValue = new DERGeneralizedTime("19950102120000Z");
+                RDN rdn = new RDN(id, atvValue);
+                list.add(rdn);
+            }
         }
 
         // postalAddress
-        id = ObjectIdentifiers.DN_POSTAL_ADDRESS;
-        rdns = name.getRDNs(id);
+        if (complexSubject.booleanValue()) {
+            id = ObjectIdentifiers.DN_POSTAL_ADDRESS;
+            RDN[] rdns = name.getRDNs(id);
 
-        if (rdns == null || rdns.length == 0) {
-            ASN1EncodableVector vec = new ASN1EncodableVector();
-            vec.add(new DERUTF8String("my street 1"));
-            vec.add(new DERUTF8String("12345 Germany"));
+            if (rdns == null || rdns.length == 0) {
+                ASN1EncodableVector vec = new ASN1EncodableVector();
+                vec.add(new DERUTF8String("my street 1"));
+                vec.add(new DERUTF8String("12345 Germany"));
 
-            ASN1Sequence atvValue = new DERSequence(vec);
-            RDN rdn = new RDN(id, atvValue);
-            list.add(rdn);
+                ASN1Sequence atvValue = new DERSequence(vec);
+                RDN rdn = new RDN(id, atvValue);
+                list.add(rdn);
+            }
         }
 
         // DN_UNIQUE_IDENTIFIER
         id = ObjectIdentifiers.DN_UNIQUE_IDENTIFIER;
-        rdns = name.getRDNs(id);
+        RDN[] rdns = name.getRDNs(id);
 
         if (rdns == null || rdns.length == 0) {
             DERUTF8String atvValue = new DERUTF8String("abc-def-ghi");
