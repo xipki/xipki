@@ -52,6 +52,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -77,6 +78,7 @@ import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.Attribute;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
@@ -94,6 +96,7 @@ import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyQualifierId;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
+import org.bouncycastle.asn1.x509.SubjectDirectoryAttributes;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
@@ -127,6 +130,7 @@ import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.x509.AuthorityInfoAccessControl;
 import org.xipki.pki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
+import org.xipki.pki.ca.api.profile.x509.SubjectDirectoryAttributesControl;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.certprofile.BiometricInfoOption;
@@ -156,6 +160,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapabilities;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectAltName;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectDirectoryAttributs;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
@@ -254,6 +259,8 @@ public class ExtensionsChecker {
     private QaTlsFeature tlsFeature;
 
     private QaExtensionValue smimeCapabilities;
+
+    private SubjectDirectoryAttributesControl subjectDirAttrsControl;
 
     private Map<ASN1ObjectIdentifier, QaExtensionValue> constantExtensions;
 
@@ -566,6 +573,19 @@ public class ExtensionsChecker {
             }
         }
 
+        // SubjectDirectoryAttributes
+        type = Extension.subjectDirectoryAttributes;
+        if (extensionControls.containsKey(type)) {
+            SubjectDirectoryAttributs extConf = (SubjectDirectoryAttributs) getExtensionValue(
+                    type, extensionsType, SubjectDirectoryAttributs.class);
+            if (extConf == null) {
+                return;
+            }
+
+            List<ASN1ObjectIdentifier> types = XmlX509CertprofileUtil.toOidList(extConf.getType());
+            subjectDirAttrsControl = new SubjectDirectoryAttributesControl(types);
+        }
+
         // constant extensions
         this.constantExtensions = buildConstantExtesions(extensionsType);
     } // constructor
@@ -648,6 +668,10 @@ public class ExtensionsChecker {
                 } else if (Extension.subjectAlternativeName.equals(oid)) {
                     // SubjectAltName
                     checkExtensionSubjectAltName(failureMsg, extensionValue, requestExtensions,
+                            extControl);
+                } else if (Extension.subjectDirectoryAttributes.equals(oid)) {
+                    // SubjectDirectoryAttributes
+                    checkExtensionSubjectDirAttrs(failureMsg, extensionValue, requestExtensions,
                             extControl);
                 } else if (Extension.issuerAlternativeName.equals(oid)) {
                     // IssuerAltName
@@ -1528,6 +1552,218 @@ public class ExtensionsChecker {
             addViolation(failureMsg, "skipCerts", isSkipCerts, conf.getSkipCerts());
         }
     } // method checkExtensionInhibitAnyPolicy
+
+    private void checkExtensionSubjectDirAttrs(final StringBuilder failureMsg,
+            final byte[] extensionValue, final Extensions requestExtensions,
+            final ExtensionControl extControl) {
+        SubjectDirectoryAttributesControl conf = subjectDirAttrsControl;
+        if (conf == null) {
+            failureMsg.append("extension is present but not expected; ");
+            return;
+        }
+
+        ASN1Encodable extInRequest = null;
+        if (requestExtensions != null) {
+            extInRequest = requestExtensions.getExtensionParsedValue(
+                    Extension.subjectDirectoryAttributes);
+        }
+
+        if (extInRequest == null) {
+            failureMsg.append("extension is present but not expected; ");
+            return;
+        }
+
+        SubjectDirectoryAttributes requested = SubjectDirectoryAttributes.getInstance(extInRequest);
+        Vector<?> reqSubDirAttrs = requested.getAttributes();
+        ASN1GeneralizedTime expDateOfBirth = null;
+        String expPlaceOfBirth = null;
+        String expGender = null;
+        Set<String> expCountryOfCitizenshipList = new HashSet<>();
+        Set<String> expCountryOfResidenceList = new HashSet<>();
+        Map<ASN1ObjectIdentifier, Set<ASN1Encodable>> expOtherAttrs = new HashMap<>();
+
+        final int expN = reqSubDirAttrs.size();
+        for (int i = 0; i < expN; i++) {
+            Attribute attr = (Attribute) reqSubDirAttrs.get(i);
+            ASN1ObjectIdentifier attrType = attr.getAttrType();
+            ASN1Encodable attrVal = attr.getAttributeValues()[0];
+
+            if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(attrType)) {
+                expDateOfBirth = ASN1GeneralizedTime.getInstance(attrVal);
+            } else if (ObjectIdentifiers.DN_PLACE_OF_BIRTH.equals(attrType)) {
+                expPlaceOfBirth = DirectoryString.getInstance(attrVal).getString();
+            } else if (ObjectIdentifiers.DN_GENDER.equals(attrType)) {
+                expGender = DERPrintableString.getInstance(attrVal).getString();
+            } else if (ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP.equals(attrType)) {
+                String country = DERPrintableString.getInstance(attrVal).getString();
+                expCountryOfCitizenshipList.add(country);
+            } else if (ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE.equals(attrType)) {
+                String country = DERPrintableString.getInstance(attrVal).getString();
+                expCountryOfResidenceList.add(country);
+            } else {
+                Set<ASN1Encodable> otherAttrVals = expOtherAttrs.get(attrType);
+                if (otherAttrVals == null) {
+                    otherAttrVals = new HashSet<>();
+                    expOtherAttrs.put(attrType, otherAttrVals);
+                }
+                otherAttrVals.add(attrVal);
+            }
+        }
+
+        SubjectDirectoryAttributes ext = SubjectDirectoryAttributes.getInstance(extensionValue);
+        Vector<?> subDirAttrs = ext.getAttributes();
+        ASN1GeneralizedTime dateOfBirth = null;
+        String placeOfBirth = null;
+        String gender = null;
+        Set<String> countryOfCitizenshipList = new HashSet<>();
+        Set<String> countryOfResidenceList = new HashSet<>();
+        Map<ASN1ObjectIdentifier, Set<ASN1Encodable>> otherAttrs = new HashMap<>();
+
+        List<ASN1ObjectIdentifier> attrTypes = new LinkedList<>(conf.getTypes());
+        final int n = subDirAttrs.size();
+        for (int i = 0; i < n; i++) {
+            Attribute attr = (Attribute) subDirAttrs.get(i);
+            ASN1ObjectIdentifier attrType = attr.getAttrType();
+            if ( !attrTypes.contains(attrType)) {
+                failureMsg.append("attribute of type " + attrType.getId()
+                    + " is present but not expected; ");
+                continue;
+            }
+
+            ASN1Encodable[] attrs = attr.getAttributeValues();
+            if (attrs.length != 1) {
+                failureMsg.append("attribute of type " + attrType.getId()
+                    + " does not single-value value: " + attrs.length + "; ");
+                continue;
+            }
+
+            ASN1Encodable attrVal = attrs[0];
+
+            if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(attrType)) {
+                dateOfBirth = ASN1GeneralizedTime.getInstance(attrVal);
+            } else if (ObjectIdentifiers.DN_PLACE_OF_BIRTH.equals(attrType)) {
+                placeOfBirth = DirectoryString.getInstance(attrVal).getString();
+            } else if (ObjectIdentifiers.DN_GENDER.equals(attrType)) {
+                gender = DERPrintableString.getInstance(attrVal).getString();
+            } else if (ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP.equals(attrType)) {
+                String country = DERPrintableString.getInstance(attrVal).getString();
+                countryOfCitizenshipList.add(country);
+            } else if (ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE.equals(attrType)) {
+                String country = DERPrintableString.getInstance(attrVal).getString();
+                countryOfResidenceList.add(country);
+            } else {
+                Set<ASN1Encodable> otherAttrVals = otherAttrs.get(attrType);
+                if (otherAttrVals == null) {
+                    otherAttrVals = new HashSet<>();
+                    otherAttrs.put(attrType, otherAttrVals);
+                }
+                otherAttrVals.add(attrVal);
+            }
+        }
+
+        if (dateOfBirth != null) {
+            attrTypes.remove(ObjectIdentifiers.DN_DATE_OF_BIRTH);
+        }
+
+        if (placeOfBirth != null) {
+            attrTypes.remove(ObjectIdentifiers.DN_PLACE_OF_BIRTH);
+        }
+
+        if (gender != null) {
+            attrTypes.remove(ObjectIdentifiers.DN_GENDER);
+        }
+
+        if (!countryOfCitizenshipList.isEmpty()) {
+            attrTypes.remove(ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP);
+        }
+
+        if (!countryOfResidenceList.isEmpty()) {
+            attrTypes.remove(ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE);
+        }
+
+        attrTypes.removeAll(otherAttrs.keySet());
+
+        if (!attrTypes.isEmpty()) {
+            List<String> attrTypeTexts = new LinkedList<>();
+            for (ASN1ObjectIdentifier oid : attrTypes) {
+                attrTypeTexts.add(oid.getId());
+            }
+            failureMsg.append("required attributes of types " + attrTypeTexts
+                    + " are not present; ");
+        }
+
+        if (dateOfBirth != null) {
+            String timeStirng = dateOfBirth.getTimeString();
+            if (!timeStirng.endsWith("120000Z")) {
+                failureMsg.append("invalid dateOfBirth: " + timeStirng + "; ");
+            }
+
+            String exp = (expDateOfBirth == null) ? null : expDateOfBirth.getTimeString();
+            if (!timeStirng.equalsIgnoreCase(exp)) {
+                addViolation(failureMsg, "dateOfBirth", timeStirng, exp);
+            }
+        }
+
+        if (gender != null) {
+            if (!(gender.equalsIgnoreCase("F") || gender.equalsIgnoreCase("M"))) {
+                failureMsg.append("invalid gender: " + gender + "; ");
+            }
+            if (!gender.equalsIgnoreCase(expGender)) {
+                addViolation(failureMsg, "gender", gender, expGender);
+            }
+        }
+
+        if (placeOfBirth != null) {
+            if (!placeOfBirth.equals(expPlaceOfBirth)) {
+                addViolation(failureMsg, "placeOfBirth", placeOfBirth, expPlaceOfBirth);
+            }
+        }
+
+        if (!countryOfCitizenshipList.isEmpty()) {
+            Set<String> diffs = strInBnotInA(expCountryOfCitizenshipList, countryOfCitizenshipList);
+            if (CollectionUtil.isNonEmpty(diffs)) {
+                failureMsg.append("countryOfCitizenship ").append(diffs.toString());
+                failureMsg.append(" are present but not expected; ");
+            }
+
+            diffs = strInBnotInA(countryOfCitizenshipList, expCountryOfCitizenshipList);
+            if (CollectionUtil.isNonEmpty(diffs)) {
+                failureMsg.append("countryOfCitizenship ").append(diffs.toString());
+                failureMsg.append(" are absent but are required; ");
+            }
+        }
+
+        if (!countryOfResidenceList.isEmpty()) {
+            Set<String> diffs = strInBnotInA(expCountryOfResidenceList, countryOfResidenceList);
+            if (CollectionUtil.isNonEmpty(diffs)) {
+                failureMsg.append("countryOfResidence ").append(diffs.toString());
+                failureMsg.append(" are present but not expected; ");
+            }
+
+            diffs = strInBnotInA(countryOfResidenceList, expCountryOfResidenceList);
+            if (CollectionUtil.isNonEmpty(diffs)) {
+                failureMsg.append("countryOfResidence ").append(diffs.toString());
+                failureMsg.append(" are absent but are required; ");
+            }
+        }
+
+        if (!otherAttrs.isEmpty()) {
+            for (ASN1ObjectIdentifier attrType : otherAttrs.keySet()) {
+                Set<ASN1Encodable> expAttrValues = expOtherAttrs.get(attrType);
+                if (expAttrValues == null) {
+                    failureMsg.append("attribute of type " + attrType.getId()
+                            + " is present but not requested; ");
+                    continue;
+                }
+                Set<ASN1Encodable> attrValues = otherAttrs.get(attrType);
+                if (!attrValues.equals(expAttrValues)) {
+                    failureMsg.append("attribute of type " + attrType.getId()
+                        + " differs from the requested one; ");
+                    continue;
+                }
+            }
+        }
+    } // method checkExtensionSubjectDirectoryAttributes
 
     private void checkExtensionSubjectAltName(final StringBuilder failureMsg,
             final byte[] extensionValue, final Extensions requestExtensions,

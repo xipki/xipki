@@ -153,6 +153,19 @@
       </value>
     </extension>
     <extension required="true" permittedInRequest="false">
+      <type description="subjectDirectoryAttributes">2.5.29.9</type>
+      <critical>false</critical>
+      <value>
+        <subjectDirectoryAttributs>
+          <type description="countryOfCitizenship">1.3.6.1.5.5.7.9.4</type>
+          <type description="countryOfResidence">1.3.6.1.5.5.7.9.5</type>
+          <type description="gender">1.3.6.1.5.5.7.9.3</type>
+          <type description="dateOfBirth">1.3.6.1.5.5.7.9.1</type>
+          <type description="placeOfBirth">1.3.6.1.5.5.7.9.2</type>
+        </subjectDirectoryAttributs>
+      </value>
+    </extension>
+    <extension required="true" permittedInRequest="false">
       <type description="admission">1.3.36.8.3.3</type>
       <critical>false</critical>
       <value>

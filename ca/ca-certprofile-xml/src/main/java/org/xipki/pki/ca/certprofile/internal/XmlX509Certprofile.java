@@ -51,10 +51,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -65,13 +67,18 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
+import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Attribute;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.SubjectDirectoryAttributes;
 import org.bouncycastle.asn1.x509.qualified.BiometricData;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
@@ -104,6 +111,7 @@ import org.xipki.pki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.pki.ca.api.profile.x509.SubjectControl;
+import org.xipki.pki.ca.api.profile.x509.SubjectDirectoryAttributesControl;
 import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
@@ -141,6 +149,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapabilities;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectAltName;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectDirectoryAttributs;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
@@ -239,6 +248,8 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
     private ExtensionValue validityModel;
 
+    private SubjectDirectoryAttributesControl subjectDirAttrsControl;
+
     private void reset() {
         additionalInformation = null;
         admission = null;
@@ -280,6 +291,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         validity = null;
         validityModel = null;
         version = null;
+        subjectDirAttrsControl = null;
     } // method reset
 
     @Override
@@ -494,6 +506,9 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         // validityModel
         initValidityModel(extensionsType);
 
+        // subjectDirectoryAttributes
+        initSubjectDirAttrs(extensionsType);
+
         // constant extensions
         this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(extensionsType);
     } // method doInitialize
@@ -636,8 +651,8 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         List<CertificatePolicyInformation> policyInfos =
                 XmlX509CertprofileUtil.buildCertificatePolicies(extConf);
-        org.bouncycastle.asn1.x509.CertificatePolicies value = CollectionUtil.isEmpty(policyInfos)
-                ? null : XmlX509CertprofileUtil.createCertificatePolicies(policyInfos);
+        org.bouncycastle.asn1.x509.CertificatePolicies value =
+                XmlX509CertprofileUtil.createCertificatePolicies(policyInfos);
         this.certificatePolicies = new ExtensionValue(extensionControls.get(type).isCritical(),
                 value);
     }
@@ -1005,6 +1020,23 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         validityModel = new ExtensionValue(extensionControls.get(type).isCritical(), extValue);
     }
 
+    private void initSubjectDirAttrs(ExtensionsType extensionsType)
+    throws CertprofileException {
+        ASN1ObjectIdentifier type = Extension.subjectDirectoryAttributes;
+        if (!extensionControls.containsKey(type)) {
+            return;
+        }
+
+        SubjectDirectoryAttributs extConf = (SubjectDirectoryAttributs) getExtensionValue(
+                type, extensionsType, SubjectDirectoryAttributs.class);
+        if (extConf == null) {
+            return;
+        }
+
+        List<ASN1ObjectIdentifier> types = XmlX509CertprofileUtil.toOidList(extConf.getType());
+        subjectDirAttrsControl = new SubjectDirectoryAttributesControl(types);
+    }
+
     @Override
     public CertValidity getValidity() {
         return validity;
@@ -1060,7 +1092,120 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         // processed by the CA
 
         // Subject Directory Attributes
-        // not supported
+        type = Extension.subjectDirectoryAttributes;
+        if (subjectDirAttrsControl != null && occurences.remove(type) != null) {
+            Extension extension = requestedExtensions.getExtension(type);
+            if (extension == null) {
+                throw new BadCertTemplateException(
+                        "No SubjectDirecotryAttributes extension is contained in the request");
+            }
+
+            ASN1GeneralizedTime dateOfBirth = null;
+            String placeOfBirth = null;
+            String gender = null;
+            List<String> countryOfCitizenshipList = new LinkedList<>();
+            List<String> countryOfResidenceList = new LinkedList<>();
+            Map<ASN1ObjectIdentifier, List<ASN1Encodable>> otherAttrs = new HashMap<>();
+
+            Vector<?> reqSubDirAttrs = SubjectDirectoryAttributes.getInstance(
+                    extension.getParsedValue()).getAttributes();
+            final int n = reqSubDirAttrs.size();
+            for (int i = 0; i < n; i++) {
+                Attribute attr = (Attribute) reqSubDirAttrs.get(i);
+                ASN1ObjectIdentifier attrType = attr.getAttrType();
+                ASN1Encodable attrVal = attr.getAttributeValues()[0];
+
+                if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(attrType)) {
+                    dateOfBirth = ASN1GeneralizedTime.getInstance(attrVal);
+                } else if (ObjectIdentifiers.DN_PLACE_OF_BIRTH.equals(attrType)) {
+                    placeOfBirth = DirectoryString.getInstance(attrVal).getString();
+                } else if (ObjectIdentifiers.DN_GENDER.equals(attrType)) {
+                    gender = DERPrintableString.getInstance(attrVal).getString();
+                } else if (ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP.equals(attrType)) {
+                    String country = DERPrintableString.getInstance(attrVal).getString();
+                    countryOfCitizenshipList.add(country);
+                } else if (ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE.equals(attrType)) {
+                    String country = DERPrintableString.getInstance(attrVal).getString();
+                    countryOfResidenceList.add(country);
+                } else {
+                    List<ASN1Encodable> otherAttrVals = otherAttrs.get(attrType);
+                    if (otherAttrVals == null) {
+                        otherAttrVals = new LinkedList<>();
+                        otherAttrs.put(attrType, otherAttrVals);
+                    }
+                    otherAttrVals.add(attrVal);
+                }
+            }
+
+            Vector<Attribute> attrs = new Vector<>();
+            for (ASN1ObjectIdentifier attrType : subjectDirAttrsControl.getTypes()) {
+                if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(attrType) ) {
+                    if (dateOfBirth != null) {
+                        String timeStirng = dateOfBirth.getTimeString();
+                        if (!timeStirng.endsWith("120000Z")) {
+                            throw new BadCertTemplateException("invalid dateOfBirth " + timeStirng);
+                        }
+                        attrs.add(new Attribute(attrType, new DERSet(dateOfBirth)));
+                        continue;
+                    }
+                } else if (ObjectIdentifiers.DN_PLACE_OF_BIRTH.equals(attrType)) {
+                    if (placeOfBirth != null) {
+                        ASN1Encodable attrVal = new DERUTF8String(placeOfBirth);
+                        attrs.add(new Attribute(attrType, new DERSet(attrVal)));
+                        continue;
+                    }
+                } else if (ObjectIdentifiers.DN_GENDER.equals(attrType)) {
+                    if (gender != null && !gender.isEmpty()) {
+                        char ch = gender.charAt(0);
+                        if (!(gender.length() == 1
+                                && (ch == 'f' || ch == 'F' || ch == 'm' || ch == 'M'))) {
+                            throw new BadCertTemplateException("invalid gender " + gender);
+                        }
+                        ASN1Encodable attrVal = new DERPrintableString(gender);
+                        attrs.add(new Attribute(attrType, new DERSet(attrVal)));
+                        continue;
+                    }
+                } else if (ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP.equals(attrType)) {
+                    if (!countryOfCitizenshipList.isEmpty()) {
+                        for (String country : countryOfCitizenshipList) {
+                            if (!SubjectDnSpec.isValidCountryAreaCode(country)) {
+                                throw new BadCertTemplateException(
+                                        "invalid countryOfCitizenship code " + country);
+                            }
+                            ASN1Encodable attrVal = new DERPrintableString(country);
+                            attrs.add(new Attribute(attrType, new DERSet(attrVal)));
+                        }
+                        continue;
+                    }
+                } else if (ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE.equals(attrType)) {
+                    if (!countryOfResidenceList.isEmpty()) {
+                        for (String country : countryOfResidenceList) {
+                            if (!SubjectDnSpec.isValidCountryAreaCode(country)) {
+                                throw new BadCertTemplateException(
+                                        "invalid countryOfResidence code " + country);
+                            }
+                            ASN1Encodable attrVal = new DERPrintableString(country);
+                            attrs.add(new Attribute(attrType, new DERSet(attrVal)));
+                        }
+                        continue;
+                    }
+                } else if (otherAttrs.containsKey(attrType)) {
+                    for (ASN1Encodable attrVal : otherAttrs.get(attrType)) {
+                        attrs.add(new Attribute(attrType, new DERSet(attrVal)));
+                    }
+
+                    continue;
+                }
+
+                throw new BadCertTemplateException("could not process type " + attrType.getId()
+                        + " in extension SubjectDirectoryAttributes");
+            }
+
+            SubjectDirectoryAttributes subjDirAttrs = new SubjectDirectoryAttributes(attrs);
+            ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
+                    subjDirAttrs);
+            values.addExtension(type, extValue);
+        }
 
         // Basic Constraints
         // processed by the CA

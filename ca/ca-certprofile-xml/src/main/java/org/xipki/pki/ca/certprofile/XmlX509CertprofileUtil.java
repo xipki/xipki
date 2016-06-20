@@ -195,9 +195,6 @@ public class XmlX509CertprofileUtil {
     public static List<CertificatePolicyInformation> buildCertificatePolicies(
             final CertificatePolicies type) {
         List<CertificatePolicyInformationType> policyPairs = type.getCertificatePolicyInformation();
-        if (CollectionUtil.isEmpty(policyPairs)) {
-            return null;
-        }
 
         List<CertificatePolicyInformation> policies =
                 new ArrayList<CertificatePolicyInformation>(policyPairs.size());

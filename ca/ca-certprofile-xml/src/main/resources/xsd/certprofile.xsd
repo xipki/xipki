@@ -563,6 +563,13 @@
       <xs:element name="oid" type="oidWithDescType"/>
     </xs:choice>
   </xs:complexType>
+  <xs:element name="subjectDirectoryAttributs">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="type" type="oidWithDescType" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="constantExtValue">
     <xs:complexType>
       <xs:complexContent>

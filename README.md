@@ -217,6 +217,7 @@ Components
     - Restriction (German national standard CommonPKI)
     - SMIMECapabilities (RFC 4262)
     - SubjectAltName (RFC 5280)
+    - SubjectDirectoryAttributes (RFC 3739)
     - SubjectInfoAccess (RFC 5280)
     - SubjectKeyIdentifier (RFC 5280)
     - TLSFeature (RFC 7633)

@@ -138,6 +138,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.Restriction;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapabilities;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectAltName;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectDirectoryAttributs;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TripleState;
@@ -1102,6 +1103,18 @@ public class ProfileConfCreatorDemo {
                 new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
                 new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
         list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
+
+        // Extension - subjectDirectoryAttributes
+        SubjectDirectoryAttributs subjectDirAttrType = new SubjectDirectoryAttributs();
+        List<OidWithDescType> attrTypes = subjectDirAttrType.getType();
+        attrTypes.add(createOidType(ObjectIdentifiers.DN_COUNTRY_OF_CITIZENSHIP));
+        attrTypes.add(createOidType(ObjectIdentifiers.DN_COUNTRY_OF_RESIDENCE));
+        attrTypes.add(createOidType(ObjectIdentifiers.DN_GENDER));
+        attrTypes.add(createOidType(ObjectIdentifiers.DN_DATE_OF_BIRTH));
+        attrTypes.add(createOidType(ObjectIdentifiers.DN_PLACE_OF_BIRTH));
+        extensionValue = createExtensionValueType(subjectDirAttrType);
+        list.add(createExtension(Extension.subjectDirectoryAttributes, true, false,
+                extensionValue));
 
         // Extension - Admission
         AdmissionSyntax admissionSyntax = new AdmissionSyntax();
