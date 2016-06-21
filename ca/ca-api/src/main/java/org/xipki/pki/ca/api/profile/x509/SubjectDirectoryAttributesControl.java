@@ -44,7 +44,7 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0.2
+ * @since 2.0.1
  */
 
 public class SubjectDirectoryAttributesControl {
