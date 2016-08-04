@@ -66,7 +66,7 @@ import com.cloudbees.syslog.sender.UdpSyslogMessageSender;
  * @since 2.0.0
  */
 
-public class SyslogAuditServiceImpl implements AuditService {
+public class SyslogAuditServiceImpl extends AuditService {
 
     /**
      * The default port is 514.
@@ -126,7 +126,7 @@ public class SyslogAuditServiceImpl implements AuditService {
     }
 
     @Override
-    public void logEvent(@Nonnull final AuditEvent event) {
+    public void doLogEvent(@Nonnull final AuditEvent event) {
         if (!initialized) {
             LOG.error("Syslog audit not initialiazed");
             return;
@@ -189,7 +189,7 @@ public class SyslogAuditServiceImpl implements AuditService {
     } // method logEvent(AuditEvent)
 
     @Override
-    public void logEvent(@Nonnull final PciAuditEvent event) {
+    public void doLogEvent(@Nonnull final PciAuditEvent event) {
         if (!initialized) {
             LOG.error("Syslog audit not initialiazed");
             return;

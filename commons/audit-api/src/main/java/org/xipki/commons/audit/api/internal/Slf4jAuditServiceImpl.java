@@ -37,16 +37,14 @@
 package org.xipki.commons.audit.api.internal;
 
 import java.io.CharArrayWriter;
-import java.util.List;
-import java.util.Objects;
+
+import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
-import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.audit.api.PciAuditEvent;
 
 /**
@@ -54,7 +52,7 @@ import org.xipki.commons.audit.api.PciAuditEvent;
  * @since 2.0.0
  */
 
-public class Slf4jAuditServiceImpl implements AuditService {
+public class Slf4jAuditServiceImpl extends AuditService {
 
     private static final Logger LOG = LoggerFactory.getLogger("xipki.audit.slf4j");
 
@@ -62,11 +60,7 @@ public class Slf4jAuditServiceImpl implements AuditService {
     }
 
     @Override
-    public void logEvent(final AuditEvent event) {
-        if (event == null) {
-            return;
-        }
-
+    public void doLogEvent(@Nonnull final AuditEvent event) {
         switch (event.getLevel()) {
         case DEBUG:
             if (LOG.isDebugEnabled()) {
@@ -80,11 +74,7 @@ public class Slf4jAuditServiceImpl implements AuditService {
     }
 
     @Override
-    public void logEvent(final PciAuditEvent event) {
-        if (event == null) {
-            return;
-        }
-
+    public void doLogEvent(@Nonnull final PciAuditEvent event) {
         CharArrayWriter msg = event.toCharArrayWriter("");
         AuditLevel al = event.getLevel();
         switch (al) {
@@ -97,48 +87,6 @@ public class Slf4jAuditServiceImpl implements AuditService {
             LOG.info("{} | {}", al.getAlignedText(), msg);
             break;
         } // end switch
-    }
-
-    private static String createMessage(final AuditEvent event) {
-        Objects.requireNonNull(event, "event must not be null");
-        String applicationName = event.getApplicationName();
-        if (applicationName == null) {
-            applicationName = "undefined";
-        }
-
-        String name = event.getName();
-        if (name == null) {
-            name = "undefined";
-        }
-
-        StringBuilder sb = new StringBuilder(150);
-
-        sb.append(event.getLevel().getAlignedText()).append(" | ");
-        sb.append(applicationName).append(" - ").append(name);
-
-        AuditStatus status = event.getStatus();
-        if (status == null) {
-            status = AuditStatus.UNDEFINED;
-        }
-        sb.append(":\tstatus: ").append(status.name());
-        List<AuditEventData> eventDataArray = event.getEventDatas();
-
-        long duration = event.getDuration();
-        if (duration >= 0) {
-            sb.append("\tduration: ").append(duration);
-        }
-
-        if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
-            for (AuditEventData m : eventDataArray) {
-                if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
-                    continue;
-                }
-
-                sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
-            }
-        }
-
-        return sb.toString();
     }
 
 }
