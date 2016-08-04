@@ -637,8 +637,9 @@ public class X509Ca {
                     "CRL generation is not allowed");
         }
 
-        LOG.info("     START generateCrl: ca={}, deltaCRL={}, nextUpdate={}",
-                caInfo.getName(), deltaCrl, nextUpdate);
+        final String caName = caInfo.getName();
+        LOG.info("     START generateCrl: ca={}, deltaCRL={}, nextUpdate={}", caName, deltaCrl,
+                nextUpdate);
         auditEvent.addEventData(new AuditEventData("crlType", deltaCrl ? "DELTA_CRL" : "FULL_CRL"));
 
         if (nextUpdate != null) {
@@ -736,13 +737,15 @@ public class X509Ca {
                                 + crlControl.getInvalidityDateMode());
                     }
 
+                    BigInteger serial = revInfo.getSerial();
+                    LOG.debug("added cert ca={} serial={} to CRL", caName, serial);
+
                     if (directCrl || !isFirstCrlEntry) {
                         if (invalidityTime != null) {
-                            crlBuilder.addCRLEntry(revInfo.getSerial(), revocationTime,
-                                    reason.getCode(), invalidityTime);
+                            crlBuilder.addCRLEntry(serial, revocationTime, reason.getCode(),
+                                    invalidityTime);
                         } else {
-                            crlBuilder.addCRLEntry(revInfo.getSerial(), revocationTime,
-                                    reason.getCode());
+                            crlBuilder.addCRLEntry(serial, revocationTime, reason.getCode());
                         }
                         continue;
                     }
@@ -763,7 +766,7 @@ public class X509Ca {
 
                     Extensions asn1Extensions = new Extensions(
                             extensions.toArray(new Extension[0]));
-                    crlBuilder.addCRLEntry(revInfo.getSerial(), revocationTime, asn1Extensions);
+                    crlBuilder.addCRLEntry(serial, revocationTime, asn1Extensions);
                     isFirstCrlEntry = false;
                 } // end for
 
@@ -2087,7 +2090,8 @@ public class X509Ca {
                 try {
                     removed = doRemoveCertificate(serial) != null;
                 } catch (Throwable th) {
-                    LogUtil.error(LOG, th, "could not remove expired certificate");
+                    LogUtil.error(LOG, th, "could not remove expired certificate with serial"
+                            + serial);
                     if (!removed) {
                         return sum;
                     }
@@ -2130,7 +2134,7 @@ public class X509Ca {
             break;
         default:
             throw new RuntimeException("should not reach here, unknown Valditiy Unit "
- + val.getUnit());
+                + val.getUnit());
         }
         final long latestLastUpdatedAt = (System.currentTimeMillis() - ms) / 1000; // seconds
         final CrlReason reason = caInfo.getRevokeSuspendedCertsControl().getTargetReason();
