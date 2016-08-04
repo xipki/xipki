@@ -36,17 +36,104 @@
 
 package org.xipki.commons.audit.api;
 
+import java.io.CharArrayWriter;
+import java.util.List;
+import java.util.Objects;
+
 import javax.annotation.Nonnull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface AuditService {
+public abstract class AuditService {
 
-    void logEvent(@Nonnull AuditEvent event);
+    private static final Logger LOG = LoggerFactory.getLogger(AuditService.class);
 
-    void logEvent(@Nonnull PciAuditEvent event);
+    public abstract void doLogEvent(@Nonnull AuditEvent event);
+
+    public abstract void doLogEvent(@Nonnull PciAuditEvent event);
+
+    public final void logEvent(@Nonnull AuditEvent event) {
+        Objects.requireNonNull(event, "event could not be null");
+
+        switch (event.getLevel()) {
+        case DEBUG:
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("AuditEvent {}", createMessage(event));
+            }
+            break;
+        default:
+            LOG.info("AuditEvent {}", createMessage(event));
+            break;
+        } // end switch
+
+        doLogEvent(event);
+    }
+
+    public final void logEvent(@Nonnull PciAuditEvent event) {
+        Objects.requireNonNull(event, "event could not be null");
+
+        CharArrayWriter msg = event.toCharArrayWriter("");
+        AuditLevel al = event.getLevel();
+        switch (al) {
+        case DEBUG:
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("PciAuditEvent {} | {}", al.getAlignedText(), msg);
+            }
+            break;
+        default:
+            LOG.info("PciAuditEvent {} | {}", al.getAlignedText(), msg);
+            break;
+        } // end switch
+
+        doLogEvent(event);
+    }
+
+    protected static String createMessage(final AuditEvent event) {
+        Objects.requireNonNull(event, "event must not be null");
+        String applicationName = event.getApplicationName();
+        if (applicationName == null) {
+            applicationName = "undefined";
+        }
+
+        String name = event.getName();
+        if (name == null) {
+            name = "undefined";
+        }
+
+        StringBuilder sb = new StringBuilder(150);
+
+        sb.append(event.getLevel().getAlignedText()).append(" | ");
+        sb.append(applicationName).append(" - ").append(name);
+
+        AuditStatus status = event.getStatus();
+        if (status == null) {
+            status = AuditStatus.UNDEFINED;
+        }
+        sb.append(":\tstatus: ").append(status.name());
+        List<AuditEventData> eventDataArray = event.getEventDatas();
+
+        long duration = event.getDuration();
+        if (duration >= 0) {
+            sb.append("\tduration: ").append(duration);
+        }
+
+        if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
+            for (AuditEventData m : eventDataArray) {
+                if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
+                    continue;
+                }
+
+                sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
+            }
+        }
+
+        return sb.toString();
+    }
 
 }
