@@ -185,16 +185,16 @@ Components
   - Customized extension to embed certificates in CRL
   - CMP (RFC 4210 and RFC 4211)
   - API to specify customized certificate profiles
-  - Embedded support of XML-based certificate profile
+  - Support of XML-based certificate profile
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
-  - Embedded support of publisher for OCSP responder
+  - Support of publisher for OCSP responder
   - Signature algorithms of certificates
     - SHA*withRSA: where * is 1, 224, 256, 384 and 512
     - SHA*withRSAandMGF1: where * is 1, 224, 256, 384 and 512
     - SHA*withECDSA: where * is 1, 224, 256, 384 and 512
     - SHA*withPlainECDSA: where * is 1, 224, 256, 384 and 512
     - SHA*withDSA: where * is 1, 224, 256, 384 and 512
- - Embedded support of X.509 extensions
+ - Native support of X.509 extensions (other extensions can be supported by configuring it as blob)
     - AdditionalInformation (German national standard CommonPKI)
     - Admission (German national standard CommonPKI)
     - AuthorityInformationAccess (RFC 5280)
@@ -224,18 +224,18 @@ Components
     - ValidityModel (German national standard CommonPKI)
  - Management of multiple CAs in one software instance
  - Multiple software instances (all can be in active mode) for the same CA
- - Embedded support of management of CA via embedded OSGi commands
+ - Native support of management of CA via embedded OSGi commands
  - API to specify CA management, e.g. GUI
- - Embedded database tool (export and import CA database) simplifies the switch of databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
- - Embedded client to enroll, revoke, unrevoke and remove certificates, to generate and download CRLs
+ - Database tool (export and import CA database) simplifies the switch of databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
+ - Client to enroll, revoke, unrevoke and remove certificates, to generate and download CRLs
  - All configuration of CA except those of databases is saved in database
 
 - OCSP Responder
   - OCSP Responder (RFC 2560 and RFC 6960)
   - Support of Common PKI 2.0
   - Management of multiple certificate status sources
-  - Embedded support of certificate status source published by XiPKI CA
-  - Embedded support of certificate status source CRL and DeltaCRL
+  - Support of certificate status source published by XiPKI CA
+  - Support of certificate status source CRL and DeltaCRL
   - API to support proprietary certificate sources
   - Support of both unsigned and signed OCSP requests
   - Multiple software instances (all can be in active mode) for the same OCSP signer and certificate status sources.
@@ -247,8 +247,8 @@ Components
     - MariaDB
     - H2
     - HSQLDB
-  - Embedded database tool (export and import OCSP database) simplifies the switch of databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
-  - Embedded client to send OCSP request
+  - Database tool (export and import OCSP database) simplifies the switch of databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
+  - Client to send OCSP request
 
 - Key Tool (for both PKCS#12 and PKCS#11 tokens)
   - Generating keypairs of RSA, EC and DSA in token
@@ -268,6 +268,6 @@ Components
 
 - For CA, OCSP Responder and Key Tool
   - API to resolve password
-  - Embedded support of PBE (password based encryption) password resolver
+  - Support of PBE (password based encryption) password resolver
      - All passwords can be encrypted by the master password
-  - Embedded support of OBF (as in jetty) password resolver
+  - Support of OBF (as in jetty) password resolver
