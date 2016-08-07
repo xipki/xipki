@@ -69,6 +69,8 @@ public class CaEntry {
 
     private boolean duplicateSubjectPermitted;
 
+    private boolean saveRequst;
+
     private ValidityMode validityMode = ValidityMode.STRICT;
 
     private Set<Permission> permissions;
@@ -155,6 +157,14 @@ public class CaEntry {
         this.duplicateSubjectPermitted = duplicateSubjectPermitted;
     }
 
+    public boolean isSaveRequst() {
+        return saveRequst;
+    }
+
+    public void setSaveRequst(boolean saveRequst) {
+        this.saveRequst = saveRequst;
+    }
+
     public ValidityMode getValidityMode() {
         return validityMode;
     }
@@ -214,6 +224,7 @@ public class CaEntry {
         sb.append("responderName: ").append(responderName).append('\n');
         sb.append("duplicateKey: ").append(duplicateKeyPermitted).append('\n');
         sb.append("duplicateSubject: ").append(duplicateSubjectPermitted).append('\n');
+        sb.append("saveRequest: ").append(saveRequst).append('\n');
         sb.append("validityMode: ").append(validityMode).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions)).append('\n');
         sb.append("keepExpiredCerts: ");

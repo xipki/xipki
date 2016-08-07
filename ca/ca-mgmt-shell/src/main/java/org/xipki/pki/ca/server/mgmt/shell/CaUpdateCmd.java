@@ -181,6 +181,11 @@ public class CaUpdateCmd extends CaCommandSupport {
     @Completion(YesNoCompleter.class)
     private String duplicateSubjectS;
 
+    @Option(name = "--save-req",
+            description = "whether the request is saved")
+    @Completion(YesNoCompleter.class)
+    private String saveReqS = "yes";
+
     @Option(name = "--validity-mode",
             description = "mode of valditity")
     @Completion(ValidityModeCompleter.class)
@@ -242,6 +247,11 @@ public class CaUpdateCmd extends CaCommandSupport {
         if (duplicateSubjectS != null) {
             boolean permitted = isEnabled(duplicateSubjectS, true, "duplicate-subject");
             entry.setDuplicateSubjectPermitted(permitted);
+        }
+
+        if (saveReqS != null) {
+            boolean saveReq = isEnabled(saveReqS, true, "save-req");
+            entry.setSaveRequest(saveReq);
         }
 
         if (permissions != null && permissions.size() > 0) {

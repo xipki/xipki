@@ -477,8 +477,8 @@ class CaManagerQueryExecutor {
             final CertificateStore certstore) throws CaMgmtException {
         final String sql = "NAME,ART,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
                 + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT"
-                + ",PERMISSIONS,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,EXPIRATION_PERIOD,REV,RR,RT,RIT"
-                + ",VALIDITY_MODE,CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,EXTRA_CONTROL"
+                + ",SAVE_REQ,PERMISSIONS,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,EXPIRATION_PERIOD,REV,RR"
+                + ",RT,RIT,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,EXTRA_CONTROL"
                 + ",SIGNER_CONF FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -589,6 +589,9 @@ class CaManagerQueryExecutor {
 
             boolean duplicateSubjectPermitted = (rs.getInt("DUPLICATE_SUBJECT") != 0);
             entry.setDuplicateSubjectPermitted(duplicateSubjectPermitted);
+
+            boolean saveReq = (rs.getInt("SAVE_REQ") != 0);
+            entry.setSaveRequst(saveReq);
 
             String str = rs.getString("PERMISSIONS");
             Set<Permission> permissions = getPermissions(str);
@@ -757,9 +760,9 @@ class CaManagerQueryExecutor {
         sqlBuilder.append("INSERT INTO CA (NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS");
         sqlBuilder.append(",DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE");
         sqlBuilder.append(",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY");
-        sqlBuilder.append(",DUPLICATE_SUBJECT,PERMISSIONS,NUM_CRLS,EXPIRATION_PERIOD");
+        sqlBuilder.append(",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSIONS,NUM_CRLS,EXPIRATION_PERIOD");
         sqlBuilder.append(",KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
-        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         final String sql = sqlBuilder.toString();
 
         // insert to table ca
@@ -786,6 +789,7 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, entry.getCmpControlName());
             setBoolean(ps, idx++, entry.isDuplicateKeyPermitted());
             setBoolean(ps, idx++, entry.isDuplicateSubjectPermitted());
+            setBoolean(ps, idx++, entry.isSaveRequst());
             ps.setString(idx++, Permission.toString(entry.getPermissions()));
             ps.setInt(idx++, entry.getNumCrls());
             ps.setInt(idx++, entry.getExpirationPeriod());
@@ -1083,6 +1087,7 @@ class CaManagerQueryExecutor {
         String cmpcontrolName = entry.getCmpControlName();
         Boolean duplicateKeyPermitted = entry.getDuplicateKeyPermitted();
         Boolean duplicateSubjectPermitted = entry.getDuplicateSubjectPermitted();
+        Boolean saveReq = entry.getSaveRequest();
         Set<Permission> permissions = entry.getPermissions();
         Integer numCrls = entry.getNumCrls();
         Integer expirationPeriod = entry.getExpirationPeriod();
@@ -1169,6 +1174,8 @@ class CaManagerQueryExecutor {
                 "DUPLICATE_KEY");
         Integer idxDuplicateSubject = addToSqlIfNotNull(sqlBuilder, index, duplicateKeyPermitted,
                 "DUPLICATE_SUBJECT");
+        Integer idxSaveReq = addToSqlIfNotNull(sqlBuilder, index, saveReq,
+                "SAVE_REQ");
         Integer idxPermissions = addToSqlIfNotNull(sqlBuilder, index, permissions, "PERMISSIONS");
         Integer idxNumCrls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
         Integer idxExpirationPeriod = addToSqlIfNotNull(sqlBuilder, index, expirationPeriod,
@@ -1282,6 +1289,11 @@ class CaManagerQueryExecutor {
             if (idxDuplicateSubject != null) {
                 sb.append("duplicateSubject: '").append(duplicateSubjectPermitted).append("'; ");
                 setBoolean(ps, idxDuplicateSubject, duplicateSubjectPermitted);
+            }
+
+            if (idxSaveReq != null) {
+                sb.append("saveReq: '").append(saveReq).append("'; ");
+                setBoolean(ps, idxSaveReq, saveReq);
             }
 
             if (idxPermissions != null) {

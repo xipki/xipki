@@ -352,10 +352,10 @@ class CaConfigurationDbImporter extends DbPorter {
         sqlBuilder.append("INSERT INTO CA (NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,");
         sqlBuilder.append("CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,");
         sqlBuilder.append("CERT,SIGNER_TYPE,CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,");
-        sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,PERMISSIONS,");
+        sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,PERMISSIONS,");
         sqlBuilder.append("NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,");
         sqlBuilder.append("REV,RR,RT,RIT,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
-        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
@@ -389,6 +389,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, ca.getCmpcontrolName());
                     ps.setInt(idx++, ca.getDuplicateKey());
                     ps.setInt(idx++, ca.getDuplicateSubject());
+                    ps.setInt(idx++, ca.getSaveReq());
                     ps.setString(idx++, ca.getPermissions());
                     Integer numCrls = ca.getNumCrls();
                     int tmpNumCrls = (numCrls == null) ? 30 : numCrls.intValue();

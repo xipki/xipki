@@ -215,6 +215,11 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         str = getStrProp(props, key, true);
         entry.setDuplicateSubjectPermitted(Boolean.parseBoolean(str));
 
+        // SAVE_REQ
+        key = CaExportCmd.KEY_SAVE_REQ;
+        str = getStrProp(props, key, true);
+        entry.setSaveRequst(Boolean.parseBoolean(str));
+
         // VALIDITY_MODE
         key = CaExportCmd.KEY_VALIDITY_MODE;
         str = getStrProp(props, key, true);

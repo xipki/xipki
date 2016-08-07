@@ -89,6 +89,8 @@ public class CaExportCmd extends CaCommandSupport {
 
     static final String KEY_DUPLICATE_SUBJECT = "DUPLICATE_SUBJECT";
 
+    static final String KEY_SAVE_REQ = "SAVE_REQ";
+
     static final String KEY_VALIDITY_MODE = "VALIDITY_MODE";
 
     static final String KEY_PERMISSIONS = "PERMISSIONS";
@@ -183,6 +185,10 @@ public class CaExportCmd extends CaCommandSupport {
         // DUPLICATE_SUBJECT
         propsput(props, KEY_DUPLICATE_SUBJECT,
                 Boolean.toString(x509Entry.isDuplicateSubjectPermitted()));
+
+        // SAVE_REQ
+        propsput(props, KEY_SAVE_REQ,
+                Boolean.toString(x509Entry.isSaveRequst()));
 
         // VALIDITY_MODE
         propsput(props, KEY_VALIDITY_MODE, x509Entry.getValidityMode().name());

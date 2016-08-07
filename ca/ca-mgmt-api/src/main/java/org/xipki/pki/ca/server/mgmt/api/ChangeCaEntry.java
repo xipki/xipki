@@ -66,6 +66,8 @@ public class ChangeCaEntry {
 
     private Boolean duplicateSubjectPermitted;
 
+    private Boolean saveRequest;
+
     private ValidityMode validityMode;
 
     private Set<Permission> permissions;
@@ -152,6 +154,14 @@ public class ChangeCaEntry {
 
     public void setValidityMode(final ValidityMode validityMode) {
         this.validityMode = validityMode;
+    }
+
+    public Boolean getSaveRequest() {
+        return saveRequest;
+    }
+
+    public void setSaveRequest(Boolean saveRequest) {
+        this.saveRequest = saveRequest;
     }
 
     public Set<Permission> getPermissions() {
