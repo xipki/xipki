@@ -271,6 +271,8 @@
       <xs:element name="countUsers" type="xs:int"/>
       <xs:element name="countCrls" type="xs:int"/>
       <xs:element name="countCerts" type="xs:int"/>
+      <xs:element name="countRequests" type="xs:int"/>
+      <xs:element name="countReqCerts" type="xs:int"/>
       <xs:element name="publishQueue">
         <xs:complexType>
           <xs:sequence>

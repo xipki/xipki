@@ -92,6 +92,10 @@ import org.xipki.pki.ca.dbtool.xmlio.CaCertType;
 import org.xipki.pki.ca.dbtool.xmlio.CaCertsReader;
 import org.xipki.pki.ca.dbtool.xmlio.CaCrlType;
 import org.xipki.pki.ca.dbtool.xmlio.CaCrlsReader;
+import org.xipki.pki.ca.dbtool.xmlio.CaRequestCertType;
+import org.xipki.pki.ca.dbtool.xmlio.CaRequestCertsReader;
+import org.xipki.pki.ca.dbtool.xmlio.CaRequestType;
+import org.xipki.pki.ca.dbtool.xmlio.CaRequestsReader;
 import org.xipki.pki.ca.dbtool.xmlio.CaUserType;
 import org.xipki.pki.ca.dbtool.xmlio.CaUsersReader;
 import org.xipki.pki.ca.dbtool.xmlio.DbiXmlReader;
@@ -121,6 +125,12 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
     private static final String SQL_ADD_USER =
             "INSERT INTO USERNAME (ID,NAME,PASSWORD,CN_REGEX) VALUES (?,?,?,?)";
+
+    private static final String SQL_ADD_REQUEST =
+            "INSERT INTO REQUEST (ID,DATA) VALUES (?,?)";
+
+    private static final String SQL_ADD_REQCERT =
+            "INSERT INTO REQCERT (ID,RID,CID) VALUES (?,?,?)";
 
     private final Unmarshaller unmarshaller;
 
@@ -207,10 +217,16 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     typeProcessedInLastProcess = CaDbEntryType.CERT;
                     break;
                 case CERT:
+                    typeProcessedInLastProcess = CaDbEntryType.REQUEST;
+                    break;
+                case REQUEST:
+                    typeProcessedInLastProcess = CaDbEntryType.REQCERT;
+                    break;
+                case REQCERT:
                     entriesFinished = true;
                     break;
                 default:
-                    throw new RuntimeException("unsupported DbEntryType "
+                    throw new RuntimeException("unsupported CaDbEntryType "
                             + typeProcessedInLastProcess);
                 }
             }
@@ -226,18 +242,17 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     idProcessedInLastProcess = null;
                 }
 
-                if (exception == null
-                    && (CaDbEntryType.CRL == typeProcessedInLastProcess
-                        || typeProcessedInLastProcess == null)) {
-                    exception = importEntries(CaDbEntryType.CRL, certstore, processLogFile,
-                            numProcessedInLastProcess, idProcessedInLastProcess);
-                }
+                CaDbEntryType[] types = new CaDbEntryType[] {
+                        CaDbEntryType.CRL, CaDbEntryType.CERT, CaDbEntryType.REQUEST,
+                        CaDbEntryType.REQCERT};
 
-                if (exception == null
-                        && (CaDbEntryType.CERT == typeProcessedInLastProcess
+                for (CaDbEntryType type : types) {
+                    if (exception == null
+                        && (type == typeProcessedInLastProcess
                             || typeProcessedInLastProcess == null)) {
-                    exception = importEntries(CaDbEntryType.CERT, certstore, processLogFile,
-                            numProcessedInLastProcess, idProcessedInLastProcess);
+                        exception = importEntries(type, certstore, processLogFile,
+                                numProcessedInLastProcess, idProcessedInLastProcess);
+                    }
                 }
 
                 if (exception != null) {
@@ -477,6 +492,16 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 total = certstore.getCountUsers();
                 sqls = new String[] {SQL_ADD_USER};
                 idSequenceName = null;
+                break;
+            case REQUEST:
+                total = certstore.getCountUsers();
+                sqls = new String[] {SQL_ADD_REQUEST};
+                idSequenceName = "REQ_ID";
+                break;
+            case REQCERT:
+                total = certstore.getCountUsers();
+                sqls = new String[] {SQL_ADD_REQCERT};
+                idSequenceName = "REQ_CID";
                 break;
             default:
                 throw new RuntimeException("unsupported DbEntryType " + type);
@@ -792,6 +817,42 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                                 + user.getId() + ", message: " + ex.getMessage());
                         throw ex;
                     }
+                } else if (CaDbEntryType.REQUEST == type) {
+                    PreparedStatement psAddRequest = statements[0];
+
+                    CaRequestType request = (CaRequestType) entry;
+
+                    String filename = request.getFile();
+
+                    ZipEntry zipEnty = zipFile.getEntry(filename);
+                    byte[] encodedRequest = IoUtil.read(zipFile.getInputStream(zipEnty));
+
+                    try {
+                        int idx = 1;
+                        psAddRequest.setInt(idx++, request.getId());
+                        psAddRequest.setString(idx++, Base64.toBase64String(encodedRequest));
+                        psAddRequest.addBatch();
+                    } catch (SQLException ex) {
+                        System.err.println("could not import REQUEST with ID=" + request.getId()
+                                + ", message: " + ex.getMessage());
+                        throw ex;
+                    }
+                } else if (CaDbEntryType.REQCERT == type) {
+                    PreparedStatement psAddReqCert = statements[0];
+
+                    CaRequestCertType reqCert = (CaRequestCertType) entry;
+
+                    try {
+                        int idx = 1;
+                        psAddReqCert.setInt(idx++, reqCert.getId());
+                        psAddReqCert.setInt(idx++, reqCert.getRid());
+                        psAddReqCert.setInt(idx++, reqCert.getCid());
+                        psAddReqCert.addBatch();
+                    } catch (SQLException ex) {
+                        System.err.println("could not import REQUEST with ID=" + reqCert.getId()
+                                + ", message: " + ex.getMessage());
+                        throw ex;
+                    }
                 } else {
                     throw new RuntimeException("Unknown CaDbEntryType " + type);
                 }
@@ -857,6 +918,10 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             return new CaCrlsReader(is);
         case USER:
             return new CaUsersReader(is);
+        case REQUEST:
+            return new CaRequestsReader(is);
+        case REQCERT:
+            return new CaRequestCertsReader(is);
         default:
             throw new RuntimeException("unknown CaDbEntryType " + type);
         }
@@ -875,8 +940,13 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         datasource.dropForeignKeyConstraint(null, "FK_CRAW_CERT1", "CRAW");
         datasource.dropForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE");
 
+        datasource.dropForeignKeyConstraint(null, "FK_REQCERT_REQ1", "REQCERT");
+        datasource.dropForeignKeyConstraint(null, "FK_REQCERT_CERT1", "REQCERT");
+
         datasource.dropPrimaryKey(null, "PK_CERT", "CERT");
         datasource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
+        datasource.dropPrimaryKey(null, "PK_REQUEST", "REQUEST");
+        datasource.dropPrimaryKey(null, "PK_REQCERT", "REQCERT");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
         System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
@@ -887,6 +957,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
         datasource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
         datasource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
+        datasource.addPrimaryKey(null, "PK_REQUEST", "REQUEST", "ID");
+        datasource.addPrimaryKey(null, "PK_REQCERT", "REQCERT", "ID");
 
         datasource.addForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE",
                 "CID", "CERT", "ID", "CASCADE", "NO ACTION");
@@ -896,6 +968,13 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
         datasource.addForeignKeyConstraint(null, "FK_CERT_CS_CA1", "CERT",
                 "CA_ID", "CS_CA", "ID", "CASCADE", "NO ACTION");
+
+        datasource.addForeignKeyConstraint(null, "FK_REQCERT_REQ1", "REQCERT",
+                "RID", "REQUEST", "ID", "CASCADE", "NO ACTION");
+
+        datasource.addForeignKeyConstraint(null, "FK_REQCERT_CERT1", "REQCERT",
+                "CID", "CERT", "ID", "CASCADE", "NO ACTION");
+
         datasource.addUniqueConstrain(null, "CONST_CA_SN", "CERT", "CA_ID", "SN");
 
         datasource.createIndex(null, "IDX_CA_FPK", "CERT", "CA_ID", "FP_K");

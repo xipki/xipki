@@ -91,6 +91,10 @@ import org.xipki.pki.ca.dbtool.xmlio.CaCertType;
 import org.xipki.pki.ca.dbtool.xmlio.CaCertsWriter;
 import org.xipki.pki.ca.dbtool.xmlio.CaCrlType;
 import org.xipki.pki.ca.dbtool.xmlio.CaCrlsWriter;
+import org.xipki.pki.ca.dbtool.xmlio.CaRequestCertType;
+import org.xipki.pki.ca.dbtool.xmlio.CaRequestCertsWriter;
+import org.xipki.pki.ca.dbtool.xmlio.CaRequestType;
+import org.xipki.pki.ca.dbtool.xmlio.CaRequestsWriter;
 import org.xipki.pki.ca.dbtool.xmlio.CaUserType;
 import org.xipki.pki.ca.dbtool.xmlio.CaUsersWriter;
 import org.xipki.pki.ca.dbtool.xmlio.DbiXmlWriter;
@@ -183,22 +187,19 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 numProcessedInLastProcess = null;
             }
 
-            if (exception == null
-                    && (CaDbEntryType.CRL == typeProcessedInLastProcess
-                        || typeProcessedInLastProcess == null)) {
-                exception = exportEntries(CaDbEntryType.CRL, certstore, processLogFile,
-                        numProcessedInLastProcess);
-                typeProcessedInLastProcess = null;
-                numProcessedInLastProcess = null;
-            }
+            CaDbEntryType[] types = new CaDbEntryType[] {
+                    CaDbEntryType.CRL, CaDbEntryType.CERT, CaDbEntryType.REQUEST,
+                    CaDbEntryType.REQCERT};
 
-            if (exception == null
-                    && (CaDbEntryType.CERT == typeProcessedInLastProcess
-                        || typeProcessedInLastProcess == null)) {
-                exception = exportEntries(CaDbEntryType.CERT, certstore, processLogFile,
-                        numProcessedInLastProcess);
-                typeProcessedInLastProcess = null;
-                numProcessedInLastProcess = null;
+            for (CaDbEntryType type : types) {
+                if (exception == null
+                        && (type == typeProcessedInLastProcess
+                            || typeProcessedInLastProcess == null)) {
+                    exception = exportEntries(type, certstore, processLogFile,
+                            numProcessedInLastProcess);
+                    typeProcessedInLastProcess = null;
+                    numProcessedInLastProcess = null;
+                }
             }
 
             JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
@@ -393,6 +394,14 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             numProcessedBefore = certstore.getCountUsers();
             sql = "SELECT ID,NAME,PASSWORD,CN_REGEX FROM USERNAME"
                     + " WHERE ID>=? AND ID<? ORDER BY ID ASC";
+            break;
+        case REQUEST:
+            numProcessedBefore = certstore.getCountRequests();
+            sql = "SELECT ID,DATA FROM REQUEST WHERE ID>=? AND ID<? ORDER BY ID ASC";
+            break;
+        case REQCERT:
+               numProcessedBefore = certstore.getCountReqCerts();
+            sql = "SELECT ID,RID,CID FROM REQCERT WHERE ID>=? AND ID<? ORDER BY ID ASC";
             break;
         default:
             throw new RuntimeException("unknown CaDbEntryType " + type);
@@ -596,6 +605,31 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         String cnRegex = rs.getString("CN_REGEX");
                         user.setCnRegex(cnRegex);
                         ((CaUsersWriter) entriesInCurrentFile).add(user);
+                    } else if (CaDbEntryType.REQUEST == type) {
+                        String b64Data = rs.getString("DATA");
+                        byte[] dataBytes = Base64.decode(b64Data);
+                        String sha1 = HashAlgoType.SHA1.hexHash(dataBytes);
+                        final String dataFilename = sha1 + ".req";
+                        if (!evaulateOnly) {
+                            ZipEntry certZipEntry = new ZipEntry(dataFilename);
+                            currentEntriesZip.putNextEntry(certZipEntry);
+                            try {
+                                currentEntriesZip.write(dataBytes);
+                            } finally {
+                                currentEntriesZip.closeEntry();
+                            }
+                        }
+                        CaRequestType entry = new CaRequestType();
+                        entry.setId(id);
+                        entry.setFile(dataFilename);
+                    } else if (CaDbEntryType.REQCERT == type) {
+                        int cid = rs.getInt("CID");
+                        int rid = rs.getInt("RID");
+                        CaRequestCertType entry = new CaRequestCertType();
+                        entry.setId(id);
+                        entry.setCid(cid);
+                        entry.setRid(rid);
+                        ((CaRequestCertsWriter) entriesInCurrentFile).add(entry);
                     } else {
                         throw new RuntimeException("unknown CaDbEntryType " + type);
                     }
@@ -781,6 +815,10 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             return new CaCrlsWriter();
         case USER:
             return new CaUsersWriter();
+        case REQUEST:
+            return new CaRequestsWriter();
+        case REQCERT:
+            return new CaRequestCertsWriter();
         default:
             throw new RuntimeException("unknown CaDbEntryType " + type);
         }
@@ -797,6 +835,12 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             break;
         case USER:
             certstore.setCountUsers(num);
+            break;
+        case REQUEST:
+            certstore.setCountRequests(num);
+            break;
+        case REQCERT:
+            certstore.setCountReqCerts(num);
             break;
         default:
             throw new RuntimeException("unknown CaDbEntryType " + type);

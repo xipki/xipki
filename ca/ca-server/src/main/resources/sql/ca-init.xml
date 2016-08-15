@@ -168,7 +168,6 @@
         <constraints nullable="false"/>
       </column>
       <column name="EXPIRATION_PERIOD" type="SMALLINT" defaultValueNumeric="365" />
-
       <column name="REV" type="SMALLINT" defaultValueNumeric="0" 
           remarks="whether the certificate is revoked">
         <constraints nullable="false"/>
@@ -405,6 +404,24 @@
       <column name="TID" type="VARCHAR(43)"
           remarks="base64 encoded transactionId, maximal 256 bit"/>
     </createTable>
+    <createTable tableName="REQUEST">
+      <column name="ID" type="INT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="DATA" type="CLOB"/>
+    </createTable>
+    <!-- table REQCERT -->
+    <createTable tableName="REQCERT">
+      <column name="ID" type="INT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="RID" type="INT" remarks="request id">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CID" type="INT" remarks="cert id">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
     <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SN" constraintName="CONST_CA_SN"/>
     <createIndex tableName="CERT" unique="false" indexName="IDX_CA_FPK">
       <column name="CA_ID"/>
@@ -488,11 +505,21 @@
       <column name="SEQ_NAME" value="CID"/>
       <column name="SEQ_VALUE" value="1"/>
     </insert>
+    <insert tableName="SEQ_TBL">
+      <column name="SEQ_NAME" value="REQ_ID"/>
+      <column name="SEQ_VALUE" value="1"/>
+    </insert>
+    <insert tableName="SEQ_TBL">
+      <column name="SEQ_NAME" value="REQ_CID"/>
+      <column name="SEQ_VALUE" value="1"/>
+    </insert>
   </changeSet>
   <changeSet author="xipki" id="4" dbms="oracle,postgresql,db2,h2,hsqldb">
     <!-- sequence for the column ID in table DELTACRL_CACHE -->
     <createSequence sequenceName="DCC_ID" incrementBy="1" startValue="1"/>
     <createSequence sequenceName="CID" incrementBy="1" startValue="1"/>
+    <createSequence sequenceName="REQ_ID" incrementBy="1" startValue="1"/>
+    <createSequence sequenceName="REQ_CID" incrementBy="1" startValue="1"/>
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="5">
@@ -592,6 +619,16 @@
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="CID" baseTableName="PUBLISHQUEUE"
+      referencedColumnNames="ID" referencedTableName="CERT"/>
+    <addForeignKeyConstraint constraintName="FK_REQCERT_REQ1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="RID" baseTableName="REQCERT"
+      referencedColumnNames="ID" referencedTableName="REQUEST"/>
+    <addForeignKeyConstraint constraintName="FK_REQCERT_CERT1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CID" baseTableName="REQCERT"
       referencedColumnNames="ID" referencedTableName="CERT"/>
   </changeSet>
 </databaseChangeLog>
