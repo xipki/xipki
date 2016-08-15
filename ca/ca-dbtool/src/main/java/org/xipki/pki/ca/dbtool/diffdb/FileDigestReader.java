@@ -94,7 +94,7 @@ public class FileDigestReader implements DigestReader {
         this.totalAccount = Integer.parseInt(accoutS);
 
         this.certsFilesReader = new BufferedReader(
-                new FileReader(new File(caDirname, "certs-manifest")));
+                new FileReader(new File(caDirname, "certs.mf")));
         this.caSubjectName = X509Util.getRfc4519Name(this.caCert.getSubjectX500Principal());
         this.next = retrieveNext(true);
     }

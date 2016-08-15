@@ -93,7 +93,7 @@ public class CaEntry {
         this.certsDir = new File(caDir, "certs");
         this.certsDir.mkdirs();
 
-        this.certsManifestOs = new FileOutputStream(new File(caDir, "certs-manifest"), true);
+        this.certsManifestOs = new FileOutputStream(new File(caDir, "certs.mf"), true);
 
         createNewCsvFile();
     }
