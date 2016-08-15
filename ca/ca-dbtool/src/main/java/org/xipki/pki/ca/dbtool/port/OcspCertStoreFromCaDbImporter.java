@@ -389,10 +389,14 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         PreparedStatement psRawCert = prepareStatement(SQL_ADD_CRAW);
         ImportStatements statments = new ImportStatements(psCert, psCerthash, psRawCert);
 
-        DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(certsListFile);
+        CaDbEntryType type = CaDbEntryType.CERT;
+
+        DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
+                baseDir + File.separator + type.getDirName() + ".mf");
         try {
             while (certsFileIterator.hasNext()) {
-                String certsFile = certsDir + File.separator + certsFileIterator.next();
+                String certsFile = baseDir + File.separator + type.getDirName() + File.separator
+                        + certsFileIterator.next();
                 // extract the toId from the filename
                 int fromIdx = certsFile.indexOf('-');
                 int toIdx = certsFile.indexOf(".zip");
@@ -440,7 +444,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             final ProcessLog processLog, final int numProcessedInLastProcess,
             final ProcessLog importLog) throws Exception {
         ZipFile zipFile = new ZipFile(new File(certsZipFile));
-        ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
+        ZipEntry certsXmlEntry = zipFile.getEntry("overview.xml");
 
         CaCertsReader certs;
         try {

@@ -62,6 +62,68 @@ import org.xml.sax.SAXException;
 
 public class DbPorter extends DbToolBase {
 
+    enum OcspDbEntryType {
+        CERT ("certs", "CERT", 1);
+
+        private final String dirName;
+
+        private final String tableName;
+
+        private final float sqlBatchFactor;
+
+        private OcspDbEntryType (final String dirName, final String tableName,
+                final float sqlBatchFactor) {
+            this.dirName = dirName;
+            this.tableName = tableName;
+            this.sqlBatchFactor = sqlBatchFactor;
+        }
+
+        public String getDirName() {
+            return dirName;
+        }
+
+        public String getTableName () {
+            return tableName;
+        }
+
+        public float getSqlBatchFactor() {
+            return sqlBatchFactor;
+        }
+
+    }
+
+    enum CaDbEntryType {
+        CERT ("certs", "CERT", 1),
+        CRL ("crls", "CRL", 0.1f),
+        USER ("users", "USERNAME", 10);
+
+        private final String dirName;
+
+        private final String tableName;
+
+        private final float sqlBatchFactor;
+
+        private CaDbEntryType (final String dirName, final String tableName,
+                final float sqlBatchFactor) {
+            this.dirName = dirName;
+            this.tableName = tableName;
+            this.sqlBatchFactor = sqlBatchFactor;
+        }
+
+        public String getDirName() {
+            return dirName;
+        }
+
+        public String getTableName () {
+            return tableName;
+        }
+
+        public float getSqlBatchFactor() {
+            return sqlBatchFactor;
+        }
+
+    }
+
     public static final String FILENAME_CA_CONFIGURATION = "ca-configuration.xml";
 
     public static final String FILENAME_CA_CERTSTORE = "ca-certstore.xml";
@@ -78,21 +140,11 @@ public class DbPorter extends DbToolBase {
 
     public static final String IMPORT_PROCESS_LOG_FILENAME = "import.process";
 
-    public static final String MSG_CERTS_FINISHED = "certs.finished";
-
     public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "import-to-ocsp.process";
 
     public static final int VERSION = 1;
 
-    private static final String CERTS_DIRNAME = "certs";
-
-    private static final String CERTS_MANIFEST_FILENAME = "certs-manifest";
-
     protected final boolean evaulateOnly;
-
-    protected final String certsDir;
-
-    protected final String certsListFile;
 
     protected final int dbSchemaVersion;
 
@@ -103,8 +155,6 @@ public class DbPorter extends DbToolBase {
         super(datasource, baseDir, stopMe);
 
         this.evaulateOnly = evaluateOnly;
-        this.certsDir = this.baseDir + File.separator + CERTS_DIRNAME;
-        this.certsListFile = this.baseDir + File.separator + CERTS_MANIFEST_FILENAME;
 
         DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
         String str = dbSchemaInfo.getVariableValue("VERSION");

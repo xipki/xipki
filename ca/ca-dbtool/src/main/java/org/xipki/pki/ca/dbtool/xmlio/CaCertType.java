@@ -45,11 +45,9 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class CaCertType extends DbDataObject {
+public class CaCertType extends IdentifidDbObjectType {
 
     public static final String TAG_ROOT = "cert";
-
-    public static final String TAG_ID = "id";
 
     public static final String TAG_ART = "art";
 
@@ -118,8 +116,6 @@ public class CaCertType extends DbDataObject {
 
     private String file;
 
-    private Integer id;
-
     private Integer art;
 
     private Integer caId;
@@ -149,14 +145,6 @@ public class CaCertType extends DbDataObject {
     private Long fpRs;
 
     private String rs;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(final Integer id) {
-        this.id = id;
-    }
 
     public Integer getArt() {
         return art;
@@ -280,7 +268,8 @@ public class CaCertType extends DbDataObject {
 
     @Override
     public void validate() throws InvalidDataObjectException {
-        assertNotNull("id", id);
+        super.validate();
+
         assertNotNull("art", art);
         assertNotNull("caId", caId);
         assertNotBlank("sn", sn);
@@ -316,7 +305,7 @@ public class CaCertType extends DbDataObject {
         validate();
 
         writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_ID, id);
+        writeIfNotNull(writer, TAG_ID, getId());
         writeIfNotNull(writer, TAG_ART, art);
         writeIfNotNull(writer, TAG_CAID, caId);
         writeIfNotNull(writer, TAG_SN, sn);

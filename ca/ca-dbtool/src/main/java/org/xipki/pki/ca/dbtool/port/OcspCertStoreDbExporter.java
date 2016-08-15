@@ -207,13 +207,14 @@ class OcspCertStoreDbExporter extends DbPorter {
     } // method exportIssuer
 
     private Exception exportCert(final CertStoreType certstore, final File processLogFile) {
-        File tmpCertsDir = new File(certsDir);
-        tmpCertsDir.mkdirs();
+        final File entriesDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
+        entriesDir.mkdirs();
 
         FileOutputStream certsFileOs = null;
 
         try {
-            certsFileOs = new FileOutputStream(certsListFile, true);
+            certsFileOs = new FileOutputStream(
+                    new File(baseDir, OcspDbEntryType.CERT.getDirName() + ".mf"), true);
             doExportCert(certstore, processLogFile, certsFileOs);
             return null;
         } catch (Exception ex) {
@@ -230,6 +231,7 @@ class OcspCertStoreDbExporter extends DbPorter {
 
     private void doExportCert(final CertStoreType certstore, final File processLogFile,
             final FileOutputStream certsFileOs) throws Exception {
+        File certsDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
         Integer minCertId = null;
         if (processLogFile.exists()) {
             byte[] content = IoUtil.read(processLogFile);

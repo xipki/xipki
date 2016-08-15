@@ -45,11 +45,9 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class OcspCertType extends DbDataObject {
+public class OcspCertType extends IdentifidDbObjectType {
 
     public static final String TAG_ROOT = "cert";
-
-    public static final String TAG_ID = "id";
 
     /**
      * issuer id.
@@ -93,8 +91,6 @@ public class OcspCertType extends DbDataObject {
      */
     public static final String TAG_FILE = "file";
 
-    private Integer id;
-
     private String file;
 
     private String profile;
@@ -112,14 +108,6 @@ public class OcspCertType extends DbDataObject {
     private Long rt;
 
     private Long rit;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(final Integer id) {
-        this.id = id;
-    }
 
     public Integer getIid() {
         return iid;
@@ -195,7 +183,7 @@ public class OcspCertType extends DbDataObject {
 
     @Override
     public void validate() throws InvalidDataObjectException {
-        assertNotNull("id", id);
+        super.validate();
         assertNotNull("iid", iid);
         assertNotBlank("sn", sn);
         assertNotNull("update", update);
@@ -216,7 +204,7 @@ public class OcspCertType extends DbDataObject {
         validate();
 
         writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_ID, id);
+        writeIfNotNull(writer, TAG_ID, getId());
         writeIfNotNull(writer, TAG_IID, iid);
         writeIfNotNull(writer, TAG_SN, sn);
         writeIfNotNull(writer, TAG_UPDATE, update);

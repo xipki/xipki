@@ -45,11 +45,9 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class CaUserType extends DbDataObject {
+public class CaUserType extends IdentifidDbObjectType {
 
     public static final String TAG_ROOT = "user";
-
-    public static final String TAG_ID = "id";
 
     public static final String TAG_NAME = "name";
 
@@ -57,21 +55,11 @@ public class CaUserType extends DbDataObject {
 
     public static final String TAG_CN_REGEX = "cnRegex";
 
-    private Integer id;
-
     private String name;
 
     private String password;
 
     private String cnRegex;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(final int id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -99,7 +87,7 @@ public class CaUserType extends DbDataObject {
 
     @Override
     public void validate() throws InvalidDataObjectException {
-        assertNotNull("id", id);
+        super.validate();
         assertNotBlank("name", name);
         assertNotBlank("password", password);
         assertNotBlank("cnRegex", cnRegex);
@@ -112,7 +100,7 @@ public class CaUserType extends DbDataObject {
         validate();
 
         writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_ID, id);
+        writeIfNotNull(writer, TAG_ID, getId());
         writeIfNotNull(writer, TAG_NAME, name);
         writeIfNotNull(writer, TAG_PASSWORD, password);
         writeIfNotNull(writer, TAG_CN_REGEX, cnRegex);

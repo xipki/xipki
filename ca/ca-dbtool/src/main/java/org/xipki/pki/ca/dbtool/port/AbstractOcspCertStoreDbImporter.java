@@ -51,6 +51,8 @@ import org.xipki.commons.security.HashAlgoType;
 
 abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
 
+    protected static final String MSG_CERTS_FINISHED = "certs.finished";
+
     protected static final String SQL_ADD_ISSUER =
         "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,S384S,S384K,"
         + "S512S,S512K,S1C,CERT,REV,RR,RT,RIT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";

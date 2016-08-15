@@ -36,7 +36,6 @@
 
 package org.xipki.pki.ca.dbtool.port;
 
-import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.xipki.commons.datasource.DataSourceWrapper;
@@ -49,30 +48,9 @@ import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 
 class AbstractCaCertStoreDbPorter extends DbPorter {
 
-    private static final String CRLS_DIRNAME = "crls";
-
-    private static final String CRLS_MANIFEST_FILENAME = "crls-manifest";
-
-    private static final String USERS_DIRNAME = "users";
-
-    private static final String USERS_MANIFEST_FILENAME = "users-manifest";
-
-    protected final String crlsDir;
-
-    protected final String crlsListFile;
-
-    protected final String usersDir;
-
-    protected final String usersListFile;
-
     AbstractCaCertStoreDbPorter(final DataSourceWrapper datasource, final String baseDir,
             final AtomicBoolean stopMe, final boolean evaluateOnly) throws DataAccessException {
         super(datasource, baseDir, stopMe, evaluateOnly);
-
-        this.crlsDir = super.baseDir + File.separator + CRLS_DIRNAME;
-        this.crlsListFile = super.baseDir + File.separator + CRLS_MANIFEST_FILENAME;
-        this.usersDir = super.baseDir + File.separator + USERS_DIRNAME;
-        this.usersListFile = super.baseDir + File.separator + USERS_MANIFEST_FILENAME;
     }
 
 }

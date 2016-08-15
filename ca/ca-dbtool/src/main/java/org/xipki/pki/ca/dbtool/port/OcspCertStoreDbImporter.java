@@ -240,10 +240,14 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         PreparedStatement psCerthash = prepareStatement(SQL_ADD_CHASH);
         PreparedStatement psRawcert = prepareStatement(SQL_ADD_CRAW);
 
-        DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(certsListFile);
+        OcspDbEntryType type = OcspDbEntryType.CERT;
+
+        DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
+                baseDir + File.separator + type.getDirName() + ".mf");
         try {
             while (certsFileIterator.hasNext()) {
-                String certsFile = certsDir + File.separator + certsFileIterator.next();
+                String certsFile = baseDir + File.separator + type.getDirName() + File.separator
+                        + certsFileIterator.next();
 
                 // extract the toId from the filename
                 int fromIdx = certsFile.indexOf('-');

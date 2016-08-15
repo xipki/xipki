@@ -36,73 +36,28 @@
 
 package org.xipki.pki.ca.dbtool.xmlio;
 
-import javax.xml.stream.XMLStreamException;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CaCrlType extends IdentifidDbObjectType {
+public abstract class IdentifidDbObjectType extends DbDataObject {
 
-    public static final String TAG_ROOT = "crl";
+    public static final String TAG_ID = "id";
 
-    public static final String TAG_CAID = "caId";
+    private Integer id;
 
-    public static final String TAG_CRLNO = "crlNo";
-
-    public static final String TAG_FILE = "file";
-
-    private Integer caId;
-
-    private String crlNo;
-
-    private String file;
-
-    public Integer getCaId() {
-        return caId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setCaId(final Integer caId) {
-        this.caId = caId;
-    }
-
-    public String getCrlNo() {
-        return crlNo;
-    }
-
-    public void setCrlNo(final String crlNo) {
-        this.crlNo = crlNo;
-    }
-
-    public String getFile() {
-        return file;
-    }
-
-    public void setFile(final String file) {
-        this.file = file;
+    public void setId(final Integer id) {
+        this.id = id;
     }
 
     @Override
     public void validate() throws InvalidDataObjectException {
-        super.validate();
-        assertNotNull("caId", caId);
-        assertNotBlank("crlNo", crlNo);
-        assertNotBlank("file", file);
-    }
-
-    @Override
-    public void writeTo(final DbiXmlWriter writer)
-    throws InvalidDataObjectException, XMLStreamException {
-        validate();
-
-        writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_ID, getId());
-        writeIfNotNull(writer, TAG_CAID, caId);
-        writeIfNotNull(writer, TAG_CRLNO, crlNo);
-        writeIfNotNull(writer, TAG_FILE, file);
-        writer.writeEndElement();
-        writer.writeNewline();
+        assertNotNull("id", id);
     }
 
 }
