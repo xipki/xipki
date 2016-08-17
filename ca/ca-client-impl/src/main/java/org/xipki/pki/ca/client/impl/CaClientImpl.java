@@ -490,8 +490,8 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public EnrollCertResult requestCert(final CertificationRequest p10Request, final String profile,
-            final String caName, final String username, final RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException {
+            final String caName, final String username, final Date notBefore, final Date notAfter,
+            final RequestResponseDebug debug) throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("p10Request", p10Request);
 
         String tmpCaName = caName;
@@ -512,7 +512,8 @@ public final class CaClientImpl implements CaClient {
         P10EnrollCertRequest request = new P10EnrollCertRequest(id, profile, p10Request);
         EnrollCertResultResp result;
         try {
-            result = ca.getRequestor().requestCertificate(request, username, debug);
+            result = ca.getRequestor().requestCertificate(request, username, notBefore, notAfter,
+                    debug);
         } catch (CmpRequestorException ex) {
             throw new CaClientException(ex.getMessage(), ex);
         }

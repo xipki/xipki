@@ -39,6 +39,7 @@ package org.xipki.commons.common.util;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
@@ -69,6 +70,11 @@ public class DateUtil {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
                     + ex.getMessage());
         }
+    }
+
+    public static String toUtcTimeyyyyMMddhhmmss(final Date utcTime) {
+        ZonedDateTime zd = utcTime.toInstant().atZone(ZONE_UTC);
+        return SDF.format(zd);
     }
 
 }
