@@ -172,7 +172,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     X509Ca ca = x509cas.get(name);
                     boolean bo = ca.publishCertsInQueue();
                     if (bo) {
-                        LOG.debug(" published certificates of CA '{}' in PUBLISHQUEUE", name);
+                        LOG.info(" published certificates of CA '{}' in PUBLISHQUEUE", name);
                     } else {
                         LOG.error("publishing certificates of CA '{}' in PUBLISHQUEUE failed",
                                 name);
@@ -201,8 +201,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             try {
                 try {
                     // older than 10 minutes
-                    certstore.deleteCertsInProcessOlderThan(
-                            new Date(System.currentTimeMillis() - 10 * 60 * 1000L));
+                    Date date = new Date(System.currentTimeMillis() - 10 * 60 * 1000L);
+                    certstore.deleteCertsInProcessOlderThan(date);
+                    LOG.info(" deleted CertsInProcessOlderThan {}", date);
                 } catch (Throwable th) {
                     LogUtil.error(LOG, th, "could not deleteCertsInProcessOlderThan");
                 }
@@ -253,10 +254,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 SystemEvent event = queryExecutor.getSystemEvent(EVENT_CACHAGNE);
                 long caChangedTime = (event == null) ? 0 : event.getEventTime();
 
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("check the restart CA system event: changed at={}, lastStartTime={}",
-                            new Date(caChangedTime * 1000L), lastStartTime);
-                }
+                LOG.info("check the restart CA system event: changed at={}, lastStartTime={}",
+                        new Date(caChangedTime * 1000L), lastStartTime);
 
                 if (caChangedTime > lastStartTime.getTime() / 1000L) {
                     LOG.info("received event to restart CA");
@@ -724,8 +723,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 int len = sb.length();
                 sb.delete(len - 2, len);
 
-                scheduledThreadPoolExecutor.scheduleAtFixedRate(new ScheduledPublishQueueCleaner(),
-                        120, 120, TimeUnit.SECONDS);
+                scheduledThreadPoolExecutor.scheduleAtFixedRate(
+                        new ScheduledPublishQueueCleaner(), 120, 120, TimeUnit.SECONDS);
                 scheduledThreadPoolExecutor.scheduleAtFixedRate(
                         new ScheduledDeleteCertsInProcessService(), 120, 120, TimeUnit.SECONDS);
                 scheduledThreadPoolExecutor.scheduleAtFixedRate(
