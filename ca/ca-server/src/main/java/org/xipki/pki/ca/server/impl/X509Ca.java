@@ -1587,6 +1587,14 @@ public class X509Ca {
         } // end for
     } // method unrevoke
 
+    public int addRequest(final byte[] request) throws OperationException {
+        return certstore.addRequest(request);
+    }
+
+    public void addRequestCert(final int requestId, final int certId) throws OperationException {
+        certstore.addRequestCert(requestId, certId);
+    }
+
     private List<IdentifiedX509CertPublisher> getPublishers() {
         return caManager.getIdentifiedPublishersForCa(caInfo.getName());
     }

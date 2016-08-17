@@ -127,7 +127,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             "INSERT INTO USERNAME (ID,NAME,PASSWORD,CN_REGEX) VALUES (?,?,?,?)";
 
     private static final String SQL_ADD_REQUEST =
-            "INSERT INTO REQUEST (ID,DATA) VALUES (?,?)";
+            "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES (?,?,?)";
 
     private static final String SQL_ADD_REQCERT =
             "INSERT INTO REQCERT (ID,RID,CID) VALUES (?,?,?)";
@@ -494,14 +494,14 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 idSequenceName = null;
                 break;
             case REQUEST:
-                total = certstore.getCountUsers();
+                total = certstore.getCountRequests();
                 sqls = new String[] {SQL_ADD_REQUEST};
                 idSequenceName = "REQ_ID";
                 break;
             case REQCERT:
-                total = certstore.getCountUsers();
+                total = certstore.getCountReqCerts();
                 sqls = new String[] {SQL_ADD_REQCERT};
-                idSequenceName = "REQ_CID";
+                idSequenceName = "REQCERT_ID";
                 break;
             default:
                 throw new RuntimeException("unsupported DbEntryType " + type);
@@ -523,8 +523,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                 statements = new PreparedStatement[sqls.length];
                 for (int i = 0; i < sqls.length; i++) {
-                    String sql = sqls[i];
-                    statements[i] = prepareStatement(sql);
+                    statements[i] = prepareStatement(sqls[i]);
                 }
 
                 while (entriesFileIterator.hasNext()) {
@@ -804,7 +803,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     PreparedStatement psAddUser = statements[0];
                     CaUserType user = (CaUserType) entry;
 
-                    numEntriesInBatch++;
                     try {
                         int idx = 1;
                         psAddUser.setInt(idx++, user.getId());
@@ -830,6 +828,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     try {
                         int idx = 1;
                         psAddRequest.setInt(idx++, request.getId());
+                        psAddRequest.setLong(idx++, request.getUpdate());
                         psAddRequest.setString(idx++, Base64.toBase64String(encodedRequest));
                         psAddRequest.addBatch();
                     } catch (SQLException ex) {

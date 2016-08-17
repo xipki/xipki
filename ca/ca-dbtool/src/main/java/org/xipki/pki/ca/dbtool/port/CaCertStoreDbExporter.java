@@ -397,7 +397,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             break;
         case REQUEST:
             numProcessedBefore = certstore.getCountRequests();
-            sql = "SELECT ID,DATA FROM REQUEST WHERE ID>=? AND ID<? ORDER BY ID ASC";
+            sql = "SELECT ID,LUPDATE,DATA FROM REQUEST WHERE ID>=? AND ID<? ORDER BY ID ASC";
             break;
         case REQCERT:
                numProcessedBefore = certstore.getCountReqCerts();
@@ -606,6 +606,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         user.setCnRegex(cnRegex);
                         ((CaUsersWriter) entriesInCurrentFile).add(user);
                     } else if (CaDbEntryType.REQUEST == type) {
+                        long update = rs.getLong("LUPDATE");
                         String b64Data = rs.getString("DATA");
                         byte[] dataBytes = Base64.decode(b64Data);
                         String sha1 = HashAlgoType.SHA1.hexHash(dataBytes);
@@ -621,7 +622,9 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         }
                         CaRequestType entry = new CaRequestType();
                         entry.setId(id);
+                        entry.setUpdate(update);
                         entry.setFile(dataFilename);
+                        ((CaRequestsWriter) entriesInCurrentFile).add(entry);
                     } else if (CaDbEntryType.REQCERT == type) {
                         int cid = rs.getInt("CID");
                         int rid = rs.getInt("RID");

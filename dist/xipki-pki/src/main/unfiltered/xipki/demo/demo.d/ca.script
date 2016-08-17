@@ -181,7 +181,8 @@ xipki-ca:gen-rca \
   --responder responder1 \
   --duplicate-subject yes \
   --duplicate-key yes \
-  --validity-mode CUTOFF
+  --validity-mode CUTOFF \
+  --save-req no
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "pkcs11" } {
@@ -389,6 +390,7 @@ xipki-ca:ca-add \
   --responder responder1 \
   --duplicate-subject yes \
   --duplicate-key yes \
+  --save-req yes \
   --extra-control revokeSuspendedCerts.enabled=true,revokeSuspendedCerts.targetReason=cessationOfOperation,revokeSuspendedCerts.unchangedSince=15d
 
 xipki-ca:caalias-add \
@@ -466,7 +468,8 @@ xipki-ca:ca-add \
   --responder responder1 \
   --duplicate-subject yes \
   --duplicate-key yes \
-  --validity-mode LAX
+  --validity-mode LAX \
+  --save-req no
 
 xipki-ca:caalias-add \
   --ca SubCAwithCRL1 \

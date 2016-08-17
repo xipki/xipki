@@ -694,4 +694,33 @@ public class CertificateStore {
         }
     }
 
+    public void deleteUnreferencedRequests() throws OperationException {
+        try {
+            queryExecutor.deleteUnreferencedRequests();
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+        }
+    }
+
+    public int addRequest(byte[] request) throws OperationException {
+        try {
+            return queryExecutor.addRequest(request);
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+        }
+    }
+
+    public void addRequestCert(int requestId, int certId) throws OperationException {
+        try {
+            queryExecutor.addRequestCert(requestId, certId);
+        } catch (DataAccessException ex) {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+        }
+    }
 }

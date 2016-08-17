@@ -133,9 +133,10 @@ abstract class CmpResponder {
         return getRequestor((X500Name) requestSender.getName());
     } // method getRequestor
 
-    protected abstract PKIMessage doProcessPkiMessage(@Nonnull RequestorInfo requestor,
-            @Nullable String user, @Nonnull ASN1OctetString transactionId,
-            @Nonnull GeneralPKIMessage pkiMessage, @Nonnull AuditEvent auditEvent)
+    protected abstract PKIMessage doProcessPkiMessage(@Nullable PKIMessage request,
+            @Nonnull RequestorInfo requestor, @Nullable String user,
+            @Nonnull ASN1OctetString transactionId, @Nonnull GeneralPKIMessage pkiMessage,
+            @Nonnull AuditEvent auditEvent)
     throws InvalidConfException;
 
     public PKIMessage processPkiMessage(final PKIMessage pkiMessage,
@@ -282,7 +283,8 @@ abstract class CmpResponder {
                     errorStatus);
         }
 
-        PKIMessage resp = doProcessPkiMessage(requestor, username, tid, message, auditEvent);
+        PKIMessage resp = doProcessPkiMessage(pkiMessage, requestor, username, tid, message,
+                auditEvent);
 
         if (isProtected) {
             resp = addProtection(resp, auditEvent);

@@ -283,6 +283,14 @@ public class X509CaInfo {
         caEntry.setDuplicateSubjectPermitted(permitted);
     }
 
+    public boolean isSaveRequest() {
+        return caEntry.isSaveRequest();
+    }
+
+    public void setSaveRequest(final boolean saveRequest) {
+        caEntry.setSaveRequest(saveRequest);
+    }
+
     public ValidityMode getValidityMode() {
         return caEntry.getValidityMode();
     }

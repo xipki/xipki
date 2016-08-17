@@ -92,6 +92,9 @@ public class CaRequestsReader extends DbiXmlReader {
                 case CaRequestType.TAG_ROOT:
                     ret.validate();
                     return ret;
+                case CaRequestType.TAG_UPDATE:
+                    ret.setUpdate(Long.parseLong(tagContent));
+                    break;
                 case CaRequestType.TAG_FILE:
                     ret.setFile(tagContent);
                     break;

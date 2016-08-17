@@ -188,7 +188,7 @@ public class CaExportCmd extends CaCommandSupport {
 
         // SAVE_REQ
         propsput(props, KEY_SAVE_REQ,
-                Boolean.toString(x509Entry.isSaveRequst()));
+                Boolean.toString(x509Entry.isSaveRequest()));
 
         // VALIDITY_MODE
         propsput(props, KEY_VALIDITY_MODE, x509Entry.getValidityMode().name());

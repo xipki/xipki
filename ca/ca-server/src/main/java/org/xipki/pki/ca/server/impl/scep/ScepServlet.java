@@ -145,8 +145,6 @@ public class ScepServlet extends HttpServlet {
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
         String auditMessage = null;
 
-        //OutputStream respStream = response.getOutputStream();
-
         try {
             if (responderManager == null) {
                 auditMessage = "responderManager in servlet not configured";

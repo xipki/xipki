@@ -591,7 +591,7 @@ class CaManagerQueryExecutor {
             entry.setDuplicateSubjectPermitted(duplicateSubjectPermitted);
 
             boolean saveReq = (rs.getInt("SAVE_REQ") != 0);
-            entry.setSaveRequst(saveReq);
+            entry.setSaveRequest(saveReq);
 
             String str = rs.getString("PERMISSIONS");
             Set<Permission> permissions = getPermissions(str);
@@ -789,7 +789,7 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, entry.getCmpControlName());
             setBoolean(ps, idx++, entry.isDuplicateKeyPermitted());
             setBoolean(ps, idx++, entry.isDuplicateSubjectPermitted());
-            setBoolean(ps, idx++, entry.isSaveRequst());
+            setBoolean(ps, idx++, entry.isSaveRequest());
             ps.setString(idx++, Permission.toString(entry.getPermissions()));
             ps.setInt(idx++, entry.getNumCrls());
             ps.setInt(idx++, entry.getExpirationPeriod());

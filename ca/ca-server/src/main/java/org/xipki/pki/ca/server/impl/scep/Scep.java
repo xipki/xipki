@@ -272,7 +272,7 @@ public class Scep {
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent,
                 envelopedDataDecryptor, null);
 
-        PkiMessage rep = doServicePkiOperation(req, certProfileName, auditEvent);
+        PkiMessage rep = doServicePkiOperation(requestContent, req, certProfileName, auditEvent);
         audit(auditEvent, "pkiStatus", rep.getPkiStatus().toString());
         if (rep.getPkiStatus() == PkiStatus.FAILURE) {
             auditEvent.setStatus(AuditStatus.FAILED);
@@ -283,9 +283,10 @@ public class Scep {
         return encodeResponse(rep, req);
     } // method servicePkiOperation
 
-    private PkiMessage doServicePkiOperation(final DecodedPkiMessage req,
-            final String certProfileName, final AuditEvent auditEvent)
+    private PkiMessage doServicePkiOperation(final CMSSignedData requestContent,
+            final DecodedPkiMessage req, final String certProfileName, final AuditEvent auditEvent)
     throws MessageDecodingException, OperationException {
+        ParamUtil.requireNonNull("requestContent", requestContent);
         ParamUtil.requireNonNull("req", req);
 
         String tid = req.getTransactionId().getId();
@@ -511,6 +512,19 @@ public class Scep {
                         certProfileName);
                 X509CertificateInfo cert = ca.generateCertificate(certTemplateData, true, null,
                         user, RequestType.SCEP, tidBytes);
+                if (ca.getCaInfo().isSaveRequest() && cert.getCert().getCertId() != null) {
+                    byte[] encodedRequest;
+                    try {
+                        encodedRequest = requestContent.getEncoded();
+                    } catch (IOException ex) {
+                        LOG.warn("could not encode request");
+                        encodedRequest = null;
+                    }
+                    if (encodedRequest != null) {
+                        int reqId = ca.addRequest(encodedRequest);
+                        ca.addRequestCert(reqId, cert.getCert().getCertId());
+                    }
+                }
 
                 audit(auditEvent, "subject", cert.getCert().getSubject());
                 signedData = buildSignedData(cert.getCert().getCert());

@@ -178,7 +178,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
     @Option(name = "--save-req",
             description = "whether the request is saved")
     @Completion(YesNoCompleter.class)
-    private String saveReqS = "false";
+    private String saveReqS = "no";
 
     @Option(name = "--validity-mode",
             description = "mode of valditity")
@@ -230,7 +230,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
         entry.setDuplicateSubjectPermitted(duplicateSubjectPermitted);
 
         boolean saveReq = isEnabled(saveReqS, false, "save-req");
-        entry.setSaveRequst(saveReq);
+        entry.setSaveRequest(saveReq);
 
         ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
         if (validityMode == null) {

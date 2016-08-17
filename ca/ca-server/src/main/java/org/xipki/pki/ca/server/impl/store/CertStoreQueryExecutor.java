@@ -177,6 +177,15 @@ class CertStoreQueryExecutor {
     private static final String CORESQL_CERT_FOR_KEY_ISSUED =
             "ID FROM CERT WHERE CA_ID=? AND FP_K=?";
 
+    private static final String SQL_DELETE_UNREFERENCED_REQUEST =
+            "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
+
+    private static final String SQL_ADD_REQUEST=
+            "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES(?,?,?)";
+
+    private static final String SQL_ADD_REQCERT=
+            "INSERT INTO REQCERT (ID,RID,CID) VALUES(?,?,?)";
+
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
 
     private final DataSourceWrapper datasource;
@@ -2125,26 +2134,29 @@ class CertStoreQueryExecutor {
     } // method commitNextCrlNoIfLess
 
     private int nextCertId() throws DataAccessException {
-        Connection conn = datasource.getConnection();
-        try {
-            while (true) {
-                int certId = (int) datasource.nextSeqValue(conn, "CID");
-                if (!datasource.columnExists(conn, "CERT", "ID", certId)) {
-                    return certId;
-                }
-            }
-        } finally {
-            datasource.returnConnection(conn);
-        }
+        return nextSeqValue("CID", "CERT");
     }
 
-    private long nextDccId() throws DataAccessException {
+    private int nextDccId() throws DataAccessException {
+        return nextSeqValue("DCC_ID", "DELTACRL_CACHE");
+    }
+
+    private int nextRequestId() throws DataAccessException {
+        return nextSeqValue("REQ_ID", "REQUEST");
+    }
+
+    private int nextReqCertId() throws DataAccessException {
+        return nextSeqValue("REQCERT_ID", "REQCERT");
+    }
+
+    private int nextSeqValue(final String seqName, final String targetTable)
+    throws DataAccessException {
         Connection conn = datasource.getConnection();
         try {
             while (true) {
-                long id = datasource.nextSeqValue(conn, "DCC_ID");
-                if (!datasource.columnExists(conn, "DELTACRL_CACHE", "ID", id)) {
-                    return id;
+                long id = datasource.nextSeqValue(conn, seqName);
+                if (!datasource.columnExists(conn, targetTable, "ID", id)) {
+                    return (int) id;
                 }
             }
         } finally {
@@ -2203,6 +2215,59 @@ class CertStoreQueryExecutor {
             throw datasource.translate(sql, ex);
         } finally {
             datasource.releaseResources(ps, rs);
+        }
+    }
+
+    void deleteUnreferencedRequests() throws DataAccessException {
+        final String sql = SQL_DELETE_UNREFERENCED_REQUEST;
+        PreparedStatement ps = borrowPreparedStatement(sql);
+        ResultSet rs = null;
+        try {
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            datasource.releaseResources(ps, rs);
+        }
+    }
+
+    int addRequest(byte[] request) throws DataAccessException {
+        ParamUtil.requireNonNull("request", request);
+
+        int id = nextRequestId();
+        long currentTimeSeconds = System.currentTimeMillis() / 1000;
+        String b64Request = Base64.toBase64String(request);
+        final String sql = SQL_ADD_REQUEST;
+        PreparedStatement ps = borrowPreparedStatement(sql);
+        try {
+            int index = 1;
+            ps.setInt(index++, id);
+            ps.setLong(index++, currentTimeSeconds);
+            ps.setString(index++, b64Request);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            releaseDbResources(ps, null);
+        }
+
+        return id;
+    }
+
+    void addRequestCert(int requestId, int certId) throws DataAccessException {
+        final String sql = SQL_ADD_REQCERT;
+        int id = nextReqCertId();
+        PreparedStatement ps = borrowPreparedStatement(sql);
+        try {
+            int index = 1;
+            ps.setInt(index++, id);
+            ps.setInt(index++, requestId);
+            ps.setInt(index++, certId);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            releaseDbResources(ps, null);
         }
     }
 

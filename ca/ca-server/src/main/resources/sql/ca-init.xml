@@ -408,6 +408,10 @@
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
+      <column name="LUPDATE" type="BIGINT"
+          remarks="time at which the request is added to database, seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
       <column name="DATA" type="CLOB"/>
     </createTable>
     <!-- table REQCERT -->
@@ -519,7 +523,7 @@
     <createSequence sequenceName="DCC_ID" incrementBy="1" startValue="1"/>
     <createSequence sequenceName="CID" incrementBy="1" startValue="1"/>
     <createSequence sequenceName="REQ_ID" incrementBy="1" startValue="1"/>
-    <createSequence sequenceName="REQ_CID" incrementBy="1" startValue="1"/>
+    <createSequence sequenceName="REQCERT_ID" incrementBy="1" startValue="1"/>
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="5">

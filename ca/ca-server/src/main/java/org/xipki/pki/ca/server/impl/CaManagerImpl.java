@@ -213,6 +213,31 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     } // class ScheduledDeleteCertsInProcessService
 
+    private class ScheduledDeleteUnreferencedRequstervice implements Runnable {
+
+        private boolean inProcess;
+
+        @Override
+        public void run() {
+            if (inProcess) {
+                return;
+            }
+
+            inProcess = true;
+            try {
+                try {
+                    certstore.deleteUnreferencedRequests();
+                    LOG.info("deleted UnreferencedRequests");
+                } catch (Throwable th) {
+                    LogUtil.error(LOG, th, "could not deleteUnreferencedRequests");
+                }
+            } finally {
+                inProcess = false;
+            }
+        } // method run
+
+    } // class ScheduledDeleteCertsInProcessService
+
     private class ScheduledCaRestarter implements Runnable {
 
         private boolean inProcess;
@@ -703,6 +728,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                         120, 120, TimeUnit.SECONDS);
                 scheduledThreadPoolExecutor.scheduleAtFixedRate(
                         new ScheduledDeleteCertsInProcessService(), 120, 120, TimeUnit.SECONDS);
+                scheduledThreadPoolExecutor.scheduleAtFixedRate(
+                        new ScheduledDeleteUnreferencedRequstervice(), 60, 24 * 60 * 60, // 1 DAY
+                        TimeUnit.SECONDS);
             } else {
                 sb.append(": no CA is configured");
             }
@@ -1156,6 +1184,14 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             // sequence CID
             maxId = datasource.getMax(null, "CERT", "ID");
             datasource.setLastUsedSeqValue("CID", maxId);
+
+            // sequence REQ_ID
+            maxId = datasource.getMax(null, "REQUEST", "ID");
+            datasource.setLastUsedSeqValue("REQ_ID", maxId);
+
+            // sequence REQCERT_ID
+            maxId = datasource.getMax(null, "REQCERT", "ID");
+            datasource.setLastUsedSeqValue("REQCERT_ID", maxId);
         } catch (DataAccessException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
