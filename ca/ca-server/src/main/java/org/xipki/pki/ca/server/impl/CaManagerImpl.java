@@ -2292,7 +2292,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public X509Certificate generateCertificate(final String caName, final String profileName,
-            final String user, final byte[] encodedPkcs10Request) throws CaMgmtException {
+            final String user, final byte[] encodedPkcs10Request, Date notBefore, Date notAfter)
+    throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonBlank("profileName", profileName);
         ParamUtil.requireNonNull("encodedPkcs10Request", encodedPkcs10Request);
@@ -2323,7 +2324,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
 
         CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
-                (Date) null, (Date) null, extensions, profileName);
+                notBefore, notAfter, extensions, profileName);
 
         X509CertificateInfo certInfo;
         try {

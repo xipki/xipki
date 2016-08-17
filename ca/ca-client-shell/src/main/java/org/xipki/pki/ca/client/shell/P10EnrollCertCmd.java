@@ -38,6 +38,7 @@ package org.xipki.pki.ca.client.shell;
 
 import java.io.File;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -45,7 +46,9 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.commons.common.RequestResponseDebug;
+import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.client.api.CertOrError;
@@ -75,6 +78,14 @@ public class P10EnrollCertCmd extends ClientCommandSupport {
                     + "(required)")
     private String profile;
 
+    @Option(name="--not-before",
+            description = "notBefore, UTC time of format yyyyMMddHHmmss")
+    private String notBeforeS;
+
+    @Option(name="--not-after",
+            description = "notAfter, UTC time of format yyyyMMddHHmmss")
+    private String notAfterS;
+
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
@@ -96,10 +107,15 @@ public class P10EnrollCertCmd extends ClientCommandSupport {
     protected Object doExecute() throws Exception {
         CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
 
+        Date notBefore = StringUtil.isNotBlank(notBeforeS)
+                ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+        Date notAfter = StringUtil.isNotBlank(notAfterS)
+                  ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            result = caClient.requestCert(p10Req, profile, caName, user, debug);
+            result = caClient.requestCert(p10Req, profile, caName, user, notBefore, notAfter,
+                    debug);
         } finally {
             saveRequestResponse(debug);
         }

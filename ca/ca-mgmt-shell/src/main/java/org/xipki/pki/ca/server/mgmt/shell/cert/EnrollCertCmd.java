@@ -38,12 +38,15 @@ package org.xipki.pki.ca.server.mgmt.shell.cert;
 
 import java.io.File;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
@@ -93,6 +96,14 @@ public class EnrollCertCmd extends CaCommandSupport {
             description = "username")
     private String user;
 
+    @Option(name="--not-before",
+            description = "notBefore, UTC time of format yyyyMMddHHmmss")
+    private String notBeforeS;
+
+    @Option(name="--not-after",
+            description = "notAfter, UTC time of format yyyyMMddHHmmss")
+    private String notAfterS;
+
     @Override
     protected Object doExecute() throws Exception {
         CaEntry ca = caManager.getCa(caName);
@@ -100,10 +111,16 @@ public class EnrollCertCmd extends CaCommandSupport {
             throw new CmdFailure("CA " + caName + " not available");
         }
 
+        Date notBefore = StringUtil.isNotBlank(notBeforeS)
+                ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+
+        Date notAfter = StringUtil.isNotBlank(notAfterS)
+                  ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+
         byte[] encodedP10Request = IoUtil.read(p10File);
 
         X509Certificate cert = caManager.generateCertificate(caName, profileName, user,
-                encodedP10Request);
+                encodedP10Request, notBefore, notAfter);
         saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
 
         return null;

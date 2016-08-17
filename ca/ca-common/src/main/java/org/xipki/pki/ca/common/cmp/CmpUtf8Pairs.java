@@ -52,9 +52,13 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CmpUtf8Pairs {
 
-    public static final String KEY_CERT_PROFILE = "cert_profile";
+    public static final String KEY_CERT_PROFILE = "CERT-PROFILE";
 
-    public static final String KEY_USER = "user";
+    public static final String KEY_USER = "USER";
+
+    public static final String KEY_NOT_BEFORE = "NOT-BEFORE";
+
+    public static final String KEY_NOT_AFTER = "NOT-AFTER";
 
     private static final char NAME_TERM = '?';
 

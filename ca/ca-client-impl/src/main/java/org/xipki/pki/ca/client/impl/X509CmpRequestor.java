@@ -108,6 +108,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
@@ -357,11 +358,11 @@ abstract class X509CmpRequestor extends CmpRequestor {
     } // method parse
 
     public EnrollCertResultResp requestCertificate(final P10EnrollCertRequest p10Req,
-            final String username, final RequestResponseDebug debug)
-    throws CmpRequestorException, PkiErrorException {
+            final String username, final Date notBefore, final Date notAfter,
+            final RequestResponseDebug debug) throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("p10Req", p10Req);
 
-        PKIMessage request = buildPkiMessage(p10Req, username);
+        PKIMessage request = buildPkiMessage(p10Req, username, notBefore, notAfter);
         Map<BigInteger, String> reqIdIdMap = new HashMap<>();
         reqIdIdMap.put(MINUS_ONE, p10Req.getId());
         return internRequestCertificate(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
@@ -596,11 +597,20 @@ abstract class X509CmpRequestor extends CmpRequestor {
         return new PKIMessage(header, body);
     } // method buildUnrevokeOrRemoveCertRequest
 
-    private PKIMessage buildPkiMessage(final P10EnrollCertRequest p10Req, final String username) {
+    private PKIMessage buildPkiMessage(final P10EnrollCertRequest p10Req, final String username,
+            final Date notBefore, final Date notAfter) {
         CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE,
                 p10Req.getCertprofile());
         if (StringUtil.isNotBlank(username)) {
             utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_USER, username);
+        }
+        if (notBefore != null) {
+            utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_NOT_BEFORE,
+                    DateUtil.toUtcTimeyyyyMMddhhmmss(notBefore));
+        }
+        if (notAfter != null) {
+            utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_NOT_AFTER,
+                    DateUtil.toUtcTimeyyyyMMddhhmmss(notAfter));
         }
 
         PKIHeader header = buildPkiHeader(implicitConfirm, null, utf8Pairs);

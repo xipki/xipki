@@ -115,6 +115,7 @@ import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.ConcurrentContentSigner;
@@ -525,18 +526,32 @@ public class X509CaCmpResponder extends CmpResponder {
 
             try {
                 CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
-                String certprofileName = (keyvalues == null) ? null
-                        : keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
-                if (certprofileName == null) {
-                    throw new CMPException("no certificate profile is specified");
+                String certprofileName = null;
+                Date notBefore = null;
+                Date notAfter = null;
+
+                if (keyvalues != null) {
+                    certprofileName = keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
+                    if (certprofileName == null) {
+                        throw new CMPException("no certificate profile is specified");
+                    }
+
+                    String str = keyvalues.getValue(CmpUtf8Pairs.KEY_NOT_BEFORE);
+                    if (str != null) {
+                        notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+                    }
+
+                    str = keyvalues.getValue(CmpUtf8Pairs.KEY_NOT_AFTER);
+                    if (str != null) {
+                        notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+                    }
                 }
 
                 childAuditEvent.addEventData(new AuditEventData("certprofile", certprofileName));
 
                 checkPermission(requestor, certprofileName);
-
                 CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
-                        null, null, extensions, certprofileName);
+                        notBefore, notAfter, extensions, certprofileName);
                 byte[] encodedRequest = null;
                 try {
                     encodedRequest = request.getEncoded();

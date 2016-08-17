@@ -40,6 +40,7 @@ import java.io.File;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,6 +60,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
+import org.bouncycastle.asn1.crmf.OptionalValidity;
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -66,6 +68,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.asn1.x509.qualified.BiometricData;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
@@ -75,6 +78,7 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.RequestResponseDebug;
+import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
@@ -123,6 +127,14 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
             description = "certificate profile\n"
                     + "(required)")
     private String profile;
+
+    @Option(name="--not-before",
+            description = "notBefore, UTC time of format yyyyMMddHHmmss")
+    private String notBeforeS;
+
+    @Option(name="--not-after",
+            description = "notAfter, UTC time of format yyyyMMddHHmmss")
+    private String notAfterS;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
@@ -231,6 +243,16 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         X500Name x500Subject = new X500Name(subject);
         certTemplateBuilder.setSubject(x500Subject);
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
+
+        if (StringUtil.isNotBlank(notBeforeS) || StringUtil.isNotBlank(notAfterS)) {
+            Date notBefore = StringUtil.isNotBlank(notBeforeS)
+                    ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+            Date notAfter = StringUtil.isNotBlank(notAfterS)
+                    ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+            OptionalValidity validity = new OptionalValidity(new Time(notBefore),
+                    new Time(notAfter));
+            certTemplateBuilder.setValidity(validity);
+        }
 
         if (needExtensionTypes == null) {
             needExtensionTypes = new LinkedList<>();

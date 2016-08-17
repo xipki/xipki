@@ -90,7 +90,7 @@ public class NegP10EnrollCertCmd extends ClientCommandSupport {
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            result = caClient.requestCert(p10Req, profile, caName, user, debug);
+            result = caClient.requestCert(p10Req, profile, caName, user, null, null, debug);
         } finally {
             saveRequestResponse(debug);
         }

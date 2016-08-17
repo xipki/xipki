@@ -1644,6 +1644,7 @@ public class X509Ca {
         }
 
         Date grantedNotBefore = certprofile.getNotBefore(certTemplate.getNotBefore());
+
         if (grantedNotBefore == null) {
             grantedNotBefore = new Date();
         }
