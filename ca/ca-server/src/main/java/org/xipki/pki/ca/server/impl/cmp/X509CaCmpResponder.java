@@ -532,9 +532,6 @@ public class X509CaCmpResponder extends CmpResponder {
 
                 if (keyvalues != null) {
                     certprofileName = keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
-                    if (certprofileName == null) {
-                        throw new CMPException("no certificate profile is specified");
-                    }
 
                     String str = keyvalues.getValue(CmpUtf8Pairs.KEY_NOT_BEFORE);
                     if (str != null) {
@@ -545,6 +542,10 @@ public class X509CaCmpResponder extends CmpResponder {
                     if (str != null) {
                         notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
                     }
+                }
+
+                if (certprofileName == null) {
+                    throw new CMPException("no certificate profile is specified");
                 }
 
                 childAuditEvent.addEventData(new AuditEventData("certprofile", certprofileName));
