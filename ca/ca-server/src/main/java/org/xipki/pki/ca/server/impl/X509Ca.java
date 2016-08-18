@@ -1643,10 +1643,17 @@ public class X509Ca {
             }
         }
 
-        Date grantedNotBefore = certprofile.getNotBefore(certTemplate.getNotBefore());
-
-        if (grantedNotBefore == null) {
-            grantedNotBefore = new Date();
+        Date now = new Date();
+        Date reqNotBefore ;
+        if (certTemplate.getNotBefore() != null && certTemplate.getNotBefore().after(now)) {
+            reqNotBefore = certTemplate.getNotBefore();
+        } else {
+            reqNotBefore = now;
+        }
+        Date grantedNotBefore = certprofile.getNotBefore(reqNotBefore);
+        // notBefore in the past is not permitted
+        if (grantedNotBefore.before(now)) {
+            grantedNotBefore = now;
         }
 
         if (certprofile.hasMidnightNotBefore()) {
@@ -1656,8 +1663,7 @@ public class X509Ca {
         if (grantedNotBefore.before(caInfo.getNotBefore())) {
             grantedNotBefore = caInfo.getNotBefore();
             if (certprofile.hasMidnightNotBefore()) {
-                grantedNotBefore = setToMidnight(new Date(grantedNotBefore.getTime() + DAY_IN_MS),
-                        certprofile.getTimezone());
+                grantedNotBefore = setToMidnight(grantedNotBefore, certprofile.getTimezone());
             }
         }
 
@@ -1868,7 +1874,7 @@ public class X509Ca {
             if (grantedNotAfter != null) {
                 if (grantedNotAfter.after(maxNotAfter)) {
                     grantedNotAfter = maxNotAfter;
-                    msgBuilder.append(", NotAfter modified");
+                    msgBuilder.append(", notAfter modified");
                 }
             } else {
                 grantedNotAfter = maxNotAfter;
@@ -2418,7 +2424,8 @@ public class X509Ca {
 
     private static Date setToMidnight(final Date date, final TimeZone timezone) {
         Calendar cal = Calendar.getInstance(timezone);
-        cal.setTime(date);
+        // the next midnight time
+        cal.setTime(new Date(date.getTime() + DAY_IN_MS - 1));
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
