@@ -737,9 +737,10 @@ public class OcspServer {
                 OcspStore answeredStore = null;
                 boolean exceptionOccurs = false;
 
+                Date now = new Date();
                 for (OcspStore store : responder.getStores()) {
                     try {
-                        certStatusInfo = store.getCertStatus(reqHashAlgo,
+                        certStatusInfo = store.getCertStatus(now, reqHashAlgo,
                                 certId.getIssuerNameHash(), certId.getIssuerKeyHash(),
                                 certId.getSerialNumber(),  responseOption.isIncludeCerthash(),
                                 responseOption.getCertHashAlgo(), certprofileOption);

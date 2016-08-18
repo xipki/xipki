@@ -117,14 +117,15 @@ public class DbCertStatusStore extends OcspStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
 
-    private static final String SQL_CS = "REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
+    private static final String SQL_CS =
+            "NBEFORE,NAFTER,REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
 
     private static final Map<HashAlgoType, String> SQL_CS_HASHMAP = new HashMap<>();
 
     static {
         for (HashAlgoType h : HashAlgoType.values()) {
             StringBuilder sb = new StringBuilder();
-            sb.append("ID,REV,RR,RT,RIT,PN,").append(h.getShortName());
+            sb.append("NBEFORE,NAFTER,ID,REV,RR,RT,RIT,PN,").append(h.getShortName());
             sb.append(" FROM CERT INNER JOIN CHASH ON ");
             sb.append(" CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID");
             SQL_CS_HASHMAP.put(h, sb.toString());
@@ -262,8 +263,8 @@ public class DbCertStatusStore extends OcspStore {
     } // method initIssuerStore
 
     @Override
-    public CertStatusInfo getCertStatus(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
-            final byte[] issuerKeyHash, final BigInteger serialNumber,
+    public CertStatusInfo getCertStatus(final Date time, final HashAlgoType hashAlgo,
+            final byte[] issuerNameHash, final byte[] issuerKeyHash, final BigInteger serialNumber,
             final boolean includeCertHash, final HashAlgoType certHashAlg,
             final CertprofileOption certprofileOption) throws OcspStoreException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
@@ -332,10 +333,21 @@ public class DbCertStatusStore extends OcspStore {
 
                 if (rs.next()) {
                     unknown = false;
+
+                    long timeInSec = time.getTime() / 1000;
+                    long notBeforeInSec = rs.getLong("NBEFORE");
+                    long notAfterInSec = rs.getLong("NAFTER");
+                    if (timeInSec < notBeforeInSec || timeInSec > notAfterInSec) {
+                        ignore = true;
+                    }
+
                     certprofile = rs.getString("PN");
-                    ignore = (certprofile != null)
-                            && (certprofileOption != null)
-                            && !certprofileOption.include(certprofile);
+                    if (!ignore) {
+                        ignore = (certprofile != null)
+                                && (certprofileOption != null)
+                                && !certprofileOption.include(certprofile);
+                    }
+
                     if (!ignore) {
                         if (includeCertHash) {
                             b64CertHash = rs.getString(certHashAlgo.getShortName());

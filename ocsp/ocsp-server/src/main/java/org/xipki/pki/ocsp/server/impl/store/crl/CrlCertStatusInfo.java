@@ -58,14 +58,21 @@ class CrlCertStatusInfo {
 
     private final String certprofile;
 
+    private final Date notBefore;
+
+    private final Date notAfter;
+
     private final Map<HashAlgoType, byte[]> certHashes;
 
     private CrlCertStatusInfo(final CertStatus certStatus, final CertRevocationInfo revocationInfo,
-            final String certprofile, final Map<HashAlgoType, byte[]> certHashes) {
+            final String certprofile, final Map<HashAlgoType, byte[]> certHashes,
+            final Date notBefore, final Date notAfter) {
         this.certStatus = ParamUtil.requireNonNull("certStatus", certStatus);
         this.revocationInfo = revocationInfo;
         this.certprofile = certprofile;
         this.certHashes = certHashes;
+        this.notBefore = notBefore;
+        this.notAfter = notAfter;
     }
 
     CertStatus getCertStatus() {
@@ -78,6 +85,26 @@ class CrlCertStatusInfo {
 
     String getCertprofile() {
         return certprofile;
+    }
+
+    boolean isValid(Date time) {
+        if (notBefore == null && notAfter == null) {
+            return true;
+        }
+
+        if (notBefore != null) {
+            if (time.before(notBefore)) {
+                return false;
+            }
+        }
+
+        if (notAfter != null) {
+            if (time.after(notAfter)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     CertStatusInfo getCertStatusInfo(final HashAlgoType hashAlgo, final Date thisUpdate,
@@ -108,19 +135,22 @@ class CrlCertStatusInfo {
     } // method getCertStatusInfo
 
     static CrlCertStatusInfo getIgnoreCertStatusInfo() {
-        return new CrlCertStatusInfo(CertStatus.IGNORE, null, null, null);
+        return new CrlCertStatusInfo(CertStatus.IGNORE, null, null, null, null, null);
     }
 
     static CrlCertStatusInfo getGoodCertStatusInfo(final String certprofile, final Map<HashAlgoType,
-            byte[]> certHashes) {
+            byte[]> certHashes, final Date notBefore, final Date notAfter) {
         ParamUtil.requireNonBlank("certprofile", certprofile);
-        return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes);
+        return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes, notBefore,
+                notAfter);
     }
 
     static CrlCertStatusInfo getRevokedCertStatusInfo(final CertRevocationInfo revocationInfo,
-            final String certprofile, final Map<HashAlgoType, byte[]> certHashes) {
+            final String certprofile, final Map<HashAlgoType, byte[]> certHashes,
+            final Date notBefore, final Date notAfter) {
         ParamUtil.requireNonNull("revocationInfo", revocationInfo);
-        return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certprofile, certHashes);
+        return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certprofile, certHashes,
+                notBefore, notAfter);
     }
 
 }

@@ -472,25 +472,37 @@ public class CrlCertStatusStore extends OcspStore {
                         }
                     }
 
-                    Map<HashAlgoType, byte[]> certHashes = (cert == null || cert.getCert() == null)
-                            ? null : getCertHashes(cert.getCert());
+                    Certificate bcCert = (cert == null) ? null : cert.getCert();
+                    Map<HashAlgoType, byte[]> certHashes = (bcCert == null) ? null
+                            : getCertHashes(bcCert);
+                    Date notBefore = (bcCert == null) ? null
+                            : bcCert.getTBSCertificate().getStartDate().getDate();
+                    Date notAfter = (bcCert == null) ? null
+                            : bcCert.getTBSCertificate().getEndDate().getDate();
 
                     CertRevocationInfo revocationInfo = new CertRevocationInfo(reasonCode, revTime,
                             invalidityTime);
                     String profileName = (cert == null) ? null : cert.getProfileName();
                     CrlCertStatusInfo crlCertStatusInfo =
                             CrlCertStatusInfo.getRevokedCertStatusInfo(revocationInfo, profileName,
-                                    certHashes);
+                                    certHashes, notBefore, notAfter);
                     newCertStatusInfoMap.put(serialNumber, crlCertStatusInfo);
                 } // end while (it.hasNext())
             } // end if (it)
 
             for (BigInteger serialNumber : certsMap.keySet()) {
                 CertWithInfo cert = certsMap.get(serialNumber);
-                Map<HashAlgoType, byte[]> certHashes = (cert.getCert() == null)
-                        ? null : getCertHashes(cert.getCert());
+
+                Certificate bcCert = (cert == null) ? null : cert.getCert();
+                Map<HashAlgoType, byte[]> certHashes = (bcCert == null) ? null
+                        : getCertHashes(bcCert);
+                Date notBefore = (bcCert == null) ? null
+                        : bcCert.getTBSCertificate().getStartDate().getDate();
+                Date notAfter = (bcCert == null) ? null
+                        : bcCert.getTBSCertificate().getEndDate().getDate();
+
                 CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getGoodCertStatusInfo(
-                        cert.getProfileName(), certHashes);
+                        cert.getProfileName(), certHashes, notBefore, notAfter);
                 newCertStatusInfoMap.put(cert.getSerialNumber(), crlCertStatusInfo);
             }
 
@@ -595,8 +607,8 @@ public class CrlCertStatusStore extends OcspStore {
     }
 
     @Override
-    public CertStatusInfo getCertStatus(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
-            final byte[] issuerKeyHash, final BigInteger serialNumber,
+    public CertStatusInfo getCertStatus(final Date time, final HashAlgoType hashAlgo,
+            final byte[] issuerNameHash, final byte[] issuerKeyHash, final BigInteger serialNumber,
             final boolean includeCertHash, final HashAlgoType certHashAlg,
             final CertprofileOption certprofileOption) throws OcspStoreException {
         // wait for max. 0.5 second
@@ -648,10 +660,18 @@ public class CrlCertStatusStore extends OcspStore {
         CrlCertStatusInfo crlCertStatusInfo = certStatusInfoMap.get(serialNumber);
 
         if (crlCertStatusInfo != null) {
-            String profileName = crlCertStatusInfo.getCertprofile();
-            boolean ignore = profileName != null
-                    && certprofileOption != null
-                    && !certprofileOption.include(profileName);
+            boolean ignore = false;
+            if (!crlCertStatusInfo.isValid(time)) {
+                ignore = true;
+            }
+
+            if (!ignore) {
+                String profileName = crlCertStatusInfo.getCertprofile();
+                ignore = profileName != null
+                        && certprofileOption != null
+                        && !certprofileOption.include(profileName);
+            }
+
             if (ignore) {
                 certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(tmpThisUpdate,
                         tmpNextUpdate);

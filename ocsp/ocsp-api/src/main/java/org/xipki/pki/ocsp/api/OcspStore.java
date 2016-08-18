@@ -37,6 +37,7 @@
 package org.xipki.pki.ocsp.api;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -78,7 +79,7 @@ public abstract class OcspStore {
     public abstract boolean canResolveIssuer(@Nonnull HashAlgoType hashAlgo,
             @Nonnull byte[] issuerNameHash, @Nonnull byte[] issuerKeyHash);
 
-    public abstract CertStatusInfo getCertStatus(@Nonnull HashAlgoType hashAlgo,
+    public abstract CertStatusInfo getCertStatus(@Nonnull Date time, @Nonnull HashAlgoType hashAlgo,
             @Nonnull byte[] issuerNameHash, @Nonnull byte[] issuerKeyHash,
             @Nonnull BigInteger serialNumber, boolean includeCertHash,
             @Nullable HashAlgoType certHashAlg, @Nullable CertprofileOption certprofileOption)
