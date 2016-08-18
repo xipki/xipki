@@ -493,14 +493,13 @@ public class CrlCertStatusStore extends OcspStore {
             for (BigInteger serialNumber : certsMap.keySet()) {
                 CertWithInfo cert = certsMap.get(serialNumber);
 
-                Certificate bcCert = (cert == null) ? null : cert.getCert();
+                Certificate bcCert = cert.getCert();
                 Map<HashAlgoType, byte[]> certHashes = (bcCert == null) ? null
                         : getCertHashes(bcCert);
                 Date notBefore = (bcCert == null) ? null
                         : bcCert.getTBSCertificate().getStartDate().getDate();
                 Date notAfter = (bcCert == null) ? null
                         : bcCert.getTBSCertificate().getEndDate().getDate();
-
                 CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getGoodCertStatusInfo(
                         cert.getProfileName(), certHashes, notBefore, notAfter);
                 newCertStatusInfoMap.put(cert.getSerialNumber(), crlCertStatusInfo);
