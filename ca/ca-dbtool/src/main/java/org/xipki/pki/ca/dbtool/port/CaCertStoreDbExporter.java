@@ -187,9 +187,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 numProcessedInLastProcess = null;
             }
 
-            CaDbEntryType[] types = new CaDbEntryType[] {
-                    CaDbEntryType.CRL, CaDbEntryType.CERT, CaDbEntryType.REQUEST,
-                    CaDbEntryType.REQCERT};
+            CaDbEntryType[] types = new CaDbEntryType[] {CaDbEntryType.CRL, CaDbEntryType.CERT,
+                CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
 
             for (CaDbEntryType type : types) {
                 if (exception == null
@@ -400,7 +399,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             sql = "SELECT ID,LUPDATE,DATA FROM REQUEST WHERE ID>=? AND ID<? ORDER BY ID ASC";
             break;
         case REQCERT:
-               numProcessedBefore = certstore.getCountReqCerts();
+            numProcessedBefore = certstore.getCountReqCerts();
             sql = "SELECT ID,RID,CID FROM REQCERT WHERE ID>=? AND ID<? ORDER BY ID ASC";
             break;
         default:

@@ -242,9 +242,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     idProcessedInLastProcess = null;
                 }
 
-                CaDbEntryType[] types = new CaDbEntryType[] {
-                        CaDbEntryType.CRL, CaDbEntryType.CERT, CaDbEntryType.REQUEST,
-                        CaDbEntryType.REQCERT};
+                CaDbEntryType[] types = new CaDbEntryType[] {CaDbEntryType.CRL, CaDbEntryType.CERT,
+                    CaDbEntryType.REQUEST, CaDbEntryType.REQCERT};
 
                 for (CaDbEntryType type : types) {
                     if (exception == null
@@ -527,8 +526,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 }
 
                 while (entriesFileIterator.hasNext()) {
-                    String entriesFile = baseDir + File.separator + type.getDirName() +
-                            File.separator + entriesFileIterator.next();
+                    String entriesFile = baseDir + File.separator + type.getDirName()
+                            + File.separator + entriesFileIterator.next();
 
                     // extract the toId from the filename
                     int fromIdx = entriesFile.indexOf('-');

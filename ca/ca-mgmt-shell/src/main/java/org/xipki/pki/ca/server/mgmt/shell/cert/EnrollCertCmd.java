@@ -96,11 +96,11 @@ public class EnrollCertCmd extends CaCommandSupport {
             description = "username")
     private String user;
 
-    @Option(name="--not-before",
+    @Option(name = "--not-before",
             description = "notBefore, UTC time of format yyyyMMddHHmmss")
     private String notBeforeS;
 
-    @Option(name="--not-after",
+    @Option(name = "--not-after",
             description = "notAfter, UTC time of format yyyyMMddHHmmss")
     private String notAfterS;
 

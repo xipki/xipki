@@ -180,10 +180,10 @@ class CertStoreQueryExecutor {
     private static final String SQL_DELETE_UNREFERENCED_REQUEST =
             "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
 
-    private static final String SQL_ADD_REQUEST=
+    private static final String SQL_ADD_REQUEST =
             "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES(?,?,?)";
 
-    private static final String SQL_ADD_REQCERT=
+    private static final String SQL_ADD_REQCERT =
             "INSERT INTO REQCERT (ID,RID,CID) VALUES(?,?,?)";
 
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);

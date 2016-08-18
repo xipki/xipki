@@ -63,7 +63,7 @@ import org.xml.sax.SAXException;
 public class DbPorter extends DbToolBase {
 
     enum OcspDbEntryType {
-        CERT ("certs", "CERT", 1);
+        CERT("certs", "CERT", 1);
 
         private final String dirName;
 
@@ -71,7 +71,7 @@ public class DbPorter extends DbToolBase {
 
         private final float sqlBatchFactor;
 
-        private OcspDbEntryType (final String dirName, final String tableName,
+        private OcspDbEntryType(final String dirName, final String tableName,
                 final float sqlBatchFactor) {
             this.dirName = dirName;
             this.tableName = tableName;
@@ -82,7 +82,7 @@ public class DbPorter extends DbToolBase {
             return dirName;
         }
 
-        public String getTableName () {
+        public String getTableName() {
             return tableName;
         }
 
@@ -93,11 +93,11 @@ public class DbPorter extends DbToolBase {
     }
 
     enum CaDbEntryType {
-        CERT ("certs", "CERT", 1),
-        CRL ("crls", "CRL", 0.1f),
-        USER ("users", "USERNAME", 10),
-        REQUEST ("requests", "REQUEST", 0.1f),
-        REQCERT ("reqcerts", "REQCERT", 50);
+        CERT("certs", "CERT", 1),
+        CRL("crls", "CRL", 0.1f),
+        USER("users", "USERNAME", 10),
+        REQUEST("requests", "REQUEST", 0.1f),
+        REQCERT("reqcerts", "REQCERT", 50);
 
         private final String dirName;
 
@@ -105,7 +105,7 @@ public class DbPorter extends DbToolBase {
 
         private final float sqlBatchFactor;
 
-        private CaDbEntryType (final String dirName, final String tableName,
+        private CaDbEntryType(final String dirName, final String tableName,
                 final float sqlBatchFactor) {
             this.dirName = dirName;
             this.tableName = tableName;
@@ -116,7 +116,7 @@ public class DbPorter extends DbToolBase {
             return dirName;
         }
 
-        public String getTableName () {
+        public String getTableName() {
             return tableName;
         }
 

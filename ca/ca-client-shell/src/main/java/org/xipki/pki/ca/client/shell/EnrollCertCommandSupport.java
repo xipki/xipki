@@ -128,11 +128,11 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
                     + "(required)")
     private String profile;
 
-    @Option(name="--not-before",
+    @Option(name = "--not-before",
             description = "notBefore, UTC time of format yyyyMMddHHmmss")
     private String notBeforeS;
 
-    @Option(name="--not-after",
+    @Option(name = "--not-after",
             description = "notAfter, UTC time of format yyyyMMddHHmmss")
     private String notAfterS;
 
