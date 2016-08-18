@@ -40,7 +40,6 @@ import java.io.File;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -245,12 +244,11 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
 
         if (StringUtil.isNotBlank(notBeforeS) || StringUtil.isNotBlank(notAfterS)) {
-            Date notBefore = StringUtil.isNotBlank(notBeforeS)
-                    ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
-            Date notAfter = StringUtil.isNotBlank(notAfterS)
-                    ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
-            OptionalValidity validity = new OptionalValidity(new Time(notBefore),
-                    new Time(notAfter));
+            Time notBefore = StringUtil.isNotBlank(notBeforeS)
+                    ? new Time(DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS)) : null;
+            Time notAfter = StringUtil.isNotBlank(notAfterS)
+                    ? new Time(DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS)) : null;
+            OptionalValidity validity = new OptionalValidity(notBefore, notAfter);
             certTemplateBuilder.setValidity(validity);
         }
 
