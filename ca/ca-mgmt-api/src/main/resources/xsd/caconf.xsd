@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (c) 2014 - 2015 Lijun Liao
+-->
+<xs:schema xmlns="http://xipki.org/pki/ca/conf/v2"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://xipki.org/pki/ca/conf/v2"
+  elementFormDefault="qualified">
+  <!--  CAConfiguration -->
+  <xs:element name="CAConf" type="CAConfType"/>
+  <xs:complexType name="CAConfType">
+    <xs:all>
+      <xs:element name="cmpcontrols" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="cmpcontrol" type="cmpcontrolType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="responders" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="responder" type="responderType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="environments" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="environment" type="environmentType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="crlsigners" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="crlsigner" type="crlsignerType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="requestors" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="requestor" type="requestorType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="publishers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="publisher" type="publisherType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="profiles" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="profile" type="profileType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="cas" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ca" type="caType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="sceps">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="scep" type="scepType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+    <xs:attribute name="version" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="cmpcontrolType">
+    <xs:all>
+      <xs:element name="conf" type="xs:string"/>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="responderType">
+    <xs:all>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="environmentType">
+    <xs:all>
+      <xs:element name="value" type="xs:string"/>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="crlsignerType">
+    <xs:all>
+      <xs:element name="signerType" type="xs:string"/>
+      <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="signerCert" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="crlControl" type="xs:string"/>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="requestorType">
+    <xs:all>
+      <xs:element name="cert" type="fileOrValueType"/>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="publisherType">
+    <xs:all>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="profileType">
+    <xs:all>
+      <xs:element name="art" type="xs:int" minOccurs="0"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="caType">
+    <xs:all>
+      <xs:element name="caInfo">
+        <xs:complexType>
+          <xs:choice>
+            <xs:element name="x509CaInfo" type="x509CaInfoType"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="alias" type="xs:string" minOccurs="0"/>
+      <xs:element name="profiles" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="profile" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="requestors" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="requestor" type="caHasRequestorType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="publishers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="publisher" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="caInfoType" abstract="true">
+    <xs:sequence>
+      <xs:element name="status" type="xs:string"/>
+      <xs:element name="maxValidity" type="xs:string"/>
+      <xs:element name="cert" type="fileOrValueType"/>
+      <xs:element name="signerType" type="xs:string"/>
+      <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="responderName" type="xs:string" minOccurs="0"/>
+      <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>
+      <xs:element name="duplicateKey" type="xs:int"/>
+      <xs:element name="duplicateSubject" type="xs:int"/>
+      <xs:element name="saveReq" type="xs:int"/>
+      <xs:element name="permissions" type="xs:string" minOccurs="0"/>
+      <xs:element name="expirationPeriod" type="xs:int"/>
+      <xs:element name="keepExpiredCertDays" type="xs:int"/>
+      <xs:element name="validityMode" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Valid values are STRICT, CUTOFF, LAX. Default is STRICT</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="extraControl" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="x509CaInfoType">
+    <xs:complexContent>
+      <xs:extension base="caInfoType">
+        <xs:sequence>
+          <xs:element name="snSize" type="xs:int"/>
+          <xs:element name="nextCrlNo" type="xs:int"/>
+          <xs:element name="crlUris" type="xs:string" minOccurs="0"/>
+          <xs:element name="deltacrlUris" type="xs:string" minOccurs="0"/>
+          <xs:element name="ocspUris" type="xs:string" minOccurs="0"/>
+          <xs:element name="cacertUris" type="xs:string" minOccurs="0"/>
+          <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
+          <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
+          <xs:element name="revoked" type="xs:boolean"/>
+          <xs:element name="revReason" type="xs:int" minOccurs="0"/>
+          <xs:element name="revTime" type="xs:string" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>UTC time of format yyyyMMddHHmmss</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="revInvTime" type="xs:string" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>UTC time of format yyyyMMddHHmmss</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="caHasRequestorType">
+    <xs:all>
+      <xs:element name="requestorName" type="xs:string"/>
+      <xs:element name="ra" type="xs:boolean"/>
+      <xs:element name="permissions" type="xs:string" minOccurs="0"/>
+      <xs:element name="profiles" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="scepType">
+    <xs:all>
+      <xs:element name="caName" type="xs:string"/>
+      <xs:element name="responderType" type="xs:string"/>
+      <xs:element name="responderConf" type="fileOrValueType"/>
+      <xs:element name="responderCert" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="control" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="fileOrValueType">
+    <xs:choice>
+      <xs:element name="value" type="xs:string"/>
+      <xs:element name="file" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>
+</xs:schema>

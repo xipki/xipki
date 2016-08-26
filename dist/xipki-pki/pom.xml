@@ -168,14 +168,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-qa-shell</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
-                  <artifactId>ca-server</artifactId>
+                  <artifactId>ca-mgmt-api</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
