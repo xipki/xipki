@@ -2,7 +2,7 @@ XiPKI
 =========
 eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
 
-Highly scalable and high-performance open source PKI (Certification Authority and OCSP responder), especially suitable for IoT, M2M and V2X.
+Highly scalable and high-performance open source PKI (CA and OCSP responder), especially suitable for IoT, M2M and V2X.
 
 License
 -----------
@@ -40,7 +40,7 @@ Tested Platforms
   * Thales nCipher Solo (PCI Card)
   * Thales nCipher Connect (network)
   * Utimaco Se
-  * [Softhsm v2](https://www.opendnssec.org/download/packages/)
+  * [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
 
 * JVM
   * OpenJDK 8
@@ -100,9 +100,9 @@ Install
     ```sh
     tar xvf xipki-pki-<version>.tar.gz
     ```
-    The following steps use `$XIPKI_HOME` to point to the unpacked folder
+    The following steps use `$XIPKI_HOME` to point to the unpacked root folder
 
-* Adapt the database configuration (access rights read and write of database are required)
+* Adapt the database configuration (access rights read & write of database are required)
 
     ```sh
     $XIPKI_HOME/xipki/ca-config/ca-db.properties
@@ -131,7 +131,7 @@ Run Demo
     bin/karaf
     ```
 
-    HSM devices of Thales, e.g. nCipher, uses Thales preload to manage the PKCS#11 session. In this case, XiPKI should be started as follows
+    HSM devices of Thales, e.g. nCipher, can use Thales preload to manage the PKCS#11 sessions. In this case, XiPKI should be started as follows
     ```sh
     preload bin/karaf
     ```
@@ -147,7 +147,7 @@ Run Demo
 
 * Run the pre-configured OSGi-commands in OSGi console
 
-In the OSGi console, call `source xipki/demo/demo.script` to demonstrate the whole life-cycle (key generation, database initialization, CA installation, certificate enrollment, OCSP server installation, OCSP status, etc.). The generated keys, certificates and CRLs are saved in folder `output`, and the log files are located in the folder data/log.
+In the OSGi console, call `source xipki/demo/demo.script` to demonstrate the whole life-cycle (key generation, database initialization, CA installation, certificate enrollment, OCSP server installation, OCSP status, etc.). The generated keys, certificates and CRLs are saved in the folder `output`, and the log files are located in the folder data/log.
 
 Karaf Features
 -----
@@ -156,7 +156,7 @@ The karaf feature can be installed via the command `feature:install <feature nam
 in the OSGi console via the command `feature:uninstall <feature name>`. The possible feature can be
 auto-completed by typing the `TAB` key.
 
-A list of all available features can be retrieved via the
+A list of all available XiPKI features can be retrieved via the
 command `feature:list  | grep xipki` in OSGi console.
 
 Karaf Commands
