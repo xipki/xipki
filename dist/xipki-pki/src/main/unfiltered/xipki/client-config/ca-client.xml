@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CAClient xmlns="http://xipki.org/pki/ca/client/conf/v2">
-  <devMode>true</devMode>
+  <devMode>false</devMode>
   <requestors>
     <requestor>
       <name>requestor1</name>
@@ -25,6 +25,9 @@
     </responder>
   </responders>
   <CAs>
+    <!-- Interval in minutes to update the CA information if autoconf is activated, 
+      default to be 10, value between 1 and 4 will be converted to 5, value less than 1
+      disables the interval update -->
     <CAInfoUpdateInterval>0</CAInfoUpdateInterval>
     <CA enabled="true">
       <name>RCA1</name>
