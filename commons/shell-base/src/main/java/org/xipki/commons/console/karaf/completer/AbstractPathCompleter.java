@@ -167,8 +167,6 @@ abstract class AbstractPathCompleter implements Completer {
                 String name = file.getName();
                 if (matches == 1 && file.isDirectory()) {
                     name += SEP;
-                    // this line prevent from appending whitespace
-                    candidates.add(name);
                 } else {
                     name += " ";
                 }
