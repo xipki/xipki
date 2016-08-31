@@ -91,7 +91,7 @@ public enum KeyUsage {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("invalid KeyUsage " + usage);
     }
 
     public static KeyUsage getKeyUsage(final int bit) {
@@ -101,7 +101,7 @@ public enum KeyUsage {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("invalid KeyUsage(bit) " + bit);
     }
 
     public static KeyUsage getKeyUsageFromBcUsage(final int bcUsage) {
@@ -111,7 +111,7 @@ public enum KeyUsage {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("invalid KeyUsage(bcUsage) " + bcUsage);
     }
 
 }

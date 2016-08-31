@@ -55,13 +55,12 @@ public enum AuditStatus {
     @Nullable
     public static final AuditStatus getAuditStatus(@Nonnull final String name) {
         Objects.requireNonNull(name, "name must not be null");
-
         for (AuditStatus v : values()) {
             if (v.name().equals(name)) {
                 return v;
             }
         }
-        return null;
+        throw new IllegalArgumentException("invalid AuditStatus name " + name);
     }
 
 }
