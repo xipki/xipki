@@ -159,7 +159,7 @@ public enum CrlReason {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("invalid CrlReason " + text);
     }
 
 }
