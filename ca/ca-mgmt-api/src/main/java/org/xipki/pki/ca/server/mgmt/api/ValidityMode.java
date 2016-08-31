@@ -58,7 +58,7 @@ public enum ValidityMode {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("invalid ValidityMode " + text);
     }
 
 }

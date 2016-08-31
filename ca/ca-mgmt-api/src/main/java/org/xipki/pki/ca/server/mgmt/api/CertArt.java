@@ -63,7 +63,7 @@ public enum CertArt {
                 return value;
             }
         }
-        return null;
+        throw new IllegalArgumentException("invalid CertArt " + code);
     }
 
 }

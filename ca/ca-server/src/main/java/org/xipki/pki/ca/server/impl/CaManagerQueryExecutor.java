@@ -552,9 +552,6 @@ class CaManagerQueryExecutor {
 
             String status = rs.getString("STATUS");
             CaStatus caStatus = CaStatus.getCaStatus(status);
-            if (caStatus == null) {
-                caStatus = CaStatus.INACTIVE;
-            }
             entry.setStatus(caStatus);
 
             String maxValidityS = rs.getString("MAX_VALIDITY");
@@ -2399,9 +2396,6 @@ class CaManagerQueryExecutor {
         Set<Permission> permissions = new HashSet<>();
         for (String permissionText : strs) {
             Permission permission = Permission.getPermission(permissionText);
-            if (permission == null) {
-                throw new CaMgmtException("unknown permission " + permissionText);
-            }
             if (permission == Permission.ALL) {
                 permissions.clear();
                 permissions.add(permission);

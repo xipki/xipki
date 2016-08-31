@@ -66,7 +66,7 @@ public enum CaStatus {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("invalid CaStatus " + status);
     }
 
 }

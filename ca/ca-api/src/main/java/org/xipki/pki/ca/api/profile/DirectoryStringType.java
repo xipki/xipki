@@ -68,7 +68,7 @@ public enum DirectoryStringType {
             return new DERBMPString(text);
         } else {
             throw new RuntimeException(String.format(
-                    "should not reach here, unkown DirectoryStringType '%s'", text));
+                    "invalid DirectoryStringType '%s'", text));
         }
     }
 

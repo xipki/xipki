@@ -208,9 +208,6 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
         }
 
         CaStatus status = CaStatus.getCaStatus(caStatus);
-        if (status == null) {
-            throw new IllegalCmdParamException("invalid status: " + caStatus);
-        }
 
         if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver,
@@ -233,9 +230,6 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
         entry.setSaveRequest(saveReq);
 
         ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
-        if (validityMode == null) {
-            throw new IllegalCmdParamException("invalid validity: " + validityModeS);
-        }
         entry.setValidityMode(validityMode);
 
         entry.setStatus(status);
@@ -258,11 +252,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
 
         Set<Permission> tmpPermissions = new HashSet<>();
         for (String permission : permissions) {
-            Permission tmpPermission = Permission.getPermission(permission);
-            if (tmpPermission == null) {
-                throw new IllegalCmdParamException("invalid permission: " + permission);
-            }
-            tmpPermissions.add(tmpPermission);
+            tmpPermissions.add(Permission.getPermission(permission));
         }
 
         entry.setPermissions(tmpPermissions);

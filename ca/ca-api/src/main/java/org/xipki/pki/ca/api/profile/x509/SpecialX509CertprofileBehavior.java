@@ -57,7 +57,7 @@ public enum SpecialX509CertprofileBehavior {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("invalid SpecialX509CertprofileBehavior " + behavior);
     }
 
 }

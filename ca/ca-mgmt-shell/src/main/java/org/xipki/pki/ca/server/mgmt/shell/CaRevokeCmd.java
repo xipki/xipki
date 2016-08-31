@@ -93,9 +93,6 @@ public class CaRevokeCmd extends CaCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         CrlReason crlReason = CrlReason.getInstance(reason);
-        if (crlReason == null) {
-            throw new IllegalCmdParamException("invalid reason " + reason);
-        }
 
         if (!PERMITTED_REASONS.contains(crlReason)) {
             throw new IllegalCmdParamException("reason " + reason + " is not permitted");

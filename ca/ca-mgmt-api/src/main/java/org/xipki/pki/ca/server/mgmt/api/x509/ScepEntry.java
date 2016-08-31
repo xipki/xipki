@@ -43,6 +43,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.SignerConf;
@@ -176,5 +177,35 @@ public class ScepEntry {
 
         return sb.toString();
     } // method toString
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ScepEntry)) {
+            return false;
+        }
+
+        ScepEntry objB = (ScepEntry) obj;
+        if (!caName.equals(objB.caName)) {
+            return false;
+        }
+
+        if (!responderType.equals(objB.responderType)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(responderConf, objB.responderConf)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(control, objB.control)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(base64Cert, objB.base64Cert)) {
+            return false;
+        }
+
+        return false;
+    }
 
 }

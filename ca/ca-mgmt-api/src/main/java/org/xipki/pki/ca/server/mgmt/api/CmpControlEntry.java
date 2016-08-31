@@ -82,4 +82,14 @@ public class CmpControlEntry {
         return sb.toString();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CmpControlEntry)) {
+            return false;
+        }
+
+        CmpControlEntry objB = (CmpControlEntry) obj;
+        return name.equals(objB.name) && conf.equals(objB.conf);
+    }
+
 }

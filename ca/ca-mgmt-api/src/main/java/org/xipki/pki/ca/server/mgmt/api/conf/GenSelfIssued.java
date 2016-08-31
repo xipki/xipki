@@ -34,56 +34,39 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api;
+package org.xipki.pki.ca.server.mgmt.api.conf;
 
-import java.util.Objects;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.0.2
  */
 
-public enum AuditLevel {
+public class GenSelfIssued {
 
-    ERROR(3, "ERROR    "),
-    WARN(4, "WARN     "),
-    INFO(6, "INFO     "),
-    DEBUG(7, "DEBUG    ");
+    private final String profile;
 
-    private final int value;
+    private final byte[] csr;
 
-    private final String alignedText;
+    private final String certFilename;
 
-    AuditLevel(final int value, final String alignedText) {
-        this.value = value;
-        this.alignedText = alignedText;
+    public GenSelfIssued(final String profile, byte[] csr, final String certFilename) {
+        this.profile = ParamUtil.requireNonBlank("profile", profile);
+        this.csr = ParamUtil.requireNonNull("csr", csr);
+        this.certFilename = certFilename;
     }
 
-    public int getValue() {
-        return value;
+    public String getProfile() {
+        return profile;
     }
 
-    public static final AuditLevel forName(final String name) {
-    	Objects.requireNonNull("name", "name must not be null");
-        for (AuditLevel value : values()) {
-            if (value.name().equals(name)) {
-                return value;
-            }
-        }
-        throw new IllegalArgumentException("invalid AuditLevel name " + name);
+    public byte[] getCsr() {
+        return csr;
     }
 
-    public static final AuditLevel forValue(final int value) {
-        for (AuditLevel v : values()) {
-            if (v.getValue() == value) {
-                return v;
-            }
-        }
-        throw new IllegalArgumentException("invalid AuditLevel code " + value);
-    }
-
-    public String getAlignedText() {
-        return alignedText;
+    public String getCertFilename() {
+        return certFilename;
     }
 
 }

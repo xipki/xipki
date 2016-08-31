@@ -257,11 +257,7 @@ public class CaUpdateCmd extends CaCommandSupport {
         if (permissions != null && permissions.size() > 0) {
             Set<Permission> tmpPermissions = new HashSet<>();
             for (String permission : permissions) {
-                Permission tmpPermission = Permission.getPermission(permission);
-                if (tmpPermission == null) {
-                    throw new IllegalCmdParamException("invalid permission: " + permission);
-                }
-                tmpPermissions.add(tmpPermission);
+                tmpPermissions.add(Permission.getPermission(permission));
             }
             entry.setPermissions(tmpPermissions);
         }
@@ -273,9 +269,6 @@ public class CaUpdateCmd extends CaCommandSupport {
 
         if (validityModeS != null) {
             ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
-            if (validityMode == null) {
-                throw new IllegalCmdParamException("invalid validity mode: " + validityModeS);
-            }
             entry.setValidityMode(validityMode);
         }
 

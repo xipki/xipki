@@ -202,7 +202,6 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         key = CaExportCmd.KEY_STATUS;
         str = getStrProp(props, key, true);
         CaStatus status = CaStatus.getCaStatus(str);
-        assertNotNull(status, key, str);
         entry.setStatus(status);
 
         // DUPLICATE_KEY
@@ -265,11 +264,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         Set<String> permissions = StringUtil.splitAsSet(str, ", ");
         Set<Permission> tmpPermissions = new HashSet<>();
         for (String permission : permissions) {
-            Permission tmpPermission = Permission.getPermission(permission);
-            if (tmpPermission == null) {
-                throw new IllegalCmdParamException("invalid permission: " + permission);
-            }
-            tmpPermissions.add(tmpPermission);
+            tmpPermissions.add(Permission.getPermission(permission));
         }
         entry.setPermissions(tmpPermissions);
 
@@ -313,6 +308,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
             str = getStrProp(props, key, false);
             byte[] certBytes = null;
             if (str != null) {
+                // TODO: the certificate should be saved in binary form but not base64
                 certBytes = StringUtil.startsWithIgnoreCase(str, "file:")
                     ? IoUtil.read(str.substring("file:".length())) : Base64.decode(str);
             }

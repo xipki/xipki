@@ -10,6 +10,22 @@
   <xs:element name="CAConf" type="CAConfType"/>
   <xs:complexType name="CAConfType">
     <xs:all>
+      <xs:element name="properties" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="property" type="nameValueType" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>The element name specifies the property name, the the element
+                value specifies the property value. The property propname can be referenced by
+                ${propname}.
+                
+                Property baseDir is reserved which points to the parent directory
+                of the configuration file</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="cmpcontrols" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -27,7 +43,7 @@
       <xs:element name="environments" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="environment" type="environmentType" maxOccurs="unbounded"/>
+            <xs:element name="environment" type="nameValueType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -66,7 +82,7 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="sceps">
+      <xs:element name="sceps" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="scep" type="scepType" minOccurs="0" maxOccurs="unbounded"/>
@@ -86,28 +102,29 @@
     <xs:all>
       <xs:element name="type" type="xs:string"/>
       <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
-      <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="cert" type="fileOrBinaryType" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
-  <xs:complexType name="environmentType">
-    <xs:all>
-      <xs:element name="value" type="xs:string"/>
-    </xs:all>
-    <xs:attribute name="name" type="xs:string" use="required"/>
+  <xs:complexType name="nameValueType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
   </xs:complexType>
   <xs:complexType name="crlsignerType">
     <xs:all>
       <xs:element name="signerType" type="xs:string"/>
       <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>
-      <xs:element name="signerCert" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="signerCert" type="fileOrBinaryType" minOccurs="0"/>
       <xs:element name="crlControl" type="xs:string"/>
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:complexType name="requestorType">
     <xs:all>
-      <xs:element name="cert" type="fileOrValueType"/>
+      <xs:element name="cert" type="fileOrBinaryType"/>
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
@@ -128,21 +145,15 @@
   </xs:complexType>
   <xs:complexType name="caType">
     <xs:all>
-      <xs:element name="caInfo">
+      <xs:element name="caInfo" minOccurs="0">
         <xs:complexType>
           <xs:choice>
-            <xs:element name="x509CaInfo" type="x509CaInfoType"/>
+            <xs:element name="x509Ca" type="x509CaInfoType" minOccurs="0"/>
           </xs:choice>
         </xs:complexType>
       </xs:element>
       <xs:element name="alias" type="xs:string" minOccurs="0"/>
-      <xs:element name="profiles" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="profile" type="xs:string" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
+      <xs:element name="profiles" type="stringsType" minOccurs="0"/>
       <xs:element name="requestors" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -150,87 +161,91 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="publishers" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="publisher" type="xs:string" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
+      <xs:element name="publishers" type="stringsType" minOccurs="0"/>
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
-  <xs:complexType name="caInfoType" abstract="true">
+  <xs:complexType name="genSelfIssuedType">
     <xs:sequence>
-      <xs:element name="status" type="xs:string"/>
+      <xs:element name="csr" type="fileOrBinaryType"/>
+      <xs:element name="profile" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="x509CaInfoType">
+    <xs:all>
+      <!-- general CA configuration -->
+      <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>
+      <xs:element name="cert" type="fileOrBinaryType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>If genSelfIssued is preset, only choice file is allowed and 
+          it specifies the location to save the new self-issued CA certificate. Otherwise it
+          specifies the CA certificate</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="duplicateKey" type="xs:boolean"/>
+      <xs:element name="duplicateSubject" type="xs:boolean"/>
+      <xs:element name="expirationPeriod" type="xs:int"/>
+      <xs:element name="extraControl" type="xs:string" minOccurs="0"/>
+      <xs:element name="genSelfIssued" type="genSelfIssuedType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>A new self-issued CA certificate will be generated</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="keepExpiredCertDays" type="xs:int"/>
+      <xs:element name="permissions" type="stringsType" minOccurs="0"/>
       <xs:element name="maxValidity" type="xs:string"/>
-      <xs:element name="cert" type="fileOrValueType"/>
+      <xs:element name="responderName" type="xs:string" minOccurs="0"/>
+      <xs:element name="saveReq" type="xs:boolean"/>
       <xs:element name="signerType" type="xs:string"/>
       <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>
-      <xs:element name="responderName" type="xs:string" minOccurs="0"/>
-      <xs:element name="cmpcontrolName" type="xs:string" minOccurs="0"/>
-      <xs:element name="duplicateKey" type="xs:int"/>
-      <xs:element name="duplicateSubject" type="xs:int"/>
-      <xs:element name="saveReq" type="xs:int"/>
-      <xs:element name="permissions" type="xs:string" minOccurs="0"/>
-      <xs:element name="expirationPeriod" type="xs:int"/>
-      <xs:element name="keepExpiredCertDays" type="xs:int"/>
+      <xs:element name="status" type="xs:string"/>
       <xs:element name="validityMode" type="xs:string" minOccurs="0">
         <xs:annotation>
           <xs:documentation>Valid values are STRICT, CUTOFF, LAX. Default is STRICT</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="extraControl" type="xs:string" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="x509CaInfoType">
-    <xs:complexContent>
-      <xs:extension base="caInfoType">
-        <xs:sequence>
-          <xs:element name="snSize" type="xs:int"/>
-          <xs:element name="nextCrlNo" type="xs:int"/>
-          <xs:element name="crlUris" type="xs:string" minOccurs="0"/>
-          <xs:element name="deltacrlUris" type="xs:string" minOccurs="0"/>
-          <xs:element name="ocspUris" type="xs:string" minOccurs="0"/>
-          <xs:element name="cacertUris" type="xs:string" minOccurs="0"/>
-          <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
-          <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
-          <xs:element name="revoked" type="xs:boolean"/>
-          <xs:element name="revReason" type="xs:int" minOccurs="0"/>
-          <xs:element name="revTime" type="xs:string" minOccurs="0">
-            <xs:annotation>
-              <xs:documentation>UTC time of format yyyyMMddHHmmss</xs:documentation>
-            </xs:annotation>
-          </xs:element>
-          <xs:element name="revInvTime" type="xs:string" minOccurs="0">
-            <xs:annotation>
-              <xs:documentation>UTC time of format yyyyMMddHHmmss</xs:documentation>
-            </xs:annotation>
-          </xs:element>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="caHasRequestorType">
-    <xs:all>
-      <xs:element name="requestorName" type="xs:string"/>
-      <xs:element name="ra" type="xs:boolean"/>
-      <xs:element name="permissions" type="xs:string" minOccurs="0"/>
-      <xs:element name="profiles" type="xs:string" minOccurs="0"/>
+      <!-- X.509 specific CA configuration -->
+      <xs:element name="cacertUris" type="stringsType" minOccurs="0"/>
+      <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
+      <xs:element name="crlUris" type="stringsType" minOccurs="0"/>
+      <xs:element name="deltacrlUris" type="stringsType" minOccurs="0"/>
+      <xs:element name="nextCrlNo" type="xs:int"/>
+      <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
+      <xs:element name="ocspUris" type="stringsType" minOccurs="0"/>
+      <xs:element name="snSize" type="xs:int"/>
     </xs:all>
   </xs:complexType>
+  <xs:complexType name="caHasRequestorType">
+    <xs:sequence>
+      <xs:element name="requestorName" type="xs:string"/>
+      <xs:element name="ra" type="xs:boolean"/>
+      <xs:element name="permissions" type="stringsType" minOccurs="0"/>
+      <xs:element name="profiles" type="stringsType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="scepType">
-    <xs:all>
+    <xs:sequence>
       <xs:element name="caName" type="xs:string"/>
       <xs:element name="responderType" type="xs:string"/>
       <xs:element name="responderConf" type="fileOrValueType"/>
-      <xs:element name="responderCert" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="responderCert" type="fileOrBinaryType" minOccurs="0"/>
       <xs:element name="control" type="xs:string" minOccurs="0"/>
-    </xs:all>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="stringsType">
+    <xs:sequence>
+      <xs:element name="str" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
   </xs:complexType>
   <xs:complexType name="fileOrValueType">
     <xs:choice>
       <xs:element name="value" type="xs:string"/>
+      <xs:element name="file" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="fileOrBinaryType">
+    <xs:choice>
+      <xs:element name="binary" type="xs:base64Binary"/>
       <xs:element name="file" type="xs:string"/>
     </xs:choice>
   </xs:complexType>

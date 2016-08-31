@@ -117,4 +117,21 @@ public class CmpRequestorEntry {
         return sb.toString();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CmpRequestorEntry)) {
+            return false;
+        }
+
+        CmpRequestorEntry objB = (CmpRequestorEntry) obj;
+        if (!name.equals(objB.name)) {
+            return false;
+        }
+
+        if (!base64Cert.equals(objB.base64Cert)) {
+            return false;
+        }
+        return true;
+    }
+
 }

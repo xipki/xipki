@@ -60,14 +60,14 @@ public enum OcspResponseStatus {
         return status;
     }
 
-    public static OcspResponseStatus getOcspResponseStatus(final int status) {
+    public static OcspResponseStatus getIntance(final int status) {
         for (OcspResponseStatus entry : values()) {
             if (entry.status == status) {
                 return entry;
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("invalid OcspResponseStatus " + status);
     }
 
 }

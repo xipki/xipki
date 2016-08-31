@@ -104,11 +104,7 @@ public class CaRequestorAddCmd extends CaCommandSupport {
         entry.setProfiles(profiles);
         Set<Permission> tmpPermissions = new HashSet<>();
         for (String permission : permissions) {
-            Permission tmpPermission = Permission.getPermission(permission);
-            if (tmpPermission == null) {
-                throw new IllegalCmdParamException("invalid permission: " + permission);
-            }
-            tmpPermissions.add(tmpPermission);
+            tmpPermissions.add(Permission.getPermission(permission));
         }
         entry.setPermissions(tmpPermissions);
 

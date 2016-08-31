@@ -82,9 +82,6 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCommandSupport {
         }
 
         CrlReason crlReason = CrlReason.getInstance(reason);
-        if (crlReason == null) {
-            throw new IllegalCmdParamException("invalid reason " + reason);
-        }
 
         if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
             throw new IllegalCmdParamException("reason " + reason + " is not permitted");

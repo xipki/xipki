@@ -71,9 +71,6 @@ public class RevokeCertCmd extends UnRevRmCertCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         CrlReason crlReason = CrlReason.getInstance(reason);
-        if (crlReason == null) {
-            throw new InvalidConfException("invalid reason " + reason);
-        }
 
         if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
             throw new InvalidConfException("reason " + reason + " is not permitted");

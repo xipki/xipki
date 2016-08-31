@@ -130,11 +130,7 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
         if (permissions != null) {
             Set<Permission> tmpPermissions = new HashSet<>();
             for (String permission : permissions) {
-                Permission tmpPermission = Permission.getPermission(permission);
-                if (tmpPermission == null) {
-                    throw new IllegalCmdParamException("invalid permission: " + permission);
-                }
-                tmpPermissions.add(tmpPermission);
+                tmpPermissions.add(Permission.getPermission(permission));
             }
 
             if (!tmpPermissions.equals(entry.getPermissions())) {

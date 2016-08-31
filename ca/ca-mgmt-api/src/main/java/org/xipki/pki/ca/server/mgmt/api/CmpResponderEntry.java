@@ -40,6 +40,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.SignerConf;
@@ -163,5 +164,31 @@ public class CmpResponderEntry {
         }
         return sb.toString();
     } // method toString
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CmpResponderEntry)) {
+            return false;
+        }
+
+        CmpResponderEntry objB = (CmpResponderEntry) obj;
+        if (!name.equals(objB.name)) {
+            return false;
+        }
+
+        if (!type.equals(objB.type)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(conf, objB.conf)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(base64Cert, objB.base64Cert)) {
+            return false;
+        }
+
+        return true;
+    }
 
 }

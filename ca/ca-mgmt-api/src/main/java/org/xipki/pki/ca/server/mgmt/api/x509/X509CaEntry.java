@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.CertRevocationInfo;
@@ -241,5 +242,67 @@ public class X509CaEntry extends CaEntry {
     @Override
     public void setExtraControl(final String extraControl) {
         super.setExtraControl(extraControl);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return equals(obj, false);
+    }
+
+    public boolean equals(Object obj, boolean ignoreDynamicFields) {
+        if (! (obj instanceof X509CaEntry)) {
+            return false;
+        }
+
+        if (!super.equals(obj)) {
+            return false;
+        }
+
+        X509CaEntry objB = (X509CaEntry) obj;
+
+        if (!ignoreDynamicFields) {
+            if (nextCrlNumber != objB.nextCrlNumber) {
+                return false;
+            }
+        }
+
+        if (!CompareUtil.equalsObject(crlUris, objB.crlUris)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(deltaCrlUris, objB.deltaCrlUris)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(ocspUris, objB.ocspUris)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(cacertUris, objB.cacertUris)) {
+            return false;
+        }
+
+        // TODO: make sure that the certificate will be always set by reading from the CAConf.
+        if (!CompareUtil.equalsObject(cert, objB.cert)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(crlSignerName, objB.crlSignerName)) {
+            return false;
+        }
+
+        if (serialNoBitLen != objB.serialNoBitLen) {
+            return false;
+        }
+
+        if (numCrls != objB.numCrls) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(revocationInfo, objB.revocationInfo)) {
+            return false;
+        }
+
+        return true;
     }
 }

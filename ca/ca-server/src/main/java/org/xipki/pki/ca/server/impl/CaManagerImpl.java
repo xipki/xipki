@@ -140,6 +140,9 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
+import org.xipki.pki.ca.server.mgmt.api.conf.CaConf;
+import org.xipki.pki.ca.server.mgmt.api.conf.GenSelfIssued;
+import org.xipki.pki.ca.server.mgmt.api.conf.SingleCaConf;
 import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 import org.xipki.pki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
@@ -1743,7 +1746,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         try {
             certstore.addPublisherName(name);
         } catch (OperationException ex) {
-            LogUtil.error(LOG, ex, "could not publish publisher nameto certStore");
+            LogUtil.error(LOG, ex, "could not publish publisher " + name + " to certStore");
         }
 
         return true;
@@ -1841,7 +1844,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         try {
             cmpControl = new CmpControl(dbEntry);
         } catch (InvalidConfException ex) {
-            LogUtil.error(LOG, ex, "could not add CMP requestor to certStore");
+            LogUtil.error(LOG, ex, "could not add CMP control to certStore");
             return false;
         }
 
@@ -2809,4 +2812,358 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         return (certInfo != null) ? certInfo.toCertWithStatusInfo() : new CertWithStatusInfo();
     }
 
+    @Override
+    public boolean loadConf(CaConf conf) throws CaMgmtException {
+        ParamUtil.requireNonNull("conf", conf);
+        for (String name : conf.getCmpControlNames()) {
+            CmpControlEntry entry = conf.getCmpControl(name);
+            CmpControlEntry entryB = cmpControlDbEntries.get(name);
+            if (entryB != null) {
+                if (entry.equals(entryB)) {
+                    LOG.info("ignore existed CMP control {}", name);
+                } else {
+                    LOG.error("CMP control {} existed, could not re-added it", name);
+                    return false;
+                }
+            } else {
+                if (addCmpControl(entry)) {
+                    LOG.info("added CMP control {}", name);
+                } else {
+                    LOG.error("could not add CMP control {}", name);
+                    return false;
+                }
+            }
+        }
+
+        for (String name : conf.getResponderNames()) {
+            CmpResponderEntry entry = conf.getResponder(name);
+            CmpResponderEntry entryB = responderDbEntries.get(name);
+            if (entryB != null) {
+                if (entry.equals(entryB)) {
+                    LOG.info("ignore existed CMP responder {}", name);
+                } else {
+                    LOG.error("CMP responder {} existed, could not re-added it", name);
+                    return false;
+                }
+            } else {
+                if (addCmpResponder(entry)) {
+                    LOG.info("added CMP responder {}", name);
+                } else {
+                    LOG.error("could not add CMP responder {}", name);
+                    return false;
+                }
+            }
+        }
+
+        for (String name : conf.getEnvironmentNames()) {
+            String entry = conf.getEnvironment(name);
+            String entryB = envParameterResolver.getEnvParam(name);
+            if (entryB != null) {
+                if (entry.equals(entryB)) {
+                    LOG.info("ignore existed environment parameter {}", name);
+                } else {
+                    LOG.error("environment parameter {} existed, could not re-added it", name);
+                    return false;
+                }
+            } else {
+                if (addEnvParam(name, entry)) {
+                    LOG.info("could not add environment parameter {}", name);
+                } else {
+                    LOG.error("could not add environment parameter {}", name);
+                    return false;
+                }
+            }
+        }
+
+        for (String name : conf.getCrlSignerNames()) {
+            X509CrlSignerEntry entry = conf.getCrlSigner(name);
+            X509CrlSignerEntry entryB = crlSignerDbEntries.get(name);
+            if (entryB != null) {
+                if (entry.equals(entryB)) {
+                    LOG.info("ignore existed CRL signer {}", name);
+                } else {
+                    LOG.error("CRL signer {} existed, could not re-added it", name);
+                    return false;
+                }
+            } else {
+                if (addCrlSigner(entry)) {
+                    LOG.info("added CRL signer {}", name);
+                } else {
+                    LOG.error("could not add CRL signer {}", name);
+                    return false;
+                }
+            }
+        }
+
+        for (String name : conf.getCrlSignerNames()) {
+            X509CrlSignerEntry entry = conf.getCrlSigner(name);
+            X509CrlSignerEntry entryB = crlSignerDbEntries.get(name);
+            if (entryB != null) {
+                if (entry.equals(entryB)) {
+                    LOG.info("ignore existed CRL signer {}", name);
+                } else {
+                    LOG.error("CRL signer {} existed, could not re-added it", name);
+                    return false;
+                }
+            } else {
+                if (addCrlSigner(entry)) {
+                    LOG.info("added CRL signer {}", name);
+                } else {
+                    LOG.error("could not add CRL signer {}", name);
+                    return false;
+                }
+            }
+        }
+
+        for (String name : conf.getRequestorNames()) {
+            CmpRequestorEntry entry = conf.getRequestor(name);
+            CmpRequestorEntry entryB = requestorDbEntries.get(name);
+            if (entryB != null) {
+                if (entry.equals(entryB)) {
+                    LOG.info("ignore existed CMP requestor {}", name);
+                    continue;
+                } else {
+                    LOG.error("CMP requestor {} existed, could not re-added it", name);
+                    return false;
+                }
+            }
+
+            if (addCmpRequestor(entry)) {
+                LOG.info("added CMP requestor {}", name);
+            } else {
+                LOG.error("could not add CMP requestor {}", name);
+                return false;
+            }
+        }
+
+        for (String name : conf.getPublisherNames()) {
+            PublisherEntry entry = conf.getPublisher(name);
+            PublisherEntry entryB = publisherDbEntries.get(name);
+            if (entryB != null) {
+                if (entry.equals(entryB)) {
+                    LOG.info("ignore existed publisher {}", name);
+                    continue;
+                } else {
+                    LOG.error("publisher {} existed, could not re-added it", name);
+                    return false;
+                }
+            }
+
+            if (addPublisher(entry)) {
+                LOG.info("added publisher {}", name);
+            } else {
+                LOG.error("could not add publisher {}", name);
+                return false;
+            }
+        }
+
+        for (String name : conf.getCertProfileNames()) {
+            CertprofileEntry entry = conf.getCertProfile(name);
+            CertprofileEntry entryB = certprofileDbEntries.get(name);
+            if (entryB != null) {
+                if (entry.equals(entryB)) {
+                    LOG.info("ignore existed certProfile {}", name);
+                } else {
+                    LOG.error("certProfile {} existed, could not re-added it", name);
+                    return false;
+                }
+            } else {
+                if (addCertprofile(entry)) {
+                    LOG.info("added certProfile {}", name);
+                } else {
+                    LOG.error("could not add certProfile {}", name);
+                    return false;
+                }
+            }
+        }
+
+        for (String name : conf.getCertProfileNames()) {
+            CertprofileEntry entry = conf.getCertProfile(name);
+            CertprofileEntry entryB = certprofileDbEntries.get(name);
+            if (entryB != null) {
+                if (entry.equals(entryB)) {
+                    LOG.info("ignore existed certProfile {}", name);
+                } else {
+                    LOG.error("certProfile {} existed, could not re-added it", name);
+                    return false;
+                }
+            } else {
+                if (addCertprofile(entry)) {
+                    LOG.info("added certProfile {}", name);
+                } else {
+                    LOG.error("could not add certProfile {}", name);
+                    return false;
+                }
+            }
+        }
+
+        for (String caName : conf.getCaNames()) {
+            SingleCaConf scc = conf.getCa(caName);
+            GenSelfIssued genSelfIssued = scc.getGenSelfIssued();
+            CaEntry caEntry = scc.getCaEntry();
+            if (caEntry != null) {
+                if (! (caEntry instanceof X509CaEntry)) {
+                    throw new CaMgmtException("Unsupported CaEntry " + caName
+                            + " (only X509CaEntry is supported");
+                }
+
+                X509CaEntry entry = (X509CaEntry) caEntry;
+                if (caInfos.containsKey(caName)) {
+                    CaEntry entryB = caInfos.get(caName).getCaEntry();
+                    if (entry.getCertificate() == null && genSelfIssued != null) {
+                        SignerConf signerConf = new SignerConf(entry.getSignerConf());
+                        ConcurrentContentSigner signer;
+                        try {
+                            signer = securityFactory.createSigner(entry.getSignerType(), signerConf,
+                                    (X509Certificate) null);
+                        } catch (ObjectCreationException ex) {
+                            throw new CaMgmtException("could not create signer for CA " + caName,
+                                    ex);
+                        }
+                        entry.setCertificate(signer.getCertificate());
+                    }
+
+                    if (entry.equals(entryB, true)) {
+                        LOG.info("ignore existed CA {}", caName);
+                    } else {
+                        LOG.error("CA {} existed, could not re-added it", caName);
+                        return false;
+                    }
+                } else {
+                    if (genSelfIssued != null) {
+                        X509Certificate cert = generateRootCa(entry, genSelfIssued.getProfile(),
+                                genSelfIssued.getCsr());
+                        LOG.info("generated root CA {}", caName);
+                        String fn = genSelfIssued.getCertFilename();
+                        try {
+                            IoUtil.save(fn, cert.getEncoded());
+                            LOG.info("saved generated certificate of root CA {} to {}",
+                                    caName, fn);
+                        } catch (CertificateEncodingException ex) {
+                            LogUtil.error(LOG, ex, "could not encode certificate of CA " + caName);
+                        } catch (IOException ex) {
+                            LogUtil.error(LOG, ex, "error while saving certificate of root CA "
+                                    + caName + " to " + fn);
+                        }
+                    } else  if (addCa(entry)) {
+                        LOG.info("added CA {}", caName);
+                    } else {
+                        LOG.error("could not add CA {}", caName);
+                        return false;
+                    }
+                }
+            }
+
+            if (scc.getAlias() != null) {
+                String alias = scc.getAlias();
+                String caNameB = caAliases.get(alias);
+                if (caNameB != null) {
+                    if (caName.equals(caNameB)) {
+                        LOG.info("ignore existed CA alias {}", caName);
+                    } else {
+                        LOG.error("CA alias {} existed, could not re-added it", alias);
+                        return false;
+                    }
+                } else {
+                    if (addCaAlias(alias, caName)) {
+                        LOG.info("associated CA {} to alias {}", caName, alias);
+                    } else {
+                        LOG.info("could not associate CA {} to alias {}", caName, alias);
+                        return false;
+                    }
+                }
+            }
+
+            if (scc.getProfileNames() != null) {
+                Set<String> profilesB = caHasProfiles.get(caName);
+                for (String profileName : scc.getProfileNames()) {
+                    if (profilesB != null && profilesB.contains(profileName)) {
+                        LOG.info("ignored adding certprofile {} to CA {}", profileName, caName);
+                    } else {
+                        if (addCertprofileToCa(profileName, caName)) {
+                            LOG.info("added certprofile {} to CA {}", profileName, caName);
+                        } else {
+                            LOG.error("could not add certprofile {} to CA {}", profileName, caName);
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            if (scc.getPublisherNames() != null) {
+                Set<String> publishersB = caHasPublishers.get(caName);
+                for (String publisherName : scc.getPublisherNames()) {
+                    if (publishersB != null && publishersB.contains(publisherName)) {
+                        LOG.info("ignored adding publisher {} to CA {}", publisherName, caName);
+                    } else {
+                        if (addPublisherToCa(publisherName, caName)) {
+                            LOG.info("added publisher {} to CA {}", publisherName, caName);
+                        } else {
+                            LOG.error("could not add publisher {} to CA {}", publisherName, caName);
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            if (scc.getRequestors() != null) {
+                Set<CaHasRequestorEntry> requestorsB = caHasRequestors.get(caName);
+
+                for (CaHasRequestorEntry requestor : scc.getRequestors()) {
+                    String requestorName = requestor.getRequestorName();
+                    CaHasRequestorEntry requestorB = null;
+                    for (CaHasRequestorEntry m : requestorsB) {
+                        if (m.getRequestorName().equals(requestorName)) {
+                            requestorB = m;
+                            break;
+                        }
+                    }
+
+                    if (requestorB != null) {
+                        if (requestor.equals(requestorB)) {
+                            LOG.info("ignored adding requestor {} to CA {}", requestorName, caName);
+                        } else {
+                            LOG.error("could not add requestor {} to CA {}", requestorName, caName);
+                            return false;
+                        }
+                    } else {
+                        if (addCmpRequestorToCa(requestor, caName)) {
+                            LOG.info("added publisher {} to CA {}", requestorName, caName);
+                        } else {
+                            LOG.error("could not add publisher {} to CA {}", requestorName, caName);
+                            return false;
+                        }
+                    }
+                }
+            } // scc.getRequestors()
+
+            // publisher root CA certificate
+            if (genSelfIssued != null) {
+                publishRootCa(caName, genSelfIssued.getProfile());
+            }
+        } // cas
+
+        for (String name : conf.getScepNames()) {
+            ScepEntry entry = conf.getScep(name);
+            ScepEntry entryB = scepDbEntries.get(name);
+            if (entryB != null) {
+                if (entry.equals(entryB)) {
+                    LOG.error("ignore existed SCEP {}", name);
+                    continue;
+                } else {
+                    LOG.error("SCEP {} existed, could not re-added it", name);
+                    return false;
+                }
+            } else {
+                if (addScep(entry)) {
+                    LOG.info("added SCEP {}", name);
+                } else {
+                    LOG.error("could not add SCEP {}", name);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }

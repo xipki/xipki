@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -102,4 +103,25 @@ public class CertprofileEntry {
         return sb.toString();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if  (!(obj instanceof CertprofileEntry)) {
+            return false;
+        }
+
+        CertprofileEntry objB = (CertprofileEntry) obj;
+        if (!name.equals(objB.name)) {
+            return false;
+        }
+
+        if (!type.equals(objB.type)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(conf, objB.conf)) {
+            return false;
+        }
+
+        return true;
+    }
 }

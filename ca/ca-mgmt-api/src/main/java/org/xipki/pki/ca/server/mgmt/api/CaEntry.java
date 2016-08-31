@@ -40,6 +40,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -255,6 +256,72 @@ public class CaEntry {
             }
         }
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CaEntry)) {
+            return false;
+        }
+
+        CaEntry objB = (CaEntry) obj;
+        if (!name.equals(objB.name)) {
+            return false;
+        }
+
+        if (!signerType.equals(objB.signerType)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(status, objB.status)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(maxValidity, objB.maxValidity)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(cmpControlName, objB.cmpControlName)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(responderName, objB.responderName)) {
+            return false;
+        }
+
+        if (duplicateKeyPermitted != objB.duplicateKeyPermitted) {
+            return false;
+        }
+
+        if (duplicateSubjectPermitted != objB.duplicateSubjectPermitted) {
+            return false;
+        }
+
+        if (saveRequest != objB.saveRequest) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(validityMode, objB.validityMode)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(permissions, objB.permissions)) {
+            return false;
+        }
+
+        if (expirationPeriod != objB.expirationPeriod) {
+            return false;
+        }
+
+        if (keepExpiredCertInDays != objB.keepExpiredCertInDays) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(extraControl, objB.extraControl)) {
+            return false;
+        }
+
+        return true;
     }
 
 }

@@ -64,7 +64,7 @@ public enum RequestType {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("invalid RequestType code " + code);
     }
 
 }

@@ -34,56 +34,21 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api;
+package org.xipki.pki.ca.server.mgmt.api.conf;
 
-import java.util.Objects;
+public class DELETEME {
 
-/**
- * @author Lijun Liao
- * @since 2.0.0
- */
-
-public enum AuditLevel {
-
-    ERROR(3, "ERROR    "),
-    WARN(4, "WARN     "),
-    INFO(6, "INFO     "),
-    DEBUG(7, "DEBUG    ");
-
-    private final int value;
-
-    private final String alignedText;
-
-    AuditLevel(final int value, final String alignedText) {
-        this.value = value;
-        this.alignedText = alignedText;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public static final AuditLevel forName(final String name) {
-    	Objects.requireNonNull("name", "name must not be null");
-        for (AuditLevel value : values()) {
-            if (value.name().equals(name)) {
-                return value;
-            }
+    public static void main(String[] args) {
+        try {
+            String filename =
+                    "/Users/lliao/Documents/source/xipki/dist"
+                    + "/xipki-pki/src/main/unfiltered/xipki/demo/demo.d/caconf.xml";
+            CaConf conf = new CaConf(filename);
+            System.out.println("finished: " + conf);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        throw new IllegalArgumentException("invalid AuditLevel name " + name);
-    }
 
-    public static final AuditLevel forValue(final int value) {
-        for (AuditLevel v : values()) {
-            if (v.getValue() == value) {
-                return v;
-            }
-        }
-        throw new IllegalArgumentException("invalid AuditLevel code " + value);
-    }
-
-    public String getAlignedText() {
-        return alignedText;
     }
 
 }

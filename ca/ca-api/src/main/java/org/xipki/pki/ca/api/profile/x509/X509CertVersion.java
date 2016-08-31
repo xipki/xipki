@@ -67,7 +67,7 @@ public enum X509CertVersion {
                 return m;
             }
         }
-        return null;
+        throw new IllegalArgumentException("invalid X509CertVersion " + version);
     }
 
     public static X509CertVersion getInstance(final int versionNumber) {
@@ -76,7 +76,7 @@ public enum X509CertVersion {
                 return m;
             }
         }
-        return null;
+        throw new IllegalArgumentException("invalid X509CertVersion " + versionNumber);
     }
 
 }

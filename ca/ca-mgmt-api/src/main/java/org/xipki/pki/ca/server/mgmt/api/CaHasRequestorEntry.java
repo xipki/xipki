@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -98,6 +99,32 @@ public class CaHasRequestorEntry {
         sb.append("profiles: ").append(profiles).append("\n");
         sb.append("permissions: ").append(Permission.toString(permissions));
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CaHasRequestorEntry)) {
+            return false;
+        }
+
+        CaHasRequestorEntry objB = (CaHasRequestorEntry) obj;
+        if (ra != objB.ra) {
+            return false;
+        }
+
+        if (!requestorName.equals(objB.requestorName)) {
+            return false;
+        }
+
+        if (!permissions.equals(objB.permissions)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(profiles, objB.profiles)) {
+            return false;
+        }
+
+        return true;
     }
 
 }

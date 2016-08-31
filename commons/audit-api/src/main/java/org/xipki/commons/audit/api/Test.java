@@ -36,54 +36,22 @@
 
 package org.xipki.commons.audit.api;
 
-import java.util.Objects;
+import java.math.BigInteger;
 
-/**
- * @author Lijun Liao
- * @since 2.0.0
- */
+public class Test {
 
-public enum AuditLevel {
-
-    ERROR(3, "ERROR    "),
-    WARN(4, "WARN     "),
-    INFO(6, "INFO     "),
-    DEBUG(7, "DEBUG    ");
-
-    private final int value;
-
-    private final String alignedText;
-
-    AuditLevel(final int value, final String alignedText) {
-        this.value = value;
-        this.alignedText = alignedText;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public static final AuditLevel forName(final String name) {
-    	Objects.requireNonNull("name", "name must not be null");
-        for (AuditLevel value : values()) {
-            if (value.name().equals(name)) {
-                return value;
+    public static void main(String[] args) {
+        for (int i = 4; i < 8; i++) {
+            byte[] bytes = new byte[i];
+            bytes[0] = 0x7F;
+            for (int j = 1; j < bytes.length; j++) {
+                bytes[j] = (byte) 0xFF;
             }
+            long seconds = new BigInteger(bytes).longValue();
+            long years = seconds / 1000 / 60 / 60 / 24 / 365;
+            System.out.println(i + ": " + years);
         }
-        throw new IllegalArgumentException("invalid AuditLevel name " + name);
-    }
 
-    public static final AuditLevel forValue(final int value) {
-        for (AuditLevel v : values()) {
-            if (v.getValue() == value) {
-                return v;
-            }
-        }
-        throw new IllegalArgumentException("invalid AuditLevel code " + value);
-    }
-
-    public String getAlignedText() {
-        return alignedText;
     }
 
 }

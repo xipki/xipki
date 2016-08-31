@@ -72,7 +72,7 @@ public enum StringType {
             return new DERIA5String(text, true);
         } else {
             throw new RuntimeException(String.format(
-                    "should not reach here, unkown StringType '%s'", text));
+                    "invalid StringType '%s'", text));
         }
     }
 

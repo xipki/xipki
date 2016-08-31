@@ -43,6 +43,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.SignerConf;
@@ -177,4 +178,33 @@ public class X509CrlSignerEntry {
         return sb.toString();
     } // method toString
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof X509CrlSignerEntry)) {
+            return false;
+        }
+
+        X509CrlSignerEntry objB = (X509CrlSignerEntry) obj;
+        if (!name.equals(objB.name)) {
+            return false;
+        }
+
+        if (!signerType.equals(objB.signerType)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(signerConf, signerConf)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(crlControl, objB.crlControl)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(base64Cert, objB.base64Cert)) {
+            return false;
+        }
+
+        return true;
+    }
 }

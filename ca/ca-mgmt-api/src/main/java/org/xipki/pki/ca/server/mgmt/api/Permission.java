@@ -76,7 +76,7 @@ public enum Permission {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("invalid Permission " + permission);
     }
 
     public static String toString(final Set<Permission> permissions) {

@@ -34,56 +34,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api;
+package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.util.Objects;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.ca.server.mgmt.api.conf.CaConf;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public enum AuditLevel {
+@Command(scope = "xipki-ca", name = "load-conf",
+        description = "add CA")
+@Service
+public class LoadConfCmd extends CaCommandSupport {
 
-    ERROR(3, "ERROR    "),
-    WARN(4, "WARN     "),
-    INFO(6, "INFO     "),
-    DEBUG(7, "DEBUG    ");
+    @Option(name = "--conf-file",
+            description = "CA system configuration file")
+    @Completion(FilePathCompleter.class)
+    private String confFile;
 
-    private final int value;
-
-    private final String alignedText;
-
-    AuditLevel(final int value, final String alignedText) {
-        this.value = value;
-        this.alignedText = alignedText;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public static final AuditLevel forName(final String name) {
-    	Objects.requireNonNull("name", "name must not be null");
-        for (AuditLevel value : values()) {
-            if (value.name().equals(name)) {
-                return value;
-            }
-        }
-        throw new IllegalArgumentException("invalid AuditLevel name " + name);
-    }
-
-    public static final AuditLevel forValue(final int value) {
-        for (AuditLevel v : values()) {
-            if (v.getValue() == value) {
-                return v;
-            }
-        }
-        throw new IllegalArgumentException("invalid AuditLevel code " + value);
-    }
-
-    public String getAlignedText() {
-        return alignedText;
+    @Override
+    protected Object doExecute() throws Exception {
+        CaConf caConf = new CaConf(confFile);
+        boolean bo = caManager.loadConf(caConf);
+        output(bo, "loaded", "could not load", "configuration " + confFile);
+        return null;
     }
 
 }
