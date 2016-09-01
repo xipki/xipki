@@ -124,7 +124,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
     @Option(name = "--subject", aliases = "-s",
             required = true,
-            description = "subject in the PKCS#10 request\n"
+            description = "subject in the CSR\n"
                     + "(required)")
     private String subject;
 
@@ -365,11 +365,11 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         }
 
         X500Name subjectDn = getSubject(subject);
-        PKCS10CertificationRequest p10Req = generateRequest(signer, subjectPublicKeyInfo, subjectDn,
+        PKCS10CertificationRequest csr = generateRequest(signer, subjectPublicKeyInfo, subjectDn,
                 attributes);
 
         File file = new File(outputFilename);
-        saveVerbose("saved PKCS#10 request to file", file, p10Req.getEncoded());
+        saveVerbose("saved CSR to file", file, csr.getEncoded());
         return null;
     } // method doExecute
 
@@ -451,16 +451,16 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         ParamUtil.requireNonNull("signer", signer);
         ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
         ParamUtil.requireNonNull("subjectDn", subjectDn);
-        PKCS10CertificationRequestBuilder p10ReqBuilder =
+        PKCS10CertificationRequestBuilder csrBuilder =
                 new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
         if (CollectionUtil.isNonEmpty(attributes)) {
             for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
-                p10ReqBuilder.addAttribute(attrType, attributes.get(attrType));
+                csrBuilder.addAttribute(attrType, attributes.get(attrType));
             }
         }
 
         try {
-            return signer.build(p10ReqBuilder);
+            return signer.build(csrBuilder);
         } catch (NoIdleSignerException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }

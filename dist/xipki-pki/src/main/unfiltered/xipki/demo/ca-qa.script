@@ -15,25 +15,25 @@ echo "#################################################################"
 xipki-qa:check-cert \
   --issuer RCA \
   --profile RCA \
-  --p10 output/RCA1.p10 \
+  --csr output/RCA1.csr \
   --cert output/RCA1.der
 
 xipki-qa:check-cert \
   --issuer RCA \
   --profile Cross \
-  --p10 output/Cross1.p10 \
+  --csr output/Cross1.csr \
   --cert output/Cross1.der
 
 xipki-qa:check-cert \
   --issuer RCA \
   --profile SubCA \
-  --p10 output/SubCA1.p10 \
+  --csr output/SubCA1.csr \
   --cert output/SubCA1.der
 
 xipki-qa:check-cert \
   --issuer RCA \
   --profile SubCA.Complex \
-  --p10 output/SubCAwithCRL1.p10 \
+  --csr output/SubCAwithCRL1.csr \
   --cert output/SubCAwithCRL1.der
 
 ## SubCAwithCRL
@@ -41,37 +41,37 @@ xipki-qa:check-cert \
 xipki-qa:check-cert \
   --issuer SubCAwithCRL \
   --profile OCSP \
-  --p10 output/OCSP1.p10 \
+  --csr output/OCSP1.csr \
   --cert output/OCSP1.der
 
 xipki-qa:check-cert \
   --issuer SubCAwithCRL \
   --profile OCSP \
-  --p10 output/OCSP2.p10 \
+  --csr output/OCSP2.csr \
   --cert output/OCSP2.der
 
 xipki-qa:check-cert \
   --issuer SubCAwithCRL \
   --profile multipleOUs \
-  --p10 output/multipleOUs1.p10 \
+  --csr output/multipleOUs1.csr \
   --cert output/multipleOUs1.der
 
 xipki-qa:check-cert \
   --issuer SubCAwithCRL \
   --profile multipleOUs \
-  --p10 output/multipleOUs2.p10 \
+  --csr output/multipleOUs2.csr \
   --cert output/multipleOUs2.der
 
 xipki-qa:check-cert \
   --issuer SubCAwithCRL \
   --profile multiValuedRDN \
-  --p10 output/multiValuedRDN1.p10 \
+  --csr output/multiValuedRDN1.csr \
   --cert output/multiValuedRDN1.der
 
 xipki-qa:check-cert \
   --issuer SubCAwithCRL \
   --profile MaxTime \
-  --p10 output/MaxTime1.p10 \
+  --csr output/MaxTime1.csr \
   --cert output/MaxTime1.der
 
 ## SubCA
@@ -79,73 +79,73 @@ xipki-qa:check-cert \
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile TLS \
-  --p10 output/TLS1.p10 \
+  --csr output/TLS1.csr \
   --cert output/TLS1.der
 
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile TLSwithIncSN \
-  --p10 output/TLSwithIncSN1.p10 \
+  --csr output/TLSwithIncSN1.csr \
   --cert output/TLSwithIncSN1.der
 
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile TLSwithIncSN \
-  --p10 output/TLSwithIncSN1-1.p10 \
+  --csr output/TLSwithIncSN1-1.csr \
   --cert output/TLSwithIncSN1-1.der
 
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile TLSwithIncSN \
-  --p10 output/TLSwithIncSN1-2.p10 \
+  --csr output/TLSwithIncSN1-2.csr \
   --cert output/TLSwithIncSN1-2.der
 
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile TLS \
-  --p10 output/TLS2.p10 \
+  --csr output/TLS2.csr \
   --cert output/TLS2.der
 
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile TLS_C \
-  --p10 output/TLS_C1.p10 \
+  --csr output/TLS_C1.csr \
   --cert output/TLS_C1.der
 
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile TLS_C \
-  --p10 output/TLS_C2.p10 \
+  --csr output/TLS_C2.csr \
   --cert output/TLS_C2.der
 
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile gSMC_K \
-  --p10 output/gSMC_K1.p10 \
+  --csr output/gSMC_K1.csr \
   --cert output/gSMC_K1.der
 
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile gSMC_K \
-  --p10 output/gSMC_K2.p10 \
+  --csr output/gSMC_K2.csr \
   --cert output/gSMC_K2.der
 
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile QC \
-  --p10 output/QC1.p10 \
+  --csr output/QC1.csr \
   --cert output/QC1.der
 
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile EE.Complex \
-  --p10 output/EE.Complex1.p10 \
+  --csr output/EE.Complex1.csr \
   --cert output/EE.Complex1.der
 
 xipki-qa:check-cert \
   --issuer SubCA \
   --profile EE.Complex \
-  --p10 output/EE.Complex2.p10 \
+  --csr output/EE.Complex2.csr \
   --cert output/EE.Complex2.der
 
 echo "#################################################################"
@@ -161,10 +161,10 @@ xipki-tk:req-p12 \
   --p12 output/TLS-neg.p12 \
   --password 1234 \
   --subject "CN=TLS101,O=xipki,C=DE" \
-  --out output/neg/TLS101.p10
+  --out output/neg/TLS101.csr
 
-xipki-qa:neg-p10-enroll \
-  --p10 output/neg/TLS101.p10 \
+xipki-qa:neg-csr-enroll \
+  --csr output/neg/TLS101.csr \
   --profile TLS \
   --user USER-T
 

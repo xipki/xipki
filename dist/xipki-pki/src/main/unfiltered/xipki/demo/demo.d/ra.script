@@ -14,12 +14,12 @@ xipki-tk:req-p12 \
   --p12 output/Cross1.p12 \
   --password 1234 \
   --subject "CN=Cross1,O=xipki,C=DE" \
-  --out output/Cross1.p10
+  --out output/Cross1.csr
 
 xipki-ca:enroll-cert \
   --ca RCA1 \
   --profile Cross \
-  --p10 output/Cross1.p10 \
+  --csr output/Cross1.csr \
   --out output/Cross1.der
 
 #################################################################
@@ -44,11 +44,11 @@ xipki-cli:health \
 ## Enroll certificates
 # Certificate OCSP1
 
-## Create the PKCS#10 request for the command caqa:check-cert in QA 
+## Create the CSR for the command caqa:check-cert in QA 
 xipki-tk:req-p12 \
   --p12 output/OCSP1.p12 \
   --password 1234 \
-  --out output/OCSP1.p10 \
+  --out output/OCSP1.csr \
   --subject "CN=OCSP1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
@@ -70,11 +70,11 @@ xipki-tk:update-cert-p12 \
 
 # Certificate OCSP2
 
-## Create the PKCS#10 request for the command caqa:check-cert in QA 
+## Create the CSR for the command caqa:check-cert in QA 
 xipki-tk:req-p12 \
   --p12 output/OCSP2.p12 \
   --password 1234 \
-  --out output/OCSP2.p10 \
+  --out output/OCSP2.csr \
   --subject "CN=OCSP2,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
@@ -101,11 +101,11 @@ xipki-cli:revoke \
 
 # Certificate multipleOUs
 
-## Create the PKCS#10 request for the command caqa:check-cert in QA 
+## Create the CSR for the command caqa:check-cert in QA 
 xipki-tk:req-p12 \
   --p12 output/multipleOUs1.p12 \
   --password 1234 \
-  --out output/multipleOUs1.p10 \
+  --out output/multipleOUs1.csr \
   --subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
 
 xipki-cli:enroll-p12 \
@@ -123,11 +123,11 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/SubCAwithCRL1.der \
   --ca-cert output/RCA1.der
 
-## Create the PKCS#10 request for the command caqa:check-cert in QA 
+## Create the CSR for the command caqa:check-cert in QA 
 xipki-tk:req-p12 \
   --p12 output/multipleOUs2.p12 \
   --password 1234 \
-  --out output/multipleOUs2.p10 \
+  --out output/multipleOUs2.csr \
   --subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
 
 xipki-cli:enroll-p12 \
@@ -147,11 +147,11 @@ xipki-tk:update-cert-p12 \
 
 # Certificate multiValuedRDN
 
-## Create the PKCS#10 request for the command caqa:check-cert in QA 
+## Create the CSR for the command caqa:check-cert in QA 
 xipki-tk:req-p12 \
   --p12 output/multiValuedRDN1.p12 \
   --password 1234 \
-  --out output/multiValuedRDN1.p10 \
+  --out output/multiValuedRDN1.csr \
   --subject "CN=multiValuedRDN1,OU=A12345,O=xipki,C=DE"
 
 xipki-cli:enroll-p12 \
@@ -174,7 +174,7 @@ xipki-tk:update-cert-p12 \
 xipki-tk:req-p12 \
   --p12 output/QC1.p12 \
   --password 1234 \
-  --out output/QC1.p10 \
+  --out output/QC1.csr \
   --subject "CN=QC1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
@@ -199,15 +199,15 @@ xipki-tk:req-p12-complex \
   --subject "CN=EE.Complex1,O=xipki,C=DE" \
   --p12 output/EE.Complex1.p12 \
   --password 1234 \
-  --out output/EE.Complex1.p10 \
+  --out output/EE.Complex1.csr \
   --qc-eu-limit EUR:150:15 \
   --biometric-type 0 \
   --biometric-hash SHA256 \
   --biometric-file xipki/README.md \
   --biometric-uri https://example.org/?id=123
 
-xipki-cli:p10-enroll \
-  --p10 output/EE.Complex1.p10 \
+xipki-cli:csr-enroll \
+  --csr output/EE.Complex1.csr \
   --out output/EE.Complex1.der \
   --profile EE.Complex \
   --user USER-T
@@ -225,7 +225,7 @@ xipki-tk:req-p12-complex \
   --subject "CN=EE.Complex2,O=xipki,C=DE" \
   --p12 output/EE.Complex2.p12 \
   --password 1234 \
-  --out output/EE.Complex2.p10 \
+  --out output/EE.Complex2.csr \
   --qc-eu-limit EUR:150:15 \
   --biometric-type 0 \
   --biometric-hash SHA256 \
@@ -233,8 +233,8 @@ xipki-tk:req-p12-complex \
   --biometric-uri https://example.org/?id=123 \
   --complex-subject
 
-xipki-cli:p10-enroll \
-  --p10 output/EE.Complex2.p10 \
+xipki-cli:csr-enroll \
+  --csr output/EE.Complex2.csr \
   --out output/EE.Complex2.der \
   --profile EE.Complex \
   --user USER-T
@@ -252,10 +252,10 @@ xipki-tk:req-p12 \
   --p12 output/TLS1.p12 \
   --password 1234 \
   --subject "CN=TLS1.xipki.org,O=xipki,C=DE" \
-  --out output/TLS1.p10
+  --out output/TLS1.csr
 
-xipki-cli:p10-enroll \
-  --p10 output/TLS1.p10 \
+xipki-cli:csr-enroll \
+  --csr output/TLS1.csr \
   --out output/TLS1.der \
   --profile TLS \
   --user USER-T
@@ -274,10 +274,10 @@ xipki-tk:req-p12 \
   --p12 output/TLSwithIncSN1.p12 \
   --password 1234 \
   --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
-  --out output/TLSwithIncSN1.p10
+  --out output/TLSwithIncSN1.csr
 
-xipki-cli:p10-enroll \
-  --p10 output/TLSwithIncSN1.p10 \
+xipki-cli:csr-enroll \
+  --csr output/TLSwithIncSN1.csr \
   --out output/TLSwithIncSN1.der \
   --profile TLSwithIncSN --user USER-T
 
@@ -287,10 +287,10 @@ xipki-tk:req-p12 \
   --p12 output/TLSwithIncSN1-1.p12 \
   --password 1234 \
   --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
-  --out output/TLSwithIncSN1-1.p10
+  --out output/TLSwithIncSN1-1.csr
 
-xipki-cli:p10-enroll \
-  --p10 output/TLSwithIncSN1-1.p10 \
+xipki-cli:csr-enroll \
+  --csr output/TLSwithIncSN1-1.csr \
   --out output/TLSwithIncSN1-1.der \
   --profile TLSwithIncSN --user USER-T
 
@@ -300,10 +300,10 @@ xipki-tk:req-p12 \
   --p12 output/TLSwithIncSN1-2.p12 \
   --password 1234 \
   --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
-  --out output/TLSwithIncSN1-2.p10
+  --out output/TLSwithIncSN1-2.csr
 
-xipki-cli:p10-enroll \
-  --p10 output/TLSwithIncSN1-2.p10 \
+xipki-cli:csr-enroll \
+  --csr output/TLSwithIncSN1-2.csr \
   --out output/TLSwithIncSN1-2.der \
   --profile TLSwithIncSN --user USER-T
  
@@ -313,10 +313,10 @@ xipki-tk:req-p12 \
   --p12 output/TLS2.p12 \
   --password 1234 \
   --subject "CN=TLS2.xipki.org,O=xipki,C=DE" \
-  --out output/TLS2.p10
+  --out output/TLS2.csr
 
-xipki-cli:p10-enroll \
-  --p10 output/TLS2.p10 \
+xipki-cli:csr-enroll \
+  --csr output/TLS2.csr \
   --out output/TLS2.der \
   --profile TLS \
   --user USER-T
@@ -341,10 +341,10 @@ xipki-tk:req-p12 \
   --p12 output/TLS_C1.p12 \
   --password 1234 \
   --subject "CN=TLS_C1,O=xipki,C=DE" \
-  --out output/TLS_C1.p10
+  --out output/TLS_C1.csr
 
-xipki-cli:p10-enroll \
-  --p10 output/TLS_C1.p10 \
+xipki-cli:csr-enroll \
+  --csr output/TLS_C1.csr \
   --out output/TLS_C1.der \
   --profile TLS_C \
   --user USER-T
@@ -362,10 +362,10 @@ xipki-tk:req-p12 \
   --p12 output/TLS_C2.p12 \
   --password 1234 \
   --subject "CN=TLS_C2,O=xipki,C=DE" \
-  --out output/TLS_C2.p10
+  --out output/TLS_C2.csr
 
-xipki-cli:p10-enroll \
-  --p10 output/TLS_C2.p10 \
+xipki-cli:csr-enroll \
+  --csr output/TLS_C2.csr \
   --out output/TLS_C2.der \
   --profile TLS_C \
   --user USER-T
@@ -388,10 +388,10 @@ xipki-tk:req-p12 \
   --p12 output/gSMC_K1.p12 \
   --password 1234 \
   --subject "CN=80276123451234512345,O=xipki,C=DE" \
-  --out output/gSMC_K1.p10
+  --out output/gSMC_K1.csr
 
-xipki-cli:p10-enroll \
-  --p10 output/gSMC_K1.p10 \
+xipki-cli:csr-enroll \
+  --csr output/gSMC_K1.csr \
   --out output/gSMC_K1.der \
   --profile gSMC_K \
   --user USER-T
@@ -412,10 +412,10 @@ xipki-tk:req-p12 \
   --p12 output/gSMC_K2.p12 \
   --password 1234 \
   --subject "CN=80276123451234512345,O=xipki,C=DE" \
-  --out output/gSMC_K2.p10
+  --out output/gSMC_K2.csr
 
-xipki-cli:p10-enroll \
-  --p10 output/gSMC_K2.p10 \
+xipki-cli:csr-enroll \
+  --csr output/gSMC_K2.csr \
   --out output/gSMC_K2.der \
   --profile gSMC_K \
   --user USER-T
@@ -433,10 +433,10 @@ xipki-tk:req-p12 \
   --p12 output/MaxTime1.p12 \
   --password 1234 \
   --subject "CN=MaxTime1.xipki.org,O=xipki,C=DE" \
-  --out output/MaxTime1.p10
+  --out output/MaxTime1.csr
 
-xipki-cli:p10-enroll \
-  --p10 output/MaxTime1.p10 \
+xipki-cli:csr-enroll \
+  --csr output/MaxTime1.csr \
   --out output/MaxTime1.der \
   --profile MaxTime \
   --user USER-T

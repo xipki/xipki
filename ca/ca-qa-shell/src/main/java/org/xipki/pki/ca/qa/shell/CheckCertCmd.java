@@ -83,12 +83,12 @@ public class CheckCertCmd extends XipkiCommandSupport {
     @Completion(X509IssuerNameCompleter.class)
     private String issuerName;
 
-    @Option(name = "--p10",
+    @Option(name = "--csr",
             required = true,
-            description = "PKCS#10 request file\n"
+            description = "CSR file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String p10File;
+    private String csrFile;
 
     @Option(name = "--profile", aliases = "-p",
             required = true,
@@ -132,9 +132,9 @@ public class CheckCertCmd extends XipkiCommandSupport {
                     + profileName + "'");
         }
 
-        CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
+        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
         Extensions extensions = null;
-        ASN1Set attrs = p10Req.getCertificationRequestInfo().getAttributes();
+        ASN1Set attrs = csr.getCertificationRequestInfo().getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
             if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
@@ -144,8 +144,8 @@ public class CheckCertCmd extends XipkiCommandSupport {
 
         byte[] certBytes = IoUtil.read(certFile);
         ValidationResult result = qa.checkCert(certBytes, issuerInfo,
-                p10Req.getCertificationRequestInfo().getSubject(),
-                p10Req.getCertificationRequestInfo().getSubjectPublicKeyInfo(), extensions);
+                csr.getCertificationRequestInfo().getSubject(),
+                csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), extensions);
         StringBuilder sb = new StringBuilder();
 
         sb.append(certFile).append(" (certprofile ").append(profileName).append(")\n");

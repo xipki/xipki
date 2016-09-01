@@ -492,8 +492,8 @@ public class X509CaCmpResponder extends CmpResponder {
 
     /**
      * handle the PKI body with the choice {@code p10cr}<br/>
-     * Since it is not possible to add attribute to the PKCS#10 request, the certificate profile
-     * must be specified in the attribute regInfo-utf8Pairs (1.3.6.1.5.5.7.5.2.1) within
+     * Since it is not possible to add attribute to the PKCS#10 request (CSR), the certificate
+     * profile must be specified in the attribute regInfo-utf8Pairs (1.3.6.1.5.5.7.5.2.1) within
      * PKIHeader.generalInfo
      *
      */

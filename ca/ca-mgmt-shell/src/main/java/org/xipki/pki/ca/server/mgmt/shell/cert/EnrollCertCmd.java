@@ -71,12 +71,12 @@ public class EnrollCertCmd extends CaCommandSupport {
     @Completion(CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--p10",
+    @Option(name = "--csr",
             required = true,
-            description = "PKCS#10 request file\n"
+            description = "CSR file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String p10File;
+    private String csrFile;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
@@ -117,10 +117,10 @@ public class EnrollCertCmd extends CaCommandSupport {
         Date notAfter = StringUtil.isNotBlank(notAfterS)
                   ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
 
-        byte[] encodedP10Request = IoUtil.read(p10File);
+        byte[] encodedCsr = IoUtil.read(csrFile);
 
-        X509Certificate cert = caManager.generateCertificate(caName, profileName, user,
-                encodedP10Request, notBefore, notAfter);
+        X509Certificate cert = caManager.generateCertificate(caName, profileName, user, encodedCsr,
+                notBefore, notAfter);
         saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
 
         return null;

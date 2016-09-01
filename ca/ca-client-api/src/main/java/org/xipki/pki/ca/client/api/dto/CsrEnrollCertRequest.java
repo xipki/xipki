@@ -44,23 +44,25 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 
-public class P10EnrollCertEntry {
+public class CsrEnrollCertRequest extends IdentifiedObject {
 
-    private final CertificationRequest p10Request;
+    private final String certprofile;
 
-    private final String profile;
+    private final CertificationRequest csr;
 
-    public P10EnrollCertEntry(final CertificationRequest p10Request, final String profile) {
-        this.p10Request = ParamUtil.requireNonNull("p10Request", p10Request);
-        this.profile = ParamUtil.requireNonNull("profile", profile);
+    public CsrEnrollCertRequest(final String id, final String certprofile,
+            final CertificationRequest csr) {
+        super(id);
+        this.certprofile = ParamUtil.requireNonBlank("certprofile", certprofile);
+        this.csr = ParamUtil.requireNonNull("csr", csr);
     }
 
-    public CertificationRequest getP10Request() {
-        return p10Request;
+    public CertificationRequest getCsr() {
+        return csr;
     }
 
-    public String getProfile() {
-        return profile;
+    public String getCertprofile() {
+        return certprofile;
     }
 
 }

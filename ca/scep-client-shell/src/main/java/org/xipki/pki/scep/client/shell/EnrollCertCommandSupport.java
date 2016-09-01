@@ -59,12 +59,12 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
 
 public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
-    @Option(name = "--p10",
+    @Option(name = "--csr",
             required = true,
-            description = "PKCS#10 request file\n"
+            description = "CSR file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String p10File;
+    private String csrFile;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
@@ -81,7 +81,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     protected Object doExecute() throws Exception {
         ScepClient client = getScepClient();
 
-        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
+        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
         EnrolmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
                 getIdentityCert());
         if (resp.isFailure()) {

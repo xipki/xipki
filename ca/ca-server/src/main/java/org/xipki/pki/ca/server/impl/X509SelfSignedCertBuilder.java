@@ -126,14 +126,14 @@ class X509SelfSignedCertBuilder {
 
     public static GenerateSelfSignedResult generateSelfSigned(final SecurityFactory securityFactory,
             final String signerType, final String signerConf,
-            final IdentifiedX509Certprofile certprofile, final CertificationRequest p10Request,
+            final IdentifiedX509Certprofile certprofile, final CertificationRequest csr,
             final BigInteger serialNumber, final List<String> cacertUris,
             final List<String> ocspUris, final List<String> crlUris,
             final List<String> deltaCrlUris) throws OperationException, InvalidConfException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         ParamUtil.requireNonBlank("signerType", signerType);
         ParamUtil.requireNonNull("certprofile", certprofile);
-        ParamUtil.requireNonNull("p10Request", p10Request);
+        ParamUtil.requireNonNull("csr", csr);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
         if (serialNumber.compareTo(BigInteger.ZERO) != 1) {
             throw new IllegalArgumentException(
@@ -146,8 +146,8 @@ class X509SelfSignedCertBuilder {
                     + X509CertLevel.RootCA);
         }
 
-        if (!securityFactory.verifyPopo(p10Request)) {
-            throw new InvalidConfException("could not validate POP for the pkcs#10 requst");
+        if (!securityFactory.verifyPopo(csr)) {
+            throw new InvalidConfException("could not validate POP for the CSR");
         }
 
         if ("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType)) {
@@ -214,15 +214,14 @@ class X509SelfSignedCertBuilder {
             }
         }
 
-        X509Certificate newCert = generateCertificate(
-                signer, certprofile, p10Request, serialNumber, publicKeyInfo,
-                cacertUris, ocspUris, crlUris, deltaCrlUris);
+        X509Certificate newCert = generateCertificate(signer, certprofile, csr, serialNumber,
+                publicKeyInfo, cacertUris, ocspUris, crlUris, deltaCrlUris);
 
         return new GenerateSelfSignedResult(signerConf, newCert);
     } // method generateSelfSigned
 
     private static X509Certificate generateCertificate(final ConcurrentContentSigner signer,
-            final IdentifiedX509Certprofile certprofile, final CertificationRequest p10Request,
+            final IdentifiedX509Certprofile certprofile, final CertificationRequest csr,
             final BigInteger serialNumber, final SubjectPublicKeyInfo publicKeyInfo,
             final List<String> cacertUris, final List<String> ocspUris, final List<String> crlUris,
             final List<String> deltaCrlUris) throws OperationException {
@@ -242,7 +241,7 @@ class X509SelfSignedCertBuilder {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
         }
 
-        X500Name requestedSubject = p10Request.getCertificationRequestInfo().getSubject();
+        X500Name requestedSubject = csr.getCertificationRequestInfo().getSubject();
 
         SubjectInfo subjectInfo;
         // subject
@@ -278,7 +277,7 @@ class X509SelfSignedCertBuilder {
                 cacertUris, ocspUris, crlUris, deltaCrlUris);
 
         Extensions extensions = null;
-        ASN1Set attrs = p10Request.getCertificationRequestInfo().getAttributes();
+        ASN1Set attrs = csr.getCertificationRequestInfo().getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
             if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {

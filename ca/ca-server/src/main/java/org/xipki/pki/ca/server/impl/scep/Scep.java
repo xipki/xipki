@@ -419,23 +419,23 @@ public class Scep {
             case PKCSReq:
             case RenewalReq:
             case UpdateReq:
-                CertificationRequest p10Req = (CertificationRequest) req.getMessageData();
-                X500Name reqSubject = p10Req.getCertificationRequestInfo().getSubject();
+                CertificationRequest csr = (CertificationRequest) req.getMessageData();
+                X500Name reqSubject = csr.getCertificationRequestInfo().getSubject();
                 String reqSubjectText = X509Util.getRfc4519Name(reqSubject);
                 audit(auditEvent, "req-subject", reqSubjectText);
                 LOG.info("tid={}, subject={}", tid, reqSubjectText);
 
-                if (!caManager.getSecurityFactory().verifyPopo(p10Req)) {
+                if (!caManager.getSecurityFactory().verifyPopo(csr)) {
                     LOG.warn("tid={}, POPO verification failed", tid);
                     throw FailInfoException.BAD_MESSAGE_CHECK;
                 }
 
-                CertificationRequestInfo p10ReqInfo = p10Req.getCertificationRequestInfo();
+                CertificationRequestInfo csrReqInfo = csr.getCertificationRequestInfo();
                 X509Certificate reqSignatureCert = req.getSignatureCert();
                 boolean selfSigned = reqSignatureCert.getSubjectX500Principal().equals(
                         reqSignatureCert.getIssuerX500Principal());
 
-                String cn = X509Util.getCommonName(p10ReqInfo.getSubject());
+                String cn = X509Util.getCommonName(csrReqInfo.getSubject());
                 if (cn == null) {
                     throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
                             "tid=" + tid + ": no CommonName in requested subject");
@@ -444,7 +444,7 @@ public class Scep {
                 String user = null;
                 boolean authenticatedByPwd = false;
 
-                String challengePwd = CaUtil.getChallengePassword(p10ReqInfo);
+                String challengePwd = CaUtil.getChallengePassword(csrReqInfo);
                 if (challengePwd != null) {
                     String[] strs = challengePwd.split(":");
                     if (strs != null && strs.length == 2) {
@@ -506,9 +506,9 @@ public class Scep {
 
                 byte[] tidBytes = getTransactionIdBytes(tid);
 
-                Extensions extensions = CaUtil.getExtensions(p10ReqInfo);
-                CertTemplateData certTemplateData = new CertTemplateData(p10ReqInfo.getSubject(),
-                        p10ReqInfo.getSubjectPublicKeyInfo(), (Date) null, (Date) null, extensions,
+                Extensions extensions = CaUtil.getExtensions(csrReqInfo);
+                CertTemplateData certTemplateData = new CertTemplateData(csrReqInfo.getSubject(),
+                        csrReqInfo.getSubjectPublicKeyInfo(), (Date) null, (Date) null, extensions,
                         certProfileName);
                 X509CertificateInfo cert = ca.generateCertificate(certTemplateData, true, null,
                         user, RequestType.SCEP, tidBytes);

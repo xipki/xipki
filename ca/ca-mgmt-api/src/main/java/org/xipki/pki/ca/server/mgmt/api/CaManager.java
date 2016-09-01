@@ -214,11 +214,11 @@ public interface CaManager {
     throws CaMgmtException;
 
     X509Certificate generateCertificate(@Nonnull String caName, @Nonnull String profileName,
-            @Nullable String user, @Nonnull byte[] encodedPkcs10Request, @Nullable Date notBefore,
+            @Nullable String user, @Nonnull byte[] encodedCsr, @Nullable Date notBefore,
             @Nullable Date notAfter) throws CaMgmtException;
 
     X509Certificate generateRootCa(@Nonnull X509CaEntry caEntry, @Nonnull String certprofileName,
-            @Nonnull byte[] p10Req) throws CaMgmtException;
+            @Nonnull byte[] encodedCsr) throws CaMgmtException;
 
     boolean addUser(@Nonnull AddUserEntry userEntry) throws CaMgmtException;
 

@@ -137,19 +137,19 @@ xipki-ca:profile-add \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_RootCA.xml
 
-## Create the PKCS#10 request for the command caqa:check-cert in QA
+## Create the CSR for the command caqa:check-cert in QA
 if { $TOKEN_TYPE equals "pkcs11" } {
   xipki-tk:req \
     --slot $SLOT \
     --label RCA1 \
-    --out output/RCA1.p10 \
+    --out output/RCA1.csr \
     --subject "CN=RCA1,O=xipki,C=DE" \
     --keyusage cRLSign
 } {
   xipki-tk:req-p12 \
     --p12 output/RCA1.p12 \
     --password 1234 \
-    --out output/RCA1.p10 \
+    --out output/RCA1.csr \
     --subject "CN=RCA1,O=xipki,C=DE" \
     --keyusage cRLSign
 }
@@ -166,7 +166,7 @@ if { $TOKEN_TYPE equals "pkcs12" } {
 
 xipki-ca:gen-rca \
   --name RCA1 \
-  --p10 output/RCA1.p10 \
+  --csr output/RCA1.csr \
   --profile RCA \
   --out output/RCA1.der \
   --permission all \
@@ -240,24 +240,24 @@ xipki-ca:publish-self \
   --profile RCA \
   RCA1
 
-## Generate keys and PKCS#10 request for SubCA1
+## Generate keys and CSR for SubCA1
 if { $TOKEN_TYPE equals "pkcs11" } {
   xipki-tk:req \
     --slot $SLOT \
     --label SubCA1 \
-    --out output/SubCA1.p10 \
+    --out output/SubCA1.csr \
     --subject "CN=SubCA1,O=xipki,C=DE"
 } {
   xipki-tk:req-p12 \
     --p12 output/SubCA1.p12 \
     --password 1234 \
-    --out output/SubCA1.p10 \
+    --out output/SubCA1.csr \
     --subject "CN=SubCA1,O=xipki,C=DE"
 }
 
 xipki-ca:enroll-cert \
   --ca RCA1 \
-  --p10 output/SubCA1.p10 \
+  --csr output/SubCA1.csr \
   --out output/SubCA1.der \
   --profile SubCA
 
@@ -274,11 +274,11 @@ if { $TOKEN_TYPE equals "pkcs11" } {
     --ca-cert output/RCA1.der
 }
 
-## Generate keys and PKCS#10 request for SubCAwithCRL1
+## Generate keys and CSR for SubCAwithCRL1
 if { $TOKEN_TYPE equals "pkcs11" } {
   xipki-tk:req \
     --slot $SLOT \
-    --label SubCAwithCRL1 --out output/SubCAwithCRL1.p10 \
+    --label SubCAwithCRL1 --out output/SubCAwithCRL1.csr \
     --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
     --subject-alt-name "[1]info@xipki.org" \
     --subject-alt-name "[2]xipki.org" \
@@ -293,7 +293,7 @@ if { $TOKEN_TYPE equals "pkcs11" } {
   xipki-tk:req-p12 \
     --p12 output/SubCAwithCRL1.p12 \
     --password 1234 \
-    --out output/SubCAwithCRL1.p10 \
+    --out output/SubCAwithCRL1.csr \
     --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
     --subject-alt-name "[1]info@xipki.org" \
     --subject-alt-name "[2]xipki.org" \
@@ -308,7 +308,7 @@ if { $TOKEN_TYPE equals "pkcs11" } {
 
 xipki-ca:enroll-cert \
   --ca RCA1 \
-  --p10 output/SubCAwithCRL1.p10 \
+  --csr output/SubCAwithCRL1.csr \
   --out output/SubCAwithCRL1.der \
   --profile SubCA.Complex
 
@@ -325,24 +325,24 @@ if { $TOKEN_TYPE equals "pkcs11" } {
     --ca-cert output/RCA1.der
 }
 
-## Generate keys and PKCS#10 request for OCSPResponder
+## Generate keys and CSR for OCSPResponder
 if { $TOKEN_TYPE equals "pkcs11" } {
   xipki-tk:req \
     --slot $SLOT \
     --label OCSP99 \
-    --out output/OCSP99.p10 \
+    --out output/OCSP99.csr \
     --subject "CN=OCSP99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 } {
   xipki-tk:req-p12 \
     --p12 output/OCSP99.p12 \
     --password 1234 \
-    --out output/OCSP99.p10 \
+    --out output/OCSP99.csr \
     --subject "CN=OCSP99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 }
 
 xipki-ca:enroll-cert \
   --ca RCA1 \
-  --p10 output/OCSP99.p10 \
+  --csr output/OCSP99.csr \
   --out output/OCSP99.der \
   --profile OCSP
 

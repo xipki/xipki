@@ -76,9 +76,9 @@ public class CaUtil {
     private CaUtil() {
     }
 
-    public static Extensions getExtensions(final CertificationRequestInfo p10Req) {
-        ParamUtil.requireNonNull("p10Req", p10Req);
-        ASN1Set attrs = p10Req.getAttributes();
+    public static Extensions getExtensions(final CertificationRequestInfo csr) {
+        ParamUtil.requireNonNull("csr", csr);
+        ASN1Set attrs = csr.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
             if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
@@ -88,9 +88,9 @@ public class CaUtil {
         return null;
     }
 
-    public static String getChallengePassword(final CertificationRequestInfo p10Req) {
-        ParamUtil.requireNonNull("p10Req", p10Req);
-        ASN1Set attrs = p10Req.getAttributes();
+    public static String getChallengePassword(final CertificationRequestInfo csr) {
+        ParamUtil.requireNonNull("csr", csr);
+        ASN1Set attrs = csr.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
             if (PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType())) {

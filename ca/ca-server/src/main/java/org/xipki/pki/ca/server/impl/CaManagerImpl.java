@@ -2295,25 +2295,25 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public X509Certificate generateCertificate(final String caName, final String profileName,
-            final String user, final byte[] encodedPkcs10Request, Date notBefore, Date notAfter)
+            final String user, final byte[] encodedCsr, Date notBefore, Date notAfter)
     throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonBlank("profileName", profileName);
-        ParamUtil.requireNonNull("encodedPkcs10Request", encodedPkcs10Request);
+        ParamUtil.requireNonNull("encodedPkcs10Request", encodedCsr);
 
         X509Ca ca = getX509Ca(caName);
-        CertificationRequest p10cr;
+        CertificationRequest csr;
         try {
-            p10cr = CertificationRequest.getInstance(encodedPkcs10Request);
+            csr = CertificationRequest.getInstance(encodedCsr);
         } catch (Exception ex) {
-            throw new CaMgmtException("invalid PKCS#10 request. ERROR: " + ex.getMessage());
+            throw new CaMgmtException("invalid CSR request. ERROR: " + ex.getMessage());
         }
 
-        if (!securityFactory.verifyPopo(p10cr)) {
-            throw new CaMgmtException("could not validate POP for the pkcs#10 requst");
+        if (!securityFactory.verifyPopo(csr)) {
+            throw new CaMgmtException("could not validate POP for the CSR");
         }
 
-        CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
+        CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
         Extensions extensions = null;
         ASN1Set attrs = certTemp.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
@@ -2370,10 +2370,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public X509Certificate generateRootCa(final X509CaEntry caEntry, final String certprofileName,
-            final byte[] p10Req) throws CaMgmtException {
+            final byte[] encodedCsr) throws CaMgmtException {
         ParamUtil.requireNonNull("caEntry", caEntry);
         ParamUtil.requireNonBlank("certprofileName", certprofileName);
-        ParamUtil.requireNonNull("p10Req", p10Req);
+        ParamUtil.requireNonNull("encodedCsr", encodedCsr);
         int numCrls = caEntry.getNumCrls();
         List<String> crlUris = caEntry.getCrlUris();
         List<String> deltaCrlUris = caEntry.getDeltaCrlUris();
@@ -2394,16 +2394,16 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return null;
         }
 
-        CertificationRequest p10Request;
-        if (p10Req == null) {
-            System.err.println("p10Req is null");
+        if (encodedCsr == null) {
+            System.err.println("encodedCsr is null");
             return null;
         }
 
+        CertificationRequest csr;
         try {
-            p10Request = CertificationRequest.getInstance(p10Req);
+            csr = CertificationRequest.getInstance(encodedCsr);
         } catch (Exception ex) {
-            System.err.println("invalid p10Req");
+            System.err.println("invalid encodedCsr");
             return null;
         }
 
@@ -2418,7 +2418,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         GenerateSelfSignedResult result;
         try {
             result = X509SelfSignedCertBuilder.generateSelfSigned(securityFactory, signerType,
-                    caEntry.getSignerConf(), certprofile, p10Request, serialOfThisCert, cacertUris,
+                    caEntry.getSignerConf(), certprofile, csr, serialOfThisCert, cacertUris,
                     ocspUris, crlUris, deltaCrlUris);
         } catch (OperationException | InvalidConfException ex) {
             throw new CaMgmtException(ex.getClass().getName() + ": " + ex.getMessage(), ex);

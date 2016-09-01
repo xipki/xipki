@@ -34,9 +34,11 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.qa.shell;
+package org.xipki.pki.ca.client.shell;
 
+import java.io.File;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -44,35 +46,52 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.commons.common.RequestResponseDebug;
+import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
-import org.xipki.pki.ca.client.shell.ClientCommandSupport;
+import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-qa", name = "neg-p10-enroll",
-        description = "enroll certificate via PKCS#10 request (negative, for QA)")
+@Command(scope = "xipki-cli", name = "csr-enroll",
+        description = "enroll certificate via CSR")
 @Service
-public class NegP10EnrollCertCmd extends ClientCommandSupport {
+public class CsrEnrollCertCmd extends ClientCommandSupport {
 
-    @Option(name = "--p10",
+    @Option(name = "--csr",
             required = true,
-            description = "PKCS#10 request file\n"
+            description = "CSR file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String p10File;
+    private String csrFile;
 
     @Option(name = "--profile", aliases = "-p",
             required = true,
             description = "certificate profile\n"
                     + "(required)")
     private String profile;
+
+    @Option(name = "--not-before",
+            description = "notBefore, UTC time of format yyyyMMddHHmmss")
+    private String notBeforeS;
+
+    @Option(name = "--not-after",
+            description = "notAfter, UTC time of format yyyyMMddHHmmss")
+    private String notAfterS;
+
+    @Option(name = "--out", aliases = "-o",
+            required = true,
+            description = "where to save the certificate\n"
+                    + "(required)")
+    @Completion(FilePathCompleter.class)
+    private String outputFile;
 
     @Option(name = "--user",
             description = "username")
@@ -81,16 +100,22 @@ public class NegP10EnrollCertCmd extends ClientCommandSupport {
     @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if the profile is supported by more than one CA)")
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Override
     protected Object doExecute() throws Exception {
-        CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
+        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
 
+        Date notBefore = StringUtil.isNotBlank(notBeforeS)
+                ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+        Date notAfter = StringUtil.isNotBlank(notAfterS)
+                  ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            result = caClient.requestCert(p10Req, profile, caName, user, null, null, debug);
+            result = caClient.requestCert(csr, profile, caName, user, notBefore, notAfter,
+                    debug);
         } finally {
             saveRequestResponse(debug);
         }
@@ -102,10 +127,12 @@ public class NegP10EnrollCertCmd extends ClientCommandSupport {
             cert = (X509Certificate) certOrError.getCertificate();
         }
 
-        if (cert != null) {
-            throw new CmdFailure("no certificate is excepted, but received one");
+        if (cert == null) {
+            throw new CmdFailure("no certificate received from the server");
         }
 
+        File certFile = new File(outputFile);
+        saveVerbose("certificate saved to file", certFile, cert.getEncoded());
         return null;
     }
 

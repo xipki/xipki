@@ -16,7 +16,7 @@ xipki-tk:req-p12 \
   --password 1234 \
   --challenge-password user1:password1 \
   --subject "CN=JSCEP-OCSP1,O=xipki,C=DE" \
-  --out output/JSCEP-OCSP1.p10
+  --out output/JSCEP-OCSP1.csr
 
 ## Enroll certificate via PKCSReq
 xipki-jscep:enroll \
@@ -24,7 +24,7 @@ xipki-jscep:enroll \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
   --password 1234 \
-  --p10 output/JSCEP-OCSP1.p10 \
+  --csr output/JSCEP-OCSP1.csr \
   --out output/JSCEP-OCSP1.der
 
 ## Poll Cert
@@ -33,7 +33,7 @@ xipki-jscep:certpoll \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
   --password 1234 \
-  --p10 output/JSCEP-OCSP1.p10 \
+  --csr output/JSCEP-OCSP1.csr \
   --out output/JSCEP-OCSP1-certpoll.der
   
 ## Get Cert
@@ -69,7 +69,7 @@ xipki-tk:req-p12 \
   --p12 output/JSCEP-OCSP1-2.p12 \
   --password 1234 \
   --subject "CN=JSCEP-OCSP1,O=xipki,C=DE" \
-  --out output/JSCEP-OCSP1-2.p10
+  --out output/JSCEP-OCSP1-2.csr
 
 ## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12
 xipki-jscep:enroll \
@@ -77,7 +77,7 @@ xipki-jscep:enroll \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
   --password 1234 \
-  --p10 output/JSCEP-OCSP1-2.p10 \
+  --csr output/JSCEP-OCSP1-2.csr \
   --out output/JSCEP-OCSP1-2.der \
 
 ## Update the certificate in PKCS#12 file
@@ -94,7 +94,7 @@ xipki-tk:req-p12 \
   --p12 output/JSCEP-OCSP2.p12 \
   --password 1234 \
   --subject "CN=JSCEP-OCSP2,O=xipki,C=DE" \
-  --out output/JSCEP-OCSP2.p10
+  --out output/JSCEP-OCSP2.csr
 
 ## Enroll certificate via Renewal, hence signed by the old key JSCEP-OCSP1.p12
 xipki-jscep:enroll \
@@ -102,7 +102,7 @@ xipki-jscep:enroll \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
   --password 1234 \
-  --p10 output/JSCEP-OCSP2.p10 \
+  --csr output/JSCEP-OCSP2.csr \
   --out output/JSCEP-OCSP2.der \
 
 ## Update the certificate in PKCS#12 file

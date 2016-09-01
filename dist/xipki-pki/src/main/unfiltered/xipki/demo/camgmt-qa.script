@@ -428,7 +428,7 @@ if { $printUsage equals "true" } {
 
   xipki-caqa:neg-gen-rca \
     --name RCA1 \
-    --p10 output/RCA1.p10 \
+    --csr output/RCA1.csr \
     --profile RCA \
     --out output/RCA1-2.der \
     --permission all \

@@ -57,12 +57,12 @@ import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 @Service
 public class CaGenRcaFromFileCmd extends CaAddFromFileCmd {
 
-    @Option(name = "--p10",
+    @Option(name = "--csr",
             required = true,
-            description = "PKCS#10 request of the Root CA\n"
+            description = "CSR of the Root CA\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String p10ReqFile;
+    private String csrFile;
 
     @Option(name = "--profile",
             required = true,
@@ -78,8 +78,8 @@ public class CaGenRcaFromFileCmd extends CaAddFromFileCmd {
     @Override
     protected Object doExecute() throws Exception {
         X509CaEntry caEntry = getCaEntry(true);
-        byte[] p10Req = IoUtil.read(p10ReqFile);
-        X509Certificate rcaCert = caManager.generateRootCa(caEntry, rcaProfile, p10Req);
+        byte[] csr = IoUtil.read(csrFile);
+        X509Certificate rcaCert = caManager.generateRootCa(caEntry, rcaProfile, csr);
         if (rcaCertOutFile != null) {
             saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
                     rcaCert.getEncoded());
