@@ -248,8 +248,11 @@ public class DecodedPkiMessage extends PkiMessage {
             throw new MessageDecodingException("tid " + transactionId.getId()
                     + ": missing required SCEP attribute messageType");
         }
-        MessageType messageType = MessageType.valueForCode(intValue);
-        if (messageType == null) {
+
+        MessageType messageType;
+        try {
+            messageType = MessageType.forValue(intValue);
+        } catch (IllegalArgumentException ex) {
             throw new MessageDecodingException("tid " + transactionId.getId()
                     + ": invalid messageType '" + intValue + "'");
         }
@@ -295,8 +298,9 @@ public class DecodedPkiMessage extends PkiMessage {
                 return ret;
             }
 
-            pkiStatus = PkiStatus.valueForCode(intValue);
-            if (pkiStatus == null) {
+            try {
+                pkiStatus = PkiStatus.forValue(intValue);
+            } catch (IllegalArgumentException ex) {
                 ret.setFailureMessage("invalid pkiStatus '" + intValue + "'");
                 return ret;
             }
@@ -317,11 +321,13 @@ public class DecodedPkiMessage extends PkiMessage {
                     return ret;
                 }
 
-                failInfo = FailInfo.valueForCode(intValue);
-                if (failInfo == null) {
+                try {
+                    failInfo = FailInfo.forValue(intValue);
+                } catch (IllegalArgumentException ex) {
                     ret.setFailureMessage("invalid failureInfo '" + intValue + "'");
                     return ret;
                 }
+
                 ret.setFailInfo(failInfo);
             } // end if(pkiStatus == PkiStatus.FAILURE)
         } // end if (MessageType.CertRep == messageType)

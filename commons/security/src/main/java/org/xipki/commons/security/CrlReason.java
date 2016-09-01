@@ -146,10 +146,15 @@ public enum CrlReason {
     }
 
     public static CrlReason forReasonCode(final int reasonCode) {
-        return REASONS.get(reasonCode);
+        CrlReason ret = REASONS.get(reasonCode);
+        if (ret != null) {
+            return ret;
+        }
+
+        throw new IllegalArgumentException("invalid CrlReason code " + reasonCode);
     }
 
-    public static CrlReason getInstance(final String text) {
+    public static CrlReason forNameOrText(final String text) {
         ParamUtil.requireNonNull("text", text);
         for (CrlReason value : values()) {
             if (value.desription.equalsIgnoreCase(text)

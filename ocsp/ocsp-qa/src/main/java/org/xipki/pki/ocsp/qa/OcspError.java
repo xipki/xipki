@@ -61,7 +61,7 @@ public enum OcspError {
         return status;
     }
 
-    public static OcspError getInstance(final String name) {
+    public static OcspError forName(final String name) {
         ParamUtil.requireNonNull("name", name);
         for (OcspError entry : values()) {
             if (entry.name().equals(name)) {
@@ -72,14 +72,14 @@ public enum OcspError {
         throw new IllegalArgumentException("unknown OCSP error '" + name + "'");
     }
 
-    public static OcspError getInstanceForCode(final int status) {
+    public static OcspError forCode(final int status) {
         for (OcspError entry : values()) {
             if (entry.status == status) {
                 return entry;
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("unknown OCSP error code '" + status + "'");
     }
 
 }

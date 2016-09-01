@@ -93,10 +93,10 @@ public class DataSourceFactory {
         DatabaseType databaseType;
         String className = conf.getProperty("dataSourceClassName");
         if (className != null) {
-            databaseType = DatabaseType.getDataSourceForDataSource(className);
+            databaseType = DatabaseType.forDataSourceClass(className);
         } else {
             className = conf.getProperty("driverClassName");
-            databaseType = DatabaseType.getDataSourceForDriver(className);
+            databaseType = DatabaseType.forDriver(className);
         }
 
         String password = conf.getProperty("password");

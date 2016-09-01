@@ -54,12 +54,12 @@ public enum DatabaseType {
     POSTGRES,
     UNKNOWN;
 
-    public static DatabaseType getDataSourceForDriver(final String driverClass) {
+    public static DatabaseType forDriver(final String driverClass) {
         Objects.requireNonNull(driverClass, "driverClass must not be null");
         return getDatabaseType(driverClass);
     }
 
-    public static DatabaseType getDataSourceForDataSource(final String datasourceClass) {
+    public static DatabaseType forDataSourceClass(final String datasourceClass) {
         Objects.requireNonNull(datasourceClass, "datasourceClass must not be null");
         return getDatabaseType(datasourceClass);
     }

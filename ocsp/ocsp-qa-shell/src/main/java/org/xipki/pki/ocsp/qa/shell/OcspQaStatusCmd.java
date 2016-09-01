@@ -52,7 +52,6 @@ import org.xipki.commons.common.qa.ValidationIssue;
 import org.xipki.commons.common.qa.ValidationResult;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.SigAlgCompleter;
 import org.xipki.commons.security.IssuerHash;
@@ -147,10 +146,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
         }
 
         if (isNotBlank(errorText)) {
-            expectedOcspError = OcspError.getInstance(errorText);
-            if (expectedOcspError == null) {
-                throw new IllegalArgumentException("invalid OCSP error status '" + errorText + "'");
-            }
+            expectedOcspError = OcspError.forName(errorText);
         }
 
         if (isNotEmpty(statusTexts)) {
@@ -165,18 +161,14 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
 
             for (int i = 0; i < n; i++) {
                 String expectedStatusText = statusTexts.get(i);
-                OcspCertStatus certStatus = OcspCertStatus.getInstance(expectedStatusText);
-                if (certStatus == null) {
-                    throw new IllegalArgumentException(
-                            "invalid cert status '" + expectedStatusText + "'");
-                }
+                OcspCertStatus certStatus = OcspCertStatus.forName(expectedStatusText);
                 expectedStatuses.put(serialNumbers.get(i), certStatus);
             }
         }
 
-        expectedCerthashOccurrence = getOccurrence(certhashOccurrenceText);
-        expectedNextUpdateOccurrence = getOccurrence(nextUpdateOccurrenceText);
-        expectedNonceOccurrence = getOccurrence(nonceOccurrenceText);
+        expectedCerthashOccurrence = Occurrence.forName(certhashOccurrenceText);
+        expectedNextUpdateOccurrence = Occurrence.forName(nextUpdateOccurrenceText);
+        expectedNonceOccurrence = Occurrence.forName(nonceOccurrenceText);
     } // method checkParameters
 
     @Override
@@ -229,14 +221,6 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
         if (issue.getFailureMessage() != null) {
             sb.append(", ").append(issue.getFailureMessage());
         }
-    }
-
-    private static Occurrence getOccurrence(final String text) throws IllegalCmdParamException {
-        Occurrence ret = Occurrence.getInstance(text);
-        if (ret == null) {
-            throw new IllegalCmdParamException("invalid occurrence '" + text + "'");
-        }
-        return ret;
     }
 
 }

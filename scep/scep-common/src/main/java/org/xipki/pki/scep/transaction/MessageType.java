@@ -90,13 +90,13 @@ public enum MessageType {
         return code;
     }
 
-    public static MessageType valueForCode(final int code) {
+    public static MessageType forValue(final int code) {
         for (MessageType m : values()) {
             if (m.code == code) {
                 return m;
             }
         }
-        return null;
+        throw new IllegalArgumentException("invalid MessageType " + code);
     }
 
 }

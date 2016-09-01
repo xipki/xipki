@@ -71,11 +71,7 @@ public class CertRevocationInfo {
     public CertRevocationInfo(final int reasonCode, final Date revocationTime,
             final Date invalidityTime) {
         this.revocationTime = ParamUtil.requireNonNull("revocationTime", revocationTime);
-
         this.reason = CrlReason.forReasonCode(reasonCode);
-        if (this.reason == null) {
-            throw new IllegalArgumentException("invalid reason " + reasonCode);
-        }
         this.invalidityTime = invalidityTime;
     }
 

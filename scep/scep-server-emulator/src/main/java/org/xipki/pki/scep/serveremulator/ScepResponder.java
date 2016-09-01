@@ -182,7 +182,7 @@ public class ScepResponder {
         }
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(getSigningKey(),
-                ScepHashAlgoType.getHashAlgoType(req.getDigestAlgorithm().getId()));
+                ScepHashAlgoType.forNameOrOid(req.getDigestAlgorithm().getId()));
 
         try {
             X509Certificate jceSignerCert = new X509CertificateObject(getSigningCert());
@@ -257,7 +257,7 @@ public class ScepResponder {
 
         // check the digest algorithm
         String oid = req.getDigestAlgorithm().getId();
-        ScepHashAlgoType hashAlgoType = ScepHashAlgoType.getHashAlgoType(oid);
+        ScepHashAlgoType hashAlgoType = ScepHashAlgoType.forNameOrOid(oid);
         if (hashAlgoType == null) {
             LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
             rep.setPkiStatus(PkiStatus.FAILURE);
