@@ -127,7 +127,7 @@ public class CrlControl {
         interval,
         onDemand;
 
-        public static UpdateMode getUpdateMode(final String mode) {
+        public static UpdateMode forName(final String mode) {
             ParamUtil.requireNonNull("mode", mode);
             for (UpdateMode v : values()) {
                 if (v.name().equalsIgnoreCase(mode)) {
@@ -135,7 +135,7 @@ public class CrlControl {
                 }
             }
 
-            return null;
+            throw new IllegalArgumentException("invalid UpdateMode " + mode);
         }
 
     } // enum UpdateMode
@@ -264,18 +264,11 @@ public class CrlControl {
         }
 
         String str = props.getValue(KEY_UPDATE_MODE);
-        if (str == null) {
-            this.updateMode = UpdateMode.interval;
-        } else {
-            this.updateMode = UpdateMode.getUpdateMode(str);
-            if (this.updateMode == null) {
-                throw new InvalidConfException("invalid " + KEY_UPDATE_MODE + ": " + str);
-            }
-        }
+        this.updateMode = (str == null) ? UpdateMode.interval : UpdateMode.forName(str);
 
         str = props.getValue(KEY_INVALIDITY_DATE);
         if (str != null) {
-            this.invalidityDateMode = TripleState.fromValue(str);
+            this.invalidityDateMode = TripleState.forValue(str);
         }
 
         this.includeExpiredCerts = getBoolean(props, KEY_EXPIRED_CERTS_INCLUDED, false);

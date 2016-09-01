@@ -55,7 +55,7 @@ public enum GeneralNameTag {
 
     private final int tag;
 
-    GeneralNameTag(final int tag) {
+    private GeneralNameTag(final int tag) {
         this.tag = tag;
     }
 

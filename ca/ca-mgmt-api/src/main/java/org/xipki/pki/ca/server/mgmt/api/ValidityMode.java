@@ -49,7 +49,7 @@ public enum ValidityMode {
     LAX,
     CUTOFF;
 
-    public static ValidityMode getInstance(final String text) {
+    public static ValidityMode forName(final String text) {
         ParamUtil.requireNonNull("text", text);
 
         for (ValidityMode value : values()) {

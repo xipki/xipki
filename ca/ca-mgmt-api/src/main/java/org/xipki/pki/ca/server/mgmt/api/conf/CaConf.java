@@ -216,7 +216,7 @@ public class CaConf {
                 addProfile(en);
             }
         }
-       // TODO: all enums: getInstance: throws Excpetion if unknown. Never returns null
+        // TODO: all enums: getInstance: throws Excpetion if unknown. Never returns null
 
         // CAs
         if (jaxb.getCas() != null) {
@@ -263,7 +263,7 @@ public class CaConf {
                     if (permStrs != null) {
                         Set<Permission> permissions = new HashSet<>();
                         for (String per : permStrs) {
-                            permissions.add(Permission.getPermission(per));
+                            permissions.add(Permission.forValue(per));
                         }
                         caEntry.setPermissions(permissions);
                     }
@@ -271,10 +271,10 @@ public class CaConf {
                     caEntry.setResponderName(ci.getCmpcontrolName());
 
                     caEntry.setSaveRequest(ci.isSaveReq());
-                    caEntry.setStatus(CaStatus.getCaStatus(ci.getStatus()));
+                    caEntry.setStatus(CaStatus.forName(ci.getStatus()));
 
                     if (ci.getValidityMode() != null) {
-                        caEntry.setValidityMode(ValidityMode.getInstance(ci.getValidityMode()));
+                        caEntry.setValidityMode(ValidityMode.forName(ci.getValidityMode()));
                     }
 
                     if (ci.getCert() != null) {
@@ -303,7 +303,7 @@ public class CaConf {
                         if (strs != null) {
                             Set<Permission> permissions = new HashSet<>();
                             for (String perm : strs) {
-                                permissions.add(Permission.getPermission(perm));
+                                permissions.add(Permission.forValue(perm));
                             }
 
                             en.setPermissions(permissions);

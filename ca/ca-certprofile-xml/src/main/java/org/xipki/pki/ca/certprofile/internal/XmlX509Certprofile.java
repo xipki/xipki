@@ -320,7 +320,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         if (conf.getVersion() != null) {
             String versionText = conf.getVersion();
-            this.version = X509CertVersion.getInstance(versionText);
+            this.version = X509CertVersion.forName(versionText);
             if (this.version == null) {
                 throw new CertprofileException(String.format("invalid version '%s'", versionText));
             }
@@ -366,7 +366,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         String specBehavior = conf.getSpecialBehavior();
         if (specBehavior != null) {
-            this.specialBehavior = SpecialX509CertprofileBehavior.getInstance(specBehavior);
+            this.specialBehavior = SpecialX509CertprofileBehavior.forName(specBehavior);
         }
 
         this.duplicateKeyPermitted = conf.isDuplicateKey();

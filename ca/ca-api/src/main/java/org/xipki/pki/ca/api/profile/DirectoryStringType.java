@@ -67,8 +67,8 @@ public enum DirectoryStringType {
         } else if (bmpString == this) {
             return new DERBMPString(text);
         } else {
-            throw new RuntimeException(String.format(
-                    "invalid DirectoryStringType '%s'", text));
+            throw new RuntimeException(
+                    "should not reach here, unknown DirectoryStringType " + this.name());
         }
     }
 

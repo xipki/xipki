@@ -58,7 +58,7 @@ public enum TripleState {
         return value;
     }
 
-    public static TripleState fromValue(String textValue) {
+    public static TripleState forValue(String textValue) {
         ParamUtil.requireNonNull("textValue", textValue);
 
         for (TripleState ts : TripleState.values()) {
@@ -66,7 +66,7 @@ public enum TripleState {
                 return ts;
             }
         }
-        throw new IllegalArgumentException(textValue);
+        throw new IllegalArgumentException("invalid TripleState " + textValue);
     }
 
 }

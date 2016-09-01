@@ -267,7 +267,7 @@ public class ExtensionsChecker {
 
     public ExtensionsChecker(final X509ProfileType conf) throws CertprofileException {
         ParamUtil.requireNonNull("conf", conf);
-        this.version = X509CertVersion.getInstance(conf.getVersion());
+        this.version = X509CertVersion.forName(conf.getVersion());
         if (this.version == null) {
             throw new CertprofileException("invalid version " + conf.getVersion());
         }

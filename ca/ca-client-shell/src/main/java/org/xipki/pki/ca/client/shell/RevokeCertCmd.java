@@ -81,7 +81,7 @@ public class RevokeCertCmd extends UnRevRemoveCertCommandSupport {
             throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
         }
 
-        CrlReason crlReason = CrlReason.getInstance(reason);
+        CrlReason crlReason = CrlReason.forNameOrText(reason);
 
         if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
             throw new IllegalCmdParamException("reason " + reason + " is not permitted");

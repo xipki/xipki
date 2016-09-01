@@ -207,8 +207,6 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
             throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
         }
 
-        CaStatus status = CaStatus.getCaStatus(caStatus);
-
         if ("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType)) {
             signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver,
                     securityFactory);
@@ -229,9 +227,10 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
         boolean saveReq = isEnabled(saveReqS, false, "save-req");
         entry.setSaveRequest(saveReq);
 
-        ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
+        ValidityMode validityMode = ValidityMode.forName(validityModeS);
         entry.setValidityMode(validityMode);
 
+        CaStatus status = CaStatus.forName(caStatus);
         entry.setStatus(status);
         if (crlSignerName != null) {
             entry.setCrlSignerName(crlSignerName);
@@ -252,7 +251,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
 
         Set<Permission> tmpPermissions = new HashSet<>();
         for (String permission : permissions) {
-            tmpPermissions.add(Permission.getPermission(permission));
+            tmpPermissions.add(Permission.forValue(permission));
         }
 
         entry.setPermissions(tmpPermissions);

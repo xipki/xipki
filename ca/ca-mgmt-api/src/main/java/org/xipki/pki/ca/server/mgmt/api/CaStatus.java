@@ -58,7 +58,7 @@ public enum CaStatus {
         return status;
     }
 
-    public static CaStatus getCaStatus(final String status) {
+    public static CaStatus forName(final String status) {
         ParamUtil.requireNonNull("status", status);
         for (CaStatus value : values()) {
             if (value.status.equalsIgnoreCase(status)) {

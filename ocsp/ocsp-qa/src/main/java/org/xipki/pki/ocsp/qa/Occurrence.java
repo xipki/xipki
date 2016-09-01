@@ -49,7 +49,7 @@ public enum Occurrence {
     optional,
     forbidden;
 
-    public static Occurrence getInstance(final String name) {
+    public static Occurrence forName(final String name) {
         ParamUtil.requireNonNull("name", name);
         for (Occurrence entry : values()) {
             if (entry.name().equals(name)) {
@@ -57,7 +57,7 @@ public enum Occurrence {
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("invalid Occurrence " + name);
     }
 
 }

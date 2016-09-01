@@ -207,7 +207,7 @@ public class CaUpdateCmd extends CaCommandSupport {
         }
 
         if (caStatus != null) {
-            entry.setStatus(CaStatus.getCaStatus(caStatus));
+            entry.setStatus(CaStatus.forName(caStatus));
         }
 
         if (expirationPeriod != null && expirationPeriod < 0) {
@@ -257,7 +257,7 @@ public class CaUpdateCmd extends CaCommandSupport {
         if (permissions != null && permissions.size() > 0) {
             Set<Permission> tmpPermissions = new HashSet<>();
             for (String permission : permissions) {
-                tmpPermissions.add(Permission.getPermission(permission));
+                tmpPermissions.add(Permission.forValue(permission));
             }
             entry.setPermissions(tmpPermissions);
         }
@@ -268,7 +268,7 @@ public class CaUpdateCmd extends CaCommandSupport {
         entry.setCaCertUris(getUris(caCertUris));
 
         if (validityModeS != null) {
-            ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
+            ValidityMode validityMode = ValidityMode.forName(validityModeS);
             entry.setValidityMode(validityMode);
         }
 

@@ -65,14 +65,14 @@ public enum CaCapability {
         return text;
     }
 
-    public static CaCapability valueForText(final String text) {
+    public static CaCapability forValue(final String text) {
         ParamUtil.requireNonNull("text", text);
         for (CaCapability m : values()) {
             if (m.text.equalsIgnoreCase(text)) {
                 return m;
             }
         }
-        return null;
+        throw new IllegalArgumentException("invalid CaCapability " + text);
     }
 
 }

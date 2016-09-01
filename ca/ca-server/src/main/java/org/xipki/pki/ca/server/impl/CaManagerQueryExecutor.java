@@ -551,7 +551,7 @@ class CaManagerQueryExecutor {
             entry.setCertificate(cert);
 
             String status = rs.getString("STATUS");
-            CaStatus caStatus = CaStatus.getCaStatus(status);
+            CaStatus caStatus = CaStatus.forName(status);
             entry.setStatus(caStatus);
 
             String maxValidityS = rs.getString("MAX_VALIDITY");
@@ -598,7 +598,7 @@ class CaManagerQueryExecutor {
             String validityModeS = rs.getString("VALIDITY_MODE");
             ValidityMode validityMode = null;
             if (validityModeS != null) {
-                validityMode = ValidityMode.getInstance(validityModeS);
+                validityMode = ValidityMode.forName(validityModeS);
             }
             if (validityMode == null) {
                 validityMode = ValidityMode.STRICT;
@@ -2395,7 +2395,7 @@ class CaManagerQueryExecutor {
         List<String> strs = StringUtil.split(permissionsText, ", ");
         Set<Permission> permissions = new HashSet<>();
         for (String permissionText : strs) {
-            Permission permission = Permission.getPermission(permissionText);
+            Permission permission = Permission.forValue(permissionText);
             if (permission == Permission.ALL) {
                 permissions.clear();
                 permissions.add(permission);

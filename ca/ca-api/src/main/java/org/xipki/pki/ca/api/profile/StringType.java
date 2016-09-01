@@ -71,8 +71,8 @@ public enum StringType {
         } else if (ia5String == this) {
             return new DERIA5String(text, true);
         } else {
-            throw new RuntimeException(String.format(
-                    "invalid StringType '%s'", text));
+            throw new RuntimeException(
+                    "should not reach here, unknown StringType " + this.name());
         }
     }
 

@@ -766,7 +766,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             if (enabled) {
                 str = cp.getValue(RevokeSuspendedCertsControl.KEY_REVOCATION_REASON);
                 CrlReason reason = (str == null) ? CrlReason.CESSATION_OF_OPERATION
-                        : CrlReason.getInstance(str);
+                        : CrlReason.forNameOrText(str);
 
                 str = cp.getValue(RevokeSuspendedCertsControl.KEY_UNCHANGED_SINCE);
                 CertValidity unchangedSince = (str == null) ? new CertValidity(15, Unit.DAY)

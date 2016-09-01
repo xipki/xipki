@@ -46,7 +46,6 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
@@ -130,7 +129,7 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
         if (permissions != null) {
             Set<Permission> tmpPermissions = new HashSet<>();
             for (String permission : permissions) {
-                tmpPermissions.add(Permission.getPermission(permission));
+                tmpPermissions.add(Permission.forValue(permission));
             }
 
             if (!tmpPermissions.equals(entry.getPermissions())) {

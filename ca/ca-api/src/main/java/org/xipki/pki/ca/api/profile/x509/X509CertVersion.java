@@ -59,7 +59,7 @@ public enum X509CertVersion {
         return versionNumber;
     }
 
-    public static X509CertVersion getInstance(final String version) {
+    public static X509CertVersion forName(final String version) {
         ParamUtil.requireNonNull("version", version);
 
         for (X509CertVersion m : values()) {
@@ -70,7 +70,7 @@ public enum X509CertVersion {
         throw new IllegalArgumentException("invalid X509CertVersion " + version);
     }
 
-    public static X509CertVersion getInstance(final int versionNumber) {
+    public static X509CertVersion forValue(final int versionNumber) {
         for (X509CertVersion m : values()) {
             if (m.versionNumber == versionNumber) {
                 return m;

@@ -57,7 +57,7 @@ public enum CertArt {
         return code;
     }
 
-    public static CertArt getInstance(final int code) {
+    public static CertArt forValue(final int code) {
         for (CertArt value : values()) {
             if (value.code == code) {
                 return value;

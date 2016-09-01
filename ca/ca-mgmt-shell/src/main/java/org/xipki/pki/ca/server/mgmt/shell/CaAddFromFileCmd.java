@@ -201,7 +201,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         // STATUS
         key = CaExportCmd.KEY_STATUS;
         str = getStrProp(props, key, true);
-        CaStatus status = CaStatus.getCaStatus(str);
+        CaStatus status = CaStatus.forName(str);
         entry.setStatus(status);
 
         // DUPLICATE_KEY
@@ -264,7 +264,7 @@ public class CaAddFromFileCmd extends CaCommandSupport {
         Set<String> permissions = StringUtil.splitAsSet(str, ", ");
         Set<Permission> tmpPermissions = new HashSet<>();
         for (String permission : permissions) {
-            tmpPermissions.add(Permission.getPermission(permission));
+            tmpPermissions.add(Permission.forValue(permission));
         }
         entry.setPermissions(tmpPermissions);
 

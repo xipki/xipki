@@ -131,7 +131,7 @@ public class X509CertprofileQa {
             X509ProfileType conf = XmlX509CertprofileUtil.parse(
                     new ByteArrayInputStream(dataBytes));
 
-            this.version = X509CertVersion.getInstance(conf.getVersion());
+            this.version = X509CertVersion.forName(conf.getVersion());
             if (this.version == null) {
                 throw new CertprofileException("invalid version " + conf.getVersion());
             }

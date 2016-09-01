@@ -67,7 +67,7 @@ public enum Permission {
         return permission;
     }
 
-    public static Permission getPermission(final String permission) {
+    public static Permission forValue(final String permission) {
         ParamUtil.requireNonNull("permission", permission);
 
         for (Permission p : values()) {

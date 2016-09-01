@@ -347,7 +347,7 @@ public class Scep {
 
         // check the digest algorithm
         String oid = req.getDigestAlgorithm().getId();
-        ScepHashAlgoType hashAlgoType = ScepHashAlgoType.getHashAlgoType(oid);
+        ScepHashAlgoType hashAlgoType = ScepHashAlgoType.forNameOrOid(oid);
         if (hashAlgoType == null) {
             LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
             rep.setPkiStatus(PkiStatus.FAILURE);
@@ -680,7 +680,7 @@ public class Scep {
 
     private static String getSignatureAlgorithm(final PrivateKey key,
             final ASN1ObjectIdentifier digestOid) {
-        ScepHashAlgoType hashAlgo = ScepHashAlgoType.getHashAlgoType(digestOid.getId());
+        ScepHashAlgoType hashAlgo = ScepHashAlgoType.forNameOrOid(digestOid.getId());
         if (hashAlgo == null) {
             hashAlgo = ScepHashAlgoType.SHA256;
         }

@@ -43,7 +43,6 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
@@ -104,7 +103,7 @@ public class CaRequestorAddCmd extends CaCommandSupport {
         entry.setProfiles(profiles);
         Set<Permission> tmpPermissions = new HashSet<>();
         for (String permission : permissions) {
-            tmpPermissions.add(Permission.getPermission(permission));
+            tmpPermissions.add(Permission.forValue(permission));
         }
         entry.setPermissions(tmpPermissions);
 
