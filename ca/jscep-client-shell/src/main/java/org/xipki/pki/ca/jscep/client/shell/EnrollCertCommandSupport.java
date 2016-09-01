@@ -60,12 +60,12 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 
 public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
-    @Option(name = "--p10",
+    @Option(name = "--csr",
             required = true,
-            description = "PKCS#10 request file\n"
+            description = "CSR file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String p10File;
+    private String csrFile;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
@@ -82,7 +82,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     protected Object doExecute() throws Exception {
         Client client = getScepClient();
 
-        PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(p10File));
+        PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
 
         EnrollmentResponse resp = requestCertificate(client, csr, getIdentityKey(),
                 getIdentityCert());

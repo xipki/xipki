@@ -138,18 +138,18 @@ public class ScepUtil {
         ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
         ParamUtil.requireNonNull("subjectDn", subjectDn);
 
-        PKCS10CertificationRequestBuilder p10ReqBuilder =
+        PKCS10CertificationRequestBuilder csrBuilder =
                 new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
 
         if (attributes != null) {
             for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
-                p10ReqBuilder.addAttribute(attrType, attributes.get(attrType));
+                csrBuilder.addAttribute(attrType, attributes.get(attrType));
             }
         }
 
         ContentSigner contentSigner = new JcaContentSignerBuilder(
                 getSignatureAlgorithm(privatekey, ScepHashAlgoType.SHA1)).build(privatekey);
-        return p10ReqBuilder.build(contentSigner);
+        return csrBuilder.build(contentSigner);
     }
 
     public static PKCS10CertificationRequest generateRequest(final PrivateKey privatekey,

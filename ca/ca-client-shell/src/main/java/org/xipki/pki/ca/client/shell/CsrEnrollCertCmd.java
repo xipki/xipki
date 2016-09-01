@@ -60,17 +60,17 @@ import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "p10-enroll",
-        description = "enroll certificate via PKCS#10 request")
+@Command(scope = "xipki-cli", name = "csr-enroll",
+        description = "enroll certificate via CSR")
 @Service
-public class P10EnrollCertCmd extends ClientCommandSupport {
+public class CsrEnrollCertCmd extends ClientCommandSupport {
 
-    @Option(name = "--p10",
+    @Option(name = "--csr",
             required = true,
-            description = "PKCS#10 request file\n"
+            description = "CSR file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String p10File;
+    private String csrFile;
 
     @Option(name = "--profile", aliases = "-p",
             required = true,
@@ -105,7 +105,7 @@ public class P10EnrollCertCmd extends ClientCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
+        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
 
         Date notBefore = StringUtil.isNotBlank(notBeforeS)
                 ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
@@ -114,7 +114,7 @@ public class P10EnrollCertCmd extends ClientCommandSupport {
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            result = caClient.requestCert(p10Req, profile, caName, user, notBefore, notAfter,
+            result = caClient.requestCert(csr, profile, caName, user, notBefore, notAfter,
                     debug);
         } finally {
             saveRequestResponse(debug);

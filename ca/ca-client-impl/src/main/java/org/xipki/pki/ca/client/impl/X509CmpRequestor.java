@@ -127,7 +127,7 @@ import org.xipki.pki.ca.client.api.dto.EnrollCertResultEntry;
 import org.xipki.pki.ca.client.api.dto.EnrollCertResultResp;
 import org.xipki.pki.ca.client.api.dto.ErrorResultEntry;
 import org.xipki.pki.ca.client.api.dto.IssuerSerialEntry;
-import org.xipki.pki.ca.client.api.dto.P10EnrollCertRequest;
+import org.xipki.pki.ca.client.api.dto.CsrEnrollCertRequest;
 import org.xipki.pki.ca.client.api.dto.ResultEntry;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequest;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntry;
@@ -357,14 +357,14 @@ abstract class X509CmpRequestor extends CmpRequestor {
         return result;
     } // method parse
 
-    public EnrollCertResultResp requestCertificate(final P10EnrollCertRequest p10Req,
+    public EnrollCertResultResp requestCertificate(final CsrEnrollCertRequest csr,
             final String username, final Date notBefore, final Date notAfter,
             final RequestResponseDebug debug) throws CmpRequestorException, PkiErrorException {
-        ParamUtil.requireNonNull("p10Req", p10Req);
+        ParamUtil.requireNonNull("csr", csr);
 
-        PKIMessage request = buildPkiMessage(p10Req, username, notBefore, notAfter);
+        PKIMessage request = buildPkiMessage(csr, username, notBefore, notAfter);
         Map<BigInteger, String> reqIdIdMap = new HashMap<>();
-        reqIdIdMap.put(MINUS_ONE, p10Req.getId());
+        reqIdIdMap.put(MINUS_ONE, csr.getId());
         return internRequestCertificate(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
     }
 
@@ -597,10 +597,10 @@ abstract class X509CmpRequestor extends CmpRequestor {
         return new PKIMessage(header, body);
     } // method buildUnrevokeOrRemoveCertRequest
 
-    private PKIMessage buildPkiMessage(final P10EnrollCertRequest p10Req, final String username,
+    private PKIMessage buildPkiMessage(final CsrEnrollCertRequest csr, final String username,
             final Date notBefore, final Date notAfter) {
         CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE,
-                p10Req.getCertprofile());
+                csr.getCertprofile());
         if (StringUtil.isNotBlank(username)) {
             utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_USER, username);
         }
@@ -614,7 +614,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         }
 
         PKIHeader header = buildPkiHeader(implicitConfirm, null, utf8Pairs);
-        PKIBody body = new PKIBody(PKIBody.TYPE_P10_CERT_REQ, p10Req.getP10Req());
+        PKIBody body = new PKIBody(PKIBody.TYPE_P10_CERT_REQ, csr.getCsr());
 
         return new PKIMessage(header, body);
     }

@@ -323,9 +323,9 @@ public class ScepResponder {
 
         switch (messageType) {
         case PKCSReq:
-            CertificationRequest p10ReqInfo = (CertificationRequest) req.getMessageData();
+            CertificationRequest csr = (CertificationRequest) req.getMessageData();
 
-            String challengePwd = getChallengePassword(p10ReqInfo.getCertificationRequestInfo());
+            String challengePwd = getChallengePassword(csr.getCertificationRequestInfo());
             if (challengePwd == null || !control.getSecret().equals(challengePwd)) {
                 LOG.warn("challengePassword is not trusted");
                 rep.setPkiStatus(PkiStatus.FAILURE);
@@ -334,7 +334,7 @@ public class ScepResponder {
 
             Certificate cert;
             try {
-                cert = caEmulator.generateCert(p10ReqInfo);
+                cert = caEmulator.generateCert(csr);
             } catch (Exception ex) {
                 throw new CaException("system failure: " + ex.getMessage(), ex);
             }
@@ -378,9 +378,9 @@ public class ScepResponder {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);
             } else {
-                p10ReqInfo = (CertificationRequest) req.getMessageData();
+                csr = (CertificationRequest) req.getMessageData();
                 try {
-                    cert = caEmulator.generateCert(p10ReqInfo);
+                    cert = caEmulator.generateCert(csr);
                 } catch (Exception ex) {
                     throw new CaException("system failure: " + ex.getMessage(), ex);
                 }
@@ -397,9 +397,9 @@ public class ScepResponder {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);
             } else {
-                p10ReqInfo = (CertificationRequest) req.getMessageData();
+                csr = (CertificationRequest) req.getMessageData();
                 try {
-                    cert = caEmulator.generateCert(p10ReqInfo);
+                    cert = caEmulator.generateCert(csr);
                 } catch (Exception ex) {
                     throw new CaException("system failure: " + ex.getMessage(), ex);
                 }
@@ -491,8 +491,8 @@ public class ScepResponder {
         return nextCaAndRa;
     }
 
-    private static String getChallengePassword(final CertificationRequestInfo p10Req) {
-        ASN1Set attrs = p10Req.getAttributes();
+    private static String getChallengePassword(final CertificationRequestInfo csr) {
+        ASN1Set attrs = csr.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
             if (PKCSObjectIdentifiers.pkcs_9_at_challengePassword.equals(attr.getAttrType())) {

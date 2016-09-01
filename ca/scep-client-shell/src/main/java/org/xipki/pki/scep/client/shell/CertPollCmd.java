@@ -62,12 +62,12 @@ import org.xipki.pki.scep.client.ScepClient;
 @Service
 public class CertPollCmd extends ClientCommandSupport {
 
-    @Option(name = "--p10",
+    @Option(name = "--csr",
             required = true,
-            description = "PKCS#10 request file\n"
+            description = "CSR file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String p10File;
+    private String csrFile;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
@@ -78,7 +78,7 @@ public class CertPollCmd extends ClientCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(p10File));
+        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
 
         ScepClient client = getScepClient();
         X509Certificate caCert = client.getAuthorityCertStore().getCaCert();

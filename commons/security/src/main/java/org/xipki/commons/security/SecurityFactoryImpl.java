@@ -174,21 +174,21 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     @Override
-    public boolean verifyPopo(final CertificationRequest p10Req) {
-        return verifyPopo(new PKCS10CertificationRequest(p10Req));
+    public boolean verifyPopo(final CertificationRequest csr) {
+        return verifyPopo(new PKCS10CertificationRequest(csr));
     }
 
     @Override
-    public boolean verifyPopo(final PKCS10CertificationRequest p10Request) {
+    public boolean verifyPopo(final PKCS10CertificationRequest csr) {
         try {
-            SubjectPublicKeyInfo pkInfo = p10Request.getSubjectPublicKeyInfo();
+            SubjectPublicKeyInfo pkInfo = csr.getSubjectPublicKeyInfo();
             PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
 
             ContentVerifierProvider cvp = getContentVerifierProvider(pk);
-            return p10Request.isSignatureValid(cvp);
+            return csr.isSignatureValid(cvp);
         } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
                 | InvalidKeySpecException ex) {
-            LogUtil.error(LOG, ex, "could not validate POPO of PKCS#10 request");
+            LogUtil.error(LOG, ex, "could not validate POPO of CSR");
             return false;
         }
     }

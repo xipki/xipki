@@ -112,7 +112,7 @@ import org.xipki.pki.ca.client.api.dto.EnrollCertResultEntry;
 import org.xipki.pki.ca.client.api.dto.EnrollCertResultResp;
 import org.xipki.pki.ca.client.api.dto.ErrorResultEntry;
 import org.xipki.pki.ca.client.api.dto.IssuerSerialEntry;
-import org.xipki.pki.ca.client.api.dto.P10EnrollCertRequest;
+import org.xipki.pki.ca.client.api.dto.CsrEnrollCertRequest;
 import org.xipki.pki.ca.client.api.dto.ResultEntry;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequest;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntry;
@@ -489,10 +489,10 @@ public final class CaClientImpl implements CaClient {
     }
 
     @Override
-    public EnrollCertResult requestCert(final CertificationRequest p10Request, final String profile,
+    public EnrollCertResult requestCert(final CertificationRequest csr, final String profile,
             final String caName, final String username, final Date notBefore, final Date notAfter,
             final RequestResponseDebug debug) throws CaClientException, PkiErrorException {
-        ParamUtil.requireNonNull("p10Request", p10Request);
+        ParamUtil.requireNonNull("csr", csr);
 
         String tmpCaName = caName;
         if (tmpCaName == null) {
@@ -509,7 +509,7 @@ public final class CaClientImpl implements CaClient {
         }
 
         final String id = "cert-1";
-        P10EnrollCertRequest request = new P10EnrollCertRequest(id, profile, p10Request);
+        CsrEnrollCertRequest request = new CsrEnrollCertRequest(id, profile, csr);
         EnrollCertResultResp result;
         try {
             result = ca.getRequestor().requestCertificate(request, username, notBefore, notAfter,

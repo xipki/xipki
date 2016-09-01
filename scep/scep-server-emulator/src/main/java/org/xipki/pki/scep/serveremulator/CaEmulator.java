@@ -154,11 +154,11 @@ public class CaEmulator {
         return generateCrl;
     }
 
-    public Certificate generateCert(final CertificationRequest p10ReqInfo) throws Exception {
-        if (!verifyPopo(p10ReqInfo)) {
-            throw new Exception("PKCS#10 request invalid");
+    public Certificate generateCert(final CertificationRequest csr) throws Exception {
+        if (!verifyPopo(csr)) {
+            throw new Exception("CSR invalid");
         }
-        CertificationRequestInfo reqInfo = p10ReqInfo.getCertificationRequestInfo();
+        CertificationRequestInfo reqInfo = csr.getCertificationRequestInfo();
         return generateCert(reqInfo.getSubjectPublicKeyInfo(), reqInfo.getSubject());
     }
 
@@ -238,10 +238,10 @@ public class CaEmulator {
         return crl.toASN1Structure();
     }
 
-    private boolean verifyPopo(final CertificationRequest p10Request) {
-        ParamUtil.requireNonNull("p10Request", p10Request);
+    private boolean verifyPopo(final CertificationRequest csr) {
+        ParamUtil.requireNonNull("csr", csr);
         try {
-            PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);
+            PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(csr);
             SubjectPublicKeyInfo pkInfo = p10Req.getSubjectPublicKeyInfo();
             PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
 
@@ -249,7 +249,7 @@ public class CaEmulator {
             return p10Req.isSignatureValid(cvp);
         } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException
                 | InvalidKeySpecException ex) {
-            LogUtil.error(LOG, ex, "could not validate POPO of PKCS#10 request");
+            LogUtil.error(LOG, ex, "could not validate POPO of CSR");
             return false;
         }
     }

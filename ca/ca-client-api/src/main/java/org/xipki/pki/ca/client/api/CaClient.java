@@ -67,7 +67,7 @@ public interface CaClient {
 
     Set<CertprofileInfo> getCertprofiles(@Nonnull String caName) throws CaClientException;
 
-    EnrollCertResult requestCert(@Nonnull CertificationRequest p10Request, @Nonnull String profile,
+    EnrollCertResult requestCert(@Nonnull CertificationRequest csr, @Nonnull String profile,
             @Nullable String caName, @Nullable String username, @Nullable Date notBefore,
             @Nullable Date notAfter, @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
