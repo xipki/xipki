@@ -79,13 +79,13 @@ public enum FailInfo {
         return code;
     }
 
-    public static FailInfo valueForCode(final int code) {
+    public static FailInfo forValue(final int code) {
         for (FailInfo m : values()) {
             if (m.code == code) {
                 return m;
             }
         }
-        return null;
+        throw new IllegalArgumentException("invalid FailInfo " + code);
     }
 
 }

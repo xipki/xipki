@@ -68,13 +68,13 @@ public enum PkiStatus {
         return code;
     }
 
-    public static PkiStatus valueForCode(final int code) {
+    public static PkiStatus forValue(final int code) {
         for (PkiStatus m : values()) {
             if (m.code == code) {
                 return m;
             }
         }
-        return null;
+        throw new IllegalArgumentException("invalid PkiStatus " + code);
     }
 
 }

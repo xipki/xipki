@@ -171,11 +171,11 @@ public class CaCaps {
 
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
-            CaCapability cap = CaCapability.valueForText(token);
-            if (cap == null) {
-                LOG.warn("ignore unknown CACap '{}'", token);
-            } else {
+            try {
+                CaCapability cap = CaCapability.forValue(token);
                 ret.addCapability(cap);
+            } catch (IllegalArgumentException ex) {
+                LOG.warn("ignore unknown CACap '{}'", token);
             }
         }
         return ret;

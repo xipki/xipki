@@ -104,7 +104,7 @@ public enum ScepHashAlgoType {
         return ret;
     }
 
-    public static ScepHashAlgoType getHashAlgoType(final String nameOrOid) {
+    public static ScepHashAlgoType forNameOrOid(final String nameOrOid) {
 
         String tmpNameOrOid = nameOrOid;
 
