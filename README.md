@@ -254,7 +254,7 @@ Components
   - Generating keypairs of RSA, EC and DSA in token
   - Deleting keypairs and certificates from token
   - Updating certificates in token
-  - Generating PKCS#10 request
+  - Generating CSR (PKCS#10 request)
   - Exporting certificate from token
 
 - For both CA and OCSP Responder

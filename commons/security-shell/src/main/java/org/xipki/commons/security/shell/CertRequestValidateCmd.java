@@ -49,22 +49,22 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "validate-req",
-        description = "validate PKCS#10 request")
+@Command(scope = "xipki-tk", name = "validate-csr",
+        description = "validate CSR")
 @Service
 public class CertRequestValidateCmd extends SecurityCommandSupport {
 
-    @Option(name = "--p10",
+    @Option(name = "--csr",
             required = true,
-            description = "PKCS#10 request file\n"
+            description = "CSR file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
-    private String p10File;
+    private String csrFile;
 
     @Override
     protected Object doExecute() throws Exception {
-        CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
-        boolean bo = securityFactory.verifyPopo(p10Req);
+        CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
+        boolean bo = securityFactory.verifyPopo(csr);
         String txt = bo ? "valid" : "invalid";
         println("The POP is " + txt);
         return null;

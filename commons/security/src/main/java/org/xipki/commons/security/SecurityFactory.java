@@ -80,9 +80,9 @@ public interface SecurityFactory {
     ContentVerifierProvider getContentVerifierProvider(@Nonnull X509CertificateHolder cert)
     throws InvalidKeyException;
 
-    boolean verifyPopo(@Nonnull PKCS10CertificationRequest p10Request);
+    boolean verifyPopo(@Nonnull PKCS10CertificationRequest csr);
 
-    boolean verifyPopo(@Nonnull CertificationRequest p10Req);
+    boolean verifyPopo(@Nonnull CertificationRequest csr);
 
     PublicKey generatePublicKey(@Nonnull SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException;

@@ -95,9 +95,9 @@ Feature xipki-database-tool
 Feature xipki-security-shell
 -----
 
-   * `xipki-tk:validate-req`
+   * `xipki-tk:validate-csr`
 
-     validate PKCS#10 request
+     validate CSR
 
    * `xipki-tk:deobfuscate`
 
@@ -137,11 +137,11 @@ Feature xipki-security-shell
 
    * `xipki-tk:req`
 
-     generate PKCS#10 request with PKCS#11 device
+     generate CSR with PKCS#11 device
 
    * `xipki-tk:req-p12`
 
-     generate PKCS#10 request with PKCS#12 keystore
+     generate CSR with PKCS#12 keystore
 
    * `xipki-tk:update-cert`
 
@@ -808,9 +808,9 @@ Feature xipki-caclient-shell
 
      check healty status of CA
 
-   * `xipki-cli:p10-enroll`
+   * `xipki-cli:csr-enroll`
 
-     enroll certificate via PKCS#10 request
+     enroll certificate via CSR
 
    * `xipki-cli:enroll`
 
@@ -859,9 +859,9 @@ Feature xipki-caqa-shell
 
      download CRL (negative, for QA)
 
-   * `xipki-qa:neg-p10-enroll`
+   * `xipki-qa:neg-csr-enroll`
 
-     enroll certificate via PKCS#10 request (negative, for QA)
+     enroll certificate via CSR (negative, for QA)
 
    * `xipki-qa:neg-enroll-p12`
 
