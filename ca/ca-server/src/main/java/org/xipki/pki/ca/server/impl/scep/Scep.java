@@ -521,7 +521,7 @@ public class Scep {
                         encodedRequest = null;
                     }
                     if (encodedRequest != null) {
-                        int reqId = ca.addRequest(encodedRequest);
+                        long reqId = ca.addRequest(encodedRequest);
                         ca.addRequestCert(reqId, cert.getCert().getCertId());
                     }
                 }

@@ -101,7 +101,7 @@ public class CaCrlsReader extends DbiXmlReader {
                     ret.setFile(tagContent);
                     break;
                 case CaCrlType.TAG_ID:
-                    ret.setId(Integer.parseInt(tagContent));
+                    ret.setId(Long.parseLong(tagContent));
                     break;
                 default:
                     break;

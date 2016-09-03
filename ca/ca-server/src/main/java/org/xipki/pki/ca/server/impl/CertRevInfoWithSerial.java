@@ -50,18 +50,18 @@ import org.xipki.commons.security.CrlReason;
 
 public class CertRevInfoWithSerial extends CertRevocationInfo {
 
-    private final int id;
+    private final long id;
 
     private final BigInteger serial;
 
-    public CertRevInfoWithSerial(final int id, final BigInteger serial, final CrlReason reason,
+    public CertRevInfoWithSerial(final long id, final BigInteger serial, final CrlReason reason,
             final Date revocationTime, final Date invalidityTime) {
         super(reason, revocationTime, invalidityTime);
         this.id = id;
         this.serial = serial;
     }
 
-    public CertRevInfoWithSerial(final int id, final BigInteger serial, final int reasonCode,
+    public CertRevInfoWithSerial(final long id, final BigInteger serial, final int reasonCode,
             final Date revocationTime, final Date invalidityTime) {
         super(reasonCode, revocationTime, invalidityTime);
         this.id = id;
@@ -72,7 +72,7 @@ public class CertRevInfoWithSerial extends CertRevocationInfo {
         return serial;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

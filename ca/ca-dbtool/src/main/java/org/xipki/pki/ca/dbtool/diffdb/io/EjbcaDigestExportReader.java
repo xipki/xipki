@@ -114,8 +114,8 @@ public class EjbcaDigestExportReader {
 
             ResultSet rs = null;
             try {
-                selectCertStmt.setInt(1, idRange.getFrom());
-                selectCertStmt.setInt(2, idRange.getTo() + 1);
+                selectCertStmt.setLong(1, idRange.getFrom());
+                selectCertStmt.setLong(2, idRange.getTo() + 1);
 
                 rs = selectCertStmt.executeQuery();
 

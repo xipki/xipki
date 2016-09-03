@@ -34,17 +34,57 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.diffdb.io;
+package org.xipki.pki.ca.server.impl;
+
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
+ * id consists of
+ * <ol>
+ *  <li>highest bit is set to 0 to assure positive long.
+ *  <li>epoch in ms: 46 bits for 1312 years after the epoch</li>
+ *  <li>offset: 9 bits
+ *  <li>shard_id: 8 bits
+ * </ol>
+ *
  * @author Lijun Liao
  * @since 2.0.0
+ *
  */
 
-public enum DbSchemaType {
+public class UniqueIdGenerator {
 
-    XIPKI_CA_v2,
-    XIPKI_OCSP_v2,
-    EJBCA_CA_v3;
+    // maximal 9 bits
+    private static final int MAX_OFFSET = 0x1FF;
+
+    private final long epoch; // in milliseconds
+
+    private final int shardId; // 8 bits
+
+    private int offset = 0;
+
+    public UniqueIdGenerator(final long epoch, final int shardId) {
+        this.epoch = ParamUtil.requireMin("epoch", epoch, 0);
+        this.shardId = ParamUtil.requireRange("shardId", shardId, 0, 255);
+    }
+
+    public long nextId() {
+        long now = System.currentTimeMillis();
+        synchronized (this) {
+            long ret = now - epoch;
+            ret <<= 8;
+
+            ret += (offset++);
+            ret <<= 9;
+
+            if (offset > MAX_OFFSET) {
+                offset = 0;
+            }
+
+            ret += shardId;
+
+            return ret;
+        }
+    }
 
 }

@@ -275,6 +275,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     } // class ScheduledCARestarter
 
+    public static final String ENV_EPOCH = "EPOCH";
+
     private static final Logger LOG = LoggerFactory.getLogger(CaManagerImpl.class);
 
     private static final String EVENT_LOCK = "LOCK";
@@ -462,6 +464,23 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             masterMode = true;
         }
 
+        int shardId;
+        String shardIdStr = caConfProps.getProperty("ca.shardId");
+        if (StringUtil.isBlank(shardIdStr)) {
+            throw new CaMgmtException("ca.shardId is not set");
+        }
+        LOG.info("ca.shardId: {}", shardIdStr);
+
+        try {
+            shardId = Integer.parseInt(shardIdStr);
+        } catch (NumberFormatException ex) {
+            throw new CaMgmtException("invalid ca.shardId '" + shardIdStr + "'");
+        }
+
+        if (shardId < 0 || shardId > 255) {
+            throw new CaMgmtException("ca.shardId is not in [0, 255]");
+        }
+
         if (this.datasources == null) {
             this.datasources = new ConcurrentHashMap<>();
             for (Object objKey : caConfProps.keySet()) {
@@ -513,13 +532,36 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             }
         }
 
+        initEnvironemtParamters();
+        String envEpoch = envParameterResolver.getEnvParam(ENV_EPOCH);
+        long epoch;
+        if (envEpoch != null) {
+            epoch = Long.parseLong(envEpoch);
+        } else {
+            final long day = 24L * 60 * 60 * 1000;
+            Date epochTime = new Date(System.currentTimeMillis() - day);
+            queryExecutor.setEpoch(epochTime);
+            epoch = epochTime.getTime();
+        }
+        LOG.info("EPOCH: {} ({})", epoch, new Date(epoch));
+
+        UniqueIdGenerator idGen = new UniqueIdGenerator(epoch, shardId);
+
         try {
-            this.certstore = new CertificateStore(datasource);
+            this.certstore = new CertificateStore(datasource, idGen);
         } catch (DataAccessException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
 
-        initDataObjects();
+        initCaAliases();
+        initCertprofiles();
+        initPublishers();
+        initCmpControls();
+        initRequestors();
+        initResponders();
+        initCrlSigners();
+        initCas();
+        initSceps();
     } // method init
 
     @Override
@@ -600,20 +642,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         shutdownScheduledThreadPoolExecutor();
     } // method reset
-
-    private void initDataObjects() throws CaMgmtException {
-        initEnvironemtParamters();
-        initCaAliases();
-        initCertprofiles();
-        initPublishers();
-        initCmpControls();
-        initRequestors();
-        initResponders();
-        initCrlSigners();
-        initCas();
-        initSceps();
-        markLastSeqValues();
-    } // method initDataObjects
 
     @Override
     public boolean restartCaSystem() {
@@ -1176,28 +1204,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         return true;
     } // method createCa
-
-    private void markLastSeqValues() throws CaMgmtException {
-        try {
-            // sequence DCC_ID
-            long maxId = datasource.getMax(null, "DELTACRL_CACHE", "ID");
-            datasource.setLastUsedSeqValue("DCC_ID", maxId);
-
-            // sequence CID
-            maxId = datasource.getMax(null, "CERT", "ID");
-            datasource.setLastUsedSeqValue("CID", maxId);
-
-            // sequence REQ_ID
-            maxId = datasource.getMax(null, "REQUEST", "ID");
-            datasource.setLastUsedSeqValue("REQ_ID", maxId);
-
-            // sequence REQCERT_ID
-            maxId = datasource.getMax(null, "REQCERT", "ID");
-            datasource.setLastUsedSeqValue("REQCERT_ID", maxId);
-        } catch (DataAccessException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
-        }
-    } // method markLastSeqValues
 
     @Override
     public boolean addCa(final CaEntry caEntry) throws CaMgmtException {

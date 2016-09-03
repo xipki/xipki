@@ -99,7 +99,7 @@ public class CaRequestsReader extends DbiXmlReader {
                     ret.setFile(tagContent);
                     break;
                 case CaRequestType.TAG_ID:
-                    ret.setId(Integer.parseInt(tagContent));
+                    ret.setId(Long.parseLong(tagContent));
                     break;
                 default:
                     break;

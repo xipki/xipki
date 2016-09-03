@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,13 +53,13 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ProcessLog;
+import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.dbtool.DbToolBase;
-import org.xipki.pki.ca.dbtool.IdRange;
 import org.xipki.pki.ca.dbtool.diffdb.io.CaEntry;
 import org.xipki.pki.ca.dbtool.diffdb.io.CaEntryContainer;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbSchemaType;
@@ -81,21 +80,13 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
 
     private final XipkiDbControl dbControl;
 
-    private final int numThreads;
-
     public XipkiDigestExporter(final DataSourceWrapper datasource, final String baseDir,
             final AtomicBoolean stopMe, final int numCertsPerSelect,
-            final DbSchemaType dbSchemaType, final int numThreads)
+            final DbSchemaType dbSchemaType)
     throws DataAccessException, IOException {
         super(datasource, baseDir, stopMe);
         this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
         this.dbControl = new XipkiDbControl(dbSchemaType);
-
-        // number of threads
-        this.numThreads = Math.min(numThreads, datasource.getMaximumPoolSize() - 1);
-        if (this.numThreads != numThreads) {
-            LOG.info("adapted the numThreads from {} to {}", numThreads, this.numThreads);
-        }
     }
 
     @Override
@@ -115,7 +106,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
 
         CaEntryContainer caEntryContainer = new CaEntryContainer(caEntries);
         XipkiDigestExportReader certsReader = new XipkiDigestExportReader(datasource, dbControl,
-                numThreads);
+                numCertsPerSelect);
 
         Exception exception = null;
         try {
@@ -179,34 +170,29 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
 
     private void doDigest(final XipkiDigestExportReader certsReader, final ProcessLog processLog,
             final CaEntryContainer caEntryContainer) throws Exception {
-        int minCertId = (int) getMin("CERT", "ID");
-        final int maxCertId = (int) getMax("CERT", "ID");
-        System.out.println("digesting certificates from ID " + minCertId);
+        long lastProcessedId = 0;
+        System.out.println("digesting certificates from ID " + (lastProcessedId + 1));
         processLog.printHeader();
 
-        List<IdRange> idRanges = new ArrayList<>(numThreads);
         boolean interrupted = false;
 
-        for (int i = minCertId; i <= maxCertId;) {
+        while (true) {
             if (stopMe.get()) {
                 interrupted = true;
                 break;
             }
 
-            idRanges.clear();
-            for (int j = 0; j < numThreads; j++) {
-                int to = i + numCertsPerSelect - 1;
-                idRanges.add(new IdRange(i, to));
-                i = to + 1;
-                if (i > maxCertId) {
-                    break; // break for (int j; ...)
-                }
+            List<IdentifiedDbDigestEntry> certs = certsReader.readCerts(lastProcessedId + 1);
+            if (CollectionUtil.isEmpty(certs)) {
+                break;
             }
 
-            List<IdentifiedDbDigestEntry> certs = certsReader.readCerts(idRanges);
             for (IdentifiedDbDigestEntry cert : certs) {
-                caEntryContainer.addDigestEntry(cert.getCaId().intValue(), cert.getId(),
-                        cert.getContent());
+                long id = cert.getId();
+                if (lastProcessedId < id) {
+                    lastProcessedId = id;
+                }
+                caEntryContainer.addDigestEntry(cert.getCaId().intValue(), id, cert.getContent());
             }
             processLog.addNumProcessed(certs.size());
             processLog.printStatus();

@@ -232,26 +232,26 @@ class OcspCertStoreDbExporter extends DbPorter {
     private void doExportCert(final CertStoreType certstore, final File processLogFile,
             final FileOutputStream certsFileOs) throws Exception {
         File certsDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
-        Integer minCertId = null;
+        Long minId = null;
         if (processLogFile.exists()) {
             byte[] content = IoUtil.read(processLogFile);
             if (content != null && content.length > 0) {
-                minCertId = Integer.parseInt(new String(content).trim());
-                minCertId++;
+                minId = Long.parseLong(new String(content).trim());
+                minId++;
             }
         }
 
-        if (minCertId == null) {
-            minCertId = (int) getMin("CERT", "ID");
+        if (minId == null) {
+            minId = getMin("CERT", "ID");
         }
 
-        System.out.println(getExportingText() + "tables CERT, CHASH and CRAW from ID " + minCertId);
+        System.out.println(getExportingText() + "tables CERT, CHASH and CRAW from ID " + minId);
 
-        final String certSql = "SELECT ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,CERT "
-                + "FROM CERT INNER JOIN CRAW ON "
-                + "CERT.ID>=? AND CERT.ID<? AND CERT.ID=CRAW.CID ORDER BY CERT.ID ASC";
+        final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,CERT "
+                + "FROM CERT INNER JOIN CRAW ON CERT.ID>=? AND CERT.ID=CRAW.CID";
+        final String certSql = datasource.buildSelectFirstSql(coreSql, numCertsPerSelect, "ID ASC");
 
-        final int maxCertId = (int) getMax("CERT", "ID");
+        final long maxId = getMax("CERT", "ID");
 
         int numProcessedBefore = certstore.getCountCerts();
         final long total = getCount("CERT") - numProcessedBefore;
@@ -264,36 +264,43 @@ class OcspCertStoreDbExporter extends DbPorter {
 
         OcspCertsWriter certsInCurrentFile = new OcspCertsWriter();
 
-        final int n = numCertsPerSelect;
-
         File currentCertsZipFile = new File(baseDir,
                 "tmp-certs-" + System.currentTimeMillis() + ".zip");
         ZipOutputStream currentCertsZip = getZipOutputStream(currentCertsZipFile);
 
-        int minCertIdOfCurrentFile = -1;
-        int maxCertIdOfCurrentFile = -1;
+        long minCertIdOfCurrentFile = -1;
+        long maxCertIdOfCurrentFile = -1;
 
         processLog.printHeader();
 
         String sql = null;
+        Long id = null;
 
-        Integer id = null;
         try {
             boolean interrupted = false;
-            for (int i = minCertId; i <= maxCertId; i += n) {
+
+            long lastMaxId = minId - 1;
+
+            while (true) {
                 if (stopMe.get()) {
                     interrupted = true;
                     break;
                 }
 
                 sql = certSql;
-                certPs.setInt(1, i);
-                certPs.setInt(2, i + n);
+                certPs.setLong(1, lastMaxId + 1);
 
                 ResultSet rs = certPs.executeQuery();
 
-                while (rs.next()) {
-                    id = rs.getInt("ID");
+                if (!rs.next()) {
+                    break;
+                }
+
+                do {
+                    id = rs.getLong("ID");
+                    if (lastMaxId < id) {
+                        lastMaxId = id;
+                    }
 
                     if (minCertIdOfCurrentFile == -1) {
                         minCertIdOfCurrentFile = id;
@@ -361,12 +368,12 @@ class OcspCertStoreDbExporter extends DbPorter {
                         finalizeZip(currentCertsZip, certsInCurrentFile);
 
                         String currentCertsFilename = buildFilename("certs_", ".zip",
-                                minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
+                                minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxId);
                         currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
 
                         writeLine(certsFileOs, currentCertsFilename);
                         certstore.setCountCerts(numProcessedBefore + sum);
-                        echoToFile(Integer.toString(id), processLogFile);
+                        echoToFile(Long.toString(id), processLogFile);
 
                         processLog.addNumProcessed(numCertInCurrentFile);
                         processLog.printStatus();
@@ -380,7 +387,7 @@ class OcspCertStoreDbExporter extends DbPorter {
                                 "tmp-certs-" + System.currentTimeMillis() + ".zip");
                         currentCertsZip = getZipOutputStream(currentCertsZipFile);
                     } // end if
-                } // end while (rs.next))
+                } while (rs.next());
 
                 rs.close();
             } // end for
@@ -393,12 +400,12 @@ class OcspCertStoreDbExporter extends DbPorter {
                 finalizeZip(currentCertsZip, certsInCurrentFile);
 
                 String currentCertsFilename = buildFilename("certs_", ".zip",
-                        minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
+                        minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxId);
                 currentCertsZipFile.renameTo(new File(certsDir, currentCertsFilename));
 
                 writeLine(certsFileOs, currentCertsFilename);
                 certstore.setCountCerts(numProcessedBefore + sum);
-                echoToFile(Integer.toString(id), processLogFile);
+                echoToFile(Long.toString(id), processLogFile);
 
                 processLog.addNumProcessed(numCertInCurrentFile);
             } else {

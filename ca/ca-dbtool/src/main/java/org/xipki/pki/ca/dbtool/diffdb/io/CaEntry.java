@@ -79,9 +79,9 @@ public class CaEntry {
 
     private BufferedOutputStream csvOutputStream;
 
-    private int minIdInCsvFile;
+    private long minIdInCsvFile;
 
-    private int maxIdInCsvFile;
+    private long maxIdInCsvFile;
 
     private int numInCsvFile;
 
@@ -102,7 +102,7 @@ public class CaEntry {
         return caId;
     }
 
-    public void addDigestEntry(final int id, final DbDigestEntry reportEntry)
+    public void addDigestEntry(final long id, final DbDigestEntry reportEntry)
     throws IOException, InvalidDataObjectException {
         ParamUtil.requireNonNull("reportEntry", reportEntry);
 

@@ -682,7 +682,7 @@ public class X509Ca {
                 crlBuilder.setNextUpdate(nextUpdate);
             }
 
-            int startId = 1;
+            long startId = 1;
             final int numEntries = 100;
 
             X509Cert caCert = caInfo.getCertificate();
@@ -706,7 +706,7 @@ public class X509Ca {
                             control.isOnlyContainsCaCerts(), control.isOnlyContainsUserCerts());
                 }
 
-                int maxId = 1;
+                long maxId = 1;
 
                 for (CertRevInfoWithSerial revInfo : revInfos) {
                     if (revInfo.getId() > maxId) {
@@ -832,7 +832,7 @@ public class X509Ca {
                     serials = certstore.getCertSerials(caCert, notExpireAt, startId, numEntries,
                             false, onlyCaCerts, onlyUserCerts);
 
-                    int maxId = 1;
+                    long maxId = 1;
                     for (SerialWithId sid : serials) {
                         if (sid.getId() > maxId) {
                             maxId = sid.getId();
@@ -1028,9 +1028,9 @@ public class X509Ca {
                 }
             } // end if
 
-            Integer certId = certInfo.getCert().getCertId();
+            Long certId = certInfo.getCert().getCertId();
             try {
-                certstore.addToPublishQueue(publisher.getName(), certId.intValue(),
+                certstore.addToPublishQueue(publisher.getName(), certId.longValue(),
                         caInfo.getCertificate());
             } catch (Throwable th) {
                 LogUtil.error(LOG, th, "could not add entry to PublishQueue");
@@ -1103,7 +1103,7 @@ public class X509Ca {
 
             Date notExpiredAt = null;
 
-            int startId = 1;
+            long startId = 1;
             int numEntries = 100;
 
             List<SerialWithId> serials;
@@ -1117,7 +1117,7 @@ public class X509Ca {
                     return false;
                 }
 
-                int maxId = 1;
+                long maxId = 1;
                 for (SerialWithId sid : serials) {
                     if (sid.getId() > maxId) {
                         maxId = sid.getId();
@@ -1211,7 +1211,7 @@ public class X509Ca {
         final int numEntries = 500;
 
         while (true) {
-            List<Integer> certIds;
+            List<Long> certIds;
             try {
                 certIds = certstore.getPublishQueueEntries(caCert, publisher.getName(), numEntries);
             } catch (OperationException ex) {
@@ -1223,7 +1223,7 @@ public class X509Ca {
                 break;
             }
 
-            for (Integer certId : certIds) {
+            for (Long certId : certIds) {
                 X509CertificateInfo certInfo;
 
                 try {
@@ -1404,9 +1404,9 @@ public class X509Ca {
                 }
             } // end if
 
-            Integer certId = revokedCert.getCert().getCertId();
+            Long certId = revokedCert.getCert().getCertId();
             try {
-                certstore.addToPublishQueue(publisher.getName(), certId.intValue(),
+                certstore.addToPublishQueue(publisher.getName(), certId.longValue(),
                         caInfo.getCertificate());
             } catch (Throwable th) {
                 LogUtil.error(LOG, th, "could not add entry to PublishQueue");
@@ -1459,9 +1459,9 @@ public class X509Ca {
                 }
             } // end if
 
-            Integer certId = revokedCert.getCert().getCertId();
+            Long certId = revokedCert.getCert().getCertId();
             try {
-                certstore.addToPublishQueue(publisher.getName(), certId.intValue(),
+                certstore.addToPublishQueue(publisher.getName(), certId.longValue(),
                         caInfo.getCertificate());
             } catch (Throwable th) {
                 LogUtil.error(LOG, th, "could not add entry to PublishQueue");
@@ -1508,9 +1508,9 @@ public class X509Ca {
                 }
             } // end if
 
-            Integer certId = unrevokedCert.getCertId();
+            Long certId = unrevokedCert.getCertId();
             try {
-                certstore.addToPublishQueue(publisher.getName(), certId.intValue(),
+                certstore.addToPublishQueue(publisher.getName(), certId.longValue(),
                         caInfo.getCertificate());
             } catch (Throwable th) {
                 LogUtil.error(LOG, th, "could not add entry to PublishQueue");
@@ -1587,11 +1587,11 @@ public class X509Ca {
         } // end for
     } // method unrevoke
 
-    public int addRequest(final byte[] request) throws OperationException {
+    public long addRequest(final byte[] request) throws OperationException {
         return certstore.addRequest(request);
     }
 
-    public void addRequestCert(final int requestId, final int certId) throws OperationException {
+    public void addRequestCert(final long requestId, final long certId) throws OperationException {
         certstore.addRequestCert(requestId, certId);
     }
 

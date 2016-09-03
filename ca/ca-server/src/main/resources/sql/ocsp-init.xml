@@ -102,7 +102,7 @@
     <!-- table CERT -->
     <createTable tableName="CERT"
         remarks="certificate information">
-      <column name="ID" type="INT">
+      <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="IID" type="INT"
@@ -142,7 +142,7 @@
     <!-- table CERTHASH -->
     <createTable tableName="CHASH"
         remarks="hashes of certificates">
-      <column name="CID" type="INT"
+      <column name="CID" type="BIGINT"
           remarks="certificate id">
         <constraints primaryKey="true" nullable="false"/>
       </column>
@@ -170,7 +170,7 @@
     <!-- table RAWCERT -->
     <createTable tableName="CRAW"
         remarks="raw certificates">
-      <column name="CID" type="INT"
+      <column name="CID" type="BIGINT"
           remarks="certificate id">
         <constraints primaryKey="true" nullable="false"/>
       </column>

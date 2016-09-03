@@ -710,6 +710,19 @@ class CaManagerQueryExecutor {
     } // method createCaHasNames
 
     boolean deleteRowWithName(final String name, final String table) throws CaMgmtException {
+        return deleteRowWithName(name, table, false);
+    }
+
+    private boolean deleteRowWithName(final String name, final String table, boolean force)
+    throws CaMgmtException {
+        if (!force) {
+            if ("ENVIRONMENT".equalsIgnoreCase(table)) {
+                if (CaManagerImpl.ENV_EPOCH.equalsIgnoreCase(name)) {
+                    throw new CaMgmtException("environment " + name + " is reserved");
+                }
+            }
+        }
+
         final String sql = new StringBuilder("DELETE FROM ").append(table)
                 .append(" WHERE NAME=?").toString();
         PreparedStatement ps = null;
@@ -993,9 +1006,24 @@ class CaManagerQueryExecutor {
         }
     } // method addCrlSigner
 
+    void setEpoch(Date time) throws CaMgmtException {
+        deleteRowWithName(CaManagerImpl.ENV_EPOCH, "ENVIRONMENT", true);
+        addEnvParam(CaManagerImpl.ENV_EPOCH, Long.toString(time.getTime()), true);
+    }
+
     void addEnvParam(final String name, final String value) throws CaMgmtException {
+        addEnvParam(name, value, false);
+    }
+
+    private void addEnvParam(final String name, final String value, boolean force)
+    throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         ParamUtil.requireNonNull("value", value);
+        if (!force) {
+            if (CaManagerImpl.ENV_EPOCH.equalsIgnoreCase(name)) {
+                throw new CaMgmtException("environment " + name + " is reserved");
+            }
+        }
         final String sql = "INSERT INTO ENVIRONMENT (NAME,VALUE2) VALUES (?,?)";
 
         PreparedStatement ps = null;
@@ -1821,7 +1849,9 @@ class CaManagerQueryExecutor {
 
     boolean changeEnvParam(final String name, final String value) throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
-
+        if (CaManagerImpl.ENV_EPOCH.equalsIgnoreCase(name)) {
+            throw new CaMgmtException("environment " + name + " is reserved");
+        }
         if (value == null) {
             return false;
         }

@@ -45,17 +45,10 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class NumThreads {
 
-    private final int numRefThreads;
-
     private final int numTargetThreads;
 
-    public NumThreads(final int numRefThreads, final int numTargetThreads) {
-        this.numRefThreads = ParamUtil.requireMin("numRefThreads", numRefThreads, 1);
+    public NumThreads(final int numTargetThreads) {
         this.numTargetThreads = ParamUtil.requireMin("numTargetThreads", numTargetThreads, 1);
-    }
-
-    public int getNumRefThreads() {
-        return numRefThreads;
     }
 
     public int getNumTargetThreads() {

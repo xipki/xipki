@@ -42,13 +42,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +50,6 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbToolBase;
-import org.xipki.pki.ca.dbtool.IdRange;
 
 /**
  * @author Lijun Liao
@@ -65,101 +58,7 @@ import org.xipki.pki.ca.dbtool.IdRange;
 
 public class XipkiDigestExportReader {
 
-    private class Retriever implements Runnable {
-
-        private Connection conn;
-
-        private PreparedStatement selectCertStmt;
-
-        Retriever() throws DataAccessException {
-            this.conn = datasource.getConnection();
-            try {
-                selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
-            } catch (DataAccessException ex) {
-                datasource.returnConnection(conn);
-                throw ex;
-            }
-        }
-
-        @Override
-        public void run() {
-            while (!stop.get()) {
-                try {
-                    IdRange idRange = inQueue.take();
-                    query(idRange);
-                } catch (InterruptedException ex) {
-                    LOG.error("InterruptedException: {}", ex.getMessage());
-                }
-            }
-
-            DbToolBase.releaseResources(datasource, selectCertStmt, null);
-            datasource.returnConnection(conn);
-            selectCertStmt = null;
-        }
-
-        private void query(final IdRange idRange) {
-            DigestDbEntrySet result = new DigestDbEntrySet(idRange.getFrom());
-
-            ResultSet rs = null;
-            try {
-                selectCertStmt.setInt(1, idRange.getFrom());
-                selectCertStmt.setInt(2, idRange.getTo() + 1);
-
-                rs = selectCertStmt.executeQuery();
-
-                while (rs.next()) {
-                    int caId = rs.getInt(dbControl.getColCaId());
-                    int id = rs.getInt("ID");
-                    String hash = rs.getString(dbControl.getColCerthash());
-                    BigInteger serial = new BigInteger(rs.getString(dbControl.getColSerialNumber()),
-                            16);
-                    boolean revoked = rs.getBoolean(dbControl.getColRevoked());
-
-                    Integer revReason = null;
-                    Long revTime = null;
-                    Long revInvTime = null;
-
-                    if (revoked) {
-                        revReason = rs.getInt(dbControl.getColRevReason());
-                        revTime = rs.getLong(dbControl.getColRevTime());
-                        revInvTime = rs.getLong(dbControl.getColRevInvTime());
-                        if (revInvTime == 0) {
-                            revInvTime = null;
-                        }
-                    }
-
-                    DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
-                            revInvTime, hash);
-                    IdentifiedDbDigestEntry idCert = new IdentifiedDbDigestEntry(cert, id);
-                    idCert.setCaId(caId);
-
-                    result.addEntry(idCert);
-                }
-            } catch (Exception ex) {
-                if (ex instanceof SQLException) {
-                    ex = datasource.translate(selectCertSql, (SQLException) ex);
-                }
-                result.setException(ex);
-            } finally {
-                outQueue.add(result);
-                DbToolBase.releaseResources(datasource, null, rs);
-            }
-        } // method run
-    } // class Retriever
-
     private static final Logger LOG = LoggerFactory.getLogger(XipkiDigestExportReader.class);
-
-    protected final AtomicBoolean stop = new AtomicBoolean(false);
-
-    protected final BlockingDeque<IdRange> inQueue = new LinkedBlockingDeque<>();
-
-    protected final BlockingDeque<DigestDbEntrySet> outQueue = new LinkedBlockingDeque<>();
-
-    private final int numThreads;
-
-    private ExecutorService executor;
-
-    private final List<Retriever> retrievers;
 
     private final DataSourceWrapper datasource;
 
@@ -167,71 +66,75 @@ public class XipkiDigestExportReader {
 
     private final String selectCertSql;
 
+    private final PreparedStatement selectCertStmt;
+
+    private final int numRowsPerSelect;
+
     public XipkiDigestExportReader(final DataSourceWrapper datasource,
-            final XipkiDbControl dbControl, final int numThreads) throws Exception {
+            final XipkiDbControl dbControl, final int numRowsPerSelect) throws Exception {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
-        this.numThreads = numThreads;
         this.dbControl = ParamUtil.requireNonNull("dbControl", dbControl);
-        this.selectCertSql = dbControl.getCertSql();
+        this.numRowsPerSelect = ParamUtil.requireMin("numRowsPerSelect", numRowsPerSelect, 1);
 
-        retrievers = new ArrayList<>(numThreads);
+        this.selectCertSql = dbControl.getCertSql(datasource, numRowsPerSelect);
 
-        for (int i = 0; i < numThreads; i++) {
-            Retriever retriever = new Retriever();
-            retrievers.add(retriever);
-        }
-
-        executor = Executors.newFixedThreadPool(numThreads);
-        for (Runnable runnable : retrievers) {
-            executor.execute(runnable);
+        Connection conn = datasource.getConnection();
+        try {
+            selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
+        } catch (DataAccessException ex) {
+            datasource.returnConnection(conn);
+            throw ex;
         }
     }
 
-    public List<IdentifiedDbDigestEntry> readCerts(final List<IdRange> idRanges)
+    public List<IdentifiedDbDigestEntry> readCerts(final long startId)
     throws DataAccessException {
-        ParamUtil.requireNonNull("idRanges", idRanges);
+        List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numRowsPerSelect);
 
-        int size = idRanges.size();
-        for (IdRange range : idRanges) {
-            inQueue.add(range);
-        }
+        ResultSet rs = null;
+        try {
+            selectCertStmt.setLong(1, startId);
+            rs = selectCertStmt.executeQuery();
 
-        List<DigestDbEntrySet> results = new ArrayList<>(size);
-        int numCerts = 0;
-        for (int i = 0; i < size; i++) {
-            try {
-                DigestDbEntrySet result = outQueue.take();
-                numCerts += result.getEntries().size();
-                results.add(result);
-            } catch (InterruptedException ex) {
-                throw new DataAccessException("InterruptedException " + ex.getMessage(), ex);
+            while (rs.next()) {
+                int caId = rs.getInt(dbControl.getColCaId());
+                long id = rs.getLong("ID");
+                String hash = rs.getString(dbControl.getColCerthash());
+                BigInteger serial = new BigInteger(rs.getString("SN"), 16);
+                boolean revoked = rs.getBoolean("REV");
+
+                Integer revReason = null;
+                Long revTime = null;
+                Long revInvTime = null;
+
+                if (revoked) {
+                    revReason = rs.getInt("RR");
+                    revTime = rs.getLong("RT");
+                    revInvTime = rs.getLong("RIT");
+                    if (revInvTime == 0) {
+                        revInvTime = null;
+                    }
+                }
+
+                DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
+                        revInvTime, hash);
+                IdentifiedDbDigestEntry idCert = new IdentifiedDbDigestEntry(cert, id);
+                idCert.setCaId(caId);
+
+                ret.add(idCert);
             }
-        }
-
-        Collections.sort(results);
-        List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numCerts);
-
-        for (DigestDbEntrySet result : results) {
-            if (result.getException() != null) {
-                throw new DataAccessException(
-                        String.format("could not read from ID %d: %s", result.getStartId(),
-                                result.getException().getMessage()),
-                        result.getException());
-            }
-
-            ret.addAll(result.getEntries());
+        } catch (SQLException ex) {
+            LOG.error("could not export certificates from ID {}", startId);
+            throw datasource.translate(selectCertSql, (SQLException) ex);
+        } finally {
+            DbToolBase.releaseResources(datasource, null, rs);
         }
 
         return ret;
-    } // method readCerts
-
-    public int getNumThreads() {
-        return numThreads;
     }
 
     public void stop() {
-        stop.set(true);
-        executor.shutdownNow();
+        datasource.releaseResources(selectCertStmt, null);
     }
 
 }

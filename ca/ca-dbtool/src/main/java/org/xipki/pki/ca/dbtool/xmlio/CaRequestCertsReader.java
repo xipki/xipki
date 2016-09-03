@@ -93,13 +93,13 @@ public class CaRequestCertsReader extends DbiXmlReader {
                     ret.validate();
                     return ret;
                 case CaRequestCertType.TAG_ID:
-                    ret.setId(Integer.parseInt(tagContent));
+                    ret.setId(Long.parseLong(tagContent));
                     break;
                 case CaRequestCertType.TAG_RID:
-                    ret.setRid(Integer.parseInt(tagContent));
+                    ret.setRid(Long.parseLong(tagContent));
                     break;
                 case CaRequestCertType.TAG_CID:
-                    ret.setCid(Integer.parseInt(tagContent));
+                    ret.setCid(Long.parseLong(tagContent));
                     break;
                 default:
                     break;

@@ -61,7 +61,6 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
-import org.xipki.commons.datasource.springframework.jdbc.DuplicateKeyException;
 import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.X509Cert;
@@ -204,7 +203,7 @@ class OcspStoreQueryExecutor {
 
         final String sqlAddCert = revoked ? SQL_ADD_REVOKED_CERT : SQL_ADD_CERT;
 
-        int certId = nextCertId();
+        long certId = certificate.getCertId();
         byte[] encodedCert = certificate.getEncodedCert();
         String b64Cert = Base64.toBase64String(encodedCert);
         String sha1Fp = HashAlgoType.SHA1.base64Hash(encodedCert);
@@ -265,56 +264,44 @@ class OcspStoreQueryExecutor {
             psAddCerthash.setString(idx++, sha384Fp);
             psAddCerthash.setString(idx++, sha512Fp);
 
-            final int tries = 3;
-            for (int i = 0; i < tries; i++) {
-                if (i > 0) {
-                    certId = nextCertId();
+            psAddcert.setLong(1, certId);
+            psAddCerthash.setLong(1, certId);
+            psAddRawcert.setLong(1, certId);
+
+            final boolean origAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            String sql = null;
+
+            try {
+                sql = sqlAddCert;
+                psAddcert.executeUpdate();
+
+                sql = SQL_ADD_CHASH;
+                psAddRawcert.executeUpdate();
+
+                sql = SQL_ADD_CHASH;
+                psAddCerthash.executeUpdate();
+
+                sql = "(commit add cert to OCSP)";
+                conn.commit();
+            } catch (Throwable th) {
+                conn.rollback();
+                // more secure
+                datasource.deleteFromTable(null, "CRAW", "CID", certId);
+                datasource.deleteFromTable(null, "CHASH", "CID", certId);
+                datasource.deleteFromTable(null, "CERT", "ID", certId);
+
+                if (th instanceof SQLException) {
+                    SQLException ex = (SQLException) th;
+                    LOG.error("datasource {} could not add certificate with id {}: {}",
+                            datasource.getDatasourceName(), certId, th.getMessage());
+                    throw datasource.translate(sql, ex);
+                } else {
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
                 }
-
-                psAddcert.setInt(1, certId);
-                psAddCerthash.setInt(1, certId);
-                psAddRawcert.setInt(1, certId);
-
-                final boolean origAutoCommit = conn.getAutoCommit();
-                conn.setAutoCommit(false);
-                String sql = null;
-                try {
-                    sql = sqlAddCert;
-                    psAddcert.executeUpdate();
-
-                    sql = SQL_ADD_CHASH;
-                    psAddRawcert.executeUpdate();
-
-                    sql = SQL_ADD_CHASH;
-                    psAddCerthash.executeUpdate();
-
-                    sql = "(commit add cert to OCSP)";
-                    conn.commit();
-                } catch (Throwable th) {
-                    conn.rollback();
-                    // more secure
-                    datasource.deleteFromTable(null, "CRAW", "CID", certId);
-                    datasource.deleteFromTable(null, "CHASH", "CID", certId);
-                    datasource.deleteFromTable(null, "CERT", "ID", certId);
-
-                    if (th instanceof SQLException) {
-                        SQLException ex = (SQLException) th;
-                        DataAccessException dex = datasource.translate(sql, ex);
-                        if (dex instanceof DuplicateKeyException && i < tries - 1) {
-                            continue;
-                        }
-                        LOG.error("datasource {} could not add certificate with id {}: {}",
-                                datasource.getDatasourceName(), certId, th.getMessage());
-                        throw ex;
-                    } else {
-                        throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
-                    }
-                } finally {
-                    conn.setAutoCommit(origAutoCommit);
-                }
-
-                break;
-            } // end for
+            } finally {
+                conn.setAutoCommit(origAutoCommit);
+            }
         } catch (SQLException ex) {
             throw datasource.translate(null, ex);
         } finally {
@@ -684,20 +671,6 @@ class OcspStoreQueryExecutor {
             return false;
         }
     } // method isHealthy
-
-    private int nextCertId() throws DataAccessException {
-        Connection conn = datasource.getConnection();
-        try {
-            while (true) {
-                int certId = (int) datasource.nextSeqValue(conn, "CID");
-                if (!datasource.columnExists(conn, "CERT", "ID", certId)) {
-                    return certId;
-                }
-            }
-        } finally {
-            datasource.returnConnection(conn);
-        }
-    } // method nextCertId
 
     private static void setBoolean(final PreparedStatement ps, final int index, final boolean value)
     throws SQLException {

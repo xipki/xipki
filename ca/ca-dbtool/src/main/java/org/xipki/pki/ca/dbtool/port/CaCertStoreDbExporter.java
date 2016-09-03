@@ -166,7 +166,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
             File processLogFile = new File(baseDir, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
 
-            Integer numProcessedInLastProcess = null;
+            Long idProcessedInLastProcess = null;
             CaDbEntryType typeProcessedInLastProcess = null;
             if (processLogFile.exists()) {
                 byte[] content = IoUtil.read(processLogFile);
@@ -175,16 +175,16 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                     int idx = str.indexOf(':');
                     String typeName = str.substring(0, idx).trim();
                     typeProcessedInLastProcess = CaDbEntryType.valueOf(typeName);
-                    numProcessedInLastProcess = Integer.parseInt(str.substring(idx + 1).trim());
+                    idProcessedInLastProcess = Long.parseLong(str.substring(idx + 1).trim());
                 }
             }
 
             if (CaDbEntryType.USER == typeProcessedInLastProcess
                         || typeProcessedInLastProcess == null) {
                 exception = exportEntries(CaDbEntryType.USER, certstore, processLogFile,
-                        numProcessedInLastProcess);
+                        idProcessedInLastProcess);
                 typeProcessedInLastProcess = null;
-                numProcessedInLastProcess = null;
+                idProcessedInLastProcess = null;
             }
 
             CaDbEntryType[] types = new CaDbEntryType[] {CaDbEntryType.CRL, CaDbEntryType.CERT,
@@ -195,9 +195,9 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         && (type == typeProcessedInLastProcess
                             || typeProcessedInLastProcess == null)) {
                     exception = exportEntries(type, certstore, processLogFile,
-                            numProcessedInLastProcess);
+                            idProcessedInLastProcess);
                     typeProcessedInLastProcess = null;
-                    numProcessedInLastProcess = null;
+                    idProcessedInLastProcess = null;
                 }
             }
 
@@ -221,7 +221,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     } // method export
 
     private Exception exportEntries(final CaDbEntryType type, final CertStoreType certstore,
-            final File processLogFile, final Integer idProcessedInLastProcess) {
+            final File processLogFile, final Long idProcessedInLastProcess) {
         String tablesText = (CaDbEntryType.CERT == type)
                 ? "tables CERT and CRAW" : "table " + type.getTableName();
 
@@ -367,7 +367,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
     private void doExportEntries(final CaDbEntryType type, final CertStoreType certstore,
             final File processLogFile, final FileOutputStream filenameListOs,
-            final Integer idProcessedInLastProcess) throws Exception {
+            final Long idProcessedInLastProcess) throws Exception {
         final int numEntriesPerSelect = Math.max(1,
                 Math.round(type.getSqlBatchFactor() * numCertsPerSelect));
         final int numEntriesPerZip = Math.max(1,
@@ -376,52 +376,53 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         final String tableName = type.getTableName();
 
         int numProcessedBefore;
-        String sql;
+        String coreSql;
 
         switch (type) {
         case CERT:
             numProcessedBefore = certstore.getCountCerts();
-            sql = "SELECT ID,SN,CA_ID,PID,RID,ART,RTYPE,TID,UNAME,LUPDATE,REV,RR,RT,RIT,FP_RS,"
-                    + "REQ_SUBJECT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID>=? AND CERT.ID<? "
-                    + "AND CERT.ID=CRAW.CID ORDER BY CERT.ID ASC";
+            coreSql = "ID,SN,CA_ID,PID,RID,ART,RTYPE,TID,UNAME,LUPDATE,REV,RR,RT,RIT,FP_RS,"
+                    + "REQ_SUBJECT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID>=? "
+                    + "AND CERT.ID=CRAW.CID";
             break;
         case CRL:
             numProcessedBefore = certstore.getCountCrls();
-            sql = "SELECT ID,CA_ID,CRL FROM CRL WHERE ID>=? AND ID<? ORDER BY ID ASC";
+            coreSql = "ID,CA_ID,CRL FROM CRL WHERE ID>=?";
             break;
         case USER:
             numProcessedBefore = certstore.getCountUsers();
-            sql = "SELECT ID,NAME,PASSWORD,CN_REGEX FROM USERNAME"
-                    + " WHERE ID>=? AND ID<? ORDER BY ID ASC";
+            coreSql = "ID,NAME,PASSWORD,CN_REGEX FROM USERNAME WHERE ID>=?";
             break;
         case REQUEST:
             numProcessedBefore = certstore.getCountRequests();
-            sql = "SELECT ID,LUPDATE,DATA FROM REQUEST WHERE ID>=? AND ID<? ORDER BY ID ASC";
+            coreSql = "ID,LUPDATE,DATA FROM REQUEST WHERE ID>=?";
             break;
         case REQCERT:
             numProcessedBefore = certstore.getCountReqCerts();
-            sql = "SELECT ID,RID,CID FROM REQCERT WHERE ID>=? AND ID<? ORDER BY ID ASC";
+            coreSql = "ID,RID,CID FROM REQCERT WHERE ID>=?";
             break;
         default:
             throw new RuntimeException("unknown CaDbEntryType " + type);
         }
 
-        Integer minId = null;
+        Long minId = null;
         if (idProcessedInLastProcess != null) {
             minId = idProcessedInLastProcess + 1;
         } else {
-            minId = (int) getMin(tableName, "ID");
+            minId = getMin(tableName, "ID");
         }
 
         String tablesText = (CaDbEntryType.CERT == type)
                 ? "tables " + tableName + " and CRAW" : "table " + type.getTableName();
         System.out.println(getExportingText() + tablesText + " from ID " + minId);
 
-        final int maxId = (int) getMax(tableName, "ID");
+        final long maxId = getMax(tableName, "ID");
         long total = getCount(tableName) - numProcessedBefore;
         if (total < 1) {
             total = 1; // to avoid exception
         }
+
+        String sql = datasource.buildSelectFirstSql(coreSql, numEntriesPerSelect, "ID ASC");
 
         DbiXmlWriter entriesInCurrentFile = createWriter(type);
         PreparedStatement ps = prepareStatement(sql.toString());
@@ -433,28 +434,37 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 "tmp-" + type.getDirName() + "-" + System.currentTimeMillis() + ".zip");
         ZipOutputStream currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
 
-        int minIdOfCurrentFile = -1;
-        int maxIdOfCurrentFile = -1;
+        long minIdOfCurrentFile = -1;
+        long maxIdOfCurrentFile = -1;
 
         ProcessLog processLog = new ProcessLog(total);
         processLog.printHeader();
 
         try {
-            Integer id = null;
+            Long id = null;
             boolean interrupted = false;
-            for (int i = minId; i <= maxId; i += numEntriesPerSelect) {
+            long lastMaxId = minId - 1;
+
+            while (true) {
                 if (stopMe.get()) {
                     interrupted = true;
                     break;
                 }
 
-                ps.setInt(1, i);
-                ps.setInt(2, i + numEntriesPerSelect);
+                ps.setLong(1, lastMaxId + 1);
 
                 ResultSet rs = ps.executeQuery();
 
-                while (rs.next()) {
-                    id = rs.getInt("ID");
+                // no entries anymore
+                if (!rs.next()) {
+                    break;
+                }
+
+                do {
+                    id = rs.getLong("ID");
+                    if (lastMaxId < id) {
+                        lastMaxId = id;
+                    }
 
                     if (minIdOfCurrentFile == -1) {
                         minIdOfCurrentFile = id;
@@ -625,8 +635,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         entry.setFile(dataFilename);
                         ((CaRequestsWriter) entriesInCurrentFile).add(entry);
                     } else if (CaDbEntryType.REQCERT == type) {
-                        int cid = rs.getInt("CID");
-                        int rid = rs.getInt("RID");
+                        long cid = rs.getLong("CID");
+                        long rid = rs.getLong("RID");
                         CaRequestCertType entry = new CaRequestCertType();
                         entry.setId(id);
                         entry.setCid(cid);
@@ -648,7 +658,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                         writeLine(filenameListOs, currentEntriesFilename);
                         setCount(type, certstore, numProcessedBefore + sum);
-                        echoToFile(tableName + ":" + Integer.toString(id), processLogFile);
+                        echoToFile(tableName + ":" + Long.toString(id), processLogFile);
 
                         processLog.addNumProcessed(numEntriesInCurrentFile);
                         processLog.printStatus();
@@ -662,7 +672,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                                 + System.currentTimeMillis() + ".zip");
                         currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
                     }
-                } // end while (rs.next)
+                } while (rs.next());
 
                 rs.close();
             } // end for
@@ -682,7 +692,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 writeLine(filenameListOs, currentEntriesFilename);
                 setCount(type, certstore, numProcessedBefore + sum);
                 if (id != null) {
-                    echoToFile(Integer.toString(id), processLogFile);
+                    echoToFile(Long.toString(id), processLogFile);
                 }
 
                 processLog.addNumProcessed(numEntriesInCurrentFile);

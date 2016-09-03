@@ -810,12 +810,12 @@ public abstract class DataSourceWrapper {
     }
 
     public boolean deleteFromTable(final Connection conn, final String table, final String idColumn,
-            final int id) {
+            final long id) {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("idColumn", idColumn);
         final StringBuilder sb = new StringBuilder(table.length() + idColumn.length() + 35);
         sb.append("DELETE FROM ").append(table).append(" WHERE ")
-            .append(idColumn).append(" = ").append(id);
+            .append(idColumn).append("=").append(id);
         final String sql = sb.toString();
 
         Connection tmpConn;

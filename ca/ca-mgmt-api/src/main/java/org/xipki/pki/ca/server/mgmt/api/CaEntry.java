@@ -257,7 +257,7 @@ public class CaEntry {
         }
         return sb.toString();
     }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof CaEntry)) {

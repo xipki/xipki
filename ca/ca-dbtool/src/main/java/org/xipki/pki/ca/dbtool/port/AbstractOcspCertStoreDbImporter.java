@@ -101,7 +101,7 @@ abstract class AbstractOcspCertStoreDbImporter extends DbPorter {
         return HashAlgoType.SHA512.base64Hash(data);
     }
 
-    protected void deleteCertGreatherThan(final int id, final Logger log) {
+    protected void deleteCertGreatherThan(final long id, final Logger log) {
         deleteFromTableWithLargerId("CRAW", "CID", id, log);
         deleteFromTableWithLargerId("CHASH", "CID", id, log);
         deleteFromTableWithLargerId("CERT", "ID", id, log);

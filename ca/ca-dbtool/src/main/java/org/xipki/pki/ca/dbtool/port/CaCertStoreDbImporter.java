@@ -190,7 +190,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
             CaDbEntryType typeProcessedInLastProcess = null;
             Integer numProcessedInLastProcess = null;
-            Integer idProcessedInLastProcess = null;
+            Long idProcessedInLastProcess = null;
             if (processLogFile.exists()) {
                 byte[] content = IoUtil.read(processLogFile);
                 if (content != null && content.length > 5) {
@@ -199,7 +199,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     String type = st.nextToken();
                     typeProcessedInLastProcess = CaDbEntryType.valueOf(type);
                     numProcessedInLastProcess = Integer.parseInt(st.nextToken());
-                    idProcessedInLastProcess = Integer.parseInt(st.nextToken());
+                    idProcessedInLastProcess = Long.parseLong(st.nextToken());
                 }
             }
 
@@ -207,7 +207,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             // finished for the given type
             if (idProcessedInLastProcess != null && idProcessedInLastProcess == -1) {
                 numProcessedInLastProcess = 0;
-                idProcessedInLastProcess = 0;
+                idProcessedInLastProcess = 0L;
 
                 switch (typeProcessedInLastProcess) {
                 case USER:
@@ -286,7 +286,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     String b64Sha1FpCert = HashAlgoType.SHA1.base64Hash(encodedCert);
 
                     int idx = 1;
-                    ps.setInt(idx++, m.getId());
+                    ps.setInt(idx++, (int) m.getId());
                     ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
                     ps.setString(idx++, b64Sha1FpCert);
                     ps.setString(idx++, b64Cert);
@@ -404,7 +404,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             for (ToPublishType tbp : publishQueue.getTop()) {
                 try {
                     int idx = 1;
-                    ps.setInt(idx++, tbp.getCertId());
+                    ps.setLong(idx++, tbp.getCertId());
                     ps.setInt(idx++, tbp.getPubId());
                     ps.setInt(idx++, tbp.getCaId());
                     ps.execute();
@@ -447,21 +447,18 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             releaseResources(ps, null);
         }
 
-        long maxId = getMax("DELTACRL_CACHE", "ID");
-        datasource.dropAndCreateSequence("DCC_ID", maxId + 1);
-
         System.out.println(" imported table DELTACRL_CACHE");
     } // method importDeltaCRLCache
 
     private Exception importEntries(final CaDbEntryType type, final CertStoreType certstore,
             final File processLogFile, final Integer numProcessedInLastProcess,
-            final Integer idProcessedInLastProcess) {
+            final Long idProcessedInLastProcess) {
         String tablesText = (CaDbEntryType.CERT == type)
                 ? "tables CERT and CRAW" : "table " + type.getTableName();
 
         try {
             int numProcessedBefore = 0;
-            int minId = 1;
+            long minId = 1;
             if (idProcessedInLastProcess != null) {
                 minId = idProcessedInLastProcess + 1;
                 numProcessedBefore = numProcessedInLastProcess;
@@ -474,33 +471,27 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
             final long total;
             String[] sqls;
-            String idSequenceName;
 
             switch (type) {
             case CERT:
                 total = certstore.getCountCerts();
                 sqls = new String[] {SQL_ADD_CERT, SQL_ADD_CRAW};
-                idSequenceName = "CID";
                 break;
             case CRL:
                 total = certstore.getCountCrls();
                 sqls = new String[] {SQL_ADD_CRL};
-                idSequenceName = null;
                 break;
             case USER:
                 total = certstore.getCountUsers();
                 sqls = new String[] {SQL_ADD_USER};
-                idSequenceName = null;
                 break;
             case REQUEST:
                 total = certstore.getCountRequests();
                 sqls = new String[] {SQL_ADD_REQUEST};
-                idSequenceName = "REQ_ID";
                 break;
             case REQCERT:
                 total = certstore.getCountReqCerts();
                 sqls = new String[] {SQL_ADD_REQCERT};
-                idSequenceName = "REQCERT_ID";
                 break;
             default:
                 throw new RuntimeException("unsupported DbEntryType " + type);
@@ -549,7 +540,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     }
 
                     try {
-                        int lastId = doImportEntries(type, entriesFile, minId, processLogFile,
+                        long lastId = doImportEntries(type, entriesFile, minId, processLogFile,
                                 processLog, numProcessedBefore, statements, sqls);
                         minId = lastId + 1;
                     } catch (Exception ex) {
@@ -570,12 +561,6 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 entriesFileIterator.close();
             }
 
-            long maxId = getMax(type.getTableName(), "ID");
-
-            if (idSequenceName != null) {
-                datasource.dropAndCreateSequence(idSequenceName, maxId + 1);
-            }
-
             processLog.printTrailer();
             echoToFile(type + ":" + (numProcessedBefore + processLog.getNumProcessed()) + ":-1",
                     processLogFile);
@@ -590,8 +575,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
     }
 
-    private int doImportEntries(final CaDbEntryType type, final String entriesZipFile,
-            final int minId, final File processLogFile, final ProcessLog processLog,
+    private long doImportEntries(final CaDbEntryType type, final String entriesZipFile,
+            final long minId, final File processLogFile, final ProcessLog processLog,
             final int numProcessedInLastProcess, final PreparedStatement[] statements,
             final String[] sqls)
     throws Exception {
@@ -618,7 +603,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
         try {
             int numEntriesInBatch = 0;
-            int lastSuccessfulEntryId = 0;
+            long lastSuccessfulEntryId = 0;
 
             while (entries.hasNext()) {
                 if (stopMe.get()) {
@@ -626,7 +611,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 }
 
                 IdentifidDbObjectType entry = (IdentifidDbObjectType) entries.next();
-                int id = entry.getId();
+                long id = entry.getId();
                 if (id < minId) {
                     continue;
                 }
@@ -667,7 +652,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     try {
                         int idx = 1;
 
-                        psCert.setInt(idx++, id);
+                        psCert.setLong(idx++, id);
                         psCert.setInt(idx++, certArt);
                         psCert.setLong(idx++, cert.getUpdate());
                         psCert.setString(idx++,
@@ -717,7 +702,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                     try {
                         int idx = 1;
-                        psRawcert.setInt(idx++, cert.getId());
+                        psRawcert.setLong(idx++, cert.getId());
                         psRawcert.setString(idx++, b64Sha1FpCert);
                         psRawcert.setString(idx++, cert.getRs());
                         psRawcert.setString(idx++, Base64.toBase64String(encodedCert));
@@ -771,7 +756,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                         }
 
                         int idx = 1;
-                        psAddCrl.setInt(idx++, crl.getId());
+                        psAddCrl.setLong(idx++, crl.getId());
                         psAddCrl.setInt(idx++, crl.getCaId());
                         psAddCrl.setLong(idx++, crlNumber.longValue());
                         psAddCrl.setLong(idx++, x509crl.getThisUpdate().getTime() / 1000);
@@ -804,7 +789,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                     try {
                         int idx = 1;
-                        psAddUser.setInt(idx++, user.getId());
+                        psAddUser.setLong(idx++, user.getId());
                         psAddUser.setString(idx++, user.getName());
                         psAddUser.setString(idx++, user.getPassword());
                         psAddUser.setString(idx++, user.getCnRegex());
@@ -826,7 +811,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                     try {
                         int idx = 1;
-                        psAddRequest.setInt(idx++, request.getId());
+                        psAddRequest.setLong(idx++, request.getId());
                         psAddRequest.setLong(idx++, request.getUpdate());
                         psAddRequest.setString(idx++, Base64.toBase64String(encodedRequest));
                         psAddRequest.addBatch();
@@ -842,9 +827,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                     try {
                         int idx = 1;
-                        psAddReqCert.setInt(idx++, reqCert.getId());
-                        psAddReqCert.setInt(idx++, reqCert.getRid());
-                        psAddReqCert.setInt(idx++, reqCert.getCid());
+                        psAddReqCert.setLong(idx++, reqCert.getId());
+                        psAddReqCert.setLong(idx++, reqCert.getRid());
+                        psAddReqCert.setLong(idx++, reqCert.getCid());
                         psAddReqCert.addBatch();
                     } catch (SQLException ex) {
                         System.err.println("could not import REQUEST with ID=" + reqCert.getId()

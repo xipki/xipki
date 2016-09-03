@@ -294,7 +294,7 @@
   <xs:complexType name="toPublishType">
     <xs:sequence>
       <xs:element name="pubId" type="xs:int"/>
-      <xs:element name="certId" type="xs:int"/>
+      <xs:element name="certId" type="xs:long"/>
       <xs:element name="caId" type="xs:int"/>
     </xs:sequence>
   </xs:complexType>

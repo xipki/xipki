@@ -117,7 +117,7 @@ public class DbToolBase {
     }
 
     public boolean deleteFromTableWithLargerId(final String tableName, final String idColumn,
-            final int id, final Logger log) {
+            final long id, final Logger log) {
         ParamUtil.requireNonBlank("tableName", tableName);
         ParamUtil.requireNonBlank("idColumn", idColumn);
 
@@ -324,22 +324,22 @@ public class DbToolBase {
     }
 
     public static String buildFilename(final String prefix, final String suffix,
-            final int minIdOfCurrentFile, final int maxIdOfCurrentFile, final int maxId) {
+            final long minIdOfCurrentFile, final long maxIdOfCurrentFile, final long maxId) {
         ParamUtil.requireNonNull("prefix", prefix);
         ParamUtil.requireNonNull("suffix", suffix);
 
         StringBuilder sb = new StringBuilder();
         sb.append(prefix);
 
-        int len = Integer.toString(maxId).length();
-        String minIdStr = Integer.toString(minIdOfCurrentFile);
+        int len = Long.toString(maxId).length();
+        String minIdStr = Long.toString(minIdOfCurrentFile);
         for (int i = 0; i < len - minIdStr.length(); i++) {
             sb.append('0');
         }
         sb.append(minIdStr);
         sb.append("-");
 
-        String maxIdStr = Integer.toString(maxIdOfCurrentFile);
+        String maxIdStr = Long.toString(maxIdOfCurrentFile);
         for (int i = 0; i < len - maxIdStr.length(); i++) {
             sb.append('0');
         }

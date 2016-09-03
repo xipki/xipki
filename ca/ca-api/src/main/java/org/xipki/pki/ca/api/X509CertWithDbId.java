@@ -47,7 +47,7 @@ import org.xipki.commons.security.X509Cert;
 
 public class X509CertWithDbId extends X509Cert {
 
-    private Integer certId;
+    private Long certId;
 
     public X509CertWithDbId(final X509Certificate cert) {
         super(cert);
@@ -57,11 +57,11 @@ public class X509CertWithDbId extends X509Cert {
         super(cert, encodedCert);
     }
 
-    public Integer getCertId() {
+    public Long getCertId() {
         return certId;
     }
 
-    public void setCertId(final Integer certId) {
+    public void setCertId(final Long certId) {
         this.certId = certId;
     }
 

@@ -45,13 +45,13 @@ public abstract class IdentifidDbObjectType extends DbDataObject {
 
     public static final String TAG_ID = "id";
 
-    private Integer id;
+    private Long id;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(final Integer id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 

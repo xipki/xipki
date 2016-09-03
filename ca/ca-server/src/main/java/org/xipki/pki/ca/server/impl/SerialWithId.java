@@ -45,11 +45,11 @@ import java.math.BigInteger;
 
 public class SerialWithId {
 
-    private int id;
+    private long id;
 
     private BigInteger serial;
 
-    public SerialWithId(final int id, final BigInteger serial) {
+    public SerialWithId(final long id, final BigInteger serial) {
         this.id = id;
         this.serial = serial;
     }
@@ -58,7 +58,7 @@ public class SerialWithId {
         return serial;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

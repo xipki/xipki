@@ -53,23 +53,23 @@ public class CaRequestCertType extends IdentifidDbObjectType {
 
     public static final String TAG_CID = "cid";
 
-    private Integer rid;
+    private Long rid;
 
-    private Integer cid;
+    private Long cid;
 
-    public Integer getRid() {
+    public Long getRid() {
         return rid;
     }
 
-    public void setRid(final int rid) {
+    public void setRid(final long rid) {
         this.rid = rid;
     }
 
-    public Integer getCid() {
+    public Long getCid() {
         return cid;
     }
 
-    public void setCid(final int cid) {
+    public void setCid(final long cid) {
         this.cid = cid;
     }
 

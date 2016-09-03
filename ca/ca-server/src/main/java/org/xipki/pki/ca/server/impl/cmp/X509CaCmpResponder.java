@@ -49,7 +49,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -408,7 +408,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 encodedRequest = null;
             }
         }
-        AtomicInteger reqDbId = new AtomicInteger(0);
+        AtomicLong reqDbId = new AtomicLong(0);
 
         for (int i = 0; i < certReqMsgs.length; i++) {
             AuditChildEvent childAuditEvent = new AuditChildEvent();
@@ -560,7 +560,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     LOG.warn("could not encode request");
                     encodedRequest = null;
                 }
-                certResp = generateCertificate(encodedRequest, new AtomicInteger(0),
+                certResp = generateCertificate(encodedRequest, new AtomicLong(0),
                         certTemplateData, requestor, user, tid, certReqId, false, confirmWaitTime,
                         childAuditEvent);
             } catch (CMPException ex) {
@@ -579,7 +579,7 @@ public class X509CaCmpResponder extends CmpResponder {
         return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
     } // method processP10cr
 
-    private CertResponse generateCertificate(final byte[] request, final AtomicInteger reqDbId,
+    private CertResponse generateCertificate(final byte[] request, final AtomicLong reqDbId,
             final CertTemplateData certTemplate, final CmpRequestorInfo requestor,
             final String user, final ASN1OctetString tid, final ASN1Integer certReqId,
             final boolean keyUpdate, final long confirmWaitTime,
@@ -618,7 +618,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
             if (ca.getCaInfo().isSaveRequest()) {
                 if (reqDbId.get() == 0) {
-                    int dbId = ca.addRequest(request);
+                    long dbId = ca.addRequest(request);
                     reqDbId.set(dbId);
                 }
                 ca.addRequestCert(reqDbId.get(), certInfo.getCert().getCertId());
@@ -752,7 +752,7 @@ public class X509CaCmpResponder extends CmpResponder {
             }
         }
 
-        Integer reqDbId = null;
+        Long reqDbId = null;
 
         for (int i = 0; i < n; i++) {
             AuditChildEvent childAuditEvent = new AuditChildEvent();
@@ -776,7 +776,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
             try {
                 Object returnedObj = null;
-                Integer certDbId = null;
+                Long certDbId = null;
                 X509Ca ca = getCa();
                 if (Permission.UNREVOKE_CERT == permission) {
                     // unrevoke

@@ -283,7 +283,7 @@
     </createTable>
     <!-- table USERNAME -->
     <createTable tableName="USERNAME">
-      <column name="ID" type="INT">
+      <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="NAME" type="VARCHAR(100)">
@@ -319,7 +319,7 @@
       <column name="CA_ID" type="INT">
         <constraints nullable="false"/>
       </column>
-      <column name="CRL_NO" type="INT">
+      <column name="CRL_NO" type="BIGINT">
         <constraints nullable="false"/>
       </column>
       <column name="THISUPDATE" type="BIGINT">
@@ -337,7 +337,7 @@
     <addUniqueConstraint tableName="CRL" columnNames="CA_ID, CRL_NO" constraintName="CONST_CA_CRLNO"/>
     <!-- table CERT -->
     <createTable tableName="CERT">
-      <column name="ID" type="INT">
+      <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="ART" type="SMALLINT">
@@ -405,7 +405,7 @@
           remarks="base64 encoded transactionId, maximal 256 bit"/>
     </createTable>
     <createTable tableName="REQUEST">
-      <column name="ID" type="INT">
+      <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="LUPDATE" type="BIGINT"
@@ -416,13 +416,13 @@
     </createTable>
     <!-- table REQCERT -->
     <createTable tableName="REQCERT">
-      <column name="ID" type="INT">
+      <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="RID" type="INT" remarks="request id">
+      <column name="RID" type="BIGINT" remarks="request id">
         <constraints nullable="false"/>
       </column>
-      <column name="CID" type="INT" remarks="cert id">
+      <column name="CID" type="BIGINT" remarks="cert id">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -441,7 +441,7 @@
     </createIndex>
     <!-- table CRAW -->
     <createTable tableName="CRAW">
-      <column name="CID" type="INT">
+      <column name="CID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="SHA1" type="CHAR(28)">
@@ -455,7 +455,7 @@
     </createTable>
     <!-- table PUBLISHQUEUE -->
     <createTable tableName="PUBLISHQUEUE">
-      <column name="CID" type="INT">
+      <column name="CID" type="BIGINT">
         <constraints nullable="false"/>
       </column>
       <column name="PID" type="INT">
@@ -492,41 +492,8 @@
       </column>
     </createTable>
   </changeSet>
-  <changeSet author="xipki" id="3" dbms="mysql,mariadb">
-    <createTable tableName="SEQ_TBL">
-      <column name="SEQ_NAME" type="CHAR(100)">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="SEQ_VALUE" type="BIGINT">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
-    <insert tableName="SEQ_TBL">
-      <column name="SEQ_NAME" value="DCC_ID"/>
-      <column name="SEQ_VALUE" value="1"/>
-    </insert>
-    <insert tableName="SEQ_TBL">
-      <column name="SEQ_NAME" value="CID"/>
-      <column name="SEQ_VALUE" value="1"/>
-    </insert>
-    <insert tableName="SEQ_TBL">
-      <column name="SEQ_NAME" value="REQ_ID"/>
-      <column name="SEQ_VALUE" value="1"/>
-    </insert>
-    <insert tableName="SEQ_TBL">
-      <column name="SEQ_NAME" value="REQ_CID"/>
-      <column name="SEQ_VALUE" value="1"/>
-    </insert>
-  </changeSet>
-  <changeSet author="xipki" id="4" dbms="oracle,postgresql,db2,h2,hsqldb">
-    <!-- sequence for the column ID in table DELTACRL_CACHE -->
-    <createSequence sequenceName="DCC_ID" incrementBy="1" startValue="1"/>
-    <createSequence sequenceName="CID" incrementBy="1" startValue="1"/>
-    <createSequence sequenceName="REQ_ID" incrementBy="1" startValue="1"/>
-    <createSequence sequenceName="REQCERT_ID" incrementBy="1" startValue="1"/>
-  </changeSet>
   <!-- CA Configuration :: foreign key -->
-  <changeSet author="xipki" id="5">
+  <changeSet author="xipki" id="3">
     <addForeignKeyConstraint  constraintName="FK_CA_CMPCONTROL1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
@@ -588,7 +555,7 @@
       referencedColumnNames="NAME" referencedTableName="CA"/>
   </changeSet>
   <!-- CertStore :: foreigen key -->
-  <changeSet author="xipki" id="6">
+  <changeSet author="xipki" id="4">
     <addForeignKeyConstraint constraintName="FK_CRL_CS_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"

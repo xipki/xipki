@@ -51,7 +51,7 @@ import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.dbtool.DbToolBase;
-import org.xipki.pki.ca.dbtool.IdRange;
+import org.xipki.pki.ca.dbtool.EndOfQueue;
 import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbSchemaType;
@@ -76,23 +76,12 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
     private String selectCertSql;
 
-    private String numCertSql;
-
-    private PreparedStatement numCertStmt;
-
-    private XipkiDbDigestReader(final DataSourceWrapper datasource, final X509Certificate caCert,
-            final int totalAccount, final int minId, final int maxId, final int numThreads,
-            final int numCertsToPredicate, final StopMe stopMe) throws Exception {
-        super(datasource, caCert, totalAccount, minId, maxId, numThreads,  numCertsToPredicate,
-                stopMe);
-    } // constructor
-
     private class XipkiDbRetriever implements Retriever {
-        private Connection conn;
+
         private PreparedStatement selectCertStmt;
+        private boolean endReached;
 
         XipkiDbRetriever() throws DataAccessException {
-            this.conn = datasource.getConnection();
             try {
                 selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
             } catch (DataAccessException ex) {
@@ -104,10 +93,9 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
         @Override
         public void run() {
-            while (!stopMe.stopMe()) {
+            while (!endReached && !stopMe.stopMe()) {
                 try {
-                    IdRange idRange = inQueue.take();
-                    query(idRange);
+                    query();
                 } catch (InterruptedException ex) {
                     LOG.error("InterruptedException: {}", ex.getMessage());
                 }
@@ -118,30 +106,34 @@ public class XipkiDbDigestReader extends DbDigestReader {
             selectCertStmt = null;
         }
 
-        private void query(final IdRange idRange) {
-            DigestDbEntrySet result = new DigestDbEntrySet(idRange.getFrom());
+        private void query() throws InterruptedException {
+            long startId = lastProcessedId + 1;
+            DigestDbEntrySet result = new DigestDbEntrySet(startId);
 
             ResultSet rs = null;
             try {
-                selectCertStmt.setInt(1, idRange.getFrom());
-                selectCertStmt.setInt(2, idRange.getTo() + 1);
+                selectCertStmt.setLong(1, startId);
 
                 rs = selectCertStmt.executeQuery();
 
                 while (rs.next()) {
+                    long id = rs.getLong("ID");
+                    if (lastProcessedId < id) {
+                        lastProcessedId = id;
+                    }
+
                     String hash = rs.getString(dbControl.getColCerthash());
-                    BigInteger serial = new BigInteger(rs.getString(dbControl.getColSerialNumber()),
-                            16);
-                    boolean revoked = rs.getBoolean(dbControl.getColRevoked());
+                    BigInteger serial = new BigInteger(rs.getString("SN"), 16);
+                    boolean revoked = rs.getBoolean("REV");
 
                     Integer revReason = null;
                     Long revTime = null;
                     Long revInvTime = null;
 
                     if (revoked) {
-                        revReason = rs.getInt(dbControl.getColRevReason());
-                        revTime = rs.getLong(dbControl.getColRevTime());
-                        revInvTime = rs.getLong(dbControl.getColRevInvTime());
+                        revReason = rs.getInt("RR");
+                        revTime = rs.getLong("RT");
+                        revInvTime = rs.getLong("RIT");
                         if (revInvTime == 0) {
                             revInvTime = null;
                         }
@@ -149,7 +141,6 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
                     DbDigestEntry cert = new DbDigestEntry(serial, revoked, revReason, revTime,
                             revInvTime, hash);
-                    int id = rs.getInt("ID");
                     result.addEntry(new IdentifiedDbDigestEntry(cert, id));
                 }
             } catch (Exception ex) {
@@ -161,44 +152,40 @@ public class XipkiDbDigestReader extends DbDigestReader {
                 releaseResources(null, rs);
             }
 
-            outQueue.add(result);
+            if (result.getEntries().isEmpty()) {
+                endReached = true;
+                outQueue.put(EndOfQueue.INSTANCE);
+            } else {
+                outQueue.put(result);
+            }
         } // method query
 
     } // class XipkiDbRetriever
 
-    private void init(final DbSchemaType dbSchemaType, final int caId) throws Exception {
+    private XipkiDbDigestReader(final DataSourceWrapper datasource, final X509Certificate caCert,
+            final int totalAccount, final long minId, final int numBlocksToRead,
+            final int numPerSelect, final StopMe stopMe) throws Exception {
+        super(datasource, caCert, totalAccount, minId, numBlocksToRead, stopMe);
+    } // constructor
+
+    private void init(final DbSchemaType dbSchemaType, final int caId, final int numPerSelect)
+    throws Exception {
         this.caId = caId;
         this.conn = datasource.getConnection();
         this.dbControl = new XipkiDbControl(dbSchemaType);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT ID,");
-        sb.append(dbControl.getColSerialNumber()).append(",");
-        sb.append(dbControl.getColRevoked()).append(",");
-        sb.append(dbControl.getColRevReason()).append(",");
-        sb.append(dbControl.getColRevTime()).append(",");
-        sb.append(dbControl.getColRevInvTime()).append(",");
+        sb.append("ID,SN,REV,RR,RT,RIT,");
         sb.append(dbControl.getColCerthash());
         sb.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
         sb.append(" ON CERT.").append(dbControl.getColCaId()).append("=").append(caId);
-        sb.append(" AND CERT.ID>=? AND CERT.ID<?");
-        sb.append(" AND CERT.ID=").append(dbControl.getTblCerthash())
-            .append(".").append(dbControl.getColCertId());
+        sb.append(" AND CERT.ID>=? AND CERT.ID=").append(dbControl.getTblCerthash()).append(".CID");
 
-        this.selectCertSql = sb.toString();
-        this.numCertSql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=" + caId + " AND ID>=? AND ID<=?";
-        this.numCertStmt = datasource.prepareStatement(conn, this.numCertSql);
+        this.selectCertSql = datasource.buildSelectFirstSql(sb.toString(), numPerSelect, "ID ASC");
 
         if (!super.init()) {
-            throw new Exception("could not initialize the EjbcaDigestReader");
+            throw new Exception("could not initialize the " + this.getClass().getName());
         }
-    }
-
-    public void close() {
-        super.close();
-
-        releaseResources(numCertStmt, null);
-        datasource.returnConnection(conn);
     }
 
     public int getCaId() {
@@ -211,8 +198,8 @@ public class XipkiDbDigestReader extends DbDigestReader {
     }
 
     public static XipkiDbDigestReader getInstance(final DataSourceWrapper datasource,
-            final DbSchemaType dbSchemaType, final int caId, final int numThreads,
-            final int numCertsToPredicate, final StopMe stopMe) throws Exception {
+            final DbSchemaType dbSchemaType, final int caId, final int numBlocksToRead,
+            final int numPerSelect, final StopMe stopMe) throws Exception {
         ParamUtil.requireNonNull("datasource", datasource);
 
         Connection conn = datasource.getConnection();
@@ -225,8 +212,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
         X509Certificate caCert;
         int totalAccount;
-        int minId;
-        int maxId;
+        long minId;
 
         try {
             stmt = datasource.createStatement(conn);
@@ -246,19 +232,13 @@ public class XipkiDbDigestReader extends DbDigestReader {
             totalAccount = rs.next() ? rs.getInt(1) : 0;
             rs.close();
 
-            sql = "SELECT MAX(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
-
-            rs = stmt.executeQuery(sql);
-            maxId = rs.next() ? rs.getInt(1) : 0;
-            rs.close();
-
             sql = "SELECT MIN(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
             rs = stmt.executeQuery(sql);
-            minId = rs.next() ? rs.getInt(1) : 1;
+            minId = rs.next() ? rs.getLong(1) : 1;
 
             XipkiDbDigestReader reader = new XipkiDbDigestReader(datasource, caCert,
-                    totalAccount, minId, maxId, numThreads, numCertsToPredicate, stopMe);
-            reader.init(dbSchemaType, caId);
+                    totalAccount, minId, numBlocksToRead, numPerSelect, stopMe);
+            reader.init(dbSchemaType, caId, numPerSelect);
             return reader;
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);

@@ -43,11 +43,11 @@ package org.xipki.pki.ca.dbtool;
 
 public class IdRange {
 
-    private final int from;
+    private final long from;
 
-    private final int to;
+    private final long to;
 
-    public IdRange(final int from, final int to) {
+    public IdRange(final long from, final long to) {
         if (from > to) {
             throw new IllegalArgumentException(
                     "from must not be greater than to: " + from + " > " + to);
@@ -57,11 +57,11 @@ public class IdRange {
         this.to = to;
     }
 
-    public int getFrom() {
+    public long getFrom() {
         return from;
     }
 
-    public int getTo() {
+    public long getTo() {
         return to;
     }
 

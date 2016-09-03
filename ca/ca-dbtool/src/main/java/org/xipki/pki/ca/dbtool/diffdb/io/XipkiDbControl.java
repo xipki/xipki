@@ -37,6 +37,7 @@
 package org.xipki.pki.ca.dbtool.diffdb.io;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.datasource.DataSourceWrapper;
 
 /**
  * @author Lijun Liao
@@ -51,66 +52,25 @@ public class XipkiDbControl {
 
     private final String colCaId;
 
-    private final String colCertId;
-
     private final String colCerthash;
-
-    private final String colRevoked;
-
-    private final String colRevReason;
-
-    private final String colRevTime;
-
-    private final String colRevInvTime;
-
-    private final String colSerialNumber;
 
     private final String caSql;
 
-    private final String certSql;
+    private final String certCoreSql;
 
     public XipkiDbControl(final DbSchemaType dbSchemaType) {
         ParamUtil.requireNonNull("dbSchemaType", dbSchemaType);
 
-        if (dbSchemaType == DbSchemaType.XIPKI_CA_v1
-                || dbSchemaType == DbSchemaType.XIPKI_OCSP_v1) {
-            if (dbSchemaType == DbSchemaType.XIPKI_CA_v1) { // CA
-                tblCa = "CAINFO";
-                tblCerthash = "RAWCERT";
-                colCaId = "CAINFO_ID";
-            } else { // OCSP
-                tblCa = "ISSUER";
-                tblCerthash = "CERTHASH";
-                colCaId = "ISSUER_ID";
-            }
-
-            colCerthash = "SHA1_FP";
-            colCertId = "CERT_ID";
-            colRevInvTime = "REV_INVALIDITY_TIME";
-            colRevoked = "REVOKED";
-            colRevReason = "REV_REASON";
-            colRevTime = "REV_TIME";
-            colSerialNumber = "SERIAL";
-        } else if (dbSchemaType == DbSchemaType.XIPKI_CA_v2
-                || dbSchemaType == DbSchemaType.XIPKI_OCSP_v2) {
-            if (dbSchemaType == DbSchemaType.XIPKI_CA_v2) { // CA
-                tblCa = "CS_CA";
-                tblCerthash = "CRAW";
-                colCaId = "CA_ID";
-                colCerthash = "SHA1";
-            } else { // OCSP
-                tblCa = "ISSUER";
-                tblCerthash = "CHASH";
-                colCaId = "IID";
-                colCerthash = "S1";
-            }
-
-            colCertId = "CID";
-            colRevInvTime = "RIT";
-            colRevoked = "REV";
-            colRevReason = "RR";
-            colRevTime = "RT";
-            colSerialNumber = "SN";
+        if (dbSchemaType == DbSchemaType.XIPKI_CA_v2) {
+            tblCa = "CS_CA";
+            tblCerthash = "CRAW";
+            colCaId = "CA_ID";
+            colCerthash = "SHA1";
+        } else if (dbSchemaType == DbSchemaType.XIPKI_OCSP_v2) {
+            tblCa = "ISSUER";
+            tblCerthash = "CHASH";
+            colCaId = "IID";
+            colCerthash = "S1";
         } else {
             throw new RuntimeException("unsupported DbSchemaType " + dbSchemaType);
         }
@@ -120,21 +80,15 @@ public class XipkiDbControl {
         sb.append("SELECT ID,CERT FROM ").append(tblCa);
         this.caSql = sb.toString();
 
-        // CERT SQL
+        // CERT CORE SQL
         sb.delete(0, sb.length());
-        sb.append("SELECT ID,");
-        sb.append(colCaId).append(',');
-        sb.append(colSerialNumber).append(',');
-        sb.append(colRevoked).append(',');
-        sb.append(colRevReason).append(',');
-        sb.append(colRevTime).append(',');
-        sb.append(colRevInvTime).append(',');
+        sb.append("ID,");
+        sb.append(colCaId).append(",SN,REV,RR,RT,RIT,");
         sb.append(colCerthash);
         sb.append(" FROM CERT INNER JOIN ").append(tblCerthash);
-        sb.append(" ON CERT.ID>=? AND CERT.ID<? AND CERT.ID=");
-        sb.append(tblCerthash).append(".").append(colCertId);
-        sb.append(" ORDER BY CERT.ID ASC");
-        this.certSql = sb.toString();
+        sb.append(" ON CERT.ID>=? AND CERT.ID=");
+        sb.append(tblCerthash).append(".CID");
+        this.certCoreSql = sb.toString();
     } // constructor
 
     public String getTblCa() {
@@ -149,40 +103,16 @@ public class XipkiDbControl {
         return colCaId;
     }
 
-    public String getColCertId() {
-        return colCertId;
-    }
-
     public String getColCerthash() {
         return colCerthash;
-    }
-
-    public String getColRevoked() {
-        return colRevoked;
-    }
-
-    public String getColRevReason() {
-        return colRevReason;
-    }
-
-    public String getColRevTime() {
-        return colRevTime;
-    }
-
-    public String getColRevInvTime() {
-        return colRevInvTime;
-    }
-
-    public String getColSerialNumber() {
-        return colSerialNumber;
     }
 
     public String getCaSql() {
         return caSql;
     }
 
-    public String getCertSql() {
-        return certSql;
+    public String getCertSql(final DataSourceWrapper datasource, final int rows) {
+        return datasource.buildSelectFirstSql(certCoreSql, rows, "ID ASC");
     }
 
 }

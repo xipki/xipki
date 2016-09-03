@@ -122,7 +122,7 @@ public class DbDigestExportWorker extends DbPortWorker {
                         numCertsPerSelect, dbSchemaType, numThreads);
             } else {
                 digester = new XipkiDigestExporter(datasource, destFolder, stopMe,
-                        numCertsPerSelect, dbSchemaType, numThreads);
+                        numCertsPerSelect, dbSchemaType);
             }
             digester.digest();
         } finally {
@@ -140,12 +140,7 @@ public class DbDigestExportWorker extends DbPortWorker {
     throws DataAccessException {
         Connection conn = datasource.getConnection();
         try {
-            if (datasource.tableExists(conn, "CAINFO") && datasource.tableExists(conn, "RAWCERT")) {
-                return DbSchemaType.XIPKI_CA_v1;
-            } else if (datasource.tableExists(conn, "ISSUER")
-                    && datasource.tableExists(conn, "CERTHASH")) {
-                return DbSchemaType.XIPKI_OCSP_v1;
-            } else if (datasource.tableExists(conn, "CS_CA")
+            if (datasource.tableExists(conn, "CS_CA")
                     && datasource.tableExists(conn, "CRAW")) {
                 return DbSchemaType.XIPKI_CA_v2;
             } else if (datasource.tableExists(conn, "ISSUER")

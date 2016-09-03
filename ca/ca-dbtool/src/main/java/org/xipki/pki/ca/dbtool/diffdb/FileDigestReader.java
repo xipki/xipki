@@ -83,8 +83,12 @@ public class FileDigestReader implements DigestReader {
 
     private DbDigestEntry next;
 
-    public FileDigestReader(final String caDirname) throws IOException, CertificateException {
+    private final int numCertsInOneBlock;
+
+    public FileDigestReader(final String caDirname, int numCertsInOneBlock)
+    throws IOException, CertificateException {
         this.caDirname = ParamUtil.requireNonBlank("caDirname", caDirname);
+        this.numCertsInOneBlock = ParamUtil.requireMin("numCertsInOneBlock", numCertsInOneBlock, 1);
 
         this.caCert = X509Util.parseCert(new File(caDirname, "ca.der"));
         Properties props = new Properties();
@@ -115,14 +119,14 @@ public class FileDigestReader implements DigestReader {
     }
 
     @Override
-    public synchronized CertsBundle nextCerts(final int numCerts)
+    public synchronized CertsBundle nextCerts()
     throws DataAccessException, InterruptedException {
         if (!hasNext()) {
             return null;
         }
 
-        List<BigInteger> serialNumbers = new ArrayList<>(numCerts);
-        Map<BigInteger, DbDigestEntry> certs = new HashMap<>(numCerts);
+        List<BigInteger> serialNumbers = new ArrayList<>(numCertsInOneBlock);
+        Map<BigInteger, DbDigestEntry> certs = new HashMap<>(numCertsInOneBlock);
 
         int ik = 0;
         while (hasNext()) {
@@ -136,7 +140,7 @@ public class FileDigestReader implements DigestReader {
             serialNumbers.add(line.getSerialNumber());
             certs.put(line.getSerialNumber(), line);
             ik++;
-            if (ik >= numCerts) {
+            if (ik >= numCertsInOneBlock) {
                 break;
             }
         }

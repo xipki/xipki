@@ -78,8 +78,6 @@ public class TargetDigestRetriever {
 
         private PreparedStatement inArraySelectStmt;
 
-        private PreparedStatement rangeSelectStmt;
-
         Retriever(final boolean revokedOnly) throws DataAccessException {
             this.revokedOnly = revokedOnly;
             conn = datasource.getConnection();
@@ -87,11 +85,9 @@ public class TargetDigestRetriever {
             try {
                 singleSelectStmt = datasource.prepareStatement(conn, singleCertSql);
                 inArraySelectStmt = datasource.prepareStatement(conn, inArrayCertsSql);
-                rangeSelectStmt = datasource.prepareStatement(conn, rangeCertsSql);
             } catch (DataAccessException ex) {
                 releaseResources(singleSelectStmt, null);
                 releaseResources(inArraySelectStmt, null);
-                releaseResources(rangeSelectStmt, null);
                 datasource.returnConnection(conn);
                 throw ex;
             }
@@ -102,7 +98,7 @@ public class TargetDigestRetriever {
             while (!stopMe.stopMe()) {
                 CertsBundle bundle = null;
                 try {
-                    bundle = reader.nextCerts(numPerSelect);
+                    bundle = reader.nextCerts();
                 } catch (Exception ex) {
                     exception = ex;
                     break;
@@ -150,7 +146,6 @@ public class TargetDigestRetriever {
 
             releaseResources(singleSelectStmt, null);
             releaseResources(inArraySelectStmt, null);
-            releaseResources(rangeSelectStmt, null);
             datasource.returnConnection(conn);
         } // method run
 
@@ -176,8 +171,6 @@ public class TargetDigestRetriever {
     private final String singleCertSql;
 
     private final String inArrayCertsSql;
-
-    private final String rangeCertsSql;
 
     private final StopMe stopMe;
 
@@ -207,53 +200,27 @@ public class TargetDigestRetriever {
         this.stopMe = ParamUtil.requireNonNull("stopMe", stopMe);
 
         StringBuilder buffer = new StringBuilder(200);
-        buffer.append(dbControl.getColRevoked()).append(',');
-        buffer.append(dbControl.getColRevReason()).append(',');
-        buffer.append(dbControl.getColRevTime()).append(',');
-        buffer.append(dbControl.getColRevInvTime()).append(',');
+        buffer.append("REV,RR,RT,RIT,");
         buffer.append(dbControl.getColCerthash());
         buffer.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
         buffer.append(" ON CERT.").append(dbControl.getColCaId()).append('=').append(caId);
-        buffer.append(" AND CERT.").append(dbControl.getColSerialNumber()).append("=?");
-        buffer.append(" AND CERT.ID=").append(dbControl.getTblCerthash()).append('.');
-        buffer.append(dbControl.getColCertId());
+        buffer.append(" AND CERT.SN=?");
+        buffer.append(" AND CERT.ID=").append(dbControl.getTblCerthash()).append(".CID");
 
         singleCertSql = datasource.buildSelectFirstSql(buffer.toString(), 1);
 
         buffer = new StringBuilder(200);
-        buffer.append(dbControl.getColSerialNumber()).append(',');
-        buffer.append(dbControl.getColRevoked()).append(',');
-        buffer.append(dbControl.getColRevReason()).append(',');
-        buffer.append(dbControl.getColRevTime()).append(',');
-        buffer.append(dbControl.getColRevInvTime()).append(',');
+        buffer.append("SN,REV,RR,RT,RIT,");
         buffer.append(dbControl.getColCerthash());
         buffer.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
         buffer.append(" ON CERT.").append(dbControl.getColCaId()).append('=').append(caId);
-        buffer.append(" AND CERT.").append(dbControl.getColSerialNumber()).append(" IN (?");
+        buffer.append(" AND CERT.SN IN (?");
         for (int i = 1; i < numPerSelect; i++) {
             buffer.append(",?");
         }
         buffer.append(") AND CERT.ID=").append(dbControl.getTblCerthash());
-        buffer.append(".").append(dbControl.getColCertId());
-
+        buffer.append(".CID");
         inArrayCertsSql = datasource.buildSelectFirstSql(buffer.toString(), numPerSelect);
-
-        buffer = new StringBuilder(200);
-        buffer.append("SELECT ");
-        buffer.append(dbControl.getColSerialNumber()).append(',');
-        buffer.append(dbControl.getColRevoked()).append(',');
-        buffer.append(dbControl.getColRevReason()).append(',');
-        buffer.append(dbControl.getColRevTime()).append(',');
-        buffer.append(dbControl.getColRevInvTime()).append(',');
-        buffer.append(dbControl.getColCerthash());
-        buffer.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
-        buffer.append(" ON CERT.").append(dbControl.getColCaId()).append("=").append(caId);
-        buffer.append(" AND CERT.").append(dbControl.getColSerialNumber()).append(">=?");
-        buffer.append(" AND CERT.").append(dbControl.getColSerialNumber()).append("<=?");
-        buffer.append(" AND CERT.ID=").append(dbControl.getTblCerthash()).append(".");
-        buffer.append(dbControl.getColCertId());
-
-        rangeCertsSql = buffer.toString();
 
         retrievers = new ArrayList<>(numThreads);
 
@@ -325,20 +292,20 @@ public class TargetDigestRetriever {
         Map<BigInteger, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
 
         while (rs.next()) {
-            BigInteger serialNumber = new BigInteger(rs.getString(dbControl.getColSerialNumber()),
+            BigInteger serialNumber = new BigInteger(rs.getString("SN"),
                     16);
             if (!serialNumbers.contains(serialNumber)) {
                 continue;
             }
 
-            boolean revoked = rs.getBoolean(dbControl.getColRevoked());
+            boolean revoked = rs.getBoolean("REV");
             Integer revReason = null;
             Long revTime = null;
             Long revInvTime = null;
             if (revoked) {
-                revReason = rs.getInt(dbControl.getColRevReason());
-                revTime = rs.getLong(dbControl.getColRevTime());
-                revInvTime = rs.getLong(dbControl.getColRevInvTime());
+                revReason = rs.getInt("RR");
+                revTime = rs.getLong("RT");
+                revInvTime = rs.getLong("RIT");
                 if (revInvTime == 0) {
                     revInvTime = null;
                 }
@@ -361,14 +328,14 @@ public class TargetDigestRetriever {
             if (!rs.next()) {
                 return null;
             }
-            boolean revoked = rs.getBoolean(dbControl.getColRevoked());
+            boolean revoked = rs.getBoolean("REV");
             Integer revReason = null;
             Long revTime = null;
             Long revInvTime = null;
             if (revoked) {
-                revReason = rs.getInt(dbControl.getColRevReason());
-                revTime = rs.getLong(dbControl.getColRevTime());
-                revInvTime = rs.getLong(dbControl.getColRevInvTime());
+                revReason = rs.getInt("RR");
+                revTime = rs.getLong("RT");
+                revInvTime = rs.getLong("RIT");
                 if (revInvTime == 0) {
                     revInvTime = null;
                 }

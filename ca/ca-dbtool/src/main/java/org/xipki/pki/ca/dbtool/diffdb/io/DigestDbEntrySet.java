@@ -39,20 +39,22 @@ package org.xipki.pki.ca.dbtool.diffdb.io;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.xipki.pki.ca.dbtool.QueueEntry;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class DigestDbEntrySet implements Comparable<DigestDbEntrySet> {
+public class DigestDbEntrySet implements QueueEntry, Comparable<DigestDbEntrySet> {
 
-    private final int startId;
+    private final long startId;
 
     private Exception exception;
 
     private List<IdentifiedDbDigestEntry> entries = new LinkedList<>();
 
-    public DigestDbEntrySet(final int startId) {
+    public DigestDbEntrySet(final long startId) {
         this.startId = startId;
     }
 
@@ -68,7 +70,7 @@ public class DigestDbEntrySet implements Comparable<DigestDbEntrySet> {
         entries.add(entry);
     }
 
-    public int getStartId() {
+    public long getStartId() {
         return startId;
     }
 

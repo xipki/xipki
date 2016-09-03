@@ -93,8 +93,6 @@ public class DbDigestDiff {
 
     private final int numPerSelect;
 
-    private final int numRefThreads;
-
     private final int numTargetThreads;
 
     private DbDigestDiff(final String refDir, final DataSourceWrapper refDatasource,
@@ -120,12 +118,6 @@ public class DbDigestDiff {
         this.targetDbControl = new XipkiDbControl(dbSchemaType);
 
         // number of threads
-        this.numRefThreads = (refDatasource == null) ? 1
-                : Math.min(numThreads.getNumRefThreads(), refDatasource.getMaximumPoolSize() - 1);
-        if (this.numRefThreads != numThreads.getNumRefThreads()) {
-            LOG.info("adapted the numRefThreads from {} to {}", numRefThreads, this.numRefThreads);
-        }
-
         this.numTargetThreads = Math.min(numThreads.getNumTargetThreads(),
                         targetDatasource.getMaximumPoolSize() - 1);
 
@@ -156,7 +148,7 @@ public class DbDigestDiff {
                     }
 
                     String caDirPath = caDir.getPath();
-                    DigestReader refReader = new FileDigestReader(caDirPath);
+                    DigestReader refReader = new FileDigestReader(caDirPath, numPerSelect);
                     diffSingleCa(refReader, caIdCertMap);
                 }
             }
@@ -164,21 +156,8 @@ public class DbDigestDiff {
             DbSchemaType refDbSchemaType = DbDigestExportWorker.detectDbSchemaType(refDatasource);
             List<Integer> refCaIds = new LinkedList<>();
 
-            XipkiDbControl refDbControl = null;
-            String refSql;
-
-            if (refDbSchemaType == DbSchemaType.EJBCA_CA_v3) {
-                if (!refDatasource.tableHasColumn(null, "CertificateData", "id")) {
-                    throw new RuntimeException(
-                            "EJBCA without column 'CertificateData.id' is not supported, "
-                            + "please call 'digest-db' first and then use the exported"
-                            + " folder as the reference");
-                }
-                refSql = "SELECT cAId FROM CAData WHERE cAId != 0";
-            } else {
-                refDbControl = new XipkiDbControl(refDbSchemaType);
-                refSql = "SELECT ID FROM " + refDbControl.getTblCa();
-            }
+            XipkiDbControl refDbControl = new XipkiDbControl(refDbSchemaType);
+            String refSql = "SELECT ID FROM " + refDbControl.getTblCa();
 
             Statement refStmt = null;
             try {
@@ -199,19 +178,11 @@ public class DbDigestDiff {
                 refDatasource.releaseResources(refStmt, null);
             }
 
-            boolean dbContainsMultipleCAs = (refCaIds.size() > 1);
-
-            final int numCertsToPredicate = (numTargetThreads * 3 / 2) * numPerSelect;
+            final int numBlocksToRead = (numTargetThreads * 3 / 2);
             for (Integer refCaId : refCaIds) {
-                DigestReader refReader;
-                if (refDbSchemaType == DbSchemaType.EJBCA_CA_v3) {
-                    refReader = EjbcaDbDigestReader.getInstance(refDatasource, refCaId,
-                            dbContainsMultipleCAs, numRefThreads, numCertsToPredicate,
-                            new StopMe(stopMe));
-                } else {
-                    refReader = XipkiDbDigestReader.getInstance(refDatasource, refDbSchemaType,
-                            refCaId, numRefThreads, numCertsToPredicate, new StopMe(stopMe));
-                }
+                DigestReader refReader = XipkiDbDigestReader.getInstance(refDatasource,
+                        refDbSchemaType, refCaId, numBlocksToRead, numPerSelect,
+                        new StopMe(stopMe));
                 diffSingleCa(refReader, caIdCertMap);
             }
         }

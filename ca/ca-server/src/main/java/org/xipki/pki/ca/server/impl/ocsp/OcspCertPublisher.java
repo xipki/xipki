@@ -190,7 +190,7 @@ public class OcspCertPublisher extends X509CertPublisher {
         auditEvent.setLevel(AuditLevel.ERROR);
         auditEvent.setStatus(AuditStatus.FAILED);
         if (cert instanceof X509CertWithDbId) {
-            Integer certId = ((X509CertWithDbId) cert).getCertId();
+            Long certId = ((X509CertWithDbId) cert).getCertId();
             if (certId != null) {
                 auditEvent.addEventData(new AuditEventData("id", certId.toString()));
             }

@@ -64,6 +64,7 @@ import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.pki.ca.server.impl.CertStatus;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
 import org.xipki.pki.ca.server.impl.SerialWithId;
+import org.xipki.pki.ca.server.impl.UniqueIdGenerator;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
@@ -79,9 +80,10 @@ public class CertificateStore {
 
     private final CertStoreQueryExecutor queryExecutor;
 
-    public CertificateStore(final DataSourceWrapper datasource) throws DataAccessException {
+    public CertificateStore(final DataSourceWrapper datasource,
+            final UniqueIdGenerator idGenerator) throws DataAccessException {
         ParamUtil.requireNonNull("datasource", datasource);
-        this.queryExecutor = new CertStoreQueryExecutor(datasource);
+        this.queryExecutor = new CertStoreQueryExecutor(datasource, idGenerator);
     }
 
     public boolean addCertificate(final X509CertificateInfo certInfo) {
@@ -103,7 +105,7 @@ public class CertificateStore {
         return true;
     }
 
-    public void addToPublishQueue(final String publisherName, final int certId,
+    public void addToPublishQueue(final String publisherName, final long certId,
             final X509Cert caCert) throws OperationException {
         try {
             queryExecutor.addToPublishQueue(publisherName, certId, caCert);
@@ -115,7 +117,7 @@ public class CertificateStore {
         }
     }
 
-    public void removeFromPublishQueue(final String publisherName, final int certId)
+    public void removeFromPublishQueue(final String publisherName, final long certId)
     throws OperationException {
         try {
             queryExecutor.removeFromPublishQueue(publisherName, certId);
@@ -347,7 +349,7 @@ public class CertificateStore {
      * which are not expired at {@code notExpiredAt} and the IDs are not less than {@code startId}.
      */
     public List<CertRevInfoWithSerial> getRevokedCerts(final X509Cert caCert,
-            final Date notExpiredAt, final int startId, final int numEntries,
+            final Date notExpiredAt, final long startId, final int numEntries,
             final boolean onlyCaCerts, final boolean onlyUserCerts) throws OperationException {
         try {
             return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startId,
@@ -361,7 +363,7 @@ public class CertificateStore {
     }
 
     public List<CertRevInfoWithSerial> getCertsForDeltaCrl(final X509Cert caCert,
-            final int startId, final int numEntries, final boolean onlyCaCerts,
+            final long startId, final int numEntries, final boolean onlyCaCerts,
             final boolean onlyUserCerts) throws OperationException {
         try {
             return queryExecutor.getCertificatesForDeltaCrl(caCert, startId, numEntries,
@@ -375,7 +377,7 @@ public class CertificateStore {
     }
 
     public List<SerialWithId> getCertSerials(final X509Cert caCert, final Date notExpiredAt,
-            final int startId, final int numEntries, final boolean onlyRevoked,
+            final long startId, final int numEntries, final boolean onlyRevoked,
             final boolean onlyCaCerts, final boolean onlyUserCerts) throws OperationException {
         try {
             return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startId, numEntries,
@@ -412,7 +414,7 @@ public class CertificateStore {
         }
     }
 
-    public List<Integer> getPublishQueueEntries(final X509Cert caCert, final String publisherName,
+    public List<Long> getPublishQueueEntries(final X509Cert caCert, final String publisherName,
             final int numEntries) throws OperationException {
         try {
             return queryExecutor.getPublishQueueEntries(caCert, publisherName, numEntries);
@@ -448,7 +450,7 @@ public class CertificateStore {
         }
     }
 
-    public String getCertProfileForId(final X509Cert caCert, final int id)
+    public String getCertProfileForId(final X509Cert caCert, final long id)
     throws OperationException {
         try {
             return queryExecutor.getCertProfileForId(caCert, id);
@@ -547,7 +549,7 @@ public class CertificateStore {
         }
     }
 
-    public X509CertificateInfo getCertificateInfoForId(final X509Cert caCert, final int certId)
+    public X509CertificateInfo getCertificateInfoForId(final X509Cert caCert, final long certId)
     throws OperationException, CertificateException {
         try {
             return queryExecutor.getCertForId(caCert, certId);
@@ -559,7 +561,7 @@ public class CertificateStore {
         }
     }
 
-    public X509CertWithDbId getCertForId(final int certId) throws OperationException {
+    public X509CertWithDbId getCertForId(final long certId) throws OperationException {
         try {
             return queryExecutor.getCertForId(certId);
         } catch (DataAccessException ex) {
@@ -707,7 +709,7 @@ public class CertificateStore {
         }
     }
 
-    public int addRequest(byte[] request) throws OperationException {
+    public long addRequest(byte[] request) throws OperationException {
         try {
             return queryExecutor.addRequest(request);
         } catch (DataAccessException ex) {
@@ -717,7 +719,7 @@ public class CertificateStore {
         }
     }
 
-    public void addRequestCert(int requestId, int certId) throws OperationException {
+    public void addRequestCert(long requestId, long certId) throws OperationException {
         try {
             queryExecutor.addRequestCert(requestId, certId);
         } catch (DataAccessException ex) {

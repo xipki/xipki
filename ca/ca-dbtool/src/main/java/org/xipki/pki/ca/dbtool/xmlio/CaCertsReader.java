@@ -105,7 +105,7 @@ public class CaCertsReader extends DbiXmlReader {
                     ret.setFpRs(Long.parseLong(tagContent));
                     break;
                 case CaCertType.TAG_ID:
-                    ret.setId(Integer.parseInt(tagContent));
+                    ret.setId(Long.parseLong(tagContent));
                     break;
                 case CaCertType.TAG_PID:
                     ret.setPid(Integer.parseInt(tagContent));

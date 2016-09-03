@@ -95,7 +95,7 @@ public class OcspCertsReader extends DbiXmlReader {
                     ret.setFile(tagContent);
                     break;
                 case OcspCertType.TAG_ID:
-                    ret.setId(Integer.parseInt(tagContent));
+                    ret.setId(Long.parseLong(tagContent));
                     break;
                 case OcspCertType.TAG_IID:
                     ret.setIid(Integer.parseInt(tagContent));

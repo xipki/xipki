@@ -93,10 +93,6 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
             description = "number of certificates per SELECT")
     private Integer numCertsPerSelect = 1000;
 
-    @Option(name = "--ref-threads",
-            description = "number of threads to query the target database")
-    private Integer numRefThreads = 5;
-
     @Option(name = "--target-threads",
             description = "number of threads to query the target database")
     private Integer numTargetThreads = 40;
@@ -117,7 +113,7 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
             }
         }
 
-        NumThreads numThreads = new NumThreads(numRefThreads, numTargetThreads);
+        NumThreads numThreads = new NumThreads(numTargetThreads);
         return new DbDigestDiffWorker(datasourceFactory, passwordResolver, revokedOnly, refDir,
                 refDbConf, dbconfFile, reportDir, numCertsPerSelect, numThreads, caCerts);
     }

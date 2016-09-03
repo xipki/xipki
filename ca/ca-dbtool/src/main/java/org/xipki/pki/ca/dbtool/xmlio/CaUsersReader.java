@@ -95,7 +95,7 @@ public class CaUsersReader extends DbiXmlReader {
                     ret.setCnRegex(tagContent);
                     break;
                 case CaUserType.TAG_ID:
-                    ret.setId(Integer.parseInt(tagContent));
+                    ret.setId(Long.parseLong(tagContent));
                     break;
                 case CaUserType.TAG_NAME:
                     ret.setName(tagContent);
