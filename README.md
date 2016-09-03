@@ -223,6 +223,7 @@ Components
     - TLSFeature (RFC 7633)
     - ValidityModel (German national standard CommonPKI)
  - Management of multiple CAs in one software instance
+ - Support of database cluster
  - Multiple software instances (all can be in active mode) for the same CA
  - Native support of management of CA via embedded OSGi commands
  - API to specify CA management, e.g. GUI
