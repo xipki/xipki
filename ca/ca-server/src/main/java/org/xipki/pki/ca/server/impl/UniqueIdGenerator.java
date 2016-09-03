@@ -39,6 +39,8 @@ package org.xipki.pki.ca.server.impl;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
+ * Idea: http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram
+ * <br/>
  * id consists of
  * <ol>
  *  <li>highest bit is set to 0 to assure positive long.
