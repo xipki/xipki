@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -98,7 +99,11 @@ import org.xipki.pki.ca.server.impl.KnowCertResult;
 import org.xipki.pki.ca.server.impl.SerialWithId;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.impl.util.PasswordHash;
+import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaManager;
+import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
+import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
  * @author Lijun Liao
@@ -2270,6 +2275,200 @@ class CertStoreQueryExecutor {
             releaseDbResources(ps, null);
         }
     }
+
+    boolean addUser(final AddUserEntry userEntry) throws CaMgmtException {
+        ParamUtil.requireNonNull("userEntry", userEntry);
+        final String name = userEntry.getName();
+        Integer existingId = executeGetUserIdSql(name);
+        if (existingId != null) {
+            throw new CaMgmtException("user named '" + name + " ' already exists");
+        }
+
+        String hashedPassword;
+        try {
+            hashedPassword = PasswordHash.createHash(userEntry.getPassword());
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+            throw new CaMgmtException(ex);
+        }
+        UserEntry tmpUserEntry = new UserEntry(name, hashedPassword, userEntry.getCnRegex());
+
+        try {
+            int maxId = (int) datasource.getMax(null, "USERNAME", "ID");
+            executeAddUserSql(maxId + 1, tmpUserEntry);
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        }
+
+        LOG.info("added user '{}'", name);
+
+        return true;
+    } // method addUser
+
+    private Integer executeGetUserIdSql(final String user) throws CaMgmtException {
+        ParamUtil.requireNonBlank("user", user);
+        final String sql = datasource.buildSelectFirstSql("ID FROM USERNAME WHERE NAME=?", 1);
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        try {
+            ps = borrowPreparedStatement(sql);
+
+            int idx = 1;
+            ps.setString(idx++, user);
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                return null;
+            }
+            return rs.getInt("ID");
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        } finally {
+            datasource.releaseResources(ps, rs);
+        }
+    } // method executeGetUserIdSql
+
+    private void executeAddUserSql(final int id, final UserEntry userEntry)
+    throws DataAccessException, CaMgmtException {
+        ParamUtil.requireNonNull("userEntry", userEntry);
+        final String sql = "INSERT INTO USERNAME (ID,NAME,PASSWORD,CN_REGEX) VALUES (?,?,?,?)";
+
+        PreparedStatement ps = null;
+
+        try {
+            ps = borrowPreparedStatement(sql);
+            int idx = 1;
+            ps.setInt(idx++, id);
+            ps.setString(idx++, userEntry.getName());
+            ps.setString(idx++, userEntry.getHashedPassword());
+            ps.setString(idx++, userEntry.getCnRegex());
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        } finally {
+            datasource.releaseResources(ps, null);
+        }
+    } // method executeAddUserSql
+
+    boolean removeUser(final String userName) throws CaMgmtException {
+        ParamUtil.requireNonBlank("userName", userName);
+        final String sql = "DELETE FROM USERNAME WHERE NAME=?";
+
+        PreparedStatement ps = null;
+        try {
+            ps = borrowPreparedStatement(sql);
+            ps.setString(1, userName);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        } finally {
+            datasource.releaseResources(ps, null);
+        }
+    } // method removeUser
+
+    boolean changeUser(final String username, final String password, final String cnRegex)
+    throws CaMgmtException {
+        Integer existingId = executeGetUserIdSql(username);
+        if (existingId == null) {
+            throw new CaMgmtException("user named '" + username + " ' does not exist");
+        }
+
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("UPDATE USERNAME SET ");
+
+        AtomicInteger index = new AtomicInteger(1);
+        Integer idxPassword = null;
+        if (password != null) {
+            idxPassword = index.getAndIncrement();
+            sqlBuilder.append("PASSWORD=?,");
+        }
+
+        Integer idxCnRegex = null;
+        if (cnRegex != null) {
+            sqlBuilder.append("CN_REGEX=?,");
+            idxCnRegex = index.getAndIncrement();
+        }
+
+        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
+        sqlBuilder.append(" WHERE ID=?");
+
+        if (index.get() == 1) {
+            return false;
+        }
+
+        final String sql = sqlBuilder.toString();
+
+        StringBuilder sb = new StringBuilder();
+
+        PreparedStatement ps = null;
+        try {
+            ps = borrowPreparedStatement(sql);
+            if (idxPassword != null) {
+                String txt = CaManager.NULL.equalsIgnoreCase(password) ? password : null;
+                ps.setString(idxPassword, txt);
+                sb.append("password: ****; ");
+            }
+
+            if (idxCnRegex != null) {
+                sb.append("CnRegex: '").append(cnRegex);
+                ps.setString(idxCnRegex, cnRegex);
+                sb.append("CnRegex: ").append(cnRegex).append(";");
+            }
+
+            ps.setInt(index.get(), existingId);
+
+            ps.executeUpdate();
+
+            if (sb.length() > 0) {
+                sb.deleteCharAt(sb.length() - 1).deleteCharAt(sb.length() - 1);
+            }
+            LOG.info("changed user: {}", sb);
+            return true;
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        } finally {
+            datasource.releaseResources(ps, null);
+        }
+    } // method changeUser
+
+    UserEntry getUser(final String username) throws CaMgmtException {
+        ParamUtil.requireNonNull("username", username);
+        final String sql = datasource.buildSelectFirstSql(
+                "PASSWORD,CN_REGEX FROM USERNAME WHERE NAME=?", 1);
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        try {
+            ps = borrowPreparedStatement(sql);
+
+            int idx = 1;
+            ps.setString(idx++, username);
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                return null;
+            }
+
+            String hashedPassword = rs.getString("PASSWORD");
+            String cnRegex = rs.getString("CN_REGEX");
+            return new UserEntry(username, hashedPassword, cnRegex);
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        } finally {
+            datasource.releaseResources(ps, rs);
+        }
+    } // method getUser
 
     private static void releaseStatement(final Statement statment) {
         if (statment == null) {

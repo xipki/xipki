@@ -64,6 +64,9 @@ import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.pki.ca.server.impl.CertStatus;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
 import org.xipki.pki.ca.server.impl.SerialWithId;
+import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
  * @author Lijun Liao
@@ -723,4 +726,22 @@ public class CertificateStore {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
+
+    public boolean addUser(final AddUserEntry userEntry) throws CaMgmtException {
+        return queryExecutor.addUser(userEntry);
+    }
+
+    public boolean removeUser(final String userName) throws CaMgmtException {
+        return queryExecutor.removeUser(userName);
+    }
+
+    public boolean changeUser(final String username, final String password, final String cnRegex)
+    throws CaMgmtException {
+        return queryExecutor.changeUser(username, password, cnRegex);
+    }
+
+    public UserEntry getUser(final String username) throws CaMgmtException {
+        return queryExecutor.getUser(username);
+    }
+
 }

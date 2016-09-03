@@ -37,11 +37,9 @@
 package org.xipki.pki.ca.server.impl;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -83,8 +81,6 @@ import org.xipki.pki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderEntryWrapper;
 import org.xipki.pki.ca.server.impl.scep.Scep;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
-import org.xipki.pki.ca.server.impl.util.PasswordHash;
-import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
@@ -99,7 +95,6 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
@@ -2125,176 +2120,6 @@ class CaManagerQueryExecutor {
             datasource.releaseResources(ps, null);
         }
     } // method unrevokeCa
-
-    boolean addUser(final AddUserEntry userEntry) throws CaMgmtException {
-        ParamUtil.requireNonNull("userEntry", userEntry);
-        final String name = userEntry.getName();
-        Integer existingId = executeGetUserIdSql(name);
-        if (existingId != null) {
-            throw new CaMgmtException("user named '" + name + " ' already exists");
-        }
-
-        String hashedPassword;
-        try {
-            hashedPassword = PasswordHash.createHash(userEntry.getPassword());
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            throw new CaMgmtException(ex);
-        }
-        UserEntry tmpUserEntry = new UserEntry(name, hashedPassword, userEntry.getCnRegex());
-
-        try {
-            int maxId = (int) datasource.getMax(null, "USERNAME", "ID");
-            executeAddUserSql(maxId + 1, tmpUserEntry);
-        } catch (DataAccessException ex) {
-            throw new CaMgmtException(ex);
-        }
-
-        LOG.info("added user '{}'", name);
-
-        return true;
-    } // method addUser
-
-    private Integer executeGetUserIdSql(final String user) throws CaMgmtException {
-        ParamUtil.requireNonBlank("user", user);
-        final String sql = datasource.buildSelectFirstSql("ID FROM USERNAME WHERE NAME=?", 1);
-        ResultSet rs = null;
-        PreparedStatement ps = null;
-        try {
-            ps = prepareStatement(sql);
-
-            int idx = 1;
-            ps.setString(idx++, user);
-            rs = ps.executeQuery();
-            if (!rs.next()) {
-                return null;
-            }
-            return rs.getInt("ID");
-        } catch (SQLException ex) {
-            throw new CaMgmtException(datasource.translate(sql, ex));
-        } finally {
-            datasource.releaseResources(ps, rs);
-        }
-    } // method executeGetUserIdSql
-
-    private void executeAddUserSql(final int id, final UserEntry userEntry)
-    throws DataAccessException, CaMgmtException {
-        ParamUtil.requireNonNull("userEntry", userEntry);
-        final String sql = "INSERT INTO USERNAME (ID,NAME,PASSWORD,CN_REGEX) VALUES (?,?,?,?)";
-
-        PreparedStatement ps = null;
-
-        try {
-            ps = prepareStatement(sql);
-            int idx = 1;
-            ps.setInt(idx++, id);
-            ps.setString(idx++, userEntry.getName());
-            ps.setString(idx++, userEntry.getHashedPassword());
-            ps.setString(idx++, userEntry.getCnRegex());
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, null);
-        }
-    } // method executeAddUserSql
-
-    boolean removeUser(final String userName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("userName", userName);
-        final String sql = "DELETE FROM USERNAME WHERE NAME=?";
-
-        PreparedStatement ps = null;
-        try {
-            ps = prepareStatement(sql);
-            ps.setString(1, userName);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
-        } finally {
-            datasource.releaseResources(ps, null);
-        }
-    } // method removeUser
-
-    boolean changeUser(final String username, final String password, final String cnRegex)
-    throws CaMgmtException {
-        Integer existingId = executeGetUserIdSql(username);
-        if (existingId == null) {
-            throw new CaMgmtException("user named '" + username + " ' does not exist");
-        }
-
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE USERNAME SET ");
-
-        AtomicInteger index = new AtomicInteger(1);
-        Integer idxPassword = addToSqlIfNotNull(sqlBuilder, index, password, "PASSWORD");
-        Integer idxCnRegex = addToSqlIfNotNull(sqlBuilder, index, cnRegex, "CN_REGEX");
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE ID=?");
-
-        if (index.get() == 1) {
-            return false;
-        }
-
-        final String sql = sqlBuilder.toString();
-
-        StringBuilder sb = new StringBuilder();
-
-        PreparedStatement ps = null;
-        try {
-            ps = prepareStatement(sql);
-            if (idxPassword != null) {
-                String txt = getRealString(password);
-                ps.setString(idxPassword, txt);
-                sb.append("password: ****; ");
-            }
-
-            if (idxCnRegex != null) {
-                sb.append("CnRegex: '").append(cnRegex);
-                ps.setString(idxCnRegex, cnRegex);
-            }
-
-            ps.setInt(index.get(), existingId);
-
-            ps.executeUpdate();
-
-            if (sb.length() > 0) {
-                sb.deleteCharAt(sb.length() - 1).deleteCharAt(sb.length() - 1);
-            }
-            LOG.info("changed user: {}", sb);
-            return true;
-        } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
-        } finally {
-            datasource.releaseResources(ps, null);
-        }
-    } // method changeUser
-
-    UserEntry getUser(final String username) throws CaMgmtException {
-        ParamUtil.requireNonNull("username", username);
-        final String sql = datasource.buildSelectFirstSql(
-                "PASSWORD,CN_REGEX FROM USERNAME WHERE NAME=?", 1);
-        ResultSet rs = null;
-        PreparedStatement ps = null;
-        try {
-            ps = prepareStatement(sql);
-
-            int idx = 1;
-            ps.setString(idx++, username);
-            rs = ps.executeQuery();
-            if (!rs.next()) {
-                return null;
-            }
-
-            String hashedPassword = rs.getString("PASSWORD");
-            String cnRegex = rs.getString("CN_REGEX");
-            return new UserEntry(username, hashedPassword, cnRegex);
-        } catch (SQLException ex) {
-            throw new CaMgmtException(datasource.translate(sql, ex));
-        } finally {
-            datasource.releaseResources(ps, rs);
-        }
-    } // method getUser
 
     boolean addScep(final ScepEntry scepEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("scepEntry", scepEntry);

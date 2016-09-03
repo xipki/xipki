@@ -2573,23 +2573,23 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean addUser(final AddUserEntry userEntry) throws CaMgmtException {
-        return queryExecutor.addUser(userEntry);
+        return certstore.addUser(userEntry);
     }
 
     @Override
     public boolean changeUser(final String username, final String password, final String cnRegex)
     throws CaMgmtException {
-        return queryExecutor.changeUser(username, password, cnRegex);
+        return certstore.changeUser(username, password, cnRegex);
     }
 
     @Override
     public boolean removeUser(final String username) throws CaMgmtException {
-        return queryExecutor.removeUser(username);
+        return certstore.removeUser(username);
     }
 
     @Override
     public UserEntry getUser(final String username) throws CaMgmtException {
-        return queryExecutor.getUser(username);
+        return certstore.getUser(username);
     }
 
     @Override
