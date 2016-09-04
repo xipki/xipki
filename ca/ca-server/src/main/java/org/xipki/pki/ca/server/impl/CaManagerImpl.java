@@ -3041,15 +3041,18 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                                 genSelfIssued.getCsr());
                         LOG.info("generated root CA {}", caName);
                         String fn = genSelfIssued.getCertFilename();
-                        try {
-                            IoUtil.save(fn, cert.getEncoded());
-                            LOG.info("saved generated certificate of root CA {} to {}",
-                                    caName, fn);
-                        } catch (CertificateEncodingException ex) {
-                            LogUtil.error(LOG, ex, "could not encode certificate of CA " + caName);
-                        } catch (IOException ex) {
-                            LogUtil.error(LOG, ex, "error while saving certificate of root CA "
-                                    + caName + " to " + fn);
+                        if (fn != null) {
+                            try {
+                                IoUtil.save(fn, cert.getEncoded());
+                                LOG.info("saved generated certificate of root CA {} to {}",
+                                        caName, fn);
+                            } catch (CertificateEncodingException ex) {
+                                LogUtil.error(LOG, ex,
+                                        "could not encode certificate of CA " + caName);
+                            } catch (IOException ex) {
+                                LogUtil.error(LOG, ex, "error while saving certificate of root CA "
+                                        + caName + " to " + fn);
+                            }
                         }
                     } else  if (addCa(entry)) {
                         LOG.info("added CA {}", caName);
@@ -3118,10 +3121,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 for (CaHasRequestorEntry requestor : scc.getRequestors()) {
                     String requestorName = requestor.getRequestorName();
                     CaHasRequestorEntry requestorB = null;
-                    for (CaHasRequestorEntry m : requestorsB) {
-                        if (m.getRequestorName().equals(requestorName)) {
-                            requestorB = m;
-                            break;
+                    if (requestorsB != null) {
+                        for (CaHasRequestorEntry m : requestorsB) {
+                            if (m.getRequestorName().equals(requestorName)) {
+                                requestorB = m;
+                                break;
+                            }
                         }
                     }
 

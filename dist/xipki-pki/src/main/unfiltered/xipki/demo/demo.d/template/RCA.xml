@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CAConf xmlns="http://xipki.org/pki/ca/conf/v2" version="1">
+  <properties>
+    <property name="profiles.dir">xipki/demo/profile</property>
+    <property name="security.dir">xipki/security</property>
+    <property name="output.dir">output</property>
+    <property name="token.type">replaceme-TOKEN_TYPE</property>
+    <property name="ca.signerConf">replaceme-CA_SIGNERCONF</property>
+  </properties>
+  <cmpcontrols>
+    <cmpcontrol name="cmpcontrol1">
+      <conf>
+        <value>send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA</value>
+       </conf>
+    </cmpcontrol>
+  </cmpcontrols>
+  <responders>
+    <responder name="responder1">
+      <type>JKS</type>
+      <!-- encrypted password 1234 -->
+      <conf>
+        <value>password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:${security.dir}/tlskeys/tls-server-keystore.jks,algo=SHA256withRSA</value>
+      </conf>
+    </responder>
+  </responders>
+  <crlsigners>
+    <crlsigner name="CASIGN.CRLSIGNER">
+      <signerType>CA</signerType>
+      <crlControl>updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false</crlControl>
+    </crlsigner>
+  </crlsigners>
+  <requestors>
+    <requestor name="requestor1">
+      <cert>
+        <file>${security.dir}/tlskeys/tls-client.der</file>
+      </cert>
+    </requestor>
+  </requestors>
+  <publishers>
+    <publisher name="OCSP.PUBLISHER">
+      <type>OCSP</type>
+      <conf>
+        <value>datasource=ocsp,publish.goodcerts=true</value>
+      </conf>
+    </publisher>
+  </publishers>
+  <profiles>
+    <profile name="RCA">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_RootCA.xml</file>
+      </conf>
+    </profile>
+    <profile name="Cross">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_Cross.xml</file>
+      </conf>
+    </profile>
+    <profile name="SubCA">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_SubCA.xml</file>
+      </conf>
+    </profile>
+    <profile name="SubCA.Complex">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_SubCA_Complex.xml</file>
+      </conf>
+    </profile>
+    <profile name="OCSP">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_OCSP.xml</file>
+      </conf>
+    </profile>
+    <profile name="SCEP">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_SCEP.xml</file>
+      </conf>
+    </profile>
+    <profile name="multipleOUs">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_multipleOUs.xml</file>
+      </conf>
+    </profile>
+    <profile name="multiValuedRDN">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_multiValuedRDN.xml</file>
+      </conf>
+    </profile>
+    <profile name="QC">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_QC.xml</file>
+      </conf>
+    </profile>
+    <profile name="EE.Complex">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_EE_Complex.xml</file>
+      </conf>
+    </profile>
+    <profile name="TLS">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_TLS.xml</file>
+      </conf>
+    </profile>
+    <profile name="TLS_C">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_TLS_C.xml</file>
+      </conf>
+    </profile>
+    <profile name="TLSwithIncSN">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_TLSwithIncSN.xml</file>
+      </conf>
+    </profile>
+    <profile name="gSMC_K">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_gSMC_K.xml</file>
+      </conf>
+    </profile>
+    <profile name="MaxTime">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_MaxTime.xml</file>
+      </conf>
+    </profile>
+  </profiles>
+  <cas>
+    <ca name="RCA1">
+      <caInfo>
+        <x509Ca>
+          <genSelfIssued>
+            <csr>
+              <file>${output.dir}/RCA1.csr</file>
+            </csr>
+            <profile>RCA</profile>
+          </genSelfIssued>
+          <cmpcontrolName>cmpcontrol1</cmpcontrolName>
+          <cert>
+            <file>${output.dir}/RCA1.der</file>
+          </cert>
+          <duplicateKey>true</duplicateKey>
+          <duplicateSubject>true</duplicateSubject>
+          <expirationPeriod>365</expirationPeriod>
+          <keepExpiredCertDays>-1</keepExpiredCertDays>
+          <permissions>
+            <str>all</str>
+          </permissions>
+          <maxValidity>10y</maxValidity>
+          <responderName>responder1</responderName>
+          <saveReq>false</saveReq>
+          <signerType>${token.type}</signerType>
+          <signerConf>
+            <value>${ca.signerConf}</value>
+          </signerConf>
+          <status>active</status>
+          <validityMode>CUTOFF</validityMode>
+          <cacertUris>
+            <str>http://example.org/RCA1.der</str>
+          </cacertUris>
+          <nextCrlNo>2</nextCrlNo>
+          <ocspUris>
+            <str>http://localhost:8080/ocsp/responder1</str>
+          </ocspUris>
+          <snSize>63</snSize>
+        </x509Ca>
+      </caInfo>
+      <alias>RCA</alias>
+      <profiles>
+        <str>Cross</str>
+        <str>SubCA</str>
+        <str>SubCA.Complex</str>
+        <str>OCSP</str>
+      </profiles>
+      <requestors>
+        <requestor>
+          <requestorName>requestor1</requestorName>
+          <ra>true</ra>
+          <permissions>
+            <str>all</str>
+          </permissions>
+          <profiles>
+            <str>all</str>
+          </profiles>
+        </requestor>
+      </requestors>
+      <publishers>
+        <str>OCSP.PUBLISHER</str>
+      </publishers>
+    </ca>
+  </cas>
+</CAConf>

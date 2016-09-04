@@ -1,0 +1,269 @@
+CA_SIGNER_ALGO = "$ALGO1:$ALGO2"
+
+#################################################################
+#                      Initialize the database                  #
+#################################################################
+
+feature:install xipki-database-tool
+
+sleep 1000
+
+xipki-db:initdb \
+  --force
+
+feature:uninstall xipki-database-tool
+
+feature:install xipki-caserver
+
+feature:install xipki-camgmt-shell
+
+sleep 1000
+
+xipki-ca:restart
+
+## Create the CSR for the command caqa:check-cert in QA
+if { $TOKEN_TYPE equals "pkcs11" } {
+  xipki-tk:req \
+    --slot $SLOT \
+    --label RCA1 \
+    --out output/RCA1.csr \
+    --subject "CN=RCA1,O=xipki,C=DE" \
+    --keyusage cRLSign
+} {
+  xipki-tk:req-p12 \
+    --p12 output/RCA1.p12 \
+    --password 1234 \
+    --out output/RCA1.csr \
+    --subject "CN=RCA1,O=xipki,C=DE" \
+    --keyusage cRLSign
+}
+
+#################################################################
+#                           LOAD RCA.xml                        #
+#################################################################
+
+if { $TOKEN_TYPE equals "pkcs11" } {
+  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=RCA1"
+}
+
+if { $TOKEN_TYPE equals "pkcs12" } {
+  CA_SIGNER_CONF = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO"
+}
+
+xipki-cmd:copy-file \
+  -f \
+  xipki/demo/demo.d/template/RCA.xml \
+  xipki/demo/demo.d/RCA.xml
+
+xipki-cmd:replace \
+  --old "replaceme-TOKEN_TYPE" \
+  --new "$TOKEN_TYPE" \
+  xipki/demo/demo.d/RCA.xml
+
+xipki-cmd:replace \
+  --old "replaceme-CA_SIGNERCONF" \
+  --new "$CA_SIGNER_CONF" \
+  xipki/demo/demo.d/RCA.xml
+
+xipki-ca:load-conf --conf-file xipki/demo/demo.d/RCA.xml
+
+## Update the certificate in the device
+if { $TOKEN_TYPE equals "pkcs11" } {
+  xipki-tk:update-cert \
+    --slot $SLOT \
+    --label RCA1 \
+    --cert output/RCA1.der
+} {
+  xipki-tk:update-cert-p12 \
+    --p12 output/RCA1.p12 \
+    --password 1234 \
+    --cert output/RCA1.der
+}
+
+## Generate keys and CSR for SubCA1
+if { $TOKEN_TYPE equals "pkcs11" } {
+  xipki-tk:req \
+    --slot $SLOT \
+    --label SubCA1 \
+    --out output/SubCA1.csr \
+    --subject "CN=SubCA1,O=xipki,C=DE"
+} {
+  xipki-tk:req-p12 \
+    --p12 output/SubCA1.p12 \
+    --password 1234 \
+    --out output/SubCA1.csr \
+    --subject "CN=SubCA1,O=xipki,C=DE"
+}
+
+xipki-ca:enroll-cert \
+  --ca RCA1 \
+  --csr output/SubCA1.csr \
+  --out output/SubCA1.der \
+  --profile SubCA
+
+if { $TOKEN_TYPE equals "pkcs11" } {
+  xipki-tk:update-cert \
+    --slot $SLOT \
+    --label SubCA1 \
+    --cert output/SubCA1.der \
+} {
+  xipki-tk:update-cert-p12 \
+    --p12 output/SubCA1.p12 \
+    --password 1234 \
+    --cert output/SubCA1.der \
+    --ca-cert output/RCA1.der
+}
+
+## Generate keys and CSR for SubCAwithCRL1
+if { $TOKEN_TYPE equals "pkcs11" } {
+  xipki-tk:req \
+    --slot $SLOT \
+    --label SubCAwithCRL1 --out output/SubCAwithCRL1.csr \
+    --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
+    --subject-alt-name "[1]info@xipki.org" \
+    --subject-alt-name "[2]xipki.org" \
+    --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
+    --subject-alt-name "[6]http://xipki.org/abc" \
+    --subject-alt-name "[7]192.168.0.1" \
+    --subject-alt-name "[8]1.2.3.4" \
+    --subject-alt-name "[0]2.5.4.10=long organization name" \
+    --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://example.org/abc" \
+    --keyusage cRLSign
+} {
+  xipki-tk:req-p12 \
+    --p12 output/SubCAwithCRL1.p12 \
+    --password 1234 \
+    --out output/SubCAwithCRL1.csr \
+    --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
+    --subject-alt-name "[1]info@xipki.org" \
+    --subject-alt-name "[2]xipki.org" \
+    --subject-alt-name "[5]edi-nameAssigner-1=edi-partyName1" \
+    --subject-alt-name "[6]http://xipki.org/abc" \
+    --subject-alt-name "[7]192.168.0.1" \
+    --subject-alt-name "[8]1.2.3.4" \
+    --subject-alt-name "[0]2.5.4.10=long organization name" \
+    --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://example.org/abc" \
+    --keyusage cRLSign
+}
+
+xipki-ca:enroll-cert \
+  --ca RCA1 \
+  --csr output/SubCAwithCRL1.csr \
+  --out output/SubCAwithCRL1.der \
+  --profile SubCA.Complex
+
+if { $TOKEN_TYPE equals "pkcs11" } {
+  xipki-tk:update-cert \
+    --slot $SLOT \
+    --label SubCAwithCRL1 \
+    --cert output/SubCAwithCRL1.der \
+} {
+  xipki-tk:update-cert-p12 \
+    --p12 output/SubCAwithCRL1.p12 \
+    --password 1234 \
+    --cert output/SubCAwithCRL1.der \
+    --ca-cert output/RCA1.der
+}
+
+## Generate keys and CSR for OCSPResponder
+if { $TOKEN_TYPE equals "pkcs11" } {
+  xipki-tk:req \
+    --slot $SLOT \
+    --label OCSP99 \
+    --out output/OCSP99.csr \
+    --subject "CN=OCSP99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+} {
+  xipki-tk:req-p12 \
+    --p12 output/OCSP99.p12 \
+    --password 1234 \
+    --out output/OCSP99.csr \
+    --subject "CN=OCSP99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
+}
+
+xipki-ca:enroll-cert \
+  --ca RCA1 \
+  --csr output/OCSP99.csr \
+  --out output/OCSP99.der \
+  --profile OCSP
+
+if { $TOKEN_TYPE equals "pkcs11" } {
+  xipki-tk:update-cert \
+    --slot $SLOT \
+    --label OCSP99 \
+    --cert output/OCSP99.der \
+} {
+  xipki-tk:update-cert-p12 \
+    --p12 output/OCSP99.p12 \
+    --password 1234 \
+    --cert output/OCSP99.der \
+    --ca-cert output/RCA1.der
+}
+
+xipki-ca:caprofile-rm \
+  --ca RCA1 \
+  --profile OCSP
+
+#################################################################
+#                        ADD SubCA with OCSP                    #
+#################################################################
+## Add CA
+
+if { $TOKEN_TYPE equals "pkcs11" } {
+  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=SubCA1"
+}
+
+if { $TOKEN_TYPE equals "pkcs12" } {
+  CA_SIGNER_CONF = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/SubCA1.p12,algo=$CA_SIGNER_ALGO"
+}
+
+xipki-cmd:copy-file \
+  -f \
+  xipki/demo/demo.d/template/SUBCA.xml \
+  xipki/demo/demo.d/SUBCA.xml
+
+xipki-cmd:replace \
+  --old "replaceme-TOKEN_TYPE" \
+  --new "$TOKEN_TYPE" \
+  xipki/demo/demo.d/SUBCA.xml
+
+xipki-cmd:replace \
+  --old "replaceme-CA_SIGNERCONF" \
+  --new "$CA_SIGNER_CONF" \
+  xipki/demo/demo.d/SUBCA.xml
+
+xipki-ca:load-conf --conf-file xipki/demo/demo.d/SUBCA.xml
+
+## Restart the CA
+#xipki-ca:restart
+
+#################################################################
+#                       ADD SubCA with CRL                      #
+#################################################################
+## Add CA
+
+if { $TOKEN_TYPE equals "pkcs11" } {
+  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=SubCAwithCRL1"
+}
+
+if { $TOKEN_TYPE equals "pkcs12" } {
+  CA_SIGNER_CONF = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/SubCAwithCRL1.p12,algo=$CA_SIGNER_ALGO"
+}
+
+xipki-cmd:copy-file \
+  -f \
+  xipki/demo/demo.d/template/SUBCAwithCRL.xml \
+  xipki/demo/demo.d/SUBCAwithCRL.xml
+
+xipki-cmd:replace \
+  --old "replaceme-TOKEN_TYPE" \
+  --new "$TOKEN_TYPE" \
+  xipki/demo/demo.d/SUBCAwithCRL.xml
+
+xipki-cmd:replace \
+  --old "replaceme-CA_SIGNERCONF" \
+  --new "$CA_SIGNER_CONF" \
+  xipki/demo/demo.d/SUBCAwithCRL.xml
+
+xipki-ca:load-conf --conf-file xipki/demo/demo.d/SUBCAwithCRL.xml
+
+source ./xipki/demo/demo.d/scep-server.script

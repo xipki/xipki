@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CAConf xmlns="http://xipki.org/pki/ca/conf/v2" version="1">
+  <properties>
+    <property name="token.type">replaceme-TOKEN_TYPE</property>
+    <property name="ca.signerConf">replaceme-CA_SIGNERCONF</property>
+  </properties>
+  <cas>
+    <ca name="SubCA1.complex-Name">
+      <caInfo>
+        <x509Ca>
+          <cmpcontrolName>cmpcontrol1</cmpcontrolName>
+          <duplicateKey>true</duplicateKey>
+          <duplicateSubject>true</duplicateSubject>
+          <expirationPeriod>365</expirationPeriod>
+          <keepExpiredCertDays>-1</keepExpiredCertDays>
+          <permissions>
+            <str>all</str>
+          </permissions>
+          <maxValidity>5y</maxValidity>
+          <responderName>responder1</responderName>
+          <saveReq>true</saveReq>
+          <signerType>${token.type}</signerType>
+          <signerConf>
+            <value>${ca.signerConf}</value>
+          </signerConf>
+          <status>active</status>
+          <validityMode>STRICT</validityMode>
+          <cacertUris>
+            <str>http://example.org/SubCA1.der</str>
+          </cacertUris>
+          <nextCrlNo>2</nextCrlNo>
+          <ocspUris>
+            <str>http://localhost:8080/ocsp/responder1</str>
+          </ocspUris>
+          <snSize>63</snSize>
+          <extraControl>
+            <value>revokeSuspendedCerts.enabled=true,revokeSuspendedCerts.targetReason=cessationOfOperation,revokeSuspendedCerts.unchangedSince=15d</value>
+          </extraControl>
+        </x509Ca>
+      </caInfo>
+      <alias>SubCA</alias>
+      <profiles>
+        <str>QC</str>
+        <str>EE.Complex</str>
+        <str>TLS</str>
+        <str>TLS_C</str>
+        <str>TLSwithIncSN</str>
+        <str>gSMC_K</str>
+      </profiles>
+      <requestors>
+        <requestor>
+          <requestorName>requestor1</requestorName>
+          <ra>true</ra>
+          <permissions>
+            <str>all</str>
+          </permissions>
+          <profiles>
+            <str>all</str>
+          </profiles>
+        </requestor>
+      </requestors>
+      <publishers>
+        <str>OCSP.PUBLISHER</str>
+      </publishers>
+    </ca>
+  </cas>
+</CAConf>

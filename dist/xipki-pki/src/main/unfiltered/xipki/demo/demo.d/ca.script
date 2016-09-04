@@ -201,10 +201,6 @@ xipki-ca:caalias-add \
   --ca RCA1 \
   --alias RCA
 
-## Remove the profile RCA
-xipki-ca:profile-rm \
-  RCA
-
 ## Add Profiles
 xipki-ca:caprofile-add \
   --ca RCA1 \

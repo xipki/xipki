@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- Copyright (c) 2014 - 2015 Lijun Liao
+ Copyright (c) 2014 - 2016 Lijun Liao
 -->
 <xs:schema xmlns="http://xipki.org/pki/ca/conf/v2"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -94,7 +94,7 @@
   </xs:complexType>
   <xs:complexType name="cmpcontrolType">
     <xs:all>
-      <xs:element name="conf" type="xs:string"/>
+      <xs:element name="conf" type="fileOrValueType"/>
     </xs:all>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
@@ -184,15 +184,15 @@
       </xs:element>
       <xs:element name="duplicateKey" type="xs:boolean"/>
       <xs:element name="duplicateSubject" type="xs:boolean"/>
-      <xs:element name="expirationPeriod" type="xs:int"/>
-      <xs:element name="extraControl" type="xs:string" minOccurs="0"/>
+      <xs:element name="expirationPeriod" type="xs:int" minOccurs="0"/>
+      <xs:element name="extraControl" type="fileOrValueType" minOccurs="0"/>
       <xs:element name="genSelfIssued" type="genSelfIssuedType" minOccurs="0">
         <xs:annotation>
           <xs:documentation>A new self-issued CA certificate will be generated</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="keepExpiredCertDays" type="xs:int"/>
-      <xs:element name="permissions" type="stringsType" minOccurs="0"/>
+      <xs:element name="keepExpiredCertDays" type="xs:int" minOccurs="0"/>
+      <xs:element name="permissions" type="stringsType"/>
       <xs:element name="maxValidity" type="xs:string"/>
       <xs:element name="responderName" type="xs:string" minOccurs="0"/>
       <xs:element name="saveReq" type="xs:boolean"/>

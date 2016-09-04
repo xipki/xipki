@@ -59,6 +59,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
@@ -121,18 +122,22 @@ public class CaConf {
 
     public CaConf(final String confFilename)
     throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
-        JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
-        Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
+        try {
+            JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+            Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
 
-        final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        URL url = CaConf.class.getResource("/xsd/caconf.xsd");
-        jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
+            final SchemaFactory schemaFact = SchemaFactory.newInstance(
+                    javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            URL url = CaConf.class.getResource("/xsd/caconf.xsd");
+            jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
 
-        File confFile = new File(confFilename);
-        CAConfType root = (CAConfType) ((JAXBElement<?>) jaxbUnmarshaller.unmarshal(confFile))
-                .getValue();
-        init(root, confFile.getParentFile().getPath());
+            File confFile = new File(confFilename);
+            CAConfType root = (CAConfType) ((JAXBElement<?>) jaxbUnmarshaller.unmarshal(confFile))
+                    .getValue();
+            init(root, confFile.getParentFile().getPath());
+        } catch (JAXBException ex) {
+            throw XmlUtil.convert(ex);
+        }
     }
 
     public CaConf(final CAConfType jaxb, final String baseDir)
@@ -159,7 +164,7 @@ public class CaConf {
         // CMP controls
         if (jaxb.getCmpcontrols() != null) {
             for (CmpcontrolType m : jaxb.getCmpcontrols().getCmpcontrol()) {
-                CmpControlEntry en = new CmpControlEntry(m.getName(), extendConf(m.getConf()));
+                CmpControlEntry en = new CmpControlEntry(m.getName(), getValue(m.getConf()));
                 addCmpControl(en);
             }
         }
@@ -230,10 +235,13 @@ public class CaConf {
                     X509CaInfoType ci = m.getCaInfo().getX509Ca();
                     if (ci.getGenSelfIssued() != null) {
                         String certFilename = null;
-                        if (ci.getCert() != null && ci.getCert().getFile() == null) {
-                            certFilename = ci.getCert().getFile();
-                            throw new InvalidConfException("cert.file of CA " + name
-                                    + " must not be null");
+                        if (ci.getCert() != null) {
+                            if (ci.getCert().getFile() != null) {
+                                certFilename = extendConf(ci.getCert().getFile());
+                            } else {
+                                throw new InvalidConfException("cert.file of CA " + name
+                                        + " must not be null");
+                            }
                         }
                         genSelfIssued = new GenSelfIssued(ci.getGenSelfIssued().getProfile(),
                                 getBinary(ci.getGenSelfIssued().getCsr()), certFilename);
@@ -243,9 +251,14 @@ public class CaConf {
                             getStrings(ci.getOcspUris()), getStrings(ci.getCrlUris()),
                             getStrings(ci.getDeltacrlUris()));
 
+                    int exprirationPeriod = (ci.getExpirationPeriod() == null) ? 365
+                            : ci.getExpirationPeriod().intValue();
+
+                    int numCrls = (ci.getNumCrls() == null) ? 30 : ci.getNumCrls().intValue();
+
                     caEntry = new X509CaEntry(name, ci.getSnSize(), ci.getNextCrlNo(),
                             extendConf(ci.getSignerType()), getValue(ci.getSignerConf()),
-                            caUris, ci.getNumCrls(), ci.getExpirationPeriod());
+                            caUris, numCrls, exprirationPeriod);
 
                     caEntry.setCmpControlName(ci.getCmpcontrolName());
                     caEntry.setCrlSignerName(ci.getCrlsignerName());
@@ -253,10 +266,12 @@ public class CaConf {
                     caEntry.setDuplicateSubjectPermitted(ci.isDuplicateSubject());
 
                     if (ci.getExtraControl() != null) {
-                        caEntry.setExtraControl(extendConf(ci.getExtraControl()));
+                        caEntry.setExtraControl(getValue(ci.getExtraControl()));
                     }
 
-                    caEntry.setKeepExpiredCertInDays(ci.getKeepExpiredCertDays());
+                    int keepExpiredCertDays = (ci.getKeepExpiredCertDays() == null) ? -1
+                            : ci.getKeepExpiredCertDays().intValue();
+                    caEntry.setKeepExpiredCertInDays(keepExpiredCertDays);
 
                     caEntry.setMaxValidity(CertValidity.getInstance(ci.getMaxValidity()));
                     List<String> permStrs = getStrings(ci.getPermissions());
@@ -268,7 +283,7 @@ public class CaConf {
                         caEntry.setPermissions(permissions);
                     }
 
-                    caEntry.setResponderName(ci.getCmpcontrolName());
+                    caEntry.setResponderName(ci.getResponderName());
 
                     caEntry.setSaveRequest(ci.isSaveReq());
                     caEntry.setStatus(CaStatus.forName(ci.getStatus()));
@@ -277,7 +292,7 @@ public class CaConf {
                         caEntry.setValidityMode(ValidityMode.forName(ci.getValidityMode()));
                     }
 
-                    if (ci.getCert() != null) {
+                    if (ci.getGenSelfIssued() == null && ci.getCert() != null) {
                         byte[] bytes = getBinary(ci.getCert());
                         try {
                             caEntry.setCertificate(X509Util.parseCert(bytes));
@@ -394,7 +409,7 @@ public class CaConf {
     }
 
     public Set<String> getPublisherNames() {
-        return Collections.unmodifiableSet(requestors.keySet());
+        return Collections.unmodifiableSet(publishers.keySet());
     }
 
     public PublisherEntry getPublisher(final String name) {
@@ -490,8 +505,8 @@ public class CaConf {
 
         for (String name : properties.keySet()) {
             String placeHolder = "${" + name + "}";
-            if (confStr.contains(placeHolder)) {
-                confStr = confStr.replaceAll(placeHolder, properties.get(name));
+            while (confStr.contains(placeHolder)) {
+                confStr = confStr.replace(placeHolder, properties.get(name));
             }
         }
 

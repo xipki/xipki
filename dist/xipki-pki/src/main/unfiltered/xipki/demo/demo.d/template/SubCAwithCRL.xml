@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CAConf xmlns="http://xipki.org/pki/ca/conf/v2" version="1">
+  <properties>
+    <property name="token.type">replaceme-TOKEN_TYPE</property>
+    <property name="ca.signerConf">replaceme-CA_SIGNERCONF</property>
+  </properties>
+  <cas>
+    <ca name="SubCAwithCRL1">
+      <caInfo>
+        <x509Ca>
+          <cmpcontrolName>cmpcontrol1</cmpcontrolName>
+          <crlsignerName>CASIGN.CRLSIGNER</crlsignerName>
+          <crlUris>
+            <str>http://subcawithcrl.example.org/crl</str>
+          </crlUris>
+          <deltacrlUris>
+            <str>http://subcawithcrl.example.org/deltacrl</str>
+          </deltacrlUris>
+          <duplicateKey>true</duplicateKey>
+          <duplicateSubject>true</duplicateSubject>
+          <expirationPeriod>365</expirationPeriod>
+          <keepExpiredCertDays>-1</keepExpiredCertDays>
+          <permissions>
+            <str>all</str>
+          </permissions>
+          <maxValidity>8000y</maxValidity>
+          <responderName>responder1</responderName>
+          <saveReq>false</saveReq>
+          <signerType>${token.type}</signerType>
+          <signerConf>
+            <value>${ca.signerConf}</value>
+          </signerConf>
+          <status>active</status>
+          <validityMode>LAX</validityMode>
+          <cacertUris>
+            <str>http://example.org/SubCAwithCRL1.der</str>
+          </cacertUris>
+          <nextCrlNo>2</nextCrlNo>
+          <ocspUris>
+            <str>http://localhost:8080/ocsp/responder2</str>
+          </ocspUris>
+          <snSize>63</snSize>
+        </x509Ca>
+      </caInfo>
+      <alias>SubCAwithCRL</alias>
+      <profiles>
+        <str>OCSP</str>
+        <str>SCEP</str>
+        <str>multipleOUs</str>
+        <str>multiValuedRDN</str>
+        <str>MaxTime</str>
+      </profiles>
+      <requestors>
+        <requestor>
+          <requestorName>requestor1</requestorName>
+          <ra>true</ra>
+          <permissions>
+            <str>all</str>
+          </permissions>
+          <profiles>
+            <str>all</str>
+          </profiles>
+        </requestor>
+      </requestors>
+    </ca>
+  </cas>
+</CAConf>
