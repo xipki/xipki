@@ -45,8 +45,8 @@ import org.xipki.commons.common.util.ParamUtil;
  * <ol>
  *  <li>highest bit is set to 0 to assure positive long.
  *  <li>epoch in ms: 46 bits for 1312 years after the epoch</li>
- *  <li>offset: 9 bits
- *  <li>shard_id: 8 bits
+ *  <li>offset: 10 bits
+ *  <li>shard_id: 7 bits
  * </ol>
  *
  * @author Lijun Liao
@@ -56,33 +56,33 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class UniqueIdGenerator {
 
-    // maximal 9 bits
-    private static final int MAX_OFFSET = 0x1FF;
+    // maximal 10 bits
+    private static final int MAX_OFFSET = 0x3FF;
 
     private final long epoch; // in milliseconds
 
-    private final int shardId; // 8 bits
+    private final int shardId; // 7 bits
 
     private int offset = 0;
 
     public UniqueIdGenerator(final long epoch, final int shardId) {
         this.epoch = ParamUtil.requireMin("epoch", epoch, 0);
-        this.shardId = ParamUtil.requireRange("shardId", shardId, 0, 255);
+        this.shardId = ParamUtil.requireRange("shardId", shardId, 0, 127);
     }
 
     public long nextId() {
         long now = System.currentTimeMillis();
         synchronized (this) {
             long ret = now - epoch;
-            ret <<= 8;
-
+            ret <<= 10;
+            System.out.println(Long.toHexString(ret));
             ret += (offset++);
-            ret <<= 9;
-
+            ret <<= 7;
+            System.out.println(Long.toHexString(ret));
             if (offset > MAX_OFFSET) {
                 offset = 0;
             }
-
+            System.out.println(Long.toHexString(ret));
             ret += shardId;
 
             return ret;
