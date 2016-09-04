@@ -182,11 +182,13 @@ class CaConfigurationDbImporter extends DbPorter {
             ps = prepareStatement(sql);
 
             for (ResponderType responder : responders.getResponder()) {
+                byte[] certBytes = getBinary(responder.getCert());
+                String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
                 try {
                     int idx = 1;
                     ps.setString(idx++, responder.getName());
                     ps.setString(idx++, responder.getType());
-                    ps.setString(idx++, getValue(responder.getCert()));
+                    ps.setString(idx++, b64Cert);
                     ps.setString(idx++, getValue(responder.getConf()));
 
                     ps.executeUpdate();
@@ -237,11 +239,13 @@ class CaConfigurationDbImporter extends DbPorter {
             ps = prepareStatement(sql);
 
             for (CrlsignerType crlsigner : crlsigners.getCrlsigner()) {
+                byte[] certBytes = getBinary(crlsigner.getSignerCert());
+                String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
                 try {
                     int idx = 1;
                     ps.setString(idx++, crlsigner.getName());
                     ps.setString(idx++, crlsigner.getSignerType());
-                    ps.setString(idx++, getValue(crlsigner.getSignerCert()));
+                    ps.setString(idx++, b64Cert);
                     ps.setString(idx++, crlsigner.getCrlControl());
                     ps.setString(idx++, getValue(crlsigner.getSignerConf()));
                     ps.executeUpdate();
@@ -266,10 +270,12 @@ class CaConfigurationDbImporter extends DbPorter {
             ps = prepareStatement(sql);
 
             for (RequestorType requestor : requestors.getRequestor()) {
+                byte[] certBytes = getBinary(requestor.getCert());
+                String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
                 try {
                     int idx = 1;
                     ps.setString(idx++, requestor.getName());
-                    ps.setString(idx++, getValue(requestor.getCert()));
+                    ps.setString(idx++, b64Cert);
 
                     ps.executeUpdate();
                 } catch (SQLException ex) {
@@ -366,8 +372,8 @@ class CaConfigurationDbImporter extends DbPorter {
                 int art = (ca.getArt() == null) ? 1 : ca.getArt();
 
                 try {
-                    String b64Cert = getValue(ca.getCert());
-                    X509Certificate cert = X509Util.parseCert(Base64.decode(b64Cert));
+                    byte[] certBytes = getBinary(ca.getCert());
+                    X509Certificate cert = X509Util.parseCert(certBytes);
 
                     int idx = 1;
                     ps.setString(idx++, ca.getName().toUpperCase());
@@ -382,7 +388,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, ca.getOcspUris());
                     ps.setString(idx++, ca.getCacertUris());
                     ps.setString(idx++, ca.getMaxValidity());
-                    ps.setString(idx++, b64Cert);
+                    ps.setString(idx++, Base64.toBase64String(certBytes));
                     ps.setString(idx++, ca.getSignerType());
                     ps.setString(idx++, ca.getCrlsignerName());
                     ps.setString(idx++, ca.getResponderName());
@@ -528,11 +534,13 @@ class CaConfigurationDbImporter extends DbPorter {
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (ScepType entry : sceps.getScep()) {
+                byte[] certBytes = getBinary(entry.getResponderCert());
+                String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
                 try {
                     int idx = 1;
                     ps.setString(idx++, entry.getCaName().toUpperCase());
                     ps.setString(idx++, entry.getResponderType());
-                    ps.setString(idx++, getValue(entry.getResponderCert()));
+                    ps.setString(idx++, b64Cert);
                     ps.setString(idx++, entry.getControl());
                     ps.setString(idx++, getValue(entry.getResponderConf()));
                     ps.executeUpdate();

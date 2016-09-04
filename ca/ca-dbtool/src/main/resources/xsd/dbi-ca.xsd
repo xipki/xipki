@@ -117,7 +117,7 @@
       <xs:element name="name" type="xs:string"/>
       <xs:element name="type" type="xs:string"/>
       <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
-      <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="cert" type="fileOrBinaryType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="environment" type="environmentType"/>
@@ -133,7 +133,7 @@
       <xs:element name="name" type="xs:string"/>
       <xs:element name="signerType" type="xs:string"/>
       <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>
-      <xs:element name="signerCert" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="signerCert" type="fileOrBinaryType" minOccurs="0"/>
       <xs:element name="crlControl" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
@@ -141,7 +141,7 @@
   <xs:complexType name="requestorType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="cert" type="fileOrValueType"/>
+      <xs:element name="cert" type="fileOrBinaryType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="publisher" type="publisherType"/>
@@ -174,7 +174,7 @@
       <xs:element name="ocspUris" type="xs:string" minOccurs="0"/>
       <xs:element name="cacertUris" type="xs:string" minOccurs="0"/>
       <xs:element name="maxValidity" type="xs:string"/>
-      <xs:element name="cert" type="fileOrValueType"/>
+      <xs:element name="cert" type="fileOrBinaryType"/>
       <xs:element name="signerType" type="xs:string"/>
       <xs:element name="signerConf" type="fileOrValueType" minOccurs="0"/>
       <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
@@ -232,7 +232,7 @@
       <xs:element name="caName" type="xs:string"/>
       <xs:element name="responderType" type="xs:string"/>
       <xs:element name="responderConf" type="fileOrValueType"/>
-      <xs:element name="responderCert" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="responderCert" type="fileOrBinaryType" minOccurs="0"/>
       <xs:element name="control" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
@@ -307,7 +307,7 @@
   <xs:complexType name="certstoreCaType">
     <xs:sequence>
       <xs:element name="id" type="xs:int"/>
-      <xs:element name="cert" type="fileOrValueType"/>
+      <xs:element name="cert" type="fileOrBinaryType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="nameIdType">
@@ -319,6 +319,12 @@
   <xs:complexType name="fileOrValueType">
     <xs:choice>
       <xs:element name="value" type="xs:string"/>
+      <xs:element name="file" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="fileOrBinaryType">
+    <xs:choice>
+      <xs:element name="binary" type="xs:base64Binary"/>
       <xs:element name="file" type="xs:string"/>
     </xs:choice>
   </xs:complexType>

@@ -280,8 +280,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         try {
             for (CertstoreCaType m : cas.getCa()) {
                 try {
-                    String b64Cert = getValue(m.getCert());
-                    byte[] encodedCert = Base64.decode(b64Cert);
+                    byte[] encodedCert = getBinary(m.getCert());
                     Certificate cert = Certificate.getInstance(encodedCert);
                     String b64Sha1FpCert = HashAlgoType.SHA1.base64Hash(encodedCert);
 
@@ -289,7 +288,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     ps.setInt(idx++, (int) m.getId());
                     ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
                     ps.setString(idx++, b64Sha1FpCert);
-                    ps.setString(idx++, b64Cert);
+                    ps.setString(idx++, Base64.toBase64String(encodedCert));
 
                     ps.execute();
                 } catch (SQLException ex) {

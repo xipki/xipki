@@ -216,7 +216,8 @@ class CaConfigurationDbExporter extends DbPorter {
                 crlsigner.setSignerConf(
                         buildFileOrValue(signerConf, "ca-conf/signerconf-crlsigner-" + name));
                 crlsigner.setSignerCert(
-                        buildFileOrValue(signerCert, "ca-conf/signercert-crlsigner-" + name));
+                        buildFileOrBase64Binary(signerCert,
+                                "ca-conf/signercert-crlsigner-" + name + ".der"));
                 crlsigner.setCrlControl(crlControl);
 
                 crlsigners.getCrlsigner().add(crlsigner);
@@ -279,7 +280,8 @@ class CaConfigurationDbExporter extends DbPorter {
                 String cert = rs.getString("CERT");
                 RequestorType requestor = new RequestorType();
                 requestor.setName(name);
-                requestor.setCert(buildFileOrValue(cert, "ca-conf/cert-requestor-" + name));
+                requestor.setCert(
+                        buildFileOrBase64Binary(cert, "ca-conf/cert-requestor-" + name + ".der"));
                 requestors.getRequestor().add(requestor);
             }
         } catch (SQLException ex) {
@@ -316,7 +318,8 @@ class CaConfigurationDbExporter extends DbPorter {
                 responder.setName(name);
                 responder.setType(type);
                 responder.setConf(buildFileOrValue(conf, "ca-conf/conf-responder-" + name));
-                responder.setCert(buildFileOrValue(cert, "ca-conf/cert-responder-" + name));
+                responder.setCert(
+                        buildFileOrBase64Binary(cert, "ca-conf/cert-responder-" + name + ".der"));
                 responders.getResponder().add(responder);
             }
         } catch (SQLException ex) {
@@ -456,7 +459,7 @@ class CaConfigurationDbExporter extends DbPorter {
                 ca.setOcspUris(ocspUris);
                 ca.setCacertUris(caCertUris);
                 ca.setMaxValidity(maxValidity);
-                ca.setCert(buildFileOrValue(cert, "ca-conf/cert-ca-" + name));
+                ca.setCert(buildFileOrBase64Binary(cert, "ca-conf/cert-ca-" + name + ".der"));
                 ca.setSignerType(signerType);
                 ca.setSignerConf(buildFileOrValue(signerConf, "ca-conf/signerconf-ca-" + name));
                 ca.setCrlsignerName(crlsignerName);
@@ -594,7 +597,8 @@ class CaConfigurationDbExporter extends DbPorter {
                 scep.setResponderConf(
                         buildFileOrValue(respConf, "ca-conf/responderconf-scep-" + caName));
                 scep.setResponderCert(
-                        buildFileOrValue(respCert, "ca-conf/respondercert-scep-" + caName));
+                        buildFileOrBase64Binary(respCert,
+                                "ca-conf/respondercert-scep-" + caName + ".der"));
                 scep.setControl(control);
                 sceps.getScep().add(scep);
             }

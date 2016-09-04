@@ -267,7 +267,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                 CertstoreCaType ca = new CertstoreCaType();
                 ca.setId(id);
-                ca.setCert(buildFileOrValue(cert, "ca-certstore/cert-ca-" + id));
+                ca.setCert(buildFileOrBase64Binary(cert, "ca-certstore/cert-ca-" + id + ".der"));
 
                 cas.getCa().add(ca);
             }

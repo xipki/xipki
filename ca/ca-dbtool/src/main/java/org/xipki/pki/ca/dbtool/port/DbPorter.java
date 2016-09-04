@@ -46,12 +46,14 @@ import javax.xml.bind.JAXBException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbSchemaInfo;
 import org.xipki.pki.ca.dbtool.DbToolBase;
+import org.xipki.pki.ca.dbtool.jaxb.ca.FileOrBinaryType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.FileOrValueType;
 import org.xml.sax.SAXException;
 
@@ -202,6 +204,53 @@ public class DbPorter extends DbToolBase {
 
         File file = new File(baseDir, fileOrValue.getFile());
         return new String(IoUtil.read(file), "UTF-8");
+    }
+
+    protected FileOrBinaryType buildFileOrBase64Binary(final String base64Content,
+            final String fileName) throws IOException {
+        if (base64Content == null) {
+            return null;
+        }
+        return buildFileOrBinary(Base64.decode(base64Content), fileName);
+    }
+
+    protected FileOrBinaryType buildFileOrBinary(final byte[] content, final String fileName)
+    throws IOException {
+        if (content == null) {
+            return null;
+        }
+
+        ParamUtil.requireNonNull("fileName", fileName);
+
+        FileOrBinaryType ret = new FileOrBinaryType();
+        if (content.length < 256) {
+            ret.setBinary(content);
+            return ret;
+        }
+
+        File file = new File(baseDir, fileName);
+        File parent = file.getParentFile();
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs();
+        }
+
+        IoUtil.save(file, content);
+
+        ret.setFile(fileName);
+        return ret;
+    }
+
+    protected byte[] getBinary(final FileOrBinaryType fileOrValue) throws IOException {
+        if (fileOrValue == null) {
+            return null;
+        }
+
+        if (fileOrValue.getBinary() != null) {
+            return fileOrValue.getBinary();
+        }
+
+        File file = new File(baseDir, fileOrValue.getFile());
+        return IoUtil.read(file);
     }
 
     protected String getImportingText() {

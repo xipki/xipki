@@ -243,13 +243,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
     throws IOException {
         List<Integer> relatedCaIds = new LinkedList<>();
         for (CertstoreCaType issuer : issuers.getCa()) {
-            String b64Cert = getValue(issuer.getCert());
-            byte[] encodedCert = Base64.decode(b64Cert);
+            byte[] encodedCert = getBinary(issuer.getCert());
 
             // retrieve the revocation information of the CA, if possible
             CaType ca = null;
             for (CaType caType : cas) {
-                if (Arrays.equals(encodedCert, Base64.decode(getValue(caType.getCert())))) {
+                if (Arrays.equals(encodedCert, getBinary(caType.getCert()))) {
                     ca = caType;
                     break;
                 }
@@ -287,13 +286,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             final PreparedStatement ps, final List<CaType> cas, final List<Integer> relatedCaIds)
     throws IOException, DataAccessException, CertificateException {
         try {
-            String b64Cert = getValue(issuer.getCert());
-            byte[] encodedCert = Base64.decode(b64Cert);
+            byte[] encodedCert = getBinary(issuer.getCert());
 
             // retrieve the revocation information of the CA, if possible
             CaType ca = null;
             for (CaType caType : cas) {
-                if (Arrays.equals(encodedCert, Base64.decode(getValue(caType.getCert())))) {
+                if (Arrays.equals(encodedCert, getBinary(caType.getCert()))) {
                     ca = caType;
                     break;
                 }
@@ -337,7 +335,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             ps.setString(idx++, HashAlgoType.SHA512.base64Hash(encodedName));
             ps.setString(idx++, HashAlgoType.SHA512.base64Hash(encodedKey));
             ps.setString(idx++, HashAlgoType.SHA1.base64Hash(encodedCert));
-            ps.setString(idx++, b64Cert);
+            ps.setString(idx++, Base64.toBase64String(encodedCert));
 
             setBoolean(ps, idx++, ca.isRevoked());
             setInt(ps, idx++, ca.getRevReason());
