@@ -2445,7 +2445,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         X509CaUris caUris = new X509CaUris(cacertUris, ocspUris, crlUris, deltaCrlUris);
 
         String name = caEntry.getName();
-        int nextCrlNumber = caEntry.getNextCrlNumber();
+        long nextCrlNumber = caEntry.getNextCrlNumber();
         CaStatus status = caEntry.getStatus();
 
         X509CaEntry entry = new X509CaEntry(name, caEntry.getSerialNoBitLen(), nextCrlNumber,

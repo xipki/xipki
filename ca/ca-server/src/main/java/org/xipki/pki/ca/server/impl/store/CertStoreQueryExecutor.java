@@ -356,53 +356,40 @@ class CertStoreQueryExecutor {
             psAddRawcert.setString(idx++, reqSubjectText);
             psAddRawcert.setString(idx++, b64Cert);
 
-            final int tries = 3;
-            for (int i = 0; i < tries; i++) {
-                if (i > 0) {
-                    certId = idGenerator.nextId();
+            certificate.setCertId(certId);
+
+            psAddcert.setLong(1, certId);
+            psAddRawcert.setLong(1, certId);
+
+            final boolean origAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+
+            String sql = null;
+            try {
+                sql = SQL_ADD_CERT;
+                psAddcert.executeUpdate();
+
+                sql = SQL_ADD_CRAW;
+                psAddRawcert.executeUpdate();
+
+                sql = "(commit add cert to CA certstore)";
+                conn.commit();
+            } catch (Throwable th) {
+                conn.rollback();
+                // more secure
+                datasource.deleteFromTable(null, "CRAW", "CID", certId);
+                datasource.deleteFromTable(null, "CERT", "ID", certId);
+
+                if (th instanceof SQLException) {
+                    LOG.error("datasource {} could not add certificate with id {}: {}",
+                        datasource.getDatasourceName(), certId, th.getMessage());
+                    throw datasource.translate(sql, (SQLException) th);
+                } else {
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
                 }
-                certificate.setCertId(certId);
-
-                psAddcert.setLong(1, certId);
-                psAddRawcert.setLong(1, certId);
-
-                final boolean origAutoCommit = conn.getAutoCommit();
-                conn.setAutoCommit(false);
-
-                String sql = null;
-                try {
-                    sql = SQL_ADD_CERT;
-                    psAddcert.executeUpdate();
-
-                    sql = SQL_ADD_CRAW;
-                    psAddRawcert.executeUpdate();
-
-                    sql = "(commit add cert to CA certstore)";
-                    conn.commit();
-                } catch (Throwable th) {
-                    conn.rollback();
-                    // more secure
-                    datasource.deleteFromTable(null, "CRAW", "CID", certId);
-                    datasource.deleteFromTable(null, "CERT", "ID", certId);
-
-                    if (th instanceof SQLException) {
-                        SQLException ex = (SQLException) th;
-                        DataAccessException dex = datasource.translate(sql, ex);
-                        if (dex instanceof DuplicateKeyException && i < tries - 1) {
-                            continue;
-                        }
-                        LOG.error("datasource {} could not add certificate with id {}: {}",
-                            datasource.getDatasourceName(), certId, th.getMessage());
-                        throw ex;
-                    } else {
-                        throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
-                    }
-                } finally {
-                    conn.setAutoCommit(origAutoCommit);
-                }
-
-                break;
-            } // end for
+            } finally {
+                conn.setAutoCommit(origAutoCommit);
+            }
         } catch (SQLException ex) {
             throw datasource.translate(null, ex);
         } finally {
@@ -534,7 +521,7 @@ class CertStoreQueryExecutor {
         }
     }
 
-    int getMaxCrlNumber(final X509Cert caCert) throws DataAccessException, OperationException {
+    long getMaxCrlNumber(final X509Cert caCert) throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
 
         final String sql = SQL_MAX_CRLNO;
@@ -547,7 +534,7 @@ class CertStoreQueryExecutor {
             if (!rs.next()) {
                 return 0;
             }
-            int maxCrlNumber = rs.getInt(1);
+            long maxCrlNumber = rs.getLong(1);
             return (maxCrlNumber < 0) ? 0 : maxCrlNumber;
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
@@ -607,17 +594,17 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("crl", crl);
 
         byte[] encodedExtnValue = crl.getExtensionValue(Extension.cRLNumber.getId());
-        Integer crlNumber = null;
+        Long crlNumber = null;
         if (encodedExtnValue != null) {
             byte[] extnValue = DEROctetString.getInstance(encodedExtnValue).getOctets();
-            crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().intValue();
+            crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
         }
 
         encodedExtnValue = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
-        Integer baseCrlNumber = null;
+        Long baseCrlNumber = null;
         if (encodedExtnValue != null) {
             byte[] extnValue = DEROctetString.getInstance(encodedExtnValue).getOctets();
-            baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().intValue();
+            baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
         }
 
         final String sql = SQL_ADD_CRL;
@@ -635,12 +622,12 @@ class CertStoreQueryExecutor {
             int idx = 1;
             ps.setLong(idx++, crlId);
             ps.setInt(idx++, caId);
-            setInt(ps, idx++, crlNumber);
+            setLong(ps, idx++, crlNumber);
             Date date = crl.getThisUpdate();
             ps.setLong(idx++, date.getTime() / 1000);
             setDateSeconds(ps, idx++, crl.getNextUpdate());
             setBoolean(ps, idx++, (baseCrlNumber != null));
-            setInt(ps, idx++, baseCrlNumber);
+            setLong(ps, idx++, baseCrlNumber);
             ps.setString(idx++, b64Crl);
 
             ps.executeUpdate();
@@ -2105,7 +2092,7 @@ class CertStoreQueryExecutor {
         }
     } // method getNotBeforeOfFirstCertStartsWithCommonName
 
-    void commitNextCrlNoIfLess(final String caName, final int nextCrlNo)
+    void commitNextCrlNoIfLess(final String caName, final long nextCrlNo)
     throws DataAccessException {
         Connection conn = datasource.getConnection();
         PreparedStatement ps = null;
@@ -2113,13 +2100,13 @@ class CertStoreQueryExecutor {
             final String sql = new StringBuilder("SELECT NEXT_CRLNO FROM CA WHERE NAME='")
                 .append(caName).append("'").toString();
             ResultSet rs = null;
-            int nextCrlNoInDb;
+            long nextCrlNoInDb;
 
             try {
                 ps = conn.prepareStatement(sql);
                 rs = ps.executeQuery();
                 rs.next();
-                nextCrlNoInDb = rs.getInt("NEXT_CRLNO");
+                nextCrlNoInDb = rs.getLong("NEXT_CRLNO");
             } catch (SQLException ex) {
                 throw datasource.translate(sql, ex);
             } finally {
@@ -2133,7 +2120,7 @@ class CertStoreQueryExecutor {
                 final String updateSql = "UPDATE CA SET NEXT_CRLNO=? WHERE NAME=?";
                 try {
                     ps = conn.prepareStatement(updateSql);
-                    ps.setInt(1, nextCrlNo);
+                    ps.setLong(1, nextCrlNo);
                     ps.setString(2, caName);
                     ps.executeUpdate();
                 } catch (SQLException ex) {

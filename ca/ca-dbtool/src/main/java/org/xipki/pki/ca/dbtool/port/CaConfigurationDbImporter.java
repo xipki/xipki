@@ -375,7 +375,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, X509Util.cutX500Name(cert.getSubjectX500Principal(),
                             maxX500nameLen));
                     ps.setInt(idx++, ca.getSnSize());
-                    ps.setInt(idx++, ca.getNextCrlNo());
+                    ps.setLong(idx++, ca.getNextCrlNo());
                     ps.setString(idx++, ca.getStatus());
                     ps.setString(idx++, ca.getCrlUris());
                     ps.setString(idx++, ca.getDeltacrlUris());

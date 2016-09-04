@@ -209,7 +209,7 @@
       <xs:element name="crlsignerName" type="xs:string" minOccurs="0"/>
       <xs:element name="crlUris" type="stringsType" minOccurs="0"/>
       <xs:element name="deltacrlUris" type="stringsType" minOccurs="0"/>
-      <xs:element name="nextCrlNo" type="xs:int"/>
+      <xs:element name="nextCrlNo" type="xs:long"/>
       <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
       <xs:element name="ocspUris" type="stringsType" minOccurs="0"/>
       <xs:element name="snSize" type="xs:int"/>

@@ -167,7 +167,7 @@
       <xs:element name="name" type="xs:string"/>
       <xs:element name="art" type="xs:int" minOccurs="0"/>
       <xs:element name="snSize" type="xs:int"/>
-      <xs:element name="nextCrlNo" type="xs:int"/>
+      <xs:element name="nextCrlNo" type="xs:long"/>
       <xs:element name="status" type="xs:string"/>
       <xs:element name="crlUris" type="xs:string" minOccurs="0"/>
       <xs:element name="deltacrlUris" type="xs:string" minOccurs="0"/>

@@ -72,7 +72,7 @@ public class X509CaEntry extends CaEntry {
 
     private int serialNoBitLen;
 
-    private int nextCrlNumber;
+    private long nextCrlNumber;
 
     private int numCrls;
 
@@ -80,18 +80,18 @@ public class X509CaEntry extends CaEntry {
 
     private String subject;
 
-    public X509CaEntry(final String name, final int serialNoBitLen, final int nextCrlNumber,
+    public X509CaEntry(final String name, final int serialNoBitLen, final long nextCrlNumber,
             final String signerType, final String signerConf, final X509CaUris caUris,
             final int numCrls, final int expirationPeriod) throws CaMgmtException {
         super(name, signerType, signerConf, expirationPeriod);
         init(serialNoBitLen, nextCrlNumber, caUris, numCrls);
     }
 
-    private void init(final int serialNoBitLen, final int nextCrlNumber, final X509CaUris caUris,
+    private void init(final int serialNoBitLen, final long nextCrlNumber, final X509CaUris caUris,
             final int numCrls) throws CaMgmtException {
-        this.numCrls = ParamUtil.requireMin("numCrls", numCrls, 0);
+        this.numCrls = ParamUtil.requireMin("numCrls", numCrls, 1);
         this.serialNoBitLen = ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
-        this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 0);
+        this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 1);
 
         this.cacertUris = caUris.getCacertUris();
         this.ocspUris = caUris.getOcspUris();
@@ -120,11 +120,11 @@ public class X509CaEntry extends CaEntry {
         this.serialNoBitLen = ParamUtil.requireMin("serialNoBitLen", serialNoBitLen, 63);
     }
 
-    public int getNextCrlNumber() {
+    public long getNextCrlNumber() {
         return nextCrlNumber;
     }
 
-    public void setNextCrlNumber(final int crlNumber) {
+    public void setNextCrlNumber(final long crlNumber) {
         this.nextCrlNumber = crlNumber;
     }
 

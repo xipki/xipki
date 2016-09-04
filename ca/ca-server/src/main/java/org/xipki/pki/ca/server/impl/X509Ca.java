@@ -899,7 +899,7 @@ public class X509Ca {
 
             try {
                 X509CRL crl = new X509CRLObject(crlHolder.toASN1Structure());
-                caInfo.getCaEntry().setNextCrlNumber(crlNumber.intValue() + 1);
+                caInfo.getCaEntry().setNextCrlNumber(crlNumber.longValue() + 1);
                 caInfo.commitNextCrlNo();
                 publishCrl(crl);
 

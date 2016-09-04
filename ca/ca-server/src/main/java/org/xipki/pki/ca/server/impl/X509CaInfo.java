@@ -336,8 +336,8 @@ public class X509CaInfo {
     }
 
     public BigInteger nextCrlNumber() throws OperationException {
-        int crlNo = caEntry.getNextCrlNumber();
-        int currentMaxNo = certStore.getMaxCrlNumber(getCertificate());
+        long crlNo = caEntry.getNextCrlNumber();
+        long currentMaxNo = certStore.getMaxCrlNumber(getCertificate());
         if (crlNo <= currentMaxNo) {
             crlNo = currentMaxNo + 1;
         }

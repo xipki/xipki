@@ -422,7 +422,7 @@ class CaConfigurationDbExporter extends DbPorter {
             while (rs.next()) {
                 String name = rs.getString("NAME");
                 int art = rs.getInt("ART");
-                int nextCrlNo = rs.getInt("NEXT_CRLNO");
+                long nextCrlNo = rs.getLong("NEXT_CRLNO");
                 String responderName = rs.getString("RESPONDER_NAME");
                 String cmpcontrolName = rs.getString("CMPCONTROL_NAME");
                 String caCertUris = rs.getString("CACERT_URIS");

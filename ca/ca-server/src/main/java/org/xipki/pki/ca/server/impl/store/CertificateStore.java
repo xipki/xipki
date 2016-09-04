@@ -280,7 +280,7 @@ public class CertificateStore {
         }
     }
 
-    public int getMaxCrlNumber(final X509Cert caCert) throws OperationException {
+    public long getMaxCrlNumber(final X509Cert caCert) throws OperationException {
         try {
             return queryExecutor.getMaxCrlNumber(caCert);
         } catch (DataAccessException ex) {
@@ -616,7 +616,7 @@ public class CertificateStore {
         }
     }
 
-    public void commitNextCrlNo(final String caName, final int nextCrlNo)
+    public void commitNextCrlNo(final String caName, final long nextCrlNo)
     throws OperationException {
         try {
             queryExecutor.commitNextCrlNoIfLess(caName, nextCrlNo);

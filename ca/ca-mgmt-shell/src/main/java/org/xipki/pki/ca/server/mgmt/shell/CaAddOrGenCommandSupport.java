@@ -119,7 +119,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
             required = true,
             description = "CRL number for the next CRL\n"
                     + "(required)")
-    private Integer nextCrlNumber;
+    private Long nextCrlNumber;
 
     @Option(name = "--max-validity",
             required = true,

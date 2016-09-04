@@ -128,7 +128,7 @@
       </column>
       <column name="SN_SIZE" type="SMALLINT"
           remarks="number of octets of the serial number"/>
-      <column name="NEXT_CRLNO" type="INT"/>
+      <column name="NEXT_CRLNO" type="BIGINT"/>
       <column name="STATUS" type="VARCHAR(10)"
           remarks="valid values: active, inactive">
         <constraints nullable="false"/>
@@ -329,7 +329,7 @@
       <column name="DELTACRL" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
-      <column name="BASECRL_NO" type="INT"/>
+      <column name="BASECRL_NO" type="BIGINT"/>
       <column name="CRL" type="${crl.data.type}">
         <constraints nullable="false"/>
       </column>

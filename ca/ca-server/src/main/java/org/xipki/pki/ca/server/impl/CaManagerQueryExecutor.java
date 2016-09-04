@@ -533,7 +533,7 @@ class CaManagerQueryExecutor {
                     tmpDeltaCrlUris);
 
             int serialNoSize = rs.getInt("SN_SIZE");
-            int nextCrlNo = rs.getInt("NEXT_CRLNO");
+            long nextCrlNo = rs.getLong("NEXT_CRLNO");
             String signerType = rs.getString("SIGNER_TYPE");
             String signerConf = rs.getString("SIGNER_CONF");
             int numCrls = rs.getInt("NUM_CRLS");
@@ -779,7 +779,7 @@ class CaManagerQueryExecutor {
             ps.setInt(idx++, CertArt.X509PKC.getCode());
             ps.setString(idx++, entry.getSubject());
             ps.setInt(idx++, entry.getSerialNoBitLen());
-            ps.setInt(idx++, entry.getNextCrlNumber());
+            ps.setLong(idx++, entry.getNextCrlNumber());
             ps.setString(idx++, entry.getStatus().getStatus());
             ps.setString(idx++, entry.getCrlUrisAsString());
             ps.setString(idx++, entry.getDeltaCrlUrisAsString());

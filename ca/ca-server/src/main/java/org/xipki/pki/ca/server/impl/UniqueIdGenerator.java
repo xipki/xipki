@@ -75,14 +75,14 @@ public class UniqueIdGenerator {
         synchronized (this) {
             long ret = now - epoch;
             ret <<= 10;
-            System.out.println(Long.toHexString(ret));
+
             ret += (offset++);
             ret <<= 7;
-            System.out.println(Long.toHexString(ret));
+
             if (offset > MAX_OFFSET) {
                 offset = 0;
             }
-            System.out.println(Long.toHexString(ret));
+
             ret += shardId;
 
             return ret;
