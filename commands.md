@@ -298,10 +298,6 @@ Feature xipki-camgmt-shell
 
      add CA
 
-   * `xipki-ca:ca-addf`
-
-     add CA from configuration file
-
    * `xipki-ca:caalias-add`
 
      add CA alias
@@ -314,17 +310,9 @@ Feature xipki-camgmt-shell
 
      remove CA alias
 
-   * `xipki-ca:ca-export`
-
-     export CA configuration
-
    * `xipki-ca:gen-rca`
 
      generate selfsigned CA
-
-   * `xipki-ca:gen-rcaf`
-
-     generate selfsigned CA from configuration file
 
    * `xipki-ca:ca-info`
 
