@@ -258,7 +258,7 @@ public class CaConf {
         // Responders
         if (jaxb.getResponders() != null) {
             for ( ResponderType m : jaxb.getResponders().getResponder()) {
-                CmpResponderEntry en = new CmpResponderEntry(m.getName(), extendConf(m.getType()),
+                CmpResponderEntry en = new CmpResponderEntry(m.getName(), expandConf(m.getType()),
                         getValue(m.getConf(), zipFile), getBase64Binary(m.getCert(), zipFile));
                 addResponder(en);
             }
@@ -267,7 +267,7 @@ public class CaConf {
         // Environments
         if (jaxb.getEnvironments() != null) {
             for (NameValueType m : jaxb.getEnvironments().getEnvironment()) {
-                addEnvironment(m.getName(), extendConf(m.getValue()));
+                addEnvironment(m.getName(), expandConf(m.getValue()));
             }
         }
 
@@ -275,8 +275,8 @@ public class CaConf {
         if (jaxb.getCrlsigners() != null) {
             for (CrlsignerType m : jaxb.getCrlsigners().getCrlsigner()) {
                 X509CrlSignerEntry en = new X509CrlSignerEntry(m.getName(),
-                        extendConf(m.getSignerType()), getValue(m.getSignerConf(), zipFile),
-                        getBase64Binary(m.getSignerCert(), zipFile), extendConf(m.getCrlControl()));
+                        expandConf(m.getSignerType()), getValue(m.getSignerConf(), zipFile),
+                        getBase64Binary(m.getSignerCert(), zipFile), expandConf(m.getCrlControl()));
                 addCrlSigner(en);
             }
         }
@@ -293,7 +293,7 @@ public class CaConf {
         // Publishers
         if (jaxb.getPublishers() != null) {
             for (PublisherType m : jaxb.getPublishers().getPublisher()) {
-                PublisherEntry en = new PublisherEntry(m.getName(), extendConf(m.getType()),
+                PublisherEntry en = new PublisherEntry(m.getName(), expandConf(m.getType()),
                         getValue(m.getConf(), zipFile));
                 addPublisher(en);
             }
@@ -302,7 +302,7 @@ public class CaConf {
         // CertProfiles
         if (jaxb.getProfiles() != null) {
             for (ProfileType m : jaxb.getProfiles().getProfile()) {
-                CertprofileEntry en = new CertprofileEntry(m.getName(), extendConf(m.getType()),
+                CertprofileEntry en = new CertprofileEntry(m.getName(), expandConf(m.getType()),
                         getValue(m.getConf(), zipFile));
                 addProfile(en);
             }
@@ -321,7 +321,7 @@ public class CaConf {
                         String certFilename = null;
                         if (ci.getCert() != null) {
                             if (ci.getCert().getFile() != null) {
-                                certFilename = extendConf(ci.getCert().getFile());
+                                certFilename = expandConf(ci.getCert().getFile());
                             } else {
                                 throw new InvalidConfException("cert.file of CA " + name
                                         + " must not be null");
@@ -341,7 +341,7 @@ public class CaConf {
                     int numCrls = (ci.getNumCrls() == null) ? 30 : ci.getNumCrls().intValue();
 
                     caEntry = new X509CaEntry(name, ci.getSnSize(), ci.getNextCrlNo(),
-                            extendConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipFile),
+                            expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipFile),
                             caUris, numCrls, exprirationPeriod);
 
                     caEntry.setCmpControlName(ci.getCmpcontrolName());
@@ -396,7 +396,7 @@ public class CaConf {
                                 SignerConf signerConf = new SignerConf(signerConfs.get(0)[1]);
 
                                 signer = securityFactory.createSigner(
-                                        extendConf(ci.getSignerType()), signerConf,
+                                        expandConf(ci.getSignerType()), signerConf,
                                         (X509Certificate) null);
                             } catch (ObjectCreationException | XiSecurityException ex) {
                                 throw new InvalidConfException("could not create CA signer for CA "
@@ -570,10 +570,10 @@ public class CaConf {
         }
 
         if (fileOrValue.getValue() != null) {
-            return extendConf(fileOrValue.getValue());
+            return expandConf(fileOrValue.getValue());
         }
 
-        String fileName = extendConf(fileOrValue.getFile());
+        String fileName = expandConf(fileOrValue.getFile());
 
         InputStream is;
         if (zipFile != null) {
@@ -586,7 +586,7 @@ public class CaConf {
         }
         byte[] binary = IoUtil.read(is);
 
-        return extendConf(new String(binary, "UTF-8"));
+        return expandConf(new String(binary, "UTF-8"));
     }
 
     private String getBase64Binary(final FileOrBinaryType fileOrBinary, final ZipFile zipFile)
@@ -605,7 +605,7 @@ public class CaConf {
             return fileOrBinary.getBinary();
         }
 
-        String fileName = extendConf(fileOrBinary.getFile());
+        String fileName = expandConf(fileOrBinary.getFile());
 
         InputStream is;
         if (zipFile != null) {
@@ -627,12 +627,12 @@ public class CaConf {
 
         List<String> ret = new ArrayList<>(jaxb.getStr().size());
         for (String m : jaxb.getStr()) {
-            ret.add(extendConf(m));
+            ret.add(expandConf(m));
         }
         return ret;
     }
 
-    private final String extendConf(String confStr) {
+    private final String expandConf(String confStr) {
         if (confStr == null || !confStr.contains("${") || confStr.indexOf('}') == -1) {
             return confStr;
         }
