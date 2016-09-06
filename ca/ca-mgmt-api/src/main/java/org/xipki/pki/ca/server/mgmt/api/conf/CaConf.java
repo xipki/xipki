@@ -396,7 +396,8 @@ public class CaConf {
                                 SignerConf signerConf = new SignerConf(signerConfs.get(0)[1]);
 
                                 signer = securityFactory.createSigner(
-                                        ci.getSignerType(), signerConf, (X509Certificate) null);
+                                        extendConf(ci.getSignerType()), signerConf,
+                                        (X509Certificate) null);
                             } catch (ObjectCreationException | XiSecurityException ex) {
                                 throw new InvalidConfException("could not create CA signer for CA "
                                         + name, ex);
