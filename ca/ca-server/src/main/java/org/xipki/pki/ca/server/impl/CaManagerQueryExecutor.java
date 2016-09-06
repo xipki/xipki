@@ -1152,7 +1152,7 @@ class CaManagerQueryExecutor {
                 }
 
                 try {
-                    List<String[]> signerConfs = CaManagerImpl.splitCaSignerConfs(tmpSignerConf);
+                    List<String[]> signerConfs = CaEntry.splitCaSignerConfs(tmpSignerConf);
                     for (String[] m : signerConfs) {
                         securityFactory.createSigner(tmpSignerType, new SignerConf(m[1]), tmpCert);
                     }
@@ -2271,7 +2271,7 @@ class CaManagerQueryExecutor {
         return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
     }
 
-    public static String canonicalizName(final X500Principal prin) {
+    static String canonicalizName(final X500Principal prin) {
         ParamUtil.requireNonNull("prin", prin);
         X500Name x500Name = X500Name.getInstance(prin.getEncoded());
         return X509Util.canonicalizName(x500Name);

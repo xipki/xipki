@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -87,6 +88,28 @@ public class PublisherEntry {
         sb.append("type: ").append(type).append('\n');
         sb.append("conf: ").append(conf);
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof PublisherEntry)) {
+            return false;
+        }
+
+        PublisherEntry objB = (PublisherEntry) obj;
+        if (!name.equals(objB.name)) {
+            return false;
+        }
+
+        if (!type.equals(objB.type)) {
+            return false;
+        }
+
+        if (!CompareUtil.equalsObject(conf, objB.conf)) {
+            return false;
+        }
+
+        return true;
     }
 
 }

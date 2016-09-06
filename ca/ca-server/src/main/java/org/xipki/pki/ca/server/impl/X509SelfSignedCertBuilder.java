@@ -90,6 +90,7 @@ import org.xipki.pki.ca.api.profile.ExtensionValue;
 import org.xipki.pki.ca.api.profile.ExtensionValues;
 import org.xipki.pki.ca.api.profile.x509.SubjectInfo;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
+import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 
 /**
  * @author Lijun Liao
@@ -161,7 +162,7 @@ class X509SelfSignedCertBuilder {
 
         ConcurrentContentSigner signer;
         try {
-            List<String[]> signerConfs = CaManagerImpl.splitCaSignerConfs(signerConf);
+            List<String[]> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
             List<String> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
 
             String thisSignerConf = null;

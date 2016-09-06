@@ -282,7 +282,6 @@ public class X509CaEntry extends CaEntry {
             return false;
         }
 
-        // TODO: make sure that the certificate will be always set by reading from the CAConf.
         if (!CompareUtil.equalsObject(cert, objB.cert)) {
             return false;
         }

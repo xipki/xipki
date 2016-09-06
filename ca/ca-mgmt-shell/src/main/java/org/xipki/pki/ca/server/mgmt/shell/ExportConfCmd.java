@@ -36,33 +36,40 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
+import java.util.List;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.pki.ca.server.mgmt.api.conf.CaConf;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "load-conf",
-        description = "load configuration")
+@Command(scope = "xipki-ca", name = "export-conf",
+        description = "export configuration to zip file")
 @Service
-public class LoadConfCmd extends CaCommandSupport {
+public class ExportConfCmd extends CaCommandSupport {
 
     @Option(name = "--conf-file",
-            description = "CA system configuration file (XML or zip file")
+            required = true,
+            description = "zip file that saves the exported configuration")
     @Completion(FilePathCompleter.class)
     private String confFile;
 
+    @Option(name = "--ca", description = "CAs whose configuration should be exported."
+            + " Empty list means all CAs\n(multi-valued)")
+    @Completion(CaNameCompleter.class)
+    private List<String> caNames;
+
     @Override
     protected Object doExecute() throws Exception {
-        CaConf caConf = new CaConf(confFile, securityFactory);
-        boolean bo = caManager.loadConf(caConf);
-        output(bo, "loaded", "could not load", "configuration " + confFile);
+        boolean bo = caManager.exportConf(confFile, caNames);
+        output(bo, "exported", "could not export", "configuration to file " + confFile);
         return null;
     }
 

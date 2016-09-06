@@ -36,12 +36,15 @@
 
 package org.xipki.pki.ca.server.impl;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.SocketException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -49,6 +52,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -61,6 +65,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.xml.bind.JAXBException;
 
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.pkcs.Attribute;
@@ -84,6 +95,7 @@ import org.xipki.commons.audit.api.PciAuditEvent;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.ObjectCreationException;
+import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -99,7 +111,6 @@ import org.xipki.commons.security.SecurityFactory;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.exception.XiSecurityException;
-import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.DfltEnvParameterResolver;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.OperationException;
@@ -138,11 +149,27 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControl;
 import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 import org.xipki.pki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.pki.ca.server.mgmt.api.conf.GenSelfIssued;
 import org.xipki.pki.ca.server.mgmt.api.conf.SingleCaConf;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.CAConfType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.CaHasRequestorType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.CaType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.CmpcontrolType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.CrlsignerType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.FileOrBinaryType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.FileOrValueType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.NameValueType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.ProfileType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.PublisherType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.RequestorType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.ResponderType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.ScepType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.StringsType;
+import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.X509CaInfoType;
 import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 import org.xipki.pki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
@@ -150,6 +177,7 @@ import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaUris;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
+import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
@@ -1220,7 +1248,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
             ConcurrentContentSigner signer;
             try {
-                List<String[]> signerConfs = splitCaSignerConfs(tmpCaEntry.getSignerConf());
+                List<String[]> signerConfs = CaEntry.splitCaSignerConfs(tmpCaEntry.getSignerConf());
                 for (String[] m : signerConfs) {
                     SignerConf signerConf = new SignerConf(m[1]);
                     signer = securityFactory.createSigner(tmpCaEntry.getSignerType(), signerConf,
@@ -2779,29 +2807,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         return pairs.getEncoded();
     } // method canonicalizeSignerConf
 
-    static List<String[]> splitCaSignerConfs(final String conf) throws XiSecurityException {
-        ConfPairs pairs = new ConfPairs(conf);
-        String str = pairs.getValue("algo");
-        List<String> list = StringUtil.split(str, ":");
-        if (list == null) {
-            throw new XiSecurityException("no algo is defined in CA signerConf");
-        }
-
-        List<String[]> signerConfs = new ArrayList<>(list.size());
-        for (String n : list) {
-            String c14nAlgo;
-            try {
-                c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(n);
-            } catch (NoSuchAlgorithmException ex) {
-                throw new XiSecurityException(ex.getMessage(), ex);
-            }
-            pairs.putPair("algo", c14nAlgo);
-            signerConfs.add(new String[]{c14nAlgo, pairs.getEncoded()});
-        }
-
-        return signerConfs;
-    } // method splitCaSignerConfs
-
     @Override
     public CertWithStatusInfo getCert(String caName, BigInteger serialNumber)
     throws CaMgmtException {
@@ -2828,15 +2833,17 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 if (entry.equals(entryB)) {
                     LOG.info("ignore existed CMP control {}", name);
                 } else {
-                    LOG.error("CMP control {} existed, could not re-added it", name);
-                    return false;
+                    String msg = "CMP control " + name + " existed, could not re-added it";
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             } else {
                 if (addCmpControl(entry)) {
                     LOG.info("added CMP control {}", name);
                 } else {
-                    LOG.error("could not add CMP control {}", name);
-                    return false;
+                    String msg = "could not add CMP control " + name;
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             }
         }
@@ -2848,15 +2855,17 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 if (entry.equals(entryB)) {
                     LOG.info("ignore existed CMP responder {}", name);
                 } else {
-                    LOG.error("CMP responder {} existed, could not re-added it", name);
-                    return false;
+                    String msg = "CMP responder " + name + " existed, could not re-added it";
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             } else {
                 if (addCmpResponder(entry)) {
                     LOG.info("added CMP responder {}", name);
                 } else {
-                    LOG.error("could not add CMP responder {}", name);
-                    return false;
+                    String msg = "could not add CMP responder " + name;
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             }
         }
@@ -2868,15 +2877,18 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 if (entry.equals(entryB)) {
                     LOG.info("ignore existed environment parameter {}", name);
                 } else {
-                    LOG.error("environment parameter {} existed, could not re-added it", name);
-                    return false;
+                    String msg = "environment parameter " + name
+                            + " existed, could not re-added it";
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             } else {
                 if (addEnvParam(name, entry)) {
                     LOG.info("could not add environment parameter {}", name);
                 } else {
-                    LOG.error("could not add environment parameter {}", name);
-                    return false;
+                    String msg = "could not add environment parameter " + name;
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             }
         }
@@ -2888,15 +2900,17 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 if (entry.equals(entryB)) {
                     LOG.info("ignore existed CRL signer {}", name);
                 } else {
-                    LOG.error("CRL signer {} existed, could not re-added it", name);
-                    return false;
+                    String msg = "CRL signer " + name + " existed, could not re-added it";
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             } else {
                 if (addCrlSigner(entry)) {
                     LOG.info("added CRL signer {}", name);
                 } else {
-                    LOG.error("could not add CRL signer {}", name);
-                    return false;
+                    String msg = "could not add CRL signer " + name;
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             }
         }
@@ -2908,15 +2922,17 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 if (entry.equals(entryB)) {
                     LOG.info("ignore existed CRL signer {}", name);
                 } else {
-                    LOG.error("CRL signer {} existed, could not re-added it", name);
-                    return false;
+                    String msg = "CRL signer " + name + " existed, could not re-added it";
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             } else {
                 if (addCrlSigner(entry)) {
                     LOG.info("added CRL signer {}", name);
                 } else {
-                    LOG.error("could not add CRL signer {}", name);
-                    return false;
+                    String msg = "could not add CRL signer " + name;
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             }
         }
@@ -2929,16 +2945,18 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     LOG.info("ignore existed CMP requestor {}", name);
                     continue;
                 } else {
-                    LOG.error("CMP requestor {} existed, could not re-added it", name);
-                    return false;
+                    String msg = "CMP requestor " + name + " existed, could not re-added it";
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             }
 
             if (addCmpRequestor(entry)) {
                 LOG.info("added CMP requestor {}", name);
             } else {
-                LOG.error("could not add CMP requestor {}", name);
-                return false;
+                String msg = "could not add CMP requestor " + name;
+                LOG.error(msg);
+                throw new CaMgmtException(msg);
             }
         }
 
@@ -2950,16 +2968,18 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     LOG.info("ignore existed publisher {}", name);
                     continue;
                 } else {
-                    LOG.error("publisher {} existed, could not re-added it", name);
-                    return false;
+                    String msg = "publisher " + name + " existed, could not re-added it";
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             }
 
             if (addPublisher(entry)) {
                 LOG.info("added publisher {}", name);
             } else {
-                LOG.error("could not add publisher {}", name);
-                return false;
+                String msg = "could not add publisher " + name;
+                LOG.error(msg);
+                throw new CaMgmtException(msg);
             }
         }
 
@@ -2970,15 +2990,17 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 if (entry.equals(entryB)) {
                     LOG.info("ignore existed certProfile {}", name);
                 } else {
-                    LOG.error("certProfile {} existed, could not re-added it", name);
-                    return false;
+                    String msg = "certProfile " + name + " existed, could not re-added it";
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             } else {
                 if (addCertprofile(entry)) {
                     LOG.info("added certProfile {}", name);
                 } else {
-                    LOG.error("could not add certProfile {}", name);
-                    return false;
+                    String msg = "could not add certProfile " + name;
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             }
         }
@@ -2990,15 +3012,17 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 if (entry.equals(entryB)) {
                     LOG.info("ignore existed certProfile {}", name);
                 } else {
-                    LOG.error("certProfile {} existed, could not re-added it", name);
-                    return false;
+                    String msg = "certProfile " + name + " existed, could not re-added it";
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             } else {
                 if (addCertprofile(entry)) {
                     LOG.info("added certProfile {}", name);
                 } else {
-                    LOG.error("could not add certProfile {}", name);
-                    return false;
+                    String msg = "could not add certProfile " + name;
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             }
         }
@@ -3032,8 +3056,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     if (entry.equals(entryB, true)) {
                         LOG.info("ignore existed CA {}", caName);
                     } else {
-                        LOG.error("CA {} existed, could not re-added it", caName);
-                        return false;
+                        String msg = "CA " + caName + " existed, could not re-added it";
+                        LOG.error(msg);
+                        throw new CaMgmtException(msg);
                     }
                 } else {
                     if (genSelfIssued != null) {
@@ -3057,28 +3082,27 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     } else  if (addCa(entry)) {
                         LOG.info("added CA {}", caName);
                     } else {
-                        LOG.error("could not add CA {}", caName);
-                        return false;
+                        String msg = "could not add CA " + caName;
+                        LOG.error(msg);
+                        throw new CaMgmtException(msg);
                     }
                 }
             }
 
-            if (scc.getAlias() != null) {
-                String alias = scc.getAlias();
-                String caNameB = caAliases.get(alias);
-                if (caNameB != null) {
-                    if (caName.equals(caNameB)) {
-                        LOG.info("ignore existed CA alias {}", caName);
+            if (scc.getAliases() != null) {
+                Set<String> aliasesB = getAliasesForCa(caName);
+                for (String aliasName : scc.getAliases()) {
+                    if (aliasesB != null && aliasesB.contains(aliasName)) {
+                        LOG.info("ignored adding existing CA alias {} to CA {}", aliasName, caName);
                     } else {
-                        LOG.error("CA alias {} existed, could not re-added it", alias);
-                        return false;
-                    }
-                } else {
-                    if (addCaAlias(alias, caName)) {
-                        LOG.info("associated CA {} to alias {}", caName, alias);
-                    } else {
-                        LOG.info("could not associate CA {} to alias {}", caName, alias);
-                        return false;
+                        if (addCaAlias(aliasName, caName)) {
+                            LOG.info("associated alias {} to CA {}", aliasName, caName);
+                        } else {
+                            String msg = "could not associate alias " + aliasName + " to CA "
+                                    + caName;
+                            LOG.error(msg);
+                            throw new CaMgmtException(msg);
+                        }
                     }
                 }
             }
@@ -3092,8 +3116,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                         if (addCertprofileToCa(profileName, caName)) {
                             LOG.info("added certprofile {} to CA {}", profileName, caName);
                         } else {
-                            LOG.error("could not add certprofile {} to CA {}", profileName, caName);
-                            return false;
+                            String msg = "could not add certprofile " + profileName + " to CA "
+                                    + caName;
+                            LOG.error(msg);
+                            throw new CaMgmtException(msg);
                         }
                     }
                 }
@@ -3108,8 +3134,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                         if (addPublisherToCa(publisherName, caName)) {
                             LOG.info("added publisher {} to CA {}", publisherName, caName);
                         } else {
-                            LOG.error("could not add publisher {} to CA {}", publisherName, caName);
-                            return false;
+                            String msg = "could not add publisher " + publisherName + " to CA "
+                                    + caName;
+                            LOG.error(msg);
+                            throw new CaMgmtException(msg);
                         }
                     }
                 }
@@ -3134,15 +3162,19 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                         if (requestor.equals(requestorB)) {
                             LOG.info("ignored adding requestor {} to CA {}", requestorName, caName);
                         } else {
-                            LOG.error("could not add requestor {} to CA {}", requestorName, caName);
-                            return false;
+                            String msg = "could not add requestor " + requestorName + " to CA"
+                                    + caName;
+                            LOG.error(msg);
+                            throw new CaMgmtException(msg);
                         }
                     } else {
                         if (addCmpRequestorToCa(requestor, caName)) {
                             LOG.info("added publisher {} to CA {}", requestorName, caName);
                         } else {
-                            LOG.error("could not add publisher {} to CA {}", requestorName, caName);
-                            return false;
+                            String msg = "could not add publisher " + requestorName + " to CA "
+                                    + caName;
+                            LOG.error(msg);
+                            throw new CaMgmtException(msg);
                         }
                     }
                 }
@@ -3162,19 +3194,465 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     LOG.error("ignore existed SCEP {}", name);
                     continue;
                 } else {
-                    LOG.error("SCEP {} existed, could not re-added it", name);
-                    return false;
+                    String msg = "SCEP " + name + " existed, could not re-added it";
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             } else {
                 if (addScep(entry)) {
                     LOG.info("added SCEP {}", name);
                 } else {
-                    LOG.error("could not add SCEP {}", name);
-                    return false;
+                    String msg = "could not add SCEP " + name;
+                    LOG.error(msg);
+                    throw new CaMgmtException(msg);
                 }
             }
         }
 
         return true;
     }
+
+    @Override
+    public boolean exportConf(@Nonnull String zipFilename, @Nullable List<String> caNames)
+    throws CaMgmtException, IOException {
+        List<String> upperCaNames;
+        if (caNames == null) {
+            upperCaNames = null;
+        } else {
+            upperCaNames = new ArrayList<>(caNames.size());
+            for (String name : caNames) {
+                upperCaNames.add(name.toUpperCase());
+            }
+        }
+
+        File zipFile = new File(zipFilename);
+        if (zipFile.exists()) {
+            throw new IOException("File " + zipFilename + " exists.");
+        }
+
+        CAConfType root = new CAConfType();
+        root.setVersion(1);
+
+        ZipOutputStream zipStream = getZipOutputStream(zipFile);
+        try {
+            Set<String> includeCaNames = new HashSet<>();
+            Set<String> includeCmpControlNames = new HashSet<>();
+            Set<String> includeResponderNames = new HashSet<>();
+            Set<String> includeRequestorNames = new HashSet<>();
+            Set<String> includeProfileNames = new HashSet<>();
+            Set<String> includePublisherNames = new HashSet<>();
+            Set<String> includeCrlSignerNames = new HashSet<>();
+
+            // cas
+            if (CollectionUtil.isNonEmpty(x509cas)) {
+                List<CaType> list = new LinkedList<>();
+
+                for (String name : x509cas.keySet()) {
+                    if (upperCaNames != null && !upperCaNames.contains(name)) {
+                        continue;
+                    }
+                    includeCaNames.add(name);
+
+                    CaType jaxb = new CaType();
+                    jaxb.setName(name);
+
+                    Set<String> strs = getAliasesForCa(name);
+                    if (CollectionUtil.isNonEmpty(strs)) {
+                        jaxb.setAliases(createStrings(strs));
+                    }
+
+                    strs = caHasProfiles.get(name);
+                    if (CollectionUtil.isNonEmpty(strs)) {
+                        includeProfileNames.addAll(strs);
+                        jaxb.setProfiles(createStrings(strs));
+                    }
+
+                    strs = caHasPublishers.get(name);
+                    if (CollectionUtil.isNonEmpty(strs)) {
+                        includePublisherNames.addAll(strs);
+                        jaxb.setPublishers(createStrings(strs));
+                    }
+
+                    Set<CaHasRequestorEntry> requestors = caHasRequestors.get(name);
+                    if (CollectionUtil.isNonEmpty(requestors)) {
+                        jaxb.setRequestors(new CaType.Requestors());
+
+                        for (CaHasRequestorEntry m : requestors) {
+                            includeRequestorNames.add(m.getRequestorName());
+
+                            CaHasRequestorType jaxb2 = new CaHasRequestorType();
+                            jaxb2.setRequestorName(m.getRequestorName());
+                            jaxb2.setRa(m.isRa());
+                            jaxb2.setProfiles(createStrings(m.getProfiles()));
+                            jaxb2.setPermissions(createStringsForPermissions(m.getPermissions()));
+
+                            jaxb.getRequestors().getRequestor().add(jaxb2);
+                        }
+                    }
+
+                    X509CaEntry entry = x509cas.get(name).getCaInfo().getCaEntry();
+                    X509CaInfoType ciJaxb = new X509CaInfoType();
+                    ciJaxb.setCacertUris(createStrings(entry.getCacertUris()));
+                    byte[] certBytes;
+                    try {
+                        certBytes = entry.getCertificate().getEncoded();
+                    } catch (CertificateEncodingException ex) {
+                        throw new CaMgmtException("could not encode CA certificate " + name);
+                    }
+                    ciJaxb.setCert(createFileOrBinary(zipStream, certBytes,
+                            "files/ca-" + name + "-cert.der"));
+
+                    if (entry.getCmpControlName() != null) {
+                        includeCmpControlNames.add(entry.getCmpControlName());
+                        ciJaxb.setCmpcontrolName(entry.getCmpControlName());
+                    }
+
+                    if (entry.getCrlSignerName() != null) {
+                        includeCrlSignerNames.add(entry.getCrlSignerName());
+                        ciJaxb.setCrlsignerName(entry.getCrlSignerName());
+                    }
+
+                    ciJaxb.setCrlUris(createStrings(entry.getCrlUris()));
+                    ciJaxb.setDeltacrlUris(createStrings(entry.getDeltaCrlUris()));
+                    ciJaxb.setDuplicateKey(entry.isDuplicateKeyPermitted());
+                    ciJaxb.setDuplicateSubject(entry.isDuplicateSubjectPermitted());
+                    ciJaxb.setExpirationPeriod(entry.getExpirationPeriod());
+                    ciJaxb.setExtraControl(
+                            createFileOrValue(zipStream, entry.getExtraControl(),
+                                    "files/ca-" + name + "-extracontrol.conf"));
+                    ciJaxb.setKeepExpiredCertDays(entry.getKeepExpiredCertInDays());
+                    ciJaxb.setMaxValidity(entry.getMaxValidity().toString());
+                    ciJaxb.setNextCrlNo(entry.getNextCrlNumber());
+                    ciJaxb.setNumCrls(entry.getNumCrls());
+                    ciJaxb.setOcspUris(createStrings(entry.getOcspUris()));
+                    ciJaxb.setPermissions(createStringsForPermissions(entry.getPermissions()));
+                    if (entry.getResponderName() != null) {
+                        includeResponderNames.add(entry.getResponderName());
+                        ciJaxb.setResponderName(entry.getResponderName());
+                    }
+                    ciJaxb.setSaveReq(entry.isSaveRequest());
+                    ciJaxb.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
+                            "files/ca-" + name + "-signerconf.conf"));
+                    ciJaxb.setSignerType(entry.getSignerType());
+                    ciJaxb.setSnSize(entry.getSerialNoBitLen());
+                    ciJaxb.setStatus(entry.getStatus().getStatus());
+                    ciJaxb.setValidityMode(entry.getValidityMode().name());
+
+                    jaxb.setCaInfo(new CaType.CaInfo());
+                    jaxb.getCaInfo().setX509Ca(ciJaxb);
+
+                    list.add(jaxb);
+                }
+
+                if (!list.isEmpty()) {
+                    root.setCas(new CAConfType.Cas());
+                    root.getCas().getCa().addAll(list);
+                }
+            }
+
+            // cmp controls
+            if (CollectionUtil.isNonEmpty(cmpControlDbEntries)) {
+                List<CmpcontrolType> list = new LinkedList<>();
+
+                for (String name : cmpControlDbEntries.keySet()) {
+                    if (!includeCmpControlNames.contains(name)) {
+                        continue;
+                    }
+
+                    CmpcontrolType jaxb = new CmpcontrolType();
+                    CmpControlEntry entry = cmpControlDbEntries.get(name);
+                    jaxb.setName(name);
+                    jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
+                            "files/cmpcontrol-" + name + ".conf"));
+                    list.add(jaxb);
+                }
+
+                if (!list.isEmpty()) {
+                    root.setCmpcontrols(new CAConfType.Cmpcontrols());
+                    root.getCmpcontrols().getCmpcontrol().addAll(list);
+                }
+            }
+
+            // responders
+            if (CollectionUtil.isNonEmpty(responderDbEntries)) {
+                List<ResponderType> list = new LinkedList<>();
+
+                for (String name : responderDbEntries.keySet()) {
+                    if (!includeResponderNames.contains(name)) {
+                        continue;
+                    }
+
+                    CmpResponderEntry entry = responderDbEntries.get(name);
+                    ResponderType jaxb = new ResponderType();
+                    jaxb.setName(name);
+                    jaxb.setType(entry.getType());
+                    jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
+                            "files/responder-" + name + ".conf"));
+                    jaxb.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
+                            "files/responder-" + name + ".der"));
+
+                    list.add(jaxb);
+                }
+
+                if (!list.isEmpty()) {
+                    root.setResponders(new CAConfType.Responders());
+                    root.getResponders().getResponder().addAll(list);
+                }
+            }
+
+            // environments
+            Set<String> names = envParameterResolver.getAllParameterNames();
+            if (CollectionUtil.isNonEmpty(names)) {
+                List<NameValueType> list = new LinkedList<>();
+
+                for (String name : names) {
+                    if (ENV_EPOCH.equalsIgnoreCase(name)) {
+                        continue;
+                    }
+
+                    NameValueType jaxb = new NameValueType();
+                    jaxb.setName(name);
+                    jaxb.setValue(envParameterResolver.getEnvParam(name));
+
+                    list.add(jaxb);
+                }
+
+                if (!list.isEmpty()) {
+                    root.setEnvironments(new CAConfType.Environments());
+                    root.getEnvironments().getEnvironment().addAll(list);
+                }
+            }
+
+            // crlsigners
+            if (CollectionUtil.isNonEmpty(crlSignerDbEntries)) {
+                List<CrlsignerType> list = new LinkedList<>();
+
+                for (String name : crlSignerDbEntries.keySet()) {
+                    if (!includeCrlSignerNames.contains(name)) {
+                        continue;
+                    }
+
+                    X509CrlSignerEntry entry = crlSignerDbEntries.get(name);
+                    CrlsignerType jaxb = new CrlsignerType();
+                    jaxb.setName(name);
+                    jaxb.setSignerType(entry.getType());
+                    jaxb.setSignerConf(createFileOrValue(zipStream, entry.getConf(),
+                            "files/crlsigner-" + name + ".conf"));
+                    jaxb.setSignerCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
+                            "files/crlsigner-" + name + ".der"));
+                    jaxb.setCrlControl(entry.getCrlControl());
+
+                    list.add(jaxb);
+                }
+
+                if (!list.isEmpty()) {
+                    root.setCrlsigners(new CAConfType.Crlsigners());
+                    root.getCrlsigners().getCrlsigner().addAll(list);
+                }
+            }
+
+            // requestors
+            if (CollectionUtil.isNonEmpty(requestorDbEntries)) {
+                List<RequestorType> list = new LinkedList<>();
+                for (String name : requestorDbEntries.keySet()) {
+                    if (!includeRequestorNames.contains(name)) {
+                        continue;
+                    }
+
+                    CmpRequestorEntry entry = requestorDbEntries.get(name);
+                    RequestorType jaxb = new RequestorType();
+                    jaxb.setName(name);
+                    jaxb.setCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
+                            "files/requestor-" + name + ".der"));
+
+                    list.add(jaxb);
+                }
+
+                if (!list.isEmpty()) {
+                    root.setRequestors(new CAConfType.Requestors());
+                    root.getRequestors().getRequestor().addAll(list);
+                }
+            }
+
+            // publishers
+            if (CollectionUtil.isNonEmpty(publisherDbEntries)) {
+                List<PublisherType> list = new LinkedList<>();
+                for (String name : publisherDbEntries.keySet()) {
+                    if (!includePublisherNames.contains(name)) {
+                        continue;
+                    }
+                    PublisherEntry entry = publisherDbEntries.get(name);
+                    PublisherType jaxb = new PublisherType();
+                    jaxb.setName(name);
+                    jaxb.setType(entry.getType());
+                    jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
+                            "files/publisher-" + name + ".conf"));
+                    list.add(jaxb);
+                }
+
+                if (!list.isEmpty()) {
+                    root.setPublishers(new CAConfType.Publishers());
+                    root.getPublishers().getPublisher().addAll(list);
+                }
+            }
+
+            // profiles
+            if (CollectionUtil.isNonEmpty(certprofileDbEntries)) {
+                List<ProfileType> list = new LinkedList<>();
+                for (String name : certprofileDbEntries.keySet()) {
+                    if (!includeProfileNames.contains(name)) {
+                        continue;
+                    }
+                    CertprofileEntry entry = certprofileDbEntries.get(name);
+                    ProfileType jaxb = new ProfileType();
+                    jaxb.setName(name);
+                    jaxb.setType(entry.getType());
+                    jaxb.setConf(createFileOrValue(zipStream, entry.getConf(),
+                            "files/certprofile-" + name + ".conf"));
+                    list.add(jaxb);
+                }
+
+                if (!list.isEmpty()) {
+                    root.setProfiles(new CAConfType.Profiles());
+                    root.getProfiles().getProfile().addAll(list);
+                }
+            }
+
+            // sceps
+            if (CollectionUtil.isNonEmpty(scepDbEntries)) {
+                List<ScepType> list = new LinkedList<>();
+                for (String name : scepDbEntries.keySet()) {
+                    if (!includeCaNames.contains(name)) {
+                        continue;
+                    }
+                    ScepEntry entry = scepDbEntries.get(name);
+                    ScepType jaxb = new ScepType();
+                    jaxb.setCaName(name);
+                    jaxb.setResponderType(entry.getResponderType());
+                    jaxb.setResponderConf(createFileOrValue(zipStream, entry.getResponderConf(),
+                            "files/scep-" + name + ".conf"));
+                    jaxb.setResponderCert(createFileOrBase64Value(zipStream, entry.getBase64Cert(),
+                            "files/scep-" + name + ".der"));
+                    jaxb.setControl(entry.getControl());
+
+                    list.add(jaxb);
+                }
+
+                if (!list.isEmpty()) {
+                    root.setSceps(new CAConfType.Sceps());
+                    root.getSceps().getScep().addAll(list);
+                }
+            }
+
+            // add the CAConf XML file
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            try {
+                CaConf.marshal(root, bout);
+            } catch (JAXBException | SAXException ex) {
+                LogUtil.error(LOG, ex, "could not marshal CAConf");
+                throw new CaMgmtException("could not marshal CAConf: " + ex.getMessage(), ex);
+            } finally {
+                bout.flush();
+            }
+
+            zipStream.putNextEntry(new ZipEntry("caconf.xml"));
+            try {
+                zipStream.write(bout.toByteArray());
+            } finally {
+                zipStream.closeEntry();
+            }
+        } finally {
+            zipStream.close();
+        }
+
+        return true;
+    }
+
+    private static FileOrValueType createFileOrValue(final ZipOutputStream zipStream,
+            final String content, final String fileName) throws IOException {
+        if (StringUtil.isBlank(content)) {
+            return null;
+        }
+
+        FileOrValueType ret = new FileOrValueType();
+        if (content.length() < 256) {
+            ret.setValue(content);
+        } else {
+            ret.setFile(fileName);
+            ZipEntry certZipEntry = new ZipEntry(fileName);
+            zipStream.putNextEntry(certZipEntry);
+            try {
+                zipStream.write(content.getBytes("UTF-8"));
+            } finally {
+                zipStream.closeEntry();
+            }
+        }
+        return ret;
+    }
+
+    private static FileOrBinaryType createFileOrBase64Value(final ZipOutputStream zipStream,
+            final String b64Content, final String fileName) throws IOException {
+        if (StringUtil.isBlank(b64Content)) {
+            return null;
+        }
+
+        return createFileOrBinary(zipStream, Base64.decode(b64Content), fileName);
+    }
+
+    private static FileOrBinaryType createFileOrBinary(final ZipOutputStream zipStream,
+            final byte[] content, final String fileName) throws IOException {
+        if (content == null || content.length == 0) {
+            return null;
+        }
+
+        FileOrBinaryType ret = new FileOrBinaryType();
+        if (content.length < 256) {
+            ret.setBinary(content);
+        } else {
+            ret.setFile(fileName);
+            ZipEntry certZipEntry = new ZipEntry(fileName);
+            zipStream.putNextEntry(certZipEntry);
+            try {
+                zipStream.write(content);
+            } finally {
+                zipStream.closeEntry();
+            }
+        }
+        return ret;
+    }
+
+    private static ZipOutputStream getZipOutputStream(final File zipFile)
+    throws FileNotFoundException {
+        ParamUtil.requireNonNull("zipFile", zipFile);
+
+        BufferedOutputStream out = new BufferedOutputStream(
+                new FileOutputStream(zipFile), 1048576); // 1M
+        ZipOutputStream zipOutStream = new ZipOutputStream(out);
+        zipOutStream.setLevel(Deflater.BEST_SPEED);
+        return zipOutStream;
+    }
+
+    private static StringsType createStringsForPermissions(Collection<Permission> permissions) {
+        if (CollectionUtil.isEmpty(permissions)) {
+            return null;
+        }
+        StringsType ret = new StringsType();
+        for (Permission perm : permissions) {
+            ret.getStr().add(perm.getPermission());
+        }
+        return ret;
+    }
+
+    private static StringsType createStrings(Collection<String> strs) {
+        if (CollectionUtil.isEmpty(strs)) {
+            return null;
+        }
+
+        StringsType ret = new StringsType();
+        for (String str : strs) {
+            ret.getStr().add(str);
+        }
+        return ret;
+    }
+
 }

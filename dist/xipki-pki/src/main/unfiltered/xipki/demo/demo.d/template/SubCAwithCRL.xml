@@ -42,7 +42,9 @@
           <snSize>63</snSize>
         </x509Ca>
       </caInfo>
-      <alias>SubCAwithCRL</alias>
+      <aliases>
+        <str>SubCAwithCRL</str>
+      </aliases>
       <profiles>
         <str>OCSP</str>
         <str>SCEP</str>

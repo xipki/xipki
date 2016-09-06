@@ -38,7 +38,9 @@
           </extraControl>
         </x509Ca>
       </caInfo>
-      <alias>SubCA</alias>
+      <aliases>
+        <str>SubCA</str>
+      </aliases>
       <profiles>
         <str>QC</str>
         <str>EE.Complex</str>

@@ -45,7 +45,7 @@ import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 
 /**
  * @author Lijun Liao
- * @since 2.0.2
+ * @since 2.1.0
  */
 
 public class SingleCaConf {
@@ -56,7 +56,7 @@ public class SingleCaConf {
 
     private final CaEntry caEntry;
 
-    private final String alias;
+    private final List<String> aliases;
 
     private final List<String> profileNames;
 
@@ -64,8 +64,8 @@ public class SingleCaConf {
 
     private final List<String> publisherNames;
 
-    public SingleCaConf(String name, GenSelfIssued genSelfIssued, CaEntry caEntry, String alias,
-            List<String> profileNames, List<CaHasRequestorEntry> requestors,
+    public SingleCaConf(String name, GenSelfIssued genSelfIssued, CaEntry caEntry,
+            List<String> aliases, List<String> profileNames, List<CaHasRequestorEntry> requestors,
             List<String> publisherNames) {
         this.name = ParamUtil.requireNonBlank("name", name);
         if (genSelfIssued != null) {
@@ -84,7 +84,7 @@ public class SingleCaConf {
 
         this.genSelfIssued = genSelfIssued;
         this.caEntry = caEntry;
-        this.alias = alias;
+        this.aliases = aliases;
         this.profileNames = profileNames;
         this.requestors = requestors;
         this.publisherNames = publisherNames;
@@ -98,8 +98,8 @@ public class SingleCaConf {
         return caEntry;
     }
 
-    public String getAlias() {
-        return alias;
+    public List<String> getAliases() {
+        return aliases;
     }
 
     public GenSelfIssued getGenSelfIssued() {

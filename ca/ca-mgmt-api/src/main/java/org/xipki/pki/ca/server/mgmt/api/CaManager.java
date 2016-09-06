@@ -36,6 +36,7 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -249,7 +250,14 @@ public interface CaManager {
     throws CaMgmtException;
 
     /**
-     * @since 2.0.2
+     * @since 2.1.0
      */
     boolean loadConf(@Nonnull CaConf conf) throws CaMgmtException;
+
+    /**
+     * @since 2.1.0
+     */
+    boolean exportConf(@Nonnull String zipFilename, @Nullable List<String> caNames)
+    throws CaMgmtException, IOException;
+
 }

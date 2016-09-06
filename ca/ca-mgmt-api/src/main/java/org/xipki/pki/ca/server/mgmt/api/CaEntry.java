@@ -36,13 +36,20 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
+import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.SignerConf;
+import org.xipki.commons.security.exception.XiSecurityException;
+import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.profile.CertValidity;
 
 /**
@@ -88,6 +95,29 @@ public class CaEntry {
         this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
         this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);
         this.signerConf = signerConf;
+    }
+
+    public static List<String[]> splitCaSignerConfs(final String conf) throws XiSecurityException {
+        ConfPairs pairs = new ConfPairs(conf);
+        String str = pairs.getValue("algo");
+        List<String> list = StringUtil.split(str, ":");
+        if (list == null) {
+            throw new XiSecurityException("no algo is defined in CA signerConf");
+        }
+
+        List<String[]> signerConfs = new ArrayList<>(list.size());
+        for (String n : list) {
+            String c14nAlgo;
+            try {
+                c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(n);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new XiSecurityException(ex.getMessage(), ex);
+            }
+            pairs.putPair("algo", c14nAlgo);
+            signerConfs.add(new String[]{c14nAlgo, pairs.getEncoded()});
+        }
+
+        return signerConfs;
     }
 
     public String getName() {

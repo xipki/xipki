@@ -60,6 +60,7 @@ import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
+import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
@@ -365,7 +366,7 @@ public class X509CaInfo {
         }
         dfltSigner = null;
 
-        List<String[]> signerConfs = CaManagerImpl.splitCaSignerConfs(caEntry.getSignerConf());
+        List<String[]> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
 
         Map<String, ConcurrentContentSigner> tmpSigners = new HashMap<>();
         for (String[] m : signerConfs) {

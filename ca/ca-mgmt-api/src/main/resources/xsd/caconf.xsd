@@ -152,7 +152,7 @@
           </xs:choice>
         </xs:complexType>
       </xs:element>
-      <xs:element name="alias" type="xs:string" minOccurs="0"/>
+      <xs:element name="aliases" type="stringsType" minOccurs="0"/>
       <xs:element name="profiles" type="stringsType" minOccurs="0"/>
       <xs:element name="requestors" minOccurs="0">
         <xs:complexType>

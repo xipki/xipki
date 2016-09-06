@@ -176,7 +176,9 @@
           <snSize>63</snSize>
         </x509Ca>
       </caInfo>
-      <alias>RCA</alias>
+      <aliases>
+        <str>RCA</str>
+      </aliases>
       <profiles>
         <str>Cross</str>
         <str>SubCA</str>
