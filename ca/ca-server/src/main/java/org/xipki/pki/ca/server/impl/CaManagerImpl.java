@@ -1268,8 +1268,16 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         queryExecutor.addCa(caEntry);
-        createCa(name);
-        startCa(name);
+        if (!createCa(name)) {
+            LOG.error("could not create CA {}", name);
+        } else {
+            if (startCa(name)) {
+                LOG.info("started CA {}", name);
+            } else {
+                LOG.error("could not start CA {}", name);
+            }
+        }
+
         return true;
     } // method addCa
 
@@ -1290,8 +1298,15 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         if (!changed) {
             LOG.info("no change of CA '{}' is processed", name);
         } else {
-            createCa(name);
-            startCa(name);
+            if (!createCa(name)) {
+                LOG.error("could not create CA {}", name);
+            } else {
+                if (startCa(name)) {
+                    LOG.info("started CA {}", name);
+                } else {
+                    LOG.error("could not start CA {}", name);
+                }
+            }
         }
 
         return changed;
