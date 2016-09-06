@@ -1166,7 +1166,7 @@ class CaManagerQueryExecutor {
             } finally {
                 datasource.releaseResources(stmt, rs);
             }
-        } // end if
+        } // end if (signerType)
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE CA SET ");
