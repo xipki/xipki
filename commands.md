@@ -366,6 +366,14 @@ Feature xipki-camgmt-shell
 
      revoke CA
 
+   * `xipki-ca:export-conf`
+
+     export configuration to zip file
+
+   * `xipki-ca:load-conf`
+
+     load configuration
+
    * `xipki-ca:notify-change`
 
      notify the change of CA system
