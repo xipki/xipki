@@ -207,4 +207,10 @@ public class X509CrlSignerEntry {
 
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
 }

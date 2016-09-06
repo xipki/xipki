@@ -124,4 +124,10 @@ public class CertprofileEntry {
 
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
 }

@@ -354,4 +354,9 @@ public class CaEntry {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
 }

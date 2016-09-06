@@ -134,4 +134,9 @@ public class CmpRequestorEntry {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
 }

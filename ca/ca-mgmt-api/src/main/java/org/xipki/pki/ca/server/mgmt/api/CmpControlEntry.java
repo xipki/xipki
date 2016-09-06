@@ -92,4 +92,9 @@ public class CmpControlEntry {
         return name.equals(objB.name) && conf.equals(objB.conf);
     }
 
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
 }

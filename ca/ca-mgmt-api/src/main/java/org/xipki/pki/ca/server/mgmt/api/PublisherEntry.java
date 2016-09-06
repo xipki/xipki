@@ -112,4 +112,9 @@ public class PublisherEntry {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
 }

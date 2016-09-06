@@ -127,4 +127,9 @@ public class CaHasRequestorEntry {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        return requestorName.hashCode();
+    }
+
 }

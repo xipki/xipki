@@ -304,4 +304,10 @@ public class X509CaEntry extends CaEntry {
 
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        return getName().hashCode();
+    }
+
 }

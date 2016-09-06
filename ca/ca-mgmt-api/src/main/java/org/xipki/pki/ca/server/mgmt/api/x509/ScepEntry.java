@@ -208,4 +208,9 @@ public class ScepEntry {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return caName.hashCode();
+    }
+
 }

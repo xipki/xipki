@@ -191,4 +191,9 @@ public class CmpResponderEntry {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
 }
