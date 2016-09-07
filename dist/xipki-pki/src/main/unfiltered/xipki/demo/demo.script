@@ -9,8 +9,18 @@ if { "$1" equals "" } {
     printUsage = "true"
     argsValid = "true"
   } {
+    if { "$1" equals "-l" } {
+      TOKEN_TYPE = $2
+      SIG_TYPE = $3
+      KEYSPEC =$4
+    } {
+      TOKEN_TYPE = $1
+      SIG_TYPE = $2
+      KEYSPEC =$3
+    }
+
     list = [pkcs11 pkcs12]; each ($list) {
-      if { "$1" equals $it } {
+      if { "$tokenType" equals $it } {
         argsValid = "true"
       }
     }
@@ -32,14 +42,16 @@ if { $argsValid equals "false" } {
 if { $printUsage equals "true" } {
   echo "Usage: "
   echo ""
-  echo "source demo.script <token type> <signature type> [<keyspec>]"
-  echo "token type:      pkcs11, pkcs12"
-  echo "signature type:  rsa, rsapss, ec, plainec, dsa"
-  echo "keyspec:         keysize for signature types rsa, rsapss and dsa,"
-  echo "                 curve name for signature types ec and plainec"
+  echo "source demo.script [option] <token type> <signature type> [<keyspec>]"
+  echo "    token type:      pkcs11, pkcs12"
+  echo "    signature type:  rsa, rsapss, ec, plainec, dsa"
+  echo "    keyspec:         keysize for signature types rsa, rsapss and dsa,"
+  echo "                     curve name for signature types ec and plainec"
+  echo "options"
+  echo "    -l               configure CAs using command 'load-conf'"
 } {
   feature:install xipki-security-shell
-  source xipki/demo/demo.d/prepare-keys.script $1 $2 $3
+  source xipki/demo/demo.d/prepare-keys.script
 
   ## OCSP responder configuration
   xipki-cmd:copy-file \
@@ -67,7 +79,11 @@ if { $printUsage equals "true" } {
     --new "$ALGO2" \
     xipki/ocsp-config/ocsp-responder.xml
 
-  source ./xipki/demo/demo.d/ca.script
+  if { "$1" equals "-l" } {
+    source ./xipki/demo/demo.d/ca-load.script
+  } {
+    source ./xipki/demo/demo.d/ca.script
+  }
 
   source ./xipki/demo/demo.d/ra.script "$KEY_TYPE"
 

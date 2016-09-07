@@ -2,16 +2,10 @@ xipki-cmd:rm -r -f output
 
 xipki-cmd:mkdir output
 
-TOKEN_TYPE = "$1"
-
-SIG_TYPE = "$2"
-
-KEYSPEC = "$3"
-
 echo "========================================================"
-echo "TOKEN_TYPE: $1"
-echo "SIG_TYPE:   $2"
-echo "keyspec:    $3"
+echo "TOKEN_TYPE: $TOKEN_TYPE"
+echo "SIG_TYPE:   $SIG_TYPE"
+echo "KEYSPEC:    $KEYSPEC"
 echo "========================================================"
 
 KEY_TYPE = ""
@@ -61,19 +55,19 @@ xipki-cmd:copy-dir xipki/demo/p12/shared output
 xipki-cmd:copy-dir xipki/demo/p12/$KEY_TYPE output
 
 if { $KEY_TYPE equals "rsa" } {
-  if { $KEYSPEC equals "" } {
+  if { "$KEYSPEC" equals "" } {
     KEYSPEC = "2048"
   }
 }
 
 if { $KEY_TYPE equals "ec" } {
-  if { $KEYSPEC equals "" } {
+  if { "$KEYSPEC" equals "" } {
     KEYSPEC = "secp256r1"
   }
 }
 
 if { $KEY_TYPE equals "dsa" } {
-  if { $KEYSPEC equals "" } {
+  if { "$KEYSPEC" equals "" } {
     KEYSPEC = "2048"
   }
 }
