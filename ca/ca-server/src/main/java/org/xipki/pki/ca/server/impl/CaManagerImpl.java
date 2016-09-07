@@ -505,8 +505,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("invalid ca.shardId '" + shardIdStr + "'");
         }
 
-        if (shardId < 0 || shardId > 255) {
-            throw new CaMgmtException("ca.shardId is not in [0, 255]");
+        if (shardId < 0 || shardId > 127) {
+            throw new CaMgmtException("ca.shardId is not in [0, 127]");
         }
 
         if (this.datasources == null) {
@@ -754,21 +754,34 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(10);
             scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
 
+            List<String> startedCaNames = new LinkedList<>();
+            List<String> failedCaNames = new LinkedList<>();
+
             // Add the CAs to the store
             for (String caName : caInfos.keySet()) {
-                if (!startCa(caName)) {
-                    return false;
+                CaStatus status = caInfos.get(caName).getCaEntry().getStatus();
+                if (CaStatus.ACTIVE != status) {
+                    continue;
+                }
+
+                if (startCa(caName)) {
+                    startedCaNames.add(caName);
+                    LOG.info("started CA {}", caName);
+                } else {
+                    failedCaNames.add(caName);
+                    LOG.error("could not start CA {}", caName);
                 }
             }
 
             caSystemSetuped = true;
             StringBuilder sb = new StringBuilder();
             sb.append("started CA system");
+
+            Set<String> caAliasNames = getCaAliasNames();
             Set<String> names = new HashSet<>(getCaNames());
 
             if (names.size() > 0) {
                 sb.append(" with following CAs: ");
-                Set<String> caAliasNames = getCaAliasNames();
                 for (String aliasName : caAliasNames) {
                     String name = getCaNameForAlias(aliasName);
                     names.remove(name);
@@ -792,6 +805,25 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             } else {
                 sb.append(": no CA is configured");
             }
+
+            if (!failedCaNames.isEmpty()) {
+                sb.append(", and following CAs could not be started: ");
+                for (String aliasName : caAliasNames) {
+                    String name = getCaNameForAlias(aliasName);
+                    if (failedCaNames.remove(name)) {
+                        sb.append(name).append(" (alias ").append(aliasName).append(")");
+                        sb.append(", ");
+                    }
+                }
+
+                for (String name : failedCaNames) {
+                    sb.append(name).append(", ");
+                }
+
+                int len = sb.length();
+                sb.delete(len - 2, len);
+            }
+
             LOG.info("{}", sb);
         } finally {
             initializing = false;
@@ -968,6 +1000,41 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         return caInfos.keySet();
     }
 
+    @Override
+    public Set<String> getSuccessfulCaNames() {
+        Set<String> names = x509cas.keySet();
+        Set<String> ret = new HashSet<>();
+        for (String name : names) {
+            if (CaStatus.ACTIVE == caInfos.get(name).getStatus()) {
+                ret.add(name);
+            }
+        }
+        return ret;
+    }
+
+    @Override
+    public Set<String> getFailedCaNames() {
+        Set<String> ret = new HashSet<>();
+        for (String name : caInfos.keySet()) {
+            if (CaStatus.ACTIVE == caInfos.get(name).getStatus() &&
+                    !x509cas.containsKey(name)) {
+                ret.add(name);
+            }
+        }
+        return ret;
+    }
+
+    @Override
+    public Set<String> getInactiveCaNames() {
+        Set<String> ret = new HashSet<>();
+        for (String name : caInfos.keySet()) {
+            if (CaStatus.INACTIVE == caInfos.get(name).getStatus()) {
+                ret.add(name);
+            }
+        }
+        return ret;
+    }
+
     private void initRequestors() throws CaMgmtException {
         if (requestorsInitialized) {
             return;
@@ -1002,6 +1069,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         for (String name : names) {
             CmpResponderEntry dbEntry = queryExecutor.createResponder(name);
             if (dbEntry == null) {
+                LOG.error("could not initialize Responder '{}'", name);
                 continue;
             }
 
@@ -1060,7 +1128,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         for (String name : names) {
             CertprofileEntry dbEntry = queryExecutor.createCertprofile(name);
             if (dbEntry == null) {
-                LOG.error("could not initialize CertificateEntry '{}'", name);
+                LOG.error("could not initialize CertificateProfile '{}'", name);
                 continue;
             }
 
@@ -1092,6 +1160,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         for (String name : names) {
             PublisherEntry dbEntry = queryExecutor.createPublisher(name);
             if (dbEntry == null) {
+                LOG.error("could not initialize Publisher '{}'", name);
                 continue;
             }
 
@@ -1119,6 +1188,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         for (String name : names) {
             X509CrlSignerEntry dbEntry = queryExecutor.createCrlSigner(name);
             if (dbEntry == null) {
+                LOG.error("could not initialize CRL signer '{}'", name);
                 continue;
             }
 
@@ -1301,6 +1371,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             if (!createCa(name)) {
                 LOG.error("could not create CA {}", name);
             } else {
+                X509CaInfo caInfo = caInfos.get(name);
+                if (CaStatus.ACTIVE != caInfo.getCaEntry().getStatus()) {
+                    return changed;
+                }
+
                 if (startCa(name)) {
                     LOG.info("started CA {}", name);
                 } else {

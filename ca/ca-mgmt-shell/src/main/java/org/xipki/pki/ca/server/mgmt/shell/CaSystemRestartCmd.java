@@ -36,9 +36,6 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.CmdFailure;
@@ -60,28 +57,17 @@ public class CaSystemRestartCmd extends CaCommandSupport {
             throw new CmdFailure("could not restart CA system");
         }
 
-        StringBuilder sb = new StringBuilder("restarted CA system");
-        Set<String> names = new HashSet<>(caManager.getCaNames());
+        StringBuilder sb = new StringBuilder("restarted CA system\n");
 
-        if (names.size() > 0) {
-            sb.append(" with following CAs: ");
-            Set<String> caAliasNames = caManager.getCaAliasNames();
-            for (String aliasName : caAliasNames) {
-                String name = caManager.getCaNameForAlias(aliasName);
-                names.remove(name);
+        sb.append("  successful CAs:\n");
+        String prefix = "    ";
+        printCaNams(sb, caManager.getSuccessfulCaNames(), prefix);
 
-                sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
-            }
+        sb.append("  failed CAs:\n");
+        printCaNams(sb, caManager.getFailedCaNames(), prefix);
 
-            for (String name : names) {
-                sb.append(name).append(", ");
-            }
-
-            int len = sb.length();
-            sb.delete(len - 2, len);
-        } else {
-            sb.append(": no CA is configured");
-        }
+        sb.append("  inactive CAs:\n");
+        printCaNams(sb, caManager.getInactiveCaNames(), prefix);
 
         println(sb.toString());
         return null;

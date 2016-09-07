@@ -108,6 +108,12 @@ public interface CaManager {
 
     Set<String> getCaNames();
 
+    Set<String> getSuccessfulCaNames();
+
+    Set<String> getFailedCaNames();
+
+    Set<String> getInactiveCaNames();
+
     boolean addCa(@Nonnull CaEntry caEntry) throws CaMgmtException;
 
     CaEntry getCa(@Nonnull String caName);

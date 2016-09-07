@@ -37,8 +37,10 @@
 package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.security.SecurityFactory;
@@ -88,6 +90,23 @@ public abstract class CaCommandSupport extends XipkiCommandSupport {
             println(posPrefix + " " + message);
         } else {
             throw new CmdFailure(negPrefix + " " + message);
+        }
+    }
+
+    protected void printCaNams(StringBuilder sb, Set<String> caNames, String prefix) {
+        if (caNames.isEmpty()) {
+            sb.append(prefix).append("-\n");
+            return;
+        }
+
+        for (String caName : caNames) {
+            Set<String> aliases = caManager.getAliasesForCa(caName);
+            if (CollectionUtil.isEmpty(aliases)) {
+                sb.append(prefix).append(caName);
+            } else {
+                sb.append(prefix).append(caName + " (aliases " + aliases + ")");
+            }
+            sb.append("\n");
         }
     }
 

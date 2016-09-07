@@ -49,6 +49,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
@@ -72,32 +73,25 @@ public class CaInfoCmd extends CaCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         StringBuilder sb = new StringBuilder();
-
         if (caName == null) {
-            Set<String> names = caManager.getCaNames();
-            int size = names.size();
-            if (size == 0 || size == 1) {
-                sb.append((size == 0) ? "no" : "1");
-                sb.append(" CA is configured\n");
-            } else {
-                sb.append(size).append(" CAs are configured:\n");
-            }
+            sb.append("successful CAs:\n");
+            String prefix = "  ";
+            printCaNams(sb, caManager.getSuccessfulCaNames(), prefix);
 
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
-            for (String paramName : sorted) {
-                sb.append("\t").append(paramName);
-                Set<String> aliases = caManager.getAliasesForCa(paramName);
-                if (CollectionUtil.isNonEmpty(aliases)) {
-                    sb.append(" (aliases: ").append(toString(aliases)).append(")");
-                }
-                sb.append("\n");
-            }
+            sb.append("failed CAs:\n");
+            printCaNams(sb, caManager.getFailedCaNames(), prefix);
+
+            sb.append("inactive CAs:\n");
+            printCaNams(sb, caManager.getInactiveCaNames(), prefix);
         } else {
             CaEntry entry = caManager.getCa(caName);
             if (entry == null) {
                 throw new CmdFailure("could not find CA '" + caName + "'");
             } else {
+                if (CaStatus.ACTIVE == entry.getStatus()) {
+                    boolean started = caManager.getSuccessfulCaNames().contains(entry.getName());
+                    sb.append("started: ").append(started).append("\n");
+                }
                 Set<String> aliases = caManager.getAliasesForCa(caName);
                 sb.append("aliases: ").append(toString(aliases)).append("\n");
                 sb.append(entry.toString(verbose.booleanValue()));
