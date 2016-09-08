@@ -65,6 +65,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.ObjectCreationException;
+import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
@@ -1006,9 +1007,11 @@ class CaManagerQueryExecutor {
         }
     } // method addCrlSigner
 
-    void setEpoch(Date time) throws CaMgmtException {
+    String setEpoch(Date time) throws CaMgmtException {
         deleteRowWithName(CaManagerImpl.ENV_EPOCH, "ENVIRONMENT", true);
-        addEnvParam(CaManagerImpl.ENV_EPOCH, Long.toString(time.getTime()), true);
+        String envEpoch = DateUtil.toUtcTimeyyyyMMdd(time);
+        addEnvParam(CaManagerImpl.ENV_EPOCH, envEpoch, true);
+        return envEpoch;
     }
 
     void addEnvParam(final String name, final String value) throws CaMgmtException {

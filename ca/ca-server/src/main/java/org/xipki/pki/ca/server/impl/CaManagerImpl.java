@@ -96,6 +96,7 @@ import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -564,10 +565,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
             if (envEpoch == null) {
                 final long day = 24L * 60 * 60 * 1000;
-                Date epochTime = new Date(System.currentTimeMillis() - day);
-                queryExecutor.setEpoch(epochTime);
-                LOG.info("set EPOCH to {}ms ()", epochTime.getTime(), epochTime);
-                envEpoch = Long.toString(epochTime.getTime());
+                envEpoch = queryExecutor.setEpoch(new Date(System.currentTimeMillis() - day));
+                LOG.info("set environment {} to {}", ENV_EPOCH, envEpoch);
             }
         } else {
             if (envEpoch == null) {
@@ -576,8 +575,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             }
         }
 
-        long epoch = Long.parseLong(envEpoch);
-        LOG.info("EPOCH: {} ({})", epoch, new Date(epoch));
+        LOG.info("use EPOCH: {}", envEpoch);
+        long epoch = DateUtil.parseUtcTimeyyyyMMdd(envEpoch).getTime();
 
         UniqueIdGenerator idGen = new UniqueIdGenerator(epoch, shardId);
 
