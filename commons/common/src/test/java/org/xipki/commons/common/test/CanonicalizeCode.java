@@ -1,8 +1,6 @@
 /*
  *
- * This file is part of the XiPKI project.
  * Copyright (c) 2013 - 2016 Lijun Liao
- * Author: Lijun Liao
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License version 3
@@ -56,9 +54,7 @@ public class CanonicalizeCode {
     private static final String LICENSE_TEXT =
             "/*\n"
             + " *\n"
-            + " * This file is part of the XiPKI project.\n"
             + " * Copyright (c) 2013 - 2016 Lijun Liao\n"
-            + " * Author: Lijun Liao\n"
             + " *\n"
             + " * This program is free software; you can redistribute it and/or modify\n"
             + " * it under the terms of the GNU Affero General Public License version 3\n"
