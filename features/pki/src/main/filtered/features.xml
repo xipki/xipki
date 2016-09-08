@@ -110,7 +110,7 @@
     <feature>xipki-datasource</feature>
     <feature>xipki-shell-base</feature>
     <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
-    <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
+    <bundle>mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
     <bundle>mvn:org.xipki.commons/database-tool/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-dbtool/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>

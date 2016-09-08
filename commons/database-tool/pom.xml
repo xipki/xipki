@@ -23,7 +23,7 @@
     </dependency>
     <dependency>
       <groupId>org.liquibase</groupId>
-      <artifactId>liquibase-osgi</artifactId>
+      <artifactId>liquibase-core</artifactId>
     </dependency>
   </dependencies>
 </project>
