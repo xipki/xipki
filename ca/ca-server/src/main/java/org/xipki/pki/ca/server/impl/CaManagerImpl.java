@@ -543,6 +543,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         this.queryExecutor = new CaManagerQueryExecutor(this.datasource);
 
+        initEnvironemtParamters();
+        String envEpoch = envParameterResolver.getEnvParam(ENV_EPOCH);
+
         if (masterMode) {
             boolean lockedSuccessful;
             try {
@@ -558,19 +561,22 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     + " shutdown of CA software in active mode is abnormal.";
                 throw new CaMgmtException(msg);
             }
+
+            if (envEpoch == null) {
+                final long day = 24L * 60 * 60 * 1000;
+                Date epochTime = new Date(System.currentTimeMillis() - day);
+                queryExecutor.setEpoch(epochTime);
+                LOG.info("set EPOCH to {}ms ()", epochTime.getTime(), epochTime);
+                envEpoch = Long.toString(epochTime.getTime());
+            }
+        } else {
+            if (envEpoch == null) {
+                throw new CaMgmtException(
+                        "The CA system must be first started with ca.mode = master");
+            }
         }
 
-        initEnvironemtParamters();
-        String envEpoch = envParameterResolver.getEnvParam(ENV_EPOCH);
-        long epoch;
-        if (envEpoch != null) {
-            epoch = Long.parseLong(envEpoch);
-        } else {
-            final long day = 24L * 60 * 60 * 1000;
-            Date epochTime = new Date(System.currentTimeMillis() - day);
-            queryExecutor.setEpoch(epochTime);
-            epoch = epochTime.getTime();
-        }
+        long epoch = Long.parseLong(envEpoch);
         LOG.info("EPOCH: {} ({})", epoch, new Date(epoch));
 
         UniqueIdGenerator idGen = new UniqueIdGenerator(epoch, shardId);
@@ -1016,8 +1022,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     public Set<String> getFailedCaNames() {
         Set<String> ret = new HashSet<>();
         for (String name : caInfos.keySet()) {
-            if (CaStatus.ACTIVE == caInfos.get(name).getStatus() &&
-                    !x509cas.containsKey(name)) {
+            if (CaStatus.ACTIVE == caInfos.get(name).getStatus()
+                    && !x509cas.containsKey(name)) {
                 ret.add(name);
             }
         }
