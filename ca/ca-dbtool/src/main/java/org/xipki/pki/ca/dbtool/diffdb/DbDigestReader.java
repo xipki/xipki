@@ -1,8 +1,6 @@
 /*
  *
- * This file is part of the XiPKI project.
  * Copyright (c) 2013 - 2016 Lijun Liao
- * Author: Lijun Liao
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License version 3
