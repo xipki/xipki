@@ -53,7 +53,9 @@ public class DateUtil {
 
     private static final ZoneId ZONE_UTC = ZoneId.of("UTC");
 
-    private static final DateTimeFormatter SDF = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    private static final DateTimeFormatter SDF1 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
+    private static final DateTimeFormatter SDF2 = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private DateUtil() {
     }
@@ -63,7 +65,21 @@ public class DateUtil {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
         }
         try {
-            LocalDateTime localDate = LocalDateTime.parse(utcTime, SDF);
+            LocalDateTime localDate = LocalDateTime.parse(utcTime, SDF1);
+            Instant instant = localDate.atZone(ZONE_UTC).toInstant();
+            return Date.from(instant);
+        } catch (DateTimeParseException ex) {
+            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': "
+                    + ex.getMessage());
+        }
+    }
+
+    public static Date parseUtcTimeyyyyMMdd(final String utcTime) {
+        if (utcTime == null || utcTime.length() != 8) {
+            throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
+        }
+        try {
+            LocalDateTime localDate = LocalDateTime.parse(utcTime + "000000", SDF1);
             Instant instant = localDate.atZone(ZONE_UTC).toInstant();
             return Date.from(instant);
         } catch (DateTimeParseException ex) {
@@ -74,7 +90,12 @@ public class DateUtil {
 
     public static String toUtcTimeyyyyMMddhhmmss(final Date utcTime) {
         ZonedDateTime zd = utcTime.toInstant().atZone(ZONE_UTC);
-        return SDF.format(zd);
+        return SDF1.format(zd);
+    }
+
+    public static String toUtcTimeyyyyMMdd(final Date utcTime) {
+        ZonedDateTime zd = utcTime.toInstant().atZone(ZONE_UTC);
+        return SDF2.format(zd);
     }
 
 }
