@@ -34,6 +34,9 @@
 
 package org.xipki.pki.ca.server.impl;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntBinaryOperator;
+
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -54,6 +57,15 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class UniqueIdGenerator {
 
+    private static class OffsetIncrement implements IntBinaryOperator {
+
+        @Override
+        public int applyAsInt(int left, int right) {
+            return (left >= right) ? 0 : left + 1;
+        }
+
+    }
+
     // maximal 10 bits
     private static final int MAX_OFFSET = 0x3FF;
 
@@ -61,30 +73,26 @@ public class UniqueIdGenerator {
 
     private final int shardId; // 7 bits
 
-    private int offset = 0;
+    private final AtomicInteger offset = new AtomicInteger(0);
+
+    private final IntBinaryOperator accumulatorFunction;
 
     public UniqueIdGenerator(final long epoch, final int shardId) {
         this.epoch = ParamUtil.requireMin("epoch", epoch, 0);
         this.shardId = ParamUtil.requireRange("shardId", shardId, 0, 127);
+        this.accumulatorFunction = new OffsetIncrement();
     }
 
     public long nextId() {
         long now = System.currentTimeMillis();
-        synchronized (this) {
-            long ret = now - epoch;
-            ret <<= 10;
+        long ret = now - epoch;
+        ret <<= 10;
 
-            ret += (offset++);
-            ret <<= 7;
+        ret += offset.getAndAccumulate(MAX_OFFSET, accumulatorFunction);
+        ret <<= 7;
 
-            if (offset > MAX_OFFSET) {
-                offset = 0;
-            }
-
-            ret += shardId;
-
-            return ret;
-        }
+        ret += shardId;
+        return ret;
     }
 
 }
