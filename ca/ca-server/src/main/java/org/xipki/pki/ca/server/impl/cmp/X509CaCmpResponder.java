@@ -40,9 +40,7 @@ import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -180,8 +178,6 @@ public class X509CaCmpResponder extends CmpResponder {
     private static final Set<String> KNOWN_GENMSG_IDS = new HashSet<>();
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CaCmpResponder.class);
-
-    private final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss.SSSz");
 
     private final PendingCertificatePool pendingCertPool;
 
@@ -818,10 +814,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     childAuditEvent.addEventData(new AuditEventData("reason",
                             reason.getDescription()));
                     if (invalidityDate != null) {
-                        String value;
-                        synchronized (dateFormat) {
-                            value = dateFormat.format(invalidityDate);
-                        }
+                        String value = DateUtil.toUtcTimeyyyyMMddhhmmss(invalidityDate);
                         childAuditEvent.addEventData(new AuditEventData("invalidityDate", value));
                     }
 

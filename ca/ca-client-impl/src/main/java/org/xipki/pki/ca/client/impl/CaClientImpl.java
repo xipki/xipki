@@ -1209,8 +1209,8 @@ public final class CaClientImpl implements CaClient {
     } // method parseEnrollCertResult
 
     private static CAClientType parse(final InputStream configStream) throws CaClientException {
+        Object root;
         synchronized (jaxbUnmarshallerLock) {
-            Object root;
             try {
                 if (jaxbUnmarshaller == null) {
                     JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
@@ -1230,12 +1230,18 @@ public final class CaClientImpl implements CaClient {
                 throw new CaClientException("parsing profile failed, message: "
                         + XmlUtil.getMessage((JAXBException) ex), ex);
             }
+        }
 
-            if (root instanceof JAXBElement) {
-                return (CAClientType) ((JAXBElement<?>) root).getValue();
-            } else {
-                throw new CaClientException("invalid root element type");
-            }
+        try {
+            configStream.close();
+        } catch (IOException ex) {
+            LOG.warn("could not close xmlConfStream: {}", ex.getMessage());
+        }
+
+        if (root instanceof JAXBElement) {
+            return (CAClientType) ((JAXBElement<?>) root).getValue();
+        } else {
+            throw new CaClientException("invalid root element type");
         }
     } // method parse
 

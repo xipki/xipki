@@ -168,17 +168,18 @@ public class XmlX509CertprofileUtil {
                 }
 
                 rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(xmlConfStream);
-                try {
-                    xmlConfStream.close();
-                } catch (IOException ex) {
-                    LOG.warn("could not close xmlConfStream: {}", ex.getMessage());
-                }
             } catch (SAXException ex) {
                 throw new CertprofileException("parse profile failed, message: " + ex.getMessage(),
                         ex);
             } catch (JAXBException ex) {
                 throw new CertprofileException(
                         "parse profile failed, message: " + XmlUtil.getMessage(ex), ex);
+            }
+
+            try {
+                xmlConfStream.close();
+            } catch (IOException ex) {
+                LOG.warn("could not close xmlConfStream: {}", ex.getMessage());
             }
 
             Object rootType = rootElement.getValue();

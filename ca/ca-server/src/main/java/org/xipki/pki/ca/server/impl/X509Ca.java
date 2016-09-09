@@ -103,6 +103,7 @@ import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
@@ -411,8 +412,6 @@ public class X509Ca {
 
     private static final Logger LOG = LoggerFactory.getLogger(X509Ca.class);
 
-    private final DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss.SSSz");
-
     private final CertificateFactory cf;
 
     private final X509CaInfo caInfo;
@@ -641,10 +640,7 @@ public class X509Ca {
         auditEvent.addEventData(new AuditEventData("crlType", deltaCrl ? "DELTA_CRL" : "FULL_CRL"));
 
         if (nextUpdate != null) {
-            String value;
-            synchronized (dateFormat) {
-                value = dateFormat.format(nextUpdate);
-            }
+            String value = DateUtil.toUtcTimeyyyyMMddhhmmss(nextUpdate);
             auditEvent.addEventData(new AuditEventData("nextUpdate", value));
         } else {
             auditEvent.addEventData(new AuditEventData("nextUpdate", "NULL"));
