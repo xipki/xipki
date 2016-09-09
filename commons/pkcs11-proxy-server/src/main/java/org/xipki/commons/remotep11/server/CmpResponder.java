@@ -375,9 +375,7 @@ class CmpResponder {
 
     private byte[] randomTransactionId() {
         byte[] bytes = new byte[10];
-        synchronized (random) {
-            random.nextBytes(bytes);
-        }
+        random.nextBytes(bytes);
         return bytes;
     }
 

@@ -39,6 +39,8 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntBinaryOperator;
 
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
@@ -63,7 +65,16 @@ import org.xipki.pki.ocsp.client.shell.OcspUtils;
 
 public class OcspLoadTest extends LoadExecutor {
 
-    class Testor implements Runnable {
+    private static final class IndexIncrementer implements IntBinaryOperator {
+
+        @Override
+        public int applyAsInt(int left, int right) {
+            return (left + 1 >= right) ? 0 : left + 1;
+        }
+
+    }
+
+    final class Testor implements Runnable {
 
         @Override
         public void run() {
@@ -140,7 +151,9 @@ public class OcspLoadTest extends LoadExecutor {
 
     private final int numSerials;
 
-    private int serialIndex;
+    private final IndexIncrementer accumulatorFunction = new IndexIncrementer();
+
+    private final AtomicInteger serialIndex = new AtomicInteger(0);
 
     private X509Certificate caCert;
 
@@ -158,7 +171,6 @@ public class OcspLoadTest extends LoadExecutor {
         this.serverUrl = ParamUtil.requireNonNull("serverUrl", serverUrl);
         this.options = ParamUtil.requireNonNull("options", options);
         this.numSerials = serials.size();
-        this.serialIndex = 0;
     }
 
     @Override
@@ -166,12 +178,8 @@ public class OcspLoadTest extends LoadExecutor {
         return new Testor();
     }
 
-    private synchronized BigInteger nextSerialNumber() {
-        serialIndex++;
-        if (serialIndex >= numSerials) {
-            serialIndex = 0;
-        }
-        return this.serials.get(serialIndex);
+    private BigInteger nextSerialNumber() {
+        return this.serials.get(serialIndex.getAndAccumulate(numSerials, accumulatorFunction));
     }
 
 }

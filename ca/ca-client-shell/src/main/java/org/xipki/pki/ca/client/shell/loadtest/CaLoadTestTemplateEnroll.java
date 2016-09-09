@@ -34,6 +34,7 @@
 
 package org.xipki.pki.ca.client.shell.loadtest;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.X509Certificate;
@@ -252,9 +253,9 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
     public static EnrollTemplateType parse(final InputStream configStream)
     throws InvalidConfException {
         ParamUtil.requireNonNull("configStream", configStream);
+        Object root;
 
         synchronized (jaxbUnmarshallerLock) {
-            Object root;
             try {
                 if (jaxbUnmarshaller == null) {
                     JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
@@ -274,12 +275,17 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
                 throw new InvalidConfException("parsing profile failed, message: "
                         + XmlUtil.getMessage((JAXBException) ex), ex);
             }
+        }
 
-            if (root instanceof JAXBElement) {
-                return (EnrollTemplateType) ((JAXBElement<?>) root).getValue();
-            } else {
-                throw new InvalidConfException("invalid root element type");
-            }
+        try {
+            configStream.close();
+        } catch (IOException ex) {
+            LOG.warn("could not close xmlConfStream: {}", ex.getMessage());
+        }
+        if (root instanceof JAXBElement) {
+            return (EnrollTemplateType) ((JAXBElement<?>) root).getValue();
+        } else {
+            throw new InvalidConfException("invalid root element type");
         }
     } // method parse
 
