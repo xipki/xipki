@@ -326,9 +326,7 @@ public class ProxyP11Module extends AbstractP11Module {
 
     private byte[] randomTransactionId() {
         byte[] tid = new byte[20];
-        synchronized (random) {
-            random.nextBytes(tid);
-        }
+        random.nextBytes(tid);
         return tid;
     }
 
