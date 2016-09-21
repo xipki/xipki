@@ -262,7 +262,7 @@ public abstract class CmpRequestor {
         int bodyType = respBody.getType();
 
         if (PKIBody.TYPE_ERROR == bodyType) {
-            ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
+            ErrorMsgContent content = ErrorMsgContent.getInstance(respBody.getContent());
             throw new CmpRequestorException(CmpFailureUtil.formatPkiStatusInfo(
                     content.getPKIStatusInfo()));
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
@@ -271,7 +271,7 @@ public abstract class CmpRequestor {
                         PKIBody.TYPE_GEN_REP, PKIBody.TYPE_ERROR));
         }
 
-        GenRepContent genRep = (GenRepContent) respBody.getContent();
+        GenRepContent genRep = GenRepContent.getInstance(respBody.getContent());
 
         InfoTypeAndValue[] itvs = genRep.toInfoTypeAndValueArray();
         InfoTypeAndValue itv = null;

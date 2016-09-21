@@ -104,13 +104,13 @@ import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
 import org.xipki.pki.ca.client.api.PkiErrorException;
+import org.xipki.pki.ca.client.api.dto.CsrEnrollCertRequest;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.pki.ca.client.api.dto.EnrollCertResultEntry;
 import org.xipki.pki.ca.client.api.dto.EnrollCertResultResp;
 import org.xipki.pki.ca.client.api.dto.ErrorResultEntry;
 import org.xipki.pki.ca.client.api.dto.IssuerSerialEntry;
-import org.xipki.pki.ca.client.api.dto.CsrEnrollCertRequest;
 import org.xipki.pki.ca.client.api.dto.ResultEntry;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequest;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntry;
@@ -516,7 +516,7 @@ public final class CaClientImpl implements CaClient {
             throw new CaClientException(ex.getMessage(), ex);
         }
 
-        return parseEnrollCertResult((EnrollCertResultResp) result, tmpCaName);
+        return parseEnrollCertResult(result, tmpCaName);
     } // method requestCert
 
     @Override
@@ -562,7 +562,7 @@ public final class CaClientImpl implements CaClient {
             throw new CaClientException(ex.getMessage(), ex);
         }
 
-        return parseEnrollCertResult((EnrollCertResultResp) result, tmpCaName);
+        return parseEnrollCertResult(result, tmpCaName);
     } // method requestCerts
 
     private void checkCertprofileSupportInCa(final String certprofile, final String caName)
@@ -671,7 +671,7 @@ public final class CaClientImpl implements CaClient {
                 ErrorResultEntry entry = (ErrorResultEntry) re;
                 certIdOrError = new CertIdOrError(entry.getStatusInfo());
             } else {
-                throw new CaClientException("unknwon type " + re);
+                throw new CaClientException("unknwon type " + re.getClass().getName());
             }
 
             ret.put(re.getId(), certIdOrError);
@@ -1082,7 +1082,7 @@ public final class CaClientImpl implements CaClient {
         }
 
         try {
-            HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
+            HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(serverUrl);
             InputStream inputStream = httpUrlConnection.getInputStream();
             int responseCode = httpUrlConnection.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK
@@ -1228,7 +1228,7 @@ public final class CaClientImpl implements CaClient {
                         ex);
             } catch (JAXBException ex) {
                 throw new CaClientException("parsing profile failed, message: "
-                        + XmlUtil.getMessage((JAXBException) ex), ex);
+                        + XmlUtil.getMessage(ex), ex);
             }
         }
 

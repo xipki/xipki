@@ -255,12 +255,12 @@ public class PciAuditEvent {
             return "UNKNOWN";
         }
         while (interfaces.hasMoreElements()) {
-            NetworkInterface ni = (NetworkInterface) interfaces.nextElement();
+            NetworkInterface ni = interfaces.nextElement();
             Enumeration<InetAddress> ee = ni.getInetAddresses();
             while (ee.hasMoreElements()) {
-                InetAddress ia = (InetAddress) ee.nextElement();
+                InetAddress ia = ee.nextElement();
                 if (ia instanceof Inet4Address) {
-                    addresses.add(((Inet4Address) ia).getHostAddress());
+                    addresses.add(ia.getHostAddress());
                 }
             }
         }

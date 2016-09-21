@@ -321,7 +321,7 @@ public class ScepResponder {
 
         switch (messageType) {
         case PKCSReq:
-            CertificationRequest csr = (CertificationRequest) req.getMessageData();
+            CertificationRequest csr = CertificationRequest.getInstance(req.getMessageData());
 
             String challengePwd = getChallengePassword(csr.getCertificationRequestInfo());
             if (challengePwd == null || !control.getSecret().equals(challengePwd)) {
@@ -349,7 +349,7 @@ public class ScepResponder {
 
             break;
         case CertPoll:
-            IssuerAndSubject is = (IssuerAndSubject) req.getMessageData();
+            IssuerAndSubject is = IssuerAndSubject.getInstance(req.getMessageData());
             cert = caEmulator.pollCert(is.getIssuer(), is.getSubject());
             if (cert != null) {
                 rep.setMessageData(createSignedData(cert));
@@ -360,7 +360,7 @@ public class ScepResponder {
 
             break;
         case GetCert:
-            IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
+            IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
             cert = caEmulator.getCert(isn.getName(),
                     isn.getSerialNumber().getValue());
             if (cert != null) {
@@ -376,7 +376,7 @@ public class ScepResponder {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);
             } else {
-                csr = (CertificationRequest) req.getMessageData();
+                csr = CertificationRequest.getInstance(req.getMessageData());
                 try {
                     cert = caEmulator.generateCert(csr);
                 } catch (Exception ex) {
@@ -395,7 +395,7 @@ public class ScepResponder {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badRequest);
             } else {
-                csr = (CertificationRequest) req.getMessageData();
+                csr = CertificationRequest.getInstance(req.getMessageData());
                 try {
                     cert = caEmulator.generateCert(csr);
                 } catch (Exception ex) {
@@ -410,7 +410,7 @@ public class ScepResponder {
             }
             break;
         case GetCRL:
-            isn = (IssuerAndSerialNumber) req.getMessageData();
+            isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
             CertificateList crl;
             try {
                 crl = caEmulator.getCrl(isn.getName(), isn.getSerialNumber().getValue());

@@ -165,7 +165,7 @@ class CmpResponder {
             return new PKIMessage(respHeader, respBody);
         }
 
-        GenMsgContent genMsgBody = (GenMsgContent) reqBody.getContent();
+        GenMsgContent genMsgBody = GenMsgContent.getInstance(reqBody.getContent());
         InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 
         InfoTypeAndValue itv = null;
@@ -323,7 +323,7 @@ class CmpResponder {
             }
             P11Params params = null;
             if (asn1Params instanceof Asn1RSAPkcsPssParams) {
-                params = ((Asn1RSAPkcsPssParams) asn1Params).getPkcsPssParams();
+                params = Asn1RSAPkcsPssParams.getInstance(asn1Params).getPkcsPssParams();
             } else if (asn1Params != null) {
                 throw new BadAsn1ObjectException("unknown SignTemplate.params");
             }
