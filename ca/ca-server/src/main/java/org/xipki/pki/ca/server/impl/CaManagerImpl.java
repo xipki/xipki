@@ -2426,7 +2426,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonBlank("profileName", profileName);
-        ParamUtil.requireNonNull("encodedPkcs10Request", encodedCsr);
+        ParamUtil.requireNonNull("encodedCsr", encodedCsr);
 
         X509Ca ca = getX509Ca(caName);
         CertificationRequest csr;

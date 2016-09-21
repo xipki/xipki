@@ -417,7 +417,7 @@ public class Scep {
             case PKCSReq:
             case RenewalReq:
             case UpdateReq:
-                CertificationRequest csr = (CertificationRequest) req.getMessageData();
+                CertificationRequest csr = CertificationRequest.getInstance(req.getMessageData());
                 X500Name reqSubject = csr.getCertificationRequestInfo().getSubject();
                 String reqSubjectText = X509Util.getRfc4519Name(reqSubject);
                 audit(auditEvent, "req-subject", reqSubjectText);
@@ -528,7 +528,7 @@ public class Scep {
                 signedData = buildSignedData(cert.getCert().getCert());
                 break;
             case CertPoll:
-                IssuerAndSubject is = (IssuerAndSubject) req.getMessageData();
+                IssuerAndSubject is = IssuerAndSubject.getInstance(req.getMessageData());
                 audit(auditEvent, "isser", X509Util.getRfc4519Name(is.getIssuer()));
                 audit(auditEvent, "subject", X509Util.getRfc4519Name(is.getSubject()));
 
@@ -536,7 +536,7 @@ public class Scep {
                 signedData = pollCert(ca, is.getSubject(), req.getTransactionId());
                 break;
             case GetCert:
-                IssuerAndSerialNumber isn = (IssuerAndSerialNumber) req.getMessageData();
+                IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
                 BigInteger serial = isn.getSerialNumber().getPositiveValue();
                 audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
                 audit(auditEvent, "serialNumber", LogUtil.formatCsn(serial));
@@ -544,7 +544,7 @@ public class Scep {
                 signedData = getCert(ca, isn.getSerialNumber().getPositiveValue());
                 break;
             case GetCRL:
-                isn = (IssuerAndSerialNumber) req.getMessageData();
+                isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
                 serial = isn.getSerialNumber().getPositiveValue();
                 audit(auditEvent, "isser", X509Util.getRfc4519Name(isn.getName()));
                 audit(auditEvent, "serialNumber", LogUtil.formatCsn(serial));
@@ -616,7 +616,7 @@ public class Scep {
                 cmsSignedDataGen.addCertificate(caCert);
             }
             CMSSignedData signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
-            return (SignedData) signedData.toASN1Structure().getContent();
+            return SignedData.getInstance(signedData.toASN1Structure().getContent());
         } catch (CMSException | IOException | CertificateEncodingException ex) {
             LogUtil.error(LOG, ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
@@ -639,8 +639,8 @@ public class Scep {
             LogUtil.error(LOG, ex, "could not generate CMSSignedData");
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
-        return (SignedData) signedData.toASN1Structure().getContent();
-    } // method getCRL
+        return SignedData.getInstance(signedData.toASN1Structure().getContent());
+    } // method getCrl
 
     private ContentInfo encodeResponse(final PkiMessage response, final DecodedPkiMessage request)
     throws OperationException {

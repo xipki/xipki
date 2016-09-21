@@ -847,14 +847,15 @@ class IdentifiedX509Certprofile {
                 throw new BadCertTemplateException("otherName.value is not tagged Object");
             }
 
-            int tagNo = ((ASN1TaggedObject) asn1).getTagNo();
+            int tagNo = ASN1TaggedObject.getInstance(asn1).getTagNo();
             if (tagNo != 0) {
                 throw new BadCertTemplateException("otherName.value does not have tag 0: " + tagNo);
             }
 
             ASN1EncodableVector vector = new ASN1EncodableVector();
             vector.add(type);
-            vector.add(new DERTaggedObject(true, 0, ((ASN1TaggedObject) asn1).getObject()));
+            vector.add(new DERTaggedObject(true, 0,
+                    ASN1TaggedObject.getInstance(asn1).getObject()));
             DERSequence seq = new DERSequence(vector);
 
             return new GeneralName(GeneralName.otherName, seq);
@@ -866,12 +867,12 @@ class IdentifiedX509Certprofile {
             int idx = 0;
             if (size > 1) {
                 DirectoryString ds = DirectoryString.getInstance(
-                        ((ASN1TaggedObject) reqSeq.getObjectAt(idx++)).getObject());
+                        ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
                 nameAssigner = ds.getString();
             }
 
             DirectoryString ds = DirectoryString.getInstance(
-                    ((ASN1TaggedObject) reqSeq.getObjectAt(idx++)).getObject());
+                    ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
             String partyName = ds.getString();
 
             vector = new ASN1EncodableVector();

@@ -245,7 +245,7 @@ public abstract class Client {
         ScepHttpResponse httpResp = httpSend(Operation.PKIOperation, request);
         CMSSignedData cmsSignedData = parsePkiMessage(httpResp.getContentBytes());
         PkiMessage response = decode(cmsSignedData, identityKey, identityCert);
-        ContentInfo messageData = (ContentInfo) response.getMessageData();
+        ContentInfo messageData = ContentInfo.getInstance(response.getMessageData());
         try {
             return ScepUtil.getCrlFromPkiMessage(SignedData.getInstance(messageData.getContent()));
         } catch (CRLException ex) {
@@ -273,7 +273,7 @@ public abstract class Client {
 
         CMSSignedData cmsSignedData = parsePkiMessage(httpResp.getContentBytes());
         DecodedPkiMessage response = decode(cmsSignedData, identityKey, identityCert);
-        ContentInfo messageData = (ContentInfo) response.getMessageData();
+        ContentInfo messageData = ContentInfo.getInstance(response.getMessageData());
         try {
             return ScepUtil.getCertsFromSignedData(
                     SignedData.getInstance(messageData.getContent()));

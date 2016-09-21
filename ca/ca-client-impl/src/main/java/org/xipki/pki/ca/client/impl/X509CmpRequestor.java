@@ -119,13 +119,13 @@ import org.xipki.commons.security.XiSecurityConstants;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
 import org.xipki.pki.ca.client.api.PkiErrorException;
+import org.xipki.pki.ca.client.api.dto.CsrEnrollCertRequest;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.pki.ca.client.api.dto.EnrollCertResultEntry;
 import org.xipki.pki.ca.client.api.dto.EnrollCertResultResp;
 import org.xipki.pki.ca.client.api.dto.ErrorResultEntry;
 import org.xipki.pki.ca.client.api.dto.IssuerSerialEntry;
-import org.xipki.pki.ca.client.api.dto.CsrEnrollCertRequest;
 import org.xipki.pki.ca.client.api.dto.ResultEntry;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequest;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntry;
@@ -206,7 +206,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         int bodyType = respBody.getType();
 
         if (PKIBody.TYPE_ERROR == bodyType) {
-            ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
+            ErrorMsgContent content = ErrorMsgContent.getInstance(respBody.getContent());
             throw new PkiErrorException(content.getPKIStatusInfo());
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new CmpRequestorException(String.format(
@@ -217,7 +217,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         ASN1ObjectIdentifier expectedType = (xipkiAction == null)
                 ? CMPObjectIdentifiers.it_currentCRL : ObjectIdentifiers.id_xipki_cmp_cmpGenmsg;
 
-        GenRepContent genRep = (GenRepContent) respBody.getContent();
+        GenRepContent genRep = GenRepContent.getInstance(respBody.getContent());
 
         InfoTypeAndValue[] itvs = genRep.toInfoTypeAndValueArray();
         InfoTypeAndValue itv = null;
@@ -290,7 +290,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         int bodyType = respBody.getType();
 
         if (PKIBody.TYPE_ERROR == bodyType) {
-            ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
+            ErrorMsgContent content = ErrorMsgContent.getInstance(respBody.getContent());
             throw new PkiErrorException(content.getPKIStatusInfo());
         } else if (PKIBody.TYPE_REVOCATION_REP != bodyType) {
             throw new CmpRequestorException(String.format(
@@ -298,7 +298,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
                     PKIBody.TYPE_REVOCATION_REP, PKIBody.TYPE_ERROR));
         }
 
-        RevRepContent content = (RevRepContent) respBody.getContent();
+        RevRepContent content = RevRepContent.getInstance(respBody.getContent());
         PKIStatusInfo[] statuses = content.getStatus();
         if (statuses == null || statuses.length != reqEntries.size()) {
             int statusesLen = 0;
@@ -404,7 +404,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         final int bodyType = respBody.getType();
 
         if (PKIBody.TYPE_ERROR == bodyType) {
-            ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
+            ErrorMsgContent content = ErrorMsgContent.getInstance(respBody.getContent());
             throw new PkiErrorException(content.getPKIStatusInfo());
         } else if (expectedBodyType != bodyType) {
             throw new CmpRequestorException(String.format(
@@ -412,7 +412,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
                     expectedBodyType, PKIBody.TYPE_ERROR));
         }
 
-        CertRepMessage certRep = (CertRepMessage) respBody.getContent();
+        CertRepMessage certRep = CertRepMessage.getInstance(respBody.getContent());
         CertResponse[] certResponses = certRep.getResponse();
 
         EnrollCertResultResp result = new EnrollCertResultResp();

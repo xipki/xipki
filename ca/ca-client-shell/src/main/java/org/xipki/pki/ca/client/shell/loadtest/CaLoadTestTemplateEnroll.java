@@ -273,7 +273,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
                         "parsing profile failed, message: " + ex.getMessage(), ex);
             } catch (JAXBException ex) {
                 throw new InvalidConfException("parsing profile failed, message: "
-                        + XmlUtil.getMessage((JAXBException) ex), ex);
+                        + XmlUtil.getMessage(ex), ex);
             }
         }
 

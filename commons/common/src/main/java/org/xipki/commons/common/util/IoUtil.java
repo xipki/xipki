@@ -41,10 +41,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.Base64;
 import java.util.Enumeration;
@@ -130,12 +133,12 @@ public class IoUtil {
 
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
-            NetworkInterface ni = (NetworkInterface) interfaces.nextElement();
+            NetworkInterface ni = interfaces.nextElement();
             Enumeration<InetAddress> ee = ni.getInetAddresses();
             while (ee.hasMoreElements()) {
-                InetAddress ia = (InetAddress) ee.nextElement();
+                InetAddress ia = ee.nextElement();
                 if (ia instanceof Inet4Address) {
-                    addresses.add(((Inet4Address) ia).getHostAddress());
+                    addresses.add(ia.getHostAddress());
                 }
             }
         }
@@ -223,4 +226,12 @@ public class IoUtil {
         return sb.toString();
     }
 
+    public static HttpURLConnection openHttpConn(final URL url) throws IOException {
+        ParamUtil.requireNonNull("url", url);
+        URLConnection conn = url.openConnection();
+        if (conn instanceof HttpURLConnection) {
+            return (HttpURLConnection) conn;
+        }
+        throw new IOException(url.toString() + " is not of protocol HTTP: " + url.getProtocol());
+    }
 }

@@ -239,20 +239,22 @@ public class SyslogAuditServiceImpl extends AuditService {
         }
 
         if ("udp".equalsIgnoreCase(protocol)) {
-            syslog = new UdpSyslogMessageSender();
-            ((UdpSyslogMessageSender) syslog).setSyslogServerPort(port);
+            UdpSyslogMessageSender lcSyslog = new UdpSyslogMessageSender();
+            syslog = lcSyslog;
+            lcSyslog.setSyslogServerPort(port);
         } else if ("tcp".equalsIgnoreCase(protocol)) {
-            syslog = new TcpSyslogMessageSender();
-            ((TcpSyslogMessageSender) syslog).setSyslogServerPort(port);
-            ((TcpSyslogMessageSender) syslog).setSsl(ssl);
-
+            TcpSyslogMessageSender lcSyslog = new TcpSyslogMessageSender();
+            syslog = lcSyslog;
+            lcSyslog.setSyslogServerPort(port);
+            lcSyslog.setSsl(ssl);
             if (writeRetries > 0) {
-                ((TcpSyslogMessageSender) syslog).setMaxRetryCount(writeRetries);
+                lcSyslog.setMaxRetryCount(writeRetries);
             }
         } else {
             LOG.warn("unknown protocol '{}', use the default one 'udp'", this.protocol);
-            syslog = new UdpSyslogMessageSender();
-            ((UdpSyslogMessageSender) syslog).setSyslogServerPort(port);
+            UdpSyslogMessageSender lcSyslog = new UdpSyslogMessageSender();
+            syslog = lcSyslog;
+            lcSyslog.setSyslogServerPort(port);
         }
 
         syslog.setDefaultMessageHostname(host);

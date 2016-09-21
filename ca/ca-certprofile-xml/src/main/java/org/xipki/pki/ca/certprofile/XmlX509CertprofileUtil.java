@@ -524,15 +524,15 @@ public class XmlX509CertprofileUtil {
         Map<ASN1ObjectIdentifier, ExtensionValue> map = new HashMap<>();
 
         for (ExtensionType m : extensionsType.getExtension()) {
-            if (m.getValue() == null
-                    || !(m.getValue().getAny() instanceof ConstantExtValue)) {
-                continue;
-            }
-
             ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
             if (Extension.subjectAlternativeName.equals(oid)
                     || Extension.subjectInfoAccess.equals(oid)
                     || Extension.biometricInfo.equals(oid)) {
+                continue;
+            }
+
+            if (m.getValue() == null
+                    || !(m.getValue().getAny() instanceof ConstantExtValue)) {
                 continue;
             }
 

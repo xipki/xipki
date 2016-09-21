@@ -791,7 +791,8 @@ public class X509CaCmpResponder extends CmpResponder {
                         ASN1ObjectIdentifier extId = Extension.reasonCode;
                         ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
                         if (extValue != null) {
-                            int reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
+                            int reasonCode =
+                                    ASN1Enumerated.getInstance(extValue).getValue().intValue();
                             reason = CrlReason.forReasonCode(reasonCode);
                         }
 
@@ -799,7 +800,8 @@ public class X509CaCmpResponder extends CmpResponder {
                         extValue = crlDetails.getExtensionParsedValue(extId);
                         if (extValue != null) {
                             try {
-                                invalidityDate = ((ASN1GeneralizedTime) extValue).getDate();
+                                invalidityDate =
+                                        ASN1GeneralizedTime.getInstance(extValue).getDate();
                             } catch (ParseException ex) {
                                 throw new OperationException(ErrorCode.INVALID_EXTENSION,
                                         "invalid extension " + extId.getId());
@@ -1184,28 +1186,28 @@ public class X509CaCmpResponder extends CmpResponder {
             addAutitEventType(auditEvent, "CERT_REQ");
             checkPermission(requestor, Permission.ENROLL_CERT);
             respBody = processCr(request, requestor, user, tid, reqHeader,
-                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert,
+                    CertReqMessages.getInstance(reqBody.getContent()), confirmWaitTime, sendCaCert,
                     auditEvent);
             break;
         case PKIBody.TYPE_KEY_UPDATE_REQ:
             addAutitEventType(auditEvent, "KEY_UPDATE");
             checkPermission(requestor, Permission.KEY_UPDATE);
             respBody = processKur(request, requestor, user, tid, reqHeader,
-                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert,
+                    CertReqMessages.getInstance(reqBody.getContent()), confirmWaitTime, sendCaCert,
                     auditEvent);
             break;
         case PKIBody.TYPE_P10_CERT_REQ:
             addAutitEventType(auditEvent, "CERT_REQ");
             checkPermission(requestor, Permission.ENROLL_CERT);
             respBody = processP10cr(request, requestor, user, tid, reqHeader,
-                    (CertificationRequest) reqBody.getContent(), confirmWaitTime, sendCaCert,
-                    auditEvent);
+                    CertificationRequest.getInstance(reqBody.getContent()), confirmWaitTime,
+                    sendCaCert, auditEvent);
             break;
         case PKIBody.TYPE_CROSS_CERT_REQ:
             addAutitEventType(auditEvent, "CROSS_CERT_REQ");
             checkPermission(requestor, Permission.CROSS_CERT_ENROLL);
             respBody = processCcp(request, requestor, user, tid, reqHeader,
-                    (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert,
+                    CertReqMessages.getInstance(reqBody.getContent()), confirmWaitTime, sendCaCert,
                     auditEvent);
             break;
         default:
@@ -1236,7 +1238,7 @@ public class X509CaCmpResponder extends CmpResponder {
         Permission requiredPermission = null;
         boolean allRevdetailsOfSameType = true;
 
-        RevReqContent rr = (RevReqContent) reqBody.getContent();
+        RevReqContent rr = RevReqContent.getInstance(reqBody.getContent());
         RevDetails[] revContent = rr.toRevDetailsArray();
 
         int len = revContent.length;
@@ -1248,7 +1250,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 ASN1ObjectIdentifier extId = Extension.reasonCode;
                 ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
                 if (extValue != null) {
-                    reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
+                    reasonCode = ASN1Enumerated.getInstance(extValue).getValue().intValue();
                 }
             }
 
@@ -1297,7 +1299,7 @@ public class X509CaCmpResponder extends CmpResponder {
             final PKIHeader reqHeader, final PKIBody reqBody, final CmpRequestorInfo requestor,
             final String user, final ASN1OctetString tid, final AuditEvent auditEvent)
     throws InsuffientPermissionException {
-        GenMsgContent genMsgBody = (GenMsgContent) reqBody.getContent();
+        GenMsgContent genMsgBody = GenMsgContent.getInstance(reqBody.getContent());
         InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 
         InfoTypeAndValue itv = null;

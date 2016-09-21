@@ -1505,7 +1505,7 @@ public class ExtensionsChecker {
         Map<String, String> isMap = new HashMap<>();
         int size = isPolicyMappings.size();
         for (int i = 0; i < size; i++) {
-            ASN1Sequence seq = (ASN1Sequence) isPolicyMappings.getObjectAt(i);
+            ASN1Sequence seq = ASN1Sequence.getInstance(isPolicyMappings.getObjectAt(i));
             CertPolicyId issuerDomainPolicy = CertPolicyId.getInstance(seq.getObjectAt(0));
             CertPolicyId subjectDomainPolicy = CertPolicyId.getInstance(seq.getObjectAt(1));
             isMap.put(issuerDomainPolicy.getId(), subjectDomainPolicy.getId());
@@ -1583,7 +1583,7 @@ public class ExtensionsChecker {
 
         final int expN = reqSubDirAttrs.size();
         for (int i = 0; i < expN; i++) {
-            Attribute attr = (Attribute) reqSubDirAttrs.get(i);
+            Attribute attr = Attribute.getInstance(reqSubDirAttrs.get(i));
             ASN1ObjectIdentifier attrType = attr.getAttrType();
             ASN1Encodable attrVal = attr.getAttributeValues()[0];
 
@@ -1621,7 +1621,7 @@ public class ExtensionsChecker {
         List<ASN1ObjectIdentifier> attrTypes = new LinkedList<>(conf.getTypes());
         final int n = subDirAttrs.size();
         for (int i = 0; i < n; i++) {
-            Attribute attr = (Attribute) subDirAttrs.get(i);
+            Attribute attr = Attribute.getInstance(subDirAttrs.get(i));
             ASN1ObjectIdentifier attrType = attr.getAttrType();
             if ( !attrTypes.contains(attrType)) {
                 failureMsg.append("attribute of type " + attrType.getId()
@@ -1917,7 +1917,7 @@ public class ExtensionsChecker {
             }
 
             GeneralNames isDistributionPointNames =
-                    (GeneralNames) entry.getDistributionPoint().getName();
+                    GeneralNames.getInstance(entry.getDistributionPoint().getName());
             GeneralName[] names = isDistributionPointNames.getNames();
 
             for (int i = 0; i < names.length; i++) {
@@ -1967,7 +1967,7 @@ public class ExtensionsChecker {
             }
 
             GeneralNames isDistributionPointNames =
-                    (GeneralNames) entry.getDistributionPoint().getName();
+                    GeneralNames.getInstance(entry.getDistributionPoint().getName());
             GeneralName[] names = isDistributionPointNames.getNames();
 
             for (int i = 0; i < names.length; i++) {
@@ -2683,7 +2683,7 @@ public class ExtensionsChecker {
                         "otherName.type " + type.getId() + " is not allowed");
             }
 
-            ASN1Encodable value = ((ASN1TaggedObject) reqSeq.getObjectAt(1)).getObject();
+            ASN1Encodable value = ASN1TaggedObject.getInstance(reqSeq.getObjectAt(1)).getObject();
             String text;
             if (!(value instanceof ASN1String)) {
                 throw new BadCertTemplateException("otherName.value is not a String");
@@ -2705,12 +2705,12 @@ public class ExtensionsChecker {
             int idx = 0;
             if (size > 1) {
                 DirectoryString ds = DirectoryString.getInstance(
-                        ((ASN1TaggedObject) reqSeq.getObjectAt(idx++)).getObject());
+                        ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
                 nameAssigner = ds.getString();
             }
 
             DirectoryString ds = DirectoryString.getInstance(
-                    ((ASN1TaggedObject) reqSeq.getObjectAt(idx++)).getObject());
+                    ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
             String partyName = ds.getString();
 
             vector = new ASN1EncodableVector();

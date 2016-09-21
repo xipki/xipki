@@ -128,7 +128,7 @@ class ResponderSigner {
 
         int size = preferredSigAlgs.size();
         for (int i = 0; i < size; i++) {
-            ASN1Sequence algObj = (ASN1Sequence) preferredSigAlgs.getObjectAt(i);
+            ASN1Sequence algObj = ASN1Sequence.getInstance(preferredSigAlgs.getObjectAt(i));
             AlgorithmIdentifier sigAlgId = AlgorithmIdentifier.getInstance(algObj.getObjectAt(0));
             String algoName = getSignatureAlgorithmName(sigAlgId);
             if (algoSignerMap.containsKey(algoName)) {

@@ -159,6 +159,8 @@ abstract class DbDigestReader implements DigestReader {
         if (next instanceof EndOfQueue) {
             endReached.set(true);
             return null;
+        } else if (!(next instanceof DigestDbEntrySet)) {
+            throw new RuntimeException("unknown QueueEntry type: " + next.getClass().getName());
         }
 
         certSet = (DigestDbEntrySet) next;

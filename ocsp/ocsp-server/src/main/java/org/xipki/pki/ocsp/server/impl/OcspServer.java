@@ -1394,7 +1394,7 @@ public class OcspServer {
                     "parse profile failed, message: " + ex.getMessage(), ex);
         } catch (JAXBException ex) {
             throw new InvalidConfException(
-                    "parse profile failed, message: " + XmlUtil.getMessage((JAXBException) ex), ex);
+                    "parse profile failed, message: " + XmlUtil.getMessage(ex), ex);
         }
     }
 
