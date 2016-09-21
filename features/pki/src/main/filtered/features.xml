@@ -28,12 +28,12 @@
   </feature>
   <feature name="xipki-cabase" version="${project.version}">
     <feature>xipki-audit</feature>
+    <feature>xipki-datasource</feature>
     <feature prerequisite="true">xipki-security</feature>
     <bundle>mvn:org.xipki.pki/ca-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-caserver" version="${project.version}">
-    <feature>xipki-datasource</feature>
     <feature>xipki-cabase</feature>
     <bundle>mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
