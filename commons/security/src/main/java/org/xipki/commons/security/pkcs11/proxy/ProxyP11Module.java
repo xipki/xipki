@@ -211,7 +211,7 @@ public class ProxyP11Module extends AbstractP11Module {
 
     byte[] send(final byte[] request) throws IOException {
         ParamUtil.requireNonNull("request", request);
-        HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
+        HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(serverUrl);
         httpUrlConnection.setDoOutput(true);
         httpUrlConnection.setUseCaches(false);
 
@@ -333,7 +333,7 @@ public class ProxyP11Module extends AbstractP11Module {
     private ServerCaps getServerCaps() throws P11TokenException {
         byte[] respBytes;
         try {
-            HttpURLConnection conn = (HttpURLConnection) getCapsUrl.openConnection();
+            HttpURLConnection conn = IoUtil.openHttpConn(getCapsUrl);
             conn.setRequestMethod("GET");
             checkResponseCode(conn);
             InputStream respStream = conn.getInputStream();

@@ -41,6 +41,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.ScepClientException;
 
@@ -61,9 +62,9 @@ public class ScepClient extends Client {
         ParamUtil.requireNonNull("url", url);
         try {
             URL tmpUrl = new URL(url);
-            HttpURLConnection conn = (HttpURLConnection) tmpUrl.openConnection();
-            conn.setRequestMethod("GET");
-            return parseResponse(conn);
+            HttpURLConnection httpConn = IoUtil.openHttpConn(tmpUrl);;
+            httpConn.setRequestMethod("GET");
+            return parseResponse(httpConn);
         } catch (IOException ex) {
             throw new ScepClientException(ex);
         }
@@ -75,22 +76,22 @@ public class ScepClient extends Client {
         ParamUtil.requireNonNull("url", url);
         try {
             URL tmpUrl = new URL(url);
-            HttpURLConnection conn = (HttpURLConnection) tmpUrl.openConnection();
-            conn.setDoOutput(true);
-            conn.setUseCaches(false);
+            HttpURLConnection httpConn = IoUtil.openHttpConn(tmpUrl);
+            httpConn.setDoOutput(true);
+            httpConn.setUseCaches(false);
 
-            conn.setRequestMethod("POST");
+            httpConn.setRequestMethod("POST");
             if (request != null) {
                 if (requestContentType != null) {
-                    conn.setRequestProperty("Content-Type", requestContentType);
+                    httpConn.setRequestProperty("Content-Type", requestContentType);
                 }
-                conn.setRequestProperty("Content-Length", Integer.toString(request.length));
-                OutputStream outputstream = conn.getOutputStream();
+                httpConn.setRequestProperty("Content-Length", Integer.toString(request.length));
+                OutputStream outputstream = httpConn.getOutputStream();
                 outputstream.write(request);
                 outputstream.flush();
             }
 
-            return parseResponse(conn);
+            return parseResponse(httpConn);
         } catch (IOException ex) {
             throw new ScepClientException(ex.getMessage(), ex);
         }
