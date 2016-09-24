@@ -264,7 +264,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
             BigInteger serialNumber = certId.getSerialNumber();
 
             msg.append("issuer matched: ").append(issuerMatch);
-            msg.append("serialNumber: ").append(LogUtil.formatCsn(serialNumber));
+            msg.append("\nserialNumber: ").append(LogUtil.formatCsn(serialNumber));
             msg.append("\nCertificate status: ").append(status);
 
             if (verbose.booleanValue()) {
