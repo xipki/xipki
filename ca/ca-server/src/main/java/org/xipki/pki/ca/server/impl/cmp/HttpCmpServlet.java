@@ -38,6 +38,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
@@ -61,8 +62,11 @@ import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
+import org.xipki.commons.common.LruCache;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -79,6 +83,8 @@ public class HttpCmpServlet extends HttpServlet {
 
     private static final String CT_RESPONSE = "application/pkixcmp";
 
+    private static final LruCache<String, X509Certificate> clientCerts = new LruCache<>(50);
+
     private CmpResponderManager responderManager;
 
     private AuditServiceRegister auditServiceRegister;
@@ -89,9 +95,7 @@ public class HttpCmpServlet extends HttpServlet {
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
-        X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
-                "javax.servlet.request.X509Certificate");
-        X509Certificate clientCert = (certs == null || certs.length < 1) ? null : certs[0];
+        X509Certificate clientCert = getTlsClientCert(request);
 
         AuditService auditService = auditServiceRegister.getAuditService();
         AuditEvent auditEvent = new AuditEvent(new Date());
@@ -253,5 +257,50 @@ public class HttpCmpServlet extends HttpServlet {
             }
         }
     } // method audit
+
+    private X509Certificate getTlsClientCert(final HttpServletRequest request)
+    throws IOException {
+
+        X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
+                "javax.servlet.request.X509Certificate");
+        X509Certificate clientCert = (certs == null || certs.length < 1) ? null : certs[0];
+        if (clientCert != null) {
+            return clientCert;
+        }
+
+        // check whether this application is behind a reverse proxy and the TLS client certificate
+        // is forwarded. Following headers should be configured to be forwarded:
+        // SSL_CLIENT_VERIFY and SSL_CLIENT_CERT.
+        // For more details please refer to
+        // http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#envvars
+        // http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start
+        String clientVerify = request.getHeader("SSL_CLIENT_VERIFY");
+        if (StringUtil.isBlank(clientVerify)) {
+            return null;
+        }
+
+        if ("SUCCESS".equalsIgnoreCase(clientVerify.trim())) {
+            return null;
+        }
+
+        String pemClientCert = request.getHeader("SSL_CLIENT_CERT");
+        if (StringUtil.isBlank(pemClientCert)) {
+            return null;
+        }
+
+        clientCert = clientCerts.get(pemClientCert);
+        if (clientCert != null) {
+            return clientCert;
+        }
+
+        try {
+            clientCert = X509Util.parsePemEncodedCert(pemClientCert);
+        } catch (CertificateException ex) {
+            throw new IOException("could not parse Certificate", ex);
+        }
+
+        clientCerts.put(pemClientCert, clientCert);
+        return clientCert;
+    }
 
 }

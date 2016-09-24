@@ -198,6 +198,14 @@ public class X509Util {
         return parseCert(Base64.decode(base64EncodedCert));
     }
 
+    public static X509Certificate parsePemEncodedCert(final String pemEncodedCert)
+    throws IOException, CertificateException {
+        ParamUtil.requireNonNull("pemEncodedCert", pemEncodedCert);
+        String b64 = pemEncodedCert.replace("-----BEGIN CERTIFICATE-----", "")
+                .replace("-----END CERTIFICATE-----", "");
+        return parseBase64EncodedCert(b64);
+    }
+
     public static X509CRL parseCrl(final String file)
     throws IOException, CertificateException, CRLException {
         ParamUtil.requireNonBlank("file", file);
