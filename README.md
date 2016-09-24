@@ -119,6 +119,20 @@ Install
     ```
   * In file xipki/security/pkcs11-conf-hsm.xml, change the PKCS#11 configuration.
 
+* If the CA is behind a reverse proxy apache httpd, configure the proxy to forward the headers via
+  mod_proxy with the following configuration
+
+   ```sh
+   RequestHeader set SSL_CLIENT_VERIFY "%{SSL_CLIENT_VERIFY}s"
+   RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
+   ```
+
+  For more details please refer to
+
+  * [Jetty/Howto/Configure mod proxy](https://wiki.eclipse.org/Jetty/Howto/Configure_mod_proxy)
+  * [Jetty: Tricks to do client certificate authentications behind a reverse proxy](http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start)
+  * [Apache Module mod_ssl](http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#envvars)
+
 Run Demo
 -----
 
