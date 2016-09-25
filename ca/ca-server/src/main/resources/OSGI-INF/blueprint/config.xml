@@ -9,6 +9,7 @@
       <cm:property name="urlPatterns" value="/cmp/*"/>
       <cm:property name="caConfFile" value="xipki/ca-config/ca.properties"/>
       <cm:property name="healthUrlPatterns" value="/health/*"/>
+      <cm:property name="sslCertInHttpHeader" value="false"/>
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.commons.security.SecurityFactory"/>
@@ -31,6 +32,7 @@
   <bean id="cmpServlet" class="org.xipki.pki.ca.server.impl.cmp.HttpCmpServlet">
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
+    <property name="sslCertInHttpHeader" value="${sslCertInHttpHeader}"/>
   </bean>
   <service ref="cmpServlet" interface="javax.servlet.Servlet">
     <service-properties>

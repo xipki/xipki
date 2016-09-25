@@ -89,6 +89,8 @@ public class HttpCmpServlet extends HttpServlet {
 
     private AuditServiceRegister auditServiceRegister;
 
+    private boolean sslCertInHttpHeader;
+
     public HttpCmpServlet() {
     }
 
@@ -232,6 +234,10 @@ public class HttpCmpServlet extends HttpServlet {
         this.auditServiceRegister = auditServiceRegister;
     }
 
+    public void setSslCertInHttpHeader(final boolean sslCertInHttpHeader) {
+        this.sslCertInHttpHeader = sslCertInHttpHeader;
+    }
+
     private static void audit(final AuditService auditService, final AuditEvent auditEvent,
             final AuditLevel auditLevel, final AuditStatus auditStatus, final String auditMessage) {
         if (auditLevel != null) {
@@ -266,6 +272,10 @@ public class HttpCmpServlet extends HttpServlet {
         X509Certificate clientCert = (certs == null || certs.length < 1) ? null : certs[0];
         if (clientCert != null) {
             return clientCert;
+        }
+
+        if (!sslCertInHttpHeader) {
+            return null;
         }
 
         // check whether this application is behind a reverse proxy and the TLS client certificate
