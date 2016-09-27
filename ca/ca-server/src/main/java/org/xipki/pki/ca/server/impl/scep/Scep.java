@@ -510,6 +510,7 @@ public class Scep {
                         certProfileName);
                 X509CertificateInfo cert = ca.generateCertificate(certTemplateData, true, null,
                         user, RequestType.SCEP, tidBytes);
+                /* Don't save SCEP message, since it contains password in plaintext
                 if (ca.getCaInfo().isSaveRequest() && cert.getCert().getCertId() != null) {
                     byte[] encodedRequest;
                     try {
@@ -522,7 +523,7 @@ public class Scep {
                         long reqId = ca.addRequest(encodedRequest);
                         ca.addRequestCert(reqId, cert.getCert().getCertId());
                     }
-                }
+                }*/
 
                 audit(auditEvent, "subject", cert.getCert().getSubject());
                 signedData = buildSignedData(cert.getCert().getCert());
