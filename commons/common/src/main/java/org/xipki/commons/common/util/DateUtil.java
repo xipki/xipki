@@ -59,11 +59,19 @@ public class DateUtil {
     }
 
     public static Date parseUtcTimeyyyyMMddhhmmss(final String utcTime) {
-        if (utcTime == null || utcTime.length() != 14) {
+        String coreUtcTime = utcTime;
+        if (StringUtil.isNotBlank(utcTime)) {
+            char ch = utcTime.charAt(utcTime.length() - 1);
+            if (ch == 'z' || ch == 'Z') {
+                coreUtcTime = utcTime.substring(0, utcTime.length() - 1);
+            }
+        }
+
+        if (coreUtcTime == null || coreUtcTime.length() != 14) {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
         }
         try {
-            LocalDateTime localDate = LocalDateTime.parse(utcTime, SDF1);
+            LocalDateTime localDate = LocalDateTime.parse(coreUtcTime, SDF1);
             Instant instant = localDate.atZone(ZONE_UTC).toInstant();
             return Date.from(instant);
         } catch (DateTimeParseException ex) {
@@ -73,11 +81,19 @@ public class DateUtil {
     }
 
     public static Date parseUtcTimeyyyyMMdd(final String utcTime) {
-        if (utcTime == null || utcTime.length() != 8) {
+        String coreUtcTime = utcTime;
+        if (StringUtil.isNotBlank(utcTime)) {
+            char ch = utcTime.charAt(utcTime.length() - 1);
+            if (ch == 'z' || ch == 'Z') {
+                coreUtcTime = utcTime.substring(0, utcTime.length() - 1);
+            }
+        }
+
+        if (coreUtcTime == null || coreUtcTime.length() != 8) {
             throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
         }
         try {
-            LocalDateTime localDate = LocalDateTime.parse(utcTime + "000000", SDF1);
+            LocalDateTime localDate = LocalDateTime.parse(coreUtcTime + "000000", SDF1);
             Instant instant = localDate.atZone(ZONE_UTC).toInstant();
             return Date.from(instant);
         } catch (DateTimeParseException ex) {

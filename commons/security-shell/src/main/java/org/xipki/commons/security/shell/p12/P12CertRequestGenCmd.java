@@ -55,6 +55,7 @@ import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.SignatureAlgoControl;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.commons.security.shell.CertRequestGenCommandSupport;
+import org.xipki.commons.security.util.KeyUtil;
 
 /**
  * @author Lijun Liao
@@ -90,7 +91,7 @@ public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
     CertificateException {
         KeyStore ks;
         try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
-            ks = KeyStore.getInstance("PKCS12", "BC");
+            ks = KeyUtil.getKeyStore("PKCS12");
             ks.load(in, getPassword());
         }
         return ks;

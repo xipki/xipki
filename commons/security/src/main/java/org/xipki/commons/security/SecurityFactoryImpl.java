@@ -246,8 +246,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         ParamUtil.requireNonNull("keystoreBytes", keystoreBytes);
 
         try {
-            KeyStore ks = "JKS".equalsIgnoreCase(keystoreType) ? KeyStore.getInstance(keystoreType)
-                    : KeyStore.getInstance(keystoreType, "BC");
+            KeyStore ks = KeyUtil.getKeyStore(keystoreType);
             ks.load(new ByteArrayInputStream(keystoreBytes), password);
 
             String tmpKeyname = keyname;
@@ -283,8 +282,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
                 certs = newCertChain;
             }
 
-            KeyStore newKs = ("JKS".equalsIgnoreCase(keystoreType))
-                    ? KeyStore.getInstance(keystoreType) : KeyStore.getInstance(keystoreType, "BC");
+            KeyStore newKs = KeyUtil.getKeyStore(keystoreType);
             newKs.load(null, password);
 
             PrivateKey key = (PrivateKey) ks.getKey(tmpKeyname, password);

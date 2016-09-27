@@ -224,7 +224,7 @@ public class P12KeypairGenerator {
         KeyAndCertPair identity = new KeyAndCertPair(certGenerator.build(contentSigner),
                 kp.getKeypair().getPrivate());
 
-        KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
+        KeyStore ks = KeyUtil.getKeyStore("PKCS12");
         ks.load(null, params.getPassword());
 
         ks.setKeyEntry("main", identity.getKey(), params.getPassword(),
