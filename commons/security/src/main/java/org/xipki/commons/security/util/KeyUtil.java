@@ -41,6 +41,8 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -101,6 +103,16 @@ public class KeyUtil {
     private static final Map<String, KeyPairGenerator> KEYPAIR_GENERATORS = new HashMap<>();
 
     private KeyUtil() {
+    }
+
+    public static KeyStore getKeyStore(final String storeType)
+    throws KeyStoreException, NoSuchProviderException {
+        ParamUtil.requireNonBlank("storeType", storeType);
+        if ("JKS".equalsIgnoreCase(storeType)) {
+            return KeyStore.getInstance(storeType);
+        } else {
+            return KeyStore.getInstance(storeType, "BC");
+        }
     }
 
     // CHECKSTYLE:SKIP
