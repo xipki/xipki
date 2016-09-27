@@ -194,7 +194,10 @@ Feature xipki-security-shell
    * `xipki-tk:rsa-p12`
 
      generate RSA keypair in PKCS#12 keystore
-	 
+
+   * `keystore-convert`
+     convert the keystore format
+
    * `xipki-tk:speed-dsa-gen`
 
      performance test of PKCS#11 DSA key generation
