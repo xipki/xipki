@@ -129,9 +129,9 @@ certs.dir = output
         <validationModel>PKIX</validationModel>
         <trustAnchors>
           <keystore>
-            <type>JKS</type>
+            <type>PKCS12</type>
             <keystore>
-              <file>xipki/security/tlskeys/tls-server-truststore.jks</file>
+              <file>xipki/security/tlskeys/tls-server-truststore.p12</file>
             </keystore>
             <password>1234</password>
           </keystore>

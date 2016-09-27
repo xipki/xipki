@@ -11,8 +11,8 @@
       </cert>
       <!-- Required if signRequest is true -->
       <!--
-      <signerType>JKS</signerType>
-      <signerConf>password=1234,algo=SHA256withRSA,keystore=file:xipki/security/tlskeys/tls-client-keystore.jks</signerConf>
+      <signerType>PKCS12</signerType>
+      <signerConf>password=1234,algo=SHA256withRSA,keystore=file:xipki/security/tlskeys/tls-client-keystore.p12</signerConf>
       -->
     </requestor>
   </requestors>
