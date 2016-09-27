@@ -2022,6 +2022,27 @@ public class X509Ca {
         return null;
     } // method getRequestor
 
+    public CmpRequestorInfo getRequestor(final X509Certificate requestorCert) {
+        if (requestorCert == null) {
+            return null;
+        }
+
+        Set<CaHasRequestorEntry> requestorEntries =
+                caManager.getCmpRequestorsForCa(caInfo.getName());
+        if (CollectionUtil.isEmpty(requestorEntries)) {
+            return null;
+        }
+
+        for (CaHasRequestorEntry m : requestorEntries) {
+            CmpRequestorEntryWrapper entry = caManager.getCmpRequestorWrapper(m.getRequestorName());
+            if (entry.getCert().getCert().equals(requestorCert)) {
+                return new CmpRequestorInfo(m, entry.getCert());
+            }
+        }
+
+        return null;
+    }
+
     public CaManagerImpl getCaManager() {
         return caManager;
     }

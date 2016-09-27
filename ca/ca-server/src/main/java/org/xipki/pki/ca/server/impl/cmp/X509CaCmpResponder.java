@@ -40,6 +40,7 @@ import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
@@ -117,6 +118,7 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.CrlReason;
 import org.xipki.commons.security.ObjectIdentifiers;
+import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.XiSecurityConstants;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.api.InsuffientPermissionException;
@@ -642,6 +644,9 @@ public class X509CaCmpResponder extends CmpResponder {
             case CERT_REVOKED:
                 failureInfo = PKIFailureInfo.certRevoked;
                 break;
+            case BAD_POP:
+                failureInfo = PKIFailureInfo.badPOP;
+                break;
             case CRL_FAILURE:
                 failureInfo = PKIFailureInfo.systemFailure;
                 break;
@@ -655,7 +660,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 failureInfo = PKIFailureInfo.notAuthorized;
                 break;
             case INVALID_EXTENSION:
-                failureInfo = PKIFailureInfo.systemFailure;
+                failureInfo = PKIFailureInfo.badRequest;
                 break;
             case SYSTEM_FAILURE:
                 failureInfo = PKIFailureInfo.systemFailure;
@@ -851,6 +856,9 @@ public class X509CaCmpResponder extends CmpResponder {
                 case CERT_REVOKED:
                     failureInfo = PKIFailureInfo.certRevoked;
                     break;
+                case BAD_POP:
+                    failureInfo = PKIFailureInfo.badPOP;
+                    break;
                 case CERT_UNREVOKED:
                 case INSUFFICIENT_PERMISSION:
                 case NOT_PERMITTED:
@@ -1032,6 +1040,20 @@ public class X509CaCmpResponder extends CmpResponder {
         throw new InsuffientPermissionException(msg);
     }
 
+    private void checkPermission(final X509Certificate requestorCert,
+            final Permission requiredPermission) throws OperationException {
+        CmpRequestorInfo requestor = getRequestor(requestorCert);
+        if (requestor == null) {
+            throw new OperationException(ErrorCode.NOT_PERMITTED);
+        }
+
+        try {
+            checkPermission(requestor, requiredPermission);
+        } catch (InsuffientPermissionException ex) {
+            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, ex.getMessage());
+        }
+    }
+
     private void checkPermission(final CmpRequestorInfo requestor,
             final Permission requiredPermission) throws InsuffientPermissionException {
         X509Ca ca = getCa();
@@ -1165,6 +1187,11 @@ public class X509CaCmpResponder extends CmpResponder {
     @Override
     protected CmpRequestorInfo getRequestor(final X500Name requestorSender) {
         return getCa().getRequestor(requestorSender);
+    }
+
+    @Override
+    protected CmpRequestorInfo getRequestor(final X509Certificate requestorCert) {
+        return getCa().getRequestor(requestorCert);
     }
 
     private PKIBody cmpEnrollCert(final PKIMessage request, final PKIHeaderBuilder respHeader,
@@ -1452,6 +1479,160 @@ public class X509CaCmpResponder extends CmpResponder {
                     statusMessage);
         }
     } // method cmpGeneralMsg
+
+    /**
+     * @since 2.1.0
+     */
+    public CertificateList getCrl(final X509Certificate requestorCert, final BigInteger crlNumber,
+            final AuditEvent auditEvent) throws OperationException {
+        addAutitEventType(auditEvent, "CRL_DOWNLOAD");
+        checkPermission(requestorCert, Permission.GET_CRL);
+
+        X509Ca ca = getCa();
+        return (crlNumber == null) ? ca.getCurrentCrl() : ca.getCrl(crlNumber);
+    }
+
+    /**
+     * @since 2.1.0
+     */
+    public X509CRL generateCrlOnDemand(final X509Certificate requestorCert,
+            final AuditEvent auditEvent) throws OperationException {
+        addAutitEventType(auditEvent, "CRL_GEN_ONDEMAND");
+        checkPermission(requestorCert, Permission.GEN_CRL);
+
+        X509Ca ca = getCa();
+        return ca.generateCrlOnDemand(auditEvent);
+    }
+
+    /**
+     * @since 2.1.0
+     */
+    public X509Cert generateCert(final X509Certificate requestorCert, final byte[] encodedCsr,
+            final String profileName, final Date notBefore, final Date notAfter, final String user,
+            final RequestType reqType, final AuditEvent auditEvent)
+    throws OperationException {
+        addAutitEventType(auditEvent, "CERT_REQ");
+
+        CmpRequestorInfo requestor = getRequestor(requestorCert);
+        if (requestor == null) {
+            throw new OperationException(ErrorCode.NOT_PERMITTED);
+        }
+
+        try {
+            checkPermission(requestor, Permission.ENROLL_CERT);
+        } catch (InsuffientPermissionException ex) {
+            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, ex.getMessage());
+        }
+
+        CertificationRequest csr = CertificationRequest.getInstance(encodedCsr);
+        if (!securityFactory.verifyPopo(csr)) {
+            LOG.warn("could not validate POP for the pkcs#10 requst");
+            throw new OperationException(ErrorCode.BAD_POP);
+        }
+
+        CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
+
+        X500Name subject = certTemp.getSubject();
+        auditEvent.addEventData(
+                new AuditEventData("req-subject", X509Util.getRfc4519Name(subject)));
+
+        SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
+        auditEvent.addEventData(new AuditEventData("certprofile", profileName));
+
+        try {
+            checkPermission(requestor, profileName);
+        } catch (InsuffientPermissionException ex) {
+            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, ex.getMessage());
+        }
+
+        Extensions extensions = CaUtil.getExtensions(certTemp);
+        CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
+                notBefore, notAfter, extensions, profileName);
+
+        X509Ca ca = getCa();
+        X509CertificateInfo certInfo = ca.generateCertificate(certTemplate, requestor.isRa(),
+                requestor, user, reqType, null);
+        certInfo.setRequestor(requestor);
+        certInfo.setUser(user);
+
+        auditEvent.addEventData(new AuditEventData("req-subject",
+                certInfo.getCert().getSubject()));
+
+        if (ca.getCaInfo().isSaveRequest()) {
+            long dbId = ca.addRequest(encodedCsr);
+            ca.addRequestCert(dbId, certInfo.getCert().getCertId());
+        }
+        auditEvent.setStatus(AuditStatus.SUCCESSFUL);
+
+        return certInfo.getCert();
+    }
+
+    /**
+     * @since 2.1.0
+     */
+    public void revokeCert(final X509Certificate requestorCert, final BigInteger serialNumber,
+            final CrlReason reason, final Date invalidityDate, final AuditEvent auditEvent)
+    throws OperationException {
+        String eventType;
+        Permission permission;
+
+        if (reason == CrlReason.REMOVE_FROM_CRL) {
+            eventType = "CERT_UNREVOKE";
+            permission = Permission.UNREVOKE_CERT;
+        } else {
+            eventType = "CERT_REVOKE";
+            permission = Permission.REVOKE_CERT;
+        }
+        addAutitEventType(auditEvent, eventType);
+        checkPermission(requestorCert, permission);
+
+        AuditEventData eventData = new AuditEventData("serialNumber",
+                LogUtil.formatCsn(serialNumber));
+        auditEvent.addEventData(eventData);
+
+        X509Ca ca = getCa();
+        Object returnedObj;
+        if (Permission.UNREVOKE_CERT == permission) {
+            // unrevoke
+            returnedObj = ca.unrevokeCertificate(serialNumber);
+        } else {
+            // revoke
+            auditEvent.addEventData(new AuditEventData("reason", reason.getDescription()));
+            if (invalidityDate != null) {
+                String value = DateUtil.toUtcTimeyyyyMMddhhmmss(invalidityDate);
+                auditEvent.addEventData(new AuditEventData("invalidityDate", value));
+            }
+
+            returnedObj = ca.revokeCertificate(serialNumber, reason, invalidityDate);
+        } // end if (permission)
+
+        if (returnedObj == null) {
+            throw new OperationException(ErrorCode.UNKNOWN_CERT, "cert not exists");
+        }
+
+        auditEvent.setStatus(AuditStatus.SUCCESSFUL);
+    }
+
+    /**
+     * @since 2.1.0
+     */
+    public void removeCert(final X509Certificate requestorCert, final BigInteger serialNumber,
+            final AuditEvent auditEvent) throws OperationException {
+        addAutitEventType(auditEvent, "REMOVE_CERT");
+        checkPermission(requestorCert, Permission.REMOVE_CERT);
+
+        AuditEventData eventData = new AuditEventData("serialNumber",
+                LogUtil.formatCsn(serialNumber));
+        auditEvent.addEventData(eventData);
+
+        X509Ca ca = getCa();
+        X509CertWithDbId returnedObj = ca.removeCertificate(serialNumber);
+        if (returnedObj == null) {
+            throw new OperationException(ErrorCode.UNKNOWN_CERT, "cert not exists");
+        }
+
+        auditEvent.setStatus(AuditStatus.SUCCESSFUL);
+    }
 
     private static PKIBody createErrorMsgPkiBody(final PKIStatus pkiStatus, final int failureInfo,
             final String statusMessage) {

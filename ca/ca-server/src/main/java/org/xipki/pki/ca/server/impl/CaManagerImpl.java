@@ -2095,13 +2095,15 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonBlank("aliasName", aliasName);
         ParamUtil.requireNonBlank("caName", caName);
         asssertMasterMode();
+
+        String tmpAlias = aliasName.toUpperCase();
         String tmpCaName = caName.toUpperCase();
-        if (caAliases.get(aliasName) != null) {
+        if (caAliases.get(tmpAlias) != null) {
             return false;
         }
 
-        queryExecutor.addCaAlias(aliasName, tmpCaName);
-        caAliases.put(aliasName, tmpCaName);
+        queryExecutor.addCaAlias(tmpAlias, tmpCaName);
+        caAliases.put(tmpAlias, tmpCaName);
         return true;
     } // method addCaAlias
 
@@ -2109,19 +2111,21 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     public boolean removeCaAlias(final String name) throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         asssertMasterMode();
-        boolean bo = queryExecutor.removeCaAlias(name);
+
+        String tmpName = name.toUpperCase();
+        boolean bo = queryExecutor.removeCaAlias(tmpName);
         if (!bo) {
             return false;
         }
 
-        caAliases.remove(name);
+        caAliases.remove(tmpName);
         return true;
     }
 
     @Override
     public String getCaNameForAlias(final String aliasName) {
         ParamUtil.requireNonBlank("aliasName", aliasName);
-        return caAliases.get(aliasName);
+        return caAliases.get(aliasName.toUpperCase());
     }
 
     @Override

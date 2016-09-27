@@ -86,6 +86,7 @@ import org.xipki.commons.security.SignatureSigner;
 import org.xipki.commons.security.XiSecurityConstants;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.SignerUtil;
 import org.xipki.commons.security.util.X509Util;
 
@@ -228,9 +229,7 @@ public class SoftTokenContentSignerBuilder {
         ParamUtil.requireNonNull("keyPassword", keyPassword);
 
         try {
-            KeyStore ks = "JKS".equalsIgnoreCase(keystoreType) ? KeyStore.getInstance(keystoreType)
-                    : KeyStore.getInstance(keystoreType, "BC");
-
+            KeyStore ks = KeyUtil.getKeyStore(keystoreType);
             ks.load(keystoreStream, keystorePassword);
 
             String tmpKeyname = keyname;

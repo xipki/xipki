@@ -39,6 +39,17 @@
       <entry key="urlPatterns" value="${urlPatterns}"/>
     </service-properties>
   </service>
+  <!-- REST servlet -->
+  <bean id="restServlet" class="org.xipki.pki.ca.server.impl.rest.HttpRestServlet">
+    <property name="responderManager" ref="caManager"/>
+    <property name="auditServiceRegister" ref="auditServiceRegister"/>
+    <property name="sslCertInHttpHeader" value="${sslCertInHttpHeader}"/>
+  </bean>
+  <service ref="restServlet" interface="javax.servlet.Servlet">
+    <service-properties>
+      <entry key="urlPatterns" value="/rest/*"/>
+    </service-properties>
+  </service>
   <!-- SCEP servlet -->
   <bean id="scepServlet" class="org.xipki.pki.ca.server.impl.scep.ScepServlet">
     <property name="responderManager" ref="caManager"/>

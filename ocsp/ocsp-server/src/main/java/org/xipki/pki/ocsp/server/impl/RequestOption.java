@@ -42,6 +42,7 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
@@ -54,6 +55,7 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.CertpathValidationModel;
 import org.xipki.commons.security.HashAlgoType;
+import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ocsp.server.impl.jaxb.CertCollectionType;
 import org.xipki.pki.ocsp.server.impl.jaxb.CertCollectionType.Keystore;
@@ -265,13 +267,14 @@ class RequestOption {
     }
 
     private static Set<X509Certificate> doGetCerts(final CertCollectionType conf)
-    throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+    throws KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException, 
+    CertificateException, IOException {
         ParamUtil.requireNonNull("conf", conf);
         Set<X509Certificate> tmpCerts = new HashSet<>();
 
         if (conf.getKeystore() != null) {
             Keystore ksConf = conf.getKeystore();
-            KeyStore trustStore = KeyStore.getInstance(ksConf.getType());
+            KeyStore trustStore = KeyUtil.getKeyStore(ksConf.getType());
 
             String fileName = ksConf.getKeystore().getFile();
             InputStream is = (fileName != null)

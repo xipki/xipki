@@ -46,6 +46,7 @@ public class OperationException extends Exception {
         ALREADY_ISSUED,
         BAD_CERT_TEMPLATE,
         BAD_REQUEST,
+        BAD_POP,
         CERT_REVOKED,
         CERT_UNREVOKED,
         CRL_FAILURE,

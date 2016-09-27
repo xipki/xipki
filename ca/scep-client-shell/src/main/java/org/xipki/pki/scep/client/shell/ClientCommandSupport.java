@@ -46,6 +46,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.scep.client.CaCertValidator;
 import org.xipki.pki.scep.client.CaIdentifier;
@@ -119,7 +120,7 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
     private void readIdentity() throws Exception {
         char[] pwd = readPasswordIfNotSet(password);
 
-        KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
+        KeyStore ks = KeyUtil.getKeyStore("PKCS12");
         ks.load(new FileInputStream(p12File), pwd);
 
         String keyname = null;

@@ -46,6 +46,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
+import org.xipki.commons.security.util.KeyUtil;
 
 /**
  * @author Lijun Liao
@@ -78,7 +79,7 @@ public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
     NoSuchProviderException {
         KeyStore ks;
         try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
-            ks = KeyStore.getInstance("PKCS12", "BC");
+            ks = KeyUtil.getKeyStore("PKCS12");
             ks.load(in, getPassword());
         }
         return ks;

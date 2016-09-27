@@ -122,6 +122,8 @@ abstract class CmpResponder {
 
     protected abstract CmpRequestorInfo getRequestor(X500Name requestorSender);
 
+    protected abstract CmpRequestorInfo getRequestor(X509Certificate requestorCert);
+
     private CmpRequestorInfo getRequestor(final PKIHeader reqHeader) {
         GeneralName requestSender = reqHeader.getSender();
         if (requestSender.getTagNo() != GeneralName.directoryName) {
