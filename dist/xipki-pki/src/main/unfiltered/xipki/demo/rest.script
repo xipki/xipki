@@ -1,0 +1,37 @@
+BASE_URL = https://localhost:8443/rest/SubCAwithCRL
+
+xipki-tk:req-p12 \
+  --p12 output/REST-OCSP1.p12 \
+  --password 1234 \
+  --subject "CN=REST-OCSP1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
+  --out output/rest/REST-OCSP1.csr
+
+echo "REST cacert"
+
+xipki-cmd:curl \
+  --out output/rest/cacert-SubCAwithCRL.der \
+  $BASE_URL/cacert
+
+echo "REST enroll"
+
+xipki-cmd:curl \
+  --out output/rest/REST-OCSP1.der \
+  --data-file output/rest/REST-OCSP1.csr \
+  --header "Content-Type: application/pkcs10" \
+  "$BASE_URL/enroll-cert?profile=OCSP"
+
+echo "REST new-crl"
+
+xipki-cmd:curl \
+  --out output/rest/new-crl1.crl \
+  $BASE_URL/new-crl
+
+echo "REST crl"
+  xipki-cmd:curl \
+  --out output/rest/crl1.crl \
+  $BASE_URL/crl
+
+echo "REST crl (crl-number)"
+  xipki-cmd:curl \
+  --out output/rest/crl-number1.crl \
+  "$BASE_URL/crl?crl-nubmer=1"

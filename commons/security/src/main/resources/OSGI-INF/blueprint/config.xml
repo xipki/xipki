@@ -62,7 +62,7 @@
   <!-- provider XIPKI -->
   <bean id="XipkiProviderRegister"
       class="org.xipki.commons.security.pkcs11.provider.XipkiProviderRegister"
-      init-method="regist" destroy-method="unregist">
+      init-method="regist">
     <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
   </bean>
 
