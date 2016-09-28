@@ -38,13 +38,15 @@ xipki-scep:certpoll \
   
 ## Get Cert
 
-xipki-scep:getcert-qa \
+SERIAL = $(xipki-tk:cert-info --serial --hex --in output/SCEP-OCSP1-certpoll.der)
+
+xipki-scep:getcert \
   --url $SCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/SCEP-OCSP1.p12 \
   --password 1234 \
   --out output/SCEP-OCSP1-getcert.der \
-  --cert output/SCEP-OCSP1-certpoll.der
+  --serial $SERIAL
 
 ## Update the certificate in PKCS#12 file
 xipki-tk:update-cert-p12 \

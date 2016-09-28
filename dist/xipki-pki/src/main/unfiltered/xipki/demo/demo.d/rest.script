@@ -1,5 +1,9 @@
 BASE_URL = https://localhost:8443/rest/SubCAwithCRL
 
+echo "#################################################################"
+echo "#             MANAGE CERTIFICATE VIA REST INTERFACE             #"
+echo "#################################################################"
+
 xipki-tk:req-p12 \
   --p12 output/REST-OCSP1.p12 \
   --password 1234 \
@@ -19,6 +23,23 @@ xipki-cmd:curl \
   --data-file output/rest/REST-OCSP1.csr \
   --header "Content-Type: application/pkcs10" \
   "$BASE_URL/enroll-cert?profile=OCSP"
+
+SERIAL = $(xipki-tk:cert-info --serial --hex --in output/rest/REST-OCSP1.der)
+
+echo "REST revoke (suspend) "
+
+xipki-cmd:curl \
+  "$BASE_URL/revoke-cert?serial-number=$SERIAL&reason=certificateHold"
+
+echo "REST revoke (unsuspend)"
+
+xipki-cmd:curl \
+  "$BASE_URL/revoke-cert?serial-number=$SERIAL&reason=removeFromCRL"
+
+echo "REST revoke (revoke)"
+
+xipki-cmd:curl \
+  "$BASE_URL/revoke-cert?serial-number=$SERIAL&reason=keyCompromise"
 
 echo "REST new-crl"
 

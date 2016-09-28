@@ -38,13 +38,15 @@ xipki-jscep:certpoll \
   
 ## Get Cert
 
-xipki-jscep:getcert-qa \
+SERIAL = $(xipki-tk:cert-info --serial --hex --in output/JSCEP-OCSP1.der)
+
+xipki-jscep:getcert \
   --url $JSCEP_URL \
   --ca-cert output/SubCAwithCRL1.der \
   --p12 output/JSCEP-OCSP1.p12 \
   --password 1234 \
   --out output/JSCEP-OCSP1-getcert.der \
-  --cert output/JSCEP-OCSP1.der
+  --serial $SERIAL
 
 ## Update the certificate in PKCS#12 file
 xipki-tk:update-cert-p12 \
