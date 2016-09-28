@@ -51,12 +51,6 @@ public class XipkiProviderRegister {
         }
     }
 
-    public void unregist() {
-        if (Security.getProperty(XipkiProvider.PROVIDER_NAME) != null) {
-            Security.removeProvider(XipkiProvider.PROVIDER_NAME);
-        }
-    }
-
     public void setP11CryptServiceFactory(final P11CryptServiceFactory p11CryptServiceFactory) {
         XipkiKeyStoreSpi.setP11CryptServiceFactory(p11CryptServiceFactory);
     }
