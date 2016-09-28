@@ -59,7 +59,7 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
  */
 
 @Command(scope = "xipki-cmd", name = "curl",
-        description = "transfer a URL")
+        description = "Transfer a URL")
 @Service
 public class CurlCmd extends XipkiCommandSupport {
 

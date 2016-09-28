@@ -46,6 +46,10 @@ Feature xipki-shell-base
 
      Replace text in file
 
+   * `xipki-cmd:curl`
+
+     Transfer a URL
+
 Feature xipki-database-tool
 -----
 
