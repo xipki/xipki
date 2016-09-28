@@ -16,39 +16,39 @@ Feature xipki-shell-base
 
    * `xipki-cmd:confirm`
 
-     Confirm an action
+     confirm an action
 
    * `xipki-cmd:copy-dir`
 
-     Copy content of the directory to destination
+     copy content of the directory to destination
 
    * `xipki-cmd:copy-file`
 
-     Copy file
+     copy file
 
    * `xipki-cmd:ls`
 
-     List directory contents
+     list directory contents
 
    * `xipki-cmd:rm`
 
-     Remove file or directory
+     remove file or directory
 
    * `xipki-cmd:mkdir`
 
-     Make directories
+     make directories
 
    * `xipki-cmd:produce-password`
 
-     Produce password
+     produce password
 
    * `xipki-cmd:replace`
 
-     Replace text in file
+     replace text in file
 
    * `xipki-cmd:curl`
 
-     Transfer a URL
+     transfer a URL
 
 Feature xipki-database-tool
 -----
@@ -98,6 +98,10 @@ Feature xipki-database-tool
 
 Feature xipki-security-shell
 -----
+
+   * `xipki-tk:cert-info`
+
+     return certificate information
 
    * `xipki-tk:validate-csr`
 
