@@ -122,7 +122,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     private List<String> certFiles;
 
     @Option(name = "--ac",
-            description = "the certificates are attribute certificate")
+            description = "the certificates are attribute certificates")
     @Completion(FilePathCompleter.class)
     private Boolean isAttrCert = Boolean.FALSE;
 
