@@ -35,12 +35,14 @@
 package org.xipki.commons.console.karaf.command;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
@@ -49,6 +51,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
@@ -70,7 +73,7 @@ public class CurlCmd extends XipkiCommandSupport {
     private String url;
 
     @Option(name = "--verbose", aliases = "-v",
-            description = "show response verbosely")
+            description = "show request and response verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Option(name = "--post", aliases = "-p",
@@ -167,7 +170,7 @@ public class CurlCmd extends XipkiCommandSupport {
 
             // show the request headers
             if (verbose) {
-                println("request:\n========");
+                println("=====request=====");
                 println("  HTTP method: " + httpConn.getRequestMethod());
                 for (String key : properties.keySet()) {
                     List<String> values = properties.get(key);
@@ -180,38 +183,91 @@ public class CurlCmd extends XipkiCommandSupport {
             // read the response
             int respCode = httpConn.getResponseCode();
             if (verbose) {
-                println("response:\n========");
+                println("=====response=====");
                 println("  reponse code: " + respCode + " " + httpConn.getResponseMessage());
                 properties = httpConn.getHeaderFields();
                 for (String key : properties.keySet()) {
+                    if (key == null) {
+                        continue;
+                    }
                     List<String> values = properties.get(key);
                     for (String value : values) {
                         println("  " + key + ": " + value);
                     }
                 }
+                println("=====response content=====");
             }
 
-            InputStream inputstream = httpConn.getInputStream();
-            if (respCode != HttpURLConnection.HTTP_OK) {
-                inputstream.close();
-                println("ERROR: bad response: " + httpConn.getResponseCode() + "    "
-                        + httpConn.getResponseMessage());
-                return null;
+            InputStream inputStream = null;
+            InputStream errorStream = null;
+
+            try {
+                inputStream = httpConn.getInputStream();
+            } catch (IOException ex) {
+                errorStream = httpConn.getErrorStream();
             }
 
-            byte[] respContentBytes = IoUtil.read(inputstream);
+            byte[] respContentBytes;
+
+            if (inputStream != null) {
+                if (respCode != HttpURLConnection.HTTP_OK) {
+                    inputStream.close();
+                    println("ERROR: bad response: " + httpConn.getResponseCode() + "    "
+                            + httpConn.getResponseMessage());
+                    return null;
+                }
+                respContentBytes = IoUtil.read(inputStream);
+            } else if (errorStream != null) {
+                respContentBytes = IoUtil.read(errorStream);
+            } else {
+                respContentBytes = null;
+            }
+
             if (respContentBytes == null || respContentBytes.length == 0) {
                 println("NO response content");
                 return null;
             }
 
             if (outFile != null) {
-                saveVerbose("saved response to", new File(outFile), respContentBytes);
+                String fn = (errorStream != null) ? "error-" + outFile : outFile;
+                saveVerbose("saved response to", new File(fn), respContentBytes);
             } else {
-                println(new String(respContentBytes, "UTF-8"));
+                String ct = httpConn.getHeaderField("Content-Type");
+                String charset = getCharset(ct);
+                if (charset == null) {
+                    charset = "UTF-8";
+                }
+                if (errorStream != null) {
+                    println("ERROR: ");
+                }
+                println(new String(respContentBytes, charset));
             }
         } finally {
-            // httpConn.disconnect();
+            httpConn.disconnect();
+        }
+
+        return null;
+    }
+
+    private static String getCharset(final String contentType) {
+        if (StringUtil.isBlank(contentType) || contentType.indexOf(';') == -1) {
+            return null;
+        }
+
+        StringTokenizer st = new StringTokenizer(contentType, ";");
+        st.nextToken();
+
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            int idx = token.indexOf('=');
+            if (idx == -1) {
+                continue;
+            }
+
+            String paramName = token.substring(0, idx).trim();
+            if ("charset".equalsIgnoreCase(paramName)) {
+                return token.substring(idx + 1, token.length());
+            }
         }
 
         return null;
