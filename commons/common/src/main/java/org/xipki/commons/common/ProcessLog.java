@@ -90,29 +90,29 @@ public class ProcessLog {
         sb.append('\n');
 
         // second header line
-        sb.append(formatText("processed"));
+        sb.append(formatText("total"));
         if (hasTotal) {
-            sb.append(formatText("processed"));
+            sb.append(formatText("%"));
         }
         sb.append(formatText("average"));
         sb.append(formatText("current"));
-        sb.append(formatText("elapsed"));
+        sb.append(formatText("time"));
         if (hasTotal) {
-            sb.append(formatText("remaining"));
+            sb.append(formatText("time"));
             sb.append(formatText("finish"));
         }
         sb.append('\n');
 
         // third header line
-        sb.append(formatText("number"));
+        sb.append(formatText(""));
         if (hasTotal) {
-            sb.append(formatText("percent"));
+            sb.append(formatText(""));
         }
         sb.append(formatText("speed"));
         sb.append(formatText("speed"));
-        sb.append(formatText("time"));
+        sb.append(formatText("spent"));
         if (hasTotal) {
-            sb.append(formatText("time"));
+            sb.append(formatText("left"));
             sb.append(formatText("at"));
         }
         sb.append('\n');
@@ -198,7 +198,7 @@ public class ProcessLog {
         // processed percent
         if (hasTotal) {
             int percent = (int) (tmpNumProcessed * 100 / total);
-            String percentS = Integer.toString(percent) + "%";
+            String percentS = Integer.toString(percent);
             sb.append(formatText(percentS));
         }
 
