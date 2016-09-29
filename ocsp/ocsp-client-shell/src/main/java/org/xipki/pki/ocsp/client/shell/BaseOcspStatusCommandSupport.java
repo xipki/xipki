@@ -53,15 +53,19 @@ import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.bouncycastle.cert.AttributeCertificateIssuer;
+import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.RequestResponsePair;
+import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
@@ -117,6 +121,11 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     @Completion(FilePathCompleter.class)
     private List<String> certFiles;
 
+    @Option(name = "--ac",
+            description = "the certificates are attribute certificate")
+    @Completion(FilePathCompleter.class)
+    private Boolean isAttrCert = Boolean.FALSE;
+
     static {
         EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff,
                 "ArchiveCutoff");
@@ -148,17 +157,46 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             encodedCerts = new HashMap<>(certFiles.size());
 
             String ocspUrl = null;
-            for (String certFile : certFiles) {
-                X509Certificate cert = X509Util.parseCert(certFile);
 
-                if (!X509Util.issues(issuerCert, cert)) {
-                    throw new IllegalCmdParamException(
-                            "certificate " + certFile + " is not issued by the given issuer");
+            X500Name issuerX500Name = null;
+            if (isAttrCert) {
+                issuerX500Name = X500Name.getInstance(
+                        issuerCert.getSubjectX500Principal().getEncoded());
+            }
+
+            for (String certFile : certFiles) {
+                BigInteger sn;
+                List<String> ocspUrls;
+
+                if (isAttrCert) {
+                    X509AttributeCertificateHolder cert =
+                            new X509AttributeCertificateHolder(IoUtil.read(certFile));
+                    // no signature validation
+                    AttributeCertificateIssuer reqIssuer = cert.getIssuer();
+                    if (reqIssuer != null) {
+                        X500Name reqIssuerName = reqIssuer.getNames()[0];
+                        if (!issuerX500Name.equals(reqIssuerName)) {
+                            throw new IllegalCmdParamException("certificate " + certFile
+                                    + " is not issued by the given issuer");
+                        }
+                    }
+
+                    ocspUrls = extractOcspUrls(cert);
+                    sn = cert.getSerialNumber();
+                } else {
+                    X509Certificate cert = X509Util.parseCert(certFile);
+                    if (!X509Util.issues(issuerCert, cert)) {
+                        throw new IllegalCmdParamException(
+                                "certificate " + certFile + " is not issued by the given issuer");
+                    }
+                    ocspUrls = extractOcspUrls(cert);
+                    sn = cert.getSerialNumber();
                 }
 
                 if (isBlank(serverUrl)) {
-                    List<String> ocspUrls = extractOcspUrls(cert);
-                    if (ocspUrls.size() > 0) {
+                    if (CollectionUtil.isEmpty(ocspUrls)) {
+                        throw new IllegalCmdParamException("could not extract OCSP responder URL");
+                    } else {
                         String url = ocspUrls.get(0);
                         if (ocspUrl != null && !ocspUrl.equals(url)) {
                             throw new IllegalCmdParamException("given certificates have different"
@@ -169,7 +207,6 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
                     }
                 } // end if
 
-                BigInteger sn = cert.getSerialNumber();
                 sns.add(sn);
 
                 byte[] encodedCert = IoUtil.read(certFile);
@@ -242,7 +279,21 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
         }
 
         AuthorityInformationAccess aia = AuthorityInformationAccess.getInstance(extValue);
+        return extractOcspUrls(aia);
+    }
 
+    public static List<String> extractOcspUrls(final X509AttributeCertificateHolder cert)
+    throws CertificateEncodingException {
+        byte[] extValue = X509Util.getCoreExtValue(cert, Extension.authorityInfoAccess);
+        if (extValue == null) {
+            return Collections.emptyList();
+        }
+        AuthorityInformationAccess aia = AuthorityInformationAccess.getInstance(extValue);
+        return extractOcspUrls(aia);
+    }
+
+    public static List<String> extractOcspUrls(final AuthorityInformationAccess aia)
+    throws CertificateEncodingException {
         AccessDescription[] accessDescriptions = aia.getAccessDescriptions();
         List<AccessDescription> ocspAccessDescriptions = new LinkedList<>();
         for (AccessDescription accessDescription : accessDescriptions) {

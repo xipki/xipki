@@ -89,6 +89,7 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
@@ -189,7 +190,12 @@ public class X509Util {
             }
         }
 
-        return (X509Certificate) certFact.generateCertificate(certStream);
+        X509Certificate cert = (X509Certificate) certFact.generateCertificate(certStream);
+        if (cert == null) {
+            throw new CertificateEncodingException(
+                    "the given one is not a valid X.509 certificate");
+        }
+        return cert;
     }
 
     public static X509Certificate parseBase64EncodedCert(final String base64EncodedCert)
@@ -220,7 +226,12 @@ public class X509Util {
                 if (certFact == null) {
                     certFact = CertificateFactory.getInstance("X.509", "BC");
                 }
-                return (X509CRL) certFact.generateCRL(crlStream);
+                X509CRL crl = (X509CRL) certFact.generateCRL(crlStream);
+                if (crl == null) {
+                    throw new CertificateEncodingException(
+                            "the given one is not a valid X.509 CRL");
+                }
+                return crl;
             }
         } catch (NoSuchProviderException ex) {
             throw new IOException("NoSuchProviderException: " + ex.getMessage());
@@ -469,6 +480,18 @@ public class X509Util {
             throw new CertificateEncodingException("invalid extension " + type.getId() + ": "
                     + ex.getMessage());
         }
+    }
+
+    public static byte[] getCoreExtValue(final X509AttributeCertificateHolder cert,
+            final ASN1ObjectIdentifier type) throws CertificateEncodingException {
+        ParamUtil.requireNonNull("cert", cert);
+        ParamUtil.requireNonNull("type", type);
+        Extension ext = cert.getExtension(type);
+        if (ext == null) {
+            return null;
+        }
+
+        return ext.getExtnValue().getOctets();
     }
 
     /**
