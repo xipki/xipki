@@ -246,19 +246,19 @@ xipki-tk:ec-p12 \
   --password 1234 \
   --out p12/ec/TLS2.p12
 
-echo " ----- generate keys for REST-OCSP1 -----"
+echo " ----- generate keys for REST-TLS1 -----"
 
 xipki-tk:rsa-p12 \
   --password 1234 \
-  --out p12/rsa/REST-OCSP1.p12
+  --out p12/rsa/REST-TLS1.p12
 
 xipki-tk:dsa-p12 \
   --password 1234 \
-  --out p12/dsa/REST-OCSP1.p12
+  --out p12/dsa/REST-TLS1.p12
 
 xipki-tk:ec-p12 \
   --password 1234 \
-  --out p12/ec/REST-OCSP1.p12
+  --out p12/ec/REST-TLS1.p12
 
 echo " ----- generate keys for TLS_C1 -----"
 
