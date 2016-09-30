@@ -5,6 +5,7 @@
       <directory>${output.directory}</directory>
       <includes>
         <include>bin/**</include>
+        <include>**/*.sh</include>
       </includes>
       <excludes>
         <exclude>bin/*.bat</exclude>
@@ -28,6 +29,7 @@
       <directory>${output.directory}</directory>
       <excludes>
         <exclude>bin/**</exclude>
+        <exclude>**/*.sh</exclude>
       </excludes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>

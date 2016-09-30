@@ -89,7 +89,7 @@ if { $printUsage equals "true" } {
 
   source ./xipki/demo/ca-qa.script
 
-  source ./xipki/demo/demo.d/rest.script
+  source ./xipki/demo/rest.script
 
   feature:install xipki-ocspserver
 
