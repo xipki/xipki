@@ -82,6 +82,11 @@ xipki-ca:profile-add \
   --conf-file xipki/demo/profile/Certprofile_TLS.xml
 
 xipki-ca:profile-add \
+  --name TLSA \
+  --type XML \
+  --conf-file xipki/demo/profile/Certprofile_TLS.xml
+
+xipki-ca:profile-add \
   --name TLS_C \
   --type XML \
   --conf-file xipki/demo/profile/Certprofile_TLS_C.xml
@@ -475,6 +480,10 @@ xipki-ca:caalias-add \
 xipki-ca:caprofile-add \
   --ca SubCAwithCRL1 \
   --profile OCSP
+
+xipki-ca:caprofile-add \
+  --ca SubCAwithCRL1 \
+  --profile TLSA
 
 xipki-ca:caprofile-add \
   --ca SubCAwithCRL1 \

@@ -5,10 +5,10 @@ echo "#             MANAGE CERTIFICATE VIA REST INTERFACE             #"
 echo "#################################################################"
 
 xipki-tk:req-p12 \
-  --p12 output/REST-OCSP1.p12 \
+  --p12 output/REST-TLS1.p12 \
   --password 1234 \
-  --subject "CN=REST-OCSP1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
-  --out output/rest/REST-OCSP1.csr
+  --subject "CN=REST-TLS1.example.org,O=xipki,C=DE" \
+  --out output/rest/REST-TLS1.csr
 
 echo "REST cacert"
 
@@ -19,12 +19,12 @@ xipki-cmd:curl \
 echo "REST enroll"
 
 xipki-cmd:curl \
-  --out output/rest/REST-OCSP1.der \
-  --data-file output/rest/REST-OCSP1.csr \
+  --out output/rest/REST-TLS1.der \
+  --data-file output/rest/REST-TLS1.csr \
   --header "Content-Type: application/pkcs10" \
-  "$BASE_URL/enroll-cert?profile=OCSP"
+  "$BASE_URL/enroll-cert?profile=TLSA"
 
-SERIAL = $(xipki-tk:cert-info --serial --hex --in output/rest/REST-OCSP1.der)
+SERIAL = $(xipki-tk:cert-info --serial --hex --in output/rest/REST-TLS1.der)
 
 echo "REST revoke (suspend) "
 
