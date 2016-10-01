@@ -501,12 +501,12 @@
       referencedColumnNames="NAME" referencedTableName="CMPCONTROL"/>
     <addForeignKeyConstraint constraintName="FK_CA_CRLSIGNER1"
       deferrable="false" initiallyDeferred="false"
-      onDelete="SET NULL" onUpdate="NO ACTION"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="CRLSIGNER_NAME" baseTableName="CA"
       referencedColumnNames="NAME" referencedTableName="CRLSIGNER"/>
     <addForeignKeyConstraint constraintName="FK_CA_RESPONDER1"
       deferrable="false" initiallyDeferred="false"
-      onDelete="SET NULL" onUpdate="NO ACTION"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="RESPONDER_NAME" baseTableName="CA"
       referencedColumnNames="NAME" referencedTableName="RESPONDER"/>
     <addForeignKeyConstraint constraintName="FK_CAALIAS_CA1"
