@@ -9,6 +9,10 @@ DIR=`dirname $0`
 
 echo ${DIR}
 
+TLS_CLIENT_CERT="${DIR}/../security/tlskeys/tls-client.pem"
+
+TLS_CLIENT_KEY="${DIR}/../security/tlskeys/tls-client-privateKey.pem"
+
 filename=tls-`date +%s` 
 
 echo "generate RSA keypair"
@@ -23,15 +27,13 @@ openssl req -new -key ${filename}-key.pem -outform der \
 
 echo "get CA certificate"
 
-curl -k --cert ${DIR}/../security/tlskeys/tls-client.pem \
-    --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem \
+curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
     --output cacert.der \
     "${BASE_URL}/cacert"
 
 echo "enroll certificate"
 
-curl -k --cert ${DIR}/../security/tlskeys/tls-client.pem \
-    --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem \
+curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
     --header "Content-Type: application/pkcs10" \
     --data-binary "@${filename}.csr" \
     --output ${filename}.der -v \
@@ -42,39 +44,33 @@ SERIAL=0X`openssl x509 -inform der -serial -noout -in ${filename}.der | cut -d '
 
 echo "suspend certificate"
 
-curl -k --cert ${DIR}/../security/tlskeys/tls-client.pem \
-    --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem \
+curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
     "${BASE_URL}/revoke-cert?serial-number=${SERIAL}&reason=certificateHold"
 
 echo "ussuspend certificate"
 
-curl -k --cert ${DIR}/../security/tlskeys/tls-client.pem \
-    --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem \
+curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
     "${BASE_URL}/revoke-cert?serial-number=${SERIAL}&reason=removeFromCRL"
 
 echo "ussuspend certificate"
 
-curl -k --cert ${DIR}/../security/tlskeys/tls-client.pem \
-    --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem \
+curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
     "${BASE_URL}/revoke-cert?serial-number=${SERIAL}&reason=keyCompromise"
 
 echo "generate new CRL"
 
-curl -k --cert ${DIR}/../security/tlskeys/tls-client.pem \
-    --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem \
+curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
     --output new-crl.der \
     "${BASE_URL}/new-crl"
 
 echo "get current CRL"
 
-curl -k --cert ${DIR}/../security/tlskeys/tls-client.pem \
-    --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem \
+curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
     --output crl.der \
     "${BASE_URL}/crl"
 
 echo "get CRL for given CRL number"
 
-curl -k --cert ${DIR}/../security/tlskeys/tls-client.pem \
-    --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem \
+curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
     --output crl-1.der \
     "${BASE_URL}/crl?crl-number=1"
