@@ -1,17 +1,15 @@
 #!/bin/sh
 
 # Please adapt the URL
-BASE_URL="https://localhost:8443/rest/SubCAwithCRL"
+BASE_URL="https://10.211.55.2:8443/rest/SubCAwithCRL"
 
-echo "${BASE_URL}"
+echo "base url: ${BASE_URL}"
 
 DIR=`dirname $0`
 
-echo ${DIR}
+echo "working dir: ${DIR}"
 
-TLS_CLIENT_CERT="${DIR}/../security/tlskeys/tls-client.pem"
-
-TLS_CLIENT_KEY="${DIR}/../security/tlskeys/tls-client-privateKey.pem"
+SSL="-k --cert ${DIR}/../security/tlskeys/tls-client.pem --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem"
 
 filename=tls-`date +%s` 
 
@@ -27,13 +25,13 @@ openssl req -new -key ${filename}-key.pem -outform der \
 
 echo "get CA certificate"
 
-curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
+curl ${SSL} \
     --output cacert.der \
     "${BASE_URL}/cacert"
 
 echo "enroll certificate"
 
-curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
+curl ${SSL} \
     --header "Content-Type: application/pkcs10" \
     --data-binary "@${filename}.csr" \
     --output ${filename}.der -v \
@@ -44,33 +42,35 @@ SERIAL=0X`openssl x509 -inform der -serial -noout -in ${filename}.der | cut -d '
 
 echo "suspend certificate"
 
-curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
+curl ${SSL} \
     "${BASE_URL}/revoke-cert?serial-number=${SERIAL}&reason=certificateHold"
 
 echo "ussuspend certificate"
 
-curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
+curl ${SSL} \
     "${BASE_URL}/revoke-cert?serial-number=${SERIAL}&reason=removeFromCRL"
 
 echo "ussuspend certificate"
 
-curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
+curl ${SSL} \
     "${BASE_URL}/revoke-cert?serial-number=${SERIAL}&reason=keyCompromise"
 
 echo "generate new CRL"
 
-curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
-    --output new-crl.der \
+curl ${SSL} \
+    --output new-crl.crl \
     "${BASE_URL}/new-crl"
 
 echo "get current CRL"
 
-curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
-    --output crl.der \
+curl ${SSL} \
+    --output crl.crl \
     "${BASE_URL}/crl"
 
 echo "get CRL for given CRL number"
 
-curl -k --cert ${TLS_CLIENT_CERT} --key ${TLS_CLIENT_KEY} \
-    --output crl-1.der \
-    "${BASE_URL}/crl?crl-number=1"
+CRLNUMBER=`openssl crl -inform der -in crl.crl -crlnumber -noout | cut -d '=' -f 2`
+
+curl ${SSL} \
+    --output crl-${CRLNUMBER}.crl \
+    "${BASE_URL}/crl?crl-number=${CRLNUMBER}"
