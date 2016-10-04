@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Please adapt the URL
-BASE_URL="https://10.211.55.2:8443/rest/SubCAwithCRL"
+BASE_URL="https://localhost:8443/rest/SubCAwithCRL"
 
 echo "base url: ${BASE_URL}"
 
