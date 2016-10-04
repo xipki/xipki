@@ -103,6 +103,10 @@ Feature xipki-security-shell
 
      return certificate information
 
+   * `xipki-tk:crl-info`
+
+     return CRL information
+
    * `xipki-tk:validate-csr`
 
      validate CSR
