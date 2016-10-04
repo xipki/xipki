@@ -44,15 +44,18 @@ xipki-cmd:curl \
 echo "REST new-crl"
 
 xipki-cmd:curl \
-  --out output/rest/new-crl1.crl \
+  --out output/rest/new-crl.crl \
   $BASE_URL/new-crl
 
 echo "REST crl"
   xipki-cmd:curl \
-  --out output/rest/crl1.crl \
+  --out output/rest/crl.crl \
   $BASE_URL/crl
 
 echo "REST crl (crl-number)"
-  xipki-cmd:curl \
-  --out output/rest/crl-number1.crl \
-  "$BASE_URL/crl?crl-nubmer=1"
+
+CRLNUMBER = $(xipki-tk:crl-info --crlnumber --in output/rest/crl.crl)
+
+xipki-cmd:curl \
+  --out output/rest/crl-number-${CRLNUMBER}.crl \
+  "$BASE_URL/crl?crl-nubmer=${CRLNUMBER}"
