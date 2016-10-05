@@ -55,11 +55,8 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
@@ -100,6 +97,7 @@ import org.xipki.pki.ca.api.profile.x509.SubjectInfo;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
+import org.xipki.pki.ca.api.profile.x509.X509CertprofileUtil;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 
@@ -263,7 +261,7 @@ class IdentifiedX509Certprofile {
     }
 
     public ExtensionValues getExtensions(@Nonnull final X500Name requestedSubject,
-            @Nullable final Extensions requestExtensions,
+            @Nonnull final X500Name grantedSubject, @Nullable final Extensions requestExtensions,
             @Nonnull final SubjectPublicKeyInfo publicKeyInfo,
             @Nonnull final PublicCaInfo publicCaInfo, @Nullable final X509Certificate crlSignerCert,
             @Nonnull final Date notBefore, @Nonnull final Date notAfter)
@@ -494,20 +492,6 @@ class IdentifiedX509Certprofile {
                     wantedExtensionTypes);
         }
 
-        // SubjectAltName
-        extType = Extension.subjectAlternativeName;
-        extControl = controls.remove(extType);
-        if (extControl != null && addMe(extType, extControl, neededExtensionTypes,
-                wantedExtensionTypes)) {
-            GeneralNames value = null;
-            if (requestExtensions != null && extControl.isRequest()) {
-                value = createRequestedSubjectAltNames(requestExtensions,
-                        certprofile.getSubjectAltNameModes());
-            }
-            addExtension(values, extType, value, extControl, neededExtensionTypes,
-                    wantedExtensionTypes);
-        }
-
         // SubjectInfoAccess
         extType = Extension.subjectInfoAccess;
         extControl = controls.remove(extType);
@@ -523,8 +507,8 @@ class IdentifiedX509Certprofile {
         }
 
         ExtensionValues subvalues = certprofile.getExtensions(
-                Collections.unmodifiableMap(controls), requestedSubject, requestExtensions,
-                notBefore, notAfter);
+                Collections.unmodifiableMap(controls), requestedSubject, grantedSubject,
+                requestExtensions, notBefore, notAfter);
 
         Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
         for (ASN1ObjectIdentifier type : extTypes) {
@@ -805,88 +789,6 @@ class IdentifiedX509Certprofile {
         return false;
     }
 
-    private static GeneralName createGeneralName(final GeneralName reqName,
-            final Set<GeneralNameMode> modes) throws BadCertTemplateException {
-        int tag = reqName.getTagNo();
-        GeneralNameMode mode = null;
-        for (GeneralNameMode m : modes) {
-            if (m.getTag().getTag() == tag) {
-                mode = m;
-                break;
-            }
-        }
-
-        if (mode == null) {
-            throw new BadCertTemplateException("generalName tag " + tag + " is not allowed");
-        }
-
-        switch (tag) {
-        case GeneralName.rfc822Name:
-        case GeneralName.dNSName:
-        case GeneralName.uniformResourceIdentifier:
-        case GeneralName.iPAddress:
-        case GeneralName.registeredID:
-        case GeneralName.directoryName:
-            return new GeneralName(tag, reqName.getName());
-        case GeneralName.otherName:
-            ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
-            int size = reqSeq.size();
-            if (size != 2) {
-                throw new BadCertTemplateException("invalid otherName sequence: size is not 2: "
-                        + size);
-            }
-
-            ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
-            if (!mode.getAllowedTypes().contains(type)) {
-                throw new BadCertTemplateException(
-                        "otherName.type " + type.getId() + " is not allowed");
-            }
-
-            ASN1Encodable asn1 = reqSeq.getObjectAt(1);
-            if (! (asn1 instanceof ASN1TaggedObject)) {
-                throw new BadCertTemplateException("otherName.value is not tagged Object");
-            }
-
-            int tagNo = ASN1TaggedObject.getInstance(asn1).getTagNo();
-            if (tagNo != 0) {
-                throw new BadCertTemplateException("otherName.value does not have tag 0: " + tagNo);
-            }
-
-            ASN1EncodableVector vector = new ASN1EncodableVector();
-            vector.add(type);
-            vector.add(new DERTaggedObject(true, 0,
-                    ASN1TaggedObject.getInstance(asn1).getObject()));
-            DERSequence seq = new DERSequence(vector);
-
-            return new GeneralName(GeneralName.otherName, seq);
-        case GeneralName.ediPartyName:
-            reqSeq = ASN1Sequence.getInstance(reqName.getName());
-
-            size = reqSeq.size();
-            String nameAssigner = null;
-            int idx = 0;
-            if (size > 1) {
-                DirectoryString ds = DirectoryString.getInstance(
-                        ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
-                nameAssigner = ds.getString();
-            }
-
-            DirectoryString ds = DirectoryString.getInstance(
-                    ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++)).getObject());
-            String partyName = ds.getString();
-
-            vector = new ASN1EncodableVector();
-            if (nameAssigner != null) {
-                vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
-            }
-            vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-            seq = new DERSequence(vector);
-            return new GeneralName(GeneralName.ediPartyName, seq);
-        default:
-            throw new RuntimeException("should not reach here, unknown GeneralName tag " + tag);
-        } // end switch (tag)
-    } // method createGeneralName
-
     private static boolean addMe(final ASN1ObjectIdentifier extType,
             final ExtensionControl extControl, final Set<ASN1ObjectIdentifier> neededExtensionTypes,
             final Set<ASN1ObjectIdentifier> wantedExtensionTypes) {
@@ -939,30 +841,13 @@ class IdentifiedX509Certprofile {
         }
     } // method addRequestedExtKeyusage
 
-    private static GeneralNames createRequestedSubjectAltNames(final Extensions requestExtensions,
-            final Set<GeneralNameMode> modes) throws BadCertTemplateException {
-        ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(
-                Extension.subjectAlternativeName);
-        if (extValue == null) {
-            return null;
-        }
-
-        GeneralNames reqNames = GeneralNames.getInstance(extValue);
-        if (modes == null) {
-            return reqNames;
-        }
-
-        GeneralName[] reqL = reqNames.getNames();
-        GeneralName[] grantedNames = new GeneralName[reqL.length];
-        for (int i = 0; i < reqL.length; i++) {
-            grantedNames[i] = createGeneralName(reqL[i], modes);
-        }
-        return new GeneralNames(grantedNames);
-    } // method createRequestedSubjectAltNames
-
     private static ASN1Sequence createSubjectInfoAccess(final Extensions requestExtensions,
             final Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes)
     throws BadCertTemplateException {
+        if (modes == null) {
+            return null;
+        }
+
         ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(
                 Extension.subjectInfoAccess);
         if (extValue == null) {
@@ -971,10 +856,6 @@ class IdentifiedX509Certprofile {
 
         ASN1Sequence reqSeq = ASN1Sequence.getInstance(extValue);
         int size = reqSeq.size();
-
-        if (modes == null) {
-            return reqSeq;
-        }
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
         for (int i = 0; i < size; i++) {
@@ -987,8 +868,8 @@ class IdentifiedX509Certprofile {
                         + accessMethod.getId() + " is not allowed");
             }
 
-            GeneralName accessLocation = createGeneralName(ad.getAccessLocation(),
-                    generalNameModes);
+            GeneralName accessLocation = X509CertprofileUtil.createGeneralName(
+                    ad.getAccessLocation(), generalNameModes);
             vec.add(new AccessDescription(accessMethod, accessLocation));
         } // end for
 

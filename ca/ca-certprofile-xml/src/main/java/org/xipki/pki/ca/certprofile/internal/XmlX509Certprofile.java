@@ -76,6 +76,8 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Attribute;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.SubjectDirectoryAttributes;
 import org.bouncycastle.asn1.x509.qualified.BiometricData;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
@@ -113,6 +115,7 @@ import org.xipki.pki.ca.api.profile.x509.SubjectDirectoryAttributesControl;
 import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
+import org.xipki.pki.ca.api.profile.x509.X509CertprofileUtil;
 import org.xipki.pki.ca.certprofile.BiometricInfoOption;
 import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
 import org.xipki.pki.ca.certprofile.commonpki.AdmissionSyntaxOption;
@@ -1048,8 +1051,8 @@ class XmlX509Certprofile extends BaseX509Certprofile {
     @Override
     public ExtensionValues getExtensions(
             final Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
-            final X500Name requestedSubject, final Extensions requestedExtensions,
-            final Date notBefore, final Date notAfter)
+            final X500Name requestedSubject, final X500Name grantedSubject,
+            final Extensions requestedExtensions, final Date notBefore, final Date notAfter)
     throws CertprofileException, BadCertTemplateException {
         ExtensionValues values = new ExtensionValues();
         if (CollectionUtil.isEmpty(extensionOccurences)) {
@@ -1060,7 +1063,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         ParamUtil.requireNonNull("notBefore", notBefore);
         ParamUtil.requireNonNull("notAfter", notAfter);
 
-        Map<ASN1ObjectIdentifier, ExtensionControl> occurences = new HashMap<>(extensionOccurences);
+        Set<ASN1ObjectIdentifier> occurences = new HashSet<>(extensionOccurences.keySet());
 
         // AuthorityKeyIdentifier
         // processed by the CA
@@ -1073,25 +1076,35 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // CertificatePolicies
         ASN1ObjectIdentifier type = Extension.certificatePolicies;
-        if (certificatePolicies != null && occurences.remove(type) != null) {
+        if (certificatePolicies != null && occurences.remove(type)) {
             values.addExtension(type, certificatePolicies);
         }
 
         // Policy Mappings
         type = Extension.policyMappings;
-        if (policyMappings != null && occurences.remove(type) != null) {
+        if (policyMappings != null && occurences.remove(type)) {
             values.addExtension(type, policyMappings);
         }
 
         // SubjectAltName
-        // processed by the CA
+        // SubjectAltName
+        type = Extension.subjectAlternativeName;
+        if (allowedSubjectAltNameModes != null && occurences.remove(type)) {
+            GeneralNames genNames = createRequestedSubjectAltNames(requestedSubject, grantedSubject,
+                    requestedExtensions);
+            if (genNames != null) {
+                ExtensionValue value = new ExtensionValue(extensionControls.get(type).isCritical(),
+                        genNames);
+                values.addExtension(type, value);
+            }
+        }
 
         // IssuerAltName
         // processed by the CA
 
         // Subject Directory Attributes
         type = Extension.subjectDirectoryAttributes;
-        if (subjectDirAttrsControl != null && occurences.remove(type) != null) {
+        if (subjectDirAttrsControl != null && occurences.remove(type)) {
             Extension extension = requestedExtensions.getExtension(type);
             if (extension == null) {
                 throw new BadCertTemplateException(
@@ -1210,13 +1223,13 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // Name Constraints
         type = Extension.nameConstraints;
-        if (nameConstraints != null && occurences.remove(type) != null) {
+        if (nameConstraints != null && occurences.remove(type)) {
             values.addExtension(type, nameConstraints);
         }
 
         // PolicyConstrains
         type = Extension.policyConstraints;
-        if (policyConstraints != null && occurences.remove(type) != null) {
+        if (policyConstraints != null && occurences.remove(type)) {
             values.addExtension(type, policyConstraints);
         }
 
@@ -1228,7 +1241,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // Inhibit anyPolicy
         type = Extension.inhibitAnyPolicy;
-        if (inhibitAnyPolicy != null && occurences.remove(type) != null) {
+        if (inhibitAnyPolicy != null && occurences.remove(type)) {
             values.addExtension(type, inhibitAnyPolicy);
         }
 
@@ -1243,7 +1256,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // Admission
         type = ObjectIdentifiers.id_extension_admission;
-        if (admission != null && occurences.remove(type) != null) {
+        if (admission != null && occurences.remove(type)) {
             if (admission.isInputFromRequestRequired()) {
                 Extension extension = requestedExtensions.getExtension(type);
                 if (extension == null) {
@@ -1278,25 +1291,25 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // restriction
         type = ObjectIdentifiers.id_extension_restriction;
-        if (restriction != null && occurences.remove(type) != null) {
+        if (restriction != null && occurences.remove(type)) {
             values.addExtension(type, restriction);
         }
 
         // additionalInformation
         type = ObjectIdentifiers.id_extension_additionalInformation;
-        if (additionalInformation != null && occurences.remove(type) != null) {
+        if (additionalInformation != null && occurences.remove(type)) {
             values.addExtension(type, additionalInformation);
         }
 
         // validityModel
         type = ObjectIdentifiers.id_extension_validityModel;
-        if (validityModel != null && occurences.remove(type) != null) {
+        if (validityModel != null && occurences.remove(type)) {
             values.addExtension(type, validityModel);
         }
 
         // PrivateKeyUsagePeriod
         type = Extension.privateKeyUsagePeriod;
-        if (occurences.remove(type) != null) {
+        if (occurences.remove(type)) {
             Date tmpNotAfter;
             if (privateKeyUsagePeriod == null) {
                 tmpNotAfter = notAfter;
@@ -1317,8 +1330,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // QCStatements
         type = Extension.qCStatements;
-        if ((qcStatments != null || qcStatementsOption != null)
-                && occurences.remove(type) != null) {
+        if ((qcStatments != null || qcStatementsOption != null) && occurences.remove(type)) {
             if (qcStatments != null) {
                 values.addExtension(type, qcStatments);
             } else if (requestedExtensions != null && qcStatementsOption != null) {
@@ -1397,8 +1409,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // biometricData
         type = Extension.biometricInfo;
-        if (requestedExtensions != null && biometricDataOption != null
-                && occurences.remove(type) != null) {
+        if (requestedExtensions != null && biometricDataOption != null && occurences.remove(type)) {
             Extension extension = requestedExtensions.getExtension(type);
             if (extension == null) {
                 throw new BadCertTemplateException(
@@ -1472,27 +1483,26 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // tlsFeature
         type = ObjectIdentifiers.id_pe_tlsfeature;
-        if (tlsFeature != null && occurences.remove(type) != null) {
+        if (tlsFeature != null && occurences.remove(type)) {
             values.addExtension(type, tlsFeature);
         }
 
         // authorizationTemplate
         type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
-        if (authorizationTemplate != null && occurences.remove(type) != null) {
+        if (authorizationTemplate != null && occurences.remove(type)) {
             values.addExtension(type, authorizationTemplate);
         }
 
         // SMIME
         type = ObjectIdentifiers.id_smimeCapabilities;
-        if (smimeCapatibilities != null && occurences.remove(type) != null) {
+        if (smimeCapatibilities != null && occurences.remove(type)) {
             values.addExtension(type, smimeCapatibilities);
         }
 
         // constant extensions
         if (constantExtensions != null) {
             for (ASN1ObjectIdentifier m : constantExtensions.keySet()) {
-                ExtensionControl occurence = occurences.remove(m);
-                if (occurence == null) {
+                if (!occurences.remove(m)) {
                     continue;
                 }
 
@@ -1505,6 +1515,29 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         return values;
     } // method getExtensions
+
+    private GeneralNames createRequestedSubjectAltNames(final X500Name requestedSubject,
+            final X500Name grantedSubject, final Extensions requestExtensions)
+    throws BadCertTemplateException {
+        ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(
+                Extension.subjectAlternativeName);
+        if (extValue == null) {
+            return null;
+        }
+
+        GeneralNames reqNames = GeneralNames.getInstance(extValue);
+        if (allowedSubjectAltNameModes.isEmpty()) {
+            return reqNames;
+        }
+
+        GeneralName[] reqL = reqNames.getNames();
+        GeneralName[] grantedNames = new GeneralName[reqL.length];
+        for (int i = 0; i < reqL.length; i++) {
+            grantedNames[i] = X509CertprofileUtil.createGeneralName(reqL[i],
+                    allowedSubjectAltNameModes);
+        }
+        return new GeneralNames(grantedNames);
+    }
 
     @Override
     public Set<KeyUsageControl> getKeyUsage() {
@@ -1579,11 +1612,6 @@ class XmlX509Certprofile extends BaseX509Certprofile {
     @Override
     public boolean isSerialNumberInReqPermitted() {
         return serialNumberInReqPermitted;
-    }
-
-    @Override
-    public Set<GeneralNameMode> getSubjectAltNameModes() {
-        return allowedSubjectAltNameModes;
     }
 
     @Override

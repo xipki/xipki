@@ -2654,6 +2654,8 @@ public class ExtensionsChecker {
 
     private static GeneralName createGeneralName(final GeneralName reqName,
             final Set<GeneralNameMode> modes) throws BadCertTemplateException {
+        boolean allowsAllTags = modes.isEmpty();
+
         int tag = reqName.getTagNo();
         GeneralNameMode mode = null;
         for (GeneralNameMode m : modes) {
@@ -2663,7 +2665,7 @@ public class ExtensionsChecker {
             }
         }
 
-        if (mode == null) {
+        if (mode == null && !allowsAllTags) {
             throw new BadCertTemplateException("generalName tag " + tag + " is not allowed");
         }
 
@@ -2678,7 +2680,7 @@ public class ExtensionsChecker {
         case GeneralName.otherName:
             ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
             ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
-            if (!mode.getAllowedTypes().contains(type)) {
+            if (mode != null && !mode.getAllowedTypes().contains(type)) {
                 throw new BadCertTemplateException(
                         "otherName.type " + type.getId() + " is not allowed");
             }

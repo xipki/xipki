@@ -141,10 +141,6 @@ public abstract class X509Certprofile {
         return null;
     }
 
-    public Set<GeneralNameMode> getSubjectAltNameModes() {
-        return null;
-    }
-
     /**
      * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod.
      */
@@ -176,8 +172,8 @@ public abstract class X509Certprofile {
 
     public abstract ExtensionValues getExtensions(
             @Nonnull Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
-            @Nonnull X500Name requestedSubject, @Nullable Extensions requestExtensions,
-            @Nonnull Date notBefore, @Nonnull Date notAfter)
+            @Nonnull X500Name requestedSubject, @Nonnull X500Name grantedSubject,
+            @Nullable Extensions requestExtensions, @Nonnull Date notBefore, @Nonnull Date notAfter)
     throws CertprofileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();

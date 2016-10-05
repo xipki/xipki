@@ -285,8 +285,8 @@ class X509SelfSignedCertBuilder {
         }
 
         try {
-            addExtensions(certBuilder, certprofile, requestedSubject, extensions, tmpPublicKeyInfo,
-                    publicCaInfo, notBefore, notAfter);
+            addExtensions(certBuilder, certprofile, requestedSubject, grantedSubject, extensions,
+                    tmpPublicKeyInfo, publicCaInfo, notBefore, notAfter);
 
             Certificate bcCert = signer.build(certBuilder).toASN1Structure();
             byte[] encodedCert = bcCert.getEncoded();
@@ -303,11 +303,12 @@ class X509SelfSignedCertBuilder {
 
     private static void addExtensions(final X509v3CertificateBuilder certBuilder,
             final IdentifiedX509Certprofile profile, final X500Name requestedSubject,
-            final Extensions extensions, final SubjectPublicKeyInfo requestedPublicKeyInfo,
-            final PublicCaInfo publicCaInfo, final Date notBefore, final Date notAfter)
+            final X500Name grantedSubject, final Extensions extensions,
+            final SubjectPublicKeyInfo requestedPublicKeyInfo, final PublicCaInfo publicCaInfo,
+            final Date notBefore, final Date notAfter)
     throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException {
-        ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, extensions,
-                requestedPublicKeyInfo, publicCaInfo, null, notBefore, notAfter);
+        ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, grantedSubject,
+                extensions, requestedPublicKeyInfo, publicCaInfo, null, notBefore, notAfter);
         if (extensionTuples == null) {
             return;
         }
