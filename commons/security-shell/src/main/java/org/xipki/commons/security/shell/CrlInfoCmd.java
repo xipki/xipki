@@ -54,31 +54,29 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
  */
 
 @Command(scope = "xipki-tk", name = "crl-info",
-        description = "return CRL information")
+        description = "print CRL information")
 @Service
 public class CrlInfoCmd extends SecurityCommandSupport {
 
-    @Option(name = "--in",
-            description = "CRL file\n"
+    @Option(name = "--in", description = "CRL file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
     private String inFile;
 
-    @Option(name = "--hex", aliases = "-h",
-            description = "return hex number")
+    @Option(name = "--hex", aliases = "-h", description = "print hex number")
     private Boolean hex = Boolean.FALSE;
 
-    @Option(name = "--crlnumber", description = "return CRL number")
+    @Option(name = "--crlnumber", description = "print CRL number")
     private Boolean crlNumber;
 
-    @Option(name = "--issuer", description = "return issuer")
+    @Option(name = "--issuer", description = "print issuer")
     private Boolean issuer;
 
-    @Option(name = "--this-update", description = "return thisUpdate")
-    private Boolean notBefore;
+    @Option(name = "--this-update", description = "print thisUpdate")
+    private Boolean thisUpdate;
 
-    @Option(name = "--next-update", description = "return nextUpdate")
-    private Boolean notAfter;
+    @Option(name = "--next-update", description = "print nextUpdate")
+    private Boolean nextUpdate;
 
     @Override
     protected Object doExecute() throws Exception {
@@ -93,11 +91,13 @@ public class CrlInfoCmd extends SecurityCommandSupport {
             return getNumber(ASN1Integer.getInstance(asn1).getPositiveValue());
         } else if (issuer != null && issuer) {
             return crl.getIssuer().toString();
-        } else if (notBefore != null && notBefore) {
-            return crl.getThisUpdate().getTime();
-        } else if (notAfter != null && notAfter) {
-            return crl.getNextUpdate().getTime();
+        } else if (thisUpdate != null && thisUpdate) {
+            return toUtcTimeyyyyMMddhhmmssZ(crl.getThisUpdate().getDate());
+        } else if (nextUpdate != null && nextUpdate) {
+            return crl.getNextUpdate() == null ? "null" :
+                toUtcTimeyyyyMMddhhmmssZ(crl.getNextUpdate().getDate());
         }
+
         return null;
     }
 

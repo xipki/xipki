@@ -51,33 +51,31 @@ import org.xipki.commons.console.karaf.completer.FilePathCompleter;
  */
 
 @Command(scope = "xipki-tk", name = "cert-info",
-        description = "return certificate information")
+        description = "print certificate information")
 @Service
 public class CertInfoCmd extends SecurityCommandSupport {
 
-    @Option(name = "--in",
-            description = "certificate file\n"
+    @Option(name = "--in", description = "certificate file\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
     private String inFile;
 
-    @Option(name = "--hex", aliases = "-h",
-            description = "return hex number")
+    @Option(name = "--hex", aliases = "-h", description = "print hex number")
     private Boolean hex = Boolean.FALSE;
 
-    @Option(name = "--serial", description = "return serial number")
+    @Option(name = "--serial", description = "print serial number")
     private Boolean serial;
 
-    @Option(name = "--subject", description = "return subject")
+    @Option(name = "--subject", description = "print subject")
     private Boolean subject;
 
-    @Option(name = "--issuer", description = "return issuer")
+    @Option(name = "--issuer", description = "print issuer")
     private Boolean issuer;
 
-    @Option(name = "--not-before", description = "return notBefore")
+    @Option(name = "--not-before", description = "print notBefore")
     private Boolean notBefore;
 
-    @Option(name = "--not-after", description = "return notAfter")
+    @Option(name = "--not-after", description = "print notAfter")
     private Boolean notAfter;
 
     @Override
@@ -91,10 +89,11 @@ public class CertInfoCmd extends SecurityCommandSupport {
         } else if (issuer != null && issuer) {
             return cert.getIssuer().toString();
         } else if (notBefore != null && notBefore) {
-            return cert.getStartDate().getTime();
+            return toUtcTimeyyyyMMddhhmmssZ(cert.getStartDate().getDate());
         } else if (notAfter != null && notAfter) {
-            return cert.getEndDate().getTime();
+            return toUtcTimeyyyyMMddhhmmssZ(cert.getEndDate().getDate());
         }
+
         return null;
     }
 

@@ -34,7 +34,10 @@
 
 package org.xipki.commons.security.shell;
 
+import java.util.Date;
+
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.security.SecurityFactory;
@@ -76,6 +79,10 @@ public abstract class SecurityCommandSupport extends XipkiCommandSupport {
             throw new IllegalCmdParamException("undefined module " + moduleName);
         }
         return p11Service.getModule();
+    }
+
+    protected String toUtcTimeyyyyMMddhhmmssZ(final Date date) {
+        return DateUtil.toUtcTimeyyyyMMddhhmmss(date) + "Z";
     }
 
 }
