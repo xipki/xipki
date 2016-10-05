@@ -101,11 +101,11 @@ Feature xipki-security-shell
 
    * `xipki-tk:cert-info`
 
-     return certificate information
+     print certificate information
 
    * `xipki-tk:crl-info`
 
-     return CRL information
+     print CRL information
 
    * `xipki-tk:validate-csr`
 
