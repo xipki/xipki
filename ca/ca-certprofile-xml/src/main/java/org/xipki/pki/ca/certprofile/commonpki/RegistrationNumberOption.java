@@ -32,7 +32,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.certprofile.isismtt;
+package org.xipki.pki.ca.certprofile.commonpki;
 
 import java.util.regex.Pattern;
 

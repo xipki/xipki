@@ -115,7 +115,7 @@ import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.certprofile.BiometricInfoOption;
 import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
-import org.xipki.pki.ca.certprofile.isismtt.AdmissionSyntaxOption;
+import org.xipki.pki.ca.certprofile.commonpki.AdmissionSyntaxOption;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AdditionalInformation;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AdmissionSyntax;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AuthorityInfoAccess;
