@@ -175,9 +175,9 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
     private AuthorityInfoAccessControl aiaControl;
 
-    private Set<GeneralNameMode> allowedSubjectAltNameModes;
+    private Set<GeneralNameMode> subjectAltNameModes;
 
-    private Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> allowedSubjectInfoAccessModes;
+    private Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> subjectInfoAccessModes;
 
     private ExtensionValue authorizationTemplate;
 
@@ -255,8 +255,8 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         additionalInformation = null;
         admission = null;
         aiaControl = null;
-        allowedSubjectAltNameModes = null;
-        allowedSubjectInfoAccessModes = null;
+        subjectAltNameModes = null;
+        subjectInfoAccessModes = null;
         authorizationTemplate = null;
         biometricDataOption = null;
         certLevel = null;
@@ -950,7 +950,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
             return;
         }
 
-        this.allowedSubjectAltNameModes = XmlX509CertprofileUtil.buildGeneralNameMode(extConf);
+        this.subjectAltNameModes = XmlX509CertprofileUtil.buildGeneralNameMode(extConf);
     }
 
     private void initSubjectInfoAccess(ExtensionsType extensionsType) throws CertprofileException {
@@ -966,9 +966,9 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         }
 
         List<Access> list = extConf.getAccess();
-        this.allowedSubjectInfoAccessModes = new HashMap<>();
+        this.subjectInfoAccessModes = new HashMap<>();
         for (Access entry : list) {
-            this.allowedSubjectInfoAccessModes.put(
+            this.subjectInfoAccessModes.put(
                     new ASN1ObjectIdentifier(entry.getAccessMethod().getValue()),
                     XmlX509CertprofileUtil.buildGeneralNameMode(entry.getAccessLocation()));
         }
@@ -1089,7 +1089,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         // SubjectAltName
         // SubjectAltName
         type = Extension.subjectAlternativeName;
-        if (allowedSubjectAltNameModes != null && occurences.remove(type)) {
+        if (subjectAltNameModes != null && occurences.remove(type)) {
             GeneralNames genNames = createRequestedSubjectAltNames(requestedSubject, grantedSubject,
                     requestedExtensions);
             if (genNames != null) {
@@ -1526,15 +1526,14 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         }
 
         GeneralNames reqNames = GeneralNames.getInstance(extValue);
-        if (allowedSubjectAltNameModes.isEmpty()) {
+        if (subjectAltNameModes.isEmpty()) {
             return reqNames;
         }
 
         GeneralName[] reqL = reqNames.getNames();
         GeneralName[] grantedNames = new GeneralName[reqL.length];
         for (int i = 0; i < reqL.length; i++) {
-            grantedNames[i] = X509CertprofileUtil.createGeneralName(reqL[i],
-                    allowedSubjectAltNameModes);
+            grantedNames[i] = X509CertprofileUtil.createGeneralName(reqL[i], subjectAltNameModes);
         }
         return new GeneralNames(grantedNames);
     }
@@ -1621,7 +1620,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
     @Override
     public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes() {
-        return allowedSubjectInfoAccessModes;
+        return subjectInfoAccessModes;
     }
 
     @Override
