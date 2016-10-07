@@ -140,17 +140,17 @@ public class AlgorithmUtil {
         } else if (X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid)) {
             return "SHA384withECDSA";
         } else if (X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid)) {
-            return "SHA512WITHECDSA";
+            return "SHA512withECDSA";
         } else if (BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(algOid)) {
-            return "SHA1WITHPLAIN-ECDSA";
+            return "SHA1withPLAIN-ECDSA";
         } else if (BSIObjectIdentifiers.ecdsa_plain_SHA224.equals(algOid)) {
-            return "SHA224WITHPLAIN-ECDSA";
+            return "SHA224withPLAIN-ECDSA";
         } else if (BSIObjectIdentifiers.ecdsa_plain_SHA256.equals(algOid)) {
-            return "SHA256WITHPLAIN-ECDSA";
+            return "SHA256withPLAIN-ECDSA";
         } else if (BSIObjectIdentifiers.ecdsa_plain_SHA384.equals(algOid)) {
-            return "SHA384WITHPLAIN-ECDSA";
+            return "SHA384withPLAIN-ECDSA";
         } else if (BSIObjectIdentifiers.ecdsa_plain_SHA512.equals(algOid)) {
-            return "SHA512WITHPLAIN-ECDSA";
+            return "SHA512withPLAIN-ECDSA";
         } else if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid)) {
             return "SHA1withDSA";
         } else if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid)) {
