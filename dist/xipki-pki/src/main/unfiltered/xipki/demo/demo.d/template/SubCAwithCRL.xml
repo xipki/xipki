@@ -68,6 +68,7 @@
         <str>multipleOUs</str>
         <str>multiValuedRDN</str>
         <str>MaxTime</str>
+        <str>TLSA</str>
       </profiles>
       <requestors>
         <requestor>

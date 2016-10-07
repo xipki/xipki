@@ -111,6 +111,12 @@
         <file>${profiles.dir}/Certprofile_TLS.xml</file>
       </conf>
     </profile>
+    <profile name="TLSA">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_TLS.xml</file>
+      </conf>
+    </profile>
     <profile name="TLS_C">
       <type>XML</type>
       <conf>
