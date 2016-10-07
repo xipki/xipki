@@ -3415,6 +3415,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     ciJaxb.setDuplicateKey(entry.isDuplicateKeyPermitted());
                     ciJaxb.setDuplicateSubject(entry.isDuplicateSubjectPermitted());
                     ciJaxb.setExpirationPeriod(entry.getExpirationPeriod());
+                    ciJaxb.setPopoAlgos(createStrings(entry.getPopoAlgorithms()));
                     ciJaxb.setExtraControl(
                             createFileOrValue(zipStream, entry.getExtraControl(),
                                     "files/ca-" + name + "-extracontrol.conf"));
