@@ -53,6 +53,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -172,12 +173,35 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     @Override
-    public boolean verifyPopo(final CertificationRequest csr) {
-        return verifyPopo(new PKCS10CertificationRequest(csr));
+    public boolean verifyPopo(final CertificationRequest csr, Set<String> allowedSigAlgos) {
+        return verifyPopo(new PKCS10CertificationRequest(csr), allowedSigAlgos);
     }
 
     @Override
-    public boolean verifyPopo(final PKCS10CertificationRequest csr) {
+    public boolean verifyPopo(final PKCS10CertificationRequest csr, Set<String> allowedSigAlgos) {
+        if (allowedSigAlgos != null) {
+            String sigAlgo;
+            try {
+                sigAlgo = AlgorithmUtil.getSignatureAlgoName(csr.getSignatureAlgorithm());
+            } catch (NoSuchAlgorithmException ex) {
+                LogUtil.error(LOG, ex, "could not get the signature algorithm of PKCS#10 request");
+                return false;
+            }
+
+            boolean allowed = false;
+            for (String m : allowedSigAlgos) {
+                if (AlgorithmUtil.equalsAlgoName(m, sigAlgo)) {
+                    allowed = true;
+                    break;
+                }
+            }
+
+            if (!allowed) {
+                LOG.error("POPO signature algorithm {} not permitted", sigAlgo);
+                return false;
+            }
+        }
+
         try {
             SubjectPublicKeyInfo pkInfo = csr.getSubjectPublicKeyInfo();
             PublicKey pk = KeyUtil.generatePublicKey(pkInfo);

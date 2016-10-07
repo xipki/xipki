@@ -41,6 +41,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.security.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao
@@ -62,9 +63,10 @@ public class CertRequestValidateCmd extends SecurityCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
-        boolean bo = securityFactory.verifyPopo(csr);
+        String sigAlgo = AlgorithmUtil.getSignatureAlgoName(csr.getSignatureAlgorithm());
+        boolean bo = securityFactory.verifyPopo(csr, null);
         String txt = bo ? "valid" : "invalid";
-        println("The POP is " + txt);
+        println("The POP is " + txt + " (signature algorithm " + sigAlgo + ").");
         return null;
     }
 
