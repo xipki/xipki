@@ -19,7 +19,7 @@ openssl genrsa -out ${filename}-key.pem 2048
 
 echo "generate CSR"
 
-openssl req -new -key ${filename}-key.pem -outform der \
+openssl req -new -sha256 -key ${filename}-key.pem -outform der \
     -out ${filename}.csr \
     -subj "/CN=${filename}.xipki.org/O=xipki/C=DE"
 
