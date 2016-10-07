@@ -61,21 +61,20 @@ public class X509CertprofileUtil {
     public static GeneralName createGeneralName(@Nonnull final GeneralName requestedName,
             @Nonnull final Set<GeneralNameMode> modes) throws BadCertTemplateException {
         ParamUtil.requireNonNull("requestedName", requestedName);
-        ParamUtil.requireNonNull("modes", modes);
 
-        boolean allowsAllTags = modes.isEmpty();
         int tag = requestedName.getTagNo();
-
         GeneralNameMode mode = null;
-        for (GeneralNameMode m : modes) {
-            if (m.getTag().getTag() == tag) {
-                mode = m;
-                break;
+        if (modes != null) {
+            for (GeneralNameMode m : modes) {
+                if (m.getTag().getTag() == tag) {
+                    mode = m;
+                    break;
+                }
             }
-        }
 
-        if (mode == null && !allowsAllTags) {
-            throw new BadCertTemplateException("generalName tag " + tag + " is not allowed");
+            if (mode == null) {
+                throw new BadCertTemplateException("generalName tag " + tag + " is not allowed");
+            }
         }
 
         switch (tag) {

@@ -261,7 +261,7 @@ class IdentifiedX509Certprofile {
     }
 
     public ExtensionValues getExtensions(@Nonnull final X500Name requestedSubject,
-            @Nonnull final X500Name grantedSubject, @Nullable final Extensions requestExtensions,
+            @Nonnull final X500Name grantedSubject, @Nullable final Extensions requestedExtensions,
             @Nonnull final SubjectPublicKeyInfo publicKeyInfo,
             @Nonnull final PublicCaInfo publicCaInfo, @Nullable final X509Certificate crlSignerCert,
             @Nonnull final Date notBefore, @Nonnull final Date notAfter)
@@ -274,8 +274,8 @@ class IdentifiedX509Certprofile {
 
         Set<ASN1ObjectIdentifier> neededExtensionTypes = new HashSet<>();
         Set<ASN1ObjectIdentifier> wantedExtensionTypes = new HashSet<>();
-        if (requestExtensions != null) {
-            Extension reqExtension = requestExtensions.getExtension(
+        if (requestedExtensions != null) {
+            Extension reqExtension = requestedExtensions.getExtension(
                     ObjectIdentifiers.id_xipki_ext_cmpRequestExtensions);
             if (reqExtension != null) {
                 ExtensionExistence ee = ExtensionExistence.getInstance(
@@ -443,8 +443,8 @@ class IdentifiedX509Certprofile {
             }
 
             // the optional KeyUsage will only be set if requested explicitly
-            if (requestExtensions != null && extControl.isRequest()) {
-                addRequestedKeyusage(usages, requestExtensions, usageOccs);
+            if (requestedExtensions != null && extControl.isRequest()) {
+                addRequestedKeyusage(usages, requestedExtensions, usageOccs);
             }
 
             org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(usages);
@@ -466,8 +466,8 @@ class IdentifiedX509Certprofile {
             }
 
             // the optional ExtKeyUsage will only be set if requested explicitly
-            if (requestExtensions != null && extControl.isRequest()) {
-                addRequestedExtKeyusage(usages, requestExtensions, usageOccs);
+            if (requestedExtensions != null && extControl.isRequest()) {
+                addRequestedExtKeyusage(usages, requestedExtensions, usageOccs);
             }
 
             if (extControl.isCritical()
@@ -498,8 +498,8 @@ class IdentifiedX509Certprofile {
         if (extControl != null && addMe(extType, extControl, neededExtensionTypes,
                 wantedExtensionTypes)) {
             ASN1Sequence value = null;
-            if (requestExtensions != null && extControl.isRequest()) {
-                value = createSubjectInfoAccess(requestExtensions,
+            if (requestedExtensions != null && extControl.isRequest()) {
+                value = createSubjectInfoAccess(requestedExtensions,
                         certprofile.getSubjectInfoAccessModes());
             }
             addExtension(values, extType, value, extControl, neededExtensionTypes,
@@ -508,7 +508,7 @@ class IdentifiedX509Certprofile {
 
         ExtensionValues subvalues = certprofile.getExtensions(
                 Collections.unmodifiableMap(controls), requestedSubject, grantedSubject,
-                requestExtensions, notBefore, notAfter);
+                requestedExtensions, notBefore, notAfter);
 
         Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
         for (ASN1ObjectIdentifier type : extTypes) {
@@ -516,8 +516,8 @@ class IdentifiedX509Certprofile {
             boolean addMe = addMe(type, extControl, neededExtensionTypes, wantedExtensionTypes);
             if (addMe) {
                 ExtensionValue value = null;
-                if (extControl.isRequest()) {
-                    Extension reqExt = requestExtensions.getExtension(type);
+                if (requestedExtensions != null && extControl.isRequest()) {
+                    Extension reqExt = requestedExtensions.getExtension(type);
                     if (reqExt != null) {
                         value = new ExtensionValue(reqExt.isCritical(), reqExt.getParsedValue());
                     }
@@ -802,8 +802,8 @@ class IdentifiedX509Certprofile {
     } // method addMe
 
     private static void addRequestedKeyusage(final Set<KeyUsage> usages,
-            final Extensions requestExtensions, final Set<KeyUsageControl> usageOccs) {
-        Extension extension = requestExtensions.getExtension(Extension.keyUsage);
+            final Extensions requestedExtensions, final Set<KeyUsageControl> usageOccs) {
+        Extension extension = requestedExtensions.getExtension(Extension.keyUsage);
         if (extension == null) {
             return;
         }
@@ -822,8 +822,8 @@ class IdentifiedX509Certprofile {
     } // method addRequestedKeyusage
 
     private static void addRequestedExtKeyusage(final List<ASN1ObjectIdentifier> usages,
-            final Extensions requestExtensions, final Set<ExtKeyUsageControl> usageOccs) {
-        Extension extension = requestExtensions.getExtension(Extension.extendedKeyUsage);
+            final Extensions requestedExtensions, final Set<ExtKeyUsageControl> usageOccs) {
+        Extension extension = requestedExtensions.getExtension(Extension.extendedKeyUsage);
         if (extension == null) {
             return;
         }
@@ -841,14 +841,14 @@ class IdentifiedX509Certprofile {
         }
     } // method addRequestedExtKeyusage
 
-    private static ASN1Sequence createSubjectInfoAccess(final Extensions requestExtensions,
+    private static ASN1Sequence createSubjectInfoAccess(final Extensions requestedExtensions,
             final Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes)
     throws BadCertTemplateException {
         if (modes == null) {
             return null;
         }
 
-        ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(
+        ASN1Encodable extValue = requestedExtensions.getExtensionParsedValue(
                 Extension.subjectInfoAccess);
         if (extValue == null) {
             return null;

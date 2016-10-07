@@ -32,7 +32,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.certprofile.internal;
+package org.xipki.pki.ca.certprofile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -71,6 +71,7 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
 import org.bouncycastle.asn1.x500.DirectoryString;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Attribute;
@@ -92,6 +93,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.api.profile.CertprofileException;
@@ -100,6 +102,7 @@ import org.xipki.pki.ca.api.profile.ExtensionControl;
 import org.xipki.pki.ca.api.profile.ExtensionValue;
 import org.xipki.pki.ca.api.profile.ExtensionValues;
 import org.xipki.pki.ca.api.profile.GeneralNameMode;
+import org.xipki.pki.ca.api.profile.GeneralNameTag;
 import org.xipki.pki.ca.api.profile.KeyParametersOption;
 import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.RdnControl;
@@ -116,8 +119,6 @@ import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.pki.ca.api.profile.x509.X509CertprofileUtil;
-import org.xipki.pki.ca.certprofile.BiometricInfoOption;
-import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
 import org.xipki.pki.ca.certprofile.commonpki.AdmissionSyntaxOption;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AdditionalInformation;
 import org.xipki.pki.ca.certprofile.x509.jaxb.AdmissionSyntax;
@@ -153,6 +154,9 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectDirectoryAttributs;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess.Access;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectToSubjectAltNameType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectToSubjectAltNameType.Target;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectToSubjectAltNamesType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ValidityModel;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
@@ -165,7 +169,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
  * @since 2.0.0
  */
 
-class XmlX509Certprofile extends BaseX509Certprofile {
+public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private static final Logger LOG = LoggerFactory.getLogger(XmlX509Certprofile.class);
 
@@ -174,6 +178,8 @@ class XmlX509Certprofile extends BaseX509Certprofile {
     private AdmissionSyntaxOption admission;
 
     private AuthorityInfoAccessControl aiaControl;
+
+    private Map<ASN1ObjectIdentifier, GeneralNameTag> subjectToSubjectAltNameModes;
 
     private Set<GeneralNameMode> subjectAltNameModes;
 
@@ -255,6 +261,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         additionalInformation = null;
         admission = null;
         aiaControl = null;
+        subjectToSubjectAltNameModes = null;
         subjectAltNameModes = null;
         subjectInfoAccessModes = null;
         authorizationTemplate = null;
@@ -301,7 +308,15 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         reset();
         try {
-            doInitialize(data);
+            byte[] bytes;
+            try {
+                bytes = data.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                bytes = data.getBytes();
+            }
+
+            X509ProfileType conf = XmlX509CertprofileUtil.parse(new ByteArrayInputStream(bytes));
+            doInitialize(conf);
         } catch (RuntimeException ex) {
             LogUtil.error(LOG, ex);
             throw new CertprofileException(
@@ -309,16 +324,20 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         }
     } // method initialize
 
-    private void doInitialize(final String data) throws CertprofileException {
-        byte[] bytes;
+    public void initialize(X509ProfileType conf) throws CertprofileException {
+        ParamUtil.requireNonNull("conf", conf);
+
+        reset();
         try {
-            bytes = data.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            bytes = data.getBytes();
+            doInitialize(conf);
+        } catch (RuntimeException ex) {
+            LogUtil.error(LOG, ex);
+            throw new CertprofileException(
+                    "caught RuntimeException while initializing certprofile: " + ex.getMessage());
         }
+    } // method initialize
 
-        X509ProfileType conf = XmlX509CertprofileUtil.parse(new ByteArrayInputStream(bytes));
-
+    private void doInitialize(X509ProfileType conf) throws CertprofileException {
         if (conf.getVersion() != null) {
             String versionText = conf.getVersion();
             this.version = X509CertVersion.forName(versionText);
@@ -438,6 +457,9 @@ class XmlX509Certprofile extends BaseX509Certprofile {
         // Extensions
         ExtensionsType extensionsType = conf.getExtensions();
 
+        // SubjectToSubjectAltName
+        initSubjectToSubjectAltNames(extensionsType);
+
         // Extension controls
         this.extensionControls = XmlX509CertprofileUtil.buildExtensionControls(extensionsType);
 
@@ -512,7 +534,68 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // constant extensions
         this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(extensionsType);
+
+        // validate the configuration
+        if (subjectToSubjectAltNameModes != null) {
+            if (!extensionControls.containsKey(Extension.subjectAlternativeName)) {
+                throw new CertprofileException(
+                        "subjectToSubjectAltNames cannot be configured if extension subjectAltNames"
+                        + " is not permitted");
+            }
+
+            if (subjectAltNameModes != null) {
+                for (ASN1ObjectIdentifier attrType : subjectToSubjectAltNameModes.keySet()) {
+                    GeneralNameTag nameTag = subjectToSubjectAltNameModes.get(attrType);
+                    boolean allowed = false;
+                    for (GeneralNameMode m : subjectAltNameModes) {
+                        if (m.getTag() == nameTag) {
+                            allowed = true;
+                            break;
+                        }
+                    }
+
+                    if (!allowed) {
+                        throw new CertprofileException("target SubjectAltName type " + nameTag
+                                + " is not allowed");
+                    }
+                }
+            }
+        }
     } // method doInitialize
+
+    private void initSubjectToSubjectAltNames(ExtensionsType extensionsType)
+    throws CertprofileException {
+        SubjectToSubjectAltNamesType s2sType = extensionsType.getSubjectToSubjectAltNames();
+        if (s2sType == null) {
+            return;
+        }
+
+        subjectToSubjectAltNameModes = new HashMap<>();
+        for (SubjectToSubjectAltNameType m : s2sType.getSubjectToSubjectAltName()) {
+            Target target = m.getTarget();
+            GeneralNameTag nameTag = null;
+
+            if (target.getDirectoryName() != null) {
+                nameTag = GeneralNameTag.directoryName;
+            } else if (target.getDnsName() != null) {
+                nameTag = GeneralNameTag.dNSName;
+            } else if (target.getIpAddress() != null) {
+                nameTag = GeneralNameTag.iPAddress;
+            } else if (target.getRfc822Name() != null) {
+                nameTag = GeneralNameTag.rfc822Name;
+            } else if (target.getUniformResourceIdentifier() != null) {
+                nameTag = GeneralNameTag.uniformResourceIdentifier;
+            } else if (target.getRegisteredID() != null) {
+                nameTag = GeneralNameTag.registeredID;
+            } else {
+                throw new RuntimeException(
+                        "should not reach here, unknown SubjectToSubjectAltName target");
+            }
+
+            subjectToSubjectAltNameModes.put(new ASN1ObjectIdentifier(m.getSource().getValue()),
+                    nameTag);
+        }
+    }
 
     private void initAdditionalInformation(ExtensionsType extensionsType)
     throws CertprofileException {
@@ -1076,26 +1159,30 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // CertificatePolicies
         ASN1ObjectIdentifier type = Extension.certificatePolicies;
-        if (certificatePolicies != null && occurences.remove(type)) {
-            values.addExtension(type, certificatePolicies);
+        if (certificatePolicies != null) {
+            if (occurences.remove(type)) {
+                values.addExtension(type, certificatePolicies);
+            }
         }
 
         // Policy Mappings
         type = Extension.policyMappings;
-        if (policyMappings != null && occurences.remove(type)) {
-            values.addExtension(type, policyMappings);
+        if (policyMappings != null) {
+            if (occurences.remove(type)) {
+                values.addExtension(type, policyMappings);
+            }
         }
 
         // SubjectAltName
-        // SubjectAltName
         type = Extension.subjectAlternativeName;
-        if (subjectAltNameModes != null && occurences.remove(type)) {
+        if (occurences.contains(type)) {
             GeneralNames genNames = createRequestedSubjectAltNames(requestedSubject, grantedSubject,
                     requestedExtensions);
             if (genNames != null) {
                 ExtensionValue value = new ExtensionValue(extensionControls.get(type).isCritical(),
                         genNames);
                 values.addExtension(type, value);
+                occurences.remove(type);
             }
         }
 
@@ -1104,8 +1191,9 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // Subject Directory Attributes
         type = Extension.subjectDirectoryAttributes;
-        if (subjectDirAttrsControl != null && occurences.remove(type)) {
-            Extension extension = requestedExtensions.getExtension(type);
+        if (occurences.contains(type) && subjectDirAttrsControl != null) {
+            Extension extension = (requestedExtensions == null) ? null
+                    : requestedExtensions.getExtension(type);
             if (extension == null) {
                 throw new BadCertTemplateException(
                         "No SubjectDirecotryAttributes extension is contained in the request");
@@ -1216,6 +1304,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
             ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
                     subjDirAttrs);
             values.addExtension(type, extValue);
+            occurences.remove(type);
         }
 
         // Basic Constraints
@@ -1223,14 +1312,18 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // Name Constraints
         type = Extension.nameConstraints;
-        if (nameConstraints != null && occurences.remove(type)) {
-            values.addExtension(type, nameConstraints);
+        if (nameConstraints != null) {
+            if (occurences.remove(type)) {
+                values.addExtension(type, nameConstraints);
+            }
         }
 
         // PolicyConstrains
         type = Extension.policyConstraints;
-        if (policyConstraints != null && occurences.remove(type)) {
-            values.addExtension(type, policyConstraints);
+        if (policyConstraints != null) {
+            if (occurences.remove(type)) {
+                values.addExtension(type, policyConstraints);
+            }
         }
 
         // ExtendedKeyUsage
@@ -1241,8 +1334,10 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // Inhibit anyPolicy
         type = Extension.inhibitAnyPolicy;
-        if (inhibitAnyPolicy != null && occurences.remove(type)) {
-            values.addExtension(type, inhibitAnyPolicy);
+        if (inhibitAnyPolicy != null) {
+            if (occurences.remove(type)) {
+                values.addExtension(type, inhibitAnyPolicy);
+            }
         }
 
         // Freshest CRL
@@ -1256,9 +1351,10 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // Admission
         type = ObjectIdentifiers.id_extension_admission;
-        if (admission != null && occurences.remove(type)) {
+        if (occurences.contains(type) && admission != null) {
             if (admission.isInputFromRequestRequired()) {
-                Extension extension = requestedExtensions.getExtension(type);
+                Extension extension = (requestedExtensions == null) ? null
+                        : requestedExtensions.getExtension(type);
                 if (extension == null) {
                     throw new BadCertTemplateException(
                             "No Admission extension is contained in the request");
@@ -1281,8 +1377,10 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                     }
                 }
                 values.addExtension(type, admission.getExtensionValue(reqRegNumsList));
+                occurences.remove(type);
             } else {
                 values.addExtension(type, admission.getExtensionValue(null));
+                occurences.remove(type);
             }
         }
 
@@ -1291,25 +1389,31 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // restriction
         type = ObjectIdentifiers.id_extension_restriction;
-        if (restriction != null && occurences.remove(type)) {
-            values.addExtension(type, restriction);
+        if (restriction != null) {
+            if (occurences.remove(type)) {
+                values.addExtension(type, restriction);
+            }
         }
 
         // additionalInformation
         type = ObjectIdentifiers.id_extension_additionalInformation;
-        if (additionalInformation != null && occurences.remove(type)) {
-            values.addExtension(type, additionalInformation);
+        if (additionalInformation != null) {
+            if (occurences.remove(type)) {
+                values.addExtension(type, additionalInformation);
+            }
         }
 
         // validityModel
         type = ObjectIdentifiers.id_extension_validityModel;
-        if (validityModel != null && occurences.remove(type)) {
-            values.addExtension(type, validityModel);
+        if (validityModel != null) {
+            if (occurences.remove(type)) {
+                values.addExtension(type, validityModel);
+            }
         }
 
         // PrivateKeyUsagePeriod
         type = Extension.privateKeyUsagePeriod;
-        if (occurences.remove(type)) {
+        if (occurences.contains(type)) {
             Date tmpNotAfter;
             if (privateKeyUsagePeriod == null) {
                 tmpNotAfter = notAfter;
@@ -1326,13 +1430,15 @@ class XmlX509Certprofile extends BaseX509Certprofile {
             ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
                     new DERSequence(vec));
             values.addExtension(type, extValue);
+            occurences.remove(type);
         }
 
         // QCStatements
         type = Extension.qCStatements;
-        if ((qcStatments != null || qcStatementsOption != null) && occurences.remove(type)) {
+        if (occurences.contains(type) && (qcStatments != null || qcStatementsOption != null)) {
             if (qcStatments != null) {
                 values.addExtension(type, qcStatments);
+                occurences.remove(type);
             } else if (requestedExtensions != null && qcStatementsOption != null) {
                 // extract the euLimit data from request
                 Extension extension = requestedExtensions.getExtension(type);
@@ -1402,6 +1508,7 @@ class XmlX509Certprofile extends BaseX509Certprofile {
                         extensionControls.get(type).isCritical(),
                         new DERSequence(vec));
                 values.addExtension(type, extValue);
+                occurences.remove(type);
             } else {
                 throw new RuntimeException("should not reach here");
             }
@@ -1409,8 +1516,9 @@ class XmlX509Certprofile extends BaseX509Certprofile {
 
         // biometricData
         type = Extension.biometricInfo;
-        if (requestedExtensions != null && biometricDataOption != null && occurences.remove(type)) {
-            Extension extension = requestedExtensions.getExtension(type);
+        if (occurences.contains(type) && biometricDataOption != null) {
+            Extension extension = (requestedExtensions == null) ? null
+                    : requestedExtensions.getExtension(type);
             if (extension == null) {
                 throw new BadCertTemplateException(
                         "no biometricInfo extension is contained in the request");
@@ -1479,24 +1587,31 @@ class XmlX509Certprofile extends BaseX509Certprofile {
             ExtensionValue extValue = new ExtensionValue(extensionControls.get(type).isCritical(),
                     new DERSequence(vec));
             values.addExtension(type, extValue);
+            occurences.remove(type);
         }
 
         // tlsFeature
         type = ObjectIdentifiers.id_pe_tlsfeature;
-        if (tlsFeature != null && occurences.remove(type)) {
-            values.addExtension(type, tlsFeature);
+        if (tlsFeature != null) {
+            if (occurences.remove(type)) {
+                values.addExtension(type, tlsFeature);
+            }
         }
 
         // authorizationTemplate
         type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
-        if (authorizationTemplate != null && occurences.remove(type)) {
-            values.addExtension(type, authorizationTemplate);
+        if (authorizationTemplate != null) {
+            if (occurences.remove(type)) {
+                values.addExtension(type, authorizationTemplate);
+            }
         }
 
         // SMIME
         type = ObjectIdentifiers.id_smimeCapabilities;
-        if (smimeCapatibilities != null && occurences.remove(type)) {
-            values.addExtension(type, smimeCapatibilities);
+        if (smimeCapatibilities != null) {
+            if (occurences.remove(type)) {
+                values.addExtension(type, smimeCapatibilities);
+            }
         }
 
         // constant extensions
@@ -1517,25 +1632,65 @@ class XmlX509Certprofile extends BaseX509Certprofile {
     } // method getExtensions
 
     private GeneralNames createRequestedSubjectAltNames(final X500Name requestedSubject,
-            final X500Name grantedSubject, final Extensions requestExtensions)
+            final X500Name grantedSubject, final Extensions requestedExtensions)
     throws BadCertTemplateException {
-        ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(
-                Extension.subjectAlternativeName);
-        if (extValue == null) {
+        ASN1Encodable extValue = (requestedExtensions == null) ? null :
+            requestedExtensions.getExtensionParsedValue(Extension.subjectAlternativeName);
+
+        if (extValue == null && subjectToSubjectAltNameModes == null) {
             return null;
         }
 
-        GeneralNames reqNames = GeneralNames.getInstance(extValue);
-        if (subjectAltNameModes.isEmpty()) {
+        GeneralNames reqNames = (extValue == null) ? null : GeneralNames.getInstance(extValue);
+        if (subjectAltNameModes == null && subjectToSubjectAltNameModes == null) {
             return reqNames;
         }
 
-        GeneralName[] reqL = reqNames.getNames();
-        GeneralName[] grantedNames = new GeneralName[reqL.length];
-        for (int i = 0; i < reqL.length; i++) {
-            grantedNames[i] = X509CertprofileUtil.createGeneralName(reqL[i], subjectAltNameModes);
+        List<GeneralName> grantedNames = new LinkedList<>();
+        // copy the required attributes of Subject
+        if (subjectToSubjectAltNameModes != null) {
+            for (ASN1ObjectIdentifier attrType : subjectToSubjectAltNameModes.keySet()) {
+                GeneralNameTag tag = subjectToSubjectAltNameModes.get(attrType);
+
+                RDN[] rdns = grantedSubject.getRDNs(attrType);
+                if (rdns == null) {
+                    rdns = requestedSubject.getRDNs(attrType);
+                }
+
+                if (rdns == null) {
+                    continue;
+                }
+
+                for (RDN rdn : rdns) {
+                    String rdnValue = X509Util.rdnValueToString(rdn.getFirst().getValue());
+                    switch (tag) {
+                    case rfc822Name:
+                    case dNSName:
+                    case uniformResourceIdentifier:
+                    case iPAddress:
+                    case directoryName:
+                    case registeredID:
+                        grantedNames.add(new GeneralName(tag.getTag(), rdnValue));
+                        break;
+                    default:
+                        throw new RuntimeException(
+                                "should not reach here, unknown GeneralName tag " + tag);
+                    } // end switch (tag)
+                }
+            }
         }
-        return new GeneralNames(grantedNames);
+
+        // copy the requested SubjectAltName entries
+        if (reqNames != null) {
+            GeneralName[] reqL = reqNames.getNames();
+            for (int i = 0; i < reqL.length; i++) {
+                grantedNames.add(
+                        X509CertprofileUtil.createGeneralName(reqL[i], subjectAltNameModes));
+            }
+        }
+
+        return grantedNames.isEmpty() ? null :
+            new GeneralNames(grantedNames.toArray(new GeneralName[0]));
     }
 
     @Override

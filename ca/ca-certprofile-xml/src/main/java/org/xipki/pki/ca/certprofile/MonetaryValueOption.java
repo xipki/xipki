@@ -32,7 +32,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.certprofile.internal;
+package org.xipki.pki.ca.certprofile;
 
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.xipki.commons.common.util.ParamUtil;
@@ -43,7 +43,7 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.Range2Type;
  * @since 2.0.0
  */
 
-public class MonetaryValueOption {
+class MonetaryValueOption {
 
     private final Iso4217CurrencyCode currency;
 

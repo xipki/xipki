@@ -88,6 +88,14 @@
     </rdn>
   </subject>
   <extensions>
+    <subjectToSubjectAltNames>
+      <subjectToSubjectAltName>
+        <source description="cn">2.5.4.3</source>
+        <target>
+          <dnsName></dnsName>
+        </target>
+      </subjectToSubjectAltName>
+    </subjectToSubjectAltNames>
     <extension required="true" permittedInRequest="false">
       <type description="subjectKeyIdentifier">2.5.29.14</type>
       <critical>false</critical>
@@ -99,6 +107,16 @@
     <extension required="false" permittedInRequest="false">
       <type description="freshestCRL">2.5.29.46</type>
       <critical>false</critical>
+    </extension>
+    <extension required="true" permittedInRequest="true">
+      <type description="subjectAlternativeName">2.5.29.17</type>
+      <critical>false</critical>
+      <value>
+        <subjectAltName>
+          <dnsName></dnsName>
+          <ipAddress></ipAddress>
+        </subjectAltName>
+      </value>
     </extension>
     <extension required="true" permittedInRequest="false">
       <type description="basicConstraints">2.5.29.19</type>

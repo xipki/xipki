@@ -77,6 +77,7 @@ import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
+import org.xipki.pki.ca.certprofile.XmlX509Certprofile;
 import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ConstantExtValue;
 import org.xipki.pki.ca.certprofile.x509.jaxb.ExtensionType;
@@ -119,6 +120,8 @@ public class X509CertprofileQa {
 
     private final int maxSize;
 
+    private final XmlX509Certprofile certProfile;
+
     public X509CertprofileQa(final String data) throws CertprofileException {
         this(ParamUtil.requireNonNull("data", data).getBytes());
     }
@@ -128,6 +131,9 @@ public class X509CertprofileQa {
         try {
             X509ProfileType conf = XmlX509CertprofileUtil.parse(
                     new ByteArrayInputStream(dataBytes));
+
+            certProfile = new XmlX509Certprofile();
+            certProfile.initialize(conf);
 
             this.version = X509CertVersion.forName(conf.getVersion());
             if (this.version == null) {
@@ -345,8 +351,12 @@ public class X509CertprofileQa {
         }
 
         // extensions
+        issue = new ValidationIssue("X509.GrantedSubject", "grantedSubject");
+        resultIssues.add(issue);
+
         resultIssues.addAll(
-                extensionsChecker.checkExtensions(bcCert, issuerInfo, requestedExtensions));
+                extensionsChecker.checkExtensions(bcCert, issuerInfo, requestedExtensions,
+                        requestedSubject, certProfile));
 
         return new ValidationResult(resultIssues);
     } // method checkCert

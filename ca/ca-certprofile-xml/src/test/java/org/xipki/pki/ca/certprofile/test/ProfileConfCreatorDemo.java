@@ -138,6 +138,9 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.SMIMECapability;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectAltName;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectDirectoryAttributs;
 import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectInfoAccess;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectToSubjectAltNameType;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectToSubjectAltNameType.Target;
+import org.xipki.pki.ca.certprofile.x509.jaxb.SubjectToSubjectAltNamesType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TlsFeature;
 import org.xipki.pki.ca.certprofile.x509.jaxb.TripleState;
 import org.xipki.pki.ca.certprofile.x509.jaxb.UsageType;
@@ -635,14 +638,29 @@ public class ProfileConfCreatorDemo {
         // Extensions - general
         ExtensionsType extensions = profile.getExtensions();
 
+        // SubjectToSubjectAltName
+        extensions.setSubjectToSubjectAltNames(new SubjectToSubjectAltNamesType());
+        SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
+        extensions.getSubjectToSubjectAltNames().getSubjectToSubjectAltName().add(s2sType);
+        s2sType.setSource(createOidType(ObjectIdentifiers.DN_CN));
+        s2sType.setTarget(new Target());
+        s2sType.getTarget().setDnsName("");
+
         // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
         list.add(createExtension(Extension.freshestCRL, false, false, null));
 
+        // Extensions - SubjectAltNames
+        SubjectAltName subjectAltNameMode = new SubjectAltName();
+        subjectAltNameMode.setDnsName("");
+        subjectAltNameMode.setIpAddress("");
+        ExtensionValueType extensionValue = createExtensionValueType(subjectAltNameMode);
+        list.add(createExtension(Extension.subjectAlternativeName, true, false, extensionValue));
+
         // Extensions - basicConstraints
-        ExtensionValueType extensionValue = null;
+        extensionValue = null;
         list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
 
         // Extensions - AuthorityInfoAccess

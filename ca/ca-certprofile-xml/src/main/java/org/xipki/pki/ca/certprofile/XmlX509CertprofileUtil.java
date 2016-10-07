@@ -342,7 +342,8 @@ public class XmlX509CertprofileUtil {
         return new DERSequence(vec);
     } //method buildPolicyConstrains
 
-    public static Set<GeneralNameMode> buildGeneralNameMode(final GeneralNameType name) {
+    public static Set<GeneralNameMode> buildGeneralNameMode(final GeneralNameType name)
+    throws CertprofileException {
         ParamUtil.requireNonNull("name", name);
 
         Set<GeneralNameMode> ret = new HashSet<>();
@@ -381,6 +382,10 @@ public class XmlX509CertprofileUtil {
 
         if (name.getRegisteredID() != null) {
             ret.add(new GeneralNameMode(GeneralNameTag.registeredID));
+        }
+
+        if (ret.isEmpty()) {
+            throw new CertprofileException("GeneralNameType could not be empty");
         }
 
         return ret;

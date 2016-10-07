@@ -44,6 +44,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.commons.common.qa.ValidationIssue;
@@ -132,7 +133,8 @@ public class CheckCertCmd extends XipkiCommandSupport {
 
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
         Extensions extensions = null;
-        ASN1Set attrs = csr.getCertificationRequestInfo().getAttributes();
+        CertificationRequestInfo reqInfo = csr.getCertificationRequestInfo();
+        ASN1Set attrs = reqInfo.getAttributes();
         for (int i = 0; i < attrs.size(); i++) {
             Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
             if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
@@ -141,9 +143,8 @@ public class CheckCertCmd extends XipkiCommandSupport {
         }
 
         byte[] certBytes = IoUtil.read(certFile);
-        ValidationResult result = qa.checkCert(certBytes, issuerInfo,
-                csr.getCertificationRequestInfo().getSubject(),
-                csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), extensions);
+        ValidationResult result = qa.checkCert(certBytes, issuerInfo, reqInfo.getSubject(),
+                reqInfo.getSubjectPublicKeyInfo(), extensions);
         StringBuilder sb = new StringBuilder();
 
         sb.append(certFile).append(" (certprofile ").append(profileName).append(")\n");

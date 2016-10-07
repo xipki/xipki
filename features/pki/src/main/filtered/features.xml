@@ -61,6 +61,7 @@
   </feature>
   <feature name="xipki-caqa-shell" version="${project.version}">
     <feature>xipki-caclient-shell</feature>
+    <bundle>mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-qa/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-qa-shell/${project.version}</bundle>
   </feature>

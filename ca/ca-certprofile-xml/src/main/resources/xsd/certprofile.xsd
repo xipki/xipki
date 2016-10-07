@@ -85,7 +85,9 @@
             <xs:element name="incSerialNumber" type="xs:boolean"/>
             <xs:element name="keepRdnOrder" type="xs:boolean">
               <xs:annotation>
-                <xs:documentation>whether the RDNs occurs as in the defined ASN.1 order</xs:documentation>
+                <xs:documentation>
+                  whether the RDNs occurs as in the defined ASN.1 order
+                </xs:documentation>
               </xs:annotation>
             </xs:element>
             <xs:element name="rdn" type="rdnType" maxOccurs="unbounded"/>
@@ -158,7 +160,38 @@
   </xs:simpleType>  
   <xs:complexType name="extensionsType">
     <xs:sequence>
+      <xs:element name="subjectToSubjectAltNames" type="subjectToSubjectAltNamesType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies how the commonName attributes in subject will be copied to the Extension
+            SubjectAltName.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element name="extension" type="extensionType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="subjectToSubjectAltNamesType">
+    <xs:sequence>
+      <xs:element name="subjectToSubjectAltName" type="subjectToSubjectAltNameType"
+        maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="subjectToSubjectAltNameType">
+    <xs:sequence>
+      <xs:element name="source" type="oidWithDescType"/>
+      <xs:element name="target">
+        <xs:complexType>
+          <xs:choice>
+            <xs:element name="rfc822Name" type="xs:string"/>
+            <xs:element name="dnsName" type="xs:string"/>
+            <xs:element name="directoryName" type="xs:string"/>
+            <xs:element name="uniformResourceIdentifier" type="xs:string"/>
+            <xs:element name="ipAddress" type="xs:string"/>
+            <xs:element name="registeredID" type="xs:string"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="extensionType">
