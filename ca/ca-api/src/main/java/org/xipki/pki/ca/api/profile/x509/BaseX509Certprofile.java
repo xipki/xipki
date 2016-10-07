@@ -96,7 +96,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     protected BaseX509Certprofile() {
     }
 
-    protected abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
+    public abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
 
     protected String[] sortRdns(final RdnControl control, final String[] values) {
         ParamUtil.requireNonNull("values", values);

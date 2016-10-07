@@ -62,8 +62,6 @@ import org.xipki.pki.ca.api.profile.KeyParametersOption.AllowAllParametersOption
 import org.xipki.pki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.pki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.pki.ca.api.profile.KeyParametersOption.RSAParametersOption;
-import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
-import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
 
 /**
  * @author Lijun Liao
@@ -79,12 +77,9 @@ public class PublicKeyChecker {
 
     private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
-    public PublicKeyChecker(final X509ProfileType conf) throws CertprofileException {
-        ParamUtil.requireNonNull("conf", conf);
-        // KeyAlgorithms
-        if (conf.getKeyAlgorithms() != null) {
-            this.keyAlgorithms = XmlX509CertprofileUtil.buildKeyAlgorithms(conf.getKeyAlgorithms());
-        }
+    public PublicKeyChecker(final Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms)
+    throws CertprofileException {
+        this.keyAlgorithms = keyAlgorithms;
     }
 
     public List<ValidationIssue> checkPublicKey(final SubjectPublicKeyInfo publicKey,

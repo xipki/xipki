@@ -35,7 +35,6 @@
 package org.xipki.pki.ca.qa;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,15 +60,11 @@ import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.profile.CertprofileException;
-import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.RdnControl;
 import org.xipki.pki.ca.api.profile.StringType;
+import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.pki.ca.api.profile.x509.SubjectControl;
 import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
-import org.xipki.pki.ca.certprofile.XmlX509CertprofileUtil;
-import org.xipki.pki.ca.certprofile.x509.jaxb.RdnType;
-import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType;
-import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 
 /**
  * @author Lijun Liao
@@ -78,55 +73,15 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
 
 public class SubjectChecker {
 
-    private final String specialBehavior;
+    private final SpecialX509CertprofileBehavior specialBehavior;
 
     private final SubjectControl subjectControl;
 
-    public SubjectChecker(final X509ProfileType conf) throws CertprofileException {
-        ParamUtil.requireNonNull("conf", conf);
-        this.specialBehavior = conf.getSpecialBehavior();
-
-        Subject subject = conf.getSubject();
-        List<RdnControl> subjectDnControls = new LinkedList<>();
-
-        for (RdnType t : subject.getRdn()) {
-            ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
-
-            List<Pattern> patterns = null;
-            if (CollectionUtil.isNonEmpty(t.getRegex())) {
-                patterns = new LinkedList<>();
-                for (String regex : t.getRegex()) {
-                    Pattern pattern = Pattern.compile(regex);
-                    patterns.add(pattern);
-                }
-            }
-
-            if (patterns == null) {
-                Pattern pattern = SubjectDnSpec.getPattern(type);
-                if (pattern != null) {
-                    patterns = Arrays.asList(pattern);
-                }
-            }
-
-            Range range = (t.getMinLen() != null || t.getMaxLen() != null)
-                    ? new Range(t.getMinLen(), t.getMaxLen()) : null;
-
-            StringType stringType = XmlX509CertprofileUtil.convertStringType(t.getStringType());
-
-            RdnControl rdnControl = new RdnControl(type, t.getMinOccurs(), t.getMaxOccurs());
-            rdnControl.setStringType(stringType);
-            rdnControl.setStringLengthRange(range);
-            rdnControl.setPatterns(patterns);
-            rdnControl.setPrefix(t.getPrefix());
-            rdnControl.setSuffix(t.getSuffix());
-            rdnControl.setGroup(t.getGroup());
-            SubjectDnSpec.fixRdnControl(rdnControl);
-
-            subjectDnControls.add(rdnControl);
-        }
-
-        this.subjectControl = new SubjectControl(subjectDnControls, subject.isKeepRdnOrder());
-    } // constructor
+    public SubjectChecker(final SpecialX509CertprofileBehavior specialBehavior,
+            final SubjectControl subjectControl) throws CertprofileException {
+        this.specialBehavior = specialBehavior;
+        this.subjectControl = ParamUtil.requireNonNull("subjectControl", subjectControl);
+    }
 
     public List<ValidationIssue> checkSubject(final X500Name subject,
             final X500Name requestedSubject) {
@@ -428,7 +383,7 @@ public class SubjectChecker {
         } else {
             String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(index);
             if (ObjectIdentifiers.DN_CN.equals(type) && specialBehavior != null
-                    && "gematik_gSMC_K".equals(specialBehavior)) {
+                    && SpecialX509CertprofileBehavior.gematik_gSMC_K.equals(specialBehavior)) {
                 if (!tmpAtvTextValue.startsWith(requestedCoreAtvTextValue + "-")) {
                     failureMsg.append("content '").append(tmpAtvTextValue)
                         .append("' does not start with '")
@@ -524,7 +479,7 @@ public class SubjectChecker {
             issue = new ValidationIssue("X509.SUBJECT." + attrName, "attribute "
                     + subjectAttrType.getId());
         } else {
-            issue = new ValidationIssue("X509.SUBJECT." + attrName, "extension " + attrName
+            issue = new ValidationIssue("X509.SUBJECT." + attrName, "attribute " + attrName
                     + " (" + subjectAttrType.getId() + ")");
         }
         return issue;

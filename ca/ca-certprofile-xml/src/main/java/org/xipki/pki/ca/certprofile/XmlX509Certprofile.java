@@ -187,7 +187,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private ExtensionValue authorizationTemplate;
 
-    private BiometricInfoOption biometricDataOption;
+    private BiometricInfoOption biometricInfo;
 
     private X509CertLevel certLevel;
 
@@ -241,7 +241,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
     private List<String> signatureAlgorithms;
 
-    private ExtensionValue smimeCapatibilities;
+    private ExtensionValue smimeCapabilities;
 
     private SpecialX509CertprofileBehavior specialBehavior;
 
@@ -265,7 +265,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         subjectAltNameModes = null;
         subjectInfoAccessModes = null;
         authorizationTemplate = null;
-        biometricDataOption = null;
+        biometricInfo = null;
         certLevel = null;
         certificatePolicies = null;
         constantExtensions = null;
@@ -292,7 +292,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         restriction = null;
         serialNumberInReqPermitted = true;
         signatureAlgorithms = null;
-        smimeCapatibilities = null;
+        smimeCapabilities = null;
         specialBehavior = null;
         subjectControl = null;
         tlsFeature = null;
@@ -350,14 +350,16 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         if (conf.getSignatureAlgorithms() != null) {
             List<String> algoNames = conf.getSignatureAlgorithms().getAlgorithm();
-            this.signatureAlgorithms = new ArrayList<>(algoNames.size());
+            List<String> list = new ArrayList<>(algoNames.size());
             for (String algoName : algoNames) {
                 try {
-                    this.signatureAlgorithms.add(AlgorithmUtil.canonicalizeSignatureAlgo(algoName));
+                    list.add(AlgorithmUtil.canonicalizeSignatureAlgo(algoName));
                 } catch (NoSuchAlgorithmException ex) {
                     throw new CertprofileException(ex.getMessage(), ex);
                 }
             }
+
+            this.signatureAlgorithms = Collections.unmodifiableList(list);
         }
 
         this.raOnly = conf.isRaOnly();
@@ -714,7 +716,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
 
         try {
-            this.biometricDataOption = new BiometricInfoOption(extConf);
+            this.biometricInfo = new BiometricInfoOption(extConf);
         } catch (NoSuchAlgorithmException ex) {
             throw new CertprofileException("NoSuchAlgorithmException: " + ex.getMessage());
         }
@@ -1016,7 +1018,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
 
         ASN1Encodable extValue = new DERSequence(vec);
-        smimeCapatibilities = new ExtensionValue(extensionControls.get(type).isCritical(),
+        smimeCapabilities = new ExtensionValue(extensionControls.get(type).isCritical(),
                 extValue);
     }
 
@@ -1516,7 +1518,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         // biometricData
         type = Extension.biometricInfo;
-        if (occurences.contains(type) && biometricDataOption != null) {
+        if (occurences.contains(type) && biometricInfo != null) {
             Extension extension = (requestedExtensions == null) ? null
                     : requestedExtensions.getExtension(type);
             if (extension == null) {
@@ -1535,13 +1537,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             for (int i = 0; i < n; i++) {
                 BiometricData bd = BiometricData.getInstance(seq.getObjectAt(i));
                 TypeOfBiometricData bdType = bd.getTypeOfBiometricData();
-                if (!biometricDataOption.isTypePermitted(bdType)) {
+                if (!biometricInfo.isTypePermitted(bdType)) {
                     throw new BadCertTemplateException(
                             "biometricInfo[" + i + "].typeOfBiometricData is not permitted");
                 }
 
                 ASN1ObjectIdentifier hashAlgo = bd.getHashAlgorithm().getAlgorithm();
-                if (!biometricDataOption.isHashAlgorithmPermitted(hashAlgo)) {
+                if (!biometricInfo.isHashAlgorithmPermitted(hashAlgo)) {
                     throw new BadCertTemplateException(
                             "biometricInfo[" + i + "].hashAlgorithm is not permitted");
                 }
@@ -1561,7 +1563,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 }
 
                 DERIA5String sourceDataUri = bd.getSourceDataUri();
-                switch (biometricDataOption.getSourceDataUriOccurrence()) {
+                switch (biometricInfo.getSourceDataUriOccurrence()) {
                 case FORBIDDEN:
                     sourceDataUri = null;
                     break;
@@ -1608,9 +1610,9 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         // SMIME
         type = ObjectIdentifiers.id_smimeCapabilities;
-        if (smimeCapatibilities != null) {
+        if (smimeCapabilities != null) {
             if (occurences.remove(type)) {
-                values.addExtension(type, smimeCapatibilities);
+                values.addExtension(type, smimeCapabilities);
             }
         }
 
@@ -1769,7 +1771,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     }
 
     @Override
-    protected Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms() {
+    public Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms() {
         return keyAlgorithms;
     }
 
@@ -1791,6 +1793,126 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
     @Override
     public boolean incSerialNumberIfSubjectExists() {
         return incSerialNoIfSubjectExists;
+    }
+
+    public ExtensionValue getAdditionalInformation() {
+        return additionalInformation;
+    }
+
+    public AdmissionSyntaxOption getAdmission() {
+        return admission;
+    }
+
+    public Map<ASN1ObjectIdentifier, GeneralNameTag> getSubjectToSubjectAltNameModes() {
+        return subjectToSubjectAltNameModes;
+    }
+
+    public Set<GeneralNameMode> getSubjectAltNameModes() {
+        return subjectAltNameModes;
+    }
+
+    public ExtensionValue getAuthorizationTemplate() {
+        return authorizationTemplate;
+    }
+
+    public BiometricInfoOption getBiometricInfo() {
+        return biometricInfo;
+    }
+
+    public ExtensionValue getCertificatePolicies() {
+        return certificatePolicies;
+    }
+
+    public Map<ASN1ObjectIdentifier, ExtensionValue> getConstantExtensions() {
+        return constantExtensions;
+    }
+
+    public Set<ExtKeyUsageControl> getExtendedKeyusages() {
+        return extendedKeyusages;
+    }
+
+    public boolean isIncludeIssuerAndSerialInAki() {
+        return includeIssuerAndSerialInAki;
+    }
+
+    public boolean isIncSerialNoIfSubjectExists() {
+        return incSerialNoIfSubjectExists;
+    }
+
+    public ExtensionValue getInhibitAnyPolicy() {
+        return inhibitAnyPolicy;
+    }
+
+    public Set<KeyUsageControl> getKeyusages() {
+        return keyusages;
+    }
+
+    public Integer getMaxSize() {
+        return maxSize;
+    }
+
+    public ExtensionValue getNameConstraints() {
+        return nameConstraints;
+    }
+
+    public boolean isNotBeforeMidnight() {
+        return notBeforeMidnight;
+    }
+
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    public Integer getPathLen() {
+        return pathLen;
+    }
+
+    public ExtensionValue getPolicyConstraints() {
+        return policyConstraints;
+    }
+
+    public ExtensionValue getPolicyMappings() {
+        return policyMappings;
+    }
+
+    public CertValidity getPrivateKeyUsagePeriod() {
+        return privateKeyUsagePeriod;
+    }
+
+    public ExtensionValue getQcStatments() {
+        return qcStatments;
+    }
+
+    public List<QcStatementOption> getQcStatementsOption() {
+        return qcStatementsOption;
+    }
+
+    public boolean isRaOnly() {
+        return raOnly;
+    }
+
+    public ExtensionValue getRestriction() {
+        return restriction;
+    }
+
+    public ExtensionValue getSmimeCapabilities() {
+        return smimeCapabilities;
+    }
+
+    public SpecialX509CertprofileBehavior getSpecialBehavior() {
+        return specialBehavior;
+    }
+
+    public ExtensionValue getTlsFeature() {
+        return tlsFeature;
+    }
+
+    public ExtensionValue getValidityModel() {
+        return validityModel;
+    }
+
+    public SubjectDirectoryAttributesControl getSubjectDirAttrsControl() {
+        return subjectDirAttrsControl;
     }
 
     private static Object getExtensionValue(final ASN1ObjectIdentifier type,

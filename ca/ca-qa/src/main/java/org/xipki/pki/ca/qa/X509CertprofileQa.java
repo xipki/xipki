@@ -110,16 +110,6 @@ public class X509CertprofileQa {
 
     private final ExtensionsChecker extensionsChecker;
 
-    private final CertValidity validity;
-
-    private final X509CertVersion version;
-
-    private final Set<String> signatureAlgorithms;
-
-    private final boolean notBeforeMidnight;
-
-    private final int maxSize;
-
     private final XmlX509Certprofile certProfile;
 
     public X509CertprofileQa(final String data) throws CertprofileException {
@@ -135,34 +125,10 @@ public class X509CertprofileQa {
             certProfile = new XmlX509Certprofile();
             certProfile.initialize(conf);
 
-            this.version = X509CertVersion.forName(conf.getVersion());
-            if (this.version == null) {
-                throw new CertprofileException("invalid version " + conf.getVersion());
-            }
-
-            Integer size = conf.getMaxSize();
-            this.maxSize = (size == null) ? 0 : size;
-
-            if (conf.getSignatureAlgorithms() == null) {
-                this.signatureAlgorithms = null;
-            } else {
-                this.signatureAlgorithms = new HashSet<>();
-                for (String algo :conf.getSignatureAlgorithms().getAlgorithm()) {
-                    String c14nAlgo;
-                    try {
-                        c14nAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(algo);
-                    } catch (NoSuchAlgorithmException ex) {
-                        throw new CertprofileException(ex.getMessage(), ex);
-                    }
-                    this.signatureAlgorithms.add(c14nAlgo);
-                }
-            }
-
-            this.validity = CertValidity.getInstance(conf.getValidity());
-            this.notBeforeMidnight = "midnight".equalsIgnoreCase(conf.getNotBeforeTime());
-            this.publicKeyChecker = new PublicKeyChecker(conf);
-            this.subjectChecker = new SubjectChecker(conf);
-            this.extensionsChecker = new ExtensionsChecker(conf);
+            this.publicKeyChecker = new PublicKeyChecker(certProfile.getKeyAlgorithms());
+            this.subjectChecker = new SubjectChecker(certProfile.getSpecialBehavior(),
+                    certProfile.getSubjectControl());
+            this.extensionsChecker = new ExtensionsChecker(conf, certProfile);
         } catch (RuntimeException ex) {
             LogUtil.error(LOG, ex);
             throw new CertprofileException(
@@ -188,7 +154,9 @@ public class X509CertprofileQa {
         // certificate size
         issue = new ValidationIssue("X509.SIZE", "certificate size");
         resultIssues.add(issue);
-        if (maxSize > 0) {
+
+        Integer maxSize = certProfile.getMaxSize();
+        if (maxSize != 0) {
             int size = certBytes.length;
             if (size > maxSize) {
                 issue.setFailureMessage(String.format(
@@ -212,9 +180,11 @@ public class X509CertprofileQa {
         issue = new ValidationIssue("X509.VERSION", "certificate version");
         resultIssues.add(issue);
         int versionNumber = tbsCert.getVersionNumber();
-        if (versionNumber != version.getVersionNumber()) {
+
+        X509CertVersion expVersion = certProfile.getVersion();
+        if (versionNumber != expVersion.getVersionNumber()) {
             issue.setFailureMessage("is '" + versionNumber
-                    + "' but expected '" + version.getVersionNumber() + "'");
+                    + "' but expected '" + expVersion.getVersionNumber() + "'");
         }
 
         // serialNumber
@@ -230,6 +200,7 @@ public class X509CertprofileQa {
         }
 
         // signatureAlgorithm
+        List<String> signatureAlgorithms = certProfile.getSignatureAlgorithms();
         if (CollectionUtil.isNonEmpty(signatureAlgorithms)) {
             issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
             resultIssues.add(issue);
@@ -273,7 +244,7 @@ public class X509CertprofileQa {
         checkTime(tbsCert.getStartDate(), issue);
 
         // notBefore
-        if (notBeforeMidnight) {
+        if (certProfile.isNotBeforeMidnight()) {
             issue = new ValidationIssue("X509.NOTBEFORE", "notBefore midnight");
             resultIssues.add(issue);
             Calendar cal = Calendar.getInstance(UTC);
@@ -297,6 +268,7 @@ public class X509CertprofileQa {
         } else if (cert.getNotBefore().before(issuerInfo.getCaNotBefore())) {
             issue.setFailureMessage("notBefore must not be before CA's notBefore");
         } else {
+            CertValidity validity = certProfile.getValidity();
             Date expectedNotAfter = validity.add(cert.getNotBefore());
             if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS) {
                 expectedNotAfter = new Date(MAX_CERT_TIME_MS);
@@ -356,7 +328,7 @@ public class X509CertprofileQa {
 
         resultIssues.addAll(
                 extensionsChecker.checkExtensions(bcCert, issuerInfo, requestedExtensions,
-                        requestedSubject, certProfile));
+                        requestedSubject));
 
         return new ValidationResult(resultIssues);
     } // method checkCert
