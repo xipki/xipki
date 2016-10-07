@@ -64,8 +64,6 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
 
     private Integer serialNoBitLen;
 
-    private String extraControl;
-
     public X509ChangeCaEntry(final String name) throws CaMgmtException {
         super(name);
     }
@@ -135,14 +133,6 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
 
     public void setNumCrls(final Integer numCrls) {
         this.numCrls = numCrls;
-    }
-
-    public String getExtraControl() {
-        return extraControl;
-    }
-
-    public void setExtraControl(final String extraControl) {
-        this.extraControl = extraControl;
     }
 
 }

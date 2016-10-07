@@ -358,8 +358,8 @@ class CaConfigurationDbImporter extends DbPorter {
         sqlBuilder.append("CERT,SIGNER_TYPE,CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,");
         sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,PERMISSIONS,");
         sqlBuilder.append("NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,");
-        sqlBuilder.append("REV,RR,RT,RIT,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
-        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        sqlBuilder.append("REV,RR,RT,RIT,VALIDITY_MODE,POPO_ALGOS,EXTRA_CONTROL,SIGNER_CONF)");
+        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
@@ -405,6 +405,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     setLong(ps, idx++, ca.getRevTime());
                     setLong(ps, idx++, ca.getRevInvTime());
                     ps.setString(idx++, ca.getValidityMode());
+                    ps.setString(idx++, ca.getPopoAlgos());
                     ps.setString(idx++, ca.getExtraControl());
                     ps.setString(idx++, getValue(ca.getSignerConf()));
 

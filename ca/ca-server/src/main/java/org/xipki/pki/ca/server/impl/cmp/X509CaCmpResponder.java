@@ -37,6 +37,7 @@ package org.xipki.pki.ca.server.impl.cmp;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
@@ -87,9 +88,12 @@ import org.bouncycastle.asn1.crmf.CertReqMessages;
 import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertTemplate;
 import org.bouncycastle.asn1.crmf.OptionalValidity;
+import org.bouncycastle.asn1.crmf.POPOSigningKey;
+import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -120,6 +124,7 @@ import org.xipki.commons.security.CrlReason;
 import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.XiSecurityConstants;
+import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.api.InsuffientPermissionException;
 import org.xipki.pki.ca.api.OperationException;
@@ -504,7 +509,8 @@ public class X509CaCmpResponder extends CmpResponder {
         AuditChildEvent childAuditEvent = new AuditChildEvent();
         auditEvent.addChildAuditEvent(childAuditEvent);
 
-        if (!securityFactory.verifyPopo(p10cr)) {
+        X509Ca ca = getCa();
+        if (!securityFactory.verifyPopo(p10cr, ca.getCaInfo().getPopoAlgorithms())) {
             LOG.warn("could not validate POP for the pkcs#10 requst");
             PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
             certResp = new CertResponse(certReqId, status);
@@ -569,7 +575,7 @@ public class X509CaCmpResponder extends CmpResponder {
         }
 
         CMPCertificate[] caPubs = sendCaCert
-                ? new CMPCertificate[]{getCa().getCaInfo().getCertInCmpFormat()} : null;
+                ? new CMPCertificate[]{ca.getCaInfo().getCertInCmpFormat()} : null;
         CertRepMessage repMessage = new CertRepMessage(caPubs, new CertResponse[]{certResp});
 
         return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
@@ -998,6 +1004,32 @@ public class X509CaCmpResponder extends CmpResponder {
 
         if (popType != CertificateRequestMessage.popSigningKey) {
             LOG.error("unsupported POP type: " + popType);
+            return false;
+        }
+
+        // check the POP signature algorithm
+        ProofOfPossession pop = certRequest.toASN1Structure().getPopo();
+        POPOSigningKey popoSign = POPOSigningKey.getInstance(pop.getObject());
+        AlgorithmIdentifier popoAlgId = popoSign.getAlgorithmIdentifier();
+        String popoAlgName;
+        try {
+            popoAlgName = AlgorithmUtil.getSignatureAlgoName(popoAlgId);
+        } catch (NoSuchAlgorithmException ex) {
+            LOG.error("Unknown signature algorithm {}", popoAlgId.getAlgorithm().getId());
+            return false;
+        }
+
+        boolean allowed = false;
+        Set<String> allowedSigAlgos = getCa().getCaInfo().getPopoAlgorithms();
+        for (String m : allowedSigAlgos) {
+            if (AlgorithmUtil.equalsAlgoName(m, popoAlgName)) {
+                allowed = true;
+                break;
+            }
+        }
+
+        if (!allowed) {
+            LOG.error("POPO signature algorithm {} not permitted", popoAlgName);
             return false;
         }
 
@@ -1524,8 +1556,10 @@ public class X509CaCmpResponder extends CmpResponder {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, ex.getMessage());
         }
 
+        X509Ca ca = getCa();
+
         CertificationRequest csr = CertificationRequest.getInstance(encodedCsr);
-        if (!securityFactory.verifyPopo(csr)) {
+        if (!securityFactory.verifyPopo(csr, ca.getCaInfo().getPopoAlgorithms())) {
             LOG.warn("could not validate POP for the pkcs#10 requst");
             throw new OperationException(ErrorCode.BAD_POP);
         }
@@ -1549,7 +1583,6 @@ public class X509CaCmpResponder extends CmpResponder {
         CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
                 notBefore, notAfter, extensions, profileName);
 
-        X509Ca ca = getCa();
         X509CertificateInfo certInfo = ca.generateCertificate(certTemplate, requestor.isRa(),
                 requestor, user, reqType, null);
         certInfo.setRequestor(requestor);

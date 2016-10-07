@@ -44,9 +44,11 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.SigAlgCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
 import org.xipki.commons.password.PasswordResolver;
+import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
@@ -183,6 +185,13 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
     @Completion(ValidityModeCompleter.class)
     private String validityModeS = "STRICT";
 
+    @Option(name = "--popo-algo",
+            required = true, multiValued = true,
+            description = "POPO signature algorithms\n"
+                    + "(required, multi-valued)")
+    @Completion(SigAlgCompleter.class)
+    private Set<String> popoAlgorithms;
+
     @Option(name = "--extra-control",
             description = "extra control")
     private String extraControl;
@@ -253,6 +262,12 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
         }
 
         entry.setPermissions(tmpPermissions);
+
+        Set<String> algos = new HashSet<>();
+        for (String m : popoAlgorithms) {
+            algos.add(AlgorithmUtil.canonicalizeSignatureAlgo(m));
+        }
+        entry.setPopoAlgorithms(algos);
 
         if (StringUtil.isNotBlank(extraControl)) {
             entry.setExtraControl(extraControl.trim());

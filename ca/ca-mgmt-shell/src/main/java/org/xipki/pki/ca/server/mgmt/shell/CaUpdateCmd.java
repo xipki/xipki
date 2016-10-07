@@ -45,9 +45,11 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.console.karaf.completer.SigAlgCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
 import org.xipki.commons.password.PasswordResolver;
@@ -142,7 +144,7 @@ public class CaUpdateCmd extends CaCommandSupport {
     private String crlSignerName;
 
     @Option(name = "--responder",
-            description = "Responder name or 'NULL'")
+            description = "responder name or 'NULL'")
     @Completion(ResponderNamePlusNullCompleter.class)
     private String responderName;
 
@@ -188,6 +190,13 @@ public class CaUpdateCmd extends CaCommandSupport {
             description = "mode of valditity")
     @Completion(ValidityModeCompleter.class)
     private String validityModeS;
+
+    @Option(name = "--popo-algo",
+            multiValued = true,
+            description = "POPO signature algorithms\n"
+                    + "(multi-valued)")
+    @Completion(SigAlgCompleter.class)
+    private Set<String> popoAlgorithms;
 
     @Option(name = "--extra-control",
             description = "extra control")
@@ -252,7 +261,7 @@ public class CaUpdateCmd extends CaCommandSupport {
             entry.setSaveRequest(saveReq);
         }
 
-        if (permissions != null && permissions.size() > 0) {
+        if (CollectionUtil.isNonEmpty(permissions)) {
             Set<Permission> tmpPermissions = new HashSet<>();
             for (String permission : permissions) {
                 tmpPermissions.add(Permission.forValue(permission));

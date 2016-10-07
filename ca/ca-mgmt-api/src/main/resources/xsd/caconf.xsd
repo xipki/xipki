@@ -185,6 +185,7 @@
       <xs:element name="duplicateKey" type="xs:boolean"/>
       <xs:element name="duplicateSubject" type="xs:boolean"/>
       <xs:element name="expirationPeriod" type="xs:int" minOccurs="0"/>
+      <xs:element name="popoAlgos" type="stringsType"/>
       <xs:element name="extraControl" type="fileOrValueType" minOccurs="0"/>
       <xs:element name="genSelfIssued" type="genSelfIssuedType" minOccurs="0">
         <xs:annotation>

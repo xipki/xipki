@@ -183,7 +183,7 @@
       <xs:element name="duplicateKey" type="xs:int"/>
       <xs:element name="duplicateSubject" type="xs:int"/>
       <xs:element name="saveReq" type="xs:int"/>
-      <xs:element name="permissions" type="xs:string" minOccurs="0"/>
+      <xs:element name="permissions" type="xs:string"/>
       <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
       <xs:element name="expirationPeriod" type="xs:int"/>
       <xs:element name="keepExpiredCertDays" type="xs:int"/>
@@ -192,6 +192,7 @@
       <xs:element name="revTime" type="xs:long" minOccurs="0"/>
       <xs:element name="revInvTime" type="xs:long" minOccurs="0"/>
       <xs:element name="validityMode" type="xs:string" minOccurs="0"/>
+      <xs:element name="popoAlgos" type="xs:string"/>
       <xs:element name="extraControl" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>

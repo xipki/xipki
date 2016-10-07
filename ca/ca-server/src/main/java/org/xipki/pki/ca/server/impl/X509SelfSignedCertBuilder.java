@@ -145,7 +145,7 @@ class X509SelfSignedCertBuilder {
                     + X509CertLevel.RootCA);
         }
 
-        if (!securityFactory.verifyPopo(csr)) {
+        if (!securityFactory.verifyPopo(csr, null)) {
             throw new InvalidConfException("could not validate POP for the CSR");
         }
 

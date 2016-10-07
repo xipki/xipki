@@ -2440,7 +2440,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("invalid CSR request. ERROR: " + ex.getMessage());
         }
 
-        if (!securityFactory.verifyPopo(csr)) {
+        if (!securityFactory.verifyPopo(csr, ca.getCaInfo().getPopoAlgorithms())) {
             throw new CaMgmtException("could not validate POP for the CSR");
         }
 
@@ -2580,6 +2580,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         entry.setCrlSignerName(caEntry.getCrlSignerName());
         entry.setDuplicateKeyPermitted(caEntry.isDuplicateKeyPermitted());
         entry.setDuplicateSubjectPermitted(caEntry.isDuplicateSubjectPermitted());
+        entry.setPopoAlgorithms(caEntry.getPopoAlgorithms());
         entry.setExtraControl(caEntry.getExtraControl());
         entry.setMaxValidity(caEntry.getMaxValidity());
         entry.setKeepExpiredCertInDays(caEntry.getKeepExpiredCertInDays());

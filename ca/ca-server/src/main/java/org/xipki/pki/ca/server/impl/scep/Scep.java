@@ -423,7 +423,8 @@ public class Scep {
                 audit(auditEvent, "req-subject", reqSubjectText);
                 LOG.info("tid={}, subject={}", tid, reqSubjectText);
 
-                if (!caManager.getSecurityFactory().verifyPopo(csr)) {
+                if (!caManager.getSecurityFactory().verifyPopo(csr,
+                        ca.getCaInfo().getPopoAlgorithms())) {
                     LOG.warn("tid={}, POPO verification failed", tid);
                     throw FailInfoException.BAD_MESSAGE_CHECK;
                 }

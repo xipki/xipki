@@ -443,7 +443,8 @@ if { $printUsage equals "true" } {
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode CUTOFF \
+    --popo-algo SHA256withRSA
 
   xipki-ca:profile-rm RCA
 
@@ -464,7 +465,8 @@ if { $printUsage equals "true" } {
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode CUTOFF \
+    --popo-algo SHA256withRSA
 
   echo "neg-ca-add: CMP control name does not exist"
 
@@ -483,7 +485,8 @@ if { $printUsage equals "true" } {
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode CUTOFF \
+    --popo-algo SHA256withRSA
 
   echo "neg-ca-add: CRL signer name does not exist"
 
@@ -503,7 +506,8 @@ if { $printUsage equals "true" } {
     --responder responder1 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode CUTOFF \
+    --popo-algo SHA256withRSA
 
   echo "neg-ca-add: responder name does not exist"
 
@@ -522,7 +526,8 @@ if { $printUsage equals "true" } {
     --responder responder2 \
     --duplicate-subject  yes \
     --duplicate-key yes \
-    --validity-mode CUTOFF
+    --validity-mode CUTOFF \
+    --popo-algo SHA256withRSA
 
   echo "#################################################################"
   echo "#                            CA ALIAS                           #"

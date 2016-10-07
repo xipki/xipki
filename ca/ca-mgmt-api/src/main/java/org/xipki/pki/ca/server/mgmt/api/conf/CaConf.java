@@ -346,7 +346,7 @@ public class CaConf {
                     caEntry.setCrlSignerName(ci.getCrlsignerName());
                     caEntry.setDuplicateKeyPermitted(ci.isDuplicateKey());
                     caEntry.setDuplicateSubjectPermitted(ci.isDuplicateSubject());
-
+                    caEntry.setPopoAlgorithms(getStringsAsSet(ci.getPopoAlgos()));
                     if (ci.getExtraControl() != null) {
                         caEntry.setExtraControl(getValue(ci.getExtraControl(), zipFile));
                     }
@@ -624,6 +624,18 @@ public class CaConf {
         }
 
         List<String> ret = new ArrayList<>(jaxb.getStr().size());
+        for (String m : jaxb.getStr()) {
+            ret.add(expandConf(m));
+        }
+        return ret;
+    }
+
+    private Set<String> getStringsAsSet(StringsType jaxb) {
+        if (jaxb == null) {
+            return null;
+        }
+
+        Set<String> ret = new HashSet<>(jaxb.getStr().size());
         for (String m : jaxb.getStr()) {
             ret.add(expandConf(m));
         }

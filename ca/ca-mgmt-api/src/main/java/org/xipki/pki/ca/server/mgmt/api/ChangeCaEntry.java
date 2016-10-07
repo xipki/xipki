@@ -34,9 +34,14 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
+import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.profile.CertValidity;
 
 /**
@@ -73,6 +78,10 @@ public class ChangeCaEntry {
     private Integer keepExpiredCertInDays;
 
     private Integer expirationPeriod;
+
+    private Set<String> popoAlgorithms;
+
+    private String extraControl;
 
     public ChangeCaEntry(final String name) throws CaMgmtException {
         this.name = ParamUtil.requireNonBlank("name", name);
@@ -184,6 +193,38 @@ public class ChangeCaEntry {
 
     public void setKeepExpiredCertInDays(final Integer days) {
         this.keepExpiredCertInDays = days;
+    }
+
+    public Set<String> getPopoAlgorithms() {
+        return popoAlgorithms;
+    }
+
+    public void setPopoAlgorithms(final Set<String> popoAlgorithms) {
+        if (CollectionUtil.isEmpty(popoAlgorithms)) {
+            this.popoAlgorithms = null;
+            return;
+        }
+
+        Set<String> canonicalizedAlgos = new HashSet<>();
+        for (String m : popoAlgorithms) {
+            String canoAlgo;
+            try {
+                canoAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(m);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new IllegalArgumentException(ex.getMessage());
+            }
+            canonicalizedAlgos.add(canoAlgo);
+        }
+
+        this.popoAlgorithms = Collections.unmodifiableSet(canonicalizedAlgos);
+    }
+
+    public String getExtraControl() {
+        return extraControl;
+    }
+
+    public void setExtraControl(final String extraControl) {
+        this.extraControl = extraControl;
     }
 
 }
