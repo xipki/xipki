@@ -5,11 +5,11 @@ BASE_URL="https://localhost:8443/rest/SubCAwithCRL"
 
 echo "base url: ${BASE_URL}"
 
-DIR=`dirname $0`
+DIRNAME=`dirname $0`
 
-echo "working dir: ${DIR}"
+echo "working dir: ${DIRNAME}"
 
-SSL="-k --cert ${DIR}/../security/tlskeys/tls-client.pem --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem"
+SSL="-k --cert ${DIRNAME}/../security/tlskeys/tls-client.pem --key ${DIRNAME}/../security/tlskeys/tls-client-privateKey.pem"
 
 filename=tls-`date +%s` 
 
