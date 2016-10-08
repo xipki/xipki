@@ -1955,6 +1955,8 @@ public class X509Ca {
                 }
             } catch (BadCertTemplateException ex) {
                 throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
+            } catch (OperationException ex) {
+                throw ex;
             } catch (Throwable th) {
                 LogUtil.error(LOG, th, "could not generate certificate");
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
