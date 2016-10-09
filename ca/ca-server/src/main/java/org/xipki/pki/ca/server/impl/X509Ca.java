@@ -102,6 +102,7 @@ import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -1798,6 +1799,9 @@ public class X509Ca {
                         try {
                             Object[] objs = incSerialNumber(certprofile, grantedSubject, latestSn);
                             grantedSubject = (X500Name) objs[0];
+                            if (CompareUtil.equalsObject(latestSn, objs[1])) {
+                                break;
+                            }
                             latestSn = (String) objs[1];
                         } catch (BadFormatException ex) {
                             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
