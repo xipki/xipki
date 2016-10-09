@@ -153,6 +153,41 @@ import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl.UpdateMode;
 
 public class X509Ca {
 
+    private static class GrantedCertTemplate {
+        private final ConcurrentContentSigner signer;
+        private final IdentifiedX509Certprofile certprofile;
+        private final Date grantedNotBefore;
+        private final Date grantedNotAfter;
+        private final X500Name requestedSubject;
+        private final X500Name grantedSubject;
+        private final String grantedSubjectText;
+        private final long fpSubject;
+        private final SubjectPublicKeyInfo grantedPublicKey;
+        private final byte[] grantedPublicKeyData;
+        private final long fpPublicKey;
+        private final String warning;
+
+        public GrantedCertTemplate(IdentifiedX509Certprofile certprofile, Date grantedNotBefore,
+                Date grantedNotAfter, X500Name requestedSubject, X500Name grantedSubject,
+                String grantedSubjectText, long fpSubject, SubjectPublicKeyInfo grantedPublicKey,
+                long fpPublicKey, byte[] grantedPublicKeyData, ConcurrentContentSigner signer,
+                String warning) {
+            this.certprofile = certprofile;
+            this.grantedNotBefore = grantedNotBefore;
+            this.grantedNotAfter = grantedNotAfter;
+            this.fpSubject = fpSubject;
+            this.requestedSubject = requestedSubject;
+            this.grantedSubject = grantedSubject;
+            this.grantedSubjectText = grantedSubjectText;
+            this.grantedPublicKey = grantedPublicKey;
+            this.grantedPublicKeyData = grantedPublicKeyData;
+            this.fpPublicKey = fpPublicKey;
+            this.signer = signer;
+            this.warning = warning;
+        }
+
+    }
+
     private class ScheduledExpiredCertsRemover implements Runnable {
 
         private boolean inProcess;
@@ -1598,6 +1633,108 @@ public class X509Ca {
             final boolean keyUpdate, final RequestType reqType, final byte[] transactionId)
     throws OperationException {
         ParamUtil.requireNonNull("certTemplate", certTemplate);
+
+        GrantedCertTemplate gct = createGrantedCertTemplate(certTemplate, requestedByRa, requestor,
+                keyUpdate);
+
+        try {
+            boolean addedCertInProcess = certstore.addCertInProcess(gct.fpPublicKey, gct.fpSubject);
+            if (!addedCertInProcess) {
+                throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                        "certificate with the given subject " + gct.grantedSubjectText
+                        + " and/or public key already in process");
+            }
+
+            X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
+                    caInfo.getPublicCaInfo().getX500Subject(), caInfo.nextSerial(),
+                    gct.grantedNotBefore, gct.grantedNotAfter, gct.grantedSubject,
+                    gct.grantedPublicKey);
+
+            X509CertificateInfo ret;
+
+            try {
+                X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
+                X509Certificate crlSignerCert = (crlSigner == null) ? null : crlSigner.getCert();
+
+                ExtensionValues extensionTuples = gct.certprofile.getExtensions(
+                        gct.requestedSubject, gct.grantedSubject, certTemplate.getExtensions(),
+                        gct.grantedPublicKey, caInfo.getPublicCaInfo(), crlSignerCert,
+                        gct.grantedNotBefore, gct.grantedNotAfter);
+                if (extensionTuples != null) {
+                    for (ASN1ObjectIdentifier extensionType : extensionTuples.getExtensionTypes()) {
+                        ExtensionValue extValue = extensionTuples.getExtensionValue(extensionType);
+                        certBuilder.addExtension(extensionType, extValue.isCritical(),
+                                extValue.getValue());
+                    }
+                }
+
+                Certificate bcCert;
+                try {
+                    bcCert = gct.signer.build(certBuilder).toASN1Structure();
+                } catch (NoIdleSignerException ex) {
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+                }
+
+                byte[] encodedCert = bcCert.getEncoded();
+                int maxCertSize = gct.certprofile.getMaxCertSize();
+                if (maxCertSize > 0) {
+                    int certSize = encodedCert.length;
+                    if (certSize > maxCertSize) {
+                        throw new OperationException(ErrorCode.NOT_PERMITTED,
+                            String.format("certificate exceeds the maximal allowed size: %d > %d",
+                                certSize, maxCertSize));
+                    }
+                }
+
+                X509Certificate cert = (X509Certificate) cf.engineGenerateCertificate(
+                        new ByteArrayInputStream(encodedCert));
+                if (!verifySignature(cert)) {
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                            "could not verify the signature of generated certificate");
+                }
+
+                X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
+
+                ret = new X509CertificateInfo(certWithMeta, caInfo.getCertificate(),
+                        gct.grantedPublicKeyData, gct.certprofile.getName());
+                ret.setUser(user);
+                ret.setRequestor(requestor);
+                ret.setReqType(reqType);
+                ret.setTransactionId(transactionId);
+                ret.setRequestedSubject(gct.requestedSubject);
+
+                if (doPublishCertificate(ret) == 1) {
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                            "could not save certificate");
+                }
+            } catch (BadCertTemplateException ex) {
+                throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
+            } catch (OperationException ex) {
+                throw ex;
+            } catch (Throwable th) {
+                LogUtil.error(LOG, th, "could not generate certificate");
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
+            }
+
+            if (gct.warning != null) {
+                ret.setWarningMessage(gct.warning);
+            }
+
+            return ret;
+        } finally {
+            try {
+                certstore.delteCertInProcess(gct.fpPublicKey, gct.fpSubject);
+            } catch (OperationException ex) {
+                LOG.error("could not delete CertInProcess (fpPublicKey={}, fpSubject={}): {}",
+                        gct.fpPublicKey, gct.fpSubject, ex.getMessage());
+            }
+        }
+    } // method doGenerateCertificate
+
+    private GrantedCertTemplate createGrantedCertTemplate(final CertTemplateData certTemplate,
+            final boolean requestedByRa, final RequestorInfo requestor, final boolean keyUpdate)
+    throws OperationException {
+        ParamUtil.requireNonNull("certTemplate", certTemplate);
         if (caInfo.getRevocationInfo() != null) {
             throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
         }
@@ -1753,7 +1890,7 @@ public class X509Ca {
         }
 
         long fpSubject = X509Util.fpCanonicalizedName(grantedSubject);
-        String grandtedSubjectText = X509Util.getRfc4519Name(grantedSubject);
+        String grantedSubjectText = X509Util.getRfc4519Name(grantedSubject);
 
         byte[] subjectPublicKeyData = grantedPublicKeyInfo.getPublicKeyData().getBytes();
         long fpPublicKey = FpIdCalculator.hash(subjectPublicKeyData);
@@ -1780,7 +1917,7 @@ public class X509Ca {
                             fpSubject);
                 if (certIssued && !incSerial) {
                     throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                            "certificate for the given subject " + grandtedSubjectText
+                            "certificate for the given subject " + grantedSubjectText
                             + " already issued");
                 }
 
@@ -1817,7 +1954,7 @@ public class X509Ca {
 
                     if (!foundUniqueSubject) {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                            "certificate for the given subject " + grandtedSubjectText
+                            "certificate for the given subject " + grantedSubjectText
                             + " and profile " + certprofileName
                             + " already issued, and could not create new unique serial number");
                     }
@@ -1825,171 +1962,84 @@ public class X509Ca {
             }
         } // end if(keyUpdate)
 
-        try {
-            boolean addedCertInProcess = certstore.addCertInProcess(fpPublicKey, fpSubject);
-            if (!addedCertInProcess) {
-                throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                        "certificate with the given subject " + grandtedSubjectText
-                        + " and/or public key already in process");
+        StringBuilder msgBuilder = new StringBuilder();
+
+        if (subjectInfo.getWarning() != null) {
+            msgBuilder.append(", ").append(subjectInfo.getWarning());
+        }
+
+        CertValidity validity = certprofile.getValidity();
+
+        if (validity == null) {
+            validity = caInfo.getMaxValidity();
+        } else if (validity.compareTo(caInfo.getMaxValidity()) > 0) {
+            validity = caInfo.getMaxValidity();
+        }
+
+        Date maxNotAfter = validity.add(grantedNotBefore);
+        if (maxNotAfter.getTime() > MAX_CERT_TIME_MS) {
+            maxNotAfter = new Date(MAX_CERT_TIME_MS);
+        }
+
+        // CHECKSTYLE:SKIP
+        Date origMaxNotAfter = maxNotAfter;
+
+        if (certprofile.getSpecialCertprofileBehavior()
+                == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
+            String str = certprofile.getParameter(
+                    SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME);
+            long maxLifetimeInDays = Long.parseLong(str);
+            Date maxLifetime = new Date(gsmckFirstNotBefore.getTime()
+                    + maxLifetimeInDays * DAY_IN_MS - MS_PER_SECOND);
+            if (maxNotAfter.after(maxLifetime)) {
+                maxNotAfter = maxLifetime;
             }
+        }
 
-            StringBuilder msgBuilder = new StringBuilder();
-
-            if (subjectInfo.getWarning() != null) {
-                msgBuilder.append(", ").append(subjectInfo.getWarning());
-            }
-
-            CertValidity validity = certprofile.getValidity();
-
-            if (validity == null) {
-                validity = caInfo.getMaxValidity();
-            } else if (validity.compareTo(caInfo.getMaxValidity()) > 0) {
-                validity = caInfo.getMaxValidity();
-            }
-
-            Date maxNotAfter = validity.add(grantedNotBefore);
-            if (maxNotAfter.getTime() > MAX_CERT_TIME_MS) {
-                maxNotAfter = new Date(MAX_CERT_TIME_MS);
-            }
-
-            // CHECKSTYLE:SKIP
-            Date origMaxNotAfter = maxNotAfter;
-
-            if (certprofile.getSpecialCertprofileBehavior()
-                    == SpecialX509CertprofileBehavior.gematik_gSMC_K) {
-                String str = certprofile.getParameter(
-                        SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME);
-                long maxLifetimeInDays = Long.parseLong(str);
-                Date maxLifetime = new Date(gsmckFirstNotBefore.getTime()
-                        + maxLifetimeInDays * DAY_IN_MS - MS_PER_SECOND);
-                if (maxNotAfter.after(maxLifetime)) {
-                    maxNotAfter = maxLifetime;
-                }
-            }
-
-            Date grantedNotAfter = certTemplate.getNotAfter();
-            if (grantedNotAfter != null) {
-                if (grantedNotAfter.after(maxNotAfter)) {
-                    grantedNotAfter = maxNotAfter;
-                    msgBuilder.append(", notAfter modified");
-                }
-            } else {
+        Date grantedNotAfter = certTemplate.getNotAfter();
+        if (grantedNotAfter != null) {
+            if (grantedNotAfter.after(maxNotAfter)) {
                 grantedNotAfter = maxNotAfter;
+                msgBuilder.append(", notAfter modified");
             }
-
-            if (grantedNotAfter.after(caInfo.getNotAfter())) {
-                ValidityMode mode = caInfo.getValidityMode();
-                if (mode == ValidityMode.CUTOFF) {
-                    grantedNotAfter = caInfo.getNotAfter();
-                } else if (mode == ValidityMode.STRICT) {
-                    throw new OperationException(ErrorCode.NOT_PERMITTED,
-                            "notAfter outside of CA's validity is not permitted");
-                } else if (mode == ValidityMode.LAX) {
-                    // permitted
-                } else {
-                    throw new RuntimeException(
-                            "should not reach here, unknown CA ValidityMode " + mode);
-                } // end if (mode)
-            } // end if (notAfter)
-
-            if (certprofile.hasMidnightNotBefore() && !maxNotAfter.equals(origMaxNotAfter)) {
-                Calendar cal = Calendar.getInstance(certprofile.getTimezone());
-                cal.setTime(new Date(grantedNotAfter.getTime() - DAY_IN_MS));
-                cal.set(Calendar.HOUR_OF_DAY, 23);
-                cal.set(Calendar.MINUTE, 59);
-                cal.set(Calendar.SECOND, 59);
-                cal.set(Calendar.MILLISECOND, 0);
-                grantedNotAfter = cal.getTime();
-            }
-
-            X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-                    caInfo.getPublicCaInfo().getX500Subject(), caInfo.nextSerial(),
-                    grantedNotBefore, grantedNotAfter, grantedSubject, grantedPublicKeyInfo);
-
-            X509CertificateInfo ret;
-
-            try {
-                X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
-                X509Certificate crlSignerCert = (crlSigner == null) ? null : crlSigner.getCert();
-
-                ExtensionValues extensionTuples = certprofile.getExtensions(requestedSubject,
-                        grantedSubject, certTemplate.getExtensions(), grantedPublicKeyInfo,
-                        caInfo.getPublicCaInfo(), crlSignerCert, grantedNotBefore, grantedNotAfter);
-                if (extensionTuples != null) {
-                    for (ASN1ObjectIdentifier extensionType : extensionTuples.getExtensionTypes()) {
-                        ExtensionValue extValue = extensionTuples.getExtensionValue(extensionType);
-                        certBuilder.addExtension(extensionType, extValue.isCritical(),
-                                extValue.getValue());
-                    }
-                }
-
-                Certificate bcCert = buildCert(signer, certBuilder);
-
-                byte[] encodedCert = bcCert.getEncoded();
-                int maxCertSize = certprofile.getMaxCertSize();
-                if (maxCertSize > 0) {
-                    int certSize = encodedCert.length;
-                    if (certSize > maxCertSize) {
-                        throw new OperationException(ErrorCode.NOT_PERMITTED,
-                            String.format("certificate exceeds the maximal allowed size: %d > %d",
-                                certSize, maxCertSize));
-                    }
-                }
-
-                X509Certificate cert = (X509Certificate) cf.engineGenerateCertificate(
-                        new ByteArrayInputStream(encodedCert));
-                if (!verifySignature(cert)) {
-                    throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                            "could not verify the signature of generated certificate");
-                }
-
-                X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
-
-                ret = new X509CertificateInfo(certWithMeta, caInfo.getCertificate(),
-                        subjectPublicKeyData, certprofileName);
-                ret.setUser(user);
-                ret.setRequestor(requestor);
-                ret.setReqType(reqType);
-                ret.setTransactionId(transactionId);
-                ret.setRequestedSubject(requestedSubject);
-
-                if (doPublishCertificate(ret) == 1) {
-                    throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                            "could not save certificate");
-                }
-            } catch (BadCertTemplateException ex) {
-                throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
-            } catch (OperationException ex) {
-                throw ex;
-            } catch (Throwable th) {
-                LogUtil.error(LOG, th, "could not generate certificate");
-                throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
-            }
-
-            if (msgBuilder.length() > 2) {
-                ret.setWarningMessage(msgBuilder.substring(2));
-            }
-
-            return ret;
-        } finally {
-            try {
-                certstore.delteCertInProcess(fpPublicKey, fpSubject);
-            } catch (OperationException ex) {
-                LOG.error("could not delete CertInProcess (fpPublicKey={}, fpSubject={}): {}",
-                        fpPublicKey, fpSubject, ex.getMessage());
-            }
+        } else {
+            grantedNotAfter = maxNotAfter;
         }
-    } // method doGenerateCertificate
 
-    private Certificate buildCert(final ConcurrentContentSigner signer,
-            final X509v3CertificateBuilder certBuilder) throws OperationException {
-        ParamUtil.requireNonNull("signer",signer);
-        try {
-            return signer.build(certBuilder).toASN1Structure();
-        } catch (NoIdleSignerException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+        if (grantedNotAfter.after(caInfo.getNotAfter())) {
+            ValidityMode mode = caInfo.getValidityMode();
+            if (mode == ValidityMode.CUTOFF) {
+                grantedNotAfter = caInfo.getNotAfter();
+            } else if (mode == ValidityMode.STRICT) {
+                throw new OperationException(ErrorCode.NOT_PERMITTED,
+                        "notAfter outside of CA's validity is not permitted");
+            } else if (mode == ValidityMode.LAX) {
+                // permitted
+            } else {
+                throw new RuntimeException(
+                        "should not reach here, unknown CA ValidityMode " + mode);
+            } // end if (mode)
+        } // end if (notAfter)
+
+        if (certprofile.hasMidnightNotBefore() && !maxNotAfter.equals(origMaxNotAfter)) {
+            Calendar cal = Calendar.getInstance(certprofile.getTimezone());
+            cal.setTime(new Date(grantedNotAfter.getTime() - DAY_IN_MS));
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            cal.set(Calendar.MILLISECOND, 0);
+            grantedNotAfter = cal.getTime();
         }
-    }
+
+        String warning = null;
+        if (msgBuilder.length() > 2) {
+            warning = msgBuilder.substring(2);
+        }
+        return new GrantedCertTemplate(certprofile, grantedNotBefore, grantedNotAfter,
+                requestedSubject, grantedSubject, grantedSubjectText, fpSubject,
+                grantedPublicKeyInfo, fpPublicKey, subjectPublicKeyData, signer, warning);
+
+    } // method createGrantedCertTemplate
 
     public IdentifiedX509Certprofile getX509Certprofile(final String certprofileName) {
         if (certprofileName == null) {
