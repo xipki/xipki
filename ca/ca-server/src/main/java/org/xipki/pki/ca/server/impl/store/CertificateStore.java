@@ -40,8 +40,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -76,19 +75,13 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 public class CertificateStore {
 
-    private class CertInProcess {
-
-        CertInProcess() {
-        }
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(CertificateStore.class);
 
-    private final ConcurrentMap<Long, CertInProcess> publicKeyCertsInProcess
-        = new ConcurrentHashMap<>();
+    private final ConcurrentSkipListSet<Long> publicKeyCertsInProcess
+        = new ConcurrentSkipListSet<>();
 
-    private final ConcurrentMap<Long, CertInProcess> subjectCertsInProcess
-        = new ConcurrentHashMap<>();
+    private final ConcurrentSkipListSet<Long> subjectCertsInProcess
+        = new ConcurrentSkipListSet<>();
 
     private final CertStoreQueryExecutor queryExecutor;
 
@@ -681,18 +674,17 @@ public class CertificateStore {
 
     /**
      * add the certificate in process to list.
-     * @param fpKey Fingeprint of public key
+     * @param fpKey Fingerprint of public key
      * @param fpSubject Fingerprint of subject
      * @return 0 if added, 1 if <code>fpKey</code> already exists, 2 if <code>fpSubject</code>
      *     already exists
      */
     public int addCertInProcess(final long fpKey, final long fpSubject) {
-        CertInProcess cip = new CertInProcess();
-        if (null != publicKeyCertsInProcess.putIfAbsent(fpKey, cip)) {
+        if (!publicKeyCertsInProcess.add(fpKey)) {
             return 1;
         }
 
-        if (null != subjectCertsInProcess.putIfAbsent(fpSubject, cip)) {
+        if (!subjectCertsInProcess.add(fpSubject)) {
             publicKeyCertsInProcess.remove(fpKey);
             return 2;
         }
