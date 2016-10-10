@@ -70,6 +70,8 @@ public class CmpControl {
 
     public static final String KEY_PROTECTION_SIGALGO = "protection.sigalgo";
 
+    public static final String KEY_GROUP_ENROLL = "group.enroll";
+
     private static final int DFLT_MESSAGE_TIME_BIAS = 300; // 300 seconds
 
     private static final int DFLT_CONFIRM_WAIT_TIME = 300; // 300 seconds
@@ -88,6 +90,8 @@ public class CmpControl {
 
     private final int confirmWaitTime;
 
+    private final boolean groupEnroll;
+
     private final Set<String> sigAlgos;
 
     public CmpControl(final CmpControlEntry dbEntry) throws InvalidConfException {
@@ -97,6 +101,7 @@ public class CmpControl {
         this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
         this.sendCaCert = getBoolean(pairs, KEY_SEND_CA, false);
         this.sendResponderCert = getBoolean(pairs, KEY_SEND_RESPONDER, true);
+        this.groupEnroll = getBoolean(pairs, KEY_GROUP_ENROLL, false);
         this.messageTimeRequired = getBoolean(pairs, KEY_MESSAGETIME_REQUIRED, true);
         this.messageTimeBias = getInt(pairs, KEY_MESSAGETIME_BIAS, DFLT_MESSAGE_TIME_BIAS);
         this.confirmWaitTime = getInt(pairs, KEY_CONFIRM_WAITTIME, DFLT_CONFIRM_WAIT_TIME);
@@ -118,7 +123,7 @@ public class CmpControl {
 
     public CmpControl(final String name, final Boolean confirmCert, final Boolean sendCaCert,
             final Boolean messageTimeRequired, final Boolean sendResponderCert,
-            final Integer messageTimeBias, final Integer confirmWaitTime,
+            final Integer messageTimeBias, final Integer confirmWaitTime, final Boolean groupEnroll,
             final Set<String> sigAlgos) throws InvalidConfException {
         ParamUtil.requireNonBlank("name", name);
 
@@ -142,6 +147,8 @@ public class CmpControl {
 
         this.confirmWaitTime = (confirmWaitTime == null) ? DFLT_CONFIRM_WAIT_TIME : confirmWaitTime;
         pairs.putPair(KEY_CONFIRM_WAITTIME, Integer.toString(this.confirmWaitTime));
+
+        this.groupEnroll = (groupEnroll == null) ? false : groupEnroll;
 
         if (CollectionUtil.isEmpty(sigAlgos)) {
             this.sigAlgos = null;
@@ -178,6 +185,10 @@ public class CmpControl {
         return sendResponderCert;
     }
 
+    public boolean isGroupEnroll() {
+        return groupEnroll;
+    }
+
     public Set<String> getSigAlgos() {
         return sigAlgos;
     }
@@ -211,6 +222,7 @@ public class CmpControl {
         sb.append("sendCaCert: ").append(getYesNo(sendCaCert)).append("\n");
         sb.append("sendResponderCert: ").append(getYesNo(sendResponderCert)).append("\n");
         sb.append("messageTimeRequired: ").append(getYesNo(messageTimeRequired)).append("\n");
+        sb.append("groupEnroll: ").append(getYesNo(groupEnroll)).append("\n");
         sb.append("messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
         sb.append("confirmWaitTime: ").append(confirmWaitTime).append(" s").append('\n');
         sb.append("signature algos: ")

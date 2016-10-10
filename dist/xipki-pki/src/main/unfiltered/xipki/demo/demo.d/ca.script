@@ -28,7 +28,7 @@ echo "#################################################################"
 ## CMP control: messageTimeBias is set to 300 seconds.
 xipki-ca:cmpcontrol-add \
   --name cmpcontrol1 \
-  --conf send.ca=true,messageTime.bias=300,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
+  --conf send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
 
 ## Certificate Profiles
 xipki-ca:profile-add \

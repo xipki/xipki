@@ -52,6 +52,7 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -155,6 +156,7 @@ public class X509Ca {
 
     private static class GrantedCertTemplate {
         private final ConcurrentContentSigner signer;
+        private final Extensions extensions;
         private final IdentifiedX509Certprofile certprofile;
         private final Date grantedNotBefore;
         private final Date grantedNotAfter;
@@ -168,10 +170,11 @@ public class X509Ca {
         private String grantedSubjectText;
         private long fpSubject;
 
-        public GrantedCertTemplate(IdentifiedX509Certprofile certprofile, Date grantedNotBefore,
-                Date grantedNotAfter, X500Name requestedSubject,
+        public GrantedCertTemplate(Extensions extensions, IdentifiedX509Certprofile certprofile,
+                Date grantedNotBefore, Date grantedNotAfter, X500Name requestedSubject,
                 SubjectPublicKeyInfo grantedPublicKey, long fpPublicKey,
                 byte[] grantedPublicKeyData, ConcurrentContentSigner signer, String warning) {
+            this.extensions = extensions;
             this.certprofile = certprofile;
             this.grantedNotBefore = grantedNotBefore;
             this.grantedNotAfter = grantedNotAfter;
@@ -960,69 +963,33 @@ public class X509Ca {
             final boolean requestedByRa, final RequestorInfo requestor, final String user,
             final RequestType reqType, final byte[] transactionId) throws OperationException {
         ParamUtil.requireNonNull("certTemplate", certTemplate);
-        final String certprofileName = certTemplate.getCertprofileName();
-        final String subjectText = X509Util.getRfc4519Name(certTemplate.getSubject());
-        LOG.info("     START generateCertificate: CA={}, profile={}, subject='{}'",
-                caInfo.getName(), certprofileName, subjectText);
+        return generateCertificates(Arrays.asList(certTemplate), requestedByRa, requestor, user,
+                reqType, transactionId).get(0);
+    }
 
-        boolean successful = false;
-        try {
-            X509CertificateInfo ret = doGenerateCertificate(certTemplate, requestedByRa, requestor,
-                    user, false, reqType, transactionId);
-            successful = true;
-
-            if (LOG.isInfoEnabled()) {
-                String prefix = ret.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFUL";
-                X509CertWithDbId cert = ret.getCert();
-                LOG.info("{} generateCertificate: CA={}, profile={}, subject='{}', serialNumber={}",
-                        prefix, caInfo.getName(), certprofileName, cert.getSubject(),
-                        LogUtil.formatCsn(cert.getCert().getSerialNumber()));
-            }
-            return ret;
-        } catch (RuntimeException ex) {
-            LogUtil.warn(LOG, ex);
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
-        } finally {
-            if (!successful) {
-                LOG.warn("    FAILED generateCertificate: CA={}, profile={}, subject='{}'",
-                        caInfo.getName(), certprofileName, subjectText);
-            }
-        }
-    } // method generateCertificate
+    public List<X509CertificateInfo> generateCertificates(
+            final List<CertTemplateData> certTemplates, final boolean requestedByRa,
+            final RequestorInfo requestor, final String user, final RequestType reqType,
+            final byte[] transactionId) throws OperationException {
+        return doGenerateCertificates(certTemplates, requestedByRa, requestor, user, false,
+                reqType, transactionId);
+    }
 
     public X509CertificateInfo regenerateCertificate(final CertTemplateData certTemplate,
             final boolean requestedByRa, final RequestorInfo requestor, final String user,
             final RequestType reqType, final byte[] transactionId) throws OperationException {
         ParamUtil.requireNonNull("certTemplate", certTemplate);
-        final String certprofileName = certTemplate.getCertprofileName();
-        final String subjectText = X509Util.getRfc4519Name(certTemplate.getSubject());
-        LOG.info("     START regenerateCertificate: CA={}, profile={}, subject='{}'",
-                caInfo.getName(), certprofileName, subjectText);
+        return regenerateCertificates(Arrays.asList(certTemplate), requestedByRa, requestor, user,
+                reqType, transactionId).get(0);
+    }
 
-        boolean successful = false;
-
-        try {
-            X509CertificateInfo ret = doGenerateCertificate(certTemplate, requestedByRa, requestor,
-                    user, false, reqType, transactionId);
-            successful = true;
-            if (LOG.isInfoEnabled()) {
-                X509CertWithDbId cert = ret.getCert();
-                LOG.info("SUCCESSFUL generateCertificate: CA={}, profile={}, subject='{}', {}={}",
-                    caInfo.getName(), certprofileName, cert.getSubject(), "serialNumber",
-                    LogUtil.formatCsn(cert.getCert().getSerialNumber()));
-            }
-
-            return ret;
-        } catch (RuntimeException ex) {
-            LogUtil.warn(LOG, ex);
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
-        } finally {
-            if (!successful) {
-                LOG.warn("    FAILED regenerateCertificate: CA={}, profile={}, subject='{}'",
-                        caInfo.getName(), certprofileName, subjectText);
-            }
-        }
-    } // method regenerateCertificate
+    public List<X509CertificateInfo> regenerateCertificates(
+            final List<CertTemplateData> certTemplates, final boolean requestedByRa,
+            final RequestorInfo requestor, final String user, final RequestType reqType,
+            final byte[] transactionId) throws OperationException {
+        return doGenerateCertificates(certTemplates, requestedByRa, requestor, user, true, reqType,
+                transactionId);
+    }
 
     public boolean publishCertificate(final X509CertificateInfo certInfo) {
         return doPublishCertificate(certInfo) == 0;
@@ -1631,14 +1598,89 @@ public class X509Ca {
         return caManager.getIdentifiedPublishersForCa(caInfo.getName());
     }
 
-    private X509CertificateInfo doGenerateCertificate(final CertTemplateData certTemplate,
+    private List<X509CertificateInfo> doGenerateCertificates(
+            final List<CertTemplateData> certTemplates, final boolean requestedByRa,
+            final RequestorInfo requestor, final String user, final boolean keyUpdate,
+            final RequestType reqType, final byte[] transactionId)
+    throws OperationExceptionWithIndex {
+        ParamUtil.requireNonEmpty("certTemplates", certTemplates);
+        final int n = certTemplates.size();
+        List<GrantedCertTemplate> gcts = new ArrayList<>(n);
+
+        for (int i = 0; i < n; i++) {
+            CertTemplateData certTemplate = certTemplates.get(i);
+            try {
+                GrantedCertTemplate gct = createGrantedCertTemplate(certTemplate, requestedByRa,
+                        requestor, keyUpdate);
+                gcts.add(gct);
+            } catch (OperationException ex) {
+                throw new OperationExceptionWithIndex(i, ex);
+            }
+        }
+
+        List<X509CertificateInfo> certInfos = new ArrayList<>(n);
+        OperationExceptionWithIndex exception = null;
+
+        for (int i = 0; i < n; i++) {
+            GrantedCertTemplate gct = gcts.get(i);
+            final String certprofileName = gct.certprofile.getName();
+            final String subjectText = gct.grantedSubjectText;
+            LOG.info("     START generateCertificate: CA={}, profile={}, subject='{}'",
+                    caInfo.getName(), certprofileName, subjectText);
+
+            boolean successful = false;
+            try {
+                X509CertificateInfo certInfo = doGenerateCertificate(gct, requestedByRa, requestor,
+                    user, false, reqType, transactionId);
+                successful = true;
+
+                if (LOG.isInfoEnabled()) {
+                    String prefix = certInfo.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFUL";
+                    X509CertWithDbId cert = certInfo.getCert();
+                    LOG.info(
+                        "{} generateCertificate: CA={}, profile={}, subject='{}', serialNumber={}",
+                        prefix, caInfo.getName(), certprofileName, cert.getSubject(),
+                        LogUtil.formatCsn(cert.getCert().getSerialNumber()));
+                }
+                certInfos.add(certInfo);
+            } catch (OperationException ex) {
+                exception = new OperationExceptionWithIndex(i, ex);
+            } catch (Throwable th) {
+                exception = new OperationExceptionWithIndex(i,
+                        new OperationException(ErrorCode.SYSTEM_FAILURE, th));
+            } finally {
+                if (!successful) {
+                    LOG.warn("    FAILED generateCertificate: CA={}, profile={}, subject='{}'",
+                            caInfo.getName(), certprofileName, subjectText);
+                }
+            }
+        }
+
+        if (exception != null) {
+            LOG.error("could not generate certificate for request[{}], reverted all generated"
+                    + " certificates", exception.getIndex());
+            // delete gererated certificates
+            for (X509CertificateInfo m : certInfos) {
+                BigInteger serial = m.getCert().getCert().getSerialNumber();
+                try {
+                    removeCertificate(serial);
+                } catch (Throwable thr) {
+                    LogUtil.error(LOG, thr, "could not delete certificate serial=" + serial);
+                }
+            }
+
+            LogUtil.warn(LOG, exception);
+        }
+
+        return certInfos;
+    }
+
+    private X509CertificateInfo doGenerateCertificate(final GrantedCertTemplate gct,
             final boolean requestedByRa, final RequestorInfo requestor, final String user,
             final boolean keyUpdate, final RequestType reqType, final byte[] transactionId)
     throws OperationException {
-        ParamUtil.requireNonNull("certTemplate", certTemplate);
+        ParamUtil.requireNonNull("gct", gct);
 
-        GrantedCertTemplate gct = createGrantedCertTemplate(certTemplate, requestedByRa, requestor,
-                keyUpdate);
         adaptGrantedSubejct(gct);
 
         int code = certstore.addCertInProcess(gct.fpPublicKey, gct.fpSubject);
@@ -1666,7 +1708,7 @@ public class X509Ca {
                 X509Certificate crlSignerCert = (crlSigner == null) ? null : crlSigner.getCert();
 
                 ExtensionValues extensionTuples = gct.certprofile.getExtensions(
-                        gct.requestedSubject, gct.grantedSubject, certTemplate.getExtensions(),
+                        gct.requestedSubject, gct.grantedSubject, gct.extensions,
                         gct.grantedPublicKey, caInfo.getPublicCaInfo(), crlSignerCert,
                         gct.grantedNotBefore, gct.grantedNotAfter);
                 if (extensionTuples != null) {
@@ -2050,9 +2092,9 @@ public class X509Ca {
         if (msgBuilder.length() > 2) {
             warning = msgBuilder.substring(2);
         }
-        GrantedCertTemplate gct = new GrantedCertTemplate(certprofile, grantedNotBefore,
-                grantedNotAfter, requestedSubject, grantedPublicKeyInfo, fpPublicKey,
-                subjectPublicKeyData, signer, warning);
+        GrantedCertTemplate gct = new GrantedCertTemplate(certTemplate.getExtensions(), certprofile,
+                grantedNotBefore, grantedNotAfter, requestedSubject, grantedPublicKeyInfo,
+                fpPublicKey, subjectPublicKeyData, signer, warning);
         gct.setGrantedSubject(grantedSubject);
         return gct;
 
