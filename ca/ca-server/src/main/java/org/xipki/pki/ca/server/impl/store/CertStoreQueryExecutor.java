@@ -75,8 +75,6 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
-import org.xipki.commons.datasource.springframework.dao.DataIntegrityViolationException;
-import org.xipki.commons.datasource.springframework.jdbc.DuplicateKeyException;
 import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.CrlReason;
 import org.xipki.commons.security.FpIdCalculator;
@@ -165,15 +163,6 @@ class CertStoreQueryExecutor {
     private static final String CORESQL_CERTINFO =
             "PID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=?"
             + " AND CRAW.CID=CERT.ID";
-
-    private static final String SQL_ADD_CERT_INPROCESS =
-            "INSERT INTO CERT_IN_PROCESS (FP_K,FP_S,TIME2) VALUES (?,?,?)";
-
-    private static final String SQL_DELETE_CERT_INPROCESS =
-            "DELETE FROM CERT_IN_PROCESS WHERE FP_K=? AND FP_S=?";
-
-    private static final String SQL_DELETE_CERT_INPROCESS_OLDER_THAN =
-            "DELETE FROM CERT_IN_PROCESS WHERE TIME2<?";
 
     private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED =
             "ID FROM CERT WHERE CA_ID=? AND FP_S=?";
@@ -2129,60 +2118,6 @@ class CertStoreQueryExecutor {
             datasource.releaseResources(ps, null);
         }
     } // method commitNextCrlNoIfLess
-
-    void deleteCertInProcess(final long fpKey, final long fpSubject) throws DataAccessException {
-        final String sql = SQL_DELETE_CERT_INPROCESS;
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        ResultSet rs = null;
-        try {
-            ps.setLong(1, fpKey);
-            ps.setLong(2, fpSubject);
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, rs);
-        }
-    } // method deleteCertInProcess
-
-    boolean addCertInProcess(final long fpKey, final long fpSubject) throws DataAccessException {
-        final String sql = SQL_ADD_CERT_INPROCESS;
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        ResultSet rs = null;
-        try {
-            ps.setLong(1, fpKey);
-            ps.setLong(2, fpSubject);
-            ps.setLong(3, System.currentTimeMillis() / 1000);
-            try {
-                ps.executeUpdate();
-            } catch (SQLException ex) {
-                DataAccessException dex = datasource.translate(sql, ex);
-                if (dex instanceof DuplicateKeyException
-                        || dex instanceof DataIntegrityViolationException) {
-                    return false;
-                }
-            }
-            return true;
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, rs);
-        }
-    } // method addCertInProcess
-
-    void deleteCertsInProcessOlderThan(final Date time) throws DataAccessException {
-        final String sql = SQL_DELETE_CERT_INPROCESS_OLDER_THAN;
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        ResultSet rs = null;
-        try {
-            ps.setLong(1, time.getTime() / 1000);
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, rs);
-        }
-    }
 
     void deleteUnreferencedRequests() throws DataAccessException {
         final String sql = SQL_DELETE_UNREFERENCED_REQUEST;

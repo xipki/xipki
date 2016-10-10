@@ -217,33 +217,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     } // class ScheduledPublishQueueCleaner
 
-    private class ScheduledDeleteCertsInProcessService implements Runnable {
-
-        private boolean inProcess;
-
-        @Override
-        public void run() {
-            if (inProcess) {
-                return;
-            }
-
-            inProcess = true;
-            try {
-                try {
-                    // older than 10 minutes
-                    Date date = new Date(System.currentTimeMillis() - 10 * 60 * 1000L);
-                    certstore.deleteCertsInProcessOlderThan(date);
-                    LOG.info(" deleted CertsInProcessOlderThan {}", date);
-                } catch (Throwable th) {
-                    LogUtil.error(LOG, th, "could not deleteCertsInProcessOlderThan");
-                }
-            } finally {
-                inProcess = false;
-            }
-        } // method run
-
-    } // class ScheduledDeleteCertsInProcessService
-
     private class ScheduledDeleteUnreferencedRequstervice implements Runnable {
 
         private boolean inProcess;
@@ -800,8 +773,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
                 scheduledThreadPoolExecutor.scheduleAtFixedRate(
                         new ScheduledPublishQueueCleaner(), 120, 120, TimeUnit.SECONDS);
-                scheduledThreadPoolExecutor.scheduleAtFixedRate(
-                        new ScheduledDeleteCertsInProcessService(), 120, 120, TimeUnit.SECONDS);
                 scheduledThreadPoolExecutor.scheduleAtFixedRate(
                         new ScheduledDeleteUnreferencedRequstervice(), 60, 24 * 60 * 60, // 1 DAY
                         TimeUnit.SECONDS);

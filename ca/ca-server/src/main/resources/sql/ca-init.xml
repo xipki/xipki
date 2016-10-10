@@ -480,20 +480,6 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <createTable tableName="CERT_IN_PROCESS">
-      <column name="FP_K" type="BIGINT"
-          remarks="first 8 bytes of the SHA1 sum of the public key">
-        <constraints primaryKey="true"/>
-      </column>
-      <column name="FP_S" type="BIGINT"
-          remarks="first 8 bytes of the SHA1 sum of the subject">
-        <constraints primaryKey="true"/>
-      </column>
-      <column name="TIME2" type="BIGINT"
-          remarks="seconds since January 1, 1970, 00:00:00 GMT">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="3">

@@ -159,31 +159,34 @@ public class X509Ca {
         private final Date grantedNotBefore;
         private final Date grantedNotAfter;
         private final X500Name requestedSubject;
-        private final X500Name grantedSubject;
-        private final String grantedSubjectText;
-        private final long fpSubject;
         private final SubjectPublicKeyInfo grantedPublicKey;
         private final byte[] grantedPublicKeyData;
         private final long fpPublicKey;
         private final String warning;
 
+        private X500Name grantedSubject;
+        private String grantedSubjectText;
+        private long fpSubject;
+
         public GrantedCertTemplate(IdentifiedX509Certprofile certprofile, Date grantedNotBefore,
-                Date grantedNotAfter, X500Name requestedSubject, X500Name grantedSubject,
-                String grantedSubjectText, long fpSubject, SubjectPublicKeyInfo grantedPublicKey,
-                long fpPublicKey, byte[] grantedPublicKeyData, ConcurrentContentSigner signer,
-                String warning) {
+                Date grantedNotAfter, X500Name requestedSubject,
+                SubjectPublicKeyInfo grantedPublicKey, long fpPublicKey,
+                byte[] grantedPublicKeyData, ConcurrentContentSigner signer, String warning) {
             this.certprofile = certprofile;
             this.grantedNotBefore = grantedNotBefore;
             this.grantedNotAfter = grantedNotAfter;
-            this.fpSubject = fpSubject;
             this.requestedSubject = requestedSubject;
-            this.grantedSubject = grantedSubject;
-            this.grantedSubjectText = grantedSubjectText;
             this.grantedPublicKey = grantedPublicKey;
             this.grantedPublicKeyData = grantedPublicKeyData;
             this.fpPublicKey = fpPublicKey;
             this.signer = signer;
             this.warning = warning;
+        }
+
+        public void setGrantedSubject(X500Name subject) {
+            this.grantedSubject = subject;
+            this.grantedSubjectText = X509Util.getRfc4519Name(subject);
+            this.fpSubject = X509Util.fpCanonicalizedName(subject);
         }
 
     }
@@ -1636,15 +1639,21 @@ public class X509Ca {
 
         GrantedCertTemplate gct = createGrantedCertTemplate(certTemplate, requestedByRa, requestor,
                 keyUpdate);
+        adaptGrantedSubejct(gct);
 
-        try {
-            boolean addedCertInProcess = certstore.addCertInProcess(gct.fpPublicKey, gct.fpSubject);
-            if (!addedCertInProcess) {
+        int code = certstore.addCertInProcess(gct.fpPublicKey, gct.fpSubject);
+        if (code != 0) {
+            if (code == 1) {
+                throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                    "certificate with the given public key already in process");
+            } else {
                 throw new OperationException(ErrorCode.ALREADY_ISSUED,
                         "certificate with the given subject " + gct.grantedSubjectText
-                        + " and/or public key already in process");
+                        + " already in process");
             }
+        }
 
+        try {
             X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                     caInfo.getPublicCaInfo().getX500Subject(), caInfo.nextSerial(),
                     gct.grantedNotBefore, gct.grantedNotAfter, gct.grantedSubject,
@@ -1722,14 +1731,77 @@ public class X509Ca {
 
             return ret;
         } finally {
-            try {
-                certstore.delteCertInProcess(gct.fpPublicKey, gct.fpSubject);
-            } catch (OperationException ex) {
-                LOG.error("could not delete CertInProcess (fpPublicKey={}, fpSubject={}): {}",
-                        gct.fpPublicKey, gct.fpSubject, ex.getMessage());
-            }
+            certstore.delteCertInProcess(gct.fpPublicKey, gct.fpSubject);
         }
     } // method doGenerateCertificate
+
+    private void adaptGrantedSubejct(GrantedCertTemplate gct) throws OperationException {
+        boolean duplicateSubjectPermitted = caInfo.isDuplicateSubjectPermitted();
+        if (duplicateSubjectPermitted && !gct.certprofile.isDuplicateSubjectPermitted()) {
+            duplicateSubjectPermitted = false;
+        }
+
+        if (duplicateSubjectPermitted) {
+            return;
+        }
+
+        long fpSubject = X509Util.fpCanonicalizedName(gct.grantedSubject);
+        String grantedSubjectText = X509Util.getRfc4519Name(gct.grantedSubject);
+
+        final boolean incSerial = gct.certprofile.incSerialNumberIfSubjectExists();
+        final boolean certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(),
+                    fpSubject);
+        if (certIssued && !incSerial) {
+            throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                    "certificate for the given subject " + grantedSubjectText
+                    + " already issued");
+        }
+
+        if (!certIssued) {
+            return;
+        }
+
+        X500Name subject = gct.grantedSubject;
+
+        String latestSn;
+        try {
+            Object[] objs = incSerialNumber(gct.certprofile, subject, null);
+            latestSn = certstore.getLatestSerialNumber((X500Name) objs[0]);
+        } catch (BadFormatException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+        }
+
+        boolean foundUniqueSubject = false;
+        // maximal 100 tries
+        for (int i = 0; i < 100; i++) {
+            try {
+                Object[] objs = incSerialNumber(gct.certprofile, subject, latestSn);
+                subject = (X500Name) objs[0];
+                if (CompareUtil.equalsObject(latestSn, objs[1])) {
+                    break;
+                }
+                latestSn = (String) objs[1];
+            } catch (BadFormatException ex) {
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+            }
+
+            foundUniqueSubject = !certstore.isCertForSubjectIssued(
+                    caInfo.getCertificate(),
+                    X509Util.fpCanonicalizedName(subject));
+            if (foundUniqueSubject) {
+                break;
+            }
+        }
+
+        if (!foundUniqueSubject) {
+            throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                "certificate for the given subject " + grantedSubjectText
+                + " and profile " + gct.certprofile.getName()
+                + " already issued, and could not create new unique serial number");
+        }
+
+        gct.setGrantedSubject(subject);
+    }
 
     private GrantedCertTemplate createGrantedCertTemplate(final CertTemplateData certTemplate,
             final boolean requestedByRa, final RequestorInfo requestor, final boolean keyUpdate)
@@ -1884,14 +1956,6 @@ public class X509Ca {
             duplicateKeyPermitted = false;
         }
 
-        boolean duplicateSubjectPermitted = caInfo.isDuplicateSubjectPermitted();
-        if (duplicateSubjectPermitted && !certprofile.isDuplicateSubjectPermitted()) {
-            duplicateSubjectPermitted = false;
-        }
-
-        long fpSubject = X509Util.fpCanonicalizedName(grantedSubject);
-        String grantedSubjectText = X509Util.getRfc4519Name(grantedSubject);
-
         byte[] subjectPublicKeyData = grantedPublicKeyInfo.getPublicKeyData().getBytes();
         long fpPublicKey = FpIdCalculator.hash(subjectPublicKeyData);
 
@@ -1910,56 +1974,7 @@ public class X509Ca {
                             "certificate for the given public key already issued");
                 }
             }
-
-            if (!duplicateSubjectPermitted) {
-                final boolean incSerial = certprofile.incSerialNumberIfSubjectExists();
-                final boolean certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(),
-                            fpSubject);
-                if (certIssued && !incSerial) {
-                    throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                            "certificate for the given subject " + grantedSubjectText
-                            + " already issued");
-                }
-
-                if (certIssued) {
-                    String latestSn;
-                    try {
-                        Object[] objs = incSerialNumber(certprofile, grantedSubject, null);
-                        latestSn = certstore.getLatestSerialNumber((X500Name) objs[0]);
-                    } catch (BadFormatException ex) {
-                        throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
-                    }
-
-                    boolean foundUniqueSubject = false;
-                    // maximal 100 tries
-                    for (int i = 0; i < 100; i++) {
-                        try {
-                            Object[] objs = incSerialNumber(certprofile, grantedSubject, latestSn);
-                            grantedSubject = (X500Name) objs[0];
-                            if (CompareUtil.equalsObject(latestSn, objs[1])) {
-                                break;
-                            }
-                            latestSn = (String) objs[1];
-                        } catch (BadFormatException ex) {
-                            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
-                        }
-
-                        foundUniqueSubject = !certstore.isCertForSubjectIssued(
-                                caInfo.getCertificate(),
-                                X509Util.fpCanonicalizedName(grantedSubject));
-                        if (foundUniqueSubject) {
-                            break;
-                        }
-                    }
-
-                    if (!foundUniqueSubject) {
-                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                            "certificate for the given subject " + grantedSubjectText
-                            + " and profile " + certprofileName
-                            + " already issued, and could not create new unique serial number");
-                    }
-                } // end if (certIssued)
-            }
+            // duplicateSubject check will be processed later
         } // end if(keyUpdate)
 
         StringBuilder msgBuilder = new StringBuilder();
@@ -2035,9 +2050,11 @@ public class X509Ca {
         if (msgBuilder.length() > 2) {
             warning = msgBuilder.substring(2);
         }
-        return new GrantedCertTemplate(certprofile, grantedNotBefore, grantedNotAfter,
-                requestedSubject, grantedSubject, grantedSubjectText, fpSubject,
-                grantedPublicKeyInfo, fpPublicKey, subjectPublicKeyData, signer, warning);
+        GrantedCertTemplate gct = new GrantedCertTemplate(certprofile, grantedNotBefore,
+                grantedNotAfter, requestedSubject, grantedPublicKeyInfo, fpPublicKey,
+                subjectPublicKeyData, signer, warning);
+        gct.setGrantedSubject(grantedSubject);
+        return gct;
 
     } // method createGrantedCertTemplate
 
