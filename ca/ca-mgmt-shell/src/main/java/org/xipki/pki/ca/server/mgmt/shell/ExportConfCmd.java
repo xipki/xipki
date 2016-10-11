@@ -59,7 +59,8 @@ public class ExportConfCmd extends CaCommandSupport {
     @Completion(FilePathCompleter.class)
     private String confFile;
 
-    @Option(name = "--ca", description = "CAs whose configuration should be exported."
+    @Option(name = "--ca", multiValued = true,
+            description = "CAs whose configuration should be exported."
             + " Empty list means all CAs\n(multi-valued)")
     @Completion(CaNameCompleter.class)
     private List<String> caNames;
