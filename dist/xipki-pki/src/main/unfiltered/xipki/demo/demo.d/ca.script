@@ -28,7 +28,9 @@ echo "#################################################################"
 ## CMP control: messageTimeBias is set to 300 seconds.
 xipki-ca:cmpcontrol-add \
   --name cmpcontrol1 \
-  --conf send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA
+  --conf send.ca=true,messageTime.bias=300,group.enroll=true,\
+protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA,\
+popo.sigalgo=SHA256withRSA:SHA256withDSA:SHA256withECDSA
 
 ## Certificate Profiles
 xipki-ca:profile-add \
@@ -187,22 +189,7 @@ xipki-ca:gen-rca \
   --duplicate-subject yes \
   --duplicate-key yes \
   --validity-mode CUTOFF \
-  --save-req no \
-  --popo-algo SHA1withRSA \
-  --popo-algo SHA224withRSA \
-  --popo-algo SHA256withRSA \
-  --popo-algo SHA384withRSA \
-  --popo-algo SHA512withRSA \
-  --popo-algo SHA1withDSA \
-  --popo-algo SHA224withDSA \
-  --popo-algo SHA256withDSA \
-  --popo-algo SHA384withDSA \
-  --popo-algo SHA512withDSA \
-  --popo-algo SHA1withECDSA \
-  --popo-algo SHA224withECDSA \
-  --popo-algo SHA256withECDSA \
-  --popo-algo SHA384withECDSA \
-  --popo-algo SHA512withECDSA
+  --save-req no
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "pkcs11" } {
@@ -407,22 +394,7 @@ xipki-ca:ca-add \
   --duplicate-subject yes \
   --duplicate-key yes \
   --save-req yes \
-  --extra-control revokeSuspendedCerts.enabled=true,revokeSuspendedCerts.targetReason=cessationOfOperation,revokeSuspendedCerts.unchangedSince=15d \
-  --popo-algo SHA1withRSA \
-  --popo-algo SHA224withRSA \
-  --popo-algo SHA256withRSA \
-  --popo-algo SHA384withRSA \
-  --popo-algo SHA512withRSA \
-  --popo-algo SHA1withDSA \
-  --popo-algo SHA224withDSA \
-  --popo-algo SHA256withDSA \
-  --popo-algo SHA384withDSA \
-  --popo-algo SHA512withDSA \
-  --popo-algo SHA1withECDSA \
-  --popo-algo SHA224withECDSA \
-  --popo-algo SHA256withECDSA \
-  --popo-algo SHA384withECDSA \
-  --popo-algo SHA512withECDSA
+  --extra-control revokeSuspendedCerts.enabled=true,revokeSuspendedCerts.targetReason=cessationOfOperation,revokeSuspendedCerts.unchangedSince=15d
 
 xipki-ca:caalias-add \
   --ca SubCA1.complex-Name \
@@ -500,22 +472,7 @@ xipki-ca:ca-add \
   --duplicate-subject yes \
   --duplicate-key yes \
   --validity-mode LAX \
-  --save-req no \
-  --popo-algo SHA1withRSA \
-  --popo-algo SHA224withRSA \
-  --popo-algo SHA256withRSA \
-  --popo-algo SHA384withRSA \
-  --popo-algo SHA512withRSA \
-  --popo-algo SHA1withDSA \
-  --popo-algo SHA224withDSA \
-  --popo-algo SHA256withDSA \
-  --popo-algo SHA384withDSA \
-  --popo-algo SHA512withDSA \
-  --popo-algo SHA1withECDSA \
-  --popo-algo SHA224withECDSA \
-  --popo-algo SHA256withECDSA \
-  --popo-algo SHA384withECDSA \
-  --popo-algo SHA512withECDSA
+  --save-req no
 
 xipki-ca:caalias-add \
   --ca SubCAwithCRL1 \

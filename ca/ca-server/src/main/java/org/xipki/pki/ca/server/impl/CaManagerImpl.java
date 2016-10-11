@@ -2411,7 +2411,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("invalid CSR request. ERROR: " + ex.getMessage());
         }
 
-        if (!securityFactory.verifyPopo(csr, ca.getCaInfo().getPopoAlgorithms())) {
+        CmpControl cmpControl = getCmpControlObject(ca.getCaInfo().getCmpControlName());
+        if (!securityFactory.verifyPopo(csr, cmpControl.getPopoAlgoValidator())) {
             throw new CaMgmtException("could not validate POP for the CSR");
         }
 
@@ -2551,7 +2552,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         entry.setCrlSignerName(caEntry.getCrlSignerName());
         entry.setDuplicateKeyPermitted(caEntry.isDuplicateKeyPermitted());
         entry.setDuplicateSubjectPermitted(caEntry.isDuplicateSubjectPermitted());
-        entry.setPopoAlgorithms(caEntry.getPopoAlgorithms());
         entry.setExtraControl(caEntry.getExtraControl());
         entry.setMaxValidity(caEntry.getMaxValidity());
         entry.setKeepExpiredCertInDays(caEntry.getKeepExpiredCertInDays());
@@ -3386,7 +3386,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     ciJaxb.setDuplicateKey(entry.isDuplicateKeyPermitted());
                     ciJaxb.setDuplicateSubject(entry.isDuplicateSubjectPermitted());
                     ciJaxb.setExpirationPeriod(entry.getExpirationPeriod());
-                    ciJaxb.setPopoAlgos(createStrings(entry.getPopoAlgorithms()));
                     ciJaxb.setExtraControl(
                             createFileOrValue(zipStream, entry.getExtraControl(),
                                     "files/ca-" + name + "-extracontrol.conf"));

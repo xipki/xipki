@@ -93,6 +93,7 @@ import org.xipki.pki.ca.server.impl.X509Ca;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
+import org.xipki.pki.ca.server.mgmt.api.CmpControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
@@ -423,8 +424,10 @@ public class Scep {
                 audit(auditEvent, "req-subject", reqSubjectText);
                 LOG.info("tid={}, subject={}", tid, reqSubjectText);
 
-                if (!caManager.getSecurityFactory().verifyPopo(csr,
-                        ca.getCaInfo().getPopoAlgorithms())) {
+                CmpControl cmpControl = caManager.getCmpControlObject(
+                        ca.getCaInfo().getCmpControlName());
+                if (!caManager.getSecurityFactory().verifyPopo(
+                        csr, cmpControl.getPopoAlgoValidator())) {
                     LOG.warn("tid={}, POPO verification failed", tid);
                     throw FailInfoException.BAD_MESSAGE_CHECK;
                 }

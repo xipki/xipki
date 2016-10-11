@@ -192,7 +192,6 @@
       <xs:element name="revTime" type="xs:long" minOccurs="0"/>
       <xs:element name="revInvTime" type="xs:long" minOccurs="0"/>
       <xs:element name="validityMode" type="xs:string" minOccurs="0"/>
-      <xs:element name="popoAlgos" type="xs:string"/>
       <xs:element name="extraControl" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>

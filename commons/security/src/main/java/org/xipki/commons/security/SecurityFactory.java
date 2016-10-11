@@ -39,7 +39,6 @@ import java.security.KeyStoreException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -82,22 +81,22 @@ public interface SecurityFactory {
     /**
      *
      * @param csr CSR to be verified
-     * @param allowedSigAlgos signature algorithms that are accepted. <code>null</null> to accept
-     *            all algorithms
+     * @param algoValidator signature algorithms validator. <code>null</null> to accept all
+     *            algorithms
      * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
      *         <code>false</code> otherwise.
      */
-    boolean verifyPopo(@Nonnull PKCS10CertificationRequest csr, Set<String> allowedSigAlgos);
+    boolean verifyPopo(@Nonnull PKCS10CertificationRequest csr, AlgorithmValidator algoValidator);
 
     /**
      *
      * @param csr CSR to be verified
-     * @param allowedSigAlgos signature algorithms that are accepted. <code>null</null> to accept
-     *            all algorithms
+     * @param algoValidator signature algorithms validator. <code>null</null> to accept all
+     *            algorithms
      * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
      *         <code>false</code> otherwise.
      */
-    boolean verifyPopo(@Nonnull CertificationRequest csr, Set<String> allowedSigAlgos);
+    boolean verifyPopo(@Nonnull CertificationRequest csr, AlgorithmValidator algoValidator);
 
     PublicKey generatePublicKey(@Nonnull SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException;

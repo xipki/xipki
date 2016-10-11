@@ -472,7 +472,7 @@ class CaManagerQueryExecutor {
         final String sql = "NAME,ART,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
                 + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT"
                 + ",SAVE_REQ,PERMISSIONS,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,EXPIRATION_PERIOD,REV,RR"
-                + ",RT,RIT,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,POPO_ALGOS"
+                + ",RT,RIT,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS"
                 + ",EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -563,12 +563,6 @@ class CaManagerQueryExecutor {
             String responderName = rs.getString("RESPONDER_NAME");
             if (responderName != null) {
                 entry.setResponderName(responderName);
-            }
-
-            String popoAlgos = rs.getString("POPO_ALGOS");
-            if (popoAlgos != null) {
-                Set<String> algos = StringUtil.splitAsSet(popoAlgos, ", ");
-                entry.setPopoAlgorithms(algos);
             }
 
             String extraControl = rs.getString("EXTRA_CONTROL");
@@ -771,9 +765,8 @@ class CaManagerQueryExecutor {
         sqlBuilder.append(",DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE");
         sqlBuilder.append(",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY");
         sqlBuilder.append(",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSIONS,NUM_CRLS,EXPIRATION_PERIOD");
-        sqlBuilder.append(",KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,POPO_ALGOS,EXTRA_CONTROL");
-        sqlBuilder.append(",SIGNER_CONF)");
-        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        sqlBuilder.append(",KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
+        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         final String sql = sqlBuilder.toString();
 
         // insert to table ca
@@ -806,7 +799,6 @@ class CaManagerQueryExecutor {
             ps.setInt(idx++, entry.getExpirationPeriod());
             ps.setInt(idx++, entry.getKeepExpiredCertInDays());
             ps.setString(idx++, entry.getValidityMode().name());
-            ps.setString(idx++, StringUtil.collectionAsString(entry.getPopoAlgorithms(), ","));
             ps.setString(idx++, entry.getExtraControl());
             ps.setString(idx++, entry.getSignerConf());
 
@@ -1122,7 +1114,6 @@ class CaManagerQueryExecutor {
         Integer expirationPeriod = entry.getExpirationPeriod();
         Integer keepExpiredCertInDays = entry.getKeepExpiredCertInDays();
         ValidityMode validityMode = entry.getValidityMode();
-        Set<String> popoAlgos = entry.getPopoAlgorithms();
         String extraControl = entry.getExtraControl();
 
         if (signerType != null || signerConf != null || cert != null) {
@@ -1214,7 +1205,6 @@ class CaManagerQueryExecutor {
                  "KEEP_EXPIRED_CERT_DAYS");
         Integer idxValidityMode = addToSqlIfNotNull(sqlBuilder, index, validityMode,
                 "VALIDITY_MODE");
-        Integer idxPopoAlgos = addToSqlIfNotNull(sqlBuilder, index, popoAlgos, "POPO_ALGOS");
         Integer idxExtraControl = addToSqlIfNotNull(sqlBuilder, index, extraControl,
                 "EXTRA_CONTROL");
         Integer idxSignerConf = addToSqlIfNotNull(sqlBuilder, index, signerConf, "SIGNER_CONF");
@@ -1352,12 +1342,6 @@ class CaManagerQueryExecutor {
                 String txt = validityMode.name();
                 sb.append("validityMode: '").append(txt).append("'; ");
                 ps.setString(idxValidityMode, txt);
-            }
-
-            if (idxPopoAlgos != null) {
-                String txt = StringUtil.collectionAsString(popoAlgos, ",");
-                sb.append("popoAlgos: '").append(txt).append("'; ");
-                ps.setString(idxPopoAlgos, txt);
             }
 
             if (idxExtraControl != null) {

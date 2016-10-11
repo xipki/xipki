@@ -410,7 +410,7 @@ class CaConfigurationDbExporter extends DbPorter {
         sqlBuilder.append("EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV,RR,RT,RIT,");
         sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,");
         sqlBuilder.append("VALIDITY_MODE,CACERT_URIS,ART,NEXT_CRLNO,RESPONDER_NAME,");
-        sqlBuilder.append("CMPCONTROL_NAME,POPO_ALGOS,EXTRA_CONTROL FROM CA");
+        sqlBuilder.append("CMPCONTROL_NAME,EXTRA_CONTROL FROM CA");
 
         final String sql = sqlBuilder.toString();
 
@@ -427,7 +427,6 @@ class CaConfigurationDbExporter extends DbPorter {
                 String responderName = rs.getString("RESPONDER_NAME");
                 String cmpcontrolName = rs.getString("CMPCONTROL_NAME");
                 String caCertUris = rs.getString("CACERT_URIS");
-                String popoAlgos = rs.getString("POPO_ALGOS");
                 String extraControl = rs.getString("EXTRA_CONTROL");
                 int serialSize = rs.getInt("SN_SIZE");
                 String status = rs.getString("STATUS");
@@ -471,7 +470,6 @@ class CaConfigurationDbExporter extends DbPorter {
                 ca.setExpirationPeriod(expirationPeriod);
                 ca.setKeepExpiredCertDays(keepExpiredCertDays);
                 ca.setValidityMode(validityMode);
-                ca.setPopoAlgos(popoAlgos);
                 ca.setExtraControl(extraControl);
 
                 int numCrls = rs.getInt("NUM_CRLS");

@@ -330,10 +330,6 @@ public class X509CaInfo {
         return caEntry.getCrlBaseTime();
     }
 
-    public Set<String> getPopoAlgorithms() {
-        return caEntry.getPopoAlgorithms();
-    }
-
     public BigInteger nextSerial() throws OperationException {
         return randomSnGenerator.nextSerialNumber(caEntry.getSerialNoBitLen());
     }

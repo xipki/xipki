@@ -35,17 +35,14 @@
 package org.xipki.pki.ca.server.mgmt.api;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.commons.security.AlgorithmValidator;
+import org.xipki.commons.security.CollectionAlgorithmValidator;
 
 /**
  * @author Lijun Liao
@@ -70,6 +67,8 @@ public class CmpControl {
 
     public static final String KEY_PROTECTION_SIGALGO = "protection.sigalgo";
 
+    public static final String KEY_POPO_SIGALGO = "popo.sigalgo";
+
     public static final String KEY_GROUP_ENROLL = "group.enroll";
 
     private static final int DFLT_MESSAGE_TIME_BIAS = 300; // 300 seconds
@@ -92,7 +91,9 @@ public class CmpControl {
 
     private final boolean groupEnroll;
 
-    private final Set<String> sigAlgos;
+    private final CollectionAlgorithmValidator sigAlgoValidator;
+
+    private final CollectionAlgorithmValidator popoAlgoValidator;
 
     public CmpControl(final CmpControlEntry dbEntry) throws InvalidConfException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
@@ -105,18 +106,28 @@ public class CmpControl {
         this.messageTimeRequired = getBoolean(pairs, KEY_MESSAGETIME_REQUIRED, true);
         this.messageTimeBias = getInt(pairs, KEY_MESSAGETIME_BIAS, DFLT_MESSAGE_TIME_BIAS);
         this.confirmWaitTime = getInt(pairs, KEY_CONFIRM_WAITTIME, DFLT_CONFIRM_WAIT_TIME);
-        String str = pairs.getValue(KEY_PROTECTION_SIGALGO);
 
-        if (str == null) {
-            this.sigAlgos = null;
-        } else {
-            Set<String> set = StringUtil.splitAsSet(str, ALGO_DELIMITER);
-            this.sigAlgos = canonicalizeAlgos(set);
-            if (CollectionUtil.isNonEmpty(this.sigAlgos)) {
-                pairs.putPair(KEY_PROTECTION_SIGALGO,
-                        StringUtil.collectionAsString(this.sigAlgos, ALGO_DELIMITER));
-            }
+        // protection algorithms
+        String str = pairs.getValue(KEY_PROTECTION_SIGALGO);
+        Set<String> algos = (str == null) ? null : StringUtil.splitAsSet(str, ALGO_DELIMITER);
+        try {
+            this.sigAlgoValidator = new CollectionAlgorithmValidator(algos);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new InvalidConfException("invalid " + KEY_PROTECTION_SIGALGO + ": " + str, ex);
         }
+        algos = this.sigAlgoValidator.getAlgoNames();
+        pairs.putPair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(algos, ALGO_DELIMITER));
+
+        // popo algorithms
+        str = pairs.getValue(KEY_POPO_SIGALGO);
+        algos = (str == null) ? null : StringUtil.splitAsSet(str, ALGO_DELIMITER);
+        try {
+            this.popoAlgoValidator = new CollectionAlgorithmValidator(algos);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new InvalidConfException("invalid " + KEY_POPO_SIGALGO + ": " + str, ex);
+        }
+        algos = this.popoAlgoValidator.getAlgoNames();
+        pairs.putPair(KEY_POPO_SIGALGO, StringUtil.collectionAsString(algos, ALGO_DELIMITER));
 
         this.dbEntry = new CmpControlEntry(dbEntry.getName(), pairs.getEncoded());
     } // constructor
@@ -124,7 +135,7 @@ public class CmpControl {
     public CmpControl(final String name, final Boolean confirmCert, final Boolean sendCaCert,
             final Boolean messageTimeRequired, final Boolean sendResponderCert,
             final Integer messageTimeBias, final Integer confirmWaitTime, final Boolean groupEnroll,
-            final Set<String> sigAlgos) throws InvalidConfException {
+            final Set<String> sigAlgos, final Set<String> popoAlgos) throws InvalidConfException {
         ParamUtil.requireNonBlank("name", name);
 
         ConfPairs pairs = new ConfPairs();
@@ -149,14 +160,21 @@ public class CmpControl {
         pairs.putPair(KEY_CONFIRM_WAITTIME, Integer.toString(this.confirmWaitTime));
 
         this.groupEnroll = (groupEnroll == null) ? false : groupEnroll;
-
-        if (CollectionUtil.isEmpty(sigAlgos)) {
-            this.sigAlgos = null;
-        } else {
-            this.sigAlgos = canonicalizeAlgos(sigAlgos);
-            pairs.putPair(KEY_PROTECTION_SIGALGO,
-                    StringUtil.collectionAsString(this.sigAlgos, ALGO_DELIMITER));
+        try {
+            this.sigAlgoValidator = new CollectionAlgorithmValidator(sigAlgos);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new InvalidConfException("invalid sigAlgos", ex);
         }
+        pairs.putPair(KEY_PROTECTION_SIGALGO,
+            StringUtil.collectionAsString(this.sigAlgoValidator.getAlgoNames(), ALGO_DELIMITER));
+
+        try {
+            this.popoAlgoValidator = new CollectionAlgorithmValidator(popoAlgos);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new InvalidConfException("invalid popoAlgos", ex);
+        }
+        pairs.putPair(KEY_POPO_SIGALGO,
+            StringUtil.collectionAsString(this.popoAlgoValidator.getAlgoNames(), ALGO_DELIMITER));
 
         this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
     } // constructor
@@ -189,25 +207,12 @@ public class CmpControl {
         return groupEnroll;
     }
 
-    public Set<String> getSigAlgos() {
-        return sigAlgos;
+    public AlgorithmValidator getSigAlgoValidator() {
+        return sigAlgoValidator;
     }
 
-    public boolean isSigAlgoPermitted(final AlgorithmIdentifier algId) {
-        ParamUtil.requireNonNull("algId", algId);
-
-        if (sigAlgos == null) {
-            return true;
-        }
-
-        String name;
-        try {
-            name = AlgorithmUtil.getSignatureAlgoName(algId);
-        } catch (NoSuchAlgorithmException ex) {
-            return false;
-        }
-
-        return sigAlgos.contains(name);
+    public AlgorithmValidator getPopoAlgoValidator() {
+        return popoAlgoValidator;
     }
 
     public CmpControlEntry getDbEntry() {
@@ -226,23 +231,14 @@ public class CmpControl {
         sb.append("messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
         sb.append("confirmWaitTime: ").append(confirmWaitTime).append(" s").append('\n');
         sb.append("signature algos: ")
-            .append(StringUtil.collectionAsString(sigAlgos, ALGO_DELIMITER)).append('\n');
+            .append(StringUtil.collectionAsString(sigAlgoValidator.getAlgoNames(), ALGO_DELIMITER))
+            .append('\n');
+        sb.append("popo algos: ")
+            .append(StringUtil.collectionAsString(popoAlgoValidator.getAlgoNames(), ALGO_DELIMITER))
+            .append('\n');
         sb.append("conf: ").append(dbEntry.getConf());
 
         return sb.toString();
-    }
-
-    private static Set<String> canonicalizeAlgos(final Set<String> algos)
-    throws InvalidConfException {
-        Set<String> ret = new HashSet<String>();
-        for (String m : algos) {
-            try {
-                ret.add(AlgorithmUtil.canonicalizeSignatureAlgo(m));
-            } catch (NoSuchAlgorithmException ex) {
-                throw new InvalidConfException(ex.getMessage(), ex);
-            }
-        }
-        return Collections.unmodifiableSet(ret);
     }
 
     private static boolean getBoolean(final ConfPairs pairs, final String key,

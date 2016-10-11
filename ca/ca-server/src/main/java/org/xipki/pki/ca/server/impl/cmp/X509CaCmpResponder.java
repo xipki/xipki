@@ -119,6 +119,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.AlgorithmValidator;
 import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.CrlReason;
 import org.xipki.commons.security.ObjectIdentifiers;
@@ -510,7 +511,7 @@ public class X509CaCmpResponder extends CmpResponder {
         auditEvent.addChildAuditEvent(childAuditEvent);
 
         X509Ca ca = getCa();
-        if (!securityFactory.verifyPopo(p10cr, ca.getCaInfo().getPopoAlgorithms())) {
+        if (!securityFactory.verifyPopo(p10cr, getCmpControl().getPopoAlgoValidator())) {
             LOG.warn("could not validate POP for the pkcs#10 requst");
             PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
             certResp = new CertResponse(certReqId, status);
@@ -1011,25 +1012,15 @@ public class X509CaCmpResponder extends CmpResponder {
         ProofOfPossession pop = certRequest.toASN1Structure().getPopo();
         POPOSigningKey popoSign = POPOSigningKey.getInstance(pop.getObject());
         AlgorithmIdentifier popoAlgId = popoSign.getAlgorithmIdentifier();
-        String popoAlgName;
-        try {
-            popoAlgName = AlgorithmUtil.getSignatureAlgoName(popoAlgId);
-        } catch (NoSuchAlgorithmException ex) {
-            LOG.error("Unknown signature algorithm {}", popoAlgId.getAlgorithm().getId());
-            return false;
-        }
-
-        boolean allowed = false;
-        Set<String> allowedSigAlgos = getCa().getCaInfo().getPopoAlgorithms();
-        for (String m : allowedSigAlgos) {
-            if (AlgorithmUtil.equalsAlgoName(m, popoAlgName)) {
-                allowed = true;
-                break;
+        AlgorithmValidator algoValidator = getCmpControl().getPopoAlgoValidator();
+        if (!algoValidator.isAlgorithmPermitted(popoAlgId)) {
+            String algoName;
+            try {
+                algoName = AlgorithmUtil.getSignatureAlgoName(popoAlgId);
+            } catch (NoSuchAlgorithmException ex) {
+                algoName = popoAlgId.getAlgorithm().getId();
             }
-        }
-
-        if (!allowed) {
-            LOG.error("POPO signature algorithm {} not permitted", popoAlgName);
+            LOG.error("POPO signature algorithm {} not permitted", algoName);
             return false;
         }
 
@@ -1556,10 +1547,8 @@ public class X509CaCmpResponder extends CmpResponder {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, ex.getMessage());
         }
 
-        X509Ca ca = getCa();
-
         CertificationRequest csr = CertificationRequest.getInstance(encodedCsr);
-        if (!securityFactory.verifyPopo(csr, ca.getCaInfo().getPopoAlgorithms())) {
+        if (!securityFactory.verifyPopo(csr, getCmpControl().getPopoAlgoValidator())) {
             LOG.warn("could not validate POP for the pkcs#10 requst");
             throw new OperationException(ErrorCode.BAD_POP);
         }
@@ -1583,6 +1572,7 @@ public class X509CaCmpResponder extends CmpResponder {
         CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
                 notBefore, notAfter, extensions, profileName);
 
+        X509Ca ca = getCa();
         X509CertificateInfo certInfo = ca.generateCertificate(certTemplate, requestor.isRa(),
                 requestor, user, reqType, null);
         certInfo.setRequestor(requestor);

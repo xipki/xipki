@@ -53,9 +53,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
@@ -173,31 +173,25 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     }
 
     @Override
-    public boolean verifyPopo(final CertificationRequest csr, Set<String> allowedSigAlgos) {
-        return verifyPopo(new PKCS10CertificationRequest(csr), allowedSigAlgos);
+    public boolean verifyPopo(final CertificationRequest csr,
+            final AlgorithmValidator algoValidator) {
+        return verifyPopo(new PKCS10CertificationRequest(csr), algoValidator);
     }
 
     @Override
-    public boolean verifyPopo(final PKCS10CertificationRequest csr, Set<String> allowedSigAlgos) {
-        if (allowedSigAlgos != null) {
-            String sigAlgo;
-            try {
-                sigAlgo = AlgorithmUtil.getSignatureAlgoName(csr.getSignatureAlgorithm());
-            } catch (NoSuchAlgorithmException ex) {
-                LogUtil.error(LOG, ex, "could not get the signature algorithm of PKCS#10 request");
-                return false;
-            }
-
-            boolean allowed = false;
-            for (String m : allowedSigAlgos) {
-                if (AlgorithmUtil.equalsAlgoName(m, sigAlgo)) {
-                    allowed = true;
-                    break;
+    public boolean verifyPopo(final PKCS10CertificationRequest csr,
+            final AlgorithmValidator algoValidator) {
+        if (algoValidator != null) {
+            AlgorithmIdentifier algoId = csr.getSignatureAlgorithm();
+            if (!algoValidator.isAlgorithmPermitted(algoId)) {
+                String algoName;
+                try {
+                    algoName = AlgorithmUtil.getSignatureAlgoName(algoId);
+                } catch (NoSuchAlgorithmException ex) {
+                    algoName = algoId.getAlgorithm().getId();
                 }
-            }
 
-            if (!allowed) {
-                LOG.error("POPO signature algorithm {} not permitted", sigAlgo);
+                LOG.error("POPO signature algorithm {} not permitted", algoName);
                 return false;
             }
         }

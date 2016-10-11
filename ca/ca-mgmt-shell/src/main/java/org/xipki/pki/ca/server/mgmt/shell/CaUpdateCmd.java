@@ -49,7 +49,6 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.console.karaf.completer.SigAlgCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
 import org.xipki.commons.password.PasswordResolver;
@@ -190,13 +189,6 @@ public class CaUpdateCmd extends CaCommandSupport {
             description = "mode of valditity")
     @Completion(ValidityModeCompleter.class)
     private String validityModeS;
-
-    @Option(name = "--popo-algo",
-            multiValued = true,
-            description = "POPO signature algorithms\n"
-                    + "(multi-valued)")
-    @Completion(SigAlgCompleter.class)
-    private Set<String> popoAlgorithms;
 
     @Option(name = "--extra-control",
             description = "extra control")

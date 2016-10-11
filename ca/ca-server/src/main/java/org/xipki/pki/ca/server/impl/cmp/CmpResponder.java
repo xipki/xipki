@@ -314,7 +314,7 @@ abstract class CmpResponder {
 
         PKIHeader header = protectedMsg.getHeader();
         AlgorithmIdentifier protectionAlg = header.getProtectionAlg();
-        if (!cmpControl.isSigAlgoPermitted(protectionAlg)) {
+        if (!cmpControl.getSigAlgoValidator().isAlgorithmPermitted(protectionAlg)) {
             LOG.warn("SIG_ALGO_FORBIDDEN: {}",
                     pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
             return new ProtectionVerificationResult(null, ProtectionResult.SIGALGO_FORBIDDEN);

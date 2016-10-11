@@ -37,8 +37,6 @@ package org.xipki.pki.ca.server.mgmt.api;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -86,8 +84,6 @@ public class CaEntry {
     private int expirationPeriod;
 
     private int keepExpiredCertInDays;
-
-    private Set<String> popoAlgorithms;
 
     private String extraControl;
 
@@ -222,27 +218,6 @@ public class CaEntry {
         return expirationPeriod;
     }
 
-    public Set<String> getPopoAlgorithms() {
-        return popoAlgorithms;
-    }
-
-    public void setPopoAlgorithms(final Set<String> popoAlgorithms) {
-        ParamUtil.requireNonEmpty("popoAlgorithms", popoAlgorithms);
-
-        Set<String> canonicalizedAlgos = new HashSet<>();
-        for (String m : popoAlgorithms) {
-            String canoAlgo;
-            try {
-                canoAlgo = AlgorithmUtil.canonicalizeSignatureAlgo(m);
-            } catch (NoSuchAlgorithmException ex) {
-                throw new IllegalArgumentException(ex.getMessage());
-            }
-            canonicalizedAlgos.add(canoAlgo);
-        }
-
-        this.popoAlgorithms = Collections.unmodifiableSet(canonicalizedAlgos);
-    }
-
     public String getExtraControl() {
         return extraControl;
     }
@@ -286,13 +261,6 @@ public class CaEntry {
             sb.append("forever");
         } else {
             sb.append(keepExpiredCertInDays).append(" days");
-        }
-        sb.append("\n");
-        sb.append("POPO algorithms: ");
-        if (popoAlgorithms == null) {
-            sb.append("null");
-        } else {
-            sb.append(StringUtil.collectionAsString(popoAlgorithms, ", "));
         }
         sb.append("\n");
         sb.append("extraControl: ").append(extraControl).append('\n');

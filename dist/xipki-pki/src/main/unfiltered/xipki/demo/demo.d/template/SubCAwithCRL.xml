@@ -40,23 +40,6 @@
             <str>http://localhost:8080/ocsp/responder2</str>
           </ocspUris>
           <snSize>63</snSize>
-          <popoAlgos>
-            <str>SHA1withRSA</str>
-            <str>SHA224withRSA</str>
-            <str>SHA256withRSA</str>
-            <str>SHA384withRSA</str>
-            <str>SHA512withRSA</str>
-            <str>SHA1withDSA</str>
-            <str>SHA224withDSA</str>
-            <str>SHA256withDSA</str>
-            <str>SHA384withDSA</str>
-            <str>SHA512withDSA</str>
-            <str>SHA1withECDSA</str>
-            <str>SHA224withECDSA</str>
-            <str>SHA256withECDSA</str>
-            <str>SHA384withECDSA</str>
-            <str>SHA512withECDSA</str>
-          </popoAlgos>
         </x509Ca>
       </caInfo>
       <aliases>
