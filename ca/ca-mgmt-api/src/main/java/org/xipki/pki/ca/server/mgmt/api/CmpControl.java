@@ -89,6 +89,8 @@ public class CmpControl {
 
     private final int confirmWaitTime;
 
+    private final long confirmWaitTimeMs;
+
     private final boolean groupEnroll;
 
     private final CollectionAlgorithmValidator sigAlgoValidator;
@@ -106,6 +108,10 @@ public class CmpControl {
         this.messageTimeRequired = getBoolean(pairs, KEY_MESSAGETIME_REQUIRED, true);
         this.messageTimeBias = getInt(pairs, KEY_MESSAGETIME_BIAS, DFLT_MESSAGE_TIME_BIAS);
         this.confirmWaitTime = getInt(pairs, KEY_CONFIRM_WAITTIME, DFLT_CONFIRM_WAIT_TIME);
+        if (this.confirmWaitTime < 0) {
+            throw new InvalidConfException("invalid " + KEY_CONFIRM_WAITTIME);
+        }
+        this.confirmWaitTimeMs = this.confirmWaitTime * 1000L;
 
         // protection algorithms
         String str = pairs.getValue(KEY_PROTECTION_SIGALGO);
@@ -137,6 +143,9 @@ public class CmpControl {
             final Integer messageTimeBias, final Integer confirmWaitTime, final Boolean groupEnroll,
             final Set<String> sigAlgos, final Set<String> popoAlgos) throws InvalidConfException {
         ParamUtil.requireNonBlank("name", name);
+        if (confirmWaitTime != null) {
+            ParamUtil.requireMin("confirmWaitTime", confirmWaitTime, 0);
+        }
 
         ConfPairs pairs = new ConfPairs();
 
@@ -158,6 +167,8 @@ public class CmpControl {
 
         this.confirmWaitTime = (confirmWaitTime == null) ? DFLT_CONFIRM_WAIT_TIME : confirmWaitTime;
         pairs.putPair(KEY_CONFIRM_WAITTIME, Integer.toString(this.confirmWaitTime));
+
+        this.confirmWaitTimeMs = this.confirmWaitTime * 1000L;
 
         this.groupEnroll = (groupEnroll == null) ? false : groupEnroll;
         try {
@@ -193,6 +204,10 @@ public class CmpControl {
 
     public int getConfirmWaitTime() {
         return confirmWaitTime;
+    }
+
+    public long getConfirmWaitTimeMs() {
+        return confirmWaitTimeMs;
     }
 
     public boolean isSendCaCert() {

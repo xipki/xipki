@@ -377,9 +377,14 @@ abstract class CmpResponder {
 
     protected PKIStatusInfo generateCmpRejectionStatus(final Integer info,
             final String errorMessage) {
+        return generateCmpRejectionStatus(PKIStatus.rejection, info, errorMessage);
+    } // method generateCmpRejectionStatus
+
+    protected PKIStatusInfo generateCmpRejectionStatus(final PKIStatus status, final Integer info,
+            final String errorMessage) {
         PKIFreeText statusMessage = (errorMessage == null) ? null : new PKIFreeText(errorMessage);
         PKIFailureInfo failureInfo = (info == null) ? null : new PKIFailureInfo(info);
-        return new PKIStatusInfo(PKIStatus.rejection, statusMessage, failureInfo);
+        return new PKIStatusInfo(status, statusMessage, failureInfo);
     } // method generateCmpRejectionStatus
 
     public X500Name getResponderSubject() throws InvalidConfException {
