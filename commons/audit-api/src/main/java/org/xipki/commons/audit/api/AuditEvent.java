@@ -78,7 +78,7 @@ public class AuditEvent {
      */
     private final List<AuditEventData> eventDatas = new LinkedList<>();
 
-    private final List<AuditChildEvent> childAuditEvents = new LinkedList<>();
+    private final List<AuditChildEvent> auditChildEvents = new LinkedList<>();
 
     public AuditEvent(final Date timestamp) {
         this.timestamp = (timestamp == null) ? new Date() : timestamp;
@@ -136,7 +136,7 @@ public class AuditEvent {
         }
         eventDatas.add(eventData);
 
-        for (AuditChildEvent cae : childAuditEvents) {
+        for (AuditChildEvent cae : auditChildEvents) {
             cae.removeEventData(eventData.getName());
         }
 
@@ -151,23 +151,23 @@ public class AuditEvent {
         this.status = Objects.requireNonNull(status, "status must not be null");
     }
 
-    public void addChildAuditEvent(final AuditChildEvent childAuditEvent) {
-        Objects.requireNonNull(childAuditEvent, "childAuditEvent must not be null");
-        childAuditEvents.add(childAuditEvent);
+    public void addAuditChildEvent(final AuditChildEvent auditChildEvent) {
+        Objects.requireNonNull(auditChildEvent, "auditChildEvent must not be null");
+        auditChildEvents.add(auditChildEvent);
     }
 
-    public boolean containsChildAuditEvents() {
-        return !childAuditEvents.isEmpty();
+    public boolean containsAuditChildEvents() {
+        return !auditChildEvents.isEmpty();
     }
 
     public List<AuditEvent> expandAuditEvents() {
-        int size = childAuditEvents.size();
+        int size = auditChildEvents.size();
         if (size == 0) {
             return Arrays.asList(this);
         }
 
         List<AuditEvent> expandedEvents = new ArrayList<>(size);
-        for (AuditChildEvent child : childAuditEvents) {
+        for (AuditChildEvent child : auditChildEvents) {
             AuditEvent event = new AuditEvent(timestamp);
             event.setApplicationName(applicationName);
             event.setName(name);
