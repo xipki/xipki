@@ -451,7 +451,7 @@ public class HttpRestServlet extends HttpServlet {
 
         auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
 
-        if (!auditEvent.containsChildAuditEvents()) {
+        if (!auditEvent.containsAuditChildEvents()) {
             auditService.logEvent(auditEvent);
         } else {
             List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();

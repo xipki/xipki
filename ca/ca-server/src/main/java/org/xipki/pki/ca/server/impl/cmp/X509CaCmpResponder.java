@@ -407,7 +407,7 @@ public class X509CaCmpResponder extends CmpResponder {
         final int n = certReqMsgs.length;
 
         Map<Integer, CertTemplateData> certTemplateDatas = new HashMap<>(n * 10 / 6);
-        Map<Integer, AuditChildEvent> childAuditEvents = new HashMap<>(n * 10 / 6);
+        Map<Integer, AuditChildEvent> auditChildEvents = new HashMap<>(n * 10 / 6);
         Map<Integer, CertResponse> certResponses = new HashMap<>(n * 10 / 6);
         Map<Integer, ASN1Integer> certReqIds = new HashMap<>(n * 10 / 6);
 
@@ -418,24 +418,24 @@ public class X509CaCmpResponder extends CmpResponder {
                 break;
             }
 
-            AuditChildEvent childAuditEvent = new AuditChildEvent();
-            auditEvent.addChildAuditEvent(childAuditEvent);
-            childAuditEvents.put(i, childAuditEvent);
+            AuditChildEvent auditChildEvent = new AuditChildEvent();
+            auditEvent.addAuditChildEvent(auditChildEvent);
+            auditChildEvents.put(i, auditChildEvent);
 
             CertReqMsg reqMsg = certReqMsgs[i];
             CertificateRequestMessage req = new CertificateRequestMessage(reqMsg);
             ASN1Integer certReqId = reqMsg.getCertReq().getCertReqId();
             certReqIds.put(i, certReqId);
 
-            childAuditEvent.addEventData(
+            auditChildEvent.addEventData(
                     new AuditEventData("certReqId", certReqId.getPositiveValue().toString()));
 
             if (!req.hasProofOfPossession()) {
                 PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
                 certResponses.put(i, new CertResponse(certReqId, status));
 
-                childAuditEvent.setStatus(AuditStatus.FAILED);
-                childAuditEvent.addEventData(new AuditEventData("message", "no POP"));
+                auditChildEvent.setStatus(AuditStatus.FAILED);
+                auditChildEvent.addEventData(new AuditEventData("message", "no POP"));
                 continue;
             }
 
@@ -444,8 +444,8 @@ public class X509CaCmpResponder extends CmpResponder {
                 PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
                 certResponses.put(i, new CertResponse(certReqId, status));
 
-                childAuditEvent.setStatus(AuditStatus.FAILED);
-                childAuditEvent.addEventData(new AuditEventData("message", "invalid POP"));
+                auditChildEvent.setStatus(AuditStatus.FAILED);
+                auditChildEvent.addEventData(new AuditEventData("message", "invalid POP"));
                 continue;
             }
 
@@ -456,13 +456,13 @@ public class X509CaCmpResponder extends CmpResponder {
                 String msg = "no certificate profile";
                 certResponses.put(i, new CertResponse(certReqId,
                         generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate, msg)));
-                childAuditEvent.setStatus(AuditStatus.FAILED);
-                childAuditEvent.addEventData(
+                auditChildEvent.setStatus(AuditStatus.FAILED);
+                auditChildEvent.addEventData(
                         new AuditEventData("message", msg));
                 continue;
             }
 
-            childAuditEvent.addEventData(new AuditEventData("certprofile", certprofileName));
+            auditChildEvent.addEventData(new AuditEventData("certprofile", certprofileName));
             checkPermission(tmpRequestor, certprofileName);
 
             CertTemplate certTemp = req.getCertTemplate();
@@ -515,9 +515,9 @@ public class X509CaCmpResponder extends CmpResponder {
 
                 ASN1Integer certReqId = certReqIds.get(i);
                 String msg = "error in certReq " + failCertReqId;
-                AuditChildEvent childAuditEvent = childAuditEvents.get(i);
-                childAuditEvent.setStatus(AuditStatus.FAILED);
-                childAuditEvent.addEventData(new AuditEventData("message", msg));
+                AuditChildEvent auditChildEvent = auditChildEvents.get(i);
+                auditChildEvent.setStatus(AuditStatus.FAILED);
+                auditChildEvent.addEventData(new AuditEventData("message", msg));
 
                 PKIStatusInfo tmpStatus = generateCmpRejectionStatus(failStatus,
                         failureInfo.intValue(), msg);
@@ -540,7 +540,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
             certTemplateList.add(certTemplateDatas.get(i));
             certReqIdList.add(certReqIds.get(i));
-            auditChildEventList.add(childAuditEvents.get(i));
+            auditChildEventList.add(auditChildEvents.get(i));
             reqIndexToCertIndexMap.put(i, certTemplateList.size() - 1);
         }
 
@@ -585,22 +585,22 @@ public class X509CaCmpResponder extends CmpResponder {
         CertResponse certResp;
         ASN1Integer certReqId = new ASN1Integer(-1);
 
-        AuditChildEvent childAuditEvent = new AuditChildEvent();
-        auditEvent.addChildAuditEvent(childAuditEvent);
+        AuditChildEvent auditChildEvent = new AuditChildEvent();
+        auditEvent.addAuditChildEvent(auditChildEvent);
 
         X509Ca ca = getCa();
         if (!securityFactory.verifyPopo(p10cr, getCmpControl().getPopoAlgoValidator())) {
             LOG.warn("could not validate POP for the pkcs#10 requst");
             PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
             certResp = new CertResponse(certReqId, status);
-            childAuditEvent.setStatus(AuditStatus.FAILED);
-            childAuditEvent.addEventData(new AuditEventData("message", "invalid POP"));
+            auditChildEvent.setStatus(AuditStatus.FAILED);
+            auditChildEvent.addEventData(new AuditEventData("message", "invalid POP"));
         } else {
             CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
             Extensions extensions = CaUtil.getExtensions(certTemp);
 
             X500Name subject = certTemp.getSubject();
-            childAuditEvent.addEventData(
+            auditChildEvent.addEventData(
                     new AuditEventData("req-subject", X509Util.getRfc4519Name(subject)));
 
             SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
@@ -631,21 +631,21 @@ public class X509CaCmpResponder extends CmpResponder {
 
                 checkPermission(requestor, certprofileName);
 
-                childAuditEvent.addEventData(new AuditEventData("certprofile", certprofileName));
+                auditChildEvent.addEventData(new AuditEventData("certprofile", certprofileName));
 
                 checkPermission(requestor, certprofileName);
                 CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
                         notBefore, notAfter, extensions, certprofileName);
 
                 certResp = generateCertificates(Arrays.asList(certTemplateData),
-                        Arrays.asList(certReqId), Arrays.asList(childAuditEvent),
+                        Arrays.asList(certReqId), Arrays.asList(auditChildEvent),
                         requestor, user, tid, false, request, cmpControl).get(0);
             } catch (CMPException ex) {
                 certResp = new CertResponse(certReqId,
                         generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate,
                         ex.getMessage()));
-                childAuditEvent.setStatus(AuditStatus.FAILED);
-                childAuditEvent.addEventData(new AuditEventData("message", "badCertTemplate"));
+                auditChildEvent.setStatus(AuditStatus.FAILED);
+                auditChildEvent.addEventData(new AuditEventData("message", "badCertTemplate"));
             } // end try
         }
 
@@ -747,9 +747,9 @@ public class X509CaCmpResponder extends CmpResponder {
         return ret;
     } // method generateCertificates
 
-    private CertResponse postProcessCertInfo(ASN1Integer certReqId, AuditChildEvent childAuditEvent,
+    private CertResponse postProcessCertInfo(ASN1Integer certReqId, AuditChildEvent auditChildEvent,
             X509CertificateInfo certInfo, ASN1OctetString tid, CmpControl cmpControl) {
-        childAuditEvent.addEventData(new AuditEventData("req-subject",
+        auditChildEvent.addEventData(new AuditEventData("req-subject",
                 certInfo.getCert().getSubject()));
 
         if (cmpControl.isConfirmCert()) {
@@ -770,7 +770,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     new PKIFreeText(warningMsg));
         }
 
-        childAuditEvent.setStatus(AuditStatus.SUCCESSFUL);
+        auditChildEvent.setStatus(AuditStatus.SUCCESSFUL);
 
         CertOrEncCert cec = new CertOrEncCert(
                 CMPCertificate.getInstance(certInfo.getCert().getEncodedCert()));
@@ -835,8 +835,8 @@ public class X509CaCmpResponder extends CmpResponder {
         Long reqDbId = null;
 
         for (int i = 0; i < n; i++) {
-            AuditChildEvent childAuditEvent = new AuditChildEvent();
-            auditEvent.addChildAuditEvent(childAuditEvent);
+            AuditChildEvent auditChildEvent = new AuditChildEvent();
+            auditEvent.addAuditChildEvent(auditChildEvent);
 
             RevDetails revDetails = revContent[i];
 
@@ -850,7 +850,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
             AuditEventData eventData = new AuditEventData("serialNumber",
                     LogUtil.formatCsn(snBigInt));
-            childAuditEvent.addEventData(eventData);
+            auditChildEvent.addEventData(eventData);
 
             PKIStatusInfo status;
 
@@ -899,11 +899,11 @@ public class X509CaCmpResponder extends CmpResponder {
                         reason = CrlReason.UNSPECIFIED;
                     }
 
-                    childAuditEvent.addEventData(new AuditEventData("reason",
+                    auditChildEvent.addEventData(new AuditEventData("reason",
                             reason.getDescription()));
                     if (invalidityDate != null) {
                         String value = DateUtil.toUtcTimeyyyyMMddhhmmss(invalidityDate);
-                        childAuditEvent.addEventData(new AuditEventData("invalidityDate", value));
+                        auditChildEvent.addEventData(new AuditEventData("invalidityDate", value));
                     }
 
                     returnedObj = ca.revokeCertificate(snBigInt, reason, invalidityDate);
@@ -923,7 +923,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     ca.addRequestCert(reqDbId, certDbId);
                 }
                 status = new PKIStatusInfo(PKIStatus.granted);
-                childAuditEvent.setStatus(AuditStatus.SUCCESSFUL);
+                auditChildEvent.setStatus(AuditStatus.SUCCESSFUL);
             } catch (OperationException ex) {
                 ErrorCode code = ex.getErrorCode();
                 LOG.warn("{} certificate, OperationException: code={}, message={}",
@@ -939,8 +939,8 @@ public class X509CaCmpResponder extends CmpResponder {
                     break;
                 } // end switch code
 
-                childAuditEvent.setStatus(AuditStatus.FAILED);
-                childAuditEvent.addEventData(new AuditEventData("message", code.name()));
+                auditChildEvent.setStatus(AuditStatus.FAILED);
+                auditChildEvent.addEventData(new AuditEventData("message", code.name()));
 
                 int failureInfo = getPKiFailureInfo(ex);
                 status = generateCmpRejectionStatus(failureInfo, errorMessage);

@@ -317,7 +317,7 @@ public class HttpOcspServlet extends HttpServlet {
 
                 auditEvent.setDuration(System.currentTimeMillis() - start);
 
-                if (!auditEvent.containsChildAuditEvents()) {
+                if (!auditEvent.containsAuditChildEvents()) {
                     auditService.logEvent(auditEvent);
                 } else {
                     List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();

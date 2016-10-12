@@ -712,8 +712,8 @@ public class OcspServer {
             long cacheThisUpdate = 0;
             long cacheNextUpdate = Long.MAX_VALUE;
             for (int i = 0; i < requestsSize; i++) {
-                AuditChildEvent childAuditEvent = new AuditChildEvent();
-                auditEvent.addChildAuditEvent(childAuditEvent);
+                AuditChildEvent auditChildEvent = new AuditChildEvent();
+                auditEvent.addAuditChildEvent(auditChildEvent);
 
                 Req req = requestList[i];
                 CertificateID certId = req.getCertID();
@@ -721,12 +721,12 @@ public class OcspServer {
                 HashAlgoType reqHashAlgo = HashAlgoType.getHashAlgoType(certIdHashAlgo);
                 if (reqHashAlgo == null) {
                     LOG.warn("unknown CertID.hashAlgorithm {}", certIdHashAlgo);
-                    fillAuditEvent(childAuditEvent, AuditLevel.INFO, AuditStatus.FAILED,
+                    fillAuditEvent(auditChildEvent, AuditLevel.INFO, AuditStatus.FAILED,
                             "unknown CertID.hashAlgorithm " + certIdHashAlgo);
                     return createUnsuccessfulOcspResp(OcspResponseStatus.malformedRequest);
                 } else if (!requestOption.allows(reqHashAlgo)) {
                     LOG.warn("CertID.hashAlgorithm {} not allowed", certIdHashAlgo);
-                    fillAuditEvent(childAuditEvent, AuditLevel.INFO, AuditStatus.FAILED,
+                    fillAuditEvent(auditChildEvent, AuditLevel.INFO, AuditStatus.FAILED,
                             "not allowed CertID.hashAlgorithm " + certIdHashAlgo);
                     return createUnsuccessfulOcspResp(OcspResponseStatus.malformedRequest);
                 }
@@ -754,8 +754,8 @@ public class OcspServer {
                 } // end for
 
                 if (certStatusInfo == null) {
-                    if (childAuditEvent != null) {
-                        fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
+                    if (auditChildEvent != null) {
+                        fillAuditEvent(auditChildEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                                 "no CertStatusStore can answer the request");
                     }
                     if (exceptionOccurs) {
@@ -796,7 +796,7 @@ public class OcspServer {
                     } // end if
                 } // end if
 
-                if (childAuditEvent != null) {
+                if (auditChildEvent != null) {
                     String certprofile = certStatusInfo.getCertprofile();
                     String auditCertType;
                     if (certprofile != null) {
@@ -808,7 +808,7 @@ public class OcspServer {
                         auditCertType = "UNKNOWN";
                     }
 
-                    childAuditEvent.addEventData(new AuditEventData("certType", auditCertType));
+                    auditChildEvent.addEventData(new AuditEventData("certType", auditCertType));
                 }
 
                 // certStatusInfo must not be null in any case, since at least one store
@@ -882,8 +882,8 @@ public class OcspServer {
                         encodedCertHash = bcCertHash.getEncoded();
                     } catch (IOException ex) {
                         LogUtil.error(LOG, ex, "answer() bcCertHash.getEncoded");
-                        if (childAuditEvent != null) {
-                            fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
+                        if (auditChildEvent != null) {
+                            fillAuditEvent(auditChildEvent, AuditLevel.ERROR, AuditStatus.FAILED,
                                     "CertHash.getEncoded() with IOException");
                         }
                         return createUnsuccessfulOcspResp(OcspResponseStatus.internalError);
@@ -915,10 +915,10 @@ public class OcspServer {
                     certStatusText = "should-not-happen";
                 }
 
-                if (childAuditEvent != null) {
-                    childAuditEvent.setLevel(AuditLevel.INFO);
-                    childAuditEvent.setStatus(AuditStatus.SUCCESSFUL);
-                    childAuditEvent.addEventData(new AuditEventData("certStatus", certStatusText));
+                if (auditChildEvent != null) {
+                    auditChildEvent.setLevel(AuditLevel.INFO);
+                    auditChildEvent.setStatus(AuditStatus.SUCCESSFUL);
+                    auditChildEvent.addEventData(new AuditEventData("certStatus", certStatusText));
                 }
 
                 if (LOG.isDebugEnabled()) {
