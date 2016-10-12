@@ -15,10 +15,10 @@
     <app.name>PKI</app.name>
     <features.artifactId>pki</features.artifactId>
     <boot.features>http-whiteboard</boot.features>
-    <postgresql.version>9.4.1207.jre7</postgresql.version>
-    <h2-jdbc.version>1.4.191</h2-jdbc.version>
-    <hsqldb.version>2.3.3</hsqldb.version>
-    <mariadb.version>1.4.3</mariadb.version>
+    <postgresql.version>9.4.1211</postgresql.version>
+    <h2-jdbc.version>1.4.192</h2-jdbc.version>
+    <hsqldb.version>2.3.4</hsqldb.version>
+    <mariadb.version>1.5.3</mariadb.version>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
   </properties>
