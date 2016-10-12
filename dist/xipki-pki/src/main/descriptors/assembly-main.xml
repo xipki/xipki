@@ -15,13 +15,13 @@
   </fileSets>
   <files>
     <file>
-      <source>${output.directory}/xipki/ca-config/example/ca-db.properties-h2</source>
+      <source>${output.directory}/xipki/ca-config/example/ca-db.properties-hsqldb</source>
       <outputDirectory>xipki/ca-config</outputDirectory>
       <destName>ca-db.properties</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${output.directory}/xipki/ca-config/example/ocsp-db.properties-h2</source>
+      <source>${output.directory}/xipki/ca-config/example/ocsp-db.properties-hsqldb</source>
       <outputDirectory>xipki/ca-config</outputDirectory>
       <destName>ocsp-db.properties</destName>
       <fileMode>0644</fileMode>
