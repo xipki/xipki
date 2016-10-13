@@ -57,8 +57,8 @@ public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
             P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     @Option(name = "--duration",
-            description = "duration in seconds for each test case")
-    private Integer durationInSecond = 10;
+            description = "duration for each test case")
+    private String duration = "10s";
 
     @Option(name = "--thread",
             description = "number of threads")
@@ -83,7 +83,7 @@ public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
                 break;
             }
 
-            tester.setDuration(durationInSecond);
+            tester.setDuration(duration);
             tester.setThreads(Math.min(20, numThreads));
             tester.test();
             if (tester.isInterrupted()) {
