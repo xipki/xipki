@@ -278,7 +278,12 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected static BigInteger toBigInt(final String str) {
+        return toBigInt(str, false);
+    }
+
+    protected static BigInteger toBigInt(final String str, boolean defaultHex) {
         String tmpStr = str.trim();
+
         if (tmpStr.startsWith("0x") || tmpStr.startsWith("0X")) {
             if (tmpStr.length() > 2) {
                 return new BigInteger(tmpStr.substring(2), 16);
@@ -286,7 +291,7 @@ public abstract class XipkiCommandSupport implements Action {
                 throw new NumberFormatException("invalid integer '" + tmpStr + "'");
             }
         }
-        return new BigInteger(tmpStr);
+        return new BigInteger(tmpStr, defaultHex ? 16 : 10);
     }
 
     protected boolean confirm(final String prompt, final int maxTries) throws IOException {
