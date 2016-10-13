@@ -34,7 +34,7 @@ if { $printUsage equals "true" } {
 } {
   if { "$2" equals "" } {
     argsValid = "true"
-    duration = 15
+    duration = "15s"
     threads = 5
   } {
     argsValid = "true"
