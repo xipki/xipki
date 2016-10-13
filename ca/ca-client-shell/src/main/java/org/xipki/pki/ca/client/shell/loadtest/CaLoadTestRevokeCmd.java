@@ -68,8 +68,8 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
     private String issuerCertFile;
 
     @Option(name = "--duration",
-            description = "maximal duration in seconds")
-    private Integer durationInSecond = 30;
+            description = "maximal duration")
+    private String duration = "30s";
 
     @Option(name = "--thread",
             description = "number of threads")
@@ -100,10 +100,6 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
 
-        if (durationInSecond < 1) {
-            throw new IllegalCmdParamException("invalid duration " + durationInSecond);
-        }
-
         StringBuilder description = new StringBuilder(200);
         description.append("issuer: ").append(issuerCertFile).append("\n");
         description.append("cadb: ").append(caDbConfFile).append("\n");
@@ -130,7 +126,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
             CaLoadTestRevoke loadTest = new CaLoadTestRevoke(
                     caClient, caCert, caDataSource, maxCerts, num, description.toString());
 
-            loadTest.setDuration(durationInSecond);
+            loadTest.setDuration(duration);
             loadTest.setThreads(numThreads);
             loadTest.test();
         } finally {

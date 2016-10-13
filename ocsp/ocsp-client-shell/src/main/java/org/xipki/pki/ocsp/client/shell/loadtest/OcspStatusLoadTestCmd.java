@@ -74,8 +74,8 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
     private List<String> certFiles;
 
     @Option(name = "--duration",
-            description = "duration in seconds")
-    private int durationInSecond = 30;
+            description = "duration")
+    private String duration = "30s";
 
     @Option(name = "--thread",
             description = "number of threads")
@@ -137,7 +137,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
         OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
                 issuerCert, serverUrl, options, description.toString());
-        loadTest.setDuration(durationInSecond);
+        loadTest.setDuration(duration);
         loadTest.setThreads(numThreads);
         loadTest.test();
 

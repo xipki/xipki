@@ -75,8 +75,8 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
     private String randomDnStr = "O";
 
     @Option(name = "--duration",
-            description = "duration in seconds")
-    private Integer durationInSecond = 30;
+            description = "duration")
+    private String duration = "30s";
 
     @Option(name = "--thread",
             description = "number of threads")
@@ -103,10 +103,6 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
     protected Object doExecute() throws Exception {
         if (numThreads < 1) {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
-        }
-
-        if (durationInSecond < 1) {
-            throw new IllegalCmdParamException("invalid duration " + durationInSecond);
         }
 
         if ("EC".equalsIgnoreCase(keyType) && StringUtil.isBlank(curveName)) {
@@ -147,7 +143,7 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
         CaLoadTestEnroll loadTest = new CaLoadTestEnroll(caClient, loadtestEntry,
                 num, description.toString());
 
-        loadTest.setDuration(durationInSecond);
+        loadTest.setDuration(duration);
         loadTest.setThreads(numThreads);
         loadTest.test();
 

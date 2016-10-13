@@ -141,9 +141,41 @@ public abstract class LoadExecutor {
         return interrupted;
     }
 
-    public void setDuration(final int duration) {
-        if (duration > 0) {
-            this.duration = duration;
+    public void setDuration(final String duration) {
+        ParamUtil.requireNonBlank("duration", duration);
+        char unit = duration.charAt(duration.length() - 1);
+
+        String numStr;
+        if (unit == 's' || unit == 'm' || unit == 'h') {
+            numStr = duration.substring(0, duration.length() - 1);
+        } else {
+            unit = 's';
+            numStr = duration;
+        }
+
+        int num;
+        try {
+            num = Integer.parseInt(numStr);
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("invalid duration " + duration);
+        }
+
+        if (num < 1) {
+            throw new IllegalArgumentException("invalid duration " + duration);
+        }
+
+        switch (unit) {
+        case 's':
+            this.duration = num;
+            break;
+        case 'm':
+            this.duration = num * 60;
+            break;
+        case 'h':
+            this.duration = num * 60 * 24;
+            break;
+        default:
+            throw new RuntimeException("invalid duration unit " + unit);
         }
     }
 
