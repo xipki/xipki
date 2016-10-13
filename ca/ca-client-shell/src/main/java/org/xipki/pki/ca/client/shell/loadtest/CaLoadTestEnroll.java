@@ -38,6 +38,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.crmf.CertRequest;
@@ -79,9 +80,14 @@ public class CaLoadTestEnroll extends LoadExecutor {
 
     private final int num;
 
+    private final int maxRequests;
+
+    private AtomicInteger processedRequests = new AtomicInteger(0);
+
     public CaLoadTestEnroll(final CaClient caClient, final LoadTestEntry loadtestEntry,
-            final int num, final String description) {
+            final int maxRequests, final int num, final String description) {
         super(description);
+        this.maxRequests = maxRequests;
         this.num = ParamUtil.requireMin("num", num, 1);
         this.loadtestEntry = ParamUtil.requireNonNull("loadtestEntry", loadtestEntry);
         this.caClient = ParamUtil.requireNonNull("caClient", caClient);
@@ -93,13 +99,13 @@ public class CaLoadTestEnroll extends LoadExecutor {
         public void run() {
             while (!stop() && getErrorAccout() < 1) {
                 Map<Integer, CertRequest> certReqs = nextCertRequests();
-                if (certReqs != null) {
-                    boolean successful = testNext(certReqs);
-                    int numFailed = successful ? 0 : 1;
-                    account(1, numFailed);
-                } else {
-                    account(1, 1);
+                if (certReqs == null) {
+                    break;
                 }
+
+                boolean successful = testNext(certReqs);
+                int numFailed = successful ? 0 : 1;
+                account(1, numFailed);
             }
         }
 
@@ -150,6 +156,13 @@ public class CaLoadTestEnroll extends LoadExecutor {
     }
 
     private Map<Integer, CertRequest> nextCertRequests() {
+        if (maxRequests > 0) {
+            int num = processedRequests.getAndAdd(1);
+            if (num >= maxRequests) {
+                return null;
+            }
+        }
+
         Map<Integer, CertRequest> certRequests = new HashMap<>();
         for (int i = 0; i < num; i++) {
             final int certId = i + 1;
@@ -159,10 +172,6 @@ public class CaLoadTestEnroll extends LoadExecutor {
             certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
 
             SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo(thisIndex);
-            if (spki == null) {
-                return null;
-            }
-
             certTempBuilder.setPublicKey(spki);
             CertTemplate certTemplate = certTempBuilder.build();
             CertRequest certRequest = new CertRequest(certId, certTemplate, null);

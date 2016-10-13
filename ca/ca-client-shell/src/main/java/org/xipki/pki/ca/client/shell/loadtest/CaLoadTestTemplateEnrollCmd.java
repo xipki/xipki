@@ -69,6 +69,11 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
             description = "number of threads")
     private Integer numThreads = 5;
 
+    @Option(name = "--max-num",
+            description = "maximal number of requests\n"
+                    + "0 for unlimited")
+    private Integer maxRequests = 0;
+
     @Override
     protected Object doExecute() throws Exception {
         if (numThreads < 1) {
@@ -82,6 +87,7 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
         StringBuilder description = new StringBuilder(200);
         description.append("template: ").append(templateFile).append("\n");
         description.append("#certs/req: ").append(size).append("\n");
+        description.append("maxRequests: ").append(maxRequests).append("\n");
         description.append("unit: ").append(size).append(" certificate");
         if (size > 1) {
             description.append("s");
@@ -89,7 +95,7 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
         description.append("\n");
 
         CaLoadTestTemplateEnroll loadTest = new CaLoadTestTemplateEnroll(caClient, template,
-                description.toString());
+                maxRequests, description.toString());
         loadTest.setDuration(duration);
         loadTest.setThreads(numThreads);
         loadTest.test();

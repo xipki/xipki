@@ -87,6 +87,11 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
                     + "required")
     private String serverUrlS;
 
+    @Option(name = "--max-num",
+            description = "maximal number of certificates to be asked\n"
+                    + "0 for unlimited")
+    private Integer maxCerts = 0;
+
     @Override
     protected Object doExecute() throws Exception {
         List<BigInteger> serialNumbers = new LinkedList<>();
@@ -129,6 +134,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
         StringBuilder description = new StringBuilder();
         description.append("issuer cert: ").append(issuerCertFile).append("\n");
         description.append("server URL: ").append(serverUrl.toString()).append("\n");
+        description.append("maxCerts: ").append(maxCerts).append("\n");
         description.append("hash: ").append(hashAlgo);
 
         X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
@@ -136,7 +142,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
         RequestOptions options = getRequestOptions();
 
         OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
-                issuerCert, serverUrl, options, description.toString());
+                issuerCert, serverUrl, options, maxCerts, description.toString());
         loadTest.setDuration(duration);
         loadTest.setThreads(numThreads);
         loadTest.test();

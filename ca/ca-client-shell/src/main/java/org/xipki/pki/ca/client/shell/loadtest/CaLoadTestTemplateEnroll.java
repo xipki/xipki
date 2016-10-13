@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.bind.JAXBContext;
@@ -103,13 +104,13 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
         public void run() {
             while (!stop() && getErrorAccout() < 1) {
                 Map<Integer, CertRequestWithProfile> certReqs = nextCertRequests();
-                if (certReqs != null) {
-                    boolean successful = testNext(certReqs);
-                    int numFailed = successful ? 0 : 1;
-                    account(1, numFailed);
-                } else {
-                    account(1, 1);
+                if (certReqs == null) {
+                    break;
                 }
+
+                boolean successful = testNext(certReqs);
+                int numFailed = successful ? 0 : 1;
+                account(1, numFailed);
             }
         }
 
@@ -171,13 +172,18 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
 
     private final List<LoadTestEntry> loadtestEntries;
 
+    private final int maxRequests;
+
+    private AtomicInteger processedRequests = new AtomicInteger(0);
+
     private final AtomicLong index;
 
     public CaLoadTestTemplateEnroll(final CaClient caClient, final EnrollTemplateType template,
-            final String description) throws Exception {
+            final int maxRequests, final String description) throws Exception {
         super(description);
 
         ParamUtil.requireNonNull("template", template);
+        this.maxRequests = maxRequests;
         this.caClient = ParamUtil.requireNonNull("caClient", caClient);
 
         Calendar baseTime = Calendar.getInstance(Locale.UK);
@@ -224,6 +230,13 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
     }
 
     private Map<Integer, CertRequestWithProfile> nextCertRequests() {
+        if (maxRequests > 0) {
+            int num = processedRequests.getAndAdd(1);
+            if (num >= maxRequests) {
+                return null;
+            }
+        }
+
         Map<Integer, CertRequestWithProfile> certRequests = new HashMap<>();
         final int n = loadtestEntries.size();
         for (int i = 0; i < n; i++) {
@@ -235,10 +248,6 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
             certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
 
             SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo(thisIndex);
-            if (spki == null) {
-                return null;
-            }
-
             certTempBuilder.setPublicKey(spki);
 
             CertTemplate certTemplate = certTempBuilder.build();

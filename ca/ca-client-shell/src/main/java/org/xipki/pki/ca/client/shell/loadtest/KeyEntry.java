@@ -57,8 +57,6 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.commons.security.util.KeyUtil;
@@ -70,8 +68,6 @@ import org.xipki.commons.security.util.SignerUtil;
  */
 
 public abstract class KeyEntry {
-
-    private static final Logger LOG = LoggerFactory.getLogger(KeyEntry.class);
 
     // CHECKSTYLE:SKIP
     public static final class RSAKeyEntry extends KeyEntry {
@@ -101,11 +97,11 @@ public abstract class KeyEntry {
                         SignerUtil.generateRSAPublicKeyParameter(
                                 KeyUtil.generateRSAPublicKey(keySpec)));
             } catch (InvalidKeySpecException ex) {
-                LOG.warn("InvalidKeySpecException: {}", ex.getMessage());
-                return null;
+                throw new RuntimeException(
+                        "InvalidKeySpecException while constructing SubjectPublicKeyInfo", ex);
             } catch (IOException ex) {
-                LOG.warn("IOException: {}", ex.getMessage());
-                return null;
+                throw new RuntimeException(
+                        "IOException while constructing SubjectPublicKeyInfo", ex);
             }
         }
 
@@ -257,8 +253,8 @@ public abstract class KeyEntry {
                         algId,
                         new ASN1Integer(y));
             } catch (IOException ex) {
-                LOG.warn("IOException: {}", ex.getMessage());
-                return null;
+                throw new RuntimeException("IOException while constructing SubjectPublicKeyInfo",
+                        ex);
             }
         }
 

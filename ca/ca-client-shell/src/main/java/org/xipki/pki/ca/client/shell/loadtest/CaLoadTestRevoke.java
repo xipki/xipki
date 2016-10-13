@@ -92,9 +92,9 @@ public class CaLoadTestRevoke extends LoadExecutor {
 
     private final int maxId;
 
-    private final int maxCerts;
-
     private final int num;
+
+    private final int maxCerts;
 
     private AtomicInteger processedCerts = new AtomicInteger(0);
 
