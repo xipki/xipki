@@ -35,6 +35,8 @@
 package org.xipki.pki.ca.client.shell.loadtest;
 
 import java.io.FileInputStream;
+import java.math.BigInteger;
+import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -43,6 +45,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.commons.common.util.FileBigIntegerIterator;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
@@ -76,11 +79,19 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
     private Integer numThreads = 5;
 
     @Option(name = "--ca-db",
-            required = true,
             description = "CA database configuration file\n"
-                    + "(required)")
+                    + "(exactly one of ca-db and serial-file must be specified)")
     @Completion(FilePathCompleter.class)
     private String caDbConfFile;
+
+    @Option(name = "--hex",
+            description = "serial number without prefix in the serial-file is hex number")
+    private Boolean hex = Boolean.FALSE;
+
+    @Option(name = "--serial-file",
+            description = "file that contains serial numbers")
+    @Completion(FilePathCompleter.class)
+    private String serialNumberFile;
 
     @Option(name = "--max-num",
             description = "maximal number of certificates to be revoked\n"
@@ -100,9 +111,15 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
 
+        if (!(serialNumberFile == null ^ caDbConfFile == null)) {
+            throw new IllegalCmdParamException(
+                    "exactly one of ca-db and serial-file must be specified");
+        }
+
         StringBuilder description = new StringBuilder(200);
         description.append("issuer: ").append(issuerCertFile).append("\n");
         description.append("cadb: ").append(caDbConfFile).append("\n");
+        description.append("serialNumberFile: ").append(serialNumberFile).append("\n");
         description.append("maxCerts: ").append(maxCerts).append("\n");
         description.append("#certs/req: ").append(num).append("\n");
         description.append("unit: ").append(num).append(" certificate");
@@ -119,18 +136,31 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
         props.setProperty("maximumPoolSize", "1");
         props.setProperty("minimumIdle", "1");
 
-        DataSourceWrapper caDataSource = new DataSourceFactory().createDataSource(
-                "ds-" + caDbConfFile, props,
-                securityFactory.getPasswordResolver());
+        DataSourceWrapper caDataSource = null;
+        Iterator<BigInteger> serialNumberIterator;
+        if (caDbConfFile != null) {
+            caDataSource = new DataSourceFactory().createDataSource(
+                    "ds-" + caDbConfFile, props, securityFactory.getPasswordResolver());
+            serialNumberIterator = new DbGoodCertSerialIterator(caCert, caDataSource);
+        } else {
+            serialNumberIterator = new FileBigIntegerIterator(serialNumberFile, hex, false);
+        }
+
         try {
             CaLoadTestRevoke loadTest = new CaLoadTestRevoke(
-                    caClient, caCert, caDataSource, maxCerts, num, description.toString());
+                    caClient, caCert, serialNumberIterator, maxCerts, num, description.toString());
 
             loadTest.setDuration(duration);
             loadTest.setThreads(numThreads);
             loadTest.test();
         } finally {
-            caDataSource.shutdown();
+            if (caDataSource != null) {
+                caDataSource.shutdown();
+            }
+
+            if (serialNumberIterator instanceof FileBigIntegerIterator) {
+                ((FileBigIntegerIterator) serialNumberIterator).close();
+            }
         }
 
         return null;
