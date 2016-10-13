@@ -50,6 +50,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.BigIntegerRange;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.FileBigIntegerIterator;
+import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.RangeBigIntegerIterator;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
@@ -77,6 +78,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
     @Option(name = "--serial-file",
             description = "file that contains serial numbers")
+    @Completion(FilePathCompleter.class)
     private String serialNumberFile;
 
     @Option(name = "--cert",
@@ -139,7 +141,8 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
         Iterator<BigInteger> serialNumberIterator;
 
         if (serialNumberFile != null) {
-            serialNumberIterator = new FileBigIntegerIterator(serialNumberFile, hex, true);
+            serialNumberIterator = new FileBigIntegerIterator(
+                    IoUtil.expandFilepath(serialNumberFile), hex, true);
         } else {
             List<BigIntegerRange> serialNumbers = new LinkedList<>();
             if (serialNumberList != null) {
