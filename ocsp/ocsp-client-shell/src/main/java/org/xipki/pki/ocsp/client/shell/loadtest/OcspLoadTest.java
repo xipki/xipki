@@ -80,6 +80,9 @@ public class OcspLoadTest extends LoadExecutor {
         public void run() {
             while (!stop() && getErrorAccout() < 10) {
                 BigInteger sn = nextSerialNumber();
+                if (sn == null) {
+                    break;
+                }
                 int numFailed = testNext(sn) ? 0 : 1;
                 account(1, numFailed);
             }
@@ -161,10 +164,15 @@ public class OcspLoadTest extends LoadExecutor {
 
     private RequestOptions options;
 
+    private final int maxRequests;
+
+    private AtomicInteger processedRequests = new AtomicInteger(0);
+
     public OcspLoadTest(final OcspRequestor requestor, final List<BigInteger> serials,
             final X509Certificate caCert, final URL serverUrl, final RequestOptions options,
-            final String description) {
+            final int maxRequests, final String description) {
         super(description);
+        this.maxRequests = maxRequests;
         this.requestor = ParamUtil.requireNonNull("requestor", requestor);
         this.serials = ParamUtil.requireNonEmpty("serials", serials);
         this.caCert = ParamUtil.requireNonNull("caCert", caCert);
@@ -179,6 +187,13 @@ public class OcspLoadTest extends LoadExecutor {
     }
 
     private BigInteger nextSerialNumber() {
+        if (maxRequests > 0) {
+            int num = processedRequests.getAndAdd(1);
+            if (num >= maxRequests) {
+                return null;
+            }
+        }
+
         return this.serials.get(serialIndex.getAndAccumulate(numSerials, accumulatorFunction));
     }
 

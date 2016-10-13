@@ -82,7 +82,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
     @Completion(FilePathCompleter.class)
     private String caDbConfFile;
 
-    @Option(name = "--max-certs",
+    @Option(name = "--max-num",
             description = "maximal number of certificates to be revoked\n"
                     + "0 for unlimited")
     private Integer maxCerts = 0;

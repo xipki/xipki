@@ -99,6 +99,11 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
             description = "number of certificates to be requested in one request")
     private Integer num = 1;
 
+    @Option(name = "--max-num",
+            description = "maximal number of requests\n"
+                    + "0 for unlimited")
+    private Integer maxRequests = 0;
+
     @Override
     protected Object doExecute() throws Exception {
         if (numThreads < 1) {
@@ -114,6 +119,7 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
         description.append("profile: ").append(certprofile).append("\n");
         description.append("keyType: ").append(keyType).append("\n");
         description.append("#certs/req: ").append(num).append("\n");
+        description.append("maxRequests: ").append(maxRequests).append("\n");
         description.append("unit: ").append(num).append(" certificate");
         if (num > 1) {
             description.append("s");
@@ -140,7 +146,7 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
 
         LoadTestEntry loadtestEntry = new LoadTestEntry(certprofile, keyEntry,
                 subjectTemplate, randomDn);
-        CaLoadTestEnroll loadTest = new CaLoadTestEnroll(caClient, loadtestEntry,
+        CaLoadTestEnroll loadTest = new CaLoadTestEnroll(caClient, loadtestEntry, maxRequests,
                 num, description.toString());
 
         loadTest.setDuration(duration);
