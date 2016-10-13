@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,8 +66,10 @@ import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.RequestResponsePair;
+import org.xipki.commons.common.util.BigIntegerRange;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.HashAlgoType;
@@ -108,11 +111,14 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     @Completion(FilePathCompleter.class)
     private String respout;
 
+    @Option(name = "--hex",
+            description = "serial number without prefix is hex number")
+    private Boolean hex = Boolean.FALSE;
+
     @Option(name = "--serial", aliases = "-s",
-            multiValued = true,
-            description = "serial number\n"
-                    + "(multi-valued)")
-    private List<String> serialNumberList;
+            description = "comma-separated serial numbers or ranges (like 1,3,6-10)\n"
+                    + "(at least one of serial and cert must be specified)")
+    private String serialNumberList;
 
     @Option(name = "--cert", aliases = "-c",
             multiValued = true,
@@ -145,7 +151,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
     @Override
     protected final Object doExecute() throws Exception {
-        if (isEmpty(serialNumberList) && isEmpty(certFiles)) {
+        if (StringUtil.isBlank(serialNumberList) && isEmpty(certFiles)) {
             throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
         }
 
@@ -153,6 +159,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
         Map<BigInteger, byte[]> encodedCerts = null;
         List<BigInteger> sns = new LinkedList<>();
+
         if (isNotEmpty(certFiles)) {
             encodedCerts = new HashMap<>(certFiles.size());
 
@@ -217,9 +224,26 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
                 serverUrl = ocspUrl;
             }
         } else {
-            for (String serialNumber : serialNumberList) {
-                BigInteger sn = toBigInt(serialNumber);
-                sns.add(sn);
+            StringTokenizer st = new StringTokenizer(serialNumberList, ", ");
+            while (st.hasMoreTokens()) {
+                String token = st.nextToken();
+                StringTokenizer st2 = new StringTokenizer(token, "-");
+                BigInteger from = toBigInt(st2.nextToken(), hex);
+                BigInteger to = st2.hasMoreTokens() ? toBigInt(st2.nextToken(), hex) : null;
+                if (to == null) {
+                    sns.add(from);
+                } else {
+                    BigIntegerRange range = new BigIntegerRange(from, to);
+                    if (range.getDiff().compareTo(BigInteger.valueOf(10)) > 0) {
+                        throw new IllegalCmdParamException("to many serial numbers");
+                    }
+
+                    BigInteger sn = range.getFrom();
+                    while (range.isInRange(sn)) {
+                        sns.add(sn);
+                        sn = sn.add(BigInteger.ONE);
+                    }
+                }
             }
         }
 

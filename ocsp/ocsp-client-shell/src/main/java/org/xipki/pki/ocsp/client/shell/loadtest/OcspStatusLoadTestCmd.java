@@ -64,11 +64,11 @@ import org.xipki.pki.ocsp.client.shell.OcspStatusCommandSupport;
 @Service
 public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
     @Option(name = "--hex",
-            description = "the serial numbers are hex numbers")
+            description = "serial number without prefix is hex number")
     private Boolean hex = Boolean.FALSE;
 
-    @Option(name = "--serial",
-            description = "comma-separated serial number or ranges (like 1,3,6-10)\n"
+    @Option(name = "--serial", aliases = "-s",
+            description = "comma-separated serial numbers or ranges (like 1,3,6-10)\n"
                     + "(at least one of serial and cert must be specified)")
     private String serialNumberList;
 
@@ -107,8 +107,8 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
             while (st.hasMoreTokens()) {
                 String token = st.nextToken();
                 StringTokenizer st2 = new StringTokenizer(token, "-");
-                BigInteger from = toBigInteger(st2.nextToken());
-                BigInteger to = st2.hasMoreTokens() ? toBigInteger(st2.nextToken()) : from;
+                BigInteger from = toBigInt(st2.nextToken(), hex);
+                BigInteger to = st2.hasMoreTokens() ? toBigInt(st2.nextToken(), hex) : from;
                 serialNumbers.add(new BigIntegerRange(from, to));
             }
         }
@@ -158,13 +158,5 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
         return null;
     } // end doExecute
-
-    private BigInteger toBigInteger(String str) {
-        if (str.startsWith("0x") || str.startsWith("0X")) {
-            return toBigInt(str);
-        }
-
-        return new BigInteger(str, hex ? 16 : 10);
-    }
 
 }
