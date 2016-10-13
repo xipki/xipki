@@ -38,9 +38,9 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.List;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.IntBinaryOperator;
 
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
@@ -64,15 +64,6 @@ import org.xipki.pki.ocsp.client.shell.OcspUtils;
  */
 
 public class OcspLoadTest extends LoadExecutor {
-
-    private static final class IndexIncrementer implements IntBinaryOperator {
-
-        @Override
-        public int applyAsInt(int left, int right) {
-            return (left + 1 >= right) ? 0 : left + 1;
-        }
-
-    }
 
     final class Testor implements Runnable {
 
@@ -150,13 +141,7 @@ public class OcspLoadTest extends LoadExecutor {
 
     private final OcspRequestor requestor;
 
-    private final List<BigInteger> serials;
-
-    private final int numSerials;
-
-    private final IndexIncrementer accumulatorFunction = new IndexIncrementer();
-
-    private final AtomicInteger serialIndex = new AtomicInteger(0);
+    private final Iterator<BigInteger> serials;
 
     private X509Certificate caCert;
 
@@ -168,17 +153,16 @@ public class OcspLoadTest extends LoadExecutor {
 
     private AtomicInteger processedRequests = new AtomicInteger(0);
 
-    public OcspLoadTest(final OcspRequestor requestor, final List<BigInteger> serials,
+    public OcspLoadTest(final OcspRequestor requestor, final Iterator<BigInteger> serials,
             final X509Certificate caCert, final URL serverUrl, final RequestOptions options,
             final int maxRequests, final String description) {
         super(description);
         this.maxRequests = maxRequests;
         this.requestor = ParamUtil.requireNonNull("requestor", requestor);
-        this.serials = ParamUtil.requireNonEmpty("serials", serials);
+        this.serials = ParamUtil.requireNonNull("serials", serials);
         this.caCert = ParamUtil.requireNonNull("caCert", caCert);
         this.serverUrl = ParamUtil.requireNonNull("serverUrl", serverUrl);
         this.options = ParamUtil.requireNonNull("options", options);
-        this.numSerials = serials.size();
     }
 
     @Override
@@ -194,7 +178,11 @@ public class OcspLoadTest extends LoadExecutor {
             }
         }
 
-        return this.serials.get(serialIndex.getAndAccumulate(numSerials, accumulatorFunction));
+        try {
+            return this.serials.next();
+        } catch (NoSuchElementException ex) {
+            return null;
+        }
     }
 
 }
