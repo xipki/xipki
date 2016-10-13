@@ -38,6 +38,7 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -47,6 +48,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.BigIntegerRange;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.FileBigIntegerIterator;
 import org.xipki.commons.common.util.RangeBigIntegerIterator;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
@@ -69,8 +72,12 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
     @Option(name = "--serial", aliases = "-s",
             description = "comma-separated serial numbers or ranges (like 1,3,6-10)\n"
-                    + "(at least one of serial and cert must be specified)")
+                    + "(exactly one of serial, serial-file and cert must be specified)")
     private String serialNumberList;
+
+    @Option(name = "--serial-file",
+            description = "file that contains serial numbers")
+    private String serialNumberFile;
 
     @Option(name = "--cert",
             multiValued = true,
@@ -100,31 +107,22 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        List<BigIntegerRange> serialNumbers = new LinkedList<>();
-
+        int ii = 0;
         if (serialNumberList != null) {
-            StringTokenizer st = new StringTokenizer(serialNumberList, ", ");
-            while (st.hasMoreTokens()) {
-                String token = st.nextToken();
-                StringTokenizer st2 = new StringTokenizer(token, "-");
-                BigInteger from = toBigInt(st2.nextToken(), hex);
-                BigInteger to = st2.hasMoreTokens() ? toBigInt(st2.nextToken(), hex) : from;
-                serialNumbers.add(new BigIntegerRange(from, to));
-            }
+            ii++;
         }
 
-        if (certFiles != null) {
-            for (String certFile : certFiles) {
-                X509Certificate cert;
-                try {
-                    cert = X509Util.parseCert(certFile);
-                } catch (Exception ex) {
-                    throw new IllegalCmdParamException(
-                            "invalid certificate file  '" + certFile + "'", ex);
-                }
-                BigInteger serial = cert.getSerialNumber();
-                serialNumbers.add(new BigIntegerRange(serial, serial));
-            }
+        if (serialNumberFile != null) {
+            ii++;
+        }
+
+        if (CollectionUtil.isNonEmpty(certFiles)) {
+            ii++;
+        }
+
+        if (ii != 1) {
+            throw new IllegalCmdParamException(
+                    "exactly one of serial, serial-file and cert must be specified");
         }
 
         if (numThreads < 1) {
@@ -138,23 +136,59 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
             throw new RuntimeException("invalid URL: " + serverUrlS);
         }
 
-        StringBuilder description = new StringBuilder();
-        description.append("issuer cert: ").append(issuerCertFile).append("\n");
-        description.append("server URL: ").append(serverUrl.toString()).append("\n");
-        description.append("maxCerts: ").append(maxCerts).append("\n");
-        description.append("hash: ").append(hashAlgo);
+        Iterator<BigInteger> serialNumberIterator;
 
-        X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
+        if (serialNumberFile != null) {
+            serialNumberIterator = new FileBigIntegerIterator(serialNumberFile, hex, true);
+        } else {
+            List<BigIntegerRange> serialNumbers = new LinkedList<>();
+            if (serialNumberList != null) {
+                StringTokenizer st = new StringTokenizer(serialNumberList, ", ");
+                while (st.hasMoreTokens()) {
+                    String token = st.nextToken();
+                    StringTokenizer st2 = new StringTokenizer(token, "-");
+                    BigInteger from = toBigInt(st2.nextToken(), hex);
+                    BigInteger to = st2.hasMoreTokens() ? toBigInt(st2.nextToken(), hex) : from;
+                    serialNumbers.add(new BigIntegerRange(from, to));
+                }
+            } else  if (certFiles != null) {
+                for (String certFile : certFiles) {
+                    X509Certificate cert;
+                    try {
+                        cert = X509Util.parseCert(certFile);
+                    } catch (Exception ex) {
+                        throw new IllegalCmdParamException(
+                                "invalid certificate file  '" + certFile + "'", ex);
+                    }
+                    BigInteger serial = cert.getSerialNumber();
+                    serialNumbers.add(new BigIntegerRange(serial, serial));
+                }
+            }
 
-        RequestOptions options = getRequestOptions();
+            serialNumberIterator = new RangeBigIntegerIterator(serialNumbers, true);
+        }
 
-        RangeBigIntegerIterator iterator = new RangeBigIntegerIterator(serialNumbers, true);
+        try {
+            StringBuilder description = new StringBuilder();
+            description.append("issuer cert: ").append(issuerCertFile).append("\n");
+            description.append("server URL: ").append(serverUrl.toString()).append("\n");
+            description.append("maxCerts: ").append(maxCerts).append("\n");
+            description.append("hash: ").append(hashAlgo);
 
-        OcspLoadTest loadTest = new OcspLoadTest(requestor, iterator, issuerCert, serverUrl,
-                options, maxCerts, description.toString());
-        loadTest.setDuration(duration);
-        loadTest.setThreads(numThreads);
-        loadTest.test();
+            X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
+
+            RequestOptions options = getRequestOptions();
+
+            OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumberIterator, issuerCert,
+                    serverUrl, options, maxCerts, description.toString());
+            loadTest.setDuration(duration);
+            loadTest.setThreads(numThreads);
+            loadTest.test();
+        } finally {
+            if (serialNumberIterator instanceof FileBigIntegerIterator) {
+                ((FileBigIntegerIterator) serialNumberIterator).close();
+            }
+        }
 
         return null;
     } // end doExecute
