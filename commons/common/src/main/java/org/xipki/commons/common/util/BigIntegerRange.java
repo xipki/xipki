@@ -44,6 +44,7 @@ import java.math.BigInteger;
 public class BigIntegerRange {
     private final BigInteger from;
     private final BigInteger to;
+    private final BigInteger diff;
 
     public BigIntegerRange(BigInteger from, BigInteger to) {
         if (from.compareTo(to) > 0) {
@@ -52,6 +53,7 @@ public class BigIntegerRange {
         }
         this.from = from;
         this.to = to;
+        this.diff = to.subtract(from);
     }
 
     public BigInteger getFrom() {
@@ -60,6 +62,10 @@ public class BigIntegerRange {
 
     public BigInteger getTo() {
         return to;
+    }
+
+    public BigInteger getDiff() {
+        return diff;
     }
 
     public boolean isInRange(final BigInteger num) {
