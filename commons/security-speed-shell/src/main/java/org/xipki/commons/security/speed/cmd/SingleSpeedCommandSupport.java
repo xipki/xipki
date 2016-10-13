@@ -45,8 +45,8 @@ import org.xipki.commons.common.LoadExecutor;
 public abstract class SingleSpeedCommandSupport extends SecurityCommandSupport {
 
     @Option(name = "--duration",
-            description = "duration in seconds")
-    private Integer durationInSecond = 30;
+            description = "duration")
+    private String duration = "30s";
 
     @Option(name = "--thread",
             description = "number of threads")
@@ -57,7 +57,7 @@ public abstract class SingleSpeedCommandSupport extends SecurityCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         LoadExecutor tester = getTester();
-        tester.setDuration(durationInSecond);
+        tester.setDuration(duration);
         tester.setThreads(Math.max(20, numThreads));
 
         tester.test();

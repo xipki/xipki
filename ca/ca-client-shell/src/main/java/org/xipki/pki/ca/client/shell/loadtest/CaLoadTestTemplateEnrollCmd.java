@@ -62,8 +62,8 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
     private String templateFile;
 
     @Option(name = "--duration",
-            description = "duration in seconds")
-    private Integer durationInSecond = 30;
+            description = "duration")
+    private String duration = "30s";
 
     @Option(name = "--thread",
             description = "number of threads")
@@ -73,10 +73,6 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
     protected Object doExecute() throws Exception {
         if (numThreads < 1) {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
-        }
-
-        if (durationInSecond < 1) {
-            throw new IllegalCmdParamException("invalid duration " + durationInSecond);
         }
 
         EnrollTemplateType template = CaLoadTestTemplateEnroll.parse(
@@ -94,7 +90,7 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
 
         CaLoadTestTemplateEnroll loadTest = new CaLoadTestTemplateEnroll(caClient, template,
                 description.toString());
-        loadTest.setDuration(durationInSecond);
+        loadTest.setDuration(duration);
         loadTest.setThreads(numThreads);
         loadTest.test();
 
