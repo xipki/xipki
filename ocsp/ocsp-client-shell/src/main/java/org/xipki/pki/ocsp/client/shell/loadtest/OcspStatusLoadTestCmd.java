@@ -40,11 +40,14 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.common.util.BigIntegerRange;
+import org.xipki.commons.common.util.RangeBigIntegerIterator;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.util.X509Util;
@@ -60,11 +63,14 @@ import org.xipki.pki.ocsp.client.shell.OcspStatusCommandSupport;
         description = "OCSP Load test")
 @Service
 public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
+    @Option(name = "--hex",
+            description = "the serial numbers are hex numbers")
+    private Boolean hex = Boolean.FALSE;
+
     @Option(name = "--serial",
-            multiValued = true,
-            description = "serial number\n"
-                    + "(multi-valued, at least one of serial and cert must be specified)")
-    private List<String> serialNumberList;
+            description = "comma-separated serial number or ranges (like 1,3,6-10)\n"
+                    + "(at least one of serial and cert must be specified)")
+    private String serialNumberList;
 
     @Option(name = "--cert",
             multiValued = true,
@@ -94,16 +100,16 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        List<BigInteger> serialNumbers = new LinkedList<>();
+        List<BigIntegerRange> serialNumbers = new LinkedList<>();
 
         if (serialNumberList != null) {
-            for (String serialNumber : serialNumberList) {
-                try {
-                    serialNumbers.add(toBigInt(serialNumber));
-                } catch (Exception ex) {
-                    throw new IllegalCmdParamException(
-                            "invalid serial number '" + serialNumber + "'", ex);
-                }
+            StringTokenizer st = new StringTokenizer(serialNumberList, ", ");
+            while (st.hasMoreTokens()) {
+                String token = st.nextToken();
+                StringTokenizer st2 = new StringTokenizer(token, "-");
+                BigInteger from = toBigInteger(st2.nextToken());
+                BigInteger to = st2.hasMoreTokens() ? toBigInteger(st2.nextToken()) : from;
+                serialNumbers.add(new BigIntegerRange(from, to));
             }
         }
 
@@ -116,7 +122,8 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
                     throw new IllegalCmdParamException(
                             "invalid certificate file  '" + certFile + "'", ex);
                 }
-                serialNumbers.add(cert.getSerialNumber());
+                BigInteger serial = cert.getSerialNumber();
+                serialNumbers.add(new BigIntegerRange(serial, serial));
             }
         }
 
@@ -141,13 +148,23 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
         RequestOptions options = getRequestOptions();
 
-        OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
-                issuerCert, serverUrl, options, maxCerts, description.toString());
+        RangeBigIntegerIterator iterator = new RangeBigIntegerIterator(serialNumbers, true);
+
+        OcspLoadTest loadTest = new OcspLoadTest(requestor, iterator, issuerCert, serverUrl,
+                options, maxCerts, description.toString());
         loadTest.setDuration(duration);
         loadTest.setThreads(numThreads);
         loadTest.test();
 
         return null;
     } // end doExecute
+
+    private BigInteger toBigInteger(String str) {
+        if (str.startsWith("0x") || str.startsWith("0X")) {
+            return toBigInt(str);
+        }
+
+        return new BigInteger(str, hex ? 16 : 10);
+    }
 
 }
