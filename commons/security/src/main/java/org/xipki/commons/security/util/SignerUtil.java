@@ -343,13 +343,23 @@ public class SignerUtil {
     public static byte[] convertX962DSASigToPlain(final byte[] x962Signature, final int keyBitLen)
     throws XiSecurityException {
         ParamUtil.requireNonNull("x962Signature", x962Signature);
-        final int blockSize = (keyBitLen + 7) / 8;
         ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
         if (seq.size() != 2) {
             throw new IllegalArgumentException("invalid X962Signature");
         }
         BigInteger sigR = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
         BigInteger sigS = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
+        return convertDSASigToPlain(sigR, sigS, keyBitLen);
+    }
+
+    // CHECKSTYLE:SKIP
+    public static byte[] convertDSASigToPlain(final BigInteger sigR, final BigInteger sigS,
+            final int keyBitLen)
+    throws XiSecurityException {
+        ParamUtil.requireNonNull("sigR", sigR);
+        ParamUtil.requireNonNull("sigS", sigS);
+
+        final int blockSize = (keyBitLen + 7) / 8;
         int bitLenOfR = sigR.bitLength();
         int bitLenOfS = sigS.bitLength();
         int bitLen = Math.max(bitLenOfR, bitLenOfS);
