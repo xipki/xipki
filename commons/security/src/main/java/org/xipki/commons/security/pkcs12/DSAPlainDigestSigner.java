@@ -48,6 +48,8 @@ import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.exception.XiSecurityException;
+import org.xipki.commons.security.util.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -130,8 +132,8 @@ public class DSAPlainDigestSigner implements Signer {
         BigInteger[] sig = dsaSigner.generateSignature(hash);
 
         try {
-            return encode(sig[0], sig[1]);
-        } catch (IOException ex) {
+            return SignerUtil.convertDSASigToPlain(sig[0], sig[1], keyBitLen);
+        } catch (XiSecurityException ex) {
             throw new IllegalStateException("unable to encode signature");
         }
     }
@@ -158,30 +160,6 @@ public class DSAPlainDigestSigner implements Signer {
         digest.reset();
     }
 
-    // CHECKSTYLE:OFF
-    private byte[] encode(final BigInteger r, final BigInteger s) throws IOException {
-    // CHECKSTYLE:ON
-        int blockSize = (keyBitLen + 7) / 8;
-        if ((r.bitLength() + 7) / 8 > blockSize) {
-            throw new IOException("r is too long");
-        }
-
-        if ((s.bitLength() + 7) / 8 > blockSize) {
-            throw new IOException("s is too long");
-        }
-
-        byte[] ret = new byte[2 * blockSize];
-
-        byte[] bytes = r.toByteArray();
-        int srcOffset = Math.max(0, bytes.length - blockSize);
-        System.arraycopy(bytes, srcOffset, ret, 0, bytes.length - srcOffset);
-
-        bytes = s.toByteArray();
-        srcOffset = Math.max(0, bytes.length - blockSize);
-        System.arraycopy(bytes, srcOffset, ret, blockSize, bytes.length - srcOffset);
-        return ret;
-    }
-
     private BigInteger[] decode(final byte[] encoding) throws IOException {
         int blockSize = (keyBitLen + 7) / 8;
         if (encoding.length != 2 * blockSize) {
@@ -189,12 +167,13 @@ public class DSAPlainDigestSigner implements Signer {
         }
 
         BigInteger[] ret = new BigInteger[2];
-        byte[] buffer = new byte[blockSize];
-        System.arraycopy(encoding, 0, buffer, 0, blockSize);
-        ret[0] = new BigInteger(1, buffer);
+        byte[] buffer = new byte[blockSize + 1];
+        System.arraycopy(encoding, 0, buffer, 1, blockSize);
+        ret[0] = new BigInteger(buffer);
 
-        System.arraycopy(encoding, blockSize, buffer, 0, blockSize);
-        ret[1] = new BigInteger(1, buffer);
+        buffer = new byte[blockSize + 1];
+        System.arraycopy(encoding, blockSize, buffer, 1, blockSize);
+        ret[1] = new BigInteger(buffer);
         return ret;
     }
 
