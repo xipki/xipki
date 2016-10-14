@@ -92,10 +92,10 @@ public class XipkiECContentVerifierProviderBuilder extends BcContentVerifierProv
             dig = digestProvider.get(digAlg);
         }
 
-        if (!plainDsa) {
-            return new DSADigestSigner(new ECDSASigner(), dig);
-        } else {
+        if (plainDsa) {
             return new DSAPlainDigestSigner(new ECDSASigner(), dig);
+        } else {
+            return new DSADigestSigner(new ECDSASigner(), dig);
         }
     }
 
