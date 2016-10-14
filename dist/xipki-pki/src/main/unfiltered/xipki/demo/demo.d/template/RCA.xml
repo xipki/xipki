@@ -10,7 +10,7 @@
   <cmpcontrols>
     <cmpcontrol name="cmpcontrol1">
       <conf>
-        <value>send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA,popo.sigalgo=SHA256withRSA:SHA256withDSA:SHA256withECDSA</value>
+        <value>send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA,popo.sigalgo=SHA256withRSA:SHA256withDSA:SHA256withECDSA:SHA256withPLAIN-ECDSA</value>
        </conf>
     </cmpcontrol>
   </cmpcontrols>
