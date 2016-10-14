@@ -64,7 +64,6 @@ import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
-import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
@@ -146,7 +145,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             } else if ("DSA".equals(keyAlg)) {
                 builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
             } else if ("EC".equals(keyAlg) || "ECDSA".equals(keyAlg)) {
-                builder = new BcECContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+                builder = new XipkiECContentVerifierProviderBuilder(
+                        DFLT_DIGESTALG_IDENTIFIER_FINDER);
             } else {
                 throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
             }

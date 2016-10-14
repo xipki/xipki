@@ -54,7 +54,7 @@ import org.xipki.commons.common.util.ParamUtil;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-class DSAPlainDigestSigner implements Signer {
+public class DSAPlainDigestSigner implements Signer {
 
     private final Digest digest;
 
@@ -64,7 +64,7 @@ class DSAPlainDigestSigner implements Signer {
 
     private int keyBitLen;
 
-    DSAPlainDigestSigner(final DSA signer, final Digest digest) {
+    public DSAPlainDigestSigner(final DSA signer, final Digest digest) {
         this.digest = digest;
         this.dsaSigner = signer;
     }
