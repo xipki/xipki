@@ -86,6 +86,14 @@ public class P11Constants {
 
     public static final long CKM_SHA512_RSA_PKCS = 0x00000042L;
 
+    public static final long CKM_SHA3_224_RSA_PKCS = 0x00000066L;
+
+    public static final long CKM_SHA3_256_RSA_PKCS = 0x00000060L;
+
+    public static final long CKM_SHA3_384_RSA_PKCS = 0x00000061L;
+
+    public static final long CKM_SHA3_512_RSA_PKCS = 0x00000062L;
+
     /* RSA :: PSS */
     public static final long CKM_RSA_PKCS_PSS = 0x0000000DL;
 
@@ -98,6 +106,14 @@ public class P11Constants {
     public static final long CKM_SHA384_RSA_PKCS_PSS = 0x00000044L;
 
     public static final long CKM_SHA512_RSA_PKCS_PSS = 0x00000045L;
+
+    public static final long CKM_SHA3_224_RSA_PKCS_PSS = 0x00000067L;
+
+    public static final long CKM_SHA3_256_RSA_PKCS_PSS = 0x00000063L;
+
+    public static final long CKM_SHA3_384_RSA_PKCS_PSS = 0x00000064L;
+
+    public static final long CKM_SHA3_512_RSA_PKCS_PSS = 0x00000065L;
 
     /* DSA */
     public static final long CKM_DSA = 0x00000011L;
@@ -112,7 +128,15 @@ public class P11Constants {
 
     public static final long CKM_DSA_SHA512 = 0x00000016L;
 
-    /* DSA */
+    public static final long CKM_DSA_SHA3_224 = 0x00000018L;
+
+    public static final long CKM_DSA_SHA3_256 = 0x00000019L;
+
+    public static final long CKM_DSA_SHA3_384 = 0x0000001AL;
+
+    public static final long CKM_DSA_SHA3_512 = 0x0000001BL;
+
+    /* ECDSA */
     public static final long CKM_ECDSA = 0x00001041L;
 
     public static final long CKM_ECDSA_SHA1 = 0x00001042L;
@@ -125,6 +149,18 @@ public class P11Constants {
 
     public static final long CKM_ECDSA_SHA512 = 0x00001046L;
 
+    // Still not defined by PKCS#11, just guessed
+    public static final long CKM_ECDSA_SHA3_224 = 0x00001048L;
+
+    // Still not defined by PKCS#11, just guessed
+    public static final long CKM_ECDSA_SHA3_256 = 0x00001049L;
+
+    // Still not defined by PKCS#11, just guessed
+    public static final long CKM_ECDSA_SHA3_384 = 0x0000104AL;
+
+    // Still not defined by PKCS#11, just guessed
+    public static final long CKM_ECDSA_SHA3_512 = 0x0000104BL;
+
     /* MGFs */
     public static final long CKG_MGF1_SHA1 = 0x00000001L;
 
@@ -136,6 +172,14 @@ public class P11Constants {
 
     public static final long CKG_MGF1_SHA512 = 0x00000004L;
 
+    public static final long CKG_MGF1_SHA3_224 = 0x00000006L;
+
+    public static final long CKG_MGF1_SHA3_256 = 0x00000007L;
+
+    public static final long CKG_MGF1_SHA3_384 = 0x00000008L;
+
+    public static final long CKG_MGF1_SHA3_512 = 0x00000009L;
+
     /* Hashs*/
     public static final long CKM_SHA_1 = 0x00000220L;
 
@@ -146,6 +190,14 @@ public class P11Constants {
     public static final long CKM_SHA384 = 0x00000260L;
 
     public static final long CKM_SHA512 = 0x00000270L;
+
+    public static final long CKM_SHA3_224 = 0x000002B5L;
+
+    public static final long CKM_SHA3_256 = 0x000002B0L;
+
+    public static final long CKM_SHA3_384 = 0x000002C0L;
+
+    public static final long CKM_SHA3_512 = 0x000002D0L;
 
     private static final Map<Long, String> mechanismNameMap;
 
@@ -164,6 +216,10 @@ public class P11Constants {
         mp.put(CKM_DSA_SHA256, "CKM_DSA_SHA256");
         mp.put(CKM_DSA_SHA384, "CKM_DSA_SHA384");
         mp.put(CKM_DSA_SHA512, "CKM_DSA_SHA512");
+        mp.put(CKM_DSA_SHA3_224, "CKM_DSA_SHA3_224");
+        mp.put(CKM_DSA_SHA3_256, "CKM_DSA_SHA3_256");
+        mp.put(CKM_DSA_SHA3_384, "CKM_DSA_SHA3_384");
+        mp.put(CKM_DSA_SHA3_512, "CKM_DSA_SHA3_512");
 
         mp.put(CKM_ECDSA, "CKM_ECDSA");
         mp.put(CKM_ECDSA_SHA1, "CKM_ECDSA_SHA1");
@@ -171,6 +227,10 @@ public class P11Constants {
         mp.put(CKM_ECDSA_SHA256, "CKM_ECDSA_SHA256");
         mp.put(CKM_ECDSA_SHA384, "CKM_ECDSA_SHA384");
         mp.put(CKM_ECDSA_SHA512, "CKM_ECDSA_SHA512");
+        mp.put(CKM_ECDSA_SHA3_224, "CKM_ECDSA_SHA3_224");
+        mp.put(CKM_ECDSA_SHA3_256, "CKM_ECDSA_SHA3_256");
+        mp.put(CKM_ECDSA_SHA3_384, "CKM_ECDSA_SHA3_384");
+        mp.put(CKM_ECDSA_SHA3_512, "CKM_ECDSA_SHA3_512");
 
         mp.put(CKM_RSA_X_509, "CKM_RSA_X_509");
 
@@ -183,6 +243,10 @@ public class P11Constants {
         mp.put(CKM_SHA256_RSA_PKCS, "CKM_SHA256_RSA_PKCS");
         mp.put(CKM_SHA384_RSA_PKCS, "CKM_SHA384_RSA_PKCS");
         mp.put(CKM_SHA512_RSA_PKCS, "CKM_SHA512_RSA_PKCS");
+        mp.put(CKM_SHA3_224_RSA_PKCS, "CKM_SHA3_224_RSA_PKCS");
+        mp.put(CKM_SHA3_256_RSA_PKCS, "CKM_SHA3_256_RSA_PKCS");
+        mp.put(CKM_SHA3_384_RSA_PKCS, "CKM_SHA3_384_RSA_PKCS");
+        mp.put(CKM_SHA3_512_RSA_PKCS, "CKM_SHA3_512_RSA_PKCS");
 
         mp.put(CKM_RSA_PKCS_PSS, "CKM_RSA_PKCS_PSS");
 
@@ -191,12 +255,20 @@ public class P11Constants {
         mp.put(CKM_SHA256_RSA_PKCS_PSS, "CKM_SHA256_RSA_PKCS_PSS");
         mp.put(CKM_SHA384_RSA_PKCS_PSS, "CKM_SHA384_RSA_PKCS_PSS");
         mp.put(CKM_SHA512_RSA_PKCS_PSS, "CKM_SHA512_RSA_PKCS_PSS");
+        mp.put(CKM_SHA3_224_RSA_PKCS_PSS, "CKM_SHA3_224_RSA_PKCS_PSS");
+        mp.put(CKM_SHA3_256_RSA_PKCS_PSS, "CKM_SHA3_256_RSA_PKCS_PSS");
+        mp.put(CKM_SHA3_384_RSA_PKCS_PSS, "CKM_SHA3_384_RSA_PKCS_PSS");
+        mp.put(CKM_SHA3_512_RSA_PKCS_PSS, "CKM_SHA3_512_RSA_PKCS_PSS");
 
         mp.put(CKM_SHA_1, "CKM_SHA_1");
         mp.put(CKM_SHA224, "CKM_SHA224");
         mp.put(CKM_SHA256, "CKM_SHA256");
         mp.put(CKM_SHA384, "CKM_SHA384");
         mp.put(CKM_SHA512, "CKM_SHA512");
+        mp.put(CKM_SHA3_224, "CKM_SHA3_224");
+        mp.put(CKM_SHA3_256, "CKM_SHA3_256");
+        mp.put(CKM_SHA3_384, "CKM_SHA3_384");
+        mp.put(CKM_SHA3_512, "CKM_SHA3_512");
 
         mechanismNameMap = Collections.unmodifiableMap(mp);
 
