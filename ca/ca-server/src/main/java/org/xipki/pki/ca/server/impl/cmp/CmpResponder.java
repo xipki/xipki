@@ -70,7 +70,6 @@ import org.xipki.commons.audit.api.AuditEvent;
 import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditStatus;
-import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.ConcurrentContentSigner;
@@ -100,11 +99,11 @@ abstract class CmpResponder {
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
     }
 
-    protected abstract ConcurrentContentSigner getSigner() throws InvalidConfException;
+    protected abstract ConcurrentContentSigner getSigner();
 
-    protected abstract GeneralName getSender() throws InvalidConfException;
+    protected abstract GeneralName getSender();
 
-    protected abstract boolean intendsMe(GeneralName requestRecipient) throws InvalidConfException;
+    protected abstract boolean intendsMe(GeneralName requestRecipient);
 
     public boolean isInService() {
         try {
@@ -136,12 +135,10 @@ abstract class CmpResponder {
     protected abstract PKIMessage doProcessPkiMessage(@Nullable PKIMessage request,
             @Nonnull RequestorInfo requestor, @Nullable String user,
             @Nonnull ASN1OctetString transactionId, @Nonnull GeneralPKIMessage pkiMessage,
-            @Nonnull AuditEvent auditEvent)
-    throws InvalidConfException;
+            @Nonnull AuditEvent auditEvent);
 
     public PKIMessage processPkiMessage(final PKIMessage pkiMessage,
-            final X509Certificate tlsClientCert, final AuditEvent auditEvent)
-    throws InvalidConfException {
+            final X509Certificate tlsClientCert, final AuditEvent auditEvent) {
         ParamUtil.requireNonNull("pkiMessage", pkiMessage);
         ParamUtil.requireNonNull("auditEvent", auditEvent);
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
@@ -357,8 +354,7 @@ abstract class CmpResponder {
     } // method addProtection
 
     protected PKIMessage buildErrorPkiMessage(final ASN1OctetString tid,
-            final PKIHeader requestHeader, final int failureCode, final String statusText)
-    throws InvalidConfException {
+            final PKIHeader requestHeader, final int failureCode, final String statusText) {
         GeneralName respRecipient = requestHeader.getSender();
 
         PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
@@ -387,12 +383,12 @@ abstract class CmpResponder {
         return new PKIStatusInfo(status, statusMessage, failureInfo);
     } // method generateCmpRejectionStatus
 
-    public X500Name getResponderSubject() throws InvalidConfException {
+    public X500Name getResponderSubject() {
         GeneralName sender = getSender();
         return (sender == null) ? null : (X500Name) sender.getName();
     }
 
-    public X509Certificate getResponderCert() throws InvalidConfException {
+    public X509Certificate getResponderCert() {
         ConcurrentContentSigner signer = getSigner();
         return (signer == null) ? null : signer.getCertificate();
     }

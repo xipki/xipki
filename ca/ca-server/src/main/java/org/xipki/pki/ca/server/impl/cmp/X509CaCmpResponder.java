@@ -118,7 +118,6 @@ import org.xipki.commons.audit.api.AuditEvent;
 import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.HealthCheckResult;
-import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.LogUtil;
@@ -240,13 +239,8 @@ public class X509CaCmpResponder extends CmpResponder {
 
         boolean healthy = result.isHealthy();
 
-        boolean responderHealthy;
-        try {
-            responderHealthy = caManager.getCmpResponderWrapper(
-                    getResponderName()).getSigner().isHealthy();
-        } catch (InvalidConfException ex) {
-            responderHealthy = false;
-        }
+        boolean responderHealthy = caManager.getCmpResponderWrapper(
+                getResponderName()).getSigner().isHealthy();
         healthy &= responderHealthy;
 
         HealthCheckResult responderHealth = new HealthCheckResult("Responder");
@@ -257,19 +251,14 @@ public class X509CaCmpResponder extends CmpResponder {
         return result;
     }
 
-    public String getResponderName() throws InvalidConfException {
-        String name = getCa().getCaInfo().getResponderName();
-        if (name == null) {
-            throw new InvalidConfException("No responder is configured for CA " + caName);
-        }
-        return name;
+    public String getResponderName() {
+        return getCa().getCaInfo().getResponderName();
     }
 
     @Override
     protected PKIMessage doProcessPkiMessage(PKIMessage request, final RequestorInfo requestor,
             final String user, final ASN1OctetString tid, final GeneralPKIMessage message,
-            final AuditEvent auditEvent)
-    throws InvalidConfException {
+            final AuditEvent auditEvent) {
         if (!(requestor instanceof CmpRequestorInfo)) {
             throw new IllegalArgumentException(
                     "unknown requestor type " + requestor.getClass().getName());
@@ -1297,18 +1286,18 @@ public class X509CaCmpResponder extends CmpResponder {
     } // method getSystemInfo
 
     @Override
-    protected ConcurrentContentSigner getSigner() throws InvalidConfException {
+    protected ConcurrentContentSigner getSigner() {
         String name = getResponderName();
         return caManager.getCmpResponderWrapper(name).getSigner();
     }
 
     @Override
-    protected GeneralName getSender() throws InvalidConfException {
+    protected GeneralName getSender() {
         return caManager.getCmpResponderWrapper(getResponderName()).getSubjectAsGeneralName();
     }
 
     @Override
-    protected boolean intendsMe(final GeneralName requestRecipient) throws InvalidConfException {
+    protected boolean intendsMe(final GeneralName requestRecipient) {
         if (requestRecipient == null) {
             return false;
         }
