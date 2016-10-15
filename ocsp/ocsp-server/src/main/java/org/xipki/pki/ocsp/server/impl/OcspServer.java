@@ -537,8 +537,11 @@ public class OcspServer {
                     if (!CollectionUtil.isEmpty(algs)) {
                         certHashAlgos.addAll(algs);
                     } else {
-                        for (HashAlgoType algo : HashAlgoType.values()) {
-                            certHashAlgos.add(algo);
+                        HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA1,
+                            HashAlgoType.SHA224, HashAlgoType.SHA256, HashAlgoType.SHA384,
+                            HashAlgoType.SHA512};
+                        for (HashAlgoType hashAlgo : hashAlgos) {
+                            certHashAlgos.add(hashAlgo);
                         }
                     }
                 }
