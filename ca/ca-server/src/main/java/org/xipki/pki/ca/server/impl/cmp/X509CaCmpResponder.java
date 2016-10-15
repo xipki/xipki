@@ -104,7 +104,6 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.Time;
-import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.CertificateRequestMessage;
@@ -314,7 +313,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 break;
             default:
                 addAutitEventType(auditEvent, "PKIBody." + type);
-                respBody = createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+                respBody = buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                         "unsupported type " + type);
                 break;
             } // end switch (type)
@@ -356,8 +355,7 @@ public class X509CaCmpResponder extends CmpResponder {
      */
     private PKIBody processCr(final PKIMessage request, final CmpRequestorInfo requestor,
             final String user, final ASN1OctetString tid, final PKIHeader reqHeader,
-            final CertReqMessages cr, final CmpControl cmpControl, final AuditEvent auditEvent)
-    throws InsuffientPermissionException {
+            final CertReqMessages cr, final CmpControl cmpControl, final AuditEvent auditEvent) {
         CertRepMessage repMessage = processCertReqMessages(request, requestor, user, tid, reqHeader,
                 cr, false, cmpControl, auditEvent);
         return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
@@ -365,8 +363,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
     private PKIBody processKur(final PKIMessage request, final CmpRequestorInfo requestor,
             final String user, final ASN1OctetString tid, final PKIHeader reqHeader,
-            final CertReqMessages kur, final CmpControl cmpControl, final AuditEvent auditEvent)
-    throws InsuffientPermissionException {
+            final CertReqMessages kur, final CmpControl cmpControl, final AuditEvent auditEvent) {
         CertRepMessage repMessage = processCertReqMessages(request, requestor, user, tid, reqHeader,
                 kur, true, cmpControl, auditEvent);
         return new PKIBody(PKIBody.TYPE_KEY_UPDATE_REP, repMessage);
@@ -378,8 +375,7 @@ public class X509CaCmpResponder extends CmpResponder {
      */
     private PKIBody processCcp(final PKIMessage request, final CmpRequestorInfo requestor,
             final String user, final ASN1OctetString tid, final PKIHeader reqHeader,
-            final CertReqMessages cr, final CmpControl cmpControl, final AuditEvent auditEvent)
-    throws InsuffientPermissionException {
+            final CertReqMessages cr, final CmpControl cmpControl, final AuditEvent auditEvent) {
         CertRepMessage repMessage = processCertReqMessages(request, requestor, user, tid, reqHeader,
                 cr, false, cmpControl, auditEvent);
         return new PKIBody(PKIBody.TYPE_CROSS_CERT_REP, repMessage);
@@ -388,8 +384,7 @@ public class X509CaCmpResponder extends CmpResponder {
     private CertRepMessage processCertReqMessages(final PKIMessage request,
             final CmpRequestorInfo requestor, final String user, final ASN1OctetString tid,
             final PKIHeader reqHeader, final CertReqMessages kur, final boolean keyUpdate,
-            final CmpControl cmpControl, final AuditEvent auditEvent)
-    throws InsuffientPermissionException {
+            final CmpControl cmpControl, final AuditEvent auditEvent) {
         CmpRequestorInfo tmpRequestor = (CmpRequestorInfo) requestor;
 
         CertReqMsg[] certReqMsgs = kur.toCertReqMsgArray();
@@ -420,21 +415,15 @@ public class X509CaCmpResponder extends CmpResponder {
                     new AuditEventData("certReqId", certReqId.getPositiveValue().toString()));
 
             if (!req.hasProofOfPossession()) {
-                PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
-                certResponses.put(i, new CertResponse(certReqId, status));
-
-                auditChildEvent.setStatus(AuditStatus.FAILED);
-                auditChildEvent.addEventData(new AuditEventData("message", "no POP"));
+                certResponses.put(i, buildErrorCertResponse(certReqId,
+                        PKIFailureInfo.badPOP, "no POP", null, auditChildEvent));
                 continue;
             }
 
             if (!verifyPopo(req, tmpRequestor.isRa())) {
                 LOG.warn("could not validate POP for requst {}", certReqId.getValue());
-                PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
-                certResponses.put(i, new CertResponse(certReqId, status));
-
-                auditChildEvent.setStatus(AuditStatus.FAILED);
-                auditChildEvent.addEventData(new AuditEventData("message", "invalid POP"));
+                certResponses.put(i, buildErrorCertResponse(certReqId,
+                        PKIFailureInfo.badPOP, "invalid POP", null, auditChildEvent));
                 continue;
             }
 
@@ -443,16 +432,18 @@ public class X509CaCmpResponder extends CmpResponder {
                     : keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
             if (certprofileName == null) {
                 String msg = "no certificate profile";
-                certResponses.put(i, new CertResponse(certReqId,
-                        generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate, msg)));
-                auditChildEvent.setStatus(AuditStatus.FAILED);
-                auditChildEvent.addEventData(
-                        new AuditEventData("message", msg));
+                certResponses.put(i, buildErrorCertResponse(certReqId,
+                        PKIFailureInfo.badCertTemplate, msg, auditChildEvent));
                 continue;
             }
 
             auditChildEvent.addEventData(new AuditEventData("certprofile", certprofileName));
-            checkPermission(tmpRequestor, certprofileName);
+            if (!isCertProfilePermitted(tmpRequestor, certprofileName)) {
+                String msg = "certprofile " + certprofileName + " is not allowed";
+                certResponses.put(i, buildErrorCertResponse(certReqId,
+                        PKIFailureInfo.notAuthorized, msg, auditChildEvent));
+                continue;
+            }
 
             CertTemplate certTemp = req.getCertTemplate();
             OptionalValidity validity = certTemp.getValidity();
@@ -569,7 +560,7 @@ public class X509CaCmpResponder extends CmpResponder {
     private PKIBody processP10cr(final PKIMessage request, final CmpRequestorInfo requestor,
             final String user, final ASN1OctetString tid, final PKIHeader reqHeader,
             final CertificationRequest p10cr, final CmpControl cmpControl,
-            final AuditEvent auditEvent) throws InsuffientPermissionException {
+            final AuditEvent auditEvent) {
         // verify the POP first
         CertResponse certResp;
         ASN1Integer certReqId = new ASN1Integer(-1);
@@ -577,13 +568,13 @@ public class X509CaCmpResponder extends CmpResponder {
         AuditChildEvent auditChildEvent = new AuditChildEvent();
         auditEvent.addAuditChildEvent(auditChildEvent);
 
+        boolean certGenerated = false;
         X509Ca ca = getCa();
+
         if (!securityFactory.verifyPopo(p10cr, getCmpControl().getPopoAlgoValidator())) {
             LOG.warn("could not validate POP for the pkcs#10 requst");
-            PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
-            certResp = new CertResponse(certReqId, status);
-            auditChildEvent.setStatus(AuditStatus.FAILED);
-            auditChildEvent.addEventData(new AuditEventData("message", "invalid POP"));
+            certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP, "invalid POP",
+                    auditChildEvent);
         } else {
             CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
             Extensions extensions = CaUtil.getExtensions(certTemp);
@@ -594,52 +585,50 @@ public class X509CaCmpResponder extends CmpResponder {
 
             SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
 
-            try {
-                CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
-                String certprofileName = null;
-                Date notBefore = null;
-                Date notAfter = null;
+            CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
+            String certprofileName = null;
+            Date notBefore = null;
+            Date notAfter = null;
 
-                if (keyvalues != null) {
-                    certprofileName = keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
+            if (keyvalues != null) {
+                certprofileName = keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
 
-                    String str = keyvalues.getValue(CmpUtf8Pairs.KEY_NOT_BEFORE);
-                    if (str != null) {
-                        notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
-                    }
-
-                    str = keyvalues.getValue(CmpUtf8Pairs.KEY_NOT_AFTER);
-                    if (str != null) {
-                        notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
-                    }
+                String str = keyvalues.getValue(CmpUtf8Pairs.KEY_NOT_BEFORE);
+                if (str != null) {
+                    notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
                 }
 
-                if (certprofileName == null) {
-                    throw new CMPException("no certificate profile is specified");
+                str = keyvalues.getValue(CmpUtf8Pairs.KEY_NOT_AFTER);
+                if (str != null) {
+                    notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
                 }
+            }
 
-                checkPermission(requestor, certprofileName);
-
+            if (certprofileName == null) {
+                certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
+                        "badCertTemplate", null, auditChildEvent);
+            } else {
                 auditChildEvent.addEventData(new AuditEventData("certprofile", certprofileName));
+                if (!isCertProfilePermitted(requestor, certprofileName)) {
+                    String msg = "certprofile " + certprofileName + " is not allowed";
+                    certResp = buildErrorCertResponse(certReqId,
+                            PKIFailureInfo.notAuthorized, msg, auditChildEvent);
+                } else {
+                    CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
+                            notBefore, notAfter, extensions, certprofileName);
 
-                checkPermission(requestor, certprofileName);
-                CertTemplateData certTemplateData = new CertTemplateData(subject, publicKeyInfo,
-                        notBefore, notAfter, extensions, certprofileName);
-
-                certResp = generateCertificates(Arrays.asList(certTemplateData),
-                        Arrays.asList(certReqId), Arrays.asList(auditChildEvent),
-                        requestor, user, tid, false, request, cmpControl).get(0);
-            } catch (CMPException ex) {
-                certResp = new CertResponse(certReqId,
-                        generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate,
-                        ex.getMessage()));
-                auditChildEvent.setStatus(AuditStatus.FAILED);
-                auditChildEvent.addEventData(new AuditEventData("message", "badCertTemplate"));
-            } // end try
+                    certResp = generateCertificates(Arrays.asList(certTemplateData),
+                            Arrays.asList(certReqId), Arrays.asList(auditChildEvent),
+                            requestor, user, tid, false, request, cmpControl).get(0);
+                    certGenerated = true;
+                }
+            }
         }
 
-        CMPCertificate[] caPubs = cmpControl.isSendCaCert()
-                ? new CMPCertificate[]{ca.getCaInfo().getCertInCmpFormat()} : null;
+        CMPCertificate[] caPubs = null;
+        if (certGenerated && cmpControl.isSendCaCert()) {
+            caPubs = new CMPCertificate[]{ca.getCaInfo().getCertInCmpFormat()};
+        }
         CertRepMessage repMessage = new CertRepMessage(caPubs, new CertResponse[]{certResp});
 
         return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
@@ -785,13 +774,13 @@ public class X509CaCmpResponder extends CmpResponder {
                 X500Name caSubject = getCa().getCaInfo().getCertificate().getSubjectAsX500Name();
 
                 if (issuer == null) {
-                    return createErrorMsgPkiBody(PKIStatus.rejection,
+                    return buildErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate, "issuer is not present");
                 } else if (!issuer.equals(caSubject)) {
-                    return createErrorMsgPkiBody(PKIStatus.rejection,
+                    return buildErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate, "issuer not targets at the CA");
                 } else if (serialNumber == null) {
-                    return createErrorMsgPkiBody(PKIStatus.rejection,
+                    return buildErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate, "serialNumber is not present");
                 } else if (certDetails.getSigningAlg() != null
                         || certDetails.getValidity() != null
@@ -800,13 +789,13 @@ public class X509CaCmpResponder extends CmpResponder {
                         || certDetails.getIssuerUID() != null
                         || certDetails.getSubjectUID() != null
                         || certDetails.getExtensions() != null) {
-                    return createErrorMsgPkiBody(PKIStatus.rejection,
+                    return buildErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate,
                             "only version, issuer and serialNumber in RevDetails.certDetails are "
                             + "allowed, but more is specified");
                 }
             } catch (IllegalArgumentException ex) {
-                return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+                return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                         "the request is not invalid");
             }
         } // end for
@@ -1159,18 +1148,16 @@ public class X509CaCmpResponder extends CmpResponder {
                 "should not happen, no CMP control is defined for CA " + caName);
     }
 
-    private void checkPermission(final CmpRequestorInfo requestor, final String certprofile)
-    throws InsuffientPermissionException {
+    private boolean isCertProfilePermitted(final CmpRequestorInfo requestor,
+            final String certprofile) {
         Set<String> profiles = requestor.getCaHasRequestor().getProfiles();
         if (profiles != null) {
             if (profiles.contains("all") || profiles.contains(certprofile)) {
-                return;
+                return true;
             }
         }
 
-        String msg = "certprofile " + certprofile + " is not allowed";
-        LOG.warn(msg);
-        throw new InsuffientPermissionException(msg);
+        return false;
     }
 
     private void checkPermission(final X509Certificate requestorCert,
@@ -1388,8 +1375,7 @@ public class X509CaCmpResponder extends CmpResponder {
     private PKIBody cmpRevokeOrUnrevokeOrRemoveCertificates(final PKIMessage request,
             final PKIHeaderBuilder respHeader, final CmpControl cmpControl,
             final PKIHeader reqHeader, final PKIBody reqBody, final CmpRequestorInfo requestor,
-            final String user, final ASN1OctetString tid, final AuditEvent auditEvent)
-    throws InsuffientPermissionException {
+            final String user, final ASN1OctetString tid, final AuditEvent auditEvent) {
         Permission requiredPermission = null;
         boolean allRevdetailsOfSameType = true;
 
@@ -1444,7 +1430,14 @@ public class X509CaCmpResponder extends CmpResponder {
 
             return new PKIBody(PKIBody.TYPE_ERROR, emc);
         } else {
-            checkPermission(requestor, requiredPermission);
+            try {
+                checkPermission(requestor, requiredPermission);
+            } catch (InsuffientPermissionException ex) {
+                auditEvent.setStatus(AuditStatus.FAILED);
+                auditEvent.addEventData(new AuditEventData("message", "NOT_PERMITTED"));
+                return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.notAuthorized,
+                        null);
+            }
             return revokeOrUnrevokeOrRemoveCertificates(request, rr, auditEvent,
                     requiredPermission);
         }
@@ -1471,7 +1464,7 @@ public class X509CaCmpResponder extends CmpResponder {
         if (itv == null) {
             String statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG
                     + " is only supported with the sub-types " + KNOWN_GENMSG_IDS.toString();
-            return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+            return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                     statusMessage);
         }
 
@@ -1496,7 +1489,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
                 if (crl == null) {
                     String statusMessage = "no CRL is available";
-                    return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
+                    return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
                             statusMessage);
                 }
 
@@ -1515,7 +1508,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 } catch (IllegalArgumentException ex) {
                     String statusMessage = "invalid value of the InfoTypeAndValue for "
                             + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId();
-                    return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+                    return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                             statusMessage);
                 }
 
@@ -1529,7 +1522,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     X509CRL tmpCrl = ca.generateCrlOnDemand(auditEvent);
                     if (tmpCrl == null) {
                         String statusMessage = "CRL generation is not activated";
-                        return createErrorMsgPkiBody(PKIStatus.rejection,
+                        return buildErrorMsgPkiBody(PKIStatus.rejection,
                                 PKIFailureInfo.systemFailure, statusMessage);
                     } else {
                         respValue = CertificateList.getInstance(tmpCrl.getEncoded());
@@ -1543,7 +1536,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     respValue = ca.getCrl(crlNumber.getPositiveValue());
                     if (respValue == null) {
                         String statusMessage = "no CRL is available";
-                        return createErrorMsgPkiBody(PKIStatus.rejection,
+                        return buildErrorMsgPkiBody(PKIStatus.rejection,
                                 PKIFailureInfo.systemFailure, statusMessage);
                     }
                     break;
@@ -1568,7 +1561,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     break;
                 default:
                     String statusMessage = "unsupported XiPKI action code '" + action + "'";
-                    return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
+                    return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
                             statusMessage);
                 } // end switch (action)
 
@@ -1597,10 +1590,10 @@ public class X509CaCmpResponder extends CmpResponder {
                 break;
             } // end switch code
 
-            return createErrorMsgPkiBody(PKIStatus.rejection, failureInfo, errorMessage);
+            return buildErrorMsgPkiBody(PKIStatus.rejection, failureInfo, errorMessage);
         } catch (CRLException ex) {
             String statusMessage = "CRLException: " + ex.getMessage();
-            return createErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
+            return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.systemFailure,
                     statusMessage);
         }
     } // method cmpGeneralMsg
@@ -1664,10 +1657,9 @@ public class X509CaCmpResponder extends CmpResponder {
         SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
         auditEvent.addEventData(new AuditEventData("certprofile", profileName));
 
-        try {
-            checkPermission(requestor, profileName);
-        } catch (InsuffientPermissionException ex) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, ex.getMessage());
+        if (!isCertProfilePermitted(requestor, profileName)) {
+            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+                    "certProfile " + profileName + " is not allowed");
         }
 
         Extensions extensions = CaUtil.getExtensions(certTemp);
@@ -1759,7 +1751,7 @@ public class X509CaCmpResponder extends CmpResponder {
         auditEvent.setStatus(AuditStatus.SUCCESSFUL);
     }
 
-    private static PKIBody createErrorMsgPkiBody(final PKIStatus pkiStatus, final int failureInfo,
+    private static PKIBody buildErrorMsgPkiBody(final PKIStatus pkiStatus, final int failureInfo,
             final String statusMessage) {
         PKIFreeText pkiStatusMsg = (statusMessage == null) ? null : new PKIFreeText(statusMessage);
         ErrorMsgContent emc = new ErrorMsgContent(
@@ -1769,6 +1761,19 @@ public class X509CaCmpResponder extends CmpResponder {
 
     private static void addAutitEventType(final AuditEvent auditEvent, final String eventType) {
         auditEvent.addEventData(new AuditEventData("eventType", eventType));
+    }
+
+    private CertResponse buildErrorCertResponse(ASN1Integer certReqId, int pkiFailureInfo,
+            String msg, AuditChildEvent auditChildEvent) {
+        return buildErrorCertResponse(certReqId, pkiFailureInfo, msg, msg, auditChildEvent);
+    }
+
+    private CertResponse buildErrorCertResponse(ASN1Integer certReqId, int pkiFailureInfo,
+            String msg, String pkiStatusText, AuditChildEvent auditChildEvent) {
+        auditChildEvent.setStatus(AuditStatus.FAILED);
+        auditChildEvent.addEventData(new AuditEventData("message", msg));
+        return new CertResponse(certReqId,
+                generateCmpRejectionStatus(pkiFailureInfo, pkiStatusText));
     }
 
 }
