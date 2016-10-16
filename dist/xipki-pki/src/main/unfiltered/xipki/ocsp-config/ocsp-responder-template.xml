@@ -28,11 +28,10 @@
   <!-- signers -->
   <signers>
     <signer name="signer1">
-      <type>replaceme-type</type>
-      <key>replaceme-key</key>
+      <type>REPLACEME-TOKENTYPE</type>
+      <key>REPLACEME-TOKENKEY</key>
       <algorithms>
-        <algorithm>replaceme-algo1</algorithm>
-        <algorithm>replaceme-algo2</algorithm>
+        <algorithm>REPLACEME-SIGALGO</algorithm>
       </algorithms>
     </signer>
   </signers>

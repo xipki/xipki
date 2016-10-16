@@ -4,13 +4,13 @@
     <property name="profiles.dir">xipki/demo/profile</property>
     <property name="security.dir">xipki/security</property>
     <property name="output.dir">output</property>
-    <property name="token.type">replaceme-TOKEN_TYPE</property>
-    <property name="ca.signerConf">replaceme-CA_SIGNERCONF</property>
+    <property name="token.type">REPLACEME-TOKEN_TYPE</property>
+    <property name="ca.signerConf">REPLACEME-CA_SIGNERCONF</property>
   </properties>
   <cmpcontrols>
     <cmpcontrol name="cmpcontrol1">
       <conf>
-        <value>send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=SHA256withRSA:SHA256withRSAandMGF1:SHA256withDSA:SHA256withECDSA,popo.sigalgo=SHA256withRSA:SHA256withDSA:SHA256withECDSA:SHA256withPLAIN-ECDSA</value>
+        <value>send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=REPLACEME_SIGALGO</value>
        </conf>
     </cmpcontrol>
   </cmpcontrols>

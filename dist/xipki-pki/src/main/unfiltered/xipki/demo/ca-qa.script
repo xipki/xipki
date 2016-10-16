@@ -158,6 +158,7 @@ xipki-cmd:rm -r -f output/neg
 
 # TLS
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/TLS-neg.p12 \
   --password 1234 \
   --subject "CN=TLS101,O=xipki,C=DE" \
@@ -169,6 +170,7 @@ xipki-qa:neg-csr-enroll \
   --user USER-T
 
 xipki-qa:neg-enroll-p12 \
+  --hash $HASH \
   --p12 output/TLS-neg.p12 \
   --password 1234 \
   --profile TLS \
@@ -176,6 +178,7 @@ xipki-qa:neg-enroll-p12 \
 
 # multipleOUs
 xipki-qa:neg-enroll-p12 \
+  --hash $HASH \
   --p12 output/TLS-neg.p12 \
   --password 1234 \
   --profile multipleOUs \
@@ -183,6 +186,7 @@ xipki-qa:neg-enroll-p12 \
   --user USER-O
 
 xipki-qa:neg-enroll-p12 \
+  --hash $HASH \
   --p12 output/TLS-neg.p12 \
   --password 1234 \
   --profile multipleOUs \
@@ -190,6 +194,7 @@ xipki-qa:neg-enroll-p12 \
   --user USER-O
 
 xipki-qa:neg-enroll-p12 \
+  --hash $HASH \
   --p12 output/TLS-neg.p12 \
   --password 1234 \
   --profile multipleOUs \

@@ -9,17 +9,36 @@ if { "$1" equals "" } {
     printUsage = "true"
     argsValid = "true"
   } {
-    list = [pkcs11 pkcs12]; each ($list) {
-      if { "$1" equals $it } {
+    if { "$1" equals "-l" } {
+      HASH = $2
+      TOKEN_TYPE = $3
+      SIG_TYPE = $4
+      KEYSPEC =$5
+    } {
+      HASH = $1
+      TOKEN_TYPE = $2
+      SIG_TYPE = $3
+      KEYSPEC =$4
+    }
+
+    list = [SHA1, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512]; each ($list) {
+      if { "$HASH" equals $it } {
         argsValid = "true"
       }
     }
-  }
-}
 
-list = [rsa rsapss ec plainec dsa]; each ($list) {
-  if { "$1" equals $it } {
-    argsValid = "true"
+    list = [PKCS11 PKCS12]; each ($list) {
+      if { "$TOKEN_TYPE" equals $it } {
+        argsValid = "true"
+      }
+    }
+
+    list = [RSA RSAPSS EC PLAINEC DSA]; each ($list) {
+      if { "$SIG_TYPE" equals $it } {
+        argsValid = "true"
+      }
+    }
+
   }
 }
 
@@ -32,14 +51,18 @@ if { $argsValid equals "false" } {
 if { $printUsage equals "true" } {
   echo "Usage: "
   echo ""
-  echo "source camgmt-qa.script <token type> <signature type> [<keyspec>]"
-  echo "token type:      pkcs11, pkcs12"
-  echo "signature type:  rsa, rsapss, ec, plainec, dsa"
-  echo "keyspec:         keysize for signature types rsa, rsapss and dsa,"
-  echo "                 curve name for signature types ec and plainec"
+  echo "source demo.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
+  echo "    hash algo:       SHA1, SHA224, SHA256, SHA384, SHA512"
+  echo "                     SHA3-224, SHA3-256, SHA3-384, SHA3-512"
+  echo "    token type:      PKCS11, PKCS12"
+  echo "    signature type:  RSA, RSAPSS, EC, PLAINEC, DSA"
+  echo "    keyspec:         keysize for signature types RSA, RSAPSS and DSA,"
+  echo "                     curve name for signature types EC and PLAINEC"
+  echo "options"
+  echo "    -l               configure CAs using command 'load-conf'"
 } {
   feature:install xipki-security-shell
-  source xipki/demo/demo.d/prepare-keys.script $1 $2 $3
+  source xipki/demo/demo.d/prepare-keys.script
 
   source xipki/demo/demo.d/ca.script
 
@@ -416,11 +439,11 @@ if { $printUsage equals "true" } {
 
   # The CA named RCA2 exists. No new CA with the same name is allowed
 
-  if { $TOKEN_TYPE equals "pkcs11" } {
+  if { $TOKEN_TYPE equals "PKCS11" } {
     CA_SIGNER_CONF_RCA = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=RCA1"
   }
 
-  if { $TOKEN_TYPE equals "pkcs12" } {
+  if { $TOKEN_TYPE equals "PKCS12" } {
     CA_SIGNER_CONF_RCA = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO"
   }
 

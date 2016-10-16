@@ -3,6 +3,7 @@ xipki-cmd:rm -r -f output
 xipki-cmd:mkdir output
 
 echo "========================================================"
+echo "HASH:       $HASH"
 echo "TOKEN_TYPE: $TOKEN_TYPE"
 echo "SIG_TYPE:   $SIG_TYPE"
 echo "KEYSPEC:    $KEYSPEC"
@@ -10,69 +11,54 @@ echo "========================================================"
 
 KEY_TYPE = ""
 
-if { $SIG_TYPE equals "rsa" } {
-  KEY_TYPE = "rsa"
-
-  # Valid signer algos are SHA<n>withRSA where n is 1, 224, 256, 384 and 512
-  ALGO1 = "SHA256withRSA"
-  ALGO2 = "SHA1withRSA"
+if { $SIG_TYPE equals "RSA" } {
+  KEY_TYPE = "RSA"
+  SIGALGO = "${HASH}withRSA"
 }
 
-if { $SIG_TYPE equals "rsapss" } {
-  KEY_TYPE = "rsa"
-
-  # Valid signer algos are SHA<n>withRSAandMGF1 where n is 1, 224, 256, 384 and 512
-  ALGO1 = "SHA256withRSAandMGF1"
-  ALGO2 = "SHA1withRSAandMGF1"
+if { $SIG_TYPE equals "RSAPSS" } {
+  KEY_TYPE = "RSA"
+  SIGALGO = "${HASH}withRSAandMGF1"
 }
 
-if { $SIG_TYPE equals "ec" } {
-  KEY_TYPE = "ec"
-
-  # Valid signer algos are SHA<n>withECDSA, where n is 1, 224, 256, 384 and 512
-  ALGO1 = "SHA256withECDSA"
-  ALGO2 = "SHA1withECDSA"
+if { $SIG_TYPE equals "EC" } {
+  KEY_TYPE = "EC"
+  SIGALGO = "${HASH}withECDSA"
 }
 
-if { $SIG_TYPE equals "plainec" } {
-  KEY_TYPE = "ec"
-
-  # Valid signer algos are SHA<n>withPlainECDSA, where n is 1, 224, 256, 384 and 512
-  ALGO1 = "SHA256withPlainECDSA"
-  ALGO2 = "SHA1withPlainECDSA"
+if { $SIG_TYPE equals "PLAINEC" } {
+  KEY_TYPE = "EC"
+  SIGALGO = "${HASH}withPlainECDSA"
 }
 
-if { $SIG_TYPE equals "dsa" } {
-  KEY_TYPE = "dsa"
-
-  # Valid signer algos are SHA<n>withDSA, where n is 1, 256, 384 and 512
-  ALGO1 = "SHA256withDSA"
-  ALGO2 = "SHA1withDSA"
+if { $SIG_TYPE equals "DSA" } {
+  KEY_TYPE = "DSA"
+  SIGALGO = "${HASH}withDSA"
 }
 
 xipki-cmd:copy-dir xipki/demo/p12/shared output
 
 xipki-cmd:copy-dir xipki/demo/p12/$KEY_TYPE output
 
-if { $KEY_TYPE equals "rsa" } {
+if { $KEY_TYPE equals "RSA" } {
   if { "$KEYSPEC" equals "" } {
     KEYSPEC = "2048"
   }
 }
 
-if { $KEY_TYPE equals "ec" } {
+if { $KEY_TYPE equals "EC" } {
   if { "$KEYSPEC" equals "" } {
     KEYSPEC = "secp256r1"
   }
 }
 
-if { $KEY_TYPE equals "dsa" } {
+if { $KEY_TYPE equals "DSA" } {
   if { "$KEYSPEC" equals "" } {
     KEYSPEC = "2048"
   }
 }
 
-if { $TOKEN_TYPE equals "pkcs11" } {
+if { $TOKEN_TYPE equals "PKCS11" } {
   SLOT = "0"
 
   OCSP_KEYCONF = "slot=$SLOT,key-label=OCSP99"
@@ -93,7 +79,7 @@ if { $TOKEN_TYPE equals "pkcs11" } {
     --slot $SLOT \
     --label OCSP99
 
-  if { $KEY_TYPE equals "rsa" } {
+  if { $KEY_TYPE equals "RSA" } {
     xipki-tk:rsa \
 	  --key-size $KEYSPEC \
       --slot $SLOT \
@@ -116,7 +102,7 @@ if { $TOKEN_TYPE equals "pkcs11" } {
 
   }
 
-  if { $KEY_TYPE equals "ec" } {
+  if { $KEY_TYPE equals "EC" } {
     xipki-tk:ec \
 	  --curve $KEYSPEC \
       --slot $SLOT \
@@ -138,7 +124,7 @@ if { $TOKEN_TYPE equals "pkcs11" } {
       --label OCSP99
   }
 
-  if { $KEY_TYPE equals "dsa" } {
+  if { $KEY_TYPE equals "DSA" } {
     xipki-tk:dsa \
 	  --plen $KEYSPEC \
       --slot $SLOT \
@@ -163,11 +149,11 @@ if { $TOKEN_TYPE equals "pkcs11" } {
 
 }
 
-if { $TOKEN_TYPE equals "pkcs12" } {
+if { $TOKEN_TYPE equals "PKCS12" } {
 
   OCSP_KEYCONF = "password=1234,keystore=file:output/OCSP99.p12"
 
-  if { $KEY_TYPE equals "rsa" } {
+  if { $KEY_TYPE equals "RSA" } {
     xipki-tk:rsa-p12 \
       --password 1234 \
       --key-size $KEYSPEC \
@@ -190,7 +176,7 @@ if { $TOKEN_TYPE equals "pkcs12" } {
 
   }
   
-  if { $KEY_TYPE equals "dsa" } {
+  if { $KEY_TYPE equals "DSA" } {
     xipki-tk:dsa-p12 \
       --password 1234 \
       --plen $KEYSPEC \
@@ -213,7 +199,7 @@ if { $TOKEN_TYPE equals "pkcs12" } {
 
   }
     
-  if { $KEY_TYPE equals "ec" } {
+  if { $KEY_TYPE equals "EC" } {
     xipki-tk:ec-p12 \
       --curve $KEYSPEC \
       --password 1234 \

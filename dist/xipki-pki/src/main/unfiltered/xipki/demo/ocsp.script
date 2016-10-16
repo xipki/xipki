@@ -1,5 +1,3 @@
-SIG_ALGO = "$1"
-
 echo "#################################################################"
 echo "#                              OCSP                             #"
 echo "#################################################################"
@@ -18,7 +16,7 @@ xipki-qa:ocsp-status \
   --cert output/SubCA1.der \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (now is before notBefore) (POST, DB)"
@@ -26,7 +24,7 @@ xipki-qa:ocsp-status \
   --issuer output/SubCA1.der \
   --cert output/TLS1.der \
   --exp-status unknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
   
 echo "QA: Unknown (now is before notBefore) (POST, DB)"
@@ -34,7 +32,7 @@ xipki-qa:ocsp-status \
   --issuer output/SubCA1.der \
   --cert output/TLS2.der \
   --exp-status unknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
   
 echo "QA: Good (POST, DB)"
@@ -43,7 +41,7 @@ xipki-qa:ocsp-status \
   --cert output/TLS_C1.der \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = affiliationChanged (POST, DB)"
@@ -52,7 +50,7 @@ xipki-qa:ocsp-status \
   --cert output/TLS_C2.der \
   --exp-status affiliationChanged \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, CRL)"
@@ -61,7 +59,7 @@ xipki-qa:ocsp-status \
   --cert output/OCSP1.der \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = keyCompromise (POST, CRL)"
@@ -70,7 +68,7 @@ xipki-qa:ocsp-status \
   --cert output/OCSP2.der \
   --exp-status keyCompromise \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, CRL)"
@@ -79,7 +77,7 @@ xipki-qa:ocsp-status \
   --serial 99999 \
   --exp-status good \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --url $URL_CRL \
   --resp-issuer output/RCA1.der
 
@@ -88,7 +86,7 @@ xipki-qa:ocsp-status \
   --issuer output/SubCA1.der \
   --serial 99999 \
   --exp-status unknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --url $URL \
   --resp-issuer output/RCA1.der
 
@@ -97,7 +95,7 @@ xipki-qa:ocsp-status \
   --issuer output/OCSP1.der \
   --serial 2 \
   --exp-status issuerUnknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --url $URL \
   --resp-issuer output/RCA1.der
 
@@ -109,7 +107,7 @@ xipki-qa:ocsp-status \
   --http-get \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (now is before notBefore) (GET, DB)"
@@ -118,7 +116,7 @@ xipki-qa:ocsp-status \
   --cert output/TLS1.der \
   --http-get \
   --exp-status unknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (now is before notBefore) (GET, DB)"
@@ -127,7 +125,7 @@ xipki-qa:ocsp-status \
   --cert output/TLS2.der \
   --http-get \
   --exp-status unknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (GET,DB)"
@@ -137,7 +135,7 @@ xipki-qa:ocsp-status \
   --http-get \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = affiliationChanged (GET, DB)"
@@ -147,7 +145,7 @@ xipki-qa:ocsp-status \
   --http-get \
   --exp-status affiliationChanged \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (GET, CRL)"
@@ -157,7 +155,7 @@ xipki-qa:ocsp-status \
   --http-get \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = keyCompromise (GET, CRL)"
@@ -167,7 +165,7 @@ xipki-qa:ocsp-status \
   --http-get \
   --exp-status keyCompromise \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (GET, CRL)"
@@ -177,7 +175,7 @@ xipki-qa:ocsp-status \
   --http-get \
   --exp-status good \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --url $URL_CRL \
   --resp-issuer output/RCA1.der
 
@@ -187,7 +185,7 @@ xipki-qa:ocsp-status \
   --serial 99999 \
   --http-get \
   --exp-status unknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --url $URL \
   --resp-issuer output/RCA1.der
 
@@ -197,7 +195,7 @@ xipki-qa:ocsp-status \
   --serial 2 \
   --http-get \
   --exp-status issuerUnknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --url $URL \
   --resp-issuer output/RCA1.der
  
@@ -209,7 +207,7 @@ xipki-qa:ocsp-status \
   --sign \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (now is before notBefore) (POST, SIGNED, DB)"
@@ -218,7 +216,7 @@ xipki-qa:ocsp-status \
   --cert output/TLS1.der \
   --sign \
   --exp-status unknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Unknown (now is before notBefore) (POST, SIGNED, DB)"
@@ -227,7 +225,7 @@ xipki-qa:ocsp-status \
   --cert output/TLS2.der \
   --sign \
   --exp-status unknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, SIGNED, DB)"
@@ -237,7 +235,7 @@ xipki-qa:ocsp-status \
   --sign \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Revoked, reason = affiliationChanged (POST, SIGNED, DB)"
@@ -247,7 +245,7 @@ xipki-qa:ocsp-status \
   --sign \
   --exp-status affiliationChanged \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
 
 echo "QA: Good (POST, SIGNED, CRL)"
@@ -257,7 +255,7 @@ xipki-qa:ocsp-status \
   --sign \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
  
 echo "QA: Revoked, reason = keyCompromise (POST, SIGNED, CRL)"
@@ -266,7 +264,7 @@ xipki-qa:ocsp-status \
   --cert output/OCSP2.der --sign \
   --exp-status keyCompromise \
   --exp-certhash required \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --resp-issuer output/RCA1.der
  
 echo "QA: Good (POST, SIGNED, CRL)"
@@ -276,7 +274,7 @@ xipki-qa:ocsp-status \
   --sign \
   --exp-status good \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --url $URL_CRL \
   --resp-issuer output/RCA1.der
 
@@ -286,7 +284,7 @@ xipki-qa:ocsp-status \
   --serial 99999 \
   --sign \
   --exp-status unknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --url $URL \
   --resp-issuer output/RCA1.der
 
@@ -296,7 +294,7 @@ xipki-qa:ocsp-status \
   --serial 2 \
   --sign \
   --exp-status issuerUnknown \
-  --exp-sig-alg $SIG_ALGO \
+  --exp-sig-alg $SIGALGO \
   --url $URL \
   --resp-issuer output/RCA1.der
 

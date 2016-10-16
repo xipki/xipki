@@ -1,5 +1,3 @@
-CA_SIGNER_ALGO = "$ALGO1:$ALGO2"
-
 echo "#################################################################"
 echo "#                      Initialize the database                  #"
 echo "#################################################################"
@@ -22,7 +20,7 @@ sleep 1000
 xipki-ca:restart
 
 ## Create the CSR for the command caqa:check-cert in QA
-if { $TOKEN_TYPE equals "pkcs11" } {
+if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:req \
     --slot $SLOT \
     --label RCA1 \
@@ -42,33 +40,33 @@ echo "#################################################################"
 echo "#                           LOAD RCA.xml                        #"
 echo "#################################################################"
 
-if { $TOKEN_TYPE equals "pkcs11" } {
-  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=RCA1"
+if { $TOKEN_TYPE equals "PKCS11" } {
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=RCA1"
 }
 
-if { $TOKEN_TYPE equals "pkcs12" } {
-  CA_SIGNER_CONF = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO"
+if { $TOKEN_TYPE equals "PKCS12" } {
+  CA_SIGNER_CONF = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/RCA1.p12,algo=$SIGALGO"
 }
 
 xipki-cmd:copy-file \
   -f \
-  xipki/demo/demo.d/template/RCA.xml \
+  xipki/demo/demo.d/RCA-template.xml \
   xipki/demo/demo.d/RCA.xml
 
 xipki-cmd:replace \
-  --old "replaceme-TOKEN_TYPE" \
+  --old "REPLACEME-TOKEN_TYPE" \
   --new "$TOKEN_TYPE" \
   xipki/demo/demo.d/RCA.xml
 
 xipki-cmd:replace \
-  --old "replaceme-CA_SIGNERCONF" \
+  --old "REPLACEME-CA_SIGNERCONF" \
   --new "$CA_SIGNER_CONF" \
   xipki/demo/demo.d/RCA.xml
 
 xipki-ca:load-conf --conf-file xipki/demo/demo.d/RCA.xml
 
 ## Update the certificate in the device
-if { $TOKEN_TYPE equals "pkcs11" } {
+if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:update-cert \
     --slot $SLOT \
     --label RCA1 \
@@ -81,7 +79,7 @@ if { $TOKEN_TYPE equals "pkcs11" } {
 }
 
 ## Generate keys and CSR for SubCA1
-if { $TOKEN_TYPE equals "pkcs11" } {
+if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:req \
     --slot $SLOT \
     --label SubCA1 \
@@ -101,7 +99,7 @@ xipki-ca:enroll-cert \
   --out output/SubCA1.der \
   --profile SubCA
 
-if { $TOKEN_TYPE equals "pkcs11" } {
+if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:update-cert \
     --slot $SLOT \
     --label SubCA1 \
@@ -115,7 +113,7 @@ if { $TOKEN_TYPE equals "pkcs11" } {
 }
 
 ## Generate keys and CSR for SubCAwithCRL1
-if { $TOKEN_TYPE equals "pkcs11" } {
+if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:req \
     --slot $SLOT \
     --label SubCAwithCRL1 --out output/SubCAwithCRL1.csr \
@@ -152,7 +150,7 @@ xipki-ca:enroll-cert \
   --out output/SubCAwithCRL1.der \
   --profile SubCA.Complex
 
-if { $TOKEN_TYPE equals "pkcs11" } {
+if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:update-cert \
     --slot $SLOT \
     --label SubCAwithCRL1 \
@@ -166,7 +164,7 @@ if { $TOKEN_TYPE equals "pkcs11" } {
 }
 
 ## Generate keys and CSR for OCSPResponder
-if { $TOKEN_TYPE equals "pkcs11" } {
+if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:req \
     --slot $SLOT \
     --label OCSP99 \
@@ -186,7 +184,7 @@ xipki-ca:enroll-cert \
   --out output/OCSP99.der \
   --profile OCSP
 
-if { $TOKEN_TYPE equals "pkcs11" } {
+if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:update-cert \
     --slot $SLOT \
     --label OCSP99 \
@@ -208,26 +206,26 @@ echo "#                        ADD SubCA with OCSP                    #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "pkcs11" } {
-  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=SubCA1"
+if { $TOKEN_TYPE equals "PKCS11" } {
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=SubCA1"
 }
 
-if { $TOKEN_TYPE equals "pkcs12" } {
-  CA_SIGNER_CONF = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/SubCA1.p12,algo=$CA_SIGNER_ALGO"
+if { $TOKEN_TYPE equals "PKCS12" } {
+  CA_SIGNER_CONF = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/SubCA1.p12,algo=$SIGALGO"
 }
 
 xipki-cmd:copy-file \
   -f \
-  xipki/demo/demo.d/template/SUBCA.xml \
+  xipki/demo/demo.d/SUBCA-template.xml \
   xipki/demo/demo.d/SUBCA.xml
 
 xipki-cmd:replace \
-  --old "replaceme-TOKEN_TYPE" \
+  --old "REPLACEME-TOKEN_TYPE" \
   --new "$TOKEN_TYPE" \
   xipki/demo/demo.d/SUBCA.xml
 
 xipki-cmd:replace \
-  --old "replaceme-CA_SIGNERCONF" \
+  --old "REPLACEME-CA_SIGNERCONF" \
   --new "$CA_SIGNER_CONF" \
   xipki/demo/demo.d/SUBCA.xml
 
@@ -241,26 +239,26 @@ echo "#                       ADD SubCA with CRL                      #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "pkcs11" } {
-  CA_SIGNER_CONF = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=SubCAwithCRL1"
+if { $TOKEN_TYPE equals "PKCS11" } {
+  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=SubCAwithCRL1"
 }
 
-if { $TOKEN_TYPE equals "pkcs12" } {
-  CA_SIGNER_CONF = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/SubCAwithCRL1.p12,algo=$CA_SIGNER_ALGO"
+if { $TOKEN_TYPE equals "PKCS12" } {
+  CA_SIGNER_CONF = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/SubCAwithCRL1.p12,algo=$SIGALGO"
 }
 
 xipki-cmd:copy-file \
   -f \
-  xipki/demo/demo.d/template/SUBCAwithCRL.xml \
+  xipki/demo/demo.d/SUBCAwithCRL-template.xml \
   xipki/demo/demo.d/SUBCAwithCRL.xml
 
 xipki-cmd:replace \
-  --old "replaceme-TOKEN_TYPE" \
+  --old "REPLACEME-TOKEN_TYPE" \
   --new "$TOKEN_TYPE" \
   xipki/demo/demo.d/SUBCAwithCRL.xml
 
 xipki-cmd:replace \
-  --old "replaceme-CA_SIGNERCONF" \
+  --old "REPLACEME-CA_SIGNERCONF" \
   --new "$CA_SIGNER_CONF" \
   xipki/demo/demo.d/SUBCAwithCRL.xml
 

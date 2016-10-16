@@ -1,5 +1,3 @@
-KEY_TYPE = "$1"
-
 ## Generate CRL
 xipki-ca:gencrl \
   --ca SubCAwithCRL1 \
@@ -11,6 +9,7 @@ xipki-ca:getcrl \
   --out output/SubCAwithCRL1-CAMGMT-get.crl
   
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/Cross1.p12 \
   --password 1234 \
   --subject "CN=Cross1,O=xipki,C=DE" \
@@ -46,6 +45,7 @@ xipki-cli:health \
 
 ## Create the CSR for the command caqa:check-cert in QA 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/OCSP1.p12 \
   --password 1234 \
   --out output/OCSP1.csr \
@@ -53,6 +53,7 @@ xipki-tk:req-p12 \
   --need-extension authorityInfoAccess
 
 xipki-cli:enroll-p12 \
+  --hash $HASH \
   --p12 output/OCSP1.p12 \
   --password 1234 \
   --out output/OCSP1.der \
@@ -72,6 +73,7 @@ xipki-tk:update-cert-p12 \
 
 ## Create the CSR for the command caqa:check-cert in QA 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/OCSP2.p12 \
   --password 1234 \
   --out output/OCSP2.csr \
@@ -79,6 +81,7 @@ xipki-tk:req-p12 \
   --need-extension authorityInfoAccess
 
 xipki-cli:enroll-p12 \
+  --hash $HASH \
   --p12 output/OCSP2.p12 \
   --password 1234 \
   --out output/OCSP2.der \
@@ -103,12 +106,14 @@ xipki-cli:revoke \
 
 ## Create the CSR for the command caqa:check-cert in QA 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/multipleOUs1.p12 \
   --password 1234 \
   --out output/multipleOUs1.csr \
   --subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
 
 xipki-cli:enroll-p12 \
+  --hash $HASH \
   --p12 output/multipleOUs1.p12 \
   --password 1234 \
   --out output/multipleOUs1.der \
@@ -125,12 +130,14 @@ xipki-tk:update-cert-p12 \
 
 ## Create the CSR for the command caqa:check-cert in QA 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/multipleOUs2.p12 \
   --password 1234 \
   --out output/multipleOUs2.csr \
   --subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
 
 xipki-cli:enroll-p12 \
+  --hash $HASH \
   --p12 output/multipleOUs2.p12 \
   --password 1234 \
   --out output/multipleOUs2.der \
@@ -149,12 +156,14 @@ xipki-tk:update-cert-p12 \
 
 ## Create the CSR for the command caqa:check-cert in QA 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/multiValuedRDN1.p12 \
   --password 1234 \
   --out output/multiValuedRDN1.csr \
   --subject "CN=multiValuedRDN1,OU=A12345,O=xipki,C=DE"
 
 xipki-cli:enroll-p12 \
+  --hash $HASH \
   --p12 output/multiValuedRDN1.p12 \
   --password 1234 \
   --out output/multiValuedRDN1.der \
@@ -172,6 +181,7 @@ xipki-tk:update-cert-p12 \
 # Certificate QC
 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/QC1.p12 \
   --password 1234 \
   --out output/QC1.csr \
@@ -179,6 +189,7 @@ xipki-tk:req-p12 \
   --need-extension authorityInfoAccess
 
 xipki-cli:enroll-p12 \
+  --hash $HASH \
   --p12 output/QC1.p12 \
   --password 1234 \
   --out output/QC1.der \
@@ -196,6 +207,7 @@ xipki-tk:update-cert-p12 \
 # Certificate EE.Complex1 with complex subject (parsable in openssl)
 
 xipki-tk:req-p12-complex \
+  --hash $HASH \
   --subject "CN=EE.Complex1,O=xipki,C=DE" \
   --p12 output/EE.Complex1.p12 \
   --password 1234 \
@@ -222,6 +234,7 @@ xipki-tk:update-cert-p12 \
 # Certificate EE.Complex1 with complex subject (not parsable in openssl due to complex subject)
 
 xipki-tk:req-p12-complex \
+  --hash $HASH \
   --subject "CN=EE.Complex2,O=xipki,C=DE" \
   --p12 output/EE.Complex2.p12 \
   --password 1234 \
@@ -249,6 +262,7 @@ xipki-tk:update-cert-p12 \
 # Certificate TLS1
 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/TLS1.p12 \
   --password 1234 \
   --subject "CN=TLS1.xipki.org,O=xipki,C=DE" \
@@ -272,6 +286,7 @@ xipki-tk:update-cert-p12 \
 # 1.
 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/TLSwithIncSN1.p12 \
   --password 1234 \
   --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
@@ -285,6 +300,7 @@ xipki-cli:csr-enroll \
 # 2.
 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/TLSwithIncSN1-1.p12 \
   --password 1234 \
   --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
@@ -298,6 +314,7 @@ xipki-cli:csr-enroll \
 # 3.
 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/TLSwithIncSN1-2.p12 \
   --password 1234 \
   --subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE" \
@@ -311,6 +328,7 @@ xipki-cli:csr-enroll \
 # Certificate TLS2
 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/TLS2.p12 \
   --password 1234 \
   --subject "CN=TLS2.xipki.org,O=xipki,C=DE" \
@@ -339,6 +357,7 @@ xipki-cli:revoke \
 # Certificate TLS_C1
 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/TLS_C1.p12 \
   --password 1234 \
   --subject "CN=TLS_C1,O=xipki,C=DE" \
@@ -360,6 +379,7 @@ xipki-tk:update-cert-p12 \
 # Certificate TLS_C2
 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/TLS_C2.p12 \
   --password 1234 \
   --subject "CN=TLS_C2,O=xipki,C=DE" \
@@ -386,6 +406,7 @@ xipki-cli:revoke \
 ## Enroll certificates gSMC-K
 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/gSMC_K1.p12 \
   --password 1234 \
   --subject "CN=80276123451234512345,O=xipki,C=DE" \
@@ -410,6 +431,7 @@ sleep 1200
 # with the same CN
 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/gSMC_K2.p12 \
   --password 1234 \
   --subject "CN=80276123451234512345,O=xipki,C=DE" \
@@ -431,6 +453,7 @@ xipki-tk:update-cert-p12 \
 # Certificate MaxTime1
 
 xipki-tk:req-p12 \
+  --hash $HASH \
   --p12 output/MaxTime1.p12 \
   --password 1234 \
   --subject "CN=MaxTime1.xipki.org,O=xipki,C=DE" \
