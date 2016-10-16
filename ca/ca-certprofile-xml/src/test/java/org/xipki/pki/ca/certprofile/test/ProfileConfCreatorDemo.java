@@ -278,7 +278,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileRootCa() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile RootCA", X509CertLevel.RootCA, "10y",
-                false, new String[]{"SHA256", "SHA1"});
+                false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -318,7 +318,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileCross() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile Cross", X509CertLevel.SubCA, "10y",
-                false, new String[]{"SHA256", "SHA1"});
+                false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -361,7 +361,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileSubCa() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile SubCA", X509CertLevel.SubCA, "8y",
-                false, new String[]{"SHA256", "SHA1"});
+                false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -406,7 +406,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileSubCaComplex() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile SubCA with most extensions",
-                X509CertLevel.SubCA, "8y", false, new String[]{"SHA256", "SHA1"});
+                X509CertLevel.SubCA, "8y", false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -518,7 +518,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileOcsp() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile OCSP", X509CertLevel.EndEntity, "5y",
-                false, new String[]{"SHA256"});
+                false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -569,7 +569,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileScep() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile SCEP", X509CertLevel.EndEntity, "5y",
-                false, new String[]{"SHA256"});
+                false);
 
         profile.setKeyAlgorithms(createRSAKeyAlgorithms());
 
@@ -616,7 +616,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileTls() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile TLS", X509CertLevel.EndEntity, "5y",
-                true, new String[]{"SHA1"});
+                true);
 
         profile.setDuplicateKey(true);
 
@@ -700,7 +700,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileTlsC() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile TLS_C", X509CertLevel.EndEntity, "5y",
-                false, new String[]{"SHA1"});
+                false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -751,7 +751,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileTlsWithIncSerial() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile TLSwithIncSN",
-                X509CertLevel.EndEntity, "5y", false, new String[]{"SHA1"});
+                X509CertLevel.EndEntity, "5y", false);
 
         profile.setDuplicateKey(true);
 
@@ -810,7 +810,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileGsmcK() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile gSMC_K", X509CertLevel.EndEntity,
-                "5y", false, new String[]{"SHA256"});
+                "5y", false);
 
         // SpecialBehavior
         profile.setSpecialBehavior(SpecialX509CertprofileBehavior.gematik_gSMC_K.name());
@@ -912,7 +912,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileMultipleOus() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile Multiple OUs DEMO",
-                X509CertLevel.EndEntity, "5y", false, new String[]{"SHA1"});
+                X509CertLevel.EndEntity, "5y", false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -963,7 +963,7 @@ public class ProfileConfCreatorDemo {
      */
     private static X509ProfileType certprofileMultipleValuedRdn() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile Multiple Valued RDN",
-                X509CertLevel.EndEntity, "5y", false, new String[]{"SHA1"});
+                X509CertLevel.EndEntity, "5y", false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -1007,7 +1007,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileQc() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile QC", X509CertLevel.EndEntity,
-                "5y", false, new String[]{"SHA1"});
+                "5y", false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -1068,7 +1068,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileEeComplex() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile EE complex", X509CertLevel.EndEntity,
-                "5y", true, new String[]{"SHA1"});
+                "5y", true);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -1263,7 +1263,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType certprofileMaxTime() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile MaxTime", X509CertLevel.EndEntity,
-                "9999y", false, new String[]{"SHA1"});
+                "9999y", false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -1699,7 +1699,7 @@ public class ProfileConfCreatorDemo {
 
     private static X509ProfileType getBaseProfile(final String description,
             final X509CertLevel certLevel, final String validity,
-            final boolean useMidnightNotBefore, final String[] sigHashAlgos) {
+            final boolean useMidnightNotBefore) {
         X509ProfileType profile = new X509ProfileType();
 
         profile.setAppInfo(createDescription(description));
@@ -1713,17 +1713,24 @@ public class ProfileConfCreatorDemo {
         profile.setSerialNumberInReq(false);
 
         // SignatureAlgorithms
-        if (sigHashAlgos != null && sigHashAlgos.length > 0) {
-            SignatureAlgorithms sigAlgosType = new SignatureAlgorithms();
-            profile.setSignatureAlgorithms(sigAlgosType);
+        String[] sigHashAlgos = new String[]{"SHA3-512", "SHA3-384", "SHA3-256", "SHA3-224",
+            "SHA512", "SHA384", "SHA256", "SHA1"};
 
-            List<String> algos = sigAlgosType.getAlgorithm();
-            String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA", "withPlainECDSA",
-                "withRSAandMGF1"};
-            for (String part2 : algoPart2s) {
-                for (String hashAlgo : sigHashAlgos) {
-                    algos.add(hashAlgo + part2);
-                }
+        SignatureAlgorithms sigAlgosType = new SignatureAlgorithms();
+        profile.setSignatureAlgorithms(sigAlgosType);
+
+        List<String> algos = sigAlgosType.getAlgorithm();
+        String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA", "withRSAandMGF1"};
+        for (String part2 : algoPart2s) {
+            for (String hashAlgo : sigHashAlgos) {
+                algos.add(hashAlgo + part2);
+            }
+        }
+
+        String part2 = "withPlainECDSA";
+        for (String hashAlgo : sigHashAlgos) {
+            if (!hashAlgo.startsWith("SHA3-")) {
+                algos.add(hashAlgo + part2);
             }
         }
 

@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bouncycastle.asn1.bsi.BSIObjectIdentifiers;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.Digest;
@@ -85,6 +86,14 @@ class P11ECDSAContentSigner implements ContentSigner {
         sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA256.getId(), HashAlgoType.SHA256);
         sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA384.getId(), HashAlgoType.SHA384);
         sigAlgHashMap.put(X9ObjectIdentifiers.ecdsa_with_SHA512.getId(), HashAlgoType.SHA512);
+        sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224.getId(),
+                HashAlgoType.SHA3_224);
+        sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256.getId(),
+                HashAlgoType.SHA3_256);
+        sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384.getId(),
+                HashAlgoType.SHA3_384);
+        sigAlgHashMap.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512.getId(),
+                HashAlgoType.SHA3_512);
 
         sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA1.getId(), HashAlgoType.SHA1);
         sigAlgHashMap.put(BSIObjectIdentifiers.ecdsa_plain_SHA224.getId(), HashAlgoType.SHA224);
@@ -97,6 +106,10 @@ class P11ECDSAContentSigner implements ContentSigner {
         hashMechMap.put(HashAlgoType.SHA256, P11Constants.CKM_ECDSA_SHA256);
         hashMechMap.put(HashAlgoType.SHA384, P11Constants.CKM_ECDSA_SHA384);
         hashMechMap.put(HashAlgoType.SHA512, P11Constants.CKM_ECDSA_SHA512);
+        hashMechMap.put(HashAlgoType.SHA3_224, P11Constants.CKM_ECDSA_SHA3_224);
+        hashMechMap.put(HashAlgoType.SHA3_256, P11Constants.CKM_ECDSA_SHA3_256);
+        hashMechMap.put(HashAlgoType.SHA3_384, P11Constants.CKM_ECDSA_SHA3_384);
+        hashMechMap.put(HashAlgoType.SHA3_512, P11Constants.CKM_ECDSA_SHA3_512);
     }
 
     P11ECDSAContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,

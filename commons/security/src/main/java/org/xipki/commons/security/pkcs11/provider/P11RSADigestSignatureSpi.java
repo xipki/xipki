@@ -104,6 +104,42 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
     } // class SHA512
 
     // CHECKSTYLE:SKIP
+    public static class SHA3_224 extends P11RSADigestSignatureSpi {
+
+        public SHA3_224() {
+            super(HashAlgoType.SHA3_224);
+        }
+
+    } // class SHA3-224
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_256 extends P11RSADigestSignatureSpi {
+
+        public SHA3_256() {
+            super(HashAlgoType.SHA3_256);
+        }
+
+    } // class SHA3-256
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_384 extends P11RSADigestSignatureSpi {
+
+        public SHA3_384() {
+            super(HashAlgoType.SHA3_384);
+        }
+
+    } // class SHA3-384
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_512 extends P11RSADigestSignatureSpi {
+
+        public SHA3_512() {
+            super(HashAlgoType.SHA3_512);
+        }
+
+    } // class SHA3-512
+
+    // CHECKSTYLE:SKIP
     public static class NoneRSA extends P11RSADigestSignatureSpi {
 
         public NoneRSA() {

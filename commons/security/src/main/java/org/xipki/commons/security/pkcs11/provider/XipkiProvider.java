@@ -131,6 +131,22 @@ public class XipkiProvider extends Provider {
                     P11RSADigestSignatureSpi.SHA512.class.getName());
             provider.put("Alg.Alias.Signature.RSAwithSHA512", "SHA512withRSA");
 
+            provider.put("Signature.SHA3-224withRSA",
+                    P11RSADigestSignatureSpi.SHA3_224.class.getName());
+            provider.put("Alg.Alias.Signature.RSAwithSHA3-224", "SHA3-224withRSA");
+
+            provider.put("Signature.SHA3-256withRSA",
+                    P11RSADigestSignatureSpi.SHA3_256.class.getName());
+            provider.put("Alg.Alias.Signature.RSAwithSHA3-256", "SHA3-256withRSA");
+
+            provider.put("Signature.SHA3-384withRSA",
+                    P11RSADigestSignatureSpi.SHA3_384.class.getName());
+            provider.put("Alg.Alias.Signature.RSAwithSHA3-384", "SHA3-384withRSA");
+
+            provider.put("Signature.SHA3-512withRSA",
+                    P11RSADigestSignatureSpi.SHA3_512.class.getName());
+            provider.put("Alg.Alias.Signature.RSAwithSHA3-512", "SHA3-512withRSA");
+
             provider.put("Signature.NONEwithDSA", P11DSASignatureSpi.NONE.class.getName());
             provider.put("Alg.Alias.Signature.DSAwithNONE", "NONEwithDSA");
 
@@ -143,12 +159,23 @@ public class XipkiProvider extends Provider {
             provider.put("Signature.SHA256withDSA", P11DSASignatureSpi.SHA256.class.getName());
             provider.put("Alg.Alias.Signature.DSAwithSHA256", "SHA256withDSA");
 
-            provider.put("Signature.SHA384withDSA",
-                    P11ECDSASignatureSpi.SHA384.class.getName());
+            provider.put("Signature.SHA384withDSA", P11DSASignatureSpi.SHA384.class.getName());
             provider.put("Alg.Alias.Signature.DSAwithSHA384", "SHA384withDSA");
 
             provider.put("Signature.SHA512withDSA", P11DSASignatureSpi.SHA512.class.getName());
             provider.put("Alg.Alias.Signature.DSAwithSHA512", "SHA512withDSA");
+
+            provider.put("Signature.SHA3-224withDSA", P11DSASignatureSpi.SHA3_224.class.getName());
+            provider.put("Alg.Alias.Signature.DSAwithSHA3-224", "SHA3-224withDSA");
+
+            provider.put("Signature.SHA3-256withDSA", P11DSASignatureSpi.SHA3_256.class.getName());
+            provider.put("Alg.Alias.Signature.DSAwithSHA3-256", "SHA3-256withDSA");
+
+            provider.put("Signature.SHA3-384withDSA", P11DSASignatureSpi.SHA3_384.class.getName());
+            provider.put("Alg.Alias.Signature.DSAwithSHA3-384", "SHA3-384withDSA");
+
+            provider.put("Signature.SHA3-512withDSA", P11DSASignatureSpi.SHA3_512.class.getName());
+            provider.put("Alg.Alias.Signature.DSAwithSHA3-512", "SHA3-512withDSA");
 
             provider.put("Signature.NONEwithECDSA", P11ECDSASignatureSpi.NONE.class.getName());
             provider.put("Alg.Alias.Signature.ECDSAwithNONE", "NONEwithECDSA");
@@ -167,6 +194,22 @@ public class XipkiProvider extends Provider {
 
             provider.put("Signature.SHA512withECDSA", P11ECDSASignatureSpi.SHA512.class.getName());
             provider.put("Alg.Alias.Signature.ECDSAwithSHA512", "SHA512withECDSA");
+
+            provider.put("Signature.SHA3-224withECDSA",
+                    P11ECDSASignatureSpi.SHA3_224.class.getName());
+            provider.put("Alg.Alias.Signature.ECDSAwithSHA3-224", "SHA3-224withECDSA");
+
+            provider.put("Signature.SHA3-256withECDSA",
+                    P11ECDSASignatureSpi.SHA3_256.class.getName());
+            provider.put("Alg.Alias.Signature.ECDSAwithSHA3-256", "SHA3-256withECDSA");
+
+            provider.put("Signature.SHA3-384withECDSA",
+                    P11ECDSASignatureSpi.SHA3_384.class.getName());
+            provider.put("Alg.Alias.Signature.ECDSAwithSHA3-384", "SHA3-384withECDSA");
+
+            provider.put("Signature.SHA3-512withECDSA",
+                    P11ECDSASignatureSpi.SHA3_512.class.getName());
+            provider.put("Alg.Alias.Signature.ECDSAwithSHA3-512", "SHA3-512withECDSA");
 
             provider.put("Signature.NONEwithPlain-ECDSA",
                     P11PlainECDSASignatureSpi.NONE.class.getName());
@@ -223,6 +266,22 @@ public class XipkiProvider extends Provider {
             provider.put("Signature.SHA512withRSAandMGF1",
                     P11RSAPSSSignatureSpi.SHA512withRSA.class.getName());
             provider.put("Alg.Alias.Signature.RSAandMGF1withSHA512", "SHA512withRSAandMGF1");
+
+            provider.put("Signature.SHA3-224withRSAandMGF1",
+                    P11RSAPSSSignatureSpi.SHA3_224withRSA.class.getName());
+            provider.put("Alg.Alias.Signature.RSAandMGF1withSHA3-224", "SHA3-224withRSAandMGF1");
+
+            provider.put("Signature.SHA3-256withRSAandMGF1",
+                    P11RSAPSSSignatureSpi.SHA3_256withRSA.class.getName());
+            provider.put("Alg.Alias.Signature.RSAandMGF1withSHA3-256", "SHA3-256withRSAandMGF1");
+
+            provider.put("Signature.SHA3-384withRSAandMGF1",
+                    P11RSAPSSSignatureSpi.SHA3_384withRSA.class.getName());
+            provider.put("Alg.Alias.Signature.RSAandMGF1withSHA3-384", "SHA3-384withRSAandMGF1");
+
+            provider.put("Signature.SHA3-512withRSAandMGF1",
+                    P11RSAPSSSignatureSpi.SHA3_512withRSA.class.getName());
+            provider.put("Alg.Alias.Signature.RSAandMGF1withSHA3-512", "SHA3-512withRSAandMGF1");
 
             return null;
         } // method run

@@ -47,7 +47,6 @@ import java.util.Map;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
@@ -58,8 +57,7 @@ import org.bouncycastle.crypto.engines.RSABlindedEngine;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
+import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.HashAlgoType;
@@ -88,6 +86,14 @@ public class SignerUtil {
                 Hex.decode("3041300d060960864801650304020205000430"));
         digestPkcsPrefix.put(HashAlgoType.SHA512,
                 Hex.decode("3051300d060960864801650304020305000440"));
+        digestPkcsPrefix.put(HashAlgoType.SHA3_224,
+                Hex.decode("302d300d06096086480165030402070500041c"));
+        digestPkcsPrefix.put(HashAlgoType.SHA3_256,
+                Hex.decode("3031300d060960864801650304020805000420"));
+        digestPkcsPrefix.put(HashAlgoType.SHA3_384,
+                Hex.decode("3041300d060960864801650304020905000430"));
+        digestPkcsPrefix.put(HashAlgoType.SHA3_512,
+                Hex.decode("3051300d060960864801650304020a05000440"));
     }
 
     private SignerUtil() {
@@ -386,22 +392,22 @@ public class SignerUtil {
     }
 
     public static Digest getDigest(final HashAlgoType hashAlgo) throws XiSecurityException {
-        try {
-            return BcDefaultDigestProvider.INSTANCE.get(
-                    new AlgorithmIdentifier(hashAlgo.getOid(), DERNull.INSTANCE));
-        } catch (OperatorCreationException ex) {
-            throw new XiSecurityException(
-                    "could not get digest for " + hashAlgo.getOid().getId());
-        }
+        return hashAlgo.createDigest();
     }
 
     public static Digest getDigest(final AlgorithmIdentifier hashAlgo) throws XiSecurityException {
-        try {
-            return BcDefaultDigestProvider.INSTANCE.get(hashAlgo);
-        } catch (OperatorCreationException ex) {
+        HashAlgoType hat = HashAlgoType.getHashAlgoType(hashAlgo.getAlgorithm());
+        if (hat != null) {
+            return hat.createDigest();
+        } else {
             throw new XiSecurityException(
                     "could not get digest for " + hashAlgo.getAlgorithm().getId());
         }
+    }
+
+    public static byte[] getDigestPkcsPrefix(HashAlgoType hashAlgo) {
+        byte[] bytes = digestPkcsPrefix.get(hashAlgo);
+        return (bytes == null) ? null : Arrays.clone(bytes);
     }
 
 }

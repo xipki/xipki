@@ -159,6 +159,14 @@ public class EmulatorP11Identity extends P11Identity {
             return dsaAndEcdsaSign(content, HashAlgoType.SHA384);
         } else if (P11Constants.CKM_ECDSA_SHA512 == mechanism) {
             return dsaAndEcdsaSign(content, HashAlgoType.SHA512);
+        } else if (P11Constants.CKM_ECDSA_SHA3_224 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA3_224);
+        } else if (P11Constants.CKM_ECDSA_SHA3_256 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA3_256);
+        } else if (P11Constants.CKM_ECDSA_SHA3_384 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA3_384);
+        } else if (P11Constants.CKM_ECDSA_SHA3_512 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA3_512);
         } else if (P11Constants.CKM_DSA == mechanism) {
             return dsaAndEcdsaSign(content, null);
         } else if (P11Constants.CKM_DSA_SHA1 == mechanism) {
@@ -171,6 +179,14 @@ public class EmulatorP11Identity extends P11Identity {
             return dsaAndEcdsaSign(content, HashAlgoType.SHA384);
         } else if (P11Constants.CKM_DSA_SHA512 == mechanism) {
             return dsaAndEcdsaSign(content, HashAlgoType.SHA512);
+        } else if (P11Constants.CKM_DSA_SHA3_224 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA3_224);
+        } else if (P11Constants.CKM_DSA_SHA3_256 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA3_256);
+        } else if (P11Constants.CKM_DSA_SHA3_384 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA3_384);
+        } else if (P11Constants.CKM_DSA_SHA3_512 == mechanism) {
+            return dsaAndEcdsaSign(content, HashAlgoType.SHA3_512);
         } else if (P11Constants.CKM_RSA_X_509 == mechanism) {
             return rsaX509Sign(content);
         } else if (P11Constants.CKM_RSA_PKCS == mechanism) {
@@ -185,6 +201,14 @@ public class EmulatorP11Identity extends P11Identity {
             return rsaPkcsSign(content, HashAlgoType.SHA384);
         } else if (P11Constants.CKM_SHA512_RSA_PKCS == mechanism) {
             return rsaPkcsSign(content, HashAlgoType.SHA512);
+        } else if (P11Constants.CKM_SHA3_224_RSA_PKCS == mechanism) {
+            return rsaPkcsSign(content, HashAlgoType.SHA3_224);
+        } else if (P11Constants.CKM_SHA3_256_RSA_PKCS == mechanism) {
+            return rsaPkcsSign(content, HashAlgoType.SHA3_256);
+        } else if (P11Constants.CKM_SHA3_384_RSA_PKCS == mechanism) {
+            return rsaPkcsSign(content, HashAlgoType.SHA3_384);
+        } else if (P11Constants.CKM_SHA3_512_RSA_PKCS == mechanism) {
+            return rsaPkcsSign(content, HashAlgoType.SHA3_512);
         } else if (P11Constants.CKM_RSA_PKCS_PSS == mechanism) {
             return rsaPkcsPssSign(parameters, content, null);
         } else if (P11Constants.CKM_SHA1_RSA_PKCS_PSS == mechanism) {
@@ -197,6 +221,14 @@ public class EmulatorP11Identity extends P11Identity {
             return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA384);
         } else if (P11Constants.CKM_SHA512_RSA_PKCS_PSS == mechanism) {
             return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA512);
+        } else if (P11Constants.CKM_SHA3_224_RSA_PKCS_PSS == mechanism) {
+            return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA3_224);
+        } else if (P11Constants.CKM_SHA3_256_RSA_PKCS_PSS == mechanism) {
+            return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA3_256);
+        } else if (P11Constants.CKM_SHA3_384_RSA_PKCS_PSS == mechanism) {
+            return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA3_384);
+        } else if (P11Constants.CKM_SHA3_512_RSA_PKCS_PSS == mechanism) {
+            return rsaPkcsPssSign(parameters, content, HashAlgoType.SHA3_512);
         } else {
             throw new XiSecurityException("unsupported mechanism " + mechanism);
         }

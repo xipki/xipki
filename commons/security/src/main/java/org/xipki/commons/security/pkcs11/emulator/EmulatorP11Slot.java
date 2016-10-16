@@ -218,6 +218,10 @@ class EmulatorP11Slot extends AbstractP11Slot {
         ret.addMechanism(P11Constants.CKM_SHA256_RSA_PKCS);
         ret.addMechanism(P11Constants.CKM_SHA384_RSA_PKCS);
         ret.addMechanism(P11Constants.CKM_SHA512_RSA_PKCS);
+        ret.addMechanism(P11Constants.CKM_SHA3_224_RSA_PKCS);
+        ret.addMechanism(P11Constants.CKM_SHA3_256_RSA_PKCS);
+        ret.addMechanism(P11Constants.CKM_SHA3_384_RSA_PKCS);
+        ret.addMechanism(P11Constants.CKM_SHA3_512_RSA_PKCS);
 
         ret.addMechanism(P11Constants.CKM_RSA_PKCS_PSS);
         ret.addMechanism(P11Constants.CKM_SHA1_RSA_PKCS_PSS);
@@ -225,6 +229,10 @@ class EmulatorP11Slot extends AbstractP11Slot {
         ret.addMechanism(P11Constants.CKM_SHA256_RSA_PKCS_PSS);
         ret.addMechanism(P11Constants.CKM_SHA384_RSA_PKCS_PSS);
         ret.addMechanism(P11Constants.CKM_SHA512_RSA_PKCS_PSS);
+        ret.addMechanism(P11Constants.CKM_SHA3_224_RSA_PKCS_PSS);
+        ret.addMechanism(P11Constants.CKM_SHA3_256_RSA_PKCS_PSS);
+        ret.addMechanism(P11Constants.CKM_SHA3_384_RSA_PKCS_PSS);
+        ret.addMechanism(P11Constants.CKM_SHA3_512_RSA_PKCS_PSS);
 
         ret.addMechanism(P11Constants.CKM_DSA);
         ret.addMechanism(P11Constants.CKM_DSA_SHA1);
@@ -232,6 +240,10 @@ class EmulatorP11Slot extends AbstractP11Slot {
         ret.addMechanism(P11Constants.CKM_DSA_SHA256);
         ret.addMechanism(P11Constants.CKM_DSA_SHA384);
         ret.addMechanism(P11Constants.CKM_DSA_SHA512);
+        ret.addMechanism(P11Constants.CKM_DSA_SHA3_224);
+        ret.addMechanism(P11Constants.CKM_DSA_SHA3_256);
+        ret.addMechanism(P11Constants.CKM_DSA_SHA3_384);
+        ret.addMechanism(P11Constants.CKM_DSA_SHA3_512);
 
         ret.addMechanism(P11Constants.CKM_ECDSA);
         ret.addMechanism(P11Constants.CKM_ECDSA_SHA1);
@@ -239,6 +251,10 @@ class EmulatorP11Slot extends AbstractP11Slot {
         ret.addMechanism(P11Constants.CKM_ECDSA_SHA256);
         ret.addMechanism(P11Constants.CKM_ECDSA_SHA384);
         ret.addMechanism(P11Constants.CKM_ECDSA_SHA512);
+        ret.addMechanism(P11Constants.CKM_ECDSA_SHA3_224);
+        ret.addMechanism(P11Constants.CKM_ECDSA_SHA3_256);
+        ret.addMechanism(P11Constants.CKM_ECDSA_SHA3_384);
+        ret.addMechanism(P11Constants.CKM_ECDSA_SHA3_512);
 
         // Certificates
 
