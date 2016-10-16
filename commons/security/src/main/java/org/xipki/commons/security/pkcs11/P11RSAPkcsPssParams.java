@@ -103,6 +103,18 @@ public class P11RSAPkcsPssParams implements P11Params {
         case SHA512:
             this.hashAlgorithm = P11Constants.CKM_SHA512;
             break;
+        case SHA3_224:
+            this.hashAlgorithm = P11Constants.CKM_SHA3_224;
+            break;
+        case SHA3_256:
+            this.hashAlgorithm = P11Constants.CKM_SHA3_256;
+            break;
+        case SHA3_384:
+            this.hashAlgorithm = P11Constants.CKM_SHA3_384;
+            break;
+        case SHA3_512:
+            this.hashAlgorithm = P11Constants.CKM_SHA3_512;
+            break;
         default:
             throw new RuntimeException("should not reach here");
         }
@@ -122,6 +134,18 @@ public class P11RSAPkcsPssParams implements P11Params {
             break;
         case SHA512:
             this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA512;
+            break;
+        case SHA3_224:
+            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA3_224;
+            break;
+        case SHA3_256:
+            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA3_256;
+            break;
+        case SHA3_384:
+            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA3_384;
+            break;
+        case SHA3_512:
+            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA3_512;
             break;
         default:
             throw new RuntimeException("should not reach here");

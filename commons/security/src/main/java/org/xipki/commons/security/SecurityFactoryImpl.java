@@ -75,6 +75,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.exception.NoIdleSignerException;
 import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.commons.security.util.ExtDigestAlgorithmIdentifierFinder;
 import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.X509Util;
 
@@ -88,7 +89,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityFactoryImpl.class);
 
     private static final DefaultDigestAlgorithmIdentifierFinder DFLT_DIGESTALG_IDENTIFIER_FINDER =
-            new DefaultDigestAlgorithmIdentifierFinder();
+            new ExtDigestAlgorithmIdentifierFinder();
 
     private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER
         = new HashMap<>();
@@ -199,7 +200,6 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         try {
             SubjectPublicKeyInfo pkInfo = csr.getSubjectPublicKeyInfo();
             PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
-
             ContentVerifierProvider cvp = getContentVerifierProvider(pk);
             return csr.isSignatureValid(cvp);
         } catch (InvalidKeyException | PKCSException | NoSuchAlgorithmException

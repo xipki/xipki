@@ -129,6 +129,46 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
     } // class SHA512withRSA
 
+    // CHECKSTYLE:SKIP
+    public static class SHA3_224withRSA extends P11RSAPSSSignatureSpi {
+
+        public SHA3_224withRSA() {
+            super(new PSSParameterSpec("SHA3-224", "MGF1",
+                    new MGF1ParameterSpec("SHA3-224"), 28, 1));
+        }
+
+    } // class SHA224withRSA
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_256withRSA extends P11RSAPSSSignatureSpi {
+
+        public SHA3_256withRSA() {
+            super(new PSSParameterSpec("SHA3-256", "MGF1",
+                    new MGF1ParameterSpec("SHA3-256"), 32, 1));
+        }
+
+    } // class SHA256withRSA
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_384withRSA extends P11RSAPSSSignatureSpi {
+
+        public SHA3_384withRSA() {
+            super(new PSSParameterSpec("SHA3-384", "MGF1",
+                    new MGF1ParameterSpec("SHA3-384"), 48, 1));
+        }
+
+    } // class SHA384withRSA
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_512withRSA extends P11RSAPSSSignatureSpi {
+
+        public SHA3_512withRSA() {
+            super(new PSSParameterSpec("SHA3-512", "MGF1",
+                    new MGF1ParameterSpec("SHA3-512"), 64, 1));
+        }
+
+    } // class SHA512withRSA
+
     private static class NullPssDigest implements Digest {
 
         private ByteArrayOutputStream baOut = new ByteArrayOutputStream();

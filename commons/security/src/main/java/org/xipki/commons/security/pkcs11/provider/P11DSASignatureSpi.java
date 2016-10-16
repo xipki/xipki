@@ -114,6 +114,42 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
     } // class SHA512
 
+    // CHECKSTYLE:SKIP
+    public static class SHA3_224 extends P11DSASignatureSpi {
+
+        public SHA3_224() {
+            super(HashAlgoType.SHA3_224);
+        }
+
+    }
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_256 extends P11DSASignatureSpi {
+
+        public SHA3_256() {
+            super(HashAlgoType.SHA3_256);
+        }
+
+    }
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_384 extends P11DSASignatureSpi {
+
+        public SHA3_384() {
+            super(HashAlgoType.SHA3_384);
+        }
+
+    }
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_512 extends P11DSASignatureSpi {
+
+        public SHA3_512() {
+            super(HashAlgoType.SHA3_512);
+        }
+
+    }
+
     private final HashAlgoType hashAlgo;
 
     private long mechanism;
@@ -166,6 +202,18 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
             } else if (hashAlgo == HashAlgoType.SHA512
                     && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA512)) {
                 mechanism = P11Constants.CKM_DSA_SHA512;
+            } else if (hashAlgo == HashAlgoType.SHA3_224
+                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA3_224)) {
+                mechanism = P11Constants.CKM_DSA_SHA3_224;
+            } else if (hashAlgo == HashAlgoType.SHA3_256
+                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA3_256)) {
+                mechanism = P11Constants.CKM_DSA_SHA3_256;
+            } else if (hashAlgo == HashAlgoType.SHA3_384
+                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA3_384)) {
+                mechanism = P11Constants.CKM_DSA_SHA3_384;
+            } else if (hashAlgo == HashAlgoType.SHA3_512
+                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA3_512)) {
+                mechanism = P11Constants.CKM_DSA_SHA3_512;
             } else {
                 throw new InvalidKeyException("privateKey and algorithm does not match");
             }

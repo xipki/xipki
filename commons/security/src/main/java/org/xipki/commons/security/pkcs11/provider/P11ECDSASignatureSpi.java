@@ -98,6 +98,42 @@ public class P11ECDSASignatureSpi extends AbstractP11ECDSASignatureSpi {
 
     } // class SHA512
 
+    // CHECKSTYLE:SKIP
+    public static class SHA3_224 extends P11ECDSASignatureSpi {
+
+        public SHA3_224() {
+            super(HashAlgoType.SHA3_224);
+        }
+
+    } // class SHA3_224
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_256 extends P11ECDSASignatureSpi {
+
+        public SHA3_256() {
+            super(HashAlgoType.SHA3_256);
+        }
+
+    } // class SHA3_256
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_384 extends P11ECDSASignatureSpi {
+
+        public SHA3_384() {
+            super(HashAlgoType.SHA3_384);
+        }
+
+    } // class SHA3_384
+
+    // CHECKSTYLE:SKIP
+    public static class SHA3_512 extends P11ECDSASignatureSpi {
+
+        public SHA3_512() {
+            super(HashAlgoType.SHA3_512);
+        }
+
+    } // class SHA3_512
+
     private P11ECDSASignatureSpi(final HashAlgoType hashAlgo) {
         super(hashAlgo, false);
     }

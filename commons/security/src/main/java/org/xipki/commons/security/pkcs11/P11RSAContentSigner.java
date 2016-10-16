@@ -37,16 +37,14 @@ package org.xipki.commons.security.pkcs11;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.security.interfaces.RSAPublicKey;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
@@ -65,8 +63,6 @@ class P11RSAContentSigner implements ContentSigner {
 
     private static final Logger LOG = LoggerFactory.getLogger(P11RSAContentSigner.class);
 
-    private static final Map<HashAlgoType, byte[]> digestPkcsPrefixMap = new HashMap<>();
-
     private final AlgorithmIdentifier algorithmIdentifier;
 
     private final long mechanism;
@@ -80,19 +76,6 @@ class P11RSAContentSigner implements ContentSigner {
     private final byte[] digestPkcsPrefix;
 
     private final int modulusBitLen;
-
-    static {
-        digestPkcsPrefixMap.put(HashAlgoType.SHA1,
-                Hex.decode("3021300906052b0e03021a05000414"));
-        digestPkcsPrefixMap.put(HashAlgoType.SHA224,
-                Hex.decode("302d300d06096086480165030402040500041c"));
-        digestPkcsPrefixMap.put(HashAlgoType.SHA256,
-                Hex.decode("3031300d060960864801650304020105000420"));
-        digestPkcsPrefixMap.put(HashAlgoType.SHA384,
-                Hex.decode("3041300d060960864801650304020205000430"));
-        digestPkcsPrefixMap.put(HashAlgoType.SHA512,
-                Hex.decode("3051300d060960864801650304020305000440"));
-    }
 
     P11RSAContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,
             final AlgorithmIdentifier signatureAlgId)
@@ -113,6 +96,14 @@ class P11RSAContentSigner implements ContentSigner {
             hashAlgo = HashAlgoType.SHA384;
         } else if (PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid)) {
             hashAlgo = HashAlgoType.SHA512;
+        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224.equals(algOid)) {
+            hashAlgo = HashAlgoType.SHA3_224;
+        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256.equals(algOid)) {
+            hashAlgo = HashAlgoType.SHA3_256;
+        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384.equals(algOid)) {
+            hashAlgo = HashAlgoType.SHA3_384;
+        } else if (NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512.equals(algOid)) {
+            hashAlgo = HashAlgoType.SHA3_512;
         } else {
             throw new XiSecurityException("unsupported signature algorithm " + algOid.getId());
         }
@@ -140,6 +131,18 @@ class P11RSAContentSigner implements ContentSigner {
             case SHA512:
                 this.mechanism = P11Constants.CKM_SHA512_RSA_PKCS;
                 break;
+            case SHA3_224:
+                this.mechanism = P11Constants.CKM_SHA3_224_RSA_PKCS;
+                break;
+            case SHA3_256:
+                this.mechanism = P11Constants.CKM_SHA3_256_RSA_PKCS;
+                break;
+            case SHA3_384:
+                this.mechanism = P11Constants.CKM_SHA3_384_RSA_PKCS;
+                break;
+            case SHA3_512:
+                this.mechanism = P11Constants.CKM_SHA3_512_RSA_PKCS;
+                break;
             default:
                 throw new RuntimeException("should not reach here, unknown HashAlgoType "
                         + hashAlgo);
@@ -151,7 +154,7 @@ class P11RSAContentSigner implements ContentSigner {
         }
 
         if (mechanism == P11Constants.CKM_RSA_PKCS || mechanism == P11Constants.CKM_RSA_X_509) {
-            this.digestPkcsPrefix = digestPkcsPrefixMap.get(hashAlgo);
+            this.digestPkcsPrefix = SignerUtil.getDigestPkcsPrefix(hashAlgo);
             Digest digest = SignerUtil.getDigest(hashAlgo);
             this.outputStream = new DigestOutputStream(digest);
         } else {
