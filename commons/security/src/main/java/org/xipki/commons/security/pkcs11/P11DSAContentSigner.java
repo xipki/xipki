@@ -85,12 +85,24 @@ class P11DSAContentSigner implements ContentSigner {
         sigAlgHashMap.put(NISTObjectIdentifiers.dsa_with_sha256.getId(), HashAlgoType.SHA256);
         sigAlgHashMap.put(NISTObjectIdentifiers.dsa_with_sha384.getId(), HashAlgoType.SHA384);
         sigAlgHashMap.put(NISTObjectIdentifiers.dsa_with_sha512.getId(), HashAlgoType.SHA512);
+        sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_224.getId(),
+                HashAlgoType.SHA3_224);
+        sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_256.getId(),
+                HashAlgoType.SHA3_256);
+        sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_384.getId(),
+                HashAlgoType.SHA3_384);
+        sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_512.getId(),
+                HashAlgoType.SHA3_512);
 
         hashMechMap.put(HashAlgoType.SHA1, P11Constants.CKM_DSA_SHA1);
         hashMechMap.put(HashAlgoType.SHA224, P11Constants.CKM_DSA_SHA224);
         hashMechMap.put(HashAlgoType.SHA256, P11Constants.CKM_DSA_SHA256);
         hashMechMap.put(HashAlgoType.SHA384, P11Constants.CKM_DSA_SHA384);
         hashMechMap.put(HashAlgoType.SHA512, P11Constants.CKM_DSA_SHA512);
+        hashMechMap.put(HashAlgoType.SHA3_224, P11Constants.CKM_DSA_SHA3_224);
+        hashMechMap.put(HashAlgoType.SHA3_256, P11Constants.CKM_DSA_SHA3_256);
+        hashMechMap.put(HashAlgoType.SHA3_384, P11Constants.CKM_DSA_SHA3_384);
+        hashMechMap.put(HashAlgoType.SHA3_512, P11Constants.CKM_DSA_SHA3_512);
     }
 
     P11DSAContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,

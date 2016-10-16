@@ -115,6 +115,18 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
             } else if (hashAlgo == HashAlgoType.SHA512
                     && signingKey.supportsMechanism(P11Constants.CKM_ECDSA_SHA512)) {
                 mechanism = P11Constants.CKM_ECDSA_SHA512;
+            } else if (hashAlgo == HashAlgoType.SHA3_224
+                    && signingKey.supportsMechanism(P11Constants.CKM_ECDSA_SHA3_224)) {
+                mechanism = P11Constants.CKM_ECDSA_SHA3_224;
+            } else if (hashAlgo == HashAlgoType.SHA3_256
+                    && signingKey.supportsMechanism(P11Constants.CKM_ECDSA_SHA3_256)) {
+                mechanism = P11Constants.CKM_ECDSA_SHA3_256;
+            } else if (hashAlgo == HashAlgoType.SHA3_384
+                    && signingKey.supportsMechanism(P11Constants.CKM_ECDSA_SHA3_384)) {
+                mechanism = P11Constants.CKM_ECDSA_SHA3_384;
+            } else if (hashAlgo == HashAlgoType.SHA3_512
+                    && signingKey.supportsMechanism(P11Constants.CKM_ECDSA_SHA3_512)) {
+                mechanism = P11Constants.CKM_ECDSA_SHA3_512;
             } else {
                 throw new InvalidKeyException("privateKey and algorithm does not match");
             }

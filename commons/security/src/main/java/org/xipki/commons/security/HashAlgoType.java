@@ -42,6 +42,7 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.digests.SHA224Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA384Digest;
+import org.bouncycastle.crypto.digests.SHA3Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.pkcs11.P11Constants;
@@ -57,7 +58,11 @@ public enum HashAlgoType {
     SHA224(28, "2.16.840.1.101.3.4.2.4", "SHA224", "S224"),
     SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256", "S256"),
     SHA384(48, "2.16.840.1.101.3.4.2.2", "SHA384", "S384"),
-    SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512", "S512");
+    SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512", "S512"),
+    SHA3_224(28, "2.16.840.1.101.3.4.2.7", "SHA3-224", "S3-224", "SHA3224"),
+    SHA3_256(32, "2.16.840.1.101.3.4.2.8", "SHA3-256", "S3-256", "SHA3256"),
+    SHA3_384(48, "2.16.840.1.101.3.4.2.9", "SHA3-384", "S3-384", "SHA3384"),
+    SHA3_512(64, "2.16.840.1.101.3.4.2.10", "SHA3-512", "S3-512", "SHA3512");
 
     private final int length;
 
@@ -67,14 +72,22 @@ public enum HashAlgoType {
 
     private final String name;
 
+    private final String canonicalizedName;
+
     private final String shortName;
 
     HashAlgoType(final int length, final String oid, final String name, final String shortName) {
+        this(length, oid, name, shortName, null);
+    }
+
+    HashAlgoType(final int length, final String oid, final String name, final String shortName,
+            final String canonicalizedName) {
         this.length = length;
         this.oid = new ASN1ObjectIdentifier(oid).intern();
         this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
         this.name = name;
         this.shortName = shortName;
+        this.canonicalizedName = canonicalizedName;
     }
 
     public int getLength() {
@@ -121,6 +134,11 @@ public enum HashAlgoType {
                     || hashAlgo.shortName.equalsIgnoreCase(tmpNameOrOid)) {
                 return hashAlgo;
             }
+
+            // for hash algorithm with '-' in the name
+            if (tmpNameOrOid.equalsIgnoreCase(hashAlgo.canonicalizedName)) {
+                return hashAlgo;
+            }
         }
 
         return null;
@@ -153,6 +171,14 @@ public enum HashAlgoType {
             return HashAlgoType.SHA384;
         } else if (hashMech == P11Constants.CKM_SHA512) {
             return HashAlgoType.SHA512;
+        } else if (hashMech == P11Constants.CKM_SHA3_224) {
+            return HashAlgoType.SHA3_224;
+        } else if (hashMech == P11Constants.CKM_SHA3_256) {
+            return HashAlgoType.SHA3_256;
+        } else if (hashMech == P11Constants.CKM_SHA3_384) {
+            return HashAlgoType.SHA3_384;
+        } else if (hashMech == P11Constants.CKM_SHA3_512) {
+            return HashAlgoType.SHA3_512;
         } else {
             return null;
         }
@@ -169,6 +195,14 @@ public enum HashAlgoType {
             return HashAlgoType.SHA384;
         } else if (hashMech == P11Constants.CKG_MGF1_SHA512) {
             return HashAlgoType.SHA512;
+        } else if (hashMech == P11Constants.CKG_MGF1_SHA3_224) {
+            return HashAlgoType.SHA3_224;
+        } else if (hashMech == P11Constants.CKG_MGF1_SHA3_256) {
+            return HashAlgoType.SHA3_256;
+        } else if (hashMech == P11Constants.CKG_MGF1_SHA3_384) {
+            return HashAlgoType.SHA3_384;
+        } else if (hashMech == P11Constants.CKG_MGF1_SHA3_512) {
+            return HashAlgoType.SHA3_512;
         } else {
             return null;
         }
@@ -190,6 +224,14 @@ public enum HashAlgoType {
             return new SHA384Digest();
         case SHA512:
             return new SHA512Digest();
+        case SHA3_224:
+            return new SHA3Digest(224);
+        case SHA3_256:
+            return new SHA3Digest(256);
+        case SHA3_384:
+            return new SHA3Digest(384);
+        case SHA3_512:
+            return new SHA3Digest(512);
         default:
             throw new RuntimeException("should not reach here, unknown HashAlgoType " + name());
         }

@@ -335,6 +335,18 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         case SHA512:
             digestCalculator = new SHA512DigestCalculator();
             break;
+        case SHA3_224:
+            digestCalculator = new SHA3_224DigestCalculator();
+            break;
+        case SHA3_256:
+            digestCalculator = new SHA3_256DigestCalculator();
+            break;
+        case SHA3_384:
+            digestCalculator = new SHA3_384DigestCalculator();
+            break;
+        case SHA3_512:
+            digestCalculator = new SHA3_512DigestCalculator();
+            break;
         default:
             throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
         }

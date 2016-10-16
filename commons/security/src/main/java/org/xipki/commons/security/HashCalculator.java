@@ -63,6 +63,10 @@ class HashCalculator {
         MDS_MAP.put(HashAlgoType.SHA256, getMessageDigests(HashAlgoType.SHA256));
         MDS_MAP.put(HashAlgoType.SHA384, getMessageDigests(HashAlgoType.SHA384));
         MDS_MAP.put(HashAlgoType.SHA512, getMessageDigests(HashAlgoType.SHA512));
+        MDS_MAP.put(HashAlgoType.SHA3_224, getMessageDigests(HashAlgoType.SHA3_224));
+        MDS_MAP.put(HashAlgoType.SHA3_256, getMessageDigests(HashAlgoType.SHA3_256));
+        MDS_MAP.put(HashAlgoType.SHA3_384, getMessageDigests(HashAlgoType.SHA3_384));
+        MDS_MAP.put(HashAlgoType.SHA3_512, getMessageDigests(HashAlgoType.SHA3_512));
     }
 
     private HashCalculator() {

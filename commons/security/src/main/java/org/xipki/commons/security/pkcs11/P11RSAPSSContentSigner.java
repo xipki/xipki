@@ -181,6 +181,18 @@ class P11RSAPSSContentSigner implements ContentSigner {
             case SHA512:
                 this.mechanism = P11Constants.CKM_SHA512_RSA_PKCS_PSS;
                 break;
+            case SHA3_224:
+                this.mechanism = P11Constants.CKM_SHA3_224_RSA_PKCS_PSS;
+                break;
+            case SHA3_256:
+                this.mechanism = P11Constants.CKM_SHA3_256_RSA_PKCS_PSS;
+                break;
+            case SHA3_384:
+                this.mechanism = P11Constants.CKM_SHA3_384_RSA_PKCS_PSS;
+                break;
+            case SHA3_512:
+                this.mechanism = P11Constants.CKM_SHA3_512_RSA_PKCS_PSS;
+                break;
             default:
                 throw new RuntimeException("should not reach here, unknown HashAlgoType "
                         + hashAlgo);
