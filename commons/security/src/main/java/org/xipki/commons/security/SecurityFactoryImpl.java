@@ -60,11 +60,9 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
-import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
-import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.slf4j.Logger;
@@ -73,9 +71,12 @@ import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.PasswordResolver;
+import org.xipki.commons.security.bcbugfix.XipkiDSAContentVerifierProviderBuilder;
+import org.xipki.commons.security.bcbugfix.XipkiDigestAlgorithmIdentifierFinder;
+import org.xipki.commons.security.bcbugfix.XipkiECContentVerifierProviderBuilder;
+import org.xipki.commons.security.bcbugfix.XipkiRSAContentVerifierProviderBuilder;
 import org.xipki.commons.security.exception.NoIdleSignerException;
 import org.xipki.commons.security.util.AlgorithmUtil;
-import org.xipki.commons.security.util.ExtDigestAlgorithmIdentifierFinder;
 import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.X509Util;
 
@@ -88,8 +89,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecurityFactoryImpl.class);
 
-    private static final DefaultDigestAlgorithmIdentifierFinder DFLT_DIGESTALG_IDENTIFIER_FINDER =
-            new ExtDigestAlgorithmIdentifierFinder();
+    private static final DigestAlgorithmIdentifierFinder DIGESTALG_IDENTIFIER_FINDER =
+            XipkiDigestAlgorithmIdentifierFinder.INSTANCE;
 
     private static final Map<String, BcContentVerifierProviderBuilder> VERIFIER_PROVIDER_BUILDER
         = new HashMap<>();
@@ -142,12 +143,11 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         BcContentVerifierProviderBuilder builder = VERIFIER_PROVIDER_BUILDER.get(keyAlg);
         if (builder == null) {
             if ("RSA".equals(keyAlg)) {
-                builder = new BcRSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+                builder = new XipkiRSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
             } else if ("DSA".equals(keyAlg)) {
-                builder = new BcDSAContentVerifierProviderBuilder(DFLT_DIGESTALG_IDENTIFIER_FINDER);
+                builder = new XipkiDSAContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
             } else if ("EC".equals(keyAlg) || "ECDSA".equals(keyAlg)) {
-                builder = new XipkiECContentVerifierProviderBuilder(
-                        DFLT_DIGESTALG_IDENTIFIER_FINDER);
+                builder = new XipkiECContentVerifierProviderBuilder(DIGESTALG_IDENTIFIER_FINDER);
             } else {
                 throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
             }
