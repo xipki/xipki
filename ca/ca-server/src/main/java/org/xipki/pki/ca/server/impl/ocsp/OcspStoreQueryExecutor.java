@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ca.server.impl.ocsp;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -51,7 +50,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -513,36 +511,15 @@ class OcspStoreQueryExecutor {
         }
 
         String sha1FpCert = HashAlgoType.SHA1.base64Hash(issuerCert.getEncodedCert());
-
-        Certificate bcCert = Certificate.getInstance(issuerCert.getEncodedCert());
-        byte[] encodedName;
-        try {
-            encodedName = bcCert.getSubject().getEncoded("DER");
-        } catch (IOException ex) {
-            throw new CertificateEncodingException(ex.getMessage(), ex);
-        }
-        byte[] encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
-
         long maxId = datasource.getMax(null, "ISSUER", "ID");
         int id = (int) maxId + 1;
 
         byte[] encodedCert = issuerCert.getEncodedCert();
         long notBeforeSeconds = issuerCert.getCert().getNotBefore().getTime() / 1000;
         long notAfterSeconds = issuerCert.getCert().getNotAfter().getTime() / 1000;
-        String b64Sha1FpName = HashAlgoType.SHA1.base64Hash(encodedName);
-        String b64Sha1FpKey = HashAlgoType.SHA1.base64Hash(encodedKey);
-        String b64Sha224FpName = HashAlgoType.SHA224.base64Hash(encodedName);
-        String b64Sha224FpKey = HashAlgoType.SHA224.base64Hash(encodedKey);
-        String b64Sha256FpName = HashAlgoType.SHA256.base64Hash(encodedName);
-        String b64Sha256FpKey = HashAlgoType.SHA256.base64Hash(encodedKey);
-        String b64Sha384FpName = HashAlgoType.SHA384.base64Hash(encodedName);
-        String b64Sha384FpKey = HashAlgoType.SHA384.base64Hash(encodedKey);
-        String b64Sha512FpName = HashAlgoType.SHA512.base64Hash(encodedName);
-        String b64Sha512FpKey = HashAlgoType.SHA512.base64Hash(encodedKey);
 
         final String sql =
-                "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1S,S1K,S224S,S224K,S256S,S256K,"
-                + "S384S,S384K,S512S,S512K,S1C,CERT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT) VALUES (?,?,?,?,?,?)";
 
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -554,16 +531,6 @@ class OcspStoreQueryExecutor {
             ps.setString(idx++, subject);
             ps.setLong(idx++, notBeforeSeconds);
             ps.setLong(idx++, notAfterSeconds);
-            ps.setString(idx++, b64Sha1FpName);
-            ps.setString(idx++, b64Sha1FpKey);
-            ps.setString(idx++, b64Sha224FpName);
-            ps.setString(idx++, b64Sha224FpKey);
-            ps.setString(idx++, b64Sha256FpName);
-            ps.setString(idx++, b64Sha256FpKey);
-            ps.setString(idx++, b64Sha384FpName);
-            ps.setString(idx++, b64Sha384FpKey);
-            ps.setString(idx++, b64Sha512FpName);
-            ps.setString(idx++, b64Sha512FpKey);
             ps.setString(idx++, sha1FpCert);
             ps.setString(idx++, b64Cert);
 

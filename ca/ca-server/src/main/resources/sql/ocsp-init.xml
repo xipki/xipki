@@ -43,46 +43,6 @@
           remarks="notAfter of certificate, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="S1S" type="CHAR(28)"
-          remarks="base64 enoded SHA1 sum of the subject">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S1K" type="CHAR(28)"
-          remarks="base64 enoded SHA1 sum of the key">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S224S" type="CHAR(40)"
-          remarks="base64 enoded SHA224 sum of the subject">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S224K" type="CHAR(40)"
-          remarks="base64 enoded SHA224 sum of the key">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S256S" type="CHAR(44)"
-          remarks="base64 enoded SHA256 sum of the subject">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S256K" type="CHAR(44)"
-          remarks="base64 enoded SHA256 sum of the key">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S384S" type="CHAR(64)"
-          remarks="base64 enoded SHA384 sum of the subject">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S384K" type="CHAR(64)"
-          remarks="base64 enoded SHA384 sum of the key">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S512S" type="CHAR(88)"
-          remarks="base64 enoded SHA512 sum of the subject">
-        <constraints nullable="false"/>
-      </column>
-      <column name="S512K" type="CHAR(88)"
-          remarks="base64 enoded SHA512 sum of the key">
-        <constraints nullable="false"/>
-      </column>
       <column name="S1C" type="CHAR(28)"
           remarks="base64 enoded SHA1 sum of the certificate">
         <constraints nullable="false"/>

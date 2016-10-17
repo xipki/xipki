@@ -76,4 +76,16 @@ public class IssuerHashNameAndKey {
                 && Arrays.equals(this.issuerKeyHash, issuerKeyHash);
     }
 
+    public HashAlgoType getAlgo() {
+        return algo;
+    }
+
+    public byte[] getIssuerNameHash() {
+        return Arrays.copyOf(issuerNameHash, issuerNameHash.length);
+    }
+
+    public byte[] getIssuerKeyHash() {
+        return Arrays.copyOf(issuerKeyHash, issuerKeyHash.length);
+    }
+
 }

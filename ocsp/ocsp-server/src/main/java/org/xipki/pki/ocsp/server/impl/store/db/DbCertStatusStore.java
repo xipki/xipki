@@ -36,6 +36,7 @@ package org.xipki.pki.ocsp.server.impl.store.db;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
@@ -54,6 +55,7 @@ import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,11 +198,7 @@ public class DbCertStatusStore extends OcspStore {
                 }
             } // end if(initialized)
 
-            HashAlgoType[] hashAlgoTypes = {HashAlgoType.SHA1, HashAlgoType.SHA224,
-                HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512};
-
-            final String sql = "SELECT ID,NBEFORE,REV,RT,S1C,S1S,S1K,S224S,S224K,S256S,S256K,"
-                    + "S384S,S384K,S512S,S512K FROM ISSUER";
+            final String sql = "SELECT ID,NBEFORE,REV,RT,S1C,CERT FROM ISSUER";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             ResultSet rs = null;
@@ -215,25 +213,17 @@ public class DbCertStatusStore extends OcspStore {
 
                     int id = rs.getInt("ID");
                     long notBeforeInSecond = rs.getLong("NBEFORE");
-
-                    Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<>();
-                    for (HashAlgoType h : hashAlgoTypes) {
-                        String hashName = rs.getString(h.getShortName() + "S");
-                        String hashKey = rs.getString(h.getShortName() + "K");
-                        byte[] hashNameBytes = Base64.decode(hashName);
-                        byte[] hashKeyBytes = Base64.decode(hashKey);
-                        IssuerHashNameAndKey hash = new IssuerHashNameAndKey(
-                                h, hashNameBytes, hashKeyBytes);
-
-                        if (h == HashAlgoType.SHA1) {
-                            for (IssuerEntry existingIssuer : caInfos) {
-                                if (existingIssuer.matchHash(h, hashNameBytes, hashKeyBytes)) {
-                                    throw new Exception(
-                                        "found at least two issuers with the same subject and key");
-                                }
-                            }
+                    String b64Cert = rs.getString("CERT");
+                    Map<HashAlgoType, IssuerHashNameAndKey> hashes = getIssuerHashAndKeys(
+                            Base64.decode(b64Cert));
+                    IssuerHashNameAndKey sha1IssuerHash = hashes.get(HashAlgoType.SHA1);
+                    for (IssuerEntry existingIssuer : caInfos) {
+                        if (existingIssuer.matchHash(HashAlgoType.SHA1,
+                                sha1IssuerHash.getIssuerNameHash(),
+                                sha1IssuerHash.getIssuerKeyHash())) {
+                            throw new Exception(
+                                "found at least two issuers with the same subject and key");
                         }
-                        hashes.put(h, hash);
                     }
 
                     IssuerEntry caInfoEntry = new IssuerEntry(id, hashes,
@@ -261,6 +251,27 @@ public class DbCertStatusStore extends OcspStore {
             initialized = true;
         }
     } // method initIssuerStore
+
+    private Map<HashAlgoType, IssuerHashNameAndKey> getIssuerHashAndKeys(byte[] encodedCert)
+    throws CertificateEncodingException {
+        byte[] encodedName;
+        byte[] encodedKey;
+        try {
+            Certificate bcCert = Certificate.getInstance(encodedCert);
+            encodedName = bcCert.getSubject().getEncoded("DER");
+            encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+        } catch (IllegalArgumentException | IOException ex) {
+            throw new CertificateEncodingException(ex.getMessage(), ex);
+        }
+
+        Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<>();
+        for (HashAlgoType ha : HashAlgoType.values()) {
+            IssuerHashNameAndKey ih = new IssuerHashNameAndKey(ha, ha.hash(encodedName),
+                    ha.hash(encodedKey));
+            hashes.put(ha, ih);
+        }
+        return hashes;
+    }
 
     @Override
     public CertStatusInfo getCertStatus(final Date time, final HashAlgoType hashAlgo,

@@ -339,9 +339,7 @@ public class CrlCertStatusStore extends OcspStore {
             byte[] encodedKey = bcCaCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
             Map<HashAlgoType, IssuerHashNameAndKey> newIssuerHashMap = new ConcurrentHashMap<>();
 
-            HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA1,  HashAlgoType.SHA224,
-                HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512};
-            for (HashAlgoType hashAlgo : hashAlgos) {
+            for (HashAlgoType hashAlgo : HashAlgoType.values()) {
                 byte[] issuerNameHash = hashAlgo.hash(encodedName);
                 byte[] issuerKeyHash = hashAlgo.hash(encodedKey);
                 IssuerHashNameAndKey issuerHash = new IssuerHashNameAndKey(hashAlgo, issuerNameHash,

@@ -160,10 +160,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             byte[] encodedCert = Base64.decode(b64Cert);
 
             Certificate cert;
-            byte[] encodedName;
             try {
                 cert = Certificate.getInstance(encodedCert);
-                encodedName = cert.getSubject().getEncoded("DER");
             } catch (Exception ex) {
                 LOG.error("could not parse certificate of issuer {}", issuer.getId());
                 LOG.debug("could not parse certificate of issuer " + issuer.getId(), ex);
@@ -173,23 +171,12 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     throw new CertificateException(ex.getMessage(), ex);
                 }
             }
-            byte[] encodedKey = cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
             int idx = 1;
             ps.setInt(idx++, issuer.getId());
             ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
             ps.setLong(idx++, cert.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
             ps.setLong(idx++, cert.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-            ps.setString(idx++, sha1(encodedName));
-            ps.setString(idx++, sha1(encodedKey));
-            ps.setString(idx++, sha224(encodedName));
-            ps.setString(idx++, sha224(encodedKey));
-            ps.setString(idx++, sha256(encodedName));
-            ps.setString(idx++, sha256(encodedKey));
-            ps.setString(idx++, sha384(encodedName));
-            ps.setString(idx++, sha384(encodedKey));
-            ps.setString(idx++, sha512(encodedName));
-            ps.setString(idx++, sha512(encodedKey));
             ps.setString(idx++, sha1(encodedCert));
             ps.setString(idx++, b64Cert);
             setBoolean(ps, idx++, issuer.isRevoked());
