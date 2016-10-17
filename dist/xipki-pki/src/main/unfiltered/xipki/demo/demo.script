@@ -1,5 +1,6 @@
 printUsage = "false"
 argsValid = "false"
+errMsg = ""
 
 if { "$1" equals "" } {
   printUsage = "true"
@@ -21,33 +22,56 @@ if { "$1" equals "" } {
       KEYSPEC =$4
     }
 
-    list = [SHA1, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512]; each ($list) {
-      if { "$HASH" equals $it } {
-        argsValid = "true"
+   list = [PKCS11 PKCS12]; each ($list) {
+     if { "$TOKEN_TYPE" equals $it } {
+       argsValid = "true"
+     }
+   }
+
+    if { "$argsValid" equals "false" } {
+      errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
+    } {
+      argsValid = "false"
+
+      list = [RSA RSAPSS EC PLAINEC DSA]; each ($list) {
+        if { "$SIG_TYPE" equals $it } {
+          argsValid = "true"
+        }
       }
     }
 
-    list = [PKCS11 PKCS12]; each ($list) {
-      if { "$TOKEN_TYPE" equals $it } {
-        argsValid = "true"
+    if { "$argsValid" equals "false" } {
+      errMsg = "invalid SIG_TYPE $SIG_TYPE"
+    } {
+      argsValid = "false"
+
+      if { "$SIG_TYPE" equals "PLAINEC" } {
+        list = [SHA1 SHA256 SHA384 SHA512]; each ($list) {
+          if { "$HASH" equals $it } {
+            argsValid = "true"
+          }
+        }
+      } {
+        list = [SHA1 SHA256 SHA384 SHA512 SHA3-224 SHA3-256 SHA3-384 SHA3-512]; each ($list) {
+          if { "$HASH" equals $it } {
+            argsValid = "true"
+          }
+        }
       }
     }
 
-    list = [RSA RSAPSS EC PLAINEC DSA]; each ($list) {
-      if { "$SIG_TYPE" equals $it } {
-        argsValid = "true"
-      }
+    if { "$argsValid" equals "false" } {
+      errMsg = "invalid HASH $HASH"
     }
 
   }
 }
 
 if { $argsValid equals "false" } {
-  echo "invalid arguments $args"
+  echo "$errMsg"
   echo ""
   printUsage = "true"
 }
-
 if { $printUsage equals "true" } {
   echo "Usage: "
   echo ""
