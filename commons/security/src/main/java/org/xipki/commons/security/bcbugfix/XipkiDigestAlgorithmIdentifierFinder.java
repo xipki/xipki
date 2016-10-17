@@ -32,14 +32,16 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.util;
+package org.xipki.commons.security.bcbugfix;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.bsi.BSIObjectIdentifiers;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 
@@ -48,40 +50,50 @@ import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
  * @since 2.1.0
  */
 
-public class ExtDigestAlgorithmIdentifierFinder extends DefaultDigestAlgorithmIdentifierFinder {
+public class XipkiDigestAlgorithmIdentifierFinder extends DefaultDigestAlgorithmIdentifierFinder {
+
+    public static final XipkiDigestAlgorithmIdentifierFinder INSTANCE
+        = new XipkiDigestAlgorithmIdentifierFinder();
 
     private static Map<ASN1ObjectIdentifier, ASN1ObjectIdentifier> digestOids = new HashMap<>();
 
     static {
+        // Plain-ECDSA
+        digestOids.put(BSIObjectIdentifiers.ecdsa_plain_SHA1, OIWObjectIdentifiers.idSHA1);
+        digestOids.put(BSIObjectIdentifiers.ecdsa_plain_SHA224, NISTObjectIdentifiers.id_sha224);
+        digestOids.put(BSIObjectIdentifiers.ecdsa_plain_SHA256, NISTObjectIdentifiers.id_sha256);
+        digestOids.put(BSIObjectIdentifiers.ecdsa_plain_SHA384, NISTObjectIdentifiers.id_sha384);
+        digestOids.put(BSIObjectIdentifiers.ecdsa_plain_SHA512, NISTObjectIdentifiers.id_sha512);
+
         // RSA with SHA3
         digestOids.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224,
-                NISTObjectIdentifiers.id_sha224);
+                NISTObjectIdentifiers.id_sha3_224);
         digestOids.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256,
-                NISTObjectIdentifiers.id_sha256);
+                NISTObjectIdentifiers.id_sha3_256);
         digestOids.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384,
-                NISTObjectIdentifiers.id_sha384);
+                NISTObjectIdentifiers.id_sha3_384);
         digestOids.put(NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512,
-                NISTObjectIdentifiers.id_sha512);
+                NISTObjectIdentifiers.id_sha3_512);
 
         // DSA with SHA3
         digestOids.put(NISTObjectIdentifiers.id_dsa_with_sha3_224,
-                NISTObjectIdentifiers.id_sha224);
+                NISTObjectIdentifiers.id_sha3_224);
         digestOids.put(NISTObjectIdentifiers.id_dsa_with_sha3_256,
-                NISTObjectIdentifiers.id_sha256);
+                NISTObjectIdentifiers.id_sha3_256);
         digestOids.put(NISTObjectIdentifiers.id_dsa_with_sha3_384,
-                NISTObjectIdentifiers.id_sha384);
+                NISTObjectIdentifiers.id_sha3_384);
         digestOids.put(NISTObjectIdentifiers.id_dsa_with_sha3_512,
-                NISTObjectIdentifiers.id_sha512);
+                NISTObjectIdentifiers.id_sha3_512);
 
         // ECDSA with SHA3
         digestOids.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_224,
-                NISTObjectIdentifiers.id_sha224);
+                NISTObjectIdentifiers.id_sha3_224);
         digestOids.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_256,
-                NISTObjectIdentifiers.id_sha256);
+                NISTObjectIdentifiers.id_sha3_256);
         digestOids.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_384,
-                NISTObjectIdentifiers.id_sha384);
+                NISTObjectIdentifiers.id_sha3_384);
         digestOids.put(NISTObjectIdentifiers.id_ecdsa_with_sha3_512,
-                NISTObjectIdentifiers.id_sha512);
+                NISTObjectIdentifiers.id_sha3_512);
 
     }
 

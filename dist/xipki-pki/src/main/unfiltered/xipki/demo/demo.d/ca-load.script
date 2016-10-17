@@ -63,6 +63,16 @@ xipki-cmd:replace \
   --new "$CA_SIGNER_CONF" \
   xipki/demo/demo.d/RCA.xml
 
+xipki-cmd:replace \
+  --old "REPLACEME-SIGALGO" \
+  --new "$SIGALGO" \
+  xipki/demo/demo.d/RCA.xml
+
+xipki-cmd:replace \
+  --old "REPLACEME-HASH" \
+  --new "$HASH" \
+  xipki/demo/demo.d/RCA.xml
+
 xipki-ca:load-conf --conf-file xipki/demo/demo.d/RCA.xml
 
 ## Update the certificate in the device

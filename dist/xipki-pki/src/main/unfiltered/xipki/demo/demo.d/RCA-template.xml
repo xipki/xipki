@@ -9,8 +9,9 @@
   </properties>
   <cmpcontrols>
     <cmpcontrol name="cmpcontrol1">
+      <!-- The popo.algo ${HASH}withRSA is for the enrollment of SCEP responder certificates -->
       <conf>
-        <value>send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=REPLACEME_SIGALGO</value>
+        <value>send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=REPLACEME-SIGALGO:REPLACEME-HASHwithRSA</value>
        </conf>
     </cmpcontrol>
   </cmpcontrols>

@@ -54,6 +54,7 @@ if { $printUsage equals "true" } {
   echo "source demo.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
   echo "    hash algo:       SHA1, SHA224, SHA256, SHA384, SHA512"
   echo "                     SHA3-224, SHA3-256, SHA3-384, SHA3-512"
+  echo "                     The SHA3 algorithms are not for PLAINEC."
   echo "    token type:      PKCS11, PKCS12"
   echo "    signature type:  RSA, RSAPSS, EC, PLAINEC, DSA"
   echo "    keyspec:         keysize for signature types RSA, RSAPSS and DSA,"

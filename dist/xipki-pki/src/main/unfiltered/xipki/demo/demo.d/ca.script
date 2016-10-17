@@ -24,9 +24,10 @@ echo "#                       PREPARE ENVIRONMENET                    #"
 echo "#################################################################"
 
 ## CMP control: messageTimeBias is set to 300 seconds.
+# The popo.algo ${HASH}withRSA is for the enrollment of SCEP responder certificates
 xipki-ca:cmpcontrol-add \
   --name cmpcontrol1 \
-  --conf send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=$SIGALGO
+  --conf send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=$SIGALGO:${HASH}withRSA
 
 ## Certificate Profiles
 xipki-ca:profile-add \

@@ -267,7 +267,6 @@ xipki-tk:req-p12 \
   --password 1234 \
   --subject "CN=TLS1.xipki.org,O=xipki,C=DE" \
   --out output/TLS1.csr \
-  --ecdsa-plain
 
 xipki-cli:csr-enroll \
   --csr output/TLS1.csr \
