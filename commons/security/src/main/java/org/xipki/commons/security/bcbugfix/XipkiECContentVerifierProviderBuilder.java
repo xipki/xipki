@@ -32,29 +32,17 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security;
+package org.xipki.commons.security.bcbugfix;
 
-import java.io.IOException;
-
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.bsi.BSIObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Signer;
-import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.crypto.digests.SHA224Digest;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.digests.SHA384Digest;
-import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.signers.DSADigestSigner;
 import org.bouncycastle.crypto.signers.ECDSASigner;
-import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
+import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.xipki.commons.security.pkcs12.DSAPlainDigestSigner;
+import org.xipki.commons.security.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao
@@ -62,46 +50,27 @@ import org.xipki.commons.security.pkcs12.DSAPlainDigestSigner;
  */
 
 // CHECKSTYLE:SKIP
-public class XipkiECContentVerifierProviderBuilder extends BcContentVerifierProviderBuilder {
+public class XipkiECContentVerifierProviderBuilder extends BcECContentVerifierProviderBuilder {
 
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
     public XipkiECContentVerifierProviderBuilder(
             DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
+        super(digestAlgorithmFinder);
         this.digestAlgorithmFinder = digestAlgorithmFinder;
+        digestProvider = XipkiDigestProvider.INSTANCE;
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId)
         throws OperatorCreationException {
-        boolean plainDsa = true;
-        ASN1ObjectIdentifier oid = sigAlgId.getAlgorithm();
-        Digest dig;
-        if (BSIObjectIdentifiers.ecdsa_plain_SHA1.equals(oid)) {
-            dig = new SHA1Digest();
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA224.equals(oid)) {
-            dig = new SHA224Digest();
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA256.equals(oid)) {
-            dig = new SHA256Digest();
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA384.equals(oid)) {
-            dig = new SHA384Digest();
-        } else if (BSIObjectIdentifiers.ecdsa_plain_SHA512.equals(oid)) {
-            dig = new SHA512Digest();
-        } else {
-            plainDsa = false;
-            AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
-            dig = digestProvider.get(digAlg);
+        boolean plainDsa = AlgorithmUtil.isPlainECDSASigAlg(sigAlgId);
+        if (!plainDsa) {
+            return super.createSigner(sigAlgId);
         }
 
-        if (plainDsa) {
-            return new DSAPlainDigestSigner(new ECDSASigner(), dig);
-        } else {
-            return new DSADigestSigner(new ECDSASigner(), dig);
-        }
-    }
-
-    protected AsymmetricKeyParameter extractKeyParameters(SubjectPublicKeyInfo publicKeyInfo)
-    throws IOException {
-        return PublicKeyFactory.createKey(publicKeyInfo);
+        AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
+        Digest dig = digestProvider.get(digAlg);
+        return new DSAPlainDigestSigner(new ECDSASigner(), dig);
     }
 
 }
