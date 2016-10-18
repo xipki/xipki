@@ -77,10 +77,10 @@ public class P11ProviderTestCmd extends P11SecurityCommandSupport {
                     + "(only applied to RSA key)")
     private Boolean rsaMgf1 = Boolean.FALSE;
 
-    @Option(name = "--ecdsa-plain",
+    @Option(name = "--dsa-plain",
             description = "whether to use the Plain DSA for the POPO computation\n"
                     + "(only applied to ECDSA key)")
-    private Boolean ecdsaPlain = Boolean.FALSE;
+    private Boolean dsaPlain = Boolean.FALSE;
 
     @Override
     protected Object doExecute() throws Exception {
@@ -140,7 +140,7 @@ public class P11ProviderTestCmd extends P11SecurityCommandSupport {
     }
 
     private String getSignatureAlgo(final PublicKey pubKey) throws NoSuchAlgorithmException {
-        SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, ecdsaPlain);
+        SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain);
         AlgorithmIdentifier sigAlgoId = AlgorithmUtil.getSignatureAlgoId(pubKey,
                 HashAlgoType.getNonNullHashAlgoType(hashAlgo), algoControl);
         return AlgorithmUtil.getSignatureAlgoName(sigAlgoId);

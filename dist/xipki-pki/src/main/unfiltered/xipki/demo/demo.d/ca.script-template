@@ -145,7 +145,7 @@ xipki-ca:profile-add \
 ## Create the CSR for the command caqa:check-cert in QA
 if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:req \
-    --hash $HASH \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label RCA1 \
     --out output/RCA1.csr \
@@ -153,7 +153,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --keyusage cRLSign
 } {
   xipki-tk:req-p12 \
-    --hash $HASH \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --p12 output/RCA1.p12 \
     --password 1234 \
     --out output/RCA1.csr \
@@ -246,14 +246,14 @@ xipki-ca:publish-self \
 ## Generate keys and CSR for SubCA1
 if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:req \
-    --hash $HASH \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label SubCA1 \
     --out output/SubCA1.csr \
     --subject "CN=SubCA1,O=xipki,C=DE"
 } {
   xipki-tk:req-p12 \
-    --hash $HASH \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --p12 output/SubCA1.p12 \
     --password 1234 \
     --out output/SubCA1.csr \
@@ -282,7 +282,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 ## Generate keys and CSR for SubCAwithCRL1
 if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:req \
-    --hash $HASH \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label SubCAwithCRL1 --out output/SubCAwithCRL1.csr \
     --subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
@@ -297,7 +297,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
     --keyusage cRLSign
 } {
   xipki-tk:req-p12 \
-    --hash $HASH \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --p12 output/SubCAwithCRL1.p12 \
     --password 1234 \
     --out output/SubCAwithCRL1.csr \
@@ -335,14 +335,14 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 ## Generate keys and CSR for OCSPResponder
 if { $TOKEN_TYPE equals "PKCS11" } {
   xipki-tk:req \
-    --hash $HASH \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --slot $SLOT \
     --label OCSP99 \
     --out output/OCSP99.csr \
     --subject "CN=OCSP99,2.5.4.97=VATDE-123456789,O=xipki,C=DE"
 } {
   xipki-tk:req-p12 \
-    --hash $HASH \
+    --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
     --p12 output/OCSP99.p12 \
     --password 1234 \
     --out output/OCSP99.csr \
