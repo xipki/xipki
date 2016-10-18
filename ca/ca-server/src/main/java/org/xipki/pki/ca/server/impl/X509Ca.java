@@ -1622,6 +1622,9 @@ public class X509Ca {
         OperationExceptionWithIndex exception = null;
 
         for (int i = 0; i < n; i++) {
+            if (exception != null) {
+                break;
+            }
             GrantedCertTemplate gct = gcts.get(i);
             final String certprofileName = gct.certprofile.getName();
             final String subjectText = gct.grantedSubjectText;
@@ -1633,6 +1636,7 @@ public class X509Ca {
                 X509CertificateInfo certInfo = doGenerateCertificate(gct, requestedByRa, requestor,
                     user, false, reqType, transactionId);
                 successful = true;
+                certInfos.add(certInfo);
 
                 if (LOG.isInfoEnabled()) {
                     String prefix = certInfo.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFUL";
@@ -1642,7 +1646,6 @@ public class X509Ca {
                         prefix, caInfo.getName(), certprofileName, cert.getSubject(),
                         LogUtil.formatCsn(cert.getCert().getSerialNumber()));
                 }
-                certInfos.add(certInfo);
             } catch (OperationException ex) {
                 exception = new OperationExceptionWithIndex(i, ex);
             } catch (Throwable th) {
@@ -1670,6 +1673,7 @@ public class X509Ca {
             }
 
             LogUtil.warn(LOG, exception);
+            throw exception;
         }
 
         return certInfos;
