@@ -2497,11 +2497,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return null;
         }
 
-        if (encodedCsr == null) {
-            System.err.println("encodedCsr is null");
-            return null;
-        }
-
         CertificationRequest csr;
         try {
             csr = CertificationRequest.getInstance(encodedCsr);
