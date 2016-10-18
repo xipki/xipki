@@ -104,10 +104,9 @@ public abstract class XipkiCommandSupport implements Action {
                     if ("yes".equalsIgnoreCase(answer)) {
                         break;
                     } else if ("no".equalsIgnoreCase(answer)) {
-                        readPrompt("Enter name of file to save to ... ");
-                        String newFn = null;
+                        String newFn;
                         while (true) {
-                            newFn = session.readLine(null, null);
+                            newFn = readPrompt("Enter name of file to save to ... ");
                             if (!newFn.trim().isEmpty()) {
                                 break;
                             }
