@@ -447,12 +447,12 @@ public class AlgorithmUtil {
             SignatureAlgoControl algoControl = signerConf.getSignatureAlgoControl();
             HashAlgoType hashAlgo = signerConf.getHashAlgo();
             boolean rsaMgf1 = (algoControl == null) ? false : algoControl.isRsaMgf1();
-            boolean ecdsaPlain = (algoControl == null) ? false : algoControl.isEcdsaPlain();
+            boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
 
             if (pubKey instanceof RSAPublicKey) {
                 return getRSASignatureAlgoId(hashAlgo, rsaMgf1);
             } else if (pubKey instanceof ECPublicKey) {
-                return getECDSASignatureAlgoId(hashAlgo, ecdsaPlain);
+                return getECDSASignatureAlgoId(hashAlgo, dsaPlain);
             } else if (pubKey instanceof DSAPublicKey) {
                 return getDSASignatureAlgoId(hashAlgo);
             } else {
@@ -467,12 +467,12 @@ public class AlgorithmUtil {
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         boolean rsaMgf1 = (algoControl == null) ? false : algoControl.isRsaMgf1();
-        boolean ecdsaPlain = (algoControl == null) ? false : algoControl.isEcdsaPlain();
+        boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
 
         if (pubKey instanceof RSAPublicKey) {
             return getRSASignatureAlgoId(hashAlgo, rsaMgf1);
         } else if (pubKey instanceof ECPublicKey) {
-            return getECDSASignatureAlgoId(hashAlgo, ecdsaPlain);
+            return getECDSASignatureAlgoId(hashAlgo, dsaPlain);
         } else if (pubKey instanceof DSAPublicKey) {
             return getDSASignatureAlgoId(hashAlgo);
         } else {

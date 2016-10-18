@@ -43,24 +43,24 @@ public class SignatureAlgoControl {
 
     private final boolean rsaMgf1;
 
-    private final boolean ecdsaPlain;
+    private final boolean dsaPlain;
 
     public SignatureAlgoControl() {
         this.rsaMgf1 = false;
-        this.ecdsaPlain = false;
+        this.dsaPlain = false;
     }
 
-    public SignatureAlgoControl(final boolean rsaMgf1, final boolean ecdsaPlain) {
+    public SignatureAlgoControl(final boolean rsaMgf1, final boolean dsaPlain) {
         this.rsaMgf1 = rsaMgf1;
-        this.ecdsaPlain = ecdsaPlain;
+        this.dsaPlain = dsaPlain;
     }
 
     public boolean isRsaMgf1() {
         return rsaMgf1;
     }
 
-    public boolean isEcdsaPlain() {
-        return ecdsaPlain;
+    public boolean isDsaPlain() {
+        return dsaPlain;
     }
 
 }
