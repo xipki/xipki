@@ -34,8 +34,16 @@
 
 package org.xipki.commons.security.bcbugfix;
 
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.Signer;
+import org.bouncycastle.crypto.signers.RSADigestSigner;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
+import org.xipki.commons.security.exception.XiSecurityException;
+import org.xipki.commons.security.util.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -44,11 +52,29 @@ import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 
 // CHECKSTYLE:SKIP
 public class XipkiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierProviderBuilder {
+    private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
     public XipkiRSAContentVerifierProviderBuilder(
             DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
         super(digestAlgorithmFinder);
+        this.digestAlgorithmFinder = digestAlgorithmFinder;
         digestProvider = XipkiDigestProvider.INSTANCE;
+    }
+
+    @Override
+    protected Signer createSigner(AlgorithmIdentifier sigAlgId) throws OperatorCreationException {
+        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
+            try {
+                return SignerUtil.createPSSRSASigner(sigAlgId);
+            } catch (XiSecurityException ex) {
+                throw new OperatorCreationException(ex.getMessage(), ex);
+            }
+        } else {
+            AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
+            Digest dig = digestProvider.get(digAlg);
+
+            return new RSADigestSigner(dig);
+        }
     }
 
 }
