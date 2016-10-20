@@ -18,7 +18,7 @@
     <postgresql.version>9.4.1211</postgresql.version>
     <h2-jdbc.version>1.4.192</h2-jdbc.version>
     <hsqldb.version>2.3.4</hsqldb.version>
-    <mariadb.version>1.5.3</mariadb.version>
+    <mariadb.version>1.5.4</mariadb.version>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
   </properties>
