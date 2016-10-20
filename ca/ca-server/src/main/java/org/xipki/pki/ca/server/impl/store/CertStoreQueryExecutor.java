@@ -1727,7 +1727,7 @@ class CertStoreQueryExecutor {
         byte[] encodedCert = caCert.getEncodedCert();
         Integer caId = caInfoStore.getCaIdForCert(encodedCert);
         if (caId == null) {
-            return CertStatus.Unknown;
+            return CertStatus.UNKNOWN;
         }
 
         final String sql = datasource.buildSelectFirstSql(
@@ -1741,9 +1741,9 @@ class CertStoreQueryExecutor {
             ps.setInt(idx++, caId);
             rs = ps.executeQuery();
             if (!rs.next()) {
-                return CertStatus.Unknown;
+                return CertStatus.UNKNOWN;
             }
-            return rs.getBoolean("REV") ? CertStatus.Revoked : CertStatus.Good;
+            return rs.getBoolean("REV") ? CertStatus.REVOKED : CertStatus.GOOD;
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
         } finally {

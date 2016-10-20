@@ -336,7 +336,7 @@ public class CertificateStore {
             LOG.error("queryExecutor.getCertStatusForSubject. DataAccessException: {}",
                     ex.getMessage());
             LOG.debug("queryExecutor.getCertStatusForSubject", ex);
-            return CertStatus.Unknown;
+            return CertStatus.UNKNOWN;
         }
     }
 
@@ -345,7 +345,7 @@ public class CertificateStore {
             return queryExecutor.getCertStatusForSubject(caCert, subject);
         } catch (DataAccessException ex) {
             LogUtil.error(LOG, ex, "queryExecutor.getCertStatusForSubject");
-            return CertStatus.Unknown;
+            return CertStatus.UNKNOWN;
         }
     }
 

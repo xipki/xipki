@@ -472,8 +472,8 @@ class CaManagerQueryExecutor {
         final String sql = "NAME,ART,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
                 + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT"
                 + ",SAVE_REQ,PERMISSIONS,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,EXPIRATION_PERIOD,REV,RR"
-                + ",RT,RIT,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS"
-                + ",EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?";
+                + ",RT,RIT,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,EXTRA_CONTROL"
+                + ",SIGNER_CONF FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -487,8 +487,7 @@ class CaManagerQueryExecutor {
 
             int artCode = rs.getInt("ART");
             if (artCode != CertArt.X509PKC.getCode()) {
-                throw new CaMgmtException(
-                        "CA " + name + " is not X509CA, and is not supported");
+                throw new CaMgmtException("CA " + name + " is not X509CA, and is not supported");
             }
 
             String crlUris = rs.getString("CRL_URIS");
@@ -801,9 +800,7 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, entry.getValidityMode().name());
             ps.setString(idx++, entry.getExtraControl());
             ps.setString(idx++, entry.getSignerConf());
-
             ps.executeUpdate();
-
             if (LOG.isInfoEnabled()) {
                 LOG.info("add CA '{}': {}", name, entry.toString(false, true));
             }
@@ -822,7 +819,6 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonNull("caName", caName);
 
         final String sql = "INSERT INTO CAALIAS (NAME,CA_NAME) VALUES (?,?)";
-
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
@@ -851,9 +847,7 @@ class CaManagerQueryExecutor {
             ps.setString(3, dbEntry.getType());
             String conf = dbEntry.getConf();
             ps.setString(4, conf);
-
             ps.executeUpdate();
-
             LOG.info("added profile '{}': {}", name, dbEntry);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
@@ -890,7 +884,6 @@ class CaManagerQueryExecutor {
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, dbEntry.getConf());
@@ -1054,7 +1047,6 @@ class CaManagerQueryExecutor {
             ps.setString(2, dbEntry.getType());
             String conf = dbEntry.getConf();
             ps.setString(3, conf);
-
             ps.executeUpdate();
             LOG.info("added publisher '{}': {}", name, dbEntry);
         } catch (SQLException ex) {
@@ -1471,7 +1463,6 @@ class CaManagerQueryExecutor {
             ps.setString(1, conf);
             ps.setString(2, name);
             ps.executeUpdate();
-
             LOG.info("changed CMP control '{}': {}", name, conf);
             return cmpControl;
         } catch (SQLException ex) {
@@ -1835,8 +1826,9 @@ class CaManagerQueryExecutor {
             ps.setString(index.get(), caName);
             ps.executeUpdate();
 
-            if (sb.length() > 0) {
-                sb.deleteCharAt(sb.length() - 1).deleteCharAt(sb.length() - 1);
+            final int sbLen = sb.length();
+            if (sbLen > 0) {
+                sb.delete(sbLen - 2, sbLen);
             }
             LOG.info("changed CMP responder: {}", sb);
             return scep;
@@ -2103,7 +2095,6 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, b64Cert);
             ps.setString(idx++, dbEntry.getConf());
             ps.executeUpdate();
-
             LOG.info("changed responder: {}", dbEntry.toString(false, true));
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);

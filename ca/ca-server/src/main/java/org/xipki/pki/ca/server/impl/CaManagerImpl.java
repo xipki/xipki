@@ -867,7 +867,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         x509cas.put(caName, ca);
-
         X509CaCmpResponder caResponder = new X509CaCmpResponder(this, caName);
         x509Responders.put(caName, caResponder);
 
@@ -1288,11 +1287,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         if (caEntry instanceof X509CaEntry) {
-            X509CaEntry tmpCaEntry = (X509CaEntry) caEntry;
-
-            ConcurrentContentSigner signer;
             try {
+                X509CaEntry tmpCaEntry = (X509CaEntry) caEntry;
                 List<String[]> signerConfs = CaEntry.splitCaSignerConfs(tmpCaEntry.getSignerConf());
+                ConcurrentContentSigner signer;
                 for (String[] m : signerConfs) {
                     SignerConf signerConf = new SignerConf(m[1]);
                     signer = securityFactory.createSigner(tmpCaEntry.getSignerType(), signerConf,
@@ -2853,21 +2851,19 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         String passwordHint = pairs.getValue("password");
         String keyLabel = pairs.getValue("key-label");
 
-        byte[] keystoreBytes;
+        byte[] ksBytes;
         if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
             String keystoreFile = keystoreConf.substring("file:".length());
-            keystoreBytes = IoUtil.read(keystoreFile);
+            ksBytes = IoUtil.read(keystoreFile);
         } else if (StringUtil.startsWithIgnoreCase(keystoreConf, "base64:")) {
-            keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
+            ksBytes = Base64.decode(keystoreConf.substring("base64:".length()));
         } else {
             return signerConf;
         }
 
-        keystoreBytes = securityFactory.extractMinimalKeyStore(keystoreType,
-                keystoreBytes, keyLabel,
+        ksBytes = securityFactory.extractMinimalKeyStore(keystoreType, ksBytes, keyLabel,
                 securityFactory.getPasswordResolver().resolvePassword(passwordHint), certChain);
-
-        pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
+        pairs.putPair("keystore", "base64:" + Base64.toBase64String(ksBytes));
         return pairs.getEncoded();
     } // method canonicalizeSignerConf
 

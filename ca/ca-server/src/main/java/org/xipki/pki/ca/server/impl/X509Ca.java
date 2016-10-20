@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ca.server.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
@@ -89,10 +88,11 @@ import org.bouncycastle.asn1.x509.ReasonFlags;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CRLHolder;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.jcajce.provider.asymmetric.x509.CertificateFactory;
 import org.bouncycastle.jce.provider.X509CRLObject;
+import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
@@ -453,8 +453,6 @@ public class X509Ca {
 
     private static final Logger LOG = LoggerFactory.getLogger(X509Ca.class);
 
-    private final CertificateFactory cf;
-
     private final X509CaInfo caInfo;
 
     private final CertificateStore certstore;
@@ -506,7 +504,6 @@ public class X509Ca {
             }
         }
 
-        this.cf = new CertificateFactory();
         if (!masterMode) {
             return;
         }
@@ -1723,13 +1720,14 @@ public class X509Ca {
                     }
                 }
 
-                Certificate bcCert;
+                X509CertificateHolder certHolder;
                 try {
-                    bcCert = gct.signer.build(certBuilder).toASN1Structure();
+                    certHolder = gct.signer.build(certBuilder);
                 } catch (NoIdleSignerException ex) {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
                 }
 
+                Certificate bcCert = certHolder.toASN1Structure();
                 byte[] encodedCert = bcCert.getEncoded();
                 int maxCertSize = gct.certprofile.getMaxCertSize();
                 if (maxCertSize > 0) {
@@ -1741,15 +1739,13 @@ public class X509Ca {
                     }
                 }
 
-                X509Certificate cert = (X509Certificate) cf.engineGenerateCertificate(
-                        new ByteArrayInputStream(encodedCert));
+                X509CertificateObject cert = new X509CertificateObject(bcCert);
                 if (!verifySignature(cert)) {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                             "could not verify the signature of generated certificate");
                 }
 
                 X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
-
                 ret = new X509CertificateInfo(certWithMeta, caInfo.getCertificate(),
                         gct.grantedPublicKeyData, gct.certprofile.getName());
                 ret.setUser(user);
@@ -2008,9 +2004,9 @@ public class X509Ca {
         if (keyUpdate) {
             CertStatus certStatus = certstore.getCertStatusForSubject(caInfo.getCertificate(),
                     grantedSubject);
-            if (certStatus == CertStatus.Revoked) {
+            if (certStatus == CertStatus.REVOKED) {
                 throw new OperationException(ErrorCode.CERT_REVOKED);
-            } else if (certStatus == CertStatus.Unknown) {
+            } else if (certStatus == CertStatus.UNKNOWN) {
                 throw new OperationException(ErrorCode.UNKNOWN_CERT);
             }
         } else {

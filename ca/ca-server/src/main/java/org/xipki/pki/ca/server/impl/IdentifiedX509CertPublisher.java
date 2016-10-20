@@ -64,7 +64,7 @@ class IdentifiedX509CertPublisher {
     IdentifiedX509CertPublisher(final PublisherEntry entry, final X509CertPublisher certPublisher) {
         this.entry = ParamUtil.requireNonNull("entry", entry);
         this.certPublisher = ParamUtil.requireNonNull("certPublisher", certPublisher);
-    } // constructor
+    }
 
     public void initialize(final PasswordResolver passwordResolver,
             final Map<String, DataSourceWrapper> datasources) throws CertPublisherException {
