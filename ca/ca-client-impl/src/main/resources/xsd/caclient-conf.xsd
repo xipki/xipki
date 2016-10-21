@@ -57,6 +57,13 @@
     <xs:all>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="signatureAlgos">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="signatureAlgo" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
     </xs:all>
   </xs:complexType>
   <xs:complexType name="CAType">

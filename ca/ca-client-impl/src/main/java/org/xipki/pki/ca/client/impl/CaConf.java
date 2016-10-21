@@ -68,14 +68,14 @@ class CaConf {
 
     private X509Certificate cert;
 
-    private final X509Certificate responder;
+    private final CmpResponder responder;
 
     private X500Name subject;
 
     private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
     CaConf(final String name, final String url, final String healthUrl, final String requestorName,
-            final X509Certificate responder) {
+            final CmpResponder responder) {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.url = ParamUtil.requireNonBlank("url", url);
         this.requestorName = ParamUtil.requireNonNull("requestorName", requestorName);
@@ -138,7 +138,7 @@ class CaConf {
         return cert != null;
     }
 
-    public X509Certificate getResponder() {
+    public CmpResponder getResponder() {
         return responder;
     }
 
