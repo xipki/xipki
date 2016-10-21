@@ -117,7 +117,7 @@ xipki-ca:responder-add \
   --name responder1 \
   --signer-type PKCS12 \
   --signer-conf password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,\
-keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA256withRSA
+keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=REPLACEME-CMP_SIGALGO
 
 # CMP Requestors
 xipki-ca:requestor-add \

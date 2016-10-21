@@ -20,7 +20,7 @@
       <type>PKCS12</type>
       <!-- encrypted password 1234 -->
       <conf>
-        <value>password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:${security.dir}/tlskeys/tls-server-keystore.p12,algo=SHA256withRSA</value>
+        <value>password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:${security.dir}/tlskeys/tls-server-keystore.p12,algo=REPLACEME-CMP_SIGALGO</value>
       </conf>
     </responder>
   </responders>
