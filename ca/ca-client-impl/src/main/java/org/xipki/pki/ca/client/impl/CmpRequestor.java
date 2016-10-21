@@ -447,9 +447,9 @@ abstract class CmpRequestor {
             } catch (NoSuchAlgorithmException ex) {
                 algoName = protectionAlgo.getAlgorithm().getId();
             }
-            LOG.warn("tid={}: not trusted protection algorithm '{}'", tid, algoName);
-            return new ProtectionVerificationResult(null,
-                    ProtectionResult.SIGALGO_FORBIDDEN);
+            LOG.warn("tid={}: response protected by untrusted protection algorithm '{}'", tid,
+                    algoName);
+            return new ProtectionVerificationResult(null, ProtectionResult.INVALID);
         }
 
         X509Certificate cert = responder.getCert();
