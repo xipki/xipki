@@ -27,7 +27,7 @@ echo "#################################################################"
 # The popo.algo ${HASH}withRSA is for the enrollment of SCEP responder certificates
 xipki-ca:cmpcontrol-add \
   --name cmpcontrol1 \
-  --conf send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=$SIGALGO:${HASH}withRSA
+  --conf send.ca=true,messageTime.bias=300,group.enroll=true,protection.sigalgo=REPLACEME-CMP_SIGALGO,popo.sigalgo=$SIGALGO:${HASH}withRSA
 
 ## Certificate Profiles
 xipki-ca:profile-add \

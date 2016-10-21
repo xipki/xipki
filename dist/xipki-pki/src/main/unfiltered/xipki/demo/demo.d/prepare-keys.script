@@ -36,6 +36,12 @@ if { $SIG_TYPE equals "DSA" } {
   SIGALGO = "${HASH}withDSA"
 }
 
+if { $SIG_TYPE equals "RSAPSS" } {
+  CMP_SIGALGO = "${HASH}withRSAandMGF1"
+} {
+  CMP_SIGALGO = "${HASH}withRSA"
+}
+
 xipki-cmd:copy-dir xipki/demo/p12/shared output
 
 xipki-cmd:copy-dir xipki/demo/p12/$KEY_TYPE output

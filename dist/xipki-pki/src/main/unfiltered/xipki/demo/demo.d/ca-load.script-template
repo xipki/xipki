@@ -56,6 +56,11 @@ xipki-cmd:copy-file \
   xipki/demo/demo.d/RCA.xml
 
 xipki-cmd:replace \
+  --old "REPLACEME-CMP_SIGALGO" \
+  --new "$CMP_SIGALGO" \
+  xipki/demo/demo.d/RCA.xml
+
+xipki-cmd:replace \
   --old "REPLACEME-TOKEN_TYPE" \
   --new "$TOKEN_TYPE" \
   xipki/demo/demo.d/RCA.xml

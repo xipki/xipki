@@ -110,6 +110,17 @@ if { $printUsage equals "true" } {
     --new "$SIGALGO" \
     xipki/ocsp-config/ocsp-responder.xml
 
+  ## CA client configuration
+  xipki-cmd:copy-file \
+    -f \
+    xipki/client-config/ca-client.xml-template \
+    xipki/client-config/ca-client.xml
+
+  xipki-cmd:replace \
+    --old "REPLACEME-CMP_SIGALGO" \
+    --new "$CMP_SIGALGO" \
+    xipki/client-config/ca-client.xml
+
   ## Prepare scripts
   xipki-cmd:copy-file \
     -f \
@@ -130,6 +141,11 @@ if { $printUsage equals "true" } {
     -f \
     xipki/demo/demo.d/ra.script-template \
     xipki/demo/demo.d/ra.script
+
+  xipki-cmd:replace \
+    --old "REPLACEME-CMP_SIGALGO" \
+    --new "$CMP_SIGALGO" \
+    xipki/demo/demo.d/ca.script
 
   dsaPlain = ""
 
