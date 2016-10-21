@@ -92,6 +92,8 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.XmlUtil;
+import org.xipki.commons.security.AlgorithmValidator;
+import org.xipki.commons.security.CollectionAlgorithmValidator;
 import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.SecurityFactory;
 import org.xipki.commons.security.SignerConf;
@@ -293,7 +295,7 @@ public final class CaClientImpl implements CaClient {
         boolean devMode = bo != null && bo.booleanValue();
 
         // responders
-        Map<String, X509Certificate> responders = new HashMap<>();
+        Map<String, CmpResponder> responders = new HashMap<>();
         for (ResponderType m : config.getResponders().getResponder()) {
             X509Certificate cert;
             try {
@@ -302,7 +304,19 @@ public final class CaClientImpl implements CaClient {
                 LogUtil.error(LOG, ex, "could not configure responder " + m.getName());
                 throw new CaClientException(ex.getMessage(), ex);
             }
-            responders.put(m.getName(), cert);
+
+            Set<String> algoNames = new HashSet<>();
+            for (String algo : m.getSignatureAlgos().getSignatureAlgo()) {
+                algoNames.add(algo);
+            }
+            AlgorithmValidator sigAlgoValidator;
+            try {
+                sigAlgoValidator = new CollectionAlgorithmValidator(algoNames);
+            } catch (NoSuchAlgorithmException ex) {
+                throw new CaClientException(ex.getMessage());
+            }
+
+            responders.put(m.getName(), new CmpResponder(cert, sigAlgoValidator));
         }
 
         // CA
@@ -318,7 +332,7 @@ public final class CaClientImpl implements CaClient {
             String caName = caType.getName();
             try {
                 // responder
-                X509Certificate responder = responders.get(caType.getResponder());
+                CmpResponder responder = responders.get(caType.getResponder());
                 if (responder == null) {
                     throw new CaClientException("no responder named " + caType.getResponder()
                             + " is configured");

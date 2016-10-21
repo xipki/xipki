@@ -155,15 +155,15 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
     private boolean implicitConfirm = true;
 
-    X509CmpRequestor(final X509Certificate requestorCert, final X509Certificate responderCert,
+    X509CmpRequestor(final X509Certificate requestorCert, final CmpResponder responder,
             final SecurityFactory securityFactory) {
-        super(requestorCert, responderCert, securityFactory);
+        super(requestorCert, responder, securityFactory);
         xmlDocBuilder = newDocumentBuilder();
     }
 
-    X509CmpRequestor(final ConcurrentContentSigner requestor, final X509Certificate responderCert,
+    X509CmpRequestor(final ConcurrentContentSigner requestor, final CmpResponder responder,
             final SecurityFactory securityFactory, final boolean signRequest) {
-        super(requestor, responderCert, securityFactory, signRequest);
+        super(requestor, responder, securityFactory, signRequest);
         xmlDocBuilder = newDocumentBuilder();
     }
 

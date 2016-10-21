@@ -36,6 +36,7 @@ package org.xipki.pki.ca.client.impl;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,6 +63,7 @@ import org.bouncycastle.asn1.cmp.PKIHeader;
 import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
@@ -80,6 +82,7 @@ import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.SecurityFactory;
 import org.xipki.commons.security.exception.NoIdleSignerException;
+import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.commons.security.util.CmpFailureUtil;
 import org.xipki.pki.ca.client.api.PkiErrorException;
 import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
@@ -93,7 +96,7 @@ import org.xipki.pki.ca.common.cmp.ProtectionVerificationResult;
  * @since 2.0.0
  */
 
-public abstract class CmpRequestor {
+abstract class CmpRequestor {
 
     private static final Logger LOG = LoggerFactory.getLogger(CmpRequestor.class);
 
@@ -107,7 +110,7 @@ public abstract class CmpRequestor {
 
     private final GeneralName sender;
 
-    private final X509Certificate responderCert;
+    private final CmpResponder responder;
 
     private final GeneralName recipient;
 
@@ -115,10 +118,10 @@ public abstract class CmpRequestor {
 
     private boolean sendRequestorCert;
 
-    public CmpRequestor(final X509Certificate requestorCert, final X509Certificate responderCert,
+    public CmpRequestor(final X509Certificate requestorCert, final CmpResponder responder,
             final SecurityFactory securityFactory) {
         ParamUtil.requireNonNull("requestorCert", requestorCert);
-        this.responderCert = ParamUtil.requireNonNull("responderCert", responderCert);
+        this.responder = ParamUtil.requireNonNull("responder", responder);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.requestor = null;
         this.signRequest = false;
@@ -128,23 +131,23 @@ public abstract class CmpRequestor {
         this.sender = new GeneralName(x500Name);
 
         X500Name subject = X500Name.getInstance(
-                responderCert.getSubjectX500Principal().getEncoded());
+                responder.getCert().getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
         this.recipientName = subject;
     }
 
     public CmpRequestor(final ConcurrentContentSigner requestor,
-            final X509Certificate responderCert, final SecurityFactory securityFactory) {
-        this(requestor, responderCert, securityFactory, true);
+            final CmpResponder responder, final SecurityFactory securityFactory) {
+        this(requestor, responder, securityFactory, true);
     }
 
-    public CmpRequestor(ConcurrentContentSigner requestor, final X509Certificate responderCert,
+    public CmpRequestor(ConcurrentContentSigner requestor, final CmpResponder responder,
             final SecurityFactory securityFactory, final boolean signRequest) {
         this.requestor = ParamUtil.requireNonNull("requestor", requestor);
         if (requestor.getCertificate() == null) {
             throw new IllegalArgumentException("requestor without certifiate is not allowed");
         }
-        this.responderCert = ParamUtil.requireNonNull("responderCert", responderCert);
+        this.responder = ParamUtil.requireNonNull("responder", responder);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.signRequest = signRequest;
 
@@ -153,7 +156,7 @@ public abstract class CmpRequestor {
         this.sender = new GeneralName(x500Name);
 
         X500Name subject = X500Name.getInstance(
-                responderCert.getSubjectX500Principal().getEncoded());
+                responder.getCert().getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
         this.recipientName = subject;
     }
@@ -226,7 +229,7 @@ public abstract class CmpRequestor {
         if (response.hasProtection()) {
             try {
                 ProtectionVerificationResult verifyProtection = verifyProtection(
-                        Hex.toHexString(tid.getOctets()), response, responderCert);
+                        Hex.toHexString(tid.getOctets()), response);
                 ret.setProtectionVerificationResult(verifyProtection);
             } catch (InvalidKeyException | OperatorCreationException | CMPException ex) {
                 throw new CmpRequestorException(ex.getMessage(), ex);
@@ -408,7 +411,7 @@ public abstract class CmpRequestor {
     }
 
     private ProtectionVerificationResult verifyProtection(final String tid,
-            final GeneralPKIMessage pkiMessage, final X509Certificate cert)
+            final GeneralPKIMessage pkiMessage)
     throws CMPException, InvalidKeyException, OperatorCreationException {
         ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
@@ -436,6 +439,20 @@ public abstract class CmpRequestor {
             }
         }
 
+        AlgorithmIdentifier protectionAlgo = protectedMsg.getHeader().getProtectionAlg();
+        if (!responder.getSigAlgoValidator().isAlgorithmPermitted(protectionAlgo)) {
+            String algoName;
+            try {
+                algoName = AlgorithmUtil.getSignatureAlgoName(protectionAlgo);
+            } catch (NoSuchAlgorithmException ex) {
+                algoName = protectionAlgo.getAlgorithm().getId();
+            }
+            LOG.warn("tid={}: not trusted protection algorithm '{}'", tid, algoName);
+            return new ProtectionVerificationResult(null,
+                    ProtectionResult.SIGALGO_FORBIDDEN);
+        }
+
+        X509Certificate cert = responder.getCert();
         ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(cert);
         if (verifierProvider == null) {
             LOG.warn("tid={}: not authorized responder '{}'", tid, header.getSender());

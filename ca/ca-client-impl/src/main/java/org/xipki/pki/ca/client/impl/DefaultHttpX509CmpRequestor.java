@@ -61,9 +61,9 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
     private final URL serverUrl;
 
     DefaultHttpX509CmpRequestor(final X509Certificate requestorCert,
-            final X509Certificate responderCert, final String serverUrl,
+            final CmpResponder responder, final String serverUrl,
             final SecurityFactory securityFactory) {
-        super(requestorCert, responderCert, securityFactory);
+        super(requestorCert, responder, securityFactory);
         ParamUtil.requireNonBlank("serverUrl", serverUrl);
 
         try {
@@ -74,9 +74,9 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
     }
 
     DefaultHttpX509CmpRequestor(final ConcurrentContentSigner requestor,
-            final X509Certificate responderCert, final String serverUrl,
+            final CmpResponder responder, final String serverUrl,
             final SecurityFactory securityFactory, final boolean signRequest) {
-        super(requestor, responderCert, securityFactory, signRequest);
+        super(requestor, responder, securityFactory, signRequest);
         ParamUtil.requireNonBlank("serverUrl", serverUrl);
 
         try {

@@ -22,6 +22,9 @@
       <cert>
         <file>xipki/security/tlskeys/tls-server.der</file>
       </cert>
+      <signatureAlgos>
+        <signatureAlgo>REPLACEME-CMP_SIGALGO</signatureAlgo>
+      </signatureAlgos>
     </responder>
   </responders>
   <CAs>
