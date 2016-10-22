@@ -25,8 +25,10 @@
               <xs:annotation>
                 <xs:documentation>
                   Signature algorithm name. Algorithms supported by the CA are
-                  SHA*withECDSA, SHA*withDSA, SHA*withRSA, SHA*withRSAandMGF1, SHA*withPlainECDSA"
-                  where * is for 1, 224, 256, 384 and 512.
+                  SHA*withECDSA, SHA*withDSA, SHA*withRSA, SHA*withRSAandMGF1, SHA*withPlainECDSA
+                  where * is for 1, 224, 256, 384 and 512,
+                  and SHA3-*withECDSA, SHA3-*withDSA, SHA3-*withRSA, SHA3-*withRSAandMGF1
+                  where * is for 224, 256, 384 and 512.
                 </xs:documentation>
               </xs:annotation>
             </xs:element>
