@@ -47,7 +47,7 @@ import java.util.Objects;
  * @since 2.0.0
  */
 
-public class AuditEvent {
+public class AuditEvent implements AuditEventInterface {
 
     /**
      * The name of the application the event belongs to.
@@ -89,6 +89,7 @@ public class AuditEvent {
         return level;
     }
 
+    @Override
     public void setLevel(final AuditLevel level) {
         this.level = level;
     }
@@ -114,10 +115,22 @@ public class AuditEvent {
         return timestamp;
     }
 
+    @Override
     public List<AuditEventData> getEventDatas() {
         return Collections.unmodifiableList(eventDatas);
     }
 
+    @Override
+    public AuditEventData addEventType(String type) {
+        return addEventData("eventType", type);
+    }
+
+    @Override
+    public AuditEventData addEventData(String name, String value) {
+        return addEventData(new AuditEventData(name, value));
+    }
+
+    @Override
     public AuditEventData addEventData(final AuditEventData eventData) {
         Objects.requireNonNull(eventData, "eventData must not be null");
 
@@ -143,6 +156,34 @@ public class AuditEvent {
         return ret;
     }
 
+    @Override
+    public boolean removeEventData(String eventDataName) {
+        Objects.requireNonNull(eventDataName, "eventDataName must not be null");
+
+        AuditEventData tbr = null;
+        for (AuditEventData ed : eventDatas) {
+            if (ed.getName().equals(eventDataName)) {
+                tbr = ed;
+            }
+        }
+
+        boolean removed = false;
+        if (tbr != null) {
+            eventDatas.remove(tbr);
+            removed = true;
+        }
+
+        for (AuditChildEvent cae : auditChildEvents) {
+            boolean caeRemoved = cae.removeEventData(eventDataName);
+            if (caeRemoved) {
+                removed = true;
+            }
+        }
+
+        return removed;
+    }
+
+    @Override
     public AuditStatus getStatus() {
         return status;
     }

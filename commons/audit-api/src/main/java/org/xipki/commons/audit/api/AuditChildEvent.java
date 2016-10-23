@@ -44,7 +44,7 @@ import java.util.Objects;
  * @since 2.0.0
  */
 
-public class AuditChildEvent {
+public class AuditChildEvent implements AuditEventInterface {
 
     /**
      * The data array belonging to the event.
@@ -66,15 +66,18 @@ public class AuditChildEvent {
         return level;
     }
 
+    @Override
     public void setLevel(final AuditLevel level) {
         this.level = Objects.requireNonNull(level, "level must not be null");
     }
 
+    @Override
     public List<AuditEventData> getEventDatas() {
         return Collections.unmodifiableList(eventDatas);
     }
 
-    public AuditEventData removeEventData(final String eventDataName) {
+    @Override
+    public boolean removeEventData(final String eventDataName) {
         Objects.requireNonNull(eventDataName, "eventDataName must not be null");
 
         AuditEventData tbr = null;
@@ -86,11 +89,23 @@ public class AuditChildEvent {
 
         if (tbr != null) {
             eventDatas.remove(tbr);
+            return true;
         }
 
-        return tbr;
+        return false;
     }
 
+    @Override
+    public AuditEventData addEventType(String type) {
+        return addEventData("eventType", type);
+    }
+
+    @Override
+    public AuditEventData addEventData(String name, String value) {
+        return addEventData(new AuditEventData(name, value));
+    }
+
+    @Override
     public AuditEventData addEventData(final AuditEventData eventData) {
         Objects.requireNonNull(eventData, "eventData must not be null");
 
@@ -111,6 +126,7 @@ public class AuditChildEvent {
         return ret;
     }
 
+    @Override
     public AuditStatus getStatus() {
         return status;
     }
