@@ -56,7 +56,6 @@ import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
@@ -147,8 +146,7 @@ public class HttpCmpServlet extends HttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            auditEvent.addEventData(
-                    new AuditEventData("CA",responder.getCa().getCaInfo().getName()));
+            auditEvent.addEventData("CA",responder.getCa().getCaInfo().getName());
 
             PKIMessage pkiReq;
             try {
@@ -239,7 +237,7 @@ public class HttpCmpServlet extends HttpServlet {
         }
 
         if (auditMessage != null) {
-            auditEvent.addEventData(new AuditEventData("message", auditMessage));
+            auditEvent.addEventData("message", auditMessage);
         }
 
         auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());

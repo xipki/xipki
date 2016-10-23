@@ -52,7 +52,6 @@ import org.bouncycastle.asn1.x509.CertificateList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
@@ -173,9 +172,8 @@ public class HttpRestServlet extends HttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            auditEvent.addEventData(
-                    new AuditEventData("CA", responder.getCa().getCaInfo().getName()));
-            auditEvent.addEventData(new AuditEventData("command", command));
+            auditEvent.addEventData("CA", responder.getCa().getCaInfo().getName());
+            auditEvent.addEventData("command", command);
 
             String respCt = null;
             byte[] respBytes = null;
@@ -266,7 +264,7 @@ public class HttpRestServlet extends HttpServlet {
                         throw new HttpRespAuditException(HttpServletResponse.SC_BAD_REQUEST,
                                 null, message, AuditLevel.INFO, AuditStatus.FAILED);
                     }
-                    auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber.toString()));
+                    auditEvent.addEventData("crlNumber", crlNumber.toString());
                 }
 
                 CertificateList crl = responder.getCrl(clientCert, crlNumber, auditEvent);
@@ -376,7 +374,7 @@ public class HttpRestServlet extends HttpServlet {
             } // end switch (code)
 
             auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(new AuditEventData("message", code.name()));
+            auditEvent.addEventData("message", code.name());
 
             switch (code) {
             case DATABASE_FAILURE:
@@ -446,7 +444,7 @@ public class HttpRestServlet extends HttpServlet {
         }
 
         if (auditMessage != null) {
-            auditEvent.addEventData(new AuditEventData("message", auditMessage));
+            auditEvent.addEventData("message", auditMessage);
         }
 
         auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());

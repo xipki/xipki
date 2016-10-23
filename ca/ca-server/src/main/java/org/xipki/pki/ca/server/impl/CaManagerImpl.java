@@ -85,7 +85,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
@@ -2693,13 +2692,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonBlank("caName", caName);
 
         AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.addEventData(new AuditEventData("eventType", "CAMGMT_CRL_GEN_ONDEMAND"));
+        auditEvent.addEventData("eventType", "CAMGMT_CRL_GEN_ONDEMAND");
         X509Ca ca = getX509Ca(caName);
         try {
             return ca.generateCrlOnDemand(auditEvent);
         } catch (OperationException ex) {
             auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(new AuditEventData("message", ex.getErrorCode().name()));
+            auditEvent.addEventData("message", ex.getErrorCode().name());
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
             auditServiceRegister.getAuditService().logEvent(auditEvent);
@@ -2712,23 +2711,23 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonNull("crlNumber", crlNumber);
 
         AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.addEventData(new AuditEventData("eventType", "CRL_DOWNLOAD_WITH_SN"));
-        auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber.toString()));
+        auditEvent.addEventData("eventType", "CRL_DOWNLOAD_WITH_SN");
+        auditEvent.addEventData("crlNumber", crlNumber.toString());
         X509Ca ca = getX509Ca(caName);
         try {
             CertificateList crl = ca.getCrl(crlNumber);
             if (crl == null) {
-                auditEvent.addEventData(new AuditEventData("message", "found no CRL"));
+                auditEvent.addEventData("message", "found no CRL");
                 return null;
             }
             return new X509CRLObject(crl);
         } catch (OperationException ex) {
             auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(new AuditEventData("message", ex.getErrorCode().name()));
+            auditEvent.addEventData("message", ex.getErrorCode().name());
             throw new CaMgmtException(ex.getMessage(), ex);
         } catch (CRLException ex) {
             auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(new AuditEventData("message", "CRLException"));
+            auditEvent.addEventData("message", "CRLException");
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
             auditServiceRegister.getAuditService().logEvent(auditEvent);
@@ -2740,22 +2739,22 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonBlank("caName", caName);
 
         AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.addEventData(new AuditEventData("eventType", "CAMGMT_CRL_DOWNLOAD"));
+        auditEvent.addEventData("eventType", "CAMGMT_CRL_DOWNLOAD");
         X509Ca ca = getX509Ca(caName);
         try {
             CertificateList crl = ca.getCurrentCrl();
             if (crl == null) {
-                auditEvent.addEventData(new AuditEventData("message", "found no CRL"));
+                auditEvent.addEventData("message", "found no CRL");
                 return null;
             }
             return new X509CRLObject(crl);
         } catch (OperationException ex) {
             auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(new AuditEventData("message", ex.getErrorCode().name()));
+            auditEvent.addEventData("message", ex.getErrorCode().name());
             throw new CaMgmtException(ex.getMessage(), ex);
         } catch (CRLException ex) {
             auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(new AuditEventData("message", "CRLException"));
+            auditEvent.addEventData("message", "CRLException");
             throw new CaMgmtException(ex.getMessage(), ex);
         } finally {
             auditServiceRegister.getAuditService().logEvent(auditEvent);

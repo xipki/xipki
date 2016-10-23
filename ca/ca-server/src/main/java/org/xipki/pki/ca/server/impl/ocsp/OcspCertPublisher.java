@@ -42,7 +42,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
@@ -190,13 +189,13 @@ public class OcspCertPublisher extends X509CertPublisher {
         if (cert instanceof X509CertWithDbId) {
             Long certId = ((X509CertWithDbId) cert).getCertId();
             if (certId != null) {
-                auditEvent.addEventData(new AuditEventData("id", certId.toString()));
+                auditEvent.addEventData("id", certId.toString());
             }
         }
-        auditEvent.addEventData(new AuditEventData("issuer", issuer));
-        auditEvent.addEventData(new AuditEventData("subject", subjectText));
-        auditEvent.addEventData(new AuditEventData("serialNumber", serialText));
-        auditEvent.addEventData(new AuditEventData("message", messagePrefix));
+        auditEvent.addEventData("issuer", issuer);
+        auditEvent.addEventData("subject", subjectText);
+        auditEvent.addEventData("serialNumber", serialText);
+        auditEvent.addEventData("message", messagePrefix);
         auditServiceRegister.getAuditService().logEvent(auditEvent);
     } // method logAndAudit
 

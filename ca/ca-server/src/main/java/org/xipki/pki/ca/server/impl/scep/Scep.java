@@ -69,7 +69,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.ObjectCreationException;
@@ -737,7 +736,7 @@ public class Scep {
     } // method getTransactionIdBytes
 
     private static void audit(final AuditEvent audit, final String name, final String value) {
-        audit.addEventData(new AuditEventData(name, (value == null) ? "null" : value));
+        audit.addEventData(name, (value == null) ? "null" : value);
     } // method audit
 
 }

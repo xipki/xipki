@@ -96,7 +96,6 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
@@ -224,10 +223,10 @@ public class X509Ca {
             } finally {
                 AuditEvent auditEvent = newAuditEvent();
                 auditEvent.setDuration(System.currentTimeMillis() - startTime);
-                auditEvent.addEventData(new AuditEventData("CA", caInfo.getName()));
-                auditEvent.addEventData(new AuditEventData("expiredAt", expiredAt.toString()));
-                auditEvent.addEventData(new AuditEventData("eventType", "REMOVE_EXPIRED_CERTS"));
-                auditEvent.addEventData(new AuditEventData("numCerts", Integer.toString(num)));
+                auditEvent.addEventData("CA", caInfo.getName());
+                auditEvent.addEventData("expiredAt", expiredAt.toString());
+                auditEvent.addEventData("eventType", "REMOVE_EXPIRED_CERTS");
+                auditEvent.addEventData("numCerts", Integer.toString(num));
 
                 if (successful) {
                     auditEvent.setLevel(AuditLevel.INFO);
@@ -377,7 +376,7 @@ public class X509Ca {
             AuditEvent auditEvent = new AuditEvent(start);
             auditEvent.setApplicationName("CA");
             auditEvent.setName("PERF");
-            auditEvent.addEventData(new AuditEventData("eventType", "CRL_GEN_INTERVAL"));
+            auditEvent.addEventData("eventType", "CRL_GEN_INTERVAL");
 
             try {
                 long maxIdOfDeltaCrlCache = certstore.getMaxIdOfDeltaCrlCache(
@@ -675,13 +674,13 @@ public class X509Ca {
         final String caName = caInfo.getName();
         LOG.info("     START generateCrl: ca={}, deltaCRL={}, nextUpdate={}", caName, deltaCrl,
                 nextUpdate);
-        auditEvent.addEventData(new AuditEventData("crlType", deltaCrl ? "DELTA_CRL" : "FULL_CRL"));
+        auditEvent.addEventData("crlType", deltaCrl ? "DELTA_CRL" : "FULL_CRL");
 
         if (nextUpdate != null) {
             String value = DateUtil.toUtcTimeyyyyMMddhhmmss(nextUpdate);
-            auditEvent.addEventData(new AuditEventData("nextUpdate", value));
+            auditEvent.addEventData("nextUpdate", value);
         } else {
-            auditEvent.addEventData(new AuditEventData("nextUpdate", "NULL"));
+            auditEvent.addEventData("nextUpdate", "NULL");
         }
 
         if (nextUpdate != null) {
@@ -808,7 +807,7 @@ public class X509Ca {
             // end do
 
             BigInteger crlNumber = caInfo.nextCrlNumber();
-            auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber.toString()));
+            auditEvent.addEventData("crlNumber", crlNumber.toString());
 
             boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
             boolean onlyCaCerts = crlControl.isOnlyContainsCaCerts();
@@ -2243,10 +2242,9 @@ public class X509Ca {
                     AuditEvent auditEvent = newAuditEvent();
                     auditEvent.setLevel(removed ? AuditLevel.INFO : AuditLevel.ERROR);
                     auditEvent.setStatus(removed ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED);
-                    auditEvent.addEventData(new AuditEventData("CA", caName));
-                    auditEvent.addEventData(
-                            new AuditEventData("serialNumber", LogUtil.formatCsn(serial)));
-                    auditEvent.addEventData(new AuditEventData("eventType", "REMOVE_EXPIRED_CERT"));
+                    auditEvent.addEventData("CA", caName);
+                    auditEvent.addEventData("serialNumber", LogUtil.formatCsn(serial));
+                    auditEvent.addEventData("eventType", "REMOVE_EXPIRED_CERT");
                     getAuditService().logEvent(auditEvent);
                 } // end finally
             } // end for
@@ -2307,11 +2305,9 @@ public class X509Ca {
                     AuditEvent auditEvent = newAuditEvent();
                     auditEvent.setLevel(revoked ? AuditLevel.INFO : AuditLevel.ERROR);
                     auditEvent.setStatus(revoked ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED);
-                    auditEvent.addEventData(new AuditEventData("CA", caName));
-                    auditEvent.addEventData(
-                            new AuditEventData("serialNumber", LogUtil.formatCsn(serial)));
-                    auditEvent.addEventData(
-                            new AuditEventData("eventType", "REVOKE_SUSPENDED_CERT"));
+                    auditEvent.addEventData("CA", caName);
+                    auditEvent.addEventData("serialNumber", LogUtil.formatCsn(serial));
+                    auditEvent.addEventData("eventType", "REVOKE_SUSPENDED_CERT");
                     getAuditService().logEvent(auditEvent);
                 } // end try
             } // end for

@@ -67,7 +67,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.LogUtil;
@@ -151,7 +150,7 @@ abstract class CmpResponder {
             tid = new DEROctetString(randomBytes);
         }
         String tidStr = Hex.toHexString(tid.getOctets());
-        auditEvent.addEventData(new AuditEventData("tid", tidStr));
+        auditEvent.addEventData("tid", tidStr);
 
         CmpControl cmpControl = getCmpControl();
 
@@ -201,7 +200,7 @@ abstract class CmpResponder {
         if (failureCode != null) {
             auditEvent.setLevel(AuditLevel.INFO);
             auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(new AuditEventData("message", statusText));
+            auditEvent.addEventData("message", statusText);
             return buildErrorPkiMessage(tid, reqHeader, failureCode, statusText);
         }
 
@@ -275,7 +274,7 @@ abstract class CmpResponder {
         if (errorStatus != null) {
             auditEvent.setLevel(AuditLevel.INFO);
             auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(new AuditEventData("message", errorStatus));
+            auditEvent.addEventData("message", errorStatus);
             return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck,
                     errorStatus);
         }
@@ -347,7 +346,7 @@ abstract class CmpResponder {
 
             auditEvent.setLevel(AuditLevel.ERROR);
             auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(new AuditEventData("message", "could not sign the PKIMessage"));
+            auditEvent.addEventData("message", "could not sign the PKIMessage");
             PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status));
             return new PKIMessage(pkiMessage.getHeader(), body);
         }
