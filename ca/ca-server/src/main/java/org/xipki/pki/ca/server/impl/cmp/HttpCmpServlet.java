@@ -40,7 +40,6 @@ import java.io.InputStream;
 import java.net.URLDecoder;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -53,6 +52,7 @@ import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.cmp.PKIHeader;
 import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
@@ -62,6 +62,8 @@ import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.api.RequestType;
+import org.xipki.pki.ca.server.impl.CaAuditConstants;
 import org.xipki.pki.ca.server.impl.ClientCertCache;
 import org.xipki.pki.ca.server.impl.HttpRespAuditException;
 
@@ -92,12 +94,13 @@ public class HttpCmpServlet extends HttpServlet {
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
-        X509Certificate clientCert = ClientCertCache.getTlsClientCert(request,sslCertInHttpHeader);
+        X509Certificate clientCert = ClientCertCache.getTlsClientCert(request, sslCertInHttpHeader);
 
         AuditService auditService = auditServiceRegister.getAuditService();
-        AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.setApplicationName("CA");
-        auditEvent.setName("PERF");
+        AuditEvent event = new AuditEvent(new Date());
+        event.setApplicationName(CaAuditConstants.APPNAME);
+        event.setName(CaAuditConstants.NAME_PERF);
+        event.addEventData(CaAuditConstants.NAME_reqType, RequestType.CMP.name());
 
         AuditLevel auditLevel = AuditLevel.INFO;
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
@@ -146,7 +149,7 @@ public class HttpCmpServlet extends HttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            auditEvent.addEventData("CA",responder.getCa().getCaInfo().getName());
+            event.addEventData("CA", responder.getCa().getCaName());
 
             PKIMessage pkiReq;
             try {
@@ -159,13 +162,15 @@ public class HttpCmpServlet extends HttpServlet {
 
             PKIHeader reqHeader = pkiReq.getHeader();
             ASN1OctetString tid = reqHeader.getTransactionID();
+            String tidStr = Base64.toBase64String(tid.getOctets());
+            event.addEventData(CaAuditConstants.NAME_tid, tidStr);
 
             PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
                     reqHeader.getPvno().getValue().intValue(), reqHeader.getRecipient(),
                     reqHeader.getSender());
             respHeader.setTransactionID(tid);
 
-            PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, auditEvent);
+            PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, tidStr, event);
             response.setContentType(HttpCmpServlet.CT_RESPONSE);
             response.setStatus(HttpServletResponse.SC_OK);
             ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
@@ -194,7 +199,7 @@ public class HttpCmpServlet extends HttpServlet {
             try {
                 response.flushBuffer();
             } finally {
-                audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
+                audit(auditService, event, auditLevel, auditStatus, auditMessage);
             }
         }
     } // method doPost
@@ -240,16 +245,8 @@ public class HttpCmpServlet extends HttpServlet {
             auditEvent.addEventData("message", auditMessage);
         }
 
-        auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
-
-        if (!auditEvent.containsAuditChildEvents()) {
-            auditService.logEvent(auditEvent);
-        } else {
-            List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
-            for (AuditEvent event : expandedAuditEvents) {
-                auditService.logEvent(event);
-            }
-        }
+        auditEvent.finish();
+        auditService.logEvent(auditEvent);
     } // method audit
 
 }

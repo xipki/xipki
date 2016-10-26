@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -61,7 +60,10 @@ import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.RandomUtil;
 import org.xipki.pki.ca.api.OperationException;
+import org.xipki.pki.ca.api.RequestType;
+import org.xipki.pki.ca.server.impl.CaAuditConstants;
 import org.xipki.pki.ca.server.impl.CaManagerImpl;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.scep.exception.MessageDecodingException;
@@ -133,10 +135,14 @@ public class ScepServlet extends HttpServlet {
         }
 
         AuditService auditService = auditServiceRegister.getAuditService();
-        AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.setApplicationName("SCEP");
-        auditEvent.setName("PERF");
-        auditEvent.addEventData("NAME", scepName + "/" + certProfileName);
+        AuditEvent event = new AuditEvent(new Date());
+        event.setApplicationName("SCEP");
+        event.setName(CaAuditConstants.NAME_PERF);
+        event.addEventData(CaAuditConstants.NAME_SCEP_name, scepName + "/" + certProfileName);
+        event.addEventData(CaAuditConstants.NAME_reqType, RequestType.SCEP.name());
+
+        String msgId = RandomUtil.nextHexLong();
+        event.addEventData(CaAuditConstants.NAME_mid, msgId);
 
         AuditLevel auditLevel = AuditLevel.INFO;
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
@@ -172,7 +178,7 @@ public class ScepServlet extends HttpServlet {
             }
 
             String operation = request.getParameter("operation");
-            auditEvent.addEventData("operation", operation);
+            event.addEventData(CaAuditConstants.NAME_SCEP_operation, operation);
 
             if ("PKIOperation".equalsIgnoreCase(operation)) {
                 CMSSignedData reqMessage;
@@ -201,7 +207,7 @@ public class ScepServlet extends HttpServlet {
 
                 ContentInfo ci;
                 try {
-                    ci = responder.servicePkiOperation(reqMessage, certProfileName, auditEvent);
+                    ci = responder.servicePkiOperation(reqMessage, certProfileName, msgId, event);
                 } catch (MessageDecodingException ex) {
                     final String msg = "could not decrypt and/or verify the request";
                     LogUtil.error(LOG, ex, msg);
@@ -277,7 +283,7 @@ public class ScepServlet extends HttpServlet {
             try {
                 response.flushBuffer();
             } finally {
-                audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
+                audit(auditService, event, auditLevel, auditStatus, auditMessage);
             }
         }
     } // method service
@@ -316,16 +322,8 @@ public class ScepServlet extends HttpServlet {
             auditEvent.addEventData("message", auditMessage);
         }
 
-        auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
-
-        if (!auditEvent.containsAuditChildEvents()) {
-            auditService.logEvent(auditEvent);
-        } else {
-            List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
-            for (AuditEvent event : expandedAuditEvents) {
-                auditService.logEvent(event);
-            }
-        }
+        auditEvent.finish();
+        auditService.logEvent(auditEvent);
     } // method audit
 
 }

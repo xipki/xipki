@@ -39,7 +39,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,7 +54,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
@@ -130,21 +128,18 @@ public class HttpOcspServlet extends HttpServlet {
             final HttpServletResponse response, final ResponderAndRelativeUri respAndUri,
             final boolean getMethod) throws ServletException, IOException {
         Responder responder = respAndUri.getResponder();
-        AuditEvent auditEvent = null;
+        AuditEvent event = null;
         AuditLevel auditLevel = AuditLevel.INFO;
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
         String auditMessage = null;
-
-        long start = 0;
 
         AuditService auditService = (auditServiceRegister == null) ? null
                 : auditServiceRegister.getAuditService();
 
         if (responder.getAuditOption() != null) {
-            start = System.currentTimeMillis();
-            auditEvent = new AuditEvent(new Date());
-            auditEvent.setApplicationName("OCSP");
-            auditEvent.setName("PERF");
+            event = new AuditEvent(new Date());
+            event.setApplicationName(OcspAuditConstants.APPNAME);
+            event.setName(OcspAuditConstants.NAME_PERF);
         }
 
         try {
@@ -220,7 +215,7 @@ public class HttpOcspServlet extends HttpServlet {
             response.setContentType(HttpOcspServlet.CT_RESPONSE);
 
             OcspRespWithCacheInfo ocspRespWithCacheInfo =
-                    server.answer(responder, ocspReq, auditEvent, getMethod);
+                    server.answer(responder, ocspReq, getMethod, event);
             if (ocspRespWithCacheInfo == null) {
                 auditMessage = "processRequest returned null, this should not happen";
                 LOG.error(auditMessage);
@@ -304,27 +299,19 @@ public class HttpOcspServlet extends HttpServlet {
                 response.flushBuffer();
             } finally {
                 if (auditLevel != null) {
-                    auditEvent.setLevel(auditLevel);
+                    event.setLevel(auditLevel);
                 }
 
                 if (auditStatus != null) {
-                    auditEvent.setStatus(auditStatus);
+                    event.setStatus(auditStatus);
                 }
 
                 if (auditMessage != null) {
-                    auditEvent.addEventData(new AuditEventData("message", auditMessage));
+                    event.addEventData("message", auditMessage);
                 }
 
-                auditEvent.setDuration(System.currentTimeMillis() - start);
-
-                if (!auditEvent.containsAuditChildEvents()) {
-                    auditService.logEvent(auditEvent);
-                } else {
-                    List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
-                    for (AuditEvent event : expandedAuditEvents) {
-                        auditService.logEvent(event);
-                    }
-                }
+                event.finish();
+                auditService.logEvent(event);
             } // end inner try
         } // end external try
     } // method processRequest

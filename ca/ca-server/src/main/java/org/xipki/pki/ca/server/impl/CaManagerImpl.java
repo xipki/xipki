@@ -181,7 +181,6 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
 public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManager {
 
     private class ScheduledPublishQueueCleaner implements Runnable {
@@ -2234,7 +2233,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         try {
-            ca.revoke(revocationInfo);
+            ca.revokeCa(revocationInfo, CaAuditConstants.MSGID_CA_mgmt);
         } catch (OperationException ex) {
             throw new CaMgmtException("could not revoke CA " + ex.getMessage(), ex);
         }
@@ -2261,7 +2260,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         X509Ca ca = x509cas.get(lcoalCaName);
         try {
-            ca.unrevoke();
+            ca.unrevokeCa(CaAuditConstants.MSGID_CA_mgmt);
         } catch (OperationException ex) {
             throw new CaMgmtException("could not unrevoke of CA " + ex.getMessage(), ex);
         }
@@ -2355,7 +2354,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonNull("serialNumber", serialNumber);
         X509Ca ca = getX509Ca(caName);
         try {
-            return ca.revokeCertificate(serialNumber, reason, invalidityTime) != null;
+            return ca.revokeCertificate(serialNumber, reason, invalidityTime,
+                    CaAuditConstants.MSGID_CA_mgmt) != null;
         } catch (OperationException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
@@ -2368,7 +2368,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonNull("serialNumber", serialNumber);
         X509Ca ca = getX509Ca(caName);
         try {
-            return ca.unrevokeCertificate(serialNumber) != null;
+            return ca.unrevokeCertificate(serialNumber, CaAuditConstants.MSGID_CA_mgmt) != null;
         } catch (OperationException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
@@ -2386,7 +2386,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         try {
-            return ca.removeCertificate(serialNumber) != null;
+            return ca.removeCertificate(serialNumber, CaAuditConstants.MSGID_CA_mgmt) != null;
         } catch (OperationException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
@@ -2399,6 +2399,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonBlank("profileName", profileName);
         ParamUtil.requireNonNull("encodedCsr", encodedCsr);
+
+        AuditEvent auditEvent = new AuditEvent(new Date());
+        auditEvent.setApplicationName("CA");
+        auditEvent.setName("PERF");
+        auditEvent.addEventData("eventType", "CAMGMT_CRL_GEN_ONDEMAND");
 
         X509Ca ca = getX509Ca(caName);
         CertificationRequest csr;
@@ -2432,7 +2437,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         X509CertificateInfo certInfo;
         try {
             certInfo = ca.generateCertificate(certTemplateData, false, null, user, RequestType.CA,
-                    (byte[]) null);
+                    (byte[]) null, CaAuditConstants.MSGID_CA_mgmt);
         } catch (OperationException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
@@ -2691,17 +2696,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     public X509CRL generateCrlOnDemand(final String caName) throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
 
-        AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.addEventData("eventType", "CAMGMT_CRL_GEN_ONDEMAND");
         X509Ca ca = getX509Ca(caName);
         try {
-            return ca.generateCrlOnDemand(auditEvent);
+            return ca.generateCrlOnDemand(CaAuditConstants.MSGID_CA_mgmt);
         } catch (OperationException ex) {
-            auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData("message", ex.getErrorCode().name());
             throw new CaMgmtException(ex.getMessage(), ex);
-        } finally {
-            auditServiceRegister.getAuditService().logEvent(auditEvent);
         }
     } // method generateCrlOnDemand
 
@@ -2710,27 +2709,18 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonNull("crlNumber", crlNumber);
 
-        AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.addEventData("eventType", "CRL_DOWNLOAD_WITH_SN");
-        auditEvent.addEventData("crlNumber", crlNumber.toString());
         X509Ca ca = getX509Ca(caName);
         try {
             CertificateList crl = ca.getCrl(crlNumber);
             if (crl == null) {
-                auditEvent.addEventData("message", "found no CRL");
+                LOG.warn("found no CRL for CA {} and crlNumber {}", caName, crlNumber);
                 return null;
             }
             return new X509CRLObject(crl);
         } catch (OperationException ex) {
-            auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData("message", ex.getErrorCode().name());
             throw new CaMgmtException(ex.getMessage(), ex);
         } catch (CRLException ex) {
-            auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData("message", "CRLException");
             throw new CaMgmtException(ex.getMessage(), ex);
-        } finally {
-            auditServiceRegister.getAuditService().logEvent(auditEvent);
         }
     } // method getCrl
 
@@ -2738,26 +2728,18 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     public X509CRL getCurrentCrl(final String caName) throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
 
-        AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.addEventData("eventType", "CAMGMT_CRL_DOWNLOAD");
         X509Ca ca = getX509Ca(caName);
         try {
             CertificateList crl = ca.getCurrentCrl();
             if (crl == null) {
-                auditEvent.addEventData("message", "found no CRL");
+                LOG.warn("found no CRL for CA {}", caName);
                 return null;
             }
             return new X509CRLObject(crl);
         } catch (OperationException ex) {
-            auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData("message", ex.getErrorCode().name());
             throw new CaMgmtException(ex.getMessage(), ex);
         } catch (CRLException ex) {
-            auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData("message", "CRLException");
             throw new CaMgmtException(ex.getMessage(), ex);
-        } finally {
-            auditServiceRegister.getAuditService().logEvent(auditEvent);
         }
     } // method getCurrentCrl
 

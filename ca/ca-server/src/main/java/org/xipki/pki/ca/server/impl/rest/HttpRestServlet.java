@@ -41,7 +41,6 @@ import java.net.URLDecoder;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -59,6 +58,7 @@ import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
+import org.xipki.commons.common.util.RandomUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.CrlReason;
 import org.xipki.commons.security.X509Cert;
@@ -66,8 +66,10 @@ import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.RestfulAPIConstants;
+import org.xipki.pki.ca.server.impl.CaAuditConstants;
 import org.xipki.pki.ca.server.impl.ClientCertCache;
 import org.xipki.pki.ca.server.impl.HttpRespAuditException;
+import org.xipki.pki.ca.server.impl.cmp.CmpRequestorInfo;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderManager;
 import org.xipki.pki.ca.server.impl.cmp.X509CaCmpResponder;
 
@@ -77,7 +79,6 @@ import org.xipki.pki.ca.server.impl.cmp.X509CaCmpResponder;
  */
 
 public class HttpRestServlet extends HttpServlet {
-
     private static final Logger LOG = LoggerFactory.getLogger(HttpRestServlet.class);
 
     private static final long serialVersionUID = 1L;
@@ -109,9 +110,13 @@ public class HttpRestServlet extends HttpServlet {
         X509Certificate clientCert = ClientCertCache.getTlsClientCert(request,sslCertInHttpHeader);
 
         AuditService auditService = auditServiceRegister.getAuditService();
-        AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.setApplicationName("CA");
-        auditEvent.setName("PERF");
+        AuditEvent event = new AuditEvent(new Date());
+        event.setApplicationName(CaAuditConstants.APPNAME);
+        event.setName(CaAuditConstants.NAME_PERF);
+        event.addEventData(CaAuditConstants.NAME_reqType, RequestType.REST.name());
+
+        String msgId = RandomUtil.nextHexLong();
+        event.addEventData(CaAuditConstants.NAME_mid, msgId);
 
         AuditLevel auditLevel = AuditLevel.INFO;
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
@@ -172,8 +177,15 @@ public class HttpRestServlet extends HttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            auditEvent.addEventData("CA", responder.getCa().getCaInfo().getName());
-            auditEvent.addEventData("command", command);
+            event.addEventData(CaAuditConstants.NAME_CA, responder.getCa().getCaName());
+            event.addEventType(command);
+
+            CmpRequestorInfo requestor = responder.getRequestor(clientCert);
+            if (requestor == null) {
+                throw new OperationException(ErrorCode.NOT_PERMITTED, "no requestor specified");
+            }
+
+            event.addEventData(CaAuditConstants.NAME_requestor, requestor.getName());
 
             String respCt = null;
             byte[] respBytes = null;
@@ -208,8 +220,8 @@ public class HttpRestServlet extends HttpServlet {
 
                 byte[] encodedCsr = IoUtil.read(request.getInputStream());
 
-                X509Cert cert = responder.generateCert(clientCert, encodedCsr, profile, notBefore,
-                        notAfter, user, RequestType.REST, auditEvent);
+                X509Cert cert = responder.generateCert(requestor, encodedCsr, profile, notBefore,
+                        notAfter, user, RequestType.REST, msgId);
                 if (cert == null) {
                     String message = "could not generate certificate";
                     LOG.warn(message);
@@ -240,7 +252,8 @@ public class HttpRestServlet extends HttpServlet {
                     invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
                 }
 
-                responder.revokeCert(clientCert, serialNumber, reason, invalidityTime, auditEvent);
+                responder.revokeCert(requestor, serialNumber, reason, invalidityTime,
+                        RequestType.REST, msgId);
             } else if (RestfulAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
                 String strSerialNumber = request.getParameter(
                         RestfulAPIConstants.PARAM_serial_number);
@@ -251,7 +264,7 @@ public class HttpRestServlet extends HttpServlet {
                 }
 
                 BigInteger serialNumber = toBigInt(strSerialNumber);
-                responder.removeCert(clientCert, serialNumber, auditEvent);
+                responder.removeCert(requestor, serialNumber, RequestType.REST, msgId);
             } else if (RestfulAPIConstants.CMD_crl.equalsIgnoreCase(command)) {
                 String strCrlNumber = request.getParameter(RestfulAPIConstants.PARAM_crl_number);
                 BigInteger crlNumber = null;
@@ -264,10 +277,9 @@ public class HttpRestServlet extends HttpServlet {
                         throw new HttpRespAuditException(HttpServletResponse.SC_BAD_REQUEST,
                                 null, message, AuditLevel.INFO, AuditStatus.FAILED);
                     }
-                    auditEvent.addEventData("crlNumber", crlNumber.toString());
                 }
 
-                CertificateList crl = responder.getCrl(clientCert, crlNumber, auditEvent);
+                CertificateList crl = responder.getCrl(requestor, crlNumber);
                 if (crl == null) {
                     String message = "could not get CRL";
                     LOG.warn(message);
@@ -278,7 +290,7 @@ public class HttpRestServlet extends HttpServlet {
                 respCt = RestfulAPIConstants.CT_pkix_crl;
                 respBytes = crl.getEncoded();
             } else if (RestfulAPIConstants.CMD_new_crl.equalsIgnoreCase(command)) {
-                X509CRL crl = responder.generateCrlOnDemand(clientCert, auditEvent);
+                X509CRL crl = responder.generateCrlOnDemand(requestor, RequestType.REST, msgId);
                 if (crl == null) {
                     String message = "could not generate CRL";
                     LOG.warn(message);
@@ -373,8 +385,8 @@ public class HttpRestServlet extends HttpServlet {
                 break;
             } // end switch (code)
 
-            auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData("message", code.name());
+            event.setStatus(AuditStatus.FAILED);
+            event.addEventData(CaAuditConstants.NAME_message, code.name());
 
             switch (code) {
             case DATABASE_FAILURE:
@@ -416,7 +428,7 @@ public class HttpRestServlet extends HttpServlet {
             try {
                 response.flushBuffer();
             } finally {
-                audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
+                audit(auditService, event, auditLevel, auditStatus, auditMessage);
             }
         }
     } // method doPost
@@ -444,19 +456,11 @@ public class HttpRestServlet extends HttpServlet {
         }
 
         if (auditMessage != null) {
-            auditEvent.addEventData("message", auditMessage);
+            auditEvent.addEventData(CaAuditConstants.NAME_message, auditMessage);
         }
 
-        auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
-
-        if (!auditEvent.containsAuditChildEvents()) {
-            auditService.logEvent(auditEvent);
-        } else {
-            List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
-            for (AuditEvent event : expandedAuditEvents) {
-                auditService.logEvent(event);
-            }
-        }
+        auditEvent.finish();
+        auditService.logEvent(auditEvent);
     } // method audit
 
     private static BigInteger toBigInt(final String str) {

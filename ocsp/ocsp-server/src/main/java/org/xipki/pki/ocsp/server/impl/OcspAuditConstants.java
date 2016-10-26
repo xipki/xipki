@@ -32,29 +32,27 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api;
-
-import java.util.List;
+package org.xipki.pki.ocsp.server.impl;
 
 /**
  * @author Lijun Liao
  * @since 2.1.0
  */
 
-public interface AuditEventInterface {
+public class OcspAuditConstants {
 
-    AuditEventData addEventData(final AuditEventData eventData);
+    public static final String APPNAME = "OCSP";
 
-    AuditEventData addEventData(String name, String value);
+    public static final String NAME_PERF = "PERF";
 
-    AuditEventData addEventType(String type);
+    public static final String NAME_mid = "mid";
 
-    boolean removeEventData(final String eventDataName);
+    public static final String NAME_type = "type";
 
-    List<AuditEventData> getEventDatas();
+    public static final String NAME_status = "status";
 
-    public void setLevel(final AuditLevel level);
+    public static final String NAME_serial = "serial";
 
-    public AuditStatus getStatus();
+    public static final String NAME_message = "message";
 
 }

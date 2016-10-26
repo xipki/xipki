@@ -63,7 +63,6 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
@@ -71,6 +70,7 @@ import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.RandomUtil;
 import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.SecurityFactory;
 import org.xipki.commons.security.util.X509Util;
@@ -79,6 +79,7 @@ import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
 import org.xipki.pki.ca.common.cmp.ProtectionResult;
 import org.xipki.pki.ca.common.cmp.ProtectionVerificationResult;
+import org.xipki.pki.ca.server.impl.CaAuditConstants;
 import org.xipki.pki.ca.server.mgmt.api.CmpControl;
 
 /**
@@ -118,9 +119,9 @@ abstract class CmpResponder {
      */
     protected abstract CmpControl getCmpControl();
 
-    protected abstract CmpRequestorInfo getRequestor(X500Name requestorSender);
+    public abstract CmpRequestorInfo getRequestor(X500Name requestorSender);
 
-    protected abstract CmpRequestorInfo getRequestor(X509Certificate requestorCert);
+    public abstract CmpRequestorInfo getRequestor(X509Certificate requestorCert);
 
     private CmpRequestorInfo getRequestor(final PKIHeader reqHeader) {
         GeneralName requestSender = reqHeader.getSender();
@@ -134,23 +135,27 @@ abstract class CmpResponder {
     protected abstract PKIMessage doProcessPkiMessage(@Nullable PKIMessage request,
             @Nonnull RequestorInfo requestor, @Nullable String user,
             @Nonnull ASN1OctetString transactionId, @Nonnull GeneralPKIMessage pkiMessage,
-            @Nonnull AuditEvent auditEvent);
+            @Nonnull String msgId, @Nonnull AuditEvent event);
 
     public PKIMessage processPkiMessage(final PKIMessage pkiMessage,
-            final X509Certificate tlsClientCert, final AuditEvent auditEvent) {
+            final X509Certificate tlsClientCert, final String tidStr, final AuditEvent event) {
         ParamUtil.requireNonNull("pkiMessage", pkiMessage);
-        ParamUtil.requireNonNull("auditEvent", auditEvent);
+        ParamUtil.requireNonNull("event", event);
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
         PKIHeader reqHeader = message.getHeader();
         ASN1OctetString tid = reqHeader.getTransactionID();
 
+        String msgId = null;
+        if (event != null) {
+            msgId = RandomUtil.nextHexLong();
+            event.addEventData(CaAuditConstants.NAME_mid, msgId);
+        }
+
         if (tid == null) {
             byte[] randomBytes = randomTransactionId();
             tid = new DEROctetString(randomBytes);
         }
-        String tidStr = Hex.toHexString(tid.getOctets());
-        auditEvent.addEventData("tid", tidStr);
 
         CmpControl cmpControl = getCmpControl();
 
@@ -198,9 +203,9 @@ abstract class CmpResponder {
         }
 
         if (failureCode != null) {
-            auditEvent.setLevel(AuditLevel.INFO);
-            auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData("message", statusText);
+            event.setLevel(AuditLevel.INFO);
+            event.setStatus(AuditStatus.FAILED);
+            event.addEventData("message", statusText);
             return buildErrorPkiMessage(tid, reqHeader, failureCode, statusText);
         }
 
@@ -272,18 +277,18 @@ abstract class CmpResponder {
         }
 
         if (errorStatus != null) {
-            auditEvent.setLevel(AuditLevel.INFO);
-            auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData("message", errorStatus);
+            event.setLevel(AuditLevel.INFO);
+            event.setStatus(AuditStatus.FAILED);
+            event.addEventData("message", errorStatus);
             return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck,
                     errorStatus);
         }
 
-        PKIMessage resp = doProcessPkiMessage(pkiMessage, requestor, username, tid, message,
-                auditEvent);
+        PKIMessage resp = doProcessPkiMessage(pkiMessage, requestor, username, tid, message, msgId,
+                event);
 
         if (isProtected) {
-            resp = addProtection(resp, auditEvent);
+            resp = addProtection(resp, event);
         } else {
             // protected by TLS connection
         }
@@ -341,7 +346,7 @@ abstract class CmpResponder {
                     getCmpControl().isSendResponderCert());
         } catch (Exception ex) {
             LogUtil.error(LOG, ex, "could not add protection to the PKI message");
-            PKIStatusInfo status = generateCmpRejectionStatus(
+            PKIStatusInfo status = generateRejectionStatus(
                     PKIFailureInfo.systemFailure, "could not sign the PKIMessage");
 
             auditEvent.setLevel(AuditLevel.ERROR);
@@ -363,19 +368,19 @@ abstract class CmpResponder {
             respHeader.setTransactionID(tid);
         }
 
-        PKIStatusInfo status = generateCmpRejectionStatus(failureCode, statusText);
+        PKIStatusInfo status = generateRejectionStatus(failureCode, statusText);
         ErrorMsgContent error = new ErrorMsgContent(status);
         PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, error);
 
         return new PKIMessage(respHeader.build(), body);
     } // method buildErrorPkiMessage
 
-    protected PKIStatusInfo generateCmpRejectionStatus(final Integer info,
+    protected PKIStatusInfo generateRejectionStatus(final Integer info,
             final String errorMessage) {
-        return generateCmpRejectionStatus(PKIStatus.rejection, info, errorMessage);
+        return generateRejectionStatus(PKIStatus.rejection, info, errorMessage);
     } // method generateCmpRejectionStatus
 
-    protected PKIStatusInfo generateCmpRejectionStatus(final PKIStatus status, final Integer info,
+    protected PKIStatusInfo generateRejectionStatus(final PKIStatus status, final Integer info,
             final String errorMessage) {
         PKIFreeText statusMessage = (errorMessage == null) ? null : new PKIFreeText(errorMessage);
         PKIFailureInfo failureInfo = (info == null) ? null : new PKIFailureInfo(info);

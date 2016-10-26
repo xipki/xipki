@@ -95,9 +95,7 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.audit.api.AuditChildEvent;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
@@ -109,6 +107,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.RandomUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.datasource.DataSourceFactory;
@@ -187,6 +186,19 @@ public class OcspServer {
         }
 
     } // class ServletPathResponderName
+
+    private static class OcspRespControl {
+        boolean couldCacheInfo;
+        boolean includeExtendedRevokeExtension;
+        long cacheThisUpdate;
+        long cacheNextUpdate;
+
+        public OcspRespControl() {
+            includeExtendedRevokeExtension = false;
+            cacheThisUpdate = 0;
+            cacheNextUpdate = Long.MAX_VALUE;
+        }
+    }
 
     public static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
@@ -344,8 +356,7 @@ public class OcspServer {
 
             for (int i = 0; i < name.length(); i++) {
                 char ch = name.charAt(i);
-                if (!((ch >= '0' && ch <= '9')
-                        || (ch >= 'A' && ch <= 'Z')
+                if (!((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z')
                         || (ch >= 'a' && ch <= 'z'))) {
                     throw new InvalidConfException("invalid OCSP responder name '" + name + "'");
                 }
@@ -640,32 +651,36 @@ public class OcspServer {
     }
 
     public OcspRespWithCacheInfo answer(final Responder responder, final OCSPReq request,
-            final AuditEvent auditEvent, final boolean viaGet) {
+            final boolean viaGet, final AuditEvent event) {
         ParamUtil.requireNonNull("responder", responder);
         ParamUtil.requireNonNull("request", request);
 
-        ResponderOption responderOption = responder.getResponderOption();
-        RequestOption requestOption = responder.getRequestOption();
-        ResponseOption responseOption = responder.getResponseOption();
+        RequestOption reqOpt = responder.getRequestOption();
         ResponderSigner signer = responder.getSigner();
-        AuditOption auditOption = responder.getAuditOption();
-        CertprofileOption certprofileOption = responder.getCertprofileOption();
+        ResponseOption repOpt = responder.getResponseOption();
+
+        String msgId = null;
+        if (event != null) {
+            msgId = RandomUtil.nextHexLong();
+            event.addEventData(OcspAuditConstants.NAME_mid, msgId);
+        }
 
         int version = request.getVersionNumber();
-        if (!requestOption.isVersionAllowed(version)) {
+        if (!reqOpt.isVersionAllowed(version)) {
             String message = "invalid request version " + version;
             LOG.warn(message);
-            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
+            fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
             return createUnsuccessfulOcspResp(OcspResponseStatus.malformedRequest);
         }
 
         try {
-            OcspRespWithCacheInfo resp = checkSignature(request, requestOption, auditEvent);
+            OcspRespWithCacheInfo resp = checkSignature(request, reqOpt, event);
             if (resp != null) {
                 return resp;
             }
 
-            boolean couldCacheInfo = viaGet;
+            OcspRespControl repControl = new OcspRespControl();
+            repControl.couldCacheInfo = viaGet;
 
             List<Extension> responseExtensions = new ArrayList<>(2);
 
@@ -681,7 +696,7 @@ public class OcspServer {
                 }
             }
 
-            RespID respId = signer.getResponder(responseOption.isResponderIdByName());
+            RespID respId = signer.getResponder(repOpt.isResponderIdByName());
             BasicOCSPRespBuilder basicOcspBuilder = new BasicOCSPRespBuilder(respId);
             ASN1ObjectIdentifier extensionType = OCSPObjectIdentifiers.id_pkix_ocsp_nonce;
             criticalExtensionOids.remove(extensionType);
@@ -689,275 +704,53 @@ public class OcspServer {
             if (nonceExtn != null) {
                 byte[] nonce = nonceExtn.getExtnValue().getOctets();
                 int len = nonce.length;
-                int min = requestOption.getNonceMinLen();
-                int max = requestOption.getNonceMaxLen();
+                int min = reqOpt.getNonceMinLen();
+                int max = reqOpt.getNonceMaxLen();
 
                 if (len < min || len > max) {
                     LOG.warn("length of nonce {} not within [{},{}]", len, min, max);
                     StringBuilder sb = new StringBuilder(50);
                     sb.append("length of nonce ").append(len);
                     sb.append(" not within [").append(min).append(", ").append(max);
-                    fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, sb.toString());
+                    fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, sb.toString());
                     return createUnsuccessfulOcspResp(OcspResponseStatus.malformedRequest);
                 }
 
-                couldCacheInfo = false;
+                repControl.couldCacheInfo = false;
                 responseExtensions.add(nonceExtn);
-            } else if (requestOption.isNonceRequired()) {
+            } else if (reqOpt.isNonceRequired()) {
                 String message = "nonce required, but is not present in the request";
                 LOG.warn(message);
-                fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
+                fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
                 return createUnsuccessfulOcspResp(OcspResponseStatus.malformedRequest);
             }
 
-            boolean includeExtendedRevokeExtension = false;
-
-            long cacheThisUpdate = 0;
-            long cacheNextUpdate = Long.MAX_VALUE;
             for (int i = 0; i < requestsSize; i++) {
-                AuditChildEvent auditChildEvent = new AuditChildEvent();
-                auditEvent.addAuditChildEvent(auditChildEvent);
-
-                Req req = requestList[i];
-                CertificateID certId = req.getCertID();
-                String certIdHashAlgo = certId.getHashAlgOID().getId();
-                HashAlgoType reqHashAlgo = HashAlgoType.getHashAlgoType(certIdHashAlgo);
-                if (reqHashAlgo == null) {
-                    LOG.warn("unknown CertID.hashAlgorithm {}", certIdHashAlgo);
-                    fillAuditEvent(auditChildEvent, AuditLevel.INFO, AuditStatus.FAILED,
-                            "unknown CertID.hashAlgorithm " + certIdHashAlgo);
-                    return createUnsuccessfulOcspResp(OcspResponseStatus.malformedRequest);
-                } else if (!requestOption.allows(reqHashAlgo)) {
-                    LOG.warn("CertID.hashAlgorithm {} not allowed", certIdHashAlgo);
-                    fillAuditEvent(auditChildEvent, AuditLevel.INFO, AuditStatus.FAILED,
-                            "not allowed CertID.hashAlgorithm " + certIdHashAlgo);
-                    return createUnsuccessfulOcspResp(OcspResponseStatus.malformedRequest);
+                AuditEvent singleEvent = null;
+                if (event != null) {
+                    singleEvent = new AuditEvent(new Date());
+                    singleEvent.setApplicationName(OcspAuditConstants.APPNAME);
+                    singleEvent.setName(OcspAuditConstants.NAME_PERF);
+                    singleEvent.addEventData(OcspAuditConstants.NAME_mid, msgId);
                 }
 
-                CertStatusInfo certStatusInfo = null;
-                OcspStore answeredStore = null;
-                boolean exceptionOccurs = false;
-
-                Date now = new Date();
-                for (OcspStore store : responder.getStores()) {
-                    try {
-                        certStatusInfo = store.getCertStatus(now, reqHashAlgo,
-                                certId.getIssuerNameHash(), certId.getIssuerKeyHash(),
-                                certId.getSerialNumber(),  responseOption.isIncludeCerthash(),
-                                responseOption.getCertHashAlgo(), certprofileOption);
-                        if (certStatusInfo.getCertStatus() != CertStatus.ISSUER_UNKNOWN) {
-                            answeredStore = store;
-                            break;
-                        }
-                    } catch (OcspStoreException ex) {
-                        exceptionOccurs = true;
-                        LogUtil.error(LOG, ex,
-                                "getCertStatus() of CertStatusStore " + store.getName());
-                    } // end try
-                } // end for
-
-                if (certStatusInfo == null) {
-                    if (auditChildEvent != null) {
-                        fillAuditEvent(auditChildEvent, AuditLevel.ERROR, AuditStatus.FAILED,
-                                "no CertStatusStore can answer the request");
+                OcspRespWithCacheInfo ocspResp = null;
+                try {
+                    ocspResp = processCertReq(requestList[i], basicOcspBuilder, responder, reqOpt,
+                            repOpt, repControl, singleEvent);
+                } finally {
+                    if (singleEvent != null) {
+                        singleEvent.finish();
+                        auditServiceRegister.getAuditService().doLogEvent(singleEvent);
                     }
-                    if (exceptionOccurs) {
-                        return createUnsuccessfulOcspResp(OcspResponseStatus.tryLater);
-                    } else {
-                        certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(new Date(),
-                                null);
-                    }
-                } else if (answeredStore != null && responderOption.isInheritCaRevocation()) {
-                    CertRevocationInfo caRevInfo = answeredStore.getCaRevocationInfo(
-                            reqHashAlgo, certId.getIssuerNameHash(), certId.getIssuerKeyHash());
-                    if (caRevInfo != null) {
-                        CertStatus certStatus = certStatusInfo.getCertStatus();
-                        boolean replaced = false;
-                        if (certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN) {
-                            replaced = true;
-                        } else if (certStatus == CertStatus.REVOKED) {
-                            if (certStatusInfo.getRevocationInfo().getRevocationTime().after(
-                                    caRevInfo.getRevocationTime())) {
-                                replaced = true;
-                            }
-                        }
-
-                        if (replaced) {
-                            CertRevocationInfo newRevInfo;
-                            if (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) {
-                                newRevInfo = caRevInfo;
-                            } else {
-                                newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-                                        caRevInfo.getRevocationTime(),
-                                        caRevInfo.getInvalidityTime());
-                            }
-                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
-                                    certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
-                                    certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
-                                    certStatusInfo.getCertprofile());
-                        } // end if(replaced)
-                    } // end if
-                } // end if
-
-                if (auditChildEvent != null) {
-                    String certprofile = certStatusInfo.getCertprofile();
-                    String auditCertType;
-                    if (certprofile != null) {
-                        auditCertType = auditOption.getCertprofileMapping().get(certprofile);
-                        if (auditCertType == null) {
-                            auditCertType = certprofile;
-                        }
-                    } else {
-                        auditCertType = "UNKNOWN";
-                    }
-
-                    auditChildEvent.addEventData(new AuditEventData("certType", auditCertType));
                 }
 
-                // certStatusInfo must not be null in any case, since at least one store
-                // is configured
-                Date thisUpdate = certStatusInfo.getThisUpdate();
-                if (thisUpdate == null) {
-                    thisUpdate = new Date();
+                if (ocspResp != null) {
+                    return ocspResp;
                 }
-                Date nextUpdate = certStatusInfo.getNextUpdate();
+            }
 
-                List<Extension> extensions = new LinkedList<>();
-                boolean unknownAsRevoked = false;
-                CertificateStatus bcCertStatus = null;
-                switch (certStatusInfo.getCertStatus()) {
-                case GOOD:
-                    bcCertStatus = null;
-                    break;
-
-                case ISSUER_UNKNOWN:
-                    couldCacheInfo = false;
-                    bcCertStatus = new UnknownStatus();
-                    break;
-
-                case UNKNOWN:
-                case IGNORE:
-                    couldCacheInfo = false;
-                    if (responderOption.getMode() == OcspMode.RFC2560) {
-                        bcCertStatus = new UnknownStatus();
-                    } else { // (ocspMode == OCSPMode.RFC6960)
-                        unknownAsRevoked = true;
-                        includeExtendedRevokeExtension = true;
-                        bcCertStatus = new RevokedStatus(new Date(0L),
-                                CrlReason.CERTIFICATE_HOLD.getCode());
-                    }
-                    break;
-                case REVOKED:
-                    CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
-                    ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(
-                            revInfo.getRevocationTime());
-                    org.bouncycastle.asn1.x509.CRLReason tmpReason = null;
-                    if (responseOption.isIncludeRevReason()) {
-                        tmpReason = org.bouncycastle.asn1.x509.CRLReason.lookup(
-                                revInfo.getReason().getCode());
-                    }
-                    RevokedInfo tmpRevInfo = new RevokedInfo(revTime, tmpReason);
-                    bcCertStatus = new RevokedStatus(tmpRevInfo);
-
-                    Date invalidityDate = revInfo.getInvalidityTime();
-                    if (responseOption.isIncludeInvalidityDate()
-                            && invalidityDate != null
-                            && !invalidityDate.equals(revInfo.getRevocationTime())) {
-                        Extension extension = new Extension(Extension.invalidityDate,
-                                false, new ASN1GeneralizedTime(invalidityDate).getEncoded());
-                        extensions.add(extension);
-                    }
-                    break;
-                default:
-                    throw new RuntimeException(
-                            "unknown CertificateStatus:" + certStatusInfo.getCertStatus());
-                } // end switch
-
-                byte[] certHash = certStatusInfo.getCertHash();
-                if (certHash != null) {
-                    ASN1ObjectIdentifier hashAlgoOid = certStatusInfo.getCertHashAlgo().getOid();
-                    AlgorithmIdentifier hashAlgId =
-                            new AlgorithmIdentifier(hashAlgoOid, DERNull.INSTANCE);
-                    CertHash bcCertHash = new CertHash(hashAlgId, certHash);
-
-                    byte[] encodedCertHash;
-                    try {
-                        encodedCertHash = bcCertHash.getEncoded();
-                    } catch (IOException ex) {
-                        LogUtil.error(LOG, ex, "answer() bcCertHash.getEncoded");
-                        if (auditChildEvent != null) {
-                            fillAuditEvent(auditChildEvent, AuditLevel.ERROR, AuditStatus.FAILED,
-                                    "CertHash.getEncoded() with IOException");
-                        }
-                        return createUnsuccessfulOcspResp(OcspResponseStatus.internalError);
-                    }
-
-                    Extension extension = new Extension(
-                            ISISMTTObjectIdentifiers.id_isismtt_at_certHash,
-                            false, encodedCertHash);
-
-                    extensions.add(extension);
-                } // end if(certHash != null)
-
-                if (certStatusInfo.getArchiveCutOff() != null) {
-                    Extension extension = new Extension(
-                            OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, false,
-                            new ASN1GeneralizedTime(certStatusInfo.getArchiveCutOff())
-                                .getEncoded());
-                    extensions.add(extension);
-                }
-
-                String certStatusText;
-                if (bcCertStatus instanceof UnknownStatus) {
-                    certStatusText = "unknown";
-                } else if (bcCertStatus instanceof RevokedStatus) {
-                    certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
-                } else if (bcCertStatus == null) {
-                    certStatusText = "good";
-                } else {
-                    certStatusText = "should-not-happen";
-                }
-
-                if (auditChildEvent != null) {
-                    auditChildEvent.setLevel(AuditLevel.INFO);
-                    auditChildEvent.setStatus(AuditStatus.SUCCESSFUL);
-                    auditChildEvent.addEventData(new AuditEventData("certStatus", certStatusText));
-                }
-
-                if (LOG.isDebugEnabled()) {
-                    StringBuilder sb = new StringBuilder(250);
-                    sb.append("certHashAlgo: ").append(certId.getHashAlgOID().getId()).append(", ");
-
-                    String hexCertHash = null;
-                    if (certHash != null) {
-                        hexCertHash = Hex.toHexString(certHash).toUpperCase();
-                    }
-
-                    sb.append("issuerKeyHash: ") .append(
-                            Hex.toHexString(certId.getIssuerKeyHash()) .toUpperCase()).append(", ");
-                    sb.append("issuerNameHash: ").append(
-                            Hex.toHexString(certId.getIssuerNameHash()).toUpperCase()).append(", ");
-                    sb.append("serialNumber: ").append(LogUtil.formatCsn(certId.getSerialNumber()))
-                            .append(", ");
-                    sb.append("certStatus: ").append(certStatusText).append(", ");
-                    sb.append("thisUpdate: ").append(thisUpdate).append(", ");
-                    sb.append("nextUpdate: ").append(nextUpdate).append(", ");
-                    sb.append("certHash: ").append(hexCertHash);
-                    LOG.debug(sb.toString());
-                }
-
-                Extensions extns = null;
-                if (CollectionUtil.isNonEmpty(extensions)) {
-                    extns = new Extensions(extensions.toArray(new Extension[0]));
-                }
-                basicOcspBuilder.addResponse(certId, bcCertStatus, thisUpdate, nextUpdate, extns);
-                cacheThisUpdate = Math.max(cacheThisUpdate, thisUpdate.getTime());
-                if (nextUpdate != null) {
-                    cacheNextUpdate = Math.min(cacheNextUpdate, nextUpdate.getTime());
-                }
-            } // end for (int i = 0; i < n; i++)
-
-            if (includeExtendedRevokeExtension) {
+            if (repControl.includeExtendedRevokeExtension) {
                 responseExtensions.add(
                         new Extension(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke, true,
                                 DERNull.INSTANCE.getEncoded()));
@@ -969,7 +762,7 @@ public class OcspServer {
             }
 
             ConcurrentContentSigner concurrentSigner = null;
-            if (responderOption.getMode() != OcspMode.RFC2560) {
+            if (responder.getResponderOption().getMode() != OcspMode.RFC2560) {
                 extensionType = ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs;
                 criticalExtensionOids.remove(extensionType);
                 Extension ext = request.getExtension(extensionType);
@@ -989,7 +782,7 @@ public class OcspServer {
             }
 
             X509CertificateHolder[] certsInResp;
-            EmbedCertsMode certsMode = responseOption.getEmbedCertsMode();
+            EmbedCertsMode certsMode = repOpt.getEmbedCertsMode();
             if (certsMode == null || certsMode == EmbedCertsMode.SIGNER) {
                 certsInResp = new X509CertificateHolder[]{signer.getBcCertificate()};
             } else if (certsMode == EmbedCertsMode.SIGNER_AND_CA) {
@@ -1006,7 +799,7 @@ public class OcspServer {
                 return createUnsuccessfulOcspResp(OcspResponseStatus.tryLater);
             } catch (OCSPException ex) {
                 LogUtil.error(LOG, ex, "answer() basicOcspBuilder.build");
-                fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
+                fillAuditEvent(event, AuditLevel.ERROR, AuditStatus.FAILED,
                         "BasicOCSPRespBuilder.build() with OCSPException");
                 return createUnsuccessfulOcspResp(OcspResponseStatus.internalError);
             }
@@ -1016,10 +809,10 @@ public class OcspServer {
                 OCSPResp ocspResp = ocspRespBuilder.build(
                         OcspResponseStatus.successful.getStatus(), basicOcspResp);
 
-                if (couldCacheInfo) {
-                    ResponseCacheInfo cacheInfo = new ResponseCacheInfo(cacheThisUpdate);
-                    if (cacheNextUpdate != Long.MAX_VALUE) {
-                        cacheInfo.setNextUpdate(cacheNextUpdate);
+                if (repControl.couldCacheInfo) {
+                    ResponseCacheInfo cacheInfo = new ResponseCacheInfo(repControl.cacheThisUpdate);
+                    if (repControl.cacheNextUpdate != Long.MAX_VALUE) {
+                        cacheInfo.setNextUpdate(repControl.cacheNextUpdate);
                     }
                     return new OcspRespWithCacheInfo(ocspResp, cacheInfo);
                 } else {
@@ -1027,17 +820,258 @@ public class OcspServer {
                 }
             } catch (OCSPException ex) {
                 LogUtil.error(LOG, ex, "answer() ocspRespBuilder.build");
-                fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED,
+                fillAuditEvent(event, AuditLevel.ERROR, AuditStatus.FAILED,
                         "OCSPRespBuilder.build() with OCSPException");
                 return createUnsuccessfulOcspResp(OcspResponseStatus.internalError);
             }
-
         } catch (Throwable th) {
             LogUtil.error(LOG, th);
-            fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED, "internal error");
+            fillAuditEvent(event, AuditLevel.ERROR, AuditStatus.FAILED, "internal error");
             return createUnsuccessfulOcspResp(OcspResponseStatus.internalError);
         }
     } // method ask
+
+    private OcspRespWithCacheInfo processCertReq(Req req, BasicOCSPRespBuilder builder,
+            Responder responder, RequestOption reqOpt, ResponseOption repOpt,
+            OcspRespControl repControl, AuditEvent event) throws IOException {
+        CertificateID certId = req.getCertID();
+        String certIdHashAlgo = certId.getHashAlgOID().getId();
+        HashAlgoType reqHashAlgo = HashAlgoType.getHashAlgoType(certIdHashAlgo);
+        if (reqHashAlgo == null) {
+            LOG.warn("unknown CertID.hashAlgorithm {}", certIdHashAlgo);
+            if (event != null) {
+                fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED,
+                        "unknown CertID.hashAlgorithm " + certIdHashAlgo);
+            }
+            return createUnsuccessfulOcspResp(OcspResponseStatus.malformedRequest);
+        } else if (!reqOpt.allows(reqHashAlgo)) {
+            LOG.warn("CertID.hashAlgorithm {} not allowed", certIdHashAlgo);
+            if (event != null) {
+                fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED,
+                        "not allowed CertID.hashAlgorithm " + certIdHashAlgo);
+            }
+            return createUnsuccessfulOcspResp(OcspResponseStatus.malformedRequest);
+        }
+
+        if (event != null) {
+            event.addEventData(OcspAuditConstants.NAME_serial, certId.getSerialNumber().toString());
+        }
+
+        CertStatusInfo certStatusInfo = null;
+        OcspStore answeredStore = null;
+        boolean exceptionOccurs = false;
+
+        Date now = new Date();
+        for (OcspStore store : responder.getStores()) {
+            try {
+                certStatusInfo = store.getCertStatus(now, reqHashAlgo, certId.getIssuerNameHash(),
+                        certId.getIssuerKeyHash(), certId.getSerialNumber(),
+                        repOpt.isIncludeCerthash(), repOpt.getCertHashAlgo(),
+                        responder.getCertprofileOption());
+                if (certStatusInfo != null
+                        && certStatusInfo.getCertStatus() != CertStatus.ISSUER_UNKNOWN) {
+                    answeredStore = store;
+                    break;
+                }
+            } catch (OcspStoreException ex) {
+                exceptionOccurs = true;
+                LogUtil.error(LOG, ex, "getCertStatus() of CertStatusStore " + store.getName());
+            } // end try
+        } // end for
+
+        if (certStatusInfo == null) {
+            if (exceptionOccurs) {
+                fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED,
+                        "no CertStatusStore can answer the request");
+                return createUnsuccessfulOcspResp(OcspResponseStatus.tryLater);
+            } else {
+                certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(new Date(), null);
+            }
+        } else if (answeredStore != null
+                && responder.getResponderOption().isInheritCaRevocation()) {
+            CertRevocationInfo caRevInfo = answeredStore.getCaRevocationInfo(
+                    reqHashAlgo, certId.getIssuerNameHash(), certId.getIssuerKeyHash());
+            if (caRevInfo != null) {
+                CertStatus certStatus = certStatusInfo.getCertStatus();
+                boolean replaced = false;
+                if (certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN) {
+                    replaced = true;
+                } else if (certStatus == CertStatus.REVOKED) {
+                    if (certStatusInfo.getRevocationInfo().getRevocationTime().after(
+                            caRevInfo.getRevocationTime())) {
+                        replaced = true;
+                    }
+                }
+
+                if (replaced) {
+                    CertRevocationInfo newRevInfo;
+                    if (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) {
+                        newRevInfo = caRevInfo;
+                    } else {
+                        newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
+                                caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
+                    }
+                    certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
+                            certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
+                            certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
+                            certStatusInfo.getCertprofile());
+                } // end if(replaced)
+            } // end if
+        } // end if
+
+        if (event != null) {
+            String certprofile = certStatusInfo.getCertprofile();
+            String auditCertType;
+            if (certprofile != null) {
+                auditCertType = responder.getAuditOption().getCertprofileMapping().get(certprofile);
+                if (auditCertType == null) {
+                    auditCertType = certprofile;
+                }
+            } else {
+                auditCertType = "UNKNOWN";
+            }
+
+            event.addEventData(OcspAuditConstants.NAME_type, auditCertType);
+        }
+
+        // certStatusInfo must not be null in any case, since at least one store
+        // is configured
+        Date thisUpdate = certStatusInfo.getThisUpdate();
+        if (thisUpdate == null) {
+            thisUpdate = new Date();
+        }
+        Date nextUpdate = certStatusInfo.getNextUpdate();
+
+        List<Extension> extensions = new LinkedList<>();
+        boolean unknownAsRevoked = false;
+        CertificateStatus bcCertStatus = null;
+        switch (certStatusInfo.getCertStatus()) {
+        case GOOD:
+            bcCertStatus = null;
+            break;
+
+        case ISSUER_UNKNOWN:
+            repControl.couldCacheInfo = false;
+            bcCertStatus = new UnknownStatus();
+            break;
+
+        case UNKNOWN:
+        case IGNORE:
+            repControl.couldCacheInfo = false;
+            if (responder.getResponderOption().getMode() == OcspMode.RFC2560) {
+                bcCertStatus = new UnknownStatus();
+            } else { // (ocspMode == OCSPMode.RFC6960)
+                unknownAsRevoked = true;
+                repControl.includeExtendedRevokeExtension = true;
+                bcCertStatus = new RevokedStatus(new Date(0L),
+                        CrlReason.CERTIFICATE_HOLD.getCode());
+            }
+            break;
+        case REVOKED:
+            CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
+            ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(
+                    revInfo.getRevocationTime());
+            org.bouncycastle.asn1.x509.CRLReason tmpReason = null;
+            if (repOpt.isIncludeRevReason()) {
+                tmpReason = org.bouncycastle.asn1.x509.CRLReason.lookup(
+                        revInfo.getReason().getCode());
+            }
+            RevokedInfo tmpRevInfo = new RevokedInfo(revTime, tmpReason);
+            bcCertStatus = new RevokedStatus(tmpRevInfo);
+
+            Date invalidityDate = revInfo.getInvalidityTime();
+            if (repOpt.isIncludeInvalidityDate() && invalidityDate != null
+                    && !invalidityDate.equals(revInfo.getRevocationTime())) {
+                Extension extension = new Extension(Extension.invalidityDate,
+                        false, new ASN1GeneralizedTime(invalidityDate).getEncoded());
+                extensions.add(extension);
+            }
+            break;
+        default:
+            throw new RuntimeException(
+                    "unknown CertificateStatus:" + certStatusInfo.getCertStatus());
+        } // end switch
+
+        byte[] certHash = certStatusInfo.getCertHash();
+        if (certHash != null) {
+            ASN1ObjectIdentifier hashAlgoOid = certStatusInfo.getCertHashAlgo().getOid();
+            AlgorithmIdentifier hashAlgId =
+                    new AlgorithmIdentifier(hashAlgoOid, DERNull.INSTANCE);
+            CertHash bcCertHash = new CertHash(hashAlgId, certHash);
+
+            byte[] encodedCertHash;
+            try {
+                encodedCertHash = bcCertHash.getEncoded();
+            } catch (IOException ex) {
+                LogUtil.error(LOG, ex, "answer() bcCertHash.getEncoded");
+                if (event != null) {
+                    fillAuditEvent(event, AuditLevel.ERROR, AuditStatus.FAILED,
+                            "CertHash.getEncoded() with IOException");
+                }
+                return createUnsuccessfulOcspResp(OcspResponseStatus.internalError);
+            }
+
+            Extension extension = new Extension(
+                    ISISMTTObjectIdentifiers.id_isismtt_at_certHash,
+                    false, encodedCertHash);
+
+            extensions.add(extension);
+        } // end if(certHash != null)
+
+        if (certStatusInfo.getArchiveCutOff() != null) {
+            Extension extension = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff,
+                    false, new ASN1GeneralizedTime(certStatusInfo.getArchiveCutOff()).getEncoded());
+            extensions.add(extension);
+        }
+
+        String certStatusText;
+        if (bcCertStatus instanceof UnknownStatus) {
+            certStatusText = "unknown";
+        } else if (bcCertStatus instanceof RevokedStatus) {
+            certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
+        } else if (bcCertStatus == null) {
+            certStatusText = "good";
+        } else {
+            certStatusText = "should-not-happen";
+        }
+
+        if (event != null) {
+            event.setLevel(AuditLevel.INFO);
+            event.setStatus(AuditStatus.SUCCESSFUL);
+            event.addEventData(OcspAuditConstants.NAME_status, certStatusText);
+        }
+
+        if (LOG.isDebugEnabled()) {
+            StringBuilder sb = new StringBuilder(250);
+            sb.append("certHashAlgo: ").append(certId.getHashAlgOID().getId()).append(", ");
+            sb.append("issuerNameHash: ").append(
+                    Hex.toHexString(certId.getIssuerNameHash()).toUpperCase()).append(", ");
+            sb.append("issuerKeyHash: ") .append(
+                    Hex.toHexString(certId.getIssuerKeyHash()) .toUpperCase()).append(", ");
+            sb.append("serialNumber: ").append(LogUtil.formatCsn(certId.getSerialNumber()))
+                    .append(", ");
+            sb.append("certStatus: ").append(certStatusText).append(", ");
+            sb.append("thisUpdate: ").append(thisUpdate).append(", ");
+            sb.append("nextUpdate: ").append(nextUpdate);
+            if (certHash != null) {
+                sb.append(", certHash: ").append(Hex.toHexString(certHash).toUpperCase());
+            }
+            LOG.debug(sb.toString());
+        }
+
+        Extensions extns = null;
+        if (CollectionUtil.isNonEmpty(extensions)) {
+            extns = new Extensions(extensions.toArray(new Extension[0]));
+        }
+
+        builder.addResponse(certId, bcCertStatus, thisUpdate, nextUpdate, extns);
+        repControl.cacheThisUpdate = Math.max(repControl.cacheThisUpdate, thisUpdate.getTime());
+        if (nextUpdate != null) {
+            repControl.cacheNextUpdate = Math.min(repControl.cacheNextUpdate, nextUpdate.getTime());
+        }
+
+        return null;
+    }
 
     public HealthCheckResult healthCheck(final Responder responder) {
         HealthCheckResult result = new HealthCheckResult("OCSPResponder");
@@ -1077,18 +1111,18 @@ public class OcspServer {
     }
 
     private void auditLogPciEvent(final boolean successful, final String eventType) {
-        PciAuditEvent auditEvent = new PciAuditEvent(new Date());
-        auditEvent.setUserId("OCSP-SYSTEM");
-        auditEvent.setEventType(eventType);
-        auditEvent.setAffectedResource("CORE");
+        PciAuditEvent event = new PciAuditEvent(new Date());
+        event.setUserId("OCSP-SYSTEM");
+        event.setEventType(eventType);
+        event.setAffectedResource("CORE");
         if (successful) {
-            auditEvent.setStatus(AuditStatus.SUCCESSFUL.name());
-            auditEvent.setLevel(AuditLevel.INFO);
+            event.setStatus(AuditStatus.SUCCESSFUL.name());
+            event.setLevel(AuditLevel.INFO);
         } else {
-            auditEvent.setStatus(AuditStatus.FAILED.name());
-            auditEvent.setLevel(AuditLevel.ERROR);
+            event.setStatus(AuditStatus.FAILED.name());
+            event.setLevel(AuditLevel.ERROR);
         }
-        auditServiceRegister.getAuditService().logEvent(auditEvent);
+        auditServiceRegister.getAuditService().logEvent(event);
     }
 
     private ResponderSigner initSigner(final SignerType signerType) throws InvalidConfException {
@@ -1183,7 +1217,7 @@ public class OcspServer {
     } // method initStore
 
     private OcspRespWithCacheInfo checkSignature(final OCSPReq request,
-            final RequestOption requestOption, final AuditEvent auditEvent)
+            final RequestOption requestOption, final AuditEvent event)
     throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException,
     OcspResponderException {
         if (!request.isSigned()) {
@@ -1193,7 +1227,7 @@ public class OcspServer {
 
             String message = "signature in request required";
             LOG.warn(message);
-            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
+            fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
             return createUnsuccessfulOcspResp(OcspResponseStatus.sigRequired);
         }
 
@@ -1205,7 +1239,7 @@ public class OcspServer {
         if (certs == null || certs.length < 1) {
             String message = "no certificate found in request to verify the signature";
             LOG.warn(message);
-            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
+            fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
             return createUnsuccessfulOcspResp(OcspResponseStatus.unauthorized);
         }
 
@@ -1215,7 +1249,7 @@ public class OcspServer {
         } catch (InvalidKeyException ex) {
             LOG.warn("securityFactory.getContentVerifierProvider, InvalidKeyException: {}",
                     ex.getMessage());
-            fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.FAILED, ex.getMessage());
+            fillAuditEvent(event, AuditLevel.ERROR, AuditStatus.FAILED, ex.getMessage());
             return createUnsuccessfulOcspResp(OcspResponseStatus.unauthorized);
         }
 
@@ -1223,7 +1257,7 @@ public class OcspServer {
         if (!sigValid) {
             String message = "request signature is invalid";
             LOG.warn(message);
-            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
+            fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
             return createUnsuccessfulOcspResp(OcspResponseStatus.unauthorized);
         }
 
@@ -1235,7 +1269,7 @@ public class OcspServer {
 
         String message = "could not build certpath for the request's signer certifcate";
         LOG.warn(message);
-        fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
+        fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
         return createUnsuccessfulOcspResp(OcspResponseStatus.unauthorized);
     } // method checkSignature
 
@@ -1308,33 +1342,22 @@ public class OcspServer {
         return new OcspRespWithCacheInfo(resp, null);
     }
 
-    private static void fillAuditEvent(final AuditEvent auditEvent, final AuditLevel level,
+    private static void fillAuditEvent(final AuditEvent event, final AuditLevel level,
             final AuditStatus status, final String message) {
+        if (event == null) {
+            return;
+        }
+
         if (level != null) {
-            auditEvent.setLevel(level);
+            event.setLevel(level);
         }
 
         if (status != null) {
-            auditEvent.setStatus(status);
+            event.setStatus(status);
         }
 
         if (message != null) {
-            auditEvent.addEventData(new AuditEventData("messsage", message));
-        }
-    }
-
-    private static void fillAuditEvent(final AuditChildEvent auditEvent, final AuditLevel level,
-            final AuditStatus status, final String message) {
-        if (level != null) {
-            auditEvent.setLevel(level);
-        }
-
-        if (status != null) {
-            auditEvent.setStatus(status);
-        }
-
-        if (message != null) {
-            auditEvent.addEventData(new AuditEventData("messsage", message));
+            event.addEventData(OcspAuditConstants.NAME_message, message);
         }
     }
 
