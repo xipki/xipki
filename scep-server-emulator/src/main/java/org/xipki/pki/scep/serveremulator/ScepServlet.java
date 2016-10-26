@@ -330,7 +330,7 @@ public class ScepServlet extends HttpServlet {
             auditEvent.addEventData(new AuditEventData("message", auditMessage));
         }
 
-        auditEvent.setDuration(System.currentTimeMillis() - auditEvent.getTimestamp().getTime());
+        auditEvent.finish();
         auditService.logEvent(auditEvent);
     }
 
