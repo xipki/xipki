@@ -32,29 +32,22 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api;
+package org.xipki.commons.common.util;
 
-import java.util.List;
+import java.util.Random;
 
 /**
- * @author Lijun Liao
- * @since 2.1.0
- */
+*
+* @author Lijun Liao
+* @since 2.1.0
+*
+*/
 
-public interface AuditEventInterface {
+public class RandomUtil {
+    private static final Random random = new Random();
 
-    AuditEventData addEventData(final AuditEventData eventData);
-
-    AuditEventData addEventData(String name, String value);
-
-    AuditEventData addEventType(String type);
-
-    boolean removeEventData(final String eventDataName);
-
-    List<AuditEventData> getEventDatas();
-
-    public void setLevel(final AuditLevel level);
-
-    public AuditStatus getStatus();
+    public static String nextHexLong() {
+        return Long.toHexString(random.nextLong());
+    }
 
 }

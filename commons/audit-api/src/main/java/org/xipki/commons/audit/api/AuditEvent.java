@@ -34,8 +34,6 @@
 
 package org.xipki.commons.audit.api;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -47,7 +45,7 @@ import java.util.Objects;
  * @since 2.0.0
  */
 
-public class AuditEvent implements AuditEventInterface {
+public class AuditEvent {
 
     /**
      * The name of the application the event belongs to.
@@ -71,14 +69,15 @@ public class AuditEvent implements AuditEventInterface {
 
     private AuditStatus status;
 
+    /**
+     * Duration in milli seconds.
+     */
     private long duration = -1;
 
     /**
      * The data array belonging to the event.
      */
     private final List<AuditEventData> eventDatas = new LinkedList<>();
-
-    private final List<AuditChildEvent> auditChildEvents = new LinkedList<>();
 
     public AuditEvent(final Date timestamp) {
         this.timestamp = (timestamp == null) ? new Date() : timestamp;
@@ -89,7 +88,6 @@ public class AuditEvent implements AuditEventInterface {
         return level;
     }
 
-    @Override
     public void setLevel(final AuditLevel level) {
         this.level = level;
     }
@@ -115,22 +113,18 @@ public class AuditEvent implements AuditEventInterface {
         return timestamp;
     }
 
-    @Override
     public List<AuditEventData> getEventDatas() {
         return Collections.unmodifiableList(eventDatas);
     }
 
-    @Override
     public AuditEventData addEventType(String type) {
         return addEventData("eventType", type);
     }
 
-    @Override
     public AuditEventData addEventData(String name, String value) {
         return addEventData(new AuditEventData(name, value));
     }
 
-    @Override
     public AuditEventData addEventData(final AuditEventData eventData) {
         Objects.requireNonNull(eventData, "eventData must not be null");
 
@@ -149,14 +143,9 @@ public class AuditEvent implements AuditEventInterface {
         }
         eventDatas.add(eventData);
 
-        for (AuditChildEvent cae : auditChildEvents) {
-            cae.removeEventData(eventData.getName());
-        }
-
         return ret;
     }
 
-    @Override
     public boolean removeEventData(String eventDataName) {
         Objects.requireNonNull(eventDataName, "eventDataName must not be null");
 
@@ -173,17 +162,9 @@ public class AuditEvent implements AuditEventInterface {
             removed = true;
         }
 
-        for (AuditChildEvent cae : auditChildEvents) {
-            boolean caeRemoved = cae.removeEventData(eventDataName);
-            if (caeRemoved) {
-                removed = true;
-            }
-        }
-
         return removed;
     }
 
-    @Override
     public AuditStatus getStatus() {
         return status;
     }
@@ -192,50 +173,12 @@ public class AuditEvent implements AuditEventInterface {
         this.status = Objects.requireNonNull(status, "status must not be null");
     }
 
-    public void addAuditChildEvent(final AuditChildEvent auditChildEvent) {
-        Objects.requireNonNull(auditChildEvent, "auditChildEvent must not be null");
-        auditChildEvents.add(auditChildEvent);
-    }
-
-    public boolean containsAuditChildEvents() {
-        return !auditChildEvents.isEmpty();
-    }
-
-    public List<AuditEvent> expandAuditEvents() {
-        int size = auditChildEvents.size();
-        if (size == 0) {
-            return Arrays.asList(this);
-        }
-
-        List<AuditEvent> expandedEvents = new ArrayList<>(size);
-        for (AuditChildEvent child : auditChildEvents) {
-            AuditEvent event = new AuditEvent(timestamp);
-            event.setApplicationName(applicationName);
-            event.setName(name);
-            event.setLevel((child.getLevel() != null) ? child.getLevel() : level);
-            event.setStatus((child.getStatus() != null) ? child.getStatus() : status);
-
-            for (AuditEventData eventData : eventDatas) {
-                event.addEventData(eventData);
-            }
-
-            for (AuditEventData eventData : child.getEventDatas()) {
-                event.addEventData(eventData);
-            }
-
-            event.setDuration(duration);
-            expandedEvents.add(event);
-        }
-
-        return expandedEvents;
+    public void finish() {
+        this.duration = System.currentTimeMillis() - timestamp.getTime();
     }
 
     public long getDuration() {
         return duration;
-    }
-
-    public void setDuration(final long duration) {
-        this.duration = duration;
     }
 
 }
