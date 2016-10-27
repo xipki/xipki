@@ -183,13 +183,13 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     public boolean verifyPopo(final PKCS10CertificationRequest csr,
             final AlgorithmValidator algoValidator) {
         if (algoValidator != null) {
-            AlgorithmIdentifier algoId = csr.getSignatureAlgorithm();
-            if (!algoValidator.isAlgorithmPermitted(algoId)) {
+            AlgorithmIdentifier algId = csr.getSignatureAlgorithm();
+            if (!algoValidator.isAlgorithmPermitted(algId)) {
                 String algoName;
                 try {
-                    algoName = AlgorithmUtil.getSignatureAlgoName(algoId);
+                    algoName = AlgorithmUtil.getSignatureAlgoName(algId);
                 } catch (NoSuchAlgorithmException ex) {
-                    algoName = algoId.getAlgorithm().getId();
+                    algoName = algId.getAlgorithm().getId();
                 }
 
                 LOG.error("POPO signature algorithm {} not permitted", algoName);

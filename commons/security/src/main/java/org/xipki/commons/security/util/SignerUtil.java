@@ -139,7 +139,7 @@ public class SignerUtil {
 
         AlgorithmIdentifier digAlgId;
         try {
-            digAlgId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(sigAlgId);
+            digAlgId = AlgorithmUtil.extractDigesetAlgId(sigAlgId);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }
