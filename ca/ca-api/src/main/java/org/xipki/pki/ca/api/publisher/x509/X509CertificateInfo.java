@@ -99,7 +99,7 @@ public class X509CertificateInfo {
             algId = (params == null) ? new AlgorithmIdentifier(oid)
                     : new AlgorithmIdentifier(oid, new ASN1StreamParser(params).readObject());
 
-            AlgorithmIdentifier hashId = AlgorithmUtil.extractDigesetAlgorithmIdentifier(algId);
+            AlgorithmIdentifier hashId = AlgorithmUtil.extractDigesetAlgId(algId);
             this.hashAlgo = HashAlgoType.getNonNullHashAlgoType(hashId.getAlgorithm().getId());
         } catch (IllegalArgumentException | IOException | NoSuchAlgorithmException ex) {
             throw new CertificateEncodingException(

@@ -224,7 +224,7 @@ public class X509CertprofileQa {
 
                 // check parameters
                 if (!issue.isFailed()) {
-                    AlgorithmIdentifier expSigAlgId = AlgorithmUtil.getSignatureAlgoId(sigAlgo);
+                    AlgorithmIdentifier expSigAlgId = AlgorithmUtil.getSigAlgId(sigAlgo);
                     if (!expSigAlgId.equals(sigAlgId)) {
                         issue.setFailureMessage("invalid parameters");
                     }

@@ -130,7 +130,7 @@ public class P11ContentSignerBuilder {
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
         if (publicKey instanceof RSAPublicKey) {
-            if (!AlgorithmUtil.isRSASignatureAlgoId(signatureAlgId)) {
+            if (!AlgorithmUtil.isRSASigAlgId(signatureAlgId)) {
                 throw new XiSecurityException(
                         "the given algorithm is not a valid RSA signature algorithm '"
                         + signatureAlgId.getAlgorithm().getId() + "'");

@@ -233,13 +233,13 @@ public class AlgorithmUtil {
 
     public static String canonicalizeSignatureAlgo(final String algoName)
     throws NoSuchAlgorithmException {
-        return getSignatureAlgoName(getSignatureAlgoId(algoName));
+        return getSignatureAlgoName(getSigAlgId(algoName));
     }
 
-    public static AlgorithmIdentifier getSignatureAlgoId(final String signatureAlgoName)
+    public static AlgorithmIdentifier getSigAlgId(final String sigAlgName)
     throws NoSuchAlgorithmException {
-        ParamUtil.requireNonNull("signatureAlgoName", signatureAlgoName);
-        String algoS = signatureAlgoName.toUpperCase();
+        ParamUtil.requireNonNull("sigAlgName", sigAlgName);
+        String algoS = sigAlgName.toUpperCase();
         if (algoS.indexOf('-') != -1 && algoS.indexOf("SHA3-") == -1) {
             algoS = algoS.replaceAll("-", "");
         }
@@ -278,7 +278,7 @@ public class AlgorithmUtil {
                         + algoS);
             }
 
-            signatureAlgId = buildRSAPSSAlgorithmIdentifier(hashAlgo);
+            signatureAlgId = buildRSAPSSAlgId(hashAlgo);
         } else {
             boolean withNullParam = false;
             ASN1ObjectIdentifier algOid;
@@ -436,13 +436,13 @@ public class AlgorithmUtil {
         }
 
         return signatureAlgId;
-    } // method getSignatureAlgoId
+    } // method getSigAlgId
 
-    public static AlgorithmIdentifier getSignatureAlgoId(final PublicKey pubKey,
+    public static AlgorithmIdentifier getSigAlgId(final PublicKey pubKey,
             final SignerConf signerConf) throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("signerConf", signerConf);
         if (signerConf.getHashAlgo() == null) {
-            return getSignatureAlgoId(signerConf.getConfValue("algo"));
+            return getSigAlgId(signerConf.getConfValue("algo"));
         } else {
             SignatureAlgoControl algoControl = signerConf.getSignatureAlgoControl();
             HashAlgoType hashAlgo = signerConf.getHashAlgo();
@@ -450,11 +450,11 @@ public class AlgorithmUtil {
             boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
 
             if (pubKey instanceof RSAPublicKey) {
-                return getRSASignatureAlgoId(hashAlgo, rsaMgf1);
+                return getRSASigAlgId(hashAlgo, rsaMgf1);
             } else if (pubKey instanceof ECPublicKey) {
-                return getECDSASignatureAlgoId(hashAlgo, dsaPlain);
+                return getECDSASigAlgId(hashAlgo, dsaPlain);
             } else if (pubKey instanceof DSAPublicKey) {
-                return getDSASignatureAlgoId(hashAlgo);
+                return getDSASigAlgId(hashAlgo);
             } else {
                 throw new NoSuchAlgorithmException("Unknown public key '"
                         + pubKey.getClass().getName());
@@ -462,7 +462,7 @@ public class AlgorithmUtil {
         }
     }
 
-    public static AlgorithmIdentifier getSignatureAlgoId(final PublicKey pubKey,
+    public static AlgorithmIdentifier getSigAlgId(final PublicKey pubKey,
             final HashAlgoType hashAlgo, final SignatureAlgoControl algoControl)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
@@ -470,11 +470,11 @@ public class AlgorithmUtil {
         boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
 
         if (pubKey instanceof RSAPublicKey) {
-            return getRSASignatureAlgoId(hashAlgo, rsaMgf1);
+            return getRSASigAlgId(hashAlgo, rsaMgf1);
         } else if (pubKey instanceof ECPublicKey) {
-            return getECDSASignatureAlgoId(hashAlgo, dsaPlain);
+            return getECDSASigAlgId(hashAlgo, dsaPlain);
         } else if (pubKey instanceof DSAPublicKey) {
-            return getDSASignatureAlgoId(hashAlgo);
+            return getDSASigAlgId(hashAlgo);
         } else {
             throw new NoSuchAlgorithmException("Unknown public key '"
                     + pubKey.getClass().getName());
@@ -482,7 +482,7 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static boolean isRSASignatureAlgoId(final AlgorithmIdentifier algId) {
+    public static boolean isRSASigAlgId(final AlgorithmIdentifier algId) {
         ParamUtil.requireNonNull("algId", algId);
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
         if (PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(oid)
@@ -563,115 +563,115 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier getRSASignatureAlgoId(final HashAlgoType hashAlgo,
+    public static AlgorithmIdentifier getRSASigAlgId(final HashAlgoType hashAlgo,
             final boolean mgf1)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         if (mgf1) {
-            return buildRSAPSSAlgorithmIdentifier(hashAlgo);
+            return buildRSAPSSAlgId(hashAlgo);
         }
 
-        ASN1ObjectIdentifier sigAlgoOid;
+        ASN1ObjectIdentifier sigAlgOid;
         switch (hashAlgo) {
         case SHA1:
-            sigAlgoOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
+            sigAlgOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
             break;
         case SHA224:
-            sigAlgoOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
+            sigAlgOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
             break;
         case SHA256:
-            sigAlgoOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
+            sigAlgOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
             break;
         case SHA384:
-            sigAlgoOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
+            sigAlgOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
             break;
         case SHA512:
-            sigAlgoOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
+            sigAlgOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
             break;
         case SHA3_224:
-            sigAlgoOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224;
+            sigAlgOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224;
             break;
         case SHA3_256:
-            sigAlgoOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256;
+            sigAlgOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256;
             break;
         case SHA3_384:
-            sigAlgoOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384;
+            sigAlgOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384;
             break;
         case SHA3_512:
-            sigAlgoOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512;
+            sigAlgOid = NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512;
             break;
         default:
             throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
         }
 
-        return new AlgorithmIdentifier(sigAlgoOid, DERNull.INSTANCE);
-    } // method getRSASignatureAlgoId
+        return new AlgorithmIdentifier(sigAlgOid, DERNull.INSTANCE);
+    } // method getRSASigAlgId
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier getDSASignatureAlgoId(final HashAlgoType hashAlgo)
+    public static AlgorithmIdentifier getDSASigAlgId(final HashAlgoType hashAlgo)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
-        ASN1ObjectIdentifier sigAlgoOid;
+        ASN1ObjectIdentifier sigAlgOid;
         switch (hashAlgo) {
         case SHA1:
-            sigAlgoOid = X9ObjectIdentifiers.id_dsa_with_sha1;
+            sigAlgOid = X9ObjectIdentifiers.id_dsa_with_sha1;
             break;
         case SHA224:
-            sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha224;
+            sigAlgOid = NISTObjectIdentifiers.dsa_with_sha224;
             break;
         case SHA256:
-            sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha256;
+            sigAlgOid = NISTObjectIdentifiers.dsa_with_sha256;
             break;
         case SHA384:
-            sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha384;
+            sigAlgOid = NISTObjectIdentifiers.dsa_with_sha384;
             break;
         case SHA512:
-            sigAlgoOid = NISTObjectIdentifiers.dsa_with_sha512;
+            sigAlgOid = NISTObjectIdentifiers.dsa_with_sha512;
             break;
         case SHA3_224:
-            sigAlgoOid = NISTObjectIdentifiers.id_dsa_with_sha3_224;
+            sigAlgOid = NISTObjectIdentifiers.id_dsa_with_sha3_224;
             break;
         case SHA3_256:
-            sigAlgoOid = NISTObjectIdentifiers.id_dsa_with_sha3_256;
+            sigAlgOid = NISTObjectIdentifiers.id_dsa_with_sha3_256;
             break;
         case SHA3_384:
-            sigAlgoOid = NISTObjectIdentifiers.id_dsa_with_sha3_384;
+            sigAlgOid = NISTObjectIdentifiers.id_dsa_with_sha3_384;
             break;
         case SHA3_512:
-            sigAlgoOid = NISTObjectIdentifiers.id_dsa_with_sha3_512;
+            sigAlgOid = NISTObjectIdentifiers.id_dsa_with_sha3_512;
             break;
         default:
             throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
         }
 
-        return new AlgorithmIdentifier(sigAlgoOid);
-    } // method getDSASignatureAlgoId
+        return new AlgorithmIdentifier(sigAlgOid);
+    } // method getDSASigAlgId
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier getECDSASignatureAlgoId(final HashAlgoType hashAlgo,
+    public static AlgorithmIdentifier getECDSASigAlgId(final HashAlgoType hashAlgo,
             final boolean plainSignature)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
-        ASN1ObjectIdentifier sigAlgoOid;
+        ASN1ObjectIdentifier sigAlgOid;
 
         if (plainSignature) {
             switch (hashAlgo) {
             case SHA1:
-                sigAlgoOid = BSIObjectIdentifiers.ecdsa_plain_SHA1;
+                sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA1;
                 break;
             case SHA224:
-                sigAlgoOid = BSIObjectIdentifiers.ecdsa_plain_SHA224;
+                sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA224;
                 break;
             case SHA256:
-                sigAlgoOid = BSIObjectIdentifiers.ecdsa_plain_SHA256;
+                sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA256;
                 break;
             case SHA384:
-                sigAlgoOid = BSIObjectIdentifiers.ecdsa_plain_SHA384;
+                sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA384;
                 break;
             case SHA512:
-                sigAlgoOid = BSIObjectIdentifiers.ecdsa_plain_SHA512;
+                sigAlgOid = BSIObjectIdentifiers.ecdsa_plain_SHA512;
                 break;
             default:
                 throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
@@ -679,42 +679,42 @@ public class AlgorithmUtil {
         } else {
             switch (hashAlgo) {
             case SHA1:
-                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
                 break;
             case SHA224:
-                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
                 break;
             case SHA256:
-                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
                 break;
             case SHA384:
-                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
                 break;
             case SHA512:
-                sigAlgoOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
                 break;
             case SHA3_224:
-                sigAlgoOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_224;
+                sigAlgOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_224;
                 break;
             case SHA3_256:
-                sigAlgoOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_256;
+                sigAlgOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_256;
                 break;
             case SHA3_384:
-                sigAlgoOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_384;
+                sigAlgOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_384;
                 break;
             case SHA3_512:
-                sigAlgoOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_512;
+                sigAlgOid = NISTObjectIdentifiers.id_ecdsa_with_sha3_512;
                 break;
             default:
                 throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
             }
         }
 
-        return new AlgorithmIdentifier(sigAlgoOid);
-    } // method getECDSASignatureAlgoId
+        return new AlgorithmIdentifier(sigAlgOid);
+    } // method getECDSASigAlgId
 
-    public static AlgorithmIdentifier extractDigesetAlgorithmIdentifier(
-            final AlgorithmIdentifier sigAlgId) throws NoSuchAlgorithmException {
+    public static AlgorithmIdentifier extractDigesetAlgId(final AlgorithmIdentifier sigAlgId)
+    throws NoSuchAlgorithmException {
         ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
 
         ASN1ObjectIdentifier digestAlgOid;
@@ -856,14 +856,14 @@ public class AlgorithmUtil {
     }
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier buildRSAPSSAlgorithmIdentifier(final HashAlgoType digestAlg)
+    public static AlgorithmIdentifier buildRSAPSSAlgId(final HashAlgoType digestAlg)
     throws NoSuchAlgorithmException {
         RSASSAPSSparams params = createPSSRSAParams(digestAlg);
         return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
     }
 
     // CHECKSTYLE:SKIP
-    public static AlgorithmIdentifier buildDSASigAlgorithmIdentifier(final HashAlgoType digestAlg)
+    public static AlgorithmIdentifier buildDSASigAlgId(final HashAlgoType digestAlg)
     throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("digestAlg", digestAlg);
 

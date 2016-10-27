@@ -92,6 +92,7 @@ import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -203,6 +204,8 @@ public class OcspServer {
     public static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
+
+    private static final byte[] DERNullBytes = new byte[]{5, 0};
 
     private final DataSourceFactory datasourceFactory;
 
@@ -753,7 +756,7 @@ public class OcspServer {
             if (repControl.includeExtendedRevokeExtension) {
                 responseExtensions.add(
                         new Extension(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke, true,
-                                DERNull.INSTANCE.getEncoded()));
+                                Arrays.clone(DERNullBytes)));
             }
 
             if (CollectionUtil.isNonEmpty(responseExtensions)) {
@@ -994,9 +997,8 @@ public class OcspServer {
 
         byte[] certHash = certStatusInfo.getCertHash();
         if (certHash != null) {
-            ASN1ObjectIdentifier hashAlgoOid = certStatusInfo.getCertHashAlgo().getOid();
-            AlgorithmIdentifier hashAlgId =
-                    new AlgorithmIdentifier(hashAlgoOid, DERNull.INSTANCE);
+            ASN1ObjectIdentifier hashAlgOid = certStatusInfo.getCertHashAlgo().getOid();
+            AlgorithmIdentifier hashAlgId = new AlgorithmIdentifier(hashAlgOid, DERNull.INSTANCE);
             CertHash bcCertHash = new CertHash(hashAlgId, certHash);
 
             byte[] encodedCertHash;

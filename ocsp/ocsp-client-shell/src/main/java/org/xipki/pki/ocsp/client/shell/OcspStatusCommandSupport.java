@@ -94,13 +94,13 @@ public abstract class OcspStatusCommandSupport extends XipkiCommandSupport {
     protected OcspRequestor requestor;
 
     protected RequestOptions getRequestOptions() throws Exception {
-        ASN1ObjectIdentifier hashAlgoOid = AlgorithmUtil.getHashAlg(hashAlgo);
+        ASN1ObjectIdentifier hashAlgOid = AlgorithmUtil.getHashAlg(hashAlgo);
         RequestOptions options = new RequestOptions();
         options.setUseNonce(usenonce.booleanValue());
         if (nonceLen != null) {
             options.setNonceLen(nonceLen);
         }
-        options.setHashAlgorithmId(hashAlgoOid);
+        options.setHashAlgorithmId(hashAlgOid);
         options.setSignRequest(signRequest.booleanValue());
         options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
 

@@ -199,10 +199,10 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
             AlgorithmIdentifier signatureAlgId;
             if (conf.getHashAlgo() == null) {
-                signatureAlgId = AlgorithmUtil.getSignatureAlgoId(null, conf);
+                signatureAlgId = AlgorithmUtil.getSigAlgId(null, conf);
             } else {
                 PublicKey pubKey = signerBuilder.getCert().getPublicKey();
-                signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, conf);
+                signatureAlgId = AlgorithmUtil.getSigAlgId(pubKey, conf);
             }
 
             return signerBuilder.createSigner(signatureAlgId, parallelism,
@@ -285,10 +285,10 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         try {
             AlgorithmIdentifier signatureAlgId;
             if (conf.getHashAlgo() == null) {
-                signatureAlgId = AlgorithmUtil.getSignatureAlgoId(null, conf);
+                signatureAlgId = AlgorithmUtil.getSigAlgId(null, conf);
             } else {
                 PublicKey pubKey = slot.getIdentity(p11ObjId).getPublicKey();
-                signatureAlgId = AlgorithmUtil.getSignatureAlgoId(pubKey, conf);
+                signatureAlgId = AlgorithmUtil.getSigAlgId(pubKey, conf);
             }
 
             P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(p11Service,
