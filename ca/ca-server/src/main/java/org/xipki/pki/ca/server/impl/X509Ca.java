@@ -696,7 +696,6 @@ public class X509Ca {
                 crlBuilder.setNextUpdate(nextUpdate);
             }
 
-            long startId = 1;
             final int numEntries = 100;
 
             X509Cert caCert = caInfo.getCertificate();
@@ -711,6 +710,7 @@ public class X509Ca {
                 notExpireAt = new Date(thisUpdate.getTime() - 600L * MS_PER_SECOND);
             }
 
+            long startId = 1;
             do {
                 if (deltaCrl) {
                     revInfos = certstore.getCertsForDeltaCrl(caCert, startId, numEntries,
@@ -827,78 +827,8 @@ public class X509Ca {
                 throw new OperationException(ErrorCode.INVALID_EXTENSION, ex);
             }
 
-            startId = 1;
-            if (!deltaCrl && control.isXipkiCertsetIncluded()) { // XiPKI extension
-                /* TODO: move the code to new method
-                 * Xipki-CrlCertSet ::= SET OF Xipki-CrlCert
-                 *
-                 * Xipki-CrlCert ::= SEQUENCE {
-                 *         serial            INTEGER
-                 *         cert        [0] EXPLICIT    Certificate OPTIONAL
-                 *         profileName [1] EXPLICIT    UTF8String    OPTIONAL
-                 *         }
-                 */
-                ASN1EncodableVector vector = new ASN1EncodableVector();
-
-                List<SerialWithId> serials;
-
-                do {
-                    serials = certstore.getCertSerials(caCert, notExpireAt, startId, numEntries,
-                            false, onlyCaCerts, onlyUserCerts);
-
-                    long maxId = 1;
-                    for (SerialWithId sid : serials) {
-                        if (sid.getId() > maxId) {
-                            maxId = sid.getId();
-                        }
-
-                        ASN1EncodableVector vec = new ASN1EncodableVector();
-                        vec.add(new ASN1Integer(sid.getSerial()));
-
-                        String profileName = null;
-
-                        if (control.isXipkiCertsetCertIncluded()) {
-                            X509CertificateInfo certInfo;
-                            try {
-                                certInfo = certstore.getCertificateInfoForId(caCert, sid.getId());
-                            } catch (CertificateException ex) {
-                                throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                                        "CertificateException: " + ex.getMessage());
-                            }
-
-                            Certificate cert = Certificate.getInstance(
-                                    certInfo.getCert().getEncodedCert());
-
-                            vec.add(new DERTaggedObject(true, 0, cert));
-
-                            if (control.isXipkiCertsetProfilenameIncluded()) {
-                                profileName = certInfo.getProfileName();
-                            }
-                        } else if (control.isXipkiCertsetProfilenameIncluded()) {
-                            profileName = certstore.getCertProfileForId(caCert, sid.getId());
-                        }
-
-                        if (StringUtil.isNotBlank(profileName)) {
-                            vec.add(new DERTaggedObject(true, 1, new DERUTF8String(profileName)));
-                        }
-
-                        ASN1Sequence certWithInfo = new DERSequence(vec);
-
-                        vector.add(certWithInfo);
-                    } // end for
-
-                    startId = maxId + 1;
-                } while (serials.size() >= numEntries);
-                // end do
-
-                try {
-                    crlBuilder.addExtension(ObjectIdentifiers.id_xipki_ext_crlCertset, false,
-                            new DERSet(vector));
-                } catch (CertIOException ex) {
-                    throw new OperationException(ErrorCode.INVALID_EXTENSION,
-                            "CertIOException: " + ex.getMessage());
-                }
-            }
+            addXipkiCertset(crlBuilder, deltaCrl, control, caCert, notExpireAt, onlyCaCerts,
+                    onlyUserCerts);
 
             ConcurrentContentSigner concurrentSigner = (tmpCrlSigner == null)
                     ? caInfo.getSigner(null) : tmpCrlSigner;
@@ -937,6 +867,87 @@ public class X509Ca {
             }
         }
     } // method generateCrl
+
+    /**
+     * Add XiPKI extension CrlCertSet.
+     *
+     * <pre>
+     * Xipki-CrlCertSet ::= SET OF Xipki-CrlCert
+     *
+     * Xipki-CrlCert ::= SEQUENCE {
+     *         serial            INTEGER
+     *         cert        [0] EXPLICIT    Certificate OPTIONAL
+     *         profileName [1] EXPLICIT    UTF8String    OPTIONAL
+     *         }
+     * </pre>
+     */
+    private void addXipkiCertset(final X509v2CRLBuilder crlBuilder, final boolean deltaCrl,
+            final CrlControl control, final X509Cert caCert, final Date notExpireAt,
+            final boolean onlyCaCerts, final boolean onlyUserCerts) throws OperationException {
+        if (deltaCrl || !control.isXipkiCertsetIncluded()) {
+            return;
+        }
+
+        ASN1EncodableVector vector = new ASN1EncodableVector();
+        final int numEntries = 100;
+        long startId = 1;
+
+        List<SerialWithId> serials;
+        do {
+            serials = certstore.getCertSerials(caCert, notExpireAt, startId, numEntries, false,
+                    onlyCaCerts, onlyUserCerts);
+
+            long maxId = 1;
+            for (SerialWithId sid : serials) {
+                if (sid.getId() > maxId) {
+                    maxId = sid.getId();
+                }
+
+                ASN1EncodableVector vec = new ASN1EncodableVector();
+                vec.add(new ASN1Integer(sid.getSerial()));
+
+                String profileName = null;
+
+                if (control.isXipkiCertsetCertIncluded()) {
+                    X509CertificateInfo certInfo;
+                    try {
+                        certInfo = certstore.getCertificateInfoForId(caCert, sid.getId());
+                    } catch (CertificateException ex) {
+                        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                                "CertificateException: " + ex.getMessage());
+                    }
+
+                    Certificate cert = Certificate.getInstance(certInfo.getCert().getEncodedCert());
+                    vec.add(new DERTaggedObject(true, 0, cert));
+
+                    if (control.isXipkiCertsetProfilenameIncluded()) {
+                        profileName = certInfo.getProfileName();
+                    }
+                } else if (control.isXipkiCertsetProfilenameIncluded()) {
+                    profileName = certstore.getCertProfileForId(caCert, sid.getId());
+                }
+
+                if (StringUtil.isNotBlank(profileName)) {
+                    vec.add(new DERTaggedObject(true, 1, new DERUTF8String(profileName)));
+                }
+
+                ASN1Sequence certWithInfo = new DERSequence(vec);
+
+                vector.add(certWithInfo);
+            } // end for
+
+            startId = maxId + 1;
+        } while (serials.size() >= numEntries);
+        // end do
+
+        try {
+            crlBuilder.addExtension(ObjectIdentifiers.id_xipki_ext_crlCertset, false,
+                    new DERSet(vector));
+        } catch (CertIOException ex) {
+            throw new OperationException(ErrorCode.INVALID_EXTENSION,
+                    "CertIOException: " + ex.getMessage());
+        }
+    }
 
     public X509CertificateInfo regenerateCertificate(final CertTemplateData certTemplate,
             final boolean requestedByRa, final RequestorInfo requestor, final String user,
