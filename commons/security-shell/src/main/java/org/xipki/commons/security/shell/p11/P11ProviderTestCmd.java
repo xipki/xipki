@@ -141,9 +141,9 @@ public class P11ProviderTestCmd extends P11SecurityCommandSupport {
 
     private String getSignatureAlgo(final PublicKey pubKey) throws NoSuchAlgorithmException {
         SignatureAlgoControl algoControl = new SignatureAlgoControl(rsaMgf1, dsaPlain);
-        AlgorithmIdentifier sigAlgoId = AlgorithmUtil.getSignatureAlgoId(pubKey,
+        AlgorithmIdentifier sigAlgId = AlgorithmUtil.getSigAlgId(pubKey,
                 HashAlgoType.getNonNullHashAlgoType(hashAlgo), algoControl);
-        return AlgorithmUtil.getSignatureAlgoName(sigAlgoId);
+        return AlgorithmUtil.getSignatureAlgoName(sigAlgId);
     }
 
 }

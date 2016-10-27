@@ -106,14 +106,14 @@ public class SoftTokenContentSignerBuilder {
         private RSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
                 final boolean useNssForPss)
         throws NoSuchAlgorithmException, NoSuchPaddingException {
-            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgId(signatureAlgId));
             this.useNssForPss = useNssForPss;
             super.digestProvider = XipkiDigestProvider.INSTANCE;
         }
 
         protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
                 final AlgorithmIdentifier digAlgId) throws OperatorCreationException {
-            if (!AlgorithmUtil.isRSASignatureAlgoId(sigAlgId)) {
+            if (!AlgorithmUtil.isRSASigAlgId(sigAlgId)) {
                 throw new OperatorCreationException(
                         "the given algorithm is not a valid RSA signature algirthm '"
                         + sigAlgId.getAlgorithm().getId() + "'");
@@ -156,7 +156,7 @@ public class SoftTokenContentSignerBuilder {
 
         private DSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
                 final boolean plain) throws NoSuchAlgorithmException {
-            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgId(signatureAlgId));
             this.plain = plain;
             super.digestProvider = XipkiDigestProvider.INSTANCE;
         }
@@ -184,7 +184,7 @@ public class SoftTokenContentSignerBuilder {
 
         private ECDSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
                 final boolean plain) throws NoSuchAlgorithmException {
-            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgId(signatureAlgId));
             this.plain = plain;
             super.digestProvider = XipkiDigestProvider.INSTANCE;
         }
