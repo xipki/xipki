@@ -297,22 +297,30 @@ public class HttpOcspServlet extends HttpServlet {
         } finally {
             try {
                 response.flushBuffer();
+            } catch (IOException ex) {
+                final String message = "error while calling responsse.flushBuffer";
+                LogUtil.error(LOG, ex, message);
+                auditLevel = AuditLevel.ERROR;
+                auditStatus = AuditStatus.FAILED;
+                auditMessage = "internal error";
             } finally {
-                if (auditLevel != null) {
-                    event.setLevel(auditLevel);
-                }
+                if (event != null) {
+                    if (auditLevel != null) {
+                        event.setLevel(auditLevel);
+                    }
 
-                if (auditStatus != null) {
-                    event.setStatus(auditStatus);
-                }
+                    if (auditStatus != null) {
+                        event.setStatus(auditStatus);
+                    }
 
-                if (auditMessage != null) {
-                    event.addEventData("message", auditMessage);
-                }
+                    if (auditMessage != null) {
+                        event.addEventData("message", auditMessage);
+                    }
 
-                event.finish();
-                auditService.logEvent(event);
-            } // end inner try
+                    event.finish();
+                    auditService.logEvent(event);
+                }
+            } // end internal try
         } // end external try
     } // method processRequest
 
