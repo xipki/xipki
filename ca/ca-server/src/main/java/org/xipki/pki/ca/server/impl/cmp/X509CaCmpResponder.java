@@ -98,6 +98,7 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -116,6 +117,7 @@ import org.xipki.commons.audit.api.AuditEvent;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -762,7 +764,7 @@ public class X509CaCmpResponder extends CmpResponder {
                             PKIFailureInfo.badCertTemplate, "issuer is not present");
                 } else if (!issuer.equals(caSubject)) {
                     return buildErrorMsgPkiBody(PKIStatus.rejection,
-                            PKIFailureInfo.badCertTemplate, "issuer not targets at the CA");
+                            PKIFailureInfo.badCertTemplate, "issuer does not target at the CA");
                 } else if (serialNumber == null) {
                     return buildErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate, "serialNumber is not present");
@@ -771,12 +773,67 @@ public class X509CaCmpResponder extends CmpResponder {
                         || certDetails.getSubject() != null
                         || certDetails.getPublicKey() != null
                         || certDetails.getIssuerUID() != null
-                        || certDetails.getSubjectUID() != null
-                        || certDetails.getExtensions() != null) {
+                        || certDetails.getSubjectUID() != null) {
                     return buildErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate,
                             "only version, issuer and serialNumber in RevDetails.certDetails are "
                             + "allowed, but more is specified");
+                } else if (certDetails.getExtensions() != null) {
+                    Extensions exts = certDetails.getExtensions();
+                    ASN1ObjectIdentifier[] oids = exts.getCriticalExtensionOIDs();
+                    if (oids != null) {
+                        for (ASN1ObjectIdentifier oid : oids) {
+                            if (!Extension.authorityKeyIdentifier.equals(oid)) {
+                                return buildErrorMsgPkiBody(PKIStatus.rejection,
+                                        PKIFailureInfo.badCertTemplate,
+                                        "unknown critical extension " + oid.getId());
+                            }
+                        }
+                    }
+                    
+                    Extension ext = exts.getExtension(Extension.authorityKeyIdentifier);
+                    if (ext != null) {
+                        AuthorityKeyIdentifier aki = 
+                                AuthorityKeyIdentifier.getInstance(ext.getParsedValue());
+
+                        boolean issuerMatched = true;
+
+                        if (issuerMatched && aki.getKeyIdentifier() != null) {
+                            byte[] caSki = getCa().getCaInfo().getCertificate()
+                                    .getSubjectKeyIdentifier();
+                            if (Arrays.equals(caSki, aki.getKeyIdentifier())) {
+                                issuerMatched = false;
+                            }
+                        }
+
+                        if (issuerMatched && aki.getAuthorityCertSerialNumber() != null) {
+                            BigInteger caSerial = getCa().getCaInfo().getSerialNumber();
+                            if (!caSerial.equals(aki.getAuthorityCertSerialNumber())) {
+                                issuerMatched = false;
+                            }
+                        }
+
+                        if (issuerMatched && aki.getAuthorityCertIssuer() != null) {
+                            GeneralName[] names = aki.getAuthorityCertIssuer().getNames();
+                            for (GeneralName name : names) {
+                                if (name.getTagNo() != GeneralName.directoryName) {
+                                    issuerMatched = false;
+                                    break;
+                                }
+                                
+                                if (!caSubject.equals(name.getName())) {
+                                    issuerMatched = false;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (!issuerMatched) {
+                            return buildErrorMsgPkiBody(PKIStatus.rejection,
+                                    PKIFailureInfo.badCertTemplate,
+                                    "issuer does not target at the CA");
+                        }
+                    }
                 }
             } catch (IllegalArgumentException ex) {
                 return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest,
