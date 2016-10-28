@@ -4,6 +4,8 @@ echo "#################################################################"
 echo "#             MANAGE CERTIFICATE VIA REST INTERFACE             #"
 echo "#################################################################"
 
+CA_SHA1FP = $(xipki-tk:cert-info --fingerprint --hash SHA1 --in output/SubCAwithCRL1.der)
+
 xipki-tk:req-p12 \
   --hash $HASH REPLACEME-DSAPLAIN REPLACEME-RSAMGF1 \
   --p12 output/REST-TLS1.p12 \

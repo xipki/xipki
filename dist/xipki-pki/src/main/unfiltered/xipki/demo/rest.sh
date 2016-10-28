@@ -2,12 +2,15 @@
 
 # Please adapt the URL
 BASE_URL="https://localhost:8443/rest/SubCAwithCRL"
+CACERT="output/SubCAwithCRL1.der"
 
 echo "base url: ${BASE_URL}"
 
 DIRNAME=`dirname $0`
 
 echo "working dir: ${DIRNAME}"
+
+CA_SHA1FP=`openssl sha1 ${DIR}/../../${CACERT} | cut -d '=' -f 2 | cut -d ' ' -f`
 
 SSL="-k --cert ${DIRNAME}/../security/tlskeys/tls-client.pem --key ${DIRNAME}/../security/tlskeys/tls-client-privateKey.pem"
 
@@ -43,17 +46,17 @@ SERIAL=0X`openssl x509 -inform der -serial -noout -in ${filename}.der | cut -d '
 echo "suspend certificate"
 
 curl ${SSL} \
-    "${BASE_URL}/revoke-cert?serial-number=${SERIAL}&reason=certificateHold"
+    "${BASE_URL}/revoke-cert?ca-sha1={CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
-echo "ussuspend certificate"
-
-curl ${SSL} \
-    "${BASE_URL}/revoke-cert?serial-number=${SERIAL}&reason=removeFromCRL"
-
-echo "ussuspend certificate"
+echo "unsuspend certificate"
 
 curl ${SSL} \
-    "${BASE_URL}/revoke-cert?serial-number=${SERIAL}&reason=keyCompromise"
+    "${BASE_URL}/revoke-cert?ca-sha1={CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
+
+echo "revoke certificate"
+
+curl ${SSL} \
+    "${BASE_URL}/revoke-cert?ca-sha1={CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
 echo "generate new CRL"
 

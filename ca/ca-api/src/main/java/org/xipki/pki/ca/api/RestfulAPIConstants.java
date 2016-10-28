@@ -108,6 +108,8 @@ public class RestfulAPIConstants {
 
     public static final String PARAM_crl_number = "crl-number";
 
+    public static final String PARAM_ca_sha1 = "ca-sha1";
+
     public static final String PARAM_serial_number = "serial-number";
 
 }

@@ -2581,6 +2581,10 @@ public class X509Ca {
         return caInfo.getName();
     }
 
+    public String getHexSha1OfCert() {
+        return caInfo.getCaEntry().getHexSha1OfCert();
+    }
+
     void shutdown() {
         if (crlGenerationService != null) {
             crlGenerationService.cancel(false);

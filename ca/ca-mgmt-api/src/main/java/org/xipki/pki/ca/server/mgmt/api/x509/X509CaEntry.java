@@ -44,6 +44,7 @@ import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.CertRevocationInfo;
+import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.KeyUsage;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
@@ -78,6 +79,8 @@ public class X509CaEntry extends CaEntry {
 
     private String subject;
 
+    private String hexSha1OfCert;
+
     public X509CaEntry(final String name, final int serialNoBitLen, final long nextCrlNumber,
             final String signerType, final String signerConf, final X509CaUris caUris,
             final int numCrls, final int expirationPeriod) throws CaMgmtException {
@@ -101,12 +104,20 @@ public class X509CaEntry extends CaEntry {
         if (certificate == null) {
             this.cert = null;
             this.subject = null;
+            this.hexSha1OfCert = null;
         } else {
             if (!X509Util.hasKeyusage(certificate, KeyUsage.keyCertSign)) {
                 throw new CaMgmtException("CA certificate does not have keyusage keyCertSign");
             }
             this.cert = certificate;
             this.subject = X509Util.getRfc4519Name(certificate.getSubjectX500Principal());
+            byte[] encodedCert;
+            try {
+                encodedCert = certificate.getEncoded();
+            } catch (CertificateEncodingException ex) {
+                throw new CaMgmtException("could not encoded certificate", ex);
+            }
+            this.hexSha1OfCert = HashAlgoType.SHA1.hexHash(encodedCert);
         }
     }
 
@@ -237,6 +248,9 @@ public class X509CaEntry extends CaEntry {
         return subject;
     }
 
+    public String getHexSha1OfCert() {
+        return hexSha1OfCert;
+    }
     @Override
     public void setExtraControl(final String extraControl) {
         super.setExtraControl(extraControl);

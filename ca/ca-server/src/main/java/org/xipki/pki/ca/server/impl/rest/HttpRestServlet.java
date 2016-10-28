@@ -230,7 +230,15 @@ public class HttpRestServlet extends HttpServlet {
                 }
                 respCt = RestfulAPIConstants.CT_pkix_cert;
                 respBytes = cert.getEncodedCert();
-            } else if (RestfulAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)) {
+            } else if (RestfulAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)
+                    || RestfulAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
+                String strCaSha1 = request.getParameter(RestfulAPIConstants.PARAM_ca_sha1);
+                if (StringUtil.isBlank(strCaSha1)) {
+                    throw new HttpRespAuditException(HttpServletResponse.SC_BAD_REQUEST, null,
+                            "required parameter " + RestfulAPIConstants.PARAM_ca_sha1
+                            + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
+                }
+
                 String strSerialNumber = request.getParameter(
                         RestfulAPIConstants.PARAM_serial_number);
                 if (StringUtil.isBlank(strSerialNumber)) {
@@ -239,32 +247,31 @@ public class HttpRestServlet extends HttpServlet {
                              + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
                 }
 
-                BigInteger serialNumber = toBigInt(strSerialNumber);
-
-                String strReason = request.getParameter(RestfulAPIConstants.PARAM_reason);
-                CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED
-                        : CrlReason.forNameOrText(strReason);
-
-                Date invalidityTime = null;
-                String strInvalidityTime = request.getParameter(
-                        RestfulAPIConstants.PARAM_invalidity_time);
-                if (StringUtil.isNotBlank(strInvalidityTime)) {
-                    invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
-                }
-
-                responder.revokeCert(requestor, serialNumber, reason, invalidityTime,
-                        RequestType.REST, msgId);
-            } else if (RestfulAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
-                String strSerialNumber = request.getParameter(
-                        RestfulAPIConstants.PARAM_serial_number);
-                if (StringUtil.isBlank(strSerialNumber)) {
+                if (!strCaSha1.equalsIgnoreCase(responder.getCa().getHexSha1OfCert())) {
                     throw new HttpRespAuditException(HttpServletResponse.SC_BAD_REQUEST, null,
-                            "required parameter " + RestfulAPIConstants.PARAM_serial_number
-                            + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
+                            "unknown " + RestfulAPIConstants.PARAM_ca_sha1,
+                            AuditLevel.INFO, AuditStatus.FAILED);
                 }
 
                 BigInteger serialNumber = toBigInt(strSerialNumber);
-                responder.removeCert(requestor, serialNumber, RequestType.REST, msgId);
+
+                if (RestfulAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)) {
+                    String strReason = request.getParameter(RestfulAPIConstants.PARAM_reason);
+                    CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED
+                            : CrlReason.forNameOrText(strReason);
+
+                    Date invalidityTime = null;
+                    String strInvalidityTime = request.getParameter(
+                            RestfulAPIConstants.PARAM_invalidity_time);
+                    if (StringUtil.isNotBlank(strInvalidityTime)) {
+                        invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
+                    }
+
+                    responder.revokeCert(requestor, serialNumber, reason, invalidityTime,
+                            RequestType.REST, msgId);
+                } else if (RestfulAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
+                    responder.removeCert(requestor, serialNumber, RequestType.REST, msgId);
+                }
             } else if (RestfulAPIConstants.CMD_crl.equalsIgnoreCase(command)) {
                 String strCrlNumber = request.getParameter(RestfulAPIConstants.PARAM_crl_number);
                 BigInteger crlNumber = null;
