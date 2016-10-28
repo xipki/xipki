@@ -120,7 +120,7 @@ public class CaLoadTestEnroll extends LoadExecutor {
                     request.addRequestEntry(requestEntry);
                 }
 
-                result = caClient.requestCerts(request, null,
+                result = caClient.requestCerts(null, request,
                         userPrefix + System.currentTimeMillis(), null);
             } catch (CaClientException | PkiErrorException ex) {
                 LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());

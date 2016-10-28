@@ -89,6 +89,7 @@ import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
+import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -131,6 +132,7 @@ import org.xipki.pki.ca.client.api.dto.RevokeCertRequest;
 import org.xipki.pki.ca.client.api.dto.RevokeCertRequestEntry;
 import org.xipki.pki.ca.client.api.dto.RevokeCertResultEntry;
 import org.xipki.pki.ca.client.api.dto.RevokeCertResultType;
+import org.xipki.pki.ca.client.api.dto.UnrevokeOrRemoveCertEntry;
 import org.xipki.pki.ca.client.api.dto.UnrevokeOrRemoveCertRequest;
 import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
@@ -535,6 +537,11 @@ abstract class X509CmpRequestor extends CmpRequestor {
             CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
             certTempBuilder.setIssuer(requestEntry.getIssuer());
             certTempBuilder.setSerialNumber(new ASN1Integer(requestEntry.getSerialNumber()));
+            byte[] aki = requestEntry.getAuthorityKeyIdentifier();
+            if (aki != null) {
+                Extensions certTempExts = getCertTempExtensions(aki);
+                certTempBuilder.setExtensions(certTempExts);
+            }
 
             Date invalidityDate = requestEntry.getInvalidityDate();
             int idx = (invalidityDate == null) ? 1 : 2;
@@ -568,12 +575,17 @@ abstract class X509CmpRequestor extends CmpRequestor {
             final int reasonCode) throws CmpRequestorException {
         PKIHeader header = buildPkiHeader(null);
 
-        List<IssuerSerialEntry> requestEntries = request.getRequestEntries();
+        List<UnrevokeOrRemoveCertEntry> requestEntries = request.getRequestEntries();
         List<RevDetails> revDetailsArray = new ArrayList<>(requestEntries.size());
-        for (IssuerSerialEntry requestEntry : requestEntries) {
+        for (UnrevokeOrRemoveCertEntry requestEntry : requestEntries) {
             CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
             certTempBuilder.setIssuer(requestEntry.getIssuer());
             certTempBuilder.setSerialNumber(new ASN1Integer(requestEntry.getSerialNumber()));
+            byte[] aki = requestEntry.getAuthorityKeyIdentifier();
+            if (aki != null) {
+                Extensions certTempExts = getCertTempExtensions(aki);
+                certTempBuilder.setExtensions(certTempExts);
+            }
 
             Extension[] extensions = new Extension[1];
 
@@ -765,6 +777,20 @@ abstract class X509CmpRequestor extends CmpRequestor {
         } catch (ParserConfigurationException ex) {
             throw new RuntimeException("could not create XML document builder", ex);
         }
+    }
+
+    private static Extensions getCertTempExtensions(byte[] authorityKeyIdentifier)
+    throws CmpRequestorException {
+        AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(authorityKeyIdentifier);
+        byte[] encodedAki;
+        try {
+            encodedAki = aki.getEncoded();
+        } catch (IOException ex) {
+            throw new CmpRequestorException("could not encoded AuthorityKeyIdentifier", ex);
+        }
+        Extension extAki = new Extension(Extension.authorityKeyIdentifier, false, encodedAki);
+        Extensions certTempExts = new Extensions(extAki);
+        return certTempExts;
     }
 
 }

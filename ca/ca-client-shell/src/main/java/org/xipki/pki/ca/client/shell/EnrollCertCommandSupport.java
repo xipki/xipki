@@ -387,7 +387,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         RequestResponseDebug debug = getRequestResponseDebug();
         EnrollCertResult result;
         try {
-            result = caClient.requestCerts(request, caName, user, debug);
+            result = caClient.requestCerts(caName, request, user, debug);
         } finally {
             saveRequestResponse(debug);
         }

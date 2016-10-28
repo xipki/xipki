@@ -36,7 +36,6 @@ package org.xipki.pki.ca.client.api.dto;
 
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
-import java.util.Date;
 
 import org.bouncycastle.asn1.x500.X500Name;
 
@@ -45,38 +44,18 @@ import org.bouncycastle.asn1.x500.X500Name;
  * @since 2.0.0
  */
 
-public class RevokeCertRequestEntry extends IssuerSerialEntry {
-
-    private final int reason;
-
-    private final Date invalidityDate;
+public class UnrevokeOrRemoveCertEntry extends IssuerSerialEntry {
 
     private byte[] authorityKeyIdentifier;
 
-    public RevokeCertRequestEntry(final String id, final X509Certificate cert, final int reason,
-            final Date invalidityDate) {
+    public UnrevokeOrRemoveCertEntry(final String id, final X509Certificate cert) {
         this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()),
-                cert.getSerialNumber(), reason, invalidityDate);
+                cert.getSerialNumber());
     }
 
-    public RevokeCertRequestEntry(final String id, final X500Name issuer,
-            final BigInteger serialNumber, final int reason, final Date invalidityDate) {
+    public UnrevokeOrRemoveCertEntry(final String id, final X500Name issuer,
+            final BigInteger serialNumber) {
         super(id, issuer, serialNumber);
-
-        if (!(reason >= 0 && reason <= 10 && reason != 7)) {
-            throw new IllegalArgumentException("invalid reason: " + reason);
-        }
-
-        this.reason = reason;
-        this.invalidityDate = invalidityDate;
-    }
-
-    public int getReason() {
-        return reason;
-    }
-
-    public Date getInvalidityDate() {
-        return invalidityDate;
     }
 
     public byte[] getAuthorityKeyIdentifier() {

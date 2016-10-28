@@ -112,8 +112,7 @@ public class CsrEnrollCertCmd extends ClientCommandSupport {
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            result = caClient.requestCert(csr, profile, caName, user, notBefore, notAfter,
-                    debug);
+            result = caClient.requestCert(caName, csr, profile, user, notBefore, notAfter, debug);
         } finally {
             saveRequestResponse(debug);
         }
