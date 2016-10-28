@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ca.server.impl;
 
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -375,15 +374,11 @@ class IdentifiedX509Certprofile {
             extType = Extension.cRLDistributionPoints;
             extControl = controls.remove(extType);
             if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
-                try {
-                    if (CollectionUtil.isNonEmpty(publicCaInfo.getCrlUris())) {
-                        CRLDistPoint value = CaUtil.createCrlDistributionPoints(
-                                publicCaInfo.getCrlUris(), x500CaPrincipal, crlSignerSubject);
-                        addExtension(values, extType, value, extControl, neededExtTypes,
-                                wantedExtTypes);
-                    }
-                } catch (IOException ex) {
-                    throw new CertprofileException(ex.getMessage(), ex);
+                if (CollectionUtil.isNonEmpty(publicCaInfo.getCrlUris())) {
+                    CRLDistPoint value = CaUtil.createCrlDistributionPoints(
+                            publicCaInfo.getCrlUris(), x500CaPrincipal, crlSignerSubject);
+                    addExtension(values, extType, value, extControl, neededExtTypes,
+                            wantedExtTypes);
                 }
             }
 
@@ -391,15 +386,11 @@ class IdentifiedX509Certprofile {
             extType = Extension.freshestCRL;
             extControl = controls.remove(extType);
             if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
-                try {
-                    if (CollectionUtil.isNonEmpty(publicCaInfo.getDeltaCrlUris())) {
-                        CRLDistPoint value = CaUtil.createCrlDistributionPoints(
-                                publicCaInfo.getDeltaCrlUris(),x500CaPrincipal, crlSignerSubject);
-                        addExtension(values, extType, value, extControl, neededExtTypes,
-                                wantedExtTypes);
-                    }
-                } catch (IOException ex) {
-                    throw new CertprofileException(ex.getMessage(), ex);
+                if (CollectionUtil.isNonEmpty(publicCaInfo.getDeltaCrlUris())) {
+                    CRLDistPoint value = CaUtil.createCrlDistributionPoints(
+                            publicCaInfo.getDeltaCrlUris(), x500CaPrincipal, crlSignerSubject);
+                    addExtension(values, extType, value, extControl, neededExtTypes,
+                            wantedExtTypes);
                 }
             }
         }

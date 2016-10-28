@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ca.server.impl.util;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,7 +59,6 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 
@@ -141,8 +139,7 @@ public class CaUtil {
     }
 
     public static CRLDistPoint createCrlDistributionPoints(final List<String> crlUris,
-            final X500Name caSubject, final X500Name crlSignerSubject)
-    throws IOException, CertprofileException {
+            final X500Name caSubject, final X500Name crlSignerSubject) {
         ParamUtil.requireNonEmpty("crlUris", crlUris);
         int size = crlUris.size();
         DistributionPoint[] points = new DistributionPoint[1];

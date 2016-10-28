@@ -117,7 +117,6 @@ import org.xipki.commons.audit.api.AuditEvent;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -743,7 +742,7 @@ public class X509CaCmpResponder extends CmpResponder {
     }
 
     private PKIBody unRevokeRemoveCertificates(final PKIMessage request, final RevReqContent rr,
-            final Permission permission, final String msgId) {
+            final Permission permission, final CmpControl cmpControl, final String msgId) {
         RevDetails[] revContent = rr.toRevDetailsArray();
 
         RevRepContentBuilder repContentBuilder = new RevRepContentBuilder();
@@ -762,13 +761,19 @@ public class X509CaCmpResponder extends CmpResponder {
                 if (issuer == null) {
                     return buildErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate, "issuer is not present");
-                } else if (!issuer.equals(caSubject)) {
+                }
+
+                if (!issuer.equals(caSubject)) {
                     return buildErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate, "issuer does not target at the CA");
-                } else if (serialNumber == null) {
+                }
+
+                if (serialNumber == null) {
                     return buildErrorMsgPkiBody(PKIStatus.rejection,
                             PKIFailureInfo.badCertTemplate, "serialNumber is not present");
-                } else if (certDetails.getSigningAlg() != null
+                }
+
+                if (certDetails.getSigningAlg() != null
                         || certDetails.getValidity() != null
                         || certDetails.getSubject() != null
                         || certDetails.getPublicKey() != null
@@ -778,7 +783,14 @@ public class X509CaCmpResponder extends CmpResponder {
                             PKIFailureInfo.badCertTemplate,
                             "only version, issuer and serialNumber in RevDetails.certDetails are "
                             + "allowed, but more is specified");
-                } else if (certDetails.getExtensions() != null) {
+                }
+
+                if (certDetails.getExtensions() == null) {
+                    if (cmpControl.isRrAkiRequired()) {
+                        return buildErrorMsgPkiBody(PKIStatus.rejection,
+                                PKIFailureInfo.badCertTemplate, "issuer's AKI not present");
+                    }
+                } else {
                     Extensions exts = certDetails.getExtensions();
                     ASN1ObjectIdentifier[] oids = exts.getCriticalExtensionOIDs();
                     if (oids != null) {
@@ -790,20 +802,26 @@ public class X509CaCmpResponder extends CmpResponder {
                             }
                         }
                     }
-                    
+
                     Extension ext = exts.getExtension(Extension.authorityKeyIdentifier);
-                    if (ext != null) {
-                        AuthorityKeyIdentifier aki = 
+                    if (ext == null) {
+                        return buildErrorMsgPkiBody(PKIStatus.rejection,
+                                PKIFailureInfo.badCertTemplate, "issuer's AKI not present");
+                    } else {
+                        AuthorityKeyIdentifier aki =
                                 AuthorityKeyIdentifier.getInstance(ext.getParsedValue());
+
+                        if (aki.getKeyIdentifier() == null) {
+                            return buildErrorMsgPkiBody(PKIStatus.rejection,
+                                    PKIFailureInfo.badCertTemplate, "issuer's AKI not present");
+                        }
 
                         boolean issuerMatched = true;
 
-                        if (issuerMatched && aki.getKeyIdentifier() != null) {
-                            byte[] caSki = getCa().getCaInfo().getCertificate()
-                                    .getSubjectKeyIdentifier();
-                            if (Arrays.equals(caSki, aki.getKeyIdentifier())) {
-                                issuerMatched = false;
-                            }
+                        byte[] caSki = getCa().getCaInfo().getCertificate()
+                                .getSubjectKeyIdentifier();
+                        if (Arrays.equals(caSki, aki.getKeyIdentifier())) {
+                            issuerMatched = false;
                         }
 
                         if (issuerMatched && aki.getAuthorityCertSerialNumber() != null) {
@@ -820,14 +838,14 @@ public class X509CaCmpResponder extends CmpResponder {
                                     issuerMatched = false;
                                     break;
                                 }
-                                
+
                                 if (!caSubject.equals(name.getName())) {
                                     issuerMatched = false;
                                     break;
                                 }
                             }
                         }
-                        
+
                         if (!issuerMatched) {
                             return buildErrorMsgPkiBody(PKIStatus.rejection,
                                     PKIFailureInfo.badCertTemplate,
@@ -1232,6 +1250,12 @@ public class X509CaCmpResponder extends CmpResponder {
             sb.append(Base64.toBase64String(ca.getCaInfo().getCertificate().getEncodedCert()));
             sb.append("</CACert>");
 
+            // CMP control
+            sb.append("<cmpControl>");
+            sb.append("<rrAkiRequired>").append(getCmpControl().isRrAkiRequired())
+                .append("</rrAkiRequired>");
+            sb.append("</cmpControl>");
+
             // Profiles
             Set<String> requestorProfiles = requestor.getCaHasRequestor().getProfiles();
 
@@ -1441,7 +1465,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.notAuthorized,
                         null);
             }
-            return unRevokeRemoveCertificates(request, rr, requiredPermission, msgId);
+            return unRevokeRemoveCertificates(request, rr, requiredPermission, cmpControl, msgId);
         }
     } // method cmpRevokeOrUnrevokeOrRemoveCertificates
 

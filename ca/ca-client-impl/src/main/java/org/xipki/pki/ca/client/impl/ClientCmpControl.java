@@ -34,42 +34,20 @@
 
 package org.xipki.pki.ca.client.impl;
 
-import java.security.cert.X509Certificate;
-import java.util.Set;
-
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ca.client.api.CertprofileInfo;
-
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.1.0
  */
 
-class CaInfo {
+public class ClientCmpControl {
 
-    private final X509Certificate cert;
+    private final boolean rrAkiRequired;
 
-    private final Set<CertprofileInfo> certprofiles;
-
-    private final ClientCmpControl cmpControl;
-
-    CaInfo(final X509Certificate cert, final ClientCmpControl cmpControl,
-            final Set<CertprofileInfo> certprofiles) {
-        this.cert = ParamUtil.requireNonNull("cert", cert);
-        this.cmpControl = ParamUtil.requireNonNull("cmpControl", cmpControl);
-        this.certprofiles = ParamUtil.requireNonNull("certprofiles", certprofiles);
+    public ClientCmpControl(final boolean rrAkiRequired) {
+        this.rrAkiRequired = rrAkiRequired;
     }
 
-    X509Certificate getCert() {
-        return cert;
+    public boolean isRrAkiRequired() {
+        return this.rrAkiRequired;
     }
-
-    ClientCmpControl getCmpControl() {
-        return cmpControl;
-    }
-
-    Set<CertprofileInfo> getCertprofiles() {
-        return certprofiles;
-    }
-
 }

@@ -728,8 +728,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
         int version = StringUtil.isBlank(str) ? 1 : Integer.parseInt(str);
 
         if (version == 2) {
+            // CACert
             X509Certificate caCert;
-
             String b64CaCert = XmlUtil.getValueOfFirstElementChild(root, namespace, "CACert");
             try {
                 caCert = X509Util.parseBase64EncodedCert(b64CaCert);
@@ -737,9 +737,20 @@ abstract class X509CmpRequestor extends CmpRequestor {
                 throw new CmpRequestorException("could no parse the CA certificate", ex);
             }
 
+            // CmpControl
+            ClientCmpControl cmpControl = null;
+            Element cmpCtrlElement = XmlUtil.getFirstElementChild(root, namespace, "cmpControl");
+            if (cmpCtrlElement != null) {
+                String tmpStr = XmlUtil.getValueOfFirstElementChild(cmpCtrlElement, namespace,
+                        "rrAkiRequired");
+                boolean required = (tmpStr == null) ? false : Boolean.parseBoolean(tmpStr);
+                cmpControl = new ClientCmpControl(required);
+            }
+
+            // certprofiles
+            Set<String> profileNames = new HashSet<>();
             Element profilesElement = XmlUtil.getFirstElementChild(root, namespace, "certprofiles");
             Set<CertprofileInfo> profiles = new HashSet<>();
-            Set<String> profileNames = new HashSet<>();
             if (profilesElement != null) {
                 List<Element> profileElements = XmlUtil.getElementChilden(profilesElement,
                         namespace, "certprofile");
@@ -763,7 +774,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             }
 
             LOG.info("CA {} supports profiles {}", caName, profileNames);
-            return new CaInfo(caCert, profiles);
+            return new CaInfo(caCert, cmpControl, profiles);
         } else {
             throw new CmpRequestorException("unknown CAInfo version " + version);
         }

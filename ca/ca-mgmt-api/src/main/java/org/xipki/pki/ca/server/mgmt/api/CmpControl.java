@@ -71,6 +71,8 @@ public class CmpControl {
 
     public static final String KEY_GROUP_ENROLL = "group.enroll";
 
+    public static final String KEY_RR_AKI_REQUIRED = "rr.aki.required";
+
     private static final int DFLT_MESSAGE_TIME_BIAS = 300; // 300 seconds
 
     private static final int DFLT_CONFIRM_WAIT_TIME = 300; // 300 seconds
@@ -93,6 +95,8 @@ public class CmpControl {
 
     private final boolean groupEnroll;
 
+    private final boolean rrAkiRequired;
+
     private final CollectionAlgorithmValidator sigAlgoValidator;
 
     private final CollectionAlgorithmValidator popoAlgoValidator;
@@ -107,6 +111,7 @@ public class CmpControl {
         this.groupEnroll = getBoolean(pairs, KEY_GROUP_ENROLL, false);
         this.messageTimeRequired = getBoolean(pairs, KEY_MESSAGETIME_REQUIRED, true);
         this.messageTimeBias = getInt(pairs, KEY_MESSAGETIME_BIAS, DFLT_MESSAGE_TIME_BIAS);
+        this.rrAkiRequired = getBoolean(pairs, KEY_RR_AKI_REQUIRED, false);
         this.confirmWaitTime = getInt(pairs, KEY_CONFIRM_WAITTIME, DFLT_CONFIRM_WAIT_TIME);
         if (this.confirmWaitTime < 0) {
             throw new InvalidConfException("invalid " + KEY_CONFIRM_WAITTIME);
@@ -140,8 +145,9 @@ public class CmpControl {
 
     public CmpControl(final String name, final Boolean confirmCert, final Boolean sendCaCert,
             final Boolean messageTimeRequired, final Boolean sendResponderCert,
-            final Integer messageTimeBias, final Integer confirmWaitTime, final Boolean groupEnroll,
-            final Set<String> sigAlgos, final Set<String> popoAlgos) throws InvalidConfException {
+            final Boolean rrAkiRequired, final Integer messageTimeBias,
+            final Integer confirmWaitTime, final Boolean groupEnroll, final Set<String> sigAlgos,
+            final Set<String> popoAlgos) throws InvalidConfException {
         ParamUtil.requireNonBlank("name", name);
         if (confirmWaitTime != null) {
             ParamUtil.requireMin("confirmWaitTime", confirmWaitTime, 0);
@@ -161,6 +167,9 @@ public class CmpControl {
         this.sendResponderCert = (sendResponderCert == null) ? true
                 : sendResponderCert.booleanValue();
         pairs.putPair(KEY_SEND_RESPONDER, Boolean.toString(this.sendResponderCert));
+
+        this.rrAkiRequired = (rrAkiRequired == null) ? true : rrAkiRequired.booleanValue();
+        pairs.putPair(KEY_RR_AKI_REQUIRED, Boolean.toString(this.rrAkiRequired));
 
         this.messageTimeBias = (messageTimeBias == null) ? DFLT_MESSAGE_TIME_BIAS : messageTimeBias;
         pairs.putPair(KEY_MESSAGETIME_BIAS, Integer.toString(this.messageTimeBias));
@@ -212,6 +221,10 @@ public class CmpControl {
 
     public boolean isSendCaCert() {
         return sendCaCert;
+    }
+
+    public boolean isRrAkiRequired() {
+        return rrAkiRequired;
     }
 
     public boolean isSendResponderCert() {

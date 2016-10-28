@@ -125,6 +125,7 @@ import org.xipki.pki.ca.client.impl.jaxb.CAClientType;
 import org.xipki.pki.ca.client.impl.jaxb.CAType;
 import org.xipki.pki.ca.client.impl.jaxb.CertprofileType;
 import org.xipki.pki.ca.client.impl.jaxb.CertprofilesType;
+import org.xipki.pki.ca.client.impl.jaxb.CmpControlType;
 import org.xipki.pki.ca.client.impl.jaxb.FileOrValueType;
 import org.xipki.pki.ca.client.impl.jaxb.ObjectFactory;
 import org.xipki.pki.ca.client.impl.jaxb.RequestorType;
@@ -211,8 +212,8 @@ public final class CaClientImpl implements CaClient {
             }
 
             CaConf ca = casMap.get(name);
-
-            if (!ca.isCertAutoconf() && !ca.isCertprofilesAutoconf()) {
+            if (!ca.isCertAutoconf() && !ca.isCertprofilesAutoconf()
+                    && !ca.isCmpControlAutoconf()) {
                 continue;
             }
 
@@ -223,6 +224,9 @@ public final class CaClientImpl implements CaClient {
                 }
                 if (ca.isCertprofilesAutoconf()) {
                     ca.setCertprofiles(caInfo.getCertprofiles());
+                }
+                if (ca.isCmpControlAutoconf()) {
+                    ca.setCmpControl(caInfo.getCmpControl());
                 }
                 LOG.info("retrieved CAInfo for CA " + name);
             } catch (Throwable th) {
@@ -346,8 +350,20 @@ public final class CaClientImpl implements CaClient {
                 if (caType.getCaCert().getAutoconf() != null) {
                     ca.setCertAutoconf(true);
                 } else {
-                    ca.setCertAutoconf(true);
+                    ca.setCertAutoconf(false);
                     ca.setCert(X509Util.parseCert(readData(caType.getCaCert().getCert())));
+                }
+
+                // CMPControl
+                CmpControlType cmpCtrlType = caType.getCmpControl();
+                if (cmpCtrlType.getAutoconf() != null) {
+                    ca.setCmpControlAutoconf(true);
+                } else {
+                    ca.setCmpControlAutoconf(false);
+                    Boolean tmpBo = cmpCtrlType.isRrAkiRequired();
+                    ClientCmpControl control = new ClientCmpControl(
+                            (tmpBo == null) ? false : tmpBo.booleanValue());
+                    ca.setCmpControl(control);
                 }
 
                 // Certprofiles
@@ -356,7 +372,6 @@ public final class CaClientImpl implements CaClient {
                     ca.setCertprofilesAutoconf(true);
                 } else {
                     ca.setCertprofilesAutoconf(false);
-
                     List<CertprofileType> types = certprofilesType.getCertprofile();
                     Set<CertprofileInfo> profiles = new HashSet<>(types.size());
                     for (CertprofileType m : types) {
@@ -428,7 +443,7 @@ public final class CaClientImpl implements CaClient {
                 throw new CaClientException("duplicate CAs with the same name " + ca.getName());
             }
 
-            if (ca.isCertAutoconf() || ca.isCertprofilesAutoconf()) {
+            if (ca.isCertAutoconf() || ca.isCertprofilesAutoconf() || ca.isCmpControlAutoconf()) {
                 autoConf = true;
             }
 
@@ -645,6 +660,10 @@ public final class CaClientImpl implements CaClient {
         final String id = "cert-1";
         RevokeCertRequestEntry entry = new RevokeCertRequestEntry(id, ca.getSubject(), serial,
                 reason, invalidityDate);
+        if (ca.getCmpControl().isRrAkiRequired()) {
+            entry.setAuthorityKeyIdentifier(ca.getAuthorityKeyIdentifier());
+        }
+
         RevokeCertRequest request = new RevokeCertRequest();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = revokeCerts(request, debug);
@@ -972,6 +991,10 @@ public final class CaClientImpl implements CaClient {
         final String id = "cert-1";
         UnrevokeOrRemoveCertEntry entry = new UnrevokeOrRemoveCertEntry(id, ca.getSubject(),
                 serial);
+        if (ca.getCmpControl().isRrAkiRequired()) {
+            entry.setAuthorityKeyIdentifier(ca.getAuthorityKeyIdentifier());
+        }
+
         UnrevokeOrRemoveCertRequest request = new UnrevokeOrRemoveCertRequest();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = unrevokeCerts(request, debug);
@@ -1035,6 +1058,10 @@ public final class CaClientImpl implements CaClient {
         final String id = "cert-1";
         UnrevokeOrRemoveCertEntry entry = new UnrevokeOrRemoveCertEntry(id, ca.getSubject(),
                 serial);
+        if (ca.getCmpControl().isRrAkiRequired()) {
+            entry.setAuthorityKeyIdentifier(ca.getAuthorityKeyIdentifier());
+        }
+
         UnrevokeOrRemoveCertRequest request = new UnrevokeOrRemoveCertRequest();
         request.addRequestEntry(entry);
         Map<String, CertIdOrError> result = removeCerts(request, debug);

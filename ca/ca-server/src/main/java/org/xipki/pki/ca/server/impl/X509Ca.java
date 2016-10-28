@@ -76,6 +76,7 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.DistributionPointName;
@@ -138,6 +139,7 @@ import org.xipki.pki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
 import org.xipki.pki.ca.server.impl.cmp.CmpRequestorInfo;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
 import org.xipki.pki.ca.server.impl.store.X509CertWithRevocationInfo;
+import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
@@ -821,6 +823,14 @@ public class X509Ca {
                             false); // onlyContainsAttributeCerts
 
                     crlBuilder.addExtension(Extension.issuingDistributionPoint, true, idp);
+                }
+
+                // freshestCRL
+                List<String> deltaCrlUris = getCaInfo().getPublicCaInfo().getDeltaCrlUris();
+                if (control.getDeltaCrlIntervals() > 0 && CollectionUtil.isNonEmpty(deltaCrlUris)) {
+                    CRLDistPoint cdp = CaUtil.createCrlDistributionPoints(deltaCrlUris,
+                            caInfo.getPublicCaInfo().getX500Subject(), crlIssuer);
+                    crlBuilder.addExtension(Extension.freshestCRL, false, cdp);
                 }
             } catch (CertIOException ex) {
                 LogUtil.error(LOG, ex, "crlBuilder.addExtension");
