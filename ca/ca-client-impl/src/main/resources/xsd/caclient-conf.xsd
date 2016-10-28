@@ -66,6 +66,15 @@
       </xs:element>
     </xs:all>
   </xs:complexType>
+  <xs:complexType name="cmpControlType">
+    <xs:choice>
+      <xs:element name="autoconf" type="xs:anyType"/>
+      <xs:sequence>
+        <xs:element name="rrAkiRequired" type="xs:boolean"/>
+      </xs:sequence>
+    </xs:choice>
+  </xs:complexType>
+
   <xs:complexType name="CAType">
     <xs:all>
       <xs:element name="name" type="xs:string"/>
@@ -73,6 +82,7 @@
       <xs:element name="healthUrl" type="xs:anyURI" minOccurs="0"/>
       <xs:element name="requestor" type="xs:string"/>
       <xs:element name="responder" type="xs:string"/>
+      <xs:element name="cmpControl" type="cmpControlType"/>
       <xs:element name="caCert" type="CACertType"/>
       <xs:element name="certprofiles" type="certprofilesType"/>
     </xs:all>

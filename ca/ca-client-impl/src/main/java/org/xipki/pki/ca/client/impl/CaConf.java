@@ -34,6 +34,7 @@
 
 package org.xipki.pki.ca.client.impl;
 
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,8 +42,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.util.Arrays;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
 
 /**
@@ -60,17 +63,23 @@ class CaConf {
 
     private final String requestorName;
 
+    private final CmpResponder responder;
+
     private X509CmpRequestor requestor;
 
     private boolean certAutoconf;
 
     private boolean certprofilesAutoconf;
 
+    private boolean cmpControlAutoconf;
+
     private X509Certificate cert;
 
-    private final CmpResponder responder;
-
     private X500Name subject;
+
+    private byte[] authorityKeyIdentifier;
+
+    private ClientCmpControl cmpControl;
 
     private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
@@ -95,10 +104,11 @@ class CaConf {
         return healthUrl;
     }
 
-    public void setCert(final X509Certificate cert) {
+    public void setCert(final X509Certificate cert) throws CertificateEncodingException {
         this.cert = cert;
         this.subject = (cert == null) ? null
                 : X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+        this.authorityKeyIdentifier = X509Util.extractAki(cert);
     }
 
     public void setCertprofiles(final Set<CertprofileInfo> certProfiles) {
@@ -168,6 +178,26 @@ class CaConf {
 
     public X509CmpRequestor getRequestor() {
         return requestor;
+    }
+
+    public void setCmpControlAutoconf(final boolean autoconf) {
+        this.cmpControlAutoconf = autoconf;
+    }
+
+    public boolean isCmpControlAutoconf() {
+        return cmpControlAutoconf;
+    }
+
+    public void setCmpControl(final ClientCmpControl cmpControl) {
+        this.cmpControl = cmpControl;
+    }
+
+    public ClientCmpControl getCmpControl() {
+        return cmpControl;
+    }
+
+    public byte[] getAuthorityKeyIdentifier() {
+        return (authorityKeyIdentifier == null) ? null : Arrays.clone(authorityKeyIdentifier);
     }
 
 }
