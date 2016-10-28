@@ -136,7 +136,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            result = caClient.requestCerts(request, caName, user, debug);
+            result = caClient.requestCerts(caName, request, user, debug);
         } finally {
             saveRequestResponse(debug);
         }

@@ -49,6 +49,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.util.X509Util;
+import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -57,18 +58,19 @@ import org.xipki.commons.security.util.X509Util;
 
 public abstract class UnRevRemoveCertCommandSupport extends ClientCommandSupport {
 
+    @Option(name = "--ca",
+            description = "CA name\n"
+                    + "(required if more than one CA is configured)")
+    @Completion(CaNameCompleter.class)
+    protected String caName;
+
     @Option(name = "--cert", aliases = "-c",
-            description = "certificate file")
+            description = "certificate file (either cert or serial must be specified)")
     @Completion(FilePathCompleter.class)
     protected String certFile;
 
-    @Option(name = "--issuer", aliases = "-i",
-            description = "issuer certificate file")
-    @Completion(FilePathCompleter.class)
-    protected String issuerCertFile;
-
     @Option(name = "--serial", aliases = "-s",
-            description = "serial number")
+            description = "serial number (either cert or serial must be specified)")
     private String serialNumberS;
 
     private BigInteger serialNumber;

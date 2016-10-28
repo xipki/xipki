@@ -41,7 +41,6 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
@@ -75,8 +74,8 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
-            throw new IllegalCmdParamException("either cert or (cacert, serial) must be specified");
+        if (!(certFile == null ^ getSerialNumber() == null)) {
+            throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
         }
 
         CrlReason crlReason = CrlReason.forNameOrText(reason);
@@ -90,33 +89,21 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCommandSupport {
             invalidityDate = DateUtil.parseUtcTimeyyyyMMddhhmmss(invalidityDateS);
         }
 
-        X509Certificate caCert = null;
-        if (issuerCertFile != null) {
-            caCert = X509Util.parseCert(issuerCertFile);
-        }
-
         CertIdOrError certIdOrError;
         if (certFile != null) {
             X509Certificate cert = X509Util.parseCert(certFile);
-            if (caCert != null) {
-                String errorMsg = checkCertificate(cert, caCert);
-                if (errorMsg != null) {
-                    throw new CmdFailure(errorMsg);
-                }
-            }
             RequestResponseDebug debug = getRequestResponseDebug();
             try {
-                certIdOrError = caClient.revokeCert(cert, crlReason.getCode(),
+                certIdOrError = caClient.revokeCert(caName, cert, crlReason.getCode(),
                         invalidityDate, debug);
             } finally {
                 saveRequestResponse(debug);
             }
 
         } else {
-            X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             RequestResponseDebug debug = getRequestResponseDebug();
             try {
-                certIdOrError = caClient.revokeCert(issuer, getSerialNumber(), crlReason.getCode(),
+                certIdOrError = caClient.revokeCert(caName, getSerialNumber(), crlReason.getCode(),
                         invalidityDate, debug);
             } finally {
                 saveRequestResponse(debug);

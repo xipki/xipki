@@ -38,7 +38,6 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
@@ -58,35 +57,23 @@ public class UnrevokeCertCmd extends UnRevRemoveCertCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        if (certFile == null && (issuerCertFile == null || getSerialNumber() == null)) {
-            throw new IllegalCmdParamException("either cert or (issuer, serial) must be specified");
-        }
-
-        X509Certificate caCert = null;
-        if (issuerCertFile != null) {
-            caCert = X509Util.parseCert(issuerCertFile);
+        if (!(certFile == null ^ getSerialNumber() == null)) {
+            throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
         }
 
         CertIdOrError certIdOrError;
         if (certFile != null) {
             X509Certificate cert = X509Util.parseCert(certFile);
-            if (caCert != null) {
-                String errorMsg = checkCertificate(cert, caCert);
-                if (errorMsg != null) {
-                    throw new CmdFailure(errorMsg);
-                }
-            }
             RequestResponseDebug debug = getRequestResponseDebug();
             try {
-                certIdOrError = caClient.unrevokeCert(cert, debug);
+                certIdOrError = caClient.unrevokeCert(caName, cert, debug);
             } finally {
                 saveRequestResponse(debug);
             }
         } else {
-            X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             RequestResponseDebug debug = getRequestResponseDebug();
             try {
-                certIdOrError = caClient.unrevokeCert(issuer, getSerialNumber(), debug);
+                certIdOrError = caClient.unrevokeCert(caName, getSerialNumber(), debug);
             } finally {
                 saveRequestResponse(debug);
             }

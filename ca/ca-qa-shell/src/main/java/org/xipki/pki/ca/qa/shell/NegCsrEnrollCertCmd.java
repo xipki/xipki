@@ -88,7 +88,7 @@ public class NegCsrEnrollCertCmd extends ClientCommandSupport {
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            result = caClient.requestCert(csr, profile, caName, user, null, null, debug);
+            result = caClient.requestCert(caName, csr, profile, user, null, null, debug);
         } finally {
             saveRequestResponse(debug);
         }

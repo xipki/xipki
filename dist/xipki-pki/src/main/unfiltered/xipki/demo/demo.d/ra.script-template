@@ -99,6 +99,7 @@ xipki-tk:update-cert-p12 \
 
 ## Revocate certificates
 xipki-cli:revoke \
+  --ca SubCAwithCRL1 \
   --cert output/OCSP2.der \
   --reason keyCompromise
 
@@ -348,6 +349,7 @@ xipki-tk:update-cert-p12 \
 
 ## Revocate certificates
 xipki-cli:revoke \
+  --ca SubCA1 \
   --cert output/TLS2.der \
   --reason affiliationChanged
 
@@ -399,6 +401,7 @@ xipki-tk:update-cert-p12 \
 
 ## Revocate certificates
 xipki-cli:revoke \
+  --ca SubCA1 \
   --cert output/TLS_C2.der \
   --reason affiliationChanged
 

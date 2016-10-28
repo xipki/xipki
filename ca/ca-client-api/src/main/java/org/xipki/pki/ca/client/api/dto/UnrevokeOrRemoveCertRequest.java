@@ -47,11 +47,11 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class UnrevokeOrRemoveCertRequest {
 
-    private final List<IssuerSerialEntry> requestEntries = new LinkedList<>();
+    private final List<UnrevokeOrRemoveCertEntry> requestEntries = new LinkedList<>();
 
-    public boolean addRequestEntry(final IssuerSerialEntry requestEntry) {
+    public boolean addRequestEntry(final UnrevokeOrRemoveCertEntry requestEntry) {
         ParamUtil.requireNonNull("requestEntry", requestEntry);
-        for (IssuerSerialEntry re : requestEntries) {
+        for (UnrevokeOrRemoveCertEntry re : requestEntries) {
             if (re.getId().equals(requestEntry.getId())) {
                 return false;
             }
@@ -61,7 +61,7 @@ public class UnrevokeOrRemoveCertRequest {
         return true;
     }
 
-    public List<IssuerSerialEntry> getRequestEntries() {
+    public List<UnrevokeOrRemoveCertEntry> getRequestEntries() {
         return Collections.unmodifiableList(requestEntries);
     }
 }

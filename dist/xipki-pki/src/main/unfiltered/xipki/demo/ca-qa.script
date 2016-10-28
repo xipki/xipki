@@ -204,10 +204,12 @@ xipki-qa:neg-enroll-p12 \
 ## Revoke certificate that has been revoked
 
 xipki-qa:neg-revoke \
+  --ca SubCA1 \
   --cert output/TLS2.der \
   --reason keyCompromise
 
 xipki-qa:neg-unrevoke \
+  --ca SubCA1 \
   --cert output/TLS2.der
 
 ## Generate CRL
