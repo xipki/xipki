@@ -27,7 +27,7 @@
   <crlsigners>
     <crlsigner name="CASIGN.CRLSIGNER">
       <signerType>CA</signerType>
-      <crlControl>updateMode=interval,fullCRL.intervals=1,deltaCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false</crlControl>
+      <crlControl>updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false</crlControl>
     </crlsigner>
   </crlsigners>
   <requestors>
