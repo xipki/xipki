@@ -44,6 +44,8 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
+import org.xipki.commons.security.HashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -78,6 +80,14 @@ public class CertInfoCmd extends SecurityCommandSupport {
     @Option(name = "--not-after", description = "print notAfter")
     private Boolean notAfter;
 
+    @Option(name = "--fingerprint", description = "print fingerprint in hex")
+    private Boolean fingerprint;
+
+    @Option(name = "--hash",
+            description = "hash algorithm name")
+    @Completion(HashAlgCompleter.class)
+    protected String hashAlgo = "SHA256";
+
     @Override
     protected Object doExecute() throws Exception {
         Certificate cert = Certificate.getInstance(IoUtil.read(inFile));
@@ -92,6 +102,9 @@ public class CertInfoCmd extends SecurityCommandSupport {
             return toUtcTimeyyyyMMddhhmmssZ(cert.getStartDate().getDate());
         } else if (notAfter != null && notAfter) {
             return toUtcTimeyyyyMMddhhmmssZ(cert.getEndDate().getDate());
+        } else if (fingerprint != null && fingerprint) {
+            byte[] encoded = cert.getEncoded();
+            return HashAlgoType.getHashAlgoType(hashAlgo).hexHash(encoded);
         }
 
         return null;
