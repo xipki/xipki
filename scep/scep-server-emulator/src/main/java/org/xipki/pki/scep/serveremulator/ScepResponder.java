@@ -168,12 +168,12 @@ public class ScepResponder {
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
 
         PkiMessage rep = doServicePkiOperation(req, event);
-        event.addEventData(ScepAuditConstants.NAME_pkiStatus, rep.getPkiStatus().toString());
+        event.addEventData(ScepAuditConstants.NAME_pkiStatus, rep.getPkiStatus());
         if (rep.getPkiStatus() == PkiStatus.FAILURE) {
             event.setStatus(AuditStatus.FAILED);
         }
         if (rep.getFailInfo() != null) {
-            event.addEventData(ScepAuditConstants.NAME_failInfo, rep.getFailInfo().toString());
+            event.addEventData(ScepAuditConstants.NAME_failInfo, rep.getFailInfo());
         }
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(getSigningKey(),
