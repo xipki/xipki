@@ -606,7 +606,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
             byte[] ecPoint = new byte[1 + keysize * 2];
             ecPoint[0] = 4; // uncompressed
             bigIntToBytes("Wx", pointW.getAffineX(), ecPoint, 1, keysize);
-            bigIntToBytes("Wx", pointW.getAffineY(), ecPoint, 1 + keysize, keysize);
+            bigIntToBytes("Wy", pointW.getAffineY(), ecPoint, 1 + keysize, keysize);
 
             byte[] encodedEcPoint;
             try {
@@ -762,7 +762,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
                     keypair.getPublic(), null, maxSessions, random);
         } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
             throw new P11TokenException(
-                    "could not counstruct KeyStoreP11Identity: " + ex.getMessage(), ex);
+                    "could not construct KeyStoreP11Identity: " + ex.getMessage(), ex);
         }
     }
 
