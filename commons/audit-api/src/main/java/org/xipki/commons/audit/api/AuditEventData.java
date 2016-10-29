@@ -47,13 +47,18 @@ public class AuditEventData {
 
     private final String value;
 
-    public AuditEventData(final String name, final String value) {
+    public AuditEventData(final String name, final Object value) {
         Objects.requireNonNull(name, "name must not be null");
         if (name.isEmpty()) {
             throw new IllegalArgumentException("name must not be empty");
         }
+        Objects.requireNonNull(value, "value must not be null");
         this.name = name;
-        this.value = Objects.requireNonNull(value, "value must not be null");
+        if (value instanceof String) {
+            this.value = (String) value;
+        } else {
+            this.value = value.toString();
+        }
     }
 
     public String getName() {
