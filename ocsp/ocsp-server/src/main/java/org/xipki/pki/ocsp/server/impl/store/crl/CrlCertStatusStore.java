@@ -723,13 +723,13 @@ public class CrlCertStatusStore extends OcspStore {
 
     private void auditPciEvent(final AuditLevel auditLevel, final String eventType,
             final String auditStatus) {
-        PciAuditEvent auditEvent = new PciAuditEvent(new Date());
-        auditEvent.setUserId("SYSTEM");
-        auditEvent.setEventType(eventType);
-        auditEvent.setAffectedResource("CRL-Updater");
-        auditEvent.setStatus(auditStatus);
-        auditEvent.setLevel(auditLevel);
-        getAuditService().logEvent(auditEvent);
+        PciAuditEvent event = new PciAuditEvent(new Date());
+        event.setUserId("SYSTEM");
+        event.setEventType(eventType);
+        event.setAffectedResource("CRL-Updater");
+        event.setStatus(auditStatus);
+        event.setLevel(auditLevel);
+        getAuditService().logEvent(event);
     }
 
     @Override

@@ -340,7 +340,7 @@ abstract class CmpResponder {
                 signatureValid ? ProtectionResult.VALID : ProtectionResult.INVALID);
     } // method verifyProtection
 
-    private PKIMessage addProtection(final PKIMessage pkiMessage, final AuditEvent auditEvent) {
+    private PKIMessage addProtection(final PKIMessage pkiMessage, final AuditEvent event) {
         try {
             return CmpUtil.addProtection(pkiMessage, getSigner(), getSender(),
                     getCmpControl().isSendResponderCert());
@@ -349,9 +349,9 @@ abstract class CmpResponder {
             PKIStatusInfo status = generateRejectionStatus(
                     PKIFailureInfo.systemFailure, "could not sign the PKIMessage");
 
-            auditEvent.setLevel(AuditLevel.ERROR);
-            auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(CaAuditConstants.NAME_message, "could not sign the PKIMessage");
+            event.setLevel(AuditLevel.ERROR);
+            event.setStatus(AuditStatus.FAILED);
+            event.addEventData(CaAuditConstants.NAME_message, "could not sign the PKIMessage");
             PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status));
             return new PKIMessage(pkiMessage.getHeader(), body);
         }

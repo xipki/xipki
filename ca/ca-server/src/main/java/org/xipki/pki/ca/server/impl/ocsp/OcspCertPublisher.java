@@ -182,22 +182,22 @@ public class OcspCertPublisher extends X509CertPublisher {
 
         LOG.debug("error", ex);
 
-        AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.setApplicationName("CAPublisher");
-        auditEvent.setName("SYSTEM");
-        auditEvent.setLevel(AuditLevel.ERROR);
-        auditEvent.setStatus(AuditStatus.FAILED);
+        AuditEvent event = new AuditEvent(new Date());
+        event.setApplicationName("CAPublisher");
+        event.setName("SYSTEM");
+        event.setLevel(AuditLevel.ERROR);
+        event.setStatus(AuditStatus.FAILED);
         if (cert instanceof X509CertWithDbId) {
             Long certId = ((X509CertWithDbId) cert).getCertId();
             if (certId != null) {
-                auditEvent.addEventData(CaAuditConstants.NAME_id, certId);
+                event.addEventData(CaAuditConstants.NAME_id, certId);
             }
         }
-        auditEvent.addEventData(CaAuditConstants.NAME_issuer, issuer);
-        auditEvent.addEventData(CaAuditConstants.NAME_subject, subjectText);
-        auditEvent.addEventData(CaAuditConstants.NAME_serial, serialText);
-        auditEvent.addEventData(CaAuditConstants.NAME_message, messagePrefix);
-        auditServiceRegister.getAuditService().logEvent(auditEvent);
+        event.addEventData(CaAuditConstants.NAME_issuer, issuer);
+        event.addEventData(CaAuditConstants.NAME_subject, subjectText);
+        event.addEventData(CaAuditConstants.NAME_serial, serialText);
+        event.addEventData(CaAuditConstants.NAME_message, messagePrefix);
+        auditServiceRegister.getAuditService().logEvent(event);
     } // method logAndAudit
 
     @Override

@@ -231,22 +231,22 @@ public class HttpCmpServlet extends HttpServlet {
         this.sslCertInHttpHeader = sslCertInHttpHeader;
     }
 
-    private static void audit(final AuditService auditService, final AuditEvent auditEvent,
+    private static void audit(final AuditService auditService, final AuditEvent event,
             final AuditLevel auditLevel, final AuditStatus auditStatus, final String auditMessage) {
         if (auditLevel != null) {
-            auditEvent.setLevel(auditLevel);
+            event.setLevel(auditLevel);
         }
 
         if (auditStatus != null) {
-            auditEvent.setStatus(auditStatus);
+            event.setStatus(auditStatus);
         }
 
         if (auditMessage != null) {
-            auditEvent.addEventData(CaAuditConstants.NAME_message, auditMessage);
+            event.addEventData(CaAuditConstants.NAME_message, auditMessage);
         }
 
-        auditEvent.finish();
-        auditService.logEvent(auditEvent);
+        event.finish();
+        auditService.logEvent(event);
     } // method audit
 
 }

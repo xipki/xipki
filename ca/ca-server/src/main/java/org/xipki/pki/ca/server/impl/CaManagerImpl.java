@@ -2295,18 +2295,18 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     private void auditLogPciEvent(final boolean successful, final String eventType) {
-        PciAuditEvent auditEvent = new PciAuditEvent(new Date());
-        auditEvent.setUserId("CA-SYSTEM");
-        auditEvent.setEventType(eventType);
-        auditEvent.setAffectedResource("CORE");
+        PciAuditEvent event = new PciAuditEvent(new Date());
+        event.setUserId("CA-SYSTEM");
+        event.setEventType(eventType);
+        event.setAffectedResource("CORE");
         if (successful) {
-            auditEvent.setStatus(AuditStatus.SUCCESSFUL.name());
-            auditEvent.setLevel(AuditLevel.INFO);
+            event.setStatus(AuditStatus.SUCCESSFUL.name());
+            event.setLevel(AuditLevel.INFO);
         } else {
-            auditEvent.setStatus(AuditStatus.FAILED.name());
-            auditEvent.setLevel(AuditLevel.ERROR);
+            event.setStatus(AuditStatus.FAILED.name());
+            event.setLevel(AuditLevel.ERROR);
         }
-        auditServiceRegister.getAuditService().logEvent(auditEvent);
+        auditServiceRegister.getAuditService().logEvent(event);
     } // method auditLogPciEvent
 
     @Override
@@ -2400,10 +2400,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonBlank("profileName", profileName);
         ParamUtil.requireNonNull("encodedCsr", encodedCsr);
 
-        AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.setApplicationName(CaAuditConstants.APPNAME);
-        auditEvent.setName(CaAuditConstants.NAME_PERF);
-        auditEvent.addEventType("CAMGMT_CRL_GEN_ONDEMAND");
+        AuditEvent event = new AuditEvent(new Date());
+        event.setApplicationName(CaAuditConstants.APPNAME);
+        event.setName(CaAuditConstants.NAME_PERF);
+        event.addEventType("CAMGMT_CRL_GEN_ONDEMAND");
 
         X509Ca ca = getX509Ca(caName);
         CertificationRequest csr;
