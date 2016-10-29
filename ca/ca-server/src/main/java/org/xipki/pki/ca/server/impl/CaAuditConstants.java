@@ -55,6 +55,10 @@ public class CaAuditConstants {
 
     public static final String NAME_crlType = "crlType";
 
+    public static final String NAME_expiredAt = "expiredAt";
+
+    public static final String NAME_id = "id";
+
     public static final String NAME_invalidityTime = "invalidityTime";
 
     public static final String NAME_issuer = "issuer";

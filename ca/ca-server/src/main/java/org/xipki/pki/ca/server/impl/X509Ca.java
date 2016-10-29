@@ -792,7 +792,7 @@ public class X509Ca {
             // end do
 
             BigInteger crlNumber = caInfo.nextCrlNumber();
-            event.addEventData("crlNumber", crlNumber.toString());
+            event.addEventData(CaAuditConstants.NAME_crlNumber, crlNumber.toString());
 
             boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
             boolean onlyCaCerts = crlControl.isOnlyContainsCaCerts();
@@ -2342,7 +2342,7 @@ public class X509Ca {
                     "CA could not remove expired certificates in slave mode");
         }
 
-        event.addEventData("expiredAt", expiredAtTime.toString());
+        event.addEventData(CaAuditConstants.NAME_expiredAt, expiredAtTime.toString());
         final int numEntries = 100;
 
         X509Cert caCert = caInfo.getCertificate();

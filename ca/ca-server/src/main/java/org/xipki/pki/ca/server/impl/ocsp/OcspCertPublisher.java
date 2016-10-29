@@ -59,6 +59,7 @@ import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.publisher.CertPublisherException;
 import org.xipki.pki.ca.api.publisher.x509.X509CertPublisher;
 import org.xipki.pki.ca.api.publisher.x509.X509CertificateInfo;
+import org.xipki.pki.ca.server.impl.CaAuditConstants;
 
 /**
  * @author Lijun Liao
@@ -189,13 +190,13 @@ public class OcspCertPublisher extends X509CertPublisher {
         if (cert instanceof X509CertWithDbId) {
             Long certId = ((X509CertWithDbId) cert).getCertId();
             if (certId != null) {
-                auditEvent.addEventData("id", certId.toString());
+                auditEvent.addEventData(CaAuditConstants.NAME_id, certId.toString());
             }
         }
-        auditEvent.addEventData("issuer", issuer);
-        auditEvent.addEventData("subject", subjectText);
-        auditEvent.addEventData("serialNumber", serialText);
-        auditEvent.addEventData("message", messagePrefix);
+        auditEvent.addEventData(CaAuditConstants.NAME_issuer, issuer);
+        auditEvent.addEventData(CaAuditConstants.NAME_subject, subjectText);
+        auditEvent.addEventData(CaAuditConstants.NAME_serial, serialText);
+        auditEvent.addEventData(CaAuditConstants.NAME_message, messagePrefix);
         auditServiceRegister.getAuditService().logEvent(auditEvent);
     } // method logAndAudit
 

@@ -353,7 +353,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
             String statusString = pkiStatus.getStatusMessage();
             if (statusString != null) {
-                event.addEventData("message", statusString);
+                event.addEventData(CaAuditConstants.NAME_message, statusString);
             }
         } else if (event.getStatus() == null) {
             event.setStatus(AuditStatus.SUCCESSFUL);
@@ -1461,7 +1461,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 checkPermission(requestor, requiredPermission);
             } catch (InsuffientPermissionException ex) {
                 event.setStatus(AuditStatus.FAILED);
-                event.addEventData("message", "NOT_PERMITTED");
+                event.addEventData(CaAuditConstants.NAME_message, "NOT_PERMITTED");
                 return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.notAuthorized,
                         null);
             }

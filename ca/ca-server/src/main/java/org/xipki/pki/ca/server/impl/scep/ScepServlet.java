@@ -319,7 +319,7 @@ public class ScepServlet extends HttpServlet {
         }
 
         if (auditMessage != null) {
-            auditEvent.addEventData("message", auditMessage);
+            auditEvent.addEventData(CaAuditConstants.NAME_message, auditMessage);
         }
 
         auditEvent.finish();

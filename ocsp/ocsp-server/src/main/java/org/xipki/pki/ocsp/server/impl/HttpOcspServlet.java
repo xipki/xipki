@@ -314,7 +314,7 @@ public class HttpOcspServlet extends HttpServlet {
                     }
 
                     if (auditMessage != null) {
-                        event.addEventData("message", auditMessage);
+                        event.addEventData(OcspAuditConstants.NAME_message, auditMessage);
                     }
 
                     event.finish();

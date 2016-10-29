@@ -2401,9 +2401,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ParamUtil.requireNonNull("encodedCsr", encodedCsr);
 
         AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.setApplicationName("CA");
-        auditEvent.setName("PERF");
-        auditEvent.addEventData("eventType", "CAMGMT_CRL_GEN_ONDEMAND");
+        auditEvent.setApplicationName(CaAuditConstants.APPNAME);
+        auditEvent.setName(CaAuditConstants.NAME_PERF);
+        auditEvent.addEventType("CAMGMT_CRL_GEN_ONDEMAND");
 
         X509Ca ca = getX509Ca(caName);
         CertificationRequest csr;

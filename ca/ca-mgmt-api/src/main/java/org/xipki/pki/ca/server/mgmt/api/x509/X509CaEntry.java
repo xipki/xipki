@@ -251,6 +251,7 @@ public class X509CaEntry extends CaEntry {
     public String getHexSha1OfCert() {
         return hexSha1OfCert;
     }
+
     @Override
     public void setExtraControl(final String extraControl) {
         super.setExtraControl(extraControl);

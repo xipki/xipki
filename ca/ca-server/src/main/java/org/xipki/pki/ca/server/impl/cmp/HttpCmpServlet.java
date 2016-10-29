@@ -149,7 +149,7 @@ public class HttpCmpServlet extends HttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            event.addEventData("CA", responder.getCa().getCaName());
+            event.addEventData(CaAuditConstants.NAME_CA, responder.getCa().getCaName());
 
             PKIMessage pkiReq;
             try {
@@ -242,7 +242,7 @@ public class HttpCmpServlet extends HttpServlet {
         }
 
         if (auditMessage != null) {
-            auditEvent.addEventData("message", auditMessage);
+            auditEvent.addEventData(CaAuditConstants.NAME_message, auditMessage);
         }
 
         auditEvent.finish();
