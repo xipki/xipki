@@ -196,6 +196,11 @@ public class CurlCmd extends XipkiCommandSupport {
                     }
                 }
                 println("=====response content=====");
+            } else {
+                if (respCode != HttpURLConnection.HTTP_OK) {
+                    println("ERROR: bad response: " + httpConn.getResponseCode() + "    "
+                            + httpConn.getResponseMessage());
+                }
             }
 
             InputStream inputStream = null;
@@ -208,14 +213,7 @@ public class CurlCmd extends XipkiCommandSupport {
             }
 
             byte[] respContentBytes;
-
             if (inputStream != null) {
-                if (respCode != HttpURLConnection.HTTP_OK) {
-                    inputStream.close();
-                    println("ERROR: bad response: " + httpConn.getResponseCode() + "    "
-                            + httpConn.getResponseMessage());
-                    return null;
-                }
                 respContentBytes = IoUtil.read(inputStream);
             } else if (errorStream != null) {
                 respContentBytes = IoUtil.read(errorStream);

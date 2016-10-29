@@ -45,18 +45,18 @@ SERIAL=0X`openssl x509 -inform der -serial -noout -in ${filename}.der | cut -d '
 
 echo "suspend certificate"
 
-curl ${SSL} \
-    "${BASE_URL}/revoke-cert?ca-sha1={CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
+curl ${SSL} --head \
+    "${BASE_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
 echo "unsuspend certificate"
 
-curl ${SSL} \
-    "${BASE_URL}/revoke-cert?ca-sha1={CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
+curl ${SSL} --head \
+    "${BASE_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
 echo "revoke certificate"
 
-curl ${SSL} \
-    "${BASE_URL}/revoke-cert?ca-sha1={CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
+curl ${SSL} --head \
+    "${BASE_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
 echo "generate new CRL"
 

@@ -32,17 +32,17 @@ SERIAL = $(xipki-tk:cert-info --serial --hex --in output/rest/REST-TLS1.der)
 echo "REST revoke (suspend) "
 
 xipki-cmd:curl \
-  "$BASE_URL/revoke-cert?serial-number=$SERIAL&reason=certificateHold"
+  "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
 echo "REST revoke (unsuspend)"
 
 xipki-cmd:curl \
-  "$BASE_URL/revoke-cert?serial-number=$SERIAL&reason=removeFromCRL"
+  "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
 echo "REST revoke (revoke)"
 
 xipki-cmd:curl \
-  "$BASE_URL/revoke-cert?serial-number=$SERIAL&reason=keyCompromise"
+  "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
 echo "REST new-crl"
 
