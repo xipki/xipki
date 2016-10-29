@@ -589,7 +589,7 @@ public class X509Ca {
             int num = (numCrls <= 0) ? 0
                     : certstore.cleanupCrls(caInfo.getCertificate(), caInfo.getNumCrls());
             successful = true;
-            event.addEventData(CaAuditConstants.NAME_num, Integer.toString(num));
+            event.addEventData(CaAuditConstants.NAME_num, num);
             LOG.info("SUCCESSFUL cleanupCrls: ca={}, num={}", caName, num);
         } catch (RuntimeException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
@@ -665,7 +665,7 @@ public class X509Ca {
         event.addEventData(CaAuditConstants.NAME_crlType, deltaCrl ? "DELTA_CRL" : "FULL_CRL");
 
         if (nextUpdate == null) {
-            event.addEventData(CaAuditConstants.NAME_nextUpdate, "NULL");
+            event.addEventData(CaAuditConstants.NAME_nextUpdate, "null");
         } else {
             event.addEventData(CaAuditConstants.NAME_nextUpdate,
                     DateUtil.toUtcTimeyyyyMMddhhmmss(nextUpdate));
@@ -792,7 +792,7 @@ public class X509Ca {
             // end do
 
             BigInteger crlNumber = caInfo.nextCrlNumber();
-            event.addEventData(CaAuditConstants.NAME_crlNumber, crlNumber.toString());
+            event.addEventData(CaAuditConstants.NAME_crlNumber, crlNumber);
 
             boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
             boolean onlyCaCerts = crlControl.isOnlyContainsCaCerts();
@@ -2342,7 +2342,7 @@ public class X509Ca {
                     "CA could not remove expired certificates in slave mode");
         }
 
-        event.addEventData(CaAuditConstants.NAME_expiredAt, expiredAtTime.toString());
+        event.addEventData(CaAuditConstants.NAME_expiredAt, expiredAtTime);
         final int numEntries = 100;
 
         X509Cert caCert = caInfo.getCertificate();

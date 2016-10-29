@@ -121,7 +121,7 @@ public class AuditEvent {
         return addEventData("eventType", type);
     }
 
-    public AuditEventData addEventData(String name, String value) {
+    public AuditEventData addEventData(String name, Object value) {
         return addEventData(new AuditEventData(name, value));
     }
 

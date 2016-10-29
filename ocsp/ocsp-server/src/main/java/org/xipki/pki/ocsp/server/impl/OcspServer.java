@@ -857,7 +857,7 @@ public class OcspServer {
         }
 
         if (event != null) {
-            event.addEventData(OcspAuditConstants.NAME_serial, certId.getSerialNumber().toString());
+            event.addEventData(OcspAuditConstants.NAME_serial, certId.getSerialNumber());
         }
 
         CertStatusInfo certStatusInfo = null;

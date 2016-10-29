@@ -190,7 +190,7 @@ public class OcspCertPublisher extends X509CertPublisher {
         if (cert instanceof X509CertWithDbId) {
             Long certId = ((X509CertWithDbId) cert).getCertId();
             if (certId != null) {
-                auditEvent.addEventData(CaAuditConstants.NAME_id, certId.toString());
+                auditEvent.addEventData(CaAuditConstants.NAME_id, certId);
             }
         }
         auditEvent.addEventData(CaAuditConstants.NAME_issuer, issuer);
