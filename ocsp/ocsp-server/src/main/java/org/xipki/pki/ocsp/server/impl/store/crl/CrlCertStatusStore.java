@@ -282,8 +282,8 @@ public class CrlCertStatusStore extends OcspStore {
                     baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
                     if (!baseCrlNumber.equals(newCrlNumber)) {
                         deltaCrl = null;
-                        LOG.info("{} is not a deltaCRL for the CRL {}, ignore it",
-                                deltaCrlFilename, crlFilename);
+                        LOG.info("{} is not a deltaCRL for the CRL {}, ignore it", deltaCrlFilename,
+                                crlFilename);
                     } else {
                         octetString = deltaCrl.getExtensionValue(Extension.cRLNumber.getId());
                         extnValue = DEROctetString.getInstance(octetString).getOctets();
@@ -314,8 +314,7 @@ public class CrlCertStatusStore extends OcspStore {
             byte[] extValue = (deltaCrlExists ? deltaCrl : crl).getExtensionValue(
                     Extension.cRLNumber.getId());
             if (extValue != null) {
-                ASN1Integer asn1CrlNumber = ASN1Integer.getInstance(
-                        removeTagAndLenFromExtensionValue(extValue));
+                ASN1Integer asn1CrlNumber = ASN1Integer.getInstance(extractCoreValue(extValue));
                 vec.add(new DERTaggedObject(true, 1, asn1CrlNumber));
             }
             vec.add(new DERTaggedObject(true, 2, new DERGeneralizedTime(newThisUpdate)));
@@ -356,7 +355,7 @@ public class CrlCertStatusStore extends OcspStore {
             boolean certsConsidered = false;
             Map<BigInteger, CertWithInfo> certsMap;
             if (extnValue != null) {
-                extnValue = removeTagAndLenFromExtensionValue(extnValue);
+                extnValue = extractCoreValue(extnValue);
                 certsConsidered = true;
                 certsMap = extractCertsFromExtCrlCertSet(extnValue, caName);
             } else {
@@ -379,9 +378,8 @@ public class CrlCertStatusStore extends OcspStore {
             Set<? extends X509CRLEntry> revokedCertListInFullCrl = crl.getRevokedCertificates();
             if (revokedCertListInFullCrl != null) {
                 for (X509CRLEntry revokedCert : revokedCertListInFullCrl) {
-                    X500Principal thisIssuer = revokedCert.getCertificateIssuer();
-                    if (thisIssuer != null
-                            && !caCert.getSubjectX500Principal().equals(thisIssuer)) {
+                    X500Principal rcIssuer = revokedCert.getCertificateIssuer();
+                    if (rcIssuer != null && !caCert.getSubjectX500Principal().equals(rcIssuer)) {
                         throw new OcspStoreException("invalid CRLEntry");
                     }
                 }
@@ -391,9 +389,8 @@ public class CrlCertStatusStore extends OcspStore {
                     : deltaCrl.getRevokedCertificates();
             if (revokedCertListInDeltaCrl != null) {
                 for (X509CRLEntry revokedCert : revokedCertListInDeltaCrl) {
-                    X500Principal thisIssuer = revokedCert.getCertificateIssuer();
-                    if (thisIssuer != null
-                            && !caCert.getSubjectX500Principal().equals(thisIssuer)) {
+                    X500Principal rcIssuer = revokedCert.getCertificateIssuer();
+                    if (rcIssuer != null && !caCert.getSubjectX500Principal().equals(rcIssuer)) {
                         throw new OcspStoreException("invalid CRLEntry");
                     }
                 }
@@ -426,67 +423,64 @@ public class CrlCertStatusStore extends OcspStore {
                 it = revokedCertListInFullCrl.iterator();
             }
 
-            if (it != null) {
-                while (it.hasNext()) {
-                    X509CRLEntry revokedCert = it.next();
-                    BigInteger serialNumber = revokedCert.getSerialNumber();
-                    byte[] encodedExtnValue = revokedCert.getExtensionValue(
-                            Extension.reasonCode.getId());
+            while (it != null && it.hasNext()) {
+                X509CRLEntry revokedCert = it.next();
+                BigInteger serialNumber = revokedCert.getSerialNumber();
+                byte[] encodedExtnValue = revokedCert.getExtensionValue(
+                        Extension.reasonCode.getId());
 
-                    int reasonCode;
-                    if (encodedExtnValue != null) {
-                        ASN1Enumerated enumerated = ASN1Enumerated.getInstance(
-                                removeTagAndLenFromExtensionValue(encodedExtnValue));
-                        reasonCode = enumerated.getValue().intValue();
-                    } else {
-                        reasonCode = CrlReason.UNSPECIFIED.getCode();
+                int reasonCode;
+                if (encodedExtnValue != null) {
+                    ASN1Enumerated enumerated = ASN1Enumerated.getInstance(
+                            extractCoreValue(encodedExtnValue));
+                    reasonCode = enumerated.getValue().intValue();
+                } else {
+                    reasonCode = CrlReason.UNSPECIFIED.getCode();
+                }
+
+                Date revTime = revokedCert.getRevocationDate();
+
+                Date invalidityTime = null;
+                extnValue = revokedCert.getExtensionValue(Extension.invalidityDate.getId());
+
+                if (extnValue != null) {
+                    extnValue = extractCoreValue(extnValue);
+                    ASN1GeneralizedTime genTime = DERGeneralizedTime.getInstance(extnValue);
+                    try {
+                        invalidityTime = genTime.getDate();
+                    } catch (ParseException ex) {
+                        throw new OcspStoreException(ex.getMessage(), ex);
                     }
 
-                    Date revTime = revokedCert.getRevocationDate();
-
-                    Date invalidityTime = null;
-                    extnValue = revokedCert.getExtensionValue(Extension.invalidityDate.getId());
-
-                    if (extnValue != null) {
-                        extnValue = removeTagAndLenFromExtensionValue(extnValue);
-                        ASN1GeneralizedTime genTime = DERGeneralizedTime.getInstance(extnValue);
-                        try {
-                            invalidityTime = genTime.getDate();
-                        } catch (ParseException ex) {
-                            throw new OcspStoreException(ex.getMessage(), ex);
-                        }
-
-                        if (revTime.equals(invalidityTime)) {
-                            invalidityTime = null;
-                        }
+                    if (revTime.equals(invalidityTime)) {
+                        invalidityTime = null;
                     }
+                }
 
-                    CertWithInfo cert = null;
-                    if (certsConsidered) {
-                        cert = certsMap.remove(serialNumber);
-                        if (cert == null) {
-                            LOG.info("could not find certificate (serialNumber='{}')",
-                                    LogUtil.formatCsn(serialNumber));
-                        }
+                CertWithInfo cert = null;
+                if (certsConsidered) {
+                    cert = certsMap.remove(serialNumber);
+                    if (cert == null && LOG.isInfoEnabled()) {
+                        LOG.info("could not find certificate (serialNumber='{}')",
+                                LogUtil.formatCsn(serialNumber));
                     }
+                }
 
-                    Certificate bcCert = (cert == null) ? null : cert.getCert();
-                    Map<HashAlgoType, byte[]> certHashes = (bcCert == null) ? null
-                            : getCertHashes(bcCert);
-                    Date notBefore = (bcCert == null) ? null
-                            : bcCert.getTBSCertificate().getStartDate().getDate();
-                    Date notAfter = (bcCert == null) ? null
-                            : bcCert.getTBSCertificate().getEndDate().getDate();
+                Certificate bcCert = (cert == null) ? null : cert.getCert();
+                Map<HashAlgoType, byte[]> certHashes = (bcCert == null) ? null
+                        : getCertHashes(bcCert);
+                Date notBefore = (bcCert == null) ? null
+                        : bcCert.getTBSCertificate().getStartDate().getDate();
+                Date notAfter = (bcCert == null) ? null
+                        : bcCert.getTBSCertificate().getEndDate().getDate();
 
-                    CertRevocationInfo revocationInfo = new CertRevocationInfo(reasonCode, revTime,
-                            invalidityTime);
-                    String profileName = (cert == null) ? null : cert.getProfileName();
-                    CrlCertStatusInfo crlCertStatusInfo =
-                            CrlCertStatusInfo.getRevokedCertStatusInfo(revocationInfo, profileName,
-                                    certHashes, notBefore, notAfter);
-                    newCertStatusInfoMap.put(serialNumber, crlCertStatusInfo);
-                } // end while (it.hasNext())
-            } // end if (it)
+                CertRevocationInfo revocationInfo = new CertRevocationInfo(reasonCode, revTime,
+                        invalidityTime);
+                String profileName = (cert == null) ? null : cert.getProfileName();
+                CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getRevokedCertStatusInfo(
+                        revocationInfo, profileName, certHashes, notBefore, notAfter);
+                newCertStatusInfoMap.put(serialNumber, crlCertStatusInfo);
+            } // end while
 
             for (BigInteger serialNumber : certsMap.keySet()) {
                 CertWithInfo cert = certsMap.get(serialNumber);
@@ -528,18 +522,10 @@ public class CrlCertStatusStore extends OcspStore {
             initialized = true;
         } finally {
             if (updateCrlSuccessful != null) {
-                AuditLevel auditLevel;
-                AuditStatus auditStatus;
-                String eventType = "UPDATE_CRL";
-                if (updateCrlSuccessful) {
-                    auditLevel = AuditLevel.INFO;
-                    auditStatus = AuditStatus.FAILED;
-                } else {
-                    auditLevel = AuditLevel.ERROR;
-                    auditStatus = AuditStatus.SUCCESSFUL;
-                }
-
-                auditPciEvent(auditLevel, eventType, auditStatus.name());
+                AuditLevel auditLevel = updateCrlSuccessful ? AuditLevel.INFO : AuditLevel.ERROR;
+                AuditStatus auditStatus = updateCrlSuccessful ? AuditStatus.SUCCESSFUL
+                        : AuditStatus.FAILED;
+                auditPciEvent(auditLevel, "UPDATE_CRL", auditStatus.name());
             }
         }
     } // method initializeStore
@@ -576,15 +562,13 @@ public class CrlCertStatusStore extends OcspStore {
 
             if (bcCert != null) {
                 if (!caName.equals(bcCert.getIssuer())) {
-                    throw new OcspStoreException(
-                        "issuer not match (serial=" + LogUtil.formatCsn(serialNumber)
-                        + ") in CRL Extension Xipki-CertSet");
+                    throw new OcspStoreException("issuer not match (serial="
+                            + LogUtil.formatCsn(serialNumber) + ") in CRL Extension Xipki-CertSet");
                 }
 
                 if (!serialNumber.equals(bcCert.getSerialNumber().getValue())) {
-                    throw new OcspStoreException(
-                            "serialNumber not match (serial=" + LogUtil.formatCsn(serialNumber)
-                            + ") in CRL Extension Xipki-CertSet");
+                    throw new OcspStoreException("serialNumber not match (serial="
+                            + LogUtil.formatCsn(serialNumber) + ") in CRL Extension Xipki-CertSet");
                 }
             }
 
@@ -664,8 +648,7 @@ public class CrlCertStatusStore extends OcspStore {
 
             if (!ignore) {
                 String profileName = crlCertStatusInfo.getCertprofile();
-                ignore = profileName != null
-                        && certprofileOption != null
+                ignore = (profileName != null) && certprofileOption != null
                         && !certprofileOption.include(profileName);
             }
 
@@ -700,8 +683,8 @@ public class CrlCertStatusStore extends OcspStore {
                     date = caNotBefore;
                 } else {
                     long nowInMs = System.currentTimeMillis();
-                    long tmpInMs = Math.max(caNotBefore.getTime(), nowInMs
-                            - DAY * retentionInterval);
+                    long tmpInMs = Math.max(caNotBefore.getTime(),
+                            nowInMs - DAY * retentionInterval);
                     date = new Date(tmpInMs);
                 }
 
@@ -943,7 +926,7 @@ public class CrlCertStatusStore extends OcspStore {
         return certHashes;
     }
 
-    private static byte[] removeTagAndLenFromExtensionValue(final byte[] encodedExtensionValue) {
+    private static byte[] extractCoreValue(final byte[] encodedExtensionValue) {
         return ASN1OctetString.getInstance(encodedExtensionValue).getOctets();
     }
 

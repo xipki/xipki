@@ -1380,12 +1380,14 @@ public class OcspServer {
     }
 
     private static void close(final InputStream stream) {
-        if (stream != null) {
-            try {
-                stream.close();
-            } catch (IOException ex) {
-                LOG.warn("could not close stream: {}", ex.getMessage());
-            }
+        if (stream == null) {
+            return;
+        }
+
+        try {
+            stream.close();
+        } catch (IOException ex) {
+            LOG.warn("could not close stream: {}", ex.getMessage());
         }
     }
 
@@ -1418,8 +1420,7 @@ public class OcspServer {
             return (OCSPServer) unmarshaller.unmarshal(
                     new File(IoUtil.expandFilepath(confFilename)));
         } catch (SAXException ex) {
-            throw new InvalidConfException(
-                    "parse profile failed, message: " + ex.getMessage(), ex);
+            throw new InvalidConfException("parse profile failed, message: " + ex.getMessage(), ex);
         } catch (JAXBException ex) {
             throw new InvalidConfException(
                     "parse profile failed, message: " + XmlUtil.getMessage(ex), ex);

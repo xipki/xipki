@@ -176,8 +176,7 @@ public class DbCertStatusStore extends OcspStore {
                             : Collections.emptySet();
 
                     boolean issuersUnchanged = (ids.size() == newIds.size())
-                            && ids.containsAll(newIds)
-                            && newIds.containsAll(ids);
+                            && ids.containsAll(newIds) && newIds.containsAll(ids);
 
                     if (issuersUnchanged) {
                         for (Integer id : newIds) {
@@ -246,7 +245,7 @@ public class DbCertStatusStore extends OcspStore {
                 releaseDbResources(ps, rs);
             }
         } catch (Exception ex) {
-            LogUtil.error(LOG, ex, "could not executing initializeStore()");
+            LogUtil.error(LOG, ex, "could not executing initIssuerStore()");
             initializationFailed = true;
             initialized = true;
         }
@@ -354,8 +353,7 @@ public class DbCertStatusStore extends OcspStore {
 
                     certprofile = rs.getString("PN");
                     if (!ignore) {
-                        ignore = (certprofile != null)
-                                && (certprofileOption != null)
+                        ignore = (certprofile != null) && (certprofileOption != null)
                                 && !certprofileOption.include(certprofile);
                     }
 
@@ -426,7 +424,7 @@ public class DbCertStatusStore extends OcspStore {
 
                     certStatusInfo.setArchiveCutOff(date);
                 }
-            } // end if
+            }
 
             return certStatusInfo;
         } catch (DataAccessException ex) {
