@@ -60,7 +60,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditStatus;
@@ -121,10 +120,10 @@ public class ScepServlet extends HttpServlet {
             final boolean post) throws ServletException, IOException {
         String servletPath = request.getServletPath();
 
-        AuditEvent auditEvent = new AuditEvent(new Date());
-        auditEvent.setApplicationName("SCEP");
-        auditEvent.setName("PERF");
-        auditEvent.addEventData(new AuditEventData("servletPath", servletPath));
+        AuditEvent event = new AuditEvent(new Date());
+        event.setApplicationName(ScepAuditConstants.APPNAME);
+        event.setName(ScepAuditConstants.NAME_PERF);
+        event.addEventData(ScepAuditConstants.NAME_servletPath, servletPath);
 
         AuditLevel auditLevel = AuditLevel.INFO;
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
@@ -147,7 +146,7 @@ public class ScepServlet extends HttpServlet {
             }
 
             String operation = request.getParameter("operation");
-            auditEvent.addEventData(new AuditEventData("operation", operation));
+            event.addEventData(ScepAuditConstants.NAME_operation, operation);
 
             if ("PKIOperation".equalsIgnoreCase(operation)) {
                 CMSSignedData reqMessage;
@@ -175,7 +174,7 @@ public class ScepServlet extends HttpServlet {
 
                 ContentInfo ci;
                 try {
-                    ci = responder.servicePkiOperation(reqMessage, auditEvent);
+                    ci = responder.servicePkiOperation(reqMessage, event);
                 } catch (MessageDecodingException ex) {
                     final String message = "could not decrypt and/or verify the request";
                     LogUtil.error(LOG, ex, message);
@@ -296,7 +295,7 @@ public class ScepServlet extends HttpServlet {
             try {
                 response.flushBuffer();
             } finally {
-                audit(auditService, auditEvent, auditLevel, auditStatus, auditMessage);
+                audit(auditService, event, auditLevel, auditStatus, auditMessage);
             }
         } // end try
     } // method service
@@ -316,22 +315,22 @@ public class ScepServlet extends HttpServlet {
         }
     }
 
-    static void audit(final AuditService auditService, final AuditEvent auditEvent,
+    static void audit(final AuditService auditService, final AuditEvent event,
             final AuditLevel auditLevel, final AuditStatus auditStatus, final String auditMessage) {
         if (auditLevel != null) {
-            auditEvent.setLevel(auditLevel);
+            event.setLevel(auditLevel);
         }
 
         if (auditStatus != null) {
-            auditEvent.setStatus(auditStatus);
+            event.setStatus(auditStatus);
         }
 
         if (auditMessage != null) {
-            auditEvent.addEventData(new AuditEventData("message", auditMessage));
+            event.addEventData("message", auditMessage);
         }
 
-        auditEvent.finish();
-        auditService.logEvent(auditEvent);
+        event.finish();
+        auditService.logEvent(event);
     }
 
 }
