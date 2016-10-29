@@ -63,7 +63,6 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
@@ -148,7 +147,7 @@ public class ScepResponder {
     }
 
     public ContentInfo servicePkiOperation(final CMSSignedData requestContent,
-            final AuditEvent auditEvent) throws MessageDecodingException, CaException {
+            final AuditEvent event) throws MessageDecodingException, CaException {
         ParamUtil.requireNonNull("requestContent", requestContent);
         PrivateKey recipientKey = (raEmulator != null) ? raEmulator.getRaKey()
                 : caEmulator.getCaKey();
@@ -168,15 +167,13 @@ public class ScepResponder {
 
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
 
-        PkiMessage rep = doServicePkiOperation(req, auditEvent);
-        AuditEventData eventData = new AuditEventData("pkiStatus", rep.getPkiStatus().toString());
-        auditEvent.addEventData(eventData);
+        PkiMessage rep = doServicePkiOperation(req, event);
+        event.addEventData(ScepAuditConstants.NAME_pkiStatus, rep.getPkiStatus().toString());
         if (rep.getPkiStatus() == PkiStatus.FAILURE) {
-            auditEvent.setStatus(AuditStatus.FAILED);
+            event.setStatus(AuditStatus.FAILED);
         }
         if (rep.getFailInfo() != null) {
-            eventData = new AuditEventData("failInfo", rep.getFailInfo().toString());
-            auditEvent.addEventData(eventData);
+            event.addEventData(ScepAuditConstants.NAME_failInfo, rep.getFailInfo().toString());
         }
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(getSigningKey(),
@@ -208,7 +205,7 @@ public class ScepResponder {
     }
 
     private PkiMessage doServicePkiOperation(final DecodedPkiMessage req,
-            final AuditEvent auditEvent) throws MessageDecodingException, CaException {
+            final AuditEvent event) throws MessageDecodingException, CaException {
 
         TransactionId tid = req.getTransactionId();
         PkiMessage rep = new PkiMessage(tid, MessageType.CertRep, Nonce.randomNonce());
