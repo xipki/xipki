@@ -342,7 +342,7 @@ public class OcspServer {
 
         OCSPServer conf = parseConf(confFile);
 
-        //----- check the duplication names
+        //-- check the duplication names
         Set<String> set = new HashSet<>();
 
         // Duplication name check: responder
@@ -714,7 +714,7 @@ public class OcspServer {
                     LOG.warn("length of nonce {} not within [{},{}]", len, min, max);
                     StringBuilder sb = new StringBuilder(50);
                     sb.append("length of nonce ").append(len);
-                    sb.append(" not within [").append(min).append(", ").append(max);
+                    sb.append(" not within [").append(min).append(", ").append(max).append("]");
                     fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, sb.toString());
                     return createUnsuccessfulOcspResp(OcspResponseStatus.malformedRequest);
                 }
@@ -770,8 +770,7 @@ public class OcspServer {
                 criticalExtensionOids.remove(extensionType);
                 Extension ext = request.getExtension(extensionType);
                 if (ext != null) {
-                    ASN1Sequence preferredSigAlgs =
-                            ASN1Sequence.getInstance(ext.getParsedValue());
+                    ASN1Sequence preferredSigAlgs = ASN1Sequence.getInstance(ext.getParsedValue());
                     concurrentSigner = signer.getSignerForPreferredSigAlgs(preferredSigAlgs);
                 }
             }

@@ -77,11 +77,9 @@ class OcspStoreQueryExecutor {
             + " VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
     private static final String SQL_ADD_CERT =
-            "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN)"
-            + " VALUES (?,?,?,?,?,?,?,?)";
+            "INSERT INTO CERT (ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,PN) VALUES (?,?,?,?,?,?,?,?)";
 
-    private static final String SQL_ADD_CRAW =
-            "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
+    private static final String SQL_ADD_CRAW = "INSERT INTO CRAW (CID,SUBJECT,CERT) VALUES (?,?,?)";
 
     private static final String SQL_ADD_CHASH =
             "INSERT INTO CHASH (CID,S1,S224,S256,S384,S512) VALUES (?,?,?,?,?,?)";

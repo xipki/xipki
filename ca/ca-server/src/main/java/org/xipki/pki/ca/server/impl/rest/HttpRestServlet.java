@@ -310,8 +310,8 @@ public class HttpRestServlet extends HttpServlet {
             } else {
                 String message = "invalid command '" + command + "'";
                 LOG.error(message);
-                throw new HttpRespAuditException(HttpServletResponse.SC_NOT_FOUND,
-                        message, AuditLevel.INFO, AuditStatus.FAILED);
+                throw new HttpRespAuditException(HttpServletResponse.SC_NOT_FOUND, message,
+                        AuditLevel.INFO, AuditStatus.FAILED);
             }
 
             response.setStatus(HttpServletResponse.SC_OK);

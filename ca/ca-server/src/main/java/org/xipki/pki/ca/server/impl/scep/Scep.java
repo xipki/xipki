@@ -601,8 +601,7 @@ public class Scep {
         }
 
         if (certs.size() > 1) {
-            LOG.warn(
-                "given certId (subject: {}) and transactionId {} match at least two certificates",
+            LOG.warn("given certId (subject: {}) and transactionId {} match multiple certificates",
                 X509Util.getRfc4519Name(subject), tid.getId());
             throw FailInfoException.BAD_CERTID;
         }
@@ -657,8 +656,7 @@ public class Scep {
             X509Certificate[] cmsCertSet = control.isIncludeSignerCert()
                     ? new X509Certificate[]{responderCert} : null;
 
-            ci = response.encode(responderKey,
-                    signatureAlgorithm, responderCert, cmsCertSet,
+            ci = response.encode(responderKey, signatureAlgorithm, responderCert, cmsCertSet,
                     request.getSignatureCert(), request.getContentEncryptionAlgorithm());
         } catch (MessageEncodingException ex) {
             LogUtil.error(LOG, ex, "could not encode response");

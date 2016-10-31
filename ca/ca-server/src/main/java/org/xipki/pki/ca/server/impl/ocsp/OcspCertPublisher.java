@@ -179,7 +179,6 @@ public class OcspCertPublisher extends X509CertPublisher {
 
         LOG.error("{} (issuser='{}': subject='{}', serialNumber={}). Message: {}",
                 messagePrefix, issuer, subjectText, serialText, ex.getMessage());
-
         LOG.debug("error", ex);
 
         AuditEvent event = new AuditEvent(new Date());
