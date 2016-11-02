@@ -117,10 +117,14 @@ public class DbCertStatusStore extends OcspStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
 
-    private static final String SQL_CS =
+    private static final String CORE_SQL_CS =
             "NBEFORE,NAFTER,REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
 
-    private static final Map<HashAlgoType, String> SQL_CS_HASHMAP = new HashMap<>();
+    private static final Map<HashAlgoType, String> CORE_SQL_CS_MAP = new HashMap<>();
+
+    private String sqlCs;
+
+    private Map<HashAlgoType, String> sqlCsMap;
 
     static {
         HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA1,  HashAlgoType.SHA224,
@@ -130,7 +134,7 @@ public class DbCertStatusStore extends OcspStore {
             sb.append("NBEFORE,NAFTER,ID,REV,RR,RT,RIT,PN,").append(hashAlgo.getShortName());
             sb.append(" FROM CERT INNER JOIN CHASH ON ");
             sb.append(" CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID");
-            SQL_CS_HASHMAP.put(hashAlgo, sb.toString());
+            CORE_SQL_CS_MAP.put(hashAlgo, sb.toString());
         }
     }
 
@@ -301,13 +305,13 @@ public class DbCertStatusStore extends OcspStore {
             throw new OcspStoreException("initialization of CertStore failed");
         }
 
-        String coreSql;
+        String sql;
         HashAlgoType certHashAlgo = null;
         if (includeCertHash) {
             certHashAlgo = (certHashAlg == null) ? hashAlgo : certHashAlg;
-            coreSql = SQL_CS_HASHMAP.get(certHashAlgo);
+            sql = sqlCsMap.get(certHashAlgo);
         } else {
-            coreSql = SQL_CS;
+            sql = sqlCs;
         }
 
         try {
@@ -331,8 +335,7 @@ public class DbCertStatusStore extends OcspStore {
             long revocationTime = 0;
             long invalidatityTime = 0;
 
-            PreparedStatement ps = borrowPreparedStatement(
-                    datasource.buildSelectFirstSql(coreSql, 1));
+            PreparedStatement ps = borrowPreparedStatement(sql);
 
             try {
                 int idx = 1;
@@ -371,7 +374,7 @@ public class DbCertStatusStore extends OcspStore {
                     }
                 } // end if (rs.next())
             } catch (SQLException ex) {
-                throw datasource.translate(coreSql, ex);
+                throw datasource.translate(sql, ex);
             } finally {
                 releaseDbResources(ps, rs);
             }
@@ -478,6 +481,12 @@ public class DbCertStatusStore extends OcspStore {
             final Set<HashAlgoType> certHashAlgos) throws OcspStoreException {
         ParamUtil.requireNonNull("conf", conf);
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+
+        sqlCs = datasource.buildSelectFirstSql(CORE_SQL_CS, 1);
+        sqlCsMap = new HashMap<>();
+        for (HashAlgoType ha : CORE_SQL_CS_MAP.keySet()) {
+            sqlCsMap.put(ha, datasource.buildSelectFirstSql(CORE_SQL_CS_MAP.get(ha), 1));
+        }
 
         StoreConf storeConf = new StoreConf(conf);
 
