@@ -1015,7 +1015,6 @@ class CertStoreQueryExecutor {
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
         int caId = getCaId(caCert);
-        // TODO
         StringBuilder sb = new StringBuilder("ID,SN FROM CERT WHERE ID>? AND CA_ID=?");
         if (notExpiredAt != null) {
             sb.append(" AND NAFTER>?");
@@ -1060,7 +1059,6 @@ class CertStoreQueryExecutor {
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
         int caId = getCaId(caCert);
-        // TODO
         final String coreSql = "SN FROM CERT WHERE CA_ID=? AND NAFTER<?";
         final String sql = datasource.buildSelectFirstSql(coreSql, numEntries);
         ResultSet rs = null;
@@ -1090,7 +1088,6 @@ class CertStoreQueryExecutor {
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
         int caId = getCaId(caCert);
-        // TODO
         final String coreSql = "SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?";
         final String sql = datasource.buildSelectFirstSql(coreSql, numEntries);
         ResultSet rs = null;
@@ -1121,7 +1118,6 @@ class CertStoreQueryExecutor {
 
         int caId = getCaId(caCert);
         StringBuilder sqlBuilder = new StringBuilder();
-        // TODO
         sqlBuilder.append("THISUPDATE,CRL FROM CRL WHERE CA_ID=?");
         if (crlNumber != null) {
             sqlBuilder.append(" AND CRL_NO=?");
@@ -1658,7 +1654,6 @@ class CertStoreQueryExecutor {
             sqlBuiler.append(" AND EE=1");
         }
 
-        // TODO
         String sql = datasource.buildSelectFirstSql(sqlBuiler.toString(), numEntries, "ID ASC");
 
         ResultSet rs = null;
@@ -1705,7 +1700,6 @@ class CertStoreQueryExecutor {
 
         int caId = getCaId(caCert);
 
-        // TODO
         String sql = datasource.buildSelectFirstSql(
                 "ID FROM DELTACRL_CACHE WHERE ID>? AND CA_ID=?", numEntries, "ID ASC");
         List<Long> ids = new LinkedList<>();
