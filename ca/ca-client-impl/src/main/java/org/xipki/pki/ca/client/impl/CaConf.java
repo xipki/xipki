@@ -36,13 +36,13 @@ package org.xipki.pki.ca.client.impl;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.util.Arrays;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.util.X509Util;
@@ -197,7 +197,8 @@ class CaConf {
     }
 
     public byte[] getAuthorityKeyIdentifier() {
-        return (authorityKeyIdentifier == null) ? null : Arrays.clone(authorityKeyIdentifier);
+        return (authorityKeyIdentifier == null) ? null
+                : Arrays.copyOf(authorityKeyIdentifier, authorityKeyIdentifier.length);
     }
 
 }

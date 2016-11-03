@@ -35,6 +35,7 @@
 package org.xipki.commons.security.pkcs11.proxy;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -44,7 +45,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.util.Arrays;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
@@ -148,7 +148,7 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
     }
 
     public byte[] getObjectId() {
-        return Arrays.clone(objectId);
+        return Arrays.copyOf(objectId, objectId.length);
     }
 
     public String getObjectLabel() {

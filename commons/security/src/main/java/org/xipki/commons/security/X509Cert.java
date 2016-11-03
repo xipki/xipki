@@ -36,11 +36,11 @@ package org.xipki.commons.security;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.util.Arrays;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.util.X509Util;
 
@@ -108,7 +108,7 @@ public class X509Cert {
     }
 
     public byte[] getSubjectKeyIdentifier() {
-        return Arrays.clone(subjectKeyIdentifer);
+        return Arrays.copyOf(subjectKeyIdentifer, subjectKeyIdentifer.length);
     }
 
     @Override

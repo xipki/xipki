@@ -41,6 +41,7 @@ import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +58,6 @@ import org.bouncycastle.crypto.engines.RSABlindedEngine;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
-import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.HashAlgoType;
@@ -407,7 +407,7 @@ public class SignerUtil {
 
     public static byte[] getDigestPkcsPrefix(HashAlgoType hashAlgo) {
         byte[] bytes = digestPkcsPrefix.get(hashAlgo);
-        return (bytes == null) ? null : Arrays.clone(bytes);
+        return (bytes == null) ? null : Arrays.copyOf(bytes, bytes.length);
     }
 
 }
