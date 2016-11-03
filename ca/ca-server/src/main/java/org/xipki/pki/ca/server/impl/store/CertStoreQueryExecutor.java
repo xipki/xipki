@@ -109,75 +109,152 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 class CertStoreQueryExecutor {
 
-    private static final String SQL_ADD_CERT =
-            "INSERT INTO CERT (ID,ART,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,CA_ID,"
-            + "RID,UNAME,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    // CHECKSTYLE:SKIP
+    private static class SQLs {
+        private static final String SQL_ADD_CERT =
+                "INSERT INTO CERT (ID,ART,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
+                + "CA_ID,RID,UNAME,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-    private static final String SQL_ADD_CRAW =
-            "INSERT INTO CRAW (CID,SHA1,REQ_SUBJECT,CERT) VALUES (?,?,?,?)";
+        private static final String SQL_ADD_CRAW =
+                "INSERT INTO CRAW (CID,SHA1,REQ_SUBJECT,CERT) VALUES (?,?,?,?)";
 
-    private static final String SQL_REVOKE_CERT =
-            "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+        private static final String SQL_REVOKE_CERT =
+                "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
-    private static final String SQL_REVOKE_SUSPENDED_CERT =
-            "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
+        private static final String SQL_REVOKE_SUSPENDED_CERT =
+                "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
 
-    private static final String SQL_INSERT_PUBLISHQUEUE =
-            "INSERT INTO PUBLISHQUEUE (PID,CA_ID,CID) VALUES (?,?,?)";
+        private static final String SQL_INSERT_PUBLISHQUEUE =
+                "INSERT INTO PUBLISHQUEUE (PID,CA_ID,CID) VALUES (?,?,?)";
 
-    private static final String SQL_REMOVE_PUBLISHQUEUE =
-            "DELETE FROM PUBLISHQUEUE WHERE PID=? AND CID=?";
+        private static final String SQL_REMOVE_PUBLISHQUEUE =
+                "DELETE FROM PUBLISHQUEUE WHERE PID=? AND CID=?";
 
-    private static final String SQL_MAXID_DELTACRL_CACHE =
-            "SELECT MAX(ID) FROM DELTACRL_CACHE WHERE CA_ID=?";
+        private static final String SQL_MAXID_DELTACRL_CACHE =
+                "SELECT MAX(ID) FROM DELTACRL_CACHE WHERE CA_ID=?";
 
-    private static final String CLEAR_DELTACRL_CACHE =
-            "DELETE FROM DELTACRL_CACHE WHERE ID<? AND CA_ID=?";
+        private static final String CLEAR_DELTACRL_CACHE =
+                "DELETE FROM DELTACRL_CACHE WHERE ID<? AND CA_ID=?";
 
-    private static final String SQL_MAX_CRLNO =
-            "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
+        private static final String SQL_MAX_CRLNO =
+                "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
 
-    private static final String SQL_MAX_THISUPDAATE_CRL =
-            "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=?";
+        private static final String SQL_MAX_THISUPDAATE_CRL =
+                "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=?";
 
-    private static final String SQL_ADD_CRL =
-            "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL)"
-            + " VALUES (?,?,?,?,?,?,?,?)";
+        private static final String SQL_ADD_CRL =
+                "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL)"
+                + " VALUES (?,?,?,?,?,?,?,?)";
 
-    private static final String SQL_ADD_DELTACRL_CACHE =
-            "INSERT INTO DELTACRL_CACHE (ID,CA_ID,SN) VALUES (?,?,?)";
+        private static final String SQL_ADD_DELTACRL_CACHE =
+                "INSERT INTO DELTACRL_CACHE (ID,CA_ID,SN) VALUES (?,?,?)";
 
-    private static final String SQL_REMOVE_CERT =
-            "DELETE FROM CERT WHERE CA_ID=? AND SN=?";
+        private static final String SQL_REMOVE_CERT =
+                "DELETE FROM CERT WHERE CA_ID=? AND SN=?";
 
-    private static final String CORESQL_CERT_FOR_ID =
+        private static final String CORESQL_CERT_FOR_ID =
             "PID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID=? AND CRAW.CID=CERT.ID";
 
-    private static final String CORESQL_RAWCERT_FOR_ID =
-            "CERT FROM CRAW WHERE CID=?";
+        private static final String CORESQL_RAWCERT_FOR_ID =
+                "CERT FROM CRAW WHERE CID=?";
 
-    private static final String CORESQL_CERT_WITH_REVINFO =
-            "ID,REV,RR,RT,RIT,PID,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=?"
-            + " AND CRAW.CID=CERT.ID";
+        private static final String CORESQL_CERT_WITH_REVINFO =
+                "ID,REV,RR,RT,RIT,PID,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=?"
+                + " AND CRAW.CID=CERT.ID";
 
-    private static final String CORESQL_CERTINFO =
-            "PID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=?"
-            + " AND CRAW.CID=CERT.ID";
+        private static final String CORESQL_CERTINFO =
+                "PID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=?"
+                + " AND CRAW.CID=CERT.ID";
 
-    private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED =
-            "ID FROM CERT WHERE CA_ID=? AND FP_S=?";
+        private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED =
+                "ID FROM CERT WHERE CA_ID=? AND FP_S=?";
 
-    private static final String CORESQL_CERT_FOR_KEY_ISSUED =
-            "ID FROM CERT WHERE CA_ID=? AND FP_K=?";
+        private static final String CORESQL_CERT_FOR_KEY_ISSUED =
+                "ID FROM CERT WHERE CA_ID=? AND FP_K=?";
 
-    private static final String SQL_DELETE_UNREFERENCED_REQUEST =
-            "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
+        private static final String SQL_DELETE_UNREFERENCED_REQUEST =
+                "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
 
-    private static final String SQL_ADD_REQUEST =
-            "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES(?,?,?)";
+        private static final String SQL_ADD_REQUEST =
+                "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES(?,?,?)";
 
-    private static final String SQL_ADD_REQCERT =
-            "INSERT INTO REQCERT (ID,RID,CID) VALUES(?,?,?)";
+        private static final String SQL_ADD_REQCERT =
+                "INSERT INTO REQCERT (ID,RID,CID) VALUES(?,?,?)";
+
+        private final String sqlCaHasCrl;
+
+        private final String sqlContainsCertificates;
+
+        private final String sqlCertForId;
+
+        private final String sqlRawCertForId;
+
+        private final String sqlCertWithRevInfo;
+
+        private final String sqlCertInfo;
+
+        private final String sqlCertprofileForId;
+
+        private final String sqlCertprofileForSerial;
+
+        private final String sqlPasswordForUser;
+
+        private final String sqlCnRegexForUser;
+
+        private final String sqlKnowsCertForSerial;
+
+        private final String sqlRevForId;
+
+        private final String sqlCertStatusForSubjectFp;
+
+        private final String sqlCertforSubjectIssued;
+
+        private final String sqlCertForKeyIssued;
+
+        private final String sqlLatestSerialForSubjectLike;
+
+        private final String sqlLatestSerialForCertprofileAndSubjectLike;
+
+        private final String sqlGetUserId;
+
+        private final String sqlGetUser;
+
+        SQLs(final DataSourceWrapper datasource) {
+            this.sqlCaHasCrl = datasource.buildSelectFirstSql("ID FROM CRL WHERE CA_ID=?", 1);
+            this.sqlContainsCertificates = datasource.buildSelectFirstSql(
+                    "ID FROM CERT WHERE CA_ID=? AND EE=?", 1);
+            this.sqlCertForId = datasource.buildSelectFirstSql(CORESQL_CERT_FOR_ID, 1);
+            this.sqlRawCertForId = datasource.buildSelectFirstSql(CORESQL_RAWCERT_FOR_ID, 1);
+            this.sqlCertWithRevInfo = datasource.buildSelectFirstSql(CORESQL_CERT_WITH_REVINFO, 1);
+            this.sqlCertInfo = datasource.buildSelectFirstSql(CORESQL_CERTINFO, 1);
+            this.sqlCertprofileForId = datasource.buildSelectFirstSql(
+                    "PID,CA_ID FROM CERT WHERE ID=?", 1);
+            this.sqlCertprofileForSerial = datasource.buildSelectFirstSql(
+                    "PID FROM CERT WHERE SN=? AND CA_ID=?", 1);
+            this.sqlPasswordForUser = datasource.buildSelectFirstSql(
+                    "PASSWORD FROM USERNAME WHERE NAME=?", 1);
+            this.sqlCnRegexForUser = datasource.buildSelectFirstSql(
+                    "CN_REGEX FROM USERNAME WHERE NAME=?", 1);
+            this.sqlKnowsCertForSerial = datasource.buildSelectFirstSql(
+                    "UNAME FROM CERT WHERE SN=? AND CA_ID=?", 1);
+            this.sqlRevForId = datasource.buildSelectFirstSql(
+                    "SN,EE,REV,RR,RT,RIT FROM CERT WHERE ID=?", 1);
+            this.sqlCertStatusForSubjectFp = datasource.buildSelectFirstSql(
+                    "REV FROM CERT WHERE FP_S=? AND CA_ID=?", 1);
+            this.sqlCertforSubjectIssued = datasource.buildSelectFirstSql(
+                    CORESQL_CERT_FOR_SUBJECT_ISSUED, 1);
+            this.sqlCertForKeyIssued = datasource.buildSelectFirstSql(CORESQL_CERT_FOR_KEY_ISSUED,
+                    1);
+            this.sqlLatestSerialForSubjectLike = datasource.buildSelectFirstSql(
+                    "SUBJECT FROM CERT WHERE SUBJECT LIKE ?", 1, "NBEFORE DESC");
+            this.sqlLatestSerialForCertprofileAndSubjectLike = datasource.buildSelectFirstSql(
+                    "NBEFORE FROM CERT WHERE PID=? AND SUBJECT LIKE ?", 1, "NBEFORE ASC");
+            this.sqlGetUserId = datasource.buildSelectFirstSql("ID FROM USERNAME WHERE NAME=?", 1);
+            this.sqlGetUser = datasource.buildSelectFirstSql(
+                    "PASSWORD,CN_REGEX FROM USERNAME WHERE NAME=?", 1);
+        } // constructor
+
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
 
@@ -198,43 +275,7 @@ class CertStoreQueryExecutor {
 
     private final UniqueIdGenerator idGenerator;
 
-    private final String sqlCaHasCrl;
-
-    private final String sqlContainsCertificates;
-
-    private final String sqlCertForId;
-
-    private final String sqlRawCertForId;
-
-    private final String sqlCertWithRevInfo;
-
-    private final String sqlCertInfo;
-
-    private final String sqlCertprofileForId;
-
-    private final String sqlCertprofileForSerial;
-
-    private final String sqlPasswordForUser;
-
-    private final String sqlCnRegexForUser;
-
-    private final String sqlKnowsCertForSerial;
-
-    private final String sqlRevForId;
-
-    private final String sqlCertStatusForSubjectFp;
-
-    private final String sqlCertforSubjectIssued;
-
-    private final String sqlCertForKeyIssued;
-
-    private final String sqlLatestSerialForSubjectLike;
-
-    private final String sqlLatestSerialForCertprofileAndSubjectLike;
-
-    private final String sqlGetUserId;
-
-    private final String sqlGetUser;
+    private final SQLs sqls;
 
     CertStoreQueryExecutor(final DataSourceWrapper datasource, final UniqueIdGenerator idGenerator)
     throws DataAccessException {
@@ -251,38 +292,7 @@ class CertStoreQueryExecutor {
         str = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(str);
 
-        // initialize the SQL queries
-        this.sqlCaHasCrl = datasource.buildSelectFirstSql("ID FROM CRL WHERE CA_ID=?", 1);
-        this.sqlContainsCertificates = datasource.buildSelectFirstSql(
-                "ID FROM CERT WHERE CA_ID=? AND EE=?", 1);
-        this.sqlCertForId = datasource.buildSelectFirstSql(CORESQL_CERT_FOR_ID, 1);
-        this.sqlRawCertForId = datasource.buildSelectFirstSql(CORESQL_RAWCERT_FOR_ID, 1);
-        this.sqlCertWithRevInfo = datasource.buildSelectFirstSql(CORESQL_CERT_WITH_REVINFO, 1);
-        this.sqlCertInfo = datasource.buildSelectFirstSql(CORESQL_CERTINFO, 1);
-        this.sqlCertprofileForId = datasource.buildSelectFirstSql("PID,CA_ID FROM CERT WHERE ID=?",
-                1);
-        this.sqlCertprofileForSerial = datasource.buildSelectFirstSql(
-                "PID FROM CERT WHERE SN=? AND CA_ID=?", 1);
-        this.sqlPasswordForUser = datasource.buildSelectFirstSql(
-                "PASSWORD FROM USERNAME WHERE NAME=?", 1);
-        this.sqlCnRegexForUser = datasource.buildSelectFirstSql(
-                "CN_REGEX FROM USERNAME WHERE NAME=?", 1);
-        this.sqlKnowsCertForSerial = datasource.buildSelectFirstSql(
-                "UNAME FROM CERT WHERE SN=? AND CA_ID=?", 1);
-        this.sqlRevForId = datasource.buildSelectFirstSql(
-                "SN,EE,REV,RR,RT,RIT FROM CERT WHERE ID=?", 1);
-        this.sqlCertStatusForSubjectFp = datasource.buildSelectFirstSql(
-                "REV FROM CERT WHERE FP_S=? AND CA_ID=?", 1);
-        this.sqlCertforSubjectIssued = datasource.buildSelectFirstSql(
-                CORESQL_CERT_FOR_SUBJECT_ISSUED, 1);
-        this.sqlCertForKeyIssued = datasource.buildSelectFirstSql(CORESQL_CERT_FOR_KEY_ISSUED, 1);
-        this.sqlLatestSerialForSubjectLike = datasource.buildSelectFirstSql(
-                "SUBJECT FROM CERT WHERE SUBJECT LIKE ?", 1, "NBEFORE DESC");
-        this.sqlLatestSerialForCertprofileAndSubjectLike = datasource.buildSelectFirstSql(
-                "NBEFORE FROM CERT WHERE PID=? AND SUBJECT LIKE ?", 1, "NBEFORE ASC");
-        this.sqlGetUserId = datasource.buildSelectFirstSql("ID FROM USERNAME WHERE NAME=?", 1);
-        this.sqlGetUser = datasource.buildSelectFirstSql(
-                "PASSWORD,CN_REGEX FROM USERNAME WHERE NAME=?", 1);
+        this.sqls = new SQLs(datasource);
     } // constructor
 
     private CertBasedIdentityStore initCertBasedIdentyStore(final String table)
@@ -378,7 +388,7 @@ class CertStoreQueryExecutor {
         long notAfterSeconds = cert.getNotAfter().getTime() / 1000;
 
         Connection conn = null;
-        PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_CRAW);
+        PreparedStatement[] pss = borrowPreparedStatements(SQLs.SQL_ADD_CERT, SQLs.SQL_ADD_CRAW);
 
         try {
             PreparedStatement psAddcert = pss[0];
@@ -424,10 +434,10 @@ class CertStoreQueryExecutor {
 
             String sql = null;
             try {
-                sql = SQL_ADD_CERT;
+                sql = SQLs.SQL_ADD_CERT;
                 psAddcert.executeUpdate();
 
-                sql = SQL_ADD_CRAW;
+                sql = SQLs.SQL_ADD_CRAW;
                 psAddRawcert.executeUpdate();
 
                 sql = "(commit add cert to CA certstore)";
@@ -468,7 +478,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonBlank("publisherName", publisherName);
         ParamUtil.requireNonNull("caCert", caCert);
 
-        final String sql = SQL_INSERT_PUBLISHQUEUE;
+        final String sql = SQLs.SQL_INSERT_PUBLISHQUEUE;
         PreparedStatement ps = borrowPreparedStatement(sql);
         int caId = getCaId(caCert);
         try {
@@ -489,7 +499,7 @@ class CertStoreQueryExecutor {
     throws DataAccessException {
         ParamUtil.requireNonBlank("publisherName", publisherName);
 
-        final String sql = SQL_REMOVE_PUBLISHQUEUE;
+        final String sql = SQLs.SQL_REMOVE_PUBLISHQUEUE;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
             int publisherId = getPublisherId(publisherName);
@@ -508,7 +518,7 @@ class CertStoreQueryExecutor {
     throws OperationException, DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
 
-        final String sql = SQL_MAXID_DELTACRL_CACHE;
+        final String sql = SQLs.SQL_MAXID_DELTACRL_CACHE;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
             int caId = getCaId(caCert);
@@ -527,7 +537,7 @@ class CertStoreQueryExecutor {
 
     public void clearDeltaCrlCache(final X509Cert caCert, final long maxId)
     throws OperationException, DataAccessException {
-        final String sql = CLEAR_DELTACRL_CACHE;
+        final String sql = SQLs.CLEAR_DELTACRL_CACHE;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
             ps.setLong(1, maxId + 1);
@@ -582,7 +592,7 @@ class CertStoreQueryExecutor {
     long getMaxCrlNumber(final X509Cert caCert) throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
 
-        final String sql = SQL_MAX_CRLNO;
+        final String sql = SQLs.SQL_MAX_CRLNO;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
@@ -605,7 +615,7 @@ class CertStoreQueryExecutor {
     throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
 
-        final String sql = SQL_MAX_THISUPDAATE_CRL;
+        final String sql = SQLs.SQL_MAX_THISUPDAATE_CRL;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
@@ -631,7 +641,7 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        final String sql = sqlCaHasCrl;
+        final String sql = sqls.sqlCaHasCrl;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -665,7 +675,7 @@ class CertStoreQueryExecutor {
             baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
         }
 
-        final String sql = SQL_ADD_CRL;
+        final String sql = SQLs.SQL_ADD_CRL;
         long currentMaxCrlId = datasource.getMax(null, "CRL", "ID");
         long crlId = currentMaxCrlId + 1;
 
@@ -736,7 +746,7 @@ class CertStoreQueryExecutor {
             invTimeSeconds = revInfo.getInvalidityTime().getTime() / 1000;
         }
 
-        PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
+        PreparedStatement ps = borrowPreparedStatement(SQLs.SQL_REVOKE_CERT);
         try {
             int idx = 1;
             ps.setLong(idx++, System.currentTimeMillis() / 1000);
@@ -754,7 +764,7 @@ class CertStoreQueryExecutor {
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
         } catch (SQLException ex) {
-            throw datasource.translate(SQL_REVOKE_CERT, ex);
+            throw datasource.translate(SQLs.SQL_REVOKE_CERT, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -798,7 +808,7 @@ class CertStoreQueryExecutor {
 
         long certId = certWithRevInfo.getCert().getCertId().longValue();
 
-        PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_SUSPENDED_CERT);
+        PreparedStatement ps = borrowPreparedStatement(SQLs.SQL_REVOKE_SUSPENDED_CERT);
         try {
             int idx = 1;
             ps.setLong(idx++, System.currentTimeMillis() / 1000);
@@ -813,7 +823,7 @@ class CertStoreQueryExecutor {
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, message);
             }
         } catch (SQLException ex) {
-            throw datasource.translate(SQL_REVOKE_CERT, ex);
+            throw datasource.translate(SQLs.SQL_REVOKE_CERT, ex);
         } finally {
             releaseDbResources(ps, null);
         }
@@ -894,7 +904,7 @@ class CertStoreQueryExecutor {
     throws DataAccessException {
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-        final String sql = SQL_ADD_DELTACRL_CACHE;
+        final String sql = SQLs.SQL_ADD_DELTACRL_CACHE;
         PreparedStatement ps = null;
         try {
             long id = idGenerator.nextId();
@@ -922,7 +932,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
-        final String sql = SQL_REMOVE_CERT;
+        final String sql = SQLs.SQL_REMOVE_CERT;
         int caId = getCaId(caCert);
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -990,7 +1000,7 @@ class CertStoreQueryExecutor {
     throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
 
-        final String sql = sqlContainsCertificates;
+        final String sql = sqls.sqlContainsCertificates;
         int caId = getCaId(caCert);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1212,7 +1222,7 @@ class CertStoreQueryExecutor {
     throws DataAccessException, OperationException, CertificateException {
         ParamUtil.requireNonNull("caCert", caCert);
 
-        final String sql = sqlCertForId;
+        final String sql = sqls.sqlCertForId;
 
         String b64Cert;
         int certprofileId;
@@ -1266,7 +1276,7 @@ class CertStoreQueryExecutor {
 
     X509CertWithDbId getCertForId(final long certId)
     throws DataAccessException, OperationException {
-        final String sql = sqlRawCertForId;
+        final String sql = sqls.sqlRawCertForId;
 
         String b64Cert;
         ResultSet rs = null;
@@ -1305,7 +1315,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("serial", serial);
 
         int caId = getCaId(caCert);
-        final String sql = sqlCertWithRevInfo;
+        final String sql = sqls.sqlCertWithRevInfo;
 
         long certId;
         String b64Cert;
@@ -1373,7 +1383,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("serial", serial);
 
         int caId = getCaId(caCert);
-        final String sql = sqlCertInfo;
+        final String sql = sqls.sqlCertInfo;
 
         String b64Cert;
         boolean revoked;
@@ -1439,7 +1449,7 @@ class CertStoreQueryExecutor {
     throws OperationException, DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
 
-        final String sql = sqlCertprofileForId;
+        final String sql = sqls.sqlCertprofileForId;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1473,7 +1483,7 @@ class CertStoreQueryExecutor {
 
         int caId = getCaId(caCert);
 
-        final String sql = sqlCertprofileForSerial;
+        final String sql = sqls.sqlCertprofileForSerial;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1550,7 +1560,7 @@ class CertStoreQueryExecutor {
 
     boolean authenticateUser(final String user, final byte[] password)
     throws DataAccessException, OperationException {
-        final String sql = sqlPasswordForUser;
+        final String sql = sqls.sqlPasswordForUser;
 
         String expPasswordText = null;
         ResultSet rs = null;
@@ -1585,7 +1595,7 @@ class CertStoreQueryExecutor {
     String getCnRegexForUser(final String user) throws DataAccessException, OperationException {
         ParamUtil.requireNonBlank("user", user);
 
-        final String sql = sqlCnRegexForUser;
+        final String sql = sqls.sqlCnRegexForUser;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1610,7 +1620,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("serial", serial);
         int caId = getCaId(caCert);
 
-        final String sql = sqlKnowsCertForSerial;
+        final String sql = sqls.sqlKnowsCertForSerial;
 
         String user = null;
         ResultSet rs = null;
@@ -1721,7 +1731,7 @@ class CertStoreQueryExecutor {
             releaseDbResources(ps, rs);
         }
 
-        sql = sqlRevForId;
+        sql = sqls.sqlRevForId;
         ps = borrowPreparedStatement(sql);
 
         List<CertRevInfoWithSerial> ret = new ArrayList<>();
@@ -1795,7 +1805,7 @@ class CertStoreQueryExecutor {
             return CertStatus.UNKNOWN;
         }
 
-        final String sql = sqlCertStatusForSubjectFp;
+        final String sql = sqls.sqlCertStatusForSubjectFp;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1824,7 +1834,7 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        String sql = sqlCertforSubjectIssued;
+        String sql = sqls.sqlCertforSubjectIssued;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1849,7 +1859,7 @@ class CertStoreQueryExecutor {
             return false;
         }
 
-        String sql = sqlCertForKeyIssued;
+        String sql = sqls.sqlCertForKeyIssued;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -2075,7 +2085,7 @@ class CertStoreQueryExecutor {
 
         String namePattern = X509Util.getRfc4519Name(new X500Name(rdns2));
 
-        final String sql = sqlLatestSerialForSubjectLike;;
+        final String sql = sqls.sqlLatestSerialForSubjectLike;;
         ResultSet rs = null;
         PreparedStatement ps;
         try {
@@ -2116,7 +2126,7 @@ class CertStoreQueryExecutor {
             return null;
         }
 
-        final String sql = sqlLatestSerialForCertprofileAndSubjectLike;
+        final String sql = sqls.sqlLatestSerialForCertprofileAndSubjectLike;
 
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -2181,7 +2191,7 @@ class CertStoreQueryExecutor {
     } // method commitNextCrlNoIfLess
 
     void deleteUnreferencedRequests() throws DataAccessException {
-        final String sql = SQL_DELETE_UNREFERENCED_REQUEST;
+        final String sql = SQLs.SQL_DELETE_UNREFERENCED_REQUEST;
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
         try {
@@ -2199,7 +2209,7 @@ class CertStoreQueryExecutor {
         long id = idGenerator.nextId();
         long currentTimeSeconds = System.currentTimeMillis() / 1000;
         String b64Request = Base64.toBase64String(request);
-        final String sql = SQL_ADD_REQUEST;
+        final String sql = SQLs.SQL_ADD_REQUEST;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
             int index = 1;
@@ -2217,7 +2227,7 @@ class CertStoreQueryExecutor {
     }
 
     void addRequestCert(long requestId, long certId) throws DataAccessException {
-        final String sql = SQL_ADD_REQCERT;
+        final String sql = SQLs.SQL_ADD_REQCERT;
         long id = idGenerator.nextId();
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
@@ -2263,7 +2273,7 @@ class CertStoreQueryExecutor {
 
     private Long executeGetUserIdSql(final String user) throws CaMgmtException {
         ParamUtil.requireNonBlank("user", user);
-        final String sql = sqlGetUserId;
+        final String sql = sqls.sqlGetUserId;
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {
@@ -2399,7 +2409,7 @@ class CertStoreQueryExecutor {
 
     UserEntry getUser(final String username) throws CaMgmtException {
         ParamUtil.requireNonNull("username", username);
-        final String sql = sqlGetUser;
+        final String sql = sqls.sqlGetUser;
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {

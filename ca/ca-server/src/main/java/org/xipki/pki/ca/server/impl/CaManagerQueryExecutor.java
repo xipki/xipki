@@ -109,51 +109,61 @@ import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
 
 class CaManagerQueryExecutor {
 
+    // CHECKSTYLE:SKIP
+    private static class SQLs {
+
+        private final String sqlSelectCertprofile;
+        private final String sqlSelectPublisher;
+        private final String sqlSelectRequestor;
+        private final String sqlSelectCrlSigner;
+        private final String sqlSelectCmpControl;
+        private final String sqlSelectResponder;
+        private final String sqlSelectCa;
+        private final String sqlSelectScep;
+
+        SQLs(final DataSourceWrapper datasource) {
+            this.sqlSelectCertprofile = datasource.buildSelectFirstSql(
+                    "TYPE,CONF FROM PROFILE WHERE NAME=?", 1);
+
+            this.sqlSelectPublisher = datasource.buildSelectFirstSql(
+                    "TYPE,CONF FROM PUBLISHER WHERE NAME=?", 1);
+
+            this.sqlSelectRequestor = datasource.buildSelectFirstSql(
+                    "CERT FROM REQUESTOR WHERE NAME=?", 1);
+
+            this.sqlSelectCrlSigner = datasource.buildSelectFirstSql(
+                    "SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,SIGNER_CONF FROM CRLSIGNER WHERE NAME=?",
+                    1);
+
+            this.sqlSelectCmpControl = datasource.buildSelectFirstSql(
+                    "CONF FROM CMPCONTROL WHERE NAME=?", 1);
+
+            this.sqlSelectResponder = datasource.buildSelectFirstSql(
+                    "TYPE,CERT,CONF FROM RESPONDER WHERE NAME=?", 1);
+
+            this.sqlSelectCa = datasource.buildSelectFirstSql(
+                    "NAME,ART,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
+                    + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY"
+                    + ",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSIONS,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS"
+                    + ",EXPIRATION_PERIOD,REV,RR,RT,RIT,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS"
+                    + ",OCSP_URIS,CACERT_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?", 1);
+
+            this.sqlSelectScep = datasource.buildSelectFirstSql(
+                "CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF FROM SCEP WHERE CA_NAME=?",
+                1);
+        }
+
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(CaManagerQueryExecutor.class);
 
     private final DataSourceWrapper datasource;
 
-    private final String selectCertprofileSql;
-    private final String selectPublisherSql;
-    private final String selectRequestorSql;
-    private final String selectCrlSignerSql;
-    private final String selectCmpControlSql;
-    private final String selectResponderSql;
-    private final String selectCaSql;
-    private final String selectScepSql;
+    private final SQLs sqls;
 
     CaManagerQueryExecutor(final DataSourceWrapper datasource) {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
-
-        // initialize the SQL queries
-        this.selectCertprofileSql = datasource.buildSelectFirstSql(
-                "TYPE,CONF FROM PROFILE WHERE NAME=?", 1);
-
-        this.selectPublisherSql = datasource.buildSelectFirstSql(
-                "TYPE,CONF FROM PUBLISHER WHERE NAME=?", 1);
-
-        this.selectRequestorSql = datasource.buildSelectFirstSql(
-                "CERT FROM REQUESTOR WHERE NAME=?", 1);
-
-        this.selectCrlSignerSql = datasource.buildSelectFirstSql(
-                "SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,SIGNER_CONF FROM CRLSIGNER WHERE NAME=?", 1);
-
-        this.selectCmpControlSql = datasource.buildSelectFirstSql(
-                "CONF FROM CMPCONTROL WHERE NAME=?", 1);
-
-        this.selectResponderSql = datasource.buildSelectFirstSql(
-                "TYPE,CERT,CONF FROM RESPONDER WHERE NAME=?", 1);
-
-        this.selectCaSql = datasource.buildSelectFirstSql(
-                "NAME,ART,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
-                + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY,DUPLICATE_SUBJECT"
-                + ",SAVE_REQ,PERMISSIONS,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS,EXPIRATION_PERIOD,REV,RR"
-                + ",RT,RIT,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,EXTRA_CONTROL"
-                + ",SIGNER_CONF FROM CA WHERE NAME=?", 1);
-
-        this.selectScepSql = datasource.buildSelectFirstSql(
-                "CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF FROM SCEP WHERE CA_NAME=?",
-                1);
+        this.sqls = new SQLs(datasource);
     }
 
     private X509Certificate generateCert(final String b64Cert) throws CaMgmtException {
@@ -320,7 +330,7 @@ class CaManagerQueryExecutor {
     CertprofileEntry createCertprofile(final String name) throws CaMgmtException {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        final String sql = selectCertprofileSql;
+        final String sql = sqls.sqlSelectCertprofile;
         try {
             stmt = prepareStatement(sql);
             stmt.setString(1, name);
@@ -375,7 +385,7 @@ class CaManagerQueryExecutor {
     } // method getNamesFromTable
 
     PublisherEntry createPublisher(final String name) throws CaMgmtException {
-        final String sql = selectPublisherSql;
+        final String sql = sqls.sqlSelectPublisher;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -399,7 +409,7 @@ class CaManagerQueryExecutor {
     } // method createPublisher
 
     CmpRequestorEntry createRequestor(final String name) throws CaMgmtException {
-        final String sql = selectRequestorSql;
+        final String sql = sqls.sqlSelectRequestor;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -423,7 +433,7 @@ class CaManagerQueryExecutor {
     } // method createRequestor
 
     X509CrlSignerEntry createCrlSigner(final String name) throws CaMgmtException {
-        final String sql = selectCrlSignerSql;
+        final String sql = sqls.sqlSelectCrlSigner;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -452,7 +462,7 @@ class CaManagerQueryExecutor {
     } // method createCrlSigner
 
     CmpControlEntry createCmpControl(final String name) throws CaMgmtException {
-        final String sql = selectCmpControlSql;
+        final String sql = sqls.sqlSelectCmpControl;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -476,7 +486,7 @@ class CaManagerQueryExecutor {
     } // method createCmpControl
 
     CmpResponderEntry createResponder(final String name) throws CaMgmtException {
-        final String sql = selectResponderSql;
+        final String sql = sqls.sqlSelectResponder;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -503,7 +513,7 @@ class CaManagerQueryExecutor {
 
     X509CaInfo createCaInfo(final String name, final boolean masterMode,
             final CertificateStore certstore) throws CaMgmtException {
-        final String sql = selectCaSql;
+        final String sql = sqls.sqlSelectCa;
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -2218,7 +2228,7 @@ class CaManagerQueryExecutor {
 
     ScepEntry getScep(final String caName) throws CaMgmtException {
         ParamUtil.requireNonNull("caName", caName);
-        final String sql = selectScepSql;
+        final String sql = sqls.sqlSelectScep;
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {

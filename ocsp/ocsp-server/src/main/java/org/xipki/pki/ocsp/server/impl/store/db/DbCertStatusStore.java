@@ -117,26 +117,9 @@ public class DbCertStatusStore extends OcspStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
 
-    private static final String CORE_SQL_CS =
-            "NBEFORE,NAFTER,REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?";
-
-    private static final Map<HashAlgoType, String> CORE_SQL_CS_MAP = new HashMap<>();
-
     private String sqlCs;
 
     private Map<HashAlgoType, String> sqlCsMap;
-
-    static {
-        HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA1,  HashAlgoType.SHA224,
-            HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512};
-        for (HashAlgoType hashAlgo : hashAlgos) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("NBEFORE,NAFTER,ID,REV,RR,RT,RIT,PN,").append(hashAlgo.getShortName());
-            sb.append(" FROM CERT INNER JOIN CHASH ON ");
-            sb.append(" CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID");
-            CORE_SQL_CS_MAP.put(hashAlgo, sb.toString());
-        }
-    }
 
     private DataSourceWrapper datasource;
 
@@ -482,10 +465,18 @@ public class DbCertStatusStore extends OcspStore {
         ParamUtil.requireNonNull("conf", conf);
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
-        sqlCs = datasource.buildSelectFirstSql(CORE_SQL_CS, 1);
+        sqlCs = datasource.buildSelectFirstSql(
+                "NBEFORE,NAFTER,REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?", 1);
         sqlCsMap = new HashMap<>();
-        for (HashAlgoType ha : CORE_SQL_CS_MAP.keySet()) {
-            sqlCsMap.put(ha, datasource.buildSelectFirstSql(CORE_SQL_CS_MAP.get(ha), 1));
+
+        HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA1,  HashAlgoType.SHA224,
+            HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512};
+        for (HashAlgoType hashAlgo : hashAlgos) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("NBEFORE,NAFTER,ID,REV,RR,RT,RIT,PN,").append(hashAlgo.getShortName());
+            sb.append(" FROM CERT INNER JOIN CHASH ON ");
+            sb.append(" CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID");
+            sqlCsMap.put(hashAlgo, datasource.buildSelectFirstSql(sb.toString(), 1));
         }
 
         StoreConf storeConf = new StoreConf(conf);
