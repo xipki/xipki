@@ -34,7 +34,8 @@
 
 package org.xipki.pki.ca.qa.internal;
 
-import org.bouncycastle.util.Arrays;
+import java.util.Arrays;
+
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -49,8 +50,9 @@ public class QaExtensionValue {
     private final byte[] value;
 
     public QaExtensionValue(final boolean critical, final byte[] value) {
+        ParamUtil.requireNonNull("value", value);
         this.critical = critical;
-        this.value = Arrays.clone(ParamUtil.requireNonNull("value", value));
+        this.value = Arrays.copyOf(value, value.length);
     }
 
     public boolean isCritical() {
@@ -58,7 +60,7 @@ public class QaExtensionValue {
     }
 
     public byte[] getValue() {
-        return Arrays.clone(value);
+        return Arrays.copyOf(value, value.length);
     }
 
 }

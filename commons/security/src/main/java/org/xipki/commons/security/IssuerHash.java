@@ -35,9 +35,9 @@
 package org.xipki.commons.security;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.util.Arrays;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -79,11 +79,11 @@ public class IssuerHash {
     }
 
     public byte[] getIssuerNameHash() {
-        return Arrays.clone(issuerNameHash);
+        return Arrays.copyOf(issuerNameHash, issuerNameHash.length);
     }
 
     public byte[] getIssuerKeyHash() {
-        return Arrays.clone(issuerKeyHash);
+        return Arrays.copyOf(issuerKeyHash, issuerKeyHash.length);
     }
 
     public boolean match(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
@@ -93,8 +93,8 @@ public class IssuerHash {
         ParamUtil.requireNonNull("issuerKeyHash", issuerKeyHash);
 
         return this.hashAlgo == hashAlgo
-                && Arrays.areEqual(this.issuerNameHash, issuerNameHash)
-                && Arrays.areEqual(this.issuerKeyHash, issuerKeyHash);
+                && Arrays.equals(this.issuerNameHash, issuerNameHash)
+                && Arrays.equals(this.issuerKeyHash, issuerKeyHash);
     }
 
 }

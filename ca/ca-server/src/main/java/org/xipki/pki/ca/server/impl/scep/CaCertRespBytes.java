@@ -37,13 +37,13 @@ package org.xipki.pki.ca.server.impl.scep;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSAbsentContent;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.util.Arrays;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -73,7 +73,7 @@ class CaCertRespBytes {
     }
 
     byte[] getBytes() {
-        return Arrays.clone(bytes);
+        return Arrays.copyOf(bytes, bytes.length);
     }
 
 }

@@ -48,6 +48,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -92,7 +93,6 @@ import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -756,7 +756,7 @@ public class OcspServer {
             if (repControl.includeExtendedRevokeExtension) {
                 responseExtensions.add(
                         new Extension(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke, true,
-                                Arrays.clone(DERNullBytes)));
+                                Arrays.copyOf(DERNullBytes, DERNullBytes.length)));
             }
 
             if (CollectionUtil.isNonEmpty(responseExtensions)) {

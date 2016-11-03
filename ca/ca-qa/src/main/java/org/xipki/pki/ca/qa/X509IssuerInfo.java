@@ -37,6 +37,7 @@ package org.xipki.pki.ca.qa;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -44,7 +45,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.util.Arrays;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.util.X509Util;
@@ -148,7 +148,7 @@ public class X509IssuerInfo {
     }
 
     public byte[] getSubjectKeyIdentifier() {
-        return Arrays.clone(ski);
+        return Arrays.copyOf(ski, ski.length);
     }
 
     public Certificate getBcCert() {
