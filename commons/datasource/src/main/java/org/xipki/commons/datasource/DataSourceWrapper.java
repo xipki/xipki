@@ -46,6 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.LruCache;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
@@ -131,7 +132,7 @@ public abstract class DataSourceWrapper {
         @Override
         public long nextSeqValue(final Connection conn, final String sequenceName)
         throws DataAccessException {
-            final String sqlUpdate = buildNextSeqValueSql(sequenceName);
+            final String sqlUpdate = buildAndCacheNextSeqValueSql(sequenceName);
             final String sqlSelect = "SELECT @cur_value";
             String sql = null;
 
@@ -561,6 +562,8 @@ public abstract class DataSourceWrapper {
 
     private final DatabaseType databaseType;
 
+    private final LruCache<String, String> cacheSeqNameSqls;
+
     private DataSourceWrapper(final String name, final HikariDataSource service,
             final DatabaseType dbType) {
         this.service = ParamUtil.requireNonNull("service", service);
@@ -568,6 +571,7 @@ public abstract class DataSourceWrapper {
         this.name = name;
         this.sqlErrorCodes = SqlErrorCodes.newInstance(dbType);
         this.sqlStateCodes = SqlStateCodes.newInstance(dbType);
+        this.cacheSeqNameSqls = new LruCache<>(100);
     }
 
     public final String getDatasourceName() {
@@ -954,6 +958,15 @@ public abstract class DataSourceWrapper {
 
     protected abstract String buildNextSeqValueSql(String sequenceName);
 
+    protected final String buildAndCacheNextSeqValueSql(String sequenceName) {
+        String sql = cacheSeqNameSqls.get(sequenceName);
+        if (sql == null) {
+            sql = buildNextSeqValueSql(sequenceName);
+            cacheSeqNameSqls.put(sequenceName, sql);
+        }
+        return sql;
+    }
+
     protected boolean isUseSqlStateAsCode() {
         return false;
     }
@@ -1011,7 +1024,7 @@ public abstract class DataSourceWrapper {
     public long nextSeqValue(final Connection conn, final String sequenceName)
     throws DataAccessException {
         ParamUtil.requireNonBlank("sequenceName", sequenceName);
-        final String sql = buildNextSeqValueSql(sequenceName);
+        final String sql = buildAndCacheNextSeqValueSql(sequenceName);
         boolean newConn = (conn == null);
 
         Connection tmpConn = newConn ? getConnection() : conn;
