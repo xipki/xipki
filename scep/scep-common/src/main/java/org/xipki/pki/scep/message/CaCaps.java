@@ -34,12 +34,12 @@
 
 package org.xipki.pki.scep.message;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.CollectionUtil;
@@ -156,7 +156,7 @@ public class CaCaps {
     }
 
     public byte[] getBytes() {
-        return Arrays.clone(bytes);
+        return Arrays.copyOf(bytes, bytes.length);
     }
 
     public static CaCaps getInstance(final String scepMessage) {
