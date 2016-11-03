@@ -56,6 +56,10 @@ import org.xipki.commons.security.HashAlgoType;
 
 class DbGoodCertSerialIterator implements Iterator<BigInteger> {
 
+    private static final int numSqlEntries = 1000;
+
+    private final String sqlNextSerials;
+
     private final DataSourceWrapper caDataSource;
 
     private final BigInteger caSerial;
@@ -77,6 +81,9 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
         ParamUtil.requireNonNull("caCert", caCert);
         this.caDataSource = ParamUtil.requireNonNull("caDataSource", caDataSource);
         this.caSerial = caCert.getSerialNumber().getPositiveValue();
+
+        this.sqlNextSerials = caDataSource.buildSelectFirstSql(
+                "ID,SN FROM CERT WHERE REV=0 AND CA_ID=? AND ID>=?", numSqlEntries, "ID");
 
         String b64Sha1Fp = HashAlgoType.SHA1.base64Hash(caCert.getEncoded());
         String sql = "SELECT ID FROM CS_CA WHERE SHA1_CERT='" + b64Sha1Fp + "'";
@@ -124,15 +131,15 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
             return null;
         }
 
-        String sql = "ID,SN FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId + " AND ID>="
-                + nextStartId;
-        sql = caDataSource.buildSelectFirstSql(sql, 1000, "ID");
+        String sql = sqlNextSerials;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         int idx = 0;
         try {
             stmt = caDataSource.getConnection().prepareStatement(sql);
+            stmt.setInt(1, caInfoId);
+            stmt.setLong(2, nextStartId);
             rs = stmt.executeQuery();
             while (rs.next()) {
                 idx++;
@@ -156,7 +163,7 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
             caDataSource.releaseResources(stmt, rs);
         }
 
-        if (idx < 1000) {
+        if (idx < numSqlEntries) {
             noUnrevokedCerts = true;
         }
 

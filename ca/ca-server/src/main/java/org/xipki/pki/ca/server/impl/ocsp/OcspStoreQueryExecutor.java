@@ -88,6 +88,8 @@ class OcspStoreQueryExecutor {
 
     private final DataSourceWrapper datasource;
 
+    private final String sqlCertRegistered;
+
     private final IssuerStore issuerStore;
 
     private final boolean publishGoodCerts;
@@ -103,6 +105,8 @@ class OcspStoreQueryExecutor {
         this.issuerStore = initIssuerStore();
         this.publishGoodCerts = publishGoodCerts;
 
+        this.sqlCertRegistered = datasource.buildSelectFirstSql("ID FROM CERT WHERE SN=? AND IID=?",
+                1);
         final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
         Connection conn = datasource.getConnection();
         if (conn == null) {
@@ -598,7 +602,7 @@ class OcspStoreQueryExecutor {
 
     private boolean certRegistered(final int issuerId, final BigInteger serialNumber)
     throws DataAccessException {
-        final String sql = datasource.buildSelectFirstSql("ID FROM CERT WHERE SN=? AND IID=?", 1);
+        final String sql = sqlCertRegistered;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 

@@ -69,6 +69,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.LruCache;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -219,7 +220,27 @@ class CertStoreQueryExecutor {
 
         private final String sqlGetUser;
 
+        private final String sqlCrl;
+
+        private final String sqlCrlWithNo;
+
+        private final DataSourceWrapper datasource;
+
+        private final LruCache<Integer, String> cacheSqlCidFromPublishQueue = new LruCache<>(5);
+
+        private final LruCache<Integer, String> cacheSqlExpiredSerials = new LruCache<>(5);
+
+        private final LruCache<Integer, String> cacheSqlSuspendedSerials = new LruCache<>(5);
+
+        private final LruCache<Integer, String> cacheSqlDeltaCrlCacheIds = new LruCache<>(5);
+
+        private final LruCache<Integer, String> cacheSqlRevokedCerts = new LruCache<>(5);
+
+        private final LruCache<Integer, String> cacheSqlRevokedCertsWithEe = new LruCache<>(5);
+
         SQLs(final DataSourceWrapper datasource) {
+            this.datasource = ParamUtil.requireNonNull("datasource", datasource);
+
             this.sqlCaHasCrl = datasource.buildSelectFirstSql("ID FROM CRL WHERE CA_ID=?", 1);
             this.sqlContainsCertificates = datasource.buildSelectFirstSql(
                     "ID FROM CERT WHERE CA_ID=? AND EE=?", 1);
@@ -252,8 +273,82 @@ class CertStoreQueryExecutor {
             this.sqlGetUserId = datasource.buildSelectFirstSql("ID FROM USERNAME WHERE NAME=?", 1);
             this.sqlGetUser = datasource.buildSelectFirstSql(
                     "PASSWORD,CN_REGEX FROM USERNAME WHERE NAME=?", 1);
+            this.sqlCrl = datasource.buildSelectFirstSql(
+                    "THISUPDATE,CRL FROM CRL WHERE CA_ID=?", 1, "THISUPDATE DESC");
+            this.sqlCrlWithNo = datasource.buildSelectFirstSql(
+                    "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?", 1, "THISUPDATE DESC");
         } // constructor
 
+        String getSqlCidFromPublishQueue(final int numEntries) {
+            String sql = cacheSqlCidFromPublishQueue.get(numEntries);
+            if (sql == null) {
+                sql = datasource.buildSelectFirstSql(
+                        "CID FROM PUBLISHQUEUE WHERE PID=? AND CA_ID=?", numEntries, "CID ASC");
+                cacheSqlCidFromPublishQueue.put(numEntries, sql);
+            }
+            return sql;
+        }
+
+        String getSqlExpiredSerials(final int numEntries) {
+            String sql = cacheSqlExpiredSerials.get(numEntries);
+            if (sql == null) {
+                sql = datasource.buildSelectFirstSql(
+                        "SN FROM CERT WHERE CA_ID=? AND NAFTER<?", numEntries);
+                cacheSqlExpiredSerials.put(numEntries, sql);
+            }
+            return sql;
+        }
+
+        String getSqlSuspendedSerials(final int numEntries) {
+            String sql = cacheSqlSuspendedSerials.get(numEntries);
+            if (sql == null) {
+                sql = datasource.buildSelectFirstSql(
+                        "SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?", numEntries);
+                cacheSqlSuspendedSerials.put(numEntries, sql);
+            }
+            return sql;
+        }
+
+        String getSqlDeltaCrlCacheIds(final int numEntries) {
+            String sql = cacheSqlDeltaCrlCacheIds.get(numEntries);
+            if (sql == null) {
+                sql = datasource.buildSelectFirstSql(
+                        "ID FROM DELTACRL_CACHE WHERE ID>? AND CA_ID=?", numEntries, "ID ASC");
+                cacheSqlDeltaCrlCacheIds.put(numEntries, sql);
+            }
+            return sql;
+        }
+
+        String getSqlRevokedCerts(final int numEntries, final boolean withEe) {
+            LruCache<Integer, String> cache = withEe ? cacheSqlRevokedCertsWithEe
+                    : cacheSqlRevokedCerts;
+            String sql = cache.get(numEntries);
+            if (sql == null) {
+                String coreSql =
+                        "ID,SN,RR,RT,RIT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>?";
+                if (withEe) {
+                    coreSql += " AND EE=?";
+                }
+                sql = datasource.buildSelectFirstSql(coreSql, numEntries, "ID ASC");
+                cache.put(numEntries, sql);
+            }
+            return sql;
+        }
+
+        String getSqlSerials(final int numEntries, final Date notExpiredAt,
+                final boolean onlyRevoked, final boolean withEe) {
+            StringBuilder sb = new StringBuilder("ID,SN FROM CERT WHERE ID>? AND CA_ID=?");
+            if (notExpiredAt != null) {
+                sb.append(" AND NAFTER>?");
+            }
+            if (onlyRevoked) {
+                sb.append(" AND REV=1");
+            }
+            if (withEe) {
+                sb.append(" AND EE=?");
+            }
+            return datasource.buildSelectFirstSql(sb.toString(), numEntries, "ID ASC");
+        }
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
@@ -971,8 +1066,7 @@ class CertStoreQueryExecutor {
             return Collections.emptyList();
         }
 
-        final String sql = datasource.buildSelectFirstSql(
-                "CID FROM PUBLISHQUEUE WHERE PID=? AND CA_ID=?", numEntries, "CID ASC");
+        final String sql = sqls.getSqlCidFromPublishQueue(numEntries);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1024,20 +1118,15 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
+        if (onlyCaCerts && onlyUserCerts) {
+            throw new IllegalArgumentException(
+                    "onlyCaCerts and onlyUserCerts cannot be both of true");
+        }
+        boolean withEe = onlyCaCerts || onlyUserCerts;
+        final String sql = sqls.getSqlSerials(numEntries, notExpiredAt, onlyRevoked, withEe);
+
         int caId = getCaId(caCert);
-        StringBuilder sb = new StringBuilder("ID,SN FROM CERT WHERE ID>? AND CA_ID=?");
-        if (notExpiredAt != null) {
-            sb.append(" AND NAFTER>?");
-        }
-        if (onlyRevoked) {
-            sb.append(" AND REV=1");
-        }
-        if (onlyCaCerts) {
-            sb.append(" AND EE=0");
-        } else if (onlyUserCerts) {
-            sb.append(" AND EE=1");
-        }
-        final String sql = datasource.buildSelectFirstSql(sb.toString(), numEntries, "ID ASC");
+
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1047,6 +1136,9 @@ class CertStoreQueryExecutor {
             ps.setInt(idx++, caId);
             if (notExpiredAt != null) {
                 ps.setLong(idx++, notExpiredAt.getTime() / 1000 + 1);
+            }
+            if (withEe) {
+                setBoolean(ps, idx++, onlyUserCerts);
             }
             rs = ps.executeQuery();
             List<SerialWithId> ret = new ArrayList<>();
@@ -1069,8 +1161,8 @@ class CertStoreQueryExecutor {
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
         int caId = getCaId(caCert);
-        final String coreSql = "SN FROM CERT WHERE CA_ID=? AND NAFTER<?";
-        final String sql = datasource.buildSelectFirstSql(coreSql, numEntries);
+        final String sql = sqls.getSqlExpiredSerials(numEntries);
+
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1098,8 +1190,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
         int caId = getCaId(caCert);
-        final String coreSql = "SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?";
-        final String sql = datasource.buildSelectFirstSql(coreSql, numEntries);
+        final String sql = sqls.getSqlSuspendedSerials(numEntries);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1127,12 +1218,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("caCert", caCert);
 
         int caId = getCaId(caCert);
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("THISUPDATE,CRL FROM CRL WHERE CA_ID=?");
-        if (crlNumber != null) {
-            sqlBuilder.append(" AND CRL_NO=?");
-        }
-        String sql = datasource.buildSelectFirstSql(sqlBuilder.toString(), 1, "THISUPDATE DESC");
+        String sql = (crlNumber == null) ? sqls.sqlCrl : sqls.sqlCrlWithNo;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1652,19 +1738,14 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("notExpiredAt", notExpiredAt);
         ParamUtil.requireMin("numEntries", numEntries, 1);
+        if (onlyCaCerts && onlyUserCerts) {
+            throw new IllegalArgumentException(
+                    "onlyCaCerts and onlyUserCerts cannot be both of true");
+        }
+        boolean withEe = onlyCaCerts || onlyUserCerts;
 
         int caId = getCaId(caCert);
-
-        StringBuilder sqlBuiler = new StringBuilder();
-        sqlBuiler.append("ID,SN,RR,RT,RIT FROM CERT");
-        sqlBuiler.append(" WHERE ID>? AND CA_ID=? AND REV=? AND NAFTER>?");
-        if (onlyCaCerts) {
-            sqlBuiler.append(" AND EE=0");
-        } else if (onlyUserCerts) {
-            sqlBuiler.append(" AND EE=1");
-        }
-
-        String sql = datasource.buildSelectFirstSql(sqlBuiler.toString(), numEntries, "ID ASC");
+        String sql = sqls.getSqlRevokedCerts(numEntries, withEe);
 
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1673,8 +1754,10 @@ class CertStoreQueryExecutor {
             int idx = 1;
             ps.setLong(idx++, startId - 1);
             ps.setInt(idx++, caId);
-            setBoolean(ps, idx++, true);
             ps.setLong(idx++, notExpiredAt.getTime() / 1000 + 1);
+            if (withEe) {
+                setBoolean(ps, idx++, onlyUserCerts);
+            }
             rs = ps.executeQuery();
 
             List<CertRevInfoWithSerial> ret = new LinkedList<>();
@@ -1710,8 +1793,7 @@ class CertStoreQueryExecutor {
 
         int caId = getCaId(caCert);
 
-        String sql = datasource.buildSelectFirstSql(
-                "ID FROM DELTACRL_CACHE WHERE ID>? AND CA_ID=?", numEntries, "ID ASC");
+        String sql = sqls.getSqlDeltaCrlCacheIds(numEntries);
         List<Long> ids = new LinkedList<>();
         ResultSet rs = null;
 
