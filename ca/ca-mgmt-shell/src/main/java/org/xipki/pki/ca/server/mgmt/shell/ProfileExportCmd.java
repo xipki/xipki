@@ -72,7 +72,8 @@ public class ProfileExportCmd extends CaCommandSupport {
     protected Object doExecute() throws Exception {
         CertprofileEntry entry = caManager.getCertprofile(name);
         if (entry == null) {
-            throw new IllegalCmdParamException("no cert profile named " + name + " is defined");
+            throw new IllegalCmdParamException(
+                    "no certificate profile named " + name + " is defined");
         }
 
         if (StringUtil.isBlank(entry.getConf())) {

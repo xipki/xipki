@@ -64,6 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LruCache;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.util.AlgorithmUtil;
@@ -130,7 +131,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     /**
      * Get the SubjectControl.
      *
-     * @return the subjectControl, must not be null.
+     * @return the SubjectControl, must not be <code>null</code>.
      */
     protected abstract SubjectControl getSubjectControl();
 
@@ -289,7 +290,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 }
             } else {
                 throw new BadCertTemplateException(
-                        "only namedCurve or implictCA EC public key is supported");
+                        "only namedCurve EC public key is supported");
             }
 
             // point encoding
@@ -301,7 +302,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 byte pointEncoding = keyData[0];
                 if (!ecOption.getPointEncodings().contains(pointEncoding)) {
                     throw new BadCertTemplateException(String.format(
-                            "unaccepted EC point encoding '%s'", pointEncoding));
+                            "not accepted EC point encoding '%s'", pointEncoding));
                 }
             }
 
@@ -311,7 +312,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             } catch (BadCertTemplateException ex) {
                 throw ex;
             } catch (Exception ex) {
-                LOG.debug("populateFromPubKeyInfo", ex);
+                LogUtil.warn(LOG, ex, "checkEcSubjectPublicKeyInfo");
                 throw new BadCertTemplateException(String.format(
                         "invalid public key: %s", ex.getMessage()));
             }
@@ -414,7 +415,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
             if (!present) {
                 throw new BadCertTemplateException(String.format(
-                        "requied subject DN of type %s is not present",
+                        "required subject DN of type %s is not present",
                         oidToDisplayName(occurence.getType())));
             }
         }

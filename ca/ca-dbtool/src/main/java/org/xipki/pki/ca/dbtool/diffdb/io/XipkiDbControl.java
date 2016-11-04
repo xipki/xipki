@@ -80,12 +80,9 @@ public class XipkiDbControl {
 
         // CERT CORE SQL
         sb.delete(0, sb.length());
-        sb.append("ID,");
-        sb.append(colCaId).append(",SN,REV,RR,RT,RIT,");
-        sb.append(colCerthash);
+        sb.append("ID,").append(colCaId).append(",SN,REV,RR,RT,RIT,").append(colCerthash);
         sb.append(" FROM CERT INNER JOIN ").append(tblCerthash);
-        sb.append(" ON CERT.ID>=? AND CERT.ID=");
-        sb.append(tblCerthash).append(".CID");
+        sb.append(" ON CERT.ID>=? AND CERT.ID=").append(tblCerthash).append(".CID");
         this.certCoreSql = sb.toString();
     } // constructor
 

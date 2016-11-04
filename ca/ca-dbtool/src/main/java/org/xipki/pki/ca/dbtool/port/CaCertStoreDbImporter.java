@@ -590,8 +590,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             try {
                 zipFile.close();
             } catch (Exception e2) {
-                LOG.error("could not close zipFile {}: {}", entriesZipFile, e2.getMessage());
-                LOG.debug("could not close zipFile " + entriesZipFile, e2);
+                LOG.error("could not close ZIP file {}: {}", entriesZipFile, e2.getMessage());
+                LOG.debug("could not close ZIP file " + entriesZipFile, e2);
             }
             throw ex;
         }

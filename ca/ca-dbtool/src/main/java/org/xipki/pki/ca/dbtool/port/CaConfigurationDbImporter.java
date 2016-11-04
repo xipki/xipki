@@ -352,7 +352,7 @@ class CaConfigurationDbImporter extends DbPorter {
     private void importCa(final Cas cas)
     throws DataAccessException, CertificateException, IOException {
         System.out.println("importing table CA");
-        StringBuilder sqlBuilder = new StringBuilder();
+        StringBuilder sqlBuilder = new StringBuilder(500);
         sqlBuilder.append("INSERT INTO CA (NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,");
         sqlBuilder.append("CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,");
         sqlBuilder.append("CERT,SIGNER_TYPE,CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,");
@@ -466,8 +466,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.executeUpdate();
                 } catch (SQLException ex) {
                     System.err.println("could not import CA_HAS_REQUESTOR with CA_NAME="
-                            + entry.getCaName()
-                            + " and requestor_name=" + entry.getRequestorName());
+                        + entry.getCaName() + " and requestor_name=" + entry.getRequestorName());
                     throw translate(sql, ex);
                 }
             }
@@ -490,8 +489,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.executeUpdate();
                 } catch (SQLException ex) {
                     System.err.println("could not import CA_HAS_PUBLISHER with CA_NAME="
-                            + entry.getCaName()
-                            + " and publisher_name=" + entry.getPublisherName());
+                        + entry.getCaName() + " and publisher_name=" + entry.getPublisherName());
                     throw translate(sql, ex);
                 }
             }

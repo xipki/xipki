@@ -64,7 +64,7 @@ public class CaProfileCheckCmd extends CaCommandSupport {
 
     @Option(name = "--profile",
             required = true,
-            description = "profile profileName\n"
+            description = "profile name\n"
                 + "(required)")
     @Completion(ProfileNameCompleter.class)
     private String profileName;

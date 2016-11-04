@@ -215,11 +215,11 @@ public class X509CaEntry extends CaEntry {
                 } catch (CertificateEncodingException ex) {
                     b64EncodedCert = "ERROR, could not encode the certificate";
                 }
-                sb.append("\tEncoded: ").append(b64EncodedCert).append("\n");
+                sb.append("\tencoded: ").append(b64EncodedCert).append("\n");
             }
         }
 
-        sb.append("crlsignerName: ").append(crlSignerName).append('\n');
+        sb.append("crlSignerName: ").append(crlSignerName).append('\n');
         sb.append("revocation: ");
         sb.append(revocationInfo == null ? "not revoked" : "revoked");
         sb.append("\n");

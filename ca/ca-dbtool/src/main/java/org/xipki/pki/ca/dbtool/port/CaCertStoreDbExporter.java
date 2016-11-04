@@ -794,7 +794,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         }
 
         System.out.println(" exported table DELTACRL_CACHE");
-    } // method exportDeltaCRLCache
+    } // method exportDeltaCrlCache
 
     private void finalizeZip(final ZipOutputStream zipOutStream, final String filename,
             final DbiXmlWriter os) throws JAXBException, IOException, XMLStreamException {

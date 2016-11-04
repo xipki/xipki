@@ -404,7 +404,7 @@ class CaConfigurationDbExporter extends DbPorter {
     throws DataAccessException, IOException {
         System.out.println("exporting table CA");
         Cas cas = new Cas();
-        StringBuilder sqlBuilder = new StringBuilder();
+        StringBuilder sqlBuilder = new StringBuilder(400);
         sqlBuilder.append("SELECT NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,");
         sqlBuilder.append("SIGNER_TYPE,SIGNER_CONF,CRLSIGNER_NAME,PERMISSIONS,NUM_CRLS,");
         sqlBuilder.append("EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV,RR,RT,RIT,");

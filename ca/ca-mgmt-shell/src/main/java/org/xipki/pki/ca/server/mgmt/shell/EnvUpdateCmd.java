@@ -56,7 +56,7 @@ public class EnvUpdateCmd extends CaCommandSupport {
 
     @Option(name = "--value",
             required = true,
-            description = "environment paremter value\n"
+            description = "environment parameter value\n"
                     + "(required)")
     protected String value;
 

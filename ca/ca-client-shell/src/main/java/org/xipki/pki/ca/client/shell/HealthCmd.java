@@ -80,7 +80,7 @@ public class HealthCmd extends ClientCommandSupport {
             if (caNames.size() == 1) {
                 caName = caNames.iterator().next();
             } else {
-                throw new IllegalCmdParamException("no caname is specified, one of " + caNames
+                throw new IllegalCmdParamException("no CA is specified, one of " + caNames
                         + " is required");
             }
         }

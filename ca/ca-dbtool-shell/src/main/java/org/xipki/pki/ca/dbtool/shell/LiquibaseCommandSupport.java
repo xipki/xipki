@@ -176,7 +176,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
         msg.append("\n--------------------------------------------\n");
         msg.append("     driver: ").append(dbParams.getDriver()).append("\n");
         msg.append("       user: ").append(dbParams.getUsername()).append("\n");
-        msg.append("        url: ").append(dbParams.getUrl()).append("\n");
+        msg.append("        URL: ").append(dbParams.getUrl()).append("\n");
         if (dbParams.getSchema() != null) {
             msg.append("     schema: ").append(dbParams.getSchema()).append("\n");
         }

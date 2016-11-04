@@ -133,7 +133,7 @@ public class EjbcaDigestExportReader {
                     }
 
                     if (caInfo == null) {
-                        LOG.debug("Found no CA by caFingerprint, try to resolve by issuer");
+                        LOG.debug("Found no CA by cAFingerprint, try to resolve by issuer");
                         selectRawCertStmt.setInt(1, id);
 
                         ResultSet certRs = selectRawCertStmt.executeQuery();

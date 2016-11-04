@@ -145,7 +145,7 @@ public class PublicKeyChecker {
                 }
             } else {
                 throw new BadCertTemplateException(
-                        "only namedCurve or implictCA EC public key is supported");
+                        "only namedCurve EC public key is supported");
             }
 
             // point encoding
@@ -157,7 +157,7 @@ public class PublicKeyChecker {
                 byte pointEncoding = keyData[0];
                 if (!ecOption.getPointEncodings().contains(pointEncoding)) {
                     throw new BadCertTemplateException(
-                            "unaccepted EC point encoding " + pointEncoding);
+                            "not-accepted EC point encoding " + pointEncoding);
                 }
             }
 
@@ -166,7 +166,7 @@ public class PublicKeyChecker {
             } catch (BadCertTemplateException ex) {
                 throw ex;
             } catch (Exception ex) {
-                LOG.debug("populateFromPubKeyInfo", ex);
+                LOG.debug("checkECSubjectPublicKeyInfo", ex);
                 throw new BadCertTemplateException("invalid public key: " + ex.getMessage());
             }
 

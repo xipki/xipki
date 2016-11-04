@@ -288,8 +288,8 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             try {
                 zipFile.close();
             } catch (Exception e2) {
-                LOG.error("could not close zipFile {}: {}", certsZipFile, e2.getMessage());
-                LOG.debug("could not close zipFile " + certsZipFile, e2);
+                LOG.error("could not close ZIP file {}: {}", certsZipFile, e2.getMessage());
+                LOG.debug("could not close ZIP file " + certsZipFile, e2);
             }
             throw ex;
         }

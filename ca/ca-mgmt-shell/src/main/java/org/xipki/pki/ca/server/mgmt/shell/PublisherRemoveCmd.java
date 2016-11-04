@@ -57,7 +57,7 @@ public class PublisherRemoveCmd extends CaCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         boolean bo = caManager.removePublisher(name);
-        output(bo, "removed", "could not remove", "certificate profile " + name);
+        output(bo, "removed", "could not remove", "publisher " + name);
         return null;
     }
 

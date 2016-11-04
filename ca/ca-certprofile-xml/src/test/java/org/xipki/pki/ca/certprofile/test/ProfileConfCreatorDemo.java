@@ -274,7 +274,7 @@ public class ProfileConfCreatorDemo {
         } finally {
             out.close();
         }
-    } // method marshall
+    } // method marshal
 
     private static X509ProfileType certprofileRootCa() throws Exception {
         X509ProfileType profile = getBaseProfile("Certprofile RootCA", X509CertLevel.RootCA, "10y",
@@ -815,7 +815,7 @@ public class ProfileConfCreatorDemo {
         // SpecialBehavior
         profile.setSpecialBehavior(SpecialX509CertprofileBehavior.gematik_gSMC_K.name());
 
-        // Maximal liftime
+        // Maximal life time
         Parameters profileParams = new Parameters();
         profile.setParameters(profileParams);
         NameValueType nv = new NameValueType();
@@ -1358,7 +1358,7 @@ public class ProfileConfCreatorDemo {
             final boolean required, final boolean critical, final ExtensionValueType extValue,
             final String description) {
         ExtensionType ret = new ExtensionType();
-        // abbributes
+        // attributes
         ret.setRequired(required);
         ret.setPermittedInRequest(REQUEST_EXTENSIONS.contains(type));
         // children

@@ -56,6 +56,7 @@ import java.util.zip.ZipOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
@@ -121,7 +122,7 @@ public class DbToolBase {
 
         StringBuilder sb = new StringBuilder(50);
         sb.append("DELETE FROM ").append(tableName).append(" WHERE ");
-        sb.append(idColumn).append(" > ").append(id);
+        sb.append(idColumn).append(">").append(id);
 
         Statement stmt;
         try {
@@ -135,7 +136,7 @@ public class DbToolBase {
         } catch (Throwable th) {
             String msg = String.format("could not delete columns from table %s with %s > %s",
                     tableName, idColumn, id);
-            log.error(msg, th);
+            LogUtil.error(log, th, msg);
             return false;
         } finally {
             releaseResources(stmt, null);
@@ -233,8 +234,7 @@ public class DbToolBase {
             connection.setAutoCommit(connectionAutoCommit);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(null, ex);
-            LOG.error("could not recover AutoCommit: {}", dex.getMessage());
-            LOG.debug("could not recover AutoCommit", dex);
+            LogUtil.error(LOG, dex, "could not recover AutoCommit");
         }
     }
 
@@ -345,7 +345,7 @@ public class DbToolBase {
 
         sb.append(suffix);
         return sb.toString();
-    } // method writeLine
+    } // method buildFilename
 
     public static ZipOutputStream getZipOutputStream(final File zipFile)
     throws FileNotFoundException {
@@ -369,8 +369,7 @@ public class DbToolBase {
                 ps.close();
             } catch (SQLException ex) {
                 DataAccessException dex = datasource.translate(null, ex);
-                LOG.warn("could not close Statement: {}", dex.getMessage());
-                LOG.debug("could not close Statement", dex);
+                LogUtil.warn(LOG, dex, "could not close Statement");
             }
         }
 
@@ -379,8 +378,7 @@ public class DbToolBase {
                 rs.close();
             } catch (SQLException ex) {
                 DataAccessException dex = datasource.translate(null, ex);
-                LOG.warn("could not close ResultSet: {}", dex.getMessage());
-                LOG.debug("could not close ResultSet", dex);
+                LogUtil.warn(LOG, dex, "could not close ResultSet");
             }
         }
     }

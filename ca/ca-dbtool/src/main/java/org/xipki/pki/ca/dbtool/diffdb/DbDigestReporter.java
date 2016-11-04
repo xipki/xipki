@@ -163,7 +163,7 @@ public class DbDigestReporter {
 
     public void addNoCaMatch() throws IOException {
         synchronized (errorWriter) {
-            errorWriter.write("cound not find corresponding CA in target to diff\n");
+            errorWriter.write("could not find corresponding CA in target to diff\n");
         }
     }
 

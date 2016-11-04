@@ -68,7 +68,7 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
         }
 
         throw new ObjectCreationException(
-                "could not find factory to create Publisher of type '" + type + "'");
+                "could not find factory to create Publisher of type " + type);
     }
 
     public void bindService(final X509CertPublisherFactory service) {
@@ -95,7 +95,7 @@ public class X509CertPublisherFactoryRegisterImpl implements X509CertPublisherFa
         if (services.remove(service)) {
             LOG.info("removed X509CertPublisherFactory binding for {}", service);
         } else {
-            LOG.info("no X509CertPublisherFactory binding found to remove for '{}'", service);
+            LOG.info("no X509CertPublisherFactory binding found to remove for {}", service);
         }
     }
 

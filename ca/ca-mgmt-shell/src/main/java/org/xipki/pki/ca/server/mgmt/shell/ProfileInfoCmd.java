@@ -54,7 +54,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
  */
 
 @Command(scope = "xipki-ca", name = "profile-info",
-        description = "show information of certifiate profile")
+        description = "show information of certificate profile")
 @Service
 public class ProfileInfoCmd extends CaCommandSupport {
 
@@ -90,7 +90,7 @@ public class ProfileInfoCmd extends CaCommandSupport {
         } else {
             CertprofileEntry entry = caManager.getCertprofile(name);
             if (entry == null) {
-                throw new CmdFailure("\tno certprofile named '" + name + " is configured");
+                throw new CmdFailure("\tno certificate profile named '" + name + " is configured");
             } else {
                 sb.append(entry.toString(verbose));
             }

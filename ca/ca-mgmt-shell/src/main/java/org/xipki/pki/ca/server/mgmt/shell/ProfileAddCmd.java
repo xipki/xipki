@@ -65,11 +65,11 @@ public class ProfileAddCmd extends CaCommandSupport {
     private String type;
 
     @Option(name = "--conf",
-            description = "profile configuration")
+            description = "certificate profile configuration")
     private String conf;
 
     @Option(name = "--conf-file",
-            description = "profile configuration file")
+            description = "certificate profile configuration file")
     @Completion(FilePathCompleter.class)
     private String confFile;
 

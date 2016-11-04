@@ -536,8 +536,7 @@ public class XmlX509CertprofileUtil {
                 continue;
             }
 
-            if (m.getValue() == null
-                    || !(m.getValue().getAny() instanceof ConstantExtValue)) {
+            if (m.getValue() == null || !(m.getValue().getAny() instanceof ConstantExtValue)) {
                 continue;
             }
 

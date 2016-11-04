@@ -84,7 +84,7 @@ public class PublisherUpdateCmd extends CaCommandSupport {
         }
 
         boolean bo = caManager.changePublisher(name, type, conf);
-        output(bo, "updated", "could not update", "certificate profile " + name);
+        output(bo, "updated", "could not update", "publisher " + name);
         return null;
     }
 

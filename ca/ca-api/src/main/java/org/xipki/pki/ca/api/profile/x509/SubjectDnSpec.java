@@ -90,7 +90,7 @@ public class SubjectDnSpec {
 
     private static final Range RANGE_DATE_OF_BIRTH = new Range(15, 15);
 
-    // according to specification should be 32768, 256 is specified by xipki.
+    // according to specification should be 32768, 256 is specified by XiPKI.
     private static final Range RANGE_NAME = new Range(1, 256);
 
     // patterns
@@ -486,10 +486,8 @@ public class SubjectDnSpec {
         ParamUtil.requireNonNull("rdnType", rdnType);
         RdnControl control = CONTROLS.get(rdnType);
         if (control == null) {
-            control = new RdnControl(rdnType,
-                    0, // minOccurs
-                    9 // maxOccurs
-                    );
+            // minOccurs = 0, maxOccurs = 9
+            control = new RdnControl(rdnType, 0, 9);
             control.setStringType(StringType.utf8String);
         }
         return control;

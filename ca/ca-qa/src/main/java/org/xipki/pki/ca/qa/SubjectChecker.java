@@ -354,7 +354,7 @@ public class SubjectChecker {
             if (suffix != null) {
                 if (!tmpAtvTextValue.endsWith(suffix)) {
                     failureMsg.append(name).append(" '").append(tmpAtvTextValue)
-                        .append("' does not end with suffx '").append(suffix).append("'; ");
+                        .append("' does not end with suffix '").append(suffix).append("'; ");
                     return;
                 } else {
                     tmpAtvTextValue = tmpAtvTextValue.substring(0,

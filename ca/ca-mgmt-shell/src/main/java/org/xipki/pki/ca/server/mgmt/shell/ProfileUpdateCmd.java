@@ -65,11 +65,11 @@ public class ProfileUpdateCmd extends CaCommandSupport {
     protected String type;
 
     @Option(name = "--conf",
-            description = "profile configuration or 'NULL'")
+            description = "certificate profile configuration or 'NULL'")
     protected String conf;
 
     @Option(name = "--conf-file",
-            description = "profile configuration file")
+            description = "certificate profile configuration file")
     @Completion(FilePathCompleter.class)
     protected String confFile;
 

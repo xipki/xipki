@@ -465,10 +465,10 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         // Extension controls
         this.extensionControls = XmlX509CertprofileUtil.buildExtensionControls(extensionsType);
 
-        // additionalInformation
+        // AdditionalInformation
         initAdditionalInformation(extensionsType);
 
-        // admission
+        // Admission
         initAdmission(extensionsType);
 
         // AuthorityInfoAccess
@@ -477,13 +477,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         // AuthorityKeyIdentifier
         initAuthorityKeyIdentifier(extensionsType);
 
-        // authorizationTemplate
+        // AuthorizationTemplate
         initAuthorizationTemplate(extensionsType);
 
         // BasicConstrains
         initBasicConstraints(extensionsType);
 
-        // biometricInfo
+        // BiometricInfo
         initBiometricInfo(extensionsType);
 
         // Certificate Policies
@@ -513,7 +513,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         // QCStatements
         initQcStatements(extensionsType);
 
-        // restriction
+        // Restriction
         initRestriction(extensionsType);
 
         // SMIMECapatibilities
@@ -525,13 +525,13 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         // SubjectInfoAccess
         initSubjectInfoAccess(extensionsType);
 
-        // tlsFeature
+        // TlsFeature
         initTlsFeature(extensionsType);
 
         // validityModel
         initValidityModel(extensionsType);
 
-        // subjectDirectoryAttributes
+        // SubjectDirectoryAttributes
         initSubjectDirAttrs(extensionsType);
 
         // constant extensions
@@ -1198,7 +1198,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                     : requestedExtensions.getExtension(type);
             if (extension == null) {
                 throw new BadCertTemplateException(
-                        "No SubjectDirecotryAttributes extension is contained in the request");
+                        "no SubjectDirecotryAttributes extension is contained in the request");
             }
 
             ASN1GeneralizedTime dateOfBirth = null;
@@ -1397,7 +1397,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             }
         }
 
-        // additionalInformation
+        // AdditionalInformation
         type = ObjectIdentifiers.id_extension_additionalInformation;
         if (additionalInformation != null) {
             if (occurences.remove(type)) {
@@ -1405,7 +1405,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             }
         }
 
-        // validityModel
+        // ValidityModel
         type = ObjectIdentifiers.id_extension_validityModel;
         if (validityModel != null) {
             if (occurences.remove(type)) {
@@ -1516,7 +1516,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             }
         }
 
-        // biometricData
+        // BiometricData
         type = Extension.biometricInfo;
         if (occurences.contains(type) && biometricInfo != null) {
             Extension extension = (requestedExtensions == null) ? null
@@ -1592,7 +1592,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             occurences.remove(type);
         }
 
-        // tlsFeature
+        // TlsFeature
         type = ObjectIdentifiers.id_pe_tlsfeature;
         if (tlsFeature != null) {
             if (occurences.remove(type)) {
@@ -1600,7 +1600,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             }
         }
 
-        // authorizationTemplate
+        // AuthorizationTemplate
         type = ObjectIdentifiers.id_xipki_ext_authorizationTemplate;
         if (authorizationTemplate != null) {
             if (occurences.remove(type)) {

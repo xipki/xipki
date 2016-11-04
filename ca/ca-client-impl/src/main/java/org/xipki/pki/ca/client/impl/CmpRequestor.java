@@ -145,7 +145,7 @@ abstract class CmpRequestor {
             final SecurityFactory securityFactory, final boolean signRequest) {
         this.requestor = ParamUtil.requireNonNull("requestor", requestor);
         if (requestor.getCertificate() == null) {
-            throw new IllegalArgumentException("requestor without certifiate is not allowed");
+            throw new IllegalArgumentException("requestor without certificate is not allowed");
         }
         this.responder = ParamUtil.requireNonNull("responder", responder);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
@@ -253,10 +253,10 @@ abstract class CmpRequestor {
     }
 
     private ASN1Encodable extractGeneralRepContent(final PkiResponse response,
-            final String exepectedType, final boolean requireProtectionCheck)
+            final String expectedType, final boolean requireProtectionCheck)
     throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("response", response);
-        ParamUtil.requireNonNull("exepectedType", exepectedType);
+        ParamUtil.requireNonNull("expectedType", expectedType);
         if (requireProtectionCheck) {
             checkProtection(response);
         }
@@ -270,7 +270,7 @@ abstract class CmpRequestor {
                     content.getPKIStatusInfo()));
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new CmpRequestorException(String.format(
-                        "unknown PKI body type %s instead the exceptected [%s, %s]", bodyType,
+                        "unknown PKI body type %s instead the expected [%s, %s]", bodyType,
                         PKIBody.TYPE_GEN_REP, PKIBody.TYPE_ERROR));
         }
 
@@ -280,7 +280,7 @@ abstract class CmpRequestor {
         InfoTypeAndValue itv = null;
         if (itvs != null && itvs.length > 0) {
             for (InfoTypeAndValue entry : itvs) {
-                if (exepectedType.equals(entry.getInfoType().getId())) {
+                if (expectedType.equals(entry.getInfoType().getId())) {
                     itv = entry;
                     break;
                 }
@@ -288,7 +288,7 @@ abstract class CmpRequestor {
         }
         if (itv == null) {
             throw new CmpRequestorException("the response does not contain InfoTypeAndValue "
-                    + exepectedType);
+                    + expectedType);
         }
 
         return itv.getInfoValue();
@@ -325,7 +325,7 @@ abstract class CmpRequestor {
 
         if (action != tmpAction) {
             throw new CmpRequestorException("received XiPKI action '" + tmpAction
-                    + "' instead the exceptected '" + action + "'");
+                    + "' instead the expected '" + action + "'");
         }
 
         return (size == 1) ? null : seq.getObjectAt(1);
@@ -355,12 +355,12 @@ abstract class CmpRequestor {
                 ASN1ObjectIdentifier type = itv.getInfoType();
                 if (CMPObjectIdentifiers.it_implicitConfirm.equals(type)) {
                     throw new IllegalArgumentException(
-                            "additionGeneralInfos contains unpermitted ITV implicitConfirm");
+                            "additionGeneralInfos contains not-permitted ITV implicitConfirm");
                 }
 
                 if (CMPObjectIdentifiers.regInfo_utf8Pairs.equals(type)) {
                     throw new IllegalArgumentException(
-                            "additionGeneralInfos contains unpermitted ITV utf8Pairs");
+                            "additionGeneralInfos contains not-permitted ITV utf8Pairs");
                 }
             }
         }

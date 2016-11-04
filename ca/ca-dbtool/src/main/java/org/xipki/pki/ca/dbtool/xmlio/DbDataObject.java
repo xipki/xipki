@@ -77,7 +77,7 @@ public abstract class DbDataObject {
         } else if (value instanceof Boolean) {
             valueS = value.toString();
         } else {
-            throw new InvalidDataObjectException("value is not a String or Number ");
+            throw new InvalidDataObjectException("value is not a String or Number");
         }
 
         writer.writeElement(tag, valueS);

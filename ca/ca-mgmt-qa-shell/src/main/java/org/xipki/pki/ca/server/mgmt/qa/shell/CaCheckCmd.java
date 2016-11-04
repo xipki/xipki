@@ -82,7 +82,7 @@ public class CaCheckCmd extends CaUpdateCmd {
         if (ey.getCaCertUris() != null) {
             List<String> ex = ey.getCaCertUris();
             List<String> is = ca.getCacertUris();
-            MgmtQaShellUtil.assertEquals("CA cert uris", ex, is);
+            MgmtQaShellUtil.assertEquals("CA cert URIs", ex, is);
         }
 
         // CA certificate
@@ -121,14 +121,14 @@ public class CaCheckCmd extends CaUpdateCmd {
         if (ey.getCrlUris() != null) {
             List<String> ex = ey.getCrlUris();
             List<String> is = ca.getCrlUris();
-            MgmtQaShellUtil.assertEquals("CRL uris", ex, is);
+            MgmtQaShellUtil.assertEquals("CRL URIs", ex, is);
         }
 
         // DeltaCRL uris
         if (ey.getDeltaCrlUris() != null) {
             List<String> ex = ey.getDeltaCrlUris();
             List<String> is = ca.getDeltaCrlUris();
-            MgmtQaShellUtil.assertEquals("Delta CRL uris", ex, is);
+            MgmtQaShellUtil.assertEquals("Delta CRL URIs", ex, is);
         }
 
         // Duplicate key mode
@@ -181,7 +181,7 @@ public class CaCheckCmd extends CaUpdateCmd {
             Integer ex = ey.getKeepExpiredCertInDays();
             int is = ca.getKeepExpiredCertInDays();
             if (ex.intValue() != is) {
-                throw buildUnexpectedException("KeepExiredCertInDays", is, ex);
+                throw buildUnexpectedException("keepExiredCertInDays", is, ex);
             }
         }
 
@@ -198,7 +198,7 @@ public class CaCheckCmd extends CaUpdateCmd {
         if (ey.getOcspUris() != null) {
             List<String> ex = ey.getOcspUris();
             List<String> is = ca.getOcspUris();
-            MgmtQaShellUtil.assertEquals("OCSP uris", ex, is);
+            MgmtQaShellUtil.assertEquals("OCSP URIs", ex, is);
         }
 
         // Permissions

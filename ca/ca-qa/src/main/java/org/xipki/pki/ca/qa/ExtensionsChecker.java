@@ -930,7 +930,7 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(Extension.nameConstraints, requestedExtensions,
                     extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                addViolation(failureMsg, "extension valus", hex(extensionValue),
+                addViolation(failureMsg, "extension values", hex(extensionValue),
                         (expected == null) ? "not present" : hex(expected));
             }
             return;
@@ -1007,7 +1007,7 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(Extension.policyConstraints,
                     requestedExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                addViolation(failureMsg, "extension valus", hex(extensionValue),
+                addViolation(failureMsg, "extension values", hex(extensionValue),
                         (expected == null) ? "not present" : hex(expected));
             }
             return;
@@ -1017,19 +1017,19 @@ public class ExtensionsChecker {
                 org.bouncycastle.asn1.x509.PolicyConstraints.getInstance(extensionValue);
         Integer expRequireExplicitPolicy = conf.getRequireExplicitPolicy();
         BigInteger bigInt = isPolicyConstraints.getRequireExplicitPolicyMapping();
-        Integer isRequreExplicitPolicy = (bigInt == null) ? null : bigInt.intValue();
+        Integer isRequireExplicitPolicy = (bigInt == null) ? null : bigInt.intValue();
 
         boolean match = true;
         if (expRequireExplicitPolicy == null) {
-            if (isRequreExplicitPolicy != null) {
+            if (isRequireExplicitPolicy != null) {
                 match = false;
             }
-        } else if (!expRequireExplicitPolicy.equals(isRequreExplicitPolicy)) {
+        } else if (!expRequireExplicitPolicy.equals(isRequireExplicitPolicy)) {
             match = false;
         }
 
         if (!match) {
-            addViolation(failureMsg, "requreExplicitPolicy", isRequreExplicitPolicy,
+            addViolation(failureMsg, "requireExplicitPolicy", isRequireExplicitPolicy,
                     expRequireExplicitPolicy);
         }
 
@@ -1175,7 +1175,7 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_pe_tlsfeature,
                     requestedExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                addViolation(failureMsg, "extension valus", hex(extensionValue),
+                addViolation(failureMsg, "extension values", hex(extensionValue),
                         (expected == null) ? "not present" : hex(expected));
             }
             return;
@@ -1216,7 +1216,7 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(Extension.certificatePolicies,
                     requestedExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                addViolation(failureMsg, "extension valus", hex(extensionValue),
+                addViolation(failureMsg, "extension values", hex(extensionValue),
                         (expected == null) ? "not present" : hex(expected));
             }
             return;
@@ -1309,7 +1309,7 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(Extension.policyMappings, requestedExtensions,
                     extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                addViolation(failureMsg, "extension valus", hex(extensionValue),
+                addViolation(failureMsg, "extension values", hex(extensionValue),
                         (expected == null) ? "not present" : hex(expected));
             }
             return;
@@ -1353,7 +1353,7 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(Extension.inhibitAnyPolicy,
                     requestedExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                addViolation(failureMsg, "extension valus", extensionValue,
+                addViolation(failureMsg, "extension values", extensionValue,
                         (expected == null) ? "not present" : hex(expected));
             }
             return;
@@ -1991,7 +1991,7 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(extType,
                     requestedExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                addViolation(failureMsg, "extension valus", hex(extensionValue),
+                addViolation(failureMsg, "extension values", hex(extensionValue),
                         (expected == null) ? "not present" : hex(expected));
             }
             return;
@@ -2044,7 +2044,7 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_extension_validityModel,
                     requestedExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                addViolation(failureMsg, "extension valus", hex(extensionValue),
+                addViolation(failureMsg, "extension values", hex(extensionValue),
                         (expected == null) ? "not present" : hex(expected));
             }
             return;
@@ -2097,7 +2097,7 @@ public class ExtensionsChecker {
             byte[] expected = getExpectedExtValue(Extension.qCStatements,
                     requestedExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                addViolation(failureMsg, "extension valus", extensionValue,
+                addViolation(failureMsg, "extension values", extensionValue,
                         (expected == null) ? "not present" : hex(expected));
             }
             return;
@@ -2382,7 +2382,7 @@ public class ExtensionsChecker {
                     ObjectIdentifiers.id_xipki_ext_authorizationTemplate,
                     requestedExtensions, extControl);
             if (!Arrays.equals(expected, extensionValue)) {
-                addViolation(failureMsg, "extension valus", hex(extensionValue),
+                addViolation(failureMsg, "extension values", hex(extensionValue),
                         (expected == null) ? "not present" : hex(expected));
             }
             return;
@@ -2615,7 +2615,7 @@ public class ExtensionsChecker {
             seq = new DERSequence(vector);
             return new GeneralName(GeneralName.ediPartyName, seq);
         default:
-            throw new RuntimeException("should not reach here, unknwon GeneralName tag " + tag);
+            throw new RuntimeException("should not reach here, unknown GeneralName tag " + tag);
         } // end switch
     } // method createGeneralName
 

@@ -234,7 +234,7 @@ public class DbDigestDiff {
         try {
             reporter.start();
             ProcessLog processLog = new ProcessLog(refReader.getTotalAccount());
-            System.out.println("Processing certifiates of CA \n\t'" + refReader.getCaSubjectName()
+            System.out.println("Processing certificates of CA \n\t'" + refReader.getCaSubjectName()
                 + "'");
             processLog.printHeader();
 
@@ -249,7 +249,7 @@ public class DbDigestDiff {
         } catch (Exception ex) {
             reporter.addError("Exception thrown: " + ex.getClass().getName() + ": "
                     + ex.getMessage());
-            LOG.error("exception on doDiff", ex);
+            LOG.error("exception in diffSingleCa", ex);
         } finally {
             reporter.close();
             refReader.close();

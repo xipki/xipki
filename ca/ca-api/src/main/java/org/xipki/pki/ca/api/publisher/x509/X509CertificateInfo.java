@@ -103,7 +103,7 @@ public class X509CertificateInfo {
             this.hashAlgo = HashAlgoType.getNonNullHashAlgoType(hashId.getAlgorithm().getId());
         } catch (IllegalArgumentException | IOException | NoSuchAlgorithmException ex) {
             throw new CertificateEncodingException(
-                    "could not retrieve hash algorithm used to sign the certifiate: "
+                    "could not retrieve hash algorithm used to sign the certificate: "
                             + ex.getMessage(), ex);
         }
     }

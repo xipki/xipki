@@ -449,8 +449,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             try {
                 zipFile.close();
             } catch (Exception ex2) {
-                LOG.error("could not close zipFile {}: {}", certsZipFile, ex2.getMessage());
-                LOG.debug("could not close zipFile " + certsZipFile, ex2);
+                LOG.error("could not close ZIP file {}: {}", certsZipFile, ex2.getMessage());
+                LOG.debug("could not close ZIP file " + certsZipFile, ex2);
             }
             throw ex;
         }
@@ -615,7 +615,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                     echoToFile(filename, processLogFile);
                     processLog.printStatus();
                 }
-                // if (numImportedEntriesInBatch
+                // if (numImportedEntriesInBatch)
             } // end for
 
             return lastSuccessfulCertId;

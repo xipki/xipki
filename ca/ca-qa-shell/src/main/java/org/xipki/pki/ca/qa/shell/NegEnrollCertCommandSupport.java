@@ -153,6 +153,6 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
         }
 
         return null;
-    } // method getSigner
+    } // method doExecute
 
 }
