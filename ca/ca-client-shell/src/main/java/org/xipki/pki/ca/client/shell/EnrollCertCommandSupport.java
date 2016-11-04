@@ -207,12 +207,12 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     private String biometricFile;
 
     @Option(name = "--biometric-uri",
-            description = "Biometric sourcedata URI")
+            description = "Biometric source data URI")
     private String biometricUri;
 
     @Option(name = "--need-extension",
             multiValued = true,
-            description = "type (OID or name) of extension that must be contaied in the"
+            description = "type (OID or name) of extension that must be contained in the"
                     + " certificate\n"
                     + "(multi-valued)")
     @Completion(ExtensionNameCompleter.class)
@@ -220,7 +220,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
 
     @Option(name = "--want-extension",
             multiValued = true,
-            description = "type (OID or name) of extension that should be contaied in the"
+            description = "type (OID or name) of extension that should be contained in the"
                     + " certificate if possible\n"
                     + "(multi-valued)")
     @Completion(ExtensionNameCompleter.class)

@@ -249,9 +249,7 @@ public abstract class KeyEntry {
             BigInteger y = baseY.add(BigInteger.valueOf(index));
 
             try {
-                return new SubjectPublicKeyInfo(
-                        algId,
-                        new ASN1Integer(y));
+                return new SubjectPublicKeyInfo(algId, new ASN1Integer(y));
             } catch (IOException ex) {
                 throw new RuntimeException("IOException while constructing SubjectPublicKeyInfo",
                         ex);

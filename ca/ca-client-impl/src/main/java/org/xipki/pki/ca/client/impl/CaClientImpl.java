@@ -529,7 +529,7 @@ public final class CaClientImpl implements CaClient {
         }
 
         if (tmpCaName == null) {
-            throw new CaClientException("cert profile " + profile + " is not supported by any CA");
+            throw new CaClientException("certprofile " + profile + " is not supported by any CA");
         }
 
         CaConf ca = casMap.get(tmpCaName.trim());
@@ -568,7 +568,7 @@ public final class CaClientImpl implements CaClient {
             String profile = requestEntries.get(0).getCertprofile();
             tmpCaName = getCaNameForProfile(profile);
             if (tmpCaName == null) {
-                throw new CaClientException("cert profile " + profile
+                throw new CaClientException("certprofile " + profile
                         + " is not supported by any CA");
             }
         }
@@ -606,7 +606,7 @@ public final class CaClientImpl implements CaClient {
             }
 
             if (!ca.supportsProfile(certprofile)) {
-                throw new CaClientException("cert profile " + certprofile
+                throw new CaClientException("certprofile " + certprofile
                         + " is not supported by the CA " + tmpCaName);
             }
             return;
@@ -623,13 +623,13 @@ public final class CaClientImpl implements CaClient {
             if (tmpCaName == null) {
                 tmpCaName = ca.getName();
             } else {
-                throw new CaClientException("cert profile " + certprofile
+                throw new CaClientException("certprofile " + certprofile
                         + " supported by more than one CA, please specify the CA name.");
             }
         }
 
         if (tmpCaName == null) {
-            throw new CaClientException("unsupported cert profile " + certprofile);
+            throw new CaClientException("unsupported certprofile " + certprofile);
         }
     }
 
@@ -713,7 +713,7 @@ public final class CaClientImpl implements CaClient {
                 ErrorResultEntry entry = (ErrorResultEntry) re;
                 certIdOrError = new CertIdOrError(entry.getStatusInfo());
             } else {
-                throw new CaClientException("unknwon type " + re.getClass().getName());
+                throw new CaClientException("unknown type " + re.getClass().getName());
             }
 
             ret.put(re.getId(), certIdOrError);
@@ -802,7 +802,7 @@ public final class CaClientImpl implements CaClient {
             if (caName == null) {
                 caName = ca.getName();
             } else {
-                throw new CaClientException("cert profile " + certprofile
+                throw new CaClientException("certprofile " + certprofile
                         + " supported by more than one CA, please specify the CA name.");
             }
         }
@@ -843,7 +843,7 @@ public final class CaClientImpl implements CaClient {
             // detect the CA name
             tmpCaName = getCaNameForProfile(profileName);
             if (tmpCaName == null) {
-                throw new CaClientException("cert profile " + profileName
+                throw new CaClientException("certprofile " + profileName
                         + " is not supported by any CA");
             }
         } else {
@@ -1193,7 +1193,7 @@ public final class CaClientImpl implements CaClient {
                 }
             }
         } catch (IOException ex) {
-            LogUtil.error(LOG, ex, "IOException while calling the URL " + healthUrlStr);
+            LogUtil.error(LOG, ex, "IOException while fetching the URL " + healthUrlStr);
             healthCheckResult.setHealthy(false);
         }
 

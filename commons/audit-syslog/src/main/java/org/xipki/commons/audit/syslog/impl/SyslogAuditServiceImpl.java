@@ -82,7 +82,7 @@ public class SyslogAuditServiceImpl extends AuditService {
     public static final String DFLT_SYSLOG_FACILITY = "user";
 
     /**
-     * The default ip is localhost.
+     * The default IP is localhost.
      */
     public static final String DFLT_SYSLOG_HOST = "localhost";
 

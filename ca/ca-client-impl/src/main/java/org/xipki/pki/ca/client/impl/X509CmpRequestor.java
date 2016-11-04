@@ -212,7 +212,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             throw new PkiErrorException(content.getPKIStatusInfo());
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new CmpRequestorException(String.format(
-                    "unknown PKI body type %s instead the exceptected [%s, %s]",
+                    "unknown PKI body type %s instead the expected [%s, %s]",
                     bodyType, PKIBody.TYPE_GEN_REP, PKIBody.TYPE_ERROR));
         }
 
@@ -296,7 +296,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             throw new PkiErrorException(content.getPKIStatusInfo());
         } else if (PKIBody.TYPE_REVOCATION_REP != bodyType) {
             throw new CmpRequestorException(String.format(
-                    "unknown PKI body type %s instead the exceptected [%s, %s]", bodyType,
+                    "unknown PKI body type %s instead the expected [%s, %s]", bodyType,
                     PKIBody.TYPE_REVOCATION_REP, PKIBody.TYPE_ERROR));
         }
 
@@ -309,7 +309,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             }
 
             throw new CmpRequestorException(String.format(
-                "incorrect number of status entries in response '%s' instead the exceptected '%s'",
+                "incorrect number of status entries in response '%s' instead the expected '%s'",
                 statusesLen, reqEntries.size()));
         }
 
@@ -410,7 +410,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             throw new PkiErrorException(content.getPKIStatusInfo());
         } else if (expectedBodyType != bodyType) {
             throw new CmpRequestorException(String.format(
-                    "unknown PKI body type %s instead the exceptected [%s, %s]", bodyType,
+                    "unknown PKI body type %s instead the expected [%s, %s]", bodyType,
                     expectedBodyType, PKIBody.TYPE_ERROR));
         }
 
