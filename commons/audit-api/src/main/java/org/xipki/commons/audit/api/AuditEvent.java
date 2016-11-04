@@ -63,14 +63,14 @@ public class AuditEvent {
     private AuditLevel level;
 
     /**
-     * Timestamp when the event was saved.
+     * Time-stamp when the event was saved.
      */
     private final Date timestamp;
 
     private AuditStatus status;
 
     /**
-     * Duration in milli seconds.
+     * Duration in milliseconds.
      */
     private long duration = -1;
 
