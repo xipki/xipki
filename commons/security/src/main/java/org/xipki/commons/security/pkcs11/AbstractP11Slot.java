@@ -423,7 +423,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         try {
             encodedCert = cert.getEncoded();
         } catch (CertificateEncodingException ex) {
-            throw new XiSecurityException("could not encode certifiate: " + ex.getMessage(), ex);
+            throw new XiSecurityException("could not encode certificate: " + ex.getMessage(), ex);
         }
         for (P11ObjectIdentifier objectId : certificates.keySet()) {
             X509Cert tmpCert = certificates.get(objectId);

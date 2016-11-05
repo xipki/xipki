@@ -184,7 +184,7 @@ public class CurlCmd extends XipkiCommandSupport {
             int respCode = httpConn.getResponseCode();
             if (verbose) {
                 println("=====response=====");
-                println("  reponse code: " + respCode + " " + httpConn.getResponseMessage());
+                println("  response code: " + respCode + " " + httpConn.getResponseMessage());
                 properties = httpConn.getHeaderFields();
                 for (String key : properties.keySet()) {
                     if (key == null) {

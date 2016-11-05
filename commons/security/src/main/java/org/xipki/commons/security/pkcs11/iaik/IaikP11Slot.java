@@ -234,7 +234,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 analyseSingleKey(privKey, ret);
             } catch (XiSecurityException ex) {
                 LogUtil.error(LOG, ex,
-                        "SecurityException while initializing key with id " + hex(keyId));
+                        "XiSecurityException while initializing key with id " + hex(keyId));
                 continue;
             } catch (Throwable th) {
                 String label = "";
@@ -603,10 +603,10 @@ class IaikP11Slot extends AbstractP11Slot {
         boolean isRwSessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS);
         boolean isRoSessionLoggedIn = state.equals(State.RO_USER_FUNCTIONS);
 
-        boolean sessionSessionLoggedIn = ((isRoSessionLoggedIn || isRwSessionLoggedIn)
+        boolean sessionLoggedIn = ((isRoSessionLoggedIn || isRwSessionLoggedIn)
                 && deviceError == 0);
-        LOG.debug("sessionSessionLoggedIn: {}", sessionSessionLoggedIn);
-        return sessionSessionLoggedIn;
+        LOG.debug("sessionLoggedIn: {}", sessionLoggedIn);
+        return sessionLoggedIn;
     }
 
     private static List<Storage> getObjects(final Session session, final Storage template)
@@ -629,7 +629,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
                 for (iaik.pkcs.pkcs11.objects.Object object : foundObjects) {
                     if (LOG.isTraceEnabled()) {
-                        LOG.debug("foundObject: {}", object);
+                        LOG.debug("found object: {}", object);
                     }
                     objList.add((Storage) object);
                 }

@@ -388,7 +388,7 @@ public class ProxyP11Module extends AbstractP11Module {
             }
         } else if (PKIBody.TYPE_GEN_REP != bodyType) {
             throw new P11TokenException("unknown PKI body type " + bodyType
-                    + " instead the exceptected [" + PKIBody.TYPE_GEN_REP + ", "
+                    + " instead the expected [" + PKIBody.TYPE_GEN_REP + ", "
                     + PKIBody.TYPE_ERROR + "]");
         }
 

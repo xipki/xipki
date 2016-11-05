@@ -76,7 +76,7 @@ public class ExtractCertFromCrlCmd extends SecurityCommandSupport {
 
     @Option(name = "--out", aliases = "-o",
             required = true,
-            description = "zip file to save the extracted certificates\n"
+            description = "ZIP file to save the extracted certificates\n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
     private String outFile;

@@ -59,13 +59,13 @@ public class PasswordProducer {
         assertNameNotBlank(name);
         BlockingQueue<char[]> queue = new LinkedBlockingQueue<>(1);
         namePasswordsMap.put(name, queue);
-        LOG.info("registered passoword consumer '{}'", name);
+        LOG.info("registered password consumer '{}'", name);
     }
 
     public static void unregisterPasswordConsumer(final String name) {
         assertNameNotBlank(name);
         namePasswordsMap.remove(name);
-        LOG.info("unregistered passoword consumer '{}'", name);
+        LOG.info("unregistered password consumer '{}'", name);
     }
 
     public static char[] takePassword(final String name)
@@ -87,7 +87,7 @@ public class PasswordProducer {
         }
 
         namePasswordsMap.get(name).put(password);
-        LOG.info("provided passoword for consumer '{}'", name);
+        LOG.info("provided password for consumer '{}'", name);
     }
 
     public static boolean needsPassword(final String name) {

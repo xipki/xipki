@@ -190,7 +190,7 @@ public class IaikP11Module extends AbstractP11Module {
         try {
             module.finalize(null);
         } catch (Throwable th) {
-            LogUtil.error(LOG, th, "could not clonse module " + modulePath);
+            LogUtil.error(LOG, th, "could not close module " + modulePath);
         }
     }
 }

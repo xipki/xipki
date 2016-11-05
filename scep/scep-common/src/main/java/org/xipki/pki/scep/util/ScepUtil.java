@@ -220,7 +220,7 @@ public class ScepUtil {
         try {
             contentSigner = new JcaContentSignerBuilder(sigAlgorithm).build(identityKey);
         } catch (OperatorCreationException ex) {
-            throw new CertificateException("error whilc creating signer", ex);
+            throw new CertificateException("error while creating signer", ex);
         }
 
         Certificate asn1Cert = certGenerator.build(contentSigner).toASN1Structure();

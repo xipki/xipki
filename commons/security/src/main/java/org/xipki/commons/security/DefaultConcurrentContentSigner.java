@@ -205,7 +205,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
                 this.certificateChainAsBcObjects[i] = new X509CertificateHolder(cert.getEncoded());
             } catch (CertificateEncodingException | IOException ex) {
                 throw new IllegalArgumentException(
-                        String.format("%s occured while parsing certificate at index %d: %s",
+                        String.format("%s occurred while parsing certificate at index %d: %s",
                                 ex.getClass().getName(), i, ex.getMessage()), ex);
             }
         }
