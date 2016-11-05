@@ -39,6 +39,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -325,8 +326,20 @@ public class CaConf {
                                         + " must not be null");
                             }
                         }
+                        byte[] csr = getBinary(ci.getGenSelfIssued().getCsr(), zipFile);
+                        BigInteger serialNumber = null;
+                        String str = ci.getGenSelfIssued().getSerialNumber();
+                        if (str != null) {
+                            str = str.toUpperCase();
+                            if (str.startsWith("0X")) {
+                                serialNumber = new BigInteger(str.substring(2), 16);
+                            } else {
+                                serialNumber = new BigInteger(str);
+                            }
+                        }
+
                         genSelfIssued = new GenSelfIssued(ci.getGenSelfIssued().getProfile(),
-                                getBinary(ci.getGenSelfIssued().getCsr(), zipFile), certFilename);
+                                csr, serialNumber, certFilename);
                     }
 
                     X509CaUris caUris = new X509CaUris(getStrings(ci.getCacertUris()),

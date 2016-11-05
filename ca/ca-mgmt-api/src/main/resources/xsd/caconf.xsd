@@ -166,10 +166,11 @@
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:complexType name="genSelfIssuedType">
-    <xs:sequence>
+    <xs:all>
       <xs:element name="csr" type="fileOrBinaryType"/>
       <xs:element name="profile" type="xs:string"/>
-    </xs:sequence>
+      <xs:element name="serialNumber" type="xs:string" minOccurs="0"/>
+    </xs:all>
   </xs:complexType>
   <xs:complexType name="x509CaInfoType">
     <xs:all>

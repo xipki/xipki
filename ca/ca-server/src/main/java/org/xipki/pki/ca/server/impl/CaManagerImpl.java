@@ -2475,7 +2475,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public X509Certificate generateRootCa(final X509CaEntry caEntry, final String certprofileName,
-            final byte[] encodedCsr) throws CaMgmtException {
+            final byte[] encodedCsr, final BigInteger serialNumber) throws CaMgmtException {
         ParamUtil.requireNonNull("caEntry", caEntry);
         ParamUtil.requireNonBlank("certprofileName", certprofileName);
         ParamUtil.requireNonNull("encodedCsr", encodedCsr);
@@ -2512,8 +2512,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("unknown certprofile " + certprofileName);
         }
 
-        BigInteger serialOfThisCert = RandomSerialNumberGenerator.getInstance().nextSerialNumber(
-                caEntry.getSerialNoBitLen());
+        BigInteger serialOfThisCert = (serialNumber != null) ? serialNumber
+                : RandomSerialNumberGenerator.getInstance().nextSerialNumber(
+                        caEntry.getSerialNoBitLen());
 
         GenerateSelfSignedResult result;
         try {
@@ -3104,7 +3105,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 } else {
                     if (genSelfIssued != null) {
                         X509Certificate cert = generateRootCa(entry, genSelfIssued.getProfile(),
-                                genSelfIssued.getCsr());
+                                genSelfIssued.getCsr(), genSelfIssued.getSerialNumber());
                         LOG.info("generated root CA {}", caName);
                         String fn = genSelfIssued.getCertFilename();
                         if (fn != null) {

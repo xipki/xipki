@@ -34,6 +34,8 @@
 
 package org.xipki.pki.ca.server.mgmt.api.conf;
 
+import java.math.BigInteger;
+
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -49,10 +51,14 @@ public class GenSelfIssued {
 
     private final String certFilename;
 
-    public GenSelfIssued(final String profile, byte[] csr, final String certFilename) {
+    private final BigInteger serialNumber;
+
+    public GenSelfIssued(final String profile, byte[] csr, final BigInteger serialNumber,
+            final String certFilename) {
         this.profile = ParamUtil.requireNonBlank("profile", profile);
         this.csr = ParamUtil.requireNonNull("csr", csr);
         this.certFilename = certFilename;
+        this.serialNumber = serialNumber;
     }
 
     public String getProfile() {
@@ -67,4 +73,7 @@ public class GenSelfIssued {
         return certFilename;
     }
 
+    public BigInteger getSerialNumber() {
+        return serialNumber;
+    }
 }

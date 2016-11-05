@@ -152,6 +152,7 @@
               <file>${output.dir}/RCA1.csr</file>
             </csr>
             <profile>RCA</profile>
+            <serialNumber>1</serialNumber>
           </genSelfIssued>
           <cmpcontrolName>cmpcontrol1</cmpcontrolName>
           <cert>

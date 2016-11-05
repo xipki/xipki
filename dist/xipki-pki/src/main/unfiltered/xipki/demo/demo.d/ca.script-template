@@ -175,6 +175,7 @@ xipki-ca:gen-rca \
   --name RCA1 \
   --csr output/RCA1.csr \
   --profile RCA \
+  --serial 1 \
   --out output/RCA1.der \
   --permission all \
   --sn-bitlen 63 \

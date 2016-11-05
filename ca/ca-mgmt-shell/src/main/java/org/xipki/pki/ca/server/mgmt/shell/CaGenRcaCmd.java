@@ -35,6 +35,7 @@
 package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -68,6 +69,10 @@ public class CaGenRcaCmd extends CaAddOrGenCommandSupport {
                     + "(required)")
     private String rcaProfile;
 
+    @Option(name = "--serial",
+            description = "profile of the Root CA")
+    private String serialS;
+
     @Option(name = "--out", aliases = "-o",
             description = "where to save the generated CA certificate")
     @Completion(FilePathCompleter.class)
@@ -77,7 +82,12 @@ public class CaGenRcaCmd extends CaAddOrGenCommandSupport {
     protected Object doExecute() throws Exception {
         X509CaEntry caEntry = getCaEntry();
         byte[] csr = IoUtil.read(csrFile);
-        X509Certificate rcaCert = caManager.generateRootCa(caEntry, rcaProfile, csr);
+        BigInteger serialNumber = null;
+        if (serialS != null) {
+            serialNumber = toBigInt(serialS);
+        }
+
+        X509Certificate rcaCert = caManager.generateRootCa(caEntry, rcaProfile, csr, serialNumber);
         if (rcaCertOutFile != null) {
             saveVerbose("saved root certificate to file", new File(rcaCertOutFile),
                     rcaCert.getEncoded());

@@ -223,7 +223,7 @@ public interface CaManager {
             @Nullable Date notAfter) throws CaMgmtException;
 
     X509Certificate generateRootCa(@Nonnull X509CaEntry caEntry, @Nonnull String certprofileName,
-            @Nonnull byte[] encodedCsr) throws CaMgmtException;
+            @Nonnull byte[] encodedCsr, @Nullable BigInteger serialNumber) throws CaMgmtException;
 
     boolean addUser(@Nonnull AddUserEntry userEntry) throws CaMgmtException;
 
