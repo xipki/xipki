@@ -268,7 +268,7 @@ public abstract class AbstractCaTest {
         List<X509Certificate> certs = enrolResp.getCertificates();
         Assert.assertTrue("number of received certificates", certs.size() > 0);
         X509Certificate cert = certs.get(0);
-        Assert.assertNotNull("enroled certificate", cert);
+        Assert.assertNotNull("enrolled certificate", cert);
 
         // getCert
         certs = client.scepGetCert(privKey, selfSignedCert, issuerName,

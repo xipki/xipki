@@ -315,14 +315,14 @@ public class DecodedPkiMessage extends PkiMessage {
                 }
 
                 if (intValue == null) {
-                    ret.setFailureMessage("missing required SCEP attribute failureInfo");
+                    ret.setFailureMessage("missing required SCEP attribute failInfo");
                     return ret;
                 }
 
                 try {
                     failInfo = FailInfo.forValue(intValue);
                 } catch (IllegalArgumentException ex) {
-                    ret.setFailureMessage("invalid failureInfo '" + intValue + "'");
+                    ret.setFailureMessage("invalid failInfo '" + intValue + "'");
                     return ret;
                 }
 
