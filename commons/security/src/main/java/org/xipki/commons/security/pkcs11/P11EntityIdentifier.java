@@ -83,7 +83,7 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
     }
 
     public boolean match(final P11SlotIdentifier slotId, final String objectLabel) {
-        ParamUtil.requireNonNull("keyLabel", objectLabel);
+        ParamUtil.requireNonNull("objectLabel", objectLabel);
         return this.slotId.equals(slotId)
                 && objectLabel.equals(this.objectId.getLabel());
     }

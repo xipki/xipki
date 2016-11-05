@@ -157,7 +157,7 @@ public class ScepResponder {
         try {
             recipientX509Obj = new X509CertificateObject(recipientCert);
         } catch (CertificateParsingException ex) {
-            throw new MessageDecodingException("could not parse recipintCert "
+            throw new MessageDecodingException("could not parse recipientCert "
                     + recipientCert.getTBSCertificate().getSubject());
         }
 

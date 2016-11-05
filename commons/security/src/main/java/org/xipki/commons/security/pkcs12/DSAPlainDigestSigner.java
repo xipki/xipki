@@ -123,7 +123,7 @@ public class DSAPlainDigestSigner implements Signer {
     public byte[] generateSignature() {
         if (!forSigning) {
             throw new IllegalStateException(
-                    "DSADigestSigner not initialised for signature generation.");
+                    "DSADigestSigner not initialized for signature generation.");
         }
 
         byte[] hash = new byte[digest.getDigestSize()];

@@ -77,7 +77,7 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
         ParamUtil.requireNonNull("slotId", slotId);
         if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
             throw new IllegalArgumentException(
-                    "at least onf of objectId and objectLabel must not be null");
+                    "at least one of objectId and objectLabel must not be null");
         }
 
         this.objectId = objectId;

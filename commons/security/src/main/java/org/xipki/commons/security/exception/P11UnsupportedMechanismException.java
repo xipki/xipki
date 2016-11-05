@@ -55,7 +55,7 @@ public class P11UnsupportedMechanismException extends P11TokenException {
     public P11UnsupportedMechanismException(final long mechanism,
             final P11EntityIdentifier entityId) {
         super("mechanism " + P11Constants.getMechanismDesc(mechanism)
-            + " is not supported by PKCS11 entitiy " + entityId);
+            + " is not supported by PKCS11 entity " + entityId);
     }
 
     public P11UnsupportedMechanismException(final String message) {

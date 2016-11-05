@@ -54,6 +54,7 @@ import org.bouncycastle.crypto.signers.PSSSigner;
 import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.exception.P11TokenException;
@@ -232,8 +233,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
             try {
                 return ((PSSSignerOutputStream) outputStream).generateSignature();
             } catch (CryptoException ex) {
-                LOG.warn("CryptoException: {}", ex.getMessage());
-                LOG.debug("CryptoException", ex);
+                LogUtil.warn(LOG, ex);
                 throw new RuntimeCryptoException("CryptoException: " + ex.getMessage());
             }
         }
@@ -248,8 +248,7 @@ class P11RSAPSSContentSigner implements ContentSigner {
         try {
             return cryptService.getIdentity(identityId).sign(mechanism, parameters, dataToSign);
         } catch (XiSecurityException | P11TokenException ex) {
-            LOG.warn("could not sign: {}", ex.getMessage());
-            LOG.debug("could not sign", ex);
+            LogUtil.warn(LOG, ex, "could not sign");
             throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
         }
 

@@ -156,9 +156,8 @@ class P11DSAContentSigner implements ContentSigner {
             byte[] plainSignature = getPlainSignature();
             return plain ? plainSignature : SignerUtil.convertPlainDSASigToX962(plainSignature);
         } catch (XiSecurityException ex) {
-            LOG.warn("SignerException: {}", ex.getMessage());
-            LOG.debug("SignerException", ex);
-            throw new RuntimeCryptoException("SignerException: " + ex.getMessage());
+            LogUtil.warn(LOG, ex);
+            throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());
         } catch (Throwable th) {
             LogUtil.warn(LOG, th);
             throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());

@@ -51,7 +51,7 @@ import org.jscep.transaction.TransactionException;
  */
 
 @Command(scope = "xipki-jscep", name = "enroll",
-        description = "enroll certificate via automic selected messageType")
+        description = "enroll certificate via automatic selected messageType")
 @Service
 public class EnrollCertCmd extends EnrollCertCommandSupport {
 

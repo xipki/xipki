@@ -138,13 +138,13 @@ public class P11ContentSignerBuilder {
         } else if (publicKey instanceof ECPublicKey) {
             if (!AlgorithmUtil.isECSigAlg(signatureAlgId)) {
                 throw new XiSecurityException(
-                        "the given algorithm is not a valid EC signature algirthm '"
+                        "the given algorithm is not a valid EC signature algorithm '"
                         + signatureAlgId.getAlgorithm().getId() + "'");
             }
         } else if (publicKey instanceof DSAPublicKey) {
             if (!AlgorithmUtil.isDSASigAlg(signatureAlgId)) {
                 throw new XiSecurityException(
-                        "the given algorithm is not a valid DSA signature algirthm '"
+                        "the given algorithm is not a valid DSA signature algorithm '"
                         + signatureAlgId.getAlgorithm().getId() + "'");
             }
         } else {

@@ -193,7 +193,7 @@ public class SoftTokenContentSignerBuilder {
                 final AlgorithmIdentifier digAlgId) throws OperatorCreationException {
             if (!AlgorithmUtil.isECSigAlg(sigAlgId)) {
                 throw new OperatorCreationException(
-                        "the given algorithm is not a valid EC signature algirthm '"
+                        "the given algorithm is not a valid EC signature algorithm '"
                         + sigAlgId.getAlgorithm().getId() + "'");
             }
 

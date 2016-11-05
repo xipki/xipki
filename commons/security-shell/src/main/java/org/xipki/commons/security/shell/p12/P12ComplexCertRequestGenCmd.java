@@ -92,7 +92,7 @@ import org.xipki.commons.security.util.KeyUtil;
  */
 
 @Command(scope = "xipki-tk", name = "req-p12-complex",
-        description = "generate complex CSR with PKCS#12 keystore")
+        description = "generate complex CSR with PKCS#12 keystore (only for test)")
 @Service
 public class P12ComplexCertRequestGenCmd extends CertRequestGenCommandSupport {
 

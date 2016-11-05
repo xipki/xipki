@@ -93,22 +93,22 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
     private String sigAlg;
 
     @Option(name = "--exp-nextupdate",
-            description = "occurence of nextUpdate")
+            description = "occurrence of nextUpdate")
     @Completion(OccurrenceCompleter.class)
     private String nextUpdateOccurrenceText = Occurrence.optional.name();
 
     @Option(name = "--exp-certhash",
-            description = "occurence of certHash")
+            description = "occurrence of certHash")
     @Completion(OccurrenceCompleter.class)
     private String certhashOccurrenceText = Occurrence.optional.name();
 
     @Option(name = "--exp-certhash-alg",
-            description = "occurence of certHash")
+            description = "occurrence of certHash")
     @Completion(HashAlgCompleter.class)
     private String certhashAlg;
 
     @Option(name = "--exp-nonce",
-            description = "occurence of nonce")
+            description = "occurrence of nonce")
     @Completion(OccurrenceCompleter.class)
     private String nonceOccurrenceText = Occurrence.optional.name();
 

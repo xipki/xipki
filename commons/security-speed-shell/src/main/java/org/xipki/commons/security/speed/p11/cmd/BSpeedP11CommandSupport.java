@@ -64,7 +64,7 @@ public abstract class BSpeedP11CommandSupport extends BatchSpeedCommandSupport {
     protected Integer slotIndex;
 
     @Option(name = "--module",
-            description = "Name of the PKCS#11 module.")
+            description = "name of the PKCS#11 module.")
     @Completion(P11ModuleNameCompleter.class)
     protected String moduleName = DEFAULT_P11MODULE_NAME;
 
