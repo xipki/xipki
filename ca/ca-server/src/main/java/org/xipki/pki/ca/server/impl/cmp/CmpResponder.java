@@ -175,14 +175,14 @@ abstract class CmpResponder {
         GeneralName recipient = reqHeader.getRecipient();
         boolean intentMe = (recipient == null) ? true : intendsMe(recipient);
         if (!intentMe) {
-            LOG.warn("tid={}: I am not the intented recipient, but '{}'", tid,
+            LOG.warn("tid={}: I am not the intended recipient, but '{}'", tid,
                     reqHeader.getRecipient());
             failureCode = PKIFailureInfo.badRequest;
             statusText = "I am not the intended recipient";
         } else if (messageTime == null) {
             if (cmpControl.isMessageTimeRequired()) {
                 failureCode = PKIFailureInfo.missingTimeStamp;
-                statusText = "missing timestamp";
+                statusText = "missing time-stamp";
             }
         } else {
             long messageTimeBias = cmpControl.getMessageTimeBias();

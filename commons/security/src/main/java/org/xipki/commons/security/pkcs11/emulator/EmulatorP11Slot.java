@@ -521,6 +521,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         try {
             encoded = encryptedPrivKeyInfo.getEncoded();
         } catch (IOException ex) {
+            LogUtil.error(LOG, ex);
             throw new P11TokenException("could not encode PrivateKey");
         }
         savePkcs11Entry(privKeyDir, id, label, encoded);

@@ -229,16 +229,16 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             try {
                 try {
                     certstore.deleteUnreferencedRequests();
-                    LOG.info("deleted UnreferencedRequests");
+                    LOG.info("deleted unreferenced requests");
                 } catch (Throwable th) {
-                    LogUtil.error(LOG, th, "could not deleteUnreferencedRequests");
+                    LogUtil.error(LOG, th, "could not delete unreferenced requests");
                 }
             } finally {
                 inProcess = false;
             }
         } // method run
 
-    } // class ScheduledDeleteCertsInProcessService
+    } // class ScheduledDeleteUnreferencedRequstervice
 
     private class ScheduledCaRestarter implements Runnable {
 
@@ -265,13 +265,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     LOG.debug("received no event to restart CA");
                 }
             } catch (Throwable th) {
-                LogUtil.error(LOG, th, "ScheduledCARestarter");
+                LogUtil.error(LOG, th, "ScheduledCaRestarter");
             } finally {
                 inProcess = false;
             }
         } // method run
 
-    } // class ScheduledCARestarter
+    } // class ScheduledCaRestarter
 
     public static final String ENV_EPOCH = "EPOCH";
 
@@ -433,7 +433,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new IllegalStateException("datasourceFactory is not set");
         }
         if (x509CertProfileFactoryRegister == null) {
-            throw new IllegalStateException("x509CertprofileFactoryRegister is not set");
+            throw new IllegalStateException("x509CertProfileFactoryRegister is not set");
         }
         if (x509CertPublisherFactoryRegister == null) {
             throw new IllegalStateException("x509CertPublisherFactoryRegister is not set");
@@ -446,7 +446,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         try {
             caConfProps.load(new FileInputStream(IoUtil.expandFilepath(caConfFile)));
         } catch (IOException ex) {
-            throw new CaMgmtException("could not parse ca configuration" + caConfFile, ex);
+            throw new CaMgmtException("could not parse CA configuration" + caConfFile, ex);
         }
 
         String caModeStr = caConfProps.getProperty("ca.mode");
@@ -500,7 +500,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 } catch (DataAccessException | PasswordResolverException | IOException
                         | RuntimeException ex) {
                     throw new CaMgmtException(ex.getClass().getName()
-                            + " while parsing datasoure " + datasourceFile, ex);
+                            + " while parsing datasource " + datasourceFile, ex);
                 }
             }
 
@@ -595,7 +595,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             if (!forceRelock) {
                 return true;
             } else {
-                LOG.info("CA has been locked by me since {}, relock it", lockedAt);
+                LOG.info("CA has been locked by me since {}, re-lock it", lockedAt);
             }
         }
 
@@ -617,7 +617,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             queryExecutor.unlockCa();
             successful = true;
         } catch (DataAccessException | CaMgmtException ex) {
-            LogUtil.warn(LOG, ex, "error in unlockCA()");
+            LogUtil.warn(LOG, ex, "error in unlockCa()");
         }
 
         if (successful) {
@@ -668,7 +668,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             LOG.info("notified the change of CA system");
             return true;
         } catch (CaMgmtException ex) {
-            LogUtil.warn(LOG, ex, "could not notify Slave CAs to restart");
+            LogUtil.warn(LOG, ex, "could not notify slave CAs to restart");
             return false;
         }
     } // method notifyCaChange
@@ -1099,7 +1099,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         for (String name : names) {
             CertprofileEntry dbEntry = queryExecutor.createCertprofile(name);
             if (dbEntry == null) {
-                LOG.error("could not initialize CertificateProfile '{}'", name);
+                LOG.error("could not initialize Certprofile '{}'", name);
                 continue;
             }
 
@@ -1131,7 +1131,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         for (String name : names) {
             PublisherEntry dbEntry = queryExecutor.createPublisher(name);
             if (dbEntry == null) {
-                LOG.error("could not initialize Publisher '{}'", name);
+                LOG.error("could not initialize publisher '{}'", name);
                 continue;
             }
 
@@ -1778,7 +1778,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         crlSigners.remove(name);
         crlSignerDbEntries.remove(name);
-        LOG.info("removed CRLSigner '{}'", name);
+        LOG.info("removed CRL signer '{}'", name);
         return true;
     } // method removeCrlSigner
 
@@ -2509,7 +2509,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         IdentifiedX509Certprofile certprofile = getIdentifiedCertprofile(certprofileName);
         if (certprofile == null) {
-            throw new CaMgmtException("unknown cert profile " + certprofileName);
+            throw new CaMgmtException("unknown certprofile " + certprofileName);
         }
 
         BigInteger serialOfThisCert = RandomSerialNumberGenerator.getInstance().nextSerialNumber(
@@ -2613,7 +2613,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         try {
             signer.setDbEntry(dbEntry);
         } catch (InvalidConfException ex) {
-            throw new CaMgmtException("ConfigurationException: " + ex.getMessage());
+            throw new CaMgmtException("InvalidConfException: " + ex.getMessage());
         }
         try {
             signer.initSigner(securityFactory);
@@ -2666,7 +2666,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             ret.initialize(securityFactory.getPasswordResolver(), datasources);
             return ret;
         } catch (ObjectCreationException | CertPublisherException | RuntimeException ex) {
-            LogUtil.error(LOG, ex, "invalid configuration for the certPublisher " + name);
+            LogUtil.error(LOG, ex, "invalid configuration for the CertPublisher " + name);
             return null;
         }
     } // method createPublisher

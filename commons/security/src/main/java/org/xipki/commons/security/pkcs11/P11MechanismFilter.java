@@ -81,7 +81,7 @@ public class P11MechanismFilter {
             return mechanisms.contains(mechanism);
         }
 
-    } // class SingleRetriever
+    } // class SingleFilter
 
     private final List<SingleFilter> singleFilters;
 

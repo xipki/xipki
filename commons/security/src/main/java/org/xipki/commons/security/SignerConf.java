@@ -274,7 +274,7 @@ public class SignerConf {
             ConfPairs pairs = new ConfPairs(conf);
             String value = pairs.getValue("password");
             if (value != null && !StringUtil.startsWithIgnoreCase(value, "PBE:")) {
-                pairs.putPair("password", "<sensitve>");
+                pairs.putPair("password", "<sensitive>");
             }
             return pairs.getEncoded();
         } catch (Exception ex) {

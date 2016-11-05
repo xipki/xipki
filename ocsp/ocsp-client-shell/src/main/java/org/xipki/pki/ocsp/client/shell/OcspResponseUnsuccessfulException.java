@@ -34,6 +34,9 @@
 
 package org.xipki.pki.ocsp.client.shell;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.xipki.pki.ocsp.client.api.OcspResponseException;
 
 /**
@@ -44,7 +47,17 @@ import org.xipki.pki.ocsp.client.api.OcspResponseException;
 @SuppressWarnings("serial")
 public class OcspResponseUnsuccessfulException extends OcspResponseException {
 
+    private static final Map<Integer, String> codeStatusMap = new HashMap<>();
+
     private int status;
+
+    static {
+        codeStatusMap.put(1, "malformedRequest");
+        codeStatusMap.put(2, "internalError");
+        codeStatusMap.put(3, "tryLater");
+        codeStatusMap.put(5, "sigRequired");
+        codeStatusMap.put(6, "unauthorized");
+    }
 
     public OcspResponseUnsuccessfulException(final int status) {
         super(getOcspResponseStatus(status));
@@ -60,20 +73,8 @@ public class OcspResponseUnsuccessfulException extends OcspResponseException {
     }
 
     private static String getOcspResponseStatus(final int statusCode) {
-        switch (statusCode) {
-        case 1:
-            return "malformedRequest";
-        case 2:
-            return "internalError";
-        case 3:
-            return "tryLater";
-        case 5:
-            return "sigRequired";
-        case 6:
-            return "unauthorized";
-        default:
-            return "undefined";
-        }
+        String status = codeStatusMap.get(statusCode);
+        return (status == null) ? "undefined" : status;
     }
 
 }

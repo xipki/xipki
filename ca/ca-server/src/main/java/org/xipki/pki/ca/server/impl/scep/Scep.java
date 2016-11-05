@@ -483,7 +483,7 @@ public class Scep {
                         // certificate via MessageType PKCSReq
                         KnowCertResult knowCertRes = ca.knowsCertificate(reqSignatureCert);
                         if (!knowCertRes.isKnown()) {
-                            LOG.warn("tid={}: signature certiciate is not trusted by the CA", tid);
+                            LOG.warn("tid={}: signature certificate is not trusted by the CA", tid);
                             throw FailInfoException.BAD_REQUEST;
                         }
                         user = knowCertRes.getUser();

@@ -58,7 +58,7 @@ public class IssuerHashNameAndKey {
 
         int len = algo.getLength();
         if (issuerNameHash == null || issuerNameHash.length != len) {
-            throw new IllegalArgumentException("issuerNameash is invalid");
+            throw new IllegalArgumentException("issuerNameHash is invalid");
         }
 
         if (issuerKeyHash == null || issuerKeyHash.length != len) {

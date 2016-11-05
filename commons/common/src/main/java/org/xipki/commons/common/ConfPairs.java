@@ -64,7 +64,7 @@ public class ConfPairs {
     }
 
     public ConfPairs(final String confPairs) {
-        ParamUtil.requireNonBlank("encodedConfPairs", confPairs);
+        ParamUtil.requireNonBlank("confPairs", confPairs);
         int len = confPairs.length();
         List<String> tokens = new LinkedList<>();
 

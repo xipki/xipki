@@ -46,7 +46,7 @@ import junit.framework.Assert;
  * @since 2.0.0
  */
 
-public class DateUtilTes {
+public class DateUtilTest {
 
     @Test
     public void test1() {

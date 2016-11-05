@@ -63,7 +63,7 @@ public class OcspStoreFactoryRegisterImpl implements OcspStoreFactoryRegister {
 
         for (OcspStoreFactory service : services) {
             if (service.canCreateOcspStore(type)) {
-                LOG.info("fould factory to create OcspStore of type '" + type + "'");
+                LOG.info("found factory to create OcspStore of type '" + type + "'");
                 return service.newOcspStore(type);
             }
         }

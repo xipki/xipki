@@ -429,7 +429,7 @@ public class X509CaCmpResponder extends CmpResponder {
             }
 
             if (!verifyPopo(req, tmpRequestor.isRa())) {
-                LOG.warn("could not validate POP for requst {}", certReqId.getValue());
+                LOG.warn("could not validate POP for request {}", certReqId.getValue());
                 certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.badPOP,
                         "invalid POP", null));
                 continue;

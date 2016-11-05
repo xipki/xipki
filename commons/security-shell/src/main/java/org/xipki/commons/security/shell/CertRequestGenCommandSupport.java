@@ -186,14 +186,14 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
     @Option(name = "--need-extension",
             multiValued = true,
-            description = "types of extension that must be contaied in the certificate\n"
+            description = "types of extension that must be contained in the certificate\n"
                     + "(multi-valued)")
     @Completion(ExtensionNameCompleter.class)
     private List<String> needExtensionTypes;
 
     @Option(name = "--want-extension",
             multiValued = true,
-            description = "types of extension that should be contaied in the certificate if"
+            description = "types of extension that should be contained in the certificate if"
                     + " possible\n"
                     + "(multi-valued)")
     @Completion(ExtensionNameCompleter.class)

@@ -420,8 +420,8 @@ public class DbCertStatusStore extends OcspStore {
 
     /**
      * Borrow Prepared Statement.
-     * @return the next idle preparedStatement, {@code null} will be returned if no PreparedStament
-     *     can be created within 5 seconds.
+     * @return the next idle preparedStatement, {@code null} will be returned if no
+     *     PreparedStatement can be created within 5 seconds.
      */
     private PreparedStatement borrowPreparedStatement(final String sqlQuery)
     throws DataAccessException {

@@ -393,10 +393,10 @@ public class X509Ca {
                 LOG.debug("revoking suspended certificates");
                 int num = revokeSuspendedCerts(CaAuditConstants.MSGID_CA_routine);
                 if (num == 0) {
-                    LOG.debug("revokend {} suspended certificates of CA '{}'", num,
+                    LOG.debug("revoked {} suspended certificates of CA '{}'", num,
                             caInfo.getCaEntry().getName());
                 } else {
-                    LOG.info("revokend {} suspended certificates of CA '{}'", num,
+                    LOG.info("revoked {} suspended certificates of CA '{}'", num,
                             caInfo.getCaEntry().getName());
                 }
             } catch (Throwable th) {

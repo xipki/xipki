@@ -370,7 +370,7 @@ public class OcspQa {
                         break;
                     default:
                         issue.setFailureMessage(
-                                "should not reach here, unknwon CRLReason " + revocationReason);
+                                "should not reach here, unknown CRLReason " + revocationReason);
                         break;
                     }
                 } // end if
@@ -393,7 +393,7 @@ public class OcspQa {
 
         Extension extension = singleResp.getExtension(
                 ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
-        checkOccurrence("OCSP.RESPONSE." + index + ".CERTHASh", extension, certhashOccurrence);
+        checkOccurrence("OCSP.RESPONSE." + index + ".CERTHASH", extension, certhashOccurrence);
 
         if (extension != null) {
             ASN1Encodable extensionValue = extension.getParsedValue();
@@ -423,7 +423,7 @@ public class OcspQa {
                     byte[] expectedHashValue = md.digest(encodedCert);
                     if (!Arrays.equals(expectedHashValue, hashValue)) {
                         issue.setFailureMessage(
-                                "certHash does not match the requested certificate");
+                                "certhash does not match the requested certificate");
                     }
                 } catch (NoSuchAlgorithmException ex) {
                     issue.setFailureMessage("NoSuchAlgorithm " + hashAlgOid.getId());

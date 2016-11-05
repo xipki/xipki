@@ -251,8 +251,8 @@ class CaManagerQueryExecutor {
     } // method deleteSystemEvent
 
     void addSystemEvent(final SystemEvent systemEvent) throws CaMgmtException {
-        final String sql = "INSERT INTO SYSTEM_EVENT (NAME,EVENT_TIME,EVENT_TIME2,EVENT_OWNER)"
-                + " VALUES (?,?,?,?)";
+        final String sql =
+            "INSERT INTO SYSTEM_EVENT (NAME,EVENT_TIME,EVENT_TIME2,EVENT_OWNER) VALUES (?,?,?,?)";
 
         PreparedStatement ps = null;
         try {

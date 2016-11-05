@@ -247,7 +247,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
         if (countSingleResponses != serialNumbers.length) {
             StringBuilder sb = new StringBuilder(100);
-            sb.append("response with ").append(countSingleResponses).append(" singleRessponse");
+            sb.append("response with ").append(countSingleResponses).append(" singleResponse");
             if (countSingleResponses > 1) {
                 sb.append("s");
             }

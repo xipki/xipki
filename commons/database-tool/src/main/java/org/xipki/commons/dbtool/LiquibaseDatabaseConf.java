@@ -181,7 +181,7 @@ public class LiquibaseDatabaseConf {
             driverClassName = "org.hsqldb.jdbc.JDBCDriver";
             urlBuilder.append(dbProps.getProperty("dataSource.url"));
         } else {
-            throw new IllegalArgumentException("unsupported datasbase type " + datasourceClassName);
+            throw new IllegalArgumentException("unsupported database type " + datasourceClassName);
         }
 
         url = urlBuilder.toString();

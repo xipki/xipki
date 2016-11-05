@@ -76,7 +76,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
         LOG.info("trustAll: {}", trustAll);
         if (enabled) {
             oldHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
-            LOG.info("Register me as DefaulHostnameVerifier, and backup the old one {}",
+            LOG.info("Register me as DefaultHostnameVerifier, and backup the old one {}",
                     oldHostnameVerifier);
             HttpsURLConnection.setDefaultHostnameVerifier(this);
             meAsDefaultHostnameVerifier = true;

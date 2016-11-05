@@ -43,7 +43,6 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
 // CHECKSTYLE:SKIP
 class SHA1DigestCalculator extends AbstractDigestCalculator {
 

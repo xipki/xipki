@@ -178,7 +178,7 @@ public class HttpOcspServlet extends HttpServlet {
                     response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 
                     auditStatus = AuditStatus.FAILED;
-                    auditMessage = "unsupporte media type " + request.getContentType();
+                    auditMessage = "unsupported media type " + request.getContentType();
                     return;
                 }
 

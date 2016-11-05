@@ -350,7 +350,7 @@ public class OcspServer {
             String name = m.getName();
             if (set.contains(name)) {
                 throw new InvalidConfException(
-                        "responder named '" + name + "' defined duplicatedly");
+                        "duplicated definition of responder named '" + name + "'");
             }
 
             if (StringUtil.isBlank(name)) {
@@ -373,7 +373,7 @@ public class OcspServer {
             String name = m.getName();
             if (set.contains(name)) {
                 throw new InvalidConfException(
-                        "signer option named '" + name + "' defined duplicatedly");
+                        "duplicated definition of signer option named '" + name + "'");
             }
             set.add(name);
         }
@@ -384,7 +384,7 @@ public class OcspServer {
             String name = m.getName();
             if (set.contains(name)) {
                 throw new InvalidConfException(
-                        "request option named '" + name + "' defined duplicatedly");
+                        "duplicated definition of request option named '" + name + "'");
             }
             set.add(name);
         }
@@ -395,7 +395,7 @@ public class OcspServer {
             String name = m.getName();
             if (set.contains(name)) {
                 throw new InvalidConfException(
-                        "response option named '" + name + "' defined duplicatedly");
+                        "duplicated definition of response option named '" + name + "'");
             }
             set.add(name);
         }
@@ -407,7 +407,7 @@ public class OcspServer {
                 String name = m.getName();
                 if (set.contains(name)) {
                     throw new InvalidConfException(
-                            "audit option named '" + name + "' defined duplicatedly");
+                            "duplicated definition of audit option named '" + name + "'");
                 }
                 set.add(name);
             }
@@ -418,7 +418,8 @@ public class OcspServer {
         for (StoreType m : conf.getStores().getStore()) {
             String name = m.getName();
             if (set.contains(name)) {
-                throw new InvalidConfException("store named '" + name + "' defined duplicatedly");
+                throw new InvalidConfException(
+                        "duplicated definition of store named '" + name + "'");
             }
         }
 
@@ -429,7 +430,7 @@ public class OcspServer {
                 String name = m.getName();
                 if (set.contains(name)) {
                     throw new InvalidConfException(
-                            "certprofile option named '" + name + "' defined duplicatedly");
+                            "duplicated definition of certprofile option named '" + name + "'");
                 }
                 set.add(name);
             }
@@ -442,7 +443,7 @@ public class OcspServer {
                 String name = m.getName();
                 if (set.contains(name)) {
                     throw new InvalidConfException(
-                            "datasource named '" + name + "' defined duplicatedly");
+                            "duplicated definition of datasource named '" + name + "'");
                 }
                 set.add(name);
             }
@@ -1204,7 +1205,7 @@ public class OcspServer {
             datasource = datasources.get(datasourceName);
             if (datasource == null) {
                 throw new InvalidConfException("datasource named '" + datasourceName
-                        + "' not definied");
+                        + "' not defined");
             }
         }
         try {
@@ -1268,7 +1269,7 @@ public class OcspServer {
             return null;
         }
 
-        String message = "could not build certpath for the request's signer certifcate";
+        String message = "could not build certpath for the request's signer certificate";
         LOG.warn(message);
         fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
         return createUnsuccessfulOcspResp(OcspResponseStatus.unauthorized);

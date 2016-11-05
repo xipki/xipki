@@ -78,7 +78,7 @@ public class GetCertCmd extends ClientCommandSupport {
         X509Certificate cert = extractEeCerts(certs);
 
         if (cert == null) {
-            throw new CmdFailure("received no certficate from server");
+            throw new CmdFailure("received no certificate from server");
         }
 
         saveVerbose("saved returned certificate to file", new File(outputFile), cert.getEncoded());

@@ -75,7 +75,7 @@ public class HealthCheckServlet extends HttpServlet {
         response.setHeader("Access-Control-Allow-Origin", "*");
         try {
             if (responderManager == null) {
-                LOG.error("responderManager in servlet not configured");
+                LOG.error("responderManager in servlet is not configured");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);
                 return;
