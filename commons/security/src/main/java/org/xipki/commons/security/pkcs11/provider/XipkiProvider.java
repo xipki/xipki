@@ -57,11 +57,19 @@ import org.xipki.commons.security.XiSecurityConstants;
  *   <li><code>SHA256withRSA</code></li>
  *   <li><code>SHA384withRSA</code></li>
  *   <li><code>SHA512withRSA</code></li>
+ *   <li><code>SHA3-224withRSA</code></li>
+ *   <li><code>SHA3-256withRSA</code></li>
+ *   <li><code>SHA3-384withRSA</code></li>
+ *   <li><code>SHA3-512withRSA</code></li>
  *   <li><code>SHA1withRSAandMGF1</code></li>
  *   <li><code>SHA224withRSAandMGF1</code></li>
  *   <li><code>SHA256withRSAandMGF1</code></li>
  *   <li><code>SHA384withRSAandMGF1</code></li>
  *   <li><code>SHA512withRSAandMGF1</code></li>
+ *   <li><code>SHA3-224withRSAandMGF1</code></li>
+ *   <li><code>SHA3-256withRSAandMGF1</code></li>
+ *   <li><code>SHA3-384withRSAandMGF1</code></li>
+ *   <li><code>SHA3-512withRSAandMGF1</code></li>
  * </ul>
  *
  * Signature (DSA)
@@ -72,6 +80,10 @@ import org.xipki.commons.security.XiSecurityConstants;
  *   <li><code>SHA256withDSA</code></li>
  *   <li><code>SHA384withDSA</code></li>
  *   <li><code>SHA512withDSA</code></li>
+ *   <li><code>SHA3-224withDSA</code></li>
+ *   <li><code>SHA3-256withDSA</code></li>
+ *   <li><code>SHA3-384withDSA</code></li>
+ *   <li><code>SHA3-512withDSA</code></li>
  * </ul>
  *
  * Signature (ECDSA)
@@ -82,6 +94,11 @@ import org.xipki.commons.security.XiSecurityConstants;
  *   <li><code>SHA256withECDSA</code></li>
  *   <li><code>SHA384withECDSA</code></li>
  *   <li><code>SHA512withECDSA</code></li>
+ *   <li><code>SHA3-224withECDSA</code></li>
+ *   <li><code>SHA3-256withECDSA</code></li>
+ *   <li><code>SHA3-384withECDSA</code></li>
+ *   <li><code>SHA3-512withECDSA</code></li>
+ *
  *   <li><code>NONEwithPlain-ECDSA</code></li>
  *   <li><code>SHA1withPlain-ECDSA</code></li>
  *   <li><code>SHA224withPlain-ECDSA</code></li>
