@@ -66,7 +66,9 @@ public class Slf4jAuditServiceImpl extends AuditService {
             }
             break;
         default:
-            LOG.info("{}", createMessage(event));
+            if (LOG.isInfoEnabled()) {
+                LOG.info("{}", createMessage(event));
+            }
             break;
         } // end switch
     }
@@ -82,7 +84,9 @@ public class Slf4jAuditServiceImpl extends AuditService {
             }
             break;
         default:
-            LOG.info("{} | {}", al.getAlignedText(), msg);
+            if (LOG.isInfoEnabled()) {
+                LOG.info("{} | {}", al.getAlignedText(), msg);
+            }
             break;
         } // end switch
     }
