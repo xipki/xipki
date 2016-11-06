@@ -347,6 +347,16 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/SubCA1.der \
   --ca-cert output/RCA1.der
 
+## Suspend certificates
+xipki-cli:revoke \
+  --ca SubCA1 \
+  --cert output/TLS2.der \
+  --reason certificateHold
+
+xipki-cli:unrevoke \
+  --ca SubCA1 \
+  --cert output/TLS2.der
+
 ## Revocate certificates
 xipki-cli:revoke \
   --ca SubCA1 \

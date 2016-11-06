@@ -1422,6 +1422,7 @@ class CertStoreQueryExecutor {
             X509Certificate cert = X509Util.parseCert(encodedCert);
             String certprofileName = certprofileStore.getName(certprofileId);
             X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
+            certWithMeta.setCertId(certId);
             X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta,
                     caCert, cert.getPublicKey().getEncoded(), certprofileName);
             if (!revoked) {

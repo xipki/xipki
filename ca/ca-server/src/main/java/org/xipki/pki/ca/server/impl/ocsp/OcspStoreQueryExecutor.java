@@ -188,14 +188,14 @@ class OcspStoreQueryExecutor {
         int issuerId = getIssuerId(issuer);
 
         BigInteger serialNumber = certificate.getCert().getSerialNumber();
-        boolean certRegistered = certRegistered(issuerId, serialNumber);
+        Long certRegisteredId = getCertId(issuerId, serialNumber);
 
-        if (!publishGoodCerts && !revoked && !certRegistered) {
+        if (!publishGoodCerts && !revoked && certRegisteredId != null) {
             return;
         }
 
-        if (certRegistered) {
-            updateRegisteredCert(issuer, certificate, revInfo);
+        if (certRegisteredId != null) {
+            updateRegisteredCert(certRegisteredId, revInfo);
             return;
         }
 
@@ -317,16 +317,11 @@ class OcspStoreQueryExecutor {
         }
     } // method addOrUpdateCert
 
-    private void updateRegisteredCert(final X509Cert issuer, final X509CertWithDbId certificate,
-            final CertRevocationInfo revInfo)
+    private void updateRegisteredCert(final long registeredCertId, final CertRevocationInfo revInfo)
     throws CertificateEncodingException, DataAccessException {
-        ParamUtil.requireNonNull("certificate", certificate);
-
         boolean revoked = (revInfo != null);
-        int issuerId = getIssuerId(issuer);
-        BigInteger serialNumber = certificate.getCert().getSerialNumber();
 
-        final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
+        final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
         long currentTimeSeconds = System.currentTimeMillis() / 1000;
 
@@ -349,8 +344,7 @@ class OcspStoreQueryExecutor {
                 ps.setNull(idx++, Types.INTEGER); // rev_invalidity_time
                 ps.setNull(idx++, Types.INTEGER); // rev_reason
             }
-            ps.setInt(idx++, issuerId);
-            ps.setString(idx++, serialNumber.toString(16));
+            ps.setLong(idx++, registeredCertId);
             ps.executeUpdate();
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
@@ -376,15 +370,14 @@ class OcspStoreQueryExecutor {
         }
 
         BigInteger serialNumber = cert.getCert().getSerialNumber();
-        boolean certRegistered = certRegistered(issuerId, serialNumber);
+        Long certRegisteredId = getCertId(issuerId, serialNumber);
 
-        if (!certRegistered) {
+        if (certRegisteredId == null) {
             return;
         }
 
         if (publishGoodCerts) {
-            final String sql =
-                    "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE IID=? AND SN=?";
+            final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             try {
@@ -394,8 +387,7 @@ class OcspStoreQueryExecutor {
                 ps.setNull(idx++, Types.INTEGER);
                 ps.setNull(idx++, Types.INTEGER);
                 ps.setNull(idx++, Types.INTEGER);
-                ps.setInt(idx++, issuerId);
-                ps.setString(idx++, serialNumber.toString(16));
+                ps.setLong(idx++, certRegisteredId);
                 ps.executeUpdate();
             } catch (SQLException ex) {
                 throw datasource.translate(sql, ex);
@@ -600,7 +592,11 @@ class OcspStoreQueryExecutor {
         return pss;
     } // method borrowPreparedStatements
 
-    private boolean certRegistered(final int issuerId, final BigInteger serialNumber)
+    /**
+     * Returns the database Id for the given issuer and serialNumber.
+     * @return the database table id if registered, <code>null</code> otherwise.
+     */
+    private Long getCertId(final int issuerId, final BigInteger serialNumber)
     throws DataAccessException {
         final String sql = sqlCertRegistered;
         ResultSet rs = null;
@@ -612,13 +608,13 @@ class OcspStoreQueryExecutor {
             ps.setInt(idx++, issuerId);
 
             rs = ps.executeQuery();
-            return rs.next();
+            return rs.next() ? rs.getLong("ID") : null;
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
         } finally {
             datasource.releaseResources(ps, rs);
         }
-    } // method certRegistered
+    } // method getCertId
 
     boolean isHealthy() {
         final String sql = "SELECT ID FROM ISSUER";
