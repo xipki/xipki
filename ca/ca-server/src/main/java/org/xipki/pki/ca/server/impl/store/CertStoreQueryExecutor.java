@@ -238,6 +238,10 @@ class CertStoreQueryExecutor {
 
         private final LruCache<Integer, String> cacheSqlRevokedCertsWithEe = new LruCache<>(5);
 
+        private final LruCache<Integer, String> cacheSqlSerials = new LruCache<>(5);
+
+        private final LruCache<Integer, String> cacheSqlSerialsRevoked = new LruCache<>(5);
+
         SQLs(final DataSourceWrapper datasource) {
             this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
@@ -335,6 +339,21 @@ class CertStoreQueryExecutor {
             return sql;
         }
 
+        String getSqlSerials(final int numEntries, final boolean onlyRevoked) {
+            LruCache<Integer, String> cache = onlyRevoked ? cacheSqlSerialsRevoked :
+                cacheSqlSerials;
+            String sql = cache.get(numEntries);
+            if (sql == null) {
+                String coreSql = "ID,SN FROM CERT WHERE ID>? AND CA_ID=?";
+                if (onlyRevoked) {
+                    coreSql += "AND REV=1";
+                }
+                sql = datasource.buildSelectFirstSql(coreSql, numEntries, "ID ASC");
+                cache.put(numEntries, sql);
+            }
+            return sql;
+        }
+
         String getSqlSerials(final int numEntries, final Date notExpiredAt,
                 final boolean onlyRevoked, final boolean withEe) {
             StringBuilder sb = new StringBuilder("ID,SN FROM CERT WHERE ID>? AND CA_ID=?");
@@ -349,6 +368,7 @@ class CertStoreQueryExecutor {
             }
             return datasource.buildSelectFirstSql(sb.toString(), numEntries, "ID ASC");
         }
+
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
@@ -1110,6 +1130,64 @@ class CertStoreQueryExecutor {
             releaseDbResources(ps, rs);
         }
     } // method containsCertificates
+
+    long getCountOfCerts(final X509Cert caCert, final boolean onlyRevoked)
+    throws DataAccessException, OperationException {
+        ParamUtil.requireNonNull("caCert", caCert);
+        final String sql;
+        if (onlyRevoked) {
+            sql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=? AND REV=1";
+        } else {
+            sql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=?";
+        }
+        int caId = getCaId(caCert);
+
+        ResultSet rs = null;
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        try {
+            ps.setInt(1, caId);
+            rs = ps.executeQuery();
+            rs.next();
+            return rs.getLong(1);
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            releaseDbResources(ps, rs);
+        }
+    }
+
+    List<SerialWithId> getSerialNumbers(final X509Cert caCert,  final long startId,
+            final int numEntries, final boolean onlyRevoked)
+    throws DataAccessException, OperationException {
+        ParamUtil.requireNonNull("caCert", caCert);
+        ParamUtil.requireMin("numEntries", numEntries, 1);
+
+        final String sql = sqls.getSqlSerials(numEntries, onlyRevoked);
+
+        int caId = getCaId(caCert);
+
+        ResultSet rs = null;
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        try {
+            int idx = 1;
+            ps.setLong(idx++, startId - 1);
+            ps.setInt(idx++, caId);
+            rs = ps.executeQuery();
+            List<SerialWithId> ret = new ArrayList<>();
+            while (rs.next() && ret.size() < numEntries) {
+                long id = rs.getLong("ID");
+                String serial = rs.getString("SN");
+                ret.add(new SerialWithId(id, new BigInteger(serial, 16)));
+            }
+            return ret;
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            releaseDbResources(ps, rs);
+        }
+    } // method getSerialNumbers
 
     List<SerialWithId> getSerialNumbers(final X509Cert caCert, final Date notExpiredAt,
             final long startId, final int numEntries, final boolean onlyRevoked,

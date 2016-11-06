@@ -40,7 +40,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.pki.ca.server.mgmt.shell.completer.CaNamePlusAllCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter;
 
 /**
@@ -55,9 +55,9 @@ public class RepublishCmd extends CaCommandSupport {
 
     @Option(name = "--ca",
             required = true,
-            description = "CA name or 'all' for all CAs\n"
+            description = "CA name\n"
                     + "(required)")
-    @Completion(CaNamePlusAllCompleter.class)
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--publisher",

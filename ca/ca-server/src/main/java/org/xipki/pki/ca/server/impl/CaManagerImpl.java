@@ -2176,28 +2176,17 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean republishCertificates(final String caName, final List<String> publisherNames)
     throws CaMgmtException {
+        ParamUtil.requireNonBlank("caName", caName);
         asssertMasterMode();
 
-        String tmpCaName = caName;
-        Set<String> caNames;
-        if (tmpCaName == null) {
-            caNames = x509cas.keySet();
-        } else {
-            tmpCaName = tmpCaName.toUpperCase();
-            caNames = new HashSet<>();
-            caNames.add(tmpCaName);
+        X509Ca ca = x509cas.get(caName);
+        if (ca == null) {
+            throw new CaMgmtException("could not find CA named " + caName);
         }
 
-        for (String name : caNames) {
-            X509Ca ca = x509cas.get(name);
-            if (ca == null) {
-                throw new CaMgmtException("could not find CA named " + name);
-            }
-
-            boolean successful = ca.republishCertificates(publisherNames);
-            if (!successful) {
-                throw new CaMgmtException("republishing certificates of CA " + name + " failed");
-            }
+        boolean successful = ca.republishCertificates(publisherNames);
+        if (!successful) {
+            throw new CaMgmtException("republishing certificates of CA " + caName + " failed");
         }
 
         return true;

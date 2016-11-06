@@ -381,6 +381,30 @@ public class CertificateStore {
         }
     }
 
+    public long getCountOfCerts(final X509Cert caCert, final boolean onlyRevoked)
+    throws OperationException {
+        try {
+            return queryExecutor.getCountOfCerts(caCert, onlyRevoked);
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+        }
+    }
+
+    public List<SerialWithId> getCertSerials(final X509Cert caCert, final long startId,
+            final int numEntries, final boolean onlyRevoked) throws OperationException {
+        try {
+            return queryExecutor.getSerialNumbers(caCert, startId, numEntries, onlyRevoked);
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+        }
+    }
+
     public List<SerialWithId> getCertSerials(final X509Cert caCert, final Date notExpiredAt,
             final long startId, final int numEntries, final boolean onlyRevoked,
             final boolean onlyCaCerts, final boolean onlyUserCerts) throws OperationException {

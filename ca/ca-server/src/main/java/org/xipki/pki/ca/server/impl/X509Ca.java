@@ -102,6 +102,7 @@ import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
 import org.xipki.commons.common.HealthCheckResult;
+import org.xipki.commons.common.ProcessLog;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.DateUtil;
@@ -1066,6 +1067,8 @@ public class X509Ca {
             }
         } // end for
 
+        ProcessLog processLog = null;
+
         try {
             X509Cert caCert = caInfo.getCertificate();
             for (IdentifiedX509CertPublisher publisher : publishers) {
@@ -1077,19 +1080,39 @@ public class X509Ca {
                 }
             }
 
-            Date notExpiredAt = null;
+            if (caInfo.getRevocationInfo() != null) {
+                for (IdentifiedX509CertPublisher publisher : publishers) {
+                    boolean successful = publisher.caRevoked(caInfo.getCertificate(),
+                            caInfo.getRevocationInfo());
+                    if (!successful) {
+                        LOG.error("republishing CA revocation to publisher {} failed",
+                                publisher.getName());
+                        return false;
+                    }
+                }
+            } // end if
+
+            long total;
+            try {
+                total = certstore.getCountOfCerts(caCert, onlyRevokedCerts);
+            } catch (OperationException ex) {
+                LogUtil.error(LOG, ex, "could not getCountOfCerts");
+                return false;
+            }
+            processLog = new ProcessLog(total);
+            processLog.printHeader();
 
             long startId = 1;
-            int numEntries = 100;
-
             List<SerialWithId> serials;
-            int sum = 0;
+            final int numEntries = 100;
+
             do {
                 try {
-                    serials = certstore.getCertSerials(caCert, notExpiredAt, startId, numEntries,
-                            onlyRevokedCerts, false, false);
+                    serials = certstore.getCertSerials(caCert, startId, numEntries,
+                            onlyRevokedCerts);
                 } catch (OperationException ex) {
                     LogUtil.error(LOG, ex);
+                    processLog.finish();
                     return false;
                 }
 
@@ -1122,28 +1145,19 @@ public class X509Ca {
                     }
                 } // end for
 
+                processLog.addNumProcessed(serials.size());
+                processLog.printStatus();
                 startId = maxId + 1;
-
-                sum += serials.size();
-                System.out.println("CA " + caName + " republished " + sum + " certificates");
             } while (serials.size() >= numEntries);
             // end do
-
-            if (caInfo.getRevocationInfo() != null) {
-                for (IdentifiedX509CertPublisher publisher : publishers) {
-                    boolean successful = publisher.caRevoked(caInfo.getCertificate(),
-                            caInfo.getRevocationInfo());
-                    if (!successful) {
-                        LOG.error("republishing CA revocation to publisher {} failed",
-                                publisher.getName());
-                        return false;
-                    }
-                }
-            } // end if
 
             return true;
         } finally {
             caInfo.setStatus(status);
+            if (processLog != null) {
+                processLog.finish();
+                processLog.printTrailer();
+            }
         }
     } // method republishCertificates
 
