@@ -59,8 +59,8 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
 
     @Option(name = "--profile", aliases = "-p",
             required = true,
-            description = "certificate profile\n"
-                    + "(required)")
+            description =  "certificate profile that allows duplication of public key\n"
+                + "(required)")
     private String certprofile;
 
     @Option(name = "--subject", aliases = "-s",
@@ -118,7 +118,6 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
         description.append("subjectTemplate: ").append(subjectTemplate).append("\n");
         description.append("profile: ").append(certprofile).append("\n");
         description.append("keyType: ").append(keyType).append("\n");
-        description.append("#certs/req: ").append(num).append("\n");
         description.append("maxRequests: ").append(maxRequests).append("\n");
         description.append("unit: ").append(num).append(" certificate");
         if (num > 1) {

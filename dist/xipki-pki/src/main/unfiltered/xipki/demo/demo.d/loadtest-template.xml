@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <enrollTemplate xmlns="http://xipki.org/pki/ca/client/loadtest/v2">
+  <!-- the certificate profile must allow duplication of public key -->
   <!--
   <enrollCert>
     <certprofile>certificate profile name</certprofile>
@@ -17,20 +18,14 @@
   </enrollCert>
   <enrollCert>
     <certprofile>TLS</certprofile>
-    <subject>CN=xipki.org,O=example PKI TLS RSA,OU=A,C=DE</subject>
-    <randomDN>O</randomDN>
-    <rsaKey modulusLength="2048"/>
-  </enrollCert>
-  <enrollCert>
-    <certprofile>TLSwithIncSN</certprofile>
-    <subject>CN=xipki.org,O=example PKI TLSwithIncSN DSA,C=DE</subject>
+    <subject>CN=xipki.org,O=example PKI TLS DSA,C=DE</subject>
     <randomDN>O</randomDN>
     <dsaKey pLength="2048"/>
   </enrollCert>
   <enrollCert>
-    <certprofile>TLS_C</certprofile>
-    <subject>CN=TLS Client Muster,O=example PKI TLS_C EC,C=DE</subject>
-    <randomDN>CN</randomDN>
+    <certprofile>TLS</certprofile>
+    <subject>CN=xipki.org,O=example PKI EC,C=DE</subject>
+    <randomDN>O</randomDN>
     <ecKey curve="secp256r1"/>
   </enrollCert>
 </enrollTemplate>

@@ -65,7 +65,7 @@ if { $printUsage equals "true" } {
       --key-type RSA \
       --subject "CN=xipki.org,O=example PKI company RSA,C=DE" \
       --profile TLS \
-      -n 4 \
+      -n 3 \
       --random-dn O \
       --duration $duration \
       --thread $threads

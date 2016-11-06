@@ -15,7 +15,13 @@
   </xs:complexType>
   <xs:complexType name="enrollCertType">
     <xs:sequence>
-      <xs:element name="certprofile" type="xs:string"/>
+      <xs:element name="certprofile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            The certprofile must allow duplication of public key.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element name="subject" type="xs:string"/>
       <xs:element name="randomDN" type="xs:string">
         <xs:annotation>

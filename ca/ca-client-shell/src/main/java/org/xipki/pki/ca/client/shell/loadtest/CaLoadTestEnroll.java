@@ -171,7 +171,7 @@ public class CaLoadTestEnroll extends LoadExecutor {
             long thisIndex = index.getAndIncrement();
             certTempBuilder.setSubject(loadtestEntry.getX500Name(thisIndex));
 
-            SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo(thisIndex);
+            SubjectPublicKeyInfo spki = loadtestEntry.getSubjectPublicKeyInfo();
             certTempBuilder.setPublicKey(spki);
             CertTemplate certTemplate = certTempBuilder.build();
             CertRequest certRequest = new CertRequest(certId, certTemplate, null);
