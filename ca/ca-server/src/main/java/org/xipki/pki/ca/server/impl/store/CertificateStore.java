@@ -118,6 +118,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -130,6 +131,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -142,6 +144,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -153,6 +156,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -165,6 +169,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -188,6 +193,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -211,6 +217,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -234,6 +241,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -246,6 +254,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -258,6 +267,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -281,6 +291,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -292,6 +303,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -303,6 +315,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -363,6 +376,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -377,6 +391,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -389,6 +404,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -401,6 +417,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -415,6 +432,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -427,6 +445,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -439,6 +458,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -463,6 +483,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -475,6 +496,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -487,6 +509,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -499,6 +522,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -511,6 +535,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -523,6 +548,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -534,6 +560,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -546,6 +573,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -562,6 +590,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -574,6 +603,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -586,6 +616,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -597,6 +628,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -606,6 +638,7 @@ public class CertificateStore {
         try {
             return queryExecutor.getLatestSerialNumber(nameWithSerialNumber);
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -619,6 +652,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -641,6 +675,7 @@ public class CertificateStore {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -660,8 +695,10 @@ public class CertificateStore {
         try {
             queryExecutor.addCa(caCert);
         } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -670,8 +707,10 @@ public class CertificateStore {
         try {
             queryExecutor.addRequestorName(name);
         } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -680,8 +719,10 @@ public class CertificateStore {
         try {
             queryExecutor.addPublisherName(name);
         } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -690,8 +731,10 @@ public class CertificateStore {
         try {
             queryExecutor.addCertprofileName(name);
         } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -725,8 +768,10 @@ public class CertificateStore {
         try {
             queryExecutor.deleteUnreferencedRequests();
         } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -735,8 +780,10 @@ public class CertificateStore {
         try {
             return queryExecutor.addRequest(request);
         } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
@@ -745,8 +792,10 @@ public class CertificateStore {
         try {
             queryExecutor.addRequestCert(requestId, certId);
         } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
         } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
     }
