@@ -56,7 +56,8 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
 
     @Option(name = "--template", aliases = "-t",
             required = true,
-            description = "template file\n"
+            description = "template file. Note the contained profiles must allow duplication of"
+                    + " public key \n"
                     + "(required)")
     @Completion(FilePathCompleter.class)
     private String templateFile;
@@ -86,7 +87,6 @@ public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {
 
         StringBuilder description = new StringBuilder(200);
         description.append("template: ").append(templateFile).append("\n");
-        description.append("#certs/req: ").append(size).append("\n");
         description.append("maxRequests: ").append(maxRequests).append("\n");
         description.append("unit: ").append(size).append(" certificate");
         if (size > 1) {

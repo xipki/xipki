@@ -154,8 +154,8 @@ public class LoadTestEntry {
         this.subject = new IncreasableSubject(subjectTemplate, randomDn);
     }
 
-    public SubjectPublicKeyInfo getSubjectPublicKeyInfo(final long index) {
-        return keyEntry.getSubjectPublicKeyInfo(index);
+    public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
+        return keyEntry.getSubjectPublicKeyInfo();
     }
 
     public X500Name getX500Name(final long index) {
