@@ -281,6 +281,22 @@
           </xs:all>
         </xs:complexType>
       </xs:element>
+      <xs:element name="ignoreExpiredCert" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to ignore the expired certificates. The default is true.
+            Whether this flag is considered depends on the store source.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ignoreNotYetValidCert" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to ignore the certificates that will be valid later. The default is true.
+            Whether this flag is considered depends on the store source.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element name="retentionInterval" type="xs:int" minOccurs="0">
         <xs:annotation>
           <xs:documentation>

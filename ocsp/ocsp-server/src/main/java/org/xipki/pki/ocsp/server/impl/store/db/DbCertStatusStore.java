@@ -225,7 +225,7 @@ public class DbCertStatusStore extends OcspStore {
 
                 initialized = false;
                 this.issuerStore = new IssuerStore(caInfos);
-                LOG.info("Updated CertStore: {}", getName());
+                LOG.info("Updated CertStore: {}", name);
                 initializationFailed = false;
                 initialized = true;
             } finally {
@@ -333,7 +333,12 @@ public class DbCertStatusStore extends OcspStore {
                     long timeInSec = time.getTime() / 1000;
                     long notBeforeInSec = rs.getLong("NBEFORE");
                     long notAfterInSec = rs.getLong("NAFTER");
-                    if (timeInSec < notBeforeInSec || timeInSec > notAfterInSec) {
+
+                    if (!ignore && ignoreExpiredCert && timeInSec > notAfterInSec) {
+                        ignore = true;
+                    }
+
+                    if (!ignore && ignoreNotYetValidCert && timeInSec < notBeforeInSec) {
                         ignore = true;
                     }
 
@@ -363,7 +368,7 @@ public class DbCertStatusStore extends OcspStore {
             }
 
             if (unknown) {
-                if (isUnknownSerialAsGood()) {
+                if (unknownSerialAsGood) {
                     certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null,
                             thisUpdate, null, null);
                 } else {
@@ -394,8 +399,7 @@ public class DbCertStatusStore extends OcspStore {
                 }
             }
 
-            if (isIncludeArchiveCutoff()) {
-                int retentionInterval = getRetentionInterval();
+            if (includeArchiveCutoff) {
                 if (retentionInterval != 0) {
                     Date date;
                     // expired certificate remains in status store for ever

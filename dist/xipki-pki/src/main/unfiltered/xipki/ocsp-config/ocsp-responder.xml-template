@@ -59,6 +59,8 @@
 #cacerts.excludes=cacert2.der,cacert3.der
         </conf>
       </source>
+      <ignoreExpiredCert>true</ignoreExpiredCert>
+      <ignoreNotYetValidCert>true</ignoreNotYetValidCert>
       <retentionInterval>-1</retentionInterval>
       <unknownSerialAsGood>false</unknownSerialAsGood>
       <includeArchiveCutoff>true</includeArchiveCutoff>
@@ -101,6 +103,8 @@ caCert.file = output/SubCAwithCRL1.der
 certs.dir = output
         </conf>
       </source>
+      <ignoreExpiredCert>true</ignoreExpiredCert>
+      <ignoreNotYetValidCert>true</ignoreNotYetValidCert>
       <retentionInterval>0</retentionInterval>
       <unknownSerialAsGood>true</unknownSerialAsGood>
       <includeArchiveCutoff>false</includeArchiveCutoff>

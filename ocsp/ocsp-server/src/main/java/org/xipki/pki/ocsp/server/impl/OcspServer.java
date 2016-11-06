@@ -1199,6 +1199,9 @@ public class OcspServer {
         store.setIncludeArchiveCutoff(getBoolean(conf.isIncludeArchiveCutoff(), true));
         store.setIncludeCrlId(getBoolean(conf.isIncludeCrlID(), true));
 
+        store.setIgnoreExpiredCert(getBoolean(conf.isIgnoreExpiredCert(), true));
+        store.setIgnoreNotYetValidCert(getBoolean(conf.isIgnoreNotYetValidCert(), true));
+
         String datasourceName = conf.getSource().getDatasource();
         DataSourceWrapper datasource = null;
         if (datasourceName != null) {

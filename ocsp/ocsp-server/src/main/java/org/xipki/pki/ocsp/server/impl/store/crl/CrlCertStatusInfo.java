@@ -85,24 +85,12 @@ class CrlCertStatusInfo {
         return certprofile;
     }
 
-    boolean isValid(Date time) {
-        if (notBefore == null && notAfter == null) {
-            return true;
-        }
+    boolean isExpired(Date time) {
+        return (notAfter == null) ? true : time.after(notAfter);
+    }
 
-        if (notBefore != null) {
-            if (time.before(notBefore)) {
-                return false;
-            }
-        }
-
-        if (notAfter != null) {
-            if (time.after(notAfter)) {
-                return false;
-            }
-        }
-
-        return true;
+    boolean isNotYetValid(Date time) {
+        return (notBefore == null) ? true : time.before(notBefore);
     }
 
     CertStatusInfo getCertStatusInfo(final HashAlgoType hashAlgo, final Date thisUpdate,

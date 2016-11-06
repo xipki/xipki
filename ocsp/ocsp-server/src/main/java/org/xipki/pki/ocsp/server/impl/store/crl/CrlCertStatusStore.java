@@ -515,7 +515,7 @@ public class CrlCertStatusStore extends OcspStore {
             this.initializationFailed = false;
             this.initialized = true;
             updateCrlSuccessful = true;
-            LOG.info("updated CertStore {}", getName());
+            LOG.info("updated CertStore {}", name);
         } catch (Exception ex) {
             LogUtil.error(LOG, ex, "could not execute initializeStore()");
             initializationFailed = true;
@@ -641,10 +641,8 @@ public class CrlCertStatusStore extends OcspStore {
         CrlCertStatusInfo crlCertStatusInfo = certStatusInfoMap.get(serialNumber);
 
         if (crlCertStatusInfo != null) {
-            boolean ignore = false;
-            if (!crlCertStatusInfo.isValid(time)) {
-                ignore = true;
-            }
+            boolean ignore = (ignoreExpiredCert && crlCertStatusInfo.isExpired(time))
+                    || (ignoreNotYetValidCert && crlCertStatusInfo.isNotYetValid(time));
 
             if (!ignore) {
                 String profileName = crlCertStatusInfo.getCertprofile();
@@ -661,7 +659,7 @@ public class CrlCertStatusStore extends OcspStore {
             }
         } else {
             // SerialNumber is unknown
-            if (isUnknownSerialAsGood()) {
+            if (unknownSerialAsGood) {
                 certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(null, null, tmpThisUpdate,
                         tmpNextUpdate, null);
             } else {
@@ -670,12 +668,11 @@ public class CrlCertStatusStore extends OcspStore {
             }
         }
 
-        if (isIncludeCrlId()) {
+        if (includeCrlId) {
             certStatusInfo.setCrlId(crlId);
         }
 
-        if (isIncludeArchiveCutoff()) {
-            int retentionInterval = getRetentionInterval();
+        if (includeArchiveCutoff) {
             Date date;
             if (retentionInterval != 0) {
                 // expired certificate remains in status store for ever

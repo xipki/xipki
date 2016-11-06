@@ -57,17 +57,21 @@ public abstract class OcspStore {
 
     protected static final long DAY = 24L * 60 * 60 * 1000;
 
-    private String name;
+    protected String name;
 
-    private boolean unknownSerialAsGood;
+    protected boolean unknownSerialAsGood;
 
-    private int retentionInterval;
+    protected int retentionInterval;
 
-    private boolean includeArchiveCutoff;
+    protected boolean includeArchiveCutoff;
 
-    private boolean includeCrlId;
+    protected boolean includeCrlId;
 
-    private AuditServiceRegister auditServiceRegister;
+    protected boolean ignoreExpiredCert;
+
+    protected boolean ignoreNotYetValidCert;
+
+    protected AuditServiceRegister auditServiceRegister;
 
     public OcspStore() {
     }
@@ -139,6 +143,22 @@ public abstract class OcspStore {
 
     public void setIncludeCrlId(final boolean includeCrlId) {
         this.includeCrlId = includeCrlId;
+    }
+
+    public boolean isIgnoreExpiredCert() {
+        return ignoreExpiredCert;
+    }
+
+    public void setIgnoreExpiredCert(boolean ignoreExpiredCert) {
+        this.ignoreExpiredCert = ignoreExpiredCert;
+    }
+
+    public boolean isIgnoreNotYetValidCert() {
+        return ignoreNotYetValidCert;
+    }
+
+    public void setIgnoreNotYetValidCert(boolean ignoreNotYetValidCert) {
+        this.ignoreNotYetValidCert = ignoreNotYetValidCert;
     }
 
 }
