@@ -2174,9 +2174,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method publishRootCa
 
     @Override
-    public boolean republishCertificates(final String caName, final List<String> publisherNames)
-    throws CaMgmtException {
+    public boolean republishCertificates(final String caName, final List<String> publisherNames,
+            final int numThreads) throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
+        ParamUtil.requireMin("numThreads", numThreads, 1);
         asssertMasterMode();
 
         X509Ca ca = x509cas.get(caName);
@@ -2184,7 +2185,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException("could not find CA named " + caName);
         }
 
-        boolean successful = ca.republishCertificates(publisherNames);
+        boolean successful = ca.republishCertificates(publisherNames, numThreads);
         if (!successful) {
             throw new CaMgmtException("republishing certificates of CA " + caName + " failed");
         }

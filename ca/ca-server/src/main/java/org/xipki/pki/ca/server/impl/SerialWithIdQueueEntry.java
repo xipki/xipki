@@ -32,12 +32,26 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool;
+package org.xipki.pki.ca.server.impl;
+
+import org.xipki.commons.common.QueueEntry;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.1.0
  */
 
-public interface QueueEntry {
+class SerialWithIdQueueEntry implements QueueEntry {
+
+    private final SerialWithId serialWithId;
+
+    public SerialWithIdQueueEntry(final SerialWithId serialWithId) {
+        this.serialWithId = ParamUtil.requireNonNull("serialWithId", serialWithId);
+    }
+
+    public SerialWithId getSerialWithId() {
+        return serialWithId;
+    }
+
 }

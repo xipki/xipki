@@ -72,8 +72,8 @@ public interface CaManager {
     boolean publishRootCa(@Nonnull String caName, @Nonnull String certprofile)
     throws CaMgmtException;
 
-    boolean republishCertificates(@Nullable String caName, @Nullable List<String> publisherNames)
-    throws CaMgmtException;
+    boolean republishCertificates(@Nullable String caName, @Nullable List<String> publisherNames,
+            int numThreads) throws CaMgmtException;
 
     boolean clearPublishQueue(@Nullable String caName, @Nullable List<String> publisherNames)
     throws CaMgmtException;

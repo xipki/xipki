@@ -32,59 +32,18 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.dbtool.diffdb.io;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import org.xipki.commons.common.QueueEntry;
+package org.xipki.commons.common;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class DigestDbEntrySet implements QueueEntry, Comparable<DigestDbEntrySet> {
+public class EndOfQueue implements QueueEntry {
 
-    private final long startId;
+    public static final EndOfQueue INSTANCE = new EndOfQueue();
 
-    private Exception exception;
-
-    private List<IdentifiedDbDigestEntry> entries = new LinkedList<>();
-
-    public DigestDbEntrySet(final long startId) {
-        this.startId = startId;
-    }
-
-    public void setException(final Exception exception) {
-        this.exception = exception;
-    }
-
-    public Exception getException() {
-        return exception;
-    }
-
-    public void addEntry(final IdentifiedDbDigestEntry entry) {
-        entries.add(entry);
-    }
-
-    public long getStartId() {
-        return startId;
-    }
-
-    public List<IdentifiedDbDigestEntry> getEntries() {
-        return entries;
-    }
-
-    @Override
-    public int compareTo(DigestDbEntrySet obj) {
-        if (startId < obj.startId) {
-            return -1;
-        } else if (startId == obj.startId) {
-            return 0;
-        } else {
-            return 1;
-        }
+    private EndOfQueue() {
     }
 
 }

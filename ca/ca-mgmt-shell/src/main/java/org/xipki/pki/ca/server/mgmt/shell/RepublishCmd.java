@@ -53,6 +53,10 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNamePlusAllComplete
 @Service
 public class RepublishCmd extends CaCommandSupport {
 
+    @Option(name = "--thread",
+            description = "number of threads")
+    private Integer numThreads = 5;
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
@@ -88,7 +92,7 @@ public class RepublishCmd extends CaCommandSupport {
             caName = null;
         }
 
-        boolean bo = caManager.republishCertificates(caName, publisherNames);
+        boolean bo = caManager.republishCertificates(caName, publisherNames, numThreads);
         output(bo, "republished", "could not republish", "certificates");
         return null;
     }
