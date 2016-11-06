@@ -40,18 +40,18 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
 import java.security.interfaces.DSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPublicKeySpec;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
@@ -60,7 +60,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.commons.security.util.KeyUtil;
-import org.xipki.commons.security.util.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -91,14 +90,12 @@ public abstract class KeyEntry {
         public SubjectPublicKeyInfo getSubjectPublicKeyInfo(final long index) {
             BigInteger modulus = baseN.add(BigInteger.valueOf(index));
 
+            AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(
+                    PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE);
+            RSAPublicKey publicKey = new RSAPublicKey(modulus, BigInteger.valueOf(65537));
+
             try {
-                RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, BigInteger.valueOf(65537));
-                return SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
-                        SignerUtil.generateRSAPublicKeyParameter(
-                                KeyUtil.generateRSAPublicKey(keySpec)));
-            } catch (InvalidKeySpecException ex) {
-                throw new RuntimeException(
-                        "InvalidKeySpecException while constructing SubjectPublicKeyInfo", ex);
+                return new SubjectPublicKeyInfo(keyAlgId, publicKey);
             } catch (IOException ex) {
                 throw new RuntimeException(
                         "IOException while constructing SubjectPublicKeyInfo", ex);
