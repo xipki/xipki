@@ -40,7 +40,6 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -76,12 +75,6 @@ import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 public class CertificateStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(CertificateStore.class);
-
-    private final ConcurrentSkipListSet<Long> publicKeyCertsInProcess
-        = new ConcurrentSkipListSet<>();
-
-    private final ConcurrentSkipListSet<Long> subjectCertsInProcess
-        = new ConcurrentSkipListSet<>();
 
     private final CertStoreQueryExecutor queryExecutor;
 
@@ -737,31 +730,6 @@ public class CertificateStore {
             LOG.debug("RuntimeException", ex);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }
-    }
-
-    /**
-     * add the certificate in process to list.
-     * @param fpKey Fingerprint of public key
-     * @param fpSubject Fingerprint of subject
-     * @return 0 if added, 1 if <code>fpKey</code> already exists, 2 if <code>fpSubject</code>
-     *     already exists
-     */
-    public int addCertInProcess(final long fpKey, final long fpSubject) {
-        if (!publicKeyCertsInProcess.add(fpKey)) {
-            return 1;
-        }
-
-        if (!subjectCertsInProcess.add(fpSubject)) {
-            publicKeyCertsInProcess.remove(fpKey);
-            return 2;
-        }
-
-        return 0;
-    }
-
-    public void delteCertInProcess(final long fpKey, final long fpSubject) {
-        publicKeyCertsInProcess.remove(fpKey);
-        subjectCertsInProcess.remove(fpSubject);
     }
 
     public void deleteUnreferencedRequests() throws OperationException {

@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -440,6 +441,12 @@ public class X509Ca {
     private ScheduledFuture<?> suspendedCertsRevoker;
 
     private AuditServiceRegister auditServiceRegister;
+
+    private final ConcurrentSkipListSet<Long> publicKeyCertsInProcess
+        = new ConcurrentSkipListSet<>();
+
+    private final ConcurrentSkipListSet<Long> subjectCertsInProcess
+        = new ConcurrentSkipListSet<>();
 
     public X509Ca(final CaManagerImpl caManager, final X509CaInfo caInfo,
             final CertificateStore certstore, final SecurityFactory securityFactory,
@@ -1805,12 +1812,22 @@ public class X509Ca {
 
         adaptGrantedSubejct(gct);
 
-        int code = certstore.addCertInProcess(gct.fpPublicKey, gct.fpSubject);
-        if (code != 0) {
-            if (code == 1) {
+        IdentifiedX509Certprofile certprofile = gct.certprofile;
+
+        boolean publicKeyCertInProcessExisted = publicKeyCertsInProcess.add(gct.fpPublicKey);
+        if (publicKeyCertInProcessExisted) {
+            if (!certprofile.isDuplicateKeyPermitted()) {
                 throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                    "certificate with the given public key already in process");
-            } else {
+                        "certificate with the given public key already in process");
+            }
+        }
+
+        if (subjectCertsInProcess.add(gct.fpSubject)) {
+            if (!certprofile.isDuplicateSubjectPermitted()) {
+                if (!publicKeyCertInProcessExisted) {
+                    publicKeyCertsInProcess.remove(gct.fpPublicKey);
+                }
+
                 throw new OperationException(ErrorCode.ALREADY_ISSUED,
                         "certificate with the given subject " + gct.grantedSubjectText
                         + " already in process");
@@ -1829,7 +1846,7 @@ public class X509Ca {
                 X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
                 X509Certificate crlSignerCert = (crlSigner == null) ? null : crlSigner.getCert();
 
-                ExtensionValues extensionTuples = gct.certprofile.getExtensions(
+                ExtensionValues extensionTuples = certprofile.getExtensions(
                         gct.requestedSubject, gct.grantedSubject, gct.extensions,
                         gct.grantedPublicKey, caInfo.getPublicCaInfo(), crlSignerCert,
                         gct.grantedNotBefore, gct.grantedNotAfter);
@@ -1894,7 +1911,8 @@ public class X509Ca {
 
             return ret;
         } finally {
-            certstore.delteCertInProcess(gct.fpPublicKey, gct.fpSubject);
+            publicKeyCertsInProcess.remove(gct.fpPublicKey);
+            subjectCertsInProcess.remove(gct.fpSubject);
         }
     } // method doGenerateCertificate
 
