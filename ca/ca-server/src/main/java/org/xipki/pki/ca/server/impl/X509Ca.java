@@ -566,22 +566,22 @@ public class X509Ca {
         }
     } // method getCrl
 
-    private void cleanupCrlsWithoutException()
+    private void cleanupCrlsWithoutException(final String msgId)
     throws OperationException {
         try {
-            cleanupCrls();
+            cleanupCrls(msgId);
         } catch (Throwable th) {
             LOG.warn("could not cleanup CRLs.{}: {}", th.getClass().getName(), th.getMessage());
         }
     }
 
-    private void cleanupCrls() throws OperationException {
+    private void cleanupCrls(final String msgId) throws OperationException {
         String caName = getCaName();
         int numCrls = caInfo.getNumCrls();
         LOG.info("     START cleanupCrls: ca={}, numCrls={}", caName, numCrls);
 
         boolean successful = false;
-        AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_cleanup_CRL, null);
+        AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_cleanup_CRL, msgId);
 
         try {
             int num = (numCrls <= 0) ? 0
@@ -640,7 +640,7 @@ public class X509Ca {
         boolean successful = false;
         AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_CRL, msgId);
         try {
-            X509CRL crl = doGenerateCrl(deltaCrl, thisUpdate, nextUpdate, event);
+            X509CRL crl = doGenerateCrl(deltaCrl, thisUpdate, nextUpdate, event, msgId);
             successful = true;
             return crl;
         } finally {
@@ -649,7 +649,8 @@ public class X509Ca {
     }
 
     private X509CRL doGenerateCrl(final boolean deltaCrl, final Date thisUpdate,
-            final Date nextUpdate, final AuditEvent event) throws OperationException {
+            final Date nextUpdate, final AuditEvent event, final String msgId)
+    throws OperationException {
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
         if (crlSigner == null) {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
@@ -858,7 +859,7 @@ public class X509Ca {
 
                 if (!deltaCrl) {
                     // clean up the CRL
-                    cleanupCrlsWithoutException();
+                    cleanupCrlsWithoutException(msgId);
                 }
                 return crl;
             } catch (CRLException ex) {
