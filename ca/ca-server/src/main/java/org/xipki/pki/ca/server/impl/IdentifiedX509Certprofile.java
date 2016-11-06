@@ -34,8 +34,6 @@
 
 package org.xipki.pki.ca.server.impl;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Date;
@@ -75,6 +73,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.ExtensionExistence;
+import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.KeyUsage;
 import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.util.X509Util;
@@ -164,7 +163,6 @@ class IdentifiedX509Certprofile {
 
         REQUIRED_EE_EXTENSION_TYPES = new HashSet<>();
         REQUIRED_EE_EXTENSION_TYPES.add(Extension.authorityKeyIdentifier);
-        REQUIRED_EE_EXTENSION_TYPES.add(Extension.basicConstraints);
         REQUIRED_EE_EXTENSION_TYPES.add(Extension.subjectKeyIdentifier);
     } // end static
 
@@ -299,16 +297,8 @@ class IdentifiedX509Certprofile {
         ASN1ObjectIdentifier extType = Extension.subjectKeyIdentifier;
         ExtensionControl extControl = controls.remove(extType);
         if (extControl != null && addMe(extType, extControl, neededExtTypes, wantedExtTypes)) {
-            MessageDigest sha1;
-            try {
-                sha1 = MessageDigest.getInstance("SHA-1");
-            } catch (NoSuchAlgorithmException ex) {
-                throw new CertprofileException(ex.getMessage(), ex);
-            }
-            sha1.reset();
-
             byte[] encodedSpki = publicKeyInfo.getPublicKeyData().getBytes();
-            byte[] skiValue = sha1.digest(encodedSpki);
+            byte[] skiValue = HashAlgoType.SHA1.hash(encodedSpki);
             SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
             addExtension(values, extType, value, extControl, neededExtTypes, wantedExtTypes);
         }
