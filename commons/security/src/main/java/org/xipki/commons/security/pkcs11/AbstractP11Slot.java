@@ -138,7 +138,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     protected abstract P11Identity doGenerateRSAKeypair(int keysize,
             @Nonnull BigInteger publicExponent, @Nonnull String label) throws P11TokenException;
 
-    protected abstract P11SlotRefreshResult doRefresh(P11MechanismFilter mechanismFilter)
+    protected abstract P11SlotRefreshResult doRefresh()
     throws P11TokenException;
 
     protected abstract void doRemoveCerts(final P11ObjectIdentifier objectId)
@@ -208,13 +208,17 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     public void refresh() throws P11TokenException {
-        P11SlotRefreshResult res = doRefresh(mechanismFilter); // CHECKSTYLE:SKIP
+        P11SlotRefreshResult res = doRefresh(); // CHECKSTYLE:SKIP
 
         mechanisms.clear();
         certificates.clear();
         identities.clear();
 
-        mechanisms.addAll(res.getMechanisms());
+        for (Long mech : res.getMechanisms()) {
+            if (mechanismFilter.isMechanismPermitted(slotId, mech)) {
+                mechanisms.add(mech);
+            }
+        }
         certificates.putAll(res.getCertificates());
         identities.putAll(res.getIdentities());
 
@@ -446,7 +450,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         doAddCert(objectId, cert);
         certificates.put(objectId, new X509Cert(cert));
         updateCaCertsOfIdentities();
-        LOG.info("added certifiate {}", objectId);
+        LOG.info("added certificate {}", objectId);
     }
 
     protected byte[] generateId() throws P11TokenException {
@@ -534,7 +538,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     @Override
     public P11ObjectIdentifier generateDSAKeypair(final int plength, final int qlength,
             final String label) throws P11TokenException {
-        ParamUtil.requireMin("pLength", plength, 1024);
+        ParamUtil.requireMin("plength", plength, 1024);
         if (plength % 1024 != 0) {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
         }
