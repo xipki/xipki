@@ -90,7 +90,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11SlotRefreshResult doRefresh(final P11MechanismFilter mechanismFilter)
+    protected P11SlotRefreshResult doRefresh()
     throws P11TokenException {
         P11SlotRefreshResult refreshResult = new P11SlotRefreshResult();
 

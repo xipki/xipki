@@ -195,7 +195,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11SlotRefreshResult doRefresh(final P11MechanismFilter mechanismFilter)
+    protected P11SlotRefreshResult doRefresh()
     throws P11TokenException {
         Mechanism[] mechanisms;
         try {
@@ -207,10 +207,7 @@ class IaikP11Slot extends AbstractP11Slot {
         P11SlotRefreshResult ret = new P11SlotRefreshResult();
         if (mechanisms != null) {
             for (Mechanism mech : mechanisms) {
-                long code = mech.getMechanismCode();
-                if (mechanismFilter.isMechanismPermitted(slotId, code)) {
-                    ret.addMechanism(code);
-                }
+                ret.addMechanism(mech.getMechanismCode());
             }
         }
 
