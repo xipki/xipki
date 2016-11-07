@@ -110,7 +110,7 @@ class PrivateKeyCryptor {
         } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(keyAlgOid)) {
             algoName = "EC";
         } else {
-            throw new P11TokenException("unkown private key algorithm " + keyAlgOid.getId());
+            throw new P11TokenException("unknown private key algorithm " + keyAlgOid.getId());
         }
 
         try {
