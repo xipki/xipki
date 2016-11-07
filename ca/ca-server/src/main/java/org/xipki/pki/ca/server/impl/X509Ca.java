@@ -58,11 +58,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -106,10 +102,7 @@ import org.xipki.commons.audit.api.AuditLevel;
 import org.xipki.commons.audit.api.AuditService;
 import org.xipki.commons.audit.api.AuditServiceRegister;
 import org.xipki.commons.audit.api.AuditStatus;
-import org.xipki.commons.common.EndOfQueue;
 import org.xipki.commons.common.HealthCheckResult;
-import org.xipki.commons.common.ProcessLog;
-import org.xipki.commons.common.QueueEntry;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.DateUtil;
@@ -415,153 +408,6 @@ public class X509Ca {
         } // method run
 
     } // class ScheduledSuspendedCertsRevoker
-
-    private class CertRepublishProducer implements Runnable {
-
-        private final X509Cert caCert;
-
-        private final BlockingQueue<QueueEntry> queue;
-
-        private final AtomicBoolean stopMe;
-
-        private final boolean onlyRevokedCerts;
-
-        private boolean failed;
-
-        public CertRepublishProducer(final X509Cert caCert, final BlockingQueue<QueueEntry> queue,
-                final boolean onlyRevokedCerts, final AtomicBoolean stopMe) {
-            this.caCert = caCert;
-            this.queue = queue;
-            this.onlyRevokedCerts = onlyRevokedCerts;
-            this.stopMe = stopMe;
-        }
-
-        public boolean isFailed() {
-            return failed;
-        }
-
-        @Override
-        public void run() {
-            final int numEntries = 100;
-            long startId = 1;
-
-            try {
-                List<SerialWithId> serials;
-                do {
-                    serials = certstore.getCertSerials(caCert, startId, numEntries,
-                            onlyRevokedCerts);
-                    long maxId = 1;
-                    for (SerialWithId sid : serials) {
-                        if (sid.getId() > maxId) {
-                            maxId = sid.getId();
-                        }
-                        queue.put(new SerialWithIdQueueEntry(sid));
-                    }
-
-                    startId = maxId + 1;
-                } while (serials.size() >= numEntries && !failed && !stopMe.get());
-
-                queue.put(EndOfQueue.INSTANCE);
-            } catch (OperationException ex) {
-                LogUtil.error(LOG, ex, "error in RepublishProducer");
-                failed = true;
-            } catch (InterruptedException ex) {
-                LogUtil.error(LOG, ex, "error in RepublishProducer");
-                failed = true;
-            }
-
-            if (!queue.contains(EndOfQueue.INSTANCE)) {
-                try {
-                    queue.put(EndOfQueue.INSTANCE);
-                } catch (InterruptedException ex) {
-                    LogUtil.error(LOG, ex, "error in RepublishProducer");
-                    failed = true;
-                }
-            }
-        }
-    }
-
-    private class CertRepublishConsumer implements Runnable {
-
-        private final X509Cert caCert;
-
-        private final List<IdentifiedX509CertPublisher> publishers;
-
-        private final BlockingQueue<QueueEntry> queue;
-
-        private final ProcessLog processLog;
-
-        private boolean failed;
-
-        public CertRepublishConsumer(final X509Cert caCert,
-                final List<IdentifiedX509CertPublisher> publishers,
-                final BlockingQueue<QueueEntry> queue, final ProcessLog processLog) {
-            this.caCert = caCert;
-            this.publishers = publishers;
-            this.queue = queue;
-            this.processLog = processLog;
-        }
-
-        public boolean isFailed() {
-            return failed;
-        }
-
-        @Override
-        public void run() {
-            while (!failed) {
-                QueueEntry entry;
-                try {
-                    entry = queue.take();
-                } catch (InterruptedException ex) {
-                    LogUtil.error(LOG, ex, "could not take from queue");
-                    failed = true;
-                    break;
-                }
-
-                if (entry instanceof EndOfQueue) {
-                    // re-add it to queue so that other consumers know it
-                    try {
-                        queue.put(entry);
-                    } catch (InterruptedException ex) {
-                        LogUtil.warn(LOG, ex, "could not re-add EndOfQueue to queue");
-                    }
-                    break;
-                }
-
-                SerialWithId sid = ((SerialWithIdQueueEntry) entry).getSerialWithId();
-
-                X509CertificateInfo certInfo;
-
-                try {
-                    certInfo = certstore.getCertificateInfoForId(caCert, sid.getId());
-                } catch (OperationException | CertificateException ex) {
-                    LogUtil.error(LOG, ex);
-                    failed = true;
-                    break;
-                }
-
-                boolean allSucc = true;
-                for (IdentifiedX509CertPublisher publisher : publishers) {
-                    if (!certInfo.isRevoked() && !publisher.publishsGoodCert()) {
-                        continue;
-                    }
-
-                    boolean successful = publisher.certificateAdded(certInfo);
-                    if (!successful) {
-                        LOG.error("republish certificate serial={} to publisher {} failed",
-                                LogUtil.formatCsn(sid.getSerial()), publisher.getName());
-                        allSucc = false;
-                    }
-                }
-
-                if (!allSucc) {
-                    break;
-                }
-                processLog.addNumProcessed(1);
-            }
-        }
-
-    }
 
     private static final long MS_PER_SECOND = 1000L;
 
@@ -1227,8 +1073,6 @@ public class X509Ca {
             }
         } // end for
 
-        ProcessLog processLog = null;
-
         try {
             X509Cert caCert = caInfo.getCertificate();
             for (IdentifiedX509CertPublisher publisher : publishers) {
@@ -1252,97 +1096,11 @@ public class X509Ca {
                 }
             } // end if
 
-            long total;
-            try {
-                total = certstore.getCountOfCerts(caCert, onlyRevokedCerts);
-            } catch (OperationException ex) {
-                LogUtil.error(LOG, ex, "could not getCountOfCerts");
-                return false;
-            }
-            processLog = new ProcessLog(total);
-            processLog.printHeader();
-
-            final BlockingQueue<QueueEntry> queue = new ArrayBlockingQueue<>(1000);
-            ExecutorService executor = Executors.newFixedThreadPool(numThreads + 1);
-            List<CertRepublishConsumer> consumers = new ArrayList<>(numThreads);
-            AtomicBoolean stopMe = new AtomicBoolean(false);
-            for (int i = 0; i < numThreads; i++) {
-                CertRepublishConsumer consumer = new CertRepublishConsumer(caCert, publishers,
-                        queue, processLog);
-                consumers.add(consumer);
-            }
-
-            CertRepublishProducer producer = new CertRepublishProducer(caCert, queue,
-                    onlyRevokedCerts, stopMe);
-
-            executor.execute(producer);
-            for (CertRepublishConsumer consumer : consumers) {
-                executor.execute(consumer);
-            }
-
-            executor.shutdown();
-            boolean successful = true;
-
-            while (true) {
-                processLog.printStatus();
-
-                if (successful) {
-                    if (producer.isFailed()) {
-                        successful = false;
-                    }
-
-                    if (successful) {
-                        for (CertRepublishConsumer consumer : consumers) {
-                            if (consumer.isFailed()) {
-                                successful = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!successful) {
-                        stopMe.set(true);
-                        LOG.warn("failed");
-                    }
-                }
-
-                try {
-                    boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-                    if (terminated) {
-                        break;
-                    }
-                } catch (InterruptedException ex) {
-                    stopMe.set(true);
-                    LogUtil.warn(LOG, ex, "interrupted: " + ex.getMessage());
-                }
-            }
-
-            if (successful) {
-                if (producer.isFailed()) {
-                    successful = false;
-                }
-
-                if (successful) {
-                    for (CertRepublishConsumer consumer : consumers) {
-                        if (consumer.isFailed()) {
-                            successful = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (!successful) {
-                    LOG.warn("failed");
-                }
-            }
-
-            return successful;
+            CertRepublisher republisher = new CertRepublisher(caCert, certstore, publishers,
+                    onlyRevokedCerts, numThreads);
+            return republisher.republish();
         } finally {
             caInfo.setStatus(status);
-            if (processLog != null) {
-                processLog.finish();
-                processLog.printTrailer();
-            }
         }
     } // method republishCertificates
 
