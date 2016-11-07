@@ -442,33 +442,32 @@ public class X509Ca {
 
         @Override
         public void run() {
-            while (!failed && !stopMe.get()) {
-                try {
-                    final int numEntries = 100;
-                    long startId = 1;
-                    List<SerialWithId> serials;
-                    do {
-                        serials = certstore.getCertSerials(caCert, startId, numEntries,
-                                onlyRevokedCerts);
-                        long maxId = 1;
-                        for (SerialWithId sid : serials) {
-                            if (sid.getId() > maxId) {
-                                maxId = sid.getId();
-                            }
-                            queue.put(new SerialWithIdQueueEntry(sid));
+            final int numEntries = 100;
+            long startId = 1;
+
+            try {
+                List<SerialWithId> serials;
+                do {
+                    serials = certstore.getCertSerials(caCert, startId, numEntries,
+                            onlyRevokedCerts);
+                    long maxId = 1;
+                    for (SerialWithId sid : serials) {
+                        if (sid.getId() > maxId) {
+                            maxId = sid.getId();
                         }
+                        queue.put(new SerialWithIdQueueEntry(sid));
+                    }
 
-                        startId = maxId + 1;
-                    } while (serials.size() >= numEntries);
+                    startId = maxId + 1;
+                } while (serials.size() >= numEntries && !failed && !stopMe.get());
 
-                    queue.put(EndOfQueue.INSTANCE);
-                } catch (OperationException ex) {
-                    LogUtil.error(LOG, ex, "error in RepublishProducer");
-                    failed = true;
-                } catch (InterruptedException ex) {
-                    LogUtil.error(LOG, ex, "error in RepublishProducer");
-                    failed = true;
-                }
+                queue.put(EndOfQueue.INSTANCE);
+            } catch (OperationException ex) {
+                LogUtil.error(LOG, ex, "error in RepublishProducer");
+                failed = true;
+            } catch (InterruptedException ex) {
+                LogUtil.error(LOG, ex, "error in RepublishProducer");
+                failed = true;
             }
 
             if (!queue.contains(EndOfQueue.INSTANCE)) {
@@ -490,19 +489,16 @@ public class X509Ca {
 
         private final BlockingQueue<QueueEntry> queue;
 
-        private final AtomicBoolean stopMe;
-
         private final ProcessLog processLog;
 
         private boolean failed;
 
         public CertRepublishConsumer(final X509Cert caCert,
-                List<IdentifiedX509CertPublisher> publishers, final BlockingQueue<QueueEntry> queue,
-                final AtomicBoolean stopMe, final ProcessLog processLog) {
+                final List<IdentifiedX509CertPublisher> publishers,
+                final BlockingQueue<QueueEntry> queue, final ProcessLog processLog) {
             this.caCert = caCert;
             this.publishers = publishers;
             this.queue = queue;
-            this.stopMe = stopMe;
             this.processLog = processLog;
         }
 
@@ -512,7 +508,7 @@ public class X509Ca {
 
         @Override
         public void run() {
-            while (!failed && !stopMe.get()) {
+            while (!failed) {
                 QueueEntry entry;
                 try {
                     entry = queue.take();
@@ -523,6 +519,12 @@ public class X509Ca {
                 }
 
                 if (entry instanceof EndOfQueue) {
+                    // re-add it to queue so that other consumers know it
+                    try {
+                        queue.put(entry);
+                    } catch (InterruptedException ex) {
+                        LogUtil.warn(LOG, ex, "could not re-add EndOfQueue to queue");
+                    }
                     break;
                 }
 
@@ -538,6 +540,7 @@ public class X509Ca {
                     break;
                 }
 
+                boolean allSucc = true;
                 for (IdentifiedX509CertPublisher publisher : publishers) {
                     if (!certInfo.isRevoked() && !publisher.publishsGoodCert()) {
                         continue;
@@ -547,10 +550,13 @@ public class X509Ca {
                     if (!successful) {
                         LOG.error("republish certificate serial={} to publisher {} failed",
                                 LogUtil.formatCsn(sid.getSerial()), publisher.getName());
-                        failed = true;
+                        allSucc = false;
                     }
                 }
 
+                if (!allSucc) {
+                    break;
+                }
                 processLog.addNumProcessed(1);
             }
         }
@@ -1262,7 +1268,7 @@ public class X509Ca {
             AtomicBoolean stopMe = new AtomicBoolean(false);
             for (int i = 0; i < numThreads; i++) {
                 CertRepublishConsumer consumer = new CertRepublishConsumer(caCert, publishers,
-                        queue, stopMe, processLog);
+                        queue, processLog);
                 consumers.add(consumer);
             }
 
@@ -1275,23 +1281,33 @@ public class X509Ca {
             }
 
             executor.shutdown();
+            boolean successful = true;
 
             while (true) {
-                if (producer.isFailed()) {
-                    stopMe.set(true);
-                }
+                processLog.printStatus();
 
-                for (CertRepublishConsumer consumer : consumers) {
-                    if (consumer.isFailed()) {
+                if (successful) {
+                    if (producer.isFailed()) {
+                        successful = false;
+                    }
+
+                    if (successful) {
+                        for (CertRepublishConsumer consumer : consumers) {
+                            if (consumer.isFailed()) {
+                                successful = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!successful) {
                         stopMe.set(true);
-                        break;
+                        LOG.warn("failed");
                     }
                 }
 
-                processLog.printStatus();
                 try {
                     boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
-                    processLog.printStatus();
                     if (terminated) {
                         break;
                     }
@@ -1301,16 +1317,26 @@ public class X509Ca {
                 }
             }
 
-            if (producer.isFailed()) {
-                return false;
-            }
+            if (successful) {
+                if (producer.isFailed()) {
+                    successful = false;
+                }
 
-            for (CertRepublishConsumer consumer : consumers) {
-                if (consumer.isFailed()) {
-                    return false;
+                if (successful) {
+                    for (CertRepublishConsumer consumer : consumers) {
+                        if (consumer.isFailed()) {
+                            successful = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (!successful) {
+                    LOG.warn("failed");
                 }
             }
-            return true;
+
+            return successful;
         } finally {
             caInfo.setStatus(status);
             if (processLog != null) {
