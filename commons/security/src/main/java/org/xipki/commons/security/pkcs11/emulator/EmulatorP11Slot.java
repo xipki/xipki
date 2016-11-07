@@ -143,6 +143,57 @@ class EmulatorP11Slot extends AbstractP11Slot {
     private static final String PROP_EC_ECDSA_PARAMS = "ecdsaParams";
     private static final String PROP_EC_EC_POINT = "ecPoint";
 
+    private static final long[] supportedMechs = new long[]{
+        P11Constants.CKM_DSA_KEY_PAIR_GEN,
+        P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN,
+        P11Constants.CKM_EC_KEY_PAIR_GEN,
+
+        P11Constants.CKM_RSA_X_509,
+
+        P11Constants.CKM_RSA_PKCS,
+        P11Constants.CKM_SHA1_RSA_PKCS,
+        P11Constants.CKM_SHA224_RSA_PKCS,
+        P11Constants.CKM_SHA256_RSA_PKCS,
+        P11Constants.CKM_SHA384_RSA_PKCS,
+        P11Constants.CKM_SHA512_RSA_PKCS,
+        P11Constants.CKM_SHA3_224_RSA_PKCS,
+        P11Constants.CKM_SHA3_256_RSA_PKCS,
+        P11Constants.CKM_SHA3_384_RSA_PKCS,
+        P11Constants.CKM_SHA3_512_RSA_PKCS,
+
+        P11Constants.CKM_RSA_PKCS_PSS,
+        P11Constants.CKM_SHA1_RSA_PKCS_PSS,
+        P11Constants.CKM_SHA224_RSA_PKCS_PSS,
+        P11Constants.CKM_SHA256_RSA_PKCS_PSS,
+        P11Constants.CKM_SHA384_RSA_PKCS_PSS,
+        P11Constants.CKM_SHA512_RSA_PKCS_PSS,
+        P11Constants.CKM_SHA3_224_RSA_PKCS_PSS,
+        P11Constants.CKM_SHA3_256_RSA_PKCS_PSS,
+        P11Constants.CKM_SHA3_384_RSA_PKCS_PSS,
+        P11Constants.CKM_SHA3_512_RSA_PKCS_PSS,
+
+        P11Constants.CKM_DSA,
+        P11Constants.CKM_DSA_SHA1,
+        P11Constants.CKM_DSA_SHA224,
+        P11Constants.CKM_DSA_SHA256,
+        P11Constants.CKM_DSA_SHA384,
+        P11Constants.CKM_DSA_SHA512,
+        P11Constants.CKM_DSA_SHA3_224,
+        P11Constants.CKM_DSA_SHA3_256,
+        P11Constants.CKM_DSA_SHA3_384,
+        P11Constants.CKM_DSA_SHA3_512,
+
+        P11Constants.CKM_ECDSA,
+        P11Constants.CKM_ECDSA_SHA1,
+        P11Constants.CKM_ECDSA_SHA224,
+        P11Constants.CKM_ECDSA_SHA256,
+        P11Constants.CKM_ECDSA_SHA384,
+        P11Constants.CKM_ECDSA_SHA512,
+        P11Constants.CKM_ECDSA_SHA3_224,
+        P11Constants.CKM_ECDSA_SHA3_256,
+        P11Constants.CKM_ECDSA_SHA3_384,
+        P11Constants.CKM_ECDSA_SHA3_512};
+
     private static final FilenameFilter INFO_FILENAME_FILTER = new InfoFilenameFilter();
 
     private final boolean namedCurveSupported;
@@ -202,59 +253,12 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11SlotRefreshResult doRefresh(final P11MechanismFilter mechanismFilter)
+    protected P11SlotRefreshResult doRefresh()
     throws P11TokenException {
         P11SlotRefreshResult ret = new P11SlotRefreshResult();
-
-        ret.addMechanism(P11Constants.CKM_DSA_KEY_PAIR_GEN);
-        ret.addMechanism(P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
-        ret. addMechanism(P11Constants.CKM_EC_KEY_PAIR_GEN);
-
-        ret.addMechanism(P11Constants.CKM_RSA_X_509);
-
-        ret.addMechanism(P11Constants.CKM_RSA_PKCS);
-        ret.addMechanism(P11Constants.CKM_SHA1_RSA_PKCS);
-        ret.addMechanism(P11Constants.CKM_SHA224_RSA_PKCS);
-        ret.addMechanism(P11Constants.CKM_SHA256_RSA_PKCS);
-        ret.addMechanism(P11Constants.CKM_SHA384_RSA_PKCS);
-        ret.addMechanism(P11Constants.CKM_SHA512_RSA_PKCS);
-        ret.addMechanism(P11Constants.CKM_SHA3_224_RSA_PKCS);
-        ret.addMechanism(P11Constants.CKM_SHA3_256_RSA_PKCS);
-        ret.addMechanism(P11Constants.CKM_SHA3_384_RSA_PKCS);
-        ret.addMechanism(P11Constants.CKM_SHA3_512_RSA_PKCS);
-
-        ret.addMechanism(P11Constants.CKM_RSA_PKCS_PSS);
-        ret.addMechanism(P11Constants.CKM_SHA1_RSA_PKCS_PSS);
-        ret.addMechanism(P11Constants.CKM_SHA224_RSA_PKCS_PSS);
-        ret.addMechanism(P11Constants.CKM_SHA256_RSA_PKCS_PSS);
-        ret.addMechanism(P11Constants.CKM_SHA384_RSA_PKCS_PSS);
-        ret.addMechanism(P11Constants.CKM_SHA512_RSA_PKCS_PSS);
-        ret.addMechanism(P11Constants.CKM_SHA3_224_RSA_PKCS_PSS);
-        ret.addMechanism(P11Constants.CKM_SHA3_256_RSA_PKCS_PSS);
-        ret.addMechanism(P11Constants.CKM_SHA3_384_RSA_PKCS_PSS);
-        ret.addMechanism(P11Constants.CKM_SHA3_512_RSA_PKCS_PSS);
-
-        ret.addMechanism(P11Constants.CKM_DSA);
-        ret.addMechanism(P11Constants.CKM_DSA_SHA1);
-        ret.addMechanism(P11Constants.CKM_DSA_SHA224);
-        ret.addMechanism(P11Constants.CKM_DSA_SHA256);
-        ret.addMechanism(P11Constants.CKM_DSA_SHA384);
-        ret.addMechanism(P11Constants.CKM_DSA_SHA512);
-        ret.addMechanism(P11Constants.CKM_DSA_SHA3_224);
-        ret.addMechanism(P11Constants.CKM_DSA_SHA3_256);
-        ret.addMechanism(P11Constants.CKM_DSA_SHA3_384);
-        ret.addMechanism(P11Constants.CKM_DSA_SHA3_512);
-
-        ret.addMechanism(P11Constants.CKM_ECDSA);
-        ret.addMechanism(P11Constants.CKM_ECDSA_SHA1);
-        ret.addMechanism(P11Constants.CKM_ECDSA_SHA224);
-        ret.addMechanism(P11Constants.CKM_ECDSA_SHA256);
-        ret.addMechanism(P11Constants.CKM_ECDSA_SHA384);
-        ret.addMechanism(P11Constants.CKM_ECDSA_SHA512);
-        ret.addMechanism(P11Constants.CKM_ECDSA_SHA3_224);
-        ret.addMechanism(P11Constants.CKM_ECDSA_SHA3_256);
-        ret.addMechanism(P11Constants.CKM_ECDSA_SHA3_384);
-        ret.addMechanism(P11Constants.CKM_ECDSA_SHA3_512);
+        for (long mech : supportedMechs) {
+            ret.addMechanism(mech);
+        }
 
         // Certificates
 
