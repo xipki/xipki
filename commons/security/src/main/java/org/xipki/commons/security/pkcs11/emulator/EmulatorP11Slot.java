@@ -683,7 +683,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     @Override
     public int removeObjects(final byte[] id, final String label) throws P11TokenException {
         if ((id == null || id.length == 0) && StringUtil.isBlank(label)) {
-            throw new IllegalArgumentException("at least onf of id and label must not be null");
+            throw new IllegalArgumentException("at least one of id and label must not be null");
         }
 
         int num = deletePkcs11Entry(privKeyDir, id, label);
