@@ -90,6 +90,7 @@ import org.xipki.commons.common.HealthCheckResult;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -164,7 +165,16 @@ public final class CaClientImpl implements CaClient {
                     return;
                 }
 
-                autoConfCas(null);
+                StringBuilder sb = new StringBuilder("scheduled configuring CAs ");
+                sb.append(autoConfCaNames);
+
+                LOG.info(sb.toString());
+                Set<String> failedCaNames = autoConfCas(autoConfCaNames);
+
+                if (CollectionUtil.isNonEmpty(failedCaNames)) {
+                    LOG.warn("could not configured following CAs {}", failedCaNames);
+                }
+
             } finally {
                 lastUpdate = System.currentTimeMillis();
                 inProcess.set(false);
@@ -180,6 +190,8 @@ public final class CaClientImpl implements CaClient {
     private static Unmarshaller jaxbUnmarshaller;
 
     private final Map<String, CaConf> casMap = new HashMap<>();
+
+    private final Set<String> autoConfCaNames = new HashSet<>();
 
     private SecurityFactory securityFactory;
 
@@ -202,20 +214,16 @@ public final class CaClientImpl implements CaClient {
      *
      * @return names of CAs which must not been configured.
      */
-    private Set<String> autoConfCas(final Set<String> caNamesToBeConfigured) {
+    private Set<String> autoConfCas(Set<String> caNames) {
+        if (caNames.isEmpty()) {
+            return Collections.emptySet();
+        }
+
         Set<String> caNamesWithError = new HashSet<>();
 
         Set<String> errorCaNames = new HashSet<>();
-        for (String name : casMap.keySet()) {
-            if (caNamesToBeConfigured != null && !caNamesToBeConfigured.contains(name)) {
-                continue;
-            }
-
+        for (String name : caNames) {
             CaConf ca = casMap.get(name);
-            if (!ca.isCertAutoconf() && !ca.isCertprofilesAutoconf()
-                    && !ca.isCmpControlAutoconf()) {
-                continue;
-            }
 
             try {
                 CaInfo caInfo = ca.getRequestor().retrieveCaInfo(name, null);
@@ -229,16 +237,11 @@ public final class CaClientImpl implements CaClient {
                     ca.setCmpControl(caInfo.getCmpControl());
                 }
                 LOG.info("retrieved CAInfo for CA " + name);
-            } catch (Throwable th) {
+            } catch (CmpRequestorException | PkiErrorException | CertificateEncodingException
+                    | RuntimeException ex) {
                 errorCaNames.add(name);
                 caNamesWithError.add(name);
-                LogUtil.error(LOG, th, "could not retrieve CAInfo for CA " + name);
-            }
-        }
-
-        if (CollectionUtil.isNonEmpty(errorCaNames)) {
-            for (String caName : errorCaNames) {
-                casMap.remove(caName);
+                LogUtil.error(LOG, ex, "could not retrieve CAInfo for CA " + name);
             }
         }
 
@@ -271,10 +274,18 @@ public final class CaClientImpl implements CaClient {
             return;
         }
 
+        // reset
+        this.casMap.clear();
+        this.autoConfCaNames.clear();
+        if (this.scheduledThreadPoolExecutor != null) {
+            this.scheduledThreadPoolExecutor.shutdownNow();
+        }
+        this.initialized.set(false);
+
         LOG.info("initializing ...");
         File configFile = new File(IoUtil.expandFilepath(confFile));
         if (!configFile.exists()) {
-            throw new CaClientException("cound not find configuration file " + confFile);
+            throw new CaClientException("could not find configuration file " + confFile);
         }
 
         CAClientType config;
@@ -326,8 +337,6 @@ public final class CaClientImpl implements CaClient {
         }
 
         // CA
-        Set<String> configuredCaNames = new HashSet<>();
-
         Set<CaConf> cas = new HashSet<>();
         for (CAType caType : config.getCAs().getCA()) {
             bo = caType.isEnabled();
@@ -390,7 +399,10 @@ public final class CaClientImpl implements CaClient {
                 }
 
                 cas.add(ca);
-                configuredCaNames.add(caName);
+                if (ca.isCertAutoconf() || ca.isCertprofilesAutoconf()
+                        || ca.isCmpControlAutoconf()) {
+                    autoConfCaNames.add(caName);
+                }
             } catch (IOException | CertificateException ex) {
                 LogUtil.error(LOG, ex, "could not configure CA " + caName);
                 if (!devMode) {
@@ -437,14 +449,9 @@ public final class CaClientImpl implements CaClient {
             }
         }
 
-        boolean autoConf = false;
         for (CaConf ca :cas) {
             if (this.casMap.containsKey(ca.getName())) {
                 throw new CaClientException("duplicate CAs with the same name " + ca.getName());
-            }
-
-            if (ca.isCertAutoconf() || ca.isCertprofilesAutoconf() || ca.isCmpControlAutoconf()) {
-                autoConf = true;
             }
 
             String requestorName = ca.getRequestorName();
@@ -466,7 +473,7 @@ public final class CaClientImpl implements CaClient {
             this.casMap.put(ca.getName(), ca);
         }
 
-        if (autoConf) {
+        if (!autoConfCaNames.isEmpty()) {
             Integer caInfoUpdateInterval = config.getCAs().getCAInfoUpdateInterval();
             if (caInfoUpdateInterval == null) {
                 caInfoUpdateInterval = 10;
@@ -476,15 +483,29 @@ public final class CaClientImpl implements CaClient {
                 caInfoUpdateInterval = 5;
             }
 
-            Set<String> caNames = casMap.keySet();
-            StringBuilder sb = new StringBuilder("configuring CAs ");
-            sb.append(caNames);
+            LOG.info("configuring CAs {}", autoConfCaNames);
+            Set<String> failedCaNames = autoConfCas(autoConfCaNames);
 
-            LOG.info(sb.toString());
-            caNames = autoConfCas(caNames);
+            // try to re-configure the failed CAs
+            if (CollectionUtil.isNonEmpty(failedCaNames)) {
+                for (int i = 0; i < 3; i++) {
+                    LOG.info("configuring ({}-th retry) CAs {}", i + 1, failedCaNames);
 
-            if (CollectionUtil.isNonEmpty(caNames)) {
-                final String msg = "could not configured following CAs " + caNames;
+                    failedCaNames = autoConfCas(failedCaNames);
+                    if (CollectionUtil.isEmpty(failedCaNames)) {
+                        break;
+                    }
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        LOG.warn("interrupted", ex);
+                    }
+                }
+            }
+
+            if (CollectionUtil.isNonEmpty(failedCaNames)) {
+                final String msg = "could not configured following CAs " + failedCaNames;
                 if (devMode) {
                     LOG.warn(msg);
                 } else {
@@ -780,7 +801,7 @@ public final class CaClientImpl implements CaClient {
                 continue;
             }
 
-            if (ca.getSubject().equals(issuer)) {
+            if (CompareUtil.equalsObject(ca.getSubject(), issuer)) {
                 return name;
             }
         }
