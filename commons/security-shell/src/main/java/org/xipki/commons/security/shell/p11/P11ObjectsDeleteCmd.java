@@ -60,7 +60,7 @@ public class P11ObjectsDeleteCmd extends SecurityCommandSupport {
     protected Integer slotIndex;
 
     @Option(name = "--id",
-            description = "id of the objects in the PKCS#11 device\n"
+            description = "id (hex) of the objects in the PKCS#11 device\n"
                     + "at least one of id and label must be specified")
     private String id;
 
