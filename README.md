@@ -41,6 +41,7 @@ Tested Platforms
   * Thales nCipher Connect (network)
   * Utimaco Se
   * [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
+  * [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
 
 * JVM
   * OpenJDK 8
