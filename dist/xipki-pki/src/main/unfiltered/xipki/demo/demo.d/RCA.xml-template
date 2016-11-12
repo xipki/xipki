@@ -167,7 +167,7 @@
           </permissions>
           <maxValidity>10y</maxValidity>
           <responderName>responder1</responderName>
-          <saveReq>false</saveReq>
+          <saveReq>true</saveReq>
           <signerType>${token.type}</signerType>
           <signerConf>
             <value>${ca.signerConf}</value>

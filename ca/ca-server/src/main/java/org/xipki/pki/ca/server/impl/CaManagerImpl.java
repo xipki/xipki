@@ -2432,6 +2432,15 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException(ex.getMessage(), ex);
         }
 
+        if (ca.getCaInfo().isSaveRequest()) {
+            try {
+                long dbId = ca.addRequest(encodedCsr);
+                ca.addRequestCert(dbId, certInfo.getCert().getCertId());
+            } catch (OperationException ex) {
+                LogUtil.warn(LOG, ex, "could not save request");
+            }
+        }
+
         return certInfo.getCert().getCert();
     } // method generateCertificate
 
@@ -2547,6 +2556,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         entry.setResponderName(caEntry.getResponderName());
         entry.setStatus(status);
         entry.setValidityMode(caEntry.getValidityMode());
+        entry.setSaveRequest(caEntry.isSaveRequest());
 
         addCa(entry);
         return caCert;

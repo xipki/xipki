@@ -190,7 +190,7 @@ xipki-ca:gen-rca \
   --duplicate-subject yes \
   --duplicate-key yes \
   --validity-mode CUTOFF \
-  --save-req no
+  --save-req yes
 
 ## Update the certificate in the device
 if { $TOKEN_TYPE equals "PKCS11" } {
