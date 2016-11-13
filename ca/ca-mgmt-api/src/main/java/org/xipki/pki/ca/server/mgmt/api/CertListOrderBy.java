@@ -39,7 +39,7 @@ package org.xipki.pki.ca.server.mgmt.api;
  * @since 2.1.0
  */
 
-public enum CertListSortBy {
+public enum CertListOrderBy {
 
     NOT_BEFORE("notBefore"),
     NOT_AFTER("notAfter"),
@@ -47,7 +47,7 @@ public enum CertListSortBy {
 
     private final String text;
 
-    private CertListSortBy(String text) {
+    private CertListOrderBy(String text) {
         this.text = text;
     }
 
@@ -55,10 +55,10 @@ public enum CertListSortBy {
         return text;
     }
 
-    public static CertListSortBy forValue(final String value) {
-        for (CertListSortBy sort : values()) {
-            if (sort.name().equalsIgnoreCase(value) || sort.text.equalsIgnoreCase(value)) {
-                return sort;
+    public static CertListOrderBy forValue(final String value) {
+        for (CertListOrderBy m : values()) {
+            if (m.name().equalsIgnoreCase(value) || m.text.equalsIgnoreCase(value)) {
+                return m;
             }
         }
 

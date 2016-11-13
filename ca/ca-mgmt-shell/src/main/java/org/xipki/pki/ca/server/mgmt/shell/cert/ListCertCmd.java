@@ -46,7 +46,7 @@ import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
-import org.xipki.pki.ca.server.mgmt.api.CertListSortBy;
+import org.xipki.pki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CertListSortByCompleter;
@@ -86,10 +86,10 @@ public class ListCertCmd extends CaCommandSupport {
             description = "maximal number of entries (between 1 and 1000)")
     private int num = 1000;
 
-    @Option(name = "--sort",
-            description = "by which the result is sorted")
+    @Option(name = "--order",
+            description = "by which the result is ordered")
     @Completion(CertListSortByCompleter.class)
-    private String sortByS;
+    private String orderByS;
 
     /**
      * @return comma-separated serial numbers (in hex).
@@ -103,16 +103,16 @@ public class ListCertCmd extends CaCommandSupport {
             subjectPattern = new X500Name(subjectPatternS);
         }
 
-        CertListSortBy sortBy = null;
-        if (sortByS != null) {
-            sortBy = CertListSortBy.forValue(sortByS);
-            if (sortBy == null) {
-                throw new IllegalCmdParamException("invalid sort '" + sortByS + "'");
+        CertListOrderBy orderBy = null;
+        if (orderByS != null) {
+            orderBy = CertListOrderBy.forValue(orderByS);
+            if (orderBy == null) {
+                throw new IllegalCmdParamException("invalid order '" + orderByS + "'");
             }
         }
 
         List<CertListInfo> certInfos = caManager.listCertificates(caName, subjectPattern, validFrom,
-                validTo, sortBy, num);
+                validTo, orderBy, num);
         final int n = certInfos.size();
         if (n == 0) {
             println("found no certificate");

@@ -102,7 +102,7 @@ import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
-import org.xipki.pki.ca.server.mgmt.api.CertListSortBy;
+import org.xipki.pki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
@@ -1782,7 +1782,7 @@ class CertStoreQueryExecutor {
     }
 
     List<CertListInfo> listCertificates(final X509Cert caCert, final X500Name subjectPattern,
-            final Date validFrom, final Date validTo, final CertListSortBy sortBy,
+            final Date validFrom, final Date validTo, final CertListOrderBy orderBy,
             final int numEntries) throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireMin("numEntries", numEntries, 1);
@@ -1831,8 +1831,8 @@ class CertStoreQueryExecutor {
         }
 
         String sortByStr = null;
-        if (sortBy != null) {
-            switch (sortBy) {
+        if (orderBy != null) {
+            switch (orderBy) {
             case NOT_BEFORE:
                 sortByStr = "NBEFORE";
                 break;
@@ -1843,7 +1843,7 @@ class CertStoreQueryExecutor {
                 sortByStr = "SUBJECT";
                 break;
             default:
-                throw new RuntimeException("unknown CertListSortBy " + sortBy);
+                throw new RuntimeException("unknown CertListOrderBy " + orderBy);
             }
         }
 

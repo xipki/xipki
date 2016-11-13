@@ -36,7 +36,7 @@ package org.xipki.pki.ca.server.mgmt.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.AbstractEnumCompleter;
-import org.xipki.pki.ca.server.mgmt.api.CertListSortBy;
+import org.xipki.pki.ca.server.mgmt.api.CertListOrderBy;
 
 /**
  * @author Lijun Liao
@@ -49,7 +49,7 @@ public class CertListSortByCompleter extends AbstractEnumCompleter {
     public CertListSortByCompleter() {
         StringBuilder enums = new StringBuilder();
 
-        for (CertListSortBy sort : CertListSortBy.values()) {
+        for (CertListOrderBy sort : CertListOrderBy.values()) {
             enums.append(sort.getText()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

@@ -66,7 +66,7 @@ import org.xipki.pki.ca.server.impl.UniqueIdGenerator;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
-import org.xipki.pki.ca.server.mgmt.api.CertListSortBy;
+import org.xipki.pki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
@@ -549,11 +549,11 @@ public class CertificateStore {
     }
 
     public List<CertListInfo> listCertificates(final X509Cert caCert, final X500Name subjectPattern,
-            final Date validFrom, final Date validTo, final CertListSortBy sortBy,
+            final Date validFrom, final Date validTo, final CertListOrderBy orderBy,
             final int numEntries) throws OperationException {
         try {
             return queryExecutor.listCertificates(caCert, subjectPattern, validFrom, validTo,
-                    sortBy, numEntries);
+                    orderBy, numEntries);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
