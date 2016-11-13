@@ -42,8 +42,11 @@ package org.xipki.pki.ca.server.mgmt.api;
 public enum CertListOrderBy {
 
     NOT_BEFORE("notBefore"),
+    NOT_BEFORE_DESC("notBefore-desc"),
     NOT_AFTER("notAfter"),
-    SUBJECT("subject");
+    NOT_AFTER_DESC("notAfter-desc"),
+    SUBJECT("subject"),
+    SUBJECT_DESC("subject-desc");
 
     private final String text;
 

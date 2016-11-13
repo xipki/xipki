@@ -1836,11 +1836,20 @@ class CertStoreQueryExecutor {
             case NOT_BEFORE:
                 sortByStr = "NBEFORE";
                 break;
+            case NOT_BEFORE_DESC:
+                sortByStr = "NBEFORE DESC";
+                break;
             case NOT_AFTER:
                 sortByStr = "NAFTER";
                 break;
+            case NOT_AFTER_DESC:
+                sortByStr = "NAFTER DESC";
+                break;
             case SUBJECT:
                 sortByStr = "SUBJECT";
+                break;
+            case SUBJECT_DESC:
+                sortByStr = "SUBJECT DESC";
                 break;
             default:
                 throw new RuntimeException("unknown CertListOrderBy " + orderBy);
