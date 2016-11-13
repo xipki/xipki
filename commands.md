@@ -601,6 +601,18 @@ Feature xipki-camgmt-shell
 
      unrevoke certificate
 
+   * `xipki-ca:list-cert`
+
+     show a list of certificates
+
+   * `xipki-ca:get-cert`
+
+     get certificate
+
+   * `xipki-ca:get-request`
+
+     get certificate request
+
 Feature xipki-camgmt-qa-shell
 -----
 
