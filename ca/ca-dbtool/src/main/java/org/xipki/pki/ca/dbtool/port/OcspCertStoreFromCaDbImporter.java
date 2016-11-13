@@ -63,6 +63,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.ProcessLog;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
@@ -302,43 +303,29 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             relatedCaIds.add(issuer.getId());
 
             Certificate cert;
-            byte[] encodedName;
             try {
                 cert = Certificate.getInstance(encodedCert);
-                encodedName = cert.getSubject().getEncoded("DER");
             } catch (Exception ex) {
-                LOG.error("could not parse certificate of issuer {}", issuer.getId());
-                LOG.debug("could not parse certificate of issuer " + issuer.getId(), ex);
+                String msg = "could not parse certificate of issuer " + issuer.getId();
+                LogUtil.error(LOG, ex, msg);
                 if (ex instanceof CertificateException) {
                     throw (CertificateException) ex;
                 } else {
                     throw new CertificateException(ex.getMessage(), ex);
                 }
             }
-            byte[] encodedKey = cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
             int idx = 1;
             ps.setInt(idx++, issuer.getId());
             ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
             ps.setLong(idx++, cert.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
             ps.setLong(idx++, cert.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-            ps.setString(idx++, HashAlgoType.SHA1.base64Hash(encodedName));
-            ps.setString(idx++, HashAlgoType.SHA1.base64Hash(encodedKey));
-            ps.setString(idx++, HashAlgoType.SHA224.base64Hash(encodedName));
-            ps.setString(idx++, HashAlgoType.SHA224.base64Hash(encodedKey));
-            ps.setString(idx++, HashAlgoType.SHA256.base64Hash(encodedName));
-            ps.setString(idx++, HashAlgoType.SHA256.base64Hash(encodedKey));
-            ps.setString(idx++, HashAlgoType.SHA384.base64Hash(encodedName));
-            ps.setString(idx++, HashAlgoType.SHA384.base64Hash(encodedKey));
-            ps.setString(idx++, HashAlgoType.SHA512.base64Hash(encodedName));
-            ps.setString(idx++, HashAlgoType.SHA512.base64Hash(encodedKey));
             ps.setString(idx++, HashAlgoType.SHA1.base64Hash(encodedCert));
-            ps.setString(idx++, Base64.toBase64String(encodedCert));
-
             setBoolean(ps, idx++, ca.isRevoked());
             setInt(ps, idx++, ca.getRevReason());
             setLong(ps, idx++, ca.getRevTime());
             setLong(ps, idx++, ca.getRevInvTime());
+            ps.setString(idx++, Base64.toBase64String(encodedCert));
 
             ps.execute();
         } catch (SQLException ex) {
