@@ -43,25 +43,40 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
+import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.1.0
  */
 
-@Command(scope = "xipki-ca", name = "cert-status",
-        description = "show certificate status and save the certificate")
+@Command(scope = "xipki-ca", name = "get-cert",
+        description = "get certificate")
 @Service
-public class CertStatusCmd extends UnRevRmCertCommandSupport {
+public class GetCertCmd extends CaCommandSupport {
+
+    @Option(name = "--ca",
+            required = true,
+            description = "CA name\n"
+                    + "(required)")
+    @Completion(CaNameCompleter.class)
+    protected String caName;
+
+    @Option(name = "--serial", aliases = "-s",
+            required = true,
+            description = "serial number")
+    private String serialNumberS;
 
     @Option(name = "--out", aliases = "-o",
+            required = true,
             description = "where to save the certificate")
     @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Override
     protected Object doExecute() throws Exception {
-        CertWithStatusInfo certInfo = caManager.getCert(caName, getSerialNumber());
+        CertWithStatusInfo certInfo = caManager.getCert(caName, toBigInt(serialNumberS));
         X509Certificate cert = (X509Certificate) certInfo.getCert();
 
         if (cert == null) {
@@ -69,19 +84,7 @@ public class CertStatusCmd extends UnRevRmCertCommandSupport {
             return null;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("certificate profile: ").append(certInfo.getCertprofile()).append("\n");
-        sb.append("status: ");
-        if (certInfo.getRevocationInfo() == null) {
-            sb.append("good");
-        } else {
-            sb.append("revoked with ").append(certInfo.getRevocationInfo());
-        }
-        println(sb.toString());
-
-        if (outputFile != null) {
-            saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());
-        }
+        saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());
         return null;
     }
 

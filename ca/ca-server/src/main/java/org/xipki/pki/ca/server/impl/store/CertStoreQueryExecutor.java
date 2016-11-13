@@ -101,6 +101,7 @@ import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
+import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
@@ -224,6 +225,10 @@ class CertStoreQueryExecutor {
 
         private final String sqlCrlWithNo;
 
+        private final String sqlReqIdForSerial;
+
+        private final String sqlReqForId;
+
         private final DataSourceWrapper datasource;
 
         private final LruCache<Integer, String> cacheSqlCidFromPublishQueue = new LruCache<>(5);
@@ -281,6 +286,11 @@ class CertStoreQueryExecutor {
                     "THISUPDATE,CRL FROM CRL WHERE CA_ID=?", 1, "THISUPDATE DESC");
             this.sqlCrlWithNo = datasource.buildSelectFirstSql(
                     "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?", 1, "THISUPDATE DESC");
+            this.sqlReqIdForSerial = datasource.buildSelectFirstSql(
+                    "REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN CERT ON CERT.CA_ID=? "
+                    + "AND CERT.SN=? AND REQCERT.CID=CERT.ID", 1);
+            this.sqlReqForId = datasource.buildSelectFirstSql(
+                    "DATA FROM REQUEST WHERE ID=?", 1);
         } // constructor
 
         String getSqlCidFromPublishQueue(final int numEntries) {
@@ -1722,6 +1732,110 @@ class CertStoreQueryExecutor {
 
         return certs;
     } // method getCertificate
+
+    byte[] getCertRequest(final X509Cert caCert, final BigInteger serialNumber)
+    throws DataAccessException, OperationException {
+        ParamUtil.requireNonNull("caCert", caCert);
+        ParamUtil.requireNonNull("serialNumber", serialNumber);
+
+        String sql = sqls.sqlReqIdForSerial;
+        int caId = getCaId(caCert);
+        ResultSet rs = null;
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        Long reqId = null;
+        try {
+            ps.setInt(1, caId);
+            ps.setString(2, serialNumber.toString(16));
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                reqId = rs.getLong("REQ_ID");
+            }
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            releaseDbResources(ps, rs);
+        }
+
+        if (reqId == null) {
+            return null;
+        }
+
+        String b64Req = null;
+        sql = sqls.sqlReqForId;
+        ps = borrowPreparedStatement(sql);
+        try {
+            ps.setLong(1, reqId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                b64Req = rs.getString("DATA");
+            }
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            releaseDbResources(ps, rs);
+        }
+
+        return (b64Req == null) ? null : Base64.decode(b64Req);
+    }
+
+    List<CertListInfo> listCertificates(final X509Cert caCert, final X500Name subjectPattern,
+            final Date validFrom, final Date validTo, final int numEntries)
+    throws DataAccessException, OperationException {
+        ParamUtil.requireNonNull("caCert", caCert);
+        ParamUtil.requireMin("numEntries", numEntries, 1);
+
+        int caId = getCaId(caCert);
+        StringBuilder sb = new StringBuilder(200);
+        sb.append("SN,NBEFORE,NAFTER,SUBJECT FROM CERT WHERE CA_ID=").append(caId);
+        if (validFrom != null) {
+            sb.append(" AND NBEFORE<").append(validFrom.getTime() / 1000 - 1);
+        }
+        if (validTo != null) {
+            sb.append(" AND NAFTER>").append(validTo.getTime() / 1000);
+        }
+
+        if (subjectPattern != null) {
+            sb.append(" AND SUBJECT LIKE '%");
+            RDN[] rdns = subjectPattern.getRDNs();
+            for (int i = 0; i < rdns.length; i++) {
+                X500Name rdnName = new X500Name(new RDN[]{rdns[i]});
+                String rdnStr = X509Util.getRfc4519Name(rdnName);
+                if (i != 0) {
+                    sb.append(",");
+                }
+                sb.append(rdnStr);
+                sb.append("%");
+            }
+            sb.append("'");
+        }
+
+        final String sql = datasource.buildSelectFirstSql(sb.toString(), numEntries);
+        ResultSet rs = null;
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        List<CertListInfo> ret = new LinkedList<>();
+
+        try {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                String snStr = rs.getString("SN");
+                BigInteger sn = new BigInteger(snStr, 16);
+                Date notBefore = new Date(rs.getLong("NBEFORE") * 1000);
+                Date notAfter = new Date(rs.getLong("NAFTER") * 1000);
+                String subject = rs.getString("SUBJECT");
+                CertListInfo info = new CertListInfo(sn, subject, notBefore, notAfter);
+                ret.add(info);
+            }
+        } catch (SQLException ex) {
+            throw datasource.translate(sql, ex);
+        } finally {
+            releaseDbResources(ps, rs);
+        }
+
+        return ret;
+    }
 
     boolean authenticateUser(final String user, final byte[] password)
     throws DataAccessException, OperationException {

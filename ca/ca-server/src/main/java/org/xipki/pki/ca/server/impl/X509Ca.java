@@ -144,6 +144,7 @@ import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
+import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl.HourMinute;
@@ -529,6 +530,18 @@ public class X509Ca {
     public X509CertWithRevocationInfo getCertWithRevocationInfo(final BigInteger serialNumber)
     throws CertificateException, OperationException {
         return certstore.getCertWithRevocationInfo(caInfo.getCertificate(), serialNumber);
+    }
+
+    public byte[] getCertRequest(final BigInteger serialNumber)
+    throws OperationException {
+        return certstore.getCertRequest(caInfo.getCertificate(), serialNumber);
+    }
+
+    public List<CertListInfo> listCertificates(final X500Name subjectPattern, final Date validFrom,
+            final Date validTo, final int numEntries)
+    throws OperationException {
+        return certstore.listCertificates(caInfo.getCertificate(), subjectPattern, validFrom,
+                validTo, numEntries);
     }
 
     public boolean authenticateUser(final String user, final byte[] password)

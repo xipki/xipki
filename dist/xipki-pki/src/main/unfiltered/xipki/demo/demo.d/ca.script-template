@@ -519,4 +519,30 @@ xipki-ca:careq-add \
   --profile all \
   --ca SubCAwithCRL1
 
+echo "#################################################################"
+echo "#                  CA certificate commands                       #"
+echo "#################################################################"
+
+#### list certs ####
+
+xipki-ca:list-cert \
+    --ca RCA1 \
+    --subject "O=xipki" \
+    -n 100
+
+# get the serial number
+SERIAL = $(xipki-tk:cert-info --serial --hex --in output/SubCA1.der)
+
+# save the certificate request
+xipki-ca:get-request \
+    --ca RCA1 \
+    --serial $SERIAL \
+    --out output/SubCA1.request
+
+# get the certificate
+xipki-ca:get-cert \
+    --ca RCA1 \
+    --serial $SERIAL \
+    --out output/SubCA1.cert-status.der
+
 source ./xipki/demo/demo.d/scep-server.script

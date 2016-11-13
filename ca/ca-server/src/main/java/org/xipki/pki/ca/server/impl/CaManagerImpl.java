@@ -140,6 +140,7 @@ import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.CaSystemStatus;
+import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.pki.ca.server.mgmt.api.ChangeCaEntry;
 import org.xipki.pki.ca.server.mgmt.api.ChangeScepEntry;
@@ -2863,6 +2864,34 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             throw new CaMgmtException(ex.getMessage(), ex);
         }
         return (certInfo != null) ? certInfo.toCertWithStatusInfo() : new CertWithStatusInfo();
+    }
+
+    @Override
+    public byte[] getCertRequest(String caName, BigInteger serialNumber)
+    throws CaMgmtException {
+        ParamUtil.requireNonBlank("caName", caName);
+        ParamUtil.requireNonNull("serialNumber", serialNumber);
+
+        X509Ca ca = getX509Ca(caName);
+        try {
+            return ca.getCertRequest(serialNumber);
+        } catch (OperationException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public List<CertListInfo> listCertificates(final String caName, final X500Name subjectPattern,
+            final Date validFrom, final Date validTo, final int numEntries) throws CaMgmtException {
+        ParamUtil.requireNonBlank("caName", caName);
+        ParamUtil.requireRange("numEntries", numEntries, 1, 1000);
+
+        X509Ca ca = getX509Ca(caName);
+        try {
+            return ca.listCertificates(subjectPattern, validFrom, validTo, numEntries);
+        } catch (OperationException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        }
     }
 
     @Override

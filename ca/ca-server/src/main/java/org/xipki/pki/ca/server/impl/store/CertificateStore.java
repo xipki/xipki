@@ -65,6 +65,7 @@ import org.xipki.pki.ca.server.impl.SerialWithId;
 import org.xipki.pki.ca.server.impl.UniqueIdGenerator;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
@@ -524,6 +525,34 @@ public class CertificateStore {
             final byte[] transactionId) throws OperationException {
         try {
             return queryExecutor.getCertificate(subjectName, transactionId);
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+        }
+    }
+
+    public byte[] getCertRequest(final X509Cert caCert, final BigInteger serialNumber)
+    throws OperationException {
+        try {
+            return queryExecutor.getCertRequest(caCert, serialNumber);
+        } catch (DataAccessException ex) {
+            LOG.debug("DataAccessException", ex);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
+        } catch (RuntimeException ex) {
+            LOG.debug("RuntimeException", ex);
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+        }
+    }
+
+    public List<CertListInfo> listCertificates(final X509Cert caCert, final X500Name subjectPattern,
+            final Date validFrom, final Date validTo, final int numEntries)
+    throws OperationException {
+        try {
+            return queryExecutor.listCertificates(caCert, subjectPattern, validFrom, validTo,
+                    numEntries);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());

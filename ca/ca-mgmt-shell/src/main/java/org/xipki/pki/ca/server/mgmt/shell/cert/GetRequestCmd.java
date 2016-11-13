@@ -35,53 +35,38 @@
 package org.xipki.pki.ca.server.mgmt.shell.cert;
 
 import java.io.File;
-import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "cert-status",
-        description = "show certificate status and save the certificate")
+@Command(scope = "xipki-ca", name = "get-request",
+        description = "get certificate request")
 @Service
-public class CertStatusCmd extends UnRevRmCertCommandSupport {
+public class GetRequestCmd extends UnRevRmCertCommandSupport {
 
     @Option(name = "--out", aliases = "-o",
-            description = "where to save the certificate")
+            required = true,
+            description = "where to save the request")
     @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Override
     protected Object doExecute() throws Exception {
-        CertWithStatusInfo certInfo = caManager.getCert(caName, getSerialNumber());
-        X509Certificate cert = (X509Certificate) certInfo.getCert();
-
-        if (cert == null) {
-            System.out.println("certificate unknown");
+        byte[] request = caManager.getCertRequest(caName, getSerialNumber());
+        if (request == null) {
+            System.out.println("certificate request unknown");
             return null;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("certificate profile: ").append(certInfo.getCertprofile()).append("\n");
-        sb.append("status: ");
-        if (certInfo.getRevocationInfo() == null) {
-            sb.append("good");
-        } else {
-            sb.append("revoked with ").append(certInfo.getRevocationInfo());
-        }
-        println(sb.toString());
-
-        if (outputFile != null) {
-            saveVerbose("certificate saved to file", new File(outputFile), cert.getEncoded());
-        }
+        saveVerbose("certificate request saved to file", new File(outputFile), request);
         return null;
     }
 

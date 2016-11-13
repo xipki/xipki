@@ -45,6 +45,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.CrlReason;
 import org.xipki.pki.ca.server.mgmt.api.conf.CaConf;
@@ -263,5 +264,18 @@ public interface CaManager {
      */
     boolean exportConf(@Nonnull String zipFilename, @Nullable List<String> caNames)
     throws CaMgmtException, IOException;
+
+    /**
+     * @since 2.1.0
+     */
+    List<CertListInfo> listCertificates(@Nonnull String caName, @Nullable X500Name subjectPattern,
+            @Nullable Date validFrom, @Nullable Date validTo, int numEntries)
+    throws CaMgmtException;
+
+    /**
+     * @since 2.1.0
+     */
+    byte[] getCertRequest(@Nonnull String caName, @Nonnull BigInteger serialNumber)
+    throws CaMgmtException;
 
 }
