@@ -269,8 +269,8 @@ public interface CaManager {
      * @since 2.1.0
      */
     List<CertListInfo> listCertificates(@Nonnull String caName, @Nullable X500Name subjectPattern,
-            @Nullable Date validFrom, @Nullable Date validTo, int numEntries)
-    throws CaMgmtException;
+            @Nullable Date validFrom, @Nullable Date validTo, @Nullable CertListSortBy sortedBy,
+            int numEntries) throws CaMgmtException;
 
     /**
      * @since 2.1.0

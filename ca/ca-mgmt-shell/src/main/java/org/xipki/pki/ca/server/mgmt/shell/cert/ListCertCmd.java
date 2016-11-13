@@ -46,8 +46,10 @@ import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
+import org.xipki.pki.ca.server.mgmt.api.CertListSortBy;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CertListSortByCompleter;
 
 /**
  * @author Lijun Liao
@@ -84,6 +86,11 @@ public class ListCertCmd extends CaCommandSupport {
             description = "maximal number of entries (between 1 and 1000)")
     private int num = 1000;
 
+    @Option(name = "--sort",
+            description = "by which the result is sorted")
+    @Completion(CertListSortByCompleter.class)
+    private String sortByS;
+
     /**
      * @return comma-separated serial numbers (in hex).
      */
@@ -96,8 +103,16 @@ public class ListCertCmd extends CaCommandSupport {
             subjectPattern = new X500Name(subjectPatternS);
         }
 
+        CertListSortBy sortBy = null;
+        if (sortByS != null) {
+            sortBy = CertListSortBy.forValue(sortByS);
+            if (sortBy == null) {
+                throw new IllegalCmdParamException("invalid sort '" + sortByS + "'");
+            }
+        }
+
         List<CertListInfo> certInfos = caManager.listCertificates(caName, subjectPattern, validFrom,
-                validTo, num);
+                validTo, sortBy, num);
         final int n = certInfos.size();
         if (n == 0) {
             println("found no certificate");

@@ -102,6 +102,7 @@ import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
+import org.xipki.pki.ca.server.mgmt.api.CertListSortBy;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
@@ -1781,23 +1782,37 @@ class CertStoreQueryExecutor {
     }
 
     List<CertListInfo> listCertificates(final X509Cert caCert, final X500Name subjectPattern,
-            final Date validFrom, final Date validTo, final int numEntries)
-    throws DataAccessException, OperationException {
+            final Date validFrom, final Date validTo, final CertListSortBy sortBy,
+            final int numEntries) throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
         int caId = getCaId(caCert);
         StringBuilder sb = new StringBuilder(200);
-        sb.append("SN,NBEFORE,NAFTER,SUBJECT FROM CERT WHERE CA_ID=").append(caId);
+        sb.append("SN,NBEFORE,NAFTER,SUBJECT FROM CERT WHERE CA_ID=?");
+        //.append(caId)
+
+        Integer idxNotBefore = null;
+        Integer idxNotAfter = null;
+        Integer idxSubject = null;
+
+        int idx = 2;
         if (validFrom != null) {
-            sb.append(" AND NBEFORE<").append(validFrom.getTime() / 1000 - 1);
+            idxNotBefore = idx++;
+            sb.append(" AND NBEFORE<?");
         }
         if (validTo != null) {
-            sb.append(" AND NAFTER>").append(validTo.getTime() / 1000);
+            idxNotAfter = idx++;
+            sb.append(" AND NAFTER>?");
         }
 
+        String subjectLike = null;
         if (subjectPattern != null) {
-            sb.append(" AND SUBJECT LIKE '%");
+            idxSubject = idx++;
+            sb.append(" AND SUBJECT LIKE ?");
+
+            StringBuilder buffer = new StringBuilder(100);
+            buffer.append("%");
             RDN[] rdns = subjectPattern.getRDNs();
             for (int i = 0; i < rdns.length; i++) {
                 X500Name rdnName = new X500Name(new RDN[]{rdns[i]});
@@ -1809,19 +1824,50 @@ class CertStoreQueryExecutor {
                 if (rdnStr.indexOf('*') != -1) {
                     rdnStr = rdnStr.replace('*', '%');
                 }
-                sb.append(rdnStr);
-                sb.append("%");
+                buffer.append(rdnStr);
+                buffer.append("%");
             }
-            sb.append("'");
+            subjectLike = buffer.toString();
         }
 
-        final String sql = datasource.buildSelectFirstSql(sb.toString(), numEntries);
+        String sortByStr = null;
+        if (sortBy != null) {
+            switch (sortBy) {
+            case NOT_BEFORE:
+                sortByStr = "NBEFORE";
+                break;
+            case NOT_AFTER:
+                sortByStr = "NAFTER";
+                break;
+            case SUBJECT:
+                sortByStr = "SUBJECT";
+                break;
+            default:
+                throw new RuntimeException("unknown CertListSortBy " + sortBy);
+            }
+        }
+
+        final String sql = datasource.buildSelectFirstSql(sb.toString(), numEntries, sortByStr);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         List<CertListInfo> ret = new LinkedList<>();
 
         try {
+            ps.setInt(1, caId);
+
+            if (idxNotBefore != null) {
+                ps.setLong(idxNotBefore, validFrom.getTime() / 1000 - 1);
+            }
+
+            if (idxNotAfter != null) {
+                ps.setLong(idxNotAfter, validTo.getTime() / 1000);
+            }
+
+            if (idxSubject != null) {
+                ps.setString(idxSubject, subjectLike);
+            }
+
             rs = ps.executeQuery();
             while (rs.next()) {
                 String snStr = rs.getString("SN");

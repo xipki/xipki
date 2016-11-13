@@ -145,6 +145,7 @@ import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
+import org.xipki.pki.ca.server.mgmt.api.CertListSortBy;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl.HourMinute;
@@ -538,10 +539,10 @@ public class X509Ca {
     }
 
     public List<CertListInfo> listCertificates(final X500Name subjectPattern, final Date validFrom,
-            final Date validTo, final int numEntries)
+            final Date validTo, final CertListSortBy sortBy, final int numEntries)
     throws OperationException {
         return certstore.listCertificates(caInfo.getCertificate(), subjectPattern, validFrom,
-                validTo, numEntries);
+                validTo, sortBy, numEntries);
     }
 
     public boolean authenticateUser(final String user, final byte[] password)
