@@ -67,7 +67,7 @@ public class ListCertCmd extends CaCommandSupport {
     protected String caName;
 
     @Option(name = "--subject",
-            description = "the subject pattern")
+            description = "the subject pattern, * is allowed.")
     protected String subjectPatternS;
 
     @Option(name = "--valid-from",
@@ -108,7 +108,7 @@ public class ListCertCmd extends CaCommandSupport {
         println("-----+----------------------+----------------+----------------+-----------------");
         for (int i = 0; i < n; i++) {
             CertListInfo info = certInfos.get(i);
-            println(format(i, info));
+            println(format(i + 1, info));
         }
 
         return null;
@@ -116,7 +116,7 @@ public class ListCertCmd extends CaCommandSupport {
 
     private String format(int index, CertListInfo info) {
         StringBuilder sb = new StringBuilder(300);
-        sb.append(StringUtil.formatAccount(index + 1, 4)).append(" | ");
+        sb.append(StringUtil.formatAccount(index, 4)).append(" | ");
         sb.append(StringUtil.formatText(info.getSerialNumber().toString(16), 20)).append(" | ");
         sb.append(DateUtil.toUtcTimeyyyyMMddhhmmss(info.getNotBefore())).append(" | ");
         sb.append(DateUtil.toUtcTimeyyyyMMddhhmmss(info.getNotAfter())).append(" | ");

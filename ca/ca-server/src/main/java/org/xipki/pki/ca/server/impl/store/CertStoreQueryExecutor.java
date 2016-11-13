@@ -1802,8 +1802,12 @@ class CertStoreQueryExecutor {
             for (int i = 0; i < rdns.length; i++) {
                 X500Name rdnName = new X500Name(new RDN[]{rdns[i]});
                 String rdnStr = X509Util.getRfc4519Name(rdnName);
-                if (i != 0) {
-                    sb.append(",");
+                if (rdnStr.indexOf('%') != -1) {
+                    throw new OperationException(ErrorCode.BAD_REQUEST,
+                            "the character '%' is not allowed in subjectPattern");
+                }
+                if (rdnStr.indexOf('*') != -1) {
+                    rdnStr = rdnStr.replace('*', '%');
                 }
                 sb.append(rdnStr);
                 sb.append("%");
