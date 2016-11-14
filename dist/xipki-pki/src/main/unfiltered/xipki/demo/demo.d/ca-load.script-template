@@ -239,20 +239,20 @@ if { $TOKEN_TYPE equals "PKCS12" } {
 
 xipki-cmd:copy-file \
   -f \
-  xipki/demo/demo.d/SUBCA.xml-template \
-  xipki/demo/demo.d/SUBCA.xml
+  xipki/demo/demo.d/SubCA.xml-template \
+  xipki/demo/demo.d/SubCA.xml
 
 xipki-cmd:replace \
   --old "REPLACEME-TOKEN_TYPE" \
   --new "$TOKEN_TYPE" \
-  xipki/demo/demo.d/SUBCA.xml
+  xipki/demo/demo.d/SubCA.xml
 
 xipki-cmd:replace \
   --old "REPLACEME-CA_SIGNERCONF" \
   --new "$CA_SIGNER_CONF" \
-  xipki/demo/demo.d/SUBCA.xml
+  xipki/demo/demo.d/SubCA.xml
 
-xipki-ca:load-conf --conf-file xipki/demo/demo.d/SUBCA.xml
+xipki-ca:load-conf --conf-file xipki/demo/demo.d/SubCA.xml
 
 ## Restart the CA
 #xipki-ca:restart
@@ -272,19 +272,19 @@ if { $TOKEN_TYPE equals "PKCS12" } {
 
 xipki-cmd:copy-file \
   -f \
-  xipki/demo/demo.d/SUBCAwithCRL.xml-template \
-  xipki/demo/demo.d/SUBCAwithCRL.xml
+  xipki/demo/demo.d/SubCAwithCRL.xml-template \
+  xipki/demo/demo.d/SubCAwithCRL.xml
 
 xipki-cmd:replace \
   --old "REPLACEME-TOKEN_TYPE" \
   --new "$TOKEN_TYPE" \
-  xipki/demo/demo.d/SUBCAwithCRL.xml
+  xipki/demo/demo.d/SubCAwithCRL.xml
 
 xipki-cmd:replace \
   --old "REPLACEME-CA_SIGNERCONF" \
   --new "$CA_SIGNER_CONF" \
-  xipki/demo/demo.d/SUBCAwithCRL.xml
+  xipki/demo/demo.d/SubCAwithCRL.xml
 
-xipki-ca:load-conf --conf-file xipki/demo/demo.d/SUBCAwithCRL.xml
+xipki-ca:load-conf --conf-file xipki/demo/demo.d/SubCAwithCRL.xml
 
 source ./xipki/demo/demo.d/scep-server.script
