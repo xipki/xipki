@@ -212,7 +212,8 @@ if { $printUsage equals "true" } {
 
   xipki-ca:list-cert \
       --ca RCA1 \
-      --subject "O=xipki" \
+      --subject "CN=*CA*,O=xipki" \
+      --order subject \
       -n 100
 
   # get the serial number
