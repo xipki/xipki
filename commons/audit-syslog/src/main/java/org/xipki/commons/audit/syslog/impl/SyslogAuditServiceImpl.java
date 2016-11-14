@@ -126,7 +126,7 @@ public class SyslogAuditServiceImpl extends AuditService {
     @Override
     public void doLogEvent(@Nonnull final AuditEvent event) {
         if (!initialized) {
-            LOG.error("Syslog audit not initialiazed");
+            LOG.error("syslog audit not initialized");
             return;
         }
 
@@ -181,15 +181,15 @@ public class SyslogAuditServiceImpl extends AuditService {
         try {
             syslog.sendMessage(sm);
         } catch (IOException ex) {
-            LOG.error("Could not send syslog message: {}", ex.getMessage());
-            LOG.debug("Could not send syslog message", ex);
+            LOG.error("could not send syslog message: {}", ex.getMessage());
+            LOG.debug("could not send syslog message", ex);
         }
     } // method logEvent(AuditEvent)
 
     @Override
     public void doLogEvent(@Nonnull final PciAuditEvent event) {
         if (!initialized) {
-            LOG.error("Syslog audit not initialiazed");
+            LOG.error("syslog audit not initialiazed");
             return;
         }
 
@@ -213,8 +213,8 @@ public class SyslogAuditServiceImpl extends AuditService {
         try {
             syslog.sendMessage(sm);
         } catch (IOException ex) {
-            LOG.error("Could not send syslog message: {}", ex.getMessage());
-            LOG.debug("Could not send syslog message", ex);
+            LOG.error("could not send syslog message: {}", ex.getMessage());
+            LOG.debug("could not send syslog message", ex);
         }
     } // method logEvent(PCIAuditEvent)
 
@@ -278,7 +278,7 @@ public class SyslogAuditServiceImpl extends AuditService {
 
         // after we're finished set initialized to true
         this.initialized = true;
-        LOG.info("Initialized: {}", SyslogAuditServiceImpl.class);
+        LOG.info("initialized: {}", SyslogAuditServiceImpl.class);
     } // method init
 
     public void destroy() {
