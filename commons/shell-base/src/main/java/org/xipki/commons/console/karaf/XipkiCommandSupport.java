@@ -170,11 +170,7 @@ public abstract class XipkiCommandSupport implements Action {
 
     protected static boolean isEnabled(final String enabledS, final boolean defaultEnabled,
             final String optionName) {
-        if (enabledS == null) {
-            return defaultEnabled;
-        }
-
-        return internIsEnabled(enabledS, optionName);
+        return (enabledS == null) ? defaultEnabled : internIsEnabled(enabledS, optionName);
     }
 
     private static boolean internIsEnabled(final String enabledS, final String optionName) {

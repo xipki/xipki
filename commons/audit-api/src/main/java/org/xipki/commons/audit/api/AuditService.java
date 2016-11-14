@@ -57,7 +57,7 @@ public abstract class AuditService {
     public abstract void doLogEvent(@Nonnull PciAuditEvent event);
 
     public final void logEvent(@Nonnull AuditEvent event) {
-        Objects.requireNonNull(event, "event could not be null");
+        Objects.requireNonNull(event, "event must not be null");
 
         switch (event.getLevel()) {
         case DEBUG:
@@ -74,7 +74,7 @@ public abstract class AuditService {
     }
 
     public final void logEvent(@Nonnull PciAuditEvent event) {
-        Objects.requireNonNull(event, "event could not be null");
+        Objects.requireNonNull(event, "event must not be null");
 
         CharArrayWriter msg = event.toCharArrayWriter("");
         AuditLevel al = event.getLevel();
