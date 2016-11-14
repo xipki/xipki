@@ -385,7 +385,7 @@ public class XmlX509CertprofileUtil {
         }
 
         if (ret.isEmpty()) {
-            throw new CertprofileException("GeneralNameType could not be empty");
+            throw new CertprofileException("GeneralNameType must not be empty");
         }
 
         return ret;
