@@ -113,7 +113,11 @@ public class CrlCertStatusStore extends OcspStore {
 
         @Override
         public void run() {
-            initializeStore(false);
+            try {
+                initializeStore(false);
+            } catch (Throwable th) {
+                LogUtil.error(LOG, th, "could not initialize store " + name);
+            }
         }
 
     } // StoreUpdateService

@@ -502,6 +502,9 @@ public class DbCertStatusStore extends OcspStore {
 
         initIssuerStore();
 
+        if (this.scheduledThreadPoolExecutor != null) {
+            this.scheduledThreadPoolExecutor.shutdownNow();
+        }
         StoreUpdateService storeUpdateService = new StoreUpdateService();
         this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
         this.scheduledThreadPoolExecutor.scheduleAtFixedRate(storeUpdateService, 60, 60,
