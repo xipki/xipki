@@ -94,9 +94,9 @@ caCert.file = output/SubCAwithCRL1.der
 # Required for indirect CRL, otherwise optional
 #issuerCert.file = ...
 
-# When CA certificate is revoked. DateTime YYYY-MM-DDThh:mm:ssZ, e.g. 2016-04-18T16:50:58Z
+# When CA certificate is revoked. UTC DateTime yyyyMMddhhmmss, e.g. 20160418165058
 # optional, but required if CA is revoked.
-# caRevocation.time = 2016-04-18T16:50:58Z;
+# caRevocation.time = 201604181650
 
 # Folder containing the DER-encoded certificates suffixed with ".der" and ".crt"
 # optional.

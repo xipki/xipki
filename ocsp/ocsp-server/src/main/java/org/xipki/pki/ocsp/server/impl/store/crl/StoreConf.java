@@ -36,12 +36,10 @@ package org.xipki.pki.ocsp.server.impl.store.crl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Properties;
 
+import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.pki.ocsp.api.OcspStoreException;
 
@@ -86,7 +84,7 @@ class StoreConf {
     private static final String KEY_issuerCert_file = "issuerCert.file";
 
     /*
-     * When CA certificate is revoked. dateTime YYYY-MM-DDThh:mm:ssZ, e.g. 2016-04-18T16:50:58Z
+     * When CA certificate is revoked. UTC dateTime yyyyMMddThhmmss, e.g. 20160418165058
      * optional
      */
     private static final String KEY_caRevocation_time = "caRevocation.time";
@@ -96,8 +94,6 @@ class StoreConf {
      * optional.
      */
     private static final String KEY_certs_dir = "certs.dir";
-
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
     private String crlFile;
 
@@ -164,8 +160,7 @@ class StoreConf {
         propKey = KEY_caRevocation_time;
         propValue = props.getProperty(propKey);
         if (propValue != null) {
-            Instant instant = ZonedDateTime.parse(propValue, DATE_FORMATTER).toInstant();
-            this.caRevocationTime = Date.from(instant);
+            this.caRevocationTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(propValue);
         }
     }
 
