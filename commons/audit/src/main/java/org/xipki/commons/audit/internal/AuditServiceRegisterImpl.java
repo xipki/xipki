@@ -32,14 +32,14 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api.internal;
+package org.xipki.commons.audit.internal;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.audit.api.AuditService;
-import org.xipki.commons.audit.api.AuditServiceRegister;
+import org.xipki.commons.audit.AuditService;
+import org.xipki.commons.audit.AuditServiceRegister;
 
 /**
  * @author Lijun Liao

@@ -44,12 +44,12 @@ import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditEventData;
-import org.xipki.commons.audit.api.AuditLevel;
-import org.xipki.commons.audit.api.AuditService;
-import org.xipki.commons.audit.api.AuditStatus;
-import org.xipki.commons.audit.api.PciAuditEvent;
+import org.xipki.commons.audit.AuditEvent;
+import org.xipki.commons.audit.AuditEventData;
+import org.xipki.commons.audit.AuditLevel;
+import org.xipki.commons.audit.AuditService;
+import org.xipki.commons.audit.AuditStatus;
+import org.xipki.commons.audit.PciAuditEvent;
 
 import com.cloudbees.syslog.Facility;
 import com.cloudbees.syslog.MessageFormat;
