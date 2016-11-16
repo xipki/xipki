@@ -32,4 +32,33 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api.internal;
+package org.xipki.commons.audit;
+
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+/**
+ * @author Lijun Liao
+ * @since 2.0.0
+ */
+
+public enum AuditStatus {
+
+    SUCCESSFUL,
+    FAILED,
+    UNDEFINED;
+
+    @Nullable
+    public static final AuditStatus forName(@Nonnull final String name) {
+        Objects.requireNonNull(name, "name must not be null");
+        for (AuditStatus v : values()) {
+            if (v.name().equals(name)) {
+                return v;
+            }
+        }
+        throw new IllegalArgumentException("invalid AuditStatus " + name);
+    }
+
+}

@@ -32,15 +32,63 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api;
+package org.xipki.commons.audit.internal;
+
+import java.io.CharArrayWriter;
+
+import javax.annotation.Nonnull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.commons.audit.AuditEvent;
+import org.xipki.commons.audit.AuditLevel;
+import org.xipki.commons.audit.AuditService;
+import org.xipki.commons.audit.PciAuditEvent;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public interface AuditServiceRegister {
+public class Slf4jAuditServiceImpl extends AuditService {
 
-    AuditService getAuditService();
+    private static final Logger LOG = LoggerFactory.getLogger("xipki.audit.slf4j");
+
+    public Slf4jAuditServiceImpl() {
+    }
+
+    @Override
+    public void doLogEvent(@Nonnull final AuditEvent event) {
+        switch (event.getLevel()) {
+        case DEBUG:
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("{}", createMessage(event));
+            }
+            break;
+        default:
+            if (LOG.isInfoEnabled()) {
+                LOG.info("{}", createMessage(event));
+            }
+            break;
+        } // end switch
+    }
+
+    @Override
+    public void doLogEvent(@Nonnull final PciAuditEvent event) {
+        CharArrayWriter msg = event.toCharArrayWriter("");
+        AuditLevel al = event.getLevel();
+        switch (al) {
+        case DEBUG:
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("{} | {}", al.getAlignedText(), msg);
+            }
+            break;
+        default:
+            if (LOG.isInfoEnabled()) {
+                LOG.info("{} | {}", al.getAlignedText(), msg);
+            }
+            break;
+        } // end switch
+    }
 
 }

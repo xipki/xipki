@@ -32,47 +32,4 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api;
-
-import java.util.Objects;
-
-/**
- * @author Lijun Liao
- * @since 2.0.0
- */
-
-public class AuditEventData {
-
-    private final String name;
-
-    private final String value;
-
-    public AuditEventData(final String name, final Object value) {
-        Objects.requireNonNull(name, "name must not be null");
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name must not be empty");
-        }
-        Objects.requireNonNull(value, "value must not be null");
-        this.name = name;
-        if (value instanceof String) {
-            this.value = (String) value;
-        } else {
-            this.value = value.toString();
-        }
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(name).append(": ").append(value);
-        return sb.toString();
-    }
-}
+package org.xipki.commons.audit.internal;
