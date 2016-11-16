@@ -497,7 +497,7 @@ public final class CaClientImpl implements CaClient {
                     }
 
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(10000);
                     } catch (InterruptedException ex) {
                         LOG.warn("interrupted", ex);
                     }
