@@ -41,8 +41,8 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.xipki.commons.audit.api.AuditService;
-import org.xipki.commons.audit.api.AuditServiceRegister;
+import org.xipki.commons.audit.AuditService;
+import org.xipki.commons.audit.AuditServiceRegister;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.security.CertRevocationInfo;

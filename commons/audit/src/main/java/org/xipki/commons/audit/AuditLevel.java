@@ -32,33 +32,56 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api;
+package org.xipki.commons.audit;
 
 import java.util.Objects;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public enum AuditStatus {
+public enum AuditLevel {
 
-    SUCCESSFUL,
-    FAILED,
-    UNDEFINED;
+    ERROR(3, "ERROR    "),
+    WARN(4, "WARN     "),
+    INFO(6, "INFO     "),
+    DEBUG(7, "DEBUG    ");
 
-    @Nullable
-    public static final AuditStatus forName(@Nonnull final String name) {
-        Objects.requireNonNull(name, "name must not be null");
-        for (AuditStatus v : values()) {
-            if (v.name().equals(name)) {
+    private final int value;
+
+    private final String alignedText;
+
+    AuditLevel(final int value, final String alignedText) {
+        this.value = value;
+        this.alignedText = alignedText;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public static final AuditLevel forName(final String name) {
+        Objects.requireNonNull("name", "name must not be null");
+        for (AuditLevel value : values()) {
+            if (value.name().equals(name)) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("invalid AuditLevel name " + name);
+    }
+
+    public static final AuditLevel forValue(final int value) {
+        for (AuditLevel v : values()) {
+            if (v.getValue() == value) {
                 return v;
             }
         }
-        throw new IllegalArgumentException("invalid AuditStatus " + name);
+        throw new IllegalArgumentException("invalid AuditLevel code " + value);
+    }
+
+    public String getAlignedText() {
+        return alignedText;
     }
 
 }

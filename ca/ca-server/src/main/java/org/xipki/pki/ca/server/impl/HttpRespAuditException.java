@@ -34,8 +34,8 @@
 
 package org.xipki.pki.ca.server.impl;
 
-import org.xipki.commons.audit.api.AuditLevel;
-import org.xipki.commons.audit.api.AuditStatus;
+import org.xipki.commons.audit.AuditLevel;
+import org.xipki.commons.audit.AuditStatus;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**

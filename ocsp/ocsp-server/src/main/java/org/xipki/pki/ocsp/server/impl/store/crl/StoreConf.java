@@ -66,7 +66,7 @@ class StoreConf {
     private static final String KEY_deltaCrl_file = "deltaCrl.file";
 
     /*
-     * Where use thisUpdate and nextUpdate of CRL in the corresponding fields
+     * Whether thisUpdate and nextUpdate of CRL are used in the corresponding fields
      * of OCSP response. The default value is true.
      *
      * optional

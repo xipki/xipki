@@ -40,7 +40,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.xipki.commons.audit.api.AuditServiceRegister;
+import org.xipki.commons.audit.AuditServiceRegister;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.CertRevocationInfo;

@@ -14,7 +14,7 @@
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.commons.security.SecurityFactory"/>
   <reference id="auditServiceRegister"
-      interface="org.xipki.commons.audit.api.AuditServiceRegister"/>
+      interface="org.xipki.commons.audit.AuditServiceRegister"/>
   <reference id="x509CertProfileFactoryRegister"
       interface="org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegister"/>
   <reference id="x509CertPublisherFactoryRegister"

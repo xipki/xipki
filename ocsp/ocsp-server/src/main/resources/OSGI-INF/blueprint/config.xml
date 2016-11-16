@@ -13,7 +13,7 @@
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.commons.security.SecurityFactory"/>
   <reference id="auditServiceRegister"
-      interface="org.xipki.commons.audit.api.AuditServiceRegister"/>
+      interface="org.xipki.commons.audit.AuditServiceRegister"/>
   <reference id="ocspStoreFactoryRegister"
       interface="org.xipki.pki.ocsp.api.OcspStoreFactoryRegister"/>
   <bean id="ocspServer" class="org.xipki.pki.ocsp.server.impl.OcspServer" 

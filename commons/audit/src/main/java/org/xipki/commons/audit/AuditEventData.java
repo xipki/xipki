@@ -32,7 +32,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api;
+package org.xipki.commons.audit;
 
 import java.util.Objects;
 
@@ -41,47 +41,38 @@ import java.util.Objects;
  * @since 2.0.0
  */
 
-public enum AuditLevel {
+public class AuditEventData {
 
-    ERROR(3, "ERROR    "),
-    WARN(4, "WARN     "),
-    INFO(6, "INFO     "),
-    DEBUG(7, "DEBUG    ");
+    private final String name;
 
-    private final int value;
+    private final String value;
 
-    private final String alignedText;
-
-    AuditLevel(final int value, final String alignedText) {
-        this.value = value;
-        this.alignedText = alignedText;
+    public AuditEventData(final String name, final Object value) {
+        Objects.requireNonNull(name, "name must not be null");
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("name must not be empty");
+        }
+        Objects.requireNonNull(value, "value must not be null");
+        this.name = name;
+        if (value instanceof String) {
+            this.value = (String) value;
+        } else {
+            this.value = value.toString();
+        }
     }
 
-    public int getValue() {
+    public String getName() {
+        return name;
+    }
+
+    public String getValue() {
         return value;
     }
 
-    public static final AuditLevel forName(final String name) {
-        Objects.requireNonNull("name", "name must not be null");
-        for (AuditLevel value : values()) {
-            if (value.name().equals(name)) {
-                return value;
-            }
-        }
-        throw new IllegalArgumentException("invalid AuditLevel name " + name);
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(name).append(": ").append(value);
+        return sb.toString();
     }
-
-    public static final AuditLevel forValue(final int value) {
-        for (AuditLevel v : values()) {
-            if (v.getValue() == value) {
-                return v;
-            }
-        }
-        throw new IllegalArgumentException("invalid AuditLevel code " + value);
-    }
-
-    public String getAlignedText() {
-        return alignedText;
-    }
-
 }

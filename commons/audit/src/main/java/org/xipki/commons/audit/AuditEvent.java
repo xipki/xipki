@@ -32,7 +32,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.audit.api;
+package org.xipki.commons.audit;
 
 import java.util.Collections;
 import java.util.Date;

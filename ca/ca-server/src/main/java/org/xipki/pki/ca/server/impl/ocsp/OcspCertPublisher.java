@@ -41,10 +41,10 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.audit.api.AuditEvent;
-import org.xipki.commons.audit.api.AuditLevel;
-import org.xipki.commons.audit.api.AuditServiceRegister;
-import org.xipki.commons.audit.api.AuditStatus;
+import org.xipki.commons.audit.AuditEvent;
+import org.xipki.commons.audit.AuditLevel;
+import org.xipki.commons.audit.AuditServiceRegister;
+import org.xipki.commons.audit.AuditStatus;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;

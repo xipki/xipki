@@ -41,5 +41,5 @@
     <property name="ssl" value="${ssl}"/>
     <property name="messageFormat" value="${messageFormat}"/>
   </bean>
-  <service ref="syslogAuditServiceImpl" interface="org.xipki.commons.audit.api.AuditService"/>
+  <service ref="syslogAuditServiceImpl" interface="org.xipki.commons.audit.AuditService"/>
 </blueprint>
