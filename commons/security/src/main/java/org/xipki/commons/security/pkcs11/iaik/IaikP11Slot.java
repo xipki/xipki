@@ -762,7 +762,8 @@ class IaikP11Slot extends AbstractP11Slot {
             keyTemplate.getLabel().setCharArrayValue(label.toCharArray());
         }
 
-        int num = removeObjects(keyTemplate);
+        String objIdDesc = getDescription(id, label);
+        int num = removeObjects(keyTemplate, "keys " + objIdDesc);
 
         X509PublicKeyCertificate certTemplate = new X509PublicKeyCertificate();
         if (id != null && id.length > 0) {
@@ -772,11 +773,12 @@ class IaikP11Slot extends AbstractP11Slot {
             certTemplate.getLabel().setCharArrayValue(label.toCharArray());
         }
 
-        num += removeObjects(certTemplate);
+        num += removeObjects(certTemplate, "certificates" + objIdDesc);
         return num;
     }
 
-    private int removeObjects(final Storage template) throws P11TokenException {
+    private int removeObjects(final Storage template, final String desc)
+    throws P11TokenException {
         Session session = borrowWritableSession();
         try {
             List<Storage> objects = getObjects(session, template);
@@ -785,6 +787,7 @@ class IaikP11Slot extends AbstractP11Slot {
             }
             return objects.size();
         } catch (TokenException ex) {
+            LogUtil.error(LOG, ex, "could not remove " + desc);
             throw new P11TokenException(ex.getMessage(), ex);
         } finally {
             returnWritableSession(session);
@@ -926,14 +929,15 @@ class IaikP11Slot extends AbstractP11Slot {
 
             PrivateKey privateKey2 = getPrivateKeyObject(id, label.toCharArray());
             if (privateKey2 == null) {
-                throw new P11TokenException("could not read the generated privateKey");
+                throw new P11TokenException("could not read the generated private key");
             }
             return new IaikP11Identity(this, entityId, privateKey2, jcePublicKey, null);
-        } catch (P11TokenException ex) {
-            removeObjects(id, label);
-            throw ex;
-        } catch (RuntimeException ex) {
-            removeObjects(id, label);
+        } catch (P11TokenException | RuntimeException ex) {
+            try {
+                removeObjects(id, label);
+            } catch (Throwable th) {
+                LogUtil.error(LOG, th, "could not remove objects");
+            }
             throw ex;
         }
     }
@@ -1035,35 +1039,39 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected void doRemoveIdentity(final P11ObjectIdentifier objectId) throws P11TokenException {
-        PrivateKey privKey = getPrivateKeyObject(objectId.getId(), objectId.getLabelChars());
-        PublicKey pubKey = getPublicKeyObject(objectId.getId(), objectId.getLabelChars());
-        X509PublicKeyCertificate[] certs = getCertificateObjects(objectId.getId(),
-                objectId.getLabelChars());
-
         Session session = borrowWritableSession();
         try {
+            PrivateKey privKey = getPrivateKeyObject(objectId.getId(), objectId.getLabelChars());
             if (privKey != null) {
                 try {
                     session.destroyObject(privKey);
                 } catch (TokenException ex) {
-                    throw new P11TokenException("could not delete private key " + objectId);
+                    String msg = "could not delete private key " + objectId;
+                    LogUtil.error(LOG, ex, msg);
+                    throw new P11TokenException(msg);
                 }
             }
 
+            PublicKey pubKey = getPublicKeyObject(objectId.getId(), objectId.getLabelChars());
             if (pubKey != null) {
                 try {
                     session.destroyObject(pubKey);
                 } catch (TokenException ex) {
-                    throw new P11TokenException("could not delete public key " + objectId);
+                    String msg = "could not delete public key " + objectId;
+                    LogUtil.error(LOG, ex, msg);
+                    throw new P11TokenException(msg);
                 }
             }
 
+            X509PublicKeyCertificate[] certs = getCertificateObjects(objectId.getId(),
+                    objectId.getLabelChars());
             if (certs != null && certs.length > 0) {
                 for (int i = 0; i < certs.length; i++) {
                     try {
                         session.destroyObject(certs[i]);
                     } catch (TokenException ex) {
-                        throw new P11TokenException("could not delete certificate " + objectId);
+                        String msg = "could not delete certificate " + objectId;
+                        LogUtil.error(LOG, ex, msg);
                     }
                 }
             }
