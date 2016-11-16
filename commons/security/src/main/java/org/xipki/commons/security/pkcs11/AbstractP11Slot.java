@@ -117,6 +117,13 @@ public abstract class AbstractP11Slot implements P11Slot {
         return sb.toString();
     }
 
+    protected static String getDescription(final byte[] keyId, final String keyLabel) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("id ").append((keyId == null) ? "null" : Hex.toHexString(keyId));
+        sb.append(" and label ").append(keyLabel);
+        return sb.toString();
+    }
+
     protected abstract void doUpdateCertificate(final P11ObjectIdentifier objectId,
             final X509Certificate newCert) throws XiSecurityException, P11TokenException;
 
