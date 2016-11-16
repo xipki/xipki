@@ -1072,6 +1072,7 @@ class IaikP11Slot extends AbstractP11Slot {
                     } catch (TokenException ex) {
                         String msg = "could not delete certificate " + objectId;
                         LogUtil.error(LOG, ex, msg);
+                        throw new P11TokenException(msg);
                     }
                 }
             }
