@@ -23,61 +23,61 @@
   </feature>
   <feature name="xipki-datasource" version="${project.version}">
     <feature prerequisite="true">xipki-password</feature>
-    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
+    <bundle dependency="true">mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.xipki.commons/datasource/${project.version}</bundle>
   </feature>
   <feature name="xipki-cabase" version="${project.version}">
-    <feature>xipki-audit</feature>
-    <feature>xipki-datasource</feature>
+    <feature prerequisite="true">xipki-audit</feature>
+    <feature prerequisite="true">xipki-datasource</feature>
     <feature prerequisite="true">xipki-security</feature>
     <bundle>mvn:org.xipki.pki/ca-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
   </feature>
   <feature name="xipki-caserver" version="${project.version}">
-    <feature>xipki-cabase</feature>
-    <bundle>mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
+    <feature prerequisite="true">xipki-cabase</feature>
     <bundle>mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/scep-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}">
-    <feature>xipki-caserver</feature>
-    <feature>xipki-shell-base</feature>
+    <feature prerequisite="true">xipki-caserver</feature>
+    <feature prerequisite="true">xipki-shell-base</feature>
     <bundle>mvn:org.xipki.pki/ca-mgmt-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-qa-shell" version="${project.version}">
-    <feature>xipki-camgmt-shell</feature>
+    <feature prerequisite="true">xipki-camgmt-shell</feature>
     <bundle>mvn:org.xipki.pki/ca-mgmt-qa-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}">
-    <feature>xipki-cabase</feature>
+    <feature prerequisite="true">xipki-cabase</feature>
     <bundle>mvn:org.xipki.pki/ca-client-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-client-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient-shell" version="${project.version}">
-    <feature>xipki-caclient</feature>
+    <feature prerequisite="true">xipki-caclient</feature>
     <feature>xipki-shell-base</feature>
     <bundle>mvn:org.xipki.pki/ca-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caqa-shell" version="${project.version}">
-    <feature>xipki-caclient-shell</feature>
+    <feature prerequisite="true">xipki-caclient-shell</feature>
     <bundle>mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-qa/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ca-qa-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-security-shell" version="${project.version}">
-    <feature>xipki-shell-base</feature>
+    <feature prerequisite="true">xipki-shell-base</feature>
     <bundle>mvn:org.xipki.commons/security-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-speed-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-scepclient-shell" version="${project.version}">
-    <feature>xipki-shell-base</feature>
+    <feature prerequisite="true">xipki-shell-base</feature>
     <bundle>mvn:org.xipki.pki/scep-common/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/scep-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/scep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-jscepclient-shell" version="${project.version}">
-    <feature>xipki-shell-base</feature>
+    <feature prerequisite="true">xipki-shell-base</feature>
     <bundle><![CDATA[wrap:mvn:com.google.code.jscep/jscep/${jscep.version}/$Bundle-SymbolicName=jscep&Bundle-Version=2.4.0]]></bundle>
     <bundle><![CDATA[wrap:mvn:net.jcip/jcip-annotations/1.0/$Bundle-SymbolicName=jcip-annotations&Bundle-Version=1.0]]></bundle>
     <bundle>mvn:commons-codec/commons-codec/1.7</bundle>
@@ -86,7 +86,7 @@
     <bundle>mvn:org.xipki.pki/jscep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspserver" version="${project.version}">
-    <feature>xipki-datasource</feature>
+    <feature prerequisite="true">xipki-datasource</feature>
     <feature prerequisite="true">xipki-security</feature>
     <feature>xipki-audit</feature>
     <bundle>mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
@@ -98,18 +98,18 @@
     <bundle>mvn:org.xipki.pki/ocsp-client-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspclient-shell" version="${project.version}">
-    <feature>xipki-ocspclient</feature>
-    <feature>xipki-shell-base</feature>
+    <feature prerequisite="true">xipki-ocspclient</feature>
+    <feature prerequisite="true">xipki-shell-base</feature>
     <bundle>mvn:org.xipki.pki/ocsp-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspqa-shell" version="${project.version}">
-    <feature>xipki-ocspclient-shell</feature>
+    <feature prerequisite="true">xipki-ocspclient-shell</feature>
     <bundle>mvn:org.xipki.pki/ocsp-qa/${project.version}</bundle>
     <bundle>mvn:org.xipki.pki/ocsp-qa-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-database-tool" version="${project.version}">
-    <feature>xipki-datasource</feature>
-    <feature>xipki-shell-base</feature>
+    <feature prerequisite="true">xipki-datasource</feature>
+    <feature prerequisite="true">xipki-shell-base</feature>
     <bundle>mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle>mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
     <bundle>mvn:org.xipki.commons/database-tool/${project.version}</bundle>
@@ -121,7 +121,7 @@
     <bundle>mvn:org.xipki.commons/audit/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}">
-    <feature>xipki-audit</feature>
+    <feature prerequisite="true">xipki-audit</feature>
     <bundle><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
     <bundle>mvn:org.xipki.commons/audit-syslog/${project.version}</bundle>
   </feature>
