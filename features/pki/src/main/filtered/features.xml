@@ -8,7 +8,7 @@
   <feature name="xipki-password" version="${proejct.version}">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
+    <bundle>mvn:javax.annotation/javax.annotation-api/${javax.annotation-api.version}</bundle>
     <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/password/${project.version}</bundle>
   </feature>
@@ -117,7 +117,7 @@
     <bundle>mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit" version="${project.version}">
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.bundle.version}</bundle>
+    <bundle>mvn:javax.annotation/javax.annotation-api/${javax.annotation-api.version}</bundle>
     <bundle>mvn:org.xipki.commons/audit/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}">

@@ -5,7 +5,7 @@
   <feature name="xipki-pkcs11-proxy" version="${project.version}">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
+    <bundle>mvn:javax.annotation/javax.annotation-api/${javax.annotation-api.version}</bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/password/${project.version}</bundle>
