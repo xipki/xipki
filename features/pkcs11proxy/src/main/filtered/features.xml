@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<features xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" name="pkcs11proxy-${project.version}"
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pkcs11proxy-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
   <feature name="xipki-pkcs11-proxy" version="${project.version}">
@@ -11,6 +11,63 @@
     <bundle>mvn:org.xipki.commons/password/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/pkcs11-proxy-server/${project.version}</bundle>
+    <config name="org.xipki.commons.password" append="false">
+## Master password callback
+#
+# Use popup GUI to enter the master password (default)
+#
+#masterPassword.callback = PBE-GUI quorum=1,tries=3
+
+# Master password is saved in the file, e.g. /etc/xipki.masterpassword.secret, either as
+# clear text, or in obfuscated form, e.g. 'OBF:1yf01z7o1t331z7e1yf6' for password 'qwert'
+#
+masterPassword.callback = FILE file=xipki/security/masterpassword.secret
+
+# Master password will be produced by some password producer, e.g. via the karaf shell.
+#masterPassword.callback = PBE-Consumer name=master-password,tries=3
+    </config>
+    <config name="org.xipki.commons.security" append="false">
+## Whether strong secure random should be used to generate key
+# the default is false
+#key.strongrandom.enabled = false
+
+## Whether strong secure random should be used to create signature
+# the default is false
+#sign.strongrandom.enabled = false
+
+## Default parallelism degree of the sign services.
+# the default is 32
+#defaultSignerParallelism = 32
+
+## HTTPS hostname verifier
+# Whether to enable HttpsHostnameVerifier
+# the default is false
+#
+#hostnameVerifier.enabled = false
+
+## Whether to trust all certificates
+# the default is false
+#
+#hostnameVerifier.trustAll = false
+
+## Map of common name to host name
+# syntax &lt;commonname>=&lt;semicolon-seperated host names>,&lt;commonname>=&lt;semicolon-seperated host names> ...
+# the default is empty
+#
+#hostnameVerifier.commonnameHostMap=
+
+# PKCS#11 configuration file
+# the default is empty
+
+#pkcs11.confFile = xipki/security/pkcs11-conf-hsm.xml
+pkcs11.confFile = xipki/security/pkcs11-conf-emulator.xml
+    </config>
+    <config name="org.xipki.commons.security.pkcs11proxy" append="false">
+## URL patterns of the CMP serice
+# The default is /p11proxy/*
+#
+#urlPatterns = /p11proxy/*
+    </config>
   </feature>
   <feature name="xipki-security-shell" version="${project.version}">
     <feature prerequisite="true">xipki-pkcs11-proxy</feature>
