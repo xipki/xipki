@@ -41,7 +41,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.XiSecurityException;
@@ -72,20 +71,6 @@ public class LocalP11CryptServicePool {
 
     public boolean isInitialized() {
         return initialized.get();
-    }
-
-    public void asynInit() {
-        Runnable initRun = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    init();
-                } catch (Throwable th) {
-                    LogUtil.error(LOG, th, "could not asynInit");
-                }
-            }
-        };
-        new Thread(initRun).start();
     }
 
     public void init() throws P11TokenException, XiSecurityException {

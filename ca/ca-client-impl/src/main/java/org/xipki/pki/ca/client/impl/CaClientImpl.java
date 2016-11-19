@@ -172,7 +172,7 @@ public final class CaClientImpl implements CaClient {
                 Set<String> failedCaNames = autoConfCas(autoConfCaNames);
 
                 if (CollectionUtil.isNonEmpty(failedCaNames)) {
-                    LOG.warn("could not configured following CAs {}", failedCaNames);
+                    LOG.warn("could not configure following CAs {}", failedCaNames);
                 }
 
             } finally {
@@ -248,21 +248,11 @@ public final class CaClientImpl implements CaClient {
         return caNamesWithError;
     } // method autoConfCas
 
-    public void asynInit() {
-        Runnable initRun = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    init(true);
-                } catch (Throwable th) {
-                    LogUtil.error(LOG, th, "could not init");
-                }
-            }
-        };
-        new Thread(initRun).start();
+    public void init() throws CaClientException {
+        doInit(true);
     }
 
-    private synchronized void init(final boolean force) throws CaClientException {
+    private synchronized void doInit(final boolean force) throws CaClientException {
         if (confFile == null) {
             throw new IllegalStateException("confFile is not set");
         }
@@ -505,7 +495,7 @@ public final class CaClientImpl implements CaClient {
             }
 
             if (CollectionUtil.isNonEmpty(failedCaNames)) {
-                final String msg = "could not configured following CAs " + failedCaNames;
+                final String msg = "could not configure following CAs " + failedCaNames;
                 if (devMode) {
                     LOG.warn(msg);
                 } else {
@@ -754,7 +744,7 @@ public final class CaClientImpl implements CaClient {
     public X509CRL downloadCrl(final String caName, final BigInteger crlNumber,
             final RequestResponseDebug debug) throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("caName", caName);
-        init(false);
+        doInit(false);
 
         CaConf ca = casMap.get(caName.trim());
         if (ca == null) {
@@ -858,7 +848,7 @@ public final class CaClientImpl implements CaClient {
         ParamUtil.requireNonNull("pop", pop);
         ParamUtil.requireNonNull("profileName", profileName);
 
-        init(false);
+        doInit(false);
         String tmpCaName = caName;
         if (tmpCaName == null) {
             // detect the CA name
@@ -964,7 +954,7 @@ public final class CaClientImpl implements CaClient {
             final int reason) throws CaClientException {
         ParamUtil.requireNonNull("issuer", issuer);
 
-        init(false);
+        doInit(false);
         final String id = "cert-1";
         RevokeCertRequestEntry entry = new RevokeCertRequestEntry(id, issuer, serial, reason, null);
         RevokeCertRequest request = new RevokeCertRequest();
@@ -1027,7 +1017,7 @@ public final class CaClientImpl implements CaClient {
             final RequestResponseDebug debug) throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
-        init(false);
+        doInit(false);
         List<UnrevokeOrRemoveCertEntry> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
             return Collections.emptyMap();
@@ -1095,7 +1085,7 @@ public final class CaClientImpl implements CaClient {
     throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
-        init(false);
+        doInit(false);
         List<UnrevokeOrRemoveCertEntry> requestEntries = request.getRequestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
             return Collections.emptyMap();
@@ -1125,7 +1115,7 @@ public final class CaClientImpl implements CaClient {
     public Set<CertprofileInfo> getCertprofiles(final String caName) throws CaClientException {
         ParamUtil.requireNonNull("caName", caName);
 
-        init(false);
+        doInit(false);
         CaConf ca = casMap.get(caName.trim());
         if (ca == null) {
             return Collections.emptySet();
@@ -1151,7 +1141,7 @@ public final class CaClientImpl implements CaClient {
         HealthCheckResult healthCheckResult = new HealthCheckResult(name);
 
         try {
-            init(false);
+            doInit(false);
         } catch (CaClientException ex) {
             LogUtil.error(LOG, ex, "could not initialize CaCleint");
             healthCheckResult.setHealthy(false);
