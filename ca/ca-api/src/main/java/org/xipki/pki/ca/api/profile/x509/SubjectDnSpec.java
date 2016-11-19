@@ -212,8 +212,6 @@ public class SubjectDnSpec {
             }
         }
 
-        LOG.info("country/area codess: {}", countryAreaCodes);
-
         // ----- Type, Length -----
         ASN1ObjectIdentifier id;
 

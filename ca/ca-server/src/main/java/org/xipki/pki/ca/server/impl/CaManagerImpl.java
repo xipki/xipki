@@ -675,20 +675,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
     } // method notifyCaChange
 
-    public void asynStartCaSystem() {
-        Runnable initRun = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    startCaSystem();
-                } catch (Throwable th) {
-                    LogUtil.error(LOG, th);
-                }
-            }
-        };
-        new Thread(initRun).start();
-    }
-
     public void startCaSystem() {
         boolean caSystemStarted = false;
         try {

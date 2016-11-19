@@ -1,7 +1,7 @@
 echo "#################################################################"
 echo "#                              OCSP                             #"
 echo "#################################################################"
-feature:install xipki-ocspqa-shell
+feature:install -r xipki-ocspqa-shell
 
 URL = http://localhost:8080/ocsp/responder1
 URL_CRL = http://localhost:8080/ocsp/responder2

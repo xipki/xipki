@@ -294,20 +294,6 @@ public class OcspServer {
         return initialized.get();
     }
 
-    public void asynInit() {
-        Runnable initRun = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    init();
-                } catch (Throwable th) {
-                    LogUtil.error(LOG, th, "could not init");
-                }
-            }
-        };
-        new Thread(initRun).start();
-    }
-
     public void init() throws InvalidConfException, PasswordResolverException, DataAccessException {
         LOG.info("starting OCSPResponder server ...");
         if (initialized.get()) {

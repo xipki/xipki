@@ -2,7 +2,7 @@ echo "#################################################################"
 echo "#                      Initialize the database                  #"
 echo "#################################################################"
 
-feature:install xipki-database-tool
+feature:install -r xipki-database-tool
 
 sleep 1000
 
@@ -11,9 +11,9 @@ xipki-db:initdb \
 
 feature:uninstall xipki-database-tool
 
-feature:install xipki-caserver
+feature:install -r xipki-caserver
 
-feature:install xipki-camgmt-shell
+feature:install -r xipki-camgmt-shell
 
 sleep 1000
 

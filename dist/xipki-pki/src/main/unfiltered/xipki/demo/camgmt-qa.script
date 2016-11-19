@@ -61,12 +61,12 @@ if { $printUsage equals "true" } {
   echo "options"
   echo "    -l               configure CAs using command 'load-conf'"
 } {
-  feature:install xipki-security-shell
+  feature:install -r xipki-security-shell
   source xipki/demo/demo.d/prepare-keys.script
 
   source xipki/demo/demo.d/ca.script
 
-  feature:install xipki-camgmt-qa-shell
+  feature:install -r xipki-camgmt-qa-shell
 
   # Wait one second
   sleep 1000

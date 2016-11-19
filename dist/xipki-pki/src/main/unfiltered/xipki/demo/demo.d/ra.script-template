@@ -24,7 +24,7 @@ xipki-ca:enroll-cert \
 echo "#################################################################"
 echo "#              MANAGE CERTIFICATE WITH RA CLIENT                #"
 echo "#################################################################"
-feature:install xipki-caclient-shell
+feature:install -r xipki-caclient-shell
 
 # Wait two seconds
 sleep 2000

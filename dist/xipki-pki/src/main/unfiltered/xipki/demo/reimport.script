@@ -2,7 +2,7 @@ echo "#################################################################"
 echo "#               EXPORT THEN IMPORT CA AND OCSP                  #"
 echo "#################################################################"
 
-feature:install xipki-database-tool
+feature:install -r xipki-database-tool
 
 # Wait two seconds
 sleep 1000
@@ -65,7 +65,7 @@ xipki-db:import-ocspfromca \
   --in-dir output/dbexport/ca
 
 ## Restart the CA
-feature:install xipki-camgmt-shell
+feature:install -r xipki-camgmt-shell
 
 # Wait two seconds
 sleep 1000

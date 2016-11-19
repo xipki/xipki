@@ -47,7 +47,7 @@ if { $printUsage equals "true" } {
   }
 
   if { "$1" equals "enroll" } {
-    feature:install xipki-caclient-shell
+    feature:install -r xipki-caclient-shell
 
     # Wait two seconds
     sleep 2000
@@ -74,7 +74,7 @@ if { $printUsage equals "true" } {
   }
 
   if { "$1" equals "revoke" } {
-    feature:install xipki-caclient-shell
+    feature:install -r xipki-caclient-shell
 
     # Wait one second
     sleep 1000
@@ -90,7 +90,7 @@ if { $printUsage equals "true" } {
   }
 
   if { "$1" equals "ocsp" } {
-    feature:install xipki-ocspclient-shell
+    feature:install -r xipki-ocspclient-shell
 
     URL = http://localhost:8080/ocsp/responder1
     URL_CRL = http://localhost:8080/ocsp/responder2

@@ -4,7 +4,7 @@ echo "#################################################################"
 echo "#              Enroll CERTIFICATE WITH SCEP                     #"
 echo "#################################################################"
 
-feature:install xipki-scepclient-shell
+feature:install -r xipki-scepclient-shell
 
 # Wait two seconds
 sleep 2000

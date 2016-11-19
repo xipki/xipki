@@ -86,7 +86,7 @@ if { $printUsage equals "true" } {
   echo "options"
   echo "    -l               configure CAs using command 'load-conf'"
 } {
-  feature:install xipki-security-shell
+  feature:install -r xipki-security-shell
   source xipki/demo/demo.d/prepare-keys.script
 
   ## Prepare OCSP responder configuration
@@ -231,7 +231,7 @@ if { $printUsage equals "true" } {
 
   source xipki/demo/rest.script
 
-  feature:install xipki-ocspserver
+  feature:install -r xipki-ocspserver
 
   source xipki/demo/ocsp.script
 

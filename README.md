@@ -174,12 +174,12 @@ In the OSGi console, call `source xipki/demo/demo.script` to demonstrate the who
 Karaf Features
 -----
 
-The karaf feature can be installed via the command `feature:install <feature name>` and uninstalled
-in the OSGi console via the command `feature:uninstall <feature name>`. The possible feature can be
-auto-completed by typing the `TAB` key.
+The karaf feature can be installed via the command `feature:install -r <feature name>` (the flag -r disables the refreshing of already installed bundles) and uninstalled in the OSGi console via the command `feature:uninstall <feature name>`. The possible feature can be auto-completed by typing the `TAB` key.
 
-A list of all available XiPKI features can be retrieved via the
-command `feature:list  | grep xipki` in OSGi console.
+A list of all available XiPKI features can be retrieved via the command
+`feature:list  | grep xipki` in OSGi console.
+
+For details of karaf features please refer to [Karaf Manuel Provisioning](https://karaf.apache.org/manual/latest/provisioning)
 
 Karaf Commands
 -----

@@ -17,7 +17,7 @@
   <reference id="ocspStoreFactoryRegister"
       interface="org.xipki.pki.ocsp.api.OcspStoreFactoryRegister"/>
   <bean id="ocspServer" class="org.xipki.pki.ocsp.server.impl.OcspServer" 
-      init-method="asynInit" destroy-method="shutdown">
+      init-method="init" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
     <property name="securityFactory" ref="securityFactory"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>

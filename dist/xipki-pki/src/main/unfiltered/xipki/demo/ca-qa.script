@@ -1,7 +1,7 @@
 echo "#################################################################"
 echo "#                              QA                               #"
 echo "#################################################################"
-feature:install xipki-caqa-shell
+feature:install -r xipki-caqa-shell
 
 # Wait one second
 sleep 1000
