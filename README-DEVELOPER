@@ -1,6 +1,0 @@
-1. Change karaf version
-  - adapt the karaf.version, karaf-plugin.version in the root pom.xml
-  - If the version of javax.annotation-api changes
-    - adapt the javax.annotation-api.version in the root pom.xml
-    - rename the directory in dist/shared/override/system/javax/javax.annotation-api/<version>
-    - extend bundle javax.annotation-api by jsr305.

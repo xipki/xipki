@@ -2,40 +2,6 @@
 <component>
   <fileSets>
     <fileSet>
-      <directory>${shared.dir}/override</directory>
-      <includes>
-        <include>bin/**</include>
-        <include>**/*.sh</include>
-      </includes>
-      <excludes>
-        <exclude>bin/*.bat</exclude>
-      </excludes>
-      <outputDirectory>.</outputDirectory>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0755</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${shared.dir}/override</directory>
-      <includes>
-        <include>bin/*.bat</include>
-      </includes>
-      <outputDirectory>.</outputDirectory>
-      <lineEnding>dos</lineEnding>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${shared.dir}/override</directory>
-      <excludes>
-        <exclude>bin/**</exclude>
-        <exclude>**/*.sh</exclude>
-      </excludes>
-      <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
       <directory>${output.directory}</directory>
       <includes>
         <include>bin/**</include>
