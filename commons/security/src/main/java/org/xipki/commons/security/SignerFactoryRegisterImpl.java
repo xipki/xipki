@@ -266,8 +266,14 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         try {
             p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
             P11Module module = p11Service.getModule();
-            P11SlotIdentifier p11SlotId = (slotId != null) ? module.getSlotIdForId(slotId)
-                    : module.getSlotIdForIndex(slotIndex);
+            P11SlotIdentifier p11SlotId;
+            if (slotId != null) {
+                p11SlotId = module.getSlotIdForId(slotId);
+            } else if (slotIndex != null) {
+                p11SlotId = module.getSlotIdForIndex(slotIndex);
+            } else {
+                throw new RuntimeException("should not reach here");
+            }
             slot = module.getSlot(p11SlotId);
         } catch (P11TokenException | XiSecurityException ex) {
             throw new ObjectCreationException(ex.getMessage(), ex);

@@ -770,7 +770,7 @@ public class X509Util {
                     tag = Integer.parseInt(tagS);
                     value = taggedValue.substring(idx + 1);
                 } catch (NumberFormatException ex) {
-                    LOG.warn("invalid tag '{}'", tagS);
+                    throw new BadInputException("invalid tag '" + tagS + "'");
                 }
             }
         }
@@ -781,6 +781,10 @@ public class X509Util {
 
         switch (tag) {
         case GeneralName.otherName:
+            if (value == null) {
+                throw new BadInputException("invalid otherName: no value specified");
+            }
+
             int idxSep = value.indexOf("=");
             if (idxSep == -1 || idxSep == 0 || idxSep == value.length() - 1) {
                 throw new BadInputException("invalid otherName " + value);
@@ -801,6 +805,9 @@ public class X509Util {
             X500Name x500Name = reverse(new X500Name(value));
             return new GeneralName(GeneralName.directoryName, x500Name);
         case GeneralName.ediPartyName:
+            if (value == null) {
+                throw new BadInputException("invalid ediPartyName: no value specified");
+            }
             idxSep = value.indexOf("=");
             if (idxSep == -1 || idxSep == value.length() - 1) {
                 throw new BadInputException("invalid ediPartyName " + value);

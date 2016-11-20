@@ -80,8 +80,15 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
         this.certificateChain = (certificateChain != null && certificateChain.length > 0)
                         ? certificateChain : null;
-
-        this.publicKey = (publicKey == null) ? certificateChain[0].getPublicKey() : publicKey;
+        if (publicKey != null) {
+            this.publicKey = publicKey;
+        } else {
+            if (certificateChain != null && certificateChain.length > 0) {
+                this.publicKey = certificateChain[0].getPublicKey();
+            } else {
+                this.publicKey = null;
+            }
+        }
 
         if (this.publicKey instanceof RSAPublicKey) {
             signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();

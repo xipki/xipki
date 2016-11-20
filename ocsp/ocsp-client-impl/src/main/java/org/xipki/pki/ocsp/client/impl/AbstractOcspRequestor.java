@@ -202,7 +202,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             throw new ResponderUnreachableException("IOException: " + ex.getMessage(), ex);
         }
 
-        if (debug != null) {
+        if (msgPair != null) {
             msgPair.setResponse(encodedResp);
         }
 
@@ -243,7 +243,14 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         }
 
         SingleResp[] singleResponses = basicOcspResp.getResponses();
-        final int countSingleResponses = (singleResponses == null) ? 0 : singleResponses.length;
+        if (singleResponses == null || singleResponses.length == 0) {
+            StringBuilder sb = new StringBuilder(100);
+            sb.append("response with no singleResponse is returned, expected is ");
+            sb.append(serialNumbers.length);
+            throw new OcspTargetUnmatchedException(sb.toString());
+        }
+
+        final int countSingleResponses = singleResponses.length;
 
         if (countSingleResponses != serialNumbers.length) {
             StringBuilder sb = new StringBuilder(100);
@@ -279,7 +286,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             List<BigInteger> tmpSerials1 = Arrays.asList(serialNumbers);
             List<BigInteger> tmpSerials2 = new ArrayList<>(tmpSerials1);
 
-            for (int i = 0; i < singleResponses.length; i++) {
+            for (int i = 0; i < countSingleResponses; i++) {
                 SingleResp singleResp = singleResponses[i];
                 CertificateID cid = singleResp.getCertID();
                 boolean issuerMatch = issuerHashAlg.equals(cid.getHashAlgOID())

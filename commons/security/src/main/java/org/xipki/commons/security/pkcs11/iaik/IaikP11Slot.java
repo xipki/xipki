@@ -282,7 +282,6 @@ class IaikP11Slot extends AbstractP11Slot {
         if (cert != null) {
             pubKey = cert.getCert().getPublicKey();
         } else {
-            cert = null;
             PublicKey p11PublicKey = getPublicKeyObject(id, null);
             if (p11PublicKey == null) {
                 LOG.info("neither certificate nor public key for the key (" + Hex.toHexString(id)

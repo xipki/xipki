@@ -97,12 +97,13 @@ public class OcspLoadTest extends LoadExecutor {
 
             SingleResp[] singleResponses = basicResp.getResponses();
 
-            final int n = (singleResponses == null) ? 0 : singleResponses.length;
-
-            if (n == 0) {
+            if (singleResponses == null || singleResponses.length == 0) {
                 LOG.warn("received no status from server");
                 return false;
-            } else if (n != 1) {
+            }
+
+            final int n = singleResponses.length;
+            if (n != 1) {
                 LOG.warn("received status with {} single responses from server, {}", n,
                         "but 1 was requested");
                 return false;

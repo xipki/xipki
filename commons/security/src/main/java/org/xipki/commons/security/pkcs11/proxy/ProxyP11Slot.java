@@ -120,7 +120,6 @@ public class ProxyP11Slot extends AbstractP11Slot {
             if (cert != null) {
                 pubKey = cert.getCert().getPublicKey();
             } else {
-                cert = null;
                 pubKey = getPublicKey(keyId);
                 if (pubKey == null) {
                     LOG.warn("Neither public key nor certificate is associated with private key {}",
