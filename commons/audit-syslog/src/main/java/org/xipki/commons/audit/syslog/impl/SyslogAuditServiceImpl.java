@@ -40,7 +40,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,7 +124,7 @@ public class SyslogAuditServiceImpl extends AuditService {
     }
 
     @Override
-    public void doLogEvent(@Nonnull final AuditEvent event) {
+    public void doLogEvent(@NonNull final AuditEvent event) {
         if (!initialized) {
             LOG.error("syslog audit not initialized");
             return;
@@ -187,7 +187,7 @@ public class SyslogAuditServiceImpl extends AuditService {
     } // method logEvent(AuditEvent)
 
     @Override
-    public void doLogEvent(@Nonnull final PciAuditEvent event) {
+    public void doLogEvent(@NonNull final PciAuditEvent event) {
         if (!initialized) {
             LOG.error("syslog audit not initialiazed");
             return;

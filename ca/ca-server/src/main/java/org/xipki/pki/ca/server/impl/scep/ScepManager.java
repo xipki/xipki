@@ -34,7 +34,7 @@
 
 package org.xipki.pki.ca.server.impl.scep;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * @author Lijun Liao
@@ -43,6 +43,6 @@ import javax.annotation.Nonnull;
 
 public interface ScepManager {
 
-    Scep getScep(@Nonnull String name);
+    Scep getScep(@NonNull String name);
 
 }

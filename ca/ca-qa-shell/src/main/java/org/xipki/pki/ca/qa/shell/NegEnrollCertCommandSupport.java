@@ -36,7 +36,7 @@ package org.xipki.pki.ca.qa.shell;
 
 import java.security.cert.X509Certificate;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -109,7 +109,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
     private String caName;
 
     protected abstract ConcurrentContentSigner getSigner(
-            @Nonnull SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
+            @NonNull SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
 
     @Override
     protected Object doExecute() throws Exception {

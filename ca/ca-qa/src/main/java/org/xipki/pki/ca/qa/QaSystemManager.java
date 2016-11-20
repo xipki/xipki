@@ -36,7 +36,7 @@ package org.xipki.pki.ca.qa;
 
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * @author Lijun Liao
@@ -47,10 +47,10 @@ public interface QaSystemManager {
 
     Set<String> getIssuerNames();
 
-    X509IssuerInfo getIssuer(@Nonnull String issuerName);
+    X509IssuerInfo getIssuer(@NonNull String issuerName);
 
     Set<String> getCertprofileNames();
 
-    X509CertprofileQa getCertprofile(@Nonnull String certprofileName);
+    X509CertprofileQa getCertprofile(@NonNull String certprofileName);
 
 }

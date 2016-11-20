@@ -40,8 +40,8 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +112,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     }
 
     protected abstract byte[] doSign(final long mechanism, @Nullable final P11Params parameters,
-            @Nonnull final byte[] content) throws P11TokenException, XiSecurityException;
+            @NonNull final byte[] content) throws P11TokenException, XiSecurityException;
 
     public P11EntityIdentifier getIdentityId() {
         return identityId;

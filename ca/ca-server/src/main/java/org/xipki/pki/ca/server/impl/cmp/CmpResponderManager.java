@@ -34,7 +34,7 @@
 
 package org.xipki.pki.ca.server.impl.cmp;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * @author Lijun Liao
@@ -43,8 +43,8 @@ import javax.annotation.Nonnull;
 
 public interface CmpResponderManager {
 
-    String getCaNameForAlias(@Nonnull String caAlias);
+    String getCaNameForAlias(@NonNull String caAlias);
 
-    X509CaCmpResponder getX509CaCmpResponder(@Nonnull String caName);
+    X509CaCmpResponder getX509CaCmpResponder(@NonNull String caName);
 
 }

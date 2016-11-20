@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -200,7 +200,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     private List<String> wantExtensionTypes;
 
     protected abstract ConcurrentContentSigner getSigner(
-             @Nonnull SignatureAlgoControl signatureAlgoControl) throws Exception;
+             @NonNull SignatureAlgoControl signatureAlgoControl) throws Exception;
 
     @Override
     protected Object doExecute() throws Exception {

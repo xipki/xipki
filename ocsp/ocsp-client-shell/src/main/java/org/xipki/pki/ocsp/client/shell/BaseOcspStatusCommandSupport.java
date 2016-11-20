@@ -46,8 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -141,12 +141,12 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     }
 
     protected abstract void checkParameters(@Nullable X509Certificate respIssuer,
-            @Nonnull List<BigInteger> serialNumbers, @Nullable Map<BigInteger, byte[]> encodedCerts)
+            @NonNull List<BigInteger> serialNumbers, @Nullable Map<BigInteger, byte[]> encodedCerts)
     throws Exception;
 
-    protected abstract Object processResponse(@Nonnull OCSPResp response,
-            @Nullable X509Certificate respIssuer, @Nonnull IssuerHash issuerHash,
-            @Nonnull List<BigInteger> serialNumbers, @Nullable Map<BigInteger, byte[]> encodedCerts)
+    protected abstract Object processResponse(@NonNull OCSPResp response,
+            @Nullable X509Certificate respIssuer, @NonNull IssuerHash issuerHash,
+            @NonNull List<BigInteger> serialNumbers, @Nullable Map<BigInteger, byte[]> encodedCerts)
     throws Exception;
 
     @Override

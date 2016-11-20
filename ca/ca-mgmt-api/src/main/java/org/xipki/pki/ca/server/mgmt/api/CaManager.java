@@ -42,8 +42,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.security.CertRevocationInfo;
@@ -70,7 +70,7 @@ public interface CaManager {
 
     boolean notifyCaChange() throws CaMgmtException;
 
-    boolean publishRootCa(@Nonnull String caName, @Nonnull String certprofile)
+    boolean publishRootCa(@NonNull String caName, @NonNull String certprofile)
     throws CaMgmtException;
 
     boolean republishCertificates(@Nullable String caName, @Nullable List<String> publisherNames,
@@ -79,17 +79,17 @@ public interface CaManager {
     boolean clearPublishQueue(@Nullable String caName, @Nullable List<String> publisherNames)
     throws CaMgmtException;
 
-    boolean removeCa(@Nonnull String caName) throws CaMgmtException;
+    boolean removeCa(@NonNull String caName) throws CaMgmtException;
 
     boolean restartCaSystem();
 
-    boolean addCaAlias(@Nonnull String aliasName, @Nonnull String caName) throws CaMgmtException;
+    boolean addCaAlias(@NonNull String aliasName, @NonNull String caName) throws CaMgmtException;
 
-    boolean removeCaAlias(@Nonnull String aliasName) throws CaMgmtException;
+    boolean removeCaAlias(@NonNull String aliasName) throws CaMgmtException;
 
-    Set<String> getAliasesForCa(@Nonnull String caName);
+    Set<String> getAliasesForCa(@NonNull String caName);
 
-    String getCaNameForAlias(@Nonnull String aliasName);
+    String getCaNameForAlias(@NonNull String aliasName);
 
     Set<String> getCaAliasNames();
 
@@ -113,169 +113,169 @@ public interface CaManager {
 
     Set<String> getInactiveCaNames();
 
-    boolean addCa(@Nonnull CaEntry caEntry) throws CaMgmtException;
+    boolean addCa(@NonNull CaEntry caEntry) throws CaMgmtException;
 
-    CaEntry getCa(@Nonnull String caName);
+    CaEntry getCa(@NonNull String caName);
 
-    boolean changeCa(@Nonnull ChangeCaEntry changeCAentry) throws CaMgmtException;
+    boolean changeCa(@NonNull ChangeCaEntry changeCAentry) throws CaMgmtException;
 
-    boolean removeCertprofileFromCa(@Nonnull String profileName, @Nonnull String caName)
+    boolean removeCertprofileFromCa(@NonNull String profileName, @NonNull String caName)
     throws CaMgmtException;
 
-    boolean addCertprofileToCa(@Nonnull String profileName, @Nonnull String caName)
+    boolean addCertprofileToCa(@NonNull String profileName, @NonNull String caName)
     throws CaMgmtException;
 
-    boolean removePublisherFromCa(@Nonnull String publisherName, @Nonnull String caName)
+    boolean removePublisherFromCa(@NonNull String publisherName, @NonNull String caName)
     throws CaMgmtException;
 
-    boolean addPublisherToCa(@Nonnull String publisherName, @Nonnull String caName)
+    boolean addPublisherToCa(@NonNull String publisherName, @NonNull String caName)
     throws CaMgmtException;
 
-    Set<String> getCertprofilesForCa(@Nonnull String caName);
+    Set<String> getCertprofilesForCa(@NonNull String caName);
 
-    Set<CaHasRequestorEntry> getCmpRequestorsForCa(@Nonnull String caName);
+    Set<CaHasRequestorEntry> getCmpRequestorsForCa(@NonNull String caName);
 
-    CmpRequestorEntry getCmpRequestor(@Nonnull String name);
+    CmpRequestorEntry getCmpRequestor(@NonNull String name);
 
-    boolean addCmpRequestor(@Nonnull CmpRequestorEntry dbEntry) throws CaMgmtException;
+    boolean addCmpRequestor(@NonNull CmpRequestorEntry dbEntry) throws CaMgmtException;
 
-    boolean removeCmpRequestor(@Nonnull String requestorName) throws CaMgmtException;
+    boolean removeCmpRequestor(@NonNull String requestorName) throws CaMgmtException;
 
-    boolean changeCmpRequestor(@Nonnull String name, @Nonnull String base64Cert)
+    boolean changeCmpRequestor(@NonNull String name, @NonNull String base64Cert)
     throws CaMgmtException;
 
-    boolean removeCmpRequestorFromCa(@Nonnull String requestorName, @Nonnull String caName)
+    boolean removeCmpRequestorFromCa(@NonNull String requestorName, @NonNull String caName)
     throws CaMgmtException;
 
-    boolean addCmpRequestorToCa(@Nonnull CaHasRequestorEntry requestor, @Nonnull String caName)
+    boolean addCmpRequestorToCa(@NonNull CaHasRequestorEntry requestor, @NonNull String caName)
     throws CaMgmtException;
 
-    CertprofileEntry getCertprofile(@Nonnull String profileName);
+    CertprofileEntry getCertprofile(@NonNull String profileName);
 
-    boolean removeCertprofile(@Nonnull String profileName) throws CaMgmtException;
+    boolean removeCertprofile(@NonNull String profileName) throws CaMgmtException;
 
-    boolean changeCertprofile(@Nonnull String name, @Nullable String type, @Nullable String conf)
+    boolean changeCertprofile(@NonNull String name, @Nullable String type, @Nullable String conf)
     throws CaMgmtException;
 
-    boolean addCertprofile(@Nonnull CertprofileEntry dbEntry) throws CaMgmtException;
+    boolean addCertprofile(@NonNull CertprofileEntry dbEntry) throws CaMgmtException;
 
-    boolean addCmpResponder(@Nonnull CmpResponderEntry dbEntry) throws CaMgmtException;
+    boolean addCmpResponder(@NonNull CmpResponderEntry dbEntry) throws CaMgmtException;
 
-    boolean removeCmpResponder(@Nonnull String name) throws CaMgmtException;
+    boolean removeCmpResponder(@NonNull String name) throws CaMgmtException;
 
-    CmpResponderEntry getCmpResponder(@Nonnull String name);
+    CmpResponderEntry getCmpResponder(@NonNull String name);
 
-    boolean changeCmpResponder(@Nonnull String name, @Nullable String type, @Nullable String conf,
+    boolean changeCmpResponder(@NonNull String name, @Nullable String type, @Nullable String conf,
             @Nullable String base64Cert) throws CaMgmtException;
 
-    boolean addCrlSigner(@Nonnull X509CrlSignerEntry dbEntry) throws CaMgmtException;
+    boolean addCrlSigner(@NonNull X509CrlSignerEntry dbEntry) throws CaMgmtException;
 
-    boolean removeCrlSigner(@Nonnull String crlSignerName) throws CaMgmtException;
+    boolean removeCrlSigner(@NonNull String crlSignerName) throws CaMgmtException;
 
-    boolean changeCrlSigner(@Nonnull X509ChangeCrlSignerEntry dbEntry) throws CaMgmtException;
+    boolean changeCrlSigner(@NonNull X509ChangeCrlSignerEntry dbEntry) throws CaMgmtException;
 
-    X509CrlSignerEntry getCrlSigner(@Nonnull String name);
+    X509CrlSignerEntry getCrlSigner(@NonNull String name);
 
-    boolean addPublisher(@Nonnull PublisherEntry dbEntry) throws CaMgmtException;
+    boolean addPublisher(@NonNull PublisherEntry dbEntry) throws CaMgmtException;
 
-    List<PublisherEntry> getPublishersForCa(@Nonnull String caName);
+    List<PublisherEntry> getPublishersForCa(@NonNull String caName);
 
-    PublisherEntry getPublisher(@Nonnull String publisherName);
+    PublisherEntry getPublisher(@NonNull String publisherName);
 
-    boolean removePublisher(@Nonnull String publisherName) throws CaMgmtException;
+    boolean removePublisher(@NonNull String publisherName) throws CaMgmtException;
 
-    boolean changePublisher(@Nonnull String name, @Nullable String type, @Nullable String conf)
+    boolean changePublisher(@NonNull String name, @Nullable String type, @Nullable String conf)
     throws CaMgmtException;
 
-    CmpControlEntry getCmpControl(@Nonnull String name);
+    CmpControlEntry getCmpControl(@NonNull String name);
 
-    boolean addCmpControl(@Nonnull CmpControlEntry dbEntry) throws CaMgmtException;
+    boolean addCmpControl(@NonNull CmpControlEntry dbEntry) throws CaMgmtException;
 
-    boolean removeCmpControl(@Nonnull String name) throws CaMgmtException;
+    boolean removeCmpControl(@NonNull String name) throws CaMgmtException;
 
-    boolean changeCmpControl(@Nonnull String name, @Nullable String conf) throws CaMgmtException;
+    boolean changeCmpControl(@NonNull String name, @Nullable String conf) throws CaMgmtException;
 
     Set<String> getEnvParamNames();
 
-    String getEnvParam(@Nonnull String name);
+    String getEnvParam(@NonNull String name);
 
-    boolean addEnvParam(@Nonnull String name, @Nonnull String value) throws CaMgmtException;
+    boolean addEnvParam(@NonNull String name, @NonNull String value) throws CaMgmtException;
 
-    boolean removeEnvParam(@Nonnull String envParamName) throws CaMgmtException;
+    boolean removeEnvParam(@NonNull String envParamName) throws CaMgmtException;
 
-    boolean changeEnvParam(@Nonnull String name, @Nonnull String value) throws CaMgmtException;
+    boolean changeEnvParam(@NonNull String name, @NonNull String value) throws CaMgmtException;
 
-    boolean revokeCa(@Nonnull String caName, @Nonnull CertRevocationInfo revocationInfo)
+    boolean revokeCa(@NonNull String caName, @NonNull CertRevocationInfo revocationInfo)
     throws CaMgmtException;
 
-    boolean unrevokeCa(@Nonnull String caName) throws CaMgmtException;
+    boolean unrevokeCa(@NonNull String caName) throws CaMgmtException;
 
-    boolean revokeCertificate(@Nonnull String caName, @Nonnull BigInteger serialNumber,
-            @Nonnull CrlReason reason, @Nullable Date invalidityTime) throws CaMgmtException;
+    boolean revokeCertificate(@NonNull String caName, @NonNull BigInteger serialNumber,
+            @NonNull CrlReason reason, @Nullable Date invalidityTime) throws CaMgmtException;
 
-    boolean unrevokeCertificate(@Nonnull String caName, @Nonnull BigInteger serialNumber)
+    boolean unrevokeCertificate(@NonNull String caName, @NonNull BigInteger serialNumber)
     throws CaMgmtException;
 
-    boolean removeCertificate(@Nonnull String caName, @Nonnull BigInteger serialNumber)
+    boolean removeCertificate(@NonNull String caName, @NonNull BigInteger serialNumber)
     throws CaMgmtException;
 
-    X509Certificate generateCertificate(@Nonnull String caName, @Nonnull String profileName,
-            @Nullable String user, @Nonnull byte[] encodedCsr, @Nullable Date notBefore,
+    X509Certificate generateCertificate(@NonNull String caName, @NonNull String profileName,
+            @Nullable String user, @NonNull byte[] encodedCsr, @Nullable Date notBefore,
             @Nullable Date notAfter) throws CaMgmtException;
 
-    X509Certificate generateRootCa(@Nonnull X509CaEntry caEntry, @Nonnull String certprofileName,
-            @Nonnull byte[] encodedCsr, @Nullable BigInteger serialNumber) throws CaMgmtException;
+    X509Certificate generateRootCa(@NonNull X509CaEntry caEntry, @NonNull String certprofileName,
+            @NonNull byte[] encodedCsr, @Nullable BigInteger serialNumber) throws CaMgmtException;
 
-    boolean addUser(@Nonnull AddUserEntry userEntry) throws CaMgmtException;
+    boolean addUser(@NonNull AddUserEntry userEntry) throws CaMgmtException;
 
-    boolean changeUser(@Nonnull String username, @Nullable String password,
+    boolean changeUser(@NonNull String username, @Nullable String password,
             @Nullable String cnRegex) throws CaMgmtException;
 
-    boolean removeUser(@Nonnull String username) throws CaMgmtException;
+    boolean removeUser(@NonNull String username) throws CaMgmtException;
 
-    UserEntry getUser(@Nonnull String username) throws CaMgmtException;
+    UserEntry getUser(@NonNull String username) throws CaMgmtException;
 
-    X509CRL generateCrlOnDemand(@Nonnull String caName) throws CaMgmtException;
+    X509CRL generateCrlOnDemand(@NonNull String caName) throws CaMgmtException;
 
-    X509CRL getCrl(@Nonnull String caName, @Nonnull BigInteger crlNumber) throws CaMgmtException;
+    X509CRL getCrl(@NonNull String caName, @NonNull BigInteger crlNumber) throws CaMgmtException;
 
-    X509CRL getCurrentCrl(@Nonnull String caName) throws CaMgmtException;
+    X509CRL getCurrentCrl(@NonNull String caName) throws CaMgmtException;
 
-    boolean addScep(@Nonnull ScepEntry scepEntry) throws CaMgmtException;
+    boolean addScep(@NonNull ScepEntry scepEntry) throws CaMgmtException;
 
-    boolean removeScep(@Nonnull String name) throws CaMgmtException;
+    boolean removeScep(@NonNull String name) throws CaMgmtException;
 
-    boolean changeScep(@Nonnull ChangeScepEntry scepEntry) throws CaMgmtException;
+    boolean changeScep(@NonNull ChangeScepEntry scepEntry) throws CaMgmtException;
 
     Set<String> getScepNames();
 
-    ScepEntry getScepEntry(@Nonnull String name) throws CaMgmtException;
+    ScepEntry getScepEntry(@NonNull String name) throws CaMgmtException;
 
-    CertWithStatusInfo getCert(@Nonnull String caName, @Nonnull BigInteger serialNumber)
+    CertWithStatusInfo getCert(@NonNull String caName, @NonNull BigInteger serialNumber)
     throws CaMgmtException;
 
     /**
      * @since 2.1.0
      */
-    boolean loadConf(@Nonnull CaConf conf) throws CaMgmtException;
+    boolean loadConf(@NonNull CaConf conf) throws CaMgmtException;
 
     /**
      * @since 2.1.0
      */
-    boolean exportConf(@Nonnull String zipFilename, @Nullable List<String> caNames)
+    boolean exportConf(@NonNull String zipFilename, @Nullable List<String> caNames)
     throws CaMgmtException, IOException;
 
     /**
      * @since 2.1.0
      */
-    List<CertListInfo> listCertificates(@Nonnull String caName, @Nullable X500Name subjectPattern,
+    List<CertListInfo> listCertificates(@NonNull String caName, @Nullable X500Name subjectPattern,
             @Nullable Date validFrom, @Nullable Date validTo, @Nullable CertListOrderBy orderBy,
             int numEntries) throws CaMgmtException;
 
     /**
      * @since 2.1.0
      */
-    byte[] getCertRequest(@Nonnull String caName, @Nonnull BigInteger serialNumber)
+    byte[] getCertRequest(@NonNull String caName, @NonNull BigInteger serialNumber)
     throws CaMgmtException;
 
 }

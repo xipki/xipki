@@ -34,7 +34,7 @@
 
 package org.xipki.commons.security.pkcs11;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.xipki.commons.common.util.ParamUtil;
 
@@ -49,8 +49,8 @@ public class P11EntityIdentifier implements Comparable<P11EntityIdentifier> {
 
     private final P11ObjectIdentifier objectId;
 
-    public P11EntityIdentifier(@Nonnull final P11SlotIdentifier slotId,
-            @Nonnull final P11ObjectIdentifier objectId) {
+    public P11EntityIdentifier(@NonNull final P11SlotIdentifier slotId,
+            @NonNull final P11ObjectIdentifier objectId) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.objectId = ParamUtil.requireNonNull("objectId", objectId);
     }

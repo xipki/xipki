@@ -38,8 +38,8 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import org.xipki.commons.audit.AuditService;
 import org.xipki.commons.audit.AuditServiceRegister;
@@ -78,20 +78,20 @@ public abstract class OcspStore {
 
     public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
 
-    public abstract boolean canResolveIssuer(@Nonnull HashAlgoType hashAlgo,
-            @Nonnull byte[] issuerNameHash, @Nonnull byte[] issuerKeyHash);
+    public abstract boolean canResolveIssuer(@NonNull HashAlgoType hashAlgo,
+            @NonNull byte[] issuerNameHash, @NonNull byte[] issuerKeyHash);
 
-    public abstract CertStatusInfo getCertStatus(@Nonnull Date time, @Nonnull HashAlgoType hashAlgo,
-            @Nonnull byte[] issuerNameHash, @Nonnull byte[] issuerKeyHash,
-            @Nonnull BigInteger serialNumber, boolean includeCertHash,
+    public abstract CertStatusInfo getCertStatus(@NonNull Date time, @NonNull HashAlgoType hashAlgo,
+            @NonNull byte[] issuerNameHash, @NonNull byte[] issuerKeyHash,
+            @NonNull BigInteger serialNumber, boolean includeCertHash,
             @Nullable HashAlgoType certHashAlg, @Nullable CertprofileOption certprofileOption)
     throws OcspStoreException;
 
     public abstract void init(@Nullable String conf, @Nullable DataSourceWrapper datasource,
-            @Nonnull Set<HashAlgoType> certHashAlgos) throws OcspStoreException;
+            @NonNull Set<HashAlgoType> certHashAlgos) throws OcspStoreException;
 
-    public abstract CertRevocationInfo getCaRevocationInfo(@Nonnull HashAlgoType hashAlgo,
-            @Nonnull byte[] issuerNameHash, @Nonnull byte[] issuerKeyHash);
+    public abstract CertRevocationInfo getCaRevocationInfo(@NonNull HashAlgoType hashAlgo,
+            @NonNull byte[] issuerNameHash, @NonNull byte[] issuerKeyHash);
 
     public abstract void shutdown() throws OcspStoreException;
 

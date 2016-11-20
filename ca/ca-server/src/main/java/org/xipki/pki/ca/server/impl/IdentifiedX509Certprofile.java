@@ -45,8 +45,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -257,11 +257,11 @@ class IdentifiedX509Certprofile {
         return subjectInfo;
     }
 
-    public ExtensionValues getExtensions(@Nonnull final X500Name requestedSubject,
-            @Nonnull final X500Name grantedSubject, @Nullable final Extensions requestedExtensions,
-            @Nonnull final SubjectPublicKeyInfo publicKeyInfo,
-            @Nonnull final PublicCaInfo publicCaInfo, @Nullable final X509Certificate crlSignerCert,
-            @Nonnull final Date notBefore, @Nonnull final Date notAfter)
+    public ExtensionValues getExtensions(@NonNull final X500Name requestedSubject,
+            @NonNull final X500Name grantedSubject, @Nullable final Extensions requestedExtensions,
+            @NonNull final SubjectPublicKeyInfo publicKeyInfo,
+            @NonNull final PublicCaInfo publicCaInfo, @Nullable final X509Certificate crlSignerCert,
+            @NonNull final Date notBefore, @NonNull final Date notAfter)
     throws CertprofileException, BadCertTemplateException {
         ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
         ExtensionValues values = new ExtensionValues();

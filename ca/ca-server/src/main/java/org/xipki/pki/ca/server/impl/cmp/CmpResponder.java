@@ -40,8 +40,8 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -133,9 +133,9 @@ abstract class CmpResponder {
     } // method getRequestor
 
     protected abstract PKIMessage doProcessPkiMessage(@Nullable PKIMessage request,
-            @Nonnull RequestorInfo requestor, @Nullable String user,
-            @Nonnull ASN1OctetString transactionId, @Nonnull GeneralPKIMessage pkiMessage,
-            @Nonnull String msgId, @Nonnull AuditEvent event);
+            @NonNull RequestorInfo requestor, @Nullable String user,
+            @NonNull ASN1OctetString transactionId, @NonNull GeneralPKIMessage pkiMessage,
+            @NonNull String msgId, @NonNull AuditEvent event);
 
     public PKIMessage processPkiMessage(final PKIMessage pkiMessage,
             final X509Certificate tlsClientCert, final String tidStr, final AuditEvent event) {

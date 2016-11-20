@@ -37,7 +37,7 @@ package org.xipki.commons.security.pkcs11;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.ParamUtil;
@@ -55,7 +55,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
 
     private final String label;
 
-    public P11ObjectIdentifier(@Nonnull final byte[] id, @Nonnull final String label) {
+    public P11ObjectIdentifier(@NonNull final byte[] id, @NonNull final String label) {
         this.id = ParamUtil.requireNonNull("id", id);
         this.label = ParamUtil.requireNonNull("label", label);
         this.idHex = Hex.toHexString(id).toUpperCase();

@@ -40,8 +40,8 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -60,22 +60,22 @@ public interface SecurityFactory {
 
     PasswordResolver getPasswordResolver();
 
-    KeyCertPair createPrivateKeyAndCert(@Nonnull String type, @Nullable SignerConf conf,
+    KeyCertPair createPrivateKeyAndCert(@NonNull String type, @Nullable SignerConf conf,
             @Nullable X509Certificate cert) throws ObjectCreationException;
 
-    ConcurrentContentSigner createSigner(@Nonnull String type, @Nullable SignerConf conf,
+    ConcurrentContentSigner createSigner(@NonNull String type, @Nullable SignerConf conf,
             @Nullable X509Certificate cert) throws ObjectCreationException;
 
-    ConcurrentContentSigner createSigner(@Nonnull String type, @Nullable SignerConf conf,
+    ConcurrentContentSigner createSigner(@NonNull String type, @Nullable SignerConf conf,
             @Nullable X509Certificate[] certs) throws ObjectCreationException;
 
-    ContentVerifierProvider getContentVerifierProvider(@Nonnull PublicKey publicKey)
+    ContentVerifierProvider getContentVerifierProvider(@NonNull PublicKey publicKey)
     throws InvalidKeyException;
 
-    ContentVerifierProvider getContentVerifierProvider(@Nonnull X509Certificate cert)
+    ContentVerifierProvider getContentVerifierProvider(@NonNull X509Certificate cert)
     throws InvalidKeyException;
 
-    ContentVerifierProvider getContentVerifierProvider(@Nonnull X509CertificateHolder cert)
+    ContentVerifierProvider getContentVerifierProvider(@NonNull X509CertificateHolder cert)
     throws InvalidKeyException;
 
     /**
@@ -86,7 +86,7 @@ public interface SecurityFactory {
      * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
      *         <code>false</code> otherwise.
      */
-    boolean verifyPopo(@Nonnull PKCS10CertificationRequest csr, AlgorithmValidator algoValidator);
+    boolean verifyPopo(@NonNull PKCS10CertificationRequest csr, AlgorithmValidator algoValidator);
 
     /**
      *
@@ -96,13 +96,13 @@ public interface SecurityFactory {
      * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
      *         <code>false</code> otherwise.
      */
-    boolean verifyPopo(@Nonnull CertificationRequest csr, AlgorithmValidator algoValidator);
+    boolean verifyPopo(@NonNull CertificationRequest csr, AlgorithmValidator algoValidator);
 
-    PublicKey generatePublicKey(@Nonnull SubjectPublicKeyInfo subjectPublicKeyInfo)
+    PublicKey generatePublicKey(@NonNull SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException;
 
-    byte[] extractMinimalKeyStore(@Nonnull String keystoreType, @Nonnull byte[] keystoreBytes,
-            @Nullable String keyname, @Nonnull char[] password,
+    byte[] extractMinimalKeyStore(@NonNull String keystoreType, @NonNull byte[] keystoreBytes,
+            @Nullable String keyname, @NonNull char[] password,
             @Nullable X509Certificate[] newCertChain) throws KeyStoreException;
 
     SecureRandom getRandom4Sign();

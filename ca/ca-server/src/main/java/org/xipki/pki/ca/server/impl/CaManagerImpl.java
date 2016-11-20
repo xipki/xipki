@@ -67,8 +67,8 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import javax.xml.bind.JAXBException;
 
 import org.bouncycastle.asn1.ASN1Set;
@@ -3272,7 +3272,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     @Override
-    public boolean exportConf(@Nonnull String zipFilename, @Nullable List<String> caNames)
+    public boolean exportConf(@NonNull String zipFilename, @Nullable List<String> caNames)
     throws CaMgmtException, IOException {
         List<String> upperCaNames;
         if (caNames == null) {

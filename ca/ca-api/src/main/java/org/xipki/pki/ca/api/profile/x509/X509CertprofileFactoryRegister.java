@@ -34,7 +34,7 @@
 
 package org.xipki.pki.ca.api.profile.x509;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.xipki.commons.common.ObjectCreationException;
 
@@ -51,6 +51,6 @@ public interface X509CertprofileFactoryRegister {
      * @return new certificate profile.
      * @throws ObjectCreationException if certificate profile could not be created.
      */
-    X509Certprofile newCertprofile(@Nonnull String type) throws ObjectCreationException;
+    X509Certprofile newCertprofile(@NonNull String type) throws ObjectCreationException;
 
 }

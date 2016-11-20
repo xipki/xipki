@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -227,7 +227,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     private List<String> wantExtensionTypes;
 
     protected abstract ConcurrentContentSigner getSigner(
-            @Nonnull SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
+            @NonNull SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
 
     @Override
     protected Object doExecute() throws Exception {

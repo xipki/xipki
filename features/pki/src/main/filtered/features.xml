@@ -8,7 +8,7 @@
   <feature name="xipki-password" version="${proejct.version}">
     <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle start-level="70">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle start-level="70">mvn:org.xipki.commons/common/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.commons/password/${project.version}</bundle>
     <config name="org.xipki.commons.password" append="false">
@@ -224,11 +224,12 @@ signer.conf = password=1234,algo=SHA256withRSA,keystore=file:xipki/security/tlsk
     <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit" version="${project.version}">
-    <bundle start-level="70">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle start-level="80">mvn:org.xipki.commons/audit/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}">
     <feature prerequisite="true">xipki-audit</feature>
+    <bundle start-level="70">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
     <bundle start-level="70"><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
     <bundle start-level="70">mvn:org.xipki.commons/audit-syslog/${project.version}</bundle>
     <config name="org.xipki.commons.audit.syslog" append="false">

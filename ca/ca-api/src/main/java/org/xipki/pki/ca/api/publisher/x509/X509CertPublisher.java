@@ -37,8 +37,8 @@ package org.xipki.pki.ca.api.publisher.x509;
 import java.security.cert.X509CRL;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import org.xipki.commons.audit.AuditServiceRegister;
 import org.xipki.commons.datasource.DataSourceWrapper;
@@ -58,7 +58,7 @@ public abstract class X509CertPublisher {
 
     public abstract void initialize(@Nullable String conf,
             @Nullable PasswordResolver passwordResolver,
-            @Nonnull Map<String, DataSourceWrapper> datasources) throws CertPublisherException;
+            @NonNull Map<String, DataSourceWrapper> datasources) throws CertPublisherException;
 
     public void shutdown() {
     }
@@ -69,30 +69,30 @@ public abstract class X509CertPublisher {
 
     public abstract void setEnvParameterResolver(@Nullable EnvParameterResolver parameterResolver);
 
-    public abstract boolean caAdded(@Nonnull X509Cert caCert);
+    public abstract boolean caAdded(@NonNull X509Cert caCert);
 
-    public abstract boolean certificateAdded(@Nonnull X509CertificateInfo certInfo);
+    public abstract boolean certificateAdded(@NonNull X509CertificateInfo certInfo);
 
-    public abstract boolean certificateRevoked(@Nonnull X509Cert caCert,
-            @Nonnull X509CertWithDbId cert, @Nullable String certprofile,
-            @Nonnull CertRevocationInfo revInfo);
+    public abstract boolean certificateRevoked(@NonNull X509Cert caCert,
+            @NonNull X509CertWithDbId cert, @Nullable String certprofile,
+            @NonNull CertRevocationInfo revInfo);
 
-    public abstract boolean certificateUnrevoked(@Nonnull X509Cert caCert,
-            @Nonnull X509CertWithDbId cert);
+    public abstract boolean certificateUnrevoked(@NonNull X509Cert caCert,
+            @NonNull X509CertWithDbId cert);
 
-    public abstract boolean certificateRemoved(@Nonnull X509Cert caCert,
-            @Nonnull X509CertWithDbId cert);
+    public abstract boolean certificateRemoved(@NonNull X509Cert caCert,
+            @NonNull X509CertWithDbId cert);
 
-    public abstract boolean crlAdded(@Nonnull X509Cert caCert, @Nonnull X509CRL crl);
+    public abstract boolean crlAdded(@NonNull X509Cert caCert, @NonNull X509CRL crl);
 
-    public abstract boolean caRevoked(@Nonnull X509Cert caCert,
-            @Nonnull CertRevocationInfo revocationInfo);
+    public abstract boolean caRevoked(@NonNull X509Cert caCert,
+            @NonNull CertRevocationInfo revocationInfo);
 
-    public abstract boolean caUnrevoked(@Nonnull X509Cert caCert);
+    public abstract boolean caUnrevoked(@NonNull X509Cert caCert);
 
     public abstract boolean isHealthy();
 
     public abstract void setAuditServiceRegister(
-            @Nonnull AuditServiceRegister auditServiceRegister);
+            @NonNull AuditServiceRegister auditServiceRegister);
 
 }

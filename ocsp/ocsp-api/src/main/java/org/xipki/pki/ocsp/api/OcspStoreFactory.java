@@ -34,7 +34,7 @@
 
 package org.xipki.pki.ocsp.api;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.xipki.commons.common.ObjectCreationException;
 
@@ -45,8 +45,8 @@ import org.xipki.commons.common.ObjectCreationException;
 
 public interface OcspStoreFactory {
 
-    boolean canCreateOcspStore(@Nonnull String type);
+    boolean canCreateOcspStore(@NonNull String type);
 
-    OcspStore newOcspStore(@Nonnull String type) throws ObjectCreationException;
+    OcspStore newOcspStore(@NonNull String type) throws ObjectCreationException;
 
 }

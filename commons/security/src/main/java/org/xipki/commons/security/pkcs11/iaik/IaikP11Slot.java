@@ -51,7 +51,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
@@ -1081,7 +1081,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
     }
 
-    private static byte[] generateKeyId(@Nonnull final Session session) throws P11TokenException {
+    private static byte[] generateKeyId(@NonNull final Session session) throws P11TokenException {
         SecureRandom random = new SecureRandom();
         byte[] keyId = null;
         do {
@@ -1092,7 +1092,7 @@ class IaikP11Slot extends AbstractP11Slot {
         return keyId;
     }
 
-    private static boolean idExists(@Nonnull final Session session, @Nonnull final byte[] keyId)
+    private static boolean idExists(@NonNull final Session session, @NonNull final byte[] keyId)
     throws P11TokenException {
         Key key = new Key();
         key.getId().setByteArrayValue(keyId);
@@ -1119,8 +1119,8 @@ class IaikP11Slot extends AbstractP11Slot {
         return objects.length > 0;
     }
 
-    private static boolean labelExists(@Nonnull final Session session,
-            @Nonnull final String keyLabel) throws P11TokenException {
+    private static boolean labelExists(@NonNull final Session session,
+            @NonNull final String keyLabel) throws P11TokenException {
         ParamUtil.requireNonBlank("keyLabel", keyLabel);
         Key key = new Key();
         key.getLabel().setCharArrayValue(keyLabel.toCharArray());

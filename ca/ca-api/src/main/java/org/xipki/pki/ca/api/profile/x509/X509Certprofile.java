@@ -40,8 +40,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -125,7 +125,7 @@ public abstract class X509Certprofile {
         return true;
     }
 
-    public String getParameter(@Nonnull final String paramName) {
+    public String getParameter(@NonNull final String paramName) {
         return null;
     }
 
@@ -164,17 +164,17 @@ public abstract class X509Certprofile {
 
     public abstract CertValidity getValidity();
 
-    public abstract SubjectPublicKeyInfo checkPublicKey(@Nonnull SubjectPublicKeyInfo publicKey)
+    public abstract SubjectPublicKeyInfo checkPublicKey(@NonNull SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException;
 
-    public abstract SubjectInfo getSubject(@Nonnull X500Name requestedSubject)
+    public abstract SubjectInfo getSubject(@NonNull X500Name requestedSubject)
     throws CertprofileException, BadCertTemplateException;
 
     public abstract ExtensionValues getExtensions(
-            @Nonnull Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
-            @Nonnull X500Name requestedSubject, @Nonnull X500Name grantedSubject,
-            @Nullable Extensions requestedExtensions, @Nonnull Date notBefore,
-            @Nonnull Date notAfter)
+            @NonNull Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
+            @NonNull X500Name requestedSubject, @NonNull X500Name grantedSubject,
+            @Nullable Extensions requestedExtensions, @NonNull Date notBefore,
+            @NonNull Date notAfter)
     throws CertprofileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();

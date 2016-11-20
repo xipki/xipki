@@ -36,7 +36,7 @@ package org.xipki.pki.ca.api.profile.x509;
 
 import java.util.Set;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -58,8 +58,8 @@ import org.xipki.pki.ca.api.profile.GeneralNameMode;
 
 public class X509CertprofileUtil {
 
-    public static GeneralName createGeneralName(@Nonnull final GeneralName requestedName,
-            @Nonnull final Set<GeneralNameMode> modes) throws BadCertTemplateException {
+    public static GeneralName createGeneralName(@NonNull final GeneralName requestedName,
+            @NonNull final Set<GeneralNameMode> modes) throws BadCertTemplateException {
         ParamUtil.requireNonNull("requestedName", requestedName);
 
         int tag = requestedName.getTagNo();
