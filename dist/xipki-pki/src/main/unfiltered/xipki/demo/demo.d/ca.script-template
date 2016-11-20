@@ -15,12 +15,12 @@ feature:install -r xipki-caserver
 
 feature:install -r xipki-camgmt-shell
 
-sleep 1000
+sleep 3000
 
 xipki-ca:restart
 
 echo "#################################################################"
-echo "#                       PREPARE ENVIRONMENET                    #"
+echo "#                       Prepare environment                    #"
 echo "#################################################################"
 
 ## CMP control: messageTimeBias is set to 300 seconds.
@@ -134,7 +134,7 @@ xipki-ca:crlsigner-add \
 sleep 1000
 
 echo "#################################################################"
-echo "#                          GENERATE RCA                         #"
+echo "#                          Generate RCA                         #"
 echo "#################################################################"
 ## Add the profile RCA
 xipki-ca:profile-add \
@@ -374,7 +374,7 @@ xipki-ca:caprofile-rm \
   --profile OCSP
 
 echo "#################################################################"
-echo "#                        ADD SubCA with OCSP                    #"
+echo "#                        Add SubCA with OCSP                    #"
 echo "#################################################################"
 ## Add CA
 
@@ -449,7 +449,7 @@ xipki-ca:careq-add \
 #xipki-ca:restart
 
 echo "#################################################################"
-echo "#                       ADD SubCA with CRL                      #"
+echo "#                       Add SubCA with CRL                      #"
 echo "#################################################################"
 ## Add CA
 

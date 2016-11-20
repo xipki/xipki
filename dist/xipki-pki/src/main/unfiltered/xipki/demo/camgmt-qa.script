@@ -238,7 +238,7 @@ if { $printUsage equals "true" } {
     qa-responder1
 
   echo "#################################################################"
-  echo "#                          CERT PROFILE                         #"
+  echo "#                    Add certificate profile                    #"
   echo "#################################################################"
   xipki-caqa:profile-check \
     --name SubCA \
@@ -290,7 +290,7 @@ if { $printUsage equals "true" } {
     qa-SubCA \
 
   echo "#################################################################"
-  echo "#                           CRL SIGNER                          #"
+  echo "#                         Add CRL signer                        #"
   echo "#################################################################"
   xipki-caqa:crlsigner-check \
     --name CASIGN.CRLSIGNER \
@@ -553,7 +553,7 @@ if { $printUsage equals "true" } {
     --popo-algo SHA256withRSA
 
   echo "#################################################################"
-  echo "#                            CA ALIAS                           #"
+  echo "#                            CA alias                           #"
   echo "#################################################################"
   xipki-caqa:caalias-check \
     --ca RCA1 \
@@ -579,7 +579,7 @@ if { $printUsage equals "true" } {
   RCA-1
 
   echo "#################################################################"
-  echo "#                          CA HAS PROFILE                       #"
+  echo "#                          CA-has-profile                       #"
   echo "#################################################################"
 
   xipki-caqa:caprofile-check \
@@ -621,7 +621,7 @@ if { $printUsage equals "true" } {
     --profile PROFILE-DUMMY
 
   echo "#################################################################"
-  echo "#                         CA HAS PUBLISHER                      #"
+  echo "#                         CA-has-publisher                      #"
   echo "#################################################################"
   xipki-caqa:capub-check \
     --ca RCA1 \
@@ -648,7 +648,7 @@ if { $printUsage equals "true" } {
     --publisher PUBLISHER-DUMMY
 
   echo "#################################################################"
-  echo "#                         CA HAS REQUESTOR                      #"
+  echo "#                         CA-has-requestor                      #"
   echo "#################################################################"
   xipki-caqa:careq-check \
     --ca RCA1 \
@@ -993,7 +993,7 @@ if { $printUsage equals "true" } {
     --validity-mode CUTOFF
 
   #################################################################
-  #              UNINSTALL UNNEEDED FEATURES                      #
+  #              Uninstall unneeded features                      #
   #################################################################
   feature:uninstall xipki-camgmt-qa-shell
 }

@@ -22,12 +22,12 @@ xipki-ca:enroll-cert \
   --out output/Cross1.der
 
 echo "#################################################################"
-echo "#              MANAGE CERTIFICATE WITH RA CLIENT                #"
+echo "#              Manage certificate with RA Client                #"
 echo "#################################################################"
 feature:install -r xipki-caclient-shell
 
 # Wait two seconds
-sleep 2000
+sleep 3000
 
 ## Check the healthy status
 
@@ -500,7 +500,7 @@ xipki-cli:getcrl \
   --out output/SubCAwithCRL1-get.crl
 
 echo "#################################################################"
-echo "#              UNINSTALL UNNEEDED FEATURES                      #"
+echo "#              Uninstall unneeded features                      #"
 echo "#################################################################"
 feature:uninstall xipki-caclient-shell
 feature:uninstall xipki-camgmt-shell

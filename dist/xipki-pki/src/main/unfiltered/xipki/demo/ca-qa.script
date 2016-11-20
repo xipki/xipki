@@ -149,7 +149,7 @@ xipki-qa:check-cert \
   --cert output/EE.Complex2.der
 
 echo "#################################################################"
-echo "#                        NEGITIVE TESTS                         #"
+echo "#                        Negative tests                         #"
 echo "#################################################################"
 
 xipki-cmd:rm -r -f output/neg
@@ -220,5 +220,5 @@ xipki-qa:neg-gencrl \
 xipki-qa:neg-getcrl \
   --ca SubCA1
   
-# UNINSTALL UNNEEDED FEATURES
+# uninstall unneeded features
 feature:uninstall xipki-caqa-shell

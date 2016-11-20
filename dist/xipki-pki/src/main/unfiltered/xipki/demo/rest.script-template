@@ -1,7 +1,7 @@
 BASE_URL = https://localhost:8443/rest/SubCAwithCRL
 
 echo "#################################################################"
-echo "#             MANAGE CERTIFICATE VIA REST INTERFACE             #"
+echo "#             Manage certificate via REST interface             #"
 echo "#################################################################"
 
 CA_SHA1FP = $(xipki-tk:cert-info --fingerprint --hash SHA1 --in output/SubCAwithCRL1.der)

@@ -1,7 +1,7 @@
 SCEP_URL = http://localhost:8080/scep/SubCAwithCRL/OCSP/pkiclient.exe
 
 echo "#################################################################"
-echo "#              Enroll CERTIFICATE WITH SCEP                     #"
+echo "#              Enroll Certificate via SCEP                     #"
 echo "#################################################################"
 
 feature:install -r xipki-scepclient-shell
@@ -119,6 +119,6 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
 
 #################################################################
-#              UNINSTALL UNNEEDED FEATURES                      #
+#              Uninstall unneeded features                      #
 #################################################################
 feature:uninstall xipki-scepclient-shell

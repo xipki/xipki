@@ -1,5 +1,5 @@
 echo "#################################################################"
-echo "#               EXPORT THEN IMPORT CA AND OCSP                  #"
+echo "#               Export-then-import CA and OCSP                  #"
 echo "#################################################################"
 
 feature:install -r xipki-database-tool
@@ -11,7 +11,7 @@ xipki-cmd:rm -r -f output/dbexport
 
 ## Export CA
 echo "============================================================================"
-echo "||                             EXPORT CA DATABASE                         ||"
+echo "||                             Export CA Database                         ||"
 echo "============================================================================"
 
 xipki-db:export-ca \
@@ -20,7 +20,7 @@ xipki-db:export-ca \
 ## Export OCSP
 
 echo "============================================================================"
-echo "||                            EXPORT OCSP DATABASE                        ||"
+echo "||                            Export OCSP Database                        ||"
 echo "============================================================================"
 
 xipki-db:export-ocsp \
@@ -31,7 +31,7 @@ xipki-db:export-ocsp \
 ## Import CA
 
 echo "============================================================================"
-echo "||                             IMPORT CA DATABASE                         ||"
+echo "||                             Import CA Database                         ||"
 echo "============================================================================"
 
 xipki-db:initdb-ca \
@@ -43,7 +43,7 @@ xipki-db:import-ca \
 ## Import OCSP
 
 echo "============================================================================"
-echo "||                            IMPORT OCSP DATABASE                        ||"
+echo "||                            Import OCSP Database                        ||"
 echo "============================================================================"
 
 xipki-db:initdb-ocsp \
@@ -73,7 +73,7 @@ sleep 1000
 xipki-ca:restart
 
 #################################################################
-#              UNINSTALL UNNEEDED FEATURES                      #
+#              Uninstall unneeded features                      #
 #################################################################
 feature:uninstall xipki-database-tool
 feature:uninstall xipki-camgmt-shell

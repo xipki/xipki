@@ -15,7 +15,7 @@ feature:install -r xipki-caserver
 
 feature:install -r xipki-camgmt-shell
 
-sleep 1000
+sleep 3000
 
 xipki-ca:restart
 
@@ -39,7 +39,7 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 }
 
 echo "#################################################################"
-echo "#                           LOAD RCA.xml                        #"
+echo "#                           Load RCA.xml                        #"
 echo "#################################################################"
 
 if { $TOKEN_TYPE equals "PKCS11" } {
@@ -225,7 +225,7 @@ xipki-ca:caprofile-rm \
   --profile OCSP
 
 echo "#################################################################"
-echo "#                        ADD SubCA with OCSP                    #"
+echo "#                        Add SubCA with OCSP                    #"
 echo "#################################################################"
 ## Add CA
 
@@ -258,7 +258,7 @@ xipki-ca:load-conf --conf-file xipki/demo/demo.d/SubCA.xml
 #xipki-ca:restart
 
 echo "#################################################################"
-echo "#                       ADD SubCA with CRL                      #"
+echo "#                       Add SubCA with CRL                      #"
 echo "#################################################################"
 ## Add CA
 
