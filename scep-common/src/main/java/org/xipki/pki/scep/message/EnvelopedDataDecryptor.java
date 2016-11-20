@@ -77,7 +77,7 @@ public final class EnvelopedDataDecryptor {
             }
         }
 
-        if (recipientInfo == null) {
+        if (recipientInfo == null || decryptor == null) {
             throw new MessageDecodingException("missing expected key transfer recipient");
         }
 
