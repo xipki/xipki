@@ -7,7 +7,7 @@
 
 dataSourceClassName = com.mysql.jdbc.jdbc2.optional.MysqlDataSource
 
-dataSource.serverName = localhost
+dataSource.serverName = 127.0.0.1
 dataSource.port = 3306
 dataSource.databaseName = ocsp
 dataSource.user = root

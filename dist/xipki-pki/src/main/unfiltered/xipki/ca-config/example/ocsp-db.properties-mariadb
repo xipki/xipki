@@ -9,7 +9,7 @@
 dataSourceClassName = org.mariadb.jdbc.MariaDbDataSource 
 
 # choice 1
-dataSource.serverName = localhost
+dataSource.serverName = 127.0.0.1
 dataSource.port = 3306
 dataSource.databaseName = ocsp
 

@@ -10,7 +10,7 @@ dataSourceClassName = oracle.jdbc.pool.OracleDataSource
 # database can be either identified by choice 1 (serverName, portNumber,
 # databaseName and driverType) or choice 2 (only URL).
 # choice 1
-dataSource.serverName = localhost
+dataSource.serverName = 127.0.0.1
 dataSource.portNumber = 1521
 dataSource.databaseName = XE
 dataSource.driverType = thin
