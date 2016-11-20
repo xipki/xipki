@@ -3,7 +3,7 @@ echo "#                              QA                               #"
 echo "#################################################################"
 feature:install -r xipki-caqa-shell
 
-# Wait one second
+echo "Sleeping 1 second"
 sleep 1000
 
 echo "#################################################################"

@@ -49,8 +49,8 @@ if { $printUsage equals "true" } {
   if { "$1" equals "enroll" } {
     feature:install -r xipki-caclient-shell
 
-    # Wait two seconds
-    sleep 2000
+    echo "Sleeping 1 second"
+    sleep 1000
 
     # Loadtest Template
     echo "Template enroll load test"
@@ -76,7 +76,7 @@ if { $printUsage equals "true" } {
   if { "$1" equals "revoke" } {
     feature:install -r xipki-caclient-shell
 
-    # Wait one second
+    echo "Sleeping 1 second"
     sleep 1000
 
     echo "Revoke load test"
@@ -95,7 +95,7 @@ if { $printUsage equals "true" } {
     URL = http://localhost:8080/ocsp/responder1
     URL_CRL = http://localhost:8080/ocsp/responder2
 
-    # Wait one second
+    echo "Sleeping 1 second"
     sleep 1000
 
     echo "Loadtest OCSP status (database based cert source)"

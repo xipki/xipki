@@ -26,8 +26,8 @@ echo "#              Manage certificate with RA Client                #"
 echo "#################################################################"
 feature:install -r xipki-caclient-shell
 
-# Wait two seconds
-sleep 3000
+echo "Sleeping 1 second"
+sleep 1000
 
 ## Check the healthy status
 
@@ -438,6 +438,7 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/RCA1.der
 
 # sleep 1.2 seconds to ensure different notBefore in certificate
+echo "Sleeping 1.2 seconds"
 sleep 1200
 
 # with the same CN

@@ -6,8 +6,8 @@ echo "#################################################################"
 
 feature:install -r xipki-jscepclient-shell
 
-# Wait two seconds
-sleep 2000
+echo "Sleeping 1 second"
+sleep 1000
 
 # Prepare
 

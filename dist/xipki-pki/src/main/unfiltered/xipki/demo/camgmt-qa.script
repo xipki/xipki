@@ -68,7 +68,7 @@ if { $printUsage equals "true" } {
 
   feature:install -r xipki-camgmt-qa-shell
 
-  # Wait one second
+  echo "Sleeping 1 second"
   sleep 1000
 
   echo "#################################################################"

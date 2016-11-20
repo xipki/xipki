@@ -4,7 +4,7 @@ echo "#################################################################"
 
 feature:install -r xipki-database-tool
 
-# Wait two seconds
+echo "Sleeping 1 second"
 sleep 1000
 
 xipki-cmd:rm -r -f output/dbexport
@@ -67,7 +67,7 @@ xipki-db:import-ocspfromca \
 ## Restart the CA
 feature:install -r xipki-camgmt-shell
 
-# Wait two seconds
+echo "Sleeping 1 second"
 sleep 1000
 
 xipki-ca:restart

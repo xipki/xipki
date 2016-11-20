@@ -4,6 +4,7 @@ echo "#################################################################"
 
 feature:install -r xipki-database-tool
 
+echo "Sleeping 1 second"
 sleep 1000
 
 xipki-db:initdb \
@@ -15,7 +16,8 @@ feature:install -r xipki-caserver
 
 feature:install -r xipki-camgmt-shell
 
-sleep 3000
+echo "Sleeping 1 second"
+sleep 1000
 
 xipki-ca:restart
 
