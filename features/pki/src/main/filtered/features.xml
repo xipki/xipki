@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pki-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
+   xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <!-- Note: instead of defining all features monolithically in a central features file,
     Project-plugins should be defined in their own feature descriptors and then aggregated later
   -->
@@ -11,63 +11,11 @@
     <bundle><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle start-level="70">mvn:org.xipki.commons/common/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.commons/password/${project.version}</bundle>
-    <config name="org.xipki.commons.password" append="false">
-## Master password callback
-#
-# Use popup GUI to enter the master password (default)
-#
-#masterPassword.callback = PBE-GUI quorum=1,tries=3
-
-# Master password is saved in the file, e.g. /etc/xipki.masterpassword.secret, either as
-# clear text, or in obfuscated form, e.g. 'OBF:1yf01z7o1t331z7e1yf6' for password 'qwert'
-#
-masterPassword.callback = FILE file=xipki/security/masterpassword.secret
-
-# Master password will be produced by some password producer, e.g. via the karaf shell.
-#masterPassword.callback = PBE-Consumer name=master-password,tries=3
-    </config>
   </feature>
   <feature name="xipki-security" version="${project.version}">
     <feature prerequisite="true">xipki-password</feature>
     <bundle start-level="70">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.commons/security/${project.version}</bundle>
-    <config name="org.xipki.commons.security" append="false">
-## Whether strong secure random should be used to generate key
-# the default is false
-#key.strongrandom.enabled = false
-
-## Whether strong secure random should be used to create signature
-# the default is false
-#sign.strongrandom.enabled = false
-
-## Default parallelism degree of the sign services.
-# the default is 32
-#defaultSignerParallelism = 32
-
-## HTTPS hostname verifier
-# Whether to enable HttpsHostnameVerifier
-# the default is false
-#
-#hostnameVerifier.enabled = false
-
-## Whether to trust all certificates
-# the default is false
-#
-#hostnameVerifier.trustAll = false
-
-## Map of common name to host name
-# syntax &lt;commonname>=&lt;semicolon-seperated host names>,&lt;commonname>=&lt;semicolon-seperated host names> ...
-# the default is empty
-#
-#hostnameVerifier.commonnameHostMap=
-
-# PKCS#11 configuration file
-# the default is empty
-
-#pkcs11.confFile = xipki/security/pkcs11-conf-hsm.xml
-pkcs11.confFile = xipki/security/pkcs11-conf-emulator.xml
-#pkcs11.confFile = xipki/security/pkcs11-conf-proxy.xml
-    </config>
   </feature>
   <feature name="xipki-shell-base">
     <feature prerequisite="true">xipki-security</feature>
@@ -94,29 +42,6 @@ pkcs11.confFile = xipki/security/pkcs11-conf-emulator.xml
   <feature name="xipki-caserver" version="${project.version}">
     <feature prerequisite="true">xipki-caserver-base</feature>
     <bundle start-level="75">mvn:org.xipki.pki/ca-server/${project.version}</bundle>
-    <config name="org.xipki.pki.ca.server" append="false">
-# CA configuration file
-# The default is ca-config/ca.properties
-#
-#caConfFile = xipki/ca-config/ca.properties
-
-# URL patterns of the CMP serice
-# The default is /cmp/*
-#
-#urlPatterns = /cmp/*
-
-# URL patterns of the health check service
-# The default is /health/*
-#
-#healthUrlPatterns = /health/*
-
-# Whether the HTTP headers SSL_CLIENT_VERIFY and SSL_CLIENT_CERT about SSL client certificate
-# should be evaluated. Such headers will be forwarded by reverse proxy like apache httpd
-#
-# The default is false
-#
-# sslCertInHttpHeader = false
-    </config>
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}">
     <feature prerequisite="true">xipki-caserver</feature>
@@ -131,10 +56,6 @@ pkcs11.confFile = xipki/security/pkcs11-conf-emulator.xml
     <feature prerequisite="true">xipki-cabase</feature>
     <bundle start-level="80">mvn:org.xipki.pki/ca-client-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-client-impl/${project.version}</bundle>
-    <config name="org.xipki.pki.ca.client" append="false">
-# The default is client-config/ca-client.properties
-#clientConfFile = xipki/client-config/ca-client.properties
-    </config>
   </feature>
   <feature name="xipki-caclient-shell" version="${project.version}">
     <feature prerequisite="true">xipki-caclient</feature>
@@ -173,36 +94,11 @@ pkcs11.confFile = xipki/security/pkcs11-conf-emulator.xml
     <feature>xipki-audit</feature>
     <bundle start-level="70">mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
-    <config name="org.xipki.pki.ocsp.server" append="false">
-# Configuration file
-confFile = xipki/ocsp-config/ocsp-responder.xml
-
-# URL patterns of the CMP serice
-# The default is /ocsp/*
-#urlPatterns = /ocsp/*
-
-# URL patterns of the health check service
-# The default is /health/ocsp/*
-# healthUrlPatterns = /health/ocsp/*
-    </config>
   </feature>
   <feature name="xipki-ocspclient" version="${project.version}">
     <feature prerequisite="true">xipki-security</feature>
     <bundle start-level="70">mvn:org.xipki.pki/ocsp-client-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-client-impl/${project.version}</bundle>
-    <config name="org.xipki.pki.ocsp.client" append="false">
-# OCSP request signer type, PKCS11, PKCS12 or JKS
-#
-signer.type = PKCS12
-
-# OCSP request signer conf
-#
-signer.conf = password=1234,algo=SHA256withRSA,keystore=file:xipki/security/tlskeys/tls-client-keystore.p12
-
-# OCSP request signer certificate
-#
-#signer.cert =
-    </config>
   </feature>
   <feature name="xipki-ocspclient-shell" version="${project.version}">
     <feature prerequisite="true">xipki-ocspclient</feature>
@@ -232,48 +128,5 @@ signer.conf = password=1234,algo=SHA256withRSA,keystore=file:xipki/security/tlsk
     <bundle start-level="70">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
     <bundle start-level="70"><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
     <bundle start-level="70">mvn:org.xipki.commons/audit-syslog/${project.version}</bundle>
-    <config name="org.xipki.commons.audit.syslog" append="false">
-# facility for syslog message
-# the default is user
-#facility = user
-
-# syslog host
-# the default is 127.0.0.1
-#host = 127.0.0.1
-
-# prefix of the syslog message, a space will be added if not empty
-prefix = xipki:
-
-# enable this if the default hostname of the sending side should be avoided. -->
-#localname =
-
-# Maximal message length
-# the default is 1024
-#maxMessageLength = 1024
-
-# port for the syslog host
-# default is 514
-#port = 514
-
-# protocol for the syslog host
-# valid values are udp, tcp
-# the default is udp
-#protocol = udp
-
-# if a write to syslog host fails, how many retries should be done.
-# not applied to udp
-# the default is 2
-#writeRetries = 2
-
-# whether uses SSL to secure the communication
-# not applied to udp
-# the default is false
-#ssl = false
-
-# message format
-# valid values are rfc_3164 and rfc_5424
-# default is rfc_5424
-#messageFormat = rfc_5424
-    </config>
   </feature>
 </features>
