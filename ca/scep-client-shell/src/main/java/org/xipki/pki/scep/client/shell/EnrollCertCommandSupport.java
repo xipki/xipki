@@ -38,7 +38,7 @@ import java.io.File;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -71,9 +71,9 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     @Completion(FilePathCompleter.class)
     private String outputFile;
 
-    protected abstract EnrolmentResponse requestCertificate(@Nonnull ScepClient client,
-            @Nonnull CertificationRequest csr, @Nonnull PrivateKey identityKey,
-            @Nonnull X509Certificate identityCert) throws ScepClientException;
+    protected abstract EnrolmentResponse requestCertificate(@NonNull ScepClient client,
+            @NonNull CertificationRequest csr, @NonNull PrivateKey identityKey,
+            @NonNull X509Certificate identityCert) throws ScepClientException;
 
     @Override
     protected Object doExecute() throws Exception {

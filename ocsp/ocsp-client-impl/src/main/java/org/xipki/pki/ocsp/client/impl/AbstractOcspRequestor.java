@@ -46,7 +46,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -112,8 +112,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     protected AbstractOcspRequestor() {
     }
 
-    protected abstract byte[] send(@Nonnull byte[] request, @Nonnull URL responderUrl,
-            @Nonnull RequestOptions requestOptions) throws IOException;
+    protected abstract byte[] send(@NonNull byte[] request, @NonNull URL responderUrl,
+            @NonNull RequestOptions requestOptions) throws IOException;
 
     @Override
     public OCSPResp ask(final X509Certificate issuerCert, final X509Certificate cert,

@@ -38,7 +38,7 @@ import java.io.CharArrayWriter;
 import java.util.List;
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,11 +52,11 @@ public abstract class AuditService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuditService.class);
 
-    public abstract void doLogEvent(@Nonnull AuditEvent event);
+    public abstract void doLogEvent(@NonNull AuditEvent event);
 
-    public abstract void doLogEvent(@Nonnull PciAuditEvent event);
+    public abstract void doLogEvent(@NonNull PciAuditEvent event);
 
-    public final void logEvent(@Nonnull AuditEvent event) {
+    public final void logEvent(@NonNull AuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
 
         switch (event.getLevel()) {
@@ -73,7 +73,7 @@ public abstract class AuditService {
         doLogEvent(event);
     }
 
-    public final void logEvent(@Nonnull PciAuditEvent event) {
+    public final void logEvent(@NonNull PciAuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
 
         CharArrayWriter msg = event.toCharArrayWriter("");

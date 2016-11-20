@@ -45,7 +45,9 @@
     <snakeyaml.version>1.17</snakeyaml.version>
     <hikaricp.version>2.5.1</hikaricp.version>
     <syslog-java-client.version>1.0.8</syslog-java-client.version>
+    <!-- dependency of syslog-java-client -->
     <jsr305.version>3.0.1_1</jsr305.version>
+    <jdt-annotation.version>2.0.0</jdt-annotation.version>
   </properties>
   <modules>
     <module>commons</module>
@@ -102,9 +104,9 @@
         <version>${servlet-api.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.servicemix.bundles</groupId>
-        <artifactId>org.apache.servicemix.bundles.jsr305</artifactId>
-        <version>${jsr305.version}</version>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.annotation</artifactId>
+        <version>${jdt-annotation.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.karaf.shell</groupId>

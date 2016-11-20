@@ -38,8 +38,8 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.commons.common.RequestResponseDebug;
@@ -51,23 +51,23 @@ import org.xipki.commons.common.RequestResponseDebug;
 
 public interface OcspRequestor {
 
-    OCSPResp ask(@Nonnull X509Certificate issuerCert, @Nonnull X509Certificate cert,
-            @Nonnull URL responderUrl, @Nonnull RequestOptions requestOptions,
+    OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull X509Certificate cert,
+            @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException;
 
-    OCSPResp ask(@Nonnull X509Certificate issuerCert, @Nonnull X509Certificate[] certs,
-            @Nonnull URL responderUrl, @Nonnull RequestOptions requestOptions,
+    OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull X509Certificate[] certs,
+            @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException;
 
-    OCSPResp ask(@Nonnull X509Certificate issuerCert, @Nonnull BigInteger serialNumber,
-            @Nonnull URL responderUrl, @Nonnull RequestOptions requestOptions,
+    OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull BigInteger serialNumber,
+            @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException;
 
-    OCSPResp ask(@Nonnull X509Certificate issuerCert, @Nonnull BigInteger[] serialNumbers,
-            @Nonnull URL responderUrl, @Nonnull RequestOptions requestOptions,
+    OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull BigInteger[] serialNumbers,
+            @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
     throws OcspResponseException, OcspRequestorException;
 

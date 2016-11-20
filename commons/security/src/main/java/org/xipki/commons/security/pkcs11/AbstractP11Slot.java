@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.util.encoders.Hex;
@@ -106,7 +106,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         this.readOnly = readOnly;
     }
 
-    protected static String hex(@Nonnull final byte[] bytes) {
+    protected static String hex(@NonNull final byte[] bytes) {
         return Hex.toHexString(bytes).toUpperCase();
     }
 
@@ -129,21 +129,21 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     protected abstract void doRemoveIdentity(P11ObjectIdentifier objectId) throws P11TokenException;
 
-    protected abstract void doAddCert(@Nonnull final P11ObjectIdentifier objectId,
-            @Nonnull final X509Certificate cert) throws P11TokenException, XiSecurityException;
+    protected abstract void doAddCert(@NonNull final P11ObjectIdentifier objectId,
+            @NonNull final X509Certificate cert) throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:OFF
     protected abstract P11Identity doGenerateDSAKeypair(final BigInteger p, final BigInteger q,
-            final BigInteger g, @Nonnull final String label) throws P11TokenException;
+            final BigInteger g, @NonNull final String label) throws P11TokenException;
     // CHECKSTYLE:ON
 
     // CHECKSTYLE:SKIP
-    protected abstract P11Identity doGenerateECKeypair(@Nonnull ASN1ObjectIdentifier curveId,
-            @Nonnull String label) throws P11TokenException;
+    protected abstract P11Identity doGenerateECKeypair(@NonNull ASN1ObjectIdentifier curveId,
+            @NonNull String label) throws P11TokenException;
 
     // CHECKSTYLE:SKIP
     protected abstract P11Identity doGenerateRSAKeypair(int keysize,
-            @Nonnull BigInteger publicExponent, @Nonnull String label) throws P11TokenException;
+            @NonNull BigInteger publicExponent, @NonNull String label) throws P11TokenException;
 
     protected abstract P11SlotRefreshResult doRefresh()
     throws P11TokenException;
@@ -151,7 +151,7 @@ public abstract class AbstractP11Slot implements P11Slot {
     protected abstract void doRemoveCerts(final P11ObjectIdentifier objectId)
     throws P11TokenException;
 
-    protected X509Cert getCertForId(@Nonnull final byte[] id) {
+    protected X509Cert getCertForId(@NonNull final byte[] id) {
         for (P11ObjectIdentifier objId : certificates.keySet()) {
             if (objId.matchesId(id)) {
                 return certificates.get(objId);
@@ -166,7 +166,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         }
     }
 
-    private void updateCaCertsOfIdentity(@Nonnull final P11Identity identity) {
+    private void updateCaCertsOfIdentity(@NonNull final P11Identity identity) {
         X509Certificate[] certchain = identity.getCertificateChain();
         if (certchain == null || certchain.length == 0) {
             return;
@@ -182,7 +182,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         }
     }
 
-    private X509Certificate[] buildCertPath(@Nonnull final X509Certificate cert) {
+    private X509Certificate[] buildCertPath(@NonNull final X509Certificate cert) {
         List<X509Certificate> certs = new LinkedList<>();
         X509Certificate cur = cert;
         while (cur != null) {
@@ -192,7 +192,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         return certs.toArray(new X509Certificate[0]);
     }
 
-    private X509Certificate getIssuerForCert(@Nonnull final X509Certificate cert) {
+    private X509Certificate getIssuerForCert(@NonNull final X509Certificate cert) {
         try {
             if (X509Util.isSelfSigned(cert)) {
                 return null;
