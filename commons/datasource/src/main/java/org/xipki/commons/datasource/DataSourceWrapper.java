@@ -137,7 +137,7 @@ public abstract class DataSourceWrapper {
             String sql = null;
 
             boolean newConn = (conn == null);
-            Connection tmpConn = newConn ? getConnection() : conn;
+            Connection tmpConn = (conn != null) ? conn : getConnection();
 
             Statement stmt = null;
             ResultSet rs = null;
@@ -1026,8 +1026,7 @@ public abstract class DataSourceWrapper {
         ParamUtil.requireNonBlank("sequenceName", sequenceName);
         final String sql = buildAndCacheNextSeqValueSql(sequenceName);
         boolean newConn = (conn == null);
-
-        Connection tmpConn = newConn ? getConnection() : conn;
+        Connection tmpConn = (conn != null) ? conn : getConnection();
         Statement stmt = null;
 
         long next;

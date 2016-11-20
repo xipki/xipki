@@ -96,9 +96,7 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
             ASN1Encodable asn1 = seq.getObjectAt(1);
             if (asn1 instanceof ASN1String) {
                 asn1Label = asn1;
-                asn1Id = null;
             } else {
-                asn1Label = null;
                 asn1Id = asn1;
             }
         } else {

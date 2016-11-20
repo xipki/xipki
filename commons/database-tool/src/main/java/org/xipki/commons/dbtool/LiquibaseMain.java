@@ -72,7 +72,7 @@ public class LiquibaseMain {
 
     public LiquibaseMain(final LiquibaseDatabaseConf dbConf, final String changeLogFile) {
         Objects.requireNonNull(dbConf, "dbConf must not be null");
-        if (changeLogFile == null | changeLogFile.isEmpty()) {
+        if (changeLogFile == null || changeLogFile.isEmpty()) {
             throw new IllegalArgumentException("changeLogFile must not be empty");
         }
 

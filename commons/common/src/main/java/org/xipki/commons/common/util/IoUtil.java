@@ -98,12 +98,10 @@ public class IoUtil {
 
             return bout.toByteArray();
         } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ex) {
-                    LOG.error("could not close stream: {}", ex.getMessage());
-                }
+            try {
+                in.close();
+            } catch (IOException ex) {
+                LOG.error("could not close stream: {}", ex.getMessage());
             }
         }
     }
