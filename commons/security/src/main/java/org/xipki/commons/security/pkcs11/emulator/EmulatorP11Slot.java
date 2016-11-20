@@ -62,7 +62,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
@@ -755,7 +755,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         return saveP11Entity(keypair, label);
     }
 
-    private P11Identity saveP11Entity(@Nonnull final KeyPair keypair, @Nonnull final String label)
+    private P11Identity saveP11Entity(@NonNull final KeyPair keypair, @NonNull final String label)
     throws P11TokenException {
         byte[] id = generateId();
         savePkcs11PrivateKey(id, label, keypair.getPrivate());

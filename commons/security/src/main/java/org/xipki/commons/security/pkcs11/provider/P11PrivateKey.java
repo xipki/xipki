@@ -40,7 +40,7 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.P11TokenException;

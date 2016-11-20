@@ -49,7 +49,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -116,11 +116,11 @@ public abstract class Client {
         this.caCertValidator = ParamUtil.requireNonNull("caCertValidator", caCertValidator);
     }
 
-    protected abstract ScepHttpResponse httpPost(@Nonnull final String url,
-            @Nonnull final String requestContentType, @Nonnull final byte[] request)
+    protected abstract ScepHttpResponse httpPost(@NonNull final String url,
+            @NonNull final String requestContentType, @NonNull final byte[] request)
     throws ScepClientException;
 
-    protected abstract ScepHttpResponse httpGet(@Nonnull final String url)
+    protected abstract ScepHttpResponse httpGet(@NonNull final String url)
     throws ScepClientException;
 
     public boolean isHttpGetOnly() {

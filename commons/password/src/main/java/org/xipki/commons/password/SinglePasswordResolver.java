@@ -34,7 +34,7 @@
 
 package org.xipki.commons.password;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * @author Lijun Liao
@@ -43,8 +43,8 @@ import javax.annotation.Nonnull;
 
 public interface SinglePasswordResolver {
 
-    boolean canResolveProtocol(@Nonnull String protocol);
+    boolean canResolveProtocol(@NonNull String protocol);
 
-    char[] resolvePassword(@Nonnull String passwordHint) throws PasswordResolverException;
+    char[] resolvePassword(@NonNull String passwordHint) throws PasswordResolverException;
 
 }

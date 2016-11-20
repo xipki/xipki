@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * @author Lijun Liao
@@ -286,7 +286,7 @@ public class P11Constants {
         return mechanismNameMap.get(mechanism);
     }
 
-    public static long getMechanism(@Nonnull final String mechanismName) {
+    public static long getMechanism(@NonNull final String mechanismName) {
         Long mech = nameMechanismNameMap.get(mechanismName);
         return mech == null ? -1 : mech.longValue();
     }
