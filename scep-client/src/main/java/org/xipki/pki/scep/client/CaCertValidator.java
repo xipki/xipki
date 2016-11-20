@@ -36,7 +36,7 @@ package org.xipki.pki.scep.client;
 
 import java.security.cert.X509Certificate;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * @author Lijun Liao
@@ -45,6 +45,6 @@ import javax.annotation.Nonnull;
 
 public interface CaCertValidator {
 
-    boolean isTrusted(@Nonnull X509Certificate cert);
+    boolean isTrusted(@NonNull X509Certificate cert);
 
 }
