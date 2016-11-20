@@ -72,7 +72,7 @@ if { $printUsage equals "true" } {
   sleep 1000
 
   echo "#################################################################"
-  echo "#                          ENVIRONMENT                          #"
+  echo "#                          Environment                          #"
   echo "#################################################################"
 
   xipki-ca:env-add \
@@ -108,7 +108,7 @@ if { $printUsage equals "true" } {
     qa-env-not-exits
 
   echo "#################################################################"
-  echo "#                           CMP CONTROL                         #"
+  echo "#                           CMP control                         #"
   echo "#################################################################"
   xipki-caqa:cmpcontrol-check \
     --name cmpcontrol1 \
@@ -146,7 +146,7 @@ if { $printUsage equals "true" } {
     qa-cmpcontrol-not-exists \
 
   echo "#################################################################"
-  echo "#                           REQUESTOR                           #"
+  echo "#                           Requestor                           #"
   echo "#################################################################"
   xipki-caqa:requestor-check \
     --name requestor1 \
@@ -186,7 +186,7 @@ if { $printUsage equals "true" } {
     qa-requestor1
 
   echo "#################################################################"
-  echo "#                           RESPONDER                           #"
+  echo "#                           Responder                           #"
   echo "#################################################################"
   xipki-caqa:responder-check \
     --name responder1 \

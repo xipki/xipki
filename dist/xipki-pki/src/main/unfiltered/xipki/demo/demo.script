@@ -205,7 +205,7 @@ if { $printUsage equals "true" } {
   }
 
   echo "#################################################################"
-  echo "#                  CA certificate commands                       #"
+  echo "#                  CA certificate commands                      #"
   echo "#################################################################"
 
   #### list certs ####
