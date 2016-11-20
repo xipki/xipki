@@ -514,7 +514,12 @@ public class SubjectDnSpec {
         }
 
         Range specRange = RANGES.get(type);
-        Range isRange = (specRange == null) ? null : control.getStringLengthRange();
+        if (specRange == null) {
+            control.setStringLengthRange(null);
+            return;
+        }
+
+        Range isRange = control.getStringLengthRange();
         if (isRange == null) {
             control.setStringLengthRange(specRange);
             return;

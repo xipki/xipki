@@ -1866,11 +1866,15 @@ class CertStoreQueryExecutor {
             ps.setInt(1, caId);
 
             if (idxNotBefore != null) {
-                ps.setLong(idxNotBefore, validFrom.getTime() / 1000 - 1);
+                @SuppressWarnings("null")
+                long time = validFrom.getTime() / 1000;
+                ps.setLong(idxNotBefore, time - 1);
             }
 
             if (idxNotAfter != null) {
-                ps.setLong(idxNotAfter, validTo.getTime() / 1000);
+                @SuppressWarnings("null")
+                long time = validTo.getTime() / 1000;
+                ps.setLong(idxNotAfter, time);
             }
 
             if (idxSubject != null) {

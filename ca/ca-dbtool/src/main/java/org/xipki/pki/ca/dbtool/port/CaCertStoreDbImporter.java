@@ -203,7 +203,8 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
             boolean entriesFinished = false;
             // finished for the given type
-            if (idProcessedInLastProcess != null && idProcessedInLastProcess == -1) {
+            if (typeProcessedInLastProcess != null && idProcessedInLastProcess != null
+                    && idProcessedInLastProcess == -1) {
                 numProcessedInLastProcess = 0;
                 idProcessedInLastProcess = 0L;
 
@@ -555,7 +556,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                         }
                     }
                 }
-                entriesFileIterator.close();
+                if (entriesFileIterator != null) {
+                    entriesFileIterator.close();
+                }
             }
 
             processLog.printTrailer();

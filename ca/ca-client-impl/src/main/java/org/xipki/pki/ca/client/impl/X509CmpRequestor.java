@@ -429,10 +429,10 @@ abstract class X509CmpRequestor extends CmpRequestor {
             }
         }
 
-        boolean isImplicitConfirm = CmpUtil.isImplictConfirm(response.getPkiMessage().getHeader());
-
-        CertificateConfirmationContentBuilder certConfirmBuilder = isImplicitConfirm ? null
-                : new CertificateConfirmationContentBuilder();
+        CertificateConfirmationContentBuilder certConfirmBuilder = null;
+        if (!CmpUtil.isImplictConfirm(response.getPkiMessage().getHeader())) {
+            certConfirmBuilder = new CertificateConfirmationContentBuilder();
+        }
         boolean requireConfirm = false;
 
         // We only accept the certificates which are requested.
@@ -466,7 +466,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
                 resultEntry = new EnrollCertResultEntry(thisId, cmpCert, status);
 
-                if (!isImplicitConfirm) {
+                if (certConfirmBuilder != null) {
                     requireConfirm = true;
                     X509CertificateHolder certHolder = null;
                     try {

@@ -115,11 +115,11 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
 
         SingleResp[] singleResponses = basicResp.getResponses();
 
-        final int n = (singleResponses == null) ? 0 : singleResponses.length;
-        if (n == 0) {
+        if (singleResponses == null || singleResponses.length == 0) {
             throw new CmdFailure("received no status from server");
         }
 
+        final int n = singleResponses.length;
         if (n != serialNumbers.size()) {
             throw new CmdFailure("received status with " + n
                     + " single responses from server, but " + serialNumbers.size()

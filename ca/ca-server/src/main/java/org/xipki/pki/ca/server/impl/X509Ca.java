@@ -702,11 +702,13 @@ public class X509Ca {
             ConcurrentContentSigner tmpCrlSigner = crlSigner.getSigner();
             CrlControl control = crlSigner.getCrlControl();
 
-            boolean directCrl = (tmpCrlSigner == null);
+            boolean directCrl;
             X500Name crlIssuer;
-            if (directCrl) {
+            if (tmpCrlSigner == null) {
+                directCrl = true;
                 crlIssuer = caInfo.getPublicCaInfo().getX500Subject();
             } else {
+                directCrl = false;
                 crlIssuer = X500Name.getInstance(
                         tmpCrlSigner.getCertificate().getSubjectX500Principal().getEncoded());
             }
@@ -1394,11 +1396,10 @@ public class X509Ca {
             }
         } // end for
 
-        String resultText = (revokedCert == null) ? "CERT_NOT_EXIST" : "REVOKED";
         if (LOG.isInfoEnabled()) {
             LOG.info("SUCCESSFUL revokeCertificate: ca={}, serialNumber={}, reason={},"
-                + " invalidityTime={}, revocationResult={}",
-                caName, hexSerial, reason.getDescription(), invalidityTime, resultText);
+                + " invalidityTime={}, revocationResult=REVOKED",
+                caName, hexSerial, reason.getDescription(), invalidityTime);
         }
 
         return revokedCert;
@@ -1516,9 +1517,9 @@ public class X509Ca {
             }
         } // end for
 
-        String resultText = (unrevokedCert == null) ? "CERT_NOT_EXIST" : "UNREVOKED";
-        LOG.info("SUCCESSFUL unrevokeCertificate: ca={}, serialNumber={}, revocationResult={}",
-                caName, hexSerial, resultText);
+        LOG.info(
+            "SUCCESSFUL unrevokeCertificate: ca={}, serialNumber={}, revocationResult=UNREVOKED",
+            caName, hexSerial);
 
         return unrevokedCert;
     } // doUnrevokeCertificate
@@ -2134,6 +2135,7 @@ public class X509Ca {
             String str = certprofile.getParameter(
                     SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME);
             long maxLifetimeInDays = Long.parseLong(str);
+            @SuppressWarnings("null")
             Date maxLifetime = new Date(gsmckFirstNotBefore.getTime()
                     + maxLifetimeInDays * DAY_IN_MS - MS_PER_SECOND);
             if (maxNotAfter.after(maxLifetime)) {

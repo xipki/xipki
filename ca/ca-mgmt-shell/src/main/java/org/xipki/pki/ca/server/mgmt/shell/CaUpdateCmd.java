@@ -311,12 +311,10 @@ public class CaUpdateCmd extends CaCommandSupport {
         }
 
         boolean clearUris = false;
-        if (uris != null) {
-            for (String uri : uris) {
-                if (CaManager.NULL.equalsIgnoreCase(uri)) {
-                    clearUris = true;
-                    break;
-                }
+        for (String uri : uris) {
+            if (CaManager.NULL.equalsIgnoreCase(uri)) {
+                clearUris = true;
+                break;
             }
         }
 

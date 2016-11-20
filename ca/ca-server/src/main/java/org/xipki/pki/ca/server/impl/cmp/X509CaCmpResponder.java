@@ -264,9 +264,7 @@ public class X509CaCmpResponder extends CmpResponder {
         }
 
         CmpRequestorInfo tmpRequestor = (CmpRequestorInfo) requestor;
-        if (tmpRequestor != null) {
-            event.addEventData(CaAuditConstants.NAME_requestor, tmpRequestor.getName());
-        }
+        event.addEventData(CaAuditConstants.NAME_requestor, tmpRequestor.getName());
 
         PKIHeader reqHeader = message.getHeader();
         PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
@@ -865,7 +863,6 @@ public class X509CaCmpResponder extends CmpResponder {
                 encodedRequest = request.getEncoded();
             } catch (IOException ex) {
                 LOG.warn("could not encode request");
-                encodedRequest = null;
             }
         }
 

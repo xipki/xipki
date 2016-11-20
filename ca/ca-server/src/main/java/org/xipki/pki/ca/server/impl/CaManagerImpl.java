@@ -1892,9 +1892,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         IdentifiedX509CertPublisher oldPublisher = publishers.remove(name);
-        if (publisher != null) {
-            shutdownPublisher(oldPublisher);
-        }
+        shutdownPublisher(oldPublisher);
 
         publisherDbEntries.put(name, publisher.getDbEntry());
         publishers.put(name, publisher);

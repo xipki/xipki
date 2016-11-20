@@ -213,23 +213,23 @@ public class HttpProxyServlet extends HttpServlet {
 
     private static String extractModuleName(final HttpServletRequest request)
     throws UnsupportedEncodingException {
-        String moduleName = null;
         String encodedUrl = request.getRequestURI();
-        String constructedPath = null;
-        if (encodedUrl != null) {
-            constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
-            String servletPath = request.getServletPath();
-            if (!servletPath.endsWith("/")) {
-                servletPath += "/";
-                if (servletPath.startsWith(constructedPath)) {
-                    moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
-                }
-            }
 
-            int indexOf = constructedPath.indexOf(servletPath);
-            if (indexOf >= 0) {
-                constructedPath = constructedPath.substring(indexOf + servletPath.length());
+        String moduleName = null;
+        String constructedPath = null;
+
+        constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
+        String servletPath = request.getServletPath();
+        if (!servletPath.endsWith("/")) {
+            servletPath += "/";
+            if (servletPath.startsWith(constructedPath)) {
+                moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
             }
+        }
+
+        int indexOf = constructedPath.indexOf(servletPath);
+        if (indexOf >= 0) {
+            constructedPath = constructedPath.substring(indexOf + servletPath.length());
         }
 
         if (moduleName == null) {

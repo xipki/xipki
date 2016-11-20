@@ -160,7 +160,10 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             }
 
             RDN[] thisRdns = getRdns(requstedRdns, type);
-            int len = (thisRdns == null) ? 0 : thisRdns.length;
+            if (thisRdns == null) {
+                continue;
+            }
+            int len = thisRdns.length;
             if (len == 0) {
                 continue;
             }

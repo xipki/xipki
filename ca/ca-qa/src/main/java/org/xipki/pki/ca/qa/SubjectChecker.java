@@ -213,6 +213,10 @@ public class SubjectChecker {
             }
         }
 
+        if (rdns == null) { // return always false, only to make the null checker happy
+            return issue;
+        }
+
         for (int i = 0; i < rdns.length; i++) {
             RDN rdn = rdns[i];
             AttributeTypeAndValue[] atvs = rdn.getTypesAndValues();
@@ -284,6 +288,10 @@ public class SubjectChecker {
                 requestedCoreAtvTextValues = sort(requestedCoreAtvTextValues,
                         rdnControl.getPatterns());
             }
+        }
+
+        if (rdns == null) { // return always false, only to make the null checker happy
+            return issue;
         }
 
         StringBuilder failureMsg = new StringBuilder();

@@ -174,8 +174,10 @@ public class CaUtil {
         for (int i = 0; i < size; i++) {
             ASN1ObjectIdentifier type = sortedDNs.get(i);
             RDN[] thisRdns = getRdns(requstedRdns, type);
-            int len = (thisRdns == null) ? 0 : thisRdns.length;
-            if (len == 0) {
+            if (thisRdns == null) {
+                continue;
+            }
+            if (thisRdns.length == 0) {
                 continue;
             }
 

@@ -1268,6 +1268,7 @@ class CaManagerQueryExecutor {
             }
 
             if (idxCert != null) {
+                @SuppressWarnings("null")
                 String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
                 sb.append("cert: '").append(subject).append("'; ");
                 ps.setString(idxSubject, subject);
@@ -1694,12 +1695,10 @@ class CaManagerQueryExecutor {
             tmpCrlControl = dbEntry.getCrlControl();
         } else {
             // validate crlControl
-            if (tmpCrlControl != null) {
-                try {
-                    new CrlControl(tmpCrlControl);
-                } catch (InvalidConfException ex) {
-                    throw new CaMgmtException("invalid CRL control '" + tmpCrlControl + "'");
-                }
+            try {
+                new CrlControl(tmpCrlControl);
+            } catch (InvalidConfException ex) {
+                throw new CaMgmtException("invalid CRL control '" + tmpCrlControl + "'");
             }
         }
 

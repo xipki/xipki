@@ -349,7 +349,7 @@ public class DbCertStatusStore extends OcspStore {
                     }
 
                     if (!ignore) {
-                        if (includeCertHash) {
+                        if (certHashAlgo != null) {
                             b64CertHash = rs.getString(certHashAlgo.getShortName());
                         }
 

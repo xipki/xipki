@@ -168,7 +168,6 @@ abstract class CmpResponder {
                 messageTime = reqHeader.getMessageTime().getDate();
             } catch (ParseException ex) {
                 LogUtil.error(LOG, ex, "tid=" + tidStr + ": could not parse messageDate");
-                messageTime = null;
             }
         }
 
@@ -203,14 +202,16 @@ abstract class CmpResponder {
         }
 
         if (failureCode != null) {
-            event.setLevel(AuditLevel.INFO);
-            event.setStatus(AuditStatus.FAILED);
-            event.addEventData(CaAuditConstants.NAME_message, statusText);
+            if (event != null) {
+                event.setLevel(AuditLevel.INFO);
+                event.setStatus(AuditStatus.FAILED);
+                event.addEventData(CaAuditConstants.NAME_message, statusText);
+            }
             return buildErrorPkiMessage(tid, reqHeader, failureCode, statusText);
         }
 
         boolean isProtected = message.hasProtection();
-        CmpRequestorInfo requestor = null;
+        CmpRequestorInfo requestor;
 
         String errorStatus;
 
@@ -245,6 +246,7 @@ abstract class CmpResponder {
             } catch (Exception ex) {
                 LogUtil.error(LOG, ex, "tid=" + tidStr + ": could not verify the signature");
                 errorStatus = "request has invalid signature based protection";
+                requestor = null;
             }
         } else if (tlsClientCert != null) {
             boolean authorized = false;
@@ -277,9 +279,11 @@ abstract class CmpResponder {
         }
 
         if (errorStatus != null) {
-            event.setLevel(AuditLevel.INFO);
-            event.setStatus(AuditStatus.FAILED);
-            event.addEventData(CaAuditConstants.NAME_message, errorStatus);
+            if (event != null) {
+                event.setLevel(AuditLevel.INFO);
+                event.setStatus(AuditStatus.FAILED);
+                event.addEventData(CaAuditConstants.NAME_message, errorStatus);
+            }
             return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck,
                     errorStatus);
         }

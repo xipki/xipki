@@ -138,14 +138,14 @@ public class OcspQa {
         issue = new ValidationIssue("OCSP.RESPONSES.NUM", "number of single responses");
         resultIssues.add(issue);
 
-        final int n = (singleResponses == null) ? 0 : singleResponses.length;
-        if (n == 0) {
+        if (singleResponses == null || singleResponses.length == 0) {
             issue.setFailureMessage("received no status from server");
-        } else if (n != serialNumbers.size()) {
-            issue.setFailureMessage("is '" + n + "', but expected '" + serialNumbers.size() + "'");
+            return new ValidationResult(resultIssues);
         }
 
-        if (issue.isFailed()) {
+        final int n = singleResponses.length;
+        if (n != serialNumbers.size()) {
+            issue.setFailureMessage("is '" + n + "', but expected '" + serialNumbers.size() + "'");
             return new ValidationResult(resultIssues);
         }
 

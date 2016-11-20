@@ -180,7 +180,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
                             new X509AttributeCertificateHolder(IoUtil.read(certFile));
                     // no signature validation
                     AttributeCertificateIssuer reqIssuer = cert.getIssuer();
-                    if (reqIssuer != null) {
+                    if (reqIssuer != null && issuerX500Name != null) {
                         X500Name reqIssuerName = reqIssuer.getNames()[0];
                         if (!issuerX500Name.equals(reqIssuerName)) {
                             throw new IllegalCmdParamException("certificate " + certFile

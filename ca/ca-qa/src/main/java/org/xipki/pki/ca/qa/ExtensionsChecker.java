@@ -955,6 +955,10 @@ public class ExtensionsChecker {
             return;
         }
 
+        if (subtrees == null || expectedSubtrees == null) {
+            return;
+        }
+
         for (int i = 0; i < isSize; i++) {
             GeneralSubtree isSubtree = subtrees[i];
             QaGeneralSubtree expSubtree = expectedSubtrees.get(i);
@@ -1790,10 +1794,15 @@ public class ExtensionsChecker {
             final byte[] extensionValue, final X509IssuerInfo issuerInfo) {
         CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
         DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
-        int len = (isDistributionPoints == null) ? 0 : isDistributionPoints.length;
-        if (len != 1) {
-            addViolation(failureMsg, "size of CRLDistributionPoints", len, 1);
+        if (isDistributionPoints == null) {
+            addViolation(failureMsg, "size of CRLDistributionPoints", 0, 1);
             return;
+        } else {
+            int len = isDistributionPoints.length;
+            if (len != 1) {
+                addViolation(failureMsg, "size of CRLDistributionPoints", len, 1);
+                return;
+            }
         }
 
         Set<String> isCrlUrls = new HashSet<>();
@@ -1839,10 +1848,15 @@ public class ExtensionsChecker {
             final byte[] extensionValue, final X509IssuerInfo issuerInfo) {
         CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extensionValue);
         DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
-        int len = (isDistributionPoints == null) ? 0 : isDistributionPoints.length;
-        if (len != 1) {
-            addViolation(failureMsg, "size of CRLDistributionPoints (deltaCRL)", len, 1);
+        if (isDistributionPoints == null) {
+            addViolation(failureMsg, "size of CRLDistributionPoints (deltaCRL)", 0, 1);
             return;
+        } else {
+            int len = isDistributionPoints.length;
+            if (len != 1) {
+                addViolation(failureMsg, "size of CRLDistributionPoints (deltaCRL)", len, 1);
+                return;
+            }
         }
 
         Set<String> isCrlUrls = new HashSet<>();

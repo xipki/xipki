@@ -933,7 +933,7 @@ public class OcspServer {
 
         List<Extension> extensions = new LinkedList<>();
         boolean unknownAsRevoked = false;
-        CertificateStatus bcCertStatus = null;
+        CertificateStatus bcCertStatus;
         switch (certStatusInfo.getCertStatus()) {
         case GOOD:
             bcCertStatus = null;

@@ -403,7 +403,9 @@ class OcspCertStoreDbExporter extends DbPorter {
 
                 writeLine(certsFileOs, currentCertsFilename);
                 certstore.setCountCerts(numProcessedBefore + sum);
-                echoToFile(Long.toString(id), processLogFile);
+                if (id != null) {
+                    echoToFile(Long.toString(id), processLogFile);
+                }
 
                 processLog.addNumProcessed(numCertInCurrentFile);
             } else {

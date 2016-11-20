@@ -85,7 +85,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.AuditLevel;
 import org.xipki.commons.audit.AuditStatus;
 import org.xipki.commons.audit.PciAuditEvent;
-import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -186,16 +185,17 @@ public class CrlCertStatusStore extends OcspStore {
 
             long newLastModifed = fullCrlFile.lastModified();
 
+            long newLastModifedOfDeltaCrl;
             boolean deltaCrlExists;
             File deltaCrlFile = null;
             if (deltaCrlFilename != null) {
                 deltaCrlFile = new File(deltaCrlFilename);
                 deltaCrlExists = deltaCrlFile.exists();
+                newLastModifedOfDeltaCrl = deltaCrlExists ? deltaCrlFile.lastModified() : 0;
             } else {
                 deltaCrlExists = false;
+                newLastModifedOfDeltaCrl = 0;
             }
-
-            long newLastModifedOfDeltaCrl = deltaCrlExists ? deltaCrlFile.lastModified() : 0;
 
             if (!force) {
                 long now = System.currentTimeMillis();
@@ -315,7 +315,7 @@ public class CrlCertStatusStore extends OcspStore {
                 vec.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
             }
 
-            byte[] extValue = (deltaCrlExists ? deltaCrl : crl).getExtensionValue(
+            byte[] extValue = ((deltaCrl != null) ? deltaCrl : crl).getExtensionValue(
                     Extension.cRLNumber.getId());
             if (extValue != null) {
                 ASN1Integer asn1CrlNumber = ASN1Integer.getInstance(extractCoreValue(extValue));
@@ -403,10 +403,12 @@ public class CrlCertStatusStore extends OcspStore {
             Map<BigInteger, X509CRLEntry> revokedCertMap = null;
 
             // merge the revoked list
-            if (CollectionUtil.isNonEmpty(revokedCertListInDeltaCrl)) {
+            if (revokedCertListInDeltaCrl != null && !revokedCertListInDeltaCrl.isEmpty()) {
                 revokedCertMap = new HashMap<BigInteger, X509CRLEntry>();
-                for (X509CRLEntry entry : revokedCertListInFullCrl) {
-                    revokedCertMap.put(entry.getSerialNumber(), entry);
+                if (revokedCertListInFullCrl != null) {
+                    for (X509CRLEntry entry : revokedCertListInFullCrl) {
+                        revokedCertMap.put(entry.getSerialNumber(), entry);
+                    }
                 }
 
                 for (X509CRLEntry entry : revokedCertListInDeltaCrl) {
