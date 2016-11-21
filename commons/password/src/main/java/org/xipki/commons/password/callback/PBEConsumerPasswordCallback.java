@@ -34,6 +34,8 @@
 
 package org.xipki.commons.password.callback;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
@@ -49,6 +51,7 @@ import org.xipki.commons.password.PasswordResolverException;
 // CHECKSTYLE:SKIP
 public class PBEConsumerPasswordCallback implements PasswordCallback {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PBEConsumerPasswordCallback.class);
     private String passwordName;
     private int tries = 3;
 
@@ -78,14 +81,19 @@ public class PBEConsumerPasswordCallback implements PasswordCallback {
                 } catch (InterruptedException ex) {
                     throw new PasswordResolverException("interrupted");
                 }
-                if (isPasswordValid(password, testToken)) {
+                boolean valid = isPasswordValid(password, testToken);
+                PasswordProducer.setPasswordCorrect(passwordName, valid);
+                if (valid) {
                     return password;
                 }
             }
         } finally {
             PasswordProducer.unregisterPasswordConsumer(passwordName);
         }
-        throw new PasswordResolverException("Could not get the password after " + tries + " tries");
+        String msg = "Could not get the password " + passwordName + "after " + tries + " tries";
+        LOG.error(msg);
+        System.out.println(msg);
+        throw new PasswordResolverException(msg);
     }
 
     @Override
