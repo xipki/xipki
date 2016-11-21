@@ -80,8 +80,19 @@ public class ProducePasswordCmd extends XipkiCommandSupport {
                 password = StringUtil.merge(parts);
             }
             PasswordProducer.putPassword(name, password);
-            // wait for 2 seconds so that the password will be consumed
-            Thread.sleep(2000);
+
+            final int n = 10;
+            for (int i = 0; i < n; i++) {
+                Thread.sleep(500);
+                Boolean correct = PasswordProducer.removePasswordCorrect(name);
+                if (correct != null) {
+                    println("\rthe given password is "
+                            + (correct ? "correct            " : "not correct        "));
+                    break;
+                } else {
+                    println("\rthe given password is still under process");
+                }
+            }
         }
         return null;
     }

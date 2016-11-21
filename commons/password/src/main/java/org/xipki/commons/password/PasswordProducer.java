@@ -55,17 +55,38 @@ public class PasswordProducer {
     private static ConcurrentHashMap<String, BlockingQueue<char[]>> namePasswordsMap =
             new ConcurrentHashMap<>();
 
+    private static ConcurrentHashMap<String, Boolean> nameResultMap =
+            new ConcurrentHashMap<>();
+
     public static void registerPasswordConsumer(final String name) {
         assertNameNotBlank(name);
         BlockingQueue<char[]> queue = new LinkedBlockingQueue<>(1);
+        nameResultMap.remove(name);
         namePasswordsMap.put(name, queue);
-        LOG.info("registered password consumer '{}'", name);
+        final String str = "registered password consumer " + name;
+        System.out.println(str);
+        LOG.info(str);
     }
 
     public static void unregisterPasswordConsumer(final String name) {
         assertNameNotBlank(name);
         namePasswordsMap.remove(name);
-        LOG.info("unregistered password consumer '{}'", name);
+        final String str = "unregistered password consumer " + name;
+        System.out.println(str);
+        LOG.info(str);
+    }
+
+    public static void setPasswordCorrect(final String name, final boolean correct) {
+        assertNameNotBlank(name);
+        nameResultMap.put(name, correct);
+        final String str = "set result of password consumer " + name + ": "
+                + (correct ? "valid" : "invalid");
+        System.out.println(str);
+        LOG.info(str);
+    }
+
+    public static Boolean removePasswordCorrect(final String name) {
+        return nameResultMap.remove(name);
     }
 
     public static char[] takePassword(final String name)
@@ -75,7 +96,10 @@ public class PasswordProducer {
             throw new PasswordResolverException("password consumer '" + name
                     + "' is not registered ");
         }
-        return namePasswordsMap.get(name).take();
+        char[] pwd = namePasswordsMap.get(name).take();
+        final String str = "took password consumer " + name;
+        System.out.println(str);
+        return pwd;
     }
 
     public static void putPassword(final String name, final char[] password)
@@ -86,8 +110,10 @@ public class PasswordProducer {
                     + "' is not registered ");
         }
 
+        nameResultMap.remove(name);
         namePasswordsMap.get(name).put(password);
-        LOG.info("provided password for consumer '{}'", name);
+        final String str = "provided password consumer " + name;
+        System.out.println(str);
     }
 
     public static boolean needsPassword(final String name) {
