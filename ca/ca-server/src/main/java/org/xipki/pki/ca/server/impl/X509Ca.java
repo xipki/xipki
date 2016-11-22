@@ -674,8 +674,7 @@ public class X509Ca {
     throws OperationException {
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
         if (crlSigner == null) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
-                    "CRL generation is not allowed");
+            throw new OperationException(ErrorCode.NOT_PERMITTED, "CRL generation is not allowed");
         }
 
         String caName = caInfo.getName();
@@ -1222,7 +1221,7 @@ public class X509Ca {
             final CrlReason reason, final Date invalidityTime, final String msgId)
     throws OperationException {
         if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "insufficient permission to revoke CA certificate");
         }
 
@@ -1235,7 +1234,7 @@ public class X509Ca {
         case CA_COMPROMISE:
         case AA_COMPROMISE:
         case REMOVE_FROM_CRL:
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "Insufficient permission revoke certificate with reason "
                     + tmpReason.getDescription());
         case UNSPECIFIED:
@@ -1265,7 +1264,7 @@ public class X509Ca {
     public X509CertWithDbId unrevokeCertificate(final BigInteger serialNumber, final String msgId)
     throws OperationException {
         if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "insufficient permission unrevoke CA certificate");
         }
 
@@ -1283,7 +1282,7 @@ public class X509Ca {
     public X509CertWithDbId removeCertificate(final BigInteger serialNumber, String msgId)
     throws OperationException {
         if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "insufficient permission remove CA certificate");
         }
 
@@ -1963,7 +1962,7 @@ public class X509Ca {
         }
 
         if (certprofile.isOnlyForRa() && !requestedByRa) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "profile " + certprofileName + " not applied to non-RA");
         }
 
@@ -2313,7 +2312,7 @@ public class X509Ca {
     throws OperationException {
         ParamUtil.requireNonNull("expiredtime", expiredAtTime);
         if (!masterMode) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "CA could not remove expired certificates in slave mode");
         }
 
@@ -2368,7 +2367,7 @@ public class X509Ca {
     private int doRevokeSuspendedCerts(final AuditEvent event, final String msgId)
     throws OperationException {
         if (!masterMode) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "CA could not remove expired certificates in slave mode");
         }
 
@@ -2389,7 +2388,7 @@ public class X509Ca {
             ms = val.getValidity() * 365 * DAY_IN_MS;
             break;
         default:
-            throw new RuntimeException("should not reach here, unknown Valditiy Unit "
+            throw new RuntimeException("should not reach here, unknown Validity Unit "
                 + val.getUnit());
         }
         final long latestLastUpdatedAt = (System.currentTimeMillis() - ms) / 1000; // seconds

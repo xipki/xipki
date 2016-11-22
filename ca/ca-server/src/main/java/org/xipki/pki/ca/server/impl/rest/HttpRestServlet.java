@@ -362,10 +362,6 @@ public class HttpRestServlet extends HttpServlet {
                 sc = HttpServletResponse.SC_UNAUTHORIZED;
                 failureInfo = RestfulAPIConstants.FAILINFO_notAuthorized;
                 break;
-            case INSUFFICIENT_PERMISSION:
-                sc = HttpServletResponse.SC_UNAUTHORIZED;
-                failureInfo = RestfulAPIConstants.FAILINFO_notAuthorized;
-                break;
             case INVALID_EXTENSION:
                 sc = HttpServletResponse.SC_BAD_REQUEST;
                 failureInfo = RestfulAPIConstants.FAILINFO_badRequest;

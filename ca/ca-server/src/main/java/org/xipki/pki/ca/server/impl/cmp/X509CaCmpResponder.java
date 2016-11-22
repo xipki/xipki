@@ -1020,9 +1020,6 @@ public class X509CaCmpResponder extends CmpResponder {
         case NOT_PERMITTED:
             failureInfo = PKIFailureInfo.notAuthorized;
             break;
-        case INSUFFICIENT_PERMISSION:
-            failureInfo = PKIFailureInfo.notAuthorized;
-            break;
         case INVALID_EXTENSION:
             failureInfo = PKIFailureInfo.badRequest;
             break;
@@ -1630,7 +1627,7 @@ public class X509CaCmpResponder extends CmpResponder {
         try {
             checkPermission(requestor, Permission.GET_CRL);
         } catch (InsuffientPermissionException ex) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, ex.getMessage());
+            throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
         X509Ca ca = getCa();
         return (crlNumber == null) ? ca.getCurrentCrl() : ca.getCrl(crlNumber);
@@ -1645,7 +1642,7 @@ public class X509CaCmpResponder extends CmpResponder {
         try {
             checkPermission(requestor, Permission.GEN_CRL);
         } catch (InsuffientPermissionException ex) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, ex.getMessage());
+            throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
 
         X509Ca ca = getCa();
@@ -1663,7 +1660,7 @@ public class X509CaCmpResponder extends CmpResponder {
         try {
             checkPermission(requestor, Permission.ENROLL_CERT);
         } catch (InsuffientPermissionException ex) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, ex.getMessage());
+            throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
 
         CertificationRequest csr = CertificationRequest.getInstance(encodedCsr);
@@ -1678,7 +1675,7 @@ public class X509CaCmpResponder extends CmpResponder {
         SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
 
         if (!isCertProfilePermitted(requestor, profileName)) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "certProfile " + profileName + " is not allowed");
         }
 
@@ -1717,7 +1714,7 @@ public class X509CaCmpResponder extends CmpResponder {
         try {
             checkPermission(requestor, permission);
         } catch (InsuffientPermissionException ex) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, ex.getMessage());
+            throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
 
         X509Ca ca = getCa();
@@ -1744,7 +1741,7 @@ public class X509CaCmpResponder extends CmpResponder {
         try {
             checkPermission(requestor, Permission.REMOVE_CERT);
         } catch (InsuffientPermissionException ex) {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, ex.getMessage());
+            throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
 
         X509Ca ca = getCa();

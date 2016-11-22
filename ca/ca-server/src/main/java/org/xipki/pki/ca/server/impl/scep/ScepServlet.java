@@ -238,7 +238,6 @@ public class ScepServlet extends HttpServlet {
                         httpCode = HttpServletResponse.SC_BAD_REQUEST;
                         break;
                     case NOT_PERMITTED:
-                    case INSUFFICIENT_PERMISSION:
                         httpCode = HttpServletResponse.SC_UNAUTHORIZED;
                         break;
                     case SYSTEM_UNAVAILABLE:

@@ -51,7 +51,6 @@ public class OperationException extends Exception {
         CERT_UNREVOKED,
         CRL_FAILURE,
         DATABASE_FAILURE,
-        INSUFFICIENT_PERMISSION,
         INVALID_EXTENSION,
         NOT_PERMITTED,
         SYSTEM_FAILURE,
