@@ -27,7 +27,7 @@ xipki-ca:scep-add \
   
 ## add user
 xipki-ca:user-add \
-  --name user1\
-  --password password1\
-  --cn-regex "J?SCEP-OCSP[1-9]{0,9}"
+  --name user1 \
+  --password password1 \
+  --cn-regex 'J?SCEP-OCSP[1-9]{0,9}'
 
