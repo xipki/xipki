@@ -62,6 +62,7 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.RandomUtil;
 import org.xipki.pki.ca.api.OperationException;
+import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.server.impl.CaAuditConstants;
 import org.xipki.pki.ca.server.impl.CaManagerImpl;
@@ -219,10 +220,44 @@ public class ScepServlet extends HttpServlet {
                     auditStatus = AuditStatus.FAILED;
                     return;
                 } catch (OperationException ex) {
-                    final String msg = "system internal error";
+                    ErrorCode code = ex.getErrorCode();
+
+                    int httpCode;
+                    switch (code) {
+                    case ALREADY_ISSUED:
+                    case CERT_REVOKED:
+                    case CERT_UNREVOKED:
+                        httpCode = HttpServletResponse.SC_FORBIDDEN;
+                        break;
+                    case BAD_CERT_TEMPLATE:
+                    case BAD_REQUEST:
+                    case BAD_POP:
+                    case INVALID_EXTENSION:
+                    case UNKNOWN_CERT:
+                    case UNKNOWN_CERT_PROFILE:
+                        httpCode = HttpServletResponse.SC_BAD_REQUEST;
+                        break;
+                    case NOT_PERMITTED:
+                    case INSUFFICIENT_PERMISSION:
+                        httpCode = HttpServletResponse.SC_UNAUTHORIZED;
+                        break;
+                    case SYSTEM_UNAVAILABLE:
+                        httpCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+                        break;
+                    case CRL_FAILURE:
+                    case DATABASE_FAILURE:
+                    case SYSTEM_FAILURE:
+                        httpCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                        break;
+                    default:
+                        httpCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                        break;
+                    }
+
+                    final String msg = ex.getMessage();
                     LogUtil.error(LOG, ex, msg);
 
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.setStatus(httpCode);
                     response.setContentLength(0);
 
                     auditMessage = msg;
