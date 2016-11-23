@@ -2,7 +2,7 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pkcs11proxy-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
-  <feature name="xipki-pkcs11-proxy" version="${project.version}">
+  <feature name="xipki-pkcs11-proxy" version="${project.version}" description="PKCS#11 proxy">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
@@ -12,7 +12,8 @@
     <bundle>mvn:org.xipki.commons/security/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/pkcs11-proxy-server/${project.version}</bundle>
   </feature>
-  <feature name="xipki-security-shell" version="${project.version}">
+  <feature name="xipki-security-shell" version="${project.version}"
+      description="PKCS#11 proxy shell">
     <feature prerequisite="true">xipki-pkcs11-proxy</feature>
     <bundle>mvn:org.xipki.commons/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.commons/security-shell/${project.version}</bundle>

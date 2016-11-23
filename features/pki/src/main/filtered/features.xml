@@ -5,81 +5,82 @@
   <!-- Note: instead of defining all features monolithically in a central features file,
     Project-plugins should be defined in their own feature descriptors and then aggregated later
   -->
-  <feature name="xipki-password" version="${project.version}">
+  <feature name="xipki-password" version="${project.version}" description="password">
     <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle start-level="70">mvn:org.xipki.commons/common/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.commons/password/${project.version}</bundle>
   </feature>
-  <feature name="xipki-security" version="${project.version}">
+  <feature name="xipki-security" version="${project.version}" description="security">
     <feature prerequisite="true">xipki-password</feature>
     <bundle start-level="70">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.commons/security/${project.version}</bundle>
   </feature>
-  <feature name="xipki-shell-base">
+  <feature name="xipki-shell-base" description="shall base">
     <feature prerequisite="true">xipki-security</feature>
     <bundle start-level="80">mvn:org.xipki.commons/shell-base/${project.version}</bundle>
   </feature>
-  <feature name="xipki-datasource" version="${project.version}">
+  <feature name="xipki-datasource" version="${project.version}" description="datasource">
     <feature prerequisite="true">xipki-password</feature>
     <bundle start-level="70">mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.commons/datasource/${project.version}</bundle>
   </feature>
-  <feature name="xipki-cabase" version="${project.version}">
+  <feature name="xipki-cabase" version="${project.version}"
+      description="common feature for CA server and client">
     <feature prerequisite="true">xipki-audit</feature>
     <feature prerequisite="true">xipki-datasource</feature>
     <feature prerequisite="true">xipki-security</feature>
     <bundle start-level="70">mvn:org.xipki.pki/ca-common/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.pki/ca-api/${project.version}</bundle>
   </feature>
-  <feature name="xipki-caserver-base" version="${project.version}">
+  <feature name="xipki-caserver" version="${project.version}" description="CA server">
     <feature prerequisite="true">xipki-cabase</feature>
     <bundle start-level="70">mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.pki/scep-common/${project.version}</bundle>
-  </feature>
-  <feature name="xipki-caserver" version="${project.version}">
-    <feature prerequisite="true">xipki-caserver-base</feature>
     <bundle start-level="75">mvn:org.xipki.pki/ca-server/${project.version}</bundle>
   </feature>
-  <feature name="xipki-camgmt-shell" version="${project.version}">
+  <feature name="xipki-camgmt-shell" version="${project.version}" description="CA management shell">
     <feature prerequisite="true">xipki-caserver</feature>
     <feature prerequisite="true">xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.xipki.pki/ca-mgmt-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-camgmt-qa-shell" version="${project.version}">
+  <feature name="xipki-camgmt-qa-shell" version="${project.version}"
+      description="CA management QA shell">
     <feature prerequisite="true">xipki-camgmt-shell</feature>
     <bundle start-level="80">mvn:org.xipki.pki/ca-mgmt-qa-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-caclient" version="${project.version}">
+  <feature name="xipki-caclient" version="${project.version}" description="CA client">
     <feature prerequisite="true">xipki-cabase</feature>
     <bundle start-level="80">mvn:org.xipki.pki/ca-client-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-client-impl/${project.version}</bundle>
   </feature>
-  <feature name="xipki-caclient-shell" version="${project.version}">
+  <feature name="xipki-caclient-shell" version="${project.version}" description="CA client shell">
     <feature prerequisite="true">xipki-caclient</feature>
     <feature>xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.xipki.pki/ca-client-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-caqa-shell" version="${project.version}">
+  <feature name="xipki-caqa-shell" version="${project.version}" description="CA QA shell">
     <feature prerequisite="true">xipki-caclient-shell</feature>
     <bundle start-level="70">mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-qa/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-qa-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-security-shell" version="${project.version}">
+  <feature name="xipki-security-shell" version="${project.version}" description="CA security shell">
     <feature prerequisite="true">xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.xipki.commons/security-shell/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.commons/security-speed-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-scepclient-shell" version="${project.version}">
+  <feature name="xipki-scepclient-shell" version="${project.version}"
+      description="SCEP client shell">
     <feature prerequisite="true">xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.xipki.pki/scep-common/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/scep-client/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/scep-client-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-jscepclient-shell" version="${project.version}">
+  <feature name="xipki-jscepclient-shell" version="${project.version}"
+      description="SCEP client shell using JSCEP">
     <feature prerequisite="true">xipki-shell-base</feature>
     <bundle><![CDATA[wrap:mvn:com.google.code.jscep/jscep/${jscep.version}/$Bundle-SymbolicName=jscep&Bundle-Version=2.4.0]]></bundle>
     <bundle><![CDATA[wrap:mvn:net.jcip/jcip-annotations/1.0/$Bundle-SymbolicName=jcip-annotations&Bundle-Version=1.0]]></bundle>
@@ -88,29 +89,30 @@
     <bundle start-level="80">mvn:commons-lang/commons-lang/2.6</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/jscep-client-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocspserver" version="${project.version}">
+  <feature name="xipki-ocspserver" version="${project.version}" description="OCSP server">
     <feature prerequisite="true">xipki-datasource</feature>
     <feature prerequisite="true">xipki-security</feature>
     <feature>xipki-audit</feature>
     <bundle start-level="70">mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocspclient" version="${project.version}">
+  <feature name="xipki-ocspclient" version="${project.version}" description="OCSP client">
     <feature prerequisite="true">xipki-security</feature>
     <bundle start-level="70">mvn:org.xipki.pki/ocsp-client-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-client-impl/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocspclient-shell" version="${project.version}">
+  <feature name="xipki-ocspclient-shell" version="${project.version}"
+      description="OCSP client shell">
     <feature prerequisite="true">xipki-ocspclient</feature>
     <feature prerequisite="true">xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-client-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocspqa-shell" version="${project.version}">
+  <feature name="xipki-ocspqa-shell" version="${project.version}" description="OCSP QA shell">
     <feature prerequisite="true">xipki-ocspclient-shell</feature>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-qa/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-qa-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-database-tool" version="${project.version}">
+  <feature name="xipki-database-tool" version="${project.version}" description="Database tool">
     <feature prerequisite="true">xipki-datasource</feature>
     <feature prerequisite="true">xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
@@ -119,11 +121,11 @@
     <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-audit" version="${project.version}">
+  <feature name="xipki-audit" version="${project.version}" description="Audit">
     <bundle><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle start-level="80">mvn:org.xipki.commons/audit/${project.version}</bundle>
   </feature>
-  <feature name="xipki-audit-syslog" version="${project.version}">
+  <feature name="xipki-audit-syslog" version="${project.version}" description="Syslog audit">
     <feature prerequisite="true">xipki-audit</feature>
     <bundle start-level="70">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
     <bundle start-level="70"><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
