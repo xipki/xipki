@@ -49,6 +49,32 @@
     <jsr305.version>3.0.1_1</jsr305.version>
     <jdt-annotation.version>2.0.0</jdt-annotation.version>
   </properties>
+  <!--repositories>
+    <repository>
+      <id>apache-snapshots</id>
+      <name>Apache Snapshots Repository</name>
+      <url>http://repository.apache.org/content/groups/snapshots-group</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>apache-snapshots</id>
+      <name>Apache Snapshots Repository</name>
+      <url>http://repository.apache.org/content/groups/snapshots-group</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories-->
   <modules>
     <module>commons</module>
     <module>ca</module>
