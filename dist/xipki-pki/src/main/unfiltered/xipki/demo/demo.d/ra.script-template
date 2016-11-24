@@ -437,9 +437,9 @@ xipki-tk:update-cert-p12 \
   --ca-cert output/SubCA1.der \
   --ca-cert output/RCA1.der
 
-# sleep 1.2 seconds to ensure different notBefore in certificate
-echo "Sleeping 1.2 seconds"
-sleep 1200
+# Sleep 2 seconds to ensure different notBefore in certificate
+echo "Sleeping 2 seconds"
+sleep 2000
 
 # with the same CN
 
