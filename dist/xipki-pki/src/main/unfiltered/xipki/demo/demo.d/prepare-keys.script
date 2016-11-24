@@ -87,22 +87,22 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 
   if { $KEY_TYPE equals "RSA" } {
     xipki-tk:rsa \
-	  --key-size $KEYSPEC \
+      --key-size $KEYSPEC \
       --slot $SLOT \
       --label RCA1
 
     xipki-tk:rsa \
-	  --key-size $KEYSPEC \
+      --key-size $KEYSPEC \
       --slot $SLOT \
       --label SubCA1
 
     xipki-tk:rsa \
-	  --key-size $KEYSPEC \
+      --key-size $KEYSPEC \
       --slot $SLOT \
       --label SubCAwithCRL1
 
     xipki-tk:rsa \
-	  --key-size $KEYSPEC \
+      --key-size $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
 
@@ -110,44 +110,44 @@ if { $TOKEN_TYPE equals "PKCS11" } {
 
   if { $KEY_TYPE equals "EC" } {
     xipki-tk:ec \
-	  --curve $KEYSPEC \
+      --curve $KEYSPEC \
       --slot $SLOT \
       --label RCA1
 
     xipki-tk:ec \
-	  --curve $KEYSPEC \
+      --curve $KEYSPEC \
       --slot $SLOT \
       --label SubCA1
 
     xipki-tk:ec \
-	  --curve $KEYSPEC \
+      --curve $KEYSPEC \
       --slot $SLOT \
       --label SubCAwithCRL1
 
     xipki-tk:ec \
-	  --curve $KEYSPEC \
+      --curve $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
   }
 
   if { $KEY_TYPE equals "DSA" } {
     xipki-tk:dsa \
-	  --plen $KEYSPEC \
+      --plen $KEYSPEC \
       --slot $SLOT \
       --label RCA1
 
     xipki-tk:dsa \
-	  --plen $KEYSPEC \
+      --plen $KEYSPEC \
       --slot $SLOT \
       --label SubCA1
 
     xipki-tk:dsa \
-	  --plen $KEYSPEC \
+      --plen $KEYSPEC \
       --slot $SLOT \
       --label SubCAwithCRL1
 
     xipki-tk:dsa \
-	  --plen $KEYSPEC \
+      --plen $KEYSPEC \
       --slot $SLOT \
       --label OCSP99
 

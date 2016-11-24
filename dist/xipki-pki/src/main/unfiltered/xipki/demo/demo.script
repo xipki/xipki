@@ -53,8 +53,8 @@ if { "$1" equals "" } {
         }
 
         if { "$argsValid" equals "false" } {
-		  errMsg = "invalid combination $HASH and $SIG_TYPE"
-		}
+          errMsg = "invalid combination $HASH and $SIG_TYPE"
+        }
       } {
         list = [SHA1 SHA256 SHA384 SHA512 SHA3-224 SHA3-256 SHA3-384 SHA3-512]; each ($list) {
           if { "$HASH" equals $it } {
@@ -65,7 +65,7 @@ if { "$1" equals "" } {
     }
 
     if { "$argsValid" equals "false" } {
-	  if { "$errMsg" equals ""} {
+      if { "$errMsg" equals ""} {
         errMsg = "invalid HASH $HASH"
       }
     }
