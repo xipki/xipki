@@ -63,7 +63,6 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.commons.common.qa.ValidationIssue;
 import org.xipki.commons.common.qa.ValidationResult;
@@ -243,7 +242,7 @@ public class OcspQa {
                 if (!issue.isFailed() && respIssuer != null) {
                     X509Certificate jceRespSigner;
                     try {
-                        jceRespSigner = new X509CertificateObject(respSigner.toASN1Structure());
+                        jceRespSigner = X509Util.toX509Cert(respSigner.toASN1Structure());
                         if (X509Util.issues(respIssuer, jceRespSigner)) {
                             jceRespSigner.verify(respIssuer.getPublicKey());
                         } else {

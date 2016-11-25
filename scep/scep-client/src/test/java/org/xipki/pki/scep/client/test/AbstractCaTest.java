@@ -50,11 +50,11 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.scep.client.CaCertValidator;
 import org.xipki.pki.scep.client.CaIdentifier;
 import org.xipki.pki.scep.client.EnrolmentResponse;
@@ -158,7 +158,7 @@ public abstract class AbstractCaTest {
     public void test() throws Exception {
         CaIdentifier caId = new CaIdentifier("http://localhost:8080/scep/pkiclient.exe", null);
         CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(
-                new X509CertificateObject(scepServer.getCaCert()));
+                X509Util.toX509Cert(scepServer.getCaCert()));
         ScepClient client = new ScepClient(caId, caCertValidator);
         client.setUseInsecureAlgorithms(useInsecureAlgorithms());
 

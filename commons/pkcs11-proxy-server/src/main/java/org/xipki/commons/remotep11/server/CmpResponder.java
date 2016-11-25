@@ -67,7 +67,6 @@ import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +102,7 @@ import org.xipki.commons.security.pkcs11.proxy.Asn1SignTemplate;
 import org.xipki.commons.security.pkcs11.proxy.Asn1Util;
 import org.xipki.commons.security.pkcs11.proxy.P11ProxyConstants;
 import org.xipki.commons.security.util.KeyUtil;
+import org.xipki.commons.security.util.X509Util;
 
 /**
  * @author Lijun Liao
@@ -240,7 +240,7 @@ class CmpResponder {
         if (P11ProxyConstants.ACTION_addCert == action) {
             Asn1EntityIdAndCert asn1 = Asn1EntityIdAndCert.getInstance(reqValue);
             P11Slot slot = getSlot(p11CryptService, asn1.getEntityId());
-            X509Certificate cert = new X509CertificateObject(asn1.getCertificate());
+            X509Certificate cert = X509Util.toX509Cert(asn1.getCertificate());
             slot.addCert(asn1.getEntityId().getObjectId().getObjectId(), cert);
         } else if (P11ProxyConstants.ACTION_genKeypair_DSA == action) {
             Asn1GenDSAKeypairParams asn1 = Asn1GenDSAKeypairParams.getInstance(reqValue);
@@ -337,7 +337,7 @@ class CmpResponder {
             Asn1EntityIdAndCert asn1 = Asn1EntityIdAndCert.getInstance(reqValue);
             P11Slot slot = getSlot(p11CryptService, asn1.getEntityId());
             slot.updateCertificate(asn1.getEntityId().getObjectId().getObjectId(),
-                    new X509CertificateObject(asn1.getCertificate()));
+                    X509Util.toX509Cert(asn1.getCertificate()));
         } else if (P11ProxyConstants.ACTION_removeObjects == action) {
             Asn1RemoveObjectsParams asn1 = Asn1RemoveObjectsParams.getInstance(reqValue);
             P11Slot slot = getSlot(p11CryptService, asn1.getSlotId());

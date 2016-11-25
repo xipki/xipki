@@ -585,8 +585,6 @@ public abstract class Client {
     private static X509Certificate parseCert(final byte[] certBytes) throws ScepClientException {
         try {
             return ScepUtil.parseCert(certBytes);
-        } catch (IOException ex) {
-            throw new ScepClientException(ex);
         } catch (CertificateException ex) {
             throw new ScepClientException(ex);
         }

@@ -83,7 +83,6 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.HealthCheckResult;
@@ -824,7 +823,7 @@ public final class CaClientImpl implements CaClient {
     private java.security.cert.Certificate getCertificate(final CMPCertificate cmpCert)
     throws CertificateException {
         Certificate bcCert = cmpCert.getX509v3PKCert();
-        return (bcCert == null) ? null : new X509CertificateObject(bcCert);
+        return (bcCert == null) ? null : X509Util.toX509Cert(bcCert);
     }
 
     public String getConfFile() {

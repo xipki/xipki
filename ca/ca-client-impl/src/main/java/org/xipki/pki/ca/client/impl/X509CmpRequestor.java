@@ -733,7 +733,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
             String b64CaCert = XmlUtil.getValueOfFirstElementChild(root, namespace, "CACert");
             try {
                 caCert = X509Util.parseBase64EncodedCert(b64CaCert);
-            } catch (CertificateException | IOException ex) {
+            } catch (CertificateException ex) {
                 throw new CmpRequestorException("could no parse the CA certificate", ex);
             }
 

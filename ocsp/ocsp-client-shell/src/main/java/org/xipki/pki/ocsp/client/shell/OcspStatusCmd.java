@@ -65,7 +65,6 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.LogUtil;
@@ -189,7 +188,7 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
                 // verify the OCSPResponse signer
                 if (respIssuer != null) {
                     boolean certValid = true;
-                    X509Certificate jceRespSigner = new X509CertificateObject(
+                    X509Certificate jceRespSigner = X509Util.toX509Cert(
                             respSigner.toASN1Structure());
                     if (X509Util.issues(respIssuer, jceRespSigner)) {
                         try {
