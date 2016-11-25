@@ -58,7 +58,6 @@ public class XipkiECContentVerifierProviderBuilder extends BcECContentVerifierPr
             DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
         super(digestAlgorithmFinder);
         this.digestAlgorithmFinder = digestAlgorithmFinder;
-        digestProvider = XipkiDigestProvider.INSTANCE;
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId)

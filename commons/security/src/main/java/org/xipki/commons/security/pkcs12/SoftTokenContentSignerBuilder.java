@@ -84,7 +84,6 @@ import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.DefaultConcurrentContentSigner;
 import org.xipki.commons.security.SignatureSigner;
 import org.xipki.commons.security.XiSecurityConstants;
-import org.xipki.commons.security.bcbugfix.XipkiDigestProvider;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.commons.security.util.KeyUtil;
@@ -108,7 +107,6 @@ public class SoftTokenContentSignerBuilder {
         throws NoSuchAlgorithmException, NoSuchPaddingException {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgId(signatureAlgId));
             this.useNssForPss = useNssForPss;
-            super.digestProvider = XipkiDigestProvider.INSTANCE;
         }
 
         protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
@@ -158,7 +156,6 @@ public class SoftTokenContentSignerBuilder {
                 final boolean plain) throws NoSuchAlgorithmException {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgId(signatureAlgId));
             this.plain = plain;
-            super.digestProvider = XipkiDigestProvider.INSTANCE;
         }
 
         protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
@@ -186,7 +183,6 @@ public class SoftTokenContentSignerBuilder {
                 final boolean plain) throws NoSuchAlgorithmException {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgId(signatureAlgId));
             this.plain = plain;
-            super.digestProvider = XipkiDigestProvider.INSTANCE;
         }
 
         protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
