@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ca.dbtool.port;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
