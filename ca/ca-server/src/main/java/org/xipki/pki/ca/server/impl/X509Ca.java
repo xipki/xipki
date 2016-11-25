@@ -88,12 +88,12 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.IssuingDistributionPoint;
 import org.bouncycastle.asn1.x509.ReasonFlags;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.jce.provider.X509CRLObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.AuditEvent;
@@ -553,15 +553,52 @@ public class X509Ca {
         return certstore.getCnRegexForUser(user);
     }
 
-    public CertificateList getCurrentCrl()
+    public X509CRL getCurrentCrl()
     throws OperationException {
         return getCrl(null);
     }
 
-    public CertificateList getCrl(final BigInteger crlNumber)
+    public X509CRL getCrl(final BigInteger crlNumber)
     throws OperationException {
         String caName = getCaName();
-        LOG.info("     START getCurrentCrl: ca={}, crlNumber={}", caName, crlNumber);
+        LOG.info("     START getCrl: ca={}, crlNumber={}", caName, crlNumber);
+        boolean successful = false;
+
+        try {
+            byte[] encodedCrl = certstore.getEncodedCrl(caInfo.getCertificate(), crlNumber);
+            if (encodedCrl == null) {
+                return null;
+            }
+
+            try {
+                X509CRL crl = X509Util.parseCrl(encodedCrl);
+                successful = true;
+                if (LOG.isInfoEnabled()) {
+                    String timeStr = new Time(crl.getThisUpdate()).getTime();
+                    LOG.info("SUCCESSFUL getCrl: ca={}, thisUpdate={}", caName, timeStr);
+                }
+                return crl;
+            } catch (CRLException | CertificateException ex) {
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+            } catch (RuntimeException ex) {
+                throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+            }
+        } finally {
+            if (!successful) {
+                LOG.info("    FAILED getCrl: ca={}", caName);
+            }
+        }
+    } // method getCrl
+
+    public CertificateList getBcCurrentCrl()
+    throws OperationException {
+        return getBcCrl(null);
+    }
+
+    public CertificateList getBcCrl(final BigInteger crlNumber)
+    throws OperationException {
+        String caName = getCaName();
+        LOG.info("     START getCrl: ca={}, crlNumber={}", caName, crlNumber);
         boolean successful = false;
 
         try {
@@ -573,15 +610,17 @@ public class X509Ca {
             try {
                 CertificateList crl = CertificateList.getInstance(encodedCrl);
                 successful = true;
-                LOG.info("SUCCESSFUL getCurrentCrl: ca={}, thisUpdate={}", caName,
-                        crl.getThisUpdate().getTime());
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("SUCCESSFUL getCrl: ca={}, thisUpdate={}", caName,
+                            crl.getThisUpdate().getTime());
+                }
                 return crl;
             } catch (RuntimeException ex) {
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
             }
         } finally {
             if (!successful) {
-                LOG.info("    FAILED getCurrentCrl: ca={}", caName);
+                LOG.info("    FAILED getCrl: ca={}", caName);
             }
         }
     } // method getCrl
@@ -869,7 +908,7 @@ public class X509Ca {
             }
 
             try {
-                X509CRL crl = new X509CRLObject(crlHolder.toASN1Structure());
+                X509CRL crl = X509Util.toX509Crl(crlHolder.toASN1Structure());
                 caInfo.getCaEntry().setNextCrlNumber(crlNumber.longValue() + 1);
                 caInfo.commitNextCrlNo();
                 publishCrl(crl);
@@ -883,7 +922,7 @@ public class X509Ca {
                     cleanupCrlsWithoutException(msgId);
                 }
                 return crl;
-            } catch (CRLException ex) {
+            } catch (CRLException | CertificateException ex) {
                 throw new OperationException(ErrorCode.CRL_FAILURE, ex);
             }
         } finally {

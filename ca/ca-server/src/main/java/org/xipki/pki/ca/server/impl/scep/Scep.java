@@ -627,7 +627,7 @@ public class Scep {
 
     private SignedData getCrl(final X509Ca ca, final BigInteger serialNumber)
     throws FailInfoException, OperationException {
-        CertificateList crl = ca.getCurrentCrl();
+        CertificateList crl = ca.getBcCurrentCrl();
         if (crl == null) {
             throw FailInfoException.BAD_REQUEST;
         }

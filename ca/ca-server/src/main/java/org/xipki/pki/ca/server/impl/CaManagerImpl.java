@@ -43,7 +43,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.SocketException;
-import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
@@ -67,8 +66,6 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import javax.xml.bind.JAXBException;
 
 import org.bouncycastle.asn1.ASN1Set;
@@ -77,11 +74,11 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.jce.provider.X509CRLObject;
 import org.bouncycastle.util.encoders.Base64;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.AuditEvent;
@@ -2698,15 +2695,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         X509Ca ca = getX509Ca(caName);
         try {
-            CertificateList crl = ca.getCrl(crlNumber);
+            X509CRL crl = ca.getCrl(crlNumber);
             if (crl == null) {
                 LOG.warn("found no CRL for CA {} and crlNumber {}", caName, crlNumber);
-                return null;
             }
-            return new X509CRLObject(crl);
+            return crl;
         } catch (OperationException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
-        } catch (CRLException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
     } // method getCrl
@@ -2717,15 +2711,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         X509Ca ca = getX509Ca(caName);
         try {
-            CertificateList crl = ca.getCurrentCrl();
+            X509CRL crl = ca.getCurrentCrl();
             if (crl == null) {
                 LOG.warn("found no CRL for CA {}", caName);
-                return null;
             }
-            return new X509CRLObject(crl);
+            return crl;
         } catch (OperationException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
-        } catch (CRLException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
     } // method getCurrentCrl

@@ -725,7 +725,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
                     X509CRL x509crl = null;
                     try {
-                        x509crl = X509Util.parseCrl(new ByteArrayInputStream(encodedCrl));
+                        x509crl = X509Util.parseCrl(encodedCrl);
                     } catch (Exception ex) {
                         LOG.error("could not parse CRL in file {}", filename);
                         LOG.debug("could not parse CRL in file " + filename, ex);

@@ -1497,14 +1497,14 @@ public class X509CaCmpResponder extends CmpResponder {
             if (CMPObjectIdentifiers.it_currentCRL.equals(infoType)) {
                 event.addEventType(CaAuditConstants.TYPE_CMP_genm_currentCrl);
                 checkPermission(requestor, Permission.GET_CRL);
-                CertificateList crl = ca.getCurrentCrl();
+                CertificateList crl = ca.getBcCurrentCrl();
 
                 if (itv.getInfoValue() == null) { // as defined in RFC 4210
-                    crl = ca.getCurrentCrl();
+                    crl = ca.getBcCurrentCrl();
                 } else {
                     // xipki extension
                     ASN1Integer crlNumber = ASN1Integer.getInstance(itv.getInfoValue());
-                    crl = ca.getCrl(crlNumber.getPositiveValue());
+                    crl = ca.getBcCrl(crlNumber.getPositiveValue());
                 }
 
                 if (crl == null) {
@@ -1553,7 +1553,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     checkPermission(requestor, Permission.GET_CRL);
 
                     ASN1Integer crlNumber = ASN1Integer.getInstance(reqValue);
-                    respValue = ca.getCrl(crlNumber.getPositiveValue());
+                    respValue = ca.getBcCrl(crlNumber.getPositiveValue());
                     if (respValue == null) {
                         String statusMessage = "no CRL is available";
                         return buildErrorMsgPkiBody(PKIStatus.rejection,
@@ -1630,7 +1630,7 @@ public class X509CaCmpResponder extends CmpResponder {
             throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
         X509Ca ca = getCa();
-        return (crlNumber == null) ? ca.getCurrentCrl() : ca.getCrl(crlNumber);
+        return (crlNumber == null) ? ca.getBcCurrentCrl() : ca.getBcCrl(crlNumber);
     }
 
     /**
