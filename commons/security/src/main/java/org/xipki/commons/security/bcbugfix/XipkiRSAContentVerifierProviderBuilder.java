@@ -58,7 +58,6 @@ public class XipkiRSAContentVerifierProviderBuilder extends BcRSAContentVerifier
             DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
         super(digestAlgorithmFinder);
         this.digestAlgorithmFinder = digestAlgorithmFinder;
-        digestProvider = XipkiDigestProvider.INSTANCE;
     }
 
     @Override
