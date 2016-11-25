@@ -91,7 +91,6 @@ import org.bouncycastle.cert.ocsp.Req;
 import org.bouncycastle.cert.ocsp.RespID;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
@@ -1268,8 +1267,8 @@ public class OcspServer {
             final RequestOption requestOption, final Date referenceTime) {
         X509Certificate target;
         try {
-            target = new X509CertificateObject(certsInReq[0].toASN1Structure());
-        } catch (CertificateParsingException ex) {
+            target = X509Util.toX509Cert(certsInReq[0].toASN1Structure());
+        } catch (CertificateException ex) {
             return false;
         }
 
@@ -1285,8 +1284,8 @@ public class OcspServer {
             for (int i = 1; i < n; i++) {
                 Certificate cert;
                 try {
-                    cert = new X509CertificateObject(certsInReq[i].toASN1Structure());
-                } catch (CertificateParsingException ex) {
+                    cert = X509Util.toX509Cert(certsInReq[i].toASN1Structure());
+                } catch (CertificateException ex) {
                     continue;
                 }
                 certstore.add(cert);

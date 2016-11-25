@@ -55,7 +55,6 @@ import org.bouncycastle.cms.CMSAbsentContent;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +64,7 @@ import org.xipki.commons.audit.AuditService;
 import org.xipki.commons.audit.AuditStatus;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.message.CaCaps;
 import org.xipki.pki.scep.message.NextCaMessage;
@@ -249,10 +249,10 @@ public class ScepServlet extends HttpServlet {
 
                 try {
                     NextCaMessage nextCaMsg = new NextCaMessage();
-                    nextCaMsg.setCaCert(new X509CertificateObject(
+                    nextCaMsg.setCaCert(X509Util.toX509Cert(
                             responder.getNextCaAndRa().getCaCert()));
                     if (responder.getNextCaAndRa().getRaCert() != null) {
-                        X509Certificate raCert = new X509CertificateObject(
+                        X509Certificate raCert = X509Util.toX509Cert(
                                 responder.getNextCaAndRa().getRaCert());
                         nextCaMsg.setRaCerts(Arrays.asList(raCert));
                     }

@@ -172,25 +172,15 @@ public class X509Util {
     }
 
     public static X509Certificate parseCert(final byte[] certBytes)
-    throws IOException, CertificateException {
+    throws CertificateException {
         ParamUtil.requireNonNull("certBytes", certBytes);
         return parseCert(new ByteArrayInputStream(certBytes));
     }
 
     public static X509Certificate parseCert(final InputStream certStream)
-    throws IOException, CertificateException {
+    throws CertificateException {
         ParamUtil.requireNonNull("certStream", certStream);
-        synchronized (certFactLock) {
-            if (certFact == null) {
-                try {
-                    certFact = CertificateFactory.getInstance("X.509", "BC");
-                } catch (NoSuchProviderException ex) {
-                    throw new IOException("NoSuchProviderException: " + ex.getMessage());
-                }
-            }
-        }
-
-        X509Certificate cert = (X509Certificate) certFact.generateCertificate(certStream);
+        X509Certificate cert = (X509Certificate) getCertFactory().generateCertificate(certStream);
         if (cert == null) {
             throw new CertificateEncodingException(
                     "the given one is not a valid X.509 certificate");
@@ -198,18 +188,43 @@ public class X509Util {
         return cert;
     }
 
+    private static CertificateFactory getCertFactory() throws CertificateException {
+        synchronized (certFactLock) {
+            if (certFact == null) {
+                try {
+                    certFact = CertificateFactory.getInstance("X.509", "BC");
+                } catch (NoSuchProviderException ex) {
+                    throw new CertificateException("NoSuchProviderException: " + ex.getMessage());
+                }
+            }
+            return certFact;
+        }
+    }
+
     public static X509Certificate parseBase64EncodedCert(final String base64EncodedCert)
-    throws IOException, CertificateException {
+    throws CertificateException {
         ParamUtil.requireNonNull("base64EncodedCert", base64EncodedCert);
         return parseCert(Base64.decode(base64EncodedCert));
     }
 
     public static X509Certificate parsePemEncodedCert(final String pemEncodedCert)
-    throws IOException, CertificateException {
+    throws CertificateException {
         ParamUtil.requireNonNull("pemEncodedCert", pemEncodedCert);
         String b64 = pemEncodedCert.replace("-----BEGIN CERTIFICATE-----", "")
                 .replace("-----END CERTIFICATE-----", "");
         return parseBase64EncodedCert(b64);
+    }
+
+    public static X509Certificate toX509Cert(
+            final org.bouncycastle.asn1.x509.Certificate asn1Cert)
+    throws CertificateException {
+        byte[] encodedCert;
+        try {
+            encodedCert = asn1Cert.getEncoded();
+        } catch (IOException ex) {
+            throw new CertificateEncodingException("could not get encoded certificate", ex);
+        }
+        return parseCert(encodedCert);
     }
 
     public static X509CRL parseCrl(final String file)
@@ -221,18 +236,9 @@ public class X509Util {
     public static X509CRL parseCrl(final InputStream crlStream)
     throws IOException, CertificateException, CRLException {
         ParamUtil.requireNonNull("crlStream", crlStream);
-        synchronized (certFactLock) {
-            if (certFact == null) {
-                try {
-                    certFact = CertificateFactory.getInstance("X.509", "BC");
-                } catch (NoSuchProviderException ex) {
-                    throw new IOException("NoSuchProviderException: " + ex.getMessage());
-                }
-            }
-        }
-        X509CRL crl = (X509CRL) certFact.generateCRL(crlStream);
+        X509CRL crl = (X509CRL) getCertFactory().generateCRL(crlStream);
         if (crl == null) {
-            throw new CertificateEncodingException(
+            throw new CRLException(
                     "the given one is not a valid X.509 CRL");
         }
         return crl;

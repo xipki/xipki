@@ -36,7 +36,7 @@ package org.xipki.pki.ca.qa;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.cert.CertificateParsingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,7 +104,6 @@ import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -405,8 +404,8 @@ public class ExtensionsChecker {
 
         X509Certificate jceCert;
         try {
-            jceCert = new X509CertificateObject(cert);
-        } catch (CertificateParsingException ex) {
+            jceCert = X509Util.toX509Cert(cert);
+        } catch (CertificateException ex) {
             throw new IllegalArgumentException("invalid cert: " + ex.getMessage());
         }
 

@@ -88,7 +88,6 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.jce.provider.X509CRLObject;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -110,6 +109,9 @@ public class ScepUtil {
 
     private static final long MIN_IN_MS = 60L * 1000;
     private static final long DAY_IN_MS = 24L * 60 * MIN_IN_MS;
+
+    private static CertificateFactory certFact;
+    private static Object certFactLock = new Object();
 
     private ScepUtil() {
     }
@@ -224,7 +226,7 @@ public class ScepUtil {
         }
 
         Certificate asn1Cert = certGenerator.build(contentSigner).toASN1Structure();
-        return new X509CertificateObject(asn1Cert);
+        return toX509Cert(asn1Cert);
     } // method generateSelfsignedCert
 
     /**
@@ -249,8 +251,7 @@ public class ScepUtil {
         for (int i = 0; i < n; i++) {
             X509Certificate cert;
             try {
-                Certificate asn1Cert = Certificate.getInstance(set.getObjectAt(i));
-                cert = new X509CertificateObject(asn1Cert);
+                cert = toX509Cert(Certificate.getInstance(set.getObjectAt(i)));
             } catch (IllegalArgumentException ex) {
                 throw new CertificateException(ex);
             }
@@ -297,23 +298,28 @@ public class ScepUtil {
         }
     }
 
+    public static X509Certificate toX509Cert(
+            final org.bouncycastle.asn1.x509.Certificate asn1Cert)
+    throws CertificateException {
+        byte[] encodedCert;
+        try {
+            encodedCert = asn1Cert.getEncoded();
+        } catch (IOException ex) {
+            throw new CertificateEncodingException("could not get encoded certificate", ex);
+        }
+        return parseCert(encodedCert);
+    }
+
     public static X509Certificate parseCert(final byte[] certBytes)
-    throws IOException, CertificateException {
+    throws CertificateException {
         ParamUtil.requireNonNull("certBytes", certBytes);
         return parseCert(new ByteArrayInputStream(certBytes));
     }
 
     private static X509Certificate parseCert(final InputStream certStream)
-    throws IOException, CertificateException {
+    throws CertificateException {
         ParamUtil.requireNonNull("certStream", certStream);
-        CertificateFactory certFact;
-        try {
-            certFact = CertificateFactory.getInstance("X.509", "BC");
-        } catch (NoSuchProviderException ex) {
-            throw new IOException("NoSuchProviderException: " + ex.getMessage());
-        }
-
-        return (X509Certificate) certFact.generateCertificate(certStream);
+        return (X509Certificate) getCertFactory().generateCertificate(certStream);
     }
 
     private static byte[] extractSki(final X509Certificate cert)
@@ -489,6 +495,19 @@ public class ScepUtil {
 
         JcaCertStore certStore = new JcaCertStore(certColl);
         generator.addCertificates(certStore);
+    }
+
+    private static CertificateFactory getCertFactory() throws CertificateException {
+        synchronized (certFactLock) {
+            if (certFact == null) {
+                try {
+                    certFact = CertificateFactory.getInstance("X.509", "BC");
+                } catch (NoSuchProviderException ex) {
+                    throw new CertificateException("NoSuchProviderException: " + ex.getMessage());
+                }
+            }
+            return certFact;
+        }
     }
 
 }

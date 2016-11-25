@@ -1428,26 +1428,22 @@ class CertStoreQueryExecutor {
             releaseDbResources(ps, rs);
         }
 
-        try {
-            byte[] encodedCert = Base64.decode(b64Cert);
-            X509Certificate cert = X509Util.parseCert(encodedCert);
-            String certprofileName = certprofileStore.getName(certprofileId);
-            X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
-            certWithMeta.setCertId(certId);
-            X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta,
-                    caCert, cert.getPublicKey().getEncoded(), certprofileName);
-            if (!revoked) {
-                return certInfo;
-            }
-            Date invalidityTime = (revInvTime == 0 || revInvTime == revTime) ? null
-                    : new Date(revInvTime * 1000);
-            CertRevocationInfo revInfo = new CertRevocationInfo(revReason,
-                    new Date(revTime * 1000), invalidityTime);
-            certInfo.setRevocationInfo(revInfo);
+        byte[] encodedCert = Base64.decode(b64Cert);
+        X509Certificate cert = X509Util.parseCert(encodedCert);
+        String certprofileName = certprofileStore.getName(certprofileId);
+        X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
+        certWithMeta.setCertId(certId);
+        X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta,
+                caCert, cert.getPublicKey().getEncoded(), certprofileName);
+        if (!revoked) {
             return certInfo;
-        } catch (IOException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
+        Date invalidityTime = (revInvTime == 0 || revInvTime == revTime) ? null
+                : new Date(revInvTime * 1000);
+        CertRevocationInfo revInfo = new CertRevocationInfo(revReason,
+                new Date(revTime * 1000), invalidityTime);
+        certInfo.setRevocationInfo(revInfo);
+        return certInfo;
     } // method getCertForId
 
     X509CertWithDbId getCertForId(final long certId)
@@ -1478,8 +1474,6 @@ class CertStoreQueryExecutor {
         try {
             cert = X509Util.parseCert(encodedCert);
         } catch (CertificateException ex) {
-            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
-        } catch (IOException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
         return new X509CertWithDbId(cert, encodedCert);
@@ -1532,7 +1526,7 @@ class CertStoreQueryExecutor {
         X509Certificate cert;
         try {
             cert = X509Util.parseCert(certBytes);
-        } catch (CertificateException | IOException ex) {
+        } catch (CertificateException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
 

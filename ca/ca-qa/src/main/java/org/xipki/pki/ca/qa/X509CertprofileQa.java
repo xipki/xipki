@@ -171,7 +171,7 @@ public class X509CertprofileQa {
             bcCert = Certificate.getInstance(certBytes);
             tbsCert = bcCert.getTBSCertificate();
             cert = X509Util.parseCert(certBytes);
-        } catch (CertificateException | IOException ex) {
+        } catch (CertificateException ex) {
             issue.setFailureMessage("certificate is not corrected encoded");
             return new ValidationResult(resultIssues);
         }

@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ca.qa;
 
-import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -116,11 +115,7 @@ public class X509IssuerInfo {
             this.deltaCrlUrls = Collections.unmodifiableSet(set);
         }
 
-        try {
-            this.cert = X509Util.parseCert(certBytes);
-        } catch (IOException ex) {
-            throw new CertificateException(ex.getMessage(), ex);
-        }
+        this.cert = X509Util.parseCert(certBytes);
         this.bcCert = Certificate.getInstance(certBytes);
         this.ski = X509Util.extractSki(cert);
         this.caNotBefore = this.cert.getNotBefore();

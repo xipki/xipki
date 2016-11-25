@@ -702,7 +702,7 @@ class IaikP11Slot extends AbstractP11Slot {
         try {
             byte[] encoded = p11Cert.getValue().getByteArrayValue();
             return new X509Cert(X509Util.parseCert(encoded), encoded);
-        } catch (CertificateException | IOException ex) {
+        } catch (CertificateException ex) {
             throw new P11TokenException("could not parse certificate: " + ex.getMessage(), ex);
         }
     }

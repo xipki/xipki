@@ -94,7 +94,6 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.X509CRLObject;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.AuditEvent;
@@ -1827,7 +1826,14 @@ public class X509Ca {
                     }
                 }
 
-                X509CertificateObject cert = new X509CertificateObject(bcCert);
+                X509Certificate cert;
+                try {
+                    cert = X509Util.toX509Cert(bcCert);
+                } catch (CertificateException ex) {
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+                            "should not happen, could not parse generated certificate");
+                }
+
                 if (!verifySignature(cert)) {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE,
                             "could not verify the signature of generated certificate");

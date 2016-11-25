@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ca.server.impl;
 
-import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -174,7 +173,7 @@ class CaManagerQueryExecutor {
         byte[] encodedCert = Base64.decode(b64Cert);
         try {
             return X509Util.parseCert(encodedCert);
-        } catch (CertificateException | IOException ex) {
+        } catch (CertificateException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
     } // method generateCert
@@ -1178,7 +1177,7 @@ class CaManagerQueryExecutor {
                 } else {
                     try {
                         tmpCert = X509Util.parseBase64EncodedCert(tmpB64Cert);
-                    } catch (CertificateException | IOException ex) {
+                    } catch (CertificateException ex) {
                         throw new CaMgmtException("could not parse the stored certificate for CA '"
                                 + name + "'" + ex.getMessage(), ex);
                     }
@@ -1536,7 +1535,7 @@ class CaManagerQueryExecutor {
                 try {
                     subject = canonicalizName(
                             X509Util.parseBase64EncodedCert(b64Cert).getSubjectX500Principal());
-                } catch (CertificateException | IOException ex) {
+                } catch (CertificateException ex) {
                     subject = "ERROR";
                 }
             }
@@ -1621,7 +1620,7 @@ class CaManagerQueryExecutor {
                         String subject = canonicalizName(
                                 X509Util.parseBase64EncodedCert(txt).getSubjectX500Principal());
                         sb.append(subject);
-                    } catch (CertificateException | IOException ex) {
+                    } catch (CertificateException ex) {
                         sb.append("ERROR");
                     }
                 }
@@ -1737,7 +1736,7 @@ class CaManagerQueryExecutor {
                     try {
                         subject = canonicalizName(
                                 X509Util.parseBase64EncodedCert(txt).getSubjectX500Principal());
-                    } catch (CertificateException | IOException ex) {
+                    } catch (CertificateException ex) {
                         subject = "ERROR";
                     }
                 }
@@ -1848,7 +1847,7 @@ class CaManagerQueryExecutor {
                         String subject = canonicalizName(
                                 X509Util.parseBase64EncodedCert(txt).getSubjectX500Principal());
                         sb.append(subject);
-                    } catch (CertificateException | IOException ex) {
+                    } catch (CertificateException ex) {
                         sb.append("ERROR");
                     }
                 }
