@@ -35,7 +35,7 @@
 package org.xipki.pki.scep.serveremulator;
 
 import java.security.PrivateKey;
-import java.security.cert.CertificateParsingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashSet;
@@ -59,12 +59,12 @@ import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.AuditEvent;
 import org.xipki.commons.audit.AuditStatus;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.message.CaCaps;
@@ -153,10 +153,10 @@ public class ScepResponder {
                 : caEmulator.getCaKey();
         Certificate recipientCert = (raEmulator != null) ? raEmulator.getRaCert()
                 : caEmulator.getCaCert();
-        X509CertificateObject recipientX509Obj;
+        X509Certificate recipientX509Obj;
         try {
-            recipientX509Obj = new X509CertificateObject(recipientCert);
-        } catch (CertificateParsingException ex) {
+            recipientX509Obj = X509Util.toX509Cert(recipientCert);
+        } catch (CertificateException ex) {
             throw new MessageDecodingException("could not parse recipientCert "
                     + recipientCert.getTBSCertificate().getSubject());
         }
@@ -180,7 +180,7 @@ public class ScepResponder {
                 ScepHashAlgoType.forNameOrOid(req.getDigestAlgorithm().getId()));
 
         try {
-            X509Certificate jceSignerCert = new X509CertificateObject(getSigningCert());
+            X509Certificate jceSignerCert = X509Util.toX509Cert(getSigningCert());
             X509Certificate[] certs = control.isSendSignerCert()
                     ? new X509Certificate[]{jceSignerCert} : null;
 
@@ -194,8 +194,7 @@ public class ScepResponder {
     public ContentInfo encode(final NextCaMessage nextCaMsg) throws CaException {
         ParamUtil.requireNonNull("nextCAMsg", nextCaMsg);
         try {
-            X509Certificate jceSignerCert = new X509CertificateObject(getSigningCert());
-
+            X509Certificate jceSignerCert = X509Util.toX509Cert(getSigningCert());
             X509Certificate[] certs = control.isSendSignerCert()
                     ? new X509Certificate[]{jceSignerCert} : null;
             return nextCaMsg.encode(getSigningKey(), jceSignerCert, certs);

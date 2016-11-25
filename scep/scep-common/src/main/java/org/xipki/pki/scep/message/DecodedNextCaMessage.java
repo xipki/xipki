@@ -35,7 +35,6 @@
 package org.xipki.pki.scep.message;
 
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Date;
@@ -60,7 +59,6 @@ import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.cms.SignerInformationVerifier;
 import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.CollectionStore;
 import org.slf4j.Logger;
@@ -219,8 +217,8 @@ public class DecodedNextCaMessage {
                 (X509CertificateHolder) signedDataCerts.iterator().next();
         X509Certificate signerCert;
         try {
-            signerCert = new X509CertificateObject(tmpSignerCert.toASN1Structure());
-        } catch (CertificateParsingException ex) {
+            signerCert = ScepUtil.toX509Cert(tmpSignerCert.toASN1Structure());
+        } catch (CertificateException ex) {
             final String msg = "could not construct X509CertificateObject: " + ex.getMessage();
             LOG.error(msg);
             LOG.debug(msg, ex);

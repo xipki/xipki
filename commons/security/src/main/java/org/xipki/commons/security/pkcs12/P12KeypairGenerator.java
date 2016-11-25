@@ -41,7 +41,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateParsingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
@@ -62,7 +62,6 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
@@ -112,10 +111,10 @@ public class P12KeypairGenerator {
         private final PrivateKey key;
 
         KeyAndCertPair(final X509CertificateHolder cert, final PrivateKey key)
-        throws CertificateParsingException {
+        throws CertificateException {
             this.cert = cert;
             this.key = key;
-            this.jceCert = new X509CertificateObject(cert.toASN1Structure());
+            this.jceCert = X509Util.toX509Cert(cert.toASN1Structure());
         }
 
         public X509CertificateHolder getCert() {
