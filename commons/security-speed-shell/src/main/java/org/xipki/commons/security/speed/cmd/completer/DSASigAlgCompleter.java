@@ -32,21 +32,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.speed.p11.cmd;
+package org.xipki.commons.security.speed.cmd.completer;
 
-import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public abstract class SpeedP11SignCommandSupport extends SpeedP11CommandSupport {
+@Service
+//CHECKSTYLE:SKIP
+public class DSASigAlgCompleter extends AbstractEnumCompleter {
 
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
-    protected String sigAlgo;
+    public DSASigAlgCompleter() {
+        String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
+        StringBuilder enums = new StringBuilder(200);
+        for (String hashAlg : hashAlgs) {
+            enums.append(hashAlg).append("withDSA,");
+        }
+        enums.deleteCharAt(enums.length() - 1);
+        setTokens(enums.toString());
+    }
 
 }

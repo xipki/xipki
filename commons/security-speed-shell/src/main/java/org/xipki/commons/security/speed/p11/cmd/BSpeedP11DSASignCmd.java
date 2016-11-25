@@ -38,10 +38,14 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.pkcs11.P11Slot;
 import org.xipki.commons.security.speed.cmd.DSAControl;
+import org.xipki.commons.security.speed.cmd.completer.DSASigAlgCompleter;
 import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
 
 /**
@@ -53,7 +57,14 @@ import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
         description = "performance test of PKCS#11 DSA signature creation (batch)")
 @Service
 // CHECKSTYLE:SKIP
-public class BSpeedP11DSASignCmd extends BSpeedP11SignCommandSupport {
+public class BSpeedP11DSASignCmd extends BSpeedP11CommandSupport {
+
+    @Option(name = "--sig-algo",
+            required = true,
+            description = "signature algorithm\n"
+                    + "(required)")
+    @Completion(DSASigAlgCompleter.class)
+    private String sigAlgo;
 
     private final BlockingDeque<DSAControl> queue = new LinkedBlockingDeque<>();
 
@@ -74,7 +85,10 @@ public class BSpeedP11DSASignCmd extends BSpeedP11SignCommandSupport {
         P11Slot slot = getSlot();
 
         if (control.getPlen() == 1024) {
-            sigAlgo = "SHA1withDSA";
+            if (!"SHA1withDSA".equalsIgnoreCase(sigAlgo)) {
+                throw new IllegalCmdParamException(
+                        "only SHA1withDSA is permitted for DSA with 1024 bit");
+            }
         }
 
         return new P11DSASignLoadTest(securityFactory, slot, sigAlgo, control.getPlen(),
