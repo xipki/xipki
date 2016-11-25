@@ -53,6 +53,10 @@ public class ECDSASigAlgCompleter extends AbstractEnumCompleter {
         for (String hashAlg : hashAlgs) {
             enums.append(hashAlg).append("withECDSA,");
         }
+        hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
+        for (String hashAlg : hashAlgs) {
+            enums.append(hashAlg).append("withPlainECDSA,");
+        }
         enums.deleteCharAt(enums.length() - 1);
         setTokens(enums.toString());
     }
