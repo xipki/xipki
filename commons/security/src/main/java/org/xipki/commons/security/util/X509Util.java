@@ -81,6 +81,7 @@ import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.DSAParameter;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
@@ -227,14 +228,31 @@ public class X509Util {
         return parseCert(encodedCert);
     }
 
+    public static X509CRL toX509Crl(final CertificateList asn1CertList)
+    throws CertificateException, CRLException {
+        byte[] encodedCrl;
+        try {
+            encodedCrl = asn1CertList.getEncoded();
+        } catch (IOException ex) {
+            throw new CRLException("could not get encoded CRL", ex);
+        }
+        return parseCrl(encodedCrl);
+    }
+
     public static X509CRL parseCrl(final String file)
     throws IOException, CertificateException, CRLException {
         ParamUtil.requireNonBlank("file", file);
         return parseCrl(new FileInputStream(IoUtil.expandFilepath(file)));
     }
 
+    public static X509CRL parseCrl(final byte[] encodedCrl)
+    throws CertificateException, CRLException {
+        ParamUtil.requireNonNull("encodedCrl", encodedCrl);
+        return parseCrl(new ByteArrayInputStream(encodedCrl));
+    }
+
     public static X509CRL parseCrl(final InputStream crlStream)
-    throws IOException, CertificateException, CRLException {
+    throws CertificateException, CRLException {
         ParamUtil.requireNonNull("crlStream", crlStream);
         X509CRL crl = (X509CRL) getCertFactory().generateCRL(crlStream);
         if (crl == null) {
