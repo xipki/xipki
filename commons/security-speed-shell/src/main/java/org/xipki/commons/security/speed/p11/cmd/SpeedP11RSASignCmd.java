@@ -35,9 +35,11 @@
 package org.xipki.commons.security.speed.p11.cmd;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
+import org.xipki.commons.security.speed.cmd.completer.RSASigAlgCompleter;
 import org.xipki.commons.security.speed.p11.P11RSASignLoadTest;
 
 /**
@@ -49,7 +51,7 @@ import org.xipki.commons.security.speed.p11.P11RSASignLoadTest;
         description = "performance test of PKCS#11 RSA signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11RSASignCmd extends SpeedP11SignCommandSupport {
+public class SpeedP11RSASignCmd extends SpeedP11CommandSupport {
 
     @Option(name = "--key-size",
             description = "keysize in bit")
@@ -58,6 +60,13 @@ public class SpeedP11RSASignCmd extends SpeedP11SignCommandSupport {
     @Option(name = "-e",
             description = "public exponent")
     private String publicExponent = "0x10001";
+
+    @Option(name = "--sig-algo",
+            required = true,
+            description = "signature algorithm\n"
+                    + "(required)")
+    @Completion(RSASigAlgCompleter.class)
+    private String sigAlgo;
 
     @Override
     protected LoadExecutor getTester() throws Exception {

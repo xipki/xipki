@@ -35,9 +35,12 @@
 package org.xipki.commons.security.speed.p11.cmd;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.security.speed.cmd.completer.DSASigAlgCompleter;
 import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
 
 /**
@@ -49,7 +52,7 @@ import org.xipki.commons.security.speed.p11.P11DSASignLoadTest;
         description = "performance test of PKCS#11 DSA signature creation")
 @Service
 // CHECKSTYLE:SKIP
-public class SpeedP11DSASignCmd extends SpeedP11SignCommandSupport {
+public class SpeedP11DSASignCmd extends SpeedP11CommandSupport {
 
     @Option(name = "--plen",
             description = "bit length of the prime")
@@ -59,10 +62,24 @@ public class SpeedP11DSASignCmd extends SpeedP11SignCommandSupport {
             description = "bit length of the sub-prime")
     private Integer qlen;
 
+    @Option(name = "--sig-algo",
+            required = true,
+            description = "signature algorithm\n"
+                    + "(required)")
+    @Completion(DSASigAlgCompleter.class)
+    private String sigAlgo;
+
     @Override
     protected LoadExecutor getTester() throws Exception {
         if (qlen == null) {
             qlen = (plen >= 2048) ? 256 : 160;
+        }
+
+        if (plen == 1024) {
+            if (!"SHA1withDSA".equalsIgnoreCase(sigAlgo)) {
+                throw new IllegalCmdParamException(
+                        "only SHA1withDSA is permitted for DSA with 1024 bit");
+            }
         }
 
         return new P11DSASignLoadTest(securityFactory, getSlot(), sigAlgo, plen, qlen);
