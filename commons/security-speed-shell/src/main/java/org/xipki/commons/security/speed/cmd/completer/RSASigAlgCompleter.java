@@ -47,7 +47,8 @@ import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 public class RSASigAlgCompleter extends AbstractEnumCompleter {
 
     public RSASigAlgCompleter() {
-        String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
+        String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
+            "SHA3-224, SHA3-256, SHA3-384, SHA3-512"};
         StringBuilder enums = new StringBuilder(200);
         for (String hashAlg : hashAlgs) {
             enums.append(hashAlg).append("withRSA,");
