@@ -32,45 +32,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.speed.p11.cmd;
+package org.xipki.commons.security.speed.cmd.completer;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Completion;
-import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.console.karaf.completer.ECCurveNameCompleter;
-import org.xipki.commons.security.speed.cmd.completer.ECDSASigAlgCompleter;
-import org.xipki.commons.security.speed.p11.P11ECSignLoadTest;
+import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-tk", name = "speed-ec-sign",
-        description = "performance test of PKCS#11 EC signature creation")
 @Service
-// CHECKSTYLE:SKIP
-public class SpeedP11ECSignCmd extends SpeedP11CommandSupport {
+//CHECKSTYLE:SKIP
+public class ECDSASigAlgCompleter extends AbstractEnumCompleter {
 
-    @Option(name = "--curve",
-            required = true,
-            description = "EC curve name\n"
-                    + "(required)")
-    @Completion(ECCurveNameCompleter.class)
-    private String curveName;
-
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
-    @Completion(ECDSASigAlgCompleter.class)
-    private String sigAlgo;
-
-    @Override
-    protected LoadExecutor getTester() throws Exception {
-        return new P11ECSignLoadTest(securityFactory, getSlot(), sigAlgo, curveName);
+    public ECDSASigAlgCompleter() {
+        String[] hashAlgs = new String[]{"SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
+        StringBuilder enums = new StringBuilder(200);
+        for (String hashAlg : hashAlgs) {
+            enums.append(hashAlg).append("withECDSA,");
+        }
+        enums.deleteCharAt(enums.length() - 1);
+        setTokens(enums.toString());
     }
 
 }
