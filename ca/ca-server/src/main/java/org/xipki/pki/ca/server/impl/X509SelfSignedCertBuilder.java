@@ -34,15 +34,12 @@
 
 package org.xipki.pki.ca.server.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
@@ -289,14 +286,11 @@ class X509SelfSignedCertBuilder {
                     tmpPublicKeyInfo, publicCaInfo, notBefore, notAfter);
 
             Certificate bcCert = signer.build(certBuilder).toASN1Structure();
-            byte[] encodedCert = bcCert.getEncoded();
-
-            CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
-            return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encodedCert));
+            return X509Util.parseCert(bcCert.getEncoded());
         } catch (BadCertTemplateException ex) {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
         } catch (NoIdleSignerException | CertificateException | IOException
-                | CertprofileException | NoSuchAlgorithmException | NoSuchProviderException ex) {
+                | CertprofileException | NoSuchAlgorithmException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
     } // method generateCertificate

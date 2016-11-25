@@ -221,21 +221,21 @@ public class X509Util {
     public static X509CRL parseCrl(final InputStream crlStream)
     throws IOException, CertificateException, CRLException {
         ParamUtil.requireNonNull("crlStream", crlStream);
-        try {
-            synchronized (certFactLock) {
-                if (certFact == null) {
+        synchronized (certFactLock) {
+            if (certFact == null) {
+                try {
                     certFact = CertificateFactory.getInstance("X.509", "BC");
+                } catch (NoSuchProviderException ex) {
+                    throw new IOException("NoSuchProviderException: " + ex.getMessage());
                 }
-                X509CRL crl = (X509CRL) certFact.generateCRL(crlStream);
-                if (crl == null) {
-                    throw new CertificateEncodingException(
-                            "the given one is not a valid X.509 CRL");
-                }
-                return crl;
             }
-        } catch (NoSuchProviderException ex) {
-            throw new IOException("NoSuchProviderException: " + ex.getMessage());
         }
+        X509CRL crl = (X509CRL) certFact.generateCRL(crlStream);
+        if (crl == null) {
+            throw new CertificateEncodingException(
+                    "the given one is not a valid X.509 CRL");
+        }
+        return crl;
     }
 
     public static String getRfc4519Name(final X500Principal name) {
