@@ -87,7 +87,6 @@ import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.jce.X509KeyUsage;
-import org.bouncycastle.jce.provider.X509CRLObject;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -279,8 +278,8 @@ public class ScepUtil {
 
         try {
             CertificateList cl = CertificateList.getInstance(set.getObjectAt(0));
-            return new X509CRLObject(cl);
-        } catch (IllegalArgumentException ex) {
+            return ScepUtil.toX509Crl(cl);
+        } catch (IllegalArgumentException | CertificateException | CRLException ex) {
             throw new CRLException(ex);
         }
     }
@@ -308,6 +307,34 @@ public class ScepUtil {
             throw new CertificateEncodingException("could not get encoded certificate", ex);
         }
         return parseCert(encodedCert);
+    }
+
+    public static X509CRL toX509Crl(final CertificateList asn1CertList)
+    throws CertificateException, CRLException {
+        byte[] encodedCrl;
+        try {
+            encodedCrl = asn1CertList.getEncoded();
+        } catch (IOException ex) {
+            throw new CRLException("could not get encoded CRL", ex);
+        }
+        return parseCrl(encodedCrl);
+    }
+
+    public static X509CRL parseCrl(final byte[] encodedCrl)
+    throws CertificateException, CRLException {
+        ParamUtil.requireNonNull("encodedCrl", encodedCrl);
+        return parseCrl(new ByteArrayInputStream(encodedCrl));
+    }
+
+    public static X509CRL parseCrl(final InputStream crlStream)
+    throws CertificateException, CRLException {
+        ParamUtil.requireNonNull("crlStream", crlStream);
+        X509CRL crl = (X509CRL) getCertFactory().generateCRL(crlStream);
+        if (crl == null) {
+            throw new CRLException(
+                    "the given one is not a valid X.509 CRL");
+        }
+        return crl;
     }
 
     public static X509Certificate parseCert(final byte[] certBytes)

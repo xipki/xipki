@@ -98,7 +98,6 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.CertificateConfirmationContent;
 import org.bouncycastle.cert.cmp.CertificateConfirmationContentBuilder;
-import org.bouncycastle.jce.provider.X509CRLObject;
 import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.slf4j.Logger;
@@ -244,8 +243,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
         X509CRL crl;
         try {
-            crl = new X509CRLObject(certList);
-        } catch (CRLException ex) {
+            crl = X509Util.toX509Crl(certList);
+        } catch (CRLException | CertificateException ex) {
             throw new CmpRequestorException("returned CRL is invalid: " + ex.getMessage());
         }
 
