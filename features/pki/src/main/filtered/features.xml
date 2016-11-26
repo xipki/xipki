@@ -26,6 +26,7 @@
     <bundle start-level="75">mvn:org.postgresql/postgresql/${jdbc.postgresql.version}</bundle>
     <bundle start-level="75">mvn:org.hsqldb/hsqldb/${jdbc.hsqldb.version}</bundle>
     <bundle start-level="75">mvn:org.mariadb.jdbc/mariadb-java-client/${jdbc.mariadb.version}</bundle>
+    <!-- add JDBC drivers here -->
   </feature>
   <feature name="xipki-datasource" version="${project.version}" description="datasource">
     <feature prerequisite="true">xipki-password</feature>
