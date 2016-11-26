@@ -14,11 +14,7 @@
   <properties>
     <app.name>PKI</app.name>
     <features.artifactId>pki</features.artifactId>
-    <boot.features>http-whiteboard</boot.features>
-    <postgresql.version>9.4.1211</postgresql.version>
-    <h2-jdbc.version>1.4.192</h2-jdbc.version>
-    <hsqldb.version>2.3.4</hsqldb.version>
-    <mariadb.version>1.5.4</mariadb.version>
+    <boot.features>http-whiteboard,xipki-jdbc</boot.features>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
   </properties>
@@ -179,39 +175,6 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-jdbcs</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${output.directory}/lib/ext</outputDirectory>
-              <!-- Define here the JDBC drivers -->
-              <artifactItems>
-                <artifactItem>
-                  <groupId>com.h2database</groupId>
-                  <artifactId>h2</artifactId>
-                  <version>${h2-jdbc.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.postgresql</groupId>
-                  <artifactId>postgresql</artifactId>
-                  <version>${postgresql.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.hsqldb</groupId>
-                  <artifactId>hsqldb</artifactId>
-                  <version>${hsqldb.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.mariadb.jdbc</groupId>
-                  <artifactId>mariadb-java-client</artifactId>
-                  <version>${mariadb.version}</version>
                 </artifactItem>
               </artifactItems>
             </configuration>

@@ -21,8 +21,15 @@
     <feature prerequisite="true">xipki-security</feature>
     <bundle start-level="80">mvn:org.xipki.commons/shell-base/${project.version}</bundle>
   </feature>
+  <feature name="xipki-jdbc" version="${project.version}" description="JDBC drivers">
+    <bundle start-level="75">mvn:com.h2database/h2/${jdbc.h2.version}</bundle>
+    <bundle start-level="75">mvn:org.postgresql/postgresql/${jdbc.postgresql.version}</bundle>
+    <bundle start-level="75">mvn:org.hsqldb/hsqldb/${jdbc.hsqldb.version}</bundle>
+    <bundle start-level="75">mvn:org.mariadb.jdbc/mariadb-java-client/${jdbc.mariadb.version}</bundle>
+  </feature>
   <feature name="xipki-datasource" version="${project.version}" description="datasource">
     <feature prerequisite="true">xipki-password</feature>
+    <feature prerequisite="true">xipki-jdbc</feature>
     <bundle start-level="70">mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.commons/datasource/${project.version}</bundle>
   </feature>
