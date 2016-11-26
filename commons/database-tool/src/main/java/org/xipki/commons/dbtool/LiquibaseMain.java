@@ -99,8 +99,13 @@ public class LiquibaseMain {
         changeLogLevel(logLevel, logFile);
 
         FileSystemResourceAccessor fsOpener = new FileSystemResourceAccessor();
-        ClassLoader classLoader = CommandLineResourceAccessor.class.getClassLoader();
+        ClassLoader classLoader = getClass().getClassLoader();
         ResourceAccessor clOpener = new CommandLineResourceAccessor(classLoader);
+        try {
+            Class.forName("org.hsqldb.jdbc.JDBCDriver", false, classLoader);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         String defaultSchemaName = dbConf.getSchema();
         this.database = CommandLineUtils.createDatabaseObject(
