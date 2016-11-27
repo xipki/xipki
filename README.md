@@ -120,7 +120,7 @@ Install
 
   * Copy the bundle to `system/<jdbc-group-id>/<jdbc-artifact-id>/<jdbc-version>` and rename it to `<jdbc-artifact-id>-<jdbc-version>.jar`
 
-  * Append the bundle URL to the feature `xipki-jdbc` in the file `system/org/xipki/features/pki/2.1.0-SNAPSHOT/pki-2.1.0-SNAPSHOT-features.xml`.
+  * Append the bundle URL to the feature `xipki-jdbc` in the file `system/org/xipki/features/pki/<version>/pki-<version>-features.xml`.
 
     ```sh
     <feature name="xipki-jdbc" description="JDBC drivers">
