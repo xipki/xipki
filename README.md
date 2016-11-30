@@ -128,7 +128,7 @@ Install
       <bundle start-level="75">mvn:..</bundle>
     </feature>
     ```
-    Note that if the bundle is not a OSGi-bundle, the URL must be prepended by the prefix "wrap:".
+    Note that if the bundle is not an OSGi-bundle, the URL must be prepended by the prefix "wrap:".
 
     ```sh
     <feature name="xipki-jdbc" description="JDBC drivers">
