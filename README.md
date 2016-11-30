@@ -65,7 +65,7 @@ Alternative: Build and Assembly from Source Code
 ------------------
 * Get a copy of XiPKI code
   ```sh
-  git clone git://github.com/xipki/xipki
+  git clone https://github.com/xipki/xipki
   ```
 
 * Build
