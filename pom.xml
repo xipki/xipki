@@ -34,7 +34,6 @@
   </developers>
   <properties>
     <karaf.version>4.0.7</karaf.version>
-    <karaf-plugin.version>4.0.7</karaf-plugin.version>
     <bc.version>1.56-b06</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <servlet-api.version>2.5</servlet-api.version>
