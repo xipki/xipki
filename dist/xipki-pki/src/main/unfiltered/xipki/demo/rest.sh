@@ -6,13 +6,13 @@ CACERT="output/SubCAwithCRL1.der"
 
 echo "base url: ${BASE_URL}"
 
-DIRNAME=`dirname $0`
+DIR=`dirname $0`
 
-echo "working dir: ${DIRNAME}"
+echo "working dir: ${DIR}"
 
-CA_SHA1FP=`openssl sha1 ${DIR}/../../${CACERT} | cut -d '=' -f 2 | cut -d ' ' -f`
+CA_SHA1FP=`openssl sha1 ${DIR}/../../${CACERT} | cut -d '=' -f 2 | cut -d ' ' -f 2`
 
-SSL="-k --cert ${DIRNAME}/../security/tlskeys/tls-client.pem --key ${DIRNAME}/../security/tlskeys/tls-client-privateKey.pem"
+SSL="-k --cert ${DIR}/../security/tlskeys/tls-client.pem --key ${DIR}/../security/tlskeys/tls-client-privateKey.pem"
 
 filename=tls-`date +%s` 
 
