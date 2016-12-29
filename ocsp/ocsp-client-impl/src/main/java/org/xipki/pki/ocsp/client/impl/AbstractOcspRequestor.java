@@ -46,8 +46,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -66,6 +64,7 @@ import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.operator.DigestCalculator;
+import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.RequestResponsePair;
 import org.xipki.commons.common.util.CollectionUtil;

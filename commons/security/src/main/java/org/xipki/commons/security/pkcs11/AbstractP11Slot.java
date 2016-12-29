@@ -50,10 +50,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.util.encoders.Hex;
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;

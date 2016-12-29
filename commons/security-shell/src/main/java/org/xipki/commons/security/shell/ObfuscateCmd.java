@@ -40,9 +40,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.password.OBFPasswordService;
 
 /**
@@ -56,7 +56,7 @@ import org.xipki.commons.password.OBFPasswordService;
 public class ObfuscateCmd extends SecurityCommandSupport {
 
     @Option(name = "--out", description = "where to save the encrypted password")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String outFile;
 
     @Option(name = "-k", description = "quorum of the password parts")

@@ -46,11 +46,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
@@ -64,6 +62,8 @@ import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.cert.AttributeCertificateIssuer;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.RequestResponsePair;
 import org.xipki.commons.common.util.BigIntegerRange;
@@ -71,7 +71,6 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.IssuerHash;
 import org.xipki.commons.security.ObjectIdentifiers;
@@ -94,7 +93,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
     @Option(name = "--resp-issuer",
             description = "certificate file of the responder's issuer")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String respIssuerFile;
 
     @Option(name = "--url",
@@ -103,12 +102,12 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
     @Option(name = "--req-out",
             description = "where to save the request")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String reqout;
 
     @Option(name = "--resp-out",
             description = "where to save the response")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String respout;
 
     @Option(name = "--hex",
@@ -124,12 +123,12 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             multiValued = true,
             description = "certificate\n"
                     + "(multi-valued)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private List<String> certFiles;
 
     @Option(name = "--ac",
             description = "the certificates are attribute certificates")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private Boolean isAttrCert = Boolean.FALSE;
 
     static {

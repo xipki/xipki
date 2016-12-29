@@ -37,7 +37,6 @@ package org.xipki.commons.security.pkcs11;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
-
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.XiSecurityException;
 

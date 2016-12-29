@@ -38,7 +38,6 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import org.eclipse.jdt.annotation.NonNull;
-
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 
 /**

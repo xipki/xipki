@@ -49,8 +49,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
@@ -63,6 +61,7 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.util.CollectionStore;
 import org.bouncycastle.util.encoders.Base64;
+import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.OperationNotSupportedException;
 import org.xipki.pki.scep.client.exception.ScepClientException;

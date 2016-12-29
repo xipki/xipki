@@ -39,9 +39,9 @@ import java.util.List;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.SigAlgCompleter;
 import org.xipki.commons.security.util.AlgorithmUtil;
@@ -59,7 +59,7 @@ public abstract class OcspStatusCommandSupport extends XipkiCommandSupport {
             required = true,
             description = "issuer certificate file\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     protected String issuerCertFile;
 
     @Option(name = "--nonce",

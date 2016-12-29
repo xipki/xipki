@@ -44,10 +44,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -63,7 +63,7 @@ public class ReplaceFileCmd extends XipkiCommandSupport {
             required = true,
             description = "file\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String source;
 
     @Option(name = "--old",

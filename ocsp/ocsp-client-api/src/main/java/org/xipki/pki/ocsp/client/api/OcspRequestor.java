@@ -38,10 +38,9 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 
+import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-
-import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.xipki.commons.common.RequestResponseDebug;
 
 /**

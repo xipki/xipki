@@ -48,11 +48,11 @@ import java.util.Iterator;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.jscep.client.Client;
 import org.jscep.client.verification.PreProvisionedCertificateVerifier;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.X509Util;
 
@@ -77,14 +77,14 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
             required = true,
             description = "CA certificate\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String caCertFile;
 
     @Option(name = "--p12",
             required = true,
             description = "PKCS#12 keystore file\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String p12File;
 
     @Option(name = "--password",

@@ -40,14 +40,13 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.password.PasswordResolver;
 

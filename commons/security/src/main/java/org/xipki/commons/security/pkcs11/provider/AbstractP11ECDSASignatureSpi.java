@@ -45,7 +45,6 @@ import java.security.SignatureSpi;
 import java.security.spec.AlgorithmParameterSpec;
 
 import org.eclipse.jdt.annotation.Nullable;
-
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.XiSecurityException;

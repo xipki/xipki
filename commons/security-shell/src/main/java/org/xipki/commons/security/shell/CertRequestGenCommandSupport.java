@@ -46,10 +46,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -74,13 +73,13 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.completer.ExtKeyusageCompleter;
 import org.xipki.commons.console.karaf.completer.ExtensionNameCompleter;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.KeyusageCompleter;
 import org.xipki.commons.security.ConcurrentContentSigner;
@@ -139,7 +138,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
             required = true,
             description = "output file name\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String outputFilename;
 
     @Option(name = "--challenge-password", aliases = "-c",
@@ -181,7 +180,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
 
     @Option(name = "--biometric-uri",
             description = "Biometric sourcedata URI")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String biometricUri;
 
     @Option(name = "--need-extension",
