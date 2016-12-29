@@ -42,7 +42,6 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.P11UnknownEntityException;
 import org.xipki.commons.security.exception.P11UnsupportedMechanismException;

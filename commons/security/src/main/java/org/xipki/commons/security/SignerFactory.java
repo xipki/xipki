@@ -38,7 +38,6 @@ import java.security.cert.X509Certificate;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-
 import org.xipki.commons.common.ObjectCreationException;
 
 /**

@@ -37,9 +37,8 @@ package org.xipki.commons.security.pkcs11;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import org.bouncycastle.util.encoders.Hex;
+import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.commons.common.util.ParamUtil;
 
 /**

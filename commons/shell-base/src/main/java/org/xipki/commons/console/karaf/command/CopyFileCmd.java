@@ -41,9 +41,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.console.karaf.completer.DirPathCompleter;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.intern.FileUtils;
 
 /**
@@ -60,14 +59,14 @@ public class CopyFileCmd extends XipkiCommandSupport {
             required = true,
             description = "file to be copied\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String source;
 
     @Argument(index = 1, name = "destination",
             required = true,
             description = "destination directory or file\n"
                     + "(required)")
-    @Completion(DirPathCompleter.class)
+    @Completion(FileCompleter.class)
     private String dest;
 
     @Option(name = "--force", aliases = "-f",

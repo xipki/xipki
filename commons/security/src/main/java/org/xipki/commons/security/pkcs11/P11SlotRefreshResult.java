@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
-
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.X509Cert;
 

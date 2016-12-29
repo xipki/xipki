@@ -41,8 +41,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.commons.security.pkcs11.P11Slot;
 
@@ -60,7 +60,7 @@ public class P11CertExportCmd extends P11SecurityCommandSupport {
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String outFile;
 
     @Override
