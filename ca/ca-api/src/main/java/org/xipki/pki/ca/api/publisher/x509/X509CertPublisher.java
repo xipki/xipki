@@ -39,7 +39,6 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-
 import org.xipki.commons.audit.AuditServiceRegister;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.password.PasswordResolver;

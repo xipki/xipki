@@ -35,7 +35,6 @@
 package org.xipki.commons.password.callback;
 
 import org.eclipse.jdt.annotation.Nullable;
-
 import org.xipki.commons.password.PasswordResolverException;
 
 /**

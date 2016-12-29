@@ -47,13 +47,13 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.util.BigIntegerRange;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.FileBigIntegerIterator;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.RangeBigIntegerIterator;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 import org.xipki.pki.ocsp.client.shell.OcspStatusCommandSupport;
@@ -78,14 +78,14 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
 
     @Option(name = "--serial-file",
             description = "file that contains serial numbers")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String serialNumberFile;
 
     @Option(name = "--cert",
             multiValued = true,
             description = "certificate\n"
                     + "(multi-valued)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private List<String> certFiles;
 
     @Option(name = "--duration",

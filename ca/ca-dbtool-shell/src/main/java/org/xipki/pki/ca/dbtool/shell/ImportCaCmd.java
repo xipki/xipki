@@ -38,8 +38,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.completer.DirPathCompleter;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.pki.ca.dbtool.port.CaDbImportWorker;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
@@ -57,14 +56,14 @@ public class ImportCaCmd extends DbPortCommandSupport {
 
     @Option(name = "--db-conf",
             description = "database configuration file")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "--in-dir",
             required = true,
             description = "input directory\n"
                     + "(required)")
-    @Completion(DirPathCompleter.class)
+    @Completion(FileCompleter.class)
     private String indir;
 
     @Option(name = "-k",

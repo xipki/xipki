@@ -34,9 +34,9 @@
 
 package org.xipki.pki.ca.dbtool.xmlio;
 
-import org.eclipse.jdt.annotation.NonNull;
 import javax.xml.stream.XMLStreamException;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.commons.common.util.StringUtil;
 
 /**

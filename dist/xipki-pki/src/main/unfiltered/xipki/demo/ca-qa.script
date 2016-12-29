@@ -4,7 +4,7 @@ echo "#################################################################"
 feature:install -r xipki-caqa-shell
 
 echo "Sleeping 1 second"
-sleep 1000
+sleep 1
 
 echo "#################################################################"
 echo "#                       Check certificate                       #"

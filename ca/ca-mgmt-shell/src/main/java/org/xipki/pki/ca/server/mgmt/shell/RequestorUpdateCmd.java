@@ -40,9 +40,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.util.X509Util;
 
 /**
@@ -65,7 +65,7 @@ public class RequestorUpdateCmd extends CaCommandSupport {
             required = true,
             description = "requestor certificate file\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     protected String certFile;
 
     @Override

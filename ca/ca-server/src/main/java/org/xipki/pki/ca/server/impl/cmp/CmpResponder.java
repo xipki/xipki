@@ -40,9 +40,6 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
@@ -63,6 +60,8 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.AuditEvent;

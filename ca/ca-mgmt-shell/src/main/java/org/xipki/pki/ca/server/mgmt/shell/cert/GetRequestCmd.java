@@ -40,7 +40,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 
 /**
  * @author Lijun Liao
@@ -55,7 +55,7 @@ public class GetRequestCmd extends UnRevRmCertCommandSupport {
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the request")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String outputFile;
 
     @Override

@@ -42,9 +42,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.console.karaf.completer.DirPathCompleter;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.dbtool.diffdb.DbDigestDiffWorker;
 import org.xipki.pki.ca.dbtool.diffdb.NumThreads;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
@@ -62,26 +61,26 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
     @Option(name = "--ref-db",
             description = "database configuration file of the reference system\n"
                     + "(one of --ref-db and--ref-dir must be specified)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String refDbConf;
 
     @Option(name = "--ref-dir",
             description = "directory of exported digest files of the reference system\n"
                     + "(one of --ref-db and--ref-dir must be specified)")
-    @Completion(DirPathCompleter.class)
+    @Completion(FileCompleter.class)
     private String refDir;
 
     @Option(name = "--target",
             required = true,
             description = "configuration file of the target database to be evaluated")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String dbconfFile;
 
     @Option(name = "--report-dir",
             required = true,
             description = "report directory\n"
                     + "(required)")
-    @Completion(DirPathCompleter.class)
+    @Completion(FileCompleter.class)
     private String reportDir;
 
     @Option(name = "--revoked-only")
@@ -99,7 +98,7 @@ public class DiffDigestDbCmd extends DbPortCommandSupport {
             multiValued = true,
             description = "Certificate of CAs to be considered\n"
                         + "(multi-valued)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private List<String> caCertFiles;
 
     protected DbPortWorker getDbPortWorker() throws Exception {

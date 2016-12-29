@@ -35,7 +35,6 @@
 package org.xipki.pki.ocsp.api;
 
 import org.eclipse.jdt.annotation.NonNull;
-
 import org.xipki.commons.common.ObjectCreationException;
 
 /**

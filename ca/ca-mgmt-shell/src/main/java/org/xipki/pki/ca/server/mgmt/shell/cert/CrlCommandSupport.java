@@ -39,8 +39,8 @@ import java.security.cert.X509CRL;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
@@ -63,7 +63,7 @@ public abstract class CrlCommandSupport extends CaCommandSupport {
             required = true,
             description = "where to save the CRL\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     protected String outFile;
 
     protected abstract X509CRL retrieveCrl() throws Exception;

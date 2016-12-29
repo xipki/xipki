@@ -41,8 +41,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.util.X509Util;
@@ -77,7 +77,7 @@ public class ResponderAddCmd extends CaCommandSupport {
 
     @Option(name = "--cert",
             description = "responder certificate file")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String certFile;
 
     @Reference

@@ -69,7 +69,7 @@ if { $printUsage equals "true" } {
   feature:install -r xipki-camgmt-qa-shell
 
   echo "Sleeping 1 second"
-  sleep 1000
+  sleep 1
 
   echo "#################################################################"
   echo "#                          Environment                          #"

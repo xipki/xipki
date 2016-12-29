@@ -36,8 +36,6 @@ package org.xipki.pki.ca.qa.shell;
 
 import java.security.cert.X509Certificate;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
@@ -48,6 +46,7 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
+import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.console.karaf.CmdFailure;

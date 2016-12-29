@@ -44,11 +44,11 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.commons.common.util.FileBigIntegerIterator;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.datasource.DataSourceFactory;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.security.SecurityFactory;
@@ -67,7 +67,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
             required = true,
             description = "issuer certificate file\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String issuerCertFile;
 
     @Option(name = "--duration",
@@ -81,7 +81,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
     @Option(name = "--ca-db",
             description = "CA database configuration file\n"
                     + "(exactly one of ca-db and serial-file must be specified)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String caDbConfFile;
 
     @Option(name = "--hex",
@@ -90,7 +90,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
 
     @Option(name = "--serial-file",
             description = "file that contains serial numbers")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String serialNumberFile;
 
     @Option(name = "--max-num",

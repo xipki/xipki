@@ -40,9 +40,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CRLHolder;
@@ -60,6 +57,8 @@ import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.exception.NoIdleSignerException;
 import org.xipki.commons.security.exception.XiSecurityException;

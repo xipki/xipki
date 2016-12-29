@@ -41,7 +41,6 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 import org.eclipse.jdt.annotation.Nullable;
-
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.XiSecurityException;

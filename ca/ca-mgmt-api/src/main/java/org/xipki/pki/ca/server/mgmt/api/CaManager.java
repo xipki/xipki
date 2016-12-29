@@ -42,10 +42,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.bouncycastle.asn1.x500.X500Name;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-
-import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.CrlReason;
 import org.xipki.pki.ca.server.mgmt.api.conf.CaConf;

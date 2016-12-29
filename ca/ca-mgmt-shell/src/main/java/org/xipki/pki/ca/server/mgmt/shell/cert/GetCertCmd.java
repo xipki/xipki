@@ -41,7 +41,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
@@ -71,7 +71,7 @@ public class GetCertCmd extends CaCommandSupport {
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String outputFile;
 
     @Override

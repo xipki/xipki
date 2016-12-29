@@ -40,7 +40,6 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-
 import org.xipki.commons.audit.AuditService;
 import org.xipki.commons.audit.AuditServiceRegister;
 import org.xipki.commons.common.util.ParamUtil;

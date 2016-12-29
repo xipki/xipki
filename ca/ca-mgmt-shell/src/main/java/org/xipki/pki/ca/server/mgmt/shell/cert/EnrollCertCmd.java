@@ -42,11 +42,11 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
@@ -73,14 +73,14 @@ public class EnrollCertCmd extends CaCommandSupport {
             required = true,
             description = "CSR file\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String csrFile;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String outFile;
 
     @Option(name = "--profile", aliases = "-p",

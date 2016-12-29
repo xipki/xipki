@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.AuditEvent;

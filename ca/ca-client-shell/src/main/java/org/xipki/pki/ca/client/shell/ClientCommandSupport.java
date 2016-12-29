@@ -39,11 +39,11 @@ import java.io.IOException;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.RequestResponsePair;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.client.api.CaClient;
 
 /**
@@ -58,12 +58,12 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
 
     @Option(name = "--req-out",
             description = "where to save the request")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String reqout;
 
     @Option(name = "--resp-out",
             description = "where to save the response")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String respout;
 
     protected RequestResponseDebug getRequestResponseDebug() {

@@ -39,8 +39,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
@@ -75,7 +75,7 @@ public class CrlSignerAddCmd extends CaCommandSupport {
 
     @Option(name = "--cert",
             description = "CRL signer's certificate file")
-    @Completion(FilePathCompleter.class)
+    @Completion(FileCompleter.class)
     private String signerCertFile;
 
     @Option(name = "--control",

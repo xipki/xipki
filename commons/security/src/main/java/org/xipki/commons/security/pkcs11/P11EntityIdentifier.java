@@ -35,7 +35,6 @@
 package org.xipki.commons.security.pkcs11;
 
 import org.eclipse.jdt.annotation.NonNull;
-
 import org.xipki.commons.common.util.ParamUtil;
 
 /**

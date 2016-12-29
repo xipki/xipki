@@ -27,7 +27,7 @@ echo "#################################################################"
 feature:install -r xipki-caclient-shell
 
 echo "Sleeping 1 second"
-sleep 1000
+sleep 1
 
 ## Check the healthy status
 
@@ -439,7 +439,7 @@ xipki-tk:update-cert-p12 \
 
 # Sleep 2 seconds to ensure different notBefore in certificate
 echo "Sleeping 2 seconds"
-sleep 2000
+sleep 2
 
 # with the same CN
 

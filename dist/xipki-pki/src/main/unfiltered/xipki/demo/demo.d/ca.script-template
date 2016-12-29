@@ -5,7 +5,7 @@ echo "#################################################################"
 feature:install -r xipki-database-tool
 
 echo "Sleeping 1 second"
-sleep 1000
+sleep 1
 
 xipki-db:initdb \
   --force
@@ -17,7 +17,7 @@ feature:install -r xipki-caserver
 feature:install -r xipki-camgmt-shell
 
 echo "Sleeping 1 second"
-sleep 1000
+sleep 1
 
 xipki-ca:restart
 
@@ -134,7 +134,7 @@ xipki-ca:crlsigner-add \
   --control updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00,xipki.certset=false
 
 echo "Sleeping 1 second"
-sleep 1000
+sleep 1
 
 echo "#################################################################"
 echo "#                          Generate RCA                         #"
