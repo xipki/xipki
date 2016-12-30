@@ -40,7 +40,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.commons.security.pkcs11.P11Slot;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
@@ -67,7 +67,7 @@ public class P11CertAddCmd extends SecurityCommandSupport {
             required = true,
             description = "certificate file\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--module",

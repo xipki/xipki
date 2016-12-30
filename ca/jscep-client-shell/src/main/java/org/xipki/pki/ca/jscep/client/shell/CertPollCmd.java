@@ -43,7 +43,6 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.jscep.client.Client;
 import org.jscep.client.EnrollmentResponse;
@@ -51,6 +50,7 @@ import org.jscep.transaction.TransactionId;
 import org.jscep.util.CertificationRequestUtils;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -66,14 +66,14 @@ public class CertPollCmd extends ClientCommandSupport {
             required = true,
             description = "CSR file\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String csrFile;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Override

@@ -32,57 +32,21 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.jscep.client.shell;
+package org.xipki.commons.console.karaf.completer;
 
-import java.io.File;
-import java.math.BigInteger;
-import java.security.cert.CertStore;
-import java.security.cert.X509Certificate;
-
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Completion;
-import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.jscep.client.Client;
-import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-jscep", name = "getcert",
-        description = "download certificate")
 @Service
-public class GetCertCmd extends ClientCommandSupport {
-
-    @Option(name = "--serial", aliases = "-s",
-            required = true,
-            description = "serial number\n"
-                    + "(required)")
-    private String serialNumber;
-
-    @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the certificate\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String outputFile;
+public class DirPathCompleter extends AbstractPathCompleter {
 
     @Override
-    protected Object doExecute() throws Exception {
-        Client client = getScepClient();
-        BigInteger serial = toBigInt(serialNumber);
-        CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);
-        X509Certificate cert = extractEeCerts(certs);
-
-        if (cert == null) {
-            throw new CmdFailure("received no certificate from server");
-        }
-
-        saveVerbose("saved returned certificate to file", new File(outputFile), cert.getEncoded());
-        return null;
+    protected boolean isDirOnly() {
+        return true;
     }
 
 }

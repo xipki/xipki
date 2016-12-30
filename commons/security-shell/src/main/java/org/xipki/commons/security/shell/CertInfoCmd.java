@@ -40,10 +40,10 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.security.HashAlgoType;
 
@@ -59,7 +59,7 @@ public class CertInfoCmd extends SecurityCommandSupport {
 
     @Option(name = "--in", description = "certificate file\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String inFile;
 
     @Option(name = "--hex", aliases = "-h", description = "print hex number")
