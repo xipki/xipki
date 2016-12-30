@@ -48,7 +48,6 @@ import java.util.StringTokenizer;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
@@ -71,6 +70,7 @@ import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.IssuerHash;
 import org.xipki.commons.security.ObjectIdentifiers;
@@ -93,7 +93,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
     @Option(name = "--resp-issuer",
             description = "certificate file of the responder's issuer")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String respIssuerFile;
 
     @Option(name = "--url",
@@ -102,12 +102,12 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
     @Option(name = "--req-out",
             description = "where to save the request")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String reqout;
 
     @Option(name = "--resp-out",
             description = "where to save the response")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String respout;
 
     @Option(name = "--hex",
@@ -123,12 +123,12 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             multiValued = true,
             description = "certificate\n"
                     + "(multi-valued)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private List<String> certFiles;
 
     @Option(name = "--ac",
             description = "the certificates are attribute certificates")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private Boolean isAttrCert = Boolean.FALSE;
 
     static {

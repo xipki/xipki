@@ -40,11 +40,11 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.password.OBFPasswordService;
 import org.xipki.commons.password.PBEPasswordService;
 
@@ -65,19 +65,19 @@ public class PBEDecryptCmd extends SecurityCommandSupport {
     private String passwordHint;
 
     @Option(name = "--password-file", description = "file containing the encrypted password")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String passwordFile;
 
     @Option(name = "--mpassword-file",
             description = "file containing the (obfuscated) master password")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String masterPasswordFile;
 
     @Option(name = "--mk", description = "quorum of the master password parts")
     private Integer mquorum = 1;
 
     @Option(name = "--out", description = "where to save the password")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String outFile;
 
     @Override

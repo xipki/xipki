@@ -41,10 +41,10 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.util.X509Util;
@@ -79,7 +79,7 @@ public class ResponderUpdateCmd extends CaCommandSupport {
 
     @Option(name = "--cert",
             description = "requestor certificate file or 'NULL'")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     protected String certFile;
 
     @Option(name = "--signer-conf",

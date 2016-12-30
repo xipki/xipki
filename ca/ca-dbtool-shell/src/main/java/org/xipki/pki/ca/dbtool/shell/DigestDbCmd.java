@@ -38,7 +38,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.xipki.commons.console.karaf.completer.DirPathCompleter;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.dbtool.diffdb.DbDigestExportWorker;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
@@ -55,14 +56,14 @@ public class DigestDbCmd extends DbPortCommandSupport {
     @Option(name = "--db-conf",
             required = true,
             description = "database configuration file")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String dbconfFile;
 
     @Option(name = "--out-dir",
             required = true,
             description = "output directory\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(DirPathCompleter.class)
     private String outdir;
 
     @Option(name = "-k",

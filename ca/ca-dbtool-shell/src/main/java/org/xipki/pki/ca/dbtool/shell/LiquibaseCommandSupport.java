@@ -47,10 +47,10 @@ import java.util.Properties;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
 import org.xipki.commons.dbtool.LiquibaseMain;
 import org.xipki.commons.password.PasswordResolver;
@@ -82,12 +82,12 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
 
     @Option(name = "--log-file",
             description = "log file")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String logFile;
 
     @Option(name = "--ca-conf",
             description = "CA configuration file")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String caconfFile = DFLT_CACONF_FILE;
 
     protected void resetAndInit(final LiquibaseDatabaseConf dbConf, final String schemaFile)

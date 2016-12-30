@@ -40,7 +40,6 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.eclipse.jdt.annotation.NonNull;
 import org.jscep.client.Client;
@@ -49,6 +48,7 @@ import org.jscep.client.EnrollmentResponse;
 import org.jscep.transaction.TransactionException;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -61,14 +61,14 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
             required = true,
             description = "CSR file\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String csrFile;
 
     @Option(name = "--out", aliases = "-o",
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String outputFile;
 
     protected abstract EnrollmentResponse requestCertificate(@NonNull Client client,

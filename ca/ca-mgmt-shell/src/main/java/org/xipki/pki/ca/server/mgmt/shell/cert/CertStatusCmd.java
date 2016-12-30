@@ -41,7 +41,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 
 /**
@@ -56,7 +56,7 @@ public class CertStatusCmd extends UnRevRmCertCommandSupport {
 
     @Option(name = "--out", aliases = "-o",
             description = "where to save the certificate")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Override

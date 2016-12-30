@@ -39,9 +39,9 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
@@ -79,7 +79,7 @@ public class ScepAddCmd extends CaCommandSupport {
 
     @Option(name = "--resp-cert",
             description = "responder certificate file")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String certFile;
 
     @Option(name = "--control",

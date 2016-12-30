@@ -40,8 +40,8 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
+import org.xipki.commons.console.karaf.completer.DirPathCompleter;
 import org.xipki.commons.console.karaf.intern.FileUtils;
 
 /**
@@ -58,14 +58,14 @@ public class CopyDirCmd extends XipkiCommandSupport {
             required = true,
             description = "content of this directory will be copied\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(DirPathCompleter.class)
     private String source;
 
     @Argument(index = 1, name = "destination",
             required = true,
             description = "destination directory\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(DirPathCompleter.class)
     private String dest;
 
     @Override

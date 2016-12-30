@@ -42,8 +42,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 
 /**
@@ -60,7 +60,7 @@ public class CaGenRcaCmd extends CaAddOrGenCommandSupport {
             required = true,
             description = "CSR of the Root CA\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String csrFile;
 
     @Option(name = "--profile",
@@ -75,7 +75,7 @@ public class CaGenRcaCmd extends CaAddOrGenCommandSupport {
 
     @Option(name = "--out", aliases = "-o",
             description = "where to save the generated CA certificate")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String rcaCertOutFile;
 
     @Override

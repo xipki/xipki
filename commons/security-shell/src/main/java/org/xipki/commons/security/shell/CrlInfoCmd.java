@@ -40,13 +40,13 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 
 /**
  * @author Lijun Liao
@@ -60,7 +60,7 @@ public class CrlInfoCmd extends SecurityCommandSupport {
 
     @Option(name = "--in", description = "CRL file\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String inFile;
 
     @Option(name = "--hex", aliases = "-h", description = "print hex number")

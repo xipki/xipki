@@ -41,8 +41,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.ObjectCreationException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.SignatureAlgoControl;
@@ -62,7 +62,7 @@ public class NegP12EnrollCertCmd extends NegEnrollCertCommandSupport {
             required = true,
             description = "PKCS#12 request file\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String p12File;
 
     @Option(name = "--password",

@@ -32,47 +32,21 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.mgmt.shell;
+package org.xipki.commons.console.karaf.completer;
 
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Completion;
-import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-ca", name = "requestor-add",
-        description = "add requestor")
 @Service
-public class RequestorAddCmd extends CaCommandSupport {
-
-    @Option(name = "--name", aliases = "-n",
-            required = true,
-            description = "requestor name\n"
-                    + "(required)")
-    private String name;
-
-    @Option(name = "--cert",
-            required = true,
-            description = "requestor certificate file\n"
-                    + "(required)")
-    @Completion(FilePathCompleter.class)
-    private String certFile;
+public class FilePathCompleter extends AbstractPathCompleter {
 
     @Override
-    protected Object doExecute() throws Exception {
-        String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
-        CmpRequestorEntry entry = new CmpRequestorEntry(name, base64Cert);
-
-        boolean bo = (entry.getCert() == null) ? false : caManager.addCmpRequestor(entry);
-        output(bo, "added", "could not add", "CMP requestor " + name);
-        return null;
+    protected boolean isDirOnly() {
+        return false;
     }
 
 }

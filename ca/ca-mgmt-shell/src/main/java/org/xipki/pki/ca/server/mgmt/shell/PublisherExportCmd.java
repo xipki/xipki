@@ -40,9 +40,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.PublisherNameCompleter;
 
@@ -67,7 +67,7 @@ public class PublisherExportCmd extends CaCommandSupport {
             required = true,
             description = "where to save the publisher configuration\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String confFile;
 
     @Override

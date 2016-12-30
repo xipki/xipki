@@ -40,9 +40,9 @@ import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.client.api.CaClientException;
 import org.xipki.pki.ca.client.api.PkiErrorException;
 import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
@@ -64,7 +64,7 @@ public abstract class CrlCommandSupport extends ClientCommandSupport {
             required = true,
             description = "where to save the CRL\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     protected String outFile;
 
     protected abstract X509CRL retrieveCrl() throws CaClientException, PkiErrorException;

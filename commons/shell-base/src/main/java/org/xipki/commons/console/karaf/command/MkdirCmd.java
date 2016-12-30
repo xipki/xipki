@@ -40,8 +40,8 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
+import org.xipki.commons.console.karaf.completer.DirPathCompleter;
 
 /**
  * @author Lijun Liao
@@ -57,7 +57,7 @@ public class MkdirCmd extends XipkiCommandSupport {
             required = true,
             description = "directory\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(DirPathCompleter.class)
     private String dirName;
 
     @Override

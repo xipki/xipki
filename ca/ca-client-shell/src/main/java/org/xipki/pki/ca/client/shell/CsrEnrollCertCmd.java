@@ -42,13 +42,13 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.client.api.CertOrError;
 import org.xipki.pki.ca.client.api.EnrollCertResult;
 import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
@@ -67,7 +67,7 @@ public class CsrEnrollCertCmd extends ClientCommandSupport {
             required = true,
             description = "CSR file\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String csrFile;
 
     @Option(name = "--profile", aliases = "-p",
@@ -88,7 +88,7 @@ public class CsrEnrollCertCmd extends ClientCommandSupport {
             required = true,
             description = "where to save the certificate\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     private String outputFile;
 
     @Option(name = "--user",
