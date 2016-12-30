@@ -42,7 +42,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
