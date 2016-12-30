@@ -159,8 +159,8 @@ abstract class AbstractPathCompleter implements Completer {
                 if (name.length() >= translated.length()) {
                     name = buffer + name.subSequence(translated.length(), name.length());
                 }
-                
-                if (dir) { 
+
+                if (dir) {
                     name = name + SEP;
                 }
 
