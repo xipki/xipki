@@ -44,7 +44,7 @@ import java.security.cert.CertificateException;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.shell.SecurityCommandSupport;
 import org.xipki.commons.security.util.KeyUtil;
 
@@ -59,7 +59,7 @@ public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
             required = true,
             description = "PKCS#12 keystore file\n"
                     + "(required)")
-    @Completion(FileCompleter.class)
+    @Completion(FilePathCompleter.class)
     protected String p12File;
 
     @Option(name = "--password",

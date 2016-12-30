@@ -32,47 +32,21 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.console.karaf.command;
+package org.xipki.commons.console.karaf.completer;
 
-import java.io.File;
-
-import org.apache.karaf.shell.api.action.Argument;
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.console.karaf.completer.DirPathCompleter;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cmd", name = "mkdir",
-        description = "make directories")
 @Service
-public class MkdirCmd extends XipkiCommandSupport {
-
-    @Argument(index = 0, name = "directory_name",
-            required = true,
-            description = "directory\n"
-                    + "(required)")
-    @Completion(DirPathCompleter.class)
-    private String dirName;
+public class FilePathCompleter extends AbstractPathCompleter {
 
     @Override
-    protected Object doExecute() throws Exception {
-        File target = new File(expandFilepath(dirName));
-        if (target.exists()) {
-            if (!target.isDirectory()) {
-                System.err.println(dirName + " exists but is not a directory, cannot override it");
-                return null;
-            }
-        } else {
-            target.mkdirs();
-        }
-
-        return null;
+    protected boolean isDirOnly() {
+        return false;
     }
 
 }
