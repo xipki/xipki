@@ -7,8 +7,6 @@
   <cm:property-placeholder persistent-id="org.xipki.pki.ocsp.server" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="confFile" value="xipki/ocsp-config/ocsp-responder.xml"/>
-      <cm:property name="urlPatterns" value="/ocsp/*"/>
-      <cm:property name="healthUrlPatterns" value="/health/ocsp/*"/>
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.commons.security.SecurityFactory"/>
@@ -31,7 +29,7 @@
   <!-- register it as a servlet service for the web extender -->
   <service ref="ocspServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="${urlPatterns}"/>
+      <entry key="alias" value="/ocsp"/>
     </service-properties>
   </service>
   <!-- create the servlet and inject our own app factory -->
@@ -40,7 +38,7 @@
   </bean>
   <service ref="healthServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="${healthUrlPatterns}"/>
+      <entry key="alias" value="/health/ocsp/"/>
     </service-properties>
   </service>
 </blueprint>

@@ -6,9 +6,7 @@
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
   <cm:property-placeholder persistent-id="org.xipki.pki.ca.server" update-strategy="reload">
     <cm:default-properties>
-      <cm:property name="urlPatterns" value="/cmp/*"/>
       <cm:property name="caConfFile" value="xipki/ca-config/ca.properties"/>
-      <cm:property name="healthUrlPatterns" value="/health/*"/>
       <cm:property name="sslCertInHttpHeader" value="false"/>
     </cm:default-properties>
   </cm:property-placeholder>
@@ -36,7 +34,7 @@
   </bean>
   <service ref="cmpServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="${urlPatterns}"/>
+      <entry key="alias" value="/cmp"/>
     </service-properties>
   </service>
   <!-- REST servlet -->
@@ -47,7 +45,7 @@
   </bean>
   <service ref="restServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="/rest/*"/>
+      <entry key="alias" value="/rest"/>
     </service-properties>
   </service>
   <!-- SCEP servlet -->
@@ -57,7 +55,7 @@
   </bean>
   <service ref="scepServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="/scep/*"/>
+      <entry key="alias" value="/scep"/>
     </service-properties>
   </service>
   
@@ -66,7 +64,7 @@
   </bean>
   <service ref="healthServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="${healthUrlPatterns}"/>
+      <entry key="alias" value="/health"/>
     </service-properties>
   </service>
 </blueprint>
