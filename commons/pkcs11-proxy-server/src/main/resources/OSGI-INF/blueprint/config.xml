@@ -4,9 +4,6 @@
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
   <cm:property-placeholder persistent-id="org.xipki.commons.security.pkcs11proxy"
       update-strategy="reload">
-    <cm:default-properties>
-      <cm:property name="urlPatterns" value="/p11proxy/*"/>
-    </cm:default-properties>
   </cm:property-placeholder>
 
   <reference id="p11CryptServiceFactory"
@@ -26,7 +23,7 @@
   <!-- register it as a servlet service for the web extender -->
   <service ref="serverServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="urlPatterns" value="${urlPatterns}"/>
+      <entry key="alias" value="/p11proxy"/>
     </service-properties>
   </service>
 </blueprint>
