@@ -343,10 +343,9 @@ public class CertificateStore
         return queryExecutor.getLatestSN(nameWithSN);
     }
 
-    public long[] getValidityOfFirstCertStartsWithCN(X509CertificateWithMetaInfo caCert,
-            String commonName, String profileName)
+    public Long getNotBeforeOfFirstCertStartsWithCN(String commonName, String profileName)
     throws SQLException
     {
-        return queryExecutor.getValidityOfFirstCertStartsWithCN(caCert, commonName, profileName);
+        return queryExecutor.getNotBeforeOfFirstCertStartsWithCN(commonName, profileName);
     }
 }

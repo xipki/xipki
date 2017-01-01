@@ -1568,24 +1568,16 @@ class CertStoreQueryExecutor
         return null;
     }
 
-    long[] getValidityOfFirstCertStartsWithCN(X509CertificateWithMetaInfo caCert, String commonName, String profileName)
+    Long getNotBeforeOfFirstCertStartsWithCN(String commonName, String profileName)
     throws SQLException
     {
-        byte[] encodedCert = caCert.getEncodedCert();
-        Integer caId =  caInfoStore.getCaIdForCert(encodedCert);
-
-        if(caId == null)
-        {
-            return null;
-        }
-
         Integer profileId = certprofileStore.getId(profileName);
         if(profileId == null)
         {
             return null;
         }
 
-        String sql = "NOTBEFORE, NOTAFTER FROM CERT WHERE CERTPROFILEINFO_ID = ? AND SUBJECT LIKE ?";
+        String sql = "NOTBEFORE FROM CERT WHERE CERTPROFILEINFO_ID = ? AND SUBJECT LIKE ?";
         sql = dataSource.createFetchFirstSelectSQL(sql, 1, "NOTBEFORE ASC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1604,9 +1596,8 @@ class CertStoreQueryExecutor
             }
 
             long notBefore = rs.getLong("NOTBEFORE");
-            long notAfter = rs.getLong("NOTAFTER");
 
-            return new long[]{notBefore, notAfter};
+            return notBefore == 0 ? null : notBefore;
         }finally
         {
             releaseDbResources(ps, rs);
