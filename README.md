@@ -23,6 +23,9 @@ Prerequisite
 * JRE / JDK 8
   * OpenJDK: none
   * Oracle: [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+* JRE / JDK 9
+  * OpenJDK: none
+  * Oracle: N/A
 
 Tested Platforms
 ----------------
@@ -46,6 +49,8 @@ Tested Platforms
 * JVM
   * OpenJDK 8
   * Oracle JRE/JDK 8
+  * [OpenJDK 9 Early Access](https://jdk9.java.net/download/)
+
 * OS
   * CentOS
   * Fedora
