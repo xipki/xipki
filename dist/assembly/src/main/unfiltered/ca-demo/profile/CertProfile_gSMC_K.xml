@@ -2,11 +2,17 @@
 <profile xmlns="http://xipki.org/xmlprofile/v1" onlyForRA="false">
   <description>CertProfile gSMC_K (C.AK.AUT)</description>
   <ca>false</ca>
-  <validity>730</validity>
+  <validity>1825</validity>
   <duplicateKeyPermitted>false</duplicateKeyPermitted>
   <duplicateSubjectPermitted>true</duplicateSubjectPermitted>
   <serialNumberInReqPermitted>false</serialNumberInReqPermitted>
   <specialBehavior>gematik_gSMC_K</specialBehavior>
+  <parameters>
+    <parameter>
+      <name>maxLifetime</name>
+      <value>2920</value>
+    </parameter>
+  </parameters>
   <keyAlgorithms>
     <algorithm>
       <algorithm description="RSA">1.2.840.113549.1.1.1</algorithm>

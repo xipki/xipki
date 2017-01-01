@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -1404,11 +1405,11 @@ public class X509CA
             notBefore = now;
         }
 
-        if(notBefore.getTime() >= caInfo.getNoNewCertificateAfter() ||
-                 now.getTime() >= caInfo.getNoNewCertificateAfter())
+        long t = caInfo.getNoNewCertificateAfter();
+        if(notBefore.getTime() > t || now.getTime() > t)
         {
             throw new OperationException(ErrorCode.NOT_PERMITTED,
-                    "CA will expire in " + caInfo.getExpirationPeriod() + " days, and cannot issue new certificates");
+                    "CA is not permitted to issue certifate after " + new Date(t));
         }
 
         publicKeyInfo = IoCertUtil.toRfc3279Style(publicKeyInfo);
@@ -1422,22 +1423,22 @@ public class X509CA
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
+        Date gSMC_KFirstNotBefore = null;
         if(certProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)
         {
+            gSMC_KFirstNotBefore = notBefore;
+
             RDN[] cnRDNs = requestedSubject.getRDNs(ObjectIdentifiers.DN_CN);
             if(cnRDNs != null && cnRDNs.length > 0)
             {
-                Date notBeforeForSuffix = notBefore;
-
                 String requestedCN = IETFUtils.valueToString(cnRDNs[0].getFirst().getValue());
                 try
                 {
-                    long[] v = certstore.getValidityOfFirstCertStartsWithCN(
-                            caInfo.getCertificate(), requestedCN, certProfileName);
-                    if(v != null)
+                    Long gsmckFirstNotBeforeInSecond = certstore.getNotBeforeOfFirstCertStartsWithCN(
+                            requestedCN, certProfileName);
+                    if(gsmckFirstNotBeforeInSecond != null)
                     {
-                        notBeforeForSuffix = new Date(v[0] * 1000);
-                        notAfter = new Date(v[1]* 1000);
+                        gSMC_KFirstNotBefore = new Date(gsmckFirstNotBeforeInSecond * 1000);
                     }
                 } catch (SQLException e)
                 {
@@ -1448,7 +1449,7 @@ public class X509CA
                 // append the commonName with '-' + yyyyMMdd
                 SimpleDateFormat dateF = new SimpleDateFormat("yyyyMMdd");
                 dateF.setTimeZone(new SimpleTimeZone(0,"Z"));
-                String yyyyMMdd = dateF.format(notBeforeForSuffix);
+                String yyyyMMdd = dateF.format(gSMC_KFirstNotBefore);
                 String suffix = "-" + yyyyMMdd;
 
                 // append the -YYYYMMDD to the commonName
@@ -1775,7 +1776,36 @@ public class X509CA
             {
                 validity = caInfo.getMaxValidity();
             }
+
             Date maxNotAfter = new Date(notBefore.getTime() + DAY * validity);
+            if(certProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)
+            {
+                long maxLifetimeInDays = 8 * 365L;
+                Map<String, String> params = certProfile.getParameters();
+                if(params != null)
+                {
+                    String s = params.get("maxLifetime");
+                    if(s != null)
+                    {
+                        try
+                        {
+                            maxLifetimeInDays = Long.parseLong(s);
+                        }catch(NumberFormatException e)
+                        {
+                            throw new OperationException(ErrorCode.System_Failure, "invalid maxLifetime '" + s + "'");
+                        }
+                        if(maxLifetimeInDays < 1)
+                        {
+                            throw new OperationException(ErrorCode.System_Failure, "invalid maxLifetime '" + s + "'");
+                        }
+                    }
+                }
+                Date maxLifetime = new Date(gSMC_KFirstNotBefore.getTime() + maxLifetimeInDays * DAY);
+                if(maxNotAfter.after(maxLifetime))
+                {
+                    maxNotAfter = maxLifetime;
+                }
+            }
 
             if(notAfter != null)
             {

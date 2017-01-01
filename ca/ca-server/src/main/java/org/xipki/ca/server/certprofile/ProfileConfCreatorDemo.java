@@ -49,6 +49,7 @@ import org.xipki.ca.server.certprofile.jaxb.GeneralNameType.OtherName;
 import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreeBaseType;
 import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreesType;
 import org.xipki.ca.server.certprofile.jaxb.KeyUsageType;
+import org.xipki.ca.server.certprofile.jaxb.NameValueType;
 import org.xipki.ca.server.certprofile.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.jaxb.OidWithDescType;
 import org.xipki.ca.server.certprofile.jaxb.OperatorType;
@@ -56,6 +57,7 @@ import org.xipki.ca.server.certprofile.jaxb.ParameterType;
 import org.xipki.ca.server.certprofile.jaxb.PolicyIdMappingType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.KeyAlgorithms;
+import org.xipki.ca.server.certprofile.jaxb.ProfileType.Parameters;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
 import org.xipki.ca.server.certprofile.jaxb.RdnConstraintType;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
@@ -745,11 +747,19 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_gSMC_K()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile gSMC_K (C.AK.AUT)", false, 730);
+        ProfileType profile = getBaseProfile("CertProfile gSMC_K (C.AK.AUT)", false, 5 * 365);
         profile.setDuplicateSubjectPermitted(true);
 
         // SpecialBehavior
         profile.setSpecialBehavior(SpecialCertProfileBehavior.gematik_gSMC_K.name());
+
+        // Maximal liftime
+        Parameters profileParams = new Parameters();
+        profile.setParameters(profileParams);
+        NameValueType nv = new NameValueType();
+        nv.setName("maxLifetime");
+        nv.setValue(Integer.toString(8 * 365));
+        profileParams.getParameter().add(nv);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -784,7 +794,6 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(ObjectIdentifiers.id_extension_admission, true));
         list.add(createExtension(Extension.extendedKeyUsage, true));
 
-
         // Extensions - keyUsage
         extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
                 KeyUsageType.KEY_ENCIPHERMENT));
@@ -792,23 +801,24 @@ public class ProfileConfCreatorDemo
         // Extensions - extenedKeyUsage
         extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
                 ObjectIdentifiers.id_kp_clientAuth, ObjectIdentifiers.id_kp_serverAuth));
-        
+
         // Extensions - Policy
         CertificatePolicies policies = new CertificatePolicies();
         extensions.getCertificatePolicies().add(policies);
 
-        ASN1ObjectIdentifier[] policyIds = new ASN1ObjectIdentifier[]{
-        		id_gematik.branch("79"), id_gematik.branch("163")};        
+        ASN1ObjectIdentifier[] policyIds = new ASN1ObjectIdentifier[]
+        {
+                id_gematik.branch("79"), id_gematik.branch("163")};
         for(ASN1ObjectIdentifier id : policyIds)
         {
-	        CertificatePolicyInformationType policyInfo = new CertificatePolicyInformationType();
-	        policies.getCertificatePolicyInformation().add(policyInfo);
-	        policyInfo.setPolicyIdentifier(createOidType(id));
+            CertificatePolicyInformationType policyInfo = new CertificatePolicyInformationType();
+            policies.getCertificatePolicyInformation().add(policyInfo);
+            policyInfo.setPolicyIdentifier(createOidType(id));
         }
-        
+
         // Extension - Adminssion
         Admission admission = new Admission();
-        extensions.getAdmission().add(admission);        
+        extensions.getAdmission().add(admission);
         admission.getProfessionOid().add(createOidType(id_gematik.branch("103")));
         admission.getProfessionItem().add("Anwendungskonnektor");
 

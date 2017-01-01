@@ -91,6 +91,7 @@ import org.xipki.ca.server.certprofile.jaxb.GeneralNameType;
 import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreeBaseType;
 import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreesType;
 import org.xipki.ca.server.certprofile.jaxb.KeyUsageType;
+import org.xipki.ca.server.certprofile.jaxb.NameValueType;
 import org.xipki.ca.server.certprofile.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.jaxb.OidWithDescType;
 import org.xipki.ca.server.certprofile.jaxb.ParameterType;
@@ -98,6 +99,7 @@ import org.xipki.ca.server.certprofile.jaxb.PolicyIdMappingType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.AllowedClientExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.KeyAlgorithms;
+import org.xipki.ca.server.certprofile.jaxb.ProfileType.Parameters;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
 import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType.Access;
@@ -135,6 +137,7 @@ public class DefaultCertProfile extends AbstractCertProfile
 
     private Map<ASN1ObjectIdentifier, SubjectDNOption> subjectDNOptions;
     private List<RDNOccurrence> subjectDNOccurrences;
+    private Map<String, String> parameters;
     private Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
     private Map<ASN1ObjectIdentifier, ExtensionOccurrence> additionalExtensionOccurences;
 
@@ -334,6 +337,22 @@ public class DefaultCertProfile extends AbstractCertProfile
                 {
                     nonEcKeyAlgorithms = null;
                 }
+            }
+
+            // parameters
+            Parameters confParams = conf.getParameters();
+            if(confParams == null)
+            {
+                parameters = null;
+            }
+            else
+            {
+                Map<String, String> tMap = new HashMap<>();
+                for(NameValueType nv : confParams.getParameter())
+                {
+                    tMap.put(nv.getName(), nv.getValue());
+                }
+                parameters = Collections.unmodifiableMap(tMap);
             }
 
             // Subject
@@ -819,6 +838,12 @@ public class DefaultCertProfile extends AbstractCertProfile
     public ExtensionOccurrence getOccurenceOfIssuerAltName()
     {
         return extensionOccurences.get(Extension.issuerAlternativeName);
+    }
+
+    @Override
+    public Map<String, String> getParameters()
+    {
+        return parameters;
     }
 
     @Override
