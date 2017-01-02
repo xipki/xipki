@@ -76,10 +76,10 @@ Alternative: Build and Assembly from Source Code
 * Build
   * Install the third party artifacts that are not availablle in maven repositories
 
-    * In folder `xipki/ext`
-      ```sh
-      ./install.sh
-      ```
+    In folder `xipki/ext`
+    ```sh
+    ./install.sh
+    ```
 
   * Compile and install the artifacts
 
@@ -110,37 +110,13 @@ Install
 
 * Adapt the database configuration (access rights read & write of database are required)
 
-    ```sh
-    $XIPKI_HOME/xipki/ca-config/ca-db.properties
-    $XIPKI_HOME/xipki/ca-config/ocsp-db.properties
-    ```
+  In the folder `$XIPKI_HOME/xipki/ca-config`, copy the CA database configuration template file `example/ca-db.properties-<type>` to `ca-db.properties`, and the OCSP database configuration file `example/ocsp-db.properties-<type>` to `ocsp-db.properties`, and then adapt them.
 
 * Add JDBC drivers (optional)
 
   This step is only required if you want to use database other than H2, HSQLDB, MySQL, MariaDB and PostgreSQL.
 
   Assume that the JDBC bundle can be identified by the URL `mvn:<jdbc-group-id>/<jdbc-artifact-id>/<jdbc-version>`.
-
-  * Create folders `system/<jdbc-group-id>/<jdbc-artifact-id>/<jdbc-version>`
-
-  * Copy the bundle to `system/<jdbc-group-id>/<jdbc-artifact-id>/<jdbc-version>` and rename it to `<jdbc-artifact-id>-<jdbc-version>.jar`
-
-  * Append the bundle URL to the feature `xipki-jdbc` in the file `system/org/xipki/features/pki/<version>/pki-<version>-features.xml`.
-
-    ```sh
-    <feature name="xipki-jdbc" description="JDBC drivers">
-      ...
-      <bundle start-level="75">mvn:..</bundle>
-    </feature>
-    ```
-    Note that if the bundle is not an OSGi-bundle, the URL must be prepended by the prefix "wrap:".
-
-    ```sh
-    <feature name="xipki-jdbc" description="JDBC drivers">
-      ...
-      <bundle start-level="75">wrap:mvn:..</bundle>
-    </feature>
-    ```
 
   * Download of JDBC drivers
 
@@ -156,6 +132,27 @@ Install
     * MySQL/MariaDB
 
       You can access MySQL and MariaDB via both MariaDB and MySQL connector. The MariaDB connector library is delivered, and the MySQL connector library can be retrieved as follows: 1) For debian, use the `mysql-connector-java.jar` from the package `libmysql-java` (e.g. under /usr/share/java/mysql-connector-java.jar); 2) for non-debian, use the driver `mysql-connector-java.jar` which can be download from https://dev.mysql.com/downloads/connector/j
+
+  * Create folders `system/<jdbc-group-id>/<jdbc-artifact-id>/<jdbc-version>`
+
+  * Copy the bundle to `system/<jdbc-group-id>/<jdbc-artifact-id>/<jdbc-version>` and rename it to `<jdbc-artifact-id>-<jdbc-version>.jar`
+
+  * Append the bundle URL to the feature `xipki-jdbc` in the file `system/org/xipki/features/pki/<version>/pki-<version>-features.xml`.
+
+    ```sh
+    <feature name="xipki-jdbc" description="JDBC drivers">
+      ...
+      <bundle start-level="75">mvn:..</bundle>
+    </feature>
+    ```
+    Note that if the bundle is not an OSGi-bundle, the URL must be prepended by the prefix "wrap:". In general, a bundle contains the header Export-Package in the manifest file META-INF/MANIFEST.MF.
+
+    ```sh
+    <feature name="xipki-jdbc" description="JDBC drivers">
+      ...
+      <bundle start-level="75">wrap:mvn:..</bundle>
+    </feature>
+    ```
 
 * In case if the real PKCS#11 device instead of the emulator is used:
 
