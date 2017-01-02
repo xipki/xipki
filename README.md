@@ -118,7 +118,7 @@ Install
 
   Assume that the JDBC bundle can be identified by the URL `mvn:<jdbc-group-id>/<jdbc-artifact-id>/<jdbc-version>`.
 
-  * Download of JDBC drivers
+  * Download JDBC drivers
 
     Due to the license restrictions I cannot provide the JDBC drivers of MySQL, Oracle and DB2.
 
