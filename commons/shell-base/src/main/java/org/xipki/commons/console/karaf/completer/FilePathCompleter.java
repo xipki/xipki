@@ -35,6 +35,7 @@
 package org.xipki.commons.console.karaf.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.support.completers.FileCompleter;
 
 /**
  * @author Lijun Liao
@@ -42,11 +43,6 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
  */
 
 @Service
-public class FilePathCompleter extends AbstractPathCompleter {
-
-    @Override
-    protected boolean isDirOnly() {
-        return false;
-    }
+public class FilePathCompleter extends FileCompleter {
 
 }
