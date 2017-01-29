@@ -289,4 +289,4 @@ xipki-cmd:replace \
 
 xipki-ca:load-conf --conf-file xipki/demo/demo.d/SubCAwithCRL.xml
 
-source ./xipki/demo/demo.d/scep-server.script
+source file:./xipki/demo/demo.d/scep-server.script

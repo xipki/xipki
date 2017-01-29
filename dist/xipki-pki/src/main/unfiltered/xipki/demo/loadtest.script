@@ -27,7 +27,7 @@ if { $argsValid equals "false" } {
 if { $printUsage equals "true" } {
   echo "Usage: "
   echo ""
-  echo "source loadtest.script <test type> [<durataion> [<threads>]]"
+  echo "source file:./xipki/demo/loadtest.script <test type> [<durataion> [<threads>]]"
   echo "test type:       enroll, ocsp, revoke"
   echo "duration:        duration in seconds, default is 15"
   echo "threads:         number of threads, default is 5"

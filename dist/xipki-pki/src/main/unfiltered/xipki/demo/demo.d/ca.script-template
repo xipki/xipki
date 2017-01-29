@@ -521,4 +521,4 @@ xipki-ca:careq-add \
   --profile all \
   --ca SubCAwithCRL1
 
-source ./xipki/demo/demo.d/scep-server.script
+source file:./xipki/demo/demo.d/scep-server.script

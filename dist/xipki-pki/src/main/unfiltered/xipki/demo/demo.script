@@ -81,7 +81,7 @@ if { $argsValid equals "false" } {
 if { $printUsage equals "true" } {
   echo "Usage: "
   echo ""
-  echo "source demo.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
+  echo "source file:./xipki/demo/demo.script [option] <hash algo> <token type> <signature type> [<keyspec>]"
   echo "    hash algo:       SHA1, SHA224, SHA256, SHA384, SHA512"
   echo "                     SHA3-224, SHA3-256, SHA3-384, SHA3-512"
   echo "                     The SHA3 algorithms are not for PLAINEC."
@@ -93,7 +93,7 @@ if { $printUsage equals "true" } {
   echo "    -l               configure CAs using command 'load-conf'"
 } {
   feature:install -r xipki-security-shell
-  source xipki/demo/demo.d/prepare-keys.script
+  source file:./xipki/demo/demo.d/prepare-keys.script
 
   ## Prepare OCSP responder configuration
   xipki-cmd:copy-file \
@@ -205,9 +205,9 @@ if { $printUsage equals "true" } {
     xipki/demo/demo.d/ra.script
 
   if { "$1" equals "-l" } {
-    source xipki/demo/demo.d/ca-load.script
+    source file:./xipki/demo/demo.d/ca-load.script
   } {
-    source xipki/demo/demo.d/ca.script
+    source file:./xipki/demo/demo.d/ca.script
   }
 
   echo "#################################################################"
@@ -231,15 +231,15 @@ if { $printUsage equals "true" } {
       --serial $SERIAL \
       --out output/SubCA1.request
 
-  source xipki/demo/demo.d/ra.script
+  source file:./xipki/demo/demo.d/ra.script
 
-  source xipki/demo/ca-qa.script
+  source file:./xipki/demo/ca-qa.script
 
-  source xipki/demo/rest.script
+  source file:./xipki/demo/rest.script
 
   feature:install -r xipki-ocspserver
 
-  source xipki/demo/ocsp.script
+  source file:./xipki/demo/ocsp.script
 
   feature:uninstall xipki-ocspserver
 

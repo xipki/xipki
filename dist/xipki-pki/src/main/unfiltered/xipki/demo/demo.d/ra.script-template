@@ -506,9 +506,9 @@ echo "#################################################################"
 feature:uninstall xipki-caclient-shell
 feature:uninstall xipki-camgmt-shell
 
-source ./xipki/demo/scep.script
+source file:./xipki/demo/scep.script
 
 # JSCEP works only in case of RSA
 if { $KEY_TYPE equals "rsa" } {
-  source ./xipki/demo/jscep.script
+  source file:./xipki/demo/jscep.script
 }
