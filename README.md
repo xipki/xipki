@@ -209,7 +209,7 @@ Run Demo
 
 * Run the pre-configured OSGi-commands in OSGi console
 
-In the OSGi console, call `source xipki/demo/demo.script` to demonstrate the whole life-cycle (key generation, database initialization, CA installation, certificate enrollment, OCSP server installation, OCSP status, etc.). The generated keys, certificates and CRLs are saved in the folder `output`, and the log files are located in the folder data/log.
+In the OSGi console, call `source file:./xipki/demo/demo.script` to demonstrate the whole life-cycle (key generation, database initialization, CA installation, certificate enrollment, OCSP server installation, OCSP status, etc.). The generated keys, certificates and CRLs are saved in the folder `output`, and the log files are located in the folder data/log.
 
 Karaf Features
 -----
