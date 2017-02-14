@@ -198,11 +198,16 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected char[] readPasswordIfNotSet(final String password) throws IOException {
+        return readPasswordIfNotSet(null, password);
+    }
+
+    protected char[] readPasswordIfNotSet(final String prompt, final String password)
+    throws IOException {
         if (password != null) {
             return password.toCharArray();
         }
 
-        return readPassword(null);
+        return readPassword(prompt);
     }
 
     protected char[] readPassword() throws IOException {
