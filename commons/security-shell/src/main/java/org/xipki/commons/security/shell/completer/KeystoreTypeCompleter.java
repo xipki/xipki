@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
 
 /**
@@ -46,6 +47,7 @@ import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
  * @since 2.1.1
  */
 
+@Service
 public class KeystoreTypeCompleter extends AbstractDynamicEnumCompleter {
 
     private static final Set<String> TYPES = Collections.unmodifiableSet(
