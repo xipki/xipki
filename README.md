@@ -128,9 +128,9 @@ Install
 
       You can access MySQL and MariaDB via both MariaDB and MySQL connector. The MariaDB connector library is delivered, and the MySQL connector library can be retrieved as follows: 1) For debian, use the `mysql-connector-java.jar` from the package `libmysql-java` (e.g. under /usr/share/java/mysql-connector-java.jar); 2) for non-debian, use the driver `mysql-connector-java.jar` which can be download from https://dev.mysql.com/downloads/connector/j
 
-  * Create folders `system/<jdbc-group-id>/<jdbc-artifact-id>/<jdbc-version>`
+  * Create folders `system/<jdbc-group-id-part1>/.../<jdbc-group-id-partn>/<jdbc-artifact-id>/<jdbc-version>`
 
-  * Copy the bundle to `system/<jdbc-group-id>/<jdbc-artifact-id>/<jdbc-version>` and rename it to `<jdbc-artifact-id>-<jdbc-version>.jar`
+  * Copy the bundle to `system/<jdbc-group-id-part1>/.../<jdbc-group-id-partn>/<jdbc-artifact-id>/<jdbc-version>` and rename it to `<jdbc-artifact-id>-<jdbc-version>.jar`
 
   * Append the bundle URL to the feature `xipki-jdbc` in the file `system/org/xipki/features/pki/<version>/pki-<version>-features.xml`.
 
