@@ -32,17 +32,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.api;
+package org.xipki.pki.ca.server.impl;
+
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.1.1
  */
 
-public interface RequestorInfo {
+public class UserRequestorInfo implements RequestorInfo {
 
-    String getName();
+    private final String user;
 
-    boolean isRa();
+    public UserRequestorInfo(final String user) {
+        this.user = ParamUtil.requireNonBlank("user", user);
+    }
+
+    @Override
+    public String getName() {
+        return NAME_BY_USER;
+    }
+
+    @Override
+    public boolean isRa() {
+        return false;
+    }
+
+    public String getUser() {
+        return user;
+    }
 
 }

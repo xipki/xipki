@@ -125,7 +125,6 @@ import org.xipki.pki.ca.api.BadFormatException;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
-import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.api.profile.CertprofileException;
@@ -145,6 +144,7 @@ import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.pki.ca.server.mgmt.api.CertListOrderBy;
+import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl.HourMinute;
@@ -1012,19 +1012,19 @@ public class X509Ca {
     }
 
     public X509CertificateInfo regenerateCertificate(final CertTemplateData certTemplate,
-            final boolean requestedByRa, final RequestorInfo requestor, final String user,
+            final RequestorInfo requestor,
             final RequestType reqType, final byte[] transactionId, final String msgId)
     throws OperationException {
-        return regenerateCertificates(Arrays.asList(certTemplate), requestedByRa, requestor, user,
+        return regenerateCertificates(Arrays.asList(certTemplate), requestor,
                 reqType, transactionId, msgId).get(0);
     }
 
     public List<X509CertificateInfo> regenerateCertificates(
-            final List<CertTemplateData> certTemplates, final boolean requestedByRa,
-            final RequestorInfo requestor, final String user, final RequestType reqType,
+            final List<CertTemplateData> certTemplates,
+            final RequestorInfo requestor, final RequestType reqType,
             final byte[] transactionId, final String msgId)
     throws OperationException {
-        return generateCertificates(certTemplates, requestedByRa, requestor, user, true, reqType,
+        return generateCertificates(certTemplates, requestor, true, reqType,
                 transactionId, msgId);
     }
 
@@ -1663,17 +1663,17 @@ public class X509Ca {
     }
 
     public List<X509CertificateInfo> generateCertificates(
-            final List<CertTemplateData> certTemplates, final boolean requestedByRa,
-            final RequestorInfo requestor, final String user, final RequestType reqType,
+            final List<CertTemplateData> certTemplates,
+            final RequestorInfo requestor, final RequestType reqType,
             final byte[] transactionId, final String msgId)
     throws OperationException {
-        return generateCertificates(certTemplates, requestedByRa, requestor, user, false, reqType,
+        return generateCertificates(certTemplates, requestor, false, reqType,
                 transactionId, msgId);
     }
 
     private List<X509CertificateInfo> generateCertificates(
-            final List<CertTemplateData> certTemplates, final boolean requestedByRa,
-            final RequestorInfo requestor, final String user, final boolean keyUpdate,
+            final List<CertTemplateData> certTemplates,
+            final RequestorInfo requestor, final boolean keyUpdate,
             final RequestType reqType, final byte[] transactionId, final String msgId)
     throws OperationExceptionWithIndex {
         ParamUtil.requireNonEmpty("certTemplates", certTemplates);
@@ -1683,7 +1683,7 @@ public class X509Ca {
         for (int i = 0; i < n; i++) {
             CertTemplateData certTemplate = certTemplates.get(i);
             try {
-                GrantedCertTemplate gct = createGrantedCertTemplate(certTemplate, requestedByRa,
+                GrantedCertTemplate gct = createGrantedCertTemplate(certTemplate,
                         requestor, keyUpdate);
                 gcts.add(gct);
             } catch (OperationException ex) {
@@ -1707,8 +1707,8 @@ public class X509Ca {
 
             boolean successful = false;
             try {
-                X509CertificateInfo certInfo = generateCertificate(gct, requestedByRa, requestor,
-                    user, false, reqType, transactionId, msgId);
+                X509CertificateInfo certInfo = generateCertificate(gct, requestor,
+                    false, reqType, transactionId, msgId);
                 successful = true;
                 certInfos.add(certInfo);
 
@@ -1754,24 +1754,23 @@ public class X509Ca {
     }
 
     public X509CertificateInfo generateCertificate(final CertTemplateData certTemplate,
-            final boolean requestedByRa, final RequestorInfo requestor, final String user,
-            final RequestType reqType, final byte[] transactionId, final String msgId)
+            final RequestorInfo requestor, final RequestType reqType, final byte[] transactionId,
+            final String msgId)
     throws OperationException {
         ParamUtil.requireNonNull("certTemplate", certTemplate);
-        return generateCertificates(Arrays.asList(certTemplate), requestedByRa, requestor, user,
+        return generateCertificates(Arrays.asList(certTemplate), requestor,
                 reqType, transactionId, msgId).get(0);
     }
 
     private X509CertificateInfo generateCertificate(final GrantedCertTemplate gct,
-            final boolean requestedByRa, final RequestorInfo requestor, final String user,
-            final boolean keyUpdate, final RequestType reqType, final byte[] transactionId,
-            final String msgId)
+            final RequestorInfo requestor, final boolean keyUpdate, final RequestType reqType,
+            final byte[] transactionId, final String msgId)
     throws OperationException {
         AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_cert, msgId);
 
         boolean successful = false;
         try {
-            X509CertificateInfo ret = doGenerateCertificate(gct, requestedByRa, requestor, user,
+            X509CertificateInfo ret = doGenerateCertificate(gct, requestor,
                     keyUpdate, reqType, transactionId, event);
             successful = (ret != null);
             return ret;
@@ -1781,9 +1780,8 @@ public class X509Ca {
     }
 
     private X509CertificateInfo doGenerateCertificate(final GrantedCertTemplate gct,
-            final boolean requestedByRa, final RequestorInfo requestor, final String user,
-            final boolean keyUpdate, final RequestType reqType, final byte[] transactionId,
-            final AuditEvent event)
+            final RequestorInfo requestor, final boolean keyUpdate, final RequestType reqType,
+            final byte[] transactionId, final AuditEvent event)
     throws OperationException {
         ParamUtil.requireNonNull("gct", gct);
 
@@ -1794,9 +1792,6 @@ public class X509Ca {
                 DateUtil.toUtcTimeyyyyMMddhhmmss(gct.grantedNotBefore));
         event.addEventData(CaAuditConstants.NAME_notAfter,
                 DateUtil.toUtcTimeyyyyMMddhhmmss(gct.grantedNotAfter));
-        if (user != null) {
-            event.addEventData(CaAuditConstants.NAME_user, user);
-        }
 
         adaptGrantedSubejct(gct);
 
@@ -1881,8 +1876,12 @@ public class X509Ca {
                 X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
                 ret = new X509CertificateInfo(certWithMeta, caInfo.getCertificate(),
                         gct.grantedPublicKeyData, gct.certprofile.getName());
-                ret.setUser(user);
-                ret.setRequestor(requestor);
+                if (requestor != null) {
+                    ret.setRequestorName(requestor.getName());
+                    if (requestor instanceof UserRequestorInfo) {
+                        ret.setUser(((UserRequestorInfo) requestor).getUser());
+                    }
+                }
                 ret.setReqType(reqType);
                 ret.setTransactionId(transactionId);
                 ret.setRequestedSubject(gct.requestedSubject);
@@ -1979,7 +1978,7 @@ public class X509Ca {
     }
 
     private GrantedCertTemplate createGrantedCertTemplate(final CertTemplateData certTemplate,
-            final boolean requestedByRa, final RequestorInfo requestor, final boolean keyUpdate)
+            final RequestorInfo requestor, final boolean keyUpdate)
     throws OperationException {
         ParamUtil.requireNonNull("certTemplate", certTemplate);
         if (caInfo.getRevocationInfo() != null) {
@@ -2006,9 +2005,11 @@ public class X509Ca {
                     "unknown cert version " + certprofile.getVersion());
         }
 
-        if (certprofile.isOnlyForRa() && !requestedByRa) {
-            throw new OperationException(ErrorCode.NOT_PERMITTED,
-                    "profile " + certprofileName + " not applied to non-RA");
+        if (certprofile.isOnlyForRa()) {
+            if (requestor == null || !requestor.isRa()) {
+                throw new OperationException(ErrorCode.NOT_PERMITTED,
+                        "profile " + certprofileName + " not applied to non-RA");
+            }
         }
 
         X500Name requestedSubject = removeEmptyRdns(certTemplate.getSubject());

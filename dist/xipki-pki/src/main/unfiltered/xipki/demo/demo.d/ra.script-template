@@ -58,7 +58,6 @@ xipki-cli:enroll-p12 \
   --password 1234 \
   --out output/OCSP1.der \
   --profile OCSP \
-  --user USER-O \
   --subject "CN=OCSP1,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
@@ -86,7 +85,6 @@ xipki-cli:enroll-p12 \
   --password 1234 \
   --out output/OCSP2.der \
   --profile OCSP \
-  --user USER-O \
   --subject "CN=OCSP2,2.5.4.97=VATDE-123456789,O=xipki,C=DE" \
   --need-extension authorityInfoAccess
 
@@ -119,8 +117,7 @@ xipki-cli:enroll-p12 \
   --password 1234 \
   --out output/multipleOUs1.der \
   --profile multipleOUs \
-  --subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE" \
-  --user USER-O
+  --subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
 
 xipki-tk:update-cert-p12 \
   --p12 output/multipleOUs1.p12 \
@@ -143,8 +140,7 @@ xipki-cli:enroll-p12 \
   --password 1234 \
   --out output/multipleOUs2.der \
   --profile multipleOUs \
-  --subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE" \
-  --user USER-O
+  --subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
 
 xipki-tk:update-cert-p12 \
   --p12 output/multipleOUs2.p12 \
@@ -169,8 +165,7 @@ xipki-cli:enroll-p12 \
   --password 1234 \
   --out output/multiValuedRDN1.der \
   --profile multiValuedRDN \
-  --subject "CN=multiValuedRDN1,OU=A12345,O=xipki,C=DE" \
-  --user USER-O
+  --subject "CN=multiValuedRDN1,OU=A12345,O=xipki,C=DE"
 
 xipki-tk:update-cert-p12 \
   --p12 output/multiValuedRDN1.p12 \
@@ -222,8 +217,7 @@ xipki-tk:req-p12-complex \
 xipki-cli:csr-enroll \
   --csr output/EE.Complex1.csr \
   --out output/EE.Complex1.der \
-  --profile EE.Complex \
-  --user USER-T
+  --profile EE.Complex
 
 xipki-tk:update-cert-p12 \
   --p12 output/EE.Complex1.p12 \
@@ -250,8 +244,7 @@ xipki-tk:req-p12-complex \
 xipki-cli:csr-enroll \
   --csr output/EE.Complex2.csr \
   --out output/EE.Complex2.der \
-  --profile EE.Complex \
-  --user USER-T
+  --profile EE.Complex
 
 xipki-tk:update-cert-p12 \
   --p12 output/EE.Complex2.p12 \
@@ -272,8 +265,7 @@ xipki-tk:req-p12 \
 xipki-cli:csr-enroll \
   --csr output/TLS1.csr \
   --out output/TLS1.der \
-  --profile TLS \
-  --user USER-T
+  --profile TLS
 
 xipki-tk:update-cert-p12 \
   --p12 output/TLS1.p12 \
@@ -295,7 +287,7 @@ xipki-tk:req-p12 \
 xipki-cli:csr-enroll \
   --csr output/TLSwithIncSN1.csr \
   --out output/TLSwithIncSN1.der \
-  --profile TLSwithIncSN --user USER-T
+  --profile TLSwithIncSN
 
 # 2.
 
@@ -309,7 +301,7 @@ xipki-tk:req-p12 \
 xipki-cli:csr-enroll \
   --csr output/TLSwithIncSN1-1.csr \
   --out output/TLSwithIncSN1-1.der \
-  --profile TLSwithIncSN --user USER-T
+  --profile TLSwithIncSN
 
 # 3.
 
@@ -323,7 +315,7 @@ xipki-tk:req-p12 \
 xipki-cli:csr-enroll \
   --csr output/TLSwithIncSN1-2.csr \
   --out output/TLSwithIncSN1-2.der \
-  --profile TLSwithIncSN --user USER-T
+  --profile TLSwithIncSN
  
 # Certificate TLS2
 
@@ -337,8 +329,7 @@ xipki-tk:req-p12 \
 xipki-cli:csr-enroll \
   --csr output/TLS2.csr \
   --out output/TLS2.der \
-  --profile TLS \
-  --user USER-T
+  --profile TLS
 
 xipki-tk:update-cert-p12 \
   --p12 output/TLS2.p12 \
@@ -377,8 +368,7 @@ xipki-tk:req-p12 \
 xipki-cli:csr-enroll \
   --csr output/TLS_C1.csr \
   --out output/TLS_C1.der \
-  --profile TLS_C \
-  --user USER-T
+  --profile TLS_C
 
 xipki-tk:update-cert-p12 \
   --p12 output/TLS_C1.p12 \
@@ -399,8 +389,7 @@ xipki-tk:req-p12 \
 xipki-cli:csr-enroll \
   --csr output/TLS_C2.csr \
   --out output/TLS_C2.der \
-  --profile TLS_C \
-  --user USER-T
+  --profile TLS_C
 
 xipki-tk:update-cert-p12 \
   --p12 output/TLS_C2.p12 \
@@ -427,8 +416,7 @@ xipki-tk:req-p12 \
 xipki-cli:csr-enroll \
   --csr output/gSMC_K1.csr \
   --out output/gSMC_K1.der \
-  --profile gSMC_K \
-  --user USER-T
+  --profile gSMC_K
 
 xipki-tk:update-cert-p12 \
   --p12 output/gSMC_K1.p12 \
@@ -453,8 +441,7 @@ xipki-tk:req-p12 \
 xipki-cli:csr-enroll \
   --csr output/gSMC_K2.csr \
   --out output/gSMC_K2.der \
-  --profile gSMC_K \
-  --user USER-T
+  --profile gSMC_K
 
 xipki-tk:update-cert-p12 \
   --p12 output/gSMC_K2.p12 \
@@ -475,8 +462,7 @@ xipki-tk:req-p12 \
 xipki-cli:csr-enroll \
   --csr output/MaxTime1.csr \
   --out output/MaxTime1.der \
-  --profile MaxTime \
-  --user USER-T
+  --profile MaxTime
 
 xipki-tk:update-cert-p12 \
   --p12 output/MaxTime1.p12 \

@@ -77,7 +77,6 @@ import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.RequestResponsePair;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.SecurityFactory;
@@ -335,17 +334,9 @@ abstract class CmpRequestor {
         return buildPkiHeader(false, tid, (CmpUtf8Pairs) null, (InfoTypeAndValue[]) null);
     }
 
-    protected PKIHeader buildPkiHeader(final ASN1OctetString tid, final String username) {
-        return buildPkiHeader(false, tid, username);
-    }
-
-    protected PKIHeader buildPkiHeader(final boolean addImplictConfirm, final ASN1OctetString tid,
-            final String username) {
-        CmpUtf8Pairs utf8Pairs = null;
-        if (StringUtil.isNotBlank(username)) {
-            utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_USER, username);
-        }
-        return buildPkiHeader(addImplictConfirm, tid, utf8Pairs, (InfoTypeAndValue[]) null);
+    protected PKIHeader buildPkiHeader(final boolean addImplictConfirm, final ASN1OctetString tid) {
+        return buildPkiHeader(addImplictConfirm, tid, (CmpUtf8Pairs) null,
+                (InfoTypeAndValue[]) null);
     }
 
     protected PKIHeader buildPkiHeader(final boolean addImplictConfirm, final ASN1OctetString tid,

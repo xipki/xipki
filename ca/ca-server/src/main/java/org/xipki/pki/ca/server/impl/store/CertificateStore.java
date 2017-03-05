@@ -91,7 +91,7 @@ public class CertificateStore {
         try {
             queryExecutor.addCert(certInfo.getIssuerCert(), certInfo.getCert(),
                     certInfo.getSubjectPublicKey(), certInfo.getProfileName(),
-                    certInfo.getRequestor(), certInfo.getUser(), certInfo.getReqType(),
+                    certInfo.getRequestorName(), certInfo.getUser(), certInfo.getReqType(),
                     certInfo.getTransactionId(), certInfo.getRequestedSubject());
         } catch (Exception ex) {
             LOG.error("could not save certificate {}: {}. Message: {}",

@@ -32,45 +32,19 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.impl.cmp;
-
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ca.api.X509CertWithDbId;
-import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
-import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
+package org.xipki.pki.ca.server.mgmt.api;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class CmpRequestorInfo implements RequestorInfo {
+public interface RequestorInfo {
 
-    private final CaHasRequestorEntry caHasRequestor;
+    static final String NAME_BY_USER = "BY-USER";
 
-    private final X509CertWithDbId cert;
+    String getName();
 
-    public CmpRequestorInfo(final CaHasRequestorEntry caHasRequestor, final X509CertWithDbId cert) {
-        this.caHasRequestor = ParamUtil.requireNonNull("caHasRequestor", caHasRequestor);
-        this.cert = ParamUtil.requireNonNull("cert", cert);
-    }
-
-    public CaHasRequestorEntry getCaHasRequestor() {
-        return caHasRequestor;
-    }
-
-    public X509CertWithDbId getCert() {
-        return cert;
-    }
-
-    @Override
-    public String getName() {
-        return caHasRequestor.getRequestorName();
-    }
-
-    @Override
-    public boolean isRa() {
-        return caHasRequestor.isRa();
-    }
+    boolean isRa();
 
 }

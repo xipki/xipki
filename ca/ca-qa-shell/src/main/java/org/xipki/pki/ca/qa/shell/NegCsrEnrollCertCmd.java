@@ -72,10 +72,6 @@ public class NegCsrEnrollCertCmd extends ClientCommandSupport {
                     + "(required)")
     private String profile;
 
-    @Option(name = "--user",
-            description = "username")
-    private String user;
-
     @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if the profile is supported by more than one CA)")
@@ -88,7 +84,7 @@ public class NegCsrEnrollCertCmd extends ClientCommandSupport {
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            result = caClient.requestCert(caName, csr, profile, user, null, null, debug);
+            result = caClient.requestCert(caName, csr, profile, null, null, debug);
         } finally {
             saveRequestResponse(debug);
         }

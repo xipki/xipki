@@ -86,7 +86,6 @@ import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
-import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
@@ -472,7 +471,7 @@ class CertStoreQueryExecutor {
 
     void addCert(final X509Cert issuer, final X509CertWithDbId certificate,
             final byte[] encodedSubjectPublicKey, final String certprofileName,
-            final RequestorInfo requestor, final String user, final RequestType reqType,
+            final String requestorName, final String user, final RequestType reqType,
             final byte[] transactionId, final X500Name reqSubject)
     throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("certificate", certificate);
@@ -486,7 +485,7 @@ class CertStoreQueryExecutor {
             addCertprofileName(certprofileName);
         }
         int certprofileId = getCertprofileId(certprofileName);
-        Integer requestorId = (requestor == null) ? null : getRequestorId(requestor.getName());
+        Integer requestorId = (requestorName == null) ? null : getRequestorId(requestorName);
 
         long fpPk = FpIdCalculator.hash(encodedSubjectPublicKey);
         String subjectText = X509Util.cutText(certificate.getSubject(), maxX500nameLen);

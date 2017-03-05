@@ -90,10 +90,6 @@ public class EnrollCertCmd extends CaCommandSupport {
     @Completion(ProfileNameCompleter.class)
     private String profileName;
 
-    @Option(name = "--user",
-            description = "username")
-    private String user;
-
     @Option(name = "--not-before",
             description = "notBefore, UTC time of format yyyyMMddHHmmss")
     private String notBeforeS;
@@ -117,7 +113,7 @@ public class EnrollCertCmd extends CaCommandSupport {
 
         byte[] encodedCsr = IoUtil.read(csrFile);
 
-        X509Certificate cert = caManager.generateCertificate(caName, profileName, user, encodedCsr,
+        X509Certificate cert = caManager.generateCertificate(caName, profileName, encodedCsr,
                 notBefore, notAfter);
         saveVerbose("saved certificate to file", new File(outFile), cert.getEncoded());
 

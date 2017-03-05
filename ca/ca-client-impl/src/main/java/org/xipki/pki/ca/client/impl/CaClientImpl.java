@@ -529,7 +529,7 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public EnrollCertResult requestCert(final String caName, final CertificationRequest csr,
-            final String profile, final String username, final Date notBefore, final Date notAfter,
+            final String profile, final Date notBefore, final Date notAfter,
             final RequestResponseDebug debug) throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("csr", csr);
 
@@ -551,8 +551,7 @@ public final class CaClientImpl implements CaClient {
         CsrEnrollCertRequest request = new CsrEnrollCertRequest(id, profile, csr);
         EnrollCertResultResp result;
         try {
-            result = ca.getRequestor().requestCertificate(request, username, notBefore, notAfter,
-                    debug);
+            result = ca.getRequestor().requestCertificate(request, notBefore, notAfter, debug);
         } catch (CmpRequestorException ex) {
             throw new CaClientException(ex.getMessage(), ex);
         }
@@ -562,8 +561,7 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public EnrollCertResult requestCerts(final String caName, final EnrollCertRequest request,
-            final String username, final RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException {
+            final RequestResponseDebug debug) throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
         List<EnrollCertRequestEntry> requestEntries = request.getRequestEntries();
@@ -598,7 +596,7 @@ public final class CaClientImpl implements CaClient {
 
         EnrollCertResultResp result;
         try {
-            result = ca.getRequestor().requestCertificate(request, username, debug);
+            result = ca.getRequestor().requestCertificate(request, debug);
         } catch (CmpRequestorException ex) {
             throw new CaClientException(ex.getMessage(), ex);
         }
@@ -841,7 +839,7 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public byte[] envelope(final CertRequest certRequest, final ProofOfPossession pop,
-            final String profileName, final String caName, final String username)
+            final String profileName, final String caName)
     throws CaClientException {
         ParamUtil.requireNonNull("certRequest", certRequest);
         ParamUtil.requireNonNull("pop", pop);
@@ -867,7 +865,7 @@ public final class CaClientImpl implements CaClient {
 
         PKIMessage pkiMessage;
         try {
-            pkiMessage = ca.getRequestor().envelope(certRequest, pop, profileName, username);
+            pkiMessage = ca.getRequestor().envelope(certRequest, pop, profileName);
         } catch (CmpRequestorException ex) {
             throw new CaClientException("CmpRequestorException: " + ex.getMessage(), ex);
         }

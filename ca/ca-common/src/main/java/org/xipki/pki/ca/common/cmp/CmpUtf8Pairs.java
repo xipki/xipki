@@ -52,8 +52,6 @@ public class CmpUtf8Pairs {
 
     public static final String KEY_CERT_PROFILE = "CERT-PROFILE";
 
-    public static final String KEY_USER = "USER";
-
     public static final String KEY_NOT_BEFORE = "NOT-BEFORE";
 
     public static final String KEY_NOT_AFTER = "NOT-AFTER";

@@ -76,8 +76,6 @@ public class CaLoadTestEnroll extends LoadExecutor {
 
     private final AtomicLong index;
 
-    private final String userPrefix = "LOADTEST-";
-
     private final int num;
 
     private final int maxRequests;
@@ -120,8 +118,7 @@ public class CaLoadTestEnroll extends LoadExecutor {
                     request.addRequestEntry(requestEntry);
                 }
 
-                result = caClient.requestCerts(null, request,
-                        userPrefix + System.currentTimeMillis(), null);
+                result = caClient.requestCerts(null, request, null);
             } catch (CaClientException | PkiErrorException ex) {
                 LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
                 return false;

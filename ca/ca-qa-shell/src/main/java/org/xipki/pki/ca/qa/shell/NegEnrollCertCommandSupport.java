@@ -87,10 +87,6 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
                     + "(required)")
     private String profile;
 
-    @Option(name = "--user",
-            description = "username")
-    private String user;
-
     @Option(name = "--rsa-mgf1",
             description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
                     + "(only applied to RSA key)")
@@ -135,7 +131,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            result = caClient.requestCerts(caName, request, user, debug);
+            result = caClient.requestCerts(caName, request, debug);
         } finally {
             saveRequestResponse(debug);
         }

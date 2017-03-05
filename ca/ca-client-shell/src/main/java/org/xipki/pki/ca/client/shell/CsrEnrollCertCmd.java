@@ -91,10 +91,6 @@ public class CsrEnrollCertCmd extends ClientCommandSupport {
     @Completion(FilePathCompleter.class)
     private String outputFile;
 
-    @Option(name = "--user",
-            description = "username")
-    private String user;
-
     @Option(name = "--ca",
             description = "CA name\n"
                     + "(required if the profile is supported by more than one CA)")
@@ -112,7 +108,7 @@ public class CsrEnrollCertCmd extends ClientCommandSupport {
         EnrollCertResult result;
         RequestResponseDebug debug = getRequestResponseDebug();
         try {
-            result = caClient.requestCert(caName, csr, profile, user, notBefore, notAfter, debug);
+            result = caClient.requestCert(caName, csr, profile, notBefore, notAfter, debug);
         } finally {
             saveRequestResponse(debug);
         }

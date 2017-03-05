@@ -166,15 +166,13 @@ xipki-tk:req-p12 \
 
 xipki-qa:neg-csr-enroll \
   --csr output/neg/TLS101.csr \
-  --profile TLS \
-  --user USER-T
+  --profile TLS
 
 xipki-qa:neg-enroll-p12 \
   --hash $HASH \
   --p12 output/TLS-neg.p12 \
   --password 1234 \
-  --profile TLS \
-  --user USER-T
+  --profile TLS
 
 # multipleOUs
 xipki-qa:neg-enroll-p12 \
@@ -182,24 +180,21 @@ xipki-qa:neg-enroll-p12 \
   --p12 output/TLS-neg.p12 \
   --password 1234 \
   --profile multipleOUs \
-  --subject "CN=multipleOUs101,OU=A12345,OU=A54321,O=xipki,C=DE" \
-  --user USER-O
+  --subject "CN=multipleOUs101,OU=A12345,OU=A54321,O=xipki,C=DE"
 
 xipki-qa:neg-enroll-p12 \
   --hash $HASH \
   --p12 output/TLS-neg.p12 \
   --password 1234 \
   --profile multipleOUs \
-  --subject "CN=multipleOUs102,OU=12345,OU=54321,O=xipki,C=DE" \
-  --user USER-O
+  --subject "CN=multipleOUs102,OU=12345,OU=54321,O=xipki,C=DE"
 
 xipki-qa:neg-enroll-p12 \
   --hash $HASH \
   --p12 output/TLS-neg.p12 \
   --password 1234 \
   --profile multipleOUs \
-  --subject "CN=multipleOUs103,OU=A12345,O=xipki,C=DE" \
-  --user USER-O
+  --subject "CN=multipleOUs103,OU=A12345,O=xipki,C=DE"
 
 ## Revoke certificate that has been revoked
 

@@ -48,7 +48,6 @@ import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.RequestType;
-import org.xipki.pki.ca.api.RequestorInfo;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 
 /**
@@ -72,7 +71,7 @@ public class X509CertificateInfo {
 
     private byte[] transactionId;
 
-    private RequestorInfo requestor;
+    private String requestorName;
 
     private String user;
 
@@ -132,12 +131,12 @@ public class X509CertificateInfo {
         this.warningMessage = warningMessage;
     }
 
-    public RequestorInfo getRequestor() {
-        return requestor;
+    public String getRequestorName() {
+        return requestorName;
     }
 
-    public void setRequestor(final RequestorInfo requestor) {
-        this.requestor = requestor;
+    public void setRequestorName(final String requestorName) {
+        this.requestorName = requestorName;
     }
 
     public String getUser() {

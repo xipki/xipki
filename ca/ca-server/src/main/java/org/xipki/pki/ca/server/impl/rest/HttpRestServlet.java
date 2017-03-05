@@ -216,12 +216,10 @@ public class HttpRestServlet extends HttpServlet {
                 Date notAfter = (strNotAfter == null) ? null
                         : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
 
-                String user = request.getParameter(RestfulAPIConstants.PARAM_user);
-
                 byte[] encodedCsr = IoUtil.read(request.getInputStream());
 
                 X509Cert cert = responder.generateCert(requestor, encodedCsr, profile, notBefore,
-                        notAfter, user, RequestType.REST, msgId);
+                        notAfter, RequestType.REST, msgId);
                 if (cert == null) {
                     String message = "could not generate certificate";
                     LOG.warn(message);

@@ -272,6 +272,10 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
+    <insert tableName="CS_REQUESTOR">
+      <column name="ID" value="1"/>
+      <column name="NAME" value="BY-USER"/>
+    </insert>
     <!-- table CS_PUBLISHER -->
     <createTable tableName="CS_PUBLISHER">
       <column name="ID" type="INT">

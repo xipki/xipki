@@ -73,13 +73,12 @@ import org.xipki.commons.common.util.RandomUtil;
 import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.SecurityFactory;
 import org.xipki.commons.security.util.X509Util;
-import org.xipki.pki.ca.api.RequestorInfo;
-import org.xipki.pki.ca.common.cmp.CmpUtf8Pairs;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
 import org.xipki.pki.ca.common.cmp.ProtectionResult;
 import org.xipki.pki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.pki.ca.server.impl.CaAuditConstants;
 import org.xipki.pki.ca.server.mgmt.api.CmpControl;
+import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 /**
  * @author Lijun Liao
@@ -132,7 +131,7 @@ abstract class CmpResponder {
     } // method getRequestor
 
     protected abstract PKIMessage doProcessPkiMessage(@Nullable PKIMessage request,
-            @NonNull RequestorInfo requestor, @Nullable String user,
+            @NonNull RequestorInfo requestor,
             @NonNull ASN1OctetString transactionId, @NonNull GeneralPKIMessage pkiMessage,
             @NonNull String msgId, @NonNull AuditEvent event);
 
@@ -269,14 +268,6 @@ abstract class CmpResponder {
             requestor = null;
         }
 
-        CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
-        String username = (keyvalues == null) ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
-        if (username != null) {
-            if (username.indexOf('*') != -1 || username.indexOf('%') != -1) {
-                errorStatus = "user could not contains characters '*' and '%'";
-            }
-        }
-
         if (errorStatus != null) {
             if (event != null) {
                 event.setLevel(AuditLevel.INFO);
@@ -287,8 +278,7 @@ abstract class CmpResponder {
                     errorStatus);
         }
 
-        PKIMessage resp = doProcessPkiMessage(pkiMessage, requestor, username, tid, message, msgId,
-                event);
+        PKIMessage resp = doProcessPkiMessage(pkiMessage, requestor, tid, message, msgId, event);
 
         if (isProtected) {
             resp = addProtection(resp, event);

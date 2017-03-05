@@ -89,11 +89,13 @@ import org.xipki.pki.ca.server.impl.CaAuditConstants;
 import org.xipki.pki.ca.server.impl.CaManagerImpl;
 import org.xipki.pki.ca.server.impl.CertTemplateData;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
+import org.xipki.pki.ca.server.impl.UserRequestorInfo;
 import org.xipki.pki.ca.server.impl.X509Ca;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.CmpControl;
+import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
@@ -510,8 +512,9 @@ public class Scep {
                 CertTemplateData certTemplateData = new CertTemplateData(csrReqInfo.getSubject(),
                         csrReqInfo.getSubjectPublicKeyInfo(), (Date) null, (Date) null, extensions,
                         certProfileName);
-                X509CertificateInfo cert = ca.generateCertificate(certTemplateData, true, null,
-                        user, RequestType.SCEP, tidBytes, msgId);
+                RequestorInfo requestor = new UserRequestorInfo(user);
+                X509CertificateInfo cert = ca.generateCertificate(certTemplateData, requestor,
+                        RequestType.SCEP, tidBytes, msgId);
                 /* Don't save SCEP message, since it contains password in plaintext
                 if (ca.getCaInfo().isSaveRequest() && cert.getCert().getCertId() != null) {
                     byte[] encodedRequest;
@@ -557,7 +560,7 @@ public class Scep {
             default:
                 LOG.error("unknown SCEP messageType '{}'", req.getMessageType());
                 throw FailInfoException.BAD_REQUEST;
-            } // end switch
+            } // end switch<
 
             ContentInfo ci = new ContentInfo(CMSObjectIdentifiers.signedData, signedData);
             rep.setMessageData(ci);

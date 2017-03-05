@@ -219,7 +219,7 @@ public interface CaManager {
     throws CaMgmtException;
 
     X509Certificate generateCertificate(@NonNull String caName, @NonNull String profileName,
-            @Nullable String user, @NonNull byte[] encodedCsr, @Nullable Date notBefore,
+            @NonNull byte[] encodedCsr, @Nullable Date notBefore,
             @Nullable Date notAfter) throws CaMgmtException;
 
     X509Certificate generateRootCa(@NonNull X509CaEntry caEntry, @NonNull String certprofileName,

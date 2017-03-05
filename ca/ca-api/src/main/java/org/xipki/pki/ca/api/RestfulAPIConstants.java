@@ -96,8 +96,6 @@ public class RestfulAPIConstants {
 
     public static final String PARAM_profile = "profile";
 
-    public static final String PARAM_user = "user";
-
     public static final String PARAM_reason = "reason";
 
     public static final String PARAM_not_before = "not-before";

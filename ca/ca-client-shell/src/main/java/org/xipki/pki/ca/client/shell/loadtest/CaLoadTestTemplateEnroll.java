@@ -125,8 +125,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
                     request.addRequestEntry(requestEntry);
                 }
 
-                result = caClient.requestCerts(null, request,
-                        userPrefix + System.currentTimeMillis(), null);
+                result = caClient.requestCerts(null, request, null);
             } catch (CaClientException | PkiErrorException ex) {
                 LOG.warn("{}: {}", ex.getClass().getName(), ex.getMessage());
                 return false;
@@ -167,8 +166,6 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
     private static Unmarshaller jaxbUnmarshaller;
 
     private final CaClient caClient;
-
-    private final String userPrefix = "LOADTEST-";
 
     private final List<LoadTestEntry> loadtestEntries;
 

@@ -61,6 +61,11 @@ public class CmpRequestorEntry {
 
     public CmpRequestorEntry(final String name, final String base64Cert) {
         this.name = ParamUtil.requireNonBlank("name", name);
+        if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(name)) {
+            throw new IllegalArgumentException("Requestor name could not be "
+                    + RequestorInfo.NAME_BY_USER);
+        }
+
         this.base64Cert = ParamUtil.requireNonBlank("base64Cert", base64Cert);
         try {
             this.cert = X509Util.parseBase64EncodedCert(base64Cert);
