@@ -235,7 +235,6 @@ class OcspStoreQueryExecutor {
             psAddcert.setString(idx++, certprofile);
 
             if (revoked) {
-                @SuppressWarnings("null")
                 long revTime = revInfo.getRevocationTime().getTime() / 1000;
                 psAddcert.setLong(idx++, revTime);
                 if (revInfo.getInvalidityTime() != null) {
@@ -334,7 +333,6 @@ class OcspStoreQueryExecutor {
             ps.setLong(idx++, currentTimeSeconds);
             setBoolean(ps, idx++, revoked);
             if (revoked) {
-                @SuppressWarnings("null")
                 long revTime = revInfo.getRevocationTime().getTime() / 1000;
                 ps.setLong(idx++, revTime);
                 if (revInfo.getInvalidityTime() != null) {

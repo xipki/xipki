@@ -1267,7 +1267,6 @@ class CaManagerQueryExecutor {
             }
 
             if (idxCert != null) {
-                @SuppressWarnings("null")
                 String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
                 sb.append("cert: '").append(subject).append("'; ");
                 ps.setString(idxSubject, subject);

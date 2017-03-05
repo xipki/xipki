@@ -2179,7 +2179,6 @@ public class X509Ca {
             String str = certprofile.getParameter(
                     SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME);
             long maxLifetimeInDays = Long.parseLong(str);
-            @SuppressWarnings("null")
             Date maxLifetime = new Date(gsmckFirstNotBefore.getTime()
                     + maxLifetimeInDays * DAY_IN_MS - MS_PER_SECOND);
             if (maxNotAfter.after(maxLifetime)) {
