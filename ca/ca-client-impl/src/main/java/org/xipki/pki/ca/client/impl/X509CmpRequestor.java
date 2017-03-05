@@ -357,22 +357,22 @@ abstract class X509CmpRequestor extends CmpRequestor {
     } // method parse
 
     public EnrollCertResultResp requestCertificate(final CsrEnrollCertRequest csr,
-            final String username, final Date notBefore, final Date notAfter,
+            final Date notBefore, final Date notAfter,
             final RequestResponseDebug debug) throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("csr", csr);
 
-        PKIMessage request = buildPkiMessage(csr, username, notBefore, notAfter);
+        PKIMessage request = buildPkiMessage(csr, notBefore, notAfter);
         Map<BigInteger, String> reqIdIdMap = new HashMap<>();
         reqIdIdMap.put(MINUS_ONE, csr.getId());
         return internRequestCertificate(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
     }
 
     public EnrollCertResultResp requestCertificate(final EnrollCertRequest req,
-            final String username, final RequestResponseDebug debug)
+            final RequestResponseDebug debug)
     throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("req", req);
 
-        PKIMessage request = buildPkiMessage(req, username);
+        PKIMessage request = buildPkiMessage(req);
         Map<BigInteger, String> reqIdIdMap = new HashMap<>();
         List<EnrollCertRequestEntry> reqEntries = req.getRequestEntries();
 
@@ -606,13 +606,11 @@ abstract class X509CmpRequestor extends CmpRequestor {
         return new PKIMessage(header, body);
     } // method buildUnrevokeOrRemoveCertRequest
 
-    private PKIMessage buildPkiMessage(final CsrEnrollCertRequest csr, final String username,
+    private PKIMessage buildPkiMessage(final CsrEnrollCertRequest csr,
             final Date notBefore, final Date notAfter) {
         CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE,
                 csr.getCertprofile());
-        if (StringUtil.isNotBlank(username)) {
-            utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_USER, username);
-        }
+
         if (notBefore != null) {
             utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_NOT_BEFORE,
                     DateUtil.toUtcTimeyyyyMMddhhmmss(notBefore));
@@ -628,8 +626,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
         return new PKIMessage(header, body);
     }
 
-    private PKIMessage buildPkiMessage(final EnrollCertRequest req, final String username) {
-        PKIHeader header = buildPkiHeader(implicitConfirm, null, username);
+    private PKIMessage buildPkiMessage(final EnrollCertRequest req) {
+        PKIHeader header = buildPkiHeader(implicitConfirm, null);
 
         List<EnrollCertRequestEntry> reqEntries = req.getRequestEntries();
         CertReqMsg[] certReqMsgs = new CertReqMsg[reqEntries.size()];
@@ -662,8 +660,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
     } // method buildPkiMessage
 
     private PKIMessage buildPkiMessage(final CertRequest req, final ProofOfPossession pop,
-            final String profileName, final String username) {
-        PKIHeader header = buildPkiHeader(implicitConfirm, null, username);
+            final String profileName) {
+        PKIHeader header = buildPkiHeader(implicitConfirm, null);
 
         CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, profileName);
         AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
@@ -675,12 +673,12 @@ abstract class X509CmpRequestor extends CmpRequestor {
     }
 
     public PKIMessage envelope(final CertRequest req, final ProofOfPossession pop,
-            final String profileName, final String username) throws CmpRequestorException {
+            final String profileName) throws CmpRequestorException {
         ParamUtil.requireNonNull("req", req);
         ParamUtil.requireNonNull("pop", pop);
         ParamUtil.requireNonNull("profileName", profileName);
 
-        PKIMessage request = buildPkiMessage(req, pop, profileName, username);
+        PKIMessage request = buildPkiMessage(req, pop, profileName);
         return sign(request);
     }
 

@@ -139,10 +139,6 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     @Completion(FilePathCompleter.class)
     private String outputFile;
 
-    @Option(name = "--user",
-            description = "username")
-    private String user;
-
     @Option(name = "--rsa-mgf1",
             description = "whether to use the RSAPSS MGF1 for the POPO computation\n"
                     + "(only applied to RSA key)")
@@ -386,7 +382,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         RequestResponseDebug debug = getRequestResponseDebug();
         EnrollCertResult result;
         try {
-            result = caClient.requestCerts(caName, request, user, debug);
+            result = caClient.requestCerts(caName, request, debug);
         } finally {
             saveRequestResponse(debug);
         }

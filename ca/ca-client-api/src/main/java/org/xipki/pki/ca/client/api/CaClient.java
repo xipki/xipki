@@ -65,12 +65,12 @@ public interface CaClient {
     Set<CertprofileInfo> getCertprofiles(@NonNull String caName) throws CaClientException;
 
     EnrollCertResult requestCert(@Nullable String caName, @NonNull CertificationRequest csr,
-            @NonNull String profile, @Nullable String username, @Nullable Date notBefore,
+            @NonNull String profile, @Nullable Date notBefore,
             @Nullable Date notAfter, @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     EnrollCertResult requestCerts(@Nullable String caName, @NonNull EnrollCertRequest request,
-            @Nullable String username, @Nullable RequestResponseDebug debug)
+            @Nullable RequestResponseDebug debug)
     throws CaClientException, PkiErrorException;
 
     CertIdOrError revokeCert(@Nullable String caName, @NonNull BigInteger serial, int reason,
@@ -96,7 +96,7 @@ public interface CaClient {
     String getCaNameByIssuer(@NonNull X500Name issuer) throws CaClientException;
 
     byte[] envelope(@NonNull CertRequest certRequest, @NonNull ProofOfPossession popo,
-            @NonNull String profileName, @Nullable String caName, @Nullable String username)
+            @NonNull String profileName, @Nullable String caName)
     throws CaClientException;
 
     byte[] envelopeRevocation(@NonNull X500Name issuer, @NonNull BigInteger serial, int reason)
