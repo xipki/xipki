@@ -124,7 +124,7 @@ public class CaEmulator {
     private CertificateList crl;
 
     public CaEmulator(final PrivateKey caKey, final Certificate caCert, final boolean generateCrl)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         this.caKey = ParamUtil.requireNonNull("caKey", caKey);
         this.caCert = ParamUtil.requireNonNull("caCert", caCert);
         this.caSubject = caCert.getSubject();
@@ -161,7 +161,7 @@ public class CaEmulator {
     }
 
     public Certificate generateCert(final SubjectPublicKeyInfo pubKeyInfo, final X500Name subjectDn)
-    throws Exception {
+            throws Exception {
         return generateCert(pubKeyInfo, subjectDn,
                 new Date(System.currentTimeMillis() - 10 * CaEmulator.MIN_IN_MS));
     }
@@ -212,7 +212,7 @@ public class CaEmulator {
     }
 
     public synchronized CertificateList getCrl(final X500Name issuer, final BigInteger serialNumber)
-    throws Exception {
+            throws Exception {
         if (crl != null) {
             return crl;
         }
@@ -253,7 +253,7 @@ public class CaEmulator {
     }
 
     public ContentVerifierProvider getContentVerifierProvider(final PublicKey publicKey)
-    throws InvalidKeyException {
+            throws InvalidKeyException {
         ParamUtil.requireNonNull("publicKey", publicKey);
 
         String keyAlg = publicKey.getAlgorithm().toUpperCase();
