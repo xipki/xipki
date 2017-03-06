@@ -83,7 +83,7 @@ public interface P11Slot {
     P11ObjectIdentifier getObjectIdForLabel(String label);
 
     void updateCertificate(@NonNull P11ObjectIdentifier objectId, @NonNull X509Certificate newCert)
-    throws P11TokenException, XiSecurityException;
+            throws P11TokenException, XiSecurityException;
 
     /**
      *
@@ -99,10 +99,10 @@ public interface P11Slot {
     void removeCerts(@NonNull P11ObjectIdentifier objectId) throws P11TokenException;
 
     P11ObjectIdentifier addCert(@NonNull X509Certificate cert)
-    throws P11TokenException, XiSecurityException;
+            throws P11TokenException, XiSecurityException;
 
     void addCert(@NonNull P11ObjectIdentifier objectId, @NonNull X509Certificate cert)
-    throws P11TokenException, XiSecurityException;
+            throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateRSAKeypair(int keysize, @NonNull BigInteger publicExponent,
@@ -110,7 +110,7 @@ public interface P11Slot {
 
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, @NonNull String label)
-    throws P11TokenException, XiSecurityException;
+            throws P11TokenException, XiSecurityException;
 
     // CHECKSTYLE:OFF
     P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
@@ -119,12 +119,12 @@ public interface P11Slot {
 
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateECKeypair(@NonNull String curveNameOrOid, @NonNull String label)
-    throws P11TokenException, XiSecurityException;
+            throws P11TokenException, XiSecurityException;
 
     X509Certificate exportCert(@NonNull P11ObjectIdentifier objectId)
-    throws P11TokenException, XiSecurityException;
+            throws P11TokenException, XiSecurityException;
 
     void showDetails(@NonNull OutputStream stream, boolean verbose)
-    throws P11TokenException, XiSecurityException, IOException;
+            throws P11TokenException, XiSecurityException, IOException;
 
 }

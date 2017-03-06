@@ -75,8 +75,8 @@ public abstract class P12SecurityCommandSupport extends SecurityCommandSupport {
     }
 
     protected KeyStore getKeyStore()
-    throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException,
-    NoSuchProviderException {
+            throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException,
+                NoSuchProviderException {
         KeyStore ks;
         try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
             ks = KeyUtil.getKeyStore("PKCS12");

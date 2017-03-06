@@ -261,7 +261,7 @@ public class PkiMessage {
     public ContentInfo encode(final PrivateKey signerKey, final String signatureAlgorithm,
             final X509Certificate signerCert, final X509Certificate[] signerCertSet,
             final X509Certificate recipientCert, final ASN1ObjectIdentifier encAlgId)
-    throws MessageEncodingException {
+            throws MessageEncodingException {
         ParamUtil.requireNonNull("signerKey", signerKey);
         ContentSigner signer;
         try {

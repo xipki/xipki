@@ -53,7 +53,7 @@ public class PBEPasswordService {
     }
 
     public static char[] decryptPassword(final char[] masterPassword, final String passwordHint)
-    throws PasswordResolverException {
+            throws PasswordResolverException {
         ParamUtil.requireNonNull("masterPassword", masterPassword);
         ParamUtil.requireNonNull("passwordHint", passwordHint);
 

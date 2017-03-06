@@ -81,7 +81,7 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected void saveVerbose(final String promptPrefix, final File file, final byte[] encoded)
-    throws IOException {
+            throws IOException {
         File saveTo = expandFilepath(file);
 
         boolean randomSaveTo = false;
@@ -202,7 +202,7 @@ public abstract class XipkiCommandSupport implements Action {
     }
 
     protected char[] readPasswordIfNotSet(final String prompt, final String password)
-    throws IOException {
+            throws IOException {
         if (password != null) {
             return password.toCharArray();
         }

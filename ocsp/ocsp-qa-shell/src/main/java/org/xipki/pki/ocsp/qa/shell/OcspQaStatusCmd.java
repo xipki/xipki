@@ -130,7 +130,7 @@ public class OcspQaStatusCmd extends BaseOcspStatusCommandSupport {
     @Override
     protected void checkParameters(final X509Certificate respIssuer,
             final List<BigInteger> serialNumbers, final Map<BigInteger, byte[]> encodedCerts)
-    throws Exception {
+            throws Exception {
         ParamUtil.requireNonEmpty("serialNunmbers", serialNumbers);
 
         if (isBlank(errorText) && isEmpty(statusTexts)) {

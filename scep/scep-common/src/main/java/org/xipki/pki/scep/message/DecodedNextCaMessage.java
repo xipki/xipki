@@ -142,7 +142,7 @@ public class DecodedNextCaMessage {
     @SuppressWarnings("unchecked")
     public static DecodedNextCaMessage decode(final CMSSignedData pkiMessage,
             final CollectionStore<X509CertificateHolder> certStore)
-    throws MessageDecodingException {
+            throws MessageDecodingException {
         ParamUtil.requireNonNull("pkiMessage", pkiMessage);
 
         SignerInformationStore signerStore = pkiMessage.getSignerInfos();

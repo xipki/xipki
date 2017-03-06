@@ -104,7 +104,7 @@ public class SoftTokenContentSignerBuilder {
 
         private RSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
                 final boolean useNssForPss)
-        throws NoSuchAlgorithmException, NoSuchPaddingException {
+            throws NoSuchAlgorithmException, NoSuchPaddingException {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgId(signatureAlgId));
             this.useNssForPss = useNssForPss;
         }
@@ -211,7 +211,7 @@ public class SoftTokenContentSignerBuilder {
     private final X509Certificate[] certificateChain;
 
     public SoftTokenContentSignerBuilder(final PrivateKey privateKey, final PublicKey publicKey)
-    throws XiSecurityException {
+            throws XiSecurityException {
         this.key = ParamUtil.requireNonNull("privateKey", privateKey);
         this.publicKey = ParamUtil.requireNonNull("publicKey", publicKey);
         this.certificateChain = null;
@@ -220,7 +220,7 @@ public class SoftTokenContentSignerBuilder {
     public SoftTokenContentSignerBuilder(final String keystoreType,
             final InputStream keystoreStream, final char[] keystorePassword, final String keyname,
             final char[] keyPassword, final X509Certificate[] certificateChain)
-    throws XiSecurityException {
+            throws XiSecurityException {
         if (!("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType))) {
             throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
         }
@@ -288,7 +288,7 @@ public class SoftTokenContentSignerBuilder {
 
     public ConcurrentContentSigner createSigner(final AlgorithmIdentifier signatureAlgId,
             final int parallelism, final SecureRandom random)
-    throws OperatorCreationException, NoSuchPaddingException {
+            throws OperatorCreationException, NoSuchPaddingException {
         ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         ParamUtil.requireMin("parallelism", parallelism, 1);
 

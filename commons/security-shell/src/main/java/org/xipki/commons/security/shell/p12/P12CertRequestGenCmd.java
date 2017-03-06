@@ -87,8 +87,8 @@ public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
     }
 
     public KeyStore getKeyStore()
-    throws IOException, KeyStoreException, NoSuchProviderException, NoSuchAlgorithmException,
-    CertificateException {
+            throws IOException, KeyStoreException, NoSuchProviderException,
+                NoSuchAlgorithmException, CertificateException {
         KeyStore ks;
         try (FileInputStream in = new FileInputStream(expandFilepath(p12File))) {
             ks = KeyUtil.getKeyStore("PKCS12");
@@ -99,7 +99,7 @@ public class P12CertRequestGenCmd extends CertRequestGenCommandSupport {
 
     @Override
     protected ConcurrentContentSigner getSigner(final SignatureAlgoControl signatureAlgoControl)
-    throws ObjectCreationException {
+            throws ObjectCreationException {
         ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
         char[] pwd;
         try {

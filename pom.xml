@@ -223,25 +223,6 @@
         <artifactId>maven-resources-plugin</artifactId>
         <version>3.0.1</version>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.17</version>
-        <executions>
-          <execution>
-            <id>verify-style</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <configLocation>/xipki-checks.xml</configLocation>
-          <failsOnError>true</failsOnError>
-          <violationSeverity>warning</violationSeverity>
-        </configuration>
-      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
@@ -312,7 +293,7 @@
             <bindingDirectory>src/main/bindings</bindingDirectory>
             <bindingIncludes>
               <include>*.jxb</include>
-            </bindingIncludes> 
+            </bindingIncludes>
             <extension>true</extension>
             <args>
               <arg>-no-header</arg>
@@ -347,6 +328,35 @@
       <modules>
         <module>dist</module>
       </modules>
+    </profile>
+    <profile>
+      <id>codestyle</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>2.17</version>
+          <executions>
+            <execution>
+              <id>verify-style</id>
+              <phase>initialize</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <configLocation>/xipki-checks.xml</configLocation>
+            <failsOnError>true</failsOnError>
+            <violationSeverity>warning</violationSeverity>
+          </configuration>
+        </plugin>
+      </plugins>
+    </build>
     </profile>
   </profiles>
 </project>

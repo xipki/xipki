@@ -56,7 +56,7 @@ public class Asn1Util {
     }
 
     public static void requireRange(final ASN1Sequence seq, final int minSize, final int maxSize)
-    throws BadAsn1ObjectException {
+            throws BadAsn1ObjectException {
         int size = seq.size();
         if (size < minSize || size > maxSize) {
             String msg = String.format("seq.size() must not be out of the range [%d, %d]: %d",
@@ -66,7 +66,7 @@ public class Asn1Util {
     }
 
     public static ASN1Sequence getSequence(final ASN1Encodable object)
-    throws BadAsn1ObjectException {
+            throws BadAsn1ObjectException {
         try {
             return ASN1Sequence.getInstance(object);
         } catch (IllegalArgumentException ex) {
@@ -75,7 +75,7 @@ public class Asn1Util {
     }
 
     public static Certificate getCertificate(final ASN1Encodable object)
-    throws BadAsn1ObjectException {
+            throws BadAsn1ObjectException {
         try {
             return Certificate.getInstance(object);
         } catch (IllegalArgumentException ex) {
@@ -100,7 +100,7 @@ public class Asn1Util {
     }
 
     public static byte[] getOctetStringBytes(final ASN1Encodable object)
-    throws BadAsn1ObjectException {
+            throws BadAsn1ObjectException {
         try {
             return DEROctetString.getInstance(object).getOctets();
         } catch (IllegalArgumentException ex) {
@@ -109,7 +109,7 @@ public class Asn1Util {
     }
 
     public static ASN1ObjectIdentifier getObjectIdentifier(final ASN1Encodable object)
-    throws BadAsn1ObjectException {
+            throws BadAsn1ObjectException {
         try {
             return ASN1ObjectIdentifier.getInstance(object);
         } catch (IllegalArgumentException ex) {

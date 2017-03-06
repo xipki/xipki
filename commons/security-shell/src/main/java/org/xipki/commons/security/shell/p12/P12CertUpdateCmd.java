@@ -118,7 +118,7 @@ public class P12CertUpdateCmd extends P12SecurityCommandSupport {
     }
 
     private void assertMatch(final X509Certificate cert, final String password)
-    throws ObjectCreationException {
+            throws ObjectCreationException {
         ConfPairs pairs = new ConfPairs("keystore", "file:" + p12File);
         if (password != null) {
             pairs.putPair("password", new String(password));

@@ -169,7 +169,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     }
 
     public X509CRL generateCrl(final RequestResponseDebug debug)
-    throws CmpRequestorException, PkiErrorException {
+            throws CmpRequestorException, PkiErrorException {
         int action = XiSecurityConstants.CMP_ACTION_GEN_CRL;
         PKIMessage request = buildMessageWithXipkAction(action, null);
         PkiResponse response = signAndSend(request, debug);
@@ -177,12 +177,12 @@ abstract class X509CmpRequestor extends CmpRequestor {
     }
 
     public X509CRL downloadCurrentCrl(final RequestResponseDebug debug)
-    throws CmpRequestorException, PkiErrorException {
+            throws CmpRequestorException, PkiErrorException {
         return downloadCrl((BigInteger) null, debug);
     }
 
     public X509CRL downloadCrl(final BigInteger crlNumber, final RequestResponseDebug debug)
-    throws CmpRequestorException, PkiErrorException {
+            throws CmpRequestorException, PkiErrorException {
         Integer action = null;
         PKIMessage request;
         if (crlNumber == null) {
@@ -198,7 +198,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     }
 
     private X509CRL evaluateCrlResponse(final PkiResponse response, final Integer xipkiAction)
-    throws CmpRequestorException, PkiErrorException {
+            throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("response", response);
 
         checkProtection(response);
@@ -282,7 +282,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
     private RevokeCertResultType parse(final PkiResponse response,
             final List<? extends IssuerSerialEntry> reqEntries)
-    throws CmpRequestorException, PkiErrorException {
+            throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("response", response);
 
         checkProtection(response);
@@ -369,7 +369,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
     public EnrollCertResultResp requestCertificate(final EnrollCertRequest req,
             final RequestResponseDebug debug)
-    throws CmpRequestorException, PkiErrorException {
+            throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("req", req);
 
         PKIMessage request = buildPkiMessage(req);
@@ -514,7 +514,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
 
     private PKIMessage buildCertConfirmRequest(final ASN1OctetString tid,
             final CertificateConfirmationContentBuilder certConfirmBuilder)
-    throws CmpRequestorException {
+            throws CmpRequestorException {
         PKIHeader header = buildPkiHeader(implicitConfirm, tid, null, (InfoTypeAndValue[]) null);
         CertificateConfirmationContent certConfirm;
         try {
@@ -527,7 +527,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     }
 
     private PKIMessage buildRevokeCertRequest(final RevokeCertRequest request)
-    throws CmpRequestorException {
+            throws CmpRequestorException {
         PKIHeader header = buildPkiHeader(null);
 
         List<RevokeCertRequestEntry> requestEntries = request.getRequestEntries();
@@ -683,7 +683,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     }
 
     public PKIMessage envelopeRevocation(final RevokeCertRequest request)
-    throws CmpRequestorException {
+            throws CmpRequestorException {
         ParamUtil.requireNonNull("request", request);
 
         PKIMessage reqMessage = buildRevokeCertRequest(request);
@@ -692,7 +692,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     }
 
     public CaInfo retrieveCaInfo(final String caName, final RequestResponseDebug debug)
-    throws CmpRequestorException, PkiErrorException {
+            throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonBlank("caName", caName);
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -788,7 +788,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
     }
 
     private static Extensions getCertTempExtensions(byte[] authorityKeyIdentifier)
-    throws CmpRequestorException {
+            throws CmpRequestorException {
         AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(authorityKeyIdentifier);
         byte[] encodedAki;
         try {

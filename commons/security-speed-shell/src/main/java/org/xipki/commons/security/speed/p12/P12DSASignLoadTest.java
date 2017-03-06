@@ -50,7 +50,7 @@ public class P12DSASignLoadTest extends P12SignLoadTest {
 
     public P12DSASignLoadTest(final SecurityFactory securityFactory,
             final String signatureAlgorithm, final int plength, final int qlength)
-    throws Exception {
+            throws Exception {
         super(securityFactory, signatureAlgorithm,
                 generateKeystore(plength, qlength),
                 "PKCS#12 DSA signature creation\n"

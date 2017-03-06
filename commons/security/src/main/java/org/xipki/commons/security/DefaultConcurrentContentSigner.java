@@ -178,7 +178,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public void initialize(final String conf, final PasswordResolver passwordResolver)
-    throws XiSecurityException {
+            throws XiSecurityException {
     }
 
     @Override
@@ -273,7 +273,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public POPOSigningKey build(final ProofOfPossessionSigningKeyBuilder builder)
-    throws NoIdleSignerException {
+            throws NoIdleSignerException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
             return builder.build(contentSigner);
@@ -284,7 +284,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public ProtectedPKIMessage build(final ProtectedPKIMessageBuilder builder)
-    throws NoIdleSignerException, CMPException {
+            throws NoIdleSignerException, CMPException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
             return builder.build(contentSigner);
@@ -305,7 +305,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public X509CertificateHolder build(final X509v3CertificateBuilder builder)
-    throws NoIdleSignerException {
+            throws NoIdleSignerException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
             return builder.build(contentSigner);
@@ -316,7 +316,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public OCSPReq build(final OCSPReqBuilder builder, final X509CertificateHolder[] chain)
-    throws NoIdleSignerException, OCSPException {
+            throws NoIdleSignerException, OCSPException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
             return builder.build(contentSigner, chain);
@@ -328,7 +328,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     @Override
     public BasicOCSPResp build(final BasicOCSPRespBuilder builder,
             final X509CertificateHolder[] chain, final Date producedAt)
-    throws NoIdleSignerException, OCSPException {
+            throws NoIdleSignerException, OCSPException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
             return builder.build(contentSigner, chain, producedAt);
@@ -339,7 +339,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public PKCS10CertificationRequest build(final PKCS10CertificationRequestBuilder builder)
-    throws NoIdleSignerException {
+            throws NoIdleSignerException {
         ContentSigner contentSigner = borrowContentSigner();
         try {
             return builder.build(contentSigner);

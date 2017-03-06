@@ -97,7 +97,7 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
     }
 
     public static Asn1GenDSAKeypairParams getInstance(final Object obj)
-    throws BadAsn1ObjectException {
+            throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1GenDSAKeypairParams) {
             return (Asn1GenDSAKeypairParams) obj;
         }

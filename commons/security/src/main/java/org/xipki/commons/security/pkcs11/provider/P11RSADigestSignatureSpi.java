@@ -192,7 +192,7 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
 
     @Override
     protected void engineUpdate(final byte[] input, final int off, final int len)
-    throws SignatureException {
+            throws SignatureException {
         digest.update(input, off, len);
     }
 

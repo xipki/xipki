@@ -95,28 +95,28 @@ public interface ConcurrentContentSigner {
     X509CertificateHolder[] getCertificateChainAsBcObjects();
 
     void initialize(@Nullable String conf, @Nullable PasswordResolver passwordResolver)
-    throws XiSecurityException;
+            throws XiSecurityException;
 
     POPOSigningKey build(@NonNull ProofOfPossessionSigningKeyBuilder builder)
-    throws NoIdleSignerException;
+            throws NoIdleSignerException;
 
     ProtectedPKIMessage build(@NonNull ProtectedPKIMessageBuilder builder)
-    throws NoIdleSignerException, CMPException;
+            throws NoIdleSignerException, CMPException;
 
     X509CRLHolder build(@NonNull X509v2CRLBuilder builder) throws NoIdleSignerException;
 
     X509CertificateHolder build(@NonNull X509v3CertificateBuilder builder)
-    throws NoIdleSignerException;
+            throws NoIdleSignerException;
 
     OCSPReq build(@NonNull OCSPReqBuilder builder, X509CertificateHolder[] chain)
-    throws NoIdleSignerException, OCSPException;
+            throws NoIdleSignerException, OCSPException;
 
     BasicOCSPResp build(@NonNull BasicOCSPRespBuilder builder,
             @Nullable X509CertificateHolder[] chain, @NonNull Date producedAt)
-    throws NoIdleSignerException, OCSPException;
+            throws NoIdleSignerException, OCSPException;
 
     PKCS10CertificationRequest build(@NonNull PKCS10CertificationRequestBuilder builder)
-    throws NoIdleSignerException;
+            throws NoIdleSignerException;
 
     byte[] sign(@NonNull byte[] data) throws NoIdleSignerException, IOException;
 

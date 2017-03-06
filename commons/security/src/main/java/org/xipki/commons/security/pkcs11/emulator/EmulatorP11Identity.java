@@ -91,7 +91,7 @@ public class EmulatorP11Identity extends P11Identity {
             final PrivateKey privateKey, final PublicKey publicKey,
             final X509Certificate[] certificateChain, final int maxSessions,
             final SecureRandom random)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
+            throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         super(slot, identityId, publicKey, certificateChain);
         this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
         this.random = ParamUtil.requireNonNull("random", random);
@@ -146,7 +146,7 @@ public class EmulatorP11Identity extends P11Identity {
 
     @Override
     protected byte[] doSign(final long mechanism, final P11Params parameters, final byte[] content)
-    throws P11TokenException, XiSecurityException {
+            throws P11TokenException, XiSecurityException {
         if (P11Constants.CKM_ECDSA == mechanism) {
             return dsaAndEcdsaSign(content, null);
         } else if (P11Constants.CKM_ECDSA_SHA1 == mechanism) {
@@ -265,7 +265,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     private byte[] rsaPkcsSign(final byte[] contentToSign, final HashAlgoType hashAlgo)
-    throws XiSecurityException {
+            throws XiSecurityException {
         int modulusBitLen = getSignatureKeyBitLength();
         byte[] paddedHash;
         if (hashAlgo == null) {
@@ -295,7 +295,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     private byte[] dsaAndEcdsaSign(final byte[] dataToSign, final HashAlgoType hashAlgo)
-    throws XiSecurityException {
+            throws XiSecurityException {
         byte[] hash = (hashAlgo == null) ? dataToSign : hashAlgo.hash(dataToSign);
 
         Signature sig;

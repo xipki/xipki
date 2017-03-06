@@ -53,7 +53,7 @@ import org.xipki.pki.scep.client.exception.ScepClientException;
 public class ScepClient extends Client {
 
     public ScepClient(final CaIdentifier caId, final CaCertValidator caCertValidator)
-    throws MalformedURLException {
+            throws MalformedURLException {
         super(caId, caCertValidator);
     }
 
@@ -98,7 +98,7 @@ public class ScepClient extends Client {
     }
 
     protected ScepHttpResponse parseResponse(final HttpURLConnection conn)
-    throws ScepClientException {
+            throws ScepClientException {
         ParamUtil.requireNonNull("conn", conn);
         try {
             InputStream inputstream = conn.getInputStream();

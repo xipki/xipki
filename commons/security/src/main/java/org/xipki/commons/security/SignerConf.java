@@ -144,7 +144,7 @@ public class SignerConf {
 
     public static SignerConf getKeystoreSignerConf(final InputStream keystoreStream,
             final String password, final String signatureAlgorithm, final int parallelism)
-    throws IOException {
+            throws IOException {
         ParamUtil.requireNonNull("keystoreStream", keystoreStream);
         ParamUtil.requireNonBlank("password", password);
         ParamUtil.requireNonNull("signatureAlgorithm", signatureAlgorithm);

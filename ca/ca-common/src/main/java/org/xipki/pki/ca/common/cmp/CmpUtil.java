@@ -68,7 +68,7 @@ public class CmpUtil {
 
     public static PKIMessage addProtection(final PKIMessage pkiMessage,
             final ConcurrentContentSigner signer, final GeneralName signerName)
-    throws CMPException, NoIdleSignerException {
+            throws CMPException, NoIdleSignerException {
         return addProtection(pkiMessage, signer, signerName, true);
     }
 

@@ -206,7 +206,7 @@ public class ScepServer {
     private static Certificate issueSubCaCert(final PrivateKey rcaKey, final X500Name issuer,
             final SubjectPublicKeyInfo pubKeyInfo, final X500Name subject,
             final BigInteger serialNumber, final Date startTime)
-    throws CertIOException, OperatorCreationException {
+            throws CertIOException, OperatorCreationException {
         Date notAfter = new Date(startTime.getTime() + CaEmulator.DAY_IN_MS * 3650);
         X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(issuer,
                 serialNumber, startTime, notAfter, subject, pubKeyInfo);

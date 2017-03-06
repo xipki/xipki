@@ -268,7 +268,7 @@ public abstract class KeyEntry {
 
         // CHECKSTYLE:OFF
         private void init(final String p, final String q, final String g, final String y)
-        throws IOException {
+            throws IOException {
             // CHECKSTYLE:ON
             init(base64ToInt(p), base64ToInt(q), base64ToInt(g), base64ToInt(y));
         }

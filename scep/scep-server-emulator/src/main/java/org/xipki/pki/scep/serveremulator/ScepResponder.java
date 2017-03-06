@@ -122,7 +122,7 @@ public class ScepResponder {
 
     public ScepResponder(final CaCaps caCaps, final CaEmulator caEmulator,
             final RaEmulator raEmulator, final NextCaAndRa nextCaAndRa, final ScepControl control)
-    throws Exception {
+            throws Exception {
         this.caCaps = ParamUtil.requireNonNull("caCaps", caCaps);
         this.caEmulator = ParamUtil.requireNonNull("caEmulator", caEmulator);
         this.control = ParamUtil.requireNonNull("control", control);

@@ -79,7 +79,7 @@ public class P11ContentSignerBuilder {
     public P11ContentSignerBuilder(final P11CryptService cryptService,
             final SecurityFactory securityFactory, final P11EntityIdentifier identityId,
             final X509Certificate[] certificateChain)
-    throws XiSecurityException, P11TokenException {
+            throws XiSecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
@@ -179,7 +179,7 @@ public class P11ContentSignerBuilder {
 
     // CHECKSTYLE:SKIP
     private ContentSigner createRSAContentSigner(AlgorithmIdentifier signatureAlgId)
-    throws XiSecurityException, P11TokenException {
+            throws XiSecurityException, P11TokenException {
         if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
             return new P11RSAPSSContentSigner(cryptService, identityId, signatureAlgId,
                     securityFactory.getRandom4Sign());
@@ -190,14 +190,14 @@ public class P11ContentSignerBuilder {
 
     // CHECKSTYLE:SKIP
     private ContentSigner createECContentSigner(AlgorithmIdentifier signatureAlgId)
-    throws XiSecurityException, P11TokenException {
+            throws XiSecurityException, P11TokenException {
         return new P11ECDSAContentSigner(cryptService, identityId, signatureAlgId,
                 AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
     }
 
     // CHECKSTYLE:SKIP
     private ContentSigner createDSAContentSigner(AlgorithmIdentifier signatureAlgId)
-    throws XiSecurityException, P11TokenException {
+            throws XiSecurityException, P11TokenException {
         return new P11DSAContentSigner(cryptService, identityId, signatureAlgId,
                 AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
     }

@@ -53,7 +53,7 @@ public class P11ECSignLoadTest extends P11SignLoadTest {
     }
 
     private static P11ObjectIdentifier generateKey(final P11Slot slot, final String curveNameOrOid)
-    throws Exception {
+            throws Exception {
         ParamUtil.requireNonNull("slot", slot);
         ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
         return slot.generateECKeypair(curveNameOrOid, "loadtest-" + System.currentTimeMillis());

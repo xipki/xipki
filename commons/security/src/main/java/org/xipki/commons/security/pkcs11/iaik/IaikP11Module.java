@@ -70,7 +70,7 @@ public class IaikP11Module extends AbstractP11Module {
     private Module module;
 
     private IaikP11Module(final Module module, final P11ModuleConf moduleConf)
-    throws P11TokenException {
+            throws P11TokenException {
         super(moduleConf);
         this.module = ParamUtil.requireNonNull("module", module);
 

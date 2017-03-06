@@ -176,7 +176,7 @@ abstract class CmpRequestor {
     }
 
     protected PkiResponse signAndSend(final PKIMessage request, final RequestResponseDebug debug)
-    throws CmpRequestorException {
+            throws CmpRequestorException {
         ParamUtil.requireNonNull("request", request);
 
         PKIMessage tmpRequest = (signRequest) ? sign(request) : request;
@@ -253,7 +253,7 @@ abstract class CmpRequestor {
 
     private ASN1Encodable extractGeneralRepContent(final PkiResponse response,
             final String expectedType, final boolean requireProtectionCheck)
-    throws CmpRequestorException, PkiErrorException {
+            throws CmpRequestorException, PkiErrorException {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonNull("expectedType", expectedType);
         if (requireProtectionCheck) {
@@ -403,7 +403,7 @@ abstract class CmpRequestor {
 
     private ProtectionVerificationResult verifyProtection(final String tid,
             final GeneralPKIMessage pkiMessage)
-    throws CMPException, InvalidKeyException, OperatorCreationException {
+            throws CMPException, InvalidKeyException, OperatorCreationException {
         ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
         if (protectedMsg.hasPasswordBasedMacProtection()) {
@@ -457,7 +457,7 @@ abstract class CmpRequestor {
     } // method verifyProtection
 
     protected PKIMessage buildMessageWithXipkAction(final int action, final ASN1Encodable value)
-    throws CmpRequestorException {
+            throws CmpRequestorException {
         PKIHeader header = buildPkiHeader(null);
 
         ASN1EncodableVector vec = new ASN1EncodableVector();

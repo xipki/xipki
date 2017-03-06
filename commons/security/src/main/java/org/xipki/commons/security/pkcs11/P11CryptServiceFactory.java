@@ -50,7 +50,7 @@ public interface P11CryptServiceFactory {
     String DEFAULT_P11MODULE_NAME = "default";
 
     P11CryptService getP11CryptService(@NonNull String moduleName)
-    throws P11TokenException, XiSecurityException;
+            throws P11TokenException, XiSecurityException;
 
     Set<String> getModuleNames();
 

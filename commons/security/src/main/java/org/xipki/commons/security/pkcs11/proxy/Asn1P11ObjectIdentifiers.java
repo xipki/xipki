@@ -73,7 +73,7 @@ public class Asn1P11ObjectIdentifiers extends ASN1Object {
     }
 
     public static Asn1P11ObjectIdentifiers getInstance(final Object obj)
-    throws BadAsn1ObjectException {
+            throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1P11ObjectIdentifiers) {
             return (Asn1P11ObjectIdentifiers) obj;
         }
