@@ -52,7 +52,7 @@ public class CaRequestsWriter extends DbiXmlWriter {
     }
 
     public void add(final CaRequestType request)
-    throws InvalidDataObjectException, XMLStreamException {
+            throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("request", request);
         request.validate();
         request.writeTo(this);

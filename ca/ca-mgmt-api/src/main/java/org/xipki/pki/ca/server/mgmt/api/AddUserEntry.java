@@ -50,7 +50,7 @@ public class AddUserEntry {
     private final String cnRegex;
 
     public AddUserEntry(final String name, final String password, final String cnRegex)
-    throws CaMgmtException {
+            throws CaMgmtException {
         this.name = ParamUtil.requireNonBlank("name", name);
         this.password = ParamUtil.requireNonBlank("password", password);
         this.cnRegex = ParamUtil.requireNonBlank("cnRegex", cnRegex);

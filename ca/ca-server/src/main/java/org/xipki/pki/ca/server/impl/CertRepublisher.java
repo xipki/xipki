@@ -103,7 +103,8 @@ class CertRepublisher {
                     }
 
                     startId = maxId + 1;
-                } while (serials.size() >= numEntries && !failed && !stopMe.get());
+                }
+                while (serials.size() >= numEntries && !failed && !stopMe.get());
 
                 queue.put(EndOfQueue.INSTANCE);
             } catch (OperationException ex) {

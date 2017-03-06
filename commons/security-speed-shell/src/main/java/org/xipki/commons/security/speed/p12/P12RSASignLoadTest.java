@@ -51,14 +51,14 @@ public class P12RSASignLoadTest extends P12SignLoadTest {
 
     public P12RSASignLoadTest(final SecurityFactory securityFactory,
             final String signatureAlgorithm, final int keysize, final BigInteger publicExponent)
-    throws Exception {
+            throws Exception {
         super(securityFactory, signatureAlgorithm, generateKeystore(keysize, publicExponent),
                 "PKCS#12 RSA signature creation\nkeysize: " + keysize + "\n"
                         + "public exponent: " + publicExponent);
     }
 
     private static byte[] generateKeystore(final int keysize, final BigInteger publicExponent)
-    throws Exception {
+            throws Exception {
         byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
         if (keystoreBytes == null) {
             P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(

@@ -88,7 +88,7 @@ class PrivateKeyCryptor {
     }
 
     PrivateKey decrypt(final PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo)
-    throws P11TokenException {
+            throws P11TokenException {
         ParamUtil.requireNonNull("encryptedPrivateKeyInfo", encryptedPrivateKeyInfo);
         PrivateKeyInfo privateKeyInfo;
         synchronized (decryptorProvider) {

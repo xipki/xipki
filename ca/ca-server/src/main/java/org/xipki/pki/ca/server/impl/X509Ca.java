@@ -502,7 +502,7 @@ public class X509Ca {
     }
 
     public X509Certificate getCertificate(final BigInteger serialNumber)
-    throws CertificateException, OperationException {
+            throws CertificateException, OperationException {
         X509CertificateInfo certInfo = certstore.getCertificateInfoForSerial(
                 caInfo.getCertificate(), serialNumber);
         return (certInfo == null) ? null : certInfo.getCert().getCert();
@@ -528,24 +528,24 @@ public class X509Ca {
     }
 
     public X509CertWithRevocationInfo getCertWithRevocationInfo(final BigInteger serialNumber)
-    throws CertificateException, OperationException {
+            throws CertificateException, OperationException {
         return certstore.getCertWithRevocationInfo(caInfo.getCertificate(), serialNumber);
     }
 
     public byte[] getCertRequest(final BigInteger serialNumber)
-    throws OperationException {
+            throws OperationException {
         return certstore.getCertRequest(caInfo.getCertificate(), serialNumber);
     }
 
     public List<CertListInfo> listCertificates(final X500Name subjectPattern, final Date validFrom,
             final Date validTo, final CertListOrderBy orderBy, final int numEntries)
-    throws OperationException {
+            throws OperationException {
         return certstore.listCertificates(caInfo.getCertificate(), subjectPattern, validFrom,
                 validTo, orderBy, numEntries);
     }
 
     public boolean authenticateUser(final String user, final byte[] password)
-    throws OperationException {
+            throws OperationException {
         return certstore.authenticateUser(user, password);
     }
 
@@ -554,12 +554,12 @@ public class X509Ca {
     }
 
     public X509CRL getCurrentCrl()
-    throws OperationException {
+            throws OperationException {
         return getCrl(null);
     }
 
     public X509CRL getCrl(final BigInteger crlNumber)
-    throws OperationException {
+            throws OperationException {
         String caName = getCaName();
         LOG.info("     START getCrl: ca={}, crlNumber={}", caName, crlNumber);
         boolean successful = false;
@@ -591,12 +591,12 @@ public class X509Ca {
     } // method getCrl
 
     public CertificateList getBcCurrentCrl()
-    throws OperationException {
+            throws OperationException {
         return getBcCrl(null);
     }
 
     public CertificateList getBcCrl(final BigInteger crlNumber)
-    throws OperationException {
+            throws OperationException {
         String caName = getCaName();
         LOG.info("     START getCrl: ca={}, crlNumber={}", caName, crlNumber);
         boolean successful = false;
@@ -626,7 +626,7 @@ public class X509Ca {
     } // method getCrl
 
     private void cleanupCrlsWithoutException(final String msgId)
-    throws OperationException {
+            throws OperationException {
         try {
             cleanupCrls(msgId);
         } catch (Throwable th) {
@@ -659,7 +659,7 @@ public class X509Ca {
     } // method cleanupCrls
 
     public X509CRL generateCrlOnDemand(final String msgId)
-    throws OperationException {
+            throws OperationException {
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
         if (crlSigner == null) {
             throw new OperationException(ErrorCode.NOT_PERMITTED, "CA could not generate CRL");
@@ -709,7 +709,7 @@ public class X509Ca {
 
     private X509CRL doGenerateCrl(final boolean deltaCrl, final Date thisUpdate,
             final Date nextUpdate, final AuditEvent event, final String msgId)
-    throws OperationException {
+            throws OperationException {
         X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
         if (crlSigner == null) {
             throw new OperationException(ErrorCode.NOT_PERMITTED, "CRL generation is not allowed");
@@ -843,8 +843,8 @@ public class X509Ca {
                 } // end for
 
                 startId = maxId + 1;
-
-            } while (revInfos.size() >= numEntries);
+            }
+            while (revInfos.size() >= numEntries);
             // end do
 
             BigInteger crlNumber = caInfo.nextCrlNumber();
@@ -999,7 +999,8 @@ public class X509Ca {
             } // end for
 
             startId = maxId + 1;
-        } while (serials.size() >= numEntries);
+        }
+        while (serials.size() >= numEntries);
         // end do
 
         try {
@@ -1014,7 +1015,7 @@ public class X509Ca {
     public X509CertificateInfo regenerateCertificate(final CertTemplateData certTemplate,
             final RequestorInfo requestor,
             final RequestType reqType, final byte[] transactionId, final String msgId)
-    throws OperationException {
+            throws OperationException {
         return regenerateCertificates(Arrays.asList(certTemplate), requestor,
                 reqType, transactionId, msgId).get(0);
     }
@@ -1023,7 +1024,7 @@ public class X509Ca {
             final List<CertTemplateData> certTemplates,
             final RequestorInfo requestor, final RequestType reqType,
             final byte[] transactionId, final String msgId)
-    throws OperationException {
+            throws OperationException {
         return generateCertificates(certTemplates, requestor, true, reqType,
                 transactionId, msgId);
     }
@@ -1257,7 +1258,7 @@ public class X509Ca {
 
     public X509CertWithRevocationInfo revokeCertificate(final BigInteger serialNumber,
             final CrlReason reason, final Date invalidityTime, final String msgId)
-    throws OperationException {
+            throws OperationException {
         if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
             throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "insufficient permission to revoke CA certificate");
@@ -1300,7 +1301,7 @@ public class X509Ca {
     } // method revokeCertificate
 
     public X509CertWithDbId unrevokeCertificate(final BigInteger serialNumber, final String msgId)
-    throws OperationException {
+            throws OperationException {
         if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
             throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "insufficient permission unrevoke CA certificate");
@@ -1318,7 +1319,7 @@ public class X509Ca {
     } // method unrevokeCertificate
 
     public X509CertWithDbId removeCertificate(final BigInteger serialNumber, String msgId)
-    throws OperationException {
+            throws OperationException {
         if (caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber)) {
             throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "insufficient permission remove CA certificate");
@@ -1337,7 +1338,7 @@ public class X509Ca {
 
     private X509CertWithDbId doRemoveCertificate(final BigInteger serialNumber,
             final AuditEvent event)
-    throws OperationException {
+            throws OperationException {
         event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
         X509CertWithRevocationInfo certWithRevInfo =
                 certstore.getCertWithRevocationInfo(caInfo.getCertificate(), serialNumber);
@@ -1444,7 +1445,7 @@ public class X509Ca {
 
     private X509CertWithRevocationInfo revokeSuspendedCert(final BigInteger serialNumber,
             final CrlReason reason, final String msgId)
-    throws OperationException {
+            throws OperationException {
         AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_revoke_suspendedCert, msgId);
 
         boolean successful = false;
@@ -1459,7 +1460,7 @@ public class X509Ca {
 
     private X509CertWithRevocationInfo doRevokeSuspendedCert(final BigInteger serialNumber,
             final CrlReason reason, final AuditEvent event)
-    throws OperationException {
+            throws OperationException {
         String hexSerial = LogUtil.formatCsn(serialNumber);
 
         event.addEventData(CaAuditConstants.NAME_serial, hexSerial);
@@ -1577,7 +1578,7 @@ public class X509Ca {
     } // method shouldPublishToDeltaCrlCache
 
     public void revokeCa(final CertRevocationInfo revocationInfo, final String msgId)
-    throws OperationException {
+            throws OperationException {
         ParamUtil.requireNonNull("revocationInfo", revocationInfo);
         caInfo.setRevocationInfo(revocationInfo);
 
@@ -1666,7 +1667,7 @@ public class X509Ca {
             final List<CertTemplateData> certTemplates,
             final RequestorInfo requestor, final RequestType reqType,
             final byte[] transactionId, final String msgId)
-    throws OperationException {
+            throws OperationException {
         return generateCertificates(certTemplates, requestor, false, reqType,
                 transactionId, msgId);
     }
@@ -1675,7 +1676,7 @@ public class X509Ca {
             final List<CertTemplateData> certTemplates,
             final RequestorInfo requestor, final boolean keyUpdate,
             final RequestType reqType, final byte[] transactionId, final String msgId)
-    throws OperationExceptionWithIndex {
+            throws OperationExceptionWithIndex {
         ParamUtil.requireNonEmpty("certTemplates", certTemplates);
         final int n = certTemplates.size();
         List<GrantedCertTemplate> gcts = new ArrayList<>(n);
@@ -1756,7 +1757,7 @@ public class X509Ca {
     public X509CertificateInfo generateCertificate(final CertTemplateData certTemplate,
             final RequestorInfo requestor, final RequestType reqType, final byte[] transactionId,
             final String msgId)
-    throws OperationException {
+            throws OperationException {
         ParamUtil.requireNonNull("certTemplate", certTemplate);
         return generateCertificates(Arrays.asList(certTemplate), requestor,
                 reqType, transactionId, msgId).get(0);
@@ -1765,7 +1766,7 @@ public class X509Ca {
     private X509CertificateInfo generateCertificate(final GrantedCertTemplate gct,
             final RequestorInfo requestor, final boolean keyUpdate, final RequestType reqType,
             final byte[] transactionId, final String msgId)
-    throws OperationException {
+            throws OperationException {
         AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_gen_cert, msgId);
 
         boolean successful = false;
@@ -1782,7 +1783,7 @@ public class X509Ca {
     private X509CertificateInfo doGenerateCertificate(final GrantedCertTemplate gct,
             final RequestorInfo requestor, final boolean keyUpdate, final RequestType reqType,
             final byte[] transactionId, final AuditEvent event)
-    throws OperationException {
+            throws OperationException {
         ParamUtil.requireNonNull("gct", gct);
 
         event.addEventData(CaAuditConstants.NAME_reqSubject,
@@ -1979,7 +1980,7 @@ public class X509Ca {
 
     private GrantedCertTemplate createGrantedCertTemplate(final CertTemplateData certTemplate,
             final RequestorInfo requestor, final boolean keyUpdate)
-    throws OperationException {
+            throws OperationException {
         ParamUtil.requireNonNull("certTemplate", certTemplate);
         if (caInfo.getRevocationInfo() != null) {
             throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
@@ -2338,7 +2339,7 @@ public class X509Ca {
     } // method getCrlNextUpdate
 
     private int removeExpirtedCerts(final Date expiredAtTime, final String msgId)
-    throws OperationException {
+            throws OperationException {
         LOG.debug("revoking suspended certificates");
         AuditEvent event = newPerfAuditEvent(CaAuditConstants.TYPE_remove_expiredCerts, msgId);
         boolean successful = false;
@@ -2354,7 +2355,7 @@ public class X509Ca {
 
     private int doRemoveExpirtedCerts(final Date expiredAtTime, final AuditEvent event,
             final String msgId)
-    throws OperationException {
+            throws OperationException {
         ParamUtil.requireNonNull("expiredtime", expiredAtTime);
         if (!masterMode) {
             throw new OperationException(ErrorCode.NOT_PERMITTED,
@@ -2410,7 +2411,7 @@ public class X509Ca {
     }
 
     private int doRevokeSuspendedCerts(final AuditEvent event, final String msgId)
-    throws OperationException {
+            throws OperationException {
         if (!masterMode) {
             throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "CA could not remove expired certificates in slave mode");

@@ -230,7 +230,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
 
     private void doDigestNoTableId(final ProcessLog processLog,
             final CaEntryContainer caEntryContainer, final Map<String, EjbcaCaInfo> caInfos)
-    throws Exception {
+            throws Exception {
         int skippedAccount = 0;
         String lastProcessedHexCertFp;
 

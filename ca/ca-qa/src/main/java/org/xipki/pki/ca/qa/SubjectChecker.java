@@ -153,7 +153,7 @@ public class SubjectChecker {
 
     private ValidationIssue checkSubjectAttribute(final ASN1ObjectIdentifier type,
             final X500Name subject, final X500Name requestedSubject)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         boolean multiValuedRdn = subjectControl.getGroup(type) != null;
         if (multiValuedRdn) {
             return checkSubjectAttributeMultiValued(type, subject, requestedSubject);
@@ -164,7 +164,7 @@ public class SubjectChecker {
 
     private ValidationIssue checkSubjectAttributeNotMultiValued(final ASN1ObjectIdentifier type,
             final X500Name subject, final X500Name requestedSubject)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         ValidationIssue issue = createSubjectIssue(type);
 
         // control
@@ -248,7 +248,7 @@ public class SubjectChecker {
 
     private ValidationIssue checkSubjectAttributeMultiValued(final ASN1ObjectIdentifier type,
             final X500Name subject, final X500Name requestedSubject)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         ValidationIssue issue = createSubjectIssue(type);
 
         RDN[] rdns = subject.getRDNs(type);
@@ -450,7 +450,7 @@ public class SubjectChecker {
     }
 
     private static String getRdnTextValueOfRequest(final RDN requestedRdn)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         ASN1ObjectIdentifier type = requestedRdn.getFirst().getType();
         ASN1Encodable vec = requestedRdn.getFirst().getValue();
         if (ObjectIdentifiers.DN_DATE_OF_BIRTH.equals(type)) {

@@ -82,7 +82,7 @@ public class P11EnrollCertCmd extends EnrollCertCommandSupport {
 
     @Override
     protected ConcurrentContentSigner getSigner(final SignatureAlgoControl signatureAlgoControl)
-    throws ObjectCreationException {
+            throws ObjectCreationException {
         byte[] keyIdBytes = null;
         if (keyId != null) {
             keyIdBytes = Hex.decode(keyId);

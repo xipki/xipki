@@ -91,7 +91,7 @@ public class CaCrlType extends IdentifidDbObjectType {
 
     @Override
     public void writeTo(final DbiXmlWriter writer)
-    throws InvalidDataObjectException, XMLStreamException {
+            throws InvalidDataObjectException, XMLStreamException {
         validate();
 
         writer.writeStartElement(TAG_ROOT);

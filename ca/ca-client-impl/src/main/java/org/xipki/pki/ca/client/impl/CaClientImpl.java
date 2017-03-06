@@ -605,7 +605,7 @@ public final class CaClientImpl implements CaClient {
     } // method requestCerts
 
     private void checkCertprofileSupportInCa(final String certprofile, final String caName)
-    throws CaClientException {
+            throws CaClientException {
         String tmpCaName = caName;
         if (tmpCaName != null) {
             CaConf ca = casMap.get(tmpCaName.trim());
@@ -644,7 +644,7 @@ public final class CaClientImpl implements CaClient {
     @Override
     public CertIdOrError revokeCert(final String caName, final X509Certificate cert,
             final int reason, final Date invalidityDate, final RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException {
+            throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("cert", cert);
         CaConf ca = getCa(caName);
         assertIssuedByCa(cert, ca);
@@ -654,14 +654,14 @@ public final class CaClientImpl implements CaClient {
     @Override
     public CertIdOrError revokeCert(final String caName, final BigInteger serial,
             final int reason, final Date invalidityDate, final RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException {
+            throws CaClientException, PkiErrorException {
         CaConf ca = getCa(caName);
         return revokeCert(ca, serial, reason, invalidityDate, debug);
     }
 
     private CertIdOrError revokeCert(final CaConf ca, final BigInteger serial,
             final int reason, final Date invalidityDate, final RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException {
+            throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("ca", ca);
         ParamUtil.requireNonNull("serial", serial);
 
@@ -709,7 +709,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     private Map<String, CertIdOrError> parseRevokeCertResult(final RevokeCertResultType result)
-    throws CaClientException {
+            throws CaClientException {
         Map<String, CertIdOrError> ret = new HashMap<>();
 
         for (ResultEntry re : result.getResultEntries()) {
@@ -732,7 +732,7 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public X509CRL downloadCrl(final String caName, final RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException {
+            throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("caName", caName);
         return downloadCrl(caName, (BigInteger) null, debug);
     }
@@ -762,7 +762,7 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public X509CRL generateCrl(final String caName, final RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException {
+            throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("caName", caName);
 
         CaConf ca = casMap.get(caName.trim());
@@ -819,7 +819,7 @@ public final class CaClientImpl implements CaClient {
     }
 
     private java.security.cert.Certificate getCertificate(final CMPCertificate cmpCert)
-    throws CertificateException {
+            throws CertificateException {
         Certificate bcCert = cmpCert.getX509v3PKCert();
         return (bcCert == null) ? null : X509Util.toX509Cert(bcCert);
     }
@@ -840,7 +840,7 @@ public final class CaClientImpl implements CaClient {
     @Override
     public byte[] envelope(final CertRequest certRequest, final ProofOfPossession pop,
             final String profileName, final String caName)
-    throws CaClientException {
+            throws CaClientException {
         ParamUtil.requireNonNull("certRequest", certRequest);
         ParamUtil.requireNonNull("pop", pop);
         ParamUtil.requireNonNull("profileName", profileName);
@@ -970,7 +970,7 @@ public final class CaClientImpl implements CaClient {
 
     @Override
     public byte[] envelopeRevocation(final X509Certificate cert, final int reason)
-    throws CaClientException {
+            throws CaClientException {
         ParamUtil.requireNonNull("cert", cert);
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
         return envelopeRevocation(issuer, cert.getSerialNumber(), reason);
@@ -1043,7 +1043,7 @@ public final class CaClientImpl implements CaClient {
     @Override
     public CertIdOrError removeCert(final String caName, final X509Certificate cert,
             final RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException {
+            throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("cert", cert);
         CaConf ca = getCa(caName);
         assertIssuedByCa(cert, ca);
@@ -1053,14 +1053,14 @@ public final class CaClientImpl implements CaClient {
     @Override
     public CertIdOrError removeCert(final String caName, final BigInteger serial,
             final RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException {
+            throws CaClientException, PkiErrorException {
         CaConf ca = getCa(caName);
         return removeCert(ca, serial, debug);
     }
 
     private CertIdOrError removeCert(final CaConf ca, final BigInteger serial,
             final RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException {
+            throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("ca", ca);
         ParamUtil.requireNonNull("serial", serial);
         final String id = "cert-1";
@@ -1079,7 +1079,7 @@ public final class CaClientImpl implements CaClient {
     @Override
     public Map<String, CertIdOrError> removeCerts(final UnrevokeOrRemoveCertRequest request,
             final RequestResponseDebug debug)
-    throws CaClientException, PkiErrorException {
+            throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
         doInit(false);

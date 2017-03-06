@@ -64,7 +64,7 @@ public class IssuerHash {
     }
 
     public IssuerHash(final HashAlgoType hashAlgo, final Certificate issuerCert)
-    throws IOException {
+            throws IOException {
         this.hashAlgo = ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         ParamUtil.requireNonNull("issuerCert", issuerCert);
 

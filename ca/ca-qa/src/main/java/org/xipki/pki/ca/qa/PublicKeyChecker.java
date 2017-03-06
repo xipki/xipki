@@ -78,7 +78,7 @@ public class PublicKeyChecker {
     private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
     public PublicKeyChecker(final Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms)
-    throws CertprofileException {
+            throws CertprofileException {
         this.keyAlgorithms = keyAlgorithms;
     }
 
@@ -117,7 +117,7 @@ public class PublicKeyChecker {
     } // method checkPublicKey
 
     private void checkPublicKey(final SubjectPublicKeyInfo publicKey)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         if (CollectionUtil.isEmpty(keyAlgorithms)) {
             return;
         }
@@ -228,7 +228,7 @@ public class PublicKeyChecker {
     // CHECKSTYLE:SKIP
     private static void checkECSubjectPublicKeyInfo(final ASN1ObjectIdentifier curveOid,
             final byte[] encoded)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         Integer expectedLength = EC_CURVEFIELD_SIZES.get(curveOid);
         if (expectedLength == null) {
             X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);

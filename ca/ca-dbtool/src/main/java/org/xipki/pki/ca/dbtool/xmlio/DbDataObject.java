@@ -50,14 +50,14 @@ public abstract class DbDataObject {
     }
 
     protected void assertNotBlank(final String name, final String value)
-    throws InvalidDataObjectException {
+            throws InvalidDataObjectException {
         if (StringUtil.isBlank(value)) {
             throw new InvalidDataObjectException(name + " must not be blank");
         }
     }
 
     protected void assertNotNull(final String name, final Object value)
-    throws InvalidDataObjectException {
+            throws InvalidDataObjectException {
         if (value == null) {
             throw new InvalidDataObjectException(name + " must not be null");
         }
@@ -86,6 +86,6 @@ public abstract class DbDataObject {
     public abstract void validate() throws InvalidDataObjectException;
 
     public abstract void writeTo(@NonNull DbiXmlWriter os)
-    throws InvalidDataObjectException, XMLStreamException;
+            throws InvalidDataObjectException, XMLStreamException;
 
 }

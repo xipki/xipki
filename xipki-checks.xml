@@ -28,6 +28,10 @@
 
     <property name="fileExtensions" value="java, properties, xml"/>
 	
+    <module name="SuppressionFilter">
+        <property name="file" value="./checks-suppressions.xml"/>
+    </module>
+	
     <module name="NewlineAtEndOfFile"/>
 	
     <!-- Checks for whitespace                               -->

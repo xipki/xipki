@@ -78,7 +78,7 @@ public class X509IssuerInfo {
     public X509IssuerInfo(final List<String> caIssuerUrls, final List<String> ocspUrls,
             final List<String> crlUrls, final List<String> deltaCrlUrls, final byte[] certBytes,
             final boolean cutoffNotAfter)
-    throws CertificateException {
+            throws CertificateException {
         ParamUtil.requireNonNull("certBytes", certBytes);
 
         this.cutoffNotAfter = cutoffNotAfter;

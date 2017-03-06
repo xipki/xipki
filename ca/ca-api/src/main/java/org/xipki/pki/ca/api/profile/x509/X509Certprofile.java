@@ -96,7 +96,7 @@ public abstract class X509Certprofile {
     }
 
     public String incSerialNumber(@Nullable final String currentSerialNumber)
-    throws BadFormatException {
+            throws BadFormatException {
         try {
             int currentSn = (currentSerialNumber == null) ? 0
                     : Integer.parseInt(currentSerialNumber.trim());
@@ -164,17 +164,17 @@ public abstract class X509Certprofile {
     public abstract CertValidity getValidity();
 
     public abstract SubjectPublicKeyInfo checkPublicKey(@NonNull SubjectPublicKeyInfo publicKey)
-    throws BadCertTemplateException;
+            throws BadCertTemplateException;
 
     public abstract SubjectInfo getSubject(@NonNull X500Name requestedSubject)
-    throws CertprofileException, BadCertTemplateException;
+            throws CertprofileException, BadCertTemplateException;
 
     public abstract ExtensionValues getExtensions(
             @NonNull Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
             @NonNull X500Name requestedSubject, @NonNull X500Name grantedSubject,
             @Nullable Extensions requestedExtensions, @NonNull Date notBefore,
             @NonNull Date notAfter)
-    throws CertprofileException, BadCertTemplateException;
+            throws CertprofileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();
 

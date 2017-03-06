@@ -261,7 +261,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
     }
 
     protected void engineInitSign(final PrivateKey privateKey, final SecureRandom random)
-    throws InvalidKeyException {
+            throws InvalidKeyException {
         if (!(privateKey instanceof P11PrivateKey)) {
             throw new InvalidKeyException("privateKey is not instanceof "
                     + P11PrivateKey.class.getName());
@@ -298,7 +298,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
     @Override
     protected void engineUpdate(final byte[] input, final int off, final int len)
-    throws SignatureException {
+            throws SignatureException {
         pss.update(input, off, len);
     }
 
@@ -318,7 +318,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
 
     @Override
     protected void engineSetParameter(final AlgorithmParameterSpec params)
-    throws InvalidParameterException {
+            throws InvalidParameterException {
         if (params instanceof PSSParameterSpec) {
             PSSParameterSpec newParamSpec = (PSSParameterSpec) params;
 

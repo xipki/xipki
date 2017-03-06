@@ -166,7 +166,7 @@ public class DbPorter extends DbToolBase {
     }
 
     protected FileOrValueType buildFileOrValue(final String content, final String fileName)
-    throws IOException {
+            throws IOException {
         if (content == null) {
             return null;
         }
@@ -213,7 +213,7 @@ public class DbPorter extends DbToolBase {
     }
 
     protected FileOrBinaryType buildFileOrBinary(final byte[] content, final String fileName)
-    throws IOException {
+            throws IOException {
         if (content == null) {
             return null;
         }

@@ -239,7 +239,7 @@ public class DbCertStatusStore extends OcspStore {
     } // method initIssuerStore
 
     private Map<HashAlgoType, IssuerHashNameAndKey> getIssuerHashAndKeys(byte[] encodedCert)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         byte[] encodedName;
         byte[] encodedKey;
         try {
@@ -428,7 +428,7 @@ public class DbCertStatusStore extends OcspStore {
      *     PreparedStatement can be created within 5 seconds.
      */
     private PreparedStatement borrowPreparedStatement(final String sqlQuery)
-    throws DataAccessException {
+            throws DataAccessException {
         PreparedStatement ps = null;
         Connection conn = datasource.getConnection();
         if (conn != null) {
@@ -538,7 +538,7 @@ public class DbCertStatusStore extends OcspStore {
     }
 
     private static Set<X509Certificate> parseCerts(final Set<String> certFiles)
-    throws OcspStoreException {
+            throws OcspStoreException {
         Set<X509Certificate> certs = new HashSet<>(certFiles.size());
         for (String certFile : certFiles) {
             try {

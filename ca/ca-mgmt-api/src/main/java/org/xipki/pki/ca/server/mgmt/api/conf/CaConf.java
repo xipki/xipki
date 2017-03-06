@@ -137,7 +137,7 @@ public class CaConf {
     private final Map<String, ScepEntry> sceps = new HashMap<>();
 
     public CaConf(final String confFilename, final SecurityFactory securityFactory)
-    throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
+            throws IOException, InvalidConfException, CaMgmtException, JAXBException, SAXException {
         ParamUtil.requireNonBlank("confFilename", confFilename);
         ParamUtil.requireNonNull("securityFactory", securityFactory);
 
@@ -208,7 +208,7 @@ public class CaConf {
     }
 
     public static void marshal(final CAConfType jaxb, final OutputStream out)
-    throws JAXBException, SAXException {
+            throws JAXBException, SAXException {
         ParamUtil.requireNonNull("jaxb", jaxb);
         ParamUtil.requireNonNull("out", out);
 
@@ -229,7 +229,7 @@ public class CaConf {
 
     private void init(final CAConfType jaxb, final String baseDir, final ZipFile zipFile,
             final SecurityFactory securityFactory)
-    throws IOException, InvalidConfException, CaMgmtException {
+            throws IOException, InvalidConfException, CaMgmtException {
         // Properties
         if (baseDir != null) {
             properties.put("baseDir", baseDir);
@@ -574,7 +574,7 @@ public class CaConf {
     }
 
     private String getValue(final FileOrValueType fileOrValue, final ZipFile zipFile)
-    throws IOException {
+            throws IOException {
         if (fileOrValue == null) {
             return null;
         }
@@ -600,13 +600,13 @@ public class CaConf {
     }
 
     private String getBase64Binary(final FileOrBinaryType fileOrBinary, final ZipFile zipFile)
-    throws IOException {
+            throws IOException {
         byte[] binary = getBinary(fileOrBinary, zipFile);
         return (binary == null) ? null : Base64.toBase64String(binary);
     }
 
     private byte[] getBinary(final FileOrBinaryType fileOrBinary, final ZipFile zipFile)
-    throws IOException {
+            throws IOException {
         if (fileOrBinary == null) {
             return null;
         }

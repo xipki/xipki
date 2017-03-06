@@ -669,7 +669,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                                 + System.currentTimeMillis() + ".zip");
                         currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
                     }
-                } while (rs.next());
+                }
+                while (rs.next());
 
                 rs.close();
             } // end for
@@ -711,7 +712,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     } // method doExportEntries
 
     private void exportPublishQueue(final CertStoreType certstore)
-    throws DataAccessException, IOException, JAXBException {
+            throws DataAccessException, IOException, JAXBException {
         System.out.println("exporting table PUBLISHQUEUE");
 
         StringBuilder sqlBuilder = new StringBuilder("SELECT CID,PID,CA_ID");
@@ -761,7 +762,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     } // method exportPublishQueue
 
     private void exportDeltaCrlCache(final CertStoreType certstore)
-    throws DataAccessException, IOException, JAXBException {
+            throws DataAccessException, IOException, JAXBException {
         System.out.println("exporting table DELTACRL_CACHE");
 
         final String sql = "SELECT SN,CA_ID FROM DELTACRL_CACHE";
@@ -815,8 +816,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         return info;
     }
 
-    private static DbiXmlWriter createWriter(final CaDbEntryType type) throws IOException,
-    XMLStreamException {
+    private static DbiXmlWriter createWriter(final CaDbEntryType type)
+            throws IOException, XMLStreamException {
         switch (type) {
         case CERT:
             return new CaCertsWriter();

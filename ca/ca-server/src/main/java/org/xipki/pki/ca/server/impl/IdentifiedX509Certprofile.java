@@ -170,7 +170,7 @@ class IdentifiedX509Certprofile {
     private final X509Certprofile certprofile;
 
     IdentifiedX509Certprofile(final CertprofileEntry dbEntry, final X509Certprofile certProfile)
-    throws CertprofileException {
+            throws CertprofileException {
         this.dbEntry = ParamUtil.requireNonNull("entry", dbEntry);
         this.name = dbEntry.getName();
         this.certprofile = ParamUtil.requireNonNull("certProfile", certProfile);
@@ -241,7 +241,7 @@ class IdentifiedX509Certprofile {
     }
 
     public SubjectInfo getSubject(final X500Name requestedSubject)
-    throws CertprofileException, BadCertTemplateException {
+            throws CertprofileException, BadCertTemplateException {
         SubjectInfo subjectInfo = certprofile.getSubject(requestedSubject);
         RDN[] countryRdns = subjectInfo.getGrantedSubject().getRDNs(ObjectIdentifiers.DN_C);
         if (countryRdns != null) {
@@ -261,7 +261,7 @@ class IdentifiedX509Certprofile {
             @NonNull final SubjectPublicKeyInfo publicKeyInfo,
             @NonNull final PublicCaInfo publicCaInfo, @Nullable final X509Certificate crlSignerCert,
             @NonNull final Date notBefore, @NonNull final Date notAfter)
-    throws CertprofileException, BadCertTemplateException {
+            throws CertprofileException, BadCertTemplateException {
         ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
         ExtensionValues values = new ExtensionValues();
 
@@ -516,7 +516,7 @@ class IdentifiedX509Certprofile {
     }
 
     public SubjectPublicKeyInfo checkPublicKey(final SubjectPublicKeyInfo publicKey)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         ParamUtil.requireNonNull("publicKey", publicKey);
         return certprofile.checkPublicKey(publicKey);
     }
@@ -799,7 +799,7 @@ class IdentifiedX509Certprofile {
 
     private static ASN1Sequence createSubjectInfoAccess(final Extensions requestedExtensions,
             final Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         if (modes == null) {
             return null;
         }

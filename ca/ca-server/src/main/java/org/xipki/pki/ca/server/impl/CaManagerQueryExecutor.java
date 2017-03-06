@@ -356,7 +356,7 @@ class CaManagerQueryExecutor {
     }
 
     List<String> getNamesFromTable(final String table, final String nameColumn)
-    throws CaMgmtException {
+            throws CaMgmtException {
         final String sql = new StringBuilder("SELECT ")
                 .append(nameColumn).append(" FROM ").append(table).toString();
         Statement stmt = null;
@@ -721,7 +721,7 @@ class CaManagerQueryExecutor {
     }
 
     Set<String> createCaHasNames(final String caName, final String columnName, final String table)
-    throws CaMgmtException {
+            throws CaMgmtException {
         final String sql = new StringBuilder("SELECT ").append(columnName).append(" FROM ")
                 .append(table).append(" WHERE CA_NAME=?").toString();
         PreparedStatement stmt = null;
@@ -751,7 +751,7 @@ class CaManagerQueryExecutor {
     }
 
     private boolean deleteRowWithName(final String name, final String table, boolean force)
-    throws CaMgmtException {
+            throws CaMgmtException {
         if (!force) {
             if ("ENVIRONMENT".equalsIgnoreCase(table)) {
                 if (CaManagerImpl.ENV_EPOCH.equalsIgnoreCase(name)) {
@@ -961,7 +961,7 @@ class CaManagerQueryExecutor {
     } // method addCmpRequestor
 
     void addCmpRequestorToCa(final CaHasRequestorEntry requestor, final String caName)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonNull("requestor", requestor);
         ParamUtil.requireNonBlank("caName", caName);
 
@@ -1049,7 +1049,7 @@ class CaManagerQueryExecutor {
     }
 
     private void addEnvParam(final String name, final String value, boolean force)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         ParamUtil.requireNonNull("value", value);
         if (!force) {
@@ -1114,7 +1114,7 @@ class CaManagerQueryExecutor {
     } // method addPublisherToCa
 
     boolean changeCa(final ChangeCaEntry changeCaEntry, final SecurityFactory securityFactory)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonNull("changeCaEntry", changeCaEntry);
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         if (!(changeCaEntry instanceof X509ChangeCaEntry)) {
@@ -1513,7 +1513,7 @@ class CaManagerQueryExecutor {
     } // method changeCmpControl
 
     CmpRequestorEntryWrapper changeCmpRequestor(final String name, final String base64Cert)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
 
         CmpRequestorEntry newDbEntry = new CmpRequestorEntry(name, base64Cert);
@@ -1550,7 +1550,7 @@ class CaManagerQueryExecutor {
 
     CmpResponderEntryWrapper changeCmpResponder(final String name, final String type,
             final String conf, final String base64Cert, final CaManagerImpl caManager)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         ParamUtil.requireNonNull("caManager", caManager);
 
@@ -1766,7 +1766,7 @@ class CaManagerQueryExecutor {
 
     Scep changeScep(final String caName, final String responderType, final String responderConf,
             final String responderBase64Cert, final String control, final CaManagerImpl caManager)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonNull("caManager", caManager);
 
@@ -2012,7 +2012,7 @@ class CaManagerQueryExecutor {
     } // method removeCaAlias
 
     boolean removeCertprofileFromCa(final String profileName, final String caName)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("profileName", profileName);
         ParamUtil.requireNonBlank("caName", caName);
 
@@ -2036,7 +2036,7 @@ class CaManagerQueryExecutor {
     } // method removeCertprofileFromCa
 
     boolean removeCmpRequestorFromCa(final String requestorName, final String caName)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("requestorName", requestorName);
         ParamUtil.requireNonBlank("caName", caName);
 
@@ -2060,7 +2060,7 @@ class CaManagerQueryExecutor {
     } // method removeCmpRequestorFromCa
 
     boolean removePublisherFromCa(final String publisherName, final String caName)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("publisherName", publisherName);
         ParamUtil.requireNonBlank("caName", caName);
         final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_NAME=? AND PUBLISHER_NAME=?";
@@ -2083,7 +2083,7 @@ class CaManagerQueryExecutor {
     } // method removePublisherFromCa
 
     boolean revokeCa(final String caName, final CertRevocationInfo revocationInfo)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonNull("revocationInfo", revocationInfo);
         String sql = "UPDATE CA SET REV=?,RR=?,RT=?,RIT=? WHERE NAME=?";
@@ -2257,7 +2257,7 @@ class CaManagerQueryExecutor {
     } // method getScep
 
     private static void setBoolean(final PreparedStatement ps, final int index, final boolean bo)
-    throws SQLException {
+            throws SQLException {
         ps.setInt(index, bo ? 1 : 0);
     }
 
@@ -2272,7 +2272,7 @@ class CaManagerQueryExecutor {
     }
 
     private static Set<Permission> getPermissions(final String permissionsText)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("permissionsText", permissionsText);
 
         List<String> strs = StringUtil.split(permissionsText, ", ");

@@ -119,7 +119,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
     @Override
     public ConcurrentContentSigner newSigner(final SecurityFactory securityFactory,
             final String type, final SignerConf conf, final X509Certificate[] certificateChain)
-    throws ObjectCreationException {
+            throws ObjectCreationException {
         ParamUtil.requireNonBlank("type", type);
 
         if ("PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type)) {
@@ -142,7 +142,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
     private ConcurrentContentSigner newPkcs12OrJksSigner(final SecurityFactory securityFactory,
             final String type, final SignerConf conf, final X509Certificate[] certificateChain)
-    throws ObjectCreationException {
+            throws ObjectCreationException {
         String str = conf.getConfValue("parallelism");
         int parallelism = securityFactory.getDefaultSignerParallelism();
         if (str != null) {
@@ -216,7 +216,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
     public ConcurrentContentSigner newPkcs11Signer(final SecurityFactory securityFactory,
             final String type, final SignerConf conf, final X509Certificate[] certificateChain)
-    throws ObjectCreationException {
+            throws ObjectCreationException {
         if (p11CryptServiceFactory == null) {
             throw new ObjectCreationException("p11CryptServiceFactory is not set");
         }

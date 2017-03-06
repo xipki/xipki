@@ -86,7 +86,7 @@ public class XipkiDigestExportReader {
     }
 
     public List<IdentifiedDbDigestEntry> readCerts(final long startId)
-    throws DataAccessException {
+            throws DataAccessException {
         List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numRowsPerSelect);
 
         ResultSet rs = null;

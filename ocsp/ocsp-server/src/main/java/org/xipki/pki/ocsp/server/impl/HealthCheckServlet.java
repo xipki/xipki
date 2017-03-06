@@ -72,7 +72,7 @@ public class HealthCheckServlet extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         response.setHeader("Access-Control-Allow-Origin", "*");
         try {
             if (server == null) {

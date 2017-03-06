@@ -247,7 +247,7 @@ public class OcspServer {
     }
 
     ResponderAndRelativeUri getResponderAndRelativeUri(final HttpServletRequest request)
-    throws UnsupportedEncodingException {
+            throws UnsupportedEncodingException {
         ParamUtil.requireNonNull("request", request);
         String requestUri = request.getRequestURI();
         String servletPath = request.getServletPath();
@@ -314,7 +314,7 @@ public class OcspServer {
     }
 
     private void doInit()
-    throws InvalidConfException, DataAccessException, PasswordResolverException {
+            throws InvalidConfException, DataAccessException, PasswordResolverException {
         if (confFile == null) {
             throw new IllegalStateException("confFile is not set");
         }
@@ -1159,7 +1159,7 @@ public class OcspServer {
 
     private OcspStore newStore(final StoreType conf,
             final Map<String, DataSourceWrapper> datasources, final Set<HashAlgoType> certHashAlgos)
-    throws InvalidConfException {
+            throws InvalidConfException {
         OcspStore store;
         String type = conf.getSource().getType();
         if ("CRL".equalsIgnoreCase(type)) {
@@ -1208,8 +1208,8 @@ public class OcspServer {
 
     private OcspRespWithCacheInfo checkSignature(final OCSPReq request,
             final RequestOption requestOption, final AuditEvent event)
-    throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException,
-    OcspResponderException {
+            throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException,
+                OcspResponderException {
         if (!request.isSigned()) {
             if (!requestOption.isSignatureRequired()) {
                 return null;
@@ -1380,7 +1380,7 @@ public class OcspServer {
     }
 
     private static X509Certificate parseCert(final FileOrValueType certConf)
-    throws InvalidConfException {
+            throws InvalidConfException {
         InputStream is = null;
         try {
             is = getInputStream(certConf);

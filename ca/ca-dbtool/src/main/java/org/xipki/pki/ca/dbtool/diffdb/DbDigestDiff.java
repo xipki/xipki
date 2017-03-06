@@ -188,7 +188,7 @@ public class DbDigestDiff {
 
     private void diffSingleCa(final DigestReader refReader,
             final Map<Integer, byte[]> caIdCertBytesMap)
-    throws CertificateException, IOException, InterruptedException {
+            throws CertificateException, IOException, InterruptedException {
         X509Certificate caCert = refReader.getCaCert();
         byte[] caCertBytes = caCert.getEncoded();
 

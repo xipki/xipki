@@ -86,7 +86,7 @@ public class OcspDbExportWorker extends DbPortWorker {
             final PasswordResolver passwordResolver, final String dbConfFile,
             final String destFolder, final boolean resume, final int numCertsInBundle,
             final int numCertsPerSelect, final boolean evaluateOnly)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+            throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
         ParamUtil.requireNonNull("dbConfFile", dbConfFile);
         this.destFolder = ParamUtil.requireNonNull(destFolder, destFolder);

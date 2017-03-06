@@ -137,7 +137,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
     } // method importToDB
 
     private void importIssuer(final Issuers issuers)
-    throws DataAccessException, CertificateException, IOException {
+            throws DataAccessException, CertificateException, IOException {
         System.out.println("importing table ISSUER");
         PreparedStatement ps = prepareStatement(SQL_ADD_ISSUER);
 
@@ -152,7 +152,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
     }
 
     private void doImportIssuer(final IssuerType issuer, final PreparedStatement ps)
-    throws DataAccessException, CertificateException, IOException {
+            throws DataAccessException, CertificateException, IOException {
         try {
             String certFilename = issuer.getCertFile();
             String b64Cert = new String(
@@ -195,7 +195,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
     } // method doImportIssuer
 
     private void importCert(final CertStoreType certstore, final File processLogFile)
-    throws Exception {
+            throws Exception {
         int numProcessedBefore = 0;
         long minId = 1;
         if (processLogFile.exists()) {

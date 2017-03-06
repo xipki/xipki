@@ -55,7 +55,7 @@ public class ClientCertCache {
 
     public static X509Certificate getTlsClientCert(final HttpServletRequest request,
             final boolean sslCertInHttpHeader)
-    throws IOException {
+            throws IOException {
 
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
                 "javax.servlet.request.X509Certificate");

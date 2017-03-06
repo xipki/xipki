@@ -148,7 +148,7 @@ public class TargetDigestRetriever {
         } // method run
 
         private Map<BigInteger, DbDigestEntry> query(CertsBundle bundle)
-        throws DataAccessException {
+            throws DataAccessException {
             List<BigInteger> serialNumbers = bundle.getSerialNumbers();
             int size = serialNumbers.size();
             boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
@@ -188,7 +188,7 @@ public class TargetDigestRetriever {
             final DigestReader reader, final DbDigestReporter reporter,
             final DataSourceWrapper datasource, final XipkiDbControl dbControl, final int caId,
             final int numPerSelect, final int numThreads, final StopMe stopMe)
-    throws DataAccessException {
+            throws DataAccessException {
         this.processLog = ParamUtil.requireNonNull("processLog", processLog);
         this.numPerSelect = numPerSelect;
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
@@ -246,7 +246,7 @@ public class TargetDigestRetriever {
 
     private Map<BigInteger, DbDigestEntry> getCertsViaSingleSelectInB(
             final PreparedStatement singleSelectStmt, final List<BigInteger> serialNumbers)
-    throws DataAccessException {
+            throws DataAccessException {
         Map<BigInteger, DbDigestEntry> ret = new HashMap<>(serialNumbers.size());
 
         for (BigInteger serialNumber : serialNumbers) {
@@ -261,7 +261,7 @@ public class TargetDigestRetriever {
 
     private Map<BigInteger, DbDigestEntry> getCertsViaInArraySelectInB(
             final PreparedStatement batchSelectStmt, final List<BigInteger> serialNumbers)
-    throws DataAccessException {
+            throws DataAccessException {
         final int n = serialNumbers.size();
         if (n != numPerSelect) {
             throw new IllegalArgumentException("size of serialNumbers is not '" + numPerSelect

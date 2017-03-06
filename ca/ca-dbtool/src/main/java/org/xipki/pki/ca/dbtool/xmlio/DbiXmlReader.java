@@ -59,7 +59,7 @@ public abstract class DbiXmlReader {
     private DbDataObject next;
 
     public DbiXmlReader(final String rootElementName, final InputStream xmlStream)
-    throws XMLStreamException, InvalidDataObjectException {
+            throws XMLStreamException, InvalidDataObjectException {
         this.rootElementName = ParamUtil.requireNonBlank("rootElementName", rootElementName);
         ParamUtil.requireNonNull("xmlStream", xmlStream);
 
@@ -105,6 +105,6 @@ public abstract class DbiXmlReader {
     }
 
     protected abstract DbDataObject retrieveNext()
-    throws InvalidDataObjectException, XMLStreamException;
+            throws InvalidDataObjectException, XMLStreamException;
 
 }

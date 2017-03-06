@@ -77,7 +77,7 @@ class NssPlainRSASigner implements AsymmetricBlockCipher {
     private RSAKeyParameters key;
 
     NssPlainRSASigner()
-    throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
+            throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
         cipher = Cipher.getInstance(ALGORITHM, XiSecurityConstants.PROVIDER_NAME_NSS);
         rsaKeyFactory = KeyFactory.getInstance("RSA");
     }
@@ -139,7 +139,7 @@ class NssPlainRSASigner implements AsymmetricBlockCipher {
 
     @Override
     public byte[] processBlock(final byte[] in, final int inOff, final int len)
-    throws InvalidCipherTextException {
+            throws InvalidCipherTextException {
         try {
             return cipher.doFinal(in, 0, in.length);
         } catch (IllegalBlockSizeException | BadPaddingException ex) {

@@ -50,7 +50,7 @@ public class OBFPasswordCallback implements PasswordCallback {
 
     @Override
     public char[] getPassword(final String prompt, final String testToken)
-    throws PasswordResolverException {
+            throws PasswordResolverException {
         if (password == null) {
             throw new PasswordResolverException("please initialize me first");
         }

@@ -54,7 +54,7 @@ public class IssuerFilter {
     private final Set<String> excludeSha1Fps;
 
     public IssuerFilter(final Set<X509Certificate> includes, final Set<X509Certificate> excludes)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         if (includes == null) {
             includeSha1Fps = null;
         } else {

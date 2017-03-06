@@ -76,7 +76,7 @@ public class P11PasswordsRetriever {
         }
 
         public List<char[]> getPasswords(final PasswordResolver passwordResolver)
-        throws PasswordResolverException {
+            throws PasswordResolverException {
             if (passwords == null) {
                 return null;
             }
@@ -107,7 +107,7 @@ public class P11PasswordsRetriever {
     }
 
     public List<char[]> getPassword(final P11SlotIdentifier slotId)
-    throws PasswordResolverException {
+            throws PasswordResolverException {
         ParamUtil.requireNonNull("slotId", slotId);
         if (CollectionUtil.isEmpty(singleRetrievers)) {
             return null;

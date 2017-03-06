@@ -153,7 +153,7 @@ class OcspCertStoreDbExporter extends DbPorter {
     } // method export
 
     private void exportIssuer(final CertStoreType certstore)
-    throws DataAccessException, IOException {
+            throws DataAccessException, IOException {
         System.out.println("exporting table ISSUER");
         Issuers issuers = new Issuers();
         certstore.setIssuers(issuers);
@@ -385,7 +385,8 @@ class OcspCertStoreDbExporter extends DbPorter {
                                 "tmp-certs-" + System.currentTimeMillis() + ".zip");
                         currentCertsZip = getZipOutputStream(currentCertsZipFile);
                     } // end if
-                } while (rs.next());
+                }
+                while (rs.next());
 
                 rs.close();
             } // end for
@@ -427,7 +428,7 @@ class OcspCertStoreDbExporter extends DbPorter {
     } // method doExportCert
 
     private void finalizeZip(final ZipOutputStream zipOutStream, final DbiXmlWriter certsType)
-    throws JAXBException, IOException, XMLStreamException {
+            throws JAXBException, IOException, XMLStreamException {
         ZipEntry certZipEntry = new ZipEntry("certs.xml");
         zipOutStream.putNextEntry(certZipEntry);
         try {

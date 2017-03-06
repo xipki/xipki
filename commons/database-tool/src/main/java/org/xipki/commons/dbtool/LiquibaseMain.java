@@ -81,7 +81,7 @@ public class LiquibaseMain {
     }
 
     public void changeLogLevel(final String logLevel, String logFile)
-    throws CommandLineParsingException {
+            throws CommandLineParsingException {
         Objects.requireNonNull(logLevel, "logLevel must not be null");
         try {
             Logger log = LogFactory.getInstance().getLog();

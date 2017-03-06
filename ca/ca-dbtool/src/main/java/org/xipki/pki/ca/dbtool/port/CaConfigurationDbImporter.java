@@ -94,7 +94,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
     CaConfigurationDbImporter(final DataSourceWrapper datasource, final Unmarshaller unmarshaller,
             final String srcDir, final AtomicBoolean stopMe, final boolean evaluateOnly)
-    throws DataAccessException, PasswordResolverException, IOException {
+            throws DataAccessException, PasswordResolverException, IOException {
         super(datasource, srcDir, stopMe, evaluateOnly);
         this.unmarshaller = ParamUtil.requireNonNull("unmarshaller", unmarshaller);
     }
@@ -167,7 +167,7 @@ class CaConfigurationDbImporter extends DbPorter {
     } // method importCmpcontrol
 
     private void importResponder(final Responders responders)
-    throws DataAccessException, IOException {
+            throws DataAccessException, IOException {
         System.out.println("importing table RESPONDER");
         if (responders == null) {
             System.out.println(" imported table RESPONDER: nothing to import");
@@ -228,7 +228,7 @@ class CaConfigurationDbImporter extends DbPorter {
     } // method importEnvironment
 
     private void importCrlsigner(final Crlsigners crlsigners)
-    throws DataAccessException, IOException {
+            throws DataAccessException, IOException {
         System.out.println("importing table CRLSIGNER");
         final String sql = "INSERT INTO CRLSIGNER (NAME,SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,"
                 + "SIGNER_CONF) VALUES (?,?,?,?,?)";
@@ -260,7 +260,7 @@ class CaConfigurationDbImporter extends DbPorter {
     } // method importCrlsigner
 
     private void importRequestor(final Requestors requestors)
-    throws DataAccessException, IOException {
+            throws DataAccessException, IOException {
         System.out.println("importing table REQUESTOR");
         final String sql = "INSERT INTO REQUESTOR (NAME,CERT) VALUES (?,?)";
         PreparedStatement ps = null;
@@ -289,7 +289,7 @@ class CaConfigurationDbImporter extends DbPorter {
     } // method importRequestor
 
     private void importPublisher(final Publishers publishers)
-    throws DataAccessException, IOException {
+            throws DataAccessException, IOException {
         System.out.println("importing table PUBLISHER");
         final String sql = "INSERT INTO PUBLISHER (NAME,TYPE,CONF) VALUES (?,?,?)";
         PreparedStatement ps = null;
@@ -350,7 +350,7 @@ class CaConfigurationDbImporter extends DbPorter {
     } // method importProfile
 
     private void importCa(final Cas cas)
-    throws DataAccessException, CertificateException, IOException {
+            throws DataAccessException, CertificateException, IOException {
         System.out.println("importing table CA");
         StringBuilder sqlBuilder = new StringBuilder(500);
         sqlBuilder.append("INSERT INTO CA (NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,");
@@ -447,7 +447,7 @@ class CaConfigurationDbImporter extends DbPorter {
     } // method importCaalias
 
     private void importCaHasRequestor(final CaHasRequestors caHasRequestors)
-    throws DataAccessException {
+            throws DataAccessException {
         System.out.println("importing table CA_HAS_REQUESTOR");
         final String sql =
                 "INSERT INTO CA_HAS_REQUESTOR (CA_NAME,REQUESTOR_NAME,RA,PERMISSIONS,PROFILES)"
@@ -500,7 +500,7 @@ class CaConfigurationDbImporter extends DbPorter {
     } // method importCaHasPublisher
 
     private void importCaHasCertprofile(final CaHasProfiles caHasCertprofiles)
-    throws DataAccessException {
+            throws DataAccessException {
         System.out.println("importing table CA_HAS_PROFILE");
         final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME,PROFILE_NAME) VALUES (?,?)";
         PreparedStatement ps = prepareStatement(sql);

@@ -78,7 +78,7 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher {
 
     @Override
     public byte[] processBlock(final byte[] in, final int inOff, final int len)
-    throws InvalidCipherTextException {
+            throws InvalidCipherTextException {
         byte[] content = new byte[getInputBlockSize()];
         System.arraycopy(in, inOff, content, content.length - len, len);
 

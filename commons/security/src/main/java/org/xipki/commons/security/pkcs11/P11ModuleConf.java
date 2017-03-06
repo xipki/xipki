@@ -83,7 +83,7 @@ public class P11ModuleConf {
     private final long userType;
 
     public P11ModuleConf(final ModuleType moduleType, final PasswordResolver passwordResolver)
-    throws InvalidConfException {
+            throws InvalidConfException {
         ParamUtil.requireNonNull("moduleType", moduleType);
         this.name = moduleType.getName();
         this.readOnly = moduleType.isReadonly();
@@ -236,7 +236,7 @@ public class P11ModuleConf {
     }
 
     private static Set<P11SlotIdFilter> getSlotIdFilters(final SlotsType type)
-    throws InvalidConfException {
+            throws InvalidConfException {
         if (type == null || CollectionUtil.isEmpty(type.getSlot())) {
             return null;
         }

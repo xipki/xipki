@@ -76,7 +76,7 @@ public class Asn1P11SlotIdentifier extends ASN1Object {
     }
 
     public static Asn1P11SlotIdentifier getInstance(final Object obj)
-    throws BadAsn1ObjectException {
+            throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1P11SlotIdentifier) {
             return (Asn1P11SlotIdentifier) obj;
         }

@@ -52,7 +52,7 @@ public class OcspUtils {
     }
 
     public static BasicOCSPResp extractBasicOcspResp(final OCSPResp response)
-    throws OcspResponseException {
+            throws OcspResponseException {
         ParamUtil.requireNonNull("response", response);
         int status = response.getStatus();
         if (status == 0) {

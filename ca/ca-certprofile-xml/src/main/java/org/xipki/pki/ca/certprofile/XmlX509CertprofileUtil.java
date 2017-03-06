@@ -152,7 +152,7 @@ public class XmlX509CertprofileUtil {
     }
 
     public static X509ProfileType parse(final InputStream xmlConfStream)
-    throws CertprofileException {
+            throws CertprofileException {
         ParamUtil.requireNonNull("xmlConfStream", xmlConfStream);
         synchronized (JAXB_LOCK) {
             JAXBElement<?> rootElement;
@@ -249,7 +249,7 @@ public class XmlX509CertprofileUtil {
 
     public static NameConstraints buildNameConstrains(
             final org.xipki.pki.ca.certprofile.x509.jaxb.NameConstraints type)
-    throws CertprofileException {
+            throws CertprofileException {
         ParamUtil.requireNonNull("type", type);
         GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
         GeneralSubtree[] excluded = buildGeneralSubtrees(type.getExcludedSubtrees());
@@ -258,7 +258,7 @@ public class XmlX509CertprofileUtil {
     } // method buildNameConstrains
 
     private static GeneralSubtree[] buildGeneralSubtrees(final GeneralSubtreesType subtrees)
-    throws CertprofileException {
+            throws CertprofileException {
         if (subtrees == null || CollectionUtil.isEmpty(subtrees.getBase())) {
             return null;
         }
@@ -274,7 +274,7 @@ public class XmlX509CertprofileUtil {
     } // method buildGeneralSubtrees
 
     private static GeneralSubtree buildGeneralSubtree(final GeneralSubtreeBaseType type)
-    throws CertprofileException {
+            throws CertprofileException {
         ParamUtil.requireNonNull("type", type);
         GeneralName base = null;
         if (type.getDirectoryName() != null) {
@@ -309,7 +309,7 @@ public class XmlX509CertprofileUtil {
     } // method buildGeneralSubtree
 
     public static ASN1Sequence buildPolicyConstrains(final PolicyConstraints type)
-    throws CertprofileException {
+            throws CertprofileException {
         ParamUtil.requireNonNull("type", type);
         Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
         if (requireExplicitPolicy != null && requireExplicitPolicy < 0) {
@@ -343,7 +343,7 @@ public class XmlX509CertprofileUtil {
     } //method buildPolicyConstrains
 
     public static Set<GeneralNameMode> buildGeneralNameMode(final GeneralNameType name)
-    throws CertprofileException {
+            throws CertprofileException {
         ParamUtil.requireNonNull("name", name);
 
         Set<GeneralNameMode> ret = new HashSet<>();
@@ -574,7 +574,7 @@ public class XmlX509CertprofileUtil {
 
     public static AdmissionSyntaxOption buildAdmissionSyntax(final boolean critical,
             final AdmissionSyntax type)
-    throws CertprofileException {
+            throws CertprofileException {
         List<AdmissionsOption> admissionsList = new LinkedList<>();
         for (AdmissionsType at : type.getContentsOfAdmissions()) {
             List<ProfessionInfoOption> professionInfos = new LinkedList<>();
@@ -628,7 +628,7 @@ public class XmlX509CertprofileUtil {
     }
 
     private static ASN1Primitive asn1PrimitivefromByteArray(final byte[] encoded)
-    throws CertprofileException {
+            throws CertprofileException {
         try {
             return ASN1Primitive.fromByteArray(encoded);
         } catch (IOException ex) {
@@ -637,7 +637,7 @@ public class XmlX509CertprofileUtil {
     }
 
     private static KeyParametersOption convertKeyParametersOption(final AlgorithmType type)
-    throws CertprofileException {
+            throws CertprofileException {
         ParamUtil.requireNonNull("type", type);
         if (type.getParameters() == null || type.getParameters().getAny() == null) {
             return KeyParametersOption.ALLOW_ALL;

@@ -101,7 +101,7 @@ public class X509CaInfo {
     private RevokeSuspendedCertsControl revokeSuspendedCertsControl;
 
     public X509CaInfo(final X509CaEntry caEntry, final CertificateStore certStore)
-    throws OperationException {
+            throws OperationException {
         this.caEntry = ParamUtil.requireNonNull("caEntry", caEntry);
         this.certStore = ParamUtil.requireNonNull("certStore", certStore);
 

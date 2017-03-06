@@ -119,7 +119,7 @@ public class CertificateStore {
     }
 
     public void removeFromPublishQueue(final String publisherName, final long certId)
-    throws OperationException {
+            throws OperationException {
         try {
             queryExecutor.removeFromPublishQueue(publisherName, certId);
         } catch (DataAccessException ex) {
@@ -132,7 +132,7 @@ public class CertificateStore {
     }
 
     public void clearPublishQueue(final X509Cert caCert, final String publisherName)
-    throws OperationException {
+            throws OperationException {
         try {
             queryExecutor.clearPublishQueue(caCert, publisherName);
         } catch (DataAccessException ex) {
@@ -157,7 +157,7 @@ public class CertificateStore {
     }
 
     public void clearDeltaCrlCache(final X509Cert caCert, final long maxId)
-    throws OperationException {
+            throws OperationException {
         try {
             queryExecutor.clearDeltaCrlCache(caCert, maxId);
         } catch (DataAccessException ex) {
@@ -242,7 +242,7 @@ public class CertificateStore {
     }
 
     X509CertWithDbId getCert(final X509Cert caCert, final BigInteger serialNumber)
-    throws OperationException {
+            throws OperationException {
         try {
             return queryExecutor.getCert(caCert, serialNumber);
         } catch (DataAccessException ex) {
@@ -255,7 +255,7 @@ public class CertificateStore {
     }
 
     public void removeCertificate(final X509Cert caCert, final BigInteger serialNumber)
-    throws OperationException {
+            throws OperationException {
         try {
             queryExecutor.removeCertificate(caCert, serialNumber);
         } catch (DataAccessException ex) {
@@ -392,7 +392,7 @@ public class CertificateStore {
     }
 
     public long getCountOfCerts(final X509Cert caCert, final boolean onlyRevoked)
-    throws OperationException {
+            throws OperationException {
         try {
             return queryExecutor.getCountOfCerts(caCert, onlyRevoked);
         } catch (DataAccessException ex) {
@@ -497,7 +497,7 @@ public class CertificateStore {
     }
 
     public String getCertProfileForId(final X509Cert caCert, final long id)
-    throws OperationException {
+            throws OperationException {
         try {
             return queryExecutor.getCertProfileForId(caCert, id);
         } catch (DataAccessException ex) {
@@ -510,7 +510,7 @@ public class CertificateStore {
     }
 
     public String getCertProfileForSerial(final X509Cert caCert, final BigInteger serial)
-    throws OperationException {
+            throws OperationException {
         try {
             return queryExecutor.getCertProfileForSerial(caCert, serial);
         } catch (DataAccessException ex) {
@@ -536,7 +536,7 @@ public class CertificateStore {
     }
 
     public byte[] getCertRequest(final X509Cert caCert, final BigInteger serialNumber)
-    throws OperationException {
+            throws OperationException {
         try {
             return queryExecutor.getCertRequest(caCert, serialNumber);
         } catch (DataAccessException ex) {
@@ -564,7 +564,7 @@ public class CertificateStore {
     }
 
     public boolean authenticateUser(final String user, final byte[] password)
-    throws OperationException {
+            throws OperationException {
         try {
             return queryExecutor.authenticateUser(user, password);
         } catch (DataAccessException ex) {
@@ -589,7 +589,7 @@ public class CertificateStore {
     }
 
     public KnowCertResult knowsCertForSerial(final X509Cert caCert, final BigInteger serial)
-    throws OperationException {
+            throws OperationException {
         try {
             return queryExecutor.knowsCertForSerial(caCert, serial);
         } catch (DataAccessException ex) {
@@ -606,7 +606,7 @@ public class CertificateStore {
     }
 
     public boolean isCertForSubjectIssued(final X509Cert caCert, final long subjectFp)
-    throws OperationException {
+            throws OperationException {
         try {
             return queryExecutor.isCertForSubjectIssued(caCert, subjectFp);
         } catch (DataAccessException ex) {
@@ -619,7 +619,7 @@ public class CertificateStore {
     }
 
     public boolean isCertForKeyIssued(final X509Cert caCert, final long keyFp)
-    throws OperationException {
+            throws OperationException {
         try {
             return queryExecutor.isCertForKeyIssued(caCert, keyFp);
         } catch (DataAccessException ex) {
@@ -632,7 +632,7 @@ public class CertificateStore {
     }
 
     public X509CertificateInfo getCertificateInfoForId(final X509Cert caCert, final long certId)
-    throws OperationException, CertificateException {
+            throws OperationException, CertificateException {
         try {
             return queryExecutor.getCertForId(caCert, certId);
         } catch (DataAccessException ex) {
@@ -657,7 +657,7 @@ public class CertificateStore {
     }
 
     public String getLatestSerialNumber(final X500Name nameWithSerialNumber)
-    throws OperationException {
+            throws OperationException {
         try {
             return queryExecutor.getLatestSerialNumber(nameWithSerialNumber);
         } catch (RuntimeException ex) {
@@ -704,7 +704,7 @@ public class CertificateStore {
     }
 
     public void commitNextCrlNo(final String caName, final long nextCrlNo)
-    throws OperationException {
+            throws OperationException {
         try {
             queryExecutor.commitNextCrlNoIfLess(caName, nextCrlNo);
         } catch (DataAccessException ex) {
@@ -807,7 +807,7 @@ public class CertificateStore {
     }
 
     public boolean changeUser(final String username, final String password, final String cnRegex)
-    throws CaMgmtException {
+            throws CaMgmtException {
         return queryExecutor.changeUser(username, password, cnRegex);
     }
 

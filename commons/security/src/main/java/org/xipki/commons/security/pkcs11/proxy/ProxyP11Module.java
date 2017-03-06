@@ -256,7 +256,8 @@ public class ProxyP11Module extends AbstractP11Module {
                     break;
                 }
                 bytearrayoutputstream.write(buf, 0, readedByte);
-            } while (true);
+            }
+            while (true);
 
             return bytearrayoutputstream.toByteArray();
         } finally {
@@ -346,7 +347,7 @@ public class ProxyP11Module extends AbstractP11Module {
     }
 
     private ASN1Encodable extractItvInfoValue(final int action, final GeneralPKIMessage response)
-    throws P11TokenException {
+            throws P11TokenException {
         PKIBody respBody = response.getBody();
         int bodyType = respBody.getType();
 

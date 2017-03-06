@@ -101,7 +101,7 @@ public class CaEntry {
     }
 
     public void addDigestEntry(final long id, final DbDigestEntry reportEntry)
-    throws IOException, InvalidDataObjectException {
+            throws IOException, InvalidDataObjectException {
         ParamUtil.requireNonNull("reportEntry", reportEntry);
 
         if (minIdInCsvFile == 0) {

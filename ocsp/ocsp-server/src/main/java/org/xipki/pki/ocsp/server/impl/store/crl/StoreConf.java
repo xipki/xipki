@@ -197,7 +197,7 @@ class StoreConf {
     }
 
     private String getRequiredProperty(final Properties props, final String propKey)
-    throws OcspStoreException {
+            throws OcspStoreException {
         String str = props.getProperty(propKey);
         if (str == null) {
             throw new OcspStoreException("missing required property " + propKey);
@@ -210,7 +210,7 @@ class StoreConf {
     }
 
     private String getOptionalProperty(final Properties props, final String propKey)
-    throws OcspStoreException {
+            throws OcspStoreException {
         String str = props.getProperty(propKey);
         if (str == null) {
             return null;

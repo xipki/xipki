@@ -85,7 +85,7 @@ public class DbDigestDiffWorker extends DbPortWorker {
             final String refDirname, final String refDbConfFile, final String dbConfFile,
             final String reportDirName, final int numCertsPerSelect, final NumThreads numThreads,
             final Set<byte[]> includeCaCerts)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+            throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
         this.reportDir = ParamUtil.requireNonBlank("reportDirName", reportDirName);
         this.numThreads = ParamUtil.requireNonNull("numThreads", numThreads);

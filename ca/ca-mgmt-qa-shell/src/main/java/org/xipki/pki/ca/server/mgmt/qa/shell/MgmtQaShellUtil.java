@@ -50,7 +50,7 @@ public class MgmtQaShellUtil {
     }
 
     public static void assertEquals(final String desc, final String ex, final String is)
-    throws CmdFailure {
+            throws CmdFailure {
 
         String tmpEx = ex;
         if (CaManager.NULL.equals(tmpEx)) {
@@ -64,7 +64,7 @@ public class MgmtQaShellUtil {
     }
 
     public static void assertEquals(final String desc, final Collection<?> ex, Collection<?> is)
-    throws CmdFailure {
+            throws CmdFailure {
         boolean bo = (ex == null) ? (is == null) : ex.equals(is);
         if (!bo) {
             throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");

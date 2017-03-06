@@ -525,7 +525,7 @@ public class CrlControl {
     } // method equals
 
     private static int getInteger(final ConfPairs props, final String propKey, final int dfltValue)
-    throws InvalidConfException {
+            throws InvalidConfException {
         String str = props.getValue(propKey);
         if (str != null) {
             try {

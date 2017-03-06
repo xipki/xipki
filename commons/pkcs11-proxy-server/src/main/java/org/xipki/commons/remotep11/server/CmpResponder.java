@@ -226,8 +226,8 @@ class CmpResponder {
 
     private PKIMessage doProcessPkiMessage(final LocalP11CryptServicePool p11CryptServicePool,
             final String moduleName, final InfoTypeAndValue itv, final PKIHeader respHeader)
-    throws BadAsn1ObjectException, P11TokenException, CertificateException, XiSecurityException,
-    InvalidKeyException {
+            throws BadAsn1ObjectException, P11TokenException, CertificateException,
+                XiSecurityException, InvalidKeyException {
         ASN1Sequence seq = Asn1Util.getSequence(itv.getInfoValue());
         Asn1Util.requireRange(seq, 3, 3);
         int protocolVersion = Asn1Util.getInteger(seq.getObjectAt(0)).intValue();
@@ -385,7 +385,7 @@ class CmpResponder {
     }
 
     private P11Slot getSlot(final P11CryptService p11Service, final Asn1P11SlotIdentifier slotId)
-    throws P11TokenException {
+            throws P11TokenException {
         return p11Service.getModule().getSlot(slotId.getSlotId());
     }
 

@@ -143,7 +143,7 @@ public class AdmissionSyntaxOption {
     }
 
     public ExtensionValue getExtensionValue(final List<List<String>> registrationNumbersList)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         if (!this.inputFromRequestRequired) {
             return this.extensionValue;
         }

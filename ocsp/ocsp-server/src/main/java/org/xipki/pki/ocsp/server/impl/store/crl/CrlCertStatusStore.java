@@ -907,7 +907,7 @@ public class CrlCertStatusStore extends OcspStore {
     }
 
     private Map<HashAlgoType, byte[]> getCertHashes(final Certificate cert)
-    throws OcspStoreException {
+            throws OcspStoreException {
         ParamUtil.requireNonNull("cert", cert);
         if (certHashAlgos.isEmpty()) {
             return null;

@@ -135,7 +135,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     @Override
     public ContentVerifierProvider getContentVerifierProvider(final PublicKey publicKey)
-    throws InvalidKeyException {
+            throws InvalidKeyException {
         ParamUtil.requireNonNull("publicKey", publicKey);
 
         String keyAlg = publicKey.getAlgorithm().toUpperCase();
@@ -165,7 +165,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
 
     @Override
     public PublicKey generatePublicKey(final SubjectPublicKeyInfo subjectPublicKeyInfo)
-    throws InvalidKeyException {
+            throws InvalidKeyException {
         try {
             return KeyUtil.generatePublicKey(subjectPublicKeyInfo);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
@@ -259,7 +259,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
     @Override
     public byte[] extractMinimalKeyStore(final String keystoreType, final byte[] keystoreBytes,
             final String keyname, final char[] password, final X509Certificate[] newCertChain)
-    throws KeyStoreException {
+            throws KeyStoreException {
         ParamUtil.requireNonBlank("keystoreType", keystoreType);
         ParamUtil.requireNonNull("keystoreBytes", keystoreBytes);
 

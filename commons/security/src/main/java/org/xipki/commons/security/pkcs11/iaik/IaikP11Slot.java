@@ -138,7 +138,7 @@ class IaikP11Slot extends AbstractP11Slot {
     IaikP11Slot(final String moduleName, final P11SlotIdentifier slotId, final Slot slot,
             final boolean readOnly, final long userType, final List<char[]> password,
             final int maxMessageSize, final P11MechanismFilter mechanismFilter)
-    throws P11TokenException {
+            throws P11TokenException {
         super(moduleName, slotId, readOnly, mechanismFilter);
         this.slot = ParamUtil.requireNonNull("slot", slot);
         this.maxMessageSize = ParamUtil.requireMin("maxMessageSize", maxMessageSize, 1);
@@ -195,7 +195,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected P11SlotRefreshResult doRefresh()
-    throws P11TokenException {
+            throws P11TokenException {
         Mechanism[] mechanisms;
         try {
             mechanisms = slot.getToken().getMechanismList();
@@ -274,7 +274,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private void analyseSingleKey(final PrivateKey privKey,
             final P11SlotRefreshResult refreshResult)
-    throws P11TokenException, XiSecurityException {
+            throws P11TokenException, XiSecurityException {
         byte[] id = privKey.getId().getByteArrayValue();
         java.security.PublicKey pubKey = null;
         X509Cert cert = refreshResult.getCertForId(id);
@@ -370,7 +370,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     private static Mechanism getMechanism(final long mechanism, final P11Params parameters)
-    throws P11TokenException {
+            throws P11TokenException {
         Mechanism ret = Mechanism.get(mechanism);
         if (parameters == null) {
             return ret;
@@ -443,7 +443,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     private void firstLogin(final Session session, final List<char[]> password)
-    throws P11TokenException {
+            throws P11TokenException {
         try {
             boolean isProtectedAuthenticationPath =
                     session.getToken().getTokenInfo().isProtectedAuthenticationPath();
@@ -542,17 +542,17 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     private PrivateKey getPrivateKeyObject(final byte[] keyId, final char[] keyLabel)
-    throws P11TokenException {
+            throws P11TokenException {
         return (PrivateKey) getKeyObject(new PrivateKey(), keyId, keyLabel);
     }
 
     private PublicKey getPublicKeyObject(final byte[] keyId, final char[] keyLabel)
-    throws P11TokenException {
+            throws P11TokenException {
         return (PublicKey) getKeyObject(new PublicKey(), keyId, keyLabel);
     }
 
     private Key getKeyObject(final Key template, final byte[] keyId, final char[] keyLabel)
-    throws P11TokenException {
+            throws P11TokenException {
         Session session = borrowIdleSession();
 
         try {
@@ -605,7 +605,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     private static List<Storage> getObjects(final Session session, final Storage template)
-    throws P11TokenException {
+            throws P11TokenException {
         return getObjects(session, template, 9999);
     }
 
@@ -642,7 +642,7 @@ class IaikP11Slot extends AbstractP11Slot {
     } // method getObjects
 
     private static java.security.PublicKey generatePublicKey(final PublicKey p11Key)
-    throws XiSecurityException {
+            throws XiSecurityException {
         if (p11Key instanceof RSAPublicKey) {
             RSAPublicKey rsaP11Key = (RSAPublicKey) p11Key;
             byte[] expBytes = rsaP11Key.getPublicExponent().getByteArrayValue();
@@ -697,7 +697,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     private static X509Cert parseCert(final X509PublicKeyCertificate p11Cert)
-    throws P11TokenException {
+            throws P11TokenException {
         try {
             byte[] encoded = p11Cert.getValue().getByteArrayValue();
             return new X509Cert(X509Util.parseCert(encoded), encoded);
@@ -721,7 +721,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     private synchronized void returnWritableSession(final Session session)
-    throws P11TokenException {
+            throws P11TokenException {
         if (session != writableSession) {
             throw new P11TokenException("the returned session does not belong to me");
         }
@@ -776,7 +776,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     private int removeObjects(final Storage template, final String desc)
-    throws P11TokenException {
+            throws P11TokenException {
         Session session = borrowWritableSession();
         try {
             List<Storage> objects = getObjects(session, template);
@@ -815,7 +815,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected void doAddCert(final P11ObjectIdentifier objectId, final X509Certificate cert)
-    throws P11TokenException, XiSecurityException {
+            throws P11TokenException, XiSecurityException {
         X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
                 new X509Cert(cert), objectId.getId(), objectId.getLabelChars());
         Session session = borrowWritableSession();
@@ -1085,13 +1085,14 @@ class IaikP11Slot extends AbstractP11Slot {
         do {
             keyId = new byte[8];
             random.nextBytes(keyId);
-        } while (idExists(session, keyId));
+        }
+        while (idExists(session, keyId));
 
         return keyId;
     }
 
     private static boolean idExists(@NonNull final Session session, @NonNull final byte[] keyId)
-    throws P11TokenException {
+            throws P11TokenException {
         Key key = new Key();
         key.getId().setByteArrayValue(keyId);
 

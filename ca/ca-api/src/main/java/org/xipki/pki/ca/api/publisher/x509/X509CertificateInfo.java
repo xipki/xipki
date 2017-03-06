@@ -85,7 +85,7 @@ public class X509CertificateInfo {
 
     public X509CertificateInfo(final X509CertWithDbId cert, final X509Cert issuerCert,
             final byte[] subjectPublicKey, final String profileName)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         this.profileName = ParamUtil.requireNonBlank("profileName", profileName);
         this.cert = ParamUtil.requireNonNull("cert", cert);
         this.subjectPublicKey = ParamUtil.requireNonNull("subjectPublicKey", subjectPublicKey);

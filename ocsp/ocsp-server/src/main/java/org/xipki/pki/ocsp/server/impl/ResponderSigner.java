@@ -79,7 +79,7 @@ class ResponderSigner {
     private final RespID responderIdByKey;
 
     ResponderSigner(final List<ConcurrentContentSigner> signers)
-    throws CertificateException, IOException {
+            throws CertificateException, IOException {
         this.signers = ParamUtil.requireNonEmpty("signers", signers);
         X509Certificate[] tmpCertificateChain = signers.get(0).getCertificateChain();
         if (tmpCertificateChain == null || tmpCertificateChain.length == 0) {

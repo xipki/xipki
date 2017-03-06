@@ -71,7 +71,7 @@ public class NegP12EnrollCertCmd extends NegEnrollCertCommandSupport {
 
     @Override
     protected ConcurrentContentSigner getSigner(final SignatureAlgoControl signatureAlgoControl)
-    throws ObjectCreationException {
+            throws ObjectCreationException {
         if (password == null) {
             try {
                 password = new String(readPassword());

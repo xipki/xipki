@@ -213,7 +213,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
     }
 
     private QAConfType parseQaConf(final InputStream confStream)
-    throws IOException, JAXBException, SAXException {
+            throws IOException, JAXBException, SAXException {
         JAXBElement<?> rootElement;
         try {
             rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(confStream);

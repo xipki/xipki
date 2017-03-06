@@ -83,7 +83,7 @@ class X509CrlSignerEntryWrapper {
     }
 
     public void initSigner(final SecurityFactory securityFactory)
-    throws XiSecurityException, OperationException, InvalidConfException {
+            throws XiSecurityException, OperationException, InvalidConfException {
         ParamUtil.requireNonNull("securityFactory", securityFactory);
         if (signer != null) {
             return;

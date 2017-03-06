@@ -1622,7 +1622,7 @@ public class X509CaCmpResponder extends CmpResponder {
      * @since 2.1.0
      */
     public CertificateList getCrl(final CmpRequestorInfo requestor, final BigInteger crlNumber)
-    throws OperationException {
+            throws OperationException {
         ParamUtil.requireNonNull("requestor", requestor);
         try {
             checkPermission(requestor, Permission.GET_CRL);
@@ -1655,7 +1655,7 @@ public class X509CaCmpResponder extends CmpResponder {
     public X509Cert generateCert(final CmpRequestorInfo requestor, final byte[] encodedCsr,
             final String profileName, final Date notBefore, final Date notAfter,
             final RequestType reqType, final String msgId)
-    throws OperationException {
+            throws OperationException {
         ParamUtil.requireNonNull("requestor", requestor);
         try {
             checkPermission(requestor, Permission.ENROLL_CERT);
@@ -1736,7 +1736,7 @@ public class X509CaCmpResponder extends CmpResponder {
      */
     public void removeCert(final CmpRequestorInfo requestor, final BigInteger serialNumber,
             final RequestType reqType, final String msgId)
-    throws OperationException {
+            throws OperationException {
         ParamUtil.requireNonNull("requestor", requestor);
         try {
             checkPermission(requestor, Permission.REMOVE_CERT);

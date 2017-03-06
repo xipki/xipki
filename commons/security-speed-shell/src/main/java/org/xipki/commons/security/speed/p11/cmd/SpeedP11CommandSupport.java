@@ -69,7 +69,7 @@ public abstract class SpeedP11CommandSupport extends SingleSpeedCommandSupport {
     protected String moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     protected P11Slot getSlot()
-    throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+            throws XiSecurityException, P11TokenException, IllegalCmdParamException {
         P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
         if (p11Service == null) {
             throw new IllegalCmdParamException("undefined module " + moduleName);

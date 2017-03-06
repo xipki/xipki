@@ -67,7 +67,7 @@ public class XmlDocumentReader {
     private final XPathFactory xpathfactory;
 
     public XmlDocumentReader(final InputStream xmlStream, final boolean namespaceAware)
-    throws ParserConfigurationException, SAXException, IOException {
+            throws ParserConfigurationException, SAXException, IOException {
         ParamUtil.requireNonNull("xmlStream", xmlStream);
 
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -83,7 +83,7 @@ public class XmlDocumentReader {
         db.setEntityResolver(new EntityResolver() {
             @Override
             public InputSource resolveEntity(final String publicId, final String systemId)
-            throws SAXException, IOException {
+                    throws SAXException, IOException {
                 return new InputSource(new StringReader(""));
             }
         });

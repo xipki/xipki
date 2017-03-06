@@ -93,7 +93,7 @@ public class HttpCmpServlet extends HttpServlet {
 
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         X509Certificate clientCert = ClientCertCache.getTlsClientCert(request, sslCertInHttpHeader);
 
         AuditService auditService = auditServiceRegister.getAuditService();

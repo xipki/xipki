@@ -239,7 +239,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
     } // method importToDb
 
     private List<Integer> getIssuerIds(final Cas issuers, final List<CaType> cas)
-    throws IOException {
+            throws IOException {
         List<Integer> relatedCaIds = new LinkedList<>();
         for (CertstoreCaType issuer : issuers.getCa()) {
             byte[] encodedCert = getBinary(issuer.getCert());
@@ -262,7 +262,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
     }
 
     private List<Integer> importIssuer(final Cas issuers, final List<CaType> cas)
-    throws DataAccessException, CertificateException, IOException {
+            throws DataAccessException, CertificateException, IOException {
         System.out.println("importing table ISSUER");
         final String sql = SQL_ADD_ISSUER;
         PreparedStatement ps = prepareStatement(sql);
@@ -283,7 +283,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
     private void doImportIssuer(final CertstoreCaType issuer, final String sql,
             final PreparedStatement ps, final List<CaType> cas, final List<Integer> relatedCaIds)
-    throws IOException, DataAccessException, CertificateException {
+            throws IOException, DataAccessException, CertificateException {
         try {
             byte[] encodedCert = getBinary(issuer.getCert());
 
@@ -339,7 +339,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
     private void importCert(final CertStoreType certstore, final Map<Integer, String> profileMap,
             final boolean revokedOnly, final List<Integer> caIds, final File processLogFile)
-    throws Exception {
+            throws Exception {
         int numProcessedBefore = 0;
         long minId = 1;
         if (processLogFile.exists()) {

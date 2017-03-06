@@ -146,7 +146,7 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
     @Override
     public void engineLoad(final InputStream stream, final char[] password)
-    throws IOException, NoSuchAlgorithmException, CertificateException {
+            throws IOException, NoSuchAlgorithmException, CertificateException {
         this.creationDate = new Date();
 
         Set<String> moduleNames = p11CryptServiceFactory.getModuleNames();
@@ -194,12 +194,12 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
     @Override
     public void engineStore(final OutputStream stream, final char[] password)
-    throws IOException, NoSuchAlgorithmException, CertificateException {
+            throws IOException, NoSuchAlgorithmException, CertificateException {
     }
 
     @Override
     public Key engineGetKey(final String alias, final char[] password)
-    throws NoSuchAlgorithmException, UnrecoverableKeyException {
+            throws NoSuchAlgorithmException, UnrecoverableKeyException {
         if (!keyCerts.containsKey(alias)) {
             return null;
         }
@@ -241,13 +241,13 @@ public class XipkiKeyStoreSpi extends KeyStoreSpi {
 
     @Override
     public void engineSetKeyEntry(final String alias, final byte[] key, final Certificate[] chain)
-    throws KeyStoreException {
+            throws KeyStoreException {
         throw new KeyStoreException("keystore is read only");
     }
 
     @Override
     public void engineSetCertificateEntry(final String alias, final Certificate cert)
-    throws KeyStoreException {
+            throws KeyStoreException {
         throw new KeyStoreException("keystore is read only");
     }
 

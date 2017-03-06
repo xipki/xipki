@@ -167,7 +167,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
     } // constructor
 
     private void init(final DbSchemaType dbSchemaType, final int caId, final int numPerSelect)
-    throws Exception {
+            throws Exception {
         this.caId = caId;
         this.conn = datasource.getConnection();
         this.dbControl = new XipkiDbControl(dbSchemaType);

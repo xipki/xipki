@@ -84,7 +84,7 @@ public class FileDigestReader implements DigestReader {
     private final int numCertsInOneBlock;
 
     public FileDigestReader(final String caDirname, int numCertsInOneBlock)
-    throws IOException, CertificateException {
+            throws IOException, CertificateException {
         this.caDirname = ParamUtil.requireNonBlank("caDirname", caDirname);
         this.numCertsInOneBlock = ParamUtil.requireMin("numCertsInOneBlock", numCertsInOneBlock, 1);
 
@@ -118,7 +118,7 @@ public class FileDigestReader implements DigestReader {
 
     @Override
     public synchronized CertsBundle nextCerts()
-    throws DataAccessException, InterruptedException {
+            throws DataAccessException, InterruptedException {
         if (!hasNext()) {
             return null;
         }

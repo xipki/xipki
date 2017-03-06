@@ -247,7 +247,7 @@ public class EjbcaDigestExportReader {
     } // constructor
 
     public List<IdentifiedDbDigestEntry> readCerts(final List<IdRange> idRanges)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonNull("idRanges", idRanges);
 
         int size = idRanges.size();

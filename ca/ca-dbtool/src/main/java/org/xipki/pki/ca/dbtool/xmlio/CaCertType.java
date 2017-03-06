@@ -297,7 +297,7 @@ public class CaCertType extends IdentifidDbObjectType {
 
     @Override
     public void writeTo(final DbiXmlWriter writer)
-    throws InvalidDataObjectException, XMLStreamException {
+            throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("writer", writer);
 
         validate();

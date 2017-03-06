@@ -50,7 +50,7 @@ public class P11RSASignLoadTest extends P11SignLoadTest {
 
     public P11RSASignLoadTest(final SecurityFactory securityFactory, final P11Slot slot,
             final String signatureAlgorithm, final int keysize, final BigInteger publicExponent)
-    throws Exception {
+            throws Exception {
         super(securityFactory, slot, signatureAlgorithm,
                 generateKey(slot, keysize, publicExponent),
                 "PKCS#11 RSA signature creation\n"

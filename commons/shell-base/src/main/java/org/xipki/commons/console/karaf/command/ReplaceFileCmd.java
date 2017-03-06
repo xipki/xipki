@@ -97,7 +97,7 @@ public class ReplaceFileCmd extends XipkiCommandSupport {
     }
 
     private void replaceFile(final File file, final String oldText, final String newText)
-    throws Exception {
+            throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();

@@ -269,7 +269,7 @@ public class Scep {
 
     public ContentInfo servicePkiOperation(final CMSSignedData requestContent,
             final String certProfileName, final String msgId, final AuditEvent event)
-    throws MessageDecodingException, OperationException {
+            throws MessageDecodingException, OperationException {
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent,
                 envelopedDataDecryptor, null);
 
@@ -287,7 +287,7 @@ public class Scep {
     private PkiMessage doServicePkiOperation(final CMSSignedData requestContent,
             final DecodedPkiMessage req, final String certProfileName, final String msgId,
             final AuditEvent event)
-    throws MessageDecodingException, OperationException {
+            throws MessageDecodingException, OperationException {
         ParamUtil.requireNonNull("requestContent", requestContent);
         ParamUtil.requireNonNull("req", req);
 
@@ -575,7 +575,7 @@ public class Scep {
     } // method doServicePkiOperation
 
     private SignedData getCert(final X509Ca ca, final BigInteger serialNumber)
-    throws FailInfoException, OperationException {
+            throws FailInfoException, OperationException {
         X509Certificate cert;
         try {
             cert = ca.getCertificate(serialNumber);
@@ -592,7 +592,7 @@ public class Scep {
     } // method getCert
 
     private SignedData pollCert(final X509Ca ca, final X500Name subject, final TransactionId tid)
-    throws FailInfoException, OperationException {
+            throws FailInfoException, OperationException {
         byte[] tidBytes = getTransactionIdBytes(tid.getId());
         List<X509Certificate> certs = ca.getCertificate(subject, tidBytes);
         if (CollectionUtil.isEmpty(certs)) {
@@ -629,7 +629,7 @@ public class Scep {
     } // method buildSignedData
 
     private SignedData getCrl(final X509Ca ca, final BigInteger serialNumber)
-    throws FailInfoException, OperationException {
+            throws FailInfoException, OperationException {
         CertificateList crl = ca.getBcCurrentCrl();
         if (crl == null) {
             throw FailInfoException.BAD_REQUEST;
@@ -648,7 +648,7 @@ public class Scep {
     } // method getCrl
 
     private ContentInfo encodeResponse(final PkiMessage response, final DecodedPkiMessage request)
-    throws OperationException {
+            throws OperationException {
         ParamUtil.requireNonNull("response", response);
         ParamUtil.requireNonNull("request", request);
 
@@ -669,7 +669,7 @@ public class Scep {
     } // method encodeResponse
 
     private static void checkCommonName(final X509Ca ca, final String user, final String cn)
-    throws OperationException {
+            throws OperationException {
         String cnRegex = ca.getCnRegexForUser(user);
         if (StringUtil.isNotBlank(cnRegex)) {
             Pattern pattern = Pattern.compile(cnRegex);
@@ -703,7 +703,7 @@ public class Scep {
     }
 
     static CMSSignedData createDegeneratedSigendData(final X509Certificate... certs)
-    throws CMSException, CertificateException {
+            throws CMSException, CertificateException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
         try {
             for (X509Certificate cert : certs) {

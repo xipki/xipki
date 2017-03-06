@@ -62,7 +62,7 @@ public class DbiXmlWriter {
     private boolean flushed;
 
     public DbiXmlWriter(final String rootElementName, final String version)
-    throws XMLStreamException {
+            throws XMLStreamException {
         this.rootElementName = ParamUtil.requireNonBlank("rootElementName", rootElementName);
         ParamUtil.requireNonBlank("version", version);
 
@@ -116,7 +116,7 @@ public class DbiXmlWriter {
     }
 
     public void rewriteToZipStream(final ZipOutputStream zipStream)
-    throws IOException, XMLStreamException {
+            throws IOException, XMLStreamException {
         ParamUtil.requireNonNull("zipStream", zipStream);
         flush();
         zipStream.write(stream.toByteArray());

@@ -47,7 +47,7 @@ import javax.xml.stream.XMLStreamException;
 public class CaRequestsReader extends DbiXmlReader {
 
     public CaRequestsReader(final InputStream xmlStream)
-    throws XMLStreamException, InvalidDataObjectException {
+            throws XMLStreamException, InvalidDataObjectException {
         super("requests", xmlStream);
     }
 

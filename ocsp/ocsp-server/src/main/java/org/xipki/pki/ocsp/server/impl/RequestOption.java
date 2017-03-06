@@ -267,8 +267,8 @@ class RequestOption {
     }
 
     private static Set<X509Certificate> doGetCerts(final CertCollectionType conf)
-    throws KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException,
-    CertificateException, IOException {
+            throws KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException,
+                CertificateException, IOException {
         ParamUtil.requireNonNull("conf", conf);
         Set<X509Certificate> tmpCerts = new HashSet<>();
 

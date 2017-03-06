@@ -91,7 +91,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
     private String caconfFile = DFLT_CACONF_FILE;
 
     protected void resetAndInit(final LiquibaseDatabaseConf dbConf, final String schemaFile)
-    throws Exception {
+            throws Exception {
         ParamUtil.requireNonNull("dbConf", dbConf);
         ParamUtil.requireNonNull("schemaFile", schemaFile);
 
@@ -116,7 +116,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
     }
 
     protected void update(final LiquibaseDatabaseConf dbConf, final String schemaFile)
-    throws Exception {
+            throws Exception {
         ParamUtil.requireNonNull("dbConf", dbConf);
         ParamUtil.requireNonNull("schemaFile", schemaFile);
 
@@ -139,14 +139,14 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
     }
 
     private static Properties getDbConfPoperties(final String dbconfFile)
-    throws FileNotFoundException, IOException {
+            throws FileNotFoundException, IOException {
         Properties props = new Properties();
         props.load(new FileInputStream(IoUtil.expandFilepath(dbconfFile)));
         return props;
     }
 
     protected Map<String, LiquibaseDatabaseConf> getDatabaseConfs()
-    throws FileNotFoundException, IOException, PasswordResolverException {
+            throws FileNotFoundException, IOException, PasswordResolverException {
         Map<String, LiquibaseDatabaseConf> ret = new HashMap<>();
         Properties props = getPropertiesFromFile(caconfFile);
         for (Object objKey : props.keySet()) {
@@ -165,7 +165,7 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
     }
 
     private static Properties getPropertiesFromFile(final String propFile)
-    throws FileNotFoundException, IOException {
+            throws FileNotFoundException, IOException {
         Properties props = new Properties();
         props.load(new FileInputStream(IoUtil.expandFilepath(propFile)));
         return props;

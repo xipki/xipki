@@ -143,7 +143,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
     @Override
     public SubjectInfo getSubject(final X500Name requestedSubject)
-    throws CertprofileException, BadCertTemplateException {
+            throws CertprofileException, BadCertTemplateException {
         ParamUtil.requireNonNull("requestedSubject", requestedSubject);
 
         verifySubjectDnOccurence(requestedSubject);
@@ -262,7 +262,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
     @Override
     public SubjectPublicKeyInfo checkPublicKey(final SubjectPublicKeyInfo publicKey)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         ParamUtil.requireNonNull("publicKey", publicKey);
 
         Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = getKeyAlgorithms();
@@ -377,7 +377,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     }
 
     protected void verifySubjectDnOccurence(final X500Name requestedSubject)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         ParamUtil.requireNonNull("requestedSubject", requestedSubject);
 
         SubjectControl occurences = getSubjectControl();
@@ -459,7 +459,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
 
     private static RDN createPostalAddressRdn(final ASN1ObjectIdentifier type,
             final ASN1Encodable rdnValue, final RdnControl control, final int index)
-    throws BadCertTemplateException {
+            throws BadCertTemplateException {
         ParamUtil.requireNonNull("type", type);
 
         if (!(rdnValue instanceof ASN1Sequence)) {

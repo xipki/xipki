@@ -81,7 +81,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
     public XipkiDigestExporter(final DataSourceWrapper datasource, final String baseDir,
             final AtomicBoolean stopMe, final int numCertsPerSelect,
             final DbSchemaType dbSchemaType)
-    throws DataAccessException, IOException {
+            throws DataAccessException, IOException {
         super(datasource, baseDir, stopMe);
         this.numCertsPerSelect = ParamUtil.requireMin("numCertsPerSelect", numCertsPerSelect, 1);
         this.dbControl = new XipkiDbControl(dbSchemaType);

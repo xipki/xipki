@@ -158,7 +158,7 @@ public class DbToolBase {
     }
 
     public long getMin(final String table, final String column, final String condition)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
@@ -173,7 +173,7 @@ public class DbToolBase {
     }
 
     public long getMax(final String table, final String column, final String condition)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
@@ -187,7 +187,7 @@ public class DbToolBase {
     }
 
     public boolean tableHasColumn(final String table, final String column)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
@@ -248,7 +248,7 @@ public class DbToolBase {
     }
 
     protected static void setLong(final PreparedStatement ps, final int index, final Long value)
-    throws SQLException {
+            throws SQLException {
         ParamUtil.requireNonNull("ps", ps);
 
         if (value != null) {
@@ -259,7 +259,7 @@ public class DbToolBase {
     }
 
     protected static void setInt(final PreparedStatement ps, final int index, final Integer value)
-    throws SQLException {
+            throws SQLException {
         ParamUtil.requireNonNull("ps", ps);
 
         if (value != null) {
@@ -348,7 +348,7 @@ public class DbToolBase {
     } // method buildFilename
 
     public static ZipOutputStream getZipOutputStream(final File zipFile)
-    throws FileNotFoundException {
+            throws FileNotFoundException {
         ParamUtil.requireNonNull("zipFile", zipFile);
 
         BufferedOutputStream out = new BufferedOutputStream(

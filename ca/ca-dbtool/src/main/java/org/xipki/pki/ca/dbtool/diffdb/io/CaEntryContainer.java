@@ -60,7 +60,7 @@ public class CaEntryContainer {
     }
 
     public void addDigestEntry(final int caId, final long id, final DbDigestEntry reportEntry)
-    throws IOException, InvalidDataObjectException {
+            throws IOException, InvalidDataObjectException {
         CaEntry ce = caEntryMap.get(caId);
         if (ce == null) {
             throw new IllegalArgumentException("unknown caId '" + caId + "'");

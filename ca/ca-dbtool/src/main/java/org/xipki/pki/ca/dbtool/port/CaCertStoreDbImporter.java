@@ -270,7 +270,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     } // method importToDb
 
     private void importCa(final Cas cas)
-    throws DataAccessException, CertificateException, IOException {
+            throws DataAccessException, CertificateException, IOException {
         final String sql = "INSERT INTO CS_CA (ID,SUBJECT,SHA1_CERT,CERT) VALUES (?,?,?,?)";
         System.out.println("importing table CS_CA");
         PreparedStatement ps = prepareStatement(sql);
@@ -578,7 +578,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             final long minId, final File processLogFile, final ProcessLog processLog,
             final int numProcessedInLastProcess, final PreparedStatement[] statements,
             final String[] sqls)
-    throws Exception {
+            throws Exception {
         final int numEntriesPerCommit = Math.max(1,
                 Math.round(type.getSqlBatchFactor() * numCertsPerCommit));
 
@@ -892,7 +892,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
     } // method doImportEntries
 
     private static DbiXmlReader createReader(final CaDbEntryType type, final InputStream is)
-    throws XMLStreamException, InvalidDataObjectException {
+            throws XMLStreamException, InvalidDataObjectException {
         switch (type) {
         case CERT:
             return new CaCertsReader(is);

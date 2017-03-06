@@ -52,7 +52,7 @@ public class CaRequestCertsWriter extends DbiXmlWriter {
     }
 
     public void add(final CaRequestCertType entry)
-    throws InvalidDataObjectException, XMLStreamException {
+            throws InvalidDataObjectException, XMLStreamException {
         ParamUtil.requireNonNull("entry", entry);
         entry.validate();
         entry.writeTo(this);

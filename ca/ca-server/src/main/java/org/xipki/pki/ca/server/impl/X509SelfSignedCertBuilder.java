@@ -300,7 +300,8 @@ class X509SelfSignedCertBuilder {
             final X500Name grantedSubject, final Extensions extensions,
             final SubjectPublicKeyInfo requestedPublicKeyInfo, final PublicCaInfo publicCaInfo,
             final Date notBefore, final Date notAfter)
-    throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException {
+            throws CertprofileException, IOException, BadCertTemplateException,
+                NoSuchAlgorithmException {
         ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, grantedSubject,
                 extensions, requestedPublicKeyInfo, publicCaInfo, null, notBefore, notAfter);
         if (extensionTuples == null) {
@@ -314,7 +315,7 @@ class X509SelfSignedCertBuilder {
     } // method addExtensions
 
     public static AsymmetricKeyParameter generatePublicKeyParameter(final PublicKey key)
-    throws InvalidKeyException {
+            throws InvalidKeyException {
         ParamUtil.requireNonNull("key", key);
         if (key instanceof RSAPublicKey) {
             RSAPublicKey rsakey = (RSAPublicKey) key;

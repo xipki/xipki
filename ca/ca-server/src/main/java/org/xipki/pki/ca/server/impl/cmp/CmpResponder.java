@@ -297,7 +297,7 @@ abstract class CmpResponder {
 
     private ProtectionVerificationResult verifyProtection(final String tid,
             final GeneralPKIMessage pkiMessage, final CmpControl cmpControl)
-    throws CMPException, InvalidKeyException, OperatorCreationException {
+            throws CMPException, InvalidKeyException, OperatorCreationException {
         ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
         if (protectedMsg.hasPasswordBasedMacProtection()) {

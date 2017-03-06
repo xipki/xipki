@@ -92,7 +92,7 @@ public class HttpOcspServlet extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         ResponderAndRelativeUri respAndUri = server.getResponderAndRelativeUri(request);
         if (respAndUri == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -109,7 +109,7 @@ public class HttpOcspServlet extends HttpServlet {
 
     @Override
     protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         ResponderAndRelativeUri respAndUri = server.getResponderAndRelativeUri(request);
         if (respAndUri == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);

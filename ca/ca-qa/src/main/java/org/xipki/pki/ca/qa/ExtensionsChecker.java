@@ -226,7 +226,7 @@ public class ExtensionsChecker {
     private XmlX509Certprofile certProfile;
 
     public ExtensionsChecker(final X509ProfileType conf, final XmlX509Certprofile certProfile)
-    throws CertprofileException {
+            throws CertprofileException {
         this.certProfile = ParamUtil.requireNonNull("certProfile", certProfile);
 
         ParamUtil.requireNonNull("conf", conf);
@@ -1628,7 +1628,7 @@ public class ExtensionsChecker {
 
     private GeneralName[] getRequestedSubjectAltNames(final X500Name requestedSubject,
             final Extensions requestedExtensions)
-    throws CertprofileException, BadCertTemplateException {
+            throws CertprofileException, BadCertTemplateException {
         ASN1Encodable extValue = (requestedExtensions == null) ? null :
             requestedExtensions.getExtensionParsedValue(Extension.subjectAlternativeName);
 
@@ -2448,7 +2448,7 @@ public class ExtensionsChecker {
 
     private Object getExtensionValue(final ASN1ObjectIdentifier type,
             final ExtensionsType extensionsType, final Class<?> expectedClass)
-    throws CertprofileException {
+            throws CertprofileException {
         for (ExtensionType m : extensionsType.getExtension()) {
             if (!m.getType().getValue().equals(type.getId())) {
                 continue;
@@ -2515,7 +2515,7 @@ public class ExtensionsChecker {
     } // method buildConstantExtesions
 
     private static ASN1Encodable readAsn1Encodable(final byte[] encoded)
-    throws CertprofileException {
+            throws CertprofileException {
         ASN1StreamParser parser = new ASN1StreamParser(encoded);
         try {
             return parser.readObject();

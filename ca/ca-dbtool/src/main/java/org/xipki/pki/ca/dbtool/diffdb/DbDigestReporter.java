@@ -85,7 +85,7 @@ public class DbDigestReporter {
     private AtomicInteger numError = new AtomicInteger(0);
 
     public DbDigestReporter(final String reportDirname, final byte[] caCertBytes)
-    throws IOException {
+            throws IOException {
         this.reportDirname = ParamUtil.requireNonBlank("reportDirname", reportDirname);
         File dir = new File(reportDirname);
         dir.mkdirs();
@@ -129,7 +129,7 @@ public class DbDigestReporter {
     }
 
     public void addDiff(final DbDigestEntry refCert, final DbDigestEntry targetCert)
-    throws IOException {
+            throws IOException {
         ParamUtil.requireNonNull("refCert", refCert);
         ParamUtil.requireNonNull("targetCert", targetCert);
 
@@ -214,7 +214,7 @@ public class DbDigestReporter {
 
     private static void writeSerialNumberLine(final BufferedWriter writer,
             final BigInteger serialNumber)
-    throws IOException {
+            throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append(serialNumber.toString(16)).append('\n');
         String msg = sb.toString();

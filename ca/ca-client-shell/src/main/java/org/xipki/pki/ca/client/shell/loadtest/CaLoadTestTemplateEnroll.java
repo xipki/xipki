@@ -257,7 +257,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
     } // method nextCertRequests
 
     public static EnrollTemplateType parse(final InputStream configStream)
-    throws InvalidConfException {
+            throws InvalidConfException {
         ParamUtil.requireNonNull("configStream", configStream);
         Object root;
 

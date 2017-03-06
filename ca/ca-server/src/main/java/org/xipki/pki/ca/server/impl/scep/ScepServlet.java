@@ -99,13 +99,13 @@ public class ScepServlet extends HttpServlet {
 
     @Override
     public void doGet(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         service(request, response, false);
     }
 
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         service(request, response, true);
     }
 

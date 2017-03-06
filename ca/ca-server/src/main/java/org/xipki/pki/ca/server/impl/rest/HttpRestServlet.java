@@ -94,19 +94,19 @@ public class HttpRestServlet extends HttpServlet {
 
     @Override
     public void doGet(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         doService(true, request, response);
     }
 
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         doService(false, request, response);
     }
 
     private void doService(final boolean perRequest, final HttpServletRequest request,
             final HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         X509Certificate clientCert = ClientCertCache.getTlsClientCert(request,sslCertInHttpHeader);
 
         AuditService auditService = auditServiceRegister.getAuditService();

@@ -1344,7 +1344,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeCertprofileFromCa(final String profileName, final String caName)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("profileName", profileName);
         String tmpCaName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
         asssertMasterMode();
@@ -1364,7 +1364,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean addCertprofileToCa(final String profileName, final String caName)
-    throws CaMgmtException {
+            throws CaMgmtException {
         String tmpProfileName = ParamUtil.requireNonBlank("profileName", profileName);
         String tmpCaName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
 
@@ -1391,7 +1391,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removePublisherFromCa(final String publisherName, final String caName)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("publisherName", publisherName);
         String tmpCaName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
         asssertMasterMode();
@@ -1408,7 +1408,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean addPublisherToCa(final String publisherName, final String caName)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("publisherName", publisherName);
         String tmpCaName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
         asssertMasterMode();
@@ -1506,7 +1506,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean changeCmpRequestor(final String name, final String base64Cert)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         asssertMasterMode();
         if (base64Cert == null) {
@@ -1528,7 +1528,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeCmpRequestorFromCa(final String requestorName, final String caName)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("requestorName", requestorName);
         String tmpCaName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
         asssertMasterMode();
@@ -1549,7 +1549,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean addCmpRequestorToCa(final CaHasRequestorEntry requestor, final String caName)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonNull("requestor", requestor);
         String tmpCaName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
         asssertMasterMode();
@@ -1606,7 +1606,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean changeCertprofile(final String name, final String type, final String conf)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         if (type == null && conf == null) {
             return false;
@@ -1875,7 +1875,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean changePublisher(final String name, final String type, final String conf)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
         asssertMasterMode();
         if (type == null && conf == null) {
@@ -2125,7 +2125,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean publishRootCa(final String caName, final String certprofile)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonBlank("certprofile", certprofile);
         asssertMasterMode();
@@ -2178,7 +2178,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean revokeCa(final String caName, final CertRevocationInfo revocationInfo)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonNull("revocationInfo", revocationInfo);
         asssertMasterMode();
@@ -2284,7 +2284,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean clearPublishQueue(final String caName, final List<String> publisherNames)
-    throws CaMgmtException {
+            throws CaMgmtException {
         asssertMasterMode();
 
         if (caName == null) {
@@ -2336,7 +2336,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean unrevokeCertificate(final String caName, final BigInteger serialNumber)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
         X509Ca ca = getX509Ca(caName);
@@ -2349,7 +2349,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean removeCertificate(final String caName, final BigInteger serialNumber)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
         asssertMasterMode();
@@ -2368,7 +2368,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public X509Certificate generateCertificate(final String caName, final String profileName,
             final byte[] encodedCsr, Date notBefore, Date notAfter)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonBlank("profileName", profileName);
         ParamUtil.requireNonNull("encodedCsr", encodedCsr);
@@ -2576,7 +2576,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method shutdownPublisher
 
     CmpResponderEntryWrapper createCmpResponder(final CmpResponderEntry dbEntry)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         CmpResponderEntryWrapper ret = new CmpResponderEntryWrapper();
         ret.setDbEntry(dbEntry);
@@ -2591,7 +2591,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method createCmpResponder
 
     X509CrlSignerEntryWrapper createX509CrlSigner(final X509CrlSignerEntry dbEntry)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         X509CrlSignerEntryWrapper signer = new X509CrlSignerEntryWrapper();
         try {
@@ -2633,7 +2633,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     } // method createCertprofile
 
     IdentifiedX509CertPublisher createPublisher(final PublisherEntry dbEntry)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         String name = dbEntry.getName();
         String type = dbEntry.getType();
@@ -2662,7 +2662,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean changeUser(final String username, final String password, final String cnRegex)
-    throws CaMgmtException {
+            throws CaMgmtException {
         return certstore.changeUser(username, password, cnRegex);
     }
 
@@ -2800,7 +2800,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private static String canonicalizeSignerConf(final String keystoreType, final String signerConf,
             final X509Certificate[] certChain, final SecurityFactory securityFactory)
-    throws Exception {
+            throws Exception {
         if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
             return signerConf;
         }
@@ -2828,7 +2828,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public CertWithStatusInfo getCert(String caName, BigInteger serialNumber)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
@@ -2844,7 +2844,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public byte[] getCertRequest(String caName, BigInteger serialNumber)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
@@ -3262,7 +3262,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public boolean exportConf(@NonNull String zipFilename, @Nullable List<String> caNames)
-    throws CaMgmtException, IOException {
+            throws CaMgmtException, IOException {
         List<String> upperCaNames;
         if (caNames == null) {
             upperCaNames = null;
@@ -3670,7 +3670,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     private static ZipOutputStream getZipOutputStream(final File zipFile)
-    throws FileNotFoundException {
+            throws FileNotFoundException {
         ParamUtil.requireNonNull("zipFile", zipFile);
 
         BufferedOutputStream out = new BufferedOutputStream(

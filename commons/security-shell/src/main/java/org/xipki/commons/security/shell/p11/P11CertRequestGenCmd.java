@@ -82,7 +82,7 @@ public class P11CertRequestGenCmd extends CertRequestGenCommandSupport {
 
     @Override
     protected ConcurrentContentSigner getSigner(final SignatureAlgoControl signatureAlgoControl)
-    throws Exception {
+            throws Exception {
         ParamUtil.requireNonNull("signatureAlgoControl", signatureAlgoControl);
 
         byte[] idBytes = null;

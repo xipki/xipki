@@ -141,12 +141,12 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
     protected abstract void checkParameters(@Nullable X509Certificate respIssuer,
             @NonNull List<BigInteger> serialNumbers, @Nullable Map<BigInteger, byte[]> encodedCerts)
-    throws Exception;
+            throws Exception;
 
     protected abstract Object processResponse(@NonNull OCSPResp response,
             @Nullable X509Certificate respIssuer, @NonNull IssuerHash issuerHash,
             @NonNull List<BigInteger> serialNumbers, @Nullable Map<BigInteger, byte[]> encodedCerts)
-    throws Exception;
+            throws Exception;
 
     @Override
     protected final Object doExecute() throws Exception {
@@ -295,7 +295,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     } // method doExecute
 
     public static List<String> extractOcspUrls(final X509Certificate cert)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         byte[] extValue = X509Util.getCoreExtValue(cert, Extension.authorityInfoAccess);
         if (extValue == null) {
             return Collections.emptyList();
@@ -306,7 +306,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     }
 
     public static List<String> extractOcspUrls(final X509AttributeCertificateHolder cert)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         byte[] extValue = X509Util.getCoreExtValue(cert, Extension.authorityInfoAccess);
         if (extValue == null) {
             return Collections.emptyList();
@@ -316,7 +316,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     }
 
     public static List<String> extractOcspUrls(final AuthorityInformationAccess aia)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         AccessDescription[] accessDescriptions = aia.getAccessDescriptions();
         List<AccessDescription> ocspAccessDescriptions = new LinkedList<>();
         for (AccessDescription accessDescription : accessDescriptions) {

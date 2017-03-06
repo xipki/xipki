@@ -47,7 +47,7 @@ import javax.xml.stream.XMLStreamException;
 public class CaUsersReader extends DbiXmlReader {
 
     public CaUsersReader(final InputStream xmlStream)
-    throws XMLStreamException, InvalidDataObjectException {
+            throws XMLStreamException, InvalidDataObjectException {
         super("users", xmlStream);
     }
 

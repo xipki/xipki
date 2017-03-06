@@ -114,7 +114,7 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
     }
 
     public static Asn1RemoveObjectsParams getInstance(final Object obj)
-    throws BadAsn1ObjectException {
+            throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1RemoveObjectsParams) {
             return (Asn1RemoveObjectsParams) obj;
         }

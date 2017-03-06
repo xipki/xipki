@@ -75,7 +75,7 @@ public class PasswordHash {
      * @return a salted PBKDF2 hash of the password
      */
     public static String createHash(final String password)
-    throws NoSuchAlgorithmException, InvalidKeySpecException {
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         ParamUtil.requireNonBlank("password", password);
         return createHash(password.getBytes());
     }
@@ -87,7 +87,7 @@ public class PasswordHash {
      * @return a salted PBKDF2 hash of the password
      */
     public static String createHash(final byte[] password)
-    throws NoSuchAlgorithmException, InvalidKeySpecException {
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         return createHash(password, SALT_BYTE_SIZE, PBKDF2_ITERATIONS, DERIVED_KEY_SIZE);
     }
 
@@ -119,7 +119,7 @@ public class PasswordHash {
      * @return true if the password is correct, false if not
      */
     public static boolean validatePassword(final String password, final String correctHash)
-    throws NoSuchAlgorithmException, InvalidKeySpecException {
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         ParamUtil.requireNonBlank("password", password);
         return validatePassword(password.getBytes(), correctHash);
     }
@@ -132,7 +132,7 @@ public class PasswordHash {
      * @return true if the password is correct, false if not
      */
     public static boolean validatePassword(final byte[] password, final String correctHash)
-    throws NoSuchAlgorithmException, InvalidKeySpecException {
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         ParamUtil.requireNonNull("password", password);
         // Decode the hash into its parameters
         String[] params = correctHash.split(":");

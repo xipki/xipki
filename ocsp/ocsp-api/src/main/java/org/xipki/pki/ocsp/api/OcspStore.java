@@ -84,7 +84,7 @@ public abstract class OcspStore {
             @NonNull byte[] issuerNameHash, @NonNull byte[] issuerKeyHash,
             @NonNull BigInteger serialNumber, boolean includeCertHash,
             @Nullable HashAlgoType certHashAlg, @Nullable CertprofileOption certprofileOption)
-    throws OcspStoreException;
+            throws OcspStoreException;
 
     public abstract void init(@Nullable String conf, @Nullable DataSourceWrapper datasource,
             @NonNull Set<HashAlgoType> certHashAlgos) throws OcspStoreException;

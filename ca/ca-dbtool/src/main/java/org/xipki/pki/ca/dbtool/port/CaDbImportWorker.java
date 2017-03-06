@@ -79,7 +79,7 @@ public class CaDbImportWorker extends DbPortWorker {
     public CaDbImportWorker(final DataSourceFactory datasourceFactory,
             final PasswordResolver passwordResolver, final String dbConfFile, final boolean resume,
             final String srcFolder, final int batchEntriesPerCommit, final boolean evaluateOnly)
-    throws DataAccessException, PasswordResolverException, IOException, JAXBException {
+            throws DataAccessException, PasswordResolverException, IOException, JAXBException {
         ParamUtil.requireNonNull("datasourceFactory", datasourceFactory);
 
         Properties props = DbPorter.getDbConfProperties(

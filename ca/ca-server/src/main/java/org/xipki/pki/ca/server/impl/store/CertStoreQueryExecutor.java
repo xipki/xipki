@@ -403,7 +403,7 @@ class CertStoreQueryExecutor {
     private final SQLs sqls;
 
     CertStoreQueryExecutor(final DataSourceWrapper datasource, final UniqueIdGenerator idGenerator)
-    throws DataAccessException {
+            throws DataAccessException {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
         this.idGenerator = ParamUtil.requireNonNull("idGenerator", idGenerator);
         this.caInfoStore = initCertBasedIdentyStore("CS_CA");
@@ -421,7 +421,7 @@ class CertStoreQueryExecutor {
     } // constructor
 
     private CertBasedIdentityStore initCertBasedIdentyStore(final String table)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonNull("table", table);
         final String sql = new StringBuilder("SELECT ID,SUBJECT,SHA1_CERT,CERT FROM ")
                     .append(table).toString();
@@ -473,7 +473,7 @@ class CertStoreQueryExecutor {
             final byte[] encodedSubjectPublicKey, final String certprofileName,
             final String requestorName, final String user, final RequestType reqType,
             final byte[] transactionId, final X500Name reqSubject)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("certificate", certificate);
         ParamUtil.requireNonNull("certprofileName", certprofileName);
 
@@ -599,7 +599,7 @@ class CertStoreQueryExecutor {
     } // method addCert
 
     void addToPublishQueue(final String publisherName, final long certId, final X509Cert caCert)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonBlank("publisherName", publisherName);
         ParamUtil.requireNonNull("caCert", caCert);
 
@@ -621,7 +621,7 @@ class CertStoreQueryExecutor {
     }
 
     void removeFromPublishQueue(final String publisherName, final long certId)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonBlank("publisherName", publisherName);
 
         final String sql = SQLs.SQL_REMOVE_PUBLISHQUEUE;
@@ -640,7 +640,7 @@ class CertStoreQueryExecutor {
     }
 
     long getMaxIdOfDeltaCrlCache(final X509Cert caCert)
-    throws OperationException, DataAccessException {
+            throws OperationException, DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
 
         final String sql = SQLs.SQL_MAXID_DELTACRL_CACHE;
@@ -661,7 +661,7 @@ class CertStoreQueryExecutor {
     }
 
     public void clearDeltaCrlCache(final X509Cert caCert, final long maxId)
-    throws OperationException, DataAccessException {
+            throws OperationException, DataAccessException {
         final String sql = SQLs.CLEAR_DELTACRL_CACHE;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
@@ -677,7 +677,7 @@ class CertStoreQueryExecutor {
     }
 
     void clearPublishQueue(final X509Cert caCert, final String publisherName)
-    throws OperationException, DataAccessException {
+            throws OperationException, DataAccessException {
         StringBuilder sqlBuilder = new StringBuilder(80);
         sqlBuilder.append("DELETE FROM PUBLISHQUEUE");
         if (caCert != null || publisherName != null) {
@@ -737,7 +737,7 @@ class CertStoreQueryExecutor {
     }
 
     Long getThisUpdateOfCurrentCrl(final X509Cert caCert)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
 
         final String sql = SQLs.SQL_MAX_THISUPDAATE_CRL;
@@ -782,7 +782,7 @@ class CertStoreQueryExecutor {
     }
 
     void addCrl(final X509Cert caCert, final X509CRL crl)
-    throws DataAccessException, CRLException, OperationException {
+            throws DataAccessException, CRLException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("crl", crl);
 
@@ -906,7 +906,7 @@ class CertStoreQueryExecutor {
     X509CertWithRevocationInfo revokeSuspendedCert(final X509Cert caCert,
             final BigInteger serialNumber, final CrlReason reason,
             final boolean publishToDeltaCrlCache)
-    throws OperationException, DataAccessException {
+            throws OperationException, DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
         ParamUtil.requireNonNull("reason", reason);
@@ -964,7 +964,7 @@ class CertStoreQueryExecutor {
 
     X509CertWithDbId unrevokeCert(final X509Cert caCert, final BigInteger serialNumber,
             final boolean force, final boolean publishToDeltaCrlCache)
-    throws OperationException, DataAccessException {
+            throws OperationException, DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
@@ -1026,7 +1026,7 @@ class CertStoreQueryExecutor {
     } // method unrevokeCert
 
     private void publishToDeltaCrlCache(final int caId, final BigInteger serialNumber)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
         final String sql = SQLs.SQL_ADD_DELTACRL_CACHE;
@@ -1047,13 +1047,13 @@ class CertStoreQueryExecutor {
     }
 
     X509CertWithDbId getCert(final X509Cert caCert, final BigInteger serialNumber)
-    throws OperationException, DataAccessException {
+            throws OperationException, DataAccessException {
         X509CertWithRevocationInfo crtWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
         return (crtWithRevInfo == null) ? null : crtWithRevInfo.getCert();
     }
 
     void removeCertificate(final X509Cert caCert, final BigInteger serialNumber)
-    throws OperationException, DataAccessException {
+            throws OperationException, DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
@@ -1082,7 +1082,7 @@ class CertStoreQueryExecutor {
 
     List<Long> getPublishQueueEntries(final X509Cert caCert, final String publisherName,
             final int numEntries)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
 
         Integer publisherId = publisherStore.getId(publisherName);
@@ -1121,7 +1121,7 @@ class CertStoreQueryExecutor {
     } // method getPublishQueueEntries
 
     boolean containsCertificates(final X509Cert caCert, final boolean ee)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
 
         final String sql = sqls.sqlContainsCertificates;
@@ -1142,7 +1142,7 @@ class CertStoreQueryExecutor {
     } // method containsCertificates
 
     long getCountOfCerts(final X509Cert caCert, final boolean onlyRevoked)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
         final String sql;
         if (onlyRevoked) {
@@ -1169,7 +1169,7 @@ class CertStoreQueryExecutor {
 
     List<SerialWithId> getSerialNumbers(final X509Cert caCert,  final long startId,
             final int numEntries, final boolean onlyRevoked)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
@@ -1202,7 +1202,7 @@ class CertStoreQueryExecutor {
     List<SerialWithId> getSerialNumbers(final X509Cert caCert, final Date notExpiredAt,
             final long startId, final int numEntries, final boolean onlyRevoked,
             final boolean onlyCaCerts, final boolean onlyUserCerts)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
@@ -1302,7 +1302,7 @@ class CertStoreQueryExecutor {
     } // method getSuspendedCertIds
 
     byte[] getEncodedCrl(final X509Cert caCert, final BigInteger crlNumber)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
 
         int caId = getCaId(caCert);
@@ -1341,7 +1341,7 @@ class CertStoreQueryExecutor {
     } // method getEncodedCrl
 
     int cleanupCrls(final X509Cert caCert, final int numCrls)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireMin("numCrls", numCrls, 1);
 
@@ -1393,7 +1393,7 @@ class CertStoreQueryExecutor {
     } // method cleanupCrls
 
     X509CertificateInfo getCertForId(final X509Cert caCert, final long certId)
-    throws DataAccessException, OperationException, CertificateException {
+            throws DataAccessException, OperationException, CertificateException {
         ParamUtil.requireNonNull("caCert", caCert);
 
         final String sql = sqls.sqlCertForId;
@@ -1446,7 +1446,7 @@ class CertStoreQueryExecutor {
     } // method getCertForId
 
     X509CertWithDbId getCertForId(final long certId)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         final String sql = sqls.sqlRawCertForId;
 
         String b64Cert;
@@ -1547,7 +1547,7 @@ class CertStoreQueryExecutor {
     } // method getCertWithRevocationInfo
 
     X509CertificateInfo getCertificateInfo(final X509Cert caCert, final BigInteger serial)
-    throws DataAccessException, OperationException, CertificateException {
+            throws DataAccessException, OperationException, CertificateException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("serial", serial);
 
@@ -1615,7 +1615,7 @@ class CertStoreQueryExecutor {
     } // method getCertificateInfo
 
     String getCertProfileForId(final X509Cert caCert, final long id)
-    throws OperationException, DataAccessException {
+            throws OperationException, DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
 
         final String sql = sqls.sqlCertprofileForId;
@@ -1646,7 +1646,7 @@ class CertStoreQueryExecutor {
     } // method getCertProfileForId
 
     String getCertProfileForSerial(final X509Cert caCert, final BigInteger serial)
-    throws OperationException, DataAccessException {
+            throws OperationException, DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("serial", serial);
 
@@ -1682,7 +1682,7 @@ class CertStoreQueryExecutor {
      *     matches the subject.
      */
     List<X509Certificate> getCertificate(final X500Name subjectName, final byte[] transactionId)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         final String sql = (transactionId != null)
                 ? "SELECT ID FROM CERT WHERE TID=? AND (FP_S=? OR FP_RS=?)"
                 : "SELECT ID FROM CERT WHERE FP_S=? OR FP_RS=?";
@@ -1728,7 +1728,7 @@ class CertStoreQueryExecutor {
     } // method getCertificate
 
     byte[] getCertRequest(final X509Cert caCert, final BigInteger serialNumber)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
@@ -1892,7 +1892,7 @@ class CertStoreQueryExecutor {
     }
 
     boolean authenticateUser(final String user, final byte[] password)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         final String sql = sqls.sqlPasswordForUser;
 
         String expPasswordText = null;
@@ -1949,7 +1949,7 @@ class CertStoreQueryExecutor {
     }
 
     KnowCertResult knowsCertForSerial(final X509Cert caCert, final BigInteger serial)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("serial", serial);
         int caId = getCaId(caCert);
 
@@ -1981,7 +1981,7 @@ class CertStoreQueryExecutor {
     List<CertRevInfoWithSerial> getRevokedCertificates(final X509Cert caCert,
             final Date notExpiredAt, final long startId, final int numEntries,
             final boolean onlyCaCerts, final boolean onlyUserCerts)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireNonNull("notExpiredAt", notExpiredAt);
         ParamUtil.requireMin("numEntries", numEntries, 1);
@@ -2034,7 +2034,7 @@ class CertStoreQueryExecutor {
     List<CertRevInfoWithSerial> getCertificatesForDeltaCrl(final X509Cert caCert,
             final long startId, final int numEntries, final boolean onlyCaCerts,
             final boolean onlyUserCerts)
-    throws DataAccessException, OperationException {
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("caCert", caCert);
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
@@ -2114,19 +2114,19 @@ class CertStoreQueryExecutor {
     } // method getCertificatesForDeltaCrl
 
     CertStatus getCertStatusForSubject(final X509Cert caCert, final X500Principal subject)
-    throws DataAccessException {
+            throws DataAccessException {
         long subjectFp = X509Util.fpCanonicalizedName(subject);
         return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 
     CertStatus getCertStatusForSubject(final X509Cert caCert, final X500Name subject)
-    throws DataAccessException {
+            throws DataAccessException {
         long subjectFp = X509Util.fpCanonicalizedName(subject);
         return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 
     private CertStatus getCertStatusForSubjectFp(final X509Cert caCert, final long subjectFp)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
         byte[] encodedCert = caCert.getEncodedCert();
         Integer caId = caInfoStore.getCaIdForCert(encodedCert);
@@ -2155,7 +2155,7 @@ class CertStoreQueryExecutor {
     } // method getCertStatusForSubjectFp
 
     boolean isCertForSubjectIssued(final X509Cert caCert, final long subjectFp)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonNull("caCert", caCert);
         byte[] encodedCert = caCert.getEncodedCert();
         Integer caId = caInfoStore.getCaIdForCert(encodedCert);
@@ -2328,7 +2328,7 @@ class CertStoreQueryExecutor {
     } // method addName
 
     private PreparedStatement[] borrowPreparedStatements(final String... sqlQueries)
-    throws DataAccessException {
+            throws DataAccessException {
         Connection conn = datasource.getConnection();
         if (conn == null) {
             throw new DataAccessException("could not get connection");
@@ -2365,7 +2365,7 @@ class CertStoreQueryExecutor {
     } // method borrowPreparedStatements
 
     private PreparedStatement borrowPreparedStatement(final String sqlQuery)
-    throws DataAccessException {
+            throws DataAccessException {
         PreparedStatement ps = null;
         Connection conn = datasource.getConnection();
         if (conn != null) {
@@ -2480,7 +2480,7 @@ class CertStoreQueryExecutor {
     } // method getNotBeforeOfFirstCertStartsWithCommonName
 
     void commitNextCrlNoIfLess(final String caName, final long nextCrlNo)
-    throws DataAccessException {
+            throws DataAccessException {
         Connection conn = datasource.getConnection();
         PreparedStatement ps = null;
         try {
@@ -2626,7 +2626,7 @@ class CertStoreQueryExecutor {
     } // method executeGetUserIdSql
 
     private void executeAddUserSql(final long id, final UserEntry userEntry)
-    throws CaMgmtException {
+            throws CaMgmtException {
         ParamUtil.requireNonNull("userEntry", userEntry);
         final String sql = "INSERT INTO USERNAME (ID,NAME,PASSWORD,CN_REGEX) VALUES (?,?,?,?)";
 
@@ -2670,7 +2670,7 @@ class CertStoreQueryExecutor {
     } // method removeUser
 
     boolean changeUser(final String username, final String password, final String cnRegex)
-    throws CaMgmtException {
+            throws CaMgmtException {
         Long existingId = executeGetUserIdSql(username);
         if (existingId == null) {
             throw new CaMgmtException("user named '" + username + " ' does not exist");
@@ -2784,12 +2784,12 @@ class CertStoreQueryExecutor {
     }
 
     private static void setBoolean(final PreparedStatement ps, final int index, final boolean value)
-    throws SQLException {
+            throws SQLException {
         ps.setInt(index, value ? 1 : 0);
     }
 
     private static void setLong(final PreparedStatement ps, final int index, final Long value)
-    throws SQLException {
+            throws SQLException {
         if (value != null) {
             ps.setLong(index, value.longValue());
         } else {
@@ -2798,7 +2798,7 @@ class CertStoreQueryExecutor {
     }
 
     private static void setInt(final PreparedStatement ps, final int index, final Integer value)
-    throws SQLException {
+            throws SQLException {
         if (value != null) {
             ps.setInt(index, value.intValue());
         } else {
@@ -2807,7 +2807,7 @@ class CertStoreQueryExecutor {
     }
 
     private static void setDateSeconds(final PreparedStatement ps, final int index, final Date date)
-    throws SQLException {
+            throws SQLException {
         if (date != null) {
             ps.setLong(index, date.getTime() / 1000);
         } else {

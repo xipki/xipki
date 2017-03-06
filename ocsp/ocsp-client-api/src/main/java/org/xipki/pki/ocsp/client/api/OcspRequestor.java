@@ -53,21 +53,21 @@ public interface OcspRequestor {
     OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull X509Certificate cert,
             @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
-    throws OcspResponseException, OcspRequestorException;
+            throws OcspResponseException, OcspRequestorException;
 
     OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull X509Certificate[] certs,
             @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
-    throws OcspResponseException, OcspRequestorException;
+            throws OcspResponseException, OcspRequestorException;
 
     OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull BigInteger serialNumber,
             @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
-    throws OcspResponseException, OcspRequestorException;
+            throws OcspResponseException, OcspRequestorException;
 
     OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull BigInteger[] serialNumbers,
             @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
             @Nullable RequestResponseDebug debug)
-    throws OcspResponseException, OcspRequestorException;
+            throws OcspResponseException, OcspRequestorException;
 
 }
