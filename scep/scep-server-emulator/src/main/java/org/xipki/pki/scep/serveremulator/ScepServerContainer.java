@@ -56,7 +56,7 @@ public class ScepServerContainer {
     }
 
     public ScepServerContainer(final int port, final List<ScepServer> scepServers)
-    throws Exception {
+            throws Exception {
         ParamUtil.requireNonEmpty("scepServers", scepServers);
         Server tmpServer = new Server(port);
 

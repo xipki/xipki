@@ -310,7 +310,14 @@ public class CanonicalizeCode {
             sb.delete(lastNonSpaceCharIndex, sb.length());
         }
 
-        return sb.toString();
+        String ret = sb.toString();
+        if (ret.startsWith("    throws ")) {
+            ret = "        " + ret;
+        } else if (ret.startsWith("        throws ")) {
+            ret = "    " + ret;
+        }
+
+        return ret;
     } // end canonicalizeJavaLine
 
     private static String removeTrailingSpaces(final String line) {

@@ -123,14 +123,14 @@ public class SignerUtil {
 
     // CHECKSTYLE:SKIP
     public static PSSSigner createPSSRSASigner(final AlgorithmIdentifier sigAlgId)
-    throws XiSecurityException {
+            throws XiSecurityException {
         return createPSSRSASigner(sigAlgId, null);
     }
 
     // CHECKSTYLE:SKIP
     public static PSSSigner createPSSRSASigner(final AlgorithmIdentifier sigAlgId,
             final AsymmetricBlockCipher cipher)
-    throws XiSecurityException {
+            throws XiSecurityException {
         ParamUtil.requireNonNull("sigAlgId", sigAlgId);
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
             throw new XiSecurityException("signature algorithm " + sigAlgId.getAlgorithm()
@@ -170,7 +170,7 @@ public class SignerUtil {
     // CHECKSTYLE:SKIP
     public static byte[] EMSA_PKCS1_v1_5_encoding(final byte[] hashValue,
             final int modulusBigLength, final HashAlgoType hashAlgo)
-    throws XiSecurityException {
+            throws XiSecurityException {
         ParamUtil.requireNonNull("hashValue", hashValue);
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
@@ -207,7 +207,7 @@ public class SignerUtil {
     // CHECKSTYLE:SKIP
     public static byte[] EMSA_PKCS1_v1_5_encoding(final byte[] encodedDigestInfo,
             final int modulusBigLength)
-    throws XiSecurityException {
+            throws XiSecurityException {
         ParamUtil.requireNonNull("encodedDigestInfo", encodedDigestInfo);
 
         int msgLen = encodedDigestInfo.length;
@@ -239,7 +239,7 @@ public class SignerUtil {
     public static byte[] EMSA_PSS_ENCODE(final HashAlgoType contentDigest, final byte[] hashValue,
             final HashAlgoType mgfDigest, final int saltLen, final int modulusBitLength,
             final SecureRandom random)
-    throws XiSecurityException {
+            throws XiSecurityException {
         final int hLen = contentDigest.getLength();
         final byte[] salt = new byte[saltLen];
         final byte[] mDash = new byte[8 + saltLen + hLen];
@@ -323,7 +323,7 @@ public class SignerUtil {
 
     // CHECKSTYLE:SKIP
     public static byte[] convertPlainDSASigToX962(final byte[] signature)
-    throws XiSecurityException {
+            throws XiSecurityException {
         ParamUtil.requireNonNull("signature", signature);
         if (signature.length % 2 != 0) {
             throw new XiSecurityException("signature.lenth must be even, but is odd");
@@ -347,7 +347,7 @@ public class SignerUtil {
 
     // CHECKSTYLE:SKIP
     public static byte[] convertX962DSASigToPlain(final byte[] x962Signature, final int keyBitLen)
-    throws XiSecurityException {
+            throws XiSecurityException {
         ParamUtil.requireNonNull("x962Signature", x962Signature);
         ASN1Sequence seq = ASN1Sequence.getInstance(x962Signature);
         if (seq.size() != 2) {
@@ -361,7 +361,7 @@ public class SignerUtil {
     // CHECKSTYLE:SKIP
     public static byte[] convertDSASigToPlain(final BigInteger sigR, final BigInteger sigS,
             final int keyBitLen)
-    throws XiSecurityException {
+            throws XiSecurityException {
         ParamUtil.requireNonNull("sigR", sigR);
         ParamUtil.requireNonNull("sigS", sigS);
 

@@ -106,7 +106,7 @@ public class KeyUtil {
     }
 
     public static KeyStore getKeyStore(final String storeType)
-    throws KeyStoreException, NoSuchProviderException {
+            throws KeyStoreException, NoSuchProviderException {
         ParamUtil.requireNonBlank("storeType", storeType);
         if ("JKS".equalsIgnoreCase(storeType)) {
             return KeyStore.getInstance(storeType);
@@ -117,14 +117,16 @@ public class KeyUtil {
 
     // CHECKSTYLE:SKIP
     public static KeyPair generateRSAKeypair(final int keysize, final SecureRandom random)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+            throws NoSuchAlgorithmException, NoSuchProviderException,
+                InvalidAlgorithmParameterException {
         return generateRSAKeypair(keysize, (BigInteger) null, random);
     }
 
     // CHECKSTYLE:SKIP
     public static KeyPair generateRSAKeypair(final int keysize, final BigInteger publicExponent,
             final SecureRandom random)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+            throws NoSuchAlgorithmException, NoSuchProviderException,
+                InvalidAlgorithmParameterException {
         BigInteger tmpPublicExponent = publicExponent;
         if (tmpPublicExponent == null) {
             tmpPublicExponent = RSAKeyGenParameterSpec.F4;
@@ -144,7 +146,8 @@ public class KeyUtil {
     // CHECKSTYLE:SKIP
     public static KeyPair generateDSAKeypair(final int plength, final int qlength,
             final SecureRandom random)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+            throws NoSuchAlgorithmException, NoSuchProviderException,
+                InvalidAlgorithmParameterException {
         DSAParameterSpec dsaParamSpec = DSAParameterCache.getDSAParameterSpec(plength, qlength,
                 random);
         KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
@@ -157,7 +160,8 @@ public class KeyUtil {
     // CHECKSTYLE:SKIP
     public static KeyPair generateDSAKeypair(final DSAParameters dsaParams,
             final SecureRandom random)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+            throws NoSuchAlgorithmException, NoSuchProviderException,
+                InvalidAlgorithmParameterException {
         DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(),
                 dsaParams.getG());
         KeyPairGenerator kpGen = getKeyPairGenerator("DSA");
@@ -169,7 +173,7 @@ public class KeyUtil {
 
     // CHECKSTYLE:SKIP
     public static DSAPublicKey generateDSAPublicKey(final DSAPublicKeySpec keySpec)
-    throws InvalidKeySpecException {
+            throws InvalidKeySpecException {
         ParamUtil.requireNonNull("keySpec", keySpec);
         KeyFactory kf = getKeyFactory("DSA");
         synchronized (kf) {
@@ -180,7 +184,8 @@ public class KeyUtil {
     // CHECKSTYLE:SKIP
     public static KeyPair generateECKeypairForCurveNameOrOid(final String curveNameOrOid,
             final SecureRandom random)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+            throws NoSuchAlgorithmException, NoSuchProviderException,
+                InvalidAlgorithmParameterException {
         ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (oid == null) {
             throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
@@ -191,7 +196,8 @@ public class KeyUtil {
     // CHECKSTYLE:SKIP
     public static KeyPair generateECKeypair(final ASN1ObjectIdentifier curveId,
             final SecureRandom random)
-    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+            throws NoSuchAlgorithmException, NoSuchProviderException,
+                InvalidAlgorithmParameterException {
         ParamUtil.requireNonNull("curveId", curveId);
 
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveId.getId());
@@ -229,7 +235,7 @@ public class KeyUtil {
     }
 
     private static KeyPairGenerator getKeyPairGenerator(final String algorithm)
-    throws NoSuchAlgorithmException, NoSuchProviderException {
+            throws NoSuchAlgorithmException, NoSuchProviderException {
         String alg = algorithm.toUpperCase();
         if ("ECDSA".equals(alg)) {
             alg = "EC";
@@ -247,7 +253,7 @@ public class KeyUtil {
     }
 
     public static PublicKey generatePublicKey(final SubjectPublicKeyInfo pkInfo)
-    throws NoSuchAlgorithmException, InvalidKeySpecException {
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         ParamUtil.requireNonNull("pkInfo", pkInfo);
 
         X509EncodedKeySpec keyspec;
@@ -277,7 +283,7 @@ public class KeyUtil {
 
     // CHECKSTYLE:SKIP
     public static RSAPublicKey generateRSAPublicKey(final RSAPublicKeySpec keySpec)
-    throws InvalidKeySpecException {
+            throws InvalidKeySpecException {
         ParamUtil.requireNonNull("keySpec", keySpec);
         KeyFactory kf = getKeyFactory("RSA");
         synchronized (kf) {
@@ -288,7 +294,7 @@ public class KeyUtil {
     // CHECKSTYLE:SKIP
     public static ECPublicKey generateECPublicKeyForNameOrOid(final String curveNameOrOid,
             final byte[] encodedQ)
-    throws InvalidKeySpecException {
+            throws InvalidKeySpecException {
         ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (oid == null) {
             throw new IllegalArgumentException("invalid curveNameOrOid '" + curveNameOrOid + "'");
@@ -299,7 +305,7 @@ public class KeyUtil {
     // CHECKSTYLE:SKIP
     public static ECPublicKey generateECPublicKey(final ASN1ObjectIdentifier curveOid,
             final byte[] encodedQ)
-    throws InvalidKeySpecException {
+            throws InvalidKeySpecException {
         ParamUtil.requireNonNull("curveOid", curveOid);
         ParamUtil.requireNonNull("encoded", encodedQ);
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveOid.getId());
@@ -312,7 +318,7 @@ public class KeyUtil {
     }
 
     public static AsymmetricKeyParameter generatePrivateKeyParameter(final PrivateKey key)
-    throws InvalidKeyException {
+            throws InvalidKeyException {
         ParamUtil.requireNonNull("key", key);
 
         if (key instanceof RSAPrivateCrtKey) {
@@ -334,7 +340,7 @@ public class KeyUtil {
     }
 
     public static AsymmetricKeyParameter generatePublicKeyParameter(final PublicKey key)
-    throws InvalidKeyException {
+            throws InvalidKeyException {
         ParamUtil.requireNonNull("key", key);
 
         if (key instanceof RSAPublicKey) {
@@ -350,7 +356,7 @@ public class KeyUtil {
     }
 
     public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(final PublicKey publicKey)
-    throws InvalidKeyException {
+            throws InvalidKeyException {
         ParamUtil.requireNonNull("publicKey", publicKey);
 
         if (publicKey instanceof DSAPublicKey) {
@@ -427,7 +433,7 @@ public class KeyUtil {
     // CHECKSTYLE:SKIP
     public static ECPublicKey createECPublicKey(final byte[] encodedAlgorithmIdParameters,
             final byte[] encodedPoint)
-    throws InvalidKeySpecException {
+            throws InvalidKeySpecException {
         ParamUtil.requireNonNull("encodedAlgorithmIdParameters", encodedAlgorithmIdParameters);
         ParamUtil.requireNonNull("encodedPoint", encodedPoint);
 

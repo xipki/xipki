@@ -146,7 +146,7 @@ abstract class AbstractP11ECDSASignatureSpi extends SignatureSpi {
 
     @Override
     protected void engineUpdate(final byte[] input, final int off, final int len)
-    throws SignatureException {
+            throws SignatureException {
         try {
             outputStream.write(input, off, len);
         } catch (IOException ex) {

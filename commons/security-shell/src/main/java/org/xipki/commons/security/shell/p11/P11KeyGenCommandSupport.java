@@ -70,13 +70,13 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
     private String moduleName = DEFAULT_P11MODULE_NAME;
 
     protected void finalize(final String keyType, final P11ObjectIdentifier objectId)
-    throws Exception {
+            throws Exception {
         ParamUtil.requireNonNull("objectId", objectId);
         println("generated " + keyType + " keypair " + objectId);
     }
 
     protected P11Slot getSlot()
-    throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+            throws XiSecurityException, P11TokenException, IllegalCmdParamException {
         return getSlot(moduleName, slotIndex);
     }
 

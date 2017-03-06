@@ -131,7 +131,7 @@ public abstract class DataSourceWrapper {
 
         @Override
         public long nextSeqValue(final Connection conn, final String sequenceName)
-        throws DataAccessException {
+            throws DataAccessException {
             final String sqlUpdate = buildAndCacheNextSeqValueSql(sequenceName);
             final String sqlSelect = "SELECT @cur_value";
             String sql = null;
@@ -643,7 +643,7 @@ public abstract class DataSourceWrapper {
     }
 
     public PreparedStatement prepareStatement(final Connection conn, final String sqlQuery)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonNull("conn", conn);
         try {
             return conn.prepareStatement(sqlQuery);
@@ -707,7 +707,7 @@ public abstract class DataSourceWrapper {
             final String orderBy);
 
     public long getMin(final Connection conn, final String table, final String column)
-    throws DataAccessException {
+            throws DataAccessException {
         return getMin(conn, table, column, null);
     }
 
@@ -773,7 +773,7 @@ public abstract class DataSourceWrapper {
     }
 
     public long getMax(final Connection conn, final String table, final String column)
-    throws DataAccessException {
+            throws DataAccessException {
         return getMax(conn, table, column, null);
     }
 
@@ -894,7 +894,7 @@ public abstract class DataSourceWrapper {
     } // method columnExists
 
     public boolean tableHasColumn(final Connection conn, final String table, final String column)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
@@ -924,7 +924,7 @@ public abstract class DataSourceWrapper {
     }
 
     public boolean tableExists(final Connection conn, final String table)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
 
         Statement stmt;
@@ -972,7 +972,7 @@ public abstract class DataSourceWrapper {
     }
 
     public void dropAndCreateSequence(final String sequenceName, final long startValue)
-    throws DataAccessException {
+            throws DataAccessException {
         try {
             dropSequence(sequenceName);
         } catch (DataAccessException ex) {
@@ -983,7 +983,7 @@ public abstract class DataSourceWrapper {
     }
 
     public void createSequence(final String sequenceName, final long startValue)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonBlank("sequenceName", sequenceName);
         final String sql = buildCreateSequenceSql(sequenceName, startValue);
         Connection conn = getConnection();
@@ -1022,7 +1022,7 @@ public abstract class DataSourceWrapper {
     }
 
     public long nextSeqValue(final Connection conn, final String sequenceName)
-    throws DataAccessException {
+            throws DataAccessException {
         ParamUtil.requireNonBlank("sequenceName", sequenceName);
         final String sql = buildAndCacheNextSeqValueSql(sequenceName);
         boolean newConn = (conn == null);
@@ -1146,7 +1146,7 @@ public abstract class DataSourceWrapper {
     public void addForeignKeyConstraint(final Connection conn, final String constraintName,
             final String baseTable, final String baseColumn, final String referencedTable,
             final String referencedColumn, final String onDeleteAction, final String onUpdateAction)
-    throws DataAccessException {
+            throws DataAccessException {
         final String sql = getSqlToAddForeignKeyConstraint(constraintName, baseTable, baseColumn,
                 referencedTable, referencedColumn, onDeleteAction, onUpdateAction);
         executeUpdate(conn, sql);
@@ -1158,7 +1158,7 @@ public abstract class DataSourceWrapper {
     }
 
     public void dropIndex(final Connection conn, final String table, final String indexName)
-    throws DataAccessException {
+            throws DataAccessException {
         executeUpdate(conn, getSqlToDropIndex(table, indexName));
     }
 

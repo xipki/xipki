@@ -100,7 +100,7 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
     }
 
     public static Asn1P11EntityIdentifier getInstance(final Object obj)
-    throws BadAsn1ObjectException {
+            throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1P11EntityIdentifier) {
             return (Asn1P11EntityIdentifier) obj;
         }

@@ -178,7 +178,7 @@ public class DecodedPkiMessage extends PkiMessage {
     public static DecodedPkiMessage decode(final CMSSignedData pkiMessage,
             final PrivateKey recipientKey, final X509Certificate recipientCert,
             final CollectionStore<X509CertificateHolder> certStore)
-    throws MessageDecodingException {
+            throws MessageDecodingException {
         EnvelopedDataDecryptorInstance decInstance = new EnvelopedDataDecryptorInstance(
                 recipientCert, recipientKey);
         EnvelopedDataDecryptor recipient = new EnvelopedDataDecryptor(decInstance);
@@ -189,7 +189,7 @@ public class DecodedPkiMessage extends PkiMessage {
     public static DecodedPkiMessage decode(final CMSSignedData pkiMessage,
             final EnvelopedDataDecryptor recipient,
             final CollectionStore<X509CertificateHolder> certStore)
-    throws MessageDecodingException {
+            throws MessageDecodingException {
         ParamUtil.requireNonNull("pkiMessage", pkiMessage);
         ParamUtil.requireNonNull("recipient", recipient);
 

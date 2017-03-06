@@ -107,7 +107,7 @@ class P11DSAContentSigner implements ContentSigner {
 
     P11DSAContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,
             final AlgorithmIdentifier signatureAlgId, final boolean plain)
-    throws XiSecurityException, P11TokenException {
+            throws XiSecurityException, P11TokenException {
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);

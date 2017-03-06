@@ -79,7 +79,7 @@ class P11RSAContentSigner implements ContentSigner {
 
     P11RSAContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,
             final AlgorithmIdentifier signatureAlgId)
-    throws XiSecurityException, P11TokenException {
+            throws XiSecurityException, P11TokenException {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);

@@ -60,7 +60,7 @@ public class DataSourceFactory {
 
     public DataSourceWrapper createDataSourceForFile(final String name, final String confFile,
             final PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException {
+            throws DataAccessException, PasswordResolverException, IOException {
         ParamUtil.requireNonNull("confFile", confFile);
         FileInputStream fileIn = new FileInputStream(expandFilepath(confFile));
         return createDataSource(name, fileIn, passwordResolver);
@@ -68,7 +68,7 @@ public class DataSourceFactory {
 
     public DataSourceWrapper createDataSource(final String name, final InputStream conf,
             final PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException {
+            throws DataAccessException, PasswordResolverException, IOException {
         ParamUtil.requireNonNull("conf", conf);
         Properties config = new Properties();
         try {
@@ -86,7 +86,7 @@ public class DataSourceFactory {
 
     public DataSourceWrapper createDataSource(final String name, final Properties conf,
             final PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException {
+            throws DataAccessException, PasswordResolverException {
         ParamUtil.requireNonNull("conf", conf);
         DatabaseType databaseType;
         String className = conf.getProperty("dataSourceClassName");

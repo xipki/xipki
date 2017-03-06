@@ -106,7 +106,7 @@ public class XmlUtil {
     }
 
     public static Element getDocumentElment(final byte[] xmlFragement)
-    throws IOException, SAXException {
+            throws IOException, SAXException {
         ParamUtil.requireNonNull("xmlFragement", xmlFragement);
         Document doc = builder.parse(new ByteArrayInputStream(xmlFragement));
         return doc.getDocumentElement();
@@ -176,7 +176,8 @@ public class XmlUtil {
                         return cn.getNodeValue();
                     }
                     cn = cn.getNextSibling();
-                } while (cn != null);
+                }
+                while (cn != null);
             }
         }
 
@@ -197,7 +198,8 @@ public class XmlUtil {
                 return (Element) node;
             }
             node = node.getNextSibling();
-        } while (node != null);
+        }
+        while (node != null);
         return null;
     }
 

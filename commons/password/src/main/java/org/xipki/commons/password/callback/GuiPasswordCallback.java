@@ -56,7 +56,7 @@ public class GuiPasswordCallback implements PasswordCallback {
 
     @Override
     public char[] getPassword(final String prompt, final String testToken)
-    throws PasswordResolverException {
+            throws PasswordResolverException {
         String tmpPrompt = prompt;
         if (StringUtil.isBlank(tmpPrompt)) {
             tmpPrompt = "Password required";

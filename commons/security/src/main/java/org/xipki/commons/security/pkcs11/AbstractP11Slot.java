@@ -98,7 +98,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     protected AbstractP11Slot(final String moduleName, final P11SlotIdentifier slotId,
             final boolean readOnly, final P11MechanismFilter mechanismFilter)
-    throws P11TokenException {
+            throws P11TokenException {
         this.mechanismFilter = ParamUtil.requireNonNull("mechanismFilter", mechanismFilter);
         this.moduleName = ParamUtil.requireNonBlank("moduleName", moduleName);
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
@@ -145,10 +145,10 @@ public abstract class AbstractP11Slot implements P11Slot {
             @NonNull BigInteger publicExponent, @NonNull String label) throws P11TokenException;
 
     protected abstract P11SlotRefreshResult doRefresh()
-    throws P11TokenException;
+            throws P11TokenException;
 
     protected abstract void doRemoveCerts(final P11ObjectIdentifier objectId)
-    throws P11TokenException;
+            throws P11TokenException;
 
     protected X509Cert getCertForId(@NonNull final byte[] id) {
         for (P11ObjectIdentifier objId : certificates.keySet()) {
@@ -298,7 +298,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     public void assertMechanismSupported(final long mechanism)
-    throws P11UnsupportedMechanismException {
+            throws P11UnsupportedMechanismException {
         if (!mechanisms.contains(mechanism)) {
             throw new P11UnsupportedMechanismException(mechanism, slotId);
         }
@@ -331,7 +331,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     public P11Identity getIdentity(final P11ObjectIdentifier objectId)
-    throws P11UnknownEntityException {
+            throws P11UnknownEntityException {
         P11Identity ident = identities.get(objectId);
         if (ident == null) {
             throw new P11UnknownEntityException(slotId, objectId);
@@ -375,7 +375,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     public X509Certificate exportCert(final P11ObjectIdentifier objectId)
-    throws XiSecurityException, P11TokenException {
+            throws XiSecurityException, P11TokenException {
         ParamUtil.requireNonNull("objectId", objectId);
         try {
             return getIdentity(objectId).getCertificate();
@@ -425,7 +425,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     public P11ObjectIdentifier addCert(final X509Certificate cert)
-    throws P11TokenException, XiSecurityException {
+            throws P11TokenException, XiSecurityException {
         ParamUtil.requireNonNull("cert", cert);
         assertWritable("addCert");
 
@@ -452,7 +452,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     public void addCert(final P11ObjectIdentifier objectId, final X509Certificate cert)
-    throws P11TokenException, XiSecurityException {
+            throws P11TokenException, XiSecurityException {
         doAddCert(objectId, cert);
         certificates.put(objectId, new X509Cert(cert));
         updateCaCertsOfIdentities();
@@ -582,7 +582,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     public P11ObjectIdentifier generateECKeypair(final String curveNameOrOid, final String label)
-    throws XiSecurityException, P11TokenException {
+            throws XiSecurityException, P11TokenException {
         ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
         ParamUtil.requireNonBlank("label", label);
         assertWritable("generateECKeypair");
@@ -601,7 +601,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     public void updateCertificate(final P11ObjectIdentifier objectId, final X509Certificate newCert)
-    throws XiSecurityException, P11TokenException {
+            throws XiSecurityException, P11TokenException {
         ParamUtil.requireNonNull("objectId", objectId);
         ParamUtil.requireNonNull("newCert", newCert);
         assertWritable("updateCertificate");
@@ -625,7 +625,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     public void showDetails(final OutputStream stream, final boolean verbose)
-    throws IOException, XiSecurityException, P11TokenException {
+            throws IOException, XiSecurityException, P11TokenException {
         ParamUtil.requireNonNull("stream", stream);
 
         List<P11ObjectIdentifier> sortedObjectIds = getSortedObjectIds(identities.keySet());

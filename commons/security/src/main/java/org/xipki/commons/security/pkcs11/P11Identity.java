@@ -105,7 +105,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     } // constructor
 
     public byte[] sign(final long mechanism, final P11Params parameters, final byte[] content)
-    throws P11TokenException, XiSecurityException {
+            throws P11TokenException, XiSecurityException {
         ParamUtil.requireNonNull("content", content);
         slot.assertMechanismSupported(mechanism);
         if (!supportsMechanism(mechanism, parameters)) {

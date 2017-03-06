@@ -105,13 +105,13 @@ public abstract class P12SignLoadTest extends LoadExecutor {
 
     // CHECKSTYLE:SKIP
     protected static byte[] getPrecomputedDSAKeystore(final int plength, final int qlength)
-    throws IOException {
+            throws IOException {
         return getPrecomputedKeystore("dsa-" + plength + "-" + qlength + ".p12");
     }
 
     // CHECKSTYLE:SKIP
     protected static byte[] getPrecomputedECKeystore(final String curveNamOrOid)
-    throws IOException {
+            throws IOException {
         ASN1ObjectIdentifier oid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNamOrOid);
         if (oid == null) {
             return null;

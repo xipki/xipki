@@ -61,7 +61,7 @@ class ProxyP11Identity extends P11Identity {
 
     @Override
     protected byte[] doSign(final long mechanism, final P11Params parameters, final byte[] content)
-    throws P11TokenException {
+            throws P11TokenException {
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
         Asn1P11Params p11Param = null;
         if (parameters instanceof P11RSAPkcsPssParams) {

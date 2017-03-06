@@ -69,7 +69,7 @@ public class PBEConsumerPasswordCallback implements PasswordCallback {
 
     @Override
     public char[] getPassword(final String prompt, final String testToken)
-    throws PasswordResolverException {
+            throws PasswordResolverException {
         if (passwordName == null) {
             throw new PasswordResolverException("please initialize me first");
         }

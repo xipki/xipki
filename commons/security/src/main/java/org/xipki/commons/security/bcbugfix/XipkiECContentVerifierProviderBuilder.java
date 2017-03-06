@@ -61,7 +61,7 @@ public class XipkiECContentVerifierProviderBuilder extends BcECContentVerifierPr
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId)
-        throws OperatorCreationException {
+            throws OperatorCreationException {
         boolean plainDsa = AlgorithmUtil.isPlainECDSASigAlg(sigAlgId);
         if (!plainDsa) {
             return super.createSigner(sigAlgId);

@@ -90,7 +90,7 @@ public class PasswordProducer {
     }
 
     public static char[] takePassword(final String name)
-    throws InterruptedException, PasswordResolverException {
+            throws InterruptedException, PasswordResolverException {
         assertNameNotBlank(name);
         if (!namePasswordsMap.containsKey(name)) {
             throw new PasswordResolverException("password consumer '" + name
@@ -103,7 +103,7 @@ public class PasswordProducer {
     }
 
     public static void putPassword(final String name, final char[] password)
-    throws InterruptedException, PasswordResolverException {
+            throws InterruptedException, PasswordResolverException {
         assertNameNotBlank(name);
         if (!namePasswordsMap.containsKey(name)) {
             throw new PasswordResolverException("password consumer '" + name

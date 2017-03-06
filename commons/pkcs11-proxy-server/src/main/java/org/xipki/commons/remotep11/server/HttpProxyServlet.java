@@ -83,7 +83,7 @@ public class HttpProxyServlet extends HttpServlet {
 
     @Override
     public void doGet(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         String operation = request.getParameter("operation");
         try {
             if (!"GetCaps".equalsIgnoreCase(operation)) {
@@ -136,7 +136,7 @@ public class HttpProxyServlet extends HttpServlet {
 
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         try {
             String moduleName = extractModuleName(request);
             if (moduleName == null) {
@@ -212,7 +212,7 @@ public class HttpProxyServlet extends HttpServlet {
     }
 
     private static String extractModuleName(final HttpServletRequest request)
-    throws UnsupportedEncodingException {
+            throws UnsupportedEncodingException {
         String encodedUrl = request.getRequestURI();
 
         String moduleName = null;

@@ -74,7 +74,7 @@ public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
     protected String moduleName = DEFAULT_P11MODULE_NAME;
 
     public P11ObjectIdentifier getObjectIdentifier()
-    throws IllegalCmdParamException, XiSecurityException, P11TokenException {
+            throws IllegalCmdParamException, XiSecurityException, P11TokenException {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objIdentifier;
         if (id != null && label == null) {
@@ -89,7 +89,7 @@ public abstract class P11SecurityCommandSupport extends SecurityCommandSupport {
     }
 
     protected P11Slot getSlot()
-    throws XiSecurityException, P11TokenException, IllegalCmdParamException {
+            throws XiSecurityException, P11TokenException, IllegalCmdParamException {
         return getSlot(moduleName, slotIndex);
     }
 

@@ -69,7 +69,7 @@ public class SimpleXpath {
          *        namespace will not be evaluated.
          */
         SimpleXpathStep(final String step, final Map<String, String> nsPrefixUriMap)
-        throws XPathExpressionException {
+            throws XPathExpressionException {
             String tmpStep = ParamUtil.requireNonBlank("step", step);
             if (tmpStep.charAt(0) == '@') {
                 isElement = false;
@@ -118,7 +118,7 @@ public class SimpleXpath {
      * @throws XPathExpressionException if the XPath expression is invalid
      */
     public SimpleXpath(final String relativeXpath, final Map<String, String> nsPrefixUriMap)
-    throws XPathExpressionException {
+            throws XPathExpressionException {
         ParamUtil.requireNonBlank("relativeXpath", relativeXpath);
         if (relativeXpath.startsWith("/")) {
             throw new XPathExpressionException(relativeXpath + " is no a relative xpath");

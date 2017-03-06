@@ -69,13 +69,13 @@ public interface SecurityFactory {
             @Nullable X509Certificate[] certs) throws ObjectCreationException;
 
     ContentVerifierProvider getContentVerifierProvider(@NonNull PublicKey publicKey)
-    throws InvalidKeyException;
+            throws InvalidKeyException;
 
     ContentVerifierProvider getContentVerifierProvider(@NonNull X509Certificate cert)
-    throws InvalidKeyException;
+            throws InvalidKeyException;
 
     ContentVerifierProvider getContentVerifierProvider(@NonNull X509CertificateHolder cert)
-    throws InvalidKeyException;
+            throws InvalidKeyException;
 
     /**
      *
@@ -98,7 +98,7 @@ public interface SecurityFactory {
     boolean verifyPopo(@NonNull CertificationRequest csr, AlgorithmValidator algoValidator);
 
     PublicKey generatePublicKey(@NonNull SubjectPublicKeyInfo subjectPublicKeyInfo)
-    throws InvalidKeyException;
+            throws InvalidKeyException;
 
     byte[] extractMinimalKeyStore(@NonNull String keystoreType, @NonNull byte[] keystoreBytes,
             @Nullable String keyname, @NonNull char[] password,

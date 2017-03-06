@@ -84,7 +84,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     }
 
     public synchronized P11CryptService getP11CryptService(final String moduleName)
-    throws XiSecurityException, P11TokenException {
+            throws XiSecurityException, P11TokenException {
         if (p11Conf == null) {
             throw new IllegalStateException("please set pkcs11ConfFile and then call init() first");
         }

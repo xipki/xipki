@@ -75,7 +75,7 @@ public class P11Conf {
     private final Set<String> moduleNames;
 
     public P11Conf(final InputStream confStream, final PasswordResolver passwordResolver)
-    throws InvalidConfException, IOException {
+            throws InvalidConfException, IOException {
         ParamUtil.requireNonNull("confStream", confStream);
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);

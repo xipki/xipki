@@ -156,13 +156,13 @@ public class X509Util {
     }
 
     public static X509Certificate parseCert(final String fileName)
-    throws IOException, CertificateException {
+            throws IOException, CertificateException {
         ParamUtil.requireNonNull("fileName", fileName);
         return parseCert(new File(IoUtil.expandFilepath(fileName)));
     }
 
     public static X509Certificate parseCert(final File file)
-    throws IOException, CertificateException {
+            throws IOException, CertificateException {
         ParamUtil.requireNonNull("file", file);
         FileInputStream in = new FileInputStream(IoUtil.expandFilepath(file));
         try {
@@ -173,13 +173,13 @@ public class X509Util {
     }
 
     public static X509Certificate parseCert(final byte[] certBytes)
-    throws CertificateException {
+            throws CertificateException {
         ParamUtil.requireNonNull("certBytes", certBytes);
         return parseCert(new ByteArrayInputStream(certBytes));
     }
 
     public static X509Certificate parseCert(final InputStream certStream)
-    throws CertificateException {
+            throws CertificateException {
         ParamUtil.requireNonNull("certStream", certStream);
         X509Certificate cert = (X509Certificate) getCertFactory().generateCertificate(certStream);
         if (cert == null) {
@@ -203,13 +203,13 @@ public class X509Util {
     }
 
     public static X509Certificate parseBase64EncodedCert(final String base64EncodedCert)
-    throws CertificateException {
+            throws CertificateException {
         ParamUtil.requireNonNull("base64EncodedCert", base64EncodedCert);
         return parseCert(Base64.decode(base64EncodedCert));
     }
 
     public static X509Certificate parsePemEncodedCert(final String pemEncodedCert)
-    throws CertificateException {
+            throws CertificateException {
         ParamUtil.requireNonNull("pemEncodedCert", pemEncodedCert);
         String b64 = pemEncodedCert.replace("-----BEGIN CERTIFICATE-----", "")
                 .replace("-----END CERTIFICATE-----", "");
@@ -218,7 +218,7 @@ public class X509Util {
 
     public static X509Certificate toX509Cert(
             final org.bouncycastle.asn1.x509.Certificate asn1Cert)
-    throws CertificateException {
+            throws CertificateException {
         byte[] encodedCert;
         try {
             encodedCert = asn1Cert.getEncoded();
@@ -229,7 +229,7 @@ public class X509Util {
     }
 
     public static X509CRL toX509Crl(final CertificateList asn1CertList)
-    throws CertificateException, CRLException {
+            throws CertificateException, CRLException {
         byte[] encodedCrl;
         try {
             encodedCrl = asn1CertList.getEncoded();
@@ -240,19 +240,19 @@ public class X509Util {
     }
 
     public static X509CRL parseCrl(final String file)
-    throws IOException, CertificateException, CRLException {
+            throws IOException, CertificateException, CRLException {
         ParamUtil.requireNonBlank("file", file);
         return parseCrl(new FileInputStream(IoUtil.expandFilepath(file)));
     }
 
     public static X509CRL parseCrl(final byte[] encodedCrl)
-    throws CertificateException, CRLException {
+            throws CertificateException, CRLException {
         ParamUtil.requireNonNull("encodedCrl", encodedCrl);
         return parseCrl(new ByteArrayInputStream(encodedCrl));
     }
 
     public static X509CRL parseCrl(final InputStream crlStream)
-    throws CertificateException, CRLException {
+            throws CertificateException, CRLException {
         ParamUtil.requireNonNull("crlStream", crlStream);
         X509CRL crl = (X509CRL) getCertFactory().generateCRL(crlStream);
         if (crl == null) {
@@ -347,7 +347,7 @@ public class X509Util {
     } // method canonicalizName
 
     public static byte[] extractSki(final X509Certificate cert)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         byte[] extValue = getCoreExtValue(cert, Extension.subjectKeyIdentifier);
         if (extValue == null) {
             return null;
@@ -361,7 +361,7 @@ public class X509Util {
     }
 
     public static byte[] extractSki(final org.bouncycastle.asn1.x509.Certificate cert)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         ParamUtil.requireNonNull("cert", cert);
         Extension encodedSkiValue = cert.getTBSCertificate().getExtensions().getExtension(
                 Extension.subjectKeyIdentifier);
@@ -378,7 +378,7 @@ public class X509Util {
     }
 
     public static byte[] extractAki(final X509Certificate cert)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         byte[] extValue = getCoreExtValue(cert, Extension.authorityKeyIdentifier);
         if (extValue == null) {
             return null;
@@ -394,7 +394,7 @@ public class X509Util {
     }
 
     public static byte[] extractAki(final org.bouncycastle.asn1.x509.Certificate cert)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         ParamUtil.requireNonNull("cert", cert);
         try {
             AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.fromExtensions(
@@ -597,7 +597,7 @@ public class X509Util {
     }
 
     public static boolean isSelfSigned(final X509Certificate cert)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         ParamUtil.requireNonNull("cert", cert);
         boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
         if (equals) {
@@ -611,7 +611,7 @@ public class X509Util {
     }
 
     public static boolean issues(final X509Certificate issuerCert, final X509Certificate cert)
-    throws CertificateEncodingException {
+            throws CertificateEncodingException {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
         ParamUtil.requireNonNull("cert", cert);
         boolean isCa = issuerCert.getBasicConstraints() >= 0;
@@ -640,7 +640,7 @@ public class X509Util {
     }
 
     public static SubjectPublicKeyInfo toRfc3279Style(final SubjectPublicKeyInfo publicKeyInfo)
-    throws InvalidKeySpecException {
+            throws InvalidKeySpecException {
         ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
         ASN1ObjectIdentifier algOid = publicKeyInfo.getAlgorithm().getAlgorithm();
         ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
@@ -720,7 +720,7 @@ public class X509Util {
 
     public static Extension createExtensionSubjectInfoAccess(
             final List<String> accessMethodAndLocations, final boolean critical)
-    throws BadInputException {
+            throws BadInputException {
         if (CollectionUtil.isEmpty(accessMethodAndLocations)) {
             return null;
         }
@@ -738,7 +738,7 @@ public class X509Util {
     }
 
     public static AccessDescription createAccessDescription(final String accessMethodAndLocation)
-    throws BadInputException {
+            throws BadInputException {
         ParamUtil.requireNonNull("accessMethodAndLocation", accessMethodAndLocation);
         ConfPairs pairs;
         try {
@@ -763,7 +763,7 @@ public class X509Util {
     }
 
     public static GeneralNames createGeneralNames(final List<String> taggedValues)
-    throws BadInputException {
+            throws BadInputException {
         if (CollectionUtil.isEmpty(taggedValues)) {
             return null;
         }

@@ -82,7 +82,7 @@ class IaikP11Identity extends P11Identity {
 
     @Override
     protected byte[] doSign(final long mechanism, final P11Params parameters, final byte[] content)
-    throws P11TokenException {
+            throws P11TokenException {
         return ((IaikP11Slot) slot).sign(mechanism, parameters, content, this);
     }
 

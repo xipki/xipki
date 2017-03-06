@@ -110,17 +110,17 @@ public abstract class Client {
     private boolean useInsecureAlgorithms;
 
     public Client(final CaIdentifier caId, final CaCertValidator caCertValidator)
-    throws MalformedURLException {
+            throws MalformedURLException {
         this.caId = ParamUtil.requireNonNull("caId", caId);
         this.caCertValidator = ParamUtil.requireNonNull("caCertValidator", caCertValidator);
     }
 
     protected abstract ScepHttpResponse httpPost(@NonNull final String url,
             @NonNull final String requestContentType, @NonNull final byte[] request)
-    throws ScepClientException;
+            throws ScepClientException;
 
     protected abstract ScepHttpResponse httpGet(@NonNull final String url)
-    throws ScepClientException;
+            throws ScepClientException;
 
     public boolean isHttpGetOnly() {
         return httpGetOnly;
@@ -151,7 +151,7 @@ public abstract class Client {
     }
 
     private ScepHttpResponse httpSend(final Operation operation, final ContentInfo pkiMessage)
-    throws ScepClientException {
+            throws ScepClientException {
         byte[] request = null;
         if (pkiMessage != null) {
             try {
@@ -352,7 +352,7 @@ public abstract class Client {
 
     public EnrolmentResponse scepPkcsReq(final CertificationRequest csr,
             final PrivateKey identityKey, final X509Certificate identityCert)
-    throws ScepClientException {
+            throws ScepClientException {
         ParamUtil.requireNonNull("csr", csr);
         ParamUtil.requireNonNull("identityKey", identityKey);
         ParamUtil.requireNonNull("identityCert", identityCert);
@@ -369,7 +369,7 @@ public abstract class Client {
 
     public EnrolmentResponse scepRenewalReq(final CertificationRequest csr,
             final PrivateKey identityKey, final X509Certificate identityCert)
-    throws ScepClientException {
+            throws ScepClientException {
         initIfNotInited();
 
         if (!caCaps.containsCapability(CaCapability.Renewal)) {
@@ -386,7 +386,7 @@ public abstract class Client {
 
     public EnrolmentResponse scepUpdateReq(final CertificationRequest csr,
             final PrivateKey identityKey, final X509Certificate identityCert)
-    throws ScepClientException {
+            throws ScepClientException {
         initIfNotInited();
 
         if (!caCaps.containsCapability(CaCapability.Update)) {
@@ -403,7 +403,7 @@ public abstract class Client {
 
     private EnrolmentResponse doEnrol(final MessageType messageType, final CertificationRequest csr,
             final PrivateKey identityKey, final X509Certificate identityCert)
-    throws ScepClientException {
+            throws ScepClientException {
         TransactionId tid;
         try {
             tid = TransactionId.sha1TransactionId(
@@ -467,7 +467,7 @@ public abstract class Client {
     }
 
     private AuthorityCertStore retrieveNextCaAuthorityCertStore(final ScepHttpResponse httpResp)
-    throws ScepClientException {
+            throws ScepClientException {
         String ct = httpResp.getContentType();
 
         if (!ScepConstants.CT_X509_NEXT_CA_CERT.equalsIgnoreCase(ct)) {
@@ -590,7 +590,7 @@ public abstract class Client {
     }
 
     private static CMSSignedData parsePkiMessage(final byte[] messageBytes)
-    throws ScepClientException {
+            throws ScepClientException {
         try {
             return new CMSSignedData(messageBytes);
         } catch (CMSException ex) {
@@ -679,7 +679,7 @@ public abstract class Client {
     } // method retrieveCaCertStore
 
     private static void assertSameNonce(final PkiMessage request, final PkiMessage response)
-    throws ScepClientException {
+            throws ScepClientException {
         if (request.getSenderNonce().equals(response.getRecipientNonce())) {
             throw new ScepClientException(
                     "SenderNonce of the request and RecipientNonce of response are not the same");

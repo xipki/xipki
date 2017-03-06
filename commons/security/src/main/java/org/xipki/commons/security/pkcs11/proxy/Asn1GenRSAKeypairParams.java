@@ -95,7 +95,7 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
     }
 
     public static Asn1GenRSAKeypairParams getInstance(final Object obj)
-    throws BadAsn1ObjectException {
+            throws BadAsn1ObjectException {
         if (obj == null || obj instanceof Asn1GenRSAKeypairParams) {
             return (Asn1GenRSAKeypairParams) obj;
         }
