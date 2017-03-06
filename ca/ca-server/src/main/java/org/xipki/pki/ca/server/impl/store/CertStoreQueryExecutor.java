@@ -115,7 +115,7 @@ class CertStoreQueryExecutor {
     private static class SQLs {
         private static final String SQL_ADD_CERT =
                 "INSERT INTO CERT (ID,ART,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
-                + "CA_ID,RID,UNAME,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "CA_ID,RID,UID,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         private static final String SQL_ADD_CRAW =
                 "INSERT INTO CRAW (CID,SHA1,REQ_SUBJECT,CERT) VALUES (?,?,?,?)";
@@ -262,11 +262,11 @@ class CertStoreQueryExecutor {
             this.sqlCertprofileForSerial = datasource.buildSelectFirstSql(
                     "PID FROM CERT WHERE SN=? AND CA_ID=?", 1);
             this.sqlPasswordForUser = datasource.buildSelectFirstSql(
-                    "PASSWORD FROM USERNAME WHERE NAME=?", 1);
+                    "ID,PASSWORD FROM USERNAME WHERE NAME=?", 1);
             this.sqlCnRegexForUser = datasource.buildSelectFirstSql(
-                    "CN_REGEX FROM USERNAME WHERE NAME=?", 1);
+                    "CN_REGEX FROM USERNAME WHERE ID=?", 1);
             this.sqlKnowsCertForSerial = datasource.buildSelectFirstSql(
-                    "UNAME FROM CERT WHERE SN=? AND CA_ID=?", 1);
+                    "UID FROM CERT WHERE SN=? AND CA_ID=?", 1);
             this.sqlRevForId = datasource.buildSelectFirstSql(
                     "SN,EE,REV,RR,RT,RIT FROM CERT WHERE ID=?", 1);
             this.sqlCertStatusForSubjectFp = datasource.buildSelectFirstSql(
@@ -471,7 +471,7 @@ class CertStoreQueryExecutor {
 
     void addCert(final X509Cert issuer, final X509CertWithDbId certificate,
             final byte[] encodedSubjectPublicKey, final String certprofileName,
-            final String requestorName, final String user, final RequestType reqType,
+            final String requestorName, final Long userId, final RequestType reqType,
             final byte[] transactionId, final X500Name reqSubject)
             throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("certificate", certificate);
@@ -534,7 +534,7 @@ class CertStoreQueryExecutor {
             psAddcert.setInt(idx++, certprofileId);
             psAddcert.setInt(idx++, caId);
             setInt(psAddcert, idx++, requestorId);
-            psAddcert.setString(idx++, user);
+            setLong(psAddcert, idx++, userId);
             psAddcert.setLong(idx++, fpPk);
             boolean isEeCert = cert.getBasicConstraints() == -1;
             psAddcert.setInt(idx++, isEeCert ? 1 : 0);
@@ -1891,10 +1891,11 @@ class CertStoreQueryExecutor {
         return ret;
     }
 
-    boolean authenticateUser(final String user, final byte[] password)
+    Long authenticateUser(final String user, final byte[] password)
             throws DataAccessException, OperationException {
         final String sql = sqls.sqlPasswordForUser;
 
+        long id;
         String expPasswordText = null;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1904,9 +1905,10 @@ class CertStoreQueryExecutor {
             rs = ps.executeQuery();
 
             if (!rs.next()) {
-                return false;
+                return null;
             }
 
+            id = rs.getLong("ID");
             expPasswordText = rs.getString("PASSWORD");
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
@@ -1915,25 +1917,26 @@ class CertStoreQueryExecutor {
         }
 
         if (StringUtil.isBlank(expPasswordText)) {
-            return false;
+            return null;
         }
 
+        boolean valid;
         try {
-            return PasswordHash.validatePassword(password, expPasswordText);
+            valid = PasswordHash.validatePassword(password, expPasswordText);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
+
+        return valid ? id : null;
     } // method authenticateUser
 
-    String getCnRegexForUser(final String user) throws DataAccessException, OperationException {
-        ParamUtil.requireNonBlank("user", user);
-
+    String getCnRegexForUser(final long userId) throws DataAccessException, OperationException {
         final String sql = sqls.sqlCnRegexForUser;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
-            ps.setString(1, user);
+            ps.setLong(1, userId);
             rs = ps.executeQuery();
 
             if (!rs.next()) {
@@ -1955,7 +1958,7 @@ class CertStoreQueryExecutor {
 
         final String sql = sqls.sqlKnowsCertForSerial;
 
-        String user = null;
+        Long userId = null;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1968,14 +1971,14 @@ class CertStoreQueryExecutor {
                 return KnowCertResult.UNKNOWN;
             }
 
-            user = rs.getString("UNAME");
+            userId = rs.getLong("UID");
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
 
-        return new KnowCertResult(true, user);
+        return new KnowCertResult(true, userId);
     } // method knowsCertForSerial
 
     List<CertRevInfoWithSerial> getRevokedCertificates(final X509Cert caCert,

@@ -544,13 +544,13 @@ public class X509Ca {
                 validTo, orderBy, numEntries);
     }
 
-    public boolean authenticateUser(final String user, final byte[] password)
+    public Long authenticateUser(final String user, final byte[] password)
             throws OperationException {
         return certstore.authenticateUser(user, password);
     }
 
-    public String getCnRegexForUser(final String user) throws OperationException {
-        return certstore.getCnRegexForUser(user);
+    public String getCnRegexForUser(final long userId) throws OperationException {
+        return certstore.getCnRegexForUser(userId);
     }
 
     public X509CRL getCurrentCrl()
@@ -1880,7 +1880,7 @@ public class X509Ca {
                 if (requestor != null) {
                     ret.setRequestorName(requestor.getName());
                     if (requestor instanceof UserRequestorInfo) {
-                        ret.setUser(((UserRequestorInfo) requestor).getUser());
+                        ret.setUser(((UserRequestorInfo) requestor).getUserId());
                     }
                 }
                 ret.setReqType(reqType);

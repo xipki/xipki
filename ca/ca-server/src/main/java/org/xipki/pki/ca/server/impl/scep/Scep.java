@@ -445,18 +445,17 @@ public class Scep {
                             "tid=" + tid + ": no CommonName in requested subject");
                 }
 
-                String user = null;
-                boolean authenticatedByPwd = false;
+                Long userId = null;
 
                 String challengePwd = CaUtil.getChallengePassword(csrReqInfo);
                 if (challengePwd != null) {
                     String[] strs = challengePwd.split(":");
                     if (strs != null && strs.length == 2) {
-                        user = strs[0];
+                        String user = strs[0];
                         String password = strs[1];
-                        authenticatedByPwd = ca.authenticateUser(user, password.getBytes());
+                        userId = ca.authenticateUser(user, password.getBytes());
 
-                        if (!authenticatedByPwd) {
+                        if (userId == null) {
                             LOG.warn("tid={}: could not verify the challengePassword", tid);
                             throw FailInfoException.BAD_REQUEST;
                         }
@@ -472,15 +471,15 @@ public class Scep {
                                 + " messageType {}", tid, mt);
                         throw FailInfoException.BAD_REQUEST;
                     }
-                    if (user == null) {
+                    if (userId == null) {
                         LOG.warn("tid={}: could not extract user & password from challengePassword"
                                 + ", which are required for self-signed signature certificate",
                             tid);
                         throw FailInfoException.BAD_REQUEST;
                     }
-                    checkCommonName(ca, user, cn);
+                    checkCommonName(ca, userId, cn);
                 } else {
-                    if (user == null) {
+                    if (userId == null) {
                         // up to draft-nourse-scep-23 the client sends all messages to enroll
                         // certificate via MessageType PKCSReq
                         KnowCertResult knowCertRes = ca.knowsCertificate(reqSignatureCert);
@@ -488,7 +487,7 @@ public class Scep {
                             LOG.warn("tid={}: signature certificate is not trusted by the CA", tid);
                             throw FailInfoException.BAD_REQUEST;
                         }
-                        user = knowCertRes.getUser();
+                        userId = knowCertRes.getUserId();
                     } // end if
 
                     // only the same subject is permitted
@@ -496,8 +495,8 @@ public class Scep {
                             reqSignatureCert.getSubjectX500Principal().getEncoded()));
                     boolean b2 = cn.equals(cnInSignatureCert);
                     if (!b2) {
-                        if (user != null) {
-                            checkCommonName(ca, user, cn);
+                        if (userId != null) {
+                            checkCommonName(ca, userId, cn);
                         } else {
                             LOG.warn("tid={}: signature certificate is not trusted and {}",
                                     tid, "no challengePassword is contained in the request");
@@ -512,7 +511,7 @@ public class Scep {
                 CertTemplateData certTemplateData = new CertTemplateData(csrReqInfo.getSubject(),
                         csrReqInfo.getSubjectPublicKeyInfo(), (Date) null, (Date) null, extensions,
                         certProfileName);
-                RequestorInfo requestor = new UserRequestorInfo(user);
+                RequestorInfo requestor = new UserRequestorInfo(userId);
                 X509CertificateInfo cert = ca.generateCertificate(certTemplateData, requestor,
                         RequestType.SCEP, tidBytes, msgId);
                 /* Don't save SCEP message, since it contains password in plaintext
@@ -668,9 +667,9 @@ public class Scep {
         return ci;
     } // method encodeResponse
 
-    private static void checkCommonName(final X509Ca ca, final String user, final String cn)
+    private static void checkCommonName(final X509Ca ca, final long userId, final String cn)
             throws OperationException {
-        String cnRegex = ca.getCnRegexForUser(user);
+        String cnRegex = ca.getCnRegexForUser(userId);
         if (StringUtil.isNotBlank(cnRegex)) {
             Pattern pattern = Pattern.compile(cnRegex);
             if (!pattern.matcher(cn).matches()) {

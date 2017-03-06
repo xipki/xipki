@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ca.server.impl;
 
-import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 /**
@@ -44,10 +43,10 @@ import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 public class UserRequestorInfo implements RequestorInfo {
 
-    private final String user;
+    private final long userId;
 
-    public UserRequestorInfo(final String user) {
-        this.user = ParamUtil.requireNonBlank("user", user);
+    public UserRequestorInfo(final long userId) {
+        this.userId = userId;
     }
 
     @Override
@@ -60,8 +59,8 @@ public class UserRequestorInfo implements RequestorInfo {
         return false;
     }
 
-    public String getUser() {
-        return user;
+    public long getUserId() {
+        return userId;
     }
 
 }

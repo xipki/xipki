@@ -563,7 +563,7 @@ public class CertificateStore {
         }
     }
 
-    public boolean authenticateUser(final String user, final byte[] password)
+    public Long authenticateUser(final String user, final byte[] password)
             throws OperationException {
         try {
             return queryExecutor.authenticateUser(user, password);
@@ -576,9 +576,9 @@ public class CertificateStore {
         }
     }
 
-    public String getCnRegexForUser(final String user) throws OperationException {
+    public String getCnRegexForUser(final long userId) throws OperationException {
         try {
-            return queryExecutor.getCnRegexForUser(user);
+            return queryExecutor.getCnRegexForUser(userId);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());

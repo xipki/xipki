@@ -397,7 +397,7 @@
           remarks="whether it is an end entity cert">
         <constraints nullable="false"/>
       </column>
-      <column name="UNAME" type="VARCHAR(100)"/>
+      <column name="UID" type="BIGINT" remarks="user id"/>
       <column name="RTYPE" type="SMALLINT"
          remarks="request type, 1 for direct via CA command, 2 for CMP, 3 for SCEP">
         <constraints nullable="false"/>
@@ -556,11 +556,16 @@
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="CA_ID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="CS_CA"/>
-    <addForeignKeyConstraint constraintName="FK_CERT_CS_REQUESTOR1"
+     <addForeignKeyConstraint constraintName="FK_CERT_CS_REQUESTOR1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="RID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="CS_REQUESTOR"/>
+    <addForeignKeyConstraint constraintName="FK_CERT_USER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="UID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="USERNAME"/>
     <addForeignKeyConstraint constraintName="FK_CERT_CS_PROFILE1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"

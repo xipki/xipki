@@ -110,7 +110,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
 
     private static final String SQL_ADD_CERT =
             "INSERT INTO CERT (ID,ART,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,RR,RT,RIT,"
-            + "PID,CA_ID,RID,UNAME,FP_K,EE,RTYPE,TID)"
+            + "PID,CA_ID,RID,UID,FP_K,EE,RTYPE,TID)"
             + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     private static final String SQL_ADD_CRAW =
@@ -677,7 +677,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                         setInt(psCert, idx++, cert.getCaId());
 
                         setInt(psCert, idx++, cert.getRid());
-                        psCert.setString(idx++, cert.getUser());
+                        setLong(psCert, idx++, cert.getUid());
                         psCert.setLong(idx++, FpIdCalculator.hash(encodedKey));
                         Extension extension =
                                 tbsCert.getExtensions().getExtension(Extension.basicConstraints);

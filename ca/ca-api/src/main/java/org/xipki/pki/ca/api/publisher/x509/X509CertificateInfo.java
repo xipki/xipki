@@ -73,7 +73,7 @@ public class X509CertificateInfo {
 
     private String requestorName;
 
-    private String user;
+    private Long user;
 
     private String warningMessage;
 
@@ -139,11 +139,11 @@ public class X509CertificateInfo {
         this.requestorName = requestorName;
     }
 
-    public String getUser() {
+    public Long getUser() {
         return user;
     }
 
-    public void setUser(final String user) {
+    public void setUser(final Long user) {
         this.user = user;
     }
 

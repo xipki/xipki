@@ -88,7 +88,7 @@ public class CaCertType extends IdentifidDbObjectType {
      */
     public static final String TAG_RIT = "rit";
 
-    public static final String TAG_USER = "user";
+    public static final String TAG_UID = "uid";
 
     /**
      * base64 encoded transaction id.
@@ -134,7 +134,7 @@ public class CaCertType extends IdentifidDbObjectType {
 
     private Long rit;
 
-    private String user;
+    private Long uid;
 
     private String tid;
 
@@ -287,12 +287,12 @@ public class CaCertType extends IdentifidDbObjectType {
         assertNotBlank("file", file);
     }
 
-    public String getUser() {
-        return user;
+    public Long getUid() {
+        return uid;
     }
 
-    public void setUser(final String user) {
-        this.user = user;
+    public void setUid(final Long uid) {
+        this.uid = uid;
     }
 
     @Override
@@ -314,7 +314,7 @@ public class CaCertType extends IdentifidDbObjectType {
         writeIfNotNull(writer, TAG_RR, rr);
         writeIfNotNull(writer, TAG_RT, rt);
         writeIfNotNull(writer, TAG_RIT, rit);
-        writeIfNotNull(writer, TAG_USER, user);
+        writeIfNotNull(writer, TAG_UID, uid);
         writeIfNotNull(writer, TAG_TID, tid);
         writeIfNotNull(writer, TAG_REQ_TYPE, reqType);
         writeIfNotNull(writer, TAG_FP_RS, fpRs);

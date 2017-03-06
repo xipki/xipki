@@ -45,19 +45,19 @@ public class KnowCertResult {
 
     private final boolean known;
 
-    private final String user;
+    private final Long userId;
 
-    public KnowCertResult(final boolean known, final String user) {
+    public KnowCertResult(final boolean known, final Long userId) {
         this.known = known;
-        this.user = user;
+        this.userId = userId;
     }
 
     public boolean isKnown() {
         return known;
     }
 
-    public String getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
 }

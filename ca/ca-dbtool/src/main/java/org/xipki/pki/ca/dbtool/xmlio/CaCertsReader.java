@@ -138,8 +138,8 @@ public class CaCertsReader extends DbiXmlReader {
                 case CaCertType.TAG_UPDATE:
                     ret.setUpdate(Long.parseLong(tagContent));
                     break;
-                case CaCertType.TAG_USER:
-                    ret.setUser(tagContent);
+                case CaCertType.TAG_UID:
+                    ret.setUid(Long.parseLong(tagContent));
                     break;
                 default:
                     break;
