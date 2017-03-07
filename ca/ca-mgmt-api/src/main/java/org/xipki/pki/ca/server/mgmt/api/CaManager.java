@@ -49,6 +49,7 @@ import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.CrlReason;
 import org.xipki.pki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
+import org.xipki.pki.ca.server.mgmt.api.x509.ChangeScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
@@ -227,8 +228,7 @@ public interface CaManager {
 
     boolean addUser(@NonNull AddUserEntry userEntry) throws CaMgmtException;
 
-    boolean changeUser(@NonNull String username, @Nullable String password,
-            @Nullable String cnRegex) throws CaMgmtException;
+    boolean changeUser(@NonNull ChangeUserEntry userEntry) throws CaMgmtException;
 
     boolean removeUser(@NonNull String username) throws CaMgmtException;
 

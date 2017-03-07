@@ -89,6 +89,7 @@ import org.xipki.pki.ca.server.impl.CaAuditConstants;
 import org.xipki.pki.ca.server.impl.CaManagerImpl;
 import org.xipki.pki.ca.server.impl.CertTemplateData;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
+import org.xipki.pki.ca.server.impl.SimpleUserInfo;
 import org.xipki.pki.ca.server.impl.UserRequestorInfo;
 import org.xipki.pki.ca.server.impl.X509Ca;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
@@ -263,13 +264,28 @@ public class Scep {
         return caManager.getX509Ca(caName).supportsCertProfile(profileName);
     }
 
-    public CaStatus getStatus() throws CaMgmtException {
-        return caManager.getX509Ca(caName).getCaInfo().getStatus();
+    public CaStatus getStatus() {
+        if (!dbEntry.isActive() || dbEntry.isFaulty()) {
+            return CaStatus.INACTIVE;
+        }
+        try {
+            return caManager.getX509Ca(caName).getCaInfo().getStatus();
+        } catch (CaMgmtException ex) {
+            LogUtil.error(LOG, ex);
+            return CaStatus.INACTIVE;
+        }
     }
 
     public ContentInfo servicePkiOperation(final CMSSignedData requestContent,
             final String certProfileName, final String msgId, final AuditEvent event)
             throws MessageDecodingException, OperationException {
+        CaStatus status = getStatus();
+
+        if (CaStatus.ACTIVE != status) {
+            LOG.warn("SCEP {} is not active", caName);
+            throw new OperationException(ErrorCode.SYSTEM_UNAVAILABLE);
+        }
+
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent,
                 envelopedDataDecryptor, null);
 
@@ -450,19 +466,22 @@ public class Scep {
                 String challengePwd = CaUtil.getChallengePassword(csrReqInfo);
                 if (challengePwd != null) {
                     String[] strs = challengePwd.split(":");
-                    if (strs != null && strs.length == 2) {
-                        String user = strs[0];
-                        String password = strs[1];
-                        userId = ca.authenticateUser(user, password.getBytes());
-
-                        if (userId == null) {
-                            LOG.warn("tid={}: could not verify the challengePassword", tid);
-                            throw FailInfoException.BAD_REQUEST;
-                        }
-                    } else {
-                        LOG.warn("tid={}: ignore challengePassword since it does not has the"
+                    if (strs == null || strs.length != 2) {
+                        LOG.warn("tid={}: challengePassword does not have the"
                                 + " format <user>:<password>", tid);
+                        throw FailInfoException.BAD_REQUEST;
                     }
+
+                    String user = strs[0];
+                    String password = strs[1];
+                    SimpleUserInfo userInfo = ca.authenticateUser(user, password.getBytes());
+                    if (userInfo == null) {
+                        LOG.warn("tid={}: could not authenticate user {}", tid, user);
+                        throw FailInfoException.BAD_REQUEST;
+                    }
+
+                    checkUserPermission(userInfo, certProfileName, cn);
+                    userId = userInfo.getId();
                 } // end if
 
                 if (selfSigned) {
@@ -477,8 +496,9 @@ public class Scep {
                             tid);
                         throw FailInfoException.BAD_REQUEST;
                     }
-                    checkCommonName(ca, userId, cn);
                 } else {
+                    // No challengePassword is sent, try to find out whether the signature
+                    // certificate is known by the CA
                     if (userId == null) {
                         // up to draft-nourse-scep-23 the client sends all messages to enroll
                         // certificate via MessageType PKCSReq
@@ -491,12 +511,13 @@ public class Scep {
                     } // end if
 
                     // only the same subject is permitted
-                    String cnInSignatureCert = X509Util.getCommonName(X500Name.getInstance(
-                            reqSignatureCert.getSubjectX500Principal().getEncoded()));
+                    String cnInSignatureCert = X509Util.getCommonName(
+                            reqSignatureCert.getSubjectX500Principal());
                     boolean b2 = cn.equals(cnInSignatureCert);
                     if (!b2) {
                         if (userId != null) {
-                            checkCommonName(ca, userId, cn);
+                            SimpleUserInfo userInfo = ca.getSimpleInfoForActiveUser(userId);
+                            checkUserPermission(userInfo, certProfileName, cn);
                         } else {
                             LOG.warn("tid={}: signature certificate is not trusted and {}",
                                     tid, "no challengePassword is contained in the request");
@@ -667,9 +688,25 @@ public class Scep {
         return ci;
     } // method encodeResponse
 
-    private static void checkCommonName(final X509Ca ca, final long userId, final String cn)
-            throws OperationException {
-        String cnRegex = ca.getCnRegexForUser(userId);
+    private static void checkUserPermission(SimpleUserInfo userInfo, String certProfile,
+            final String cn) throws OperationException {
+        boolean profilePermitted = false;
+        if (userInfo.getProfiles().contains(certProfile)) {
+            String[] profiles = userInfo.getProfiles().split(",");
+            for (String p : profiles) {
+                if (certProfile.equals(p)) {
+                    profilePermitted = true;
+                    break;
+                }
+            }
+        }
+
+        if (!profilePermitted) {
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                    "Certificate profile '" + certProfile + "' is not permitted");
+        }
+
+        String cnRegex = userInfo.getCnRegex();
         if (StringUtil.isNotBlank(cnRegex)) {
             Pattern pattern = Pattern.compile(cnRegex);
             if (!pattern.matcher(cn).matches()) {

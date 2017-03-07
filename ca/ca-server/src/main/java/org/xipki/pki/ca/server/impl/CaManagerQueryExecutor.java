@@ -148,8 +148,8 @@ class CaManagerQueryExecutor {
                     + ",OCSP_URIS,CACERT_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?", 1);
 
             this.sqlSelectScep = datasource.buildSelectFirstSql(
-                "CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF FROM SCEP WHERE CA_NAME=?",
-                1);
+                    "ACTIVE,CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF FROM SCEP"
+                    + " WHERE CA_NAME=?", 1);
         }
 
     }
@@ -1764,8 +1764,9 @@ class CaManagerQueryExecutor {
         }
     } // method changeCrlSigner
 
-    Scep changeScep(final String caName, final String responderType, final String responderConf,
-            final String responderBase64Cert, final String control, final CaManagerImpl caManager)
+    Scep changeScep(final String caName, final Boolean active, final String responderType,
+            final String responderConf, final String responderBase64Cert, final String control,
+            final CaManagerImpl caManager)
             throws CaMgmtException {
         ParamUtil.requireNonBlank("caName", caName);
         ParamUtil.requireNonNull("caManager", caManager);
@@ -1773,17 +1774,13 @@ class CaManagerQueryExecutor {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE SCEP SET ");
 
-        String tmpResponderType = responderType;
-        String tmpResponderConf = responderConf;
-        String tmpResponderBase64Cert = responderBase64Cert;
-        String tmpControl = control;
-
         AtomicInteger index = new AtomicInteger(1);
-        Integer idxType = addToSqlIfNotNull(sqlBuilder, index, tmpResponderType, "RESPONDER_TYPE");
-        Integer idxCert = addToSqlIfNotNull(sqlBuilder, index, tmpResponderBase64Cert,
+        Integer idxActive = addToSqlIfNotNull(sqlBuilder, index, active, "ACTIVE");
+        Integer idxType = addToSqlIfNotNull(sqlBuilder, index, responderType, "RESPONDER_TYPE");
+        Integer idxCert = addToSqlIfNotNull(sqlBuilder, index, responderBase64Cert,
                 "RESPONDER_CERT");
-        Integer idxControl = addToSqlIfNotNull(sqlBuilder, index, tmpControl, "CONTROL");
-        Integer idxConf = addToSqlIfNotNull(sqlBuilder, index, tmpResponderConf, "RESPONDER_CONF");
+        Integer idxControl = addToSqlIfNotNull(sqlBuilder, index, control, "CONTROL");
+        Integer idxConf = addToSqlIfNotNull(sqlBuilder, index, responderConf, "RESPONDER_CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE CA_NAME=?");
 
@@ -1793,27 +1790,29 @@ class CaManagerQueryExecutor {
 
         ScepEntry dbEntry = getScep(caName);
 
-        if (tmpResponderType == null) {
-            tmpResponderType = dbEntry.getResponderType();
-        }
+        boolean tmpActive = (active == null) ? dbEntry.isActive() : active;
 
-        if (tmpResponderConf == null) {
-            tmpResponderConf = dbEntry.getResponderConf();
-        }
+        String tmpResponderType = (responderType ==  null)
+                ? dbEntry.getResponderType() : responderType;
 
-        if (tmpResponderBase64Cert == null) {
-            tmpResponderBase64Cert = dbEntry.getBase64Cert();
-        }
+        String tmpResponderConf = (responderConf == null)
+                ? dbEntry.getResponderConf() : responderConf;
 
-        if (tmpControl == null) {
+        String tmpResponderBase64Cert = (responderBase64Cert == null)
+                ? dbEntry.getBase64Cert() : responderBase64Cert;
+
+        String tmpControl;
+        if (control == null) {
             tmpControl = dbEntry.getControl();
-        } else if (CaManager.NULL.equals(tmpControl)) {
+        } else if (CaManager.NULL.equals(control)) {
             tmpControl = null;
+        } else {
+            tmpControl = control;
         }
 
         ScepEntry newDbEntry;
         try {
-            newDbEntry = new ScepEntry(caName, tmpResponderType, tmpResponderConf,
+            newDbEntry = new ScepEntry(caName, tmpActive, tmpResponderType, tmpResponderConf,
                     tmpResponderBase64Cert, tmpControl);
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex);
@@ -1824,6 +1823,12 @@ class CaManagerQueryExecutor {
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
+
+            if (idxActive != null) {
+                setBoolean(ps, idxActive, tmpActive);
+                sb.append("active: '").append(tmpActive).append("'; ");
+            }
+
             if (idxType != null) {
                 String txt = tmpResponderType;
                 ps.setString(idxType, txt);
@@ -2182,13 +2187,14 @@ class CaManagerQueryExecutor {
 
     boolean addScep(final ScepEntry scepEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("scepEntry", scepEntry);
-        final String sql = "INSERT INTO SCEP (CA_NAME,CONTROL,RESPONDER_TYPE,RESPONDER_CERT"
-                + ",RESPONDER_CONF) VALUES (?,?,?,?,?)";
+        final String sql = "INSERT INTO SCEP (CA_NAME,ACTIVE,CONTROL,RESPONDER_TYPE,RESPONDER_CERT"
+                + ",RESPONDER_CONF) VALUES (?,?,?,?,?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
             int idx = 1;
             ps.setString(idx++, scepEntry.getCaName());
+            setBoolean(ps, idx++, scepEntry.isActive());
             ps.setString(idx++, scepEntry.getControl());
             ps.setString(idx++, scepEntry.getResponderType());
             ps.setString(idx++, scepEntry.getBase64Cert());
@@ -2238,6 +2244,7 @@ class CaManagerQueryExecutor {
                 return null;
             }
 
+            boolean active = rs.getBoolean("ACTIVE");
             String control = rs.getString("CONTROL");
             String type = rs.getString("RESPONDER_TYPE");
             String conf = rs.getString("RESPONDER_CONF");
@@ -2246,7 +2253,7 @@ class CaManagerQueryExecutor {
                 cert = null;
             }
 
-            return new ScepEntry(caName, type, conf, cert, control);
+            return new ScepEntry(caName, active, type, conf, cert, control);
         } catch (SQLException ex) {
             throw new CaMgmtException(datasource.translate(sql, ex));
         } catch (InvalidConfException ex) {

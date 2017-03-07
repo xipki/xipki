@@ -49,13 +49,21 @@ public class CaUserType extends IdentifidDbObjectType {
 
     public static final String TAG_NAME = "name";
 
+    public static final String TAG_ACTIVE = "active";
+
     public static final String TAG_PASSWORD = "password";
+
+    public static final String TAG_PROFILES = "profiles";
 
     public static final String TAG_CN_REGEX = "cnRegex";
 
     private String name;
 
+    private Boolean active;
+
     private String password;
+
+    private String profiles;
 
     private String cnRegex;
 
@@ -67,12 +75,28 @@ public class CaUserType extends IdentifidDbObjectType {
         this.name = name;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
     public String getPassword() {
         return password;
     }
 
     public void setPassword(final String password) {
         this.password = password;
+    }
+
+    public String getProfiles() {
+        return profiles;
+    }
+
+    public void setProfiles(String profiles) {
+        this.profiles = profiles;
     }
 
     public String getCnRegex() {
@@ -87,7 +111,9 @@ public class CaUserType extends IdentifidDbObjectType {
     public void validate() throws InvalidDataObjectException {
         super.validate();
         assertNotBlank("name", name);
+        assertNotNull("active", active);
         assertNotBlank("password", password);
+        assertNotBlank("profiles", profiles);
         assertNotBlank("cnRegex", cnRegex);
     }
 
@@ -99,8 +125,10 @@ public class CaUserType extends IdentifidDbObjectType {
 
         writer.writeStartElement(TAG_ROOT);
         writeIfNotNull(writer, TAG_ID, getId());
+        writeIfNotNull(writer, TAG_ACTIVE, active);
         writeIfNotNull(writer, TAG_NAME, name);
         writeIfNotNull(writer, TAG_PASSWORD, password);
+        writeIfNotNull(writer, TAG_PROFILES, profiles);
         writeIfNotNull(writer, TAG_CN_REGEX, cnRegex);
         writer.writeEndElement();
         writer.writeNewline();

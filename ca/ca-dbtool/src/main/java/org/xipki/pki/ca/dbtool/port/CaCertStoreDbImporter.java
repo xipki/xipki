@@ -121,7 +121,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             + " VALUES (?,?,?,?,?,?,?,?)";
 
     private static final String SQL_ADD_USER =
-            "INSERT INTO USERNAME (ID,NAME,PASSWORD,CN_REGEX) VALUES (?,?,?,?)";
+            "INSERT INTO USERNAME (ID,NAME,ACTIVE,PASSWORD,PROFILES,CN_REGEX) VALUES (?,?,?,?,?,?)";
 
     private static final String SQL_ADD_REQUEST =
             "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES (?,?,?)";
@@ -790,7 +790,9 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                         int idx = 1;
                         psAddUser.setLong(idx++, user.getId());
                         psAddUser.setString(idx++, user.getName());
+                        setBoolean(psAddUser, idx++, user.getActive());
                         psAddUser.setString(idx++, user.getPassword());
+                        psAddUser.setString(idx++, user.getProfiles());
                         psAddUser.setString(idx++, user.getCnRegex());
                         psAddUser.addBatch();
                     } catch (SQLException ex) {

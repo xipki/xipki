@@ -49,7 +49,7 @@ import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
-import org.xipki.pki.ca.server.mgmt.api.ChangeScepEntry;
+import org.xipki.pki.ca.server.mgmt.api.x509.ChangeScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 
@@ -69,6 +69,14 @@ public class ScepUpdateCmd extends CaCommandSupport {
                     + "(required)")
     @Completion(ScepNameCompleter.class)
     private String caName;
+
+    @Option(name = "--active",
+            description = "activate this SCEP")
+    private Boolean active;
+
+    @Option(name = "--inactive",
+            description = "deactivate this SCEP")
+    private Boolean inactive;
 
     @Option(name = "--resp-type",
             description = "type of the responder")
@@ -110,6 +118,19 @@ public class ScepUpdateCmd extends CaCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
+        Boolean realActive;
+        if (active != null) {
+            if (inactive != null) {
+                throw new IllegalCmdParamException(
+                        "maximal one of --active and --inactive can be set");
+            }
+            realActive = Boolean.TRUE;
+        } else if (inactive != null) {
+            realActive = Boolean.FALSE;
+        } else {
+            realActive = null;
+        }
+
         String certConf = null;
         if (CaManager.NULL.equalsIgnoreCase(certFile)) {
             certConf = CaManager.NULL;
@@ -120,6 +141,10 @@ public class ScepUpdateCmd extends CaCommandSupport {
         }
 
         ChangeScepEntry entry = new ChangeScepEntry(caName);
+        if (realActive != null) {
+            entry.setActive(realActive);
+        }
+
         if (responderType != null) {
             entry.setResponderType(responderType);
         }

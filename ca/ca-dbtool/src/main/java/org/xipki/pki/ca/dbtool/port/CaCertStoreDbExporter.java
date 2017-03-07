@@ -388,7 +388,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             break;
         case USER:
             numProcessedBefore = certstore.getCountUsers();
-            coreSql = "ID,NAME,PASSWORD,CN_REGEX FROM USERNAME WHERE ID>=?";
+            coreSql = "ID,NAME,ACTIVE,PASSWORD,PROFILES,CN_REGEX FROM USERNAME WHERE ID>=?";
             break;
         case REQUEST:
             numProcessedBefore = certstore.getCountRequests();
@@ -605,8 +605,15 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         CaUserType user = new CaUserType();
                         user.setId(id);
                         user.setName(name);
+
+                        boolean active = rs.getBoolean("ACTIVE");
+                        user.setActive(active);
+
                         String password = rs.getString("PASSWORD");
                         user.setPassword(password);
+
+                        String profiles = rs.getString("PROFILES");
+                        user.setProfiles(profiles);
 
                         String cnRegex = rs.getString("CN_REGEX");
                         user.setCnRegex(cnRegex);

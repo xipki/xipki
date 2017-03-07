@@ -62,11 +62,13 @@ import org.xipki.pki.ca.server.impl.CertRevInfoWithSerial;
 import org.xipki.pki.ca.server.impl.CertStatus;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
 import org.xipki.pki.ca.server.impl.SerialWithId;
+import org.xipki.pki.ca.server.impl.SimpleUserInfo;
 import org.xipki.pki.ca.server.impl.UniqueIdGenerator;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.pki.ca.server.mgmt.api.CertListOrderBy;
+import org.xipki.pki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
@@ -563,7 +565,7 @@ public class CertificateStore {
         }
     }
 
-    public Long authenticateUser(final String user, final byte[] password)
+    public SimpleUserInfo authenticateUser(final String user, final byte[] password)
             throws OperationException {
         try {
             return queryExecutor.authenticateUser(user, password);
@@ -576,9 +578,9 @@ public class CertificateStore {
         }
     }
 
-    public String getCnRegexForUser(final long userId) throws OperationException {
+    public SimpleUserInfo getSimpleInfoForActiveUser(final long userId) throws OperationException {
         try {
-            return queryExecutor.getCnRegexForUser(userId);
+            return queryExecutor.getSimpleInfoForActiveUser(userId);
         } catch (DataAccessException ex) {
             LOG.debug("DataAccessException", ex);
             throw new OperationException(ErrorCode.DATABASE_FAILURE, ex.getMessage());
@@ -806,9 +808,8 @@ public class CertificateStore {
         return queryExecutor.removeUser(userName);
     }
 
-    public boolean changeUser(final String username, final String password, final String cnRegex)
-            throws CaMgmtException {
-        return queryExecutor.changeUser(username, password, cnRegex);
+    public boolean changeUser(final ChangeUserEntry userEntry) throws CaMgmtException {
+        return queryExecutor.changeUser(userEntry);
     }
 
     public UserEntry getUser(final String username) throws CaMgmtException {

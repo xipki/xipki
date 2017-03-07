@@ -237,6 +237,9 @@
       <column name="CA_NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
+      <column name="ACTIVE" type="SMALLINT" remarks="whether the SCEP is activated">
+        <constraints nullable="false"/>
+      </column>
       <!-- CONTROL is reserved for future, will currently not be used -->
       <column name="CONTROL" type="VARCHAR(400)"/>
       <column name="RESPONDER_TYPE" type="VARCHAR(100)">
@@ -293,14 +296,21 @@
       <column name="NAME" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="PASSWORD" type="VARCHAR(150)">
+      <column name="ACTIVE" type="SMALLINT" remarks="whether the user is activated">
         <constraints nullable="false"/>
-        <!-- hex salted hashed password: first byte identifies hash algorithm,
-         second byte identifies length of salt, third and forth bytes specifies the iteration,
-         following by the salt and hash value-->
       </column>
-      <column name="CN_REGEX" type="VARCHAR(300)">
-        <!-- regex for the permitted common names for this user -->
+      <column name="PASSWORD" type="VARCHAR(150)" remarks="salted hashed password in hex">
+        <constraints nullable="false"/>
+        <!-- byte 1: identifies hash algorithm,
+             byte 2: identifies length of salt,
+             byte 3 and 4: specifies the iteration,
+             further bytes: salt and hash value-->
+      </column>
+      <column name="PROFILES" type="VARCHAR(300)" remarks="comma-separated list of certificate profiles">
+        <constraints nullable="false"/>
+      </column>
+      <column name="CN_REGEX" type="VARCHAR(300)" remarks="regex for the permitted common names for this user">
+        <constraints nullable="false"/>
       </column>
     </createTable>
     <createIndex tableName="USERNAME" unique="false" indexName="IDX_USER_NAME">
@@ -383,7 +393,7 @@
           remarks="notAfter, seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="REV" type="BIGINT"
+      <column name="REV" type="SMALLINT"
           remarks="whether the certificate is revoked">
         <constraints nullable="false"/>
       </column>

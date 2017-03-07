@@ -141,7 +141,7 @@ import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.pki.ca.server.mgmt.api.CertListOrderBy;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.pki.ca.server.mgmt.api.ChangeCaEntry;
-import org.xipki.pki.ca.server.mgmt.api.ChangeScepEntry;
+import org.xipki.pki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpControl;
 import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
@@ -168,6 +168,7 @@ import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.ScepType;
 import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.StringsType;
 import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.X509CaInfoType;
 import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
+import org.xipki.pki.ca.server.mgmt.api.x509.ChangeScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
@@ -2661,9 +2662,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     @Override
-    public boolean changeUser(final String username, final String password, final String cnRegex)
+    public boolean changeUser(final ChangeUserEntry userEntry)
             throws CaMgmtException {
-        return certstore.changeUser(username, password, cnRegex);
+        return certstore.changeUser(userEntry);
     }
 
     @Override
@@ -2756,6 +2757,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         asssertMasterMode();
 
         String caName = scepEntry.getCaName();
+        Boolean active = scepEntry.isActive();
         String type = scepEntry.getResponderType();
         String conf = scepEntry.getResponderConf();
         String base64Cert = scepEntry.getBase64Cert();
@@ -2764,7 +2766,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return false;
         }
 
-        Scep scep = queryExecutor.changeScep(caName, type, conf, base64Cert, control, this);
+        Scep scep = queryExecutor.changeScep(caName, active, type, conf, base64Cert, control, this);
         if (scep == null) {
             return false;
         }

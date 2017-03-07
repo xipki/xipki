@@ -32,71 +32,76 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.mgmt.api;
+package org.xipki.pki.ca.server.mgmt.api.x509;
 
-import java.util.Collections;
-import java.util.Set;
-
+import org.xipki.commons.common.InvalidConfException;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class UserEntry {
+public class ChangeScepEntry {
 
-    private final String name;
+    private final String caName;
 
-    private final boolean active;
+    private Boolean active;
 
-    private final String hashedPassword;
+    private String responderType;
 
-    private final Set<String> profiles;
+    private String responderConf;
 
-    private final String cnRegex;
+    private String base64Cert;
 
-    public UserEntry(final String name, final boolean active, final String hashedPassword,
-            final Set<String> profiles, final String cnRegex)
-            throws CaMgmtException {
-        this.name = ParamUtil.requireNonBlank("name", name);
-        this.active = active;
-        this.hashedPassword = ParamUtil.requireNonBlank("hashedPassword", hashedPassword);
-        this.profiles = Collections.unmodifiableSet(
-                ParamUtil.requireNonEmpty("profiles", profiles));
-        this.cnRegex = cnRegex;
+    private String control;
+
+    public ChangeScepEntry(final String caName) throws InvalidConfException {
+        this.caName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
     }
 
-    public String getName() {
-        return name;
+    public String getCaName() {
+        return caName;
     }
 
-    public boolean isActive() {
+    public Boolean isActive() {
         return active;
     }
 
-    public String getHashedPassword() {
-        return hashedPassword;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
-    public Set<String> getProfiles() {
-        return profiles;
+    public String getResponderType() {
+        return responderType;
     }
 
-    public String getCnRegex() {
-        return cnRegex;
+    public void setResponderType(final String responderType) {
+        this.responderType = responderType;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("name: ").append(name).append('\n');
-        sb.append("active: ").append(active).append('\n');
-        sb.append("hashed password: ").append(hashedPassword).append("\n");
-        sb.append("profiles: ").append(StringUtil.collectionAsString(profiles, ",")).append("\n");
-        sb.append("cnRegex: ").append(cnRegex);
-        return sb.toString();
+    public String getResponderConf() {
+        return responderConf;
+    }
+
+    public void setResponderConf(final String responderConf) {
+        this.responderConf = responderConf;
+    }
+
+    public String getBase64Cert() {
+        return base64Cert;
+    }
+
+    public void setBase64Cert(final String base64Cert) {
+        this.base64Cert = base64Cert;
+    }
+
+    public String getControl() {
+        return control;
+    }
+
+    public void setControl(final String control) {
+        this.control = control;
     }
 
 }

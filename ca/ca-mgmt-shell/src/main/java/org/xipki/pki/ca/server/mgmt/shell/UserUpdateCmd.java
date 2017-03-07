@@ -34,9 +34,16 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
+import java.util.Set;
+
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.pki.ca.server.mgmt.api.ChangeUserEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -54,9 +61,24 @@ public class UserUpdateCmd extends CaCommandSupport {
                     + "(required)")
     private String name;
 
+    @Option(name = "--active",
+            description = "activate this user")
+    private Boolean active;
+
+    @Option(name = "--inactive",
+            description = "deactivate this user")
+    private Boolean inactive;
+
     @Option(name = "--password",
-            description = "user password, 'NULL' for empty password, 'C' to read from console")
+            description = "user password, 'CONSOLE' to read from console")
     private String password;
+
+    @Option(name = "--profile",
+            required = true, multiValued = true,
+            description = "profile name\n"
+                    + "(required, multi-valued)")
+    @Completion(ProfileNameCompleter.class)
+    private Set<String> profiles;
 
     @Option(name = "--cn-regex",
             description = "regex for the permitted common name, 'NULL' for empty password")
@@ -64,11 +86,42 @@ public class UserUpdateCmd extends CaCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
+        Boolean realActive;
+        if (active != null) {
+            if (inactive != null) {
+                throw new IllegalCmdParamException(
+                        "maximal one of --active and --inactive can be set");
+            }
+            realActive = Boolean.TRUE;
+        } else if (inactive != null) {
+            realActive = Boolean.FALSE;
+        } else {
+            realActive = null;
+        }
+
+        ChangeUserEntry entry = new ChangeUserEntry(name);
+        if (realActive != null) {
+            entry.setActive(realActive);
+        }
+
         if ("CONSOLE".equalsIgnoreCase(password)) {
             password = new String(readPassword());
         }
-        boolean bo = caManager.changeUser(name, password, cnRegex);
-        output(bo, "added", "could not add", "user " + name);
+
+        if (password != null) {
+            entry.setPassword(password);
+        }
+
+        if (cnRegex != null) {
+            entry.setCnRegex(cnRegex);
+        }
+
+        if (CollectionUtil.isNonEmpty(profiles)) {
+            entry.setProfiles(profiles);
+        }
+
+        boolean bo = caManager.changeUser(entry);
+        output(bo, "changed", "could not change", "user " + name);
         return null;
     }
 

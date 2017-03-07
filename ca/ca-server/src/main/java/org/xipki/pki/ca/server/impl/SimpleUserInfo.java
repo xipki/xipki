@@ -32,71 +32,39 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.mgmt.api;
-
-import java.util.Collections;
-import java.util.Set;
+package org.xipki.pki.ca.server.impl;
 
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.1.1
  */
 
-public class UserEntry {
+public class SimpleUserInfo {
 
-    private final String name;
+    private final long id;
 
-    private final boolean active;
-
-    private final String hashedPassword;
-
-    private final Set<String> profiles;
+    private final String profiles;
 
     private final String cnRegex;
 
-    public UserEntry(final String name, final boolean active, final String hashedPassword,
-            final Set<String> profiles, final String cnRegex)
-            throws CaMgmtException {
-        this.name = ParamUtil.requireNonBlank("name", name);
-        this.active = active;
-        this.hashedPassword = ParamUtil.requireNonBlank("hashedPassword", hashedPassword);
-        this.profiles = Collections.unmodifiableSet(
-                ParamUtil.requireNonEmpty("profiles", profiles));
-        this.cnRegex = cnRegex;
+    public SimpleUserInfo(long id, String profiles, String cnRegex) {
+        this.id = id;
+        this.profiles = ParamUtil.requireNonNull("profiles", profiles);
+        this.cnRegex = ParamUtil.requireNonNull("cnRegex", cnRegex);
     }
 
-    public String getName() {
-        return name;
+    public long getId() {
+        return id;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public String getHashedPassword() {
-        return hashedPassword;
-    }
-
-    public Set<String> getProfiles() {
+    public String getProfiles() {
         return profiles;
     }
 
     public String getCnRegex() {
         return cnRegex;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("name: ").append(name).append('\n');
-        sb.append("active: ").append(active).append('\n');
-        sb.append("hashed password: ").append(hashedPassword).append("\n");
-        sb.append("profiles: ").append(StringUtil.collectionAsString(profiles, ",")).append("\n");
-        sb.append("cnRegex: ").append(cnRegex);
-        return sb.toString();
     }
 
 }

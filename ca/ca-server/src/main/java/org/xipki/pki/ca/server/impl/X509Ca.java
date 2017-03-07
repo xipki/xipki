@@ -544,13 +544,13 @@ public class X509Ca {
                 validTo, orderBy, numEntries);
     }
 
-    public Long authenticateUser(final String user, final byte[] password)
+    public SimpleUserInfo authenticateUser(final String user, final byte[] password)
             throws OperationException {
         return certstore.authenticateUser(user, password);
     }
 
-    public String getCnRegexForUser(final long userId) throws OperationException {
-        return certstore.getCnRegexForUser(userId);
+    public SimpleUserInfo getSimpleInfoForActiveUser(final long userId) throws OperationException {
+        return certstore.getSimpleInfoForActiveUser(userId);
     }
 
     public X509CRL getCurrentCrl()

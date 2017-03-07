@@ -58,6 +58,8 @@ public class ScepEntry {
 
     private final String caName;
 
+    private final boolean active;
+
     private final String control;
 
     private final String responderType;
@@ -72,9 +74,11 @@ public class ScepEntry {
 
     private boolean confFaulty;
 
-    public ScepEntry(final String caName, final String responderType, final String responderConf,
-            final String base64Cert, final String control) throws InvalidConfException {
+    public ScepEntry(final String caName, final boolean active, final String responderType,
+            final String responderConf, final String base64Cert, final String control)
+            throws InvalidConfException {
         this.caName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
+        this.active = active;
         this.responderType = ParamUtil.requireNonBlank("responderType", responderType);
         this.base64Cert = base64Cert;
         this.responderConf = responderConf;
@@ -89,6 +93,10 @@ public class ScepEntry {
                 certFaulty = true;
             }
         }
+    }
+
+    public boolean isActive() {
+        return active;
     }
 
     public X509Certificate getCertificate() {
@@ -142,6 +150,7 @@ public class ScepEntry {
     public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(100);
         sb.append("caName: ").append(caName).append('\n');
+        sb.append("active: ").append(active).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("responderType: ").append(responderType).append('\n');
         sb.append("responderConf: ");
@@ -184,6 +193,10 @@ public class ScepEntry {
 
         ScepEntry objB = (ScepEntry) obj;
         if (!caName.equals(objB.caName)) {
+            return false;
+        }
+
+        if (active != objB.active) {
             return false;
         }
 

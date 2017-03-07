@@ -55,6 +55,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.security.auth.x500.X500Principal;
@@ -93,6 +94,7 @@ import org.xipki.pki.ca.server.impl.CertStatus;
 import org.xipki.pki.ca.server.impl.DbSchemaInfo;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
 import org.xipki.pki.ca.server.impl.SerialWithId;
+import org.xipki.pki.ca.server.impl.SimpleUserInfo;
 import org.xipki.pki.ca.server.impl.UniqueIdGenerator;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.impl.util.PasswordHash;
@@ -102,6 +104,7 @@ import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.pki.ca.server.mgmt.api.CertListOrderBy;
+import org.xipki.pki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
@@ -199,9 +202,9 @@ class CertStoreQueryExecutor {
 
         private final String sqlCertprofileForSerial;
 
-        private final String sqlPasswordForUser;
+        private final String sqlUserInfoForActiveUser;
 
-        private final String sqlCnRegexForUser;
+        private final String sqlSimpleInfoForActiveUser;
 
         private final String sqlKnowsCertForSerial;
 
@@ -261,10 +264,10 @@ class CertStoreQueryExecutor {
                     "PID,CA_ID FROM CERT WHERE ID=?", 1);
             this.sqlCertprofileForSerial = datasource.buildSelectFirstSql(
                     "PID FROM CERT WHERE SN=? AND CA_ID=?", 1);
-            this.sqlPasswordForUser = datasource.buildSelectFirstSql(
-                    "ID,PASSWORD FROM USERNAME WHERE NAME=?", 1);
-            this.sqlCnRegexForUser = datasource.buildSelectFirstSql(
-                    "CN_REGEX FROM USERNAME WHERE ID=?", 1);
+            this.sqlUserInfoForActiveUser = datasource.buildSelectFirstSql(
+                    "ID,PASSWORD,PROFILES,CN_REGEX FROM USERNAME WHERE NAME=? AND ACTIVE=1", 1);
+            this.sqlSimpleInfoForActiveUser = datasource.buildSelectFirstSql(
+                    "PROFILES,CN_REGEX FROM USERNAME WHERE ID=? AND ACTIVE=1", 1);
             this.sqlKnowsCertForSerial = datasource.buildSelectFirstSql(
                     "UID FROM CERT WHERE SN=? AND CA_ID=?", 1);
             this.sqlRevForId = datasource.buildSelectFirstSql(
@@ -281,7 +284,7 @@ class CertStoreQueryExecutor {
                     "NBEFORE FROM CERT WHERE PID=? AND SUBJECT LIKE ?", 1, "NBEFORE ASC");
             this.sqlGetUserId = datasource.buildSelectFirstSql("ID FROM USERNAME WHERE NAME=?", 1);
             this.sqlGetUser = datasource.buildSelectFirstSql(
-                    "PASSWORD,CN_REGEX FROM USERNAME WHERE NAME=?", 1);
+                    "ACTIVE,PASSWORD,PROFILES,CN_REGEX FROM USERNAME WHERE NAME=?", 1);
             this.sqlCrl = datasource.buildSelectFirstSql(
                     "THISUPDATE,CRL FROM CRL WHERE CA_ID=?", 1, "THISUPDATE DESC");
             this.sqlCrlWithNo = datasource.buildSelectFirstSql(
@@ -1891,12 +1894,15 @@ class CertStoreQueryExecutor {
         return ret;
     }
 
-    Long authenticateUser(final String user, final byte[] password)
+    SimpleUserInfo authenticateUser(final String user, final byte[] password)
             throws DataAccessException, OperationException {
-        final String sql = sqls.sqlPasswordForUser;
+        final String sql = sqls.sqlUserInfoForActiveUser;
 
         long id;
-        String expPasswordText = null;
+        String expPasswordText;
+        String profiles;
+        String cnRegex;
+
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1910,6 +1916,8 @@ class CertStoreQueryExecutor {
 
             id = rs.getLong("ID");
             expPasswordText = rs.getString("PASSWORD");
+            profiles = rs.getString("PROFILES");
+            cnRegex = rs.getString("CN_REGEX");
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
         } finally {
@@ -1927,11 +1935,12 @@ class CertStoreQueryExecutor {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
 
-        return valid ? id : null;
+        return valid ? new SimpleUserInfo(id, profiles, cnRegex) : null;
     } // method authenticateUser
 
-    String getCnRegexForUser(final long userId) throws DataAccessException, OperationException {
-        final String sql = sqls.sqlCnRegexForUser;
+    SimpleUserInfo getSimpleInfoForActiveUser(final long userId)
+            throws DataAccessException, OperationException {
+        final String sql = sqls.sqlSimpleInfoForActiveUser;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1943,7 +1952,9 @@ class CertStoreQueryExecutor {
                 return null;
             }
 
-            return rs.getString("CN_REGEX");
+            String profiles = rs.getString("PROFILES");
+            String cnRegex = rs.getString("CN_REGEX");
+            return new SimpleUserInfo(userId, profiles, cnRegex);
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
         } finally {
@@ -2589,7 +2600,8 @@ class CertStoreQueryExecutor {
         } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
             throw new CaMgmtException(ex);
         }
-        UserEntry tmpUserEntry = new UserEntry(name, hashedPassword, userEntry.getCnRegex());
+        UserEntry tmpUserEntry = new UserEntry(name, userEntry.isActive(), hashedPassword,
+                userEntry.getProfiles(), userEntry.getCnRegex());
 
         try {
             long maxId = datasource.getMax(null, "USERNAME", "ID");
@@ -2603,7 +2615,8 @@ class CertStoreQueryExecutor {
         return true;
     } // method addUser
 
-    private Long executeGetUserIdSql(final String user) throws CaMgmtException {
+    private Long executeGetUserIdSql(final String user)
+            throws CaMgmtException {
         ParamUtil.requireNonBlank("user", user);
         final String sql = sqls.sqlGetUserId;
         ResultSet rs = null;
@@ -2617,6 +2630,7 @@ class CertStoreQueryExecutor {
             if (!rs.next()) {
                 return null;
             }
+
             return rs.getLong("ID");
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
@@ -2631,7 +2645,8 @@ class CertStoreQueryExecutor {
     private void executeAddUserSql(final long id, final UserEntry userEntry)
             throws CaMgmtException {
         ParamUtil.requireNonNull("userEntry", userEntry);
-        final String sql = "INSERT INTO USERNAME (ID,NAME,PASSWORD,CN_REGEX) VALUES (?,?,?,?)";
+        final String sql =
+            "INSERT INTO USERNAME (ID,NAME,ACTIVE,PASSWORD,PROFILES,CN_REGEX) VALUES (?,?,?,?,?,?)";
 
         PreparedStatement ps = null;
 
@@ -2640,7 +2655,9 @@ class CertStoreQueryExecutor {
             int idx = 1;
             ps.setLong(idx++, id);
             ps.setString(idx++, userEntry.getName());
+            setBoolean(ps, idx++, userEntry.isActive());
             ps.setString(idx++, userEntry.getHashedPassword());
+            ps.setString(idx++, StringUtil.collectionAsString(userEntry.getProfiles(), ","));
             ps.setString(idx++, userEntry.getCnRegex());
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -2672,12 +2689,18 @@ class CertStoreQueryExecutor {
         }
     } // method removeUser
 
-    boolean changeUser(final String username, final String password, final String cnRegex)
-            throws CaMgmtException {
+    boolean changeUser(final ChangeUserEntry userEntry) throws CaMgmtException {
+        String username = userEntry.getName();
+
         Long existingId = executeGetUserIdSql(username);
         if (existingId == null) {
             throw new CaMgmtException("user named '" + username + " ' does not exist");
         }
+
+        String password = userEntry.getPassword();
+        String cnRegex = userEntry.getCnRegex();
+
+        // TODO
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE USERNAME SET ");
@@ -2754,9 +2777,11 @@ class CertStoreQueryExecutor {
                 return null;
             }
 
+            boolean active = rs.getBoolean("ACTIVE");
             String hashedPassword = rs.getString("PASSWORD");
             String cnRegex = rs.getString("CN_REGEX");
-            return new UserEntry(username, hashedPassword, cnRegex);
+            Set<String> profiles = StringUtil.splitAsSet(rs.getString("PROFILES"), ",");
+            return new UserEntry(username, active, hashedPassword, profiles, cnRegex);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);

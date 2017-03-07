@@ -230,6 +230,7 @@
   <xs:complexType name="scepType">
     <xs:sequence>
       <xs:element name="caName" type="xs:string"/>
+      <xs:element name="active" type="xs:int"/>
       <xs:element name="responderType" type="xs:string"/>
       <xs:element name="responderConf" type="fileOrValueType"/>
       <xs:element name="responderCert" type="fileOrBinaryType" minOccurs="0"/>

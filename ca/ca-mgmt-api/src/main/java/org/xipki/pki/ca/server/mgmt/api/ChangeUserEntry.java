@@ -34,64 +34,65 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
-import org.xipki.commons.common.InvalidConfException;
+import java.util.Set;
+
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.1.1
  */
 
-public class ChangeScepEntry {
+public class ChangeUserEntry {
 
-    private final String caName;
+    private final String name;
 
-    private String responderType;
+    private Boolean active;
 
-    private String responderConf;
+    private Set<String> profiles;
 
-    private String base64Cert;
+    private String password;
 
-    private String control;
+    private String cnRegex;
 
-    public ChangeScepEntry(final String caName) throws InvalidConfException {
-        this.caName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
+    public ChangeUserEntry(final String name) throws CaMgmtException {
+        this.name = ParamUtil.requireNonBlank("name", name);
     }
 
-    public String getCaName() {
-        return caName;
+    public String getName() {
+        return name;
     }
 
-    public String getResponderType() {
-        return responderType;
+    public Boolean isActive() {
+        return active;
     }
 
-    public void setResponderType(final String responderType) {
-        this.responderType = responderType;
+    public void setActive(final Boolean active) {
+        this.active = active;
     }
 
-    public String getResponderConf() {
-        return responderConf;
+    public void setPassword(final String password) {
+        this.password = password;
     }
 
-    public void setResponderConf(final String responderConf) {
-        this.responderConf = responderConf;
+    public String getPassword() {
+        return password;
     }
 
-    public String getBase64Cert() {
-        return base64Cert;
+    public void setCnRegex(final String cnRegex) {
+        this.cnRegex = cnRegex;
     }
 
-    public void setBase64Cert(final String base64Cert) {
-        this.base64Cert = base64Cert;
+    public String getCnRegex() {
+        return cnRegex;
     }
 
-    public String getControl() {
-        return control;
+    public void setProfiles(final Set<String> profiles) {
+        this.profiles = profiles;
     }
 
-    public void setControl(final String control) {
-        this.control = control;
+    public Set<String> getProfiles() {
+        return profiles;
     }
 
 }

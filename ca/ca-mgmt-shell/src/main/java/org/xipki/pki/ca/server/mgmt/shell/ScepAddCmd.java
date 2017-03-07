@@ -64,6 +64,10 @@ public class ScepAddCmd extends CaCommandSupport {
     @Completion(ScepNameCompleter.class)
     private String caName;
 
+    @Option(name = "--inactive",
+            description = "do not activate this SCEP")
+    private Boolean inactive = Boolean.FALSE;
+
     @Option(name = "--resp-type",
             required = true,
             description = "type of the responder\n"
@@ -102,7 +106,7 @@ public class ScepAddCmd extends CaCommandSupport {
                     passwordResolver, securityFactory);
         }
 
-        ScepEntry entry = new ScepEntry(caName, responderType, responderConf, base64Cert,
+        ScepEntry entry = new ScepEntry(caName, !inactive, responderType, responderConf, base64Cert,
                 scepControl);
         if (entry.isFaulty()) {
             throw new InvalidConfException("certificate is invalid");

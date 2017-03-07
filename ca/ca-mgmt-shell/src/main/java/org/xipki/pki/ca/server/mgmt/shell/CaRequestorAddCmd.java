@@ -86,7 +86,7 @@ public class CaRequestorAddCmd extends CaCommandSupport {
     private Set<String> permissions;
 
     @Option(name = "--profile",
-            multiValued = true,
+            required = true, multiValued = true,
             description = "profile name or 'all' for all profiles\n"
                     + "(required, multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)

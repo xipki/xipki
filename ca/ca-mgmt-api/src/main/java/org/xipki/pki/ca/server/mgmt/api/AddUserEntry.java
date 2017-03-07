@@ -34,6 +34,9 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.xipki.commons.common.util.ParamUtil;
 
 /**
@@ -45,14 +48,22 @@ public class AddUserEntry {
 
     private final String name;
 
+    private final boolean active;
+
     private final String password;
+
+    private final Set<String> profiles;
 
     private final String cnRegex;
 
-    public AddUserEntry(final String name, final String password, final String cnRegex)
+    public AddUserEntry(final String name, final boolean active, final String password,
+            final Set<String> profiles, final String cnRegex)
             throws CaMgmtException {
         this.name = ParamUtil.requireNonBlank("name", name);
+        this.active = active;
         this.password = ParamUtil.requireNonBlank("password", password);
+        this.profiles = Collections.unmodifiableSet(
+                ParamUtil.requireNonEmpty("profiles", profiles));
         this.cnRegex = ParamUtil.requireNonBlank("cnRegex", cnRegex);
     }
 
@@ -60,8 +71,16 @@ public class AddUserEntry {
         return name;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    public Set<String> getProfiles() {
+        return profiles;
     }
 
     public String getCnRegex() {

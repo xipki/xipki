@@ -573,8 +573,8 @@ class CaConfigurationDbExporter extends DbPorter {
         Sceps sceps = new Sceps();
         caconf.setSceps(sceps);
 
-        final String sql = "SELECT CA_NAME,RESPONDER_TYPE,RESPONDER_CONF,RESPONDER_CERT,CONTROL"
-                + " FROM SCEP";
+        final String sql =
+            "SELECT CA_NAME,ACTIVE,RESPONDER_TYPE,RESPONDER_CONF,RESPONDER_CERT,CONTROL FROM SCEP";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -584,6 +584,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
             while (rs.next()) {
                 String caName = rs.getString("CA_NAME");
+                int active = rs.getInt("ACTIVE");
                 String respType = rs.getString("RESPONDER_TYPE");
                 String respConf = rs.getString("RESPONDER_CONF");
                 String respCert = rs.getString("RESPONDER_CERT");
@@ -591,6 +592,7 @@ class CaConfigurationDbExporter extends DbPorter {
 
                 ScepType scep = new ScepType();
                 scep.setCaName(caName);
+                scep.setActive(active);
                 scep.setResponderType(respType);
                 scep.setResponderConf(
                         buildFileOrValue(respConf, "ca-conf/responderconf-scep-" + caName));
