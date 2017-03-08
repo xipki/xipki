@@ -353,6 +353,7 @@
             <configLocation>/xipki-checks.xml</configLocation>
             <failsOnError>true</failsOnError>
             <violationSeverity>warning</violationSeverity>
+            <excludes>**/target/**/*</excludes>
           </configuration>
         </plugin>
       </plugins>
