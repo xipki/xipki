@@ -78,7 +78,7 @@ public class CurlCmd extends XipkiCommandSupport {
 
     @Option(name = "--post", aliases = "-p",
             description = "send the request via HTTP POST")
-    private Boolean usePost;
+    private Boolean usePost = Boolean.FALSE;
 
     @Option(name = "--data", aliases = "-d",
             description = "data to be sent in a POST request")
@@ -104,7 +104,7 @@ public class CurlCmd extends XipkiCommandSupport {
     private List<String> headers;
 
     @Option(name = "--user", aliases = "-u",
-            description = "<user:password>")
+            description = "User and password of the form user:password")
     private String userPassword;
 
     @Override
@@ -119,12 +119,10 @@ public class CurlCmd extends XipkiCommandSupport {
 
         if (dataBytes != null) {
             usePost = Boolean.TRUE;
-        } else if (usePost == null) {
-            usePost = Boolean.TRUE;
         }
 
         URL newUrl = new URL(url);
-        HttpURLConnection httpConn = IoUtil.openHttpConn(newUrl);;
+        HttpURLConnection httpConn = IoUtil.openHttpConn(newUrl);
 
         try {
             httpConn.setRequestMethod(usePost ? "POST" : "GET");
