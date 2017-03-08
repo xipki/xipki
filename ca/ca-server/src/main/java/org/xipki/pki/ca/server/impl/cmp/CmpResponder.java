@@ -165,7 +165,7 @@ abstract class CmpResponder {
             try {
                 messageTime = reqHeader.getMessageTime().getDate();
             } catch (ParseException ex) {
-                LogUtil.error(LOG, ex, "tid=" + tidStr + ": could not parse messageDate");
+                LogUtil.error(LOG, ex, "tid=" + tidStr + ": could not parse messageTime");
             }
         }
 

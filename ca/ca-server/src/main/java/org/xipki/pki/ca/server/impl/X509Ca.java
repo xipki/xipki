@@ -1013,20 +1013,17 @@ public class X509Ca {
     }
 
     public X509CertificateInfo regenerateCertificate(final CertTemplateData certTemplate,
-            final RequestorInfo requestor,
-            final RequestType reqType, final byte[] transactionId, final String msgId)
-            throws OperationException {
-        return regenerateCertificates(Arrays.asList(certTemplate), requestor,
-                reqType, transactionId, msgId).get(0);
+            final RequestorInfo requestor, final RequestType reqType, final byte[] transactionId,
+            final String msgId) throws OperationException {
+        return regenerateCertificates(Arrays.asList(certTemplate), requestor, reqType,
+                transactionId, msgId).get(0);
     }
 
     public List<X509CertificateInfo> regenerateCertificates(
-            final List<CertTemplateData> certTemplates,
-            final RequestorInfo requestor, final RequestType reqType,
-            final byte[] transactionId, final String msgId)
+            final List<CertTemplateData> certTemplates, final RequestorInfo requestor,
+            final RequestType reqType, final byte[] transactionId, final String msgId)
             throws OperationException {
-        return generateCertificates(certTemplates, requestor, true, reqType,
-                transactionId, msgId);
+        return generateCertificates(certTemplates, requestor, true, reqType, transactionId, msgId);
     }
 
     public boolean publishCertificate(final X509CertificateInfo certInfo) {
