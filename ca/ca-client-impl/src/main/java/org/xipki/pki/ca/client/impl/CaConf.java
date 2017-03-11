@@ -77,7 +77,7 @@ class CaConf {
 
     private X500Name subject;
 
-    private byte[] authorityKeyIdentifier;
+    private byte[] subjectKeyIdentifier;
 
     private ClientCmpControl cmpControl;
 
@@ -108,7 +108,7 @@ class CaConf {
         this.cert = cert;
         this.subject = (cert == null) ? null
                 : X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-        this.authorityKeyIdentifier = X509Util.extractAki(cert);
+        this.subjectKeyIdentifier = X509Util.extractSki(cert);
     }
 
     public void setCertprofiles(final Set<CertprofileInfo> certProfiles) {
@@ -196,9 +196,9 @@ class CaConf {
         return cmpControl;
     }
 
-    public byte[] getAuthorityKeyIdentifier() {
-        return (authorityKeyIdentifier == null) ? null
-                : Arrays.copyOf(authorityKeyIdentifier, authorityKeyIdentifier.length);
+    public byte[] getSubjectKeyIdentifier() {
+        return (subjectKeyIdentifier == null) ? null
+                : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
     }
 
 }
