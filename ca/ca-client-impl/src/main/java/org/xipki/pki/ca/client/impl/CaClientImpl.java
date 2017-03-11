@@ -669,7 +669,7 @@ public final class CaClientImpl implements CaClient {
         RevokeCertRequestEntry entry = new RevokeCertRequestEntry(id, ca.getSubject(), serial,
                 reason, invalidityDate);
         if (ca.getCmpControl().isRrAkiRequired()) {
-            entry.setAuthorityKeyIdentifier(ca.getAuthorityKeyIdentifier());
+            entry.setAuthorityKeyIdentifier(ca.getSubjectKeyIdentifier());
         }
 
         RevokeCertRequest request = new RevokeCertRequest();
@@ -697,7 +697,18 @@ public final class CaClientImpl implements CaClient {
         }
 
         final String caName = getCaNameByIssuer(issuer);
-        X509CmpRequestor cmpRequestor = casMap.get(caName).getRequestor();
+        CaConf caConf = casMap.get(caName);
+        if (caConf.getCmpControl().isRrAkiRequired()) {
+            byte[] aki = caConf.getSubjectKeyIdentifier();
+            List<RevokeCertRequestEntry> entries = request.getRequestEntries();
+            for (RevokeCertRequestEntry entry : entries) {
+                if (entry.getAuthorityKeyIdentifier() == null) {
+                    entry.setAuthorityKeyIdentifier(aki);
+                }
+            }
+        }
+
+        X509CmpRequestor cmpRequestor = caConf.getRequestor();
         RevokeCertResultType result;
         try {
             result = cmpRequestor.revokeCertificate(request, debug);
@@ -1000,7 +1011,7 @@ public final class CaClientImpl implements CaClient {
         UnrevokeOrRemoveCertEntry entry = new UnrevokeOrRemoveCertEntry(id, ca.getSubject(),
                 serial);
         if (ca.getCmpControl().isRrAkiRequired()) {
-            entry.setAuthorityKeyIdentifier(ca.getAuthorityKeyIdentifier());
+            entry.setAuthorityKeyIdentifier(ca.getSubjectKeyIdentifier());
         }
 
         UnrevokeOrRemoveCertRequest request = new UnrevokeOrRemoveCertRequest();
@@ -1067,7 +1078,7 @@ public final class CaClientImpl implements CaClient {
         UnrevokeOrRemoveCertEntry entry = new UnrevokeOrRemoveCertEntry(id, ca.getSubject(),
                 serial);
         if (ca.getCmpControl().isRrAkiRequired()) {
-            entry.setAuthorityKeyIdentifier(ca.getAuthorityKeyIdentifier());
+            entry.setAuthorityKeyIdentifier(ca.getSubjectKeyIdentifier());
         }
 
         UnrevokeOrRemoveCertRequest request = new UnrevokeOrRemoveCertRequest();
