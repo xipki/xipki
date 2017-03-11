@@ -233,7 +233,7 @@ class CaConfigurationDbExporter extends DbPorter {
     private void exportCaalias(final CAConfigurationType caconf) throws DataAccessException {
         System.out.println("exporting table CAALIAS");
         Caaliases caaliases = new Caaliases();
-        final String sql = "SELECT NAME,CA_NAME FROM CAALIAS";
+        final String sql = "SELECT NAME,CA_ID FROM CAALIAS";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -243,11 +243,11 @@ class CaConfigurationDbExporter extends DbPorter {
 
             while (rs.next()) {
                 String name = rs.getString("NAME");
-                String caName = rs.getString("CA_NAME");
+                int caId = rs.getInt("CA_ID");
 
                 CaaliasType caalias = new CaaliasType();
                 caalias.setName(name);
-                caalias.setCaName(caName);
+                caalias.setCaId(caId);
 
                 caaliases.getCaalias().add(caalias);
             }
@@ -405,7 +405,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println("exporting table CA");
         Cas cas = new Cas();
         StringBuilder sqlBuilder = new StringBuilder(400);
-        sqlBuilder.append("SELECT NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,");
+        sqlBuilder.append("SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,");
         sqlBuilder.append("SIGNER_TYPE,SIGNER_CONF,CRLSIGNER_NAME,PERMISSIONS,NUM_CRLS,");
         sqlBuilder.append("EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV,RR,RT,RIT,");
         sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,");
@@ -421,6 +421,7 @@ class CaConfigurationDbExporter extends DbPorter {
             rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
+                int id = rs.getInt("ID");
                 String name = rs.getString("NAME");
                 int art = rs.getInt("ART");
                 long nextCrlNo = rs.getLong("NEXT_CRLNO");
@@ -447,6 +448,7 @@ class CaConfigurationDbExporter extends DbPorter {
                 String validityMode = rs.getString("VALIDITY_MODE");
 
                 CaType ca = new CaType();
+                ca.setId(id);
                 ca.setName(name);
                 ca.setArt(art);
                 ca.setSnSize(serialSize);
@@ -501,7 +503,7 @@ class CaConfigurationDbExporter extends DbPorter {
     private void exportCaHasRequestor(final CAConfigurationType caconf) throws DataAccessException {
         System.out.println("exporting table CA_HAS_REQUESTOR");
         CaHasRequestors caHasRequestors = new CaHasRequestors();
-        final String sql = "SELECT CA_NAME,REQUESTOR_NAME,RA,PERMISSIONS,PROFILES"
+        final String sql = "SELECT CA_ID,REQUESTOR_NAME,RA,PERMISSIONS,PROFILES"
                 + " FROM CA_HAS_REQUESTOR";
 
         Statement stmt = null;
@@ -511,14 +513,14 @@ class CaConfigurationDbExporter extends DbPorter {
             rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
-                String caName = rs.getString("CA_NAME");
+                int caId = rs.getInt("CA_ID");
                 String requestorName = rs.getString("REQUESTOR_NAME");
                 boolean ra = rs.getBoolean("RA");
                 String permissions = rs.getString("PERMISSIONS");
                 String profiles = rs.getString("PROFILES");
 
                 CaHasRequestorType caHasRequestor = new CaHasRequestorType();
-                caHasRequestor.setCaName(caName);
+                caHasRequestor.setCaId(caId);
                 caHasRequestor.setRequestorName(requestorName);
                 caHasRequestor.setRa(ra);
                 caHasRequestor.setPermissions(permissions);
@@ -539,7 +541,7 @@ class CaConfigurationDbExporter extends DbPorter {
     private void exportCaHasPublisher(final CAConfigurationType caconf) throws DataAccessException {
         System.out.println("exporting table CA_HAS_PUBLISHER");
         CaHasPublishers caHasPublishers = new CaHasPublishers();
-        final String sql = "SELECT CA_NAME,PUBLISHER_NAME FROM CA_HAS_PUBLISHER";
+        final String sql = "SELECT CA_ID,PUBLISHER_NAME FROM CA_HAS_PUBLISHER";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -548,11 +550,11 @@ class CaConfigurationDbExporter extends DbPorter {
             rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
-                String caName = rs.getString("CA_NAME");
+                int caId = rs.getInt("CA_ID");
                 String publisherName = rs.getString("PUBLISHER_NAME");
 
                 CaHasPublisherType caHasPublisher = new CaHasPublisherType();
-                caHasPublisher.setCaName(caName);
+                caHasPublisher.setCaId(caId);
                 caHasPublisher.setPublisherName(publisherName);
 
                 caHasPublishers.getCaHasPublisher().add(caHasPublisher);
@@ -574,7 +576,7 @@ class CaConfigurationDbExporter extends DbPorter {
         caconf.setSceps(sceps);
 
         final String sql =
-            "SELECT CA_NAME,ACTIVE,RESPONDER_TYPE,RESPONDER_CONF,RESPONDER_CERT,CONTROL FROM SCEP";
+            "SELECT CA_ID,ACTIVE,RESPONDER_TYPE,RESPONDER_CONF,RESPONDER_CERT,CONTROL FROM SCEP";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -583,7 +585,7 @@ class CaConfigurationDbExporter extends DbPorter {
             rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
-                String caName = rs.getString("CA_NAME");
+                int caId = rs.getInt("CA_ID");
                 int active = rs.getInt("ACTIVE");
                 String respType = rs.getString("RESPONDER_TYPE");
                 String respConf = rs.getString("RESPONDER_CONF");
@@ -591,14 +593,14 @@ class CaConfigurationDbExporter extends DbPorter {
                 String control = rs.getString("CONTROL");
 
                 ScepType scep = new ScepType();
-                scep.setCaName(caName);
+                scep.setCaId(caId);
                 scep.setActive(active);
                 scep.setResponderType(respType);
                 scep.setResponderConf(
-                        buildFileOrValue(respConf, "ca-conf/responderconf-scep-" + caName));
+                        buildFileOrValue(respConf, "ca-conf/responderconf-scep-" + caId));
                 scep.setResponderCert(
                         buildFileOrBase64Binary(respCert,
-                                "ca-conf/respondercert-scep-" + caName + ".der"));
+                                "ca-conf/respondercert-scep-" + caId + ".der"));
                 scep.setControl(control);
                 sceps.getScep().add(scep);
             }
@@ -615,7 +617,7 @@ class CaConfigurationDbExporter extends DbPorter {
         System.out.println("exporting table CA_HAS_PROFILE");
         CaHasProfiles caHasProfiles = new CaHasProfiles();
         StringBuilder sqlBuilder = new StringBuilder(100);
-        sqlBuilder.append("SELECT CA_NAME,PROFILE_NAME FROM CA_HAS_PROFILE");
+        sqlBuilder.append("SELECT CA_ID,PROFILE_NAME FROM CA_HAS_PROFILE");
         final String sql = sqlBuilder.toString();
 
         Statement stmt = null;
@@ -625,11 +627,11 @@ class CaConfigurationDbExporter extends DbPorter {
             rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
-                String caName = rs.getString("CA_NAME");
+                int caId = rs.getInt("CA_ID");
                 String profileName = rs.getString("PROFILE_NAME");
 
                 CaHasProfileType caHasProfile = new CaHasProfileType();
-                caHasProfile.setCaName(caName);
+                caHasProfile.setCaId(caId);
                 caHasProfile.setProfileName(profileName);
 
                 caHasProfiles.getCaHasProfile().add(caHasProfile);

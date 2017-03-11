@@ -2598,6 +2598,10 @@ public class X509Ca {
         return caInfo.getName();
     }
 
+    public int getCaId() {
+        return caInfo.getId();
+    }
+
     public String getHexSha1OfCert() {
         return caInfo.getCaEntry().getHexSha1OfCert();
     }

@@ -120,8 +120,12 @@
     </createTable>
     <!-- table CA -->
     <createTable tableName="CA">
-      <column name="NAME" type="VARCHAR(45)">
+      <column name="ID" type="INT"
+          remarks="To prevent from duplication of NAME, ID is the first four bytes of SHA1(NAME) with the cleared highest bit">
         <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="NAME" type="VARCHAR(45)"
+          remarks="duplication is not permitted">
       </column>
       <column name="ART" type="SMALLINT">
         <constraints nullable="false"/>
@@ -196,13 +200,13 @@
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="CA_NAME" type="VARCHAR(45)">
+      <column name="CA_ID" type="INT">
         <constraints nullable="false"/>
       </column>
     </createTable>
     <!-- table CA_HAS_REQUESTOR -->
     <createTable tableName="CA_HAS_REQUESTOR">
-      <column name="CA_NAME" type="VARCHAR(45)">
+      <column name="CA_ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="REQUESTOR_NAME" type="VARCHAR(45)">
@@ -216,7 +220,7 @@
     </createTable>
     <!-- table CA_HAS_PUBLISHER -->
     <createTable tableName="CA_HAS_PUBLISHER">
-      <column name="CA_NAME" type="VARCHAR(45)">
+      <column name="CA_ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="PUBLISHER_NAME" type="VARCHAR(45)">
@@ -225,7 +229,7 @@
     </createTable>
     <!-- table CA_HAS_PROFILE -->
     <createTable tableName="CA_HAS_PROFILE">
-      <column name="CA_NAME" type="VARCHAR(45)">
+      <column name="CA_ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="PROFILE_NAME" type="VARCHAR(45)">
@@ -234,7 +238,7 @@
     </createTable>
     <!-- table SCEP -->
     <createTable tableName="SCEP">
-      <column name="CA_NAME" type="VARCHAR(45)">
+      <column name="CA_ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="ACTIVE" type="SMALLINT" remarks="whether the SCEP is activated">
@@ -275,10 +279,6 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <insert tableName="CS_REQUESTOR">
-      <column name="ID" value="1"/>
-      <column name="NAME" value="BY-USER"/>
-    </insert>
     <!-- table CS_PUBLISHER -->
     <createTable tableName="CS_PUBLISHER">
       <column name="ID" type="INT">
@@ -512,19 +512,19 @@
     <addForeignKeyConstraint constraintName="FK_CAALIAS_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CA_NAME" baseTableName="CAALIAS"
-      referencedColumnNames="NAME" referencedTableName="CA"/>
+      baseColumnNames="CA_ID" baseTableName="CAALIAS"
+      referencedColumnNames="ID" referencedTableName="CA"/>
     <!-- ca_ha_requestor -->
     <addForeignKeyConstraint constraintName="FK_CA_HAS_REQUESTOR_REQUESTOR1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
       baseColumnNames="REQUESTOR_NAME" baseTableName="CA_HAS_REQUESTOR"
       referencedColumnNames="NAME" referencedTableName="REQUESTOR"/>
-    <addForeignKeyConstraint constraintName="FK_CA_HAS_REQUESTOR1_CA1"
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_REQUESTOR_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CA_NAME" baseTableName="CA_HAS_REQUESTOR"
-      referencedColumnNames="NAME" referencedTableName="CA"/>
+      baseColumnNames="CA_ID" baseTableName="CA_HAS_REQUESTOR"
+      referencedColumnNames="ID" referencedTableName="CA"/>
     <!-- ca_has_publisher -->
     <addForeignKeyConstraint constraintName="FK_CA_HAS_PUBLISHER_PUBLISHER1"
       deferrable="false" initiallyDeferred="false"
@@ -534,8 +534,8 @@
     <addForeignKeyConstraint constraintName="FK_CA_HAS_PUBLISHER_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CA_NAME" baseTableName="CA_HAS_PUBLISHER"
-      referencedColumnNames="NAME" referencedTableName="CA"/>
+      baseColumnNames="CA_ID" baseTableName="CA_HAS_PUBLISHER"
+      referencedColumnNames="ID" referencedTableName="CA"/>
     <!-- CA_HAS_PROFILE -->
     <addForeignKeyConstraint constraintName="FK_CA_HAS_PROFILE_PROFILE1"
       deferrable="false" initiallyDeferred="false"
@@ -545,14 +545,14 @@
     <addForeignKeyConstraint constraintName="FK_CA_HAS_PROFILE_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CA_NAME" baseTableName="CA_HAS_PROFILE"
-      referencedColumnNames="NAME" referencedTableName="CA"/>
+      baseColumnNames="CA_ID" baseTableName="CA_HAS_PROFILE"
+      referencedColumnNames="ID" referencedTableName="CA"/>
     <!-- SCEP -->
     <addForeignKeyConstraint constraintName="FK_SCEP_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="CASCADE" onUpdate="NO ACTION"
-      baseColumnNames="CA_NAME" baseTableName="SCEP"
-      referencedColumnNames="NAME" referencedTableName="CA"/>
+      baseColumnNames="CA_ID" baseTableName="SCEP"
+      referencedColumnNames="ID" referencedTableName="CA"/>
   </changeSet>
   <!-- CertStore :: foreigen key -->
   <changeSet author="xipki" id="4">

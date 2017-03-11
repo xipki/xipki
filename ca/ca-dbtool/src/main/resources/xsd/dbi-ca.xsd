@@ -164,6 +164,7 @@
   <xs:element name="ca" type="caType"/>
   <xs:complexType name="caType">
     <xs:sequence>
+      <xs:element name="id" type="xs:int"/>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="art" type="xs:int" minOccurs="0"/>
       <xs:element name="snSize" type="xs:int"/>
@@ -199,13 +200,13 @@
   <xs:complexType name="caaliasType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="caName" type="xs:string"/>
+      <xs:element name="caId" type="xs:int"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="caHasRequestor" type="caHasRequestorType"/>
   <xs:complexType name="caHasRequestorType">
     <xs:sequence>
-      <xs:element name="caName" type="xs:string"/>
+      <xs:element name="caId" type="xs:int"/>
       <xs:element name="requestorName" type="xs:string"/>
       <xs:element name="ra" type="xs:boolean"/>
       <xs:element name="permissions" type="xs:string" minOccurs="0"/>
@@ -215,21 +216,21 @@
   <xs:element name="caHasPublisher" type="caHasPublisherType"/>
   <xs:complexType name="caHasPublisherType">
     <xs:sequence>
-      <xs:element name="caName" type="xs:string"/>
+      <xs:element name="caId" type="xs:int"/>
       <xs:element name="publisherName" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="caHasProfile" type="caHasProfileType"/>
   <xs:complexType name="caHasProfileType">
     <xs:sequence>
-      <xs:element name="caName" type="xs:string"/>
+      <xs:element name="caId" type="xs:int"/>
       <xs:element name="profileName" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="scep" type="scepType"/>
   <xs:complexType name="scepType">
     <xs:sequence>
-      <xs:element name="caName" type="xs:string"/>
+      <xs:element name="caId" type="xs:int"/>
       <xs:element name="active" type="xs:int"/>
       <xs:element name="responderType" type="xs:string"/>
       <xs:element name="responderConf" type="fileOrValueType"/>

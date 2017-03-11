@@ -93,6 +93,7 @@ import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
@@ -141,7 +142,7 @@ class CaManagerQueryExecutor {
                     "TYPE,CERT,CONF FROM RESPONDER WHERE NAME=?", 1);
 
             this.sqlSelectCa = datasource.buildSelectFirstSql(
-                    "NAME,ART,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
+                    "ID,NAME,ART,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
                     + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY"
                     + ",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSIONS,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS"
                     + ",EXPIRATION_PERIOD,REV,RR,RT,RIT,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS"
@@ -149,7 +150,7 @@ class CaManagerQueryExecutor {
 
             this.sqlSelectScep = datasource.buildSelectFirstSql(
                     "ACTIVE,CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF FROM SCEP"
-                    + " WHERE CA_NAME=?", 1);
+                    + " WHERE CA_ID=?", 1);
         }
 
     }
@@ -300,10 +301,10 @@ class CaManagerQueryExecutor {
         return map;
     } // method createEnvParameters
 
-    Map<String, String> createCaAliases() throws CaMgmtException {
-        Map<String, String> map = new HashMap<>();
+    Map<String, Integer> createCaAliases() throws CaMgmtException {
+        Map<String, Integer> map = new HashMap<>();
 
-        final String sql = "SELECT NAME,CA_NAME FROM CAALIAS";
+        final String sql = "SELECT NAME,CA_ID FROM CAALIAS";
         Statement stmt = null;
         ResultSet rs = null;
 
@@ -313,8 +314,8 @@ class CaManagerQueryExecutor {
 
             while (rs.next()) {
                 String name = rs.getString("NAME");
-                String caName = rs.getString("CA_NAME");
-                map.put(name, caName);
+                int caId = rs.getInt("CA_ID");
+                map.put(name, caId);
             }
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
@@ -657,12 +658,12 @@ class CaManagerQueryExecutor {
 
     Set<CaHasRequestorEntry> createCaHasRequestors(final String caName) throws CaMgmtException {
         final String sql =
-            "SELECT REQUESTOR_NAME,RA,PERMISSIONS,PROFILES FROM CA_HAS_REQUESTOR WHERE CA_NAME=?";
+            "SELECT REQUESTOR_NAME,RA,PERMISSIONS,PROFILES FROM CA_HAS_REQUESTOR WHERE CA_ID=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             stmt = prepareStatement(sql);
-            stmt.setString(1, caName);
+            stmt.setInt(1, deriveCaId(caName));
             rs = stmt.executeQuery();
 
             Set<CaHasRequestorEntry> ret = new HashSet<>();
@@ -693,12 +694,12 @@ class CaManagerQueryExecutor {
     } // method createCaHasRequestors
 
     Set<String> createCaHasProfiles(final String caName) throws CaMgmtException {
-        final String sql = "SELECT PROFILE_NAME FROM CA_HAS_PROFILE WHERE CA_NAME=?";
+        final String sql = "SELECT PROFILE_NAME FROM CA_HAS_PROFILE WHERE CA_ID=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             stmt = prepareStatement(sql);
-            stmt.setString(1, caName);
+            stmt.setInt(1, deriveCaId(caName));
             rs = stmt.executeQuery();
 
             Set<String> ret = new HashSet<>();
@@ -723,12 +724,12 @@ class CaManagerQueryExecutor {
     Set<String> createCaHasNames(final String caName, final String columnName, final String table)
             throws CaMgmtException {
         final String sql = new StringBuilder("SELECT ").append(columnName).append(" FROM ")
-                .append(table).append(" WHERE CA_NAME=?").toString();
+                .append(table).append(" WHERE CA_ID=?").toString();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             stmt = prepareStatement(sql);
-            stmt.setString(1, caName);
+            stmt.setInt(1, deriveCaId(caName));
             rs = stmt.executeQuery();
 
             Set<String> ret = new HashSet<>();
@@ -799,12 +800,12 @@ class CaManagerQueryExecutor {
         String name = entry.getName();
 
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CA (NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS");
+        sqlBuilder.append("INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS");
         sqlBuilder.append(",DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE");
         sqlBuilder.append(",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY");
         sqlBuilder.append(",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSIONS,NUM_CRLS,EXPIRATION_PERIOD");
         sqlBuilder.append(",KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
-        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         final String sql = sqlBuilder.toString();
 
         // insert to table ca
@@ -812,6 +813,7 @@ class CaManagerQueryExecutor {
         try {
             ps = prepareStatement(sql);
             int idx = 1;
+            ps.setInt(idx++, entry.getId());
             ps.setString(idx++, name);
             ps.setInt(idx++, CertArt.X509PKC.getCode());
             ps.setString(idx++, entry.getSubject());
@@ -857,12 +859,12 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonNull("aliasName", aliasName);
         ParamUtil.requireNonNull("caName", caName);
 
-        final String sql = "INSERT INTO CAALIAS (NAME,CA_NAME) VALUES (?,?)";
+        final String sql = "INSERT INTO CAALIAS (NAME,CA_ID) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
             ps.setString(1, aliasName);
-            ps.setString(2, caName);
+            ps.setInt(2, deriveCaId(caName));
             ps.executeUpdate();
             LOG.info("added CA alias '{}' for CA '{}'", aliasName, caName);
         } catch (SQLException ex) {
@@ -900,11 +902,11 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonNull("profileName", profileName);
         ParamUtil.requireNonNull("caName", caName);
 
-        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME,PROFILE_NAME) VALUES (?,?)";
+        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_ID,PROFILE_NAME) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setString(1, caName);
+            ps.setInt(1, deriveCaId(caName));
             ps.setString(2, profileName);
             ps.executeUpdate();
             LOG.info("added profile '{}' to CA '{}'", profileName, caName);
@@ -960,6 +962,40 @@ class CaManagerQueryExecutor {
         }
     } // method addCmpRequestor
 
+    void addByUserRequestorIfNeeded() throws CaMgmtException {
+        final String sql = "INSERT INTO CS_REQUESTOR (ID,NAME) VALUES (?,?)";
+        final String name = RequestorInfo.NAME_BY_USER;
+        ResultSet rs = null;
+        Statement stmt = null;
+        try {
+            stmt = createStatement();
+            rs = stmt.executeQuery("SELECT ID FROM CS_REQUESTOR WHERE NAME='" + name + "'");
+            if (rs.next()) {
+                return;
+            }
+            datasource.releaseResources(stmt, rs);
+            stmt = null;
+            rs = null;
+
+            int id = (int) datasource.getMax(null, "CS_REQUESTOR", "ID");
+
+            PreparedStatement ps = prepareStatement(sql);
+            stmt = ps;
+
+            ps.setInt(1, id + 1);
+            ps.setString(2, name);
+            ps.executeUpdate();
+            LOG.info("added requestor '{}'", name);
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        } finally {
+            datasource.releaseResources(stmt, rs);
+        }
+    }
+
     void addCmpRequestorToCa(final CaHasRequestorEntry requestor, final String caName)
             throws CaMgmtException {
         ParamUtil.requireNonNull("requestor", requestor);
@@ -968,12 +1004,12 @@ class CaManagerQueryExecutor {
         final String requestorName = requestor.getRequestorName();
 
         PreparedStatement ps = null;
-        final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_NAME,REQUESTOR_NAME,RA,"
+        final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_NAME,RA,"
                 + " PERMISSIONS,PROFILES) VALUES (?,?,?,?,?)";
         try {
             ps = prepareStatement(sql);
             int idx = 1;
-            ps.setString(idx++, caName);
+            ps.setInt(idx++, deriveCaId(caName));
             ps.setString(idx++, requestorName);
 
             boolean ra = requestor.isRa();
@@ -1097,11 +1133,11 @@ class CaManagerQueryExecutor {
     } // method addPublisher
 
     void addPublisherToCa(final String publisherName, final String caName) throws CaMgmtException {
-        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME,PUBLISHER_NAME) VALUES (?,?)";
+        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_ID,PUBLISHER_NAME) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setString(1, caName);
+            ps.setInt(1, deriveCaId(caName));
             ps.setString(2, publisherName);
             ps.executeUpdate();
             LOG.info("added publisher '{}' to CA '{}'", publisherName, caName);
@@ -1782,7 +1818,7 @@ class CaManagerQueryExecutor {
         Integer idxControl = addToSqlIfNotNull(sqlBuilder, index, control, "CONTROL");
         Integer idxConf = addToSqlIfNotNull(sqlBuilder, index, responderConf, "RESPONDER_CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE CA_NAME=?");
+        sqlBuilder.append(" WHERE CA_ID=?");
 
         if (index.get() == 1) {
             return null;
@@ -1865,7 +1901,7 @@ class CaManagerQueryExecutor {
                 ps.setString(idxControl, txt);
             }
 
-            ps.setString(index.get(), caName);
+            ps.setInt(index.get(), deriveCaId(caName));
             ps.executeUpdate();
 
             final int sbLen = sb.length();
@@ -2021,11 +2057,11 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonBlank("profileName", profileName);
         ParamUtil.requireNonBlank("caName", caName);
 
-        final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_NAME=? AND PROFILE_NAME=?";
+        final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_ID=? AND PROFILE_NAME=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setString(1, caName);
+            ps.setInt(1, deriveCaId(caName));
             ps.setString(2, profileName);
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
@@ -2045,11 +2081,11 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonBlank("requestorName", requestorName);
         ParamUtil.requireNonBlank("caName", caName);
 
-        final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_NAME=? AND REQUESTOR_NAME=?";
+        final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_ID=? AND REQUESTOR_NAME=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setString(1, caName);
+            ps.setInt(1, deriveCaId(caName));
             ps.setString(2, requestorName);
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
@@ -2068,11 +2104,11 @@ class CaManagerQueryExecutor {
             throws CaMgmtException {
         ParamUtil.requireNonBlank("publisherName", publisherName);
         ParamUtil.requireNonBlank("caName", caName);
-        final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_NAME=? AND PUBLISHER_NAME=?";
+        final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_NAME=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setString(1, caName);
+            ps.setInt(1, deriveCaId(caName));
             ps.setString(2, publisherName);
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
@@ -2187,13 +2223,13 @@ class CaManagerQueryExecutor {
 
     boolean addScep(final ScepEntry scepEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("scepEntry", scepEntry);
-        final String sql = "INSERT INTO SCEP (CA_NAME,ACTIVE,CONTROL,RESPONDER_TYPE,RESPONDER_CERT"
+        final String sql = "INSERT INTO SCEP (CA_ID,ACTIVE,CONTROL,RESPONDER_TYPE,RESPONDER_CERT"
                 + ",RESPONDER_CONF) VALUES (?,?,?,?,?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
             int idx = 1;
-            ps.setString(idx++, scepEntry.getCaName());
+            ps.setInt(idx++, deriveCaId(scepEntry.getCaName()));
             setBoolean(ps, idx++, scepEntry.isActive());
             ps.setString(idx++, scepEntry.getControl());
             ps.setString(idx++, scepEntry.getResponderType());
@@ -2214,12 +2250,12 @@ class CaManagerQueryExecutor {
 
     boolean removeScep(final String name) throws CaMgmtException {
         ParamUtil.requireNonNull("name", name);
-        final String sql = "DELETE FROM SCEP WHERE CA_NAME=?";
+        final String sql = "DELETE FROM SCEP WHERE CA_ID=?";
 
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setString(1, name);
+            ps.setInt(1, deriveCaId(name));
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
@@ -2238,7 +2274,7 @@ class CaManagerQueryExecutor {
             ps = prepareStatement(sql);
 
             int idx = 1;
-            ps.setString(idx++, caName);
+            ps.setInt(idx++, deriveCaId(caName));
             rs = ps.executeQuery();
             if (!rs.next()) {
                 return null;
@@ -2312,4 +2348,7 @@ class CaManagerQueryExecutor {
         return X509Util.canonicalizName(x500Name);
     }
 
+    private static int deriveCaId(String caName) {
+        return CaEntry.deriveCaId(caName);
+    }
 }

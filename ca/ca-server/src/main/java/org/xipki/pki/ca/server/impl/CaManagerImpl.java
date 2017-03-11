@@ -326,7 +326,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     private final Map<String, Set<CaHasRequestorEntry>> caHasRequestors
             = new ConcurrentHashMap<>();
 
-    private final Map<String, String> caAliases = new ConcurrentHashMap<>();
+    private final Map<String, Integer> caAliases = new ConcurrentHashMap<>();
 
     private final DfltEnvParameterResolver envParameterResolver = new DfltEnvParameterResolver();
 
@@ -537,6 +537,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 envEpoch = queryExecutor.setEpoch(new Date(System.currentTimeMillis() - day));
                 LOG.info("set environment {} to {}", ENV_EPOCH, envEpoch);
             }
+
+            queryExecutor.addByUserRequestorIfNeeded();
         } else {
             if (envEpoch == null) {
                 throw new CaMgmtException(
@@ -1061,7 +1063,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             return;
         }
 
-        Map<String, String> map = queryExecutor.createCaAliases();
+        Map<String, Integer> map = queryExecutor.createCaAliases();
         caAliases.clear();
         for (String aliasName : map.keySet()) {
             caAliases.put(aliasName, map.get(aliasName));
@@ -1196,7 +1198,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         sceps.clear();
         scepDbEntries.clear();
 
-        List<String> names = queryExecutor.getNamesFromTable("SCEP", "CA_NAME");
+        Set<String> names = x509cas.keySet();
         for (String name : names) {
             ScepEntry scepDb = queryExecutor.getScep(name);
             if (scepDb == null) {
@@ -2054,7 +2056,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         queryExecutor.addCaAlias(tmpAlias, tmpCaName);
-        caAliases.put(tmpAlias, tmpCaName);
+        caAliases.put(tmpAlias, CaEntry.deriveCaId(tmpCaName));
         return true;
     } // method addCaAlias
 
@@ -2076,18 +2078,25 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public String getCaNameForAlias(final String aliasName) {
         ParamUtil.requireNonBlank("aliasName", aliasName);
-        return caAliases.get(aliasName.toUpperCase());
+        Integer caId = caAliases.get(aliasName.toUpperCase());
+        for (String name : x509cas.keySet()) {
+            X509Ca ca = x509cas.get(name);
+            if (ca.getCaId() == caId) {
+                return ca.getCaName();
+            }
+        }
+        return null;
     }
 
     @Override
     public Set<String> getAliasesForCa(final String caName) {
         ParamUtil.requireNonBlank("caName", caName);
-        String tmpCaName = caName.toUpperCase();
+        int caId = CaEntry.deriveCaId(caName);
 
         Set<String> aliases = new HashSet<>();
         for (String alias : caAliases.keySet()) {
-            String thisCaName = caAliases.get(alias);
-            if (thisCaName.equals(tmpCaName)) {
+            Integer thisCaId = caAliases.get(alias);
+            if (thisCaId == caId) {
                 aliases.add(alias);
             }
         }

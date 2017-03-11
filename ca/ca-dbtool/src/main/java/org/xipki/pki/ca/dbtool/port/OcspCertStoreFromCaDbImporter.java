@@ -199,16 +199,16 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                 revokedOnly = !Boolean.parseBoolean(str);
             }
 
-            Set<String> relatedCaNames = new HashSet<>();
+            Set<Integer> relatedCaIds = new HashSet<>();
             for (CaHasPublisherType ctype : caConf.getCaHasPublishers().getCaHasPublisher()) {
                 if (ctype.getPublisherName().equals(publisherName)) {
-                    relatedCaNames.add(ctype.getCaName());
+                    relatedCaIds.add(ctype.getCaId());
                 }
             }
 
             List<CaType> relatedCas = new LinkedList<>();
             for (CaType m : caConf.getCas().getCa()) {
-                if (relatedCaNames.contains(m.getName())) {
+                if (relatedCaIds.contains(m.getId())) {
                     relatedCas.add(m);
                 }
             }
@@ -223,12 +223,12 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                 profileMap.put(ni.getId(), ni.getName());
             }
 
-            List<Integer> relatedCaIds = resume
+            List<Integer> relatedCertStoreCaIds = resume
                 ? getIssuerIds(certstore.getCas(), relatedCas)
                 : importIssuer(certstore.getCas(), relatedCas);
 
             File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
-            importCert(certstore, profileMap, revokedOnly, relatedCaIds, processLogFile);
+            importCert(certstore, profileMap, revokedOnly, relatedCertStoreCaIds, processLogFile);
             recoverIndexes();
             processLogFile.delete();
         } catch (Exception ex) {

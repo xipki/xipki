@@ -177,6 +177,10 @@ public class X509CaInfo {
         return caEntry.getName();
     }
 
+    public int getId() {
+        return caEntry.getId();
+    }
+
     public List<String> getCrlUris() {
         return caEntry.getCrlUris();
     }

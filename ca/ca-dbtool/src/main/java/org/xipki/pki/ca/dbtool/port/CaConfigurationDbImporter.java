@@ -353,13 +353,13 @@ class CaConfigurationDbImporter extends DbPorter {
             throws DataAccessException, CertificateException, IOException {
         System.out.println("importing table CA");
         StringBuilder sqlBuilder = new StringBuilder(500);
-        sqlBuilder.append("INSERT INTO CA (NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,");
+        sqlBuilder.append("INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,");
         sqlBuilder.append("CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,");
         sqlBuilder.append("CERT,SIGNER_TYPE,CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,");
         sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,PERMISSIONS,");
         sqlBuilder.append("NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,");
         sqlBuilder.append("REV,RR,RT,RIT,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
-        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
@@ -374,6 +374,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     X509Certificate cert = X509Util.parseCert(certBytes);
 
                     int idx = 1;
+                    ps.setInt(idx++, ca.getId());
                     ps.setString(idx++, ca.getName().toUpperCase());
                     ps.setInt(idx++, art);
                     ps.setString(idx++, X509Util.cutX500Name(cert.getSubjectX500Principal(),
@@ -426,14 +427,14 @@ class CaConfigurationDbImporter extends DbPorter {
 
     private void importCaalias(final Caaliases caaliases) throws DataAccessException {
         System.out.println("importing table CAALIAS");
-        final String sql = "INSERT INTO CAALIAS (NAME,CA_NAME) VALUES (?,?)";
+        final String sql = "INSERT INTO CAALIAS (NAME,CA_ID) VALUES (?,?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (CaaliasType caalias : caaliases.getCaalias()) {
                 try {
                     int idx = 1;
                     ps.setString(idx++, caalias.getName());
-                    ps.setString(idx++, caalias.getCaName().toUpperCase());
+                    ps.setInt(idx++, caalias.getCaId());
                     ps.executeUpdate();
                 } catch (SQLException ex) {
                     System.err.println("could not import CAALIAS with NAME=" + caalias.getName());
@@ -450,14 +451,14 @@ class CaConfigurationDbImporter extends DbPorter {
             throws DataAccessException {
         System.out.println("importing table CA_HAS_REQUESTOR");
         final String sql =
-                "INSERT INTO CA_HAS_REQUESTOR (CA_NAME,REQUESTOR_NAME,RA,PERMISSIONS,PROFILES)"
+                "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_NAME,RA,PERMISSIONS,PROFILES)"
                 + " VALUES (?,?,?,?,?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (CaHasRequestorType entry : caHasRequestors.getCaHasRequestor()) {
                 try {
                     int idx = 1;
-                    ps.setString(idx++, entry.getCaName().toUpperCase());
+                    ps.setInt(idx++, entry.getCaId());
                     ps.setString(idx++, entry.getRequestorName());
                     setBoolean(ps, idx++, entry.isRa());
                     ps.setString(idx++, entry.getPermissions());
@@ -465,8 +466,8 @@ class CaConfigurationDbImporter extends DbPorter {
 
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("could not import CA_HAS_REQUESTOR with CA_NAME="
-                        + entry.getCaName() + " and requestor_name=" + entry.getRequestorName());
+                    System.err.println("could not import CA_HAS_REQUESTOR with CA_ID="
+                        + entry.getCaId() + " and requestor_name=" + entry.getRequestorName());
                     throw translate(sql, ex);
                 }
             }
@@ -478,18 +479,18 @@ class CaConfigurationDbImporter extends DbPorter {
 
     private void importCaHasPublisher(final CaHasPublishers caHasPublishers) throws Exception {
         System.out.println("importing table CA_HAS_PUBLISHER");
-        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME,PUBLISHER_NAME) VALUES (?,?)";
+        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_ID,PUBLISHER_NAME) VALUES (?,?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (CaHasPublisherType entry : caHasPublishers.getCaHasPublisher()) {
                 try {
                     int idx = 1;
-                    ps.setString(idx++, entry.getCaName().toUpperCase());
+                    ps.setInt(idx++, entry.getCaId());
                     ps.setString(idx++, entry.getPublisherName());
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("could not import CA_HAS_PUBLISHER with CA_NAME="
-                        + entry.getCaName() + " and publisher_name=" + entry.getPublisherName());
+                    System.err.println("could not import CA_HAS_PUBLISHER with CA_ID="
+                        + entry.getCaId() + " and publisher_name=" + entry.getPublisherName());
                     throw translate(sql, ex);
                 }
             }
@@ -502,18 +503,18 @@ class CaConfigurationDbImporter extends DbPorter {
     private void importCaHasCertprofile(final CaHasProfiles caHasCertprofiles)
             throws DataAccessException {
         System.out.println("importing table CA_HAS_PROFILE");
-        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_NAME,PROFILE_NAME) VALUES (?,?)";
+        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_ID,PROFILE_NAME) VALUES (?,?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (CaHasProfileType entry : caHasCertprofiles.getCaHasProfile()) {
                 try {
                     int idx = 1;
-                    ps.setString(idx++, entry.getCaName().toUpperCase());
+                    ps.setInt(idx++, entry.getCaId());
                     ps.setString(idx++, entry.getProfileName());
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("could not import CA_HAS_PROFILE with CA_NAME="
-                            + entry.getCaName() + " and profile_name=" + entry.getProfileName());
+                    System.err.println("could not import CA_HAS_PROFILE with CA_ID="
+                            + entry.getCaId() + " and profile_name=" + entry.getProfileName());
                     throw translate(sql, ex);
                 }
             }
@@ -525,7 +526,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
     private void importScep(final Sceps sceps) throws DataAccessException, IOException {
         System.out.println("importing table SCEP");
-        final String sql = "INSERT INTO SCEP (CA_NAME,ACTIVE,RESPONDER_TYPE,"
+        final String sql = "INSERT INTO SCEP (CA_ID,ACTIVE,RESPONDER_TYPE,"
                 + "RESPONDER_CERT,CONTROL,RESPONDER_CONF) VALUES (?,?,?,?,?,?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
@@ -534,7 +535,7 @@ class CaConfigurationDbImporter extends DbPorter {
                 String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
                 try {
                     int idx = 1;
-                    ps.setString(idx++, entry.getCaName().toUpperCase());
+                    ps.setInt(idx++, entry.getCaId());
                     ps.setInt(idx++, entry.getActive());
                     ps.setString(idx++, entry.getResponderType());
                     ps.setString(idx++, b64Cert);
@@ -542,7 +543,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, getValue(entry.getResponderConf()));
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    System.err.println("could not import SCEP with NAME=" + entry.getCaName());
+                    System.err.println("could not import SCEP with ID=" + entry.getCaId());
                     throw translate(sql, ex);
                 }
             }

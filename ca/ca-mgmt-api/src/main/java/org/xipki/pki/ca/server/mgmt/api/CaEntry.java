@@ -34,12 +34,14 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.CompareUtil;
@@ -56,6 +58,8 @@ import org.xipki.pki.ca.api.profile.CertValidity;
  */
 
 public class CaEntry {
+
+    private int id;
 
     private String name;
 
@@ -90,9 +94,22 @@ public class CaEntry {
     public CaEntry(final String name, final String signerType, final String signerConf,
             final int expirationPeriod) throws CaMgmtException {
         this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
+        this.id = deriveCaId(this.name);
         this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
         this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);
         this.signerConf = signerConf;
+    }
+
+    public static int deriveCaId(final String caName) {
+        String upperCaName = caName.toUpperCase();
+        SHA1Digest sha1 = new SHA1Digest();
+        byte[] bytes = upperCaName.getBytes();
+        sha1.update(bytes, 0, bytes.length);
+        byte[] hashValue = new byte[20];
+        sha1.doFinal(hashValue, 0);
+        byte[] highestBytes = new byte[4];
+        System.arraycopy(hashValue, 0, highestBytes, 0, 4);
+        return new BigInteger(1, highestBytes).clearBit(31).intValue();
     }
 
     public static List<String[]> splitCaSignerConfs(final String conf) throws XiSecurityException {
@@ -116,6 +133,10 @@ public class CaEntry {
         }
 
         return signerConfs;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getName() {
