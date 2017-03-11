@@ -378,13 +378,13 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         switch (type) {
         case CERT:
             numProcessedBefore = certstore.getCountCerts();
-            coreSql = "ID,SN,CA_ID,PID,RID,ART,RTYPE,TID,UID,LUPDATE,REV,RR,RT,RIT,FP_RS,"
+            coreSql = "ID,SN,CSCA_ID,PID,RID,ART,RTYPE,TID,UID,LUPDATE,REV,RR,RT,RIT,FP_RS,"
                     + "REQ_SUBJECT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID>=? "
                     + "AND CERT.ID=CRAW.CID";
             break;
         case CRL:
             numProcessedBefore = certstore.getCountCrls();
-            coreSql = "ID,CA_ID,CRL FROM CRL WHERE ID>=?";
+            coreSql = "ID,CSCA_ID,CRL FROM CRL WHERE ID>=?";
             break;
         case USER:
             numProcessedBefore = certstore.getCountUsers();
@@ -508,7 +508,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                             cert.setTid(Base64.toBase64String(tid));
                         }
 
-                        int cainfoId = rs.getInt("CA_ID");
+                        int cainfoId = rs.getInt("CSCA_ID");
                         cert.setCaId(cainfoId);
 
                         String serial = rs.getString("SN");
@@ -590,7 +590,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         CaCrlType crl = new CaCrlType();
                         crl.setId(id);
 
-                        int caId = rs.getInt("CA_ID");
+                        int caId = rs.getInt("CSCA_ID");
                         crl.setCaId(caId);
 
                         byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();

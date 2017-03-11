@@ -818,7 +818,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
                         byte[] caSki = getCa().getCaInfo().getCertificate()
                                 .getSubjectKeyIdentifier();
-                        if (Arrays.equals(caSki, aki.getKeyIdentifier())) {
+                        if (!Arrays.equals(caSki, aki.getKeyIdentifier())) {
                             issuerMatched = false;
                         }
 

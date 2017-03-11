@@ -38,7 +38,7 @@
   </bean>
   <service ref="healthServlet" interface="javax.servlet.Servlet">
     <service-properties>
-      <entry key="alias" value="/health/ocsp/"/>
+      <entry key="alias" value="/health/ocsp"/>
     </service-properties>
   </service>
 </blueprint>

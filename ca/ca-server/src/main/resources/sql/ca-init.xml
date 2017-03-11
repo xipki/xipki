@@ -120,8 +120,7 @@
     </createTable>
     <!-- table CA -->
     <createTable tableName="CA">
-      <column name="ID" type="INT"
-          remarks="To prevent from duplication of NAME, ID is the first four bytes of SHA1(NAME) with the cleared highest bit">
+      <column name="ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="NAME" type="VARCHAR(45)"
@@ -200,13 +199,13 @@
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="CA_ID" type="INT">
+      <column name="CA_ID" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
     </createTable>
     <!-- table CA_HAS_REQUESTOR -->
     <createTable tableName="CA_HAS_REQUESTOR">
-      <column name="CA_ID" type="INT">
+      <column name="CA_ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="REQUESTOR_NAME" type="VARCHAR(45)">
@@ -220,7 +219,7 @@
     </createTable>
     <!-- table CA_HAS_PUBLISHER -->
     <createTable tableName="CA_HAS_PUBLISHER">
-      <column name="CA_ID" type="INT">
+      <column name="CA_ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="PUBLISHER_NAME" type="VARCHAR(45)">
@@ -229,7 +228,7 @@
     </createTable>
     <!-- table CA_HAS_PROFILE -->
     <createTable tableName="CA_HAS_PROFILE">
-      <column name="CA_ID" type="INT">
+      <column name="CA_ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="PROFILE_NAME" type="VARCHAR(45)">
@@ -238,7 +237,7 @@
     </createTable>
     <!-- table SCEP -->
     <createTable tableName="SCEP">
-      <column name="CA_ID" type="INT">
+      <column name="CA_ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="ACTIVE" type="SMALLINT" remarks="whether the SCEP is activated">
@@ -257,7 +256,7 @@
   <changeSet author="xipki" id="2">
     <!-- table CS_CA -->
     <createTable tableName="CS_CA">
-      <column name="ID" type="INT">
+      <column name="ID" type="SMALLINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="SUBJECT" type="${x500name.type}">
@@ -330,7 +329,7 @@
       <column name="ID" type="INT">
         <constraints primaryKey="true"/>
       </column>
-      <column name="CA_ID" type="INT">
+      <column name="CSCA_ID" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
       <column name="CRL_NO" type="BIGINT">
@@ -348,7 +347,7 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <addUniqueConstraint tableName="CRL" columnNames="CA_ID, CRL_NO" constraintName="CONST_CA_CRLNO"/>
+    <addUniqueConstraint tableName="CRL" columnNames="CSCA_ID, CRL_NO" constraintName="CONST_CA_CRLNO"/>
     <!-- table CERT -->
     <createTable tableName="CERT">
       <column name="ID" type="BIGINT">
@@ -357,7 +356,7 @@
       <column name="ART" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
-      <column name="CA_ID" type="INT"
+      <column name="CSCA_ID" type="SMALLINT"
           remarks="Issuer (CA) id">
         <constraints nullable="false"/>
       </column>
@@ -440,17 +439,17 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SN" constraintName="CONST_CA_SN"/>
+    <addUniqueConstraint tableName="CERT" columnNames="CSCA_ID, SN" constraintName="CONST_CA_SN"/>
     <createIndex tableName="CERT" unique="false" indexName="IDX_CA_FPK">
-      <column name="CA_ID"/>
+      <column name="CSCA_ID"/>
       <column name="FP_K"/>
     </createIndex>
     <createIndex tableName="CERT" unique="false" indexName="IDX_CA_FPS">
-      <column name="CA_ID"/>
+      <column name="CSCA_ID"/>
       <column name="FP_S"/>
     </createIndex>
     <createIndex tableName="CERT" unique="false" indexName="IDX_CA_FPRS">
-      <column name="CA_ID"/>
+      <column name="CSCA_ID"/>
       <column name="FP_RS"/>
     </createIndex>
     <!-- table CRAW -->
@@ -475,7 +474,7 @@
       <column name="PID" type="INT">
         <constraints nullable="false"/>
       </column>
-      <column name="CA_ID" type="INT">
+      <column name="CA_ID" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -484,7 +483,7 @@
       <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="CA_ID" type="INT">
+      <column name="CA_ID" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
       <column name="SN" type="VARCHAR(40)">
@@ -559,12 +558,12 @@
     <addForeignKeyConstraint constraintName="FK_CRL_CS_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="CA_ID" baseTableName="CRL"
+      baseColumnNames="CSCA_ID" baseTableName="CRL"
       referencedColumnNames="ID" referencedTableName="CS_CA"/>
     <addForeignKeyConstraint constraintName="FK_CERT_CS_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
-      baseColumnNames="CA_ID" baseTableName="CERT"
+      baseColumnNames="CSCA_ID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="CS_CA"/>
      <addForeignKeyConstraint constraintName="FK_CERT_CS_REQUESTOR1"
       deferrable="false" initiallyDeferred="false"

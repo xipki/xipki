@@ -118,7 +118,7 @@ class CertStoreQueryExecutor {
     private static class SQLs {
         private static final String SQL_ADD_CERT =
                 "INSERT INTO CERT (ID,ART,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
-                + "CA_ID,RID,UID,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "CSCA_ID,RID,UID,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         private static final String SQL_ADD_CRAW =
                 "INSERT INTO CRAW (CID,SHA1,REQ_SUBJECT,CERT) VALUES (?,?,?,?)";
@@ -142,20 +142,20 @@ class CertStoreQueryExecutor {
                 "DELETE FROM DELTACRL_CACHE WHERE ID<? AND CA_ID=?";
 
         private static final String SQL_MAX_CRLNO =
-                "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
+                "SELECT MAX(CRL_NO) FROM CRL WHERE CSCA_ID=?";
 
         private static final String SQL_MAX_THISUPDAATE_CRL =
-                "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=?";
+                "SELECT MAX(THISUPDATE) FROM CRL WHERE CSCA_ID=?";
 
         private static final String SQL_ADD_CRL =
-                "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL)"
+                "INSERT INTO CRL (ID,CSCA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL)"
                 + " VALUES (?,?,?,?,?,?,?,?)";
 
         private static final String SQL_ADD_DELTACRL_CACHE =
                 "INSERT INTO DELTACRL_CACHE (ID,CA_ID,SN) VALUES (?,?,?)";
 
         private static final String SQL_REMOVE_CERT =
-                "DELETE FROM CERT WHERE CA_ID=? AND SN=?";
+                "DELETE FROM CERT WHERE CSCA_ID=? AND SN=?";
 
         private static final String CORESQL_CERT_FOR_ID =
             "PID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID=? AND CRAW.CID=CERT.ID";
@@ -164,18 +164,18 @@ class CertStoreQueryExecutor {
                 "CERT FROM CRAW WHERE CID=?";
 
         private static final String CORESQL_CERT_WITH_REVINFO =
-                "ID,REV,RR,RT,RIT,PID,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=?"
-                + " AND CRAW.CID=CERT.ID";
+                "ID,REV,RR,RT,RIT,PID,CERT FROM CERT INNER JOIN CRAW ON CERT.CSCA_ID=?"
+                + " AND CERT.SN=? AND CRAW.CID=CERT.ID";
 
         private static final String CORESQL_CERTINFO =
-                "PID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=?"
+                "PID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.CSCA_ID=? AND CERT.SN=?"
                 + " AND CRAW.CID=CERT.ID";
 
         private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED =
-                "ID FROM CERT WHERE CA_ID=? AND FP_S=?";
+                "ID FROM CERT WHERE CSCA_ID=? AND FP_S=?";
 
         private static final String CORESQL_CERT_FOR_KEY_ISSUED =
-                "ID FROM CERT WHERE CA_ID=? AND FP_K=?";
+                "ID FROM CERT WHERE CSCA_ID=? AND FP_K=?";
 
         private static final String SQL_DELETE_UNREFERENCED_REQUEST =
                 "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
@@ -253,27 +253,27 @@ class CertStoreQueryExecutor {
         SQLs(final DataSourceWrapper datasource) {
             this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
-            this.sqlCaHasCrl = datasource.buildSelectFirstSql("ID FROM CRL WHERE CA_ID=?", 1);
+            this.sqlCaHasCrl = datasource.buildSelectFirstSql("ID FROM CRL WHERE CSCA_ID=?", 1);
             this.sqlContainsCertificates = datasource.buildSelectFirstSql(
-                    "ID FROM CERT WHERE CA_ID=? AND EE=?", 1);
+                    "ID FROM CERT WHERE CSCA_ID=? AND EE=?", 1);
             this.sqlCertForId = datasource.buildSelectFirstSql(CORESQL_CERT_FOR_ID, 1);
             this.sqlRawCertForId = datasource.buildSelectFirstSql(CORESQL_RAWCERT_FOR_ID, 1);
             this.sqlCertWithRevInfo = datasource.buildSelectFirstSql(CORESQL_CERT_WITH_REVINFO, 1);
             this.sqlCertInfo = datasource.buildSelectFirstSql(CORESQL_CERTINFO, 1);
             this.sqlCertprofileForId = datasource.buildSelectFirstSql(
-                    "PID,CA_ID FROM CERT WHERE ID=?", 1);
+                    "PID,CSCA_ID FROM CERT WHERE ID=?", 1);
             this.sqlCertprofileForSerial = datasource.buildSelectFirstSql(
-                    "PID FROM CERT WHERE SN=? AND CA_ID=?", 1);
+                    "PID FROM CERT WHERE SN=? AND CSCA_ID=?", 1);
             this.sqlUserInfoForActiveUser = datasource.buildSelectFirstSql(
                     "ID,PASSWORD,PROFILES,CN_REGEX FROM USERNAME WHERE NAME=? AND ACTIVE=1", 1);
             this.sqlSimpleInfoForActiveUser = datasource.buildSelectFirstSql(
                     "PROFILES,CN_REGEX FROM USERNAME WHERE ID=? AND ACTIVE=1", 1);
             this.sqlKnowsCertForSerial = datasource.buildSelectFirstSql(
-                    "UID FROM CERT WHERE SN=? AND CA_ID=?", 1);
+                    "UID FROM CERT WHERE SN=? AND CSCA_ID=?", 1);
             this.sqlRevForId = datasource.buildSelectFirstSql(
                     "SN,EE,REV,RR,RT,RIT FROM CERT WHERE ID=?", 1);
             this.sqlCertStatusForSubjectFp = datasource.buildSelectFirstSql(
-                    "REV FROM CERT WHERE FP_S=? AND CA_ID=?", 1);
+                    "REV FROM CERT WHERE FP_S=? AND CSCA_ID=?", 1);
             this.sqlCertforSubjectIssued = datasource.buildSelectFirstSql(
                     CORESQL_CERT_FOR_SUBJECT_ISSUED, 1);
             this.sqlCertForKeyIssued = datasource.buildSelectFirstSql(CORESQL_CERT_FOR_KEY_ISSUED,
@@ -286,11 +286,11 @@ class CertStoreQueryExecutor {
             this.sqlGetUser = datasource.buildSelectFirstSql(
                     "ACTIVE,PASSWORD,PROFILES,CN_REGEX FROM USERNAME WHERE NAME=?", 1);
             this.sqlCrl = datasource.buildSelectFirstSql(
-                    "THISUPDATE,CRL FROM CRL WHERE CA_ID=?", 1, "THISUPDATE DESC");
+                    "THISUPDATE,CRL FROM CRL WHERE CSCA_ID=?", 1, "THISUPDATE DESC");
             this.sqlCrlWithNo = datasource.buildSelectFirstSql(
-                    "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?", 1, "THISUPDATE DESC");
+                    "THISUPDATE,CRL FROM CRL WHERE CSCA_ID=? AND CRL_NO=?", 1, "THISUPDATE DESC");
             this.sqlReqIdForSerial = datasource.buildSelectFirstSql(
-                    "REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN CERT ON CERT.CA_ID=? "
+                    "REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN CERT ON CERT.CSCA_ID=? "
                     + "AND CERT.SN=? AND REQCERT.CID=CERT.ID", 1);
             this.sqlReqForId = datasource.buildSelectFirstSql(
                     "DATA FROM REQUEST WHERE ID=?", 1);
@@ -310,7 +310,7 @@ class CertStoreQueryExecutor {
             String sql = cacheSqlExpiredSerials.get(numEntries);
             if (sql == null) {
                 sql = datasource.buildSelectFirstSql(
-                        "SN FROM CERT WHERE CA_ID=? AND NAFTER<?", numEntries);
+                        "SN FROM CERT WHERE CSCA_ID=? AND NAFTER<?", numEntries);
                 cacheSqlExpiredSerials.put(numEntries, sql);
             }
             return sql;
@@ -320,7 +320,7 @@ class CertStoreQueryExecutor {
             String sql = cacheSqlSuspendedSerials.get(numEntries);
             if (sql == null) {
                 sql = datasource.buildSelectFirstSql(
-                        "SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?", numEntries);
+                        "SN FROM CERT WHERE CSCA_ID=? AND LUPDATE<? AND RR=?", numEntries);
                 cacheSqlSuspendedSerials.put(numEntries, sql);
             }
             return sql;
@@ -342,7 +342,7 @@ class CertStoreQueryExecutor {
             String sql = cache.get(numEntries);
             if (sql == null) {
                 String coreSql =
-                        "ID,SN,RR,RT,RIT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>?";
+                        "ID,SN,RR,RT,RIT FROM CERT WHERE ID>? AND CSCA_ID=? AND REV=1 AND NAFTER>?";
                 if (withEe) {
                     coreSql += " AND EE=?";
                 }
@@ -357,7 +357,7 @@ class CertStoreQueryExecutor {
                 cacheSqlSerials;
             String sql = cache.get(numEntries);
             if (sql == null) {
-                String coreSql = "ID,SN FROM CERT WHERE ID>? AND CA_ID=?";
+                String coreSql = "ID,SN FROM CERT WHERE ID>? AND CSCA_ID=?";
                 if (onlyRevoked) {
                     coreSql += "AND REV=1";
                 }
@@ -369,7 +369,7 @@ class CertStoreQueryExecutor {
 
         String getSqlSerials(final int numEntries, final Date notExpiredAt,
                 final boolean onlyRevoked, final boolean withEe) {
-            StringBuilder sb = new StringBuilder("ID,SN FROM CERT WHERE ID>? AND CA_ID=?");
+            StringBuilder sb = new StringBuilder("ID,SN FROM CERT WHERE ID>? AND CS=?");
             if (notExpiredAt != null) {
                 sb.append(" AND NAFTER>?");
             }
@@ -855,7 +855,7 @@ class CertStoreQueryExecutor {
             if (currentReason == CrlReason.CERTIFICATE_HOLD) {
                 if (revInfo.getReason() == CrlReason.CERTIFICATE_HOLD) {
                     throw new OperationException(ErrorCode.CERT_REVOKED,
-                            "certificate already issued with the requested reason "
+                            "certificate already revoked with the requested reason "
                             + currentReason.getDescription());
                 } else {
                     revInfo.setRevocationTime(currentRevInfo.getRevocationTime());
@@ -863,7 +863,7 @@ class CertStoreQueryExecutor {
                 }
             } else if (!force) {
                 throw new OperationException(ErrorCode.CERT_REVOKED,
-                        "certificate already issued with reason " + currentReason.getDescription());
+                    "certificate already revoked with reason " + currentReason.getDescription());
             }
         }
 
@@ -1149,9 +1149,9 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("caCert", caCert);
         final String sql;
         if (onlyRevoked) {
-            sql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=? AND REV=1";
+            sql = "SELECT COUNT(*) FROM CERT WHERE CSCA_ID=? AND REV=1";
         } else {
-            sql = "SELECT COUNT(*) FROM CERT WHERE CA_ID=?";
+            sql = "SELECT COUNT(*) FROM CERT WHERE CSCA_ID=?";
         }
         int caId = getCaId(caCert);
 
@@ -1349,7 +1349,7 @@ class CertStoreQueryExecutor {
         ParamUtil.requireMin("numCrls", numCrls, 1);
 
         int caId = getCaId(caCert);
-        String sql = "SELECT CRL_NO FROM CRL WHERE CA_ID=? AND DELTACRL=?";
+        String sql = "SELECT CRL_NO FROM CRL WHERE CSCA_ID=? AND DELTACRL=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
         List<Integer> crlNumbers = new LinkedList<>();
         ResultSet rs = null;
@@ -1378,7 +1378,7 @@ class CertStoreQueryExecutor {
         }
 
         int crlNumber = crlNumbers.get(numCrlsToDelete - 1);
-        sql = "DELETE FROM CRL WHERE CA_ID=? AND CRL_NO<?";
+        sql = "DELETE FROM CRL WHERE CSCA_ID=? AND CRL_NO<?";
         ps = borrowPreparedStatement(sql);
 
         try {
@@ -1635,7 +1635,7 @@ class CertStoreQueryExecutor {
             }
 
             int caId = getCaId(caCert);
-            int caId2 = rs.getInt("CA_ID");
+            int caId2 = rs.getInt("CSCA_ID");
             if (caId != caId2) {
                 return null;
             }
@@ -1785,7 +1785,7 @@ class CertStoreQueryExecutor {
 
         int caId = getCaId(caCert);
         StringBuilder sb = new StringBuilder(200);
-        sb.append("SN,NBEFORE,NAFTER,SUBJECT FROM CERT WHERE CA_ID=?");
+        sb.append("SN,NBEFORE,NAFTER,SUBJECT FROM CERT WHERE CSCA_ID=?");
         //.append(caId)
 
         Integer idxNotBefore = null;

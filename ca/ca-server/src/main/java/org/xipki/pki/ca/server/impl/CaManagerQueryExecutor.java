@@ -579,6 +579,9 @@ class CaManagerQueryExecutor {
 
             X509CaEntry entry = new X509CaEntry(name, serialNoSize, nextCrlNo, signerType,
                     signerConf, caUris, numCrls, expirationPeriod);
+
+            int id = rs.getInt("ID");
+            entry.setId(id);
             String b64cert = rs.getString("CERT");
             X509Certificate cert = generateCert(b64cert);
             entry.setCertificate(cert);
@@ -663,7 +666,7 @@ class CaManagerQueryExecutor {
         ResultSet rs = null;
         try {
             stmt = prepareStatement(sql);
-            stmt.setInt(1, deriveCaId(caName));
+            stmt.setInt(1, getCaIdForName(caName));
             rs = stmt.executeQuery();
 
             Set<CaHasRequestorEntry> ret = new HashSet<>();
@@ -699,7 +702,7 @@ class CaManagerQueryExecutor {
         ResultSet rs = null;
         try {
             stmt = prepareStatement(sql);
-            stmt.setInt(1, deriveCaId(caName));
+            stmt.setInt(1, getCaIdForName(caName));
             rs = stmt.executeQuery();
 
             Set<String> ret = new HashSet<>();
@@ -729,7 +732,7 @@ class CaManagerQueryExecutor {
         ResultSet rs = null;
         try {
             stmt = prepareStatement(sql);
-            stmt.setInt(1, deriveCaId(caName));
+            stmt.setInt(1, getCaIdForName(caName));
             rs = stmt.executeQuery();
 
             Set<String> ret = new HashSet<>();
@@ -794,6 +797,13 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonNull("caEntry", caEntry);
         if (!(caEntry instanceof X509CaEntry)) {
             throw new CaMgmtException("unsupported CAEntry " + caEntry.getClass().getName());
+        }
+
+        try {
+            int id = (int) datasource.getMax(null, "CA", "ID");
+            caEntry.setId(id + 1);
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
         }
 
         X509CaEntry entry = (X509CaEntry) caEntry;
@@ -864,7 +874,7 @@ class CaManagerQueryExecutor {
         try {
             ps = prepareStatement(sql);
             ps.setString(1, aliasName);
-            ps.setInt(2, deriveCaId(caName));
+            ps.setInt(2, getCaIdForName(caName));
             ps.executeUpdate();
             LOG.info("added CA alias '{}' for CA '{}'", aliasName, caName);
         } catch (SQLException ex) {
@@ -906,7 +916,7 @@ class CaManagerQueryExecutor {
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, deriveCaId(caName));
+            ps.setInt(1, getCaIdForName(caName));
             ps.setString(2, profileName);
             ps.executeUpdate();
             LOG.info("added profile '{}' to CA '{}'", profileName, caName);
@@ -1009,7 +1019,7 @@ class CaManagerQueryExecutor {
         try {
             ps = prepareStatement(sql);
             int idx = 1;
-            ps.setInt(idx++, deriveCaId(caName));
+            ps.setInt(idx++, getCaIdForName(caName));
             ps.setString(idx++, requestorName);
 
             boolean ra = requestor.isRa();
@@ -1137,7 +1147,7 @@ class CaManagerQueryExecutor {
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, deriveCaId(caName));
+            ps.setInt(1, getCaIdForName(caName));
             ps.setString(2, publisherName);
             ps.executeUpdate();
             LOG.info("added publisher '{}' to CA '{}'", publisherName, caName);
@@ -1901,7 +1911,7 @@ class CaManagerQueryExecutor {
                 ps.setString(idxControl, txt);
             }
 
-            ps.setInt(index.get(), deriveCaId(caName));
+            ps.setInt(index.get(), getCaIdForName(caName));
             ps.executeUpdate();
 
             final int sbLen = sb.length();
@@ -2061,7 +2071,7 @@ class CaManagerQueryExecutor {
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, deriveCaId(caName));
+            ps.setInt(1, getCaIdForName(caName));
             ps.setString(2, profileName);
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
@@ -2085,7 +2095,7 @@ class CaManagerQueryExecutor {
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, deriveCaId(caName));
+            ps.setInt(1, getCaIdForName(caName));
             ps.setString(2, requestorName);
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
@@ -2108,7 +2118,7 @@ class CaManagerQueryExecutor {
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, deriveCaId(caName));
+            ps.setInt(1, getCaIdForName(caName));
             ps.setString(2, publisherName);
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
@@ -2229,7 +2239,7 @@ class CaManagerQueryExecutor {
         try {
             ps = prepareStatement(sql);
             int idx = 1;
-            ps.setInt(idx++, deriveCaId(scepEntry.getCaName()));
+            ps.setInt(idx++, getCaIdForName(scepEntry.getCaName()));
             setBoolean(ps, idx++, scepEntry.isActive());
             ps.setString(idx++, scepEntry.getControl());
             ps.setString(idx++, scepEntry.getResponderType());
@@ -2255,7 +2265,7 @@ class CaManagerQueryExecutor {
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, deriveCaId(name));
+            ps.setInt(1, getCaIdForName(name));
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
@@ -2274,7 +2284,7 @@ class CaManagerQueryExecutor {
             ps = prepareStatement(sql);
 
             int idx = 1;
-            ps.setInt(idx++, deriveCaId(caName));
+            ps.setInt(idx++, getCaIdForName(caName));
             rs = ps.executeQuery();
             if (!rs.next()) {
                 return null;
@@ -2348,7 +2358,24 @@ class CaManagerQueryExecutor {
         return X509Util.canonicalizName(x500Name);
     }
 
-    private static int deriveCaId(String caName) {
-        return CaEntry.deriveCaId(caName);
+    private int getCaIdForName(final String caName) throws CaMgmtException {
+        final String sql = "SELECT ID FROM CA WHERE NAME=?";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = prepareStatement(sql);
+            ps.setString(1, caName.toUpperCase());
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                throw new CaMgmtException("Found no CA '" + caName + "'");
+            }
+
+            return rs.getInt("ID");
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } finally {
+            datasource.releaseResources(ps, rs);
+        }
     }
 }

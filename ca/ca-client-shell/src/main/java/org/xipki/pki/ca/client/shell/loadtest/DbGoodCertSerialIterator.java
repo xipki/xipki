@@ -83,7 +83,7 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
         this.caSerial = caCert.getSerialNumber().getPositiveValue();
 
         this.sqlNextSerials = caDataSource.buildSelectFirstSql(
-                "ID,SN FROM CERT WHERE REV=0 AND CA_ID=? AND ID>=?", numSqlEntries, "ID");
+                "ID,SN FROM CERT WHERE REV=0 AND CSCA_ID=? AND ID>=?", numSqlEntries, "ID");
 
         String b64Sha1Fp = HashAlgoType.SHA1.base64Hash(caCert.getEncoded());
         String sql = "SELECT ID FROM CS_CA WHERE SHA1_CERT='" + b64Sha1Fp + "'";
@@ -97,7 +97,7 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
             }
             rs.close();
 
-            sql = "SELECT MIN(ID) FROM CERT WHERE REV=0 AND CA_ID=" + caInfoId;
+            sql = "SELECT MIN(ID) FROM CERT WHERE REV=0 AND CSCA_ID=" + caInfoId;
             rs = stmt.executeQuery(sql);
             rs.next();
             minId = rs.getLong(1);
