@@ -34,10 +34,8 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
-import java.util.Collections;
-import java.util.Set;
-
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.api.NameId;
 
 /**
  * @author Lijun Liao
@@ -46,29 +44,21 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class AddUserEntry {
 
-    private final String name;
+    private final NameId ident;
 
     private final boolean active;
 
     private final String password;
 
-    private final Set<String> profiles;
-
-    private final String cnRegex;
-
-    public AddUserEntry(final String name, final boolean active, final String password,
-            final Set<String> profiles, final String cnRegex)
+    public AddUserEntry(final NameId ident, final boolean active, final String password)
             throws CaMgmtException {
-        this.name = ParamUtil.requireNonBlank("name", name);
+        this.ident = ParamUtil.requireNonNull("ident", ident);
         this.active = active;
         this.password = ParamUtil.requireNonBlank("password", password);
-        this.profiles = Collections.unmodifiableSet(
-                ParamUtil.requireNonEmpty("profiles", profiles));
-        this.cnRegex = ParamUtil.requireNonBlank("cnRegex", cnRegex);
     }
 
-    public String getName() {
-        return name;
+    public NameId getIdent() {
+        return ident;
     }
 
     public boolean isActive() {
@@ -79,20 +69,13 @@ public class AddUserEntry {
         return password;
     }
 
-    public Set<String> getProfiles() {
-        return profiles;
-    }
-
-    public String getCnRegex() {
-        return cnRegex;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
-        sb.append("name: ").append(name).append('\n');
+        sb.append("id: ").append(ident.getId()).append('\n');
+        sb.append("name: ").append(ident.getName()).append('\n');
+        sb.append("active: ").append(active).append('\n');
         sb.append("password: ").append(password).append("\n");
-        sb.append("cnRegex: ").append(cnRegex);
         return sb.toString();
     }
 

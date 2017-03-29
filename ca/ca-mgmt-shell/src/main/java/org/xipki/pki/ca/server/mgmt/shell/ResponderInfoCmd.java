@@ -71,7 +71,7 @@ public class ResponderInfoCmd extends CaCommandSupport {
         StringBuilder sb = new StringBuilder();
 
         if (name == null) {
-            Set<String> names = caManager.getCmpResponderNames();
+            Set<String> names = caManager.getResponderNames();
             int size = names.size();
 
             if (size == 0 || size == 1) {
@@ -87,7 +87,7 @@ public class ResponderInfoCmd extends CaCommandSupport {
                 sb.append("\t").append(entry).append("\n");
             }
         } else {
-            CmpResponderEntry entry = caManager.getCmpResponder(name);
+            CmpResponderEntry entry = caManager.getResponder(name);
             if (entry == null) {
                 throw new CmdFailure("could not find CMP responder '" + name + "'");
             } else {

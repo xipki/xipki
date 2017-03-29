@@ -38,6 +38,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.ChangeCaEntry;
 
@@ -64,8 +65,8 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
 
     private Integer serialNoBitLen;
 
-    public X509ChangeCaEntry(final String name) throws CaMgmtException {
-        super(name);
+    public X509ChangeCaEntry(final NameId ident) throws CaMgmtException {
+        super(ident);
     }
 
     public Integer getSerialNoBitLen() {
@@ -124,7 +125,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
     }
 
     public void setCrlSignerName(final String crlSignerName) {
-        this.crlSignerName = crlSignerName;
+        this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toUpperCase();
     }
 
     public Integer getNumCrls() {

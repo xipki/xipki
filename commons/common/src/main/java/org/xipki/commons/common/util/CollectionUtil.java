@@ -34,8 +34,10 @@
 
 package org.xipki.commons.common.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,6 +74,30 @@ public class CollectionUtil {
         }
 
         return Collections.unmodifiableMap(map);
+    }
+
+    public static List<String> toUpperCaseList(final List<String> list) {
+        if (list == null) {
+            return list;
+        }
+
+        List<String> upperList = new ArrayList<>(list.size());
+        for (String s : list) {
+            upperList.add(s.toUpperCase());
+        }
+        return upperList;
+    }
+
+    public static Set<String> toUpperCaseSet(final Set<String> set) {
+        if (set == null) {
+            return set;
+        }
+
+        Set<String> upperSet = new HashSet<>();
+        for (String s : set) {
+            upperSet.add(s.toUpperCase());
+        }
+        return upperSet;
     }
 
     public static <T> Set<T> unmodifiableSet(final Set<? extends T> set) {

@@ -58,9 +58,9 @@ public class RequestorCheckCmd extends RequestorUpdateCmd {
     protected Object doExecute() throws Exception {
         println("checking requestor " + name);
 
-        CmpRequestorEntry cr = caManager.getCmpRequestor(name);
+        CmpRequestorEntry cr = caManager.getRequestor(name);
         if (cr == null) {
-            throw new CmdFailure("CMP requestor named '" + name + "' is not configured");
+            throw new CmdFailure("requestor named '" + name + "' is not configured");
         }
 
         byte[] ex = IoUtil.read(certFile);

@@ -34,12 +34,12 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.api.NameId;
 
 /**
  * @author Lijun Liao
@@ -48,7 +48,7 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CaHasRequestorEntry {
 
-    private final String requestorName;
+    private final NameId requestorIdent;
 
     private boolean ra;
 
@@ -56,8 +56,8 @@ public class CaHasRequestorEntry {
 
     private Set<String> profiles;
 
-    public CaHasRequestorEntry(final String requestorName) {
-        this.requestorName = ParamUtil.requireNonBlank("requestorName", requestorName);
+    public CaHasRequestorEntry(final NameId requestorIdent) {
+        this.requestorIdent = ParamUtil.requireNonNull("requestorIdent", requestorIdent);
     }
 
     public boolean isRa() {
@@ -73,26 +73,41 @@ public class CaHasRequestorEntry {
     }
 
     public void setPermissions(final Set<Permission> permissions) {
-        this.permissions = Collections.unmodifiableSet(permissions);
+        this.permissions = CollectionUtil.unmodifiableSet(permissions);
     }
 
-    public String getRequestorName() {
-        return requestorName;
+    public NameId getRequestorIdent() {
+        return requestorIdent;
     }
 
     public void setProfiles(final Set<String> profiles) {
-        this.profiles = (profiles == null) ? Collections.emptySet()
-                : CollectionUtil.unmodifiableSet(profiles);
+        this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toUpperCaseSet(profiles));
     }
 
     public Set<String> getProfiles() {
         return profiles;
     }
 
+    public boolean isCertProfilePermitted(String certprofile) {
+        if (CollectionUtil.isEmpty(profiles)) {
+            return false;
+        }
+
+        return profiles.contains("ALL") || profiles.contains(certprofile.toUpperCase());
+    }
+
+    public boolean isPermitted(Permission permission) {
+        if (permissions.contains(Permission.ALL)
+                || permissions.contains(permission)) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
-        sb.append("requestor: ").append(requestorName).append("\n");
+        sb.append("requestor: ").append(requestorIdent).append("\n");
         sb.append("ra: ").append(ra).append("\n");
         sb.append("profiles: ").append(profiles).append("\n");
         sb.append("permissions: ").append(Permission.toString(permissions));
@@ -110,7 +125,7 @@ public class CaHasRequestorEntry {
             return false;
         }
 
-        if (!requestorName.equals(objB.requestorName)) {
+        if (!requestorIdent.equals(objB.requestorIdent)) {
             return false;
         }
 
@@ -127,7 +142,7 @@ public class CaHasRequestorEntry {
 
     @Override
     public int hashCode() {
-        return requestorName.hashCode();
+        return requestorIdent.hashCode();
     }
 
 }

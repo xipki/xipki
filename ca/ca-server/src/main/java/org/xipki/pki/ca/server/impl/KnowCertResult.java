@@ -45,9 +45,9 @@ public class KnowCertResult {
 
     private final boolean known;
 
-    private final Long userId;
+    private final Integer userId;
 
-    public KnowCertResult(final boolean known, final Long userId) {
+    public KnowCertResult(final boolean known, final Integer userId) {
         this.known = known;
         this.userId = userId;
     }
@@ -56,7 +56,7 @@ public class KnowCertResult {
         return known;
     }
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 

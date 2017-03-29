@@ -132,7 +132,7 @@ public class HttpCmpServlet extends HttpServlet {
                     caName = caAlias;
                 }
                 caName = caName.toUpperCase();
-                responder = responderManager.getX509CaCmpResponder(caName);
+                responder = responderManager.getX509CaResponder(caName);
             }
 
             if (caName == null || responder == null || !responder.isInService()) {
@@ -149,7 +149,7 @@ public class HttpCmpServlet extends HttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            event.addEventData(CaAuditConstants.NAME_CA, responder.getCa().getCaName());
+            event.addEventData(CaAuditConstants.NAME_CA, responder.getCa().getCaIdent().getName());
 
             PKIMessage pkiReq;
             try {

@@ -47,6 +47,7 @@ import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
 import org.xipki.commons.password.PasswordResolver;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
@@ -160,6 +161,7 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
     private String signerType;
 
     @Option(name = "--signer-conf",
+            required = true,
             description = "CA signer configuration")
     private String signerConf;
 
@@ -211,8 +213,8 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
         }
 
         X509CaUris caUris = new X509CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
-        X509CaEntry entry = new X509CaEntry(caName, snBitLen, nextCrlNumber, signerType, signerConf,
-                caUris, numCrls.intValue(), expirationPeriod.intValue());
+        X509CaEntry entry = new X509CaEntry(new NameId(null, caName), snBitLen, nextCrlNumber,
+                signerType, signerConf, caUris, numCrls.intValue(), expirationPeriod.intValue());
 
         entry.setKeepExpiredCertInDays(keepExpiredCertInDays.intValue());
 

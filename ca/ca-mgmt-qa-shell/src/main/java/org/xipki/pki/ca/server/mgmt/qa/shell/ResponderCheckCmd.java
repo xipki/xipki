@@ -59,9 +59,9 @@ public class ResponderCheckCmd extends ResponderUpdateCmd {
     protected Object doExecute() throws Exception {
         println("checking responder " + name);
 
-        CmpResponderEntry cr = caManager.getCmpResponder(name);
+        CmpResponderEntry cr = caManager.getResponder(name);
         if (cr == null) {
-            throw new CmdFailure("CMP responder named '" + name + "' is not configured");
+            throw new CmdFailure("responder named '" + name + "' is not configured");
         }
 
         if (CaManager.NULL.equalsIgnoreCase(certFile)) {

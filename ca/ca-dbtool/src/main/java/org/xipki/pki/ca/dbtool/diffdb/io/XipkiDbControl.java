@@ -60,7 +60,7 @@ public class XipkiDbControl {
         ParamUtil.requireNonNull("dbSchemaType", dbSchemaType);
 
         if (dbSchemaType == DbSchemaType.XIPKI_CA_v2) {
-            tblCa = "CS_CA";
+            tblCa = "CA";
             tblCerthash = "CRAW";
             colCaId = "CA_ID";
             colCerthash = "SHA1";

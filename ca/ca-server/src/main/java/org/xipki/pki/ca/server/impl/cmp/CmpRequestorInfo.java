@@ -35,8 +35,11 @@
 package org.xipki.pki.ca.server.impl.cmp;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.api.InsuffientPermissionException;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
+import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 /**
@@ -64,13 +67,41 @@ public class CmpRequestorInfo implements RequestorInfo {
     }
 
     @Override
-    public String getName() {
-        return caHasRequestor.getRequestorName();
+    public NameId getIdent() {
+        return caHasRequestor.getRequestorIdent();
     }
 
     @Override
     public boolean isRa() {
         return caHasRequestor.isRa();
+    }
+
+    @Override
+    public boolean isCertProfilePermitted(String certprofile) {
+        return caHasRequestor.isCertProfilePermitted(certprofile);
+    }
+
+    @Override
+    public boolean isPermitted(Permission permission) {
+        return caHasRequestor.isPermitted(permission);
+    }
+
+    @Override
+    public void assertCertProfilePermitted(String certprofile)
+            throws InsuffientPermissionException {
+        if (!isCertProfilePermitted(certprofile)) {
+            throw new  InsuffientPermissionException(
+                    "CertProfile " + certprofile + " is not permitted");
+        }
+    }
+
+    @Override
+    public void assertPermitted(Permission permission)
+            throws InsuffientPermissionException {
+        if (!isPermitted(permission)) {
+            throw new  InsuffientPermissionException(permission.getPermission()
+                + " is not permitted");
+        }
     }
 
 }

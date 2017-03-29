@@ -92,7 +92,7 @@ public class ResponderUpdateCmd extends CaCommandSupport {
         }
         String tmpSignerType = signerType;
         if (tmpSignerType == null) {
-            CmpResponderEntry entry = caManager.getCmpResponder(name);
+            CmpResponderEntry entry = caManager.getResponder(name);
             if (entry == null) {
                 throw new IllegalCmdParamException("please specify the signerType");
             }
@@ -114,7 +114,7 @@ public class ResponderUpdateCmd extends CaCommandSupport {
             cert = Base64.toBase64String(certBytes);
         }
 
-        boolean bo = caManager.changeCmpResponder(name, signerType, getSignerConf(), cert);
+        boolean bo = caManager.changeResponder(name, signerType, getSignerConf(), cert);
         output(bo, "updated", "could not update", "CMP responder " + name);
         return null;
     }

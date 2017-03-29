@@ -34,9 +34,11 @@
 
 package org.xipki.pki.ca.server.mgmt.shell.completer;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 /**
  * @author Lijun Liao
@@ -48,7 +50,11 @@ public class RequestorNameCompleter extends MgmtNameCompleter {
 
     @Override
     protected Set<String> getEnums() {
-        return caManager.getCmpRequestorNames();
+        Set<String> names = new HashSet<>();
+        names.addAll(caManager.getRequestorNames());
+        names.remove(RequestorInfo.NAME_BY_CA);
+        names.remove(RequestorInfo.NAME_BY_USER);
+        return names;
     }
 
 }

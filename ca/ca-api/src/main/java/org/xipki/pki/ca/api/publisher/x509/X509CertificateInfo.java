@@ -47,6 +47,7 @@ import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 
@@ -61,9 +62,13 @@ public class X509CertificateInfo {
 
     private final X509CertWithDbId cert;
 
+    private final NameId issuer;
+
     private final X509Cert issuerCert;
 
-    private final String profileName;
+    private final NameId profile;
+
+    private final NameId requestor;
 
     private final HashAlgoType hashAlgo;
 
@@ -71,9 +76,7 @@ public class X509CertificateInfo {
 
     private byte[] transactionId;
 
-    private String requestorName;
-
-    private Long user;
+    private Integer user;
 
     private String warningMessage;
 
@@ -83,13 +86,15 @@ public class X509CertificateInfo {
 
     private boolean alreadyIssued;
 
-    public X509CertificateInfo(final X509CertWithDbId cert, final X509Cert issuerCert,
-            final byte[] subjectPublicKey, final String profileName)
-            throws CertificateEncodingException {
-        this.profileName = ParamUtil.requireNonBlank("profileName", profileName);
+    public X509CertificateInfo(final X509CertWithDbId cert, final NameId issuer,
+            final X509Cert issuerCert, final byte[] subjectPublicKey, final NameId profile,
+            final NameId requestor) throws CertificateEncodingException {
+        this.profile = ParamUtil.requireNonNull("profile", profile);
         this.cert = ParamUtil.requireNonNull("cert", cert);
         this.subjectPublicKey = ParamUtil.requireNonNull("subjectPublicKey", subjectPublicKey);
+        this.issuer = ParamUtil.requireNonNull("issuer", issuer);
         this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
+        this.requestor = ParamUtil.requireNonNull("requestor", requestor);
         ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(cert.getCert().getSigAlgOID());
         byte[] params = cert.getCert().getSigAlgParams();
 
@@ -115,12 +120,16 @@ public class X509CertificateInfo {
         return cert;
     }
 
+    public NameId getIssuer() {
+        return issuer;
+    }
+
     public X509Cert getIssuerCert() {
         return issuerCert;
     }
 
-    public String getProfileName() {
-        return profileName;
+    public NameId getProfile() {
+        return profile;
     }
 
     public String getWarningMessage() {
@@ -131,19 +140,15 @@ public class X509CertificateInfo {
         this.warningMessage = warningMessage;
     }
 
-    public String getRequestorName() {
-        return requestorName;
+    public NameId getRequestor() {
+        return requestor;
     }
 
-    public void setRequestorName(final String requestorName) {
-        this.requestorName = requestorName;
-    }
-
-    public Long getUser() {
+    public Integer getUser() {
         return user;
     }
 
-    public void setUser(final Long user) {
+    public void setUser(final Integer user) {
         this.user = user;
     }
 

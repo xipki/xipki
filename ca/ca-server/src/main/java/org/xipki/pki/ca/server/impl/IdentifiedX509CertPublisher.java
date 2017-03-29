@@ -44,6 +44,7 @@ import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.X509Cert;
 import org.xipki.pki.ca.api.EnvParameterResolver;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.publisher.CertPublisherException;
 import org.xipki.pki.ca.api.publisher.x509.X509CertPublisher;
@@ -96,8 +97,8 @@ class IdentifiedX509CertPublisher {
         return entry;
     }
 
-    public String getName() {
-        return entry.getName();
+    public NameId getIdent() {
+        return entry.getIdent();
     }
 
     public boolean isHealthy() {

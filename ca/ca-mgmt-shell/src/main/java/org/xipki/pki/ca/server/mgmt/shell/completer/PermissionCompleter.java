@@ -46,6 +46,6 @@ import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 public class PermissionCompleter extends AbstractEnumCompleter {
 
     public PermissionCompleter() {
-        setTokens("enroll,revoke,unrevoke,remove,key-update,gen-crl,get-crl,enroll-cross,all");
+        setTokens("enroll,revoke,unrevoke,remove,key-update,gen-crl,get-crl,enroll-cross,ALL");
     }
 }

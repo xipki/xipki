@@ -67,7 +67,7 @@ public class CmpResponderEntry {
 
     public CmpResponderEntry(final String name, final String type, final String conf,
             final String base64Cert) {
-        this.name = ParamUtil.requireNonBlank("name", name);
+        this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
         this.type = ParamUtil.requireNonBlank("type", type);
         this.conf = conf;
         this.base64Cert = base64Cert;

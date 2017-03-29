@@ -53,6 +53,7 @@ public class UserInfoCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", required = true, description = "user name")
     private String name;
 
+    // TODO: show also the CA_HAS_USER entries information
     @Override
     protected Object doExecute() throws Exception {
         StringBuilder sb = new StringBuilder();

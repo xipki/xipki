@@ -70,9 +70,6 @@ public interface CaManager {
 
     boolean notifyCaChange() throws CaMgmtException;
 
-    boolean publishRootCa(@NonNull String caName, @NonNull String certprofile)
-            throws CaMgmtException;
-
     boolean republishCertificates(@Nullable String caName, @Nullable List<String> publisherNames,
             int numThreads) throws CaMgmtException;
 
@@ -97,9 +94,9 @@ public interface CaManager {
 
     Set<String> getPublisherNames();
 
-    Set<String> getCmpRequestorNames();
+    Set<String> getRequestorNames();
 
-    Set<String> getCmpResponderNames();
+    Set<String> getResponderNames();
 
     Set<String> getCrlSignerNames();
 
@@ -133,21 +130,27 @@ public interface CaManager {
 
     Set<String> getCertprofilesForCa(@NonNull String caName);
 
-    Set<CaHasRequestorEntry> getCmpRequestorsForCa(@NonNull String caName);
+    Set<CaHasRequestorEntry> getRequestorsForCa(@NonNull String caName);
 
-    CmpRequestorEntry getCmpRequestor(@NonNull String name);
+    CmpRequestorEntry getRequestor(@NonNull String name);
 
-    boolean addCmpRequestor(@NonNull CmpRequestorEntry dbEntry) throws CaMgmtException;
+    boolean addRequestor(@NonNull CmpRequestorEntry dbEntry) throws CaMgmtException;
 
-    boolean removeCmpRequestor(@NonNull String requestorName) throws CaMgmtException;
+    boolean removeRequestor(@NonNull String requestorName) throws CaMgmtException;
 
-    boolean changeCmpRequestor(@NonNull String name, @NonNull String base64Cert)
+    boolean changeRequestor(@NonNull String name, @NonNull String base64Cert)
             throws CaMgmtException;
 
-    boolean removeCmpRequestorFromCa(@NonNull String requestorName, @NonNull String caName)
+    boolean removeRequestorFromCa(@NonNull String requestorName, @NonNull String caName)
             throws CaMgmtException;
 
-    boolean addCmpRequestorToCa(@NonNull CaHasRequestorEntry requestor, @NonNull String caName)
+    boolean addRequestorToCa(@NonNull CaHasRequestorEntry requestor, @NonNull String caName)
+            throws CaMgmtException;
+
+    boolean removeUserFromCa(@NonNull String userName, @NonNull String caName)
+            throws CaMgmtException;
+
+    boolean addUserToCa(@NonNull CaHasUserEntry user, @NonNull String caName)
             throws CaMgmtException;
 
     CertprofileEntry getCertprofile(@NonNull String profileName);
@@ -159,13 +162,13 @@ public interface CaManager {
 
     boolean addCertprofile(@NonNull CertprofileEntry dbEntry) throws CaMgmtException;
 
-    boolean addCmpResponder(@NonNull CmpResponderEntry dbEntry) throws CaMgmtException;
+    boolean addResponder(@NonNull CmpResponderEntry dbEntry) throws CaMgmtException;
 
-    boolean removeCmpResponder(@NonNull String name) throws CaMgmtException;
+    boolean removeResponder(@NonNull String name) throws CaMgmtException;
 
-    CmpResponderEntry getCmpResponder(@NonNull String name);
+    CmpResponderEntry getResponder(@NonNull String name);
 
-    boolean changeCmpResponder(@NonNull String name, @Nullable String type, @Nullable String conf,
+    boolean changeResponder(@NonNull String name, @Nullable String type, @Nullable String conf,
             @Nullable String base64Cert) throws CaMgmtException;
 
     boolean addCrlSigner(@NonNull X509CrlSignerEntry dbEntry) throws CaMgmtException;
@@ -220,8 +223,8 @@ public interface CaManager {
             throws CaMgmtException;
 
     X509Certificate generateCertificate(@NonNull String caName, @NonNull String profileName,
-            @NonNull byte[] encodedCsr, @Nullable Date notBefore,
-            @Nullable Date notAfter) throws CaMgmtException;
+            @NonNull byte[] encodedCsr, @Nullable Date notBefore, @Nullable Date notAfter)
+            throws CaMgmtException;
 
     X509Certificate generateRootCa(@NonNull X509CaEntry caEntry, @NonNull String certprofileName,
             @NonNull byte[] encodedCsr, @Nullable BigInteger serialNumber) throws CaMgmtException;

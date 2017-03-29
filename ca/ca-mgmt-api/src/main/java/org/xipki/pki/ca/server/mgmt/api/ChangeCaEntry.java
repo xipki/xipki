@@ -37,6 +37,7 @@ package org.xipki.pki.ca.server.mgmt.api;
 import java.util.Set;
 
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.profile.CertValidity;
 
 /**
@@ -46,7 +47,7 @@ import org.xipki.pki.ca.api.profile.CertValidity;
 
 public class ChangeCaEntry {
 
-    private final String name;
+    private final NameId ident;
 
     private CaStatus status;
 
@@ -76,12 +77,12 @@ public class ChangeCaEntry {
 
     private String extraControl;
 
-    public ChangeCaEntry(final String name) throws CaMgmtException {
-        this.name = ParamUtil.requireNonBlank("name", name);
+    public ChangeCaEntry(final NameId ident) throws CaMgmtException {
+        this.ident = ParamUtil.requireNonNull("ident", ident);
     }
 
-    public String getName() {
-        return name;
+    public NameId getIdent() {
+        return ident;
     }
 
     public CaStatus getStatus() {
@@ -121,7 +122,7 @@ public class ChangeCaEntry {
     }
 
     public void setCmpControlName(final String cmpControlName) {
-        this.cmpControlName = cmpControlName;
+        this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toUpperCase();
     }
 
     public String getResponderName() {
@@ -129,7 +130,7 @@ public class ChangeCaEntry {
     }
 
     public void setResponderName(final String responderName) {
-        this.responderName = responderName;
+        this.responderName = (responderName == null) ? null : responderName.toUpperCase();
     }
 
     public Boolean getDuplicateKeyPermitted() {

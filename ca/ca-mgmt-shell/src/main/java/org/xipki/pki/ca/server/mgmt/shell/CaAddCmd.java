@@ -68,7 +68,7 @@ public class CaAddCmd extends CaAddOrGenCommandSupport {
         }
 
         boolean bo = caManager.addCa(caEntry);
-        output(bo, "added", "could not add", "CA " + caEntry.getName());
+        output(bo, "added", "could not add", "CA " + caEntry.getIdent().getName());
         return null;
     }
 

@@ -34,9 +34,11 @@
 
 package org.xipki.pki.ca.server.impl;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -70,30 +72,35 @@ import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.SecurityFactory;
 import org.xipki.commons.security.SignerConf;
-import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.util.X509Util;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderEntryWrapper;
 import org.xipki.pki.ca.server.impl.scep.Scep;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
+import org.xipki.pki.ca.server.impl.util.CaUtil;
+import org.xipki.pki.ca.server.impl.util.PasswordHash;
+import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
+import org.xipki.pki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.pki.ca.server.mgmt.api.ChangeCaEntry;
+import org.xipki.pki.ca.server.mgmt.api.ChangeUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpControl;
 import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
+import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
@@ -106,7 +113,6 @@ import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
  * @author Lijun Liao
  * @since 2.0.0
  */
-
 class CaManagerQueryExecutor {
 
     // CHECKSTYLE:SKIP
@@ -120,16 +126,19 @@ class CaManagerQueryExecutor {
         private final String sqlSelectResponder;
         private final String sqlSelectCa;
         private final String sqlSelectScep;
+        private final String sqlGetUserId;
+
+        private final String sqlGetUser;
 
         SQLs(final DataSourceWrapper datasource) {
             this.sqlSelectCertprofile = datasource.buildSelectFirstSql(
-                    "TYPE,CONF FROM PROFILE WHERE NAME=?", 1);
+                    "ID,TYPE,CONF FROM PROFILE WHERE NAME=?", 1);
 
             this.sqlSelectPublisher = datasource.buildSelectFirstSql(
-                    "TYPE,CONF FROM PUBLISHER WHERE NAME=?", 1);
+                    "ID,TYPE,CONF FROM PUBLISHER WHERE NAME=?", 1);
 
             this.sqlSelectRequestor = datasource.buildSelectFirstSql(
-                    "CERT FROM REQUESTOR WHERE NAME=?", 1);
+                    "ID,CERT FROM REQUESTOR WHERE NAME=?", 1);
 
             this.sqlSelectCrlSigner = datasource.buildSelectFirstSql(
                     "SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,SIGNER_CONF FROM CRLSIGNER WHERE NAME=?",
@@ -149,8 +158,13 @@ class CaManagerQueryExecutor {
                     + ",OCSP_URIS,CACERT_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?", 1);
 
             this.sqlSelectScep = datasource.buildSelectFirstSql(
-                    "ACTIVE,CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF FROM SCEP"
-                    + " WHERE CA_ID=?", 1);
+                    "ACTIVE,CA_ID,PROFILES,CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF"
+                    + " FROM SCEP WHERE NAME=?", 1);
+
+            this.sqlGetUserId = datasource.buildSelectFirstSql("ID FROM USERNAME WHERE NAME=?", 1);
+
+            this.sqlGetUser = datasource.buildSelectFirstSql(
+                    "ID,ACTIVE,PASSWORD FROM USERNAME WHERE ID=?", 1);
         }
 
     }
@@ -340,10 +354,13 @@ class CaManagerQueryExecutor {
                 return null;
             }
 
+            int id = rs.getInt("ID");
             String type = rs.getString("TYPE");
             String conf = rs.getString("CONF");
 
-            return new CertprofileEntry(name, type, conf);
+            CertprofileEntry entry = new CertprofileEntry(new NameId(id, name),
+                    type, conf);
+            return entry;
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -397,9 +414,11 @@ class CaManagerQueryExecutor {
                 return null;
             }
 
+            int id = rs.getInt("ID");
             String type = rs.getString("TYPE");
             String conf = rs.getString("CONF");
-            return new PublisherEntry(name, type, conf);
+            PublisherEntry entry = new PublisherEntry(new NameId(id, name), type, conf);
+            return entry;
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -407,6 +426,29 @@ class CaManagerQueryExecutor {
             datasource.releaseResources(stmt, rs);
         }
     } // method createPublisher
+
+    Integer getRequestorId(String requestorName) throws CaMgmtException {
+        final String sql = datasource.buildSelectFirstSql("ID FROM REQUESTOR WHERE NAME=?", 1);
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = prepareStatement(sql);
+            stmt.setString(1, requestorName);
+            rs = stmt.executeQuery();
+
+            if (!rs.next()) {
+                return null;
+            }
+
+            return rs.getInt("ID");
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } finally {
+            datasource.releaseResources(stmt, rs);
+        }
+    }
 
     CmpRequestorEntry createRequestor(final String name) throws CaMgmtException {
         final String sql = sqls.sqlSelectRequestor;
@@ -422,8 +464,10 @@ class CaManagerQueryExecutor {
                 return null;
             }
 
+            int id = rs.getInt("ID");
             String b64Cert = rs.getString("CERT");
-            return new CmpRequestorEntry(name, b64Cert);
+            CmpRequestorEntry entry = new CmpRequestorEntry(new NameId(id, name), b64Cert);
+            return entry;
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -570,6 +614,7 @@ class CaManagerQueryExecutor {
             X509CaUris caUris = new X509CaUris(tmpCacertUris, tmpOcspUris, tmpCrlUris,
                     tmpDeltaCrlUris);
 
+            int id = rs.getInt("ID");
             int serialNoSize = rs.getInt("SN_SIZE");
             long nextCrlNo = rs.getLong("NEXT_CRLNO");
             String signerType = rs.getString("SIGNER_TYPE");
@@ -577,11 +622,8 @@ class CaManagerQueryExecutor {
             int numCrls = rs.getInt("NUM_CRLS");
             int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
 
-            X509CaEntry entry = new X509CaEntry(name, serialNoSize, nextCrlNo, signerType,
-                    signerConf, caUris, numCrls, expirationPeriod);
-
-            int id = rs.getInt("ID");
-            entry.setId(id);
+            X509CaEntry entry = new X509CaEntry(new NameId(id, name), serialNoSize,
+                    nextCrlNo, signerType, signerConf, caUris, numCrls, expirationPeriod);
             String b64cert = rs.getString("CERT");
             X509Certificate cert = generateCert(b64cert);
             entry.setCertificate(cert);
@@ -627,7 +669,7 @@ class CaManagerQueryExecutor {
             entry.setSaveRequest(saveReq);
 
             String str = rs.getString("PERMISSIONS");
-            Set<Permission> permissions = getPermissions(str);
+            Set<Permission> permissions = CaUtil.getPermissions(str);
             entry.setPermissions(permissions);
             entry.setRevocationInfo(revocationInfo);
 
@@ -642,11 +684,6 @@ class CaManagerQueryExecutor {
             entry.setValidityMode(validityMode);
 
             try {
-                if (masterMode) {
-                    X509Cert cm = new X509Cert(entry.getCertificate());
-                    certstore.addCa(cm);
-                }
-
                 return new X509CaInfo(entry, certstore);
             } catch (OperationException ex) {
                 throw new CaMgmtException(ex.getMessage(), ex);
@@ -659,27 +696,31 @@ class CaManagerQueryExecutor {
         }
     } // method createCaInfo
 
-    Set<CaHasRequestorEntry> createCaHasRequestors(final String caName) throws CaMgmtException {
+    Set<CaHasRequestorEntry> createCaHasRequestors(final NameId ca)
+            throws CaMgmtException {
+        Map<Integer, String> idNameMap = getIdNameMap("REQUESTOR");
+
         final String sql =
-            "SELECT REQUESTOR_NAME,RA,PERMISSIONS,PROFILES FROM CA_HAS_REQUESTOR WHERE CA_ID=?";
+                "SELECT REQUESTOR_ID,RA,PERMISSIONS,PROFILES FROM CA_HAS_REQUESTOR WHERE CA_ID=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             stmt = prepareStatement(sql);
-            stmt.setInt(1, getCaIdForName(caName));
+            stmt.setInt(1, ca.getId());
             rs = stmt.executeQuery();
 
             Set<CaHasRequestorEntry> ret = new HashSet<>();
             while (rs.next()) {
-                String requestorName = rs.getString("REQUESTOR_NAME");
+                int id = rs.getInt("REQUESTOR_ID");
+                String name = idNameMap.get(id);
+
                 boolean ra = rs.getBoolean("RA");
                 String str = rs.getString("PERMISSIONS");
-                Set<Permission> permissions = getPermissions(str);
-
+                Set<Permission> permissions = CaUtil.getPermissions(str);
                 str = rs.getString("PROFILES");
                 List<String> list = StringUtil.split(str, ",");
                 Set<String> profiles = (list == null) ? null : new HashSet<>(list);
-                CaHasRequestorEntry entry = new CaHasRequestorEntry(requestorName);
+                CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(id, name));
                 entry.setRa(ra);
                 entry.setPermissions(permissions);
                 entry.setProfiles(profiles);
@@ -696,19 +737,19 @@ class CaManagerQueryExecutor {
         }
     } // method createCaHasRequestors
 
-    Set<String> createCaHasProfiles(final String caName) throws CaMgmtException {
-        final String sql = "SELECT PROFILE_NAME FROM CA_HAS_PROFILE WHERE CA_ID=?";
+    Set<Integer> createCaHasProfiles(final NameId ca) throws CaMgmtException {
+        final String sql = "SELECT PROFILE_ID FROM CA_HAS_PROFILE WHERE CA_ID=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             stmt = prepareStatement(sql);
-            stmt.setInt(1, getCaIdForName(caName));
+            stmt.setInt(1, ca.getId());
             rs = stmt.executeQuery();
 
-            Set<String> ret = new HashSet<>();
+            Set<Integer> ret = new HashSet<>();
             while (rs.next()) {
-                String profileName = rs.getString("PROFILE_NAME");
-                ret.add(profileName);
+                int id = rs.getInt("PROFILE_ID");
+                ret.add(id);
             }
 
             return ret;
@@ -720,25 +761,19 @@ class CaManagerQueryExecutor {
         }
     } // method createCaHasProfiles
 
-    Set<String> createCaHasPublishers(final String caName) throws CaMgmtException {
-        return createCaHasNames(caName, "PUBLISHER_NAME", "CA_HAS_PUBLISHER");
-    }
-
-    Set<String> createCaHasNames(final String caName, final String columnName, final String table)
-            throws CaMgmtException {
-        final String sql = new StringBuilder("SELECT ").append(columnName).append(" FROM ")
-                .append(table).append(" WHERE CA_ID=?").toString();
+    Set<Integer> createCaHasPublishers(final NameId ca) throws CaMgmtException {
+        final String sql = "SELECT PUBLISHER_ID FROM CA_HAS_PUBLISHER WHERE CA_ID=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             stmt = prepareStatement(sql);
-            stmt.setInt(1, getCaIdForName(caName));
+            stmt.setInt(1, ca.getId());
             rs = stmt.executeQuery();
 
-            Set<String> ret = new HashSet<>();
+            Set<Integer> ret = new HashSet<>();
             while (rs.next()) {
-                String name = rs.getString(columnName);
-                ret.add(name);
+                int id = rs.getInt("PUBLISHER_ID");
+                ret.add(id);
             }
 
             return ret;
@@ -801,13 +836,12 @@ class CaManagerQueryExecutor {
 
         try {
             int id = (int) datasource.getMax(null, "CA", "ID");
-            caEntry.setId(id + 1);
+            caEntry.getIdent().setId(id + 1);
         } catch (DataAccessException ex) {
             throw new CaMgmtException(ex.getMessage(), ex);
         }
 
         X509CaEntry entry = (X509CaEntry) caEntry;
-        String name = entry.getName();
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS");
@@ -823,8 +857,8 @@ class CaManagerQueryExecutor {
         try {
             ps = prepareStatement(sql);
             int idx = 1;
-            ps.setInt(idx++, entry.getId());
-            ps.setString(idx++, name);
+            ps.setInt(idx++, entry.getIdent().getId());
+            ps.setString(idx++, entry.getIdent().getName());
             ps.setInt(idx++, CertArt.X509PKC.getCode());
             ps.setString(idx++, entry.getSubject());
             ps.setInt(idx++, entry.getSerialNoBitLen());
@@ -853,7 +887,7 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, entry.getSignerConf());
             ps.executeUpdate();
             if (LOG.isInfoEnabled()) {
-                LOG.info("add CA '{}': {}", name, entry.toString(false, true));
+                LOG.info("add CA '{}': {}", entry.getIdent(), entry.toString(false, true));
             }
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
@@ -865,18 +899,18 @@ class CaManagerQueryExecutor {
         }
     } // method addCa
 
-    void addCaAlias(final String aliasName, final String caName) throws CaMgmtException {
+    void addCaAlias(final String aliasName, final NameId ca) throws CaMgmtException {
         ParamUtil.requireNonNull("aliasName", aliasName);
-        ParamUtil.requireNonNull("caName", caName);
+        ParamUtil.requireNonNull("ca", ca);
 
         final String sql = "INSERT INTO CAALIAS (NAME,CA_ID) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
             ps.setString(1, aliasName);
-            ps.setInt(2, getCaIdForName(caName));
+            ps.setInt(2, ca.getId());
             ps.executeUpdate();
-            LOG.info("added CA alias '{}' for CA '{}'", aliasName, caName);
+            LOG.info("added CA alias '{}' for CA '{}'", aliasName, ca);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -887,19 +921,27 @@ class CaManagerQueryExecutor {
 
     void addCertprofile(final CertprofileEntry dbEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
-        final String sql = "INSERT INTO PROFILE (NAME,ART,TYPE,CONF) VALUES (?,?,?,?)";
-        final String name = dbEntry.getName();
+        final String sql = "INSERT INTO PROFILE (ID,NAME,ART,TYPE,CONF) VALUES (?,?,?,?,?)";
+
+        try {
+            int id = (int) datasource.getMax(null, "PROFILE", "ID");
+            dbEntry.getIdent().setId(id + 1);
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        }
 
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setString(1, name);
-            ps.setInt(2, CertArt.X509PKC.getCode());
-            ps.setString(3, dbEntry.getType());
+            int idx = 1;
+            ps.setInt(idx++, dbEntry.getIdent().getId());
+            ps.setString(idx++, dbEntry.getIdent().getName());
+            ps.setInt(idx++, CertArt.X509PKC.getCode());
+            ps.setString(idx++, dbEntry.getType());
             String conf = dbEntry.getConf();
-            ps.setString(4, conf);
+            ps.setString(idx++, conf);
             ps.executeUpdate();
-            LOG.info("added profile '{}': {}", name, dbEntry);
+            LOG.info("added profile '{}': {}", dbEntry.getIdent(), dbEntry);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -908,18 +950,19 @@ class CaManagerQueryExecutor {
         }
     } // method addCertprofile
 
-    void addCertprofileToCa(final String profileName, final String caName) throws CaMgmtException {
-        ParamUtil.requireNonNull("profileName", profileName);
-        ParamUtil.requireNonNull("caName", caName);
+    void addCertprofileToCa(final NameId profile, final NameId ca)
+            throws CaMgmtException {
+        ParamUtil.requireNonNull("profile", profile);
+        ParamUtil.requireNonNull("ca", ca);
 
-        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_ID,PROFILE_NAME) VALUES (?,?)";
+        final String sql = "INSERT INTO CA_HAS_PROFILE (CA_ID,PROFILE_ID) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, getCaIdForName(caName));
-            ps.setString(2, profileName);
+            ps.setInt(1, ca.getId());
+            ps.setInt(2, profile.getId());
             ps.executeUpdate();
-            LOG.info("added profile '{}' to CA '{}'", profileName, caName);
+            LOG.info("added profile '{}' to CA '{}'", profile, ca);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -948,19 +991,27 @@ class CaManagerQueryExecutor {
         }
     } // method addCmpControl
 
-    void addCmpRequestor(final CmpRequestorEntry dbEntry) throws CaMgmtException {
+    void addRequestor(final CmpRequestorEntry dbEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
-        String name = dbEntry.getName();
-        final String sql = "INSERT INTO REQUESTOR (NAME,CERT) VALUES (?,?)";
+
+        try {
+            int id = (int) datasource.getMax(null, "REQUESTOR", "ID");
+            dbEntry.getIdent().setId(id + 1);
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        }
+
+        final String sql = "INSERT INTO REQUESTOR (ID,NAME,CERT) VALUES (?,?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
             int idx = 1;
-            ps.setString(idx++, name);
+            ps.setInt(idx++, dbEntry.getIdent().getId());
+            ps.setString(idx++, dbEntry.getIdent().getName());
             ps.setString(idx++, Base64.toBase64String(dbEntry.getCert().getEncoded()));
             ps.executeUpdate();
             if (LOG.isInfoEnabled()) {
-                LOG.info("added requestor '{}': {}", name, dbEntry.toString(false));
+                LOG.info("added requestor '{}': {}", dbEntry.getIdent(), dbEntry.toString(false));
             }
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
@@ -972,14 +1023,13 @@ class CaManagerQueryExecutor {
         }
     } // method addCmpRequestor
 
-    void addByUserRequestorIfNeeded() throws CaMgmtException {
-        final String sql = "INSERT INTO CS_REQUESTOR (ID,NAME) VALUES (?,?)";
-        final String name = RequestorInfo.NAME_BY_USER;
+    void addRequestorIfNeeded(String requestorName) throws CaMgmtException {
+        final String sql = "INSERT INTO REQUESTOR (ID,NAME) VALUES (?,?)";
         ResultSet rs = null;
         Statement stmt = null;
         try {
             stmt = createStatement();
-            rs = stmt.executeQuery("SELECT ID FROM CS_REQUESTOR WHERE NAME='" + name + "'");
+            rs = stmt.executeQuery("SELECT ID FROM REQUESTOR WHERE NAME='" + requestorName + "'");
             if (rs.next()) {
                 return;
             }
@@ -987,15 +1037,15 @@ class CaManagerQueryExecutor {
             stmt = null;
             rs = null;
 
-            int id = (int) datasource.getMax(null, "CS_REQUESTOR", "ID");
+            int id = (int) datasource.getMax(null, "REQUESTOR", "ID");
 
             PreparedStatement ps = prepareStatement(sql);
             stmt = ps;
 
             ps.setInt(1, id + 1);
-            ps.setString(2, name);
+            ps.setString(2, requestorName);
             ps.executeUpdate();
-            LOG.info("added requestor '{}'", name);
+            LOG.info("added requestor '{}'", requestorName);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -1006,21 +1056,21 @@ class CaManagerQueryExecutor {
         }
     }
 
-    void addCmpRequestorToCa(final CaHasRequestorEntry requestor, final String caName)
+    void addRequestorToCa(final CaHasRequestorEntry requestor, final NameId ca)
             throws CaMgmtException {
         ParamUtil.requireNonNull("requestor", requestor);
-        ParamUtil.requireNonBlank("caName", caName);
+        ParamUtil.requireNonNull("ca", ca);
 
-        final String requestorName = requestor.getRequestorName();
+        final NameId requestorIdent = requestor.getRequestorIdent();
 
         PreparedStatement ps = null;
-        final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_NAME,RA,"
+        final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_ID,RA,"
                 + " PERMISSIONS,PROFILES) VALUES (?,?,?,?,?)";
         try {
             ps = prepareStatement(sql);
             int idx = 1;
-            ps.setInt(idx++, getCaIdForName(caName));
-            ps.setString(idx++, requestorName);
+            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, requestorIdent.getId());
 
             boolean ra = requestor.isRa();
             setBoolean(ps, idx++, ra);
@@ -1033,7 +1083,7 @@ class CaManagerQueryExecutor {
 
             ps.executeUpdate();
             LOG.info("added requestor '{}' to CA '{}': ra: {}; permission: {}; profile: {}",
-                    requestorName, caName, ra, permissionText, profilesText);
+                    requestorIdent, ca, ra, permissionText, profilesText);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -1122,18 +1172,27 @@ class CaManagerQueryExecutor {
 
     void addPublisher(final PublisherEntry dbEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
-        String name = dbEntry.getName();
-        final String sql = "INSERT INTO PUBLISHER (NAME,TYPE,CONF) VALUES (?,?,?)";
+        final String sql = "INSERT INTO PUBLISHER (ID,NAME,TYPE,CONF) VALUES (?,?,?,?)";
 
+        try {
+            int id = (int) datasource.getMax(null, "PUBLISHER", "ID");
+            dbEntry.getIdent().setId(id + 1);
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        }
+
+        String name = dbEntry.getIdent().getName();
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setString(1, name);
-            ps.setString(2, dbEntry.getType());
+            int idx = 1;
+            ps.setInt(idx++, dbEntry.getIdent().getId());
+            ps.setString(idx++, name);
+            ps.setString(idx++, dbEntry.getType());
             String conf = dbEntry.getConf();
-            ps.setString(3, conf);
+            ps.setString(idx++, conf);
             ps.executeUpdate();
-            LOG.info("added publisher '{}': {}", name, dbEntry);
+            LOG.info("added publisher '{}': {}", dbEntry.getIdent(), dbEntry);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -1142,15 +1201,16 @@ class CaManagerQueryExecutor {
         }
     } // method addPublisher
 
-    void addPublisherToCa(final String publisherName, final String caName) throws CaMgmtException {
-        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_ID,PUBLISHER_NAME) VALUES (?,?)";
+    void addPublisherToCa(final NameId publisher, final NameId ca)
+            throws CaMgmtException {
+        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_ID,PUBLISHER_ID) VALUES (?,?)";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, getCaIdForName(caName));
-            ps.setString(2, publisherName);
+            ps.setInt(1, ca.getId());
+            ps.setInt(2, publisher.getId());
             ps.executeUpdate();
-            LOG.info("added publisher '{}' to CA '{}'", publisherName, caName);
+            LOG.info("added publisher '{}' to CA '{}'", publisher, ca);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -1169,10 +1229,24 @@ class CaManagerQueryExecutor {
         }
 
         X509ChangeCaEntry entry = (X509ChangeCaEntry) changeCaEntry;
-        String name = entry.getName();
+        X509Certificate cert = entry.getCert();
+        if (cert != null) {
+            boolean anyCertIssued;
+            try {
+                anyCertIssued = datasource.columnExists(null, "CERT", "CA_ID",
+                        entry.getIdent().getId());
+            } catch (DataAccessException ex) {
+                throw new CaMgmtException(ex.getMessage(), ex);
+            }
+
+            if (anyCertIssued) {
+                throw new CaMgmtException(
+                        "Cannot change the certificate of CA, since it has issued certificates");
+            }
+        }
+
         Integer serialNoBitLen = entry.getSerialNoBitLen();
         CaStatus status = entry.getStatus();
-        X509Certificate cert = entry.getCert();
         List<String> crlUris = entry.getCrlUris();
         List<String> deltaCrlUris = entry.getDeltaCrlUris();
         List<String> ocspUris = entry.getOcspUris();
@@ -1194,16 +1268,16 @@ class CaManagerQueryExecutor {
         String extraControl = entry.getExtraControl();
 
         if (signerType != null || signerConf != null || cert != null) {
-            final String sql = "SELECT SIGNER_TYPE,CERT,SIGNER_CONF FROM CA WHERE NAME=?";
+            final String sql = "SELECT SIGNER_TYPE,CERT,SIGNER_CONF FROM CA WHERE ID=?";
             PreparedStatement stmt = null;
             ResultSet rs = null;
 
             try {
                 stmt = prepareStatement(sql);
-                stmt.setString(1, name);
+                stmt.setInt(1, entry.getIdent().getId());
                 rs = stmt.executeQuery();
                 if (!rs.next()) {
-                    throw new CaMgmtException("no CA '" + name + "' is defined");
+                    throw new CaMgmtException("no CA '" + entry.getIdent() + "' is defined");
                 }
 
                 String tmpSignerType = rs.getString("SIGNER_TYPE");
@@ -1225,7 +1299,7 @@ class CaManagerQueryExecutor {
                         tmpCert = X509Util.parseBase64EncodedCert(tmpB64Cert);
                     } catch (CertificateException ex) {
                         throw new CaMgmtException("could not parse the stored certificate for CA '"
-                                + name + "'" + ex.getMessage(), ex);
+                                + changeCaEntry.getIdent() + "'" + ex.getMessage(), ex);
                     }
                 }
 
@@ -1236,7 +1310,8 @@ class CaManagerQueryExecutor {
                     }
                 } catch (XiSecurityException | ObjectCreationException ex) {
                     throw new CaMgmtException(
-                            "could not create signer for CA '" + name + "'" + ex.getMessage(), ex);
+                            "could not create signer for CA '" + changeCaEntry.getIdent()
+                            + "'" + ex.getMessage(), ex);
                 }
             } catch (SQLException ex) {
                 DataAccessException dex = datasource.translate(sql, ex);
@@ -1288,12 +1363,12 @@ class CaManagerQueryExecutor {
 
         // delete the last ','
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
+        sqlBuilder.append(" WHERE ID=?");
 
         if (index.get() == 1) {
             return false;
         }
-        int idxName = index.get();
+        int idxId = index.get();
 
         final String sql = sqlBuilder.toString();
         StringBuilder sb = new StringBuilder();
@@ -1426,14 +1501,14 @@ class CaManagerQueryExecutor {
                 ps.setString(idxExtraControl, extraControl);
             }
 
-            ps.setString(idxName, name);
+            ps.setInt(idxId, changeCaEntry.getIdent().getId());
             ps.executeUpdate();
 
             if (sb.length() > 0) {
                 sb.deleteCharAt(sb.length() - 1).deleteCharAt(sb.length() - 1);
             }
 
-            LOG.info("changed CA '{}': {}", name, sb);
+            LOG.info("changed CA '{}': {}", changeCaEntry.getIdent(), sb);
             return true;
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
@@ -1445,9 +1520,47 @@ class CaManagerQueryExecutor {
         }
     } // method changeCa
 
-    IdentifiedX509Certprofile changeCertprofile(final String name, final String type,
+    void commitNextCrlNoIfLess(final NameId ca, final long nextCrlNo)
+            throws CaMgmtException {
+        PreparedStatement ps = null;
+        try {
+            final String sql = new StringBuilder("SELECT NEXT_CRLNO FROM CA WHERE ID=")
+                .append(ca.getId()).append("").toString();
+            ResultSet rs = null;
+            long nextCrlNoInDb;
+
+            try {
+                ps = prepareStatement(sql);
+                rs = ps.executeQuery();
+                rs.next();
+                nextCrlNoInDb = rs.getLong("NEXT_CRLNO");
+            } catch (SQLException ex) {
+                DataAccessException dex = datasource.translate(sql, ex);
+                throw new CaMgmtException(dex.getMessage(), dex);
+            } finally {
+                datasource.releaseResources(ps, rs);
+            }
+
+            if (nextCrlNoInDb < nextCrlNo) {
+                final String updateSql = "UPDATE CA SET NEXT_CRLNO=? WHERE ID=?";
+                try {
+                    ps = prepareStatement(updateSql);
+                    ps.setLong(1, nextCrlNo);
+                    ps.setInt(2, ca.getId());
+                    ps.executeUpdate();
+                } catch (SQLException ex) {
+                    DataAccessException dex = datasource.translate(sql, ex);
+                    throw new CaMgmtException(dex.getMessage(), dex);
+                }
+            }
+        } finally {
+            datasource.releaseResources(ps, null);
+        }
+    } // method commitNextCrlNoIfLess
+
+    IdentifiedX509Certprofile changeCertprofile(final NameId nameId, final String type,
             final String conf, final CaManagerImpl caManager) throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        ParamUtil.requireNonNull("nameId", nameId);
         ParamUtil.requireNonNull("caManager", caManager);
 
         StringBuilder sqlBuilder = new StringBuilder();
@@ -1470,12 +1583,12 @@ class CaManagerQueryExecutor {
         Integer idxType = addToSqlIfNotNull(sqlBuilder, index, tmpType, "TYPE");
         Integer idxConf = addToSqlIfNotNull(sqlBuilder, index, tmpConf, "CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
+        sqlBuilder.append(" WHERE ID=?");
         if (index.get() == 1) {
             return null;
         }
 
-        CertprofileEntry currentDbEntry = createCertprofile(name);
+        CertprofileEntry currentDbEntry = createCertprofile(nameId.getName());
         if (tmpType == null) {
             tmpType = currentDbEntry.getType();
         }
@@ -1486,7 +1599,8 @@ class CaManagerQueryExecutor {
         tmpType = getRealString(tmpType);
         tmpConf = getRealString(tmpConf);
 
-        CertprofileEntry newDbEntry = new CertprofileEntry(name, tmpType, tmpConf);
+        CertprofileEntry newDbEntry = new CertprofileEntry(currentDbEntry.getIdent(),
+                tmpType, tmpConf);
         IdentifiedX509Certprofile profile = caManager.createCertprofile(newDbEntry);
         if (profile == null) {
             return null;
@@ -1506,14 +1620,14 @@ class CaManagerQueryExecutor {
                 ps.setString(idxConf, getRealString(tmpConf));
             }
 
-            ps.setString(index.get(), name);
+            ps.setInt(index.get(), nameId.getId());
             ps.executeUpdate();
 
             if (sb.length() > 0) {
                 sb.deleteCharAt(sb.length() - 1).deleteCharAt(sb.length() - 1);
             }
 
-            LOG.info("changed profile '{}': {}", name, sb);
+            LOG.info("changed profile '{}': {}", nameId, sb);
             failed = false;
             return profile;
         } catch (SQLException ex) {
@@ -1558,21 +1672,21 @@ class CaManagerQueryExecutor {
         }
     } // method changeCmpControl
 
-    CmpRequestorEntryWrapper changeCmpRequestor(final String name, final String base64Cert)
+    CmpRequestorEntryWrapper changeRequestor(final NameId nameId, final String base64Cert)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("name", name);
+        ParamUtil.requireNonNull("nameId", nameId);
 
-        CmpRequestorEntry newDbEntry = new CmpRequestorEntry(name, base64Cert);
+        CmpRequestorEntry newDbEntry = new CmpRequestorEntry(nameId, base64Cert);
         CmpRequestorEntryWrapper requestor = new CmpRequestorEntryWrapper();
         requestor.setDbEntry(newDbEntry);
 
-        final String sql = "UPDATE REQUESTOR SET CERT=? WHERE NAME=?";
+        final String sql = "UPDATE REQUESTOR SET CERT=? WHERE ID=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
             String b64Cert = getRealString(base64Cert);
             ps.setString(1, b64Cert);
-            ps.setString(2, name);
+            ps.setInt(2, nameId.getId());
             ps.executeUpdate();
 
             String subject = null;
@@ -1584,7 +1698,7 @@ class CaManagerQueryExecutor {
                     subject = "ERROR";
                 }
             }
-            LOG.info("changed CMP requestor '{}': {}", name, subject);
+            LOG.info("changed CMP requestor '{}': {}", nameId, subject);
             return requestor;
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
@@ -1594,7 +1708,7 @@ class CaManagerQueryExecutor {
         }
     } // method changeCmpRequestor
 
-    CmpResponderEntryWrapper changeCmpResponder(final String name, final String type,
+    CmpResponderEntryWrapper changeResponder(final String name, final String type,
             final String conf, final String base64Cert, final CaManagerImpl caManager)
             throws CaMgmtException {
         ParamUtil.requireNonBlank("name", name);
@@ -1810,31 +1924,34 @@ class CaManagerQueryExecutor {
         }
     } // method changeCrlSigner
 
-    Scep changeScep(final String caName, final Boolean active, final String responderType,
-            final String responderConf, final String responderBase64Cert, final String control,
+    Scep changeScep(final String name, final NameId caIdent, final Boolean active,
+            final String responderType, final String responderConf,
+            final String responderBase64Cert, final Set<String> certProfiles, final String control,
             final CaManagerImpl caManager)
             throws CaMgmtException {
-        ParamUtil.requireNonBlank("caName", caName);
+        ParamUtil.requireNonBlank("name", name);
         ParamUtil.requireNonNull("caManager", caManager);
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE SCEP SET ");
 
         AtomicInteger index = new AtomicInteger(1);
+        Integer idxCa = addToSqlIfNotNull(sqlBuilder, index, caIdent, "CA_ID");
         Integer idxActive = addToSqlIfNotNull(sqlBuilder, index, active, "ACTIVE");
         Integer idxType = addToSqlIfNotNull(sqlBuilder, index, responderType, "RESPONDER_TYPE");
         Integer idxCert = addToSqlIfNotNull(sqlBuilder, index, responderBase64Cert,
                 "RESPONDER_CERT");
+        Integer idxProfiles = addToSqlIfNotNull(sqlBuilder, index, certProfiles, "PROFILES");
         Integer idxControl = addToSqlIfNotNull(sqlBuilder, index, control, "CONTROL");
         Integer idxConf = addToSqlIfNotNull(sqlBuilder, index, responderConf, "RESPONDER_CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE CA_ID=?");
+        sqlBuilder.append(" WHERE NAME=?");
 
         if (index.get() == 1) {
             return null;
         }
 
-        ScepEntry dbEntry = getScep(caName);
+        ScepEntry dbEntry = getScep(name, caManager.getIdNameMap());
 
         boolean tmpActive = (active == null) ? dbEntry.isActive() : active;
 
@@ -1847,6 +1964,20 @@ class CaManagerQueryExecutor {
         String tmpResponderBase64Cert = (responderBase64Cert == null)
                 ? dbEntry.getBase64Cert() : responderBase64Cert;
 
+        NameId tmpCaIdent;
+        if (caIdent == null) {
+            tmpCaIdent = dbEntry.getCaIdent();
+        } else {
+            tmpCaIdent = caIdent;
+        }
+
+        Set<String> tmpCertProfiles;
+        if (certProfiles == null) {
+            tmpCertProfiles = dbEntry.getCertProfiles();
+        } else {
+            tmpCertProfiles = certProfiles;
+        }
+
         String tmpControl;
         if (control == null) {
             tmpControl = dbEntry.getControl();
@@ -1858,8 +1989,8 @@ class CaManagerQueryExecutor {
 
         ScepEntry newDbEntry;
         try {
-            newDbEntry = new ScepEntry(caName, tmpActive, tmpResponderType, tmpResponderConf,
-                    tmpResponderBase64Cert, tmpControl);
+            newDbEntry = new ScepEntry(name, tmpCaIdent, tmpActive, tmpResponderType,
+                    tmpResponderConf, tmpResponderBase64Cert, tmpCertProfiles, tmpControl);
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex);
         }
@@ -1873,6 +2004,11 @@ class CaManagerQueryExecutor {
             if (idxActive != null) {
                 setBoolean(ps, idxActive, tmpActive);
                 sb.append("active: '").append(tmpActive).append("'; ");
+            }
+
+            if (idxCa != null) {
+                sb.append("ca: '").append(caIdent).append("'; ");
+                ps.setInt(idxCa, caIdent.getId());
             }
 
             if (idxType != null) {
@@ -1905,20 +2041,25 @@ class CaManagerQueryExecutor {
                 ps.setString(idxCert, txt);
             }
 
+            if (idxProfiles != null) {
+                sb.append("profiles: '").append(certProfiles).append("'; ");
+                ps.setString(idxProfiles, StringUtil.collectionAsString(certProfiles, ","));
+            }
+
             if (idxControl != null) {
                 String txt = getRealString(tmpControl);
                 sb.append("control: '").append(tmpControl);
                 ps.setString(idxControl, txt);
             }
 
-            ps.setInt(index.get(), getCaIdForName(caName));
+            ps.setInt(index.get(), caIdent.getId());
             ps.executeUpdate();
 
             final int sbLen = sb.length();
             if (sbLen > 0) {
                 sb.delete(sbLen - 2, sbLen);
             }
-            LOG.info("changed CMP responder: {}", sb);
+            LOG.info("changed SCEP: {}", sb);
             return scep;
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
@@ -1985,7 +2126,7 @@ class CaManagerQueryExecutor {
             tmpConf = currentDbEntry.getConf();
         }
 
-        PublisherEntry dbEntry = new PublisherEntry(name, tmpType, tmpConf);
+        PublisherEntry dbEntry = new PublisherEntry(currentDbEntry.getIdent(), tmpType, tmpConf);
         IdentifiedX509CertPublisher publisher = caManager.createPublisher(dbEntry);
         if (publisher == null) {
             return null;
@@ -2067,12 +2208,12 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonBlank("profileName", profileName);
         ParamUtil.requireNonBlank("caName", caName);
 
-        final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_ID=? AND PROFILE_NAME=?";
+        final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_ID=? AND PROFILE_ID=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, getCaIdForName(caName));
-            ps.setString(2, profileName);
+            ps.setInt(1, getIdForName("CA", caName));
+            ps.setInt(2, getIdForName("PROFILE", profileName));
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
                 LOG.info("removed profile '{}' from CA '{}'", profileName, caName);
@@ -2086,17 +2227,17 @@ class CaManagerQueryExecutor {
         }
     } // method removeCertprofileFromCa
 
-    boolean removeCmpRequestorFromCa(final String requestorName, final String caName)
+    boolean removeRequestorFromCa(final String requestorName, final String caName)
             throws CaMgmtException {
         ParamUtil.requireNonBlank("requestorName", requestorName);
         ParamUtil.requireNonBlank("caName", caName);
 
-        final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_ID=? AND REQUESTOR_NAME=?";
+        final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_ID=? AND REQUESTOR_ID=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, getCaIdForName(caName));
-            ps.setString(2, requestorName);
+            ps.setInt(1, getIdForName("CA", caName));
+            ps.setInt(2, getIdForName("REQUESTOR", requestorName));
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
                 LOG.info("removed requestor '{}' from CA '{}'", requestorName, caName);
@@ -2114,12 +2255,12 @@ class CaManagerQueryExecutor {
             throws CaMgmtException {
         ParamUtil.requireNonBlank("publisherName", publisherName);
         ParamUtil.requireNonBlank("caName", caName);
-        final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_NAME=?";
+        final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_ID=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, getCaIdForName(caName));
-            ps.setString(2, publisherName);
+            ps.setInt(1, getIdForName("CA", caName));
+            ps.setInt(2, getIdForName("PUBLISHER", publisherName));
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
                 LOG.info("removed publisher '{}' from CA '{}'", publisherName, caName);
@@ -2164,7 +2305,7 @@ class CaManagerQueryExecutor {
         }
     } // method revokeCa
 
-    void addCmpResponder(final CmpResponderEntry dbEntry) throws CaMgmtException {
+    void addResponder(final CmpResponderEntry dbEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
         final String sql = "INSERT INTO RESPONDER (NAME,TYPE,CERT,CONF) VALUES (?,?,?,?)";
 
@@ -2194,7 +2335,7 @@ class CaManagerQueryExecutor {
         }
     } // method addCmpResponder
 
-    boolean unlockCa() throws DataAccessException, CaMgmtException {
+    boolean unlockCa() throws CaMgmtException {
         final String sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'";
         Statement stmt = null;
         try {
@@ -2202,7 +2343,8 @@ class CaManagerQueryExecutor {
             stmt.execute(sql);
             return stmt.getUpdateCount() > 0;
         } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(ex.getMessage(), dex);
         } finally {
             datasource.releaseResources(stmt, null);
         }
@@ -2233,21 +2375,24 @@ class CaManagerQueryExecutor {
 
     boolean addScep(final ScepEntry scepEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("scepEntry", scepEntry);
-        final String sql = "INSERT INTO SCEP (CA_ID,ACTIVE,CONTROL,RESPONDER_TYPE,RESPONDER_CERT"
-                + ",RESPONDER_CONF) VALUES (?,?,?,?,?,?)";
+        final String sql = "INSERT INTO SCEP (NAME,CA_ID,ACTIVE,PROFILES,CONTROL,RESPONDER_TYPE"
+                + ",RESPONDER_CERT,RESPONDER_CONF) VALUES (?,?,?,?,?,?,?,?)";
+
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
             int idx = 1;
-            ps.setInt(idx++, getCaIdForName(scepEntry.getCaName()));
+            ps.setString(idx++, scepEntry.getName());
+            ps.setInt(idx++, scepEntry.getCaIdent().getId());
             setBoolean(ps, idx++, scepEntry.isActive());
+            ps.setString(idx++, StringUtil.collectionAsString(scepEntry.getCertProfiles(), ","));
             ps.setString(idx++, scepEntry.getControl());
             ps.setString(idx++, scepEntry.getResponderType());
             ps.setString(idx++, scepEntry.getBase64Cert());
             ps.setString(idx++, scepEntry.getResponderConf());
 
             ps.executeUpdate();
-            LOG.info("added SCEP '{}': {}", scepEntry.getCaName(), scepEntry);
+            LOG.info("added SCEP '{}': {}", scepEntry.getCaIdent(), scepEntry);
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
             throw new CaMgmtException(dex.getMessage(), dex);
@@ -2260,12 +2405,12 @@ class CaManagerQueryExecutor {
 
     boolean removeScep(final String name) throws CaMgmtException {
         ParamUtil.requireNonNull("name", name);
-        final String sql = "DELETE FROM SCEP WHERE CA_ID=?";
+        final String sql = "DELETE FROM SCEP WHERE NAME=?";
 
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, getCaIdForName(name));
+            ps.setString(1, name);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
             DataAccessException dex = datasource.translate(sql, ex);
@@ -2275,22 +2420,23 @@ class CaManagerQueryExecutor {
         }
     } // method removeScep
 
-    ScepEntry getScep(final String caName) throws CaMgmtException {
-        ParamUtil.requireNonNull("caName", caName);
+    ScepEntry getScep(final String name, final CaIdNameMap idNameMap) throws CaMgmtException {
+        ParamUtil.requireNonBlank("name", name);
         final String sql = sqls.sqlSelectScep;
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
 
-            int idx = 1;
-            ps.setInt(idx++, getCaIdForName(caName));
+            ps.setString(1, name);
             rs = ps.executeQuery();
             if (!rs.next()) {
                 return null;
             }
 
+            int caId = rs.getInt("CA_ID");
             boolean active = rs.getBoolean("ACTIVE");
+            String profilesText = rs.getString("PROFILES");
             String control = rs.getString("CONTROL");
             String type = rs.getString("RESPONDER_TYPE");
             String conf = rs.getString("RESPONDER_CONF");
@@ -2299,7 +2445,10 @@ class CaManagerQueryExecutor {
                 cert = null;
             }
 
-            return new ScepEntry(caName, active, type, conf, cert, control);
+            Set<String> profiles = StringUtil.splitAsSet(profilesText, ", ");
+
+            return new ScepEntry(name, idNameMap.getCa(caId), active, type, conf, cert, profiles,
+                    control);
         } catch (SQLException ex) {
             throw new CaMgmtException(datasource.translate(sql, ex));
         } catch (InvalidConfException ex) {
@@ -2308,6 +2457,264 @@ class CaManagerQueryExecutor {
             datasource.releaseResources(ps, rs);
         }
     } // method getScep
+
+    boolean addUser(final AddUserEntry userEntry) throws CaMgmtException {
+        ParamUtil.requireNonNull("userEntry", userEntry);
+        final String name = userEntry.getIdent().getName();
+        Integer existingId = executeGetUserIdSql(name);
+        if (existingId != null) {
+            throw new CaMgmtException("user named '" + name + " ' already exists");
+        }
+        userEntry.getIdent().setId(existingId);
+
+        String hashedPassword;
+        try {
+            hashedPassword = PasswordHash.createHash(userEntry.getPassword());
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+            throw new CaMgmtException(ex);
+        }
+
+        long id;
+        try {
+            long maxId = datasource.getMax(null, "USERNAME", "ID");
+            id = maxId + 1;
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        }
+
+        final String sql = "INSERT INTO USERNAME (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
+
+        PreparedStatement ps = null;
+
+        try {
+            ps = prepareStatement(sql);
+            int idx = 1;
+            ps.setLong(idx++, id);
+            ps.setString(idx++, name);
+            setBoolean(ps, idx++, userEntry.isActive());
+            ps.setString(idx++, hashedPassword);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } finally {
+            datasource.releaseResources(ps, null);
+        }
+
+        LOG.info("added user '{}'", name);
+
+        return true;
+    } // method addUser
+
+    private Integer executeGetUserIdSql(final String user)
+            throws CaMgmtException {
+        ParamUtil.requireNonBlank("user", user);
+        final String sql = sqls.sqlGetUserId;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        try {
+            ps = prepareStatement(sql);
+
+            int idx = 1;
+            ps.setString(idx++, user);
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                return null;
+            }
+
+            return rs.getInt("ID");
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } finally {
+            datasource.releaseResources(ps, rs);
+        }
+    } // method executeGetUserIdSql
+
+    boolean removeUser(final String userName) throws CaMgmtException {
+        ParamUtil.requireNonBlank("userName", userName);
+        final String sql = "DELETE FROM USERNAME WHERE NAME=?";
+
+        PreparedStatement ps = null;
+        try {
+            ps = prepareStatement(sql);
+            ps.setString(1, userName);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } finally {
+            datasource.releaseResources(ps, null);
+        }
+    } // method removeUser
+
+    boolean changeUser(final ChangeUserEntry userEntry) throws CaMgmtException {
+        String username = userEntry.getIdent().getName();
+
+        Integer existingId = executeGetUserIdSql(username);
+        if (existingId == null) {
+            throw new CaMgmtException("user '" + username + " ' does not exist");
+        }
+        userEntry.getIdent().setId(existingId);
+
+        // TODO: consider the activity
+        String password = userEntry.getPassword();
+
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("UPDATE USERNAME SET ");
+
+        AtomicInteger index = new AtomicInteger(1);
+        Integer idxPassword = null;
+        if (password != null) {
+            idxPassword = index.getAndIncrement();
+            sqlBuilder.append("PASSWORD=?,");
+        }
+
+        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
+        sqlBuilder.append(" WHERE ID=?");
+
+        if (index.get() == 1) {
+            return false;
+        }
+
+        final String sql = sqlBuilder.toString();
+
+        StringBuilder sb = new StringBuilder();
+
+        PreparedStatement ps = null;
+        try {
+            ps = prepareStatement(sql);
+            if (idxPassword != null) {
+                String hashedPassword;
+                try {
+                    hashedPassword = PasswordHash.createHash(password);
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+                    throw new CaMgmtException(ex);
+                }
+                ps.setString(idxPassword, hashedPassword);
+                sb.append("password: ****; ");
+            }
+
+            ps.setLong(index.get(), existingId);
+            ps.executeUpdate();
+
+            if (sb.length() > 0) {
+                sb.deleteCharAt(sb.length() - 1).deleteCharAt(sb.length() - 1);
+            }
+            LOG.info("changed user: {}", sb);
+            return true;
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } finally {
+            datasource.releaseResources(ps, null);
+        }
+    } // method changeUser
+
+    boolean removeUserFromCa(final String userName, final String caName)
+            throws CaMgmtException {
+        Integer id = executeGetUserIdSql(userName);
+        if (id == null) {
+            return false;
+        }
+
+        final String sql = "DELETE FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?";
+        PreparedStatement ps = null;
+        try {
+            ps = prepareStatement(sql);
+            ps.setInt(1, getIdForName("CA", caName));
+            ps.setInt(2, id);
+            boolean bo = ps.executeUpdate() > 0;
+            if (bo) {
+                LOG.info("removed user '{}' from CA '{}'", userName, caName);
+            }
+            return bo;
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } finally {
+            datasource.releaseResources(ps, null);
+        }
+    } // method removeCmpRequestorFromCa
+
+    boolean addUserToCa(final CaHasUserEntry user, final NameId ca)
+            throws CaMgmtException {
+        ParamUtil.requireNonNull("user", user);
+        ParamUtil.requireNonNull("ca", ca);
+
+        final NameId userIdent = user.getUserIdent();
+        Integer existingId = executeGetUserIdSql(userIdent.getName());
+        if (existingId == null) {
+            throw new CaMgmtException("user '" + userIdent.getName() + " ' does not exist");
+        }
+        userIdent.setId(existingId);
+
+        PreparedStatement ps = null;
+        final String sql = "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID,"
+                + " PERMISSIONS,PROFILES) VALUES (?,?,?,?,?)";
+
+        long maxId;
+        try {
+            maxId = datasource.getMax(null, "CA_HAS_USER", "ID");
+        } catch (DataAccessException ex) {
+            throw new CaMgmtException(ex.getMessage(), ex);
+        }
+
+        try {
+            ps = prepareStatement(sql);
+
+            int idx = 1;
+            ps.setLong(idx++, maxId + 1);
+            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, userIdent.getId());
+
+            String permissionText = Permission.toString(user.getPermissions());
+            ps.setString(idx++, permissionText);
+
+            String profilesText = toString(user.getProfiles(), ",");
+            ps.setString(idx++, profilesText);
+
+            int num = ps.executeUpdate();
+            LOG.info("added user '{}' to CA '{}': permission: {}; profile: {}",
+                    userIdent, ca, permissionText, profilesText);
+            return num > 0;
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } finally {
+            datasource.releaseResources(ps, null);
+        }
+    } // method addUserToCa
+
+    UserEntry getUser(final String username) throws CaMgmtException {
+        ParamUtil.requireNonNull("username", username);
+        NameId ident = new NameId(null, username);
+
+        final String sql = sqls.sqlGetUser;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        try {
+            ps = prepareStatement(sql);
+
+            int idx = 1;
+            ps.setString(idx++, ident.getName());
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                return null;
+            }
+
+            int id = rs.getInt("ID");
+            ident.setId(id);
+            boolean active = rs.getBoolean("ACTIVE");
+            String hashedPassword = rs.getString("PASSWORD");
+            return new UserEntry(ident, active, hashedPassword);
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } finally {
+            datasource.releaseResources(ps, rs);
+        }
+    } // method getUser
 
     private static void setBoolean(final PreparedStatement ps, final int index, final boolean bo)
             throws SQLException {
@@ -2324,26 +2731,6 @@ class CaManagerQueryExecutor {
         return index.getAndIncrement();
     }
 
-    private static Set<Permission> getPermissions(final String permissionsText)
-            throws CaMgmtException {
-        ParamUtil.requireNonBlank("permissionsText", permissionsText);
-
-        List<String> strs = StringUtil.split(permissionsText, ", ");
-        Set<Permission> permissions = new HashSet<>();
-        for (String permissionText : strs) {
-            Permission permission = Permission.forValue(permissionText);
-            if (permission == Permission.ALL) {
-                permissions.clear();
-                permissions.add(permission);
-                break;
-            } else {
-                permissions.add(permission);
-            }
-        }
-
-        return permissions;
-    } // method getPermissions
-
     private static String toString(final Collection<String> tokens, final String seperator) {
         return StringUtil.collectionAsString(tokens, seperator);
     }
@@ -2358,16 +2745,17 @@ class CaManagerQueryExecutor {
         return X509Util.canonicalizName(x500Name);
     }
 
-    private int getCaIdForName(final String caName) throws CaMgmtException {
-        final String sql = "SELECT ID FROM CA WHERE NAME=?";
+    private int getIdForName(final String tableName, final String name) throws CaMgmtException {
+        final String sql = "SELECT ID FROM " + tableName + " WHERE NAME=?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             ps = prepareStatement(sql);
-            ps.setString(1, caName.toUpperCase());
+            ps.setString(1, name);
             rs = ps.executeQuery();
             if (!rs.next()) {
-                throw new CaMgmtException("Found no CA '" + caName + "'");
+                throw new CaMgmtException(
+                        "Found no entry named '" + name + "' in table '" + tableName + "'");
             }
 
             return rs.getInt("ID");
@@ -2378,4 +2766,27 @@ class CaManagerQueryExecutor {
             datasource.releaseResources(ps, rs);
         }
     }
+
+    private Map<Integer, String> getIdNameMap(final String tableName) throws CaMgmtException {
+        final String sql = "SELECT ID,NAME FROM " + tableName;
+        Statement ps = null;
+        ResultSet rs = null;
+
+        Map<Integer, String> ret = new HashMap<>();
+        try {
+            ps = createStatement();
+            rs = ps.executeQuery(sql);
+            while (rs.next()) {
+                ret.put(rs.getInt("ID"), rs.getString("NAME"));
+            }
+        } catch (SQLException ex) {
+            DataAccessException dex = datasource.translate(sql, ex);
+            throw new CaMgmtException(dex.getMessage(), dex);
+        } finally {
+            datasource.releaseResources(ps, rs);
+        }
+
+        return ret;
+    }
+
 }

@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.util.X509Util;
+import org.xipki.pki.ca.api.NameId;
 
 /**
  * @author Lijun Liao
@@ -53,15 +54,16 @@ public class CmpRequestorEntry {
 
     private static final Logger LOG = LoggerFactory.getLogger(CmpRequestorEntry.class);
 
-    private final String name;
+    private final NameId ident;
 
     private final String base64Cert;
 
     private X509Certificate cert;
 
-    public CmpRequestorEntry(final String name, final String base64Cert) {
-        this.name = ParamUtil.requireNonBlank("name", name);
-        if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(name)) {
+    public CmpRequestorEntry(final NameId ident, final String base64Cert) {
+        this.ident = ParamUtil.requireNonNull("ident", ident);
+        if (RequestorInfo.NAME_BY_USER.equalsIgnoreCase(ident.getName())
+                || RequestorInfo.NAME_BY_CA.equalsIgnoreCase(ident.getName())) {
             throw new IllegalArgumentException("Requestor name could not be "
                     + RequestorInfo.NAME_BY_USER);
         }
@@ -70,12 +72,13 @@ public class CmpRequestorEntry {
         try {
             this.cert = X509Util.parseBase64EncodedCert(base64Cert);
         } catch (Throwable th) {
-            LogUtil.error(LOG, th, "could not parse the certificate for requestor '" + name + "'");
+            LogUtil.error(LOG, th,
+                    "could not parse the certificate for requestor '" + ident + "'");
         }
     }
 
-    public String getName() {
-        return name;
+    public NameId getIdent() {
+        return ident;
     }
 
     public String getBase64Cert() {
@@ -93,7 +96,8 @@ public class CmpRequestorEntry {
 
     public String toString(final boolean verbose) {
         StringBuilder sb = new StringBuilder(500);
-        sb.append("name: ").append(name).append('\n');
+        sb.append("id: ").append(ident.getId()).append('\n');
+        sb.append("name: ").append(ident.getName()).append('\n');
         sb.append("faulty: ").append(cert == null).append('\n');
 
         if (cert != null) {
@@ -127,7 +131,7 @@ public class CmpRequestorEntry {
         }
 
         CmpRequestorEntry objB = (CmpRequestorEntry) obj;
-        if (!name.equals(objB.name)) {
+        if (!ident.equals(objB.ident)) {
             return false;
         }
 
@@ -139,7 +143,7 @@ public class CmpRequestorEntry {
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return ident.hashCode();
     }
 
 }

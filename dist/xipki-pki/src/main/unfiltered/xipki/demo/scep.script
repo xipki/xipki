@@ -1,4 +1,4 @@
-SCEP_URL = http://localhost:8080/scep/SubCAwithCRL/OCSP/pkiclient.exe
+SCEP_URL = http://localhost:8080/scep/SCEP1/OCSP/pkiclient.exe
 
 echo "#################################################################"
 echo "#               Enroll Certificate via SCEP                     #"

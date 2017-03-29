@@ -34,16 +34,12 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.ChangeUserEntry;
-import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -73,17 +69,6 @@ public class UserUpdateCmd extends CaCommandSupport {
             description = "user password, 'CONSOLE' to read from console")
     private String password;
 
-    @Option(name = "--profile",
-            required = true, multiValued = true,
-            description = "profile name\n"
-                    + "(required, multi-valued)")
-    @Completion(ProfileNameCompleter.class)
-    private Set<String> profiles;
-
-    @Option(name = "--cn-regex",
-            description = "regex for the permitted common name, 'NULL' for empty password")
-    private String cnRegex;
-
     @Override
     protected Object doExecute() throws Exception {
         Boolean realActive;
@@ -99,7 +84,7 @@ public class UserUpdateCmd extends CaCommandSupport {
             realActive = null;
         }
 
-        ChangeUserEntry entry = new ChangeUserEntry(name);
+        ChangeUserEntry entry = new ChangeUserEntry(new NameId(null, name));
         if (realActive != null) {
             entry.setActive(realActive);
         }
@@ -110,14 +95,6 @@ public class UserUpdateCmd extends CaCommandSupport {
 
         if (password != null) {
             entry.setPassword(password);
-        }
-
-        if (cnRegex != null) {
-            entry.setCnRegex(cnRegex);
-        }
-
-        if (CollectionUtil.isNonEmpty(profiles)) {
-            entry.setProfiles(profiles);
         }
 
         boolean bo = caManager.changeUser(entry);

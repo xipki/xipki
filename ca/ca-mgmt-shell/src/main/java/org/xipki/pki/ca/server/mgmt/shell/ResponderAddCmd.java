@@ -72,6 +72,7 @@ public class ResponderAddCmd extends CaCommandSupport {
     private String signerType;
 
     @Option(name = "--signer-conf",
+            required = true,
             description = "conf of the responder signer")
     private String signerConf;
 
@@ -98,7 +99,7 @@ public class ResponderAddCmd extends CaCommandSupport {
         }
         CmpResponderEntry entry = new CmpResponderEntry(name, signerType, signerConf, base64Cert);
 
-        boolean bo = caManager.addCmpResponder(entry);
+        boolean bo = caManager.addResponder(entry);
         output(bo, "added", "could not add", "CMP responder " + name);
         return null;
     }

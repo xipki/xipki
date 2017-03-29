@@ -52,6 +52,7 @@ import org.xipki.commons.common.QueueEntry;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.X509Cert;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
@@ -92,7 +93,7 @@ class CertRepublisher {
             try {
                 List<SerialWithId> serials;
                 do {
-                    serials = certstore.getCertSerials(caCert, startId, numEntries,
+                    serials = certstore.getCertSerials(ca, startId, numEntries,
                             onlyRevokedCerts);
                     long maxId = 1;
                     for (SerialWithId sid : serials) {
@@ -160,7 +161,8 @@ class CertRepublisher {
                 X509CertificateInfo certInfo;
 
                 try {
-                    certInfo = certstore.getCertificateInfoForId(caCert, sid.getId());
+                    certInfo = certstore.getCertificateInfoForId(ca, caCert, sid.getId(),
+                            caIdNameMap);
                 } catch (OperationException | CertificateException ex) {
                     LogUtil.error(LOG, ex);
                     failed = true;
@@ -176,7 +178,8 @@ class CertRepublisher {
                     boolean successful = publisher.certificateAdded(certInfo);
                     if (!successful) {
                         LOG.error("republish certificate serial={} to publisher {} failed",
-                                LogUtil.formatCsn(sid.getSerial()), publisher.getName());
+                                LogUtil.formatCsn(sid.getSerial()),
+                                publisher.getIdent());
                         allSucc = false;
                     }
                 }
@@ -192,7 +195,11 @@ class CertRepublisher {
 
     private static final Logger LOG = LoggerFactory.getLogger(CertRepublisher.class);
 
+    private final NameId ca;
+
     private final X509Cert caCert;
+
+    private final CaIdNameMap caIdNameMap;
 
     private final CertificateStore certstore;
 
@@ -208,10 +215,12 @@ class CertRepublisher {
 
     private ProcessLog processLog;
 
-    CertRepublisher(final X509Cert caCert, final CertificateStore certstore,
-            final List<IdentifiedX509CertPublisher> publishers, final boolean onlyRevokedCerts,
-            final int numThreads) {
+    CertRepublisher(final NameId ca, final X509Cert caCert, final CaIdNameMap caIdNameMap,
+            final CertificateStore certstore, final List<IdentifiedX509CertPublisher> publishers,
+            final boolean onlyRevokedCerts, final int numThreads) {
+        this.ca = ParamUtil.requireNonNull("ca", ca);
         this.caCert = ParamUtil.requireNonNull("caCert", caCert);
+        this.caIdNameMap = ParamUtil.requireNonNull("caIdNameMap", caIdNameMap);
         this.certstore = ParamUtil.requireNonNull("certstore", certstore);
         this.publishers = ParamUtil.requireNonEmpty("publishers", publishers);
         this.onlyRevokedCerts = onlyRevokedCerts;
@@ -232,7 +241,7 @@ class CertRepublisher {
     private boolean doRepublish() {
         long total;
         try {
-            total = certstore.getCountOfCerts(caCert, onlyRevokedCerts);
+            total = certstore.getCountOfCerts(ca, onlyRevokedCerts);
         } catch (OperationException ex) {
             LogUtil.error(LOG, ex, "could not getCountOfCerts");
             return false;

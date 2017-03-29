@@ -21,7 +21,7 @@
           <expirationPeriod>365</expirationPeriod>
           <keepExpiredCertDays>-1</keepExpiredCertDays>
           <permissions>
-            <str>all</str>
+            <str>ALL</str>
           </permissions>
           <maxValidity>8000y</maxValidity>
           <responderName>responder1</responderName>
@@ -58,10 +58,10 @@
           <requestorName>requestor1</requestorName>
           <ra>true</ra>
           <permissions>
-            <str>all</str>
+            <str>ALL</str>
           </permissions>
           <profiles>
-            <str>all</str>
+            <str>ALL</str>
           </profiles>
         </requestor>
       </requestors>

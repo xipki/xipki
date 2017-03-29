@@ -48,6 +48,6 @@ public class ResponderNameCompleter extends MgmtNameCompleter {
 
     @Override
     protected Set<String> getEnums() {
-        return caManager.getCmpResponderNames();
+        return caManager.getResponderNames();
     }
 }

@@ -245,7 +245,7 @@ class X509SelfSignedCertBuilder {
             subjectInfo = certprofile.getSubject(requestedSubject);
         } catch (CertprofileException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                    "exception in cert profile " + certprofile.getName());
+                    "exception in cert profile " + certprofile.getIdent());
         } catch (BadCertTemplateException ex) {
             LOG.warn("certprofile.getSubject", ex);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
@@ -259,7 +259,7 @@ class X509SelfSignedCertBuilder {
         CertValidity validity = certprofile.getValidity();
         if (validity == null) {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-                    "no validity specified in the profile " + certprofile.getName());
+                    "no validity specified in the profile " + certprofile.getIdent());
         }
 
         Date notAfter = validity.add(notBefore);

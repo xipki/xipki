@@ -34,33 +34,28 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
-import java.util.Set;
-
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.api.NameId;
 
 /**
  * @author Lijun Liao
- * @since 2.1.1
+ * @since 2.2.0
  */
 
 public class ChangeUserEntry {
 
-    private final String name;
+    private final NameId ident;
 
     private Boolean active;
 
-    private Set<String> profiles;
-
     private String password;
 
-    private String cnRegex;
-
-    public ChangeUserEntry(final String name) throws CaMgmtException {
-        this.name = ParamUtil.requireNonBlank("name", name);
+    public ChangeUserEntry(final NameId ident) throws CaMgmtException {
+        this.ident = ParamUtil.requireNonNull("ident", ident);
     }
 
-    public String getName() {
-        return name;
+    public NameId getIdent() {
+        return ident;
     }
 
     public Boolean isActive() {
@@ -77,22 +72,6 @@ public class ChangeUserEntry {
 
     public String getPassword() {
         return password;
-    }
-
-    public void setCnRegex(final String cnRegex) {
-        this.cnRegex = cnRegex;
-    }
-
-    public String getCnRegex() {
-        return cnRegex;
-    }
-
-    public void setProfiles(final Set<String> profiles) {
-        this.profiles = profiles;
-    }
-
-    public Set<String> getProfiles() {
-        return profiles;
     }
 
 }

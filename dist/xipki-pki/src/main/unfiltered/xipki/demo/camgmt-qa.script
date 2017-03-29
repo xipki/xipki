@@ -382,7 +382,7 @@ if { $printUsage equals "true" } {
 
   xipki-caqa:ca-check \
     --name SUBCA1.COMPLEX-NAME \
-    --permission all \
+    --permission ALL \
     --max-validity 5y \
     --sn-bitlen 63  \
     --signer-type $TOKEN_TYPE \
@@ -394,7 +394,7 @@ if { $printUsage equals "true" } {
     --duplicate-key yes
 
   xipki-caqa:ca-check --name RCA1 \
-    --permission all \
+    --permission ALL \
     --max-validity 10y \
     --sn-bitlen 63  \
     --signer-type $TOKEN_TYPE \
@@ -454,7 +454,7 @@ if { $printUsage equals "true" } {
     --csr output/RCA1.csr \
     --profile RCA \
     --out output/RCA1-2.der \
-    --permission all \
+    --permission ALL \
     --sn-bitlen 63  \
     --next-crl-no 2 \
     --max-validity 10y \
@@ -475,7 +475,7 @@ if { $printUsage equals "true" } {
 
   xipki-caqa:neg-ca-add \
     --name RCA2 \
-    --permission all \
+    --permission ALL \
     --sn-bitlen 63  \
     --next-crl-no 2 \
     --max-validity 10y \
@@ -495,7 +495,7 @@ if { $printUsage equals "true" } {
 
   xipki-caqa:neg-ca-add \
     --name RCA2 \
-    --permission all \
+    --permission ALL \
     --sn-bitlen 63  \
     --next-crl-no 2 \
     --max-validity 10y \
@@ -515,7 +515,7 @@ if { $printUsage equals "true" } {
 
   xipki-caqa:neg-ca-add \
     --name RCA2 \
-    --permission all \
+    --permission ALL \
     --sn-bitlen 63  \
     --next-crl-no 2 \
     --max-validity 10y \
@@ -536,7 +536,7 @@ if { $printUsage equals "true" } {
 
   xipki-caqa:neg-ca-add \
     --name RCA2 \
-    --permission all \
+    --permission ALL \
     --sn-bitlen 63  \
     --next-crl-no 2 \
     --max-validity 10y \
@@ -654,8 +654,8 @@ if { $printUsage equals "true" } {
     --ca RCA1 \
     --requestor requestor1 \
     --ra yes \
-    --permission all \
-    --profile all
+    --permission ALL \
+    --profile ALL
 
   xipki-ca:careq-rm \
     --ca RCA1 \
@@ -680,8 +680,8 @@ if { $printUsage equals "true" } {
   xipki-caqa:neg-careq-add \
     --ca RCA10 \
     --requestor REQUESTOR-DUMMY \
-    --permission all \
-    --profile all
+    --permission ALL \
+    --profile ALL
 
   # CA name does not exist
   xipki-caqa:neg-careq-rm \
@@ -692,8 +692,8 @@ if { $printUsage equals "true" } {
   xipki-caqa:neg-careq-add \
     --ca RCA1 \
     --requestor REQUESTOR-DUMMY \
-    --permission all \
-    --profile all
+    --permission ALL \
+    --profile ALL
 
   # Requestor name does not exist
   xipki-caqa:neg-careq-rm \
@@ -704,8 +704,8 @@ if { $printUsage equals "true" } {
   xipki-caqa:neg-careq-add \
     --ca RCA1 \
     --requestor REQUESTOR-DUMMY \
-    --permission all \
-    --profile all
+    --permission ALL \
+    --profile ALL
 
   ## Positive CA demo script
 
@@ -763,9 +763,9 @@ if { $printUsage equals "true" } {
   xipki-ca:careq-add \
     --requestor requestor1 \
     --ca RCA1 \
-    --profile all \
+    --profile ALL \
     --ra yes \
-    --permission all
+    --permission ALL
 
   ##### clear-publishqueue #####
 
@@ -774,8 +774,8 @@ if { $printUsage equals "true" } {
     --publisher OCSP.PUBLISHER
 
   xipki-ca:clear-publishqueue \
-    --ca all \
-    --publisher all
+    --ca ALL \
+    --publisher ALL
 
   ##### cmpcontrol #####
 
@@ -983,7 +983,7 @@ if { $printUsage equals "true" } {
 
   xipki-ca:ca-up \
     --name RCA1 \
-    --permission all \
+    --permission ALL \
     --max-validity 10y \
     --signer-conf $CA_SIGNER_CONF_RCA \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \

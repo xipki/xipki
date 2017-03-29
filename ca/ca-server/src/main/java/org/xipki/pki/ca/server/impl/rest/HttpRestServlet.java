@@ -47,7 +47,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.bouncycastle.asn1.x509.CertificateList;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.audit.AuditEvent;
@@ -62,16 +68,23 @@ import org.xipki.commons.common.util.RandomUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.CrlReason;
 import org.xipki.commons.security.X509Cert;
+import org.xipki.pki.ca.api.InsuffientPermissionException;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.RestfulAPIConstants;
+import org.xipki.pki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.CaAuditConstants;
+import org.xipki.pki.ca.server.impl.CertTemplateData;
 import org.xipki.pki.ca.server.impl.ClientCertCache;
 import org.xipki.pki.ca.server.impl.HttpRespAuditException;
-import org.xipki.pki.ca.server.impl.cmp.CmpRequestorInfo;
+import org.xipki.pki.ca.server.impl.X509Ca;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderManager;
-import org.xipki.pki.ca.server.impl.cmp.X509CaCmpResponder;
+import org.xipki.pki.ca.server.impl.util.CaUtil;
+import org.xipki.pki.ca.server.mgmt.api.CaStatus;
+import org.xipki.pki.ca.server.mgmt.api.Permission;
+import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 /**
  * @author Lijun Liao
@@ -107,8 +120,6 @@ public class HttpRestServlet extends HttpServlet {
     private void doService(final boolean perRequest, final HttpServletRequest request,
             final HttpServletResponse response)
             throws ServletException, IOException {
-        X509Certificate clientCert = ClientCertCache.getTlsClientCert(request,sslCertInHttpHeader);
-
         AuditService auditService = auditServiceRegister.getAuditService();
         AuditEvent event = new AuditEvent(new Date());
         event.setApplicationName(CaAuditConstants.APPNAME);
@@ -122,11 +133,6 @@ public class HttpRestServlet extends HttpServlet {
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
         String auditMessage = null;
         try {
-            if (clientCert == null) {
-                throw new HttpRespAuditException(HttpServletResponse.SC_UNAUTHORIZED,
-                        null, "no client certificate", AuditLevel.INFO, AuditStatus.FAILED);
-            }
-
             if (responderManager == null) {
                 String message = "responderManager in servlet not configured";
                 LOG.error(message);
@@ -140,7 +146,7 @@ public class HttpRestServlet extends HttpServlet {
             String caName = null;
             String command = null;
 
-            X509CaCmpResponder responder = null;
+            X509Ca ca = null;
             int len = servletPath.length();
             if (requestUri.length() > len + 1) {
                 String coreUri = URLDecoder.decode(requestUri.substring(len + 1), "UTF-8");
@@ -160,14 +166,14 @@ public class HttpRestServlet extends HttpServlet {
                     caName = caAlias;
                 }
                 caName = caName.toUpperCase();
-                responder = responderManager.getX509CaCmpResponder(caName);
+                ca = responderManager.getX509CaResponder(caName).getCa();
             }
 
-            if (caName == null || responder == null || !responder.isInService()) {
+            if (caName == null || ca == null || ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
                 String message;
                 if (caName == null) {
                     message = "no CA is specified";
-                } else if (responder == null) {
+                } else if (ca == null) {
                     message = "unknown CA '" + caName + "'";
                 } else {
                     message = "CA '" + caName + "' is out of service";
@@ -177,28 +183,83 @@ public class HttpRestServlet extends HttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            event.addEventData(CaAuditConstants.NAME_CA, responder.getCa().getCaName());
+            event.addEventData(CaAuditConstants.NAME_CA, ca.getCaIdent().getName());
             event.addEventType(command);
 
-            CmpRequestorInfo requestor = responder.getRequestor(clientCert);
+            RequestorInfo requestor;
+            // Retrieve the user:password
+            String hdrValue = request.getHeader("Authorization");
+            if (hdrValue != null && hdrValue.startsWith("Basic ")) {
+                String user = null;
+                byte[] password = null;
+                if (hdrValue.length() > 6) {
+                    String b64 = hdrValue.substring(6);
+                    byte[] userPwd = Base64.decode(b64);
+                    int idx = -1;
+                    for (int i = 0; i < userPwd.length; i++) {
+                        if (userPwd[i] == ':') {
+                            idx = i;
+                            break;
+                        }
+                    }
+
+                    if (idx != -1 && idx < userPwd.length - 1) {
+                        user = new String(Arrays.copyOfRange(userPwd, 0, idx));
+                        password = Arrays.copyOfRange(userPwd, idx + 1, userPwd.length);
+                    }
+                }
+
+                if (user == null) {
+                    throw new HttpRespAuditException(HttpServletResponse.SC_UNAUTHORIZED,
+                            "invalid Authorization information",
+                            AuditLevel.INFO, AuditStatus.FAILED);
+                }
+                NameId userIdent = ca.authenticateUser(user, password);
+                if (userIdent == null) {
+                    throw new HttpRespAuditException(HttpServletResponse.SC_UNAUTHORIZED,
+                            "could not authencate user", AuditLevel.INFO, AuditStatus.FAILED);
+                }
+                requestor = ca.getByUserRequestor(userIdent);
+            } else {
+                X509Certificate clientCert = ClientCertCache.getTlsClientCert(request,
+                        sslCertInHttpHeader);
+                if (clientCert == null) {
+                    throw new HttpRespAuditException(HttpServletResponse.SC_UNAUTHORIZED,
+                            null, "no client certificate", AuditLevel.INFO, AuditStatus.FAILED);
+                }
+                requestor = ca.getRequestor(clientCert);
+            }
+
             if (requestor == null) {
                 throw new OperationException(ErrorCode.NOT_PERMITTED, "no requestor specified");
             }
 
-            event.addEventData(CaAuditConstants.NAME_requestor, requestor.getName());
+            event.addEventData(CaAuditConstants.NAME_requestor, requestor.getIdent().getName());
 
             String respCt = null;
             byte[] respBytes = null;
 
             if (RestfulAPIConstants.CMD_cacert.equalsIgnoreCase(command)) {
                 respCt = RestfulAPIConstants.CT_pkix_cert;
-                respBytes = responder.getCa().getCaInfo().getCertificate().getEncodedCert();
+                respBytes = ca.getCaInfo().getCertificate().getEncodedCert();
             } else if (RestfulAPIConstants.CMD_enroll_cert.equalsIgnoreCase(command)) {
                 String profile = request.getParameter(RestfulAPIConstants.PARAM_profile);
                 if (StringUtil.isBlank(profile)) {
                     throw new HttpRespAuditException(HttpServletResponse.SC_BAD_REQUEST, null,
                             "required parameter " + RestfulAPIConstants.PARAM_profile
                             + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
+                }
+                profile = profile.toUpperCase();
+
+                try {
+                    requestor.assertPermitted(Permission.ENROLL_CERT);
+                } catch (InsuffientPermissionException ex) {
+                    throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
+                }
+
+                if (!requestor.isCertProfilePermitted(profile)) {
+                    throw new OperationException(ErrorCode.NOT_PERMITTED,
+                            "certProfile " + profile + " is not allowed");
                 }
 
                 String ct = request.getContentType();
@@ -218,8 +279,27 @@ public class HttpRestServlet extends HttpServlet {
 
                 byte[] encodedCsr = IoUtil.read(request.getInputStream());
 
-                X509Cert cert = responder.generateCert(requestor, encodedCsr, profile, notBefore,
-                        notAfter, RequestType.REST, msgId);
+                CertificationRequest csr = CertificationRequest.getInstance(encodedCsr);
+                ca.checkCsr(csr);
+
+                CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
+
+                X500Name subject = certTemp.getSubject();
+                SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
+
+                Extensions extensions = CaUtil.getExtensions(certTemp);
+                CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
+                        notBefore, notAfter, extensions, profile);
+
+                X509CertificateInfo certInfo = ca.generateCertificate(certTemplate,
+                        requestor, RequestType.REST, null, msgId);
+
+                if (ca.getCaInfo().isSaveRequest()) {
+                    long dbId = ca.addRequest(encodedCsr);
+                    ca.addRequestCert(dbId, certInfo.getCert().getCertId());
+                }
+
+                X509Cert cert = certInfo.getCert();
                 if (cert == null) {
                     String message = "could not generate certificate";
                     LOG.warn(message);
@@ -230,6 +310,18 @@ public class HttpRestServlet extends HttpServlet {
                 respBytes = cert.getEncodedCert();
             } else if (RestfulAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)
                     || RestfulAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
+                Permission permission;
+                if (RestfulAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)) {
+                    permission = Permission.REVOKE_CERT;
+                } else {
+                    permission = Permission.REMOVE_CERT;
+                }
+                try {
+                    requestor.assertPermitted(permission);
+                } catch (InsuffientPermissionException ex) {
+                    throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
+                }
+
                 String strCaSha1 = request.getParameter(RestfulAPIConstants.PARAM_ca_sha1);
                 if (StringUtil.isBlank(strCaSha1)) {
                     throw new HttpRespAuditException(HttpServletResponse.SC_BAD_REQUEST, null,
@@ -245,7 +337,7 @@ public class HttpRestServlet extends HttpServlet {
                              + " not specified", AuditLevel.INFO, AuditStatus.FAILED);
                 }
 
-                if (!strCaSha1.equalsIgnoreCase(responder.getCa().getHexSha1OfCert())) {
+                if (!strCaSha1.equalsIgnoreCase(ca.getHexSha1OfCert())) {
                     throw new HttpRespAuditException(HttpServletResponse.SC_BAD_REQUEST, null,
                             "unknown " + RestfulAPIConstants.PARAM_ca_sha1,
                             AuditLevel.INFO, AuditStatus.FAILED);
@@ -265,12 +357,17 @@ public class HttpRestServlet extends HttpServlet {
                         invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
                     }
 
-                    responder.revokeCert(requestor, serialNumber, reason, invalidityTime,
-                            RequestType.REST, msgId);
+                    ca.revokeCertificate(serialNumber, reason, invalidityTime, msgId);
                 } else if (RestfulAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
-                    responder.removeCert(requestor, serialNumber, RequestType.REST, msgId);
+                    ca.removeCertificate(serialNumber, msgId);
                 }
             } else if (RestfulAPIConstants.CMD_crl.equalsIgnoreCase(command)) {
+                try {
+                    requestor.assertPermitted(Permission.GET_CRL);
+                } catch (InsuffientPermissionException ex) {
+                    throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
+                }
+
                 String strCrlNumber = request.getParameter(RestfulAPIConstants.PARAM_crl_number);
                 BigInteger crlNumber = null;
                 if (StringUtil.isNotBlank(strCrlNumber)) {
@@ -284,7 +381,7 @@ public class HttpRestServlet extends HttpServlet {
                     }
                 }
 
-                CertificateList crl = responder.getCrl(requestor, crlNumber);
+                X509CRL crl = ca.getCrl(crlNumber);
                 if (crl == null) {
                     String message = "could not get CRL";
                     LOG.warn(message);
@@ -295,7 +392,13 @@ public class HttpRestServlet extends HttpServlet {
                 respCt = RestfulAPIConstants.CT_pkix_crl;
                 respBytes = crl.getEncoded();
             } else if (RestfulAPIConstants.CMD_new_crl.equalsIgnoreCase(command)) {
-                X509CRL crl = responder.generateCrlOnDemand(requestor, RequestType.REST, msgId);
+                try {
+                    requestor.assertPermitted(Permission.GEN_CRL);
+                } catch (InsuffientPermissionException ex) {
+                    throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
+                }
+
+                X509CRL crl = ca.generateCrlOnDemand(msgId);
                 if (crl == null) {
                     String message = "could not generate CRL";
                     LOG.warn(message);

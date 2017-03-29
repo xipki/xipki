@@ -48,6 +48,7 @@ import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.profile.CertValidity;
 
 /**
@@ -57,9 +58,7 @@ import org.xipki.pki.ca.api.profile.CertValidity;
 
 public class CaEntry {
 
-    private Integer id;
-
-    private String name;
+    private NameId ident;
 
     private CaStatus status;
 
@@ -89,12 +88,12 @@ public class CaEntry {
 
     private String extraControl;
 
-    public CaEntry(final String name, final String signerType, final String signerConf,
+    public CaEntry(final NameId ident, final String signerType, final String signerConf,
             final int expirationPeriod) throws CaMgmtException {
-        this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
+        this.ident = ParamUtil.requireNonNull("ident", ident);
         this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
         this.expirationPeriod = ParamUtil.requireMin("expirationPeriod", expirationPeriod, 0);
-        this.signerConf = signerConf;
+        this.signerConf = ParamUtil.requireNonBlank("signerConf", signerConf);
     }
 
     public static List<String[]> splitCaSignerConfs(final String conf) throws XiSecurityException {
@@ -120,16 +119,8 @@ public class CaEntry {
         return signerConfs;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
+    public NameId getIdent() {
+        return ident;
     }
 
     public CertValidity getMaxValidity() {
@@ -165,7 +156,7 @@ public class CaEntry {
     }
 
     public void setCmpControlName(final String cmpControlName) {
-        this.cmpControlName = cmpControlName;
+        this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toUpperCase();
     }
 
     public String getCmpControlName() {
@@ -177,7 +168,7 @@ public class CaEntry {
     }
 
     public void setResponderName(final String responderName) {
-        this.responderName = responderName;
+        this.responderName = (responderName == null) ? null : responderName.toUpperCase();
     }
 
     public boolean isDuplicateKeyPermitted() {
@@ -247,8 +238,8 @@ public class CaEntry {
 
     public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(500);
-        sb.append("id: ").append(id).append('\n');
-        sb.append("name: ").append(name).append('\n');
+        sb.append("id: ").append(ident.getId()).append('\n');
+        sb.append("name: ").append(ident.getName()).append('\n');
         sb.append("status: ").append((status == null) ? "null" : status.getStatus()).append('\n');
         sb.append("maxValidity: ").append(maxValidity).append("\n");
         sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
@@ -304,7 +295,7 @@ public class CaEntry {
         }
 
         CaEntry objB = (CaEntry) obj;
-        if (!name.equals(objB.name)) {
+        if (!ident.equals(objB.ident)) {
             return false;
         }
 
@@ -365,7 +356,7 @@ public class CaEntry {
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return ident.hashCode();
     }
 
 }

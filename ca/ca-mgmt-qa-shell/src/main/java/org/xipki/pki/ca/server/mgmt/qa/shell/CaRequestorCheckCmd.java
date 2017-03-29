@@ -92,7 +92,7 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
 
     @Option(name = "--profile",
             multiValued = true,
-            description = "profile name or 'all' for all profiles\n"
+            description = "profile name or 'ALL' for all profiles\n"
                     + "(multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
@@ -105,10 +105,10 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
             throw new UnexpectedException("could not find CA '" + caName + "'");
         }
 
-        Set<CaHasRequestorEntry> entries = caManager.getCmpRequestorsForCa(caName);
+        Set<CaHasRequestorEntry> entries = caManager.getRequestorsForCa(caName);
         CaHasRequestorEntry entry = null;
         for (CaHasRequestorEntry m : entries) {
-            if (m.getRequestorName().equals(requestorName)) {
+            if (m.getRequestorIdent().getName().equals(requestorName)) {
                 entry = m;
                 break;
             }

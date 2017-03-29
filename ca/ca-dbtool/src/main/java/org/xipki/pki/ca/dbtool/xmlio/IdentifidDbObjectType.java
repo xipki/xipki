@@ -43,6 +43,8 @@ public abstract class IdentifidDbObjectType extends DbDataObject {
 
     public static final String TAG_ID = "id";
 
+    public static final String TAG_FILE = "file";
+
     private Long id;
 
     public Long getId() {
@@ -55,7 +57,7 @@ public abstract class IdentifidDbObjectType extends DbDataObject {
 
     @Override
     public void validate() throws InvalidDataObjectException {
-        assertNotNull("id", id);
+        assertNotNull(TAG_ID, id);
     }
 
 }

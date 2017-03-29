@@ -136,7 +136,7 @@ class CaConf {
 
     public boolean supportsProfile(final String profileName) {
         ParamUtil.requireNonNull("profileName", profileName);
-        return profiles.containsKey(profileName);
+        return profiles.containsKey(profileName.toUpperCase());
     }
 
     public CertprofileInfo getProfile(final String profileName) {

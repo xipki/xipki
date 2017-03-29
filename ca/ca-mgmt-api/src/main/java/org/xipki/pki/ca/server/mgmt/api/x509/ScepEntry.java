@@ -36,16 +36,19 @@ package org.xipki.pki.ca.server.mgmt.api.x509;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.commons.security.util.X509Util;
+import org.xipki.pki.ca.api.NameId;
 
 /**
  * @author Lijun Liao
@@ -56,9 +59,13 @@ public class ScepEntry {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScepEntry.class);
 
-    private final String caName;
+    private final String name;
+
+    private final NameId caIdent;
 
     private final boolean active;
+
+    private final Set<String> certProfiles;
 
     private final String control;
 
@@ -74,12 +81,16 @@ public class ScepEntry {
 
     private boolean confFaulty;
 
-    public ScepEntry(final String caName, final boolean active, final String responderType,
-            final String responderConf, final String base64Cert, final String control)
+    public ScepEntry(final String name, final NameId caIdent, final boolean active,
+            final String responderType, final String responderConf, final String base64Cert,
+            final Set<String> certProfiles, final String control)
             throws InvalidConfException {
-        this.caName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
+        this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
+        this.caIdent = ParamUtil.requireNonNull("caIdent", caIdent);
         this.active = active;
         this.responderType = ParamUtil.requireNonBlank("responderType", responderType);
+        this.certProfiles = CollectionUtil.unmodifiableSet(
+                CollectionUtil.toUpperCaseSet(certProfiles));
         this.base64Cert = base64Cert;
         this.responderConf = responderConf;
         this.control = control;
@@ -89,10 +100,14 @@ public class ScepEntry {
                 this.certificate = X509Util.parseBase64EncodedCert(base64Cert);
             } catch (Throwable th) {
                 LOG.debug("could not parse the certificate of SCEP responder for CA '"
-                        + caName + "'");
+                        + caIdent + "'");
                 certFaulty = true;
             }
         }
+    }
+
+    public String getName() {
+        return name;
     }
 
     public boolean isActive() {
@@ -105,6 +120,10 @@ public class ScepEntry {
 
     public String getBase64Cert() {
         return base64Cert;
+    }
+
+    public Set<String> getCertProfiles() {
+        return certProfiles;
     }
 
     public String getControl() {
@@ -127,8 +146,8 @@ public class ScepEntry {
         this.confFaulty = faulty;
     }
 
-    public String getCaName() {
-        return caName;
+    public NameId getCaIdent() {
+        return caIdent;
     }
 
     public void setCertificate(final X509Certificate certificate) {
@@ -149,7 +168,7 @@ public class ScepEntry {
 
     public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(100);
-        sb.append("caName: ").append(caName).append('\n');
+        sb.append("ca: ").append(caIdent).append('\n');
         sb.append("active: ").append(active).append('\n');
         sb.append("faulty: ").append(isFaulty()).append('\n');
         sb.append("responderType: ").append(responderType).append('\n');
@@ -192,7 +211,7 @@ public class ScepEntry {
         }
 
         ScepEntry objB = (ScepEntry) obj;
-        if (!caName.equals(objB.caName)) {
+        if (!caIdent.equals(objB.caIdent)) {
             return false;
         }
 
@@ -221,7 +240,7 @@ public class ScepEntry {
 
     @Override
     public int hashCode() {
-        return caName.hashCode();
+        return caIdent.hashCode();
     }
 
 }

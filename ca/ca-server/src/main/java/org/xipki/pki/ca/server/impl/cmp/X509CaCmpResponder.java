@@ -125,7 +125,6 @@ import org.xipki.commons.security.AlgorithmValidator;
 import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.CrlReason;
 import org.xipki.commons.security.ObjectIdentifiers;
-import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.XiSecurityConstants;
 import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.pki.ca.api.InsuffientPermissionException;
@@ -177,7 +176,7 @@ public class X509CaCmpResponder extends CmpResponder {
                             invalidityDate, CaAuditConstants.MSGID_CA_routine);
                 } catch (Throwable th) {
                     LOG.error("could not revoke certificate (CA={}, serialNumber={}): {}",
-                            ca.getCaInfo().getName(), LogUtil.formatCsn(serialNumber),
+                            ca.getCaInfo().getIdent(), LogUtil.formatCsn(serialNumber),
                             th.getMessage());
                 }
             }
@@ -264,7 +263,7 @@ public class X509CaCmpResponder extends CmpResponder {
         }
 
         CmpRequestorInfo tmpRequestor = (CmpRequestorInfo) requestor;
-        event.addEventData(CaAuditConstants.NAME_requestor, tmpRequestor.getName());
+        event.addEventData(CaAuditConstants.NAME_requestor, tmpRequestor.getIdent().getName());
 
         PKIHeader reqHeader = message.getHeader();
         PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
@@ -442,8 +441,9 @@ public class X509CaCmpResponder extends CmpResponder {
                         PKIFailureInfo.badCertTemplate, msg));
                 continue;
             }
+            certprofileName = certprofileName.toUpperCase();
 
-            if (!isCertProfilePermitted(tmpRequestor, certprofileName)) {
+            if (!tmpRequestor.isCertProfilePermitted(certprofileName)) {
                 String msg = "certprofile " + certprofileName + " is not allowed";
                 certResponses.put(i, buildErrorCertResponse(certReqId, PKIFailureInfo.notAuthorized,
                         msg));
@@ -600,7 +600,8 @@ public class X509CaCmpResponder extends CmpResponder {
                 certResp = buildErrorCertResponse(certReqId, PKIFailureInfo.badCertTemplate,
                         "badCertTemplate", null);
             } else {
-                if (!isCertProfilePermitted(requestor, certprofileName)) {
+                certprofileName = certprofileName.toUpperCase();
+                if (!requestor.isCertProfilePermitted(certprofileName)) {
                     String msg = "certprofile " + certprofileName + " is not allowed";
                     certResp = buildErrorCertResponse(certReqId,
                             PKIFailureInfo.notAuthorized, msg);
@@ -1080,7 +1081,8 @@ public class X509CaCmpResponder extends CmpResponder {
                 ca.revokeCertificate(serialNumber, CrlReason.CESSATION_OF_OPERATION, new Date(),
                         msgId);
             } catch (OperationException ex) {
-                LogUtil.warn(LOG, ex, "could not revoke certificate ca=" + ca.getCaInfo().getName()
+                LogUtil.warn(LOG, ex,
+                        "could not revoke certificate ca=" + ca.getCaInfo().getIdent()
                         + " serialNumber=" + LogUtil.formatCsn(serialNumber));
             }
 
@@ -1168,50 +1170,24 @@ public class X509CaCmpResponder extends CmpResponder {
 
     @Override
     protected CmpControl getCmpControl() {
-        X509Ca ca = getCa();
-        if (ca != null) {
-            String name = ca.getCaInfo().getCmpControlName();
-            if (name != null) {
-                return caManager.getCmpControlObject(name);
-            }
+        CmpControl control = getCa().getCmpControl();
+        if (control != null) {
+            return control;
         }
-
         throw new IllegalStateException(
                 "should not happen, no CMP control is defined for CA " + caName);
-    }
-
-    private boolean isCertProfilePermitted(final CmpRequestorInfo requestor,
-            final String certprofile) {
-        Set<String> profiles = requestor.getCaHasRequestor().getProfiles();
-        if (profiles != null) {
-            if (profiles.contains("all") || profiles.contains(certprofile)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private void checkPermission(final CmpRequestorInfo requestor,
             final Permission requiredPermission) throws InsuffientPermissionException {
         X509Ca ca = getCa();
         Set<Permission> permissions = ca.getCaInfo().getPermissions();
-        boolean granted = false;
         if (permissions.contains(Permission.ALL) || permissions.contains(requiredPermission)) {
-            Set<Permission> tmpPermissions = requestor.getCaHasRequestor().getPermissions();
-            if (tmpPermissions.contains(Permission.ALL)
-                    || tmpPermissions.contains(requiredPermission)) {
-                granted = true;
-            }
+            requestor.assertPermitted(requiredPermission);
+        } else {
+            String msg = requiredPermission.getPermission() + " is not allowed";
+            throw new InsuffientPermissionException(msg);
         }
-
-        if (granted) {
-            return;
-        }
-
-        String msg = requiredPermission.getPermission() + " is not allowed";
-        LOG.warn(msg);
-        throw new InsuffientPermissionException(msg);
     } // method checkPermission
 
     private String getSystemInfo(final CmpRequestorInfo requestor,
@@ -1255,9 +1231,9 @@ public class X509CaCmpResponder extends CmpResponder {
 
             Set<String> supportedProfileNames = new HashSet<>();
             Set<String> caProfileNames = ca.getCaManager().getCertprofilesForCa(
-                    ca.getCaInfo().getName());
+                    ca.getCaInfo().getIdent().getName());
             for (String caProfileName : caProfileNames) {
-                if (requestorProfiles.contains("all")
+                if (requestorProfiles.contains("ALL")
                         || requestorProfiles.contains(caProfileName)) {
                     supportedProfileNames.add(caProfileName);
                 }
@@ -1647,54 +1623,6 @@ public class X509CaCmpResponder extends CmpResponder {
 
         X509Ca ca = getCa();
         return ca.generateCrlOnDemand(msgId);
-    }
-
-    /**
-     * @since 2.1.0:
-     */
-    public X509Cert generateCert(final CmpRequestorInfo requestor, final byte[] encodedCsr,
-            final String profileName, final Date notBefore, final Date notAfter,
-            final RequestType reqType, final String msgId)
-            throws OperationException {
-        ParamUtil.requireNonNull("requestor", requestor);
-        try {
-            checkPermission(requestor, Permission.ENROLL_CERT);
-        } catch (InsuffientPermissionException ex) {
-            throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
-        }
-
-        CertificationRequest csr = CertificationRequest.getInstance(encodedCsr);
-        if (!securityFactory.verifyPopo(csr, getCmpControl().getPopoAlgoValidator())) {
-            LOG.warn("could not validate POP for the pkcs#10 requst");
-            throw new OperationException(ErrorCode.BAD_POP);
-        }
-
-        CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
-
-        X500Name subject = certTemp.getSubject();
-        SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
-
-        if (!isCertProfilePermitted(requestor, profileName)) {
-            throw new OperationException(ErrorCode.NOT_PERMITTED,
-                    "certProfile " + profileName + " is not allowed");
-        }
-
-        Extensions extensions = CaUtil.getExtensions(certTemp);
-        CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
-                notBefore, notAfter, extensions, profileName);
-
-        X509Ca ca = getCa();
-        X509CertificateInfo certInfo = ca.generateCertificate(certTemplate,
-                requestor, reqType, null, msgId);
-
-        certInfo.setRequestorName(requestor.getName());
-
-        if (ca.getCaInfo().isSaveRequest()) {
-            long dbId = ca.addRequest(encodedCsr);
-            ca.addRequestCert(dbId, certInfo.getCert().getCertId());
-        }
-
-        return certInfo.getCert();
     }
 
     /**

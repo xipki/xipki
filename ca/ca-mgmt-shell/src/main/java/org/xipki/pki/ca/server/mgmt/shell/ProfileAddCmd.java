@@ -40,6 +40,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 
 /**
@@ -79,7 +80,7 @@ public class ProfileAddCmd extends CaCommandSupport {
             conf = new String(IoUtil.read(confFile));
         }
 
-        CertprofileEntry entry = new CertprofileEntry(name, type, conf);
+        CertprofileEntry entry = new CertprofileEntry(new NameId(null, name), type, conf);
         boolean bo = caManager.addCertprofile(entry);
         output(bo, "added", "could not add", "certificate profile " + name);
         return null;

@@ -75,6 +75,7 @@ import org.xipki.commons.security.SecurityFactory;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.util.X509Util;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
@@ -283,7 +284,7 @@ public class CaConf {
         // Requesters
         if (jaxb.getRequestors() != null) {
             for (RequestorType m : jaxb.getRequestors().getRequestor()) {
-                CmpRequestorEntry en = new CmpRequestorEntry(m.getName(),
+                CmpRequestorEntry en = new CmpRequestorEntry(new NameId(null, m.getName()),
                         getBase64Binary(m.getCert(), zipFile));
                 addRequestor(en);
             }
@@ -292,8 +293,8 @@ public class CaConf {
         // Publishers
         if (jaxb.getPublishers() != null) {
             for (PublisherType m : jaxb.getPublishers().getPublisher()) {
-                PublisherEntry en = new PublisherEntry(m.getName(), expandConf(m.getType()),
-                        getValue(m.getConf(), zipFile));
+                PublisherEntry en = new PublisherEntry(new NameId(null, m.getName()),
+                        expandConf(m.getType()), getValue(m.getConf(), zipFile));
                 addPublisher(en);
             }
         }
@@ -301,8 +302,8 @@ public class CaConf {
         // CertProfiles
         if (jaxb.getProfiles() != null) {
             for (ProfileType m : jaxb.getProfiles().getProfile()) {
-                CertprofileEntry en = new CertprofileEntry(m.getName(), expandConf(m.getType()),
-                        getValue(m.getConf(), zipFile));
+                CertprofileEntry en = new CertprofileEntry(new NameId(null, m.getName()),
+                        expandConf(m.getType()), getValue(m.getConf(), zipFile));
                 addProfile(en);
             }
         }
@@ -351,8 +352,9 @@ public class CaConf {
 
                     int numCrls = (ci.getNumCrls() == null) ? 30 : ci.getNumCrls().intValue();
 
-                    caEntry = new X509CaEntry(name, ci.getSnSize(), ci.getNextCrlNo(),
-                            expandConf(ci.getSignerType()), getValue(ci.getSignerConf(), zipFile),
+                    caEntry = new X509CaEntry(new NameId(null, name), ci.getSnSize(),
+                            ci.getNextCrlNo(), expandConf(ci.getSignerType()),
+                            getValue(ci.getSignerConf(), zipFile),
                             caUris, numCrls, exprirationPeriod);
 
                     caEntry.setCmpControlName(ci.getCmpcontrolName());
@@ -423,7 +425,8 @@ public class CaConf {
                 if (m.getRequestors() != null) {
                     caHasRequestors = new LinkedList<>();
                     for (CaHasRequestorType req : m.getRequestors().getRequestor()) {
-                        CaHasRequestorEntry en = new CaHasRequestorEntry(req.getRequestorName());
+                        CaHasRequestorEntry en = new CaHasRequestorEntry(
+                                new NameId(null, req.getRequestorName()));
                         en.setRa(req.isRa());
 
                         List<String> strs = getStrings(req.getProfiles());
@@ -510,7 +513,7 @@ public class CaConf {
 
     public void addRequestor(final CmpRequestorEntry requestor) {
         ParamUtil.requireNonNull("requestor", requestor);
-        this.requestors.put(requestor.getName(), requestor);
+        this.requestors.put(requestor.getIdent().getName(), requestor);
     }
 
     public Set<String> getRequestorNames() {
@@ -523,7 +526,7 @@ public class CaConf {
 
     public void addPublisher(final PublisherEntry publisher) {
         ParamUtil.requireNonNull("publisher", publisher);
-        this.publishers.put(publisher.getName(), publisher);
+        this.publishers.put(publisher.getIdent().getName(), publisher);
     }
 
     public Set<String> getPublisherNames() {
@@ -536,7 +539,7 @@ public class CaConf {
 
     public void addProfile(final CertprofileEntry profile) {
         ParamUtil.requireNonNull("profile", profile);
-        this.certprofiles.put(profile.getName(), profile);
+        this.certprofiles.put(profile.getIdent().getName(), profile);
     }
 
     public Set<String> getCertProfileNames() {
@@ -562,7 +565,7 @@ public class CaConf {
 
     public void addScep(final ScepEntry scep) {
         ParamUtil.requireNonNull("scep", scep);
-        this.sceps.put(scep.getCaName(), scep);
+        this.sceps.put(scep.getCaIdent().getName(), scep);
     }
 
     public Set<String> getScepNames() {
@@ -656,4 +659,5 @@ public class CaConf {
 
         return confStr;
     }
+
 }

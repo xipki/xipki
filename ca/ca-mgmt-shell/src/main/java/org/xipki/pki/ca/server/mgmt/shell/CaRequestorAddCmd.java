@@ -42,6 +42,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
@@ -87,7 +88,7 @@ public class CaRequestorAddCmd extends CaCommandSupport {
 
     @Option(name = "--profile",
             required = true, multiValued = true,
-            description = "profile name or 'all' for all profiles\n"
+            description = "profile name or 'ALL' for all profiles\n"
                     + "(required, multi-valued)")
     @Completion(ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
@@ -96,7 +97,7 @@ public class CaRequestorAddCmd extends CaCommandSupport {
     protected Object doExecute() throws Exception {
         boolean ra = isEnabled(raS, false, "ra");
 
-        CaHasRequestorEntry entry = new CaHasRequestorEntry(requestorName);
+        CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(null, requestorName));
         entry.setRa(ra);
         entry.setProfiles(profiles);
         Set<Permission> tmpPermissions = new HashSet<>();
@@ -105,7 +106,7 @@ public class CaRequestorAddCmd extends CaCommandSupport {
         }
         entry.setPermissions(tmpPermissions);
 
-        boolean bo = caManager.addCmpRequestorToCa(entry, caName);
+        boolean bo = caManager.addRequestorToCa(entry, caName);
         output(bo, "added", "could not add", "requestor " + requestorName + " to CA " + caName);
         return null;
     }

@@ -36,6 +36,7 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 import org.xipki.commons.common.util.CompareUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.api.NameId;
 
 /**
  * @author Lijun Liao
@@ -44,7 +45,7 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class CertprofileEntry {
 
-    private final String name;
+    private final NameId ident;
 
     private final String type;
 
@@ -52,18 +53,18 @@ public class CertprofileEntry {
 
     private boolean faulty;
 
-    public CertprofileEntry(final String name, final String type, final String conf) {
-        this.name = ParamUtil.requireNonBlank("name", name);
+    public CertprofileEntry(final NameId ident, final String type, final String conf) {
+        this.ident = ParamUtil.requireNonNull("ident", ident);
         this.type = ParamUtil.requireNonBlank("type", type);
         this.conf = conf;
-        if ("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name)) {
+        if ("ALL".equalsIgnoreCase(ident.getName()) || "NULL".equalsIgnoreCase(ident.getName())) {
             throw new IllegalArgumentException(
-                    "certificate profile name must not be 'all' and 'null'");
+                    "certificate profile name must not be 'ALL' and 'NULL'");
         }
     }
 
-    public String getName() {
-        return name;
+    public NameId getIdent() {
+        return ident;
     }
 
     public String getType() {
@@ -89,7 +90,8 @@ public class CertprofileEntry {
 
     public String toString(final boolean verbose) {
         StringBuilder sb = new StringBuilder(200);
-        sb.append("name: ").append(name).append('\n');
+        sb.append("id: ").append(ident.getId()).append('\n');
+        sb.append("name: ").append(ident.getName()).append('\n');
         sb.append("faulty: ").append(faulty).append('\n');
         sb.append("type: ").append(type).append('\n');
         sb.append("conf: ");
@@ -108,7 +110,7 @@ public class CertprofileEntry {
         }
 
         CertprofileEntry objB = (CertprofileEntry) obj;
-        if (!name.equals(objB.name)) {
+        if (!ident.equals(objB.ident)) {
             return false;
         }
 
@@ -125,7 +127,7 @@ public class CertprofileEntry {
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return ident.hashCode();
     }
 
 }

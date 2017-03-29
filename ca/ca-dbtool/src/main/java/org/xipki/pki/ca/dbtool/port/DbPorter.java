@@ -62,7 +62,7 @@ import org.xml.sax.SAXException;
 
 public class DbPorter extends DbToolBase {
 
-    enum OcspDbEntryType {
+    public enum OcspDbEntryType {
         CERT("certs", "CERT", 1);
 
         private final String dirName;
@@ -92,10 +92,11 @@ public class DbPorter extends DbToolBase {
 
     }
 
-    enum CaDbEntryType {
+    public enum CaDbEntryType {
         CERT("certs", "CERT", 1),
         CRL("crls", "CRL", 0.1f),
         USER("users", "USERNAME", 10),
+        CAUSER("causers", "CA_HAS_USER", 10),
         REQUEST("requests", "REQUEST", 0.1f),
         REQCERT("reqcerts", "REQCERT", 50);
 
@@ -148,7 +149,7 @@ public class DbPorter extends DbToolBase {
 
     protected final boolean evaulateOnly;
 
-    protected final int dbSchemaVersion;
+    protected final float dbSchemaVersion;
 
     protected final int maxX500nameLen;
 
@@ -160,7 +161,7 @@ public class DbPorter extends DbToolBase {
 
         DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
         String str = dbSchemaInfo.getVariableValue("VERSION");
-        this.dbSchemaVersion = Integer.parseInt(str);
+        this.dbSchemaVersion = Float.parseFloat(str);
         str = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(str);
     }

@@ -45,7 +45,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
@@ -75,28 +74,27 @@ import org.xipki.commons.common.ObjectCreationException;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.KeyCertPair;
 import org.xipki.commons.security.SignatureAlgoControl;
 import org.xipki.commons.security.SignerConf;
+import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.util.X509Util;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.publisher.x509.X509CertificateInfo;
+import org.xipki.pki.ca.server.impl.ByUserRequestorInfo;
 import org.xipki.pki.ca.server.impl.CaAuditConstants;
 import org.xipki.pki.ca.server.impl.CaManagerImpl;
 import org.xipki.pki.ca.server.impl.CertTemplateData;
 import org.xipki.pki.ca.server.impl.KnowCertResult;
-import org.xipki.pki.ca.server.impl.SimpleUserInfo;
-import org.xipki.pki.ca.server.impl.UserRequestorInfo;
 import org.xipki.pki.ca.server.impl.X509Ca;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
-import org.xipki.pki.ca.server.mgmt.api.CmpControl;
-import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
+import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
@@ -129,25 +127,29 @@ public class Scep {
 
     private static final Set<ASN1ObjectIdentifier> AES_ENC_ALGOS = new HashSet<>();
 
-    private final String caName;
+    private final String name;
+
+    private final NameId caIdent;
 
     private final ScepEntry dbEntry;
+
+    private final Set<String> certProfiles;
 
     private final ScepControl control;
 
     private final CaManagerImpl caManager;
 
-    private PrivateKey responderKey;
+    private final PrivateKey responderKey;
 
-    private X509Certificate responderCert;
+    private final X509Certificate responderCert;
+
+    private final CaCaps caCaps;
+
+    private final EnvelopedDataDecryptor envelopedDataDecryptor;
+
+    private X509Cert caCert;
 
     private CaCertRespBytes caCertRespBytes;
-
-    private X509CertificateHolder caCert;
-
-    private CaCaps caCaps;
-
-    private EnvelopedDataDecryptor envelopedDataDecryptor;
 
     private long maxSigningTimeBiasInMs = DFLT_MAX_SIGNINGTIME_BIAS;
 
@@ -166,26 +168,17 @@ public class Scep {
     public Scep(final ScepEntry dbEntry, final CaManagerImpl caManager) throws CaMgmtException {
         this.caManager = ParamUtil.requireNonNull("caManager", caManager);
         this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
-        this.caName = dbEntry.getCaName();
+        this.name = dbEntry.getName();
+        this.caIdent = dbEntry.getCaIdent();
+        this.certProfiles = dbEntry.getCertProfiles();
         try {
             this.control = new ScepControl(dbEntry.getControl());
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex);
         }
-        LOG.info("SCEP {}: caCert.included={}, signerCert.included={}", this.caName,
+        LOG.info("SCEP {}: caCert.included={}, signerCert.included={}", this.caIdent,
                 this.control.isIncludeCaCert(), this.control.isIncludeSignerCert());
-    }
 
-    /**
-     *
-     * @param ms signing time bias in milliseconds. non-positive value deactivate the check of
-     *     signing time.
-     */
-    public void setMaxSigningTimeBias(final long ms) {
-        this.maxSigningTimeBiasInMs = ms;
-    }
-
-    public void refreshCa() throws CaMgmtException {
         String type = dbEntry.getResponderType();
         if (!"PKCS12".equalsIgnoreCase(type) && !"JKS".equalsIgnoreCase(type)) {
             throw new CaMgmtException("unsupported SCEP responder type '" + type + "'");
@@ -207,7 +200,7 @@ public class Scep {
 
         if (!(responderCert.getPublicKey() instanceof RSAPublicKey)) {
             throw new IllegalArgumentException(
-                    "The responder key is not RSA key (CA=" + caName + ")");
+                    "The responder key is not RSA key for CA " + caIdent);
         }
 
         // CACaps
@@ -221,27 +214,27 @@ public class Scep {
         caps.addCapability(CaCapability.SHA512);
         this.caCaps = caps;
 
-        X509Ca ca = caManager.getX509Ca(caName);
-        try {
-            this.caCert = new X509CertificateHolder(
-                    ca.getCaInfo().getCertificate().getEncodedCert());
-            this.caCertRespBytes = new CaCertRespBytes(
-                    ca.getCaInfo().getCertificate().getCert(), responderCert);
-        } catch (CertificateException ex) {
-            throw new CaMgmtException(ex);
-        } catch (CMSException ex) {
-            throw new CaMgmtException(ex);
-        } catch (IOException ex) {
-            throw new CaMgmtException(ex);
-        }
-
         EnvelopedDataDecryptorInstance di = new EnvelopedDataDecryptorInstance(responderCert,
                 responderKey);
         this.envelopedDataDecryptor = new EnvelopedDataDecryptor(di);
-    } // method refreshCa
 
-    public String getCaName() {
-        return caName;
+    }
+
+    /**
+     *
+     * @param ms signing time bias in milliseconds. non-positive value deactivate the check of
+     *     signing time.
+     */
+    public void setMaxSigningTimeBias(final long ms) {
+        this.maxSigningTimeBiasInMs = ms;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public NameId getCaIdent() {
+        return caIdent;
     }
 
     public ScepEntry getDbEntry() {
@@ -252,16 +245,17 @@ public class Scep {
         return caCaps;
     }
 
-    public void setCaCaps(final CaCaps caCaps) {
-        this.caCaps = ParamUtil.requireNonNull("caCaps", caCaps);
-    }
-
-    public CaCertRespBytes getCaCertResp() {
+    public CaCertRespBytes getCaCertResp() throws OperationException {
+        refreshCa();
         return caCertRespBytes;
     }
 
     public boolean supportsCertProfile(final String profileName) throws CaMgmtException {
-        return caManager.getX509Ca(caName).supportsCertProfile(profileName);
+        if (certProfiles.contains("ALL") || certProfiles.contains(profileName.toUpperCase())) {
+            return caManager.getX509Ca(caIdent).supportsCertProfile(profileName);
+        } else {
+            return false;
+        }
     }
 
     public CaStatus getStatus() {
@@ -269,7 +263,7 @@ public class Scep {
             return CaStatus.INACTIVE;
         }
         try {
-            return caManager.getX509Ca(caName).getCaInfo().getStatus();
+            return caManager.getX509Ca(caIdent).getCaInfo().getStatus();
         } catch (CaMgmtException ex) {
             LogUtil.error(LOG, ex);
             return CaStatus.INACTIVE;
@@ -282,7 +276,7 @@ public class Scep {
         CaStatus status = getStatus();
 
         if (CaStatus.ACTIVE != status) {
-            LOG.warn("SCEP {} is not active", caName);
+            LOG.warn("SCEP {} is not active", caIdent);
             throw new OperationException(ErrorCode.SYSTEM_UNAVAILABLE);
         }
 
@@ -419,7 +413,7 @@ public class Scep {
 
         X509Ca ca;
         try {
-            ca = caManager.getX509Ca(caName);
+            ca = caManager.getX509Ca(caIdent);
         } catch (CaMgmtException ex) {
             LogUtil.error(LOG, ex, tid + "=" + tid + ",could not get X509CA");
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
@@ -442,11 +436,10 @@ public class Scep {
                 String reqSubjectText = X509Util.getRfc4519Name(reqSubject);
                 LOG.info("tid={}, subject={}", tid, reqSubjectText);
 
-                CmpControl cmpControl = caManager.getCmpControlObject(
-                        ca.getCaInfo().getCmpControlName());
-                if (!caManager.getSecurityFactory().verifyPopo(
-                        csr, cmpControl.getPopoAlgoValidator())) {
-                    LOG.warn("tid={}, POPO verification failed", tid);
+                try {
+                    ca.checkCsr(csr);
+                } catch (OperationException ex) {
+                    LogUtil.warn(LOG, ex, "tid=" + tid + " POPO verification failed");
                     throw FailInfoException.BAD_MESSAGE_CHECK;
                 }
 
@@ -461,7 +454,7 @@ public class Scep {
                             "tid=" + tid + ": no CommonName in requested subject");
                 }
 
-                Long userId = null;
+                NameId userIdent = null;
 
                 String challengePwd = CaUtil.getChallengePassword(csrReqInfo);
                 if (challengePwd != null) {
@@ -474,14 +467,11 @@ public class Scep {
 
                     String user = strs[0];
                     String password = strs[1];
-                    SimpleUserInfo userInfo = ca.authenticateUser(user, password.getBytes());
-                    if (userInfo == null) {
+                    userIdent = ca.authenticateUser(user, password.getBytes());
+                    if (userIdent == null) {
                         LOG.warn("tid={}: could not authenticate user {}", tid, user);
                         throw FailInfoException.BAD_REQUEST;
                     }
-
-                    checkUserPermission(userInfo, certProfileName, cn);
-                    userId = userInfo.getId();
                 } // end if
 
                 if (selfSigned) {
@@ -490,7 +480,7 @@ public class Scep {
                                 + " messageType {}", tid, mt);
                         throw FailInfoException.BAD_REQUEST;
                     }
-                    if (userId == null) {
+                    if (userIdent == null) {
                         LOG.warn("tid={}: could not extract user & password from challengePassword"
                                 + ", which are required for self-signed signature certificate",
                             tid);
@@ -499,7 +489,7 @@ public class Scep {
                 } else {
                     // No challengePassword is sent, try to find out whether the signature
                     // certificate is known by the CA
-                    if (userId == null) {
+                    if (userIdent == null) {
                         // up to draft-nourse-scep-23 the client sends all messages to enroll
                         // certificate via MessageType PKCSReq
                         KnowCertResult knowCertRes = ca.knowsCertificate(reqSignatureCert);
@@ -507,24 +497,19 @@ public class Scep {
                             LOG.warn("tid={}: signature certificate is not trusted by the CA", tid);
                             throw FailInfoException.BAD_REQUEST;
                         }
-                        userId = knowCertRes.getUserId();
-                    } // end if
 
-                    // only the same subject is permitted
-                    String cnInSignatureCert = X509Util.getCommonName(
-                            reqSignatureCert.getSubjectX500Principal());
-                    boolean b2 = cn.equals(cnInSignatureCert);
-                    if (!b2) {
-                        if (userId != null) {
-                            SimpleUserInfo userInfo = ca.getSimpleInfoForActiveUser(userId);
-                            checkUserPermission(userInfo, certProfileName, cn);
-                        } else {
-                            LOG.warn("tid={}: signature certificate is not trusted and {}",
-                                    tid, "no challengePassword is contained in the request");
+                        Integer userId = knowCertRes.getUserId();
+                        if (userId == null) {
+                            LOG.warn("tid={}: could not extract user from the signature cert", tid);
                             throw FailInfoException.BAD_REQUEST;
                         }
+
+                        userIdent = ca.getUserIdent(userId);
                     } // end if
                 } // end if
+
+                ByUserRequestorInfo requestor = ca.getByUserRequestor(userIdent);
+                checkUserPermission(requestor, certProfileName);
 
                 byte[] tidBytes = getTransactionIdBytes(tid);
 
@@ -532,7 +517,6 @@ public class Scep {
                 CertTemplateData certTemplateData = new CertTemplateData(csrReqInfo.getSubject(),
                         csrReqInfo.getSubjectPublicKeyInfo(), (Date) null, (Date) null, extensions,
                         certProfileName);
-                RequestorInfo requestor = new UserRequestorInfo(userId);
                 X509CertificateInfo cert = ca.generateCertificate(certTemplateData, requestor,
                         RequestType.SCEP, tidBytes, msgId);
                 /* Don't save SCEP message, since it contains password in plaintext
@@ -600,7 +584,7 @@ public class Scep {
         try {
             cert = ca.getCertificate(serialNumber);
         } catch (CertificateException ex) {
-            final String message = "could not get certificate (CA='" + caName
+            final String message = "could not get certificate for CA '" + caIdent
                     + "' and serialNumber=" + LogUtil.formatCsn(serialNumber) + ")";
             LogUtil.error(LOG, ex, message);
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
@@ -638,7 +622,8 @@ public class Scep {
             X509CertificateHolder certHolder = new X509CertificateHolder(cert.getEncoded());
             cmsSignedDataGen.addCertificate(certHolder);
             if (control.isIncludeCaCert()) {
-                cmsSignedDataGen.addCertificate(caCert);
+                refreshCa();
+                cmsSignedDataGen.addCertificate(caCert.getCertHolder());
             }
             CMSSignedData signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
             return SignedData.getInstance(signedData.toASN1Structure().getContent());
@@ -688,31 +673,18 @@ public class Scep {
         return ci;
     } // method encodeResponse
 
-    private static void checkUserPermission(SimpleUserInfo userInfo, String certProfile,
-            final String cn) throws OperationException {
-        boolean profilePermitted = false;
-        if (userInfo.getProfiles().contains(certProfile)) {
-            String[] profiles = userInfo.getProfiles().split(",");
-            for (String p : profiles) {
-                if (certProfile.equals(p)) {
-                    profilePermitted = true;
-                    break;
-                }
-            }
+    private static void checkUserPermission(ByUserRequestorInfo requestor, String certProfile)
+            throws OperationException {
+        if (!requestor.isPermitted(Permission.ENROLL_CERT)) {
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
+                    Permission.ENROLL_CERT + " is not permitted for user "
+                    + requestor.getCaHasUser().getUserIdent().getName());
         }
 
-        if (!profilePermitted) {
-            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-                    "Certificate profile '" + certProfile + "' is not permitted");
-        }
-
-        String cnRegex = userInfo.getCnRegex();
-        if (StringUtil.isNotBlank(cnRegex)) {
-            Pattern pattern = Pattern.compile(cnRegex);
-            if (!pattern.matcher(cn).matches()) {
-                throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-                        "commonName '" + cn + "' is not permitted");
-            }
+        if (!requestor.isCertProfilePermitted(certProfile)) {
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
+                    "Certificate profile " + certProfile + " is not permitted for user "
+                    + requestor.getCaHasUser().getUserIdent().getName());
         }
     }
 
@@ -774,5 +746,20 @@ public class Scep {
     private static void audit(final AuditEvent audit, final String name, final String value) {
         audit.addEventData(name, (value == null) ? "null" : value);
     } // method audit
+
+    private void refreshCa() throws OperationException {
+        try {
+            X509Ca ca = caManager.getX509Ca(caIdent);
+            X509Cert currentCaCert = ca.getCaInfo().getCertificate();
+            if (currentCaCert.equals(caCert)) {
+                return;
+            }
+
+            caCert = currentCaCert;
+            caCertRespBytes = new CaCertRespBytes(currentCaCert.getCert(), responderCert);
+        } catch (CaMgmtException | CertificateException | CMSException ex) {
+            throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
+        }
+    }
 
 }

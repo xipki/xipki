@@ -20,7 +20,9 @@ xipki-tk:update-cert-p12 \
 
 # with encrypted password 1234
 xipki-ca:scep-add \
+  --name SCEP1 \
   --ca SubCAwithCRL1 \
+  --profile ALL \
   --resp-type PKCS12 \
   --resp-conf password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/SCEP1.p12 \
   --control caCert.included=false,signerCert.included=true
@@ -28,7 +30,11 @@ xipki-ca:scep-add \
 ## add user
 xipki-ca:user-add \
   --name user1 \
-  --password password1 \
+  --password password1
+  
+xipki-ca:causer-add \
+  --user user1 \
+  --ca SubCAwithCRL1 \
   --profile OCSP \
-  --cn-regex '.*'
-
+  --permission ENROLL
+ 

@@ -40,8 +40,8 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.DirPathCompleter;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.pki.ca.dbtool.port.CaDbImportWorker;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
+import org.xipki.pki.ca.dbtool.port.ca.CaDbImportWorker;
 
 /**
  * @author Lijun Liao

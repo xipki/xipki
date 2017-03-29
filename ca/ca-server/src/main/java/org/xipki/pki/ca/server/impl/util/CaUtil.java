@@ -35,8 +35,10 @@
 package org.xipki.pki.ca.server.impl.util;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
@@ -59,8 +61,10 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
+import org.xipki.pki.ca.server.mgmt.api.Permission;
 
 /**
  * @author Lijun Liao
@@ -202,5 +206,24 @@ public class CaUtil {
 
         return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
     }
+
+    public static Set<Permission> getPermissions(final String permissionsText) {
+        ParamUtil.requireNonBlank("permissionsText", permissionsText);
+
+        List<String> strs = StringUtil.split(permissionsText, ", ");
+        Set<Permission> permissions = new HashSet<>();
+        for (String permissionText : strs) {
+            Permission permission = Permission.forValue(permissionText);
+            if (permission == Permission.ALL) {
+                permissions.clear();
+                permissions.add(permission);
+                break;
+            } else {
+                permissions.add(permission);
+            }
+        }
+
+        return permissions;
+    } // method getPermissions
 
 }

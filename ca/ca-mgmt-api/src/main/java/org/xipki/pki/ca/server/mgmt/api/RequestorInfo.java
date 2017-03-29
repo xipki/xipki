@@ -34,6 +34,9 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import org.xipki.pki.ca.api.InsuffientPermissionException;
+import org.xipki.pki.ca.api.NameId;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -43,8 +46,20 @@ public interface RequestorInfo {
 
     static final String NAME_BY_USER = "BY-USER";
 
-    String getName();
+    static final String NAME_BY_CA = "BY-CA";
+
+    NameId getIdent();
 
     boolean isRa();
+
+    boolean isCertProfilePermitted(final String certprofile);
+
+    boolean isPermitted(Permission requiredPermission);
+
+    void assertCertProfilePermitted(final String certprofile)
+            throws InsuffientPermissionException;
+
+    void assertPermitted(Permission requiredPermission)
+            throws InsuffientPermissionException;
 
 }

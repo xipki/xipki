@@ -79,6 +79,7 @@ import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.BadFormatException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.ExtensionControl;
@@ -165,14 +166,12 @@ class IdentifiedX509Certprofile {
         REQUIRED_EE_EXTENSION_TYPES.add(Extension.subjectKeyIdentifier);
     } // end static
 
-    private final String name;
     private final CertprofileEntry dbEntry;
     private final X509Certprofile certprofile;
 
     IdentifiedX509Certprofile(final CertprofileEntry dbEntry, final X509Certprofile certProfile)
             throws CertprofileException {
         this.dbEntry = ParamUtil.requireNonNull("entry", dbEntry);
-        this.name = dbEntry.getName();
         this.certprofile = ParamUtil.requireNonNull("certProfile", certProfile);
 
         this.certprofile.initialize(dbEntry.getConf());
@@ -198,8 +197,8 @@ class IdentifiedX509Certprofile {
 
     } // constructor
 
-    public String getName() {
-        return name;
+    public NameId getIdent() {
+        return dbEntry.getIdent();
     }
 
     public CertprofileEntry getDbEntry() {

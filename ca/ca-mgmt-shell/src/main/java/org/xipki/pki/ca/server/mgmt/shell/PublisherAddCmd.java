@@ -40,6 +40,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 
 /**
@@ -79,7 +80,7 @@ public class PublisherAddCmd extends CaCommandSupport {
             conf = new String(IoUtil.read(confFile));
         }
 
-        PublisherEntry entry = new PublisherEntry(name, type, conf);
+        PublisherEntry entry = new PublisherEntry(new NameId(null, name), type, conf);
         boolean bo = caManager.addPublisher(entry);
         output(bo, "added", "could not add", "publisher " + name);
         return null;

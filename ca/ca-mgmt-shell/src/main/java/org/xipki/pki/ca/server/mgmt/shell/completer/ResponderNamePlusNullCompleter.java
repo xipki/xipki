@@ -50,7 +50,7 @@ public class ResponderNamePlusNullCompleter extends MgmtNameCompleter {
     @Override
     protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>();
-        ret.addAll(caManager.getCmpResponderNames());
+        ret.addAll(caManager.getResponderNames());
         ret.add("NULL");
         return ret;
     }

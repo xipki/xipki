@@ -179,7 +179,7 @@ xipki-ca:gen-rca \
   --profile RCA \
   --serial 1 \
   --out output/RCA1.der \
-  --permission all \
+  --permission ALL \
   --sn-bitlen 63 \
   --next-crl-no 2 \
   --max-validity 10y \
@@ -236,15 +236,10 @@ xipki-ca:capub-add \
 # Add requestor to CA
 xipki-ca:careq-add \
   --requestor requestor1 \
-  --permission all \
+  --permission ALL \
   --ra yes \
-  --profile all \
+  --profile ALL \
   --ca RCA1
-
-## Publish the self-signed certificate
-xipki-ca:publish-self \
-  --profile RCA \
-  RCA1
 
 ## Generate keys and CSR for SubCA1
 if { $TOKEN_TYPE equals "PKCS11" } {
@@ -390,7 +385,7 @@ if { $TOKEN_TYPE equals "PKCS12" } {
 
 xipki-ca:ca-add \
   --name SubCA1.complex-Name \
-  --permission all \
+  --permission ALL \
   --sn-bitlen 63 \
   --next-crl-no 2 \
   --max-validity 5y \
@@ -442,9 +437,9 @@ xipki-ca:capub-add \
 # Add requestor to CA
 xipki-ca:careq-add \
   --requestor requestor1 \
-  --permission all \
+  --permission ALL \
   --ra yes \
-  --profile all \
+  --profile ALL \
   --ca SubCA1.complex-Name
 
 ## Restart the CA
@@ -466,7 +461,7 @@ keystore=file:output/SubCAwithCRL1.p12,algo=$SIGALGO"
 
 xipki-ca:ca-add \
   --name SubCAwithCRL1 \
-  --permission all \
+  --permission ALL \
   --sn-bitlen 63 \
   --next-crl-no 2 \
   --max-validity 8000y \
@@ -516,9 +511,9 @@ xipki-ca:caprofile-add \
 ## Add CMP requestor to CA
 xipki-ca:careq-add \
   --requestor requestor1 \
-  --permission all \
+  --permission ALL \
   --ra yes \
-  --profile all \
+  --profile ALL \
   --ca SubCAwithCRL1
 
 source file:./xipki/demo/demo.d/scep-server.script

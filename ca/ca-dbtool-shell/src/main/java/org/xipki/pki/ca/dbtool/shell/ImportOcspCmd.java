@@ -41,7 +41,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.DirPathCompleter;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
-import org.xipki.pki.ca.dbtool.port.OcspDbImportWorker;
+import org.xipki.pki.ca.dbtool.port.ocsp.OcspDbImportWorker;
 
 /**
  * @author Lijun Liao

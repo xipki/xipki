@@ -73,7 +73,7 @@ public class CaPublisherInfoCmd extends CaCommandSupport {
         if (isNotEmpty(entries)) {
             sb.append("publishers for CA " + caName).append("\n");
             for (PublisherEntry entry : entries) {
-                sb.append("\t").append(entry.getName()).append("\n");
+                sb.append("\t").append(entry.getIdent().getName()).append("\n");
             }
         } else {
             sb.append("\tno publisher for CA " + caName + " is configured");

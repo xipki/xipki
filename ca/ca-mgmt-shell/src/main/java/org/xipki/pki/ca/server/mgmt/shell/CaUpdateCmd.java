@@ -53,6 +53,7 @@ import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.util.X509Util;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
@@ -198,7 +199,7 @@ public class CaUpdateCmd extends CaCommandSupport {
     private PasswordResolver passwordResolver;
 
     protected X509ChangeCaEntry getChangeCaEntry() throws Exception {
-        X509ChangeCaEntry entry = new X509ChangeCaEntry(caName);
+        X509ChangeCaEntry entry = new X509ChangeCaEntry(new NameId(null, caName));
 
         if (snBitLen != null) {
             ParamUtil.requireRange("sn-bitlen", snBitLen, 63, 159);

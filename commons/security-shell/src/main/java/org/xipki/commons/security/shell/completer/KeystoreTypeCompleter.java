@@ -44,7 +44,7 @@ import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
- * @since 2.1.1
+ * @since 2.2.0
  */
 
 @Service

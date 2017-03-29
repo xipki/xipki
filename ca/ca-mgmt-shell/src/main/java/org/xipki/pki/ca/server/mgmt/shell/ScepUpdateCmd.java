@@ -35,6 +35,7 @@
 package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.io.ByteArrayInputStream;
+import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -42,15 +43,19 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.util.X509Util;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
 import org.xipki.pki.ca.server.mgmt.api.x509.ChangeScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 
 /**
@@ -63,11 +68,18 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 @Service
 public class ScepUpdateCmd extends CaCommandSupport {
 
+    @Option(name = "--name",
+            required = true,
+            description = "name\n"
+                    + "(required)")
+    @Completion(ScepNameCompleter.class)
+    private String name;
+
     @Option(name = "--ca",
             required = true,
             description = "CA name\n"
                     + "(required)")
-    @Completion(ScepNameCompleter.class)
+    @Completion(CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--active",
@@ -91,6 +103,13 @@ public class ScepUpdateCmd extends CaCommandSupport {
             description = "responder certificate file or 'NULL'")
     @Completion(FilePathCompleter.class)
     private String certFile;
+
+    @Option(name = "--profile",
+            multiValued = true,
+            description = "profile name or 'ALL' for all profiles\n"
+                    + "(multi-valued)")
+    @Completion(ProfileNameAndAllCompleter.class)
+    private Set<String> profiles;
 
     @Option(name = "--control",
             description = "SCEP control or 'NULL'")
@@ -140,9 +159,13 @@ public class ScepUpdateCmd extends CaCommandSupport {
             certConf = Base64.toBase64String(certBytes);
         }
 
-        ChangeScepEntry entry = new ChangeScepEntry(caName);
+        ChangeScepEntry entry = new ChangeScepEntry(name);
         if (realActive != null) {
             entry.setActive(realActive);
+        }
+
+        if (caName != null) {
+            entry.setCa(new NameId(null, caName));
         }
 
         if (responderType != null) {
@@ -156,6 +179,12 @@ public class ScepUpdateCmd extends CaCommandSupport {
 
         if (certConf != null) {
             entry.setBase64Cert(certConf);
+        }
+
+        if (CollectionUtil.isNonEmpty(profiles)) {
+            if (profiles.contains("NONE")) {
+                profiles.clear();
+            }
         }
 
         if (control != null) {

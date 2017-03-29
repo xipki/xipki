@@ -55,14 +55,14 @@ public class ClearPublishQueueCmd extends CaCommandSupport {
 
     @Option(name = "--ca",
             required = true,
-            description = "CA name or 'all' for all CAs\n"
+            description = "CA name or 'ALL' for all CAs\n"
                     + "(required)")
     @Completion(CaNamePlusAllCompleter.class)
     private String caName;
 
     @Option(name = "--publisher",
             required = true, multiValued = true,
-            description = "publisher name or 'all' for all publishers\n"
+            description = "publisher name or 'ALL' for all publishers\n"
                         + "(required, multi-valued)")
     @Completion(PublisherNamePlusAllCompleter.class)
     private List<String> publisherNames;
@@ -74,7 +74,7 @@ public class ClearPublishQueueCmd extends CaCommandSupport {
         }
         boolean allPublishers = false;
         for (String publisherName : publisherNames) {
-            if ("all".equalsIgnoreCase(publisherName)) {
+            if ("ALL".equalsIgnoreCase(publisherName)) {
                 allPublishers = true;
                 break;
             }
@@ -84,7 +84,7 @@ public class ClearPublishQueueCmd extends CaCommandSupport {
             publisherNames = null;
         }
 
-        if ("all".equalsIgnoreCase(caName)) {
+        if ("ALL".equalsIgnoreCase(caName)) {
             caName = null;
         }
 

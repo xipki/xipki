@@ -34,14 +34,11 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.util.Set;
-
 import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
-import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameCompleter;
 
 /**
  * @author Lijun Liao
@@ -67,24 +64,12 @@ public class UserAddCmd extends CaCommandSupport {
             description = "do not activate this user")
     private Boolean inactive = Boolean.FALSE;
 
-    @Option(name = "--profile",
-            required = true, multiValued = true,
-            description = "profile name\n"
-                    + "(required, multi-valued)")
-    @Completion(ProfileNameCompleter.class)
-    private Set<String> profiles;
-
-    @Option(name = "--cn-regex",
-            required = true,
-            description = "regex for the permitted common name")
-    private String cnRegex;
-
     @Override
     protected Object doExecute() throws Exception {
         if (password == null) {
             password = new String(readPassword());
         }
-        AddUserEntry userEntry = new AddUserEntry(name, !inactive, password, profiles, cnRegex);
+        AddUserEntry userEntry = new AddUserEntry(new NameId(null, name), !inactive, password);
         boolean bo = caManager.addUser(userEntry);
         output(bo, "added", "could not add", "user " + name);
         return null;

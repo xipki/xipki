@@ -125,12 +125,12 @@ public class ScepServlet extends HttpServlet {
                 String[] tokens = path.split("/");
                 if (tokens.length == 2) {
                     scepName = tokens[0];
-                    certProfileName = tokens[1];
+                    certProfileName = tokens[1].toUpperCase();
                 }
             } // end if
         } // end if
 
-        if (scepName == null) {
+        if (scepName == null || certProfileName == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -161,10 +161,6 @@ public class ScepServlet extends HttpServlet {
                 return;
             }
 
-            String realScepName = responderManager.getCaNameForAlias(scepName);
-            if (realScepName != null) {
-                scepName = realScepName;
-            }
             Scep responder = responderManager.getScep(scepName);
             if (responder == null || responder.getStatus() != CaStatus.ACTIVE
                     || !responder.supportsCertProfile(certProfileName)) {

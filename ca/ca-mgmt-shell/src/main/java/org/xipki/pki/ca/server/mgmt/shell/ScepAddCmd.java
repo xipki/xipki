@@ -34,6 +34,8 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
+import java.util.Set;
+
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
@@ -44,7 +46,9 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
 import org.xipki.commons.password.PasswordResolver;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
+import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
 
 /**
@@ -56,6 +60,12 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.ScepNameCompleter;
         description = "add SCEP")
 @Service
 public class ScepAddCmd extends CaCommandSupport {
+
+    @Option(name = "--name",
+            required = true,
+            description = "name\n"
+                    + "(required)")
+    private String name;
 
     @Option(name = "--ca",
             required = true,
@@ -91,6 +101,13 @@ public class ScepAddCmd extends CaCommandSupport {
             description = "SCEP control")
     private String scepControl;
 
+    @Option(name = "--profile",
+            required = true, multiValued = true,
+            description = "profile name or 'ALL' for all profiles\n"
+                    + "(required, multi-valued)")
+    @Completion(ProfileNameAndAllCompleter.class)
+    private Set<String> profiles;
+
     @Reference
     private PasswordResolver passwordResolver;
 
@@ -106,8 +123,8 @@ public class ScepAddCmd extends CaCommandSupport {
                     passwordResolver, securityFactory);
         }
 
-        ScepEntry entry = new ScepEntry(caName, !inactive, responderType, responderConf, base64Cert,
-                scepControl);
+        ScepEntry entry = new ScepEntry(name, new NameId(null, caName), !inactive, responderType,
+                responderConf, base64Cert, profiles, scepControl);
         if (entry.isFaulty()) {
             throw new InvalidConfException("certificate is invalid");
         }

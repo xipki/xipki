@@ -94,7 +94,7 @@ public class HealthCheckServlet extends HttpServlet {
                     caName = caAlias;
                 }
                 caName = caName.toUpperCase();
-                responder = responderManager.getX509CaCmpResponder(caName);
+                responder = responderManager.getX509CaResponder(caName);
             }
 
             if (caName == null || responder == null || !responder.isInService()) {

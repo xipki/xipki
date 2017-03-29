@@ -47,6 +47,7 @@ import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.KeyUsage;
 import org.xipki.commons.security.util.X509Util;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 
@@ -81,10 +82,11 @@ public class X509CaEntry extends CaEntry {
 
     private String hexSha1OfCert;
 
-    public X509CaEntry(final String name, final int serialNoBitLen, final long nextCrlNumber,
-            final String signerType, final String signerConf, final X509CaUris caUris,
-            final int numCrls, final int expirationPeriod) throws CaMgmtException {
-        super(name, signerType, signerConf, expirationPeriod);
+    public X509CaEntry(final NameId nameId, final int serialNoBitLen,
+            final long nextCrlNumber, final String signerType, final String signerConf,
+            final X509CaUris caUris, final int numCrls, final int expirationPeriod)
+            throws CaMgmtException {
+        super(nameId, signerType, signerConf, expirationPeriod);
         init(serialNoBitLen, nextCrlNumber, caUris, numCrls);
     }
 
@@ -182,7 +184,7 @@ public class X509CaEntry extends CaEntry {
     }
 
     public void setCrlSignerName(final String crlSignerName) {
-        this.crlSignerName = crlSignerName;
+        this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toUpperCase();
     }
 
     public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
@@ -320,7 +322,7 @@ public class X509CaEntry extends CaEntry {
 
     @Override
     public int hashCode() {
-        return getName().hashCode();
+        return getIdent().hashCode();
     }
 
 }

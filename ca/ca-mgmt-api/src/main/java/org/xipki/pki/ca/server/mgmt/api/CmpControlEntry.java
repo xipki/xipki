@@ -50,7 +50,7 @@ public class CmpControlEntry {
     private boolean faulty;
 
     public CmpControlEntry(final String name, final String conf) {
-        this.name = ParamUtil.requireNonBlank("name", name);
+        this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
         this.conf = ParamUtil.requireNonBlank("conf", conf);
     }
 

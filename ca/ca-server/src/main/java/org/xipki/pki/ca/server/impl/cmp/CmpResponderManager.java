@@ -45,6 +45,6 @@ public interface CmpResponderManager {
 
     String getCaNameForAlias(@NonNull String caAlias);
 
-    X509CaCmpResponder getX509CaCmpResponder(@NonNull String caName);
+    X509CaCmpResponder getX509CaResponder(@NonNull String caName);
 
 }

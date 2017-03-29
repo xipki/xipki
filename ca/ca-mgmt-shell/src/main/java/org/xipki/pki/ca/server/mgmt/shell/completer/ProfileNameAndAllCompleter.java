@@ -50,7 +50,7 @@ public class ProfileNameAndAllCompleter extends MgmtNameCompleter {
     @Override
     protected Set<String> getEnums() {
         Set<String> ret = new HashSet<>(caManager.getCertprofileNames());
-        ret.add("all");
+        ret.add("ALL");
         return ret;
     }
 

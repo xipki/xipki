@@ -71,7 +71,7 @@ public class RequestorInfoCmd extends CaCommandSupport {
         StringBuilder sb = new StringBuilder();
 
         if (name == null) {
-            Set<String> names = caManager.getCmpRequestorNames();
+            Set<String> names = caManager.getRequestorNames();
             int size = names.size();
 
             if (size == 0 || size == 1) {
@@ -88,7 +88,7 @@ public class RequestorInfoCmd extends CaCommandSupport {
                 sb.append("\t").append(entry).append("\n");
             }
         } else {
-            CmpRequestorEntry entry = caManager.getCmpRequestor(name);
+            CmpRequestorEntry entry = caManager.getRequestor(name);
             if (entry == null) {
                 throw new CmdFailure("could not find CMP requestor '" + name + "'");
             } else {

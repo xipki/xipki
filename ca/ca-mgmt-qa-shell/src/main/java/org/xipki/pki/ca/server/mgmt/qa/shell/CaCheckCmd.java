@@ -64,7 +64,7 @@ public class CaCheckCmd extends CaUpdateCmd {
     @Override
     protected Object doExecute() throws Exception {
         X509ChangeCaEntry ey = getChangeCaEntry();
-        String caName = ey.getName();
+        String caName = ey.getIdent().getName();
         println("checking CA" + caName);
 
         CaEntry entry = caManager.getCa(caName);

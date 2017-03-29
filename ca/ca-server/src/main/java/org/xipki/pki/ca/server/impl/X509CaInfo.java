@@ -54,6 +54,7 @@ import org.xipki.commons.security.SecurityFactory;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.exception.XiSecurityException;
+import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -133,10 +134,6 @@ public class X509CaInfo {
         this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
     } // constructor
 
-    public void commitNextCrlNo() throws OperationException {
-        certStore.commitNextCrlNo(caEntry.getName(), caEntry.getNextCrlNumber());
-    }
-
     public PublicCaInfo getPublicCaInfo() {
         return publicCaInfo;
     }
@@ -173,12 +170,8 @@ public class X509CaInfo {
         return caEntry;
     }
 
-    public String getName() {
-        return caEntry.getName();
-    }
-
-    public int getId() {
-        return caEntry.getId();
+    public NameId getIdent() {
+        return caEntry.getIdent();
     }
 
     public List<String> getCrlUris() {
@@ -340,7 +333,7 @@ public class X509CaInfo {
 
     public BigInteger nextCrlNumber() throws OperationException {
         long crlNo = caEntry.getNextCrlNumber();
-        long currentMaxNo = certStore.getMaxCrlNumber(getCertificate());
+        long currentMaxNo = certStore.getMaxCrlNumber(caEntry.getIdent());
         if (crlNo <= currentMaxNo) {
             crlNo = currentMaxNo + 1;
         }

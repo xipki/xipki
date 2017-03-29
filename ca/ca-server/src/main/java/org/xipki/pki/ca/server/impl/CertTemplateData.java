@@ -60,7 +60,8 @@ public class CertTemplateData {
             final String certprofileName) {
         this.subject = ParamUtil.requireNonNull("subject", subject);
         this.publicKeyInfo = ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
-        this.certprofileName = ParamUtil.requireNonBlank("certprofileName", certprofileName);
+        this.certprofileName = ParamUtil.requireNonBlank("certprofileName", certprofileName)
+                .toUpperCase();
         this.extensions = extensions;
         this.notBefore = notBefore;
         this.notAfter = notAfter;

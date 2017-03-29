@@ -139,7 +139,7 @@ public class OcspCertPublisher extends X509CertPublisher {
         X509CertWithDbId cert = certInfo.getCert();
 
         try {
-            queryExecutor.addCert(caCert, cert, certInfo.getProfileName(),
+            queryExecutor.addCert(caCert, cert, certInfo.getProfile().getName(),
                     certInfo.getRevocationInfo());
             return true;
         } catch (Exception ex) {

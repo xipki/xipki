@@ -53,7 +53,7 @@ public enum Permission {
     GEN_CRL("gen-crl"),
     GET_CRL("get-crl"),
     CROSS_CERT_ENROLL("enroll-cross"),
-    ALL("all");
+    ALL("ALL");
 
     private String permission;
 

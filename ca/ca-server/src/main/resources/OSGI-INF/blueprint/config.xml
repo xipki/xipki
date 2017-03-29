@@ -36,7 +36,7 @@
     <service-properties>
       <entry key="alias" value="/cmp"/>
     </service-properties>
-  </service>
+  </service>../
   <!-- REST servlet -->
   <bean id="restServlet" class="org.xipki.pki.ca.server.impl.rest.HttpRestServlet">
     <property name="responderManager" ref="caManager"/>

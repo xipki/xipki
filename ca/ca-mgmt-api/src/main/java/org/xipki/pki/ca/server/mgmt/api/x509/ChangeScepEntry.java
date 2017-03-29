@@ -34,8 +34,11 @@
 
 package org.xipki.pki.ca.server.mgmt.api.x509;
 
-import org.xipki.commons.common.InvalidConfException;
+import java.util.Set;
+
+import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.pki.ca.api.NameId;
 
 /**
  * @author Lijun Liao
@@ -44,7 +47,9 @@ import org.xipki.commons.common.util.ParamUtil;
 
 public class ChangeScepEntry {
 
-    private final String caName;
+    private final String name;
+
+    private NameId caIdent;
 
     private Boolean active;
 
@@ -54,14 +59,24 @@ public class ChangeScepEntry {
 
     private String base64Cert;
 
+    private Set<String> certProfiles;
+
     private String control;
 
-    public ChangeScepEntry(final String caName) throws InvalidConfException {
-        this.caName = ParamUtil.requireNonBlank("caName", caName).toUpperCase();
+    public ChangeScepEntry(final String name) {
+        this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
     }
 
-    public String getCaName() {
-        return caName;
+    public String getName() {
+        return name;
+    }
+
+    public void setCa(final NameId caIdent) {
+        this.caIdent = caIdent;
+    }
+
+    public NameId getCaIdent() {
+        return caIdent;
     }
 
     public Boolean isActive() {
@@ -94,6 +109,19 @@ public class ChangeScepEntry {
 
     public void setBase64Cert(final String base64Cert) {
         this.base64Cert = base64Cert;
+    }
+
+    public Set<String> getCertProfiles() {
+        return certProfiles;
+    }
+
+    public void setCertProfiles(Set<String> certProfiles) {
+        if (certProfiles == null) {
+            this.certProfiles = null;
+        } else {
+            this.certProfiles = CollectionUtil.unmodifiableSet(
+                    CollectionUtil.toUpperCaseSet(certProfiles));
+        }
     }
 
     public String getControl() {
