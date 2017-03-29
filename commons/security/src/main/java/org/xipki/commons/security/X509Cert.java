@@ -34,6 +34,7 @@
 
 package org.xipki.commons.security;
 
+import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -41,6 +42,7 @@ import java.util.Arrays;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.util.X509Util;
 
@@ -60,6 +62,8 @@ public class X509Cert {
     private final byte[] subjectKeyIdentifer;
 
     private final X500Name subjectAsX500Name;
+
+    private X509CertificateHolder certHolder;
 
     public X509Cert(final X509Certificate cert) {
         this(cert, null);
@@ -111,9 +115,43 @@ public class X509Cert {
         return Arrays.copyOf(subjectKeyIdentifer, subjectKeyIdentifer.length);
     }
 
+    public X509CertificateHolder getCertHolder() {
+        if (certHolder != null) {
+            return certHolder;
+        }
+
+        synchronized (cert) {
+            try {
+                certHolder = new X509CertificateHolder(encodedCert);
+            } catch (IOException ex) {
+                throw new RuntimeException(
+                        "should not happen, could not decode certificate: " + ex.getMessage());
+            }
+            return certHolder;
+        }
+    }
+
     @Override
     public String toString() {
         return cert.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return cert.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof X509Cert)) {
+            return false;
+        }
+
+        return Arrays.equals(encodedCert, ((X509Cert) obj).encodedCert);
     }
 
 }

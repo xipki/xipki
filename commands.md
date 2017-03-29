@@ -357,10 +357,6 @@ Feature xipki-camgmt-shell
 
      remove publisher from CA
 
-   * `xipki-ca:publish-self`
-
-     publish the certificate of root CA
-
    * `xipki-ca:ca-rm`
 
      remove CA
@@ -369,13 +365,25 @@ Feature xipki-camgmt-shell
 
      add requestor to CA
 
-   * `xipki-ca:add requestor to CA`
+   * `xipki-ca:careq-info`
 
      show information of requestor in CA
 
    * `xipki-ca:careq-rm`
 
      remove requestor from CA
+
+   * `xipki-ca:causer-add`
+
+     add user to CA
+
+   * `xipki-ca:causer-info`
+
+     show information of user in CA
+
+   * `xipki-ca:causer-rm`
+
+     remove user from CA
 
    * `xipki-ca:ca-revoke`
 
@@ -695,10 +703,6 @@ Feature xipki-camgmt-qa-shell
    * `xipki-caqa:neg-capub-rm`
 
      remove publisher from CA (negative, QA)
-
-   * `xipki-caqa:neg-publish-self`
-
-     publish the certificate of root CA (negative, QA)
 
    * `xipki-caqa:neg-ca-rm`
 
