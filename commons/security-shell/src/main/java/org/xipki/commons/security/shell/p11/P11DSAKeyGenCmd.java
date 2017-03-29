@@ -67,7 +67,13 @@ public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
         }
 
         if (qlen == null) {
-            qlen = (plen >= 2048) ? 256 : 160;
+            if (plen <= 1024) {
+                qlen = 160;
+            } else if (plen <= 2048) {
+                qlen = 224;
+            } else {
+                qlen = 256;
+            }
         }
 
         P11Slot slot = getSlot();
