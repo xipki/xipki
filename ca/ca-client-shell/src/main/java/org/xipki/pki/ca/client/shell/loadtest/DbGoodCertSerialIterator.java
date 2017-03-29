@@ -39,11 +39,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
@@ -66,7 +68,7 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
 
     private final ConcurrentLinkedDeque<BigInteger> nextSerials = new ConcurrentLinkedDeque<>();
 
-    private final int caInfoId;
+    private final int caId;
 
     private final long minId;
 
@@ -83,21 +85,31 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
         this.caSerial = caCert.getSerialNumber().getPositiveValue();
 
         this.sqlNextSerials = caDataSource.buildSelectFirstSql(
-                "ID,SN FROM CERT WHERE REV=0 AND CSCA_ID=? AND ID>=?", numSqlEntries, "ID");
+                "ID,SN FROM CERT WHERE REV=0 AND CA_ID=? AND ID>=?", numSqlEntries, "ID");
 
-        String b64Sha1Fp = HashAlgoType.SHA1.base64Hash(caCert.getEncoded());
-        String sql = "SELECT ID FROM CS_CA WHERE SHA1_CERT='" + b64Sha1Fp + "'";
+        byte[] encodedCaCert = caCert.getEncoded();
+        String sql = "SELECT ID,CERT FROM CA";
         Statement stmt = caDataSource.getConnection().createStatement();
         try {
             ResultSet rs = stmt.executeQuery(sql);
-            if (rs.next()) {
-                caInfoId = rs.getInt("ID");
-            } else {
-                throw new Exception("CA Certificate and database configuration does not match");
+            int tmpCaId = -1;
+            while (rs.next()) {
+                String b64DbCert = rs.getString("CERT");
+                byte[] dbCert = Base64.decode(b64DbCert);
+                if (Arrays.equals(encodedCaCert, dbCert)) {
+                    tmpCaId = rs.getInt("ID");
+                    break;
+                }
             }
             rs.close();
 
-            sql = "SELECT MIN(ID) FROM CERT WHERE REV=0 AND CSCA_ID=" + caInfoId;
+            if (tmpCaId == -1) {
+                throw new Exception("CA Certificate and database configuration does not match");
+            }
+
+            caId = tmpCaId;
+
+            sql = "SELECT MIN(ID) FROM CERT WHERE REV=0 AND CA_ID=" + caId;
             rs = stmt.executeQuery(sql);
             rs.next();
             minId = rs.getLong(1);
@@ -138,7 +150,7 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
         int idx = 0;
         try {
             stmt = caDataSource.getConnection().prepareStatement(sql);
-            stmt.setInt(1, caInfoId);
+            stmt.setInt(1, caId);
             stmt.setLong(2, nextStartId);
             rs = stmt.executeQuery();
             while (rs.next()) {
