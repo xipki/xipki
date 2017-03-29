@@ -67,7 +67,13 @@ public class P12DSAKeyGenCmd extends P12KeyGenCommandSupport {
         }
 
         if (qlen == null) {
-            qlen = (plen >= 2048) ? 256 : 160;
+            if (plen <= 1024) {
+                qlen = 160;
+            } else if (plen <= 2048) {
+                qlen = 224;
+            } else {
+                qlen = 256;
+            }
         }
 
         P12KeypairGenerationResult keypair = new P12KeypairGenerator().generateDSAKeypair(plen,
