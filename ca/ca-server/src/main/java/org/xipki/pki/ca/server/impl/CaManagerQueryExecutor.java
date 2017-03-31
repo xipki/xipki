@@ -115,60 +115,6 @@ import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
  */
 class CaManagerQueryExecutor {
 
-    // CHECKSTYLE:SKIP
-    private static class SQLs {
-
-        private final String sqlSelectCertprofile;
-        private final String sqlSelectPublisher;
-        private final String sqlSelectRequestor;
-        private final String sqlSelectCrlSigner;
-        private final String sqlSelectCmpControl;
-        private final String sqlSelectResponder;
-        private final String sqlSelectCa;
-        private final String sqlSelectScep;
-        private final String sqlGetUserId;
-
-        private final String sqlGetUser;
-
-        SQLs(final DataSourceWrapper datasource) {
-            this.sqlSelectCertprofile = datasource.buildSelectFirstSql(
-                    "ID,TYPE,CONF FROM PROFILE WHERE NAME=?", 1);
-
-            this.sqlSelectPublisher = datasource.buildSelectFirstSql(
-                    "ID,TYPE,CONF FROM PUBLISHER WHERE NAME=?", 1);
-
-            this.sqlSelectRequestor = datasource.buildSelectFirstSql(
-                    "ID,CERT FROM REQUESTOR WHERE NAME=?", 1);
-
-            this.sqlSelectCrlSigner = datasource.buildSelectFirstSql(
-                    "SIGNER_TYPE,SIGNER_CERT,CRL_CONTROL,SIGNER_CONF FROM CRLSIGNER WHERE NAME=?",
-                    1);
-
-            this.sqlSelectCmpControl = datasource.buildSelectFirstSql(
-                    "CONF FROM CMPCONTROL WHERE NAME=?", 1);
-
-            this.sqlSelectResponder = datasource.buildSelectFirstSql(
-                    "TYPE,CERT,CONF FROM RESPONDER WHERE NAME=?", 1);
-
-            this.sqlSelectCa = datasource.buildSelectFirstSql(
-                    "ID,NAME,ART,SN_SIZE,NEXT_CRLNO,STATUS,MAX_VALIDITY,CERT,SIGNER_TYPE"
-                    + ",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY"
-                    + ",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSIONS,NUM_CRLS,KEEP_EXPIRED_CERT_DAYS"
-                    + ",EXPIRATION_PERIOD,REV,RR,RT,RIT,VALIDITY_MODE,CRL_URIS,DELTACRL_URIS"
-                    + ",OCSP_URIS,CACERT_URIS,EXTRA_CONTROL,SIGNER_CONF FROM CA WHERE NAME=?", 1);
-
-            this.sqlSelectScep = datasource.buildSelectFirstSql(
-                    "ACTIVE,CA_ID,PROFILES,CONTROL,RESPONDER_TYPE,RESPONDER_CERT,RESPONDER_CONF"
-                    + " FROM SCEP WHERE NAME=?", 1);
-
-            this.sqlGetUserId = datasource.buildSelectFirstSql("ID FROM USERNAME WHERE NAME=?", 1);
-
-            this.sqlGetUser = datasource.buildSelectFirstSql(
-                    "ID,ACTIVE,PASSWORD FROM USERNAME WHERE ID=?", 1);
-        }
-
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(CaManagerQueryExecutor.class);
 
     private final DataSourceWrapper datasource;
@@ -352,10 +298,7 @@ class CaManagerQueryExecutor {
             int id = rs.getInt("ID");
             String type = rs.getString("TYPE");
             String conf = rs.getString("CONF");
-
-            CertprofileEntry entry = new CertprofileEntry(new NameId(id, name),
-                    type, conf);
-            return entry;
+            return new CertprofileEntry(new NameId(id, name), type, conf);
         } catch (SQLException ex) {
             throw new CaMgmtException(datasource, sql, ex);
         } finally {
@@ -378,7 +321,6 @@ class CaManagerQueryExecutor {
             rs = stmt.executeQuery(sql);
 
             List<String> names = new LinkedList<>();
-
             while (rs.next()) {
                 String name = rs.getString(nameColumn);
                 if (StringUtil.isNotBlank(name)) {
@@ -410,8 +352,7 @@ class CaManagerQueryExecutor {
             int id = rs.getInt("ID");
             String type = rs.getString("TYPE");
             String conf = rs.getString("CONF");
-            PublisherEntry entry = new PublisherEntry(new NameId(id, name), type, conf);
-            return entry;
+            return new PublisherEntry(new NameId(id, name), type, conf);
         } catch (SQLException ex) {
             throw new CaMgmtException(datasource, sql, ex);
         } finally {
@@ -457,8 +398,7 @@ class CaManagerQueryExecutor {
 
             int id = rs.getInt("ID");
             String b64Cert = rs.getString("CERT");
-            CmpRequestorEntry entry = new CmpRequestorEntry(new NameId(id, name), b64Cert);
-            return entry;
+            return new CmpRequestorEntry(new NameId(id, name), b64Cert);
         } catch (SQLException ex) {
             throw new CaMgmtException(datasource, sql, ex);
         } finally {
@@ -2447,7 +2387,6 @@ class CaManagerQueryExecutor {
         }
 
         LOG.info("added user '{}'", name);
-
         return true;
     } // method addUser
 

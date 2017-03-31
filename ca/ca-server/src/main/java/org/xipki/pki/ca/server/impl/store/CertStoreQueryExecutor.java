@@ -68,7 +68,6 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.LruCache;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
@@ -110,274 +109,6 @@ import org.xipki.pki.ca.server.mgmt.api.Permission;
 
 class CertStoreQueryExecutor {
 
-    // CHECKSTYLE:SKIP
-    private static class SQLs {
-        private static final String SQL_ADD_CERT =
-                "INSERT INTO CERT (ID,ART,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
-                + "CA_ID,RID,UID,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-        private static final String SQL_ADD_CRAW =
-                "INSERT INTO CRAW (CID,SHA1,REQ_SUBJECT,CERT) VALUES (?,?,?,?)";
-
-        private static final String SQL_REVOKE_CERT =
-                "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
-
-        private static final String SQL_REVOKE_SUSPENDED_CERT =
-                "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
-
-        private static final String SQL_INSERT_PUBLISHQUEUE =
-                "INSERT INTO PUBLISHQUEUE (PID,CA_ID,CID) VALUES (?,?,?)";
-
-        private static final String SQL_REMOVE_PUBLISHQUEUE =
-                "DELETE FROM PUBLISHQUEUE WHERE PID=? AND CID=?";
-
-        private static final String SQL_MAXID_DELTACRL_CACHE =
-                "SELECT MAX(ID) FROM DELTACRL_CACHE WHERE CA_ID=?";
-
-        private static final String CLEAR_DELTACRL_CACHE =
-                "DELETE FROM DELTACRL_CACHE WHERE ID<? AND CA_ID=?";
-
-        private static final String SQL_MAX_CRLNO =
-                "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
-
-        private static final String SQL_MAX_THISUPDAATE_CRL =
-                "SELECT MAX(THISUPDATE) FROM CRL WHERE CA_ID=?";
-
-        private static final String SQL_ADD_CRL =
-                "INSERT INTO CRL (ID,CA_ID,CRL_NO,THISUPDATE,NEXTUPDATE,DELTACRL,BASECRL_NO,CRL)"
-                + " VALUES (?,?,?,?,?,?,?,?)";
-
-        private static final String SQL_ADD_DELTACRL_CACHE =
-                "INSERT INTO DELTACRL_CACHE (ID,CA_ID,SN) VALUES (?,?,?)";
-
-        private static final String SQL_REMOVE_CERT =
-                "DELETE FROM CERT WHERE CA_ID=? AND SN=?";
-
-        private static final String CORESQL_CERT_FOR_ID =
-            "PID,RID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID=?"
-            + " AND CRAW.CID=CERT.ID";
-
-        private static final String CORESQL_RAWCERT_FOR_ID =
-                "CERT FROM CRAW WHERE CID=?";
-
-        private static final String CORESQL_CERT_WITH_REVINFO =
-                "ID,REV,RR,RT,RIT,PID,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=?"
-                + " AND CERT.SN=? AND CRAW.CID=CERT.ID";
-
-        private static final String CORESQL_CERTINFO =
-                "PID,RID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=?"
-                + " AND CRAW.CID=CERT.ID";
-
-        private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED =
-                "ID FROM CERT WHERE CA_ID=? AND FP_S=?";
-
-        private static final String CORESQL_CERT_FOR_KEY_ISSUED =
-                "ID FROM CERT WHERE CA_ID=? AND FP_K=?";
-
-        private static final String SQL_DELETE_UNREFERENCED_REQUEST =
-                "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
-
-        private static final String SQL_ADD_REQUEST =
-                "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES(?,?,?)";
-
-        private static final String SQL_ADD_REQCERT =
-                "INSERT INTO REQCERT (ID,RID,CID) VALUES(?,?,?)";
-
-        private final String sqlCaHasCrl;
-
-        private final String sqlContainsCertificates;
-
-        private final String sqlCertForId;
-
-        private final String sqlRawCertForId;
-
-        private final String sqlCertWithRevInfo;
-
-        private final String sqlCertInfo;
-
-        private final String sqlCertprofileForCertId;
-
-        private final String sqlCertprofileForSerial;
-
-        private final String sqlActiveUserInfoForName;
-
-        private final String sqlActiveUserNameForId;
-
-        private final String sqlCaHasUser;
-
-        private final String sqlKnowsCertForSerial;
-
-        private final String sqlRevForId;
-
-        private final String sqlCertStatusForSubjectFp;
-
-        private final String sqlCertforSubjectIssued;
-
-        private final String sqlCertForKeyIssued;
-
-        private final String sqlLatestSerialForSubjectLike;
-
-        private final String sqlLatestSerialForCertprofileAndSubjectLike;
-
-        private final String sqlCrl;
-
-        private final String sqlCrlWithNo;
-
-        private final String sqlReqIdForSerial;
-
-        private final String sqlReqForId;
-
-        private final DataSourceWrapper datasource;
-
-        private final LruCache<Integer, String> cacheSqlCidFromPublishQueue = new LruCache<>(5);
-
-        private final LruCache<Integer, String> cacheSqlExpiredSerials = new LruCache<>(5);
-
-        private final LruCache<Integer, String> cacheSqlSuspendedSerials = new LruCache<>(5);
-
-        private final LruCache<Integer, String> cacheSqlDeltaCrlCacheIds = new LruCache<>(5);
-
-        private final LruCache<Integer, String> cacheSqlRevokedCerts = new LruCache<>(5);
-
-        private final LruCache<Integer, String> cacheSqlRevokedCertsWithEe = new LruCache<>(5);
-
-        private final LruCache<Integer, String> cacheSqlSerials = new LruCache<>(5);
-
-        private final LruCache<Integer, String> cacheSqlSerialsRevoked = new LruCache<>(5);
-
-        SQLs(final DataSourceWrapper datasource) {
-            this.datasource = ParamUtil.requireNonNull("datasource", datasource);
-
-            this.sqlCaHasCrl = datasource.buildSelectFirstSql("ID FROM CRL WHERE CA_ID=?", 1);
-            this.sqlContainsCertificates = datasource.buildSelectFirstSql(
-                    "ID FROM CERT WHERE CA_ID=? AND EE=?", 1);
-            this.sqlCertForId = datasource.buildSelectFirstSql(CORESQL_CERT_FOR_ID, 1);
-            this.sqlRawCertForId = datasource.buildSelectFirstSql(CORESQL_RAWCERT_FOR_ID, 1);
-            this.sqlCertWithRevInfo = datasource.buildSelectFirstSql(CORESQL_CERT_WITH_REVINFO, 1);
-            this.sqlCertInfo = datasource.buildSelectFirstSql(CORESQL_CERTINFO, 1);
-            this.sqlCertprofileForCertId = datasource.buildSelectFirstSql(
-                    "PID FROM CERT WHERE ID=? AND CA_ID=?", 1);
-            this.sqlCertprofileForSerial = datasource.buildSelectFirstSql(
-                    "PID FROM CERT WHERE SN=? AND CA_ID=?", 1);
-            this.sqlActiveUserInfoForName = datasource.buildSelectFirstSql(
-                    "ID,PASSWORD FROM USERNAME WHERE NAME=? AND ACTIVE=1", 1);
-            this.sqlActiveUserNameForId = datasource.buildSelectFirstSql(
-                    "NAME FROM USERNAME WHERE ID=? AND ACTIVE=1", 1);
-            this.sqlCaHasUser = datasource.buildSelectFirstSql(
-                    "PERMISSIONS,PROFILES FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?", 1);
-            this.sqlKnowsCertForSerial = datasource.buildSelectFirstSql(
-                    "UID FROM CERT WHERE SN=? AND CA_ID=?", 1);
-            this.sqlRevForId = datasource.buildSelectFirstSql(
-                    "SN,EE,REV,RR,RT,RIT FROM CERT WHERE ID=?", 1);
-            this.sqlCertStatusForSubjectFp = datasource.buildSelectFirstSql(
-                    "REV FROM CERT WHERE FP_S=? AND CA_ID=?", 1);
-            this.sqlCertforSubjectIssued = datasource.buildSelectFirstSql(
-                    CORESQL_CERT_FOR_SUBJECT_ISSUED, 1);
-            this.sqlCertForKeyIssued = datasource.buildSelectFirstSql(CORESQL_CERT_FOR_KEY_ISSUED,
-                    1);
-            this.sqlLatestSerialForSubjectLike = datasource.buildSelectFirstSql(
-                    "SUBJECT FROM CERT WHERE SUBJECT LIKE ?", 1, "NBEFORE DESC");
-            this.sqlLatestSerialForCertprofileAndSubjectLike = datasource.buildSelectFirstSql(
-                    "NBEFORE FROM CERT WHERE PID=? AND SUBJECT LIKE ?", 1, "NBEFORE ASC");
-            this.sqlCrl = datasource.buildSelectFirstSql(
-                    "THISUPDATE,CRL FROM CRL WHERE CA_ID=?", 1, "THISUPDATE DESC");
-            this.sqlCrlWithNo = datasource.buildSelectFirstSql(
-                    "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?", 1, "THISUPDATE DESC");
-            this.sqlReqIdForSerial = datasource.buildSelectFirstSql(
-                    "REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN CERT ON CERT.CA_ID=? "
-                    + "AND CERT.SN=? AND REQCERT.CID=CERT.ID", 1);
-            this.sqlReqForId = datasource.buildSelectFirstSql(
-                    "DATA FROM REQUEST WHERE ID=?", 1);
-        } // constructor
-
-        String getSqlCidFromPublishQueue(final int numEntries) {
-            String sql = cacheSqlCidFromPublishQueue.get(numEntries);
-            if (sql == null) {
-                sql = datasource.buildSelectFirstSql(
-                        "CID FROM PUBLISHQUEUE WHERE PID=? AND CA_ID=?", numEntries, "CID ASC");
-                cacheSqlCidFromPublishQueue.put(numEntries, sql);
-            }
-            return sql;
-        }
-
-        String getSqlExpiredSerials(final int numEntries) {
-            String sql = cacheSqlExpiredSerials.get(numEntries);
-            if (sql == null) {
-                sql = datasource.buildSelectFirstSql(
-                        "SN FROM CERT WHERE CA_ID=? AND NAFTER<?", numEntries);
-                cacheSqlExpiredSerials.put(numEntries, sql);
-            }
-            return sql;
-        }
-
-        String getSqlSuspendedSerials(final int numEntries) {
-            String sql = cacheSqlSuspendedSerials.get(numEntries);
-            if (sql == null) {
-                sql = datasource.buildSelectFirstSql(
-                        "SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?", numEntries);
-                cacheSqlSuspendedSerials.put(numEntries, sql);
-            }
-            return sql;
-        }
-
-        String getSqlDeltaCrlCacheIds(final int numEntries) {
-            String sql = cacheSqlDeltaCrlCacheIds.get(numEntries);
-            if (sql == null) {
-                sql = datasource.buildSelectFirstSql(
-                        "ID FROM DELTACRL_CACHE WHERE ID>? AND CA_ID=?", numEntries, "ID ASC");
-                cacheSqlDeltaCrlCacheIds.put(numEntries, sql);
-            }
-            return sql;
-        }
-
-        String getSqlRevokedCerts(final int numEntries, final boolean withEe) {
-            LruCache<Integer, String> cache = withEe ? cacheSqlRevokedCertsWithEe
-                    : cacheSqlRevokedCerts;
-            String sql = cache.get(numEntries);
-            if (sql == null) {
-                String coreSql =
-                        "ID,SN,RR,RT,RIT FROM CERT WHERE ID>? AND CA_ID=? AND REV=1 AND NAFTER>?";
-                if (withEe) {
-                    coreSql += " AND EE=?";
-                }
-                sql = datasource.buildSelectFirstSql(coreSql, numEntries, "ID ASC");
-                cache.put(numEntries, sql);
-            }
-            return sql;
-        }
-
-        String getSqlSerials(final int numEntries, final boolean onlyRevoked) {
-            LruCache<Integer, String> cache = onlyRevoked ? cacheSqlSerialsRevoked :
-                cacheSqlSerials;
-            String sql = cache.get(numEntries);
-            if (sql == null) {
-                String coreSql = "ID,SN FROM CERT WHERE ID>? AND CA_ID=?";
-                if (onlyRevoked) {
-                    coreSql += "AND REV=1";
-                }
-                sql = datasource.buildSelectFirstSql(coreSql, numEntries, "ID ASC");
-                cache.put(numEntries, sql);
-            }
-            return sql;
-        }
-
-        String getSqlSerials(final int numEntries, final Date notExpiredAt,
-                final boolean onlyRevoked, final boolean withEe) {
-            StringBuilder sb = new StringBuilder("ID,SN FROM CERT WHERE ID>? AND CS=?");
-            if (notExpiredAt != null) {
-                sb.append(" AND NAFTER>?");
-            }
-            if (onlyRevoked) {
-                sb.append(" AND REV=1");
-            }
-            if (withEe) {
-                sb.append(" AND EE=?");
-            }
-            return datasource.buildSelectFirstSql(sb.toString(), numEntries, "ID ASC");
-        }
-
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
 
     private final DataSourceWrapper datasource;
@@ -401,7 +132,6 @@ class CertStoreQueryExecutor {
         this.dbSchemaVersion = Float.parseFloat(str);
         str = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(str);
-
         this.sqls = new SQLs(datasource);
     } // constructor
 
@@ -506,7 +236,7 @@ class CertStoreQueryExecutor {
 
                 if (th instanceof SQLException) {
                     LOG.error("datasource {} could not add certificate with id {}: {}",
-                        datasource.getDatasourceName(), certId, th.getMessage());
+                            datasource.getDatasourceName(), certId, th.getMessage());
                     throw datasource.translate(sql, (SQLException) th);
                 } else {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
@@ -529,8 +259,7 @@ class CertStoreQueryExecutor {
         }
     } // method addCert
 
-    void addToPublishQueue(final NameId publisher, final long certId,
-            final NameId ca)
+    void addToPublishQueue(final NameId publisher, final long certId, final NameId ca)
             throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("ca", ca);
 
@@ -565,8 +294,7 @@ class CertStoreQueryExecutor {
         }
     }
 
-    long getMaxIdOfDeltaCrlCache(final NameId ca)
-            throws OperationException, DataAccessException {
+    long getMaxIdOfDeltaCrlCache(final NameId ca) throws OperationException, DataAccessException {
         ParamUtil.requireNonNull("ca", ca);
 
         final String sql = SQLs.SQL_MAXID_DELTACRL_CACHE;
@@ -657,8 +385,7 @@ class CertStoreQueryExecutor {
         }
     }
 
-    Long getThisUpdateOfCurrentCrl(final NameId ca)
-            throws DataAccessException, OperationException {
+    Long getThisUpdateOfCurrentCrl(final NameId ca) throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("ca", ca);
 
         final String sql = SQLs.SQL_MAX_THISUPDAATE_CRL;
@@ -993,8 +720,7 @@ class CertStoreQueryExecutor {
         }
     } // method removeCertificate
 
-    List<Long> getPublishQueueEntries(final NameId ca, final NameId publisher,
-            final int numEntries)
+    List<Long> getPublishQueueEntries(final NameId ca, final NameId publisher, final int numEntries)
             throws DataAccessException, OperationException {
         final String sql = sqls.getSqlCidFromPublishQueue(numEntries);
         ResultSet rs = null;
@@ -1062,8 +788,8 @@ class CertStoreQueryExecutor {
         }
     }
 
-    List<SerialWithId> getSerialNumbers(final NameId ca,  final long startId,
-            final int numEntries, final boolean onlyRevoked)
+    List<SerialWithId> getSerialNumbers(final NameId ca,  final long startId, final int numEntries,
+            final boolean onlyRevoked)
             throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("ca", ca);
         ParamUtil.requireMin("numEntries", numEntries, 1);
@@ -1135,7 +861,8 @@ class CertStoreQueryExecutor {
     } // method getSerialNumbers
 
     List<BigInteger> getExpiredSerialNumbers(final NameId ca, final long expiredAt,
-            final int numEntries) throws DataAccessException, OperationException {
+            final int numEntries)
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("ca", ca);
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
@@ -1163,7 +890,8 @@ class CertStoreQueryExecutor {
     } // method getExpiredSerialNumbers
 
     List<BigInteger> getSuspendedCertSerials(final NameId ca, final long latestLastUpdate,
-            final int numEntries) throws DataAccessException, OperationException {
+            final int numEntries)
+            throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("ca", ca);
         ParamUtil.requireMin("numEntries", numEntries, 1);
 
@@ -1221,11 +949,7 @@ class CertStoreQueryExecutor {
             releaseDbResources(ps, rs);
         }
 
-        if (b64Crl == null) {
-            return null;
-        }
-
-        return Base64.decode(b64Crl);
+        return (b64Crl == null) ? null : Base64.decode(b64Crl);
     } // method getEncodedCrl
 
     int cleanupCrls(final NameId ca, final int numCrls)
@@ -1371,8 +1095,8 @@ class CertStoreQueryExecutor {
         return new X509CertWithDbId(cert, encodedCert);
     } // method getCertForId
 
-    X509CertWithRevocationInfo getCertWithRevocationInfo(final NameId ca,
-            final BigInteger serial, final CaIdNameMap idNameMap)
+    X509CertWithRevocationInfo getCertWithRevocationInfo(final NameId ca, final BigInteger serial,
+            final CaIdNameMap idNameMap)
             throws DataAccessException, OperationException {
         ParamUtil.requireNonNull("ca", ca);
         ParamUtil.requireNonNull("serial", serial);
@@ -1739,8 +1463,6 @@ class CertStoreQueryExecutor {
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
-        List<CertListInfo> ret = new LinkedList<>();
-
         try {
             ps.setInt(1, ca.getId());
 
@@ -1759,6 +1481,7 @@ class CertStoreQueryExecutor {
             }
 
             rs = ps.executeQuery();
+            List<CertListInfo> ret = new LinkedList<>();
             while (rs.next()) {
                 String snStr = rs.getString("SN");
                 BigInteger sn = new BigInteger(snStr, 16);
@@ -1768,13 +1491,12 @@ class CertStoreQueryExecutor {
                 CertListInfo info = new CertListInfo(sn, subject, notBefore, notAfter);
                 ret.add(info);
             }
+            return ret;
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
-
-        return ret;
     }
 
     NameId authenticateUser(final String user, final byte[] password)
@@ -1877,7 +1599,6 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("serial", serial);
         final String sql = sqls.sqlKnowsCertForSerial;
 
-        Integer userId = null;
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1890,14 +1611,13 @@ class CertStoreQueryExecutor {
                 return KnowCertResult.UNKNOWN;
             }
 
-            userId = rs.getInt("UID");
+            int userId = rs.getInt("UID");
+            return new KnowCertResult(true, userId);
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
         } finally {
             releaseDbResources(ps, rs);
         }
-
-        return new KnowCertResult(true, userId);
     } // method knowsCertForSerial
 
     List<CertRevInfoWithSerial> getRevokedCertificates(final NameId ca,
