@@ -33,8 +33,8 @@
     </developer>
   </developers>
   <properties>
-    <karaf.version>4.1.1</karaf.version>
-    <karaf-plugin.version>4.1.0</karaf-plugin.version>
+    <karaf.version>4.0.8</karaf.version>
+    <karaf-plugin.version>4.0.8</karaf-plugin.version>
     <bc.version>1.56</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <servlet-api.version>2.5</servlet-api.version>
