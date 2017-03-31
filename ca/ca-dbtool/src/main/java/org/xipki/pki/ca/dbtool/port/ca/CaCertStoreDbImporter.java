@@ -838,14 +838,12 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         datasource.dropPrimaryKey(null, "PK_USERNAME", "USERNAME");
         datasource.dropPrimaryKey(null, "PK_CA_HAS_USER", "CA_HAS_USER");
 
-        // TODO: add tables user and ca_user
         long duration = (System.currentTimeMillis() - start) / 1000;
         System.out.println(" dropped indexes in " + StringUtil.formatTime(duration, false));
     }
 
     private void recoverIndexes() throws DataAccessException {
         long start = System.currentTimeMillis();
-        // TODO: add tables user and ca_user
         datasource.addPrimaryKey(null, "PK_CERT", "CERT", "ID");
         datasource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
         datasource.addPrimaryKey(null, "PK_REQUEST", "REQUEST", "ID");

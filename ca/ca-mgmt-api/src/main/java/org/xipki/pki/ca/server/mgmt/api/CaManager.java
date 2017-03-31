@@ -40,6 +40,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -151,6 +152,15 @@ public interface CaManager {
             throws CaMgmtException;
 
     boolean addUserToCa(@NonNull CaHasUserEntry user, @NonNull String caName)
+            throws CaMgmtException;
+
+    /**
+     * Returns map between CA name an CaHasUserEntry for given user.
+     * @param user User
+     * @return map between CA name and CaHasUserEntry for given user.
+     * @throws CaMgmtException If error occurs.
+     */
+    Map<String, CaHasUserEntry> getCaHasUsers(String user)
             throws CaMgmtException;
 
     CertprofileEntry getCertprofile(@NonNull String profileName);

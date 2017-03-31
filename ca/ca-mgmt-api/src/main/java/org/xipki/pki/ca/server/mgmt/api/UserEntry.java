@@ -75,7 +75,7 @@ public class UserEntry {
         sb.append("id: ").append(ident.getId()).append('\n');
         sb.append("name: ").append(ident.getName()).append('\n');
         sb.append("active: ").append(active).append('\n');
-        sb.append("hashed password: ").append(hashedPassword).append("\n");
+        sb.append("password: *****\n");
         return sb.toString();
     }
 

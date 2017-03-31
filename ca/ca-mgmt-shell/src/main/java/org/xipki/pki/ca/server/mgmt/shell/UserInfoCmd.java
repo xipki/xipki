@@ -34,10 +34,14 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
+import java.util.Map;
+
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.pki.ca.server.mgmt.api.CaHasUserEntry;
+import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
@@ -53,18 +57,23 @@ public class UserInfoCmd extends CaCommandSupport {
     @Argument(index = 0, name = "name", required = true, description = "user name")
     private String name;
 
-    // TODO: show also the CA_HAS_USER entries information
     @Override
     protected Object doExecute() throws Exception {
-        StringBuilder sb = new StringBuilder();
-
         UserEntry userEntry = caManager.getUser(name);
         if (userEntry == null) {
-            throw new CmdFailure("\tno user named '" + name + "' is configured");
-        } else {
-            sb.append(name).append("\n\t").append(userEntry);
+            throw new CmdFailure("no user named '" + name + "' is configured");
         }
 
+        StringBuilder sb = new StringBuilder();
+        sb.append(userEntry);
+
+        Map<String, CaHasUserEntry> caHasUsers = caManager.getCaHasUsers(name);
+        for (String ca : caHasUsers.keySet()) {
+            CaHasUserEntry entry = caHasUsers.get(ca);
+            sb.append("\n----- CA ").append(ca).append("-----");
+            sb.append("\nprofiles: ").append(entry.getProfiles()).append("\n");
+            sb.append("\npermissions: ").append(Permission.toString(entry.getPermissions()));
+        }
         println(sb.toString());
         return null;
     }

@@ -189,7 +189,7 @@ class CaManagerQueryExecutor {
         try {
             return X509Util.parseCert(encodedCert);
         } catch (CertificateException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         }
     } // method generateCert
 
@@ -213,13 +213,13 @@ class CaManagerQueryExecutor {
         try {
             dsConnection = datasource.getConnection();
         } catch (DataAccessException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         }
 
         try {
             return datasource.prepareStatement(dsConnection, sql);
         } catch (DataAccessException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         }
     } // method prepareStatement
 
@@ -241,8 +241,7 @@ class CaManagerQueryExecutor {
             String eventOwner = rs.getString("EVENT_OWNER");
             return new SystemEvent(eventName, eventOwner, eventTime);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, rs);
         }
@@ -257,8 +256,7 @@ class CaManagerQueryExecutor {
             ps.setString(1, eventName);
             ps.executeUpdate();
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -277,8 +275,7 @@ class CaManagerQueryExecutor {
             ps.setTimestamp(idx++, new Timestamp(systemEvent.getEventTime() * 1000L));
             ps.setString(idx++, systemEvent.getOwner());
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -306,8 +303,7 @@ class CaManagerQueryExecutor {
                 map.put(name, value);
             }
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -332,8 +328,7 @@ class CaManagerQueryExecutor {
                 map.put(name, caId);
             }
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -362,8 +357,7 @@ class CaManagerQueryExecutor {
                     type, conf);
             return entry;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -394,8 +388,7 @@ class CaManagerQueryExecutor {
 
             return names;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -420,8 +413,7 @@ class CaManagerQueryExecutor {
             PublisherEntry entry = new PublisherEntry(new NameId(id, name), type, conf);
             return entry;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -443,8 +435,7 @@ class CaManagerQueryExecutor {
 
             return rs.getInt("ID");
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -469,8 +460,7 @@ class CaManagerQueryExecutor {
             CmpRequestorEntry entry = new CmpRequestorEntry(new NameId(id, name), b64Cert);
             return entry;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -496,10 +486,9 @@ class CaManagerQueryExecutor {
             String crlControlConf = rs.getString("CRL_CONTROL");
             return new X509CrlSignerEntry(name, signerType, signerConf, signerCert, crlControlConf);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } catch (InvalidConfException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -522,8 +511,7 @@ class CaManagerQueryExecutor {
             String conf = rs.getString("CONF");
             return new CmpControlEntry(name, conf);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -548,8 +536,7 @@ class CaManagerQueryExecutor {
             String b64Cert = rs.getString("CERT");
             return new CmpResponderEntry(name, type, conf, b64Cert);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -686,11 +673,10 @@ class CaManagerQueryExecutor {
             try {
                 return new X509CaInfo(entry, certstore);
             } catch (OperationException ex) {
-                throw new CaMgmtException(ex.getMessage(), ex);
+                throw new CaMgmtException(ex);
             }
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -730,8 +716,7 @@ class CaManagerQueryExecutor {
 
             return ret;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -754,8 +739,7 @@ class CaManagerQueryExecutor {
 
             return ret;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -778,8 +762,7 @@ class CaManagerQueryExecutor {
 
             return ret;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -807,8 +790,7 @@ class CaManagerQueryExecutor {
             ps.setString(1, name);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -821,8 +803,7 @@ class CaManagerQueryExecutor {
             stmt = createStatement();
             return stmt.executeUpdate(sql) > 0;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, null);
         }
@@ -838,7 +819,7 @@ class CaManagerQueryExecutor {
             int id = (int) datasource.getMax(null, "CA", "ID");
             caEntry.getIdent().setId(id + 1);
         } catch (DataAccessException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         }
 
         X509CaEntry entry = (X509CaEntry) caEntry;
@@ -890,10 +871,9 @@ class CaManagerQueryExecutor {
                 LOG.info("add CA '{}': {}", entry.getIdent(), entry.toString(false, true));
             }
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } catch (CertificateEncodingException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -912,8 +892,7 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added CA alias '{}' for CA '{}'", aliasName, ca);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -927,7 +906,7 @@ class CaManagerQueryExecutor {
             int id = (int) datasource.getMax(null, "PROFILE", "ID");
             dbEntry.getIdent().setId(id + 1);
         } catch (DataAccessException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         }
 
         PreparedStatement ps = null;
@@ -943,8 +922,7 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added profile '{}': {}", dbEntry.getIdent(), dbEntry);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -964,8 +942,7 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added profile '{}' to CA '{}'", profile, ca);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -984,8 +961,7 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added CMP control: {}", dbEntry);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -998,7 +974,7 @@ class CaManagerQueryExecutor {
             int id = (int) datasource.getMax(null, "REQUESTOR", "ID");
             dbEntry.getIdent().setId(id + 1);
         } catch (DataAccessException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         }
 
         final String sql = "INSERT INTO REQUESTOR (ID,NAME,CERT) VALUES (?,?,?)";
@@ -1014,10 +990,9 @@ class CaManagerQueryExecutor {
                 LOG.info("added requestor '{}': {}", dbEntry.getIdent(), dbEntry.toString(false));
             }
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } catch (CertificateEncodingException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -1047,10 +1022,9 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added requestor '{}'", requestorName);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } catch (DataAccessException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         } finally {
             datasource.releaseResources(stmt, rs);
         }
@@ -1085,8 +1059,7 @@ class CaManagerQueryExecutor {
             LOG.info("added requestor '{}' to CA '{}': ra: {}; permission: {}; profile: {}",
                     requestorIdent, ca, ra, permissionText, profilesText);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -1124,10 +1097,9 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added CRL signer '{}': {}", name, dbEntry.toString(false, true));
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } catch (CertificateEncodingException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -1163,8 +1135,7 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added environment param '{}': {}", name, value);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -1178,7 +1149,7 @@ class CaManagerQueryExecutor {
             int id = (int) datasource.getMax(null, "PUBLISHER", "ID");
             dbEntry.getIdent().setId(id + 1);
         } catch (DataAccessException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         }
 
         String name = dbEntry.getIdent().getName();
@@ -1194,8 +1165,7 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added publisher '{}': {}", dbEntry.getIdent(), dbEntry);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -1212,8 +1182,7 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added publisher '{}' to CA '{}'", publisher, ca);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -1236,7 +1205,7 @@ class CaManagerQueryExecutor {
                 anyCertIssued = datasource.columnExists(null, "CERT", "CA_ID",
                         entry.getIdent().getId());
             } catch (DataAccessException ex) {
-                throw new CaMgmtException(ex.getMessage(), ex);
+                throw new CaMgmtException(ex);
             }
 
             if (anyCertIssued) {
@@ -1314,8 +1283,7 @@ class CaManagerQueryExecutor {
                             + "'" + ex.getMessage(), ex);
                 }
             } catch (SQLException ex) {
-                DataAccessException dex = datasource.translate(sql, ex);
-                throw new CaMgmtException(dex.getMessage(), dex);
+                throw new CaMgmtException(datasource, sql, ex);
             } finally {
                 datasource.releaseResources(stmt, rs);
             }
@@ -1511,10 +1479,9 @@ class CaManagerQueryExecutor {
             LOG.info("changed CA '{}': {}", changeCaEntry.getIdent(), sb);
             return true;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } catch (CertificateEncodingException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -1535,8 +1502,7 @@ class CaManagerQueryExecutor {
                 rs.next();
                 nextCrlNoInDb = rs.getLong("NEXT_CRLNO");
             } catch (SQLException ex) {
-                DataAccessException dex = datasource.translate(sql, ex);
-                throw new CaMgmtException(dex.getMessage(), dex);
+                throw new CaMgmtException(datasource, sql, ex);
             } finally {
                 datasource.releaseResources(ps, rs);
             }
@@ -1549,8 +1515,7 @@ class CaManagerQueryExecutor {
                     ps.setInt(2, ca.getId());
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    DataAccessException dex = datasource.translate(sql, ex);
-                    throw new CaMgmtException(dex.getMessage(), dex);
+                    throw new CaMgmtException(datasource, sql, ex);
                 }
             }
         } finally {
@@ -1631,8 +1596,7 @@ class CaManagerQueryExecutor {
             failed = false;
             return profile;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
             if (failed) {
@@ -1652,7 +1616,7 @@ class CaManagerQueryExecutor {
         try {
             cmpControl = new CmpControl(newDbEntry);
         } catch (InvalidConfException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         }
 
         final String sql = "UPDATE CMPCONTROL SET CONF=? WHERE NAME=?";
@@ -1665,8 +1629,7 @@ class CaManagerQueryExecutor {
             LOG.info("changed CMP control '{}': {}", name, conf);
             return cmpControl;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -1701,8 +1664,7 @@ class CaManagerQueryExecutor {
             LOG.info("changed CMP requestor '{}': {}", nameId, subject);
             return requestor;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -1796,8 +1758,7 @@ class CaManagerQueryExecutor {
             LOG.info("changed CMP responder: {}", sb);
             return responder;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -1864,7 +1825,7 @@ class CaManagerQueryExecutor {
             dbEntry = new X509CrlSignerEntry(name, tmpSignerType, tmpSignerConf,
                     tmpBase64Cert, tmpCrlControl);
         } catch (InvalidConfException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         }
         X509CrlSignerEntryWrapper crlSigner = caManager.createX509CrlSigner(dbEntry);
 
@@ -1917,8 +1878,7 @@ class CaManagerQueryExecutor {
             LOG.info("changed CRL signer '{}': {}", name, sb);
             return crlSigner;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2062,8 +2022,7 @@ class CaManagerQueryExecutor {
             LOG.info("changed SCEP: {}", sb);
             return scep;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2089,8 +2048,7 @@ class CaManagerQueryExecutor {
             LOG.info("changed environment param '{}': {}", name, value);
             return true;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2158,8 +2116,7 @@ class CaManagerQueryExecutor {
             LOG.info("changed publisher '{}': {}", name, sb);
             return publisher;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2175,8 +2132,7 @@ class CaManagerQueryExecutor {
             ps.setString(1, caName);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2196,8 +2152,7 @@ class CaManagerQueryExecutor {
             }
             return bo;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2220,8 +2175,7 @@ class CaManagerQueryExecutor {
             }
             return bo;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2244,8 +2198,7 @@ class CaManagerQueryExecutor {
             }
             return bo;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2267,8 +2220,7 @@ class CaManagerQueryExecutor {
             }
             return bo;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2298,8 +2250,7 @@ class CaManagerQueryExecutor {
             }
             return bo;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2326,10 +2277,9 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("changed responder: {}", dbEntry.toString(false, true));
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } catch (CertificateEncodingException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2343,8 +2293,7 @@ class CaManagerQueryExecutor {
             stmt.execute(sql);
             return stmt.getUpdateCount() > 0;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(ex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(stmt, null);
         }
@@ -2366,8 +2315,7 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, caName);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2394,8 +2342,7 @@ class CaManagerQueryExecutor {
             ps.executeUpdate();
             LOG.info("added SCEP '{}': {}", scepEntry.getCaIdent(), scepEntry);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2413,8 +2360,7 @@ class CaManagerQueryExecutor {
             ps.setString(1, name);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2450,7 +2396,7 @@ class CaManagerQueryExecutor {
             return new ScepEntry(name, idNameMap.getCa(caId), active, type, conf, cert, profiles,
                     control);
         } catch (SQLException ex) {
-            throw new CaMgmtException(datasource.translate(sql, ex));
+            throw new CaMgmtException(datasource, sql, ex);
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex);
         } finally {
@@ -2479,7 +2425,7 @@ class CaManagerQueryExecutor {
             long maxId = datasource.getMax(null, "USERNAME", "ID");
             id = maxId + 1;
         } catch (DataAccessException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         }
 
         final String sql = "INSERT INTO USERNAME (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
@@ -2495,8 +2441,7 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, hashedPassword);
             ps.executeUpdate();
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2524,8 +2469,7 @@ class CaManagerQueryExecutor {
 
             return rs.getInt("ID");
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, rs);
         }
@@ -2541,8 +2485,7 @@ class CaManagerQueryExecutor {
             ps.setString(1, userName);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2557,13 +2500,20 @@ class CaManagerQueryExecutor {
         }
         userEntry.getIdent().setId(existingId);
 
-        // TODO: consider the activity
-        String password = userEntry.getPassword();
-
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE USERNAME SET ");
 
         AtomicInteger index = new AtomicInteger(1);
+
+        Boolean active = userEntry.isActive();
+        Integer idxActive = null;
+        if (active != null) {
+            idxActive = index.getAndIncrement();
+            sqlBuilder.append("ACTIVE=?,");
+        }
+
+        String password = userEntry.getPassword();
+
         Integer idxPassword = null;
         if (password != null) {
             idxPassword = index.getAndIncrement();
@@ -2584,6 +2534,12 @@ class CaManagerQueryExecutor {
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
+
+            if (idxActive != null) {
+                setBoolean(ps, idxActive, active);
+                sb.append("active: ").append(active).append("; ");
+            }
+
             if (idxPassword != null) {
                 String hashedPassword;
                 try {
@@ -2604,8 +2560,7 @@ class CaManagerQueryExecutor {
             LOG.info("changed user: {}", sb);
             return true;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2630,8 +2585,7 @@ class CaManagerQueryExecutor {
             }
             return bo;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
@@ -2657,7 +2611,7 @@ class CaManagerQueryExecutor {
         try {
             maxId = datasource.getMax(null, "CA_HAS_USER", "ID");
         } catch (DataAccessException ex) {
-            throw new CaMgmtException(ex.getMessage(), ex);
+            throw new CaMgmtException(ex);
         }
 
         try {
@@ -2679,12 +2633,50 @@ class CaManagerQueryExecutor {
                     userIdent, ca, permissionText, profilesText);
             return num > 0;
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, null);
         }
     } // method addUserToCa
+
+    Map<String, CaHasUserEntry> getCaHasUsers(String user, CaIdNameMap idNameMap)
+            throws CaMgmtException {
+        Integer existingId = executeGetUserIdSql(user);
+        if (existingId == null) {
+            throw new CaMgmtException("user '" + user + " ' does not exist");
+        }
+
+        final String sql = "SELECT CA_ID,PERMISSIONS,PROFILES FROM CA_HAS_USER WHERE USER_ID=?";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = prepareStatement(sql);
+            ps.setInt(1, existingId);
+            rs = ps.executeQuery();
+
+            Map<String, CaHasUserEntry> ret = new HashMap<>();
+            while (rs.next()) {
+                String str = rs.getString("PERMISSIONS");
+                Set<Permission> permissions = CaUtil.getPermissions(str);
+                str = rs.getString("PROFILES");
+                List<String> list = StringUtil.split(str, ",");
+                Set<String> profiles = (list == null) ? null : new HashSet<>(list);
+                CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(existingId, user));
+                caHasUser.setPermissions(permissions);
+                caHasUser.setProfiles(profiles);
+
+                int caId = rs.getInt("CA_ID");
+                String caName = idNameMap.getCaName(caId);
+
+                ret.put(caName, caHasUser);
+            }
+            return ret;
+        } catch (SQLException ex) {
+            throw new CaMgmtException(datasource, sql, ex);
+        } finally {
+            datasource.releaseResources(ps, rs);
+        }
+    }  // method getCaHasUsers
 
     UserEntry getUser(final String username) throws CaMgmtException {
         ParamUtil.requireNonNull("username", username);
@@ -2709,8 +2701,7 @@ class CaManagerQueryExecutor {
             String hashedPassword = rs.getString("PASSWORD");
             return new UserEntry(ident, active, hashedPassword);
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, rs);
         }
@@ -2760,8 +2751,7 @@ class CaManagerQueryExecutor {
 
             return rs.getInt("ID");
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, rs);
         }
@@ -2780,8 +2770,7 @@ class CaManagerQueryExecutor {
                 ret.put(rs.getInt("ID"), rs.getString("NAME"));
             }
         } catch (SQLException ex) {
-            DataAccessException dex = datasource.translate(sql, ex);
-            throw new CaMgmtException(dex.getMessage(), dex);
+            throw new CaMgmtException(datasource, sql, ex);
         } finally {
             datasource.releaseResources(ps, rs);
         }

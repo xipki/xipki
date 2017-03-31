@@ -34,6 +34,10 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
+import java.sql.SQLException;
+
+import org.xipki.commons.datasource.DataSourceWrapper;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -55,8 +59,13 @@ public class CaMgmtException extends Exception {
         super(message);
     }
 
+    public CaMgmtException(final DataSourceWrapper datasource, final String sql,
+            final SQLException sqlEx) {
+        this(datasource.translate(sql, sqlEx));
+    }
+
     public CaMgmtException(final Throwable cause) {
-        super(cause);
+        super(cause.getMessage(), cause);
     }
 
 }

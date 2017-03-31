@@ -1701,6 +1701,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     @Override
+    public Map<String, CaHasUserEntry> getCaHasUsers(String user)
+            throws CaMgmtException {
+        ParamUtil.requireNonBlank("user", user);
+        return queryExecutor.getCaHasUsers(user, idNameMap);
+    }
+
+    @Override
     public CertprofileEntry getCertprofile(final String profileName) {
         ParamUtil.requireNonBlank("profileName", profileName);
         return certprofileDbEntries.get(profileName.toUpperCase());

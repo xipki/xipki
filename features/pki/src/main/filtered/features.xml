@@ -8,7 +8,7 @@
   <feature name="xipki-password" version="${project.version}" description="password">
     <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
+    <bundle start-level="70"><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle start-level="70">mvn:org.xipki.commons/common/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.commons/password/${project.version}</bundle>
   </feature>
@@ -90,8 +90,8 @@
   <feature name="xipki-jscepclient-shell" version="${project.version}"
       description="SCEP client shell using JSCEP">
     <feature prerequisite="true">xipki-shell-base</feature>
-    <bundle><![CDATA[wrap:mvn:com.google.code.jscep/jscep/${jscep.version}/$Bundle-SymbolicName=jscep&Bundle-Version=2.4.0]]></bundle>
-    <bundle><![CDATA[wrap:mvn:net.jcip/jcip-annotations/1.0/$Bundle-SymbolicName=jcip-annotations&Bundle-Version=1.0]]></bundle>
+    <bundle start-level="80"><![CDATA[wrap:mvn:com.google.code.jscep/jscep/${jscep.version}/$Bundle-SymbolicName=jscep&Bundle-Version=2.4.0]]></bundle>
+    <bundle start-level="80"><![CDATA[wrap:mvn:net.jcip/jcip-annotations/1.0/$Bundle-SymbolicName=jcip-annotations&Bundle-Version=1.0]]></bundle>
     <bundle start-level="80">mvn:commons-codec/commons-codec/1.7</bundle>
     <bundle start-level="80">mvn:commons-io/commons-io/2.4</bundle>
     <bundle start-level="80">mvn:commons-lang/commons-lang/2.6</bundle>
@@ -130,7 +130,7 @@
     <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit" version="${project.version}" description="Audit">
-    <bundle><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
+    <bundle start-level="70"><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle start-level="80">mvn:org.xipki.commons/audit/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}" description="Syslog audit">
