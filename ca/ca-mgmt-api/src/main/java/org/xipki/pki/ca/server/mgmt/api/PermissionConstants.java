@@ -86,7 +86,7 @@ public class PermissionConstants {
     public static boolean contains(final int permissionA, final int permissionB) {
         return (permissionA & permissionB) == permissionB;
     }
-    
+
     public static Integer getPermissionForText(String text) {
         return (text == null) ? null : textCodeMap.get(text.toUpperCase());
     }
