@@ -52,7 +52,7 @@ public class CaHasRequestorEntry {
 
     private boolean ra;
 
-    private Set<Permission> permissions;
+    private int permission;
 
     private Set<String> profiles;
 
@@ -68,12 +68,12 @@ public class CaHasRequestorEntry {
         this.ra = ra;
     }
 
-    public Set<Permission> getPermissions() {
-        return permissions;
+    public int getPermission() {
+        return permission;
     }
 
-    public void setPermissions(final Set<Permission> permissions) {
-        this.permissions = CollectionUtil.unmodifiableSet(permissions);
+    public void setPermission(final int permission) {
+        this.permission = permission;
     }
 
     public NameId getRequestorIdent() {
@@ -96,12 +96,8 @@ public class CaHasRequestorEntry {
         return profiles.contains("ALL") || profiles.contains(certprofile.toUpperCase());
     }
 
-    public boolean isPermitted(Permission permission) {
-        if (permissions.contains(Permission.ALL)
-                || permissions.contains(permission)) {
-            return true;
-        }
-        return false;
+    public boolean isPermitted(int permission) {
+        return PermissionConstants.contains(this.permission, permission);
     }
 
     @Override
@@ -110,7 +106,7 @@ public class CaHasRequestorEntry {
         sb.append("requestor: ").append(requestorIdent).append("\n");
         sb.append("ra: ").append(ra).append("\n");
         sb.append("profiles: ").append(profiles).append("\n");
-        sb.append("permissions: ").append(Permission.toString(permissions));
+        sb.append("permission: ").append(permission);
         return sb.toString();
     }
 
@@ -129,7 +125,7 @@ public class CaHasRequestorEntry {
             return false;
         }
 
-        if (!permissions.equals(objB.permissions)) {
+        if (permission != objB.permission) {
             return false;
         }
 

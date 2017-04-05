@@ -410,8 +410,8 @@ if { $printUsage equals "true" } {
   # change the CA configuration
 
   xipki-ca:ca-up --name RCA1 \
-    --permission enroll \
-    --permission revoke \
+    --permission ENROLL_CERT \
+    --permission REVOKE_CERT \
     --max-validity 8y \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
     --ca-cert-uri http://example.org/RCA1-2.der \
@@ -420,8 +420,8 @@ if { $printUsage equals "true" } {
     --validity-mode STRICT
 
   xipki-caqa:ca-check --name RCA1 \
-    --permission enroll \
-    --permission revoke \
+    --permission ENROLL_CERT \
+    --permission REVOKE_CERT \
     --max-validity 8y \
     --sn-bitlen 63  \
     --signer-type $TOKEN_TYPE \
@@ -665,15 +665,15 @@ if { $printUsage equals "true" } {
     --ca RCA1 \
     --requestor requestor1 \
     --ra yes \
-    --permission enroll \
-    --permission revoke
+    --permission ENROLL_CERT \
+    --permission REVOKE_CERT
 
   xipki-caqa:careq-check \
     --ca RCA1 \
     --ra yes \
     --requestor requestor1 \
-    --permission enroll \
-    --permission revoke \
+    --permission ENROLL_CERT \
+    --permission REVOKE_CERT \
     --profile NULL
 
   # CA name does not exist
@@ -972,7 +972,8 @@ if { $printUsage equals "true" } {
 
   xipki-ca:ca-up \
     --name RCA1 \
-    --permission enroll --permission revoke \
+    --permission ENROLL_CERT \
+    --permission REVOKE_CERT \
     --max-validity 8y \
     --signer-conf $CA_SIGNER_CONF_RCA \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \

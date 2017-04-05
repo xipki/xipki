@@ -42,7 +42,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -61,7 +60,7 @@ import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
+import org.xipki.pki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
@@ -295,12 +294,12 @@ public class X509CaInfo {
         caEntry.setValidityMode(mode);
     }
 
-    public Set<Permission> getPermissions() {
-        return caEntry.getPermissions();
+    public int getPermission() {
+        return caEntry.getPermission();
     }
 
-    public void setPermissions(final Set<Permission> permissions) {
-        caEntry.setPermissions(permissions);
+    public void setPermission(final int permission) {
+        caEntry.setPermission(permission);
     }
 
     public CertRevocationInfo getRevocationInfo() {
@@ -389,29 +388,11 @@ public class X509CaInfo {
     } // method initSigner
 
     public boolean isSignerRequired() {
-        Set<Permission> permissions = caEntry.getPermissions();
-        if (permissions == null) {
-            return true;
-        }
-
-        boolean signerRequired = false;
-        for (Permission permission : permissions) {
-            switch (permission) {
-            case REMOVE_CERT:
-            case UNREVOKE_CERT:
-            case REVOKE_CERT:
-                break;
-            default:
-                signerRequired = true;
-                break;
-            } // end switch (permission)
-
-            if (signerRequired) {
-                break;
-            }
-        }
-
-        return signerRequired;
+        int permission = caEntry.getPermission();
+        return PermissionConstants.contains(permission, PermissionConstants.ENROLL_CROSS)
+                || PermissionConstants.contains(permission, PermissionConstants.ENROLL_CERT)
+                || PermissionConstants.contains(permission, PermissionConstants.GEN_CRL)
+                || PermissionConstants.contains(permission, PermissionConstants.KEY_UPDATE);
     } // method isSignerRequired
 
     public RevokeSuspendedCertsControl getRevokeSuspendedCertsControl() {

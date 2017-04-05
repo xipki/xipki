@@ -34,8 +34,6 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
-import java.util.Set;
-
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -69,7 +67,7 @@ public class ChangeCaEntry {
 
     private ValidityMode validityMode;
 
-    private Set<Permission> permissions;
+    private Integer permission;
 
     private Integer keepExpiredCertInDays;
 
@@ -165,12 +163,12 @@ public class ChangeCaEntry {
         this.saveRequest = saveRequest;
     }
 
-    public Set<Permission> getPermissions() {
-        return permissions;
+    public Integer getPermission() {
+        return permission;
     }
 
-    public void setPermissions(final Set<Permission> permissions) {
-        this.permissions = permissions;
+    public void setPermission(final Integer permission) {
+        this.permission = permission;
     }
 
     public Integer getExpirationPeriod() {

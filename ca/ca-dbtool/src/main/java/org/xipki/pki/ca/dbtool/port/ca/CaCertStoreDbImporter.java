@@ -121,7 +121,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             "INSERT INTO USERNAME (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
 
     private static final String SQL_ADD_CAUSER =
-            "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID,PERMISSIONS,PROFILES) VALUES (?,?,?,?,?)";
+            "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID,PERMISSION,PROFILES) VALUES (?,?,?,?,?)";
 
     private static final String SQL_ADD_REQUEST =
             "INSERT INTO REQUEST (ID,LUPDATE,DATA) VALUES (?,?,?)";
@@ -687,7 +687,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                         psAddCaUser.setLong(idx++, causer.getId());
                         psAddCaUser.setInt(idx++, causer.getCaId());
                         psAddCaUser.setInt(idx++, causer.getUid());
-                        psAddCaUser.setString(idx++, causer.getPermissions());
+                        psAddCaUser.setInt(idx++, causer.getPermission());
                         psAddCaUser.setString(idx++, causer.getProfiles());
                         psAddCaUser.addBatch();
                     } catch (SQLException ex) {

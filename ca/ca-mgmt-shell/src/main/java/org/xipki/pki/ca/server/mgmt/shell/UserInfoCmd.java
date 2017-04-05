@@ -41,7 +41,6 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.server.mgmt.api.CaHasUserEntry;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 
 /**
@@ -72,7 +71,7 @@ public class UserInfoCmd extends CaCommandSupport {
             CaHasUserEntry entry = caHasUsers.get(ca);
             sb.append("\n----- CA ").append(ca).append("-----");
             sb.append("\nprofiles: ").append(entry.getProfiles()).append("\n");
-            sb.append("\npermissions: ").append(Permission.toString(entry.getPermissions()));
+            sb.append("\npermission: ").append(entry.getPermission());
         }
         println(sb.toString());
         return null;

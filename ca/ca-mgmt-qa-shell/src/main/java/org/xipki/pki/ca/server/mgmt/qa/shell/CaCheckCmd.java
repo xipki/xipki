@@ -36,7 +36,6 @@ package org.xipki.pki.ca.server.mgmt.qa.shell;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
@@ -45,7 +44,6 @@ import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCaEntry;
@@ -202,10 +200,12 @@ public class CaCheckCmd extends CaUpdateCmd {
         }
 
         // Permissions
-        if (ey.getPermissions() != null) {
-            Set<Permission> ex = ey.getPermissions();
-            Set<Permission> is = ca.getPermissions();
-            MgmtQaShellUtil.assertEquals("permissions", ex, is);
+        if (ey.getPermission() != null) {
+            int ex = ey.getPermission();
+            int is = ca.getPermission();
+            if (ex != is) {
+                throw buildUnexpectedException("permission", is, ex);
+            }
         }
 
         // Responder name

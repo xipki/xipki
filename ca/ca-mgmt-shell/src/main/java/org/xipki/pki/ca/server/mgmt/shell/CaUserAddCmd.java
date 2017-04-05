@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -43,7 +42,6 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.CaHasUserEntry;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
@@ -89,11 +87,8 @@ public class CaUserAddCmd extends CaCommandSupport {
     protected Object doExecute() throws Exception {
         CaHasUserEntry entry = new CaHasUserEntry(new NameId(null, userName));
         entry.setProfiles(profiles);
-        Set<Permission> tmpPermissions = new HashSet<>();
-        for (String permission : permissions) {
-            tmpPermissions.add(Permission.forValue(permission));
-        }
-        entry.setPermissions(tmpPermissions);
+        int intPermission = ShellUtil.getPermission(permissions);
+        entry.setPermission(intPermission);
 
         boolean bo = caManager.addUserToCa(entry, caName);
         output(bo, "added", "could not add", "user " + userName + " to CA " + caName);

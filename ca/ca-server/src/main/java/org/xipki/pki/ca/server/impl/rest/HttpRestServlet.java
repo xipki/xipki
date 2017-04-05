@@ -83,7 +83,7 @@ import org.xipki.pki.ca.server.impl.X509Ca;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderManager;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
+import org.xipki.pki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 /**
@@ -252,7 +252,7 @@ public class HttpRestServlet extends HttpServlet {
                 profile = profile.toUpperCase();
 
                 try {
-                    requestor.assertPermitted(Permission.ENROLL_CERT);
+                    requestor.assertPermitted(PermissionConstants.ENROLL_CERT);
                 } catch (InsuffientPermissionException ex) {
                     throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
                 }
@@ -310,11 +310,11 @@ public class HttpRestServlet extends HttpServlet {
                 respBytes = cert.getEncodedCert();
             } else if (RestfulAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)
                     || RestfulAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
-                Permission permission;
+                int permission;
                 if (RestfulAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)) {
-                    permission = Permission.REVOKE_CERT;
+                    permission = PermissionConstants.REVOKE_CERT;
                 } else {
-                    permission = Permission.REMOVE_CERT;
+                    permission = PermissionConstants.REMOVE_CERT;
                 }
                 try {
                     requestor.assertPermitted(permission);
@@ -363,7 +363,7 @@ public class HttpRestServlet extends HttpServlet {
                 }
             } else if (RestfulAPIConstants.CMD_crl.equalsIgnoreCase(command)) {
                 try {
-                    requestor.assertPermitted(Permission.GET_CRL);
+                    requestor.assertPermitted(PermissionConstants.GET_CRL);
                 } catch (InsuffientPermissionException ex) {
                     throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
                 }
@@ -393,7 +393,7 @@ public class HttpRestServlet extends HttpServlet {
                 respBytes = crl.getEncoded();
             } else if (RestfulAPIConstants.CMD_new_crl.equalsIgnoreCase(command)) {
                 try {
-                    requestor.assertPermitted(Permission.GEN_CRL);
+                    requestor.assertPermitted(PermissionConstants.GEN_CRL);
                 } catch (InsuffientPermissionException ex) {
                     throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
                 }

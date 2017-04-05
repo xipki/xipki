@@ -41,7 +41,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.api.InsuffientPermissionException;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.CaHasUserEntry;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
+import org.xipki.pki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 /**
@@ -55,8 +55,7 @@ public class ByUserRequestorInfo implements RequestorInfo {
 
     private final CaHasUserEntry caHasUser;
 
-    public ByUserRequestorInfo(final NameId ident,
-            final CaHasUserEntry caHasUser) {
+    public ByUserRequestorInfo(final NameId ident, final CaHasUserEntry caHasUser) {
         this.ident = ParamUtil.requireNonNull("ident", ident);
         this.caHasUser = ParamUtil.requireNonNull("caHasUser", caHasUser);
     }
@@ -90,13 +89,8 @@ public class ByUserRequestorInfo implements RequestorInfo {
     }
 
     @Override
-    public boolean isPermitted(Permission permission) {
-        Set<Permission> permissions = caHasUser.getPermissions();
-        if (permissions.contains(Permission.ALL)
-                || permissions.contains(permission)) {
-            return true;
-        }
-        return false;
+    public boolean isPermitted(int permission) {
+        return PermissionConstants.contains(caHasUser.getPermission(), permission);
     }
 
     @Override
@@ -109,11 +103,11 @@ public class ByUserRequestorInfo implements RequestorInfo {
     }
 
     @Override
-    public void assertPermitted(Permission permission)
+    public void assertPermitted(int permission)
             throws InsuffientPermissionException {
         if (!isPermitted(permission)) {
-            throw new  InsuffientPermissionException(permission.getPermission()
-                + " is not permitted");
+            throw new  InsuffientPermissionException("Permission "
+                    + PermissionConstants.getTextForCode(permission) + " is not permitted");
         }
     }
 

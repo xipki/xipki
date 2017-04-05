@@ -187,7 +187,7 @@
       <xs:element name="duplicateKey" type="xs:int"/>
       <xs:element name="duplicateSubject" type="xs:int"/>
       <xs:element name="saveReq" type="xs:int"/>
-      <xs:element name="permissions" type="xs:string"/>
+      <xs:element name="permission" type="xs:int"/>
       <xs:element name="numCrls" type="xs:int" minOccurs="0"/>
       <xs:element name="expirationPeriod" type="xs:int"/>
       <xs:element name="keepExpiredCertDays" type="xs:int"/>
@@ -212,7 +212,7 @@
       <xs:element name="caId" type="xs:int"/>
       <xs:element name="requestorId" type="xs:int"/>
       <xs:element name="ra" type="xs:boolean"/>
-      <xs:element name="permissions" type="xs:string" minOccurs="0"/>
+      <xs:element name="permission" type="xs:int" minOccurs="0"/>
       <xs:element name="profiles" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>

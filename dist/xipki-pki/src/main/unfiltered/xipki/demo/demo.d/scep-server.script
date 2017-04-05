@@ -36,5 +36,5 @@ xipki-ca:causer-add \
   --user user1 \
   --ca SubCAwithCRL1 \
   --profile OCSP \
-  --permission ENROLL
+  --permission ENROLL_CERT
  

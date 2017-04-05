@@ -36,7 +36,6 @@ package org.xipki.pki.ca.server.mgmt.qa.shell;
 
 import java.rmi.UnexpectedException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.Command;
@@ -47,8 +46,8 @@ import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.completer.YesNoCompleter;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
+import org.xipki.pki.ca.server.mgmt.shell.ShellUtil;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter;
@@ -125,14 +124,11 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
         }
 
         if (permissions != null) {
-            Set<Permission> tmpPermissions = new HashSet<>();
-            for (String permission : permissions) {
-                tmpPermissions.add(Permission.forValue(permission));
-            }
+            int intPermission = ShellUtil.getPermission(permissions);
 
-            if (!tmpPermissions.equals(entry.getPermissions())) {
-                throw new CmdFailure("permissions: is '" + entry.getPermissions()
-                        + "', but expected '" + tmpPermissions + "'");
+            if (intPermission != entry.getPermission()) {
+                throw new CmdFailure("permissions: is '" + entry.getPermission()
+                        + "', but expected '" + intPermission + "'");
             }
         }
 

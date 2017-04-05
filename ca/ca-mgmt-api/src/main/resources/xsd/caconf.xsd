@@ -193,7 +193,7 @@
         </xs:annotation>
       </xs:element>
       <xs:element name="keepExpiredCertDays" type="xs:int" minOccurs="0"/>
-      <xs:element name="permissions" type="stringsType"/>
+      <xs:element name="permission" type="xs:int"/>
       <xs:element name="maxValidity" type="xs:string"/>
       <xs:element name="responderName" type="xs:string" minOccurs="0"/>
       <xs:element name="saveReq" type="xs:boolean"/>
@@ -220,7 +220,7 @@
     <xs:sequence>
       <xs:element name="requestorName" type="xs:string"/>
       <xs:element name="ra" type="xs:boolean"/>
-      <xs:element name="permissions" type="stringsType" minOccurs="0"/>
+      <xs:element name="permission" type="xs:int"/>
       <xs:element name="profiles" type="stringsType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>

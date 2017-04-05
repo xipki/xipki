@@ -39,7 +39,7 @@ import org.xipki.pki.ca.api.InsuffientPermissionException;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
+import org.xipki.pki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 /**
@@ -82,7 +82,7 @@ public class CmpRequestorInfo implements RequestorInfo {
     }
 
     @Override
-    public boolean isPermitted(Permission permission) {
+    public boolean isPermitted(int permission) {
         return caHasRequestor.isPermitted(permission);
     }
 
@@ -96,11 +96,11 @@ public class CmpRequestorInfo implements RequestorInfo {
     }
 
     @Override
-    public void assertPermitted(Permission permission)
+    public void assertPermitted(int permission)
             throws InsuffientPermissionException {
         if (!isPermitted(permission)) {
-            throw new  InsuffientPermissionException(permission.getPermission()
-                + " is not permitted");
+            throw new  InsuffientPermissionException("Permission "
+                    + PermissionConstants.getTextForCode(permission) + " is not permitted");
         }
     }
 

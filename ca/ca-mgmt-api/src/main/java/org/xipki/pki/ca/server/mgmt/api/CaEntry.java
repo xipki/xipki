@@ -38,7 +38,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.CollectionUtil;
@@ -80,7 +79,7 @@ public class CaEntry {
 
     private ValidityMode validityMode = ValidityMode.STRICT;
 
-    private Set<Permission> permissions;
+    private int permission;
 
     private int expirationPeriod;
 
@@ -203,16 +202,12 @@ public class CaEntry {
         this.validityMode = ParamUtil.requireNonNull("mode", mode);
     }
 
-    public Set<Permission> getPermissions() {
-        return permissions;
+    public int getPermission() {
+        return permission;
     }
 
-    public String getPermissionsAsText() {
-        return toString(permissions);
-    }
-
-    public void setPermissions(final Set<Permission> permissions) {
-        this.permissions = CollectionUtil.unmodifiableSet(permissions);
+    public void setPermission(final int permission) {
+        this.permission = permission;
     }
 
     public int getExpirationPeriod() {
@@ -257,7 +252,7 @@ public class CaEntry {
         sb.append("duplicateSubject: ").append(duplicateSubjectPermitted).append('\n');
         sb.append("saveRequest: ").append(saveRequest).append('\n');
         sb.append("validityMode: ").append(validityMode).append('\n');
-        sb.append("permissions: ").append(Permission.toString(permissions)).append('\n');
+        sb.append("permission: ").append(permission).append('\n');
         sb.append("keepExpiredCerts: ");
         if (keepExpiredCertInDays < 0) {
             sb.append("forever");
@@ -335,7 +330,7 @@ public class CaEntry {
             return false;
         }
 
-        if (!CompareUtil.equalsObject(permissions, objB.permissions)) {
+        if (permission != objB.permission) {
             return false;
         }
 

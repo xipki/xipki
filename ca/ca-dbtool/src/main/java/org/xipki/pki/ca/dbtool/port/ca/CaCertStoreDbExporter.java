@@ -270,7 +270,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             break;
         case CAUSER:
             numProcessedBefore = certstore.getCountCaUsers();
-            coreSql = "ID,CA_ID,USER_ID,PERMISSIONS,PROFILES FROM CA_HAS_USER WHERE ID>=?";
+            coreSql = "ID,CA_ID,USER_ID,PERMISSION,PROFILES FROM CA_HAS_USER WHERE ID>=?";
             break;
         case REQUEST:
             numProcessedBefore = certstore.getCountRequests();
@@ -505,8 +505,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         int uid = rs.getInt("USER_ID");
                         causer.setUid(uid);
 
-                        String permissions = rs.getString("PERMISSIONS");
-                        causer.setPermissions(permissions);
+                        int permission = rs.getInt("PERMISSION");
+                        causer.setPermission(permission);
 
                         String profiles = rs.getString("PROFILES");
                         causer.setProfiles(profiles);

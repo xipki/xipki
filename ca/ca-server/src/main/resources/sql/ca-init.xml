@@ -185,7 +185,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="VALIDITY_MODE" type="varchar(100)"/>
-      <column name="PERMISSIONS" type="VARCHAR(200)">
+      <column name="PERMISSION" type="INT">
         <constraints nullable="false"/>
       </column>
       <column name="NUM_CRLS" type="SMALLINT" defaultValueNumeric="30">
@@ -236,7 +236,7 @@
       <column name="RA" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
-      <column name="PERMISSIONS" type="VARCHAR(200)"/>
+      <column name="PERMISSION" type="INT"/>
       <column name="PROFILES" type="VARCHAR(200)"/>
     </createTable>
     <!-- table CA_HAS_PUBLISHER -->
@@ -291,7 +291,7 @@
       <column name="USER_ID" type="INT">
         <constraints nullable="false"/>
       </column>
-      <column name="PERMISSIONS" type="VARCHAR(200)"/>
+      <column name="PERMISSION" type="INT"/>
       <column name="PROFILES" type="VARCHAR(200)"/>
     </createTable>
     <addUniqueConstraint tableName="CA_HAS_USER" columnNames="CA_ID, USER_ID"

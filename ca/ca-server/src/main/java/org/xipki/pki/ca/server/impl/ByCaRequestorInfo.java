@@ -37,7 +37,6 @@ package org.xipki.pki.ca.server.impl;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ca.api.InsuffientPermissionException;
 import org.xipki.pki.ca.api.NameId;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 /**
@@ -69,7 +68,7 @@ public class ByCaRequestorInfo implements RequestorInfo {
     }
 
     @Override
-    public boolean isPermitted(Permission requiredPermission) {
+    public boolean isPermitted(int requiredPermission) {
         return true;
     }
 
@@ -79,7 +78,7 @@ public class ByCaRequestorInfo implements RequestorInfo {
     }
 
     @Override
-    public void assertPermitted(Permission requiredPermission)
+    public void assertPermitted(int requiredPermission)
             throws InsuffientPermissionException {
     }
 

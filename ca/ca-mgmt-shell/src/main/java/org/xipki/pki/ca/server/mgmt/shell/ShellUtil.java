@@ -34,25 +34,29 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
+import java.util.Set;
+
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.ConfPairs;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.SecurityFactory;
+import org.xipki.pki.ca.server.mgmt.api.PermissionConstants;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-class ShellUtil {
+public class ShellUtil {
 
     private ShellUtil() {
     }
 
-    static String canonicalizeSignerConf(final String keystoreType, final String signerConf,
+    public static String canonicalizeSignerConf(final String keystoreType, final String signerConf,
             final PasswordResolver passwordResolver, final SecurityFactory securityFactory)
             throws Exception {
         ParamUtil.requireNonBlank("keystoreType", keystoreType);
@@ -96,5 +100,17 @@ class ShellUtil {
         pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
         return pairs.getEncoded();
     } // method doExecute
+
+    public static int getPermission(Set<String> permissions) throws IllegalCmdParamException {
+        int ret = 0;
+        for (String permission : permissions) {
+            Integer code = PermissionConstants.getPermissionForText(permission);
+            if (code == null) {
+                throw new IllegalCmdParamException("invalid permission '" + permission + "'");
+            }
+            ret |= code;
+        }
+        return ret;
+    }
 
 }

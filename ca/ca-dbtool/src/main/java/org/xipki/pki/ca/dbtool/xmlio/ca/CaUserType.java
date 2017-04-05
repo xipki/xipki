@@ -56,7 +56,7 @@ public class CaUserType extends IdentifidDbObjectType {
 
     public static final String TAG_UID = "uid";
 
-    public static final String TAG_PERMISSIONS = "permissions";
+    public static final String TAG_PERMISSION = "permission";
 
     public static final String TAG_PROFILES = "profiles";
 
@@ -64,7 +64,7 @@ public class CaUserType extends IdentifidDbObjectType {
 
     private Integer uid;
 
-    private String permissions;
+    private Integer permission;
 
     private String profiles;
 
@@ -84,12 +84,12 @@ public class CaUserType extends IdentifidDbObjectType {
         this.uid = uid;
     }
 
-    public String getPermissions() {
-        return permissions;
+    public Integer getPermission() {
+        return permission;
     }
 
-    public void setPermissions(String permissions) {
-        this.permissions = permissions;
+    public void setPermission(Integer permission) {
+        this.permission = permission;
     }
 
     public String getProfiles() {
@@ -117,7 +117,7 @@ public class CaUserType extends IdentifidDbObjectType {
         writeIfNotNull(writer, TAG_ID, getId());
         writeIfNotNull(writer, TAG_CA_ID, caId);
         writeIfNotNull(writer, TAG_UID, uid);
-        writeIfNotNull(writer, TAG_PERMISSIONS, permissions);
+        writeIfNotNull(writer, TAG_PERMISSION, permission);
         writeIfNotNull(writer, TAG_PROFILES, profiles);
         writer.writeEndElement();
         writer.writeNewline();

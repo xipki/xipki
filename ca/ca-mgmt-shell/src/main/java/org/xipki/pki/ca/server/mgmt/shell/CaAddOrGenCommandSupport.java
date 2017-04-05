@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ca.server.mgmt.shell;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -50,7 +49,6 @@ import org.xipki.commons.password.PasswordResolver;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaUris;
@@ -249,12 +247,8 @@ public abstract class CaAddOrGenCommandSupport extends CaCommandSupport {
             entry.setCmpControlName(cmpControlName);
         }
 
-        Set<Permission> tmpPermissions = new HashSet<>();
-        for (String permission : permissions) {
-            tmpPermissions.add(Permission.forValue(permission));
-        }
-
-        entry.setPermissions(tmpPermissions);
+        int intPermission = ShellUtil.getPermission(permissions);
+        entry.setPermission(intPermission);
 
         if (StringUtil.isNotBlank(extraControl)) {
             entry.setExtraControl(extraControl.trim());

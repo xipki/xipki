@@ -162,9 +162,7 @@
           <duplicateSubject>true</duplicateSubject>
           <expirationPeriod>365</expirationPeriod>
           <keepExpiredCertDays>-1</keepExpiredCertDays>
-          <permissions>
-            <str>ALL</str>
-          </permissions>
+          <permission>255</permission>
           <maxValidity>10y</maxValidity>
           <responderName>responder1</responderName>
           <saveReq>true</saveReq>
@@ -197,9 +195,7 @@
         <requestor>
           <requestorName>requestor1</requestorName>
           <ra>true</ra>
-          <permissions>
-            <str>ALL</str>
-          </permissions>
+          <permission>255</permission>
           <profiles>
             <str>ALL</str>
           </profiles>

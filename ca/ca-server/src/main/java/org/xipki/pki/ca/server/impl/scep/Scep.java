@@ -94,7 +94,7 @@ import org.xipki.pki.ca.server.impl.X509Ca;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
+import org.xipki.pki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
@@ -675,9 +675,10 @@ public class Scep {
 
     private static void checkUserPermission(ByUserRequestorInfo requestor, String certProfile)
             throws OperationException {
-        if (!requestor.isPermitted(Permission.ENROLL_CERT)) {
+        int permission = PermissionConstants.ENROLL_CERT;
+        if (!requestor.isPermitted(permission)) {
             throw new OperationException(ErrorCode.NOT_PERMITTED,
-                    Permission.ENROLL_CERT + " is not permitted for user "
+                    PermissionConstants.getTextForCode(permission) + " is not permitted for user "
                     + requestor.getCaHasUser().getUserIdent().getName());
         }
 

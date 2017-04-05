@@ -54,12 +54,12 @@ public interface RequestorInfo {
 
     boolean isCertProfilePermitted(final String certprofile);
 
-    boolean isPermitted(Permission requiredPermission);
+    boolean isPermitted(int requiredPermission);
 
     void assertCertProfilePermitted(final String certprofile)
             throws InsuffientPermissionException;
 
-    void assertPermitted(Permission requiredPermission)
+    void assertPermitted(int requiredPermission)
             throws InsuffientPermissionException;
 
 }

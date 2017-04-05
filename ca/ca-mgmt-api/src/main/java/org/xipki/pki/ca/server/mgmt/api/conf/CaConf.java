@@ -85,7 +85,6 @@ import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.conf.jaxb.CAConfType;
@@ -370,14 +369,7 @@ public class CaConf {
                     caEntry.setKeepExpiredCertInDays(keepExpiredCertDays);
 
                     caEntry.setMaxValidity(CertValidity.getInstance(ci.getMaxValidity()));
-                    List<String> permStrs = getStrings(ci.getPermissions());
-                    if (permStrs != null) {
-                        Set<Permission> permissions = new HashSet<>();
-                        for (String per : permStrs) {
-                            permissions.add(Permission.forValue(per));
-                        }
-                        caEntry.setPermissions(permissions);
-                    }
+                    caEntry.setPermission(ci.getPermission());
 
                     caEntry.setResponderName(ci.getResponderName());
 
@@ -434,15 +426,7 @@ public class CaConf {
                             en.setProfiles(new HashSet<>(strs));
                         }
 
-                        strs = getStrings(req.getPermissions());
-                        if (strs != null) {
-                            Set<Permission> permissions = new HashSet<>();
-                            for (String perm : strs) {
-                                permissions.add(Permission.forValue(perm));
-                            }
-
-                            en.setPermissions(permissions);
-                        }
+                        en.setPermission(req.getPermission());
                         caHasRequestors.add(en);
                     }
                 }

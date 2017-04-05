@@ -100,7 +100,6 @@ import org.xipki.pki.ca.server.mgmt.api.CaHasUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CertArt;
 import org.xipki.pki.ca.server.mgmt.api.CertListInfo;
 import org.xipki.pki.ca.server.mgmt.api.CertListOrderBy;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
 
 /**
  * @author Lijun Liao
@@ -1577,14 +1576,13 @@ class CertStoreQueryExecutor {
                 return null;
             }
 
-            String str = rs.getString("PERMISSIONS");
-            Set<Permission> permissions = CaUtil.getPermissions(str);
-            str = rs.getString("PROFILES");
+            int permission = rs.getInt("PERMISSION");
+            String str = rs.getString("PROFILES");
             List<String> list = StringUtil.split(str, ",");
             Set<String> profiles = (list == null) ? null : new HashSet<>(list);
 
             CaHasUserEntry entry = new CaHasUserEntry(user);
-            entry.setPermissions(permissions);
+            entry.setPermission(permission);
             entry.setProfiles(profiles);
             return entry;
         } catch (SQLException ex) {

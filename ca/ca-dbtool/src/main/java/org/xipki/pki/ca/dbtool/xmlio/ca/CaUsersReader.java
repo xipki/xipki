@@ -103,8 +103,8 @@ public class CaUsersReader extends DbiXmlReader {
                 case CaUserType.TAG_UID:
                     ret.setUid(Integer.parseInt(tagContent));
                     break;
-                case CaUserType.TAG_PERMISSIONS:
-                    ret.setPermissions(tagContent);
+                case CaUserType.TAG_PERMISSION:
+                    ret.setPermission(Integer.parseInt(tagContent));
                     break;
                 case CaUserType.TAG_PROFILES:
                     ret.setProfiles(tagContent);

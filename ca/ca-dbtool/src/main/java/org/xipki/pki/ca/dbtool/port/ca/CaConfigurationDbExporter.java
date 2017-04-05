@@ -413,7 +413,7 @@ class CaConfigurationDbExporter extends DbPorter {
         Cas cas = new Cas();
         StringBuilder sqlBuilder = new StringBuilder(400);
         sqlBuilder.append("SELECT ID,NAME,SN_SIZE,STATUS,CRL_URIS,OCSP_URIS,MAX_VALIDITY,CERT,");
-        sqlBuilder.append("SIGNER_TYPE,SIGNER_CONF,CRLSIGNER_NAME,PERMISSIONS,NUM_CRLS,");
+        sqlBuilder.append("SIGNER_TYPE,SIGNER_CONF,CRLSIGNER_NAME,PERMISSION,NUM_CRLS,");
         sqlBuilder.append("EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,REV,RR,RT,RIT,");
         sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,DELTACRL_URIS,");
         sqlBuilder.append("VALIDITY_MODE,CACERT_URIS,ART,NEXT_CRLNO,RESPONDER_NAME,");
@@ -449,7 +449,7 @@ class CaConfigurationDbExporter extends DbPorter {
                 int duplicateKey = rs.getInt("DUPLICATE_KEY");
                 int duplicateSubject = rs.getInt("DUPLICATE_SUBJECT");
                 int saveReq = rs.getInt("SAVE_REQ");
-                String permissions = rs.getString("PERMISSIONS");
+                int permission = rs.getInt("PERMISSION");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
                 int keepExpiredCertDays = rs.getInt("KEEP_EXPIRED_CERT_DAYS");
                 String validityMode = rs.getString("VALIDITY_MODE");
@@ -475,7 +475,7 @@ class CaConfigurationDbExporter extends DbPorter {
                 ca.setDuplicateKey(duplicateKey);
                 ca.setDuplicateSubject(duplicateSubject);
                 ca.setSaveReq(saveReq);
-                ca.setPermissions(permissions);
+                ca.setPermission(permission);
                 ca.setExpirationPeriod(expirationPeriod);
                 ca.setKeepExpiredCertDays(keepExpiredCertDays);
                 ca.setValidityMode(validityMode);
@@ -510,8 +510,7 @@ class CaConfigurationDbExporter extends DbPorter {
     private void exportCaHasRequestor(final CAConfigurationType caconf) throws DataAccessException {
         System.out.println("exporting table CA_HAS_REQUESTOR");
         CaHasRequestors caHasRequestors = new CaHasRequestors();
-        final String sql = "SELECT CA_ID,REQUESTOR_ID,RA,PERMISSIONS,PROFILES"
-                + " FROM CA_HAS_REQUESTOR";
+        final String sql = "SELECT CA_ID,REQUESTOR_ID,RA,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -523,14 +522,14 @@ class CaConfigurationDbExporter extends DbPorter {
                 int caId = rs.getInt("CA_ID");
                 int requestorId = rs.getInt("REQUESTOR_ID");
                 boolean ra = rs.getBoolean("RA");
-                String permissions = rs.getString("PERMISSIONS");
+                int permission = rs.getInt("PERMISSION");
                 String profiles = rs.getString("PROFILES");
 
                 CaHasRequestorType caHasRequestor = new CaHasRequestorType();
                 caHasRequestor.setCaId(caId);
                 caHasRequestor.setRequestorId(requestorId);
                 caHasRequestor.setRa(ra);
-                caHasRequestor.setPermissions(permissions);
+                caHasRequestor.setPermission(permission);
                 caHasRequestor.setProfiles(profiles);
 
                 caHasRequestors.getCaHasRequestor().add(caHasRequestor);

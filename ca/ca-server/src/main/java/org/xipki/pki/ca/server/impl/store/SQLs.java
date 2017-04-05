@@ -199,7 +199,7 @@ class SQLs {
         this.sqlActiveUserNameForId = datasource.buildSelectFirstSql(
                 "NAME FROM USERNAME WHERE ID=? AND ACTIVE=1", 1);
         this.sqlCaHasUser = datasource.buildSelectFirstSql(
-                "PERMISSIONS,PROFILES FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?", 1);
+                "PERMISSION,PROFILES FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?", 1);
         this.sqlKnowsCertForSerial = datasource.buildSelectFirstSql(
                 "UID FROM CERT WHERE SN=? AND CA_ID=?", 1);
         this.sqlRevForId = datasource.buildSelectFirstSql(

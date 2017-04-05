@@ -81,7 +81,6 @@ import org.xipki.pki.ca.server.impl.cmp.CmpRequestorEntryWrapper;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderEntryWrapper;
 import org.xipki.pki.ca.server.impl.scep.Scep;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
-import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.impl.util.PasswordHash;
 import org.xipki.pki.ca.server.mgmt.api.AddUserEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
@@ -98,7 +97,6 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControl;
 import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
@@ -595,9 +593,8 @@ class CaManagerQueryExecutor {
             boolean saveReq = (rs.getInt("SAVE_REQ") != 0);
             entry.setSaveRequest(saveReq);
 
-            String str = rs.getString("PERMISSIONS");
-            Set<Permission> permissions = CaUtil.getPermissions(str);
-            entry.setPermissions(permissions);
+            int permission = rs.getInt("PERMISSION");
+            entry.setPermission(permission);
             entry.setRevocationInfo(revocationInfo);
 
             String validityModeS = rs.getString("VALIDITY_MODE");
@@ -627,7 +624,7 @@ class CaManagerQueryExecutor {
         Map<Integer, String> idNameMap = getIdNameMap("REQUESTOR");
 
         final String sql =
-                "SELECT REQUESTOR_ID,RA,PERMISSIONS,PROFILES FROM CA_HAS_REQUESTOR WHERE CA_ID=?";
+                "SELECT REQUESTOR_ID,RA,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR WHERE CA_ID=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -641,14 +638,13 @@ class CaManagerQueryExecutor {
                 String name = idNameMap.get(id);
 
                 boolean ra = rs.getBoolean("RA");
-                String str = rs.getString("PERMISSIONS");
-                Set<Permission> permissions = CaUtil.getPermissions(str);
-                str = rs.getString("PROFILES");
+                int permission = rs.getInt("PERMISSION");
+                String str = rs.getString("PROFILES");
                 List<String> list = StringUtil.split(str, ",");
                 Set<String> profiles = (list == null) ? null : new HashSet<>(list);
                 CaHasRequestorEntry entry = new CaHasRequestorEntry(new NameId(id, name));
                 entry.setRa(ra);
-                entry.setPermissions(permissions);
+                entry.setPermission(permission);
                 entry.setProfiles(profiles);
 
                 ret.add(entry);
@@ -768,7 +764,7 @@ class CaManagerQueryExecutor {
         sqlBuilder.append("INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,CRL_URIS");
         sqlBuilder.append(",DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,CERT,SIGNER_TYPE");
         sqlBuilder.append(",CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,DUPLICATE_KEY");
-        sqlBuilder.append(",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSIONS,NUM_CRLS,EXPIRATION_PERIOD");
+        sqlBuilder.append(",DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,NUM_CRLS,EXPIRATION_PERIOD");
         sqlBuilder.append(",KEEP_EXPIRED_CERT_DAYS,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
         sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         final String sql = sqlBuilder.toString();
@@ -799,7 +795,7 @@ class CaManagerQueryExecutor {
             setBoolean(ps, idx++, entry.isDuplicateKeyPermitted());
             setBoolean(ps, idx++, entry.isDuplicateSubjectPermitted());
             setBoolean(ps, idx++, entry.isSaveRequest());
-            ps.setString(idx++, Permission.toString(entry.getPermissions()));
+            ps.setInt(idx++, entry.getPermission());
             ps.setInt(idx++, entry.getNumCrls());
             ps.setInt(idx++, entry.getExpirationPeriod());
             ps.setInt(idx++, entry.getKeepExpiredCertInDays());
@@ -979,7 +975,7 @@ class CaManagerQueryExecutor {
 
         PreparedStatement ps = null;
         final String sql = "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_ID,RA,"
-                + " PERMISSIONS,PROFILES) VALUES (?,?,?,?,?)";
+                + " PERMISSION,PROFILES) VALUES (?,?,?,?,?)";
         try {
             ps = prepareStatement(sql);
             int idx = 1;
@@ -988,16 +984,14 @@ class CaManagerQueryExecutor {
 
             boolean ra = requestor.isRa();
             setBoolean(ps, idx++, ra);
-
-            String permissionText = Permission.toString(requestor.getPermissions());
-            ps.setString(idx++, permissionText);
-
+            int permission = requestor.getPermission();
+            ps.setInt(idx++, permission);
             String profilesText = toString(requestor.getProfiles(), ",");
             ps.setString(idx++, profilesText);
 
             ps.executeUpdate();
             LOG.info("added requestor '{}' to CA '{}': ra: {}; permission: {}; profile: {}",
-                    requestorIdent, ca, ra, permissionText, profilesText);
+                    requestorIdent, ca, ra, permission, profilesText);
         } catch (SQLException ex) {
             throw new CaMgmtException(datasource, sql, ex);
         } finally {
@@ -1169,7 +1163,7 @@ class CaManagerQueryExecutor {
         Boolean duplicateKeyPermitted = entry.getDuplicateKeyPermitted();
         Boolean duplicateSubjectPermitted = entry.getDuplicateSubjectPermitted();
         Boolean saveReq = entry.getSaveRequest();
-        Set<Permission> permissions = entry.getPermissions();
+        Integer permission = entry.getPermission();
         Integer numCrls = entry.getNumCrls();
         Integer expirationPeriod = entry.getExpirationPeriod();
         Integer keepExpiredCertInDays = entry.getKeepExpiredCertInDays();
@@ -1257,7 +1251,7 @@ class CaManagerQueryExecutor {
                 "DUPLICATE_SUBJECT");
         Integer idxSaveReq = addToSqlIfNotNull(sqlBuilder, index, saveReq,
                 "SAVE_REQ");
-        Integer idxPermissions = addToSqlIfNotNull(sqlBuilder, index, permissions, "PERMISSIONS");
+        Integer idxPermission = addToSqlIfNotNull(sqlBuilder, index, permission, "PERMISSION");
         Integer idxNumCrls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
         Integer idxExpirationPeriod = addToSqlIfNotNull(sqlBuilder, index, expirationPeriod,
                 "EXPIRATION_PERIOD");
@@ -1377,10 +1371,9 @@ class CaManagerQueryExecutor {
                 setBoolean(ps, idxSaveReq, saveReq);
             }
 
-            if (idxPermissions != null) {
-                String txt = Permission.toString(permissions);
-                sb.append("permission: '").append(txt).append("'; ");
-                ps.setString(idxPermissions, txt);
+            if (idxPermission != null) {
+                sb.append("permission: '").append(permission).append("'; ");
+                ps.setInt(idxPermission, permission);
             }
 
             if (idxNumCrls != null) {
@@ -2544,7 +2537,7 @@ class CaManagerQueryExecutor {
 
         PreparedStatement ps = null;
         final String sql = "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID,"
-                + " PERMISSIONS,PROFILES) VALUES (?,?,?,?,?)";
+                + " PERMISSION,PROFILES) VALUES (?,?,?,?,?)";
 
         long maxId;
         try {
@@ -2560,16 +2553,14 @@ class CaManagerQueryExecutor {
             ps.setLong(idx++, maxId + 1);
             ps.setInt(idx++, ca.getId());
             ps.setInt(idx++, userIdent.getId());
-
-            String permissionText = Permission.toString(user.getPermissions());
-            ps.setString(idx++, permissionText);
+            ps.setInt(idx++, user.getPermission());
 
             String profilesText = toString(user.getProfiles(), ",");
             ps.setString(idx++, profilesText);
 
             int num = ps.executeUpdate();
             LOG.info("added user '{}' to CA '{}': permission: {}; profile: {}",
-                    userIdent, ca, permissionText, profilesText);
+                    userIdent, ca, user.getPermission(), profilesText);
             return num > 0;
         } catch (SQLException ex) {
             throw new CaMgmtException(datasource, sql, ex);
@@ -2585,7 +2576,7 @@ class CaManagerQueryExecutor {
             throw new CaMgmtException("user '" + user + " ' does not exist");
         }
 
-        final String sql = "SELECT CA_ID,PERMISSIONS,PROFILES FROM CA_HAS_USER WHERE USER_ID=?";
+        final String sql = "SELECT CA_ID,PERMISSION,PROFILES FROM CA_HAS_USER WHERE USER_ID=?";
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -2595,13 +2586,12 @@ class CaManagerQueryExecutor {
 
             Map<String, CaHasUserEntry> ret = new HashMap<>();
             while (rs.next()) {
-                String str = rs.getString("PERMISSIONS");
-                Set<Permission> permissions = CaUtil.getPermissions(str);
-                str = rs.getString("PROFILES");
+                int permission = rs.getInt("PERMISSION");
+                String str = rs.getString("PROFILES");
                 List<String> list = StringUtil.split(str, ",");
                 Set<String> profiles = (list == null) ? null : new HashSet<>(list);
                 CaHasUserEntry caHasUser = new CaHasUserEntry(new NameId(existingId, user));
-                caHasUser.setPermissions(permissions);
+                caHasUser.setPermission(permission);
                 caHasUser.setProfiles(profiles);
 
                 int caId = rs.getInt("CA_ID");

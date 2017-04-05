@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ca.server.mgmt.api;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.xipki.commons.common.util.CollectionUtil;
@@ -51,7 +50,7 @@ public class CaHasUserEntry {
 
     private final NameId userIdent;
 
-    private Set<Permission> permissions;
+    private int permission;
 
     private Set<String> profiles;
 
@@ -59,12 +58,12 @@ public class CaHasUserEntry {
         this.userIdent = ParamUtil.requireNonNull("userIdent", userIdent);
     }
 
-    public Set<Permission> getPermissions() {
-        return permissions;
+    public int getPermission() {
+        return permission;
     }
 
-    public void setPermissions(final Set<Permission> permissions) {
-        this.permissions = Collections.unmodifiableSet(permissions);
+    public void setPermission(final int permission) {
+        this.permission = permission;
     }
 
     public NameId getUserIdent() {
@@ -84,7 +83,7 @@ public class CaHasUserEntry {
         StringBuilder sb = new StringBuilder(200);
         sb.append("user: ").append(userIdent).append("\n");
         sb.append("profiles: ").append(profiles).append("\n");
-        sb.append("permissions: ").append(Permission.toString(permissions));
+        sb.append("permission: ").append(permission);
         return sb.toString();
     }
 
@@ -100,7 +99,7 @@ public class CaHasUserEntry {
             return false;
         }
 
-        if (!permissions.equals(objB.permissions)) {
+        if (permission != objB.permission) {
             return false;
         }
 

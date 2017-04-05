@@ -145,7 +145,7 @@ import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpControl;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
+import org.xipki.pki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 
 /**
@@ -741,7 +741,7 @@ public class X509CaCmpResponder extends CmpResponder {
     }
 
     private PKIBody unRevokeRemoveCertificates(final PKIMessage request, final RevReqContent rr,
-            final Permission permission, final CmpControl cmpControl, final String msgId) {
+            final int permission, final CmpControl cmpControl, final String msgId) {
         RevDetails[] revContent = rr.toRevDetailsArray();
 
         RevRepContentBuilder repContentBuilder = new RevRepContentBuilder();
@@ -886,13 +886,13 @@ public class X509CaCmpResponder extends CmpResponder {
                 Object returnedObj = null;
                 Long certDbId = null;
                 X509Ca ca = getCa();
-                if (Permission.UNREVOKE_CERT == permission) {
+                if (PermissionConstants.UNREVOKE_CERT == permission) {
                     // unrevoke
                     returnedObj = ca.unrevokeCertificate(snBigInt, msgId);
                     if (returnedObj != null) {
                         certDbId = ((X509CertWithDbId) returnedObj).getCertId();
                     }
-                } else if (Permission.REMOVE_CERT == permission) {
+                } else if (PermissionConstants.REMOVE_CERT == permission) {
                     // remove
                     returnedObj = ca.removeCertificate(snBigInt, msgId);
                 } else {
@@ -946,8 +946,9 @@ public class X509CaCmpResponder extends CmpResponder {
                 status = new PKIStatusInfo(PKIStatus.granted);
             } catch (OperationException ex) {
                 ErrorCode code = ex.getErrorCode();
-                LOG.warn("{} certificate, OperationException: code={}, message={}",
-                        permission.name(), code.name(), ex.getErrorMessage());
+                LOG.warn("{}, OperationException: code={}, message={}",
+                        PermissionConstants.getTextForCode(permission),
+                        code.name(), ex.getErrorMessage());
                 String errorMessage;
                 switch (code) {
                 case DATABASE_FAILURE:
@@ -1179,15 +1180,16 @@ public class X509CaCmpResponder extends CmpResponder {
     }
 
     private void checkPermission(final CmpRequestorInfo requestor,
-            final Permission requiredPermission) throws InsuffientPermissionException {
+            final int requiredPermission) throws InsuffientPermissionException {
         X509Ca ca = getCa();
-        Set<Permission> permissions = ca.getCaInfo().getPermissions();
-        if (permissions.contains(Permission.ALL) || permissions.contains(requiredPermission)) {
-            requestor.assertPermitted(requiredPermission);
-        } else {
-            String msg = requiredPermission.getPermission() + " is not allowed";
-            throw new InsuffientPermissionException(msg);
+        int permission = ca.getCaInfo().getPermission();
+        if (!PermissionConstants.contains(permission, requiredPermission)) {
+            throw new InsuffientPermissionException(
+                    "Permission " + PermissionConstants.getTextForCode(requiredPermission)
+                    + "is not permitted");
         }
+
+        requestor.assertPermitted(requiredPermission);
     } // method checkPermission
 
     private String getSystemInfo(final CmpRequestorInfo requestor,
@@ -1329,23 +1331,23 @@ public class X509CaCmpResponder extends CmpResponder {
         int type = reqBody.getType();
         switch (type) {
         case PKIBody.TYPE_CERT_REQ:
-            checkPermission(requestor, Permission.ENROLL_CERT);
+            checkPermission(requestor, PermissionConstants.ENROLL_CERT);
             respBody = processCr(request, requestor, tid, reqHeader,
                     CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
             break;
         case PKIBody.TYPE_KEY_UPDATE_REQ:
-            checkPermission(requestor, Permission.KEY_UPDATE);
+            checkPermission(requestor, PermissionConstants.KEY_UPDATE);
             respBody = processKur(request, requestor, tid, reqHeader,
                     CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
             break;
         case PKIBody.TYPE_P10_CERT_REQ:
-            checkPermission(requestor, Permission.ENROLL_CERT);
+            checkPermission(requestor, PermissionConstants.ENROLL_CERT);
             respBody = processP10cr(request, requestor, tid, reqHeader,
                     CertificationRequest.getInstance(reqBody.getContent()), cmpControl, msgId,
                     event);
             break;
         case PKIBody.TYPE_CROSS_CERT_REQ:
-            checkPermission(requestor, Permission.CROSS_CERT_ENROLL);
+            checkPermission(requestor, PermissionConstants.ENROLL_CROSS);
             respBody = processCcp(request, requestor, tid, reqHeader,
                     CertReqMessages.getInstance(reqBody.getContent()), cmpControl, msgId, event);
             break;
@@ -1373,7 +1375,7 @@ public class X509CaCmpResponder extends CmpResponder {
             final PKIHeaderBuilder respHeader, final CmpControl cmpControl,
             final PKIHeader reqHeader, final PKIBody reqBody, final CmpRequestorInfo requestor,
             final String msgId, final AuditEvent event) {
-        Permission requiredPermission = null;
+        Integer requiredPermission = null;
         boolean allRevdetailsOfSameType = true;
 
         RevReqContent rr = RevReqContent.getInstance(reqBody.getContent());
@@ -1395,24 +1397,24 @@ public class X509CaCmpResponder extends CmpResponder {
             if (reasonCode == XiSecurityConstants.CMP_CRL_REASON_REMOVE) {
                 if (requiredPermission == null) {
                     event.addEventType(CaAuditConstants.TYPE_CMP_rr_remove);
-                    requiredPermission = Permission.REMOVE_CERT;
-                } else if (requiredPermission != Permission.REMOVE_CERT) {
+                    requiredPermission = PermissionConstants.REMOVE_CERT;
+                } else if (requiredPermission != PermissionConstants.REMOVE_CERT) {
                     allRevdetailsOfSameType = false;
                     break;
                 }
             } else if (reasonCode == CrlReason.REMOVE_FROM_CRL.getCode()) {
                 if (requiredPermission == null) {
                     event.addEventType(CaAuditConstants.TYPE_CMP_rr_unrevoke);
-                    requiredPermission = Permission.UNREVOKE_CERT;
-                } else if (requiredPermission != Permission.UNREVOKE_CERT) {
+                    requiredPermission = PermissionConstants.UNREVOKE_CERT;
+                } else if (requiredPermission != PermissionConstants.UNREVOKE_CERT) {
                     allRevdetailsOfSameType = false;
                     break;
                 }
             } else {
                 if (requiredPermission == null) {
                     event.addEventType(CaAuditConstants.TYPE_CMP_rr_revoke);
-                    requiredPermission = Permission.REVOKE_CERT;
-                } else if (requiredPermission != Permission.REVOKE_CERT) {
+                    requiredPermission = PermissionConstants.REVOKE_CERT;
+                } else if (requiredPermission != PermissionConstants.REVOKE_CERT) {
                     allRevdetailsOfSameType = false;
                     break;
                 }
@@ -1472,7 +1474,7 @@ public class X509CaCmpResponder extends CmpResponder {
             X509Ca ca = getCa();
             if (CMPObjectIdentifiers.it_currentCRL.equals(infoType)) {
                 event.addEventType(CaAuditConstants.TYPE_CMP_genm_currentCrl);
-                checkPermission(requestor, Permission.GET_CRL);
+                checkPermission(requestor, PermissionConstants.GET_CRL);
                 CertificateList crl = ca.getBcCurrentCrl();
 
                 if (itv.getInfoValue() == null) { // as defined in RFC 4210
@@ -1514,7 +1516,7 @@ public class X509CaCmpResponder extends CmpResponder {
                 switch (action) {
                 case XiSecurityConstants.CMP_ACTION_GEN_CRL:
                     event.addEventType(CaAuditConstants.TYPE_CMP_genm_genCrl);
-                    checkPermission(requestor, Permission.GEN_CRL);
+                    checkPermission(requestor, PermissionConstants.GEN_CRL);
                     X509CRL tmpCrl = ca.generateCrlOnDemand(msgId);
                     if (tmpCrl == null) {
                         String statusMessage = "CRL generation is not activated";
@@ -1526,7 +1528,7 @@ public class X509CaCmpResponder extends CmpResponder {
                     break;
                 case XiSecurityConstants.CMP_ACTION_GET_CRL_WITH_SN:
                     event.addEventType(CaAuditConstants.TYPE_CMP_genm_crlForNumber);
-                    checkPermission(requestor, Permission.GET_CRL);
+                    checkPermission(requestor, PermissionConstants.GET_CRL);
 
                     ASN1Integer crlNumber = ASN1Integer.getInstance(reqValue);
                     respValue = ca.getBcCrl(crlNumber.getPositiveValue());
@@ -1601,7 +1603,7 @@ public class X509CaCmpResponder extends CmpResponder {
             throws OperationException {
         ParamUtil.requireNonNull("requestor", requestor);
         try {
-            checkPermission(requestor, Permission.GET_CRL);
+            checkPermission(requestor, PermissionConstants.GET_CRL);
         } catch (InsuffientPermissionException ex) {
             throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
@@ -1616,7 +1618,7 @@ public class X509CaCmpResponder extends CmpResponder {
             final RequestType reqType, final String msgId) throws OperationException {
         ParamUtil.requireNonNull("requestor", requestor);
         try {
-            checkPermission(requestor, Permission.GEN_CRL);
+            checkPermission(requestor, PermissionConstants.GEN_CRL);
         } catch (InsuffientPermissionException ex) {
             throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }
@@ -1633,11 +1635,11 @@ public class X509CaCmpResponder extends CmpResponder {
             final String msgId) throws OperationException {
         ParamUtil.requireNonNull("requestor", requestor);
 
-        Permission permission;
+        int permission;
         if (reason == CrlReason.REMOVE_FROM_CRL) {
-            permission = Permission.UNREVOKE_CERT;
+            permission = PermissionConstants.UNREVOKE_CERT;
         } else {
-            permission = Permission.REVOKE_CERT;
+            permission = PermissionConstants.REVOKE_CERT;
         }
         try {
             checkPermission(requestor, permission);
@@ -1647,7 +1649,7 @@ public class X509CaCmpResponder extends CmpResponder {
 
         X509Ca ca = getCa();
         Object returnedObj;
-        if (Permission.UNREVOKE_CERT == permission) {
+        if (PermissionConstants.UNREVOKE_CERT == permission) {
             // unrevoke
             returnedObj = ca.unrevokeCertificate(serialNumber, msgId);
         } else {
@@ -1667,7 +1669,7 @@ public class X509CaCmpResponder extends CmpResponder {
             throws OperationException {
         ParamUtil.requireNonNull("requestor", requestor);
         try {
-            checkPermission(requestor, Permission.REMOVE_CERT);
+            checkPermission(requestor, PermissionConstants.REMOVE_CERT);
         } catch (InsuffientPermissionException ex) {
             throw new OperationException(ErrorCode.NOT_PERMITTED, ex.getMessage());
         }

@@ -360,7 +360,7 @@ class CaConfigurationDbImporter extends DbPorter {
         sqlBuilder.append("INSERT INTO CA (ID,NAME,ART,SUBJECT,SN_SIZE,NEXT_CRLNO,STATUS,");
         sqlBuilder.append("CRL_URIS,DELTACRL_URIS,OCSP_URIS,CACERT_URIS,MAX_VALIDITY,");
         sqlBuilder.append("CERT,SIGNER_TYPE,CRLSIGNER_NAME,RESPONDER_NAME,CMPCONTROL_NAME,");
-        sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,PERMISSIONS,");
+        sqlBuilder.append("DUPLICATE_KEY,DUPLICATE_SUBJECT,SAVE_REQ,PERMISSION,");
         sqlBuilder.append("NUM_CRLS,EXPIRATION_PERIOD,KEEP_EXPIRED_CERT_DAYS,");
         sqlBuilder.append("REV,RR,RT,RIT,VALIDITY_MODE,EXTRA_CONTROL,SIGNER_CONF)");
         sqlBuilder.append(" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
@@ -399,7 +399,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setInt(idx++, ca.getDuplicateKey());
                     ps.setInt(idx++, ca.getDuplicateSubject());
                     ps.setInt(idx++, ca.getSaveReq());
-                    ps.setString(idx++, ca.getPermissions());
+                    ps.setInt(idx++, ca.getPermission());
                     Integer numCrls = ca.getNumCrls();
                     int tmpNumCrls = (numCrls == null) ? 30 : numCrls.intValue();
                     ps.setInt(idx++, tmpNumCrls);
@@ -455,7 +455,7 @@ class CaConfigurationDbImporter extends DbPorter {
             throws DataAccessException {
         System.out.println("importing table CA_HAS_REQUESTOR");
         final String sql =
-                "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_ID,RA,PERMISSIONS,PROFILES)"
+                "INSERT INTO CA_HAS_REQUESTOR (CA_ID,REQUESTOR_ID,RA,PERMISSION,PROFILES)"
                 + " VALUES (?,?,?,?,?)";
         PreparedStatement ps = prepareStatement(sql);
         try {
@@ -465,7 +465,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setInt(idx++, entry.getCaId());
                     ps.setInt(idx++, entry.getRequestorId());
                     setBoolean(ps, idx++, entry.isRa());
-                    ps.setString(idx++, entry.getPermissions());
+                    ps.setInt(idx++, entry.getPermission());
                     ps.setString(idx++, entry.getProfiles());
 
                     ps.executeUpdate();

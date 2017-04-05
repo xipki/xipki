@@ -147,7 +147,6 @@ import org.xipki.pki.ca.server.mgmt.api.CmpControl;
 import org.xipki.pki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.pki.ca.server.mgmt.api.Permission;
 import org.xipki.pki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
 import org.xipki.pki.ca.server.mgmt.api.UserEntry;
@@ -184,11 +183,9 @@ import org.xml.sax.SAXException;
  * @since 2.0.0
  */
 
-// Check list of certificate profiles
-// Set id of NameId if not set.
 public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManager {
 
-    private class ScheduledPublishQueueCleaner implements Runnable {
+    private class CertsInQueuePublisher implements Runnable {
 
         private boolean inProcess;
 
@@ -205,10 +202,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     X509Ca ca = x509cas.get(name);
                     boolean bo = ca.publishCertsInQueue();
                     if (bo) {
-                        LOG.info(" published certificates of CA '{}' in PUBLISHQUEUE", name);
+                        LOG.info(" published certificates of CA {} in PUBLISHQUEUE", name);
                     } else {
-                        LOG.error("publishing certificates of CA '{}' in PUBLISHQUEUE failed",
-                                name);
+                        LOG.error("publishing certificates of CA {} in PUBLISHQUEUE failed", name);
                     }
                 }
             } catch (Throwable th) {
@@ -220,7 +216,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     } // class ScheduledPublishQueueCleaner
 
-    private class ScheduledDeleteUnreferencedRequstervice implements Runnable {
+    private class UnreferencedRequstCleaner implements Runnable {
 
         private boolean inProcess;
 
@@ -245,7 +241,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     } // class ScheduledDeleteUnreferencedRequstervice
 
-    private class ScheduledCaRestarter implements Runnable {
+    private class CaRestarter implements Runnable {
 
         private boolean inProcess;
 
@@ -294,10 +290,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     private NameId byUserRequestorId;
 
-    private Map<String, CmpResponderEntry> responderDbEntries = new ConcurrentHashMap<>();
-
-    private Map<String, CmpResponderEntryWrapper> responders = new ConcurrentHashMap<>();
-
     private boolean caLockedByMe;
 
     private boolean masterMode;
@@ -305,6 +297,10 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     private Map<String, DataSourceWrapper> datasources;
 
     private final Map<String, X509CaInfo> caInfos = new ConcurrentHashMap<>();
+
+    private Map<String, CmpResponderEntryWrapper> responders = new ConcurrentHashMap<>();
+
+    private Map<String, CmpResponderEntry> responderDbEntries = new ConcurrentHashMap<>();
 
     private final Map<String, IdentifiedX509Certprofile> certprofiles = new ConcurrentHashMap<>();
 
@@ -523,12 +519,12 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         if (this.datasource == null) {
-            throw new CaMgmtException("no datasource configured with name 'ca'");
+            throw new CaMgmtException("no datasource named 'ca' configured");
         }
 
         this.queryExecutor = new CaManagerQueryExecutor(this.datasource);
 
-        initEnvironemtParamters();
+        initEnvironmentParamters();
         String envEpoch = envParameterResolver.getEnvParam(ENV_EPOCH);
 
         if (masterMode) {
@@ -558,7 +554,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         } else {
             if (envEpoch == null) {
                 throw new CaMgmtException(
-                        "The CA system must be first started with ca.mode = master");
+                        "The CA system must be started first with ca.mode = master");
             }
         }
 
@@ -774,9 +770,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 sb.delete(len - 2, len);
 
                 scheduledThreadPoolExecutor.scheduleAtFixedRate(
-                        new ScheduledPublishQueueCleaner(), 120, 120, TimeUnit.SECONDS);
+                        new CertsInQueuePublisher(), 120, 120, TimeUnit.SECONDS);
                 scheduledThreadPoolExecutor.scheduleAtFixedRate(
-                        new ScheduledDeleteUnreferencedRequstervice(), 60, 24 * 60 * 60, // 1 DAY
+                        new UnreferencedRequstCleaner(), 60, 24 * 60 * 60, // 1 DAY
                         TimeUnit.SECONDS);
             } else {
                 sb.append(": no CA is configured");
@@ -806,9 +802,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             if (!masterMode && persistentScheduledThreadPoolExecutor == null) {
                 persistentScheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
                 persistentScheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
-                ScheduledCaRestarter caRestarter = new ScheduledCaRestarter();
-                persistentScheduledThreadPoolExecutor.scheduleAtFixedRate(caRestarter, 300, 300,
-                        TimeUnit.SECONDS);
+                persistentScheduledThreadPoolExecutor.scheduleAtFixedRate(new CaRestarter(),
+                        300, 300, TimeUnit.SECONDS);
             }
         }
 
@@ -969,9 +964,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
     @Override
     public Set<String> getSuccessfulCaNames() {
-        Set<String> names = x509cas.keySet();
         Set<String> ret = new HashSet<>();
-        for (String name : names) {
+        for (String name : x509cas.keySet()) {
             if (CaStatus.ACTIVE == caInfos.get(name).getStatus()) {
                 ret.add(name);
             }
@@ -1065,7 +1059,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         responderInitialized = true;
     } // method initResponders
 
-    private void initEnvironemtParamters() throws CaMgmtException {
+    private void initEnvironmentParamters() throws CaMgmtException {
         if (environmentParametersInitialized) {
             return;
         }
@@ -1077,7 +1071,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         environmentParametersInitialized = true;
-    } // method initEnvironemtParamters
+    } // method initEnvironmentParamters
 
     private void initCaAliases() throws CaMgmtException {
         if (caAliasesInitialized) {
@@ -1566,7 +1560,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         requestors.put(name, requestor);
 
         return true;
-    } // method addCmpRequestor
+    } // method addRequestor
 
     @Override
     public boolean removeRequestor(String requestorName) throws CaMgmtException {
@@ -1588,7 +1582,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         requestors.remove(requestorName);
         LOG.info("removed requestor '{}'", requestorName);
         return true;
-    } // method removeCmpRequestor
+    } // method removeRequestor
 
     @Override
     public boolean changeRequestor(String name, final String base64Cert)
@@ -1617,7 +1611,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         requestorDbEntries.put(name, requestor.getDbEntry());
         requestors.put(name, requestor);
         return true;
-    } // method changeCmpRequestor
+    } // method changeRequestor
 
     @Override
     public boolean removeRequestorFromCa(String requestorName, String caName)
@@ -1628,6 +1622,11 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         requestorName = requestorName.toUpperCase();
         caName = caName.toUpperCase();
+        if (requestorName.equals(RequestorInfo.NAME_BY_CA)
+                || requestorName.equals(RequestorInfo.NAME_BY_USER)) {
+            throw new CaMgmtException("removing requestor " + requestorName + " is not permitted");
+        }
+
         boolean bo = queryExecutor.removeRequestorFromCa(requestorName, caName);
         if (bo && caHasRequestors.containsKey(caName)) {
             Set<CaHasRequestorEntry> entries = caHasRequestors.get(caName);
@@ -1640,7 +1639,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             entries.remove(entry);
         }
         return bo;
-    } // method removeCmpRequestorFromCa
+    } // method removeRequestorFromCa
 
     @Override
     public boolean addRequestorToCa(final CaHasRequestorEntry requestor, String caName)
@@ -1678,7 +1677,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         queryExecutor.addRequestorToCa(requestor, idNameMap.getCa(caName));
         caHasRequestors.get(caName).add(requestor);
         return true;
-    } // method addCmpRequestorToCa
+    } // method addRequestorToCa
 
     @Override
     public boolean removeUserFromCa(final String userName, final String caName)
@@ -1809,7 +1808,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         responders.put(name, responder);
         responderDbEntries.put(name, dbEntry);
         return true;
-    } // method addCmpResponder
+    } // method addResponder
 
     @Override
     public boolean removeResponder(String name) throws CaMgmtException {
@@ -1831,7 +1830,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         responders.remove(name);
         LOG.info("removed Responder '{}'", name);
         return true;
-    } // method removeCmpResponder
+    } // method removeResponder
 
     @Override
     public boolean changeResponder(String name, final String type, final String conf,
@@ -1854,7 +1853,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         responderDbEntries.put(name, newResponder.getDbEntry());
         responders.put(name, newResponder);
         return true;
-    } // method changeCmpResponder
+    } // method changeResponder
 
     @Override
     public CmpResponderEntry getResponder(final String name) {
@@ -2690,13 +2689,13 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         entry.setDuplicateKeyPermitted(caEntry.isDuplicateKeyPermitted());
         entry.setDuplicateSubjectPermitted(caEntry.isDuplicateSubjectPermitted());
         entry.setExtraControl(caEntry.getExtraControl());
-        entry.setMaxValidity(caEntry.getMaxValidity());
         entry.setKeepExpiredCertInDays(caEntry.getKeepExpiredCertInDays());
-        entry.setPermissions(caEntry.getPermissions());
+        entry.setMaxValidity(caEntry.getMaxValidity());
+        entry.setPermission(caEntry.getPermission());
         entry.setResponderName(caEntry.getResponderName());
+        entry.setSaveRequest(caEntry.isSaveRequest());
         entry.setStatus(status);
         entry.setValidityMode(caEntry.getValidityMode());
-        entry.setSaveRequest(caEntry.isSaveRequest());
 
         addCa(entry);
         return caCert;
@@ -2807,7 +2806,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             ret.initialize(securityFactory.getPasswordResolver(), datasources);
             return ret;
         } catch (ObjectCreationException | CertPublisherException | RuntimeException ex) {
-            LogUtil.error(LOG, ex, "invalid configuration for the CertPublisher "
+            LogUtil.error(LOG, ex, "invalid configuration for the publisher "
                     + dbEntry.getIdent());
             return null;
         }
@@ -3503,7 +3502,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                             jaxb2.setRequestorName(requestorName);
                             jaxb2.setRa(m.isRa());
                             jaxb2.setProfiles(createStrings(m.getProfiles()));
-                            jaxb2.setPermissions(createStringsForPermissions(m.getPermissions()));
+                            jaxb2.setPermission(m.getPermission());
 
                             jaxb.getRequestors().getRequestor().add(jaxb2);
                         }
@@ -3544,7 +3543,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                     ciJaxb.setNextCrlNo(entry.getNextCrlNumber());
                     ciJaxb.setNumCrls(entry.getNumCrls());
                     ciJaxb.setOcspUris(createStrings(entry.getOcspUris()));
-                    ciJaxb.setPermissions(createStringsForPermissions(entry.getPermissions()));
+                    ciJaxb.setPermission(entry.getPermission());
                     if (entry.getResponderName() != null) {
                         includeResponderNames.add(entry.getResponderName());
                         ciJaxb.setResponderName(entry.getResponderName());
@@ -3849,17 +3848,6 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         ZipOutputStream zipOutStream = new ZipOutputStream(out);
         zipOutStream.setLevel(Deflater.BEST_SPEED);
         return zipOutStream;
-    }
-
-    private static StringsType createStringsForPermissions(Collection<Permission> permissions) {
-        if (CollectionUtil.isEmpty(permissions)) {
-            return null;
-        }
-        StringsType ret = new StringsType();
-        for (Permission perm : permissions) {
-            ret.getStr().add(perm.getPermission());
-        }
-        return ret;
     }
 
     private static StringsType createStrings(Collection<String> strs) {
