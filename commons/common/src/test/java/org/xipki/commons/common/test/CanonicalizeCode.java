@@ -37,12 +37,17 @@ package org.xipki.commons.common.test;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -50,41 +55,6 @@ import org.xipki.commons.common.util.IoUtil;
  */
 
 public class CanonicalizeCode {
-
-    private static final String LICENSE_TEXT =
-            "/*\n"
-            + " *\n"
-            + " * Copyright (c) 2013 - 2017 Lijun Liao\n"
-            + " *\n"
-            + " * This program is free software; you can redistribute it and/or modify\n"
-            + " * it under the terms of the GNU Affero General Public License version 3\n"
-            + " * as published by the Free Software Foundation with the addition of the\n"
-            + " * following permission added to Section 15 as permitted in Section 7(a):\n"
-            + " *\n"
-            + " * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY\n"
-            + " * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT\n"
-            + " * OF THIRD PARTY RIGHTS.\n"
-            + " *\n"
-            + " * This program is distributed in the hope that it will be useful,\n"
-            + " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-            + " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n"
-            + " * GNU Affero General Public License for more details.\n"
-            + " *\n"
-            + " * You should have received a copy of the GNU Affero General Public License\n"
-            + " * along with this program. If not, see <http://www.gnu.org/licenses/>.\n"
-            + " *\n"
-            + " * The interactive user interfaces in modified source and object code versions\n"
-            + " * of this program must display Appropriate Legal Notices, as required under\n"
-            + " * Section 5 of the GNU Affero General Public License.\n"
-            + " *\n"
-            + " * You can be released from the requirements of the license by purchasing\n"
-            + " * a commercial license. Buying such a license is mandatory as soon as you\n"
-            + " * develop commercial activities involving the XiPKI software without\n"
-            + " * disclosing the source code of your own applications.\n"
-            + " *\n"
-            + " * For more information, please contact Lijun Liao at this\n"
-            + " * address: lijun.liao@gmail.com\n"
-            + " */\n\n";
 
     private final String baseDir;
 
@@ -135,6 +105,8 @@ public class CanonicalizeCode {
     } // method canonicalizeDir
 
     private void canonicalizeFile(final File file) throws Exception {
+        byte[] newLine = detectNewline(file);
+
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
         ByteArrayOutputStream writer = new ByteArrayOutputStream();
@@ -157,7 +129,7 @@ public class CanonicalizeCode {
                 if (line.trim().startsWith("package ") || line.trim().startsWith("import ")) {
                     if (!licenseTextAdded) {
                         if (!thirdparty) {
-                            writer.write(LICENSE_TEXT.getBytes());
+                            writeLicenseHeader(writer, newLine);
                         }
                         licenseTextAdded = true;
                     }
@@ -181,8 +153,7 @@ public class CanonicalizeCode {
                 }
 
                 if (addThisLine) {
-                    writer.write(canonicalizedLine.getBytes());
-                    writer.write('\n');
+                    writeLine(writer, newLine, canonicalizedLine);
                 }
             } // end while
         } finally {
@@ -331,5 +302,97 @@ public class CanonicalizeCode {
         }
         return (idx == n - 1) ?  line : line.substring(0, idx + 1);
     } // method removeTrailingSpaces
+
+    private static byte[] detectNewline(File file) throws IOException {
+        InputStream is = new FileInputStream(file);
+        byte[] bytes = new byte[200];
+        int size;
+        try {
+            size = is.read(bytes);
+        } finally {
+            is.close();
+        }
+
+        for (int i = 0; i < size - 1; i++) {
+            byte bb = bytes[i];
+            if (bb == '\n') {
+                return new byte[]{'\n'};
+            } else if (bb == '\r') {
+                if (bytes[i + 1] == '\n') {
+                    return new byte[]{'\r', '\n'};
+                } else {
+                    return new byte[]{'\r'};
+                }
+            }
+        }
+
+        return new byte[]{'\n'};
+    }
+
+    private static void writeLicenseHeader(OutputStream out, byte[] newLine) throws IOException {
+        writeLine(out, newLine, "/*");
+        writeLine(out, newLine, " *");
+        writeLine(out, newLine, " * Copyright (c) 2013 - 2017 Lijun Liao");
+        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " * This program is free software; you can redistribute it and/or modify");
+        writeLine(out, newLine,
+            " * it under the terms of the GNU Affero General Public License version 3");
+        writeLine(out,newLine,
+            " * as published by the Free Software Foundation with the addition of the");
+        writeLine(out,newLine,
+            " * following permission added to Section 15 as permitted in Section 7(a):");
+        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY");
+        writeLine(out, newLine,
+            " * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT");
+        writeLine(out, newLine,
+            " * OF THIRD PARTY RIGHTS.");
+        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " * This program is distributed in the hope that it will be useful,");
+        writeLine(out, newLine,
+            " * but WITHOUT ANY WARRANTY; without even the implied warranty of");
+        writeLine(out, newLine,
+            " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the");
+        writeLine(out, newLine,
+            " * GNU Affero General Public License for more details.");
+        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " * You should have received a copy of the GNU Affero General Public License");
+        writeLine(out, newLine,
+            " * along with this program. If not, see <http://www.gnu.org/licenses/>.");
+        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " * The interactive user interfaces in modified source and object code versions");
+        writeLine(out, newLine,
+            " * of this program must display Appropriate Legal Notices, as required under");
+        writeLine(out, newLine,
+            " * Section 5 of the GNU Affero General Public License.");
+        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " * You can be released from the requirements of the license by purchasing");
+        writeLine(out, newLine,
+            " * a commercial license. Buying such a license is mandatory as soon as you");
+        writeLine(out, newLine,
+            " * develop commercial activities involving the XiPKI software without");
+        writeLine(out, newLine,
+            " * disclosing the source code of your own applications.");
+        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " * For more information, please contact Lijun Liao at this");
+        writeLine(out, newLine, " * address: lijun.liao@gmail.com");
+        writeLine(out, newLine, " */");
+        writeLine(out, newLine, "");
+    }
+
+    private static void writeLine(OutputStream out, byte[] newLine, String line)
+            throws IOException {
+        if (StringUtil.isNotBlank(line)) {
+            out.write(line.getBytes());
+        }
+        out.write(newLine);
+    }
 
 }
