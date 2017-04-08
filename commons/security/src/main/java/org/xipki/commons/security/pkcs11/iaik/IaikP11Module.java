@@ -54,6 +54,7 @@ import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 import iaik.pkcs.pkcs11.DefaultInitializeArgs;
 import iaik.pkcs.pkcs11.Module;
 import iaik.pkcs.pkcs11.Slot;
+import iaik.pkcs.pkcs11.SlotInfo;
 import iaik.pkcs.pkcs11.TokenException;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
@@ -76,16 +77,33 @@ public class IaikP11Module extends AbstractP11Module {
 
         Slot[] slotList;
         try {
-            boolean cardPresent = true;
-            slotList = module.getSlotList(cardPresent);
+            slotList = module.getSlotList(Module.SlotRequirement.ALL_SLOTS);
         } catch (Throwable th) {
             final String msg = "could not getSlotList of module " + moduleConf.getName();
             LogUtil.error(LOG, th, msg);
             throw new P11TokenException(msg);
         }
 
-        if (slotList == null || slotList.length == 0) {
-            throw new P11TokenException("no slot with present card could be found");
+        final int size = (slotList == null) ? 0 : slotList.length;
+        if (size == 0) {
+            throw new P11TokenException("no slot could be found");
+        }
+
+        for (int i = 0; i < size; i++) {
+            Slot slot = slotList[i];
+            SlotInfo slotInfo;
+            try {
+                slotInfo = slot.getSlotInfo();
+            } catch (TokenException ex) {
+                LOG.error("ignore slot[{}] (id={} with error", i, slot.getSlotID());
+                slotList[i] = null;
+                continue;
+            }
+
+            if (slotInfo.isTokenPresent()) {
+                slotList[i] = null;
+                LOG.info("ignore slot[{}] (id={} without token", i, slot.getSlotID());
+            }
         }
 
         StringBuilder msg = new StringBuilder();
@@ -93,6 +111,10 @@ public class IaikP11Module extends AbstractP11Module {
         Set<P11Slot> slots = new HashSet<>();
         for (int i = 0; i < slotList.length; i++) {
             Slot slot = slotList[i];
+            if (slot == null) {
+                continue;
+            }
+
             P11SlotIdentifier slotId = new P11SlotIdentifier(i, slot.getSlotID());
             if (!moduleConf.isSlotIncluded(slotId)) {
                 LOG.info("skipped slot {}", slotId);
