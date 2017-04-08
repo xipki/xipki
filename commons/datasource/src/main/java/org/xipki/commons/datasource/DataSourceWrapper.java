@@ -89,8 +89,8 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        public String buildSelectFirstSql(final String coreSql, final int rows,
-                final String orderBy) {
+        public String buildSelectFirstSql(final int rows, final String orderBy,
+                final String coreSql) {
             // 'SELECT ': 7
             // ' LIMIT ': 7
             // rows (till 9999): 4
@@ -212,8 +212,8 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        public String buildSelectFirstSql(final String coreSql, final int rows,
-                final String orderBy) {
+        public String buildSelectFirstSql(final int rows, final String orderBy,
+                final String coreSql) {
             // 'SELECT ': 7
             // ' FETCH FIRST ': 15
             // ' ROWS ONLY' : 10
@@ -266,8 +266,8 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        public String buildSelectFirstSql(final String coreSql, final int rows,
-                final String orderBy) {
+        public String buildSelectFirstSql(final int rows, final String orderBy,
+                final String coreSql) {
             // 'SELECT ': 7
             // ' FETCH FIRST ': 13
             // ' ROWS ONLY': 10
@@ -342,8 +342,8 @@ public abstract class DataSourceWrapper {
          *
          */
         @Override
-        public String buildSelectFirstSql(final String coreSql, final int rows,
-                final String orderBy) {
+        public String buildSelectFirstSql(final int rows, final String orderBy,
+                final String coreSql) {
             int size = coreSql.length() + 18;
             size += StringUtil.isBlank(orderBy) ? 14 : orderBy.length() + 40;
 
@@ -444,8 +444,8 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        public String buildSelectFirstSql(final String coreSql, final int rows,
-                final String orderBy) {
+        public String buildSelectFirstSql(final int rows, final String orderBy,
+                final String coreSql) {
             // 'SELECT ': 7
             // ' LIMIT ': 7
             // rows (till 9999): 4
@@ -497,8 +497,8 @@ public abstract class DataSourceWrapper {
         }
 
         @Override
-        public String buildSelectFirstSql(final String coreSql, final int rows,
-                final String orderBy) {
+        public String buildSelectFirstSql(final int rows, final String orderBy,
+                final String coreSql) {
             // 'SELECT ': 7
             // ' LIMIT ': 7
             // rows (till 9999): 4
@@ -699,12 +699,12 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public String buildSelectFirstSql(final String coreSql, final int rows) {
-        return buildSelectFirstSql(coreSql, rows, null);
+    public String buildSelectFirstSql(final int rows, final String coreSql) {
+        return buildSelectFirstSql(rows, null, coreSql);
     }
 
-    public abstract String buildSelectFirstSql(final String coreSql, final int rows,
-            final String orderBy);
+    public abstract String buildSelectFirstSql(final int rows, final String orderBy,
+            final String coreSql);
 
     public long getMin(final Connection conn, final String table, final String column)
             throws DataAccessException {
@@ -864,7 +864,7 @@ public abstract class DataSourceWrapper {
         StringBuilder sb = new StringBuilder(2 * column.length() + 15);
         sb.append(column).append(" FROM ").append(table);
         sb.append(" WHERE ").append(column).append("=?");
-        String sql = buildSelectFirstSql(sb.toString(), 1);
+        String sql = buildSelectFirstSql(1, sb.toString());
 
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -907,7 +907,7 @@ public abstract class DataSourceWrapper {
 
         StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
         sqlBuilder.append(column).append(" FROM ").append(table);
-        final String sql = buildSelectFirstSql(sqlBuilder.toString(), 1);
+        final String sql = buildSelectFirstSql(1, sqlBuilder.toString());
 
         try {
             stmt.execute(sql);
@@ -936,7 +936,7 @@ public abstract class DataSourceWrapper {
 
         StringBuilder sqlBuilder = new StringBuilder(table.length() + 10);
         sqlBuilder.append("1 FROM ").append(table);
-        final String sql = buildSelectFirstSql(sqlBuilder.toString(), 1);
+        final String sql = buildSelectFirstSql(1, sqlBuilder.toString());
 
         try {
             stmt.execute(sql);
