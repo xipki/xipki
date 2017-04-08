@@ -330,10 +330,14 @@ public class CanonicalizeCode {
     }
 
     private static void writeLicenseHeader(OutputStream out, byte[] newLine) throws IOException {
-        writeLine(out, newLine, "/*");
-        writeLine(out, newLine, " *");
-        writeLine(out, newLine, " * Copyright (c) 2013 - 2017 Lijun Liao");
-        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            "/*");
+        writeLine(out, newLine,
+            " *");
+        writeLine(out, newLine,
+            " * Copyright (c) 2013 - 2017 Lijun Liao");
+        writeLine(out, newLine,
+            " *");
         writeLine(out, newLine,
             " * This program is free software; you can redistribute it and/or modify");
         writeLine(out, newLine,
@@ -342,14 +346,16 @@ public class CanonicalizeCode {
             " * as published by the Free Software Foundation with the addition of the");
         writeLine(out,newLine,
             " * following permission added to Section 15 as permitted in Section 7(a):");
-        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " *");
         writeLine(out, newLine,
             " * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY");
         writeLine(out, newLine,
             " * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT");
         writeLine(out, newLine,
             " * OF THIRD PARTY RIGHTS.");
-        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " *");
         writeLine(out, newLine,
             " * This program is distributed in the hope that it will be useful,");
         writeLine(out, newLine,
@@ -358,19 +364,22 @@ public class CanonicalizeCode {
             " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the");
         writeLine(out, newLine,
             " * GNU Affero General Public License for more details.");
-        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " *");
         writeLine(out, newLine,
             " * You should have received a copy of the GNU Affero General Public License");
         writeLine(out, newLine,
             " * along with this program. If not, see <http://www.gnu.org/licenses/>.");
-        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " *");
         writeLine(out, newLine,
             " * The interactive user interfaces in modified source and object code versions");
         writeLine(out, newLine,
             " * of this program must display Appropriate Legal Notices, as required under");
         writeLine(out, newLine,
             " * Section 5 of the GNU Affero General Public License.");
-        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " *");
         writeLine(out, newLine,
             " * You can be released from the requirements of the license by purchasing");
         writeLine(out, newLine,
@@ -379,12 +388,16 @@ public class CanonicalizeCode {
             " * develop commercial activities involving the XiPKI software without");
         writeLine(out, newLine,
             " * disclosing the source code of your own applications.");
-        writeLine(out, newLine, " *");
+        writeLine(out, newLine,
+            " *");
         writeLine(out, newLine,
             " * For more information, please contact Lijun Liao at this");
-        writeLine(out, newLine, " * address: lijun.liao@gmail.com");
-        writeLine(out, newLine, " */");
-        writeLine(out, newLine, "");
+        writeLine(out, newLine,
+            " * address: lijun.liao@gmail.com");
+        writeLine(out, newLine,
+            " */");
+        writeLine(out, newLine,
+            "");
     }
 
     private static void writeLine(OutputStream out, byte[] newLine, String line)
