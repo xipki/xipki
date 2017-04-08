@@ -118,7 +118,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             + " VALUES (?,?,?,?,?,?,?,?)";
 
     private static final String SQL_ADD_USER =
-            "INSERT INTO USERNAME (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
+            "INSERT INTO TUSER (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
 
     private static final String SQL_ADD_CAUSER =
             "INSERT INTO CA_HAS_USER (ID,CA_ID,USER_ID,PERMISSION,PROFILES) VALUES (?,?,?,?,?)";
@@ -674,7 +674,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                         psAddUser.setString(idx++, user.getPassword());
                         psAddUser.addBatch();
                     } catch (SQLException ex) {
-                        System.err.println("could not import USERNAME with ID="
+                        System.err.println("could not import TUSER with ID="
                                 + user.getId() + ", message: " + ex.getMessage());
                         throw ex;
                     }
@@ -815,7 +815,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         datasource.dropIndex(null, "CERT", "IDX_CA_FPS");
         datasource.dropIndex(null, "CERT", "IDX_CA_FPRS");
 
-        datasource.dropUniqueConstrain(null, "CONST_USERNAME_NAME", "USERNAME");
+        datasource.dropUniqueConstrain(null, "CONST_USER_NAME", "TUSER");
 
         datasource.dropForeignKeyConstraint(null, "FK_CERT_CA1", "CERT");
         datasource.dropForeignKeyConstraint(null, "FK_CERT_USER1", "CERT");
@@ -835,7 +835,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         datasource.dropPrimaryKey(null, "PK_CRAW", "CRAW");
         datasource.dropPrimaryKey(null, "PK_REQUEST", "REQUEST");
         datasource.dropPrimaryKey(null, "PK_REQCERT", "REQCERT");
-        datasource.dropPrimaryKey(null, "PK_USERNAME", "USERNAME");
+        datasource.dropPrimaryKey(null, "PK_TUSER", "TUSER");
         datasource.dropPrimaryKey(null, "PK_CA_HAS_USER", "CA_HAS_USER");
 
         long duration = (System.currentTimeMillis() - start) / 1000;
@@ -848,7 +848,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         datasource.addPrimaryKey(null, "PK_CRAW", "CRAW", "CID");
         datasource.addPrimaryKey(null, "PK_REQUEST", "REQUEST", "ID");
         datasource.addPrimaryKey(null, "PK_REQCERT", "REQCERT", "ID");
-        datasource.addPrimaryKey(null, "PK_USERNAME", "USERNAME", "ID");
+        datasource.addPrimaryKey(null, "PK_TUSER", "TUSER", "ID");
         datasource.addPrimaryKey(null, "PK_CA_HAS_USER", "CA_HAS_USER", "ID");
 
         datasource.addForeignKeyConstraint(null, "FK_PUBLISHQUEUE_CERT1", "PUBLISHQUEUE",
@@ -861,7 +861,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                 "CA_ID", "CA", "ID", "CASCADE", "NO ACTION");
 
         datasource.addForeignKeyConstraint(null, "FK_CERT_USER1", "CERT",
-                "UID", "USERNAME", "ID", "CASCADE", "NO ACTION");
+                "UID", "TUSER", "ID", "CASCADE", "NO ACTION");
 
         datasource.addForeignKeyConstraint(null, "FK_REQCERT_REQ1", "REQCERT",
                 "RID", "REQUEST", "ID", "CASCADE", "NO ACTION");
@@ -872,12 +872,12 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         datasource.addUniqueConstrain(null, "CONST_CA_SN", "CERT", "CA_ID", "SN");
 
         datasource.addForeignKeyConstraint(null, "FK_CA_HAS_USER_USER1", "CA_HAS_USER",
-                "USER_ID", "USERNAME", "ID", "CASCADE", "NO ACTION");
+                "USER_ID", "TUSER", "ID", "CASCADE", "NO ACTION");
 
         datasource.addForeignKeyConstraint(null, "FK_CA_HAS_USER_CA1", "CA_HAS_USER",
                 "CA_ID", "CA", "ID", "CASCADE", "NO ACTION");
 
-        datasource.addUniqueConstrain(null, "CONST_USERNAME_NAME", "USERNAME", "NAME");
+        datasource.addUniqueConstrain(null, "CONST_USER_NAME", "TUSER", "NAME");
 
         datasource.createIndex(null, "IDX_CA_FPK", "CERT", "CA_ID", "FP_K");
         datasource.createIndex(null, "IDX_CA_FPS", "CERT", "CA_ID", "FP_S");

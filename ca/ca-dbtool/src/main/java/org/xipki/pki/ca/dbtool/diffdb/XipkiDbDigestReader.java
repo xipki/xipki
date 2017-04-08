@@ -179,7 +179,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
         sb.append(" ON CERT.").append(dbControl.getColCaId()).append("=").append(caId);
         sb.append(" AND CERT.ID>=? AND CERT.ID=").append(dbControl.getTblCerthash()).append(".CID");
 
-        this.selectCertSql = datasource.buildSelectFirstSql(sb.toString(), numPerSelect, "ID ASC");
+        this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", sb.toString());
 
         if (!super.init()) {
             throw new Exception("could not initialize the " + this.getClass().getName());

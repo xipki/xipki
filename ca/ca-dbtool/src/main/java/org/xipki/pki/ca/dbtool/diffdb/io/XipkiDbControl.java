@@ -107,7 +107,7 @@ public class XipkiDbControl {
     }
 
     public String getCertSql(final DataSourceWrapper datasource, final int rows) {
-        return datasource.buildSelectFirstSql(certCoreSql, rows, "ID ASC");
+        return datasource.buildSelectFirstSql(rows, "ID ASC", certCoreSql);
     }
 
 }

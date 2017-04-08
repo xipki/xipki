@@ -49,7 +49,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
-import org.xipki.commons.security.HashAlgoType;
 
 /**
  * @author Lijun Liao
@@ -84,8 +83,8 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
         this.caDataSource = ParamUtil.requireNonNull("caDataSource", caDataSource);
         this.caSerial = caCert.getSerialNumber().getPositiveValue();
 
-        this.sqlNextSerials = caDataSource.buildSelectFirstSql(
-                "ID,SN FROM CERT WHERE REV=0 AND CA_ID=? AND ID>=?", numSqlEntries, "ID");
+        this.sqlNextSerials = caDataSource.buildSelectFirstSql(numSqlEntries, "ID",
+                "ID,SN FROM CERT WHERE REV=0 AND CA_ID=? AND ID>=?");
 
         byte[] encodedCaCert = caCert.getEncoded();
         String sql = "SELECT ID,CERT FROM CA";

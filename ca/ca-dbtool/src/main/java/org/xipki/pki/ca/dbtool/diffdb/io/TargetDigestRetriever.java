@@ -205,7 +205,7 @@ public class TargetDigestRetriever {
         buffer.append(" AND CERT.SN=?");
         buffer.append(" AND CERT.ID=").append(dbControl.getTblCerthash()).append(".CID");
 
-        singleCertSql = datasource.buildSelectFirstSql(buffer.toString(), 1);
+        singleCertSql = datasource.buildSelectFirstSql(1, buffer.toString());
 
         buffer = new StringBuilder(200);
         buffer.append("SN,REV,RR,RT,RIT,");
@@ -218,7 +218,7 @@ public class TargetDigestRetriever {
         }
         buffer.append(") AND CERT.ID=").append(dbControl.getTblCerthash());
         buffer.append(".CID");
-        inArrayCertsSql = datasource.buildSelectFirstSql(buffer.toString(), numPerSelect);
+        inArrayCertsSql = datasource.buildSelectFirstSql(numPerSelect, buffer.toString());
 
         retrievers = new ArrayList<>(numThreads);
 

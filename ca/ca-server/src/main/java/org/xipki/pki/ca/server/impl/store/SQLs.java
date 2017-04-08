@@ -47,6 +47,7 @@ import org.xipki.commons.datasource.DataSourceWrapper;
 
 // CHECKSTYLE:SKIP
 class SQLs {
+
     static final String SQL_ADD_CERT =
             "INSERT INTO CERT (ID,ART,LUPDATE,SN,SUBJECT,FP_S,FP_RS,NBEFORE,NAFTER,REV,PID,"
             + "CA_ID,RID,UID,FP_K,EE,RTYPE,TID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -69,7 +70,7 @@ class SQLs {
     static final String SQL_MAXID_DELTACRL_CACHE =
             "SELECT MAX(ID) FROM DELTACRL_CACHE WHERE CA_ID=?";
 
-    static final String CLEAR_DELTACRL_CACHE =
+    static final String SQL_CLEAR_DELTACRL_CACHE =
             "DELETE FROM DELTACRL_CACHE WHERE ID<? AND CA_ID=?";
 
     static final String SQL_MAX_CRLNO =
@@ -87,27 +88,6 @@ class SQLs {
 
     static final String SQL_REMOVE_CERT =
             "DELETE FROM CERT WHERE CA_ID=? AND SN=?";
-
-    private static final String CORESQL_CERT_FOR_ID =
-        "PID,RID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID=?"
-        + " AND CRAW.CID=CERT.ID";
-
-    private static final String CORESQL_RAWCERT_FOR_ID =
-            "CERT FROM CRAW WHERE CID=?";
-
-    private static final String CORESQL_CERT_WITH_REVINFO =
-            "ID,REV,RR,RT,RIT,PID,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=?"
-            + " AND CERT.SN=? AND CRAW.CID=CERT.ID";
-
-    private static final String CORESQL_CERTINFO =
-            "PID,RID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=?"
-            + " AND CRAW.CID=CERT.ID";
-
-    private static final String CORESQL_CERT_FOR_SUBJECT_ISSUED =
-            "ID FROM CERT WHERE CA_ID=? AND FP_S=?";
-
-    private static final String CORESQL_CERT_FOR_KEY_ISSUED =
-            "ID FROM CERT WHERE CA_ID=? AND FP_K=?";
 
     static final String SQL_DELETE_UNREFERENCED_REQUEST =
             "DELETE FROM REQUEST WHERE ID NOT IN (SELECT req.RID FROM REQCERT req)";
@@ -183,53 +163,63 @@ class SQLs {
     SQLs(final DataSourceWrapper datasource) {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
-        this.sqlCaHasCrl = datasource.buildSelectFirstSql("ID FROM CRL WHERE CA_ID=?", 1);
-        this.sqlContainsCertificates = datasource.buildSelectFirstSql(
-                "ID FROM CERT WHERE CA_ID=? AND EE=?", 1);
-        this.sqlCertForId = datasource.buildSelectFirstSql(CORESQL_CERT_FOR_ID, 1);
-        this.sqlRawCertForId = datasource.buildSelectFirstSql(CORESQL_RAWCERT_FOR_ID, 1);
-        this.sqlCertWithRevInfo = datasource.buildSelectFirstSql(CORESQL_CERT_WITH_REVINFO, 1);
-        this.sqlCertInfo = datasource.buildSelectFirstSql(CORESQL_CERTINFO, 1);
-        this.sqlCertprofileForCertId = datasource.buildSelectFirstSql(
-                "PID FROM CERT WHERE ID=? AND CA_ID=?", 1);
-        this.sqlCertprofileForSerial = datasource.buildSelectFirstSql(
-                "PID FROM CERT WHERE SN=? AND CA_ID=?", 1);
-        this.sqlActiveUserInfoForName = datasource.buildSelectFirstSql(
-                "ID,PASSWORD FROM USERNAME WHERE NAME=? AND ACTIVE=1", 1);
-        this.sqlActiveUserNameForId = datasource.buildSelectFirstSql(
-                "NAME FROM USERNAME WHERE ID=? AND ACTIVE=1", 1);
-        this.sqlCaHasUser = datasource.buildSelectFirstSql(
-                "PERMISSION,PROFILES FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?", 1);
-        this.sqlKnowsCertForSerial = datasource.buildSelectFirstSql(
-                "UID FROM CERT WHERE SN=? AND CA_ID=?", 1);
-        this.sqlRevForId = datasource.buildSelectFirstSql(
-                "SN,EE,REV,RR,RT,RIT FROM CERT WHERE ID=?", 1);
-        this.sqlCertStatusForSubjectFp = datasource.buildSelectFirstSql(
-                "REV FROM CERT WHERE FP_S=? AND CA_ID=?", 1);
-        this.sqlCertforSubjectIssued = datasource.buildSelectFirstSql(
-                CORESQL_CERT_FOR_SUBJECT_ISSUED, 1);
-        this.sqlCertForKeyIssued = datasource.buildSelectFirstSql(CORESQL_CERT_FOR_KEY_ISSUED,
-                1);
-        this.sqlLatestSerialForSubjectLike = datasource.buildSelectFirstSql(
-                "SUBJECT FROM CERT WHERE SUBJECT LIKE ?", 1, "NBEFORE DESC");
-        this.sqlLatestSerialForCertprofileAndSubjectLike = datasource.buildSelectFirstSql(
-                "NBEFORE FROM CERT WHERE PID=? AND SUBJECT LIKE ?", 1, "NBEFORE ASC");
-        this.sqlCrl = datasource.buildSelectFirstSql(
-                "THISUPDATE,CRL FROM CRL WHERE CA_ID=?", 1, "THISUPDATE DESC");
-        this.sqlCrlWithNo = datasource.buildSelectFirstSql(
-                "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?", 1, "THISUPDATE DESC");
-        this.sqlReqIdForSerial = datasource.buildSelectFirstSql(
+        this.sqlCaHasCrl = datasource.buildSelectFirstSql(1,
+                "ID FROM CRL WHERE CA_ID=?");
+        this.sqlContainsCertificates = datasource.buildSelectFirstSql(1,
+                "ID FROM CERT WHERE CA_ID=? AND EE=?");
+
+        this.sqlCertForId = datasource.buildSelectFirstSql(1,
+                "PID,RID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.ID=?"
+                + " AND CRAW.CID=CERT.ID");
+        this.sqlRawCertForId = datasource.buildSelectFirstSql(1,
+                "CERT FROM CRAW WHERE CID=?");
+        this.sqlCertWithRevInfo = datasource.buildSelectFirstSql(1,
+                "ID,REV,RR,RT,RIT,PID,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=?"
+                + " AND CERT.SN=? AND CRAW.CID=CERT.ID");
+        this.sqlCertInfo = datasource.buildSelectFirstSql(1,
+                "PID,RID,REV,RR,RT,RIT,CERT FROM CERT INNER JOIN CRAW ON CERT.CA_ID=? AND CERT.SN=?"
+                + " AND CRAW.CID=CERT.ID");
+        this.sqlCertprofileForCertId = datasource.buildSelectFirstSql(1,
+                "PID FROM CERT WHERE ID=? AND CA_ID=?");
+        this.sqlCertprofileForSerial = datasource.buildSelectFirstSql(1,
+                "PID FROM CERT WHERE SN=? AND CA_ID=?");
+        this.sqlActiveUserInfoForName = datasource.buildSelectFirstSql(1,
+                "ID,PASSWORD FROM TUSER WHERE NAME=? AND ACTIVE=1");
+        this.sqlActiveUserNameForId = datasource.buildSelectFirstSql(1,
+                "NAME FROM TUSER WHERE ID=? AND ACTIVE=1");
+        this.sqlCaHasUser = datasource.buildSelectFirstSql(1,
+                "PERMISSION,PROFILES FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?");
+        this.sqlKnowsCertForSerial = datasource.buildSelectFirstSql(1,
+                "UID FROM CERT WHERE SN=? AND CA_ID=?");
+        this.sqlRevForId = datasource.buildSelectFirstSql(1,
+                "SN,EE,REV,RR,RT,RIT FROM CERT WHERE ID=?");
+        this.sqlCertStatusForSubjectFp = datasource.buildSelectFirstSql(1,
+                "REV FROM CERT WHERE FP_S=? AND CA_ID=?");
+        this.sqlCertforSubjectIssued = datasource.buildSelectFirstSql(1,
+                "ID FROM CERT WHERE CA_ID=? AND FP_S=?");
+        this.sqlCertForKeyIssued = datasource.buildSelectFirstSql(1,
+                "ID FROM CERT WHERE CA_ID=? AND FP_K=?");
+        this.sqlLatestSerialForSubjectLike = datasource.buildSelectFirstSql(1, "NBEFORE DESC",
+                "SUBJECT FROM CERT WHERE SUBJECT LIKE ?");
+        this.sqlLatestSerialForCertprofileAndSubjectLike = datasource.buildSelectFirstSql(1,
+                "NBEFORE ASC",
+                "NBEFORE FROM CERT WHERE PID=? AND SUBJECT LIKE ?");
+        this.sqlCrl = datasource.buildSelectFirstSql(1, "THISUPDATE DESC",
+                "THISUPDATE,CRL FROM CRL WHERE CA_ID=?");
+        this.sqlCrlWithNo = datasource.buildSelectFirstSql(1, "THISUPDATE DESC",
+                "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?");
+        this.sqlReqIdForSerial = datasource.buildSelectFirstSql(1,
                 "REQCERT.RID as REQ_ID FROM REQCERT INNER JOIN CERT ON CERT.CA_ID=? "
-                + "AND CERT.SN=? AND REQCERT.CID=CERT.ID", 1);
-        this.sqlReqForId = datasource.buildSelectFirstSql(
-                "DATA FROM REQUEST WHERE ID=?", 1);
+                + "AND CERT.SN=? AND REQCERT.CID=CERT.ID");
+        this.sqlReqForId = datasource.buildSelectFirstSql(1,
+                "DATA FROM REQUEST WHERE ID=?");
     } // constructor
 
     String getSqlCidFromPublishQueue(final int numEntries) {
         String sql = cacheSqlCidFromPublishQueue.get(numEntries);
         if (sql == null) {
-            sql = datasource.buildSelectFirstSql(
-                    "CID FROM PUBLISHQUEUE WHERE PID=? AND CA_ID=?", numEntries, "CID ASC");
+            sql = datasource.buildSelectFirstSql(numEntries, "CID ASC",
+                    "CID FROM PUBLISHQUEUE WHERE PID=? AND CA_ID=?");
             cacheSqlCidFromPublishQueue.put(numEntries, sql);
         }
         return sql;
@@ -238,8 +228,8 @@ class SQLs {
     String getSqlExpiredSerials(final int numEntries) {
         String sql = cacheSqlExpiredSerials.get(numEntries);
         if (sql == null) {
-            sql = datasource.buildSelectFirstSql(
-                    "SN FROM CERT WHERE CA_ID=? AND NAFTER<?", numEntries);
+            sql = datasource.buildSelectFirstSql(numEntries,
+                    "SN FROM CERT WHERE CA_ID=? AND NAFTER<?");
             cacheSqlExpiredSerials.put(numEntries, sql);
         }
         return sql;
@@ -248,8 +238,8 @@ class SQLs {
     String getSqlSuspendedSerials(final int numEntries) {
         String sql = cacheSqlSuspendedSerials.get(numEntries);
         if (sql == null) {
-            sql = datasource.buildSelectFirstSql(
-                    "SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?", numEntries);
+            sql = datasource.buildSelectFirstSql(numEntries,
+                    "SN FROM CERT WHERE CA_ID=? AND LUPDATE<? AND RR=?");
             cacheSqlSuspendedSerials.put(numEntries, sql);
         }
         return sql;
@@ -258,8 +248,8 @@ class SQLs {
     String getSqlDeltaCrlCacheIds(final int numEntries) {
         String sql = cacheSqlDeltaCrlCacheIds.get(numEntries);
         if (sql == null) {
-            sql = datasource.buildSelectFirstSql(
-                    "ID FROM DELTACRL_CACHE WHERE ID>? AND CA_ID=?", numEntries, "ID ASC");
+            sql = datasource.buildSelectFirstSql(numEntries, "ID ASC",
+                    "ID FROM DELTACRL_CACHE WHERE ID>? AND CA_ID=?");
             cacheSqlDeltaCrlCacheIds.put(numEntries, sql);
         }
         return sql;
@@ -275,7 +265,7 @@ class SQLs {
             if (withEe) {
                 coreSql += " AND EE=?";
             }
-            sql = datasource.buildSelectFirstSql(coreSql, numEntries, "ID ASC");
+            sql = datasource.buildSelectFirstSql(numEntries, "ID ASC", coreSql);
             cache.put(numEntries, sql);
         }
         return sql;
@@ -290,7 +280,7 @@ class SQLs {
             if (onlyRevoked) {
                 coreSql += "AND REV=1";
             }
-            sql = datasource.buildSelectFirstSql(coreSql, numEntries, "ID ASC");
+            sql = datasource.buildSelectFirstSql(numEntries, "ID ASC", coreSql);
             cache.put(numEntries, sql);
         }
         return sql;
@@ -308,7 +298,7 @@ class SQLs {
         if (withEe) {
             sb.append(" AND EE=?");
         }
-        return datasource.buildSelectFirstSql(sb.toString(), numEntries, "ID ASC");
+        return datasource.buildSelectFirstSql(numEntries, "ID ASC", sb.toString());
     }
 
 }

@@ -95,7 +95,7 @@ public class DbPorter extends DbToolBase {
     public enum CaDbEntryType {
         CERT("certs", "CERT", 1),
         CRL("crls", "CRL", 0.1f),
-        USER("users", "USERNAME", 10),
+        USER("users", "TUSER", 10),
         CAUSER("causers", "CA_HAS_USER", 10),
         REQUEST("requests", "REQUEST", 0.1f),
         REQCERT("reqcerts", "REQCERT", 50);
@@ -149,7 +149,7 @@ public class DbPorter extends DbToolBase {
 
     protected final boolean evaulateOnly;
 
-    protected final float dbSchemaVersion;
+    protected final int dbSchemaVersion;
 
     protected final int maxX500nameLen;
 
@@ -161,7 +161,7 @@ public class DbPorter extends DbToolBase {
 
         DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
         String str = dbSchemaInfo.getVariableValue("VERSION");
-        this.dbSchemaVersion = Float.parseFloat(str);
+        this.dbSchemaVersion = Integer.parseInt(str);
         str = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(str);
     }

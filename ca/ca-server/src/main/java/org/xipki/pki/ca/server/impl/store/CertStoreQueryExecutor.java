@@ -113,7 +113,7 @@ class CertStoreQueryExecutor {
     private final DataSourceWrapper datasource;
 
     @SuppressWarnings("unused")
-    private final float dbSchemaVersion;
+    private final int dbSchemaVersion;
 
     private final int maxX500nameLen;
 
@@ -128,7 +128,7 @@ class CertStoreQueryExecutor {
 
         DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
         String str = dbSchemaInfo.getVariableValue("VERSION");
-        this.dbSchemaVersion = Float.parseFloat(str);
+        this.dbSchemaVersion = Integer.parseInt(str);
         str = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(str);
         this.sqls = new SQLs(datasource);
@@ -312,9 +312,9 @@ class CertStoreQueryExecutor {
         }
     }
 
-    public void clearDeltaCrlCache(final NameId ca, final long maxId)
+    void clearDeltaCrlCache(final NameId ca, final long maxId)
             throws OperationException, DataAccessException {
-        final String sql = SQLs.CLEAR_DELTACRL_CACHE;
+        final String sql = SQLs.SQL_CLEAR_DELTACRL_CACHE;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
             ps.setLong(1, maxId + 1);
@@ -1458,7 +1458,7 @@ class CertStoreQueryExecutor {
             }
         }
 
-        final String sql = datasource.buildSelectFirstSql(sb.toString(), numEntries, sortByStr);
+        final String sql = datasource.buildSelectFirstSql(numEntries, sortByStr, sb.toString());
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 

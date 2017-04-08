@@ -25,7 +25,7 @@
     </createTable>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="VERSION"/>
-      <column name="VALUE2" value="2.2"/>
+      <column name="VALUE2" value="3"/>
     </insert>
     <insert tableName="DBSCHEMA">
       <column name="NAME" value="X500NAME_MAXLEN"/>
@@ -260,8 +260,8 @@
   </changeSet>
   <!-- CertStore :: create table -->
   <changeSet author="xipki" id="2">
-    <!-- table USERNAME -->
-    <createTable tableName="USERNAME">
+    <!-- table TUSER -->
+    <createTable tableName="TUSER">
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
@@ -279,7 +279,7 @@
              further bytes: salt and hash value-->
       </column>
     </createTable>
-    <addUniqueConstraint tableName="USERNAME" columnNames="NAME" constraintName="CONST_USERNAME_NAME"/>
+    <addUniqueConstraint tableName="TUSER" columnNames="NAME" constraintName="CONST_USER_NAME"/>
     <!-- table CA_HAS_USER -->
     <createTable tableName="CA_HAS_USER">
       <column name="ID" type="BIGINT">
@@ -501,7 +501,7 @@
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="USER_ID" baseTableName="CA_HAS_USER"
-      referencedColumnNames="ID" referencedTableName="USERNAME"/>
+      referencedColumnNames="ID" referencedTableName="TUSER"/>
     <addForeignKeyConstraint constraintName="FK_CA_HAS_USER_CA1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
@@ -557,7 +557,7 @@
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="UID" baseTableName="CERT"
-      referencedColumnNames="ID" referencedTableName="USERNAME"/>
+      referencedColumnNames="ID" referencedTableName="TUSER"/>
     <addForeignKeyConstraint constraintName="FK_CERT_PROFILE1"
       deferrable="false" initiallyDeferred="false"
       onDelete="NO ACTION" onUpdate="NO ACTION"

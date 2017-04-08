@@ -266,7 +266,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             break;
         case USER:
             numProcessedBefore = certstore.getCountUsers();
-            coreSql = "ID,NAME,ACTIVE,PASSWORD FROM USERNAME WHERE ID>=?";
+            coreSql = "ID,NAME,ACTIVE,PASSWORD FROM TUSER WHERE ID>=?";
             break;
         case CAUSER:
             numProcessedBefore = certstore.getCountCaUsers();
@@ -301,7 +301,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             total = 1; // to avoid exception
         }
 
-        String sql = datasource.buildSelectFirstSql(coreSql, numEntriesPerSelect, "ID ASC");
+        String sql = datasource.buildSelectFirstSql(numEntriesPerSelect, "ID ASC", coreSql);
 
         DbiXmlWriter entriesInCurrentFile = createWriter(type);
         PreparedStatement ps = prepareStatement(sql.toString());

@@ -469,8 +469,8 @@ public class DbCertStatusStore extends OcspStore {
         ParamUtil.requireNonNull("conf", conf);
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
-        sqlCs = datasource.buildSelectFirstSql(
-                "NBEFORE,NAFTER,REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?", 1);
+        sqlCs = datasource.buildSelectFirstSql(1,
+                "NBEFORE,NAFTER,REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?");
         sqlCsMap = new HashMap<>();
 
         HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA1,  HashAlgoType.SHA224,
@@ -478,7 +478,7 @@ public class DbCertStatusStore extends OcspStore {
         for (HashAlgoType hashAlgo : hashAlgos) {
             String coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT,RIT,PN," + hashAlgo.getShortName()
                 + " FROM CERT INNER JOIN CHASH ON CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID";
-            sqlCsMap.put(hashAlgo, datasource.buildSelectFirstSql(coreSql, 1));
+            sqlCsMap.put(hashAlgo, datasource.buildSelectFirstSql(1, coreSql));
         }
 
         StoreConf storeConf = new StoreConf(conf);

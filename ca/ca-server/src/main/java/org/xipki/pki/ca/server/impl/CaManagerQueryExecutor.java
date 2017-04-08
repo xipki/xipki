@@ -168,7 +168,7 @@ class CaManagerQueryExecutor {
     } // method prepareStatement
 
     SystemEvent getSystemEvent(final String eventName) throws CaMgmtException {
-        final String sql = "SELECT EVENT_TIME,EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?";
+        final String sql = sqls.sqlSelectSystemEvent;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
@@ -283,7 +283,7 @@ class CaManagerQueryExecutor {
     CertprofileEntry createCertprofile(final String name) throws CaMgmtException {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        final String sql = sqls.sqlSelectCertprofile;
+        final String sql = sqls.sqlSelectProfile;
         try {
             stmt = prepareStatement(sql);
             stmt.setString(1, name);
@@ -359,7 +359,7 @@ class CaManagerQueryExecutor {
     } // method createPublisher
 
     Integer getRequestorId(String requestorName) throws CaMgmtException {
-        final String sql = datasource.buildSelectFirstSql("ID FROM REQUESTOR WHERE NAME=?", 1);
+        final String sql = sqls.sqlSelectRequestorId;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
@@ -935,12 +935,13 @@ class CaManagerQueryExecutor {
     } // method addCmpRequestor
 
     void addRequestorIfNeeded(String requestorName) throws CaMgmtException {
-        final String sql = "INSERT INTO REQUESTOR (ID,NAME) VALUES (?,?)";
+        String sql = sqls.sqlSelectRequestorId;
         ResultSet rs = null;
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         try {
-            stmt = createStatement();
-            rs = stmt.executeQuery("SELECT ID FROM REQUESTOR WHERE NAME='" + requestorName + "'");
+            stmt = prepareStatement(sql);
+            stmt.setString(1, requestorName);
+            rs = stmt.executeQuery();
             if (rs.next()) {
                 return;
             }
@@ -950,12 +951,11 @@ class CaManagerQueryExecutor {
 
             int id = (int) datasource.getMax(null, "REQUESTOR", "ID");
 
-            PreparedStatement ps = prepareStatement(sql);
-            stmt = ps;
-
-            ps.setInt(1, id + 1);
-            ps.setString(2, requestorName);
-            ps.executeUpdate();
+            sql = "INSERT INTO REQUESTOR (ID,NAME) VALUES (?,?)";
+            stmt = prepareStatement(sql);
+            stmt.setInt(1, id + 1);
+            stmt.setString(2, requestorName);
+            stmt.executeUpdate();
             LOG.info("added requestor '{}'", requestorName);
         } catch (SQLException ex) {
             throw new CaMgmtException(datasource, sql, ex);
@@ -1424,13 +1424,13 @@ class CaManagerQueryExecutor {
             throws CaMgmtException {
         PreparedStatement ps = null;
         try {
-            final String sql = new StringBuilder("SELECT NEXT_CRLNO FROM CA WHERE ID=")
-                .append(ca.getId()).append("").toString();
+            final String sql = sqls.sqlNextSelectCrlNo;
             ResultSet rs = null;
             long nextCrlNoInDb;
 
             try {
                 ps = prepareStatement(sql);
+                ps.setInt(1, ca.getId());
                 rs = ps.executeQuery();
                 rs.next();
                 nextCrlNoInDb = rs.getLong("NEXT_CRLNO");
@@ -2096,12 +2096,14 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonBlank("profileName", profileName);
         ParamUtil.requireNonBlank("caName", caName);
 
+        int caId = getNonNullIdForName(sqls.sqlSelectCaId, caName);
+        int profileId = getNonNullIdForName(sqls.sqlSelectProfileId, profileName);
         final String sql = "DELETE FROM CA_HAS_PROFILE WHERE CA_ID=? AND PROFILE_ID=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, getIdForName("CA", caName));
-            ps.setInt(2, getIdForName("PROFILE", profileName));
+            ps.setInt(1, caId);
+            ps.setInt(2, profileId);
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
                 LOG.info("removed profile '{}' from CA '{}'", profileName, caName);
@@ -2119,12 +2121,14 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonBlank("requestorName", requestorName);
         ParamUtil.requireNonBlank("caName", caName);
 
+        int caId = getNonNullIdForName(sqls.sqlSelectCaId, caName);
+        int requestorId = getNonNullIdForName(sqls.sqlSelectRequestorId, requestorName);
         final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_ID=? AND REQUESTOR_ID=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, getIdForName("CA", caName));
-            ps.setInt(2, getIdForName("REQUESTOR", requestorName));
+            ps.setInt(1, caId);
+            ps.setInt(2, requestorId);
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
                 LOG.info("removed requestor '{}' from CA '{}'", requestorName, caName);
@@ -2141,12 +2145,15 @@ class CaManagerQueryExecutor {
             throws CaMgmtException {
         ParamUtil.requireNonBlank("publisherName", publisherName);
         ParamUtil.requireNonBlank("caName", caName);
+        int caId = getNonNullIdForName(sqls.sqlSelectCaId, caName);
+        int publisherId = getNonNullIdForName(sqls.sqlSelectPublisherId, publisherName);
+
         final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_ID=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, getIdForName("CA", caName));
-            ps.setInt(2, getIdForName("PUBLISHER", publisherName));
+            ps.setInt(1, caId);
+            ps.setInt(2, publisherId);
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
                 LOG.info("removed publisher '{}' from CA '{}'", publisherName, caName);
@@ -2340,7 +2347,7 @@ class CaManagerQueryExecutor {
     boolean addUser(final AddUserEntry userEntry) throws CaMgmtException {
         ParamUtil.requireNonNull("userEntry", userEntry);
         final String name = userEntry.getIdent().getName();
-        Integer existingId = executeGetUserIdSql(name);
+        Integer existingId = getIdForName(sqls.sqlSelectUserId, name);
         if (existingId != null) {
             throw new CaMgmtException("user named '" + name + " ' already exists");
         }
@@ -2355,13 +2362,13 @@ class CaManagerQueryExecutor {
 
         long id;
         try {
-            long maxId = datasource.getMax(null, "USERNAME", "ID");
+            long maxId = datasource.getMax(null, "TUSER", "ID");
             id = maxId + 1;
         } catch (DataAccessException ex) {
             throw new CaMgmtException(ex);
         }
 
-        final String sql = "INSERT INTO USERNAME (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
+        final String sql = "INSERT INTO TUSER (ID,NAME,ACTIVE,PASSWORD) VALUES (?,?,?,?)";
 
         PreparedStatement ps = null;
 
@@ -2383,38 +2390,14 @@ class CaManagerQueryExecutor {
         return true;
     } // method addUser
 
-    private Integer executeGetUserIdSql(final String user)
-            throws CaMgmtException {
+    boolean removeUser(final String user) throws CaMgmtException {
         ParamUtil.requireNonBlank("user", user);
-        final String sql = sqls.sqlGetUserId;
-        ResultSet rs = null;
-        PreparedStatement ps = null;
-        try {
-            ps = prepareStatement(sql);
-
-            int idx = 1;
-            ps.setString(idx++, user);
-            rs = ps.executeQuery();
-            if (!rs.next()) {
-                return null;
-            }
-
-            return rs.getInt("ID");
-        } catch (SQLException ex) {
-            throw new CaMgmtException(datasource, sql, ex);
-        } finally {
-            datasource.releaseResources(ps, rs);
-        }
-    } // method executeGetUserIdSql
-
-    boolean removeUser(final String userName) throws CaMgmtException {
-        ParamUtil.requireNonBlank("userName", userName);
-        final String sql = "DELETE FROM USERNAME WHERE NAME=?";
+        final String sql = "DELETE FROM TUSER WHERE NAME=?";
 
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setString(1, userName);
+            ps.setString(1, user);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
             throw new CaMgmtException(datasource, sql, ex);
@@ -2424,16 +2407,16 @@ class CaManagerQueryExecutor {
     } // method removeUser
 
     boolean changeUser(final ChangeUserEntry userEntry) throws CaMgmtException {
-        String username = userEntry.getIdent().getName();
+        String userName = userEntry.getIdent().getName();
 
-        Integer existingId = executeGetUserIdSql(username);
+        Integer existingId = getIdForName(sqls.sqlSelectUserId, userName);
         if (existingId == null) {
-            throw new CaMgmtException("user '" + username + " ' does not exist");
+            throw new CaMgmtException("user '" + userName + " ' does not exist");
         }
         userEntry.getIdent().setId(existingId);
 
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE USERNAME SET ");
+        sqlBuilder.append("UPDATE TUSER SET ");
 
         AtomicInteger index = new AtomicInteger(1);
 
@@ -2500,16 +2483,18 @@ class CaManagerQueryExecutor {
 
     boolean removeUserFromCa(final String userName, final String caName)
             throws CaMgmtException {
-        Integer id = executeGetUserIdSql(userName);
+        Integer id = getIdForName(sqls.sqlSelectUserId, userName);
         if (id == null) {
             return false;
         }
+
+        int caId = getNonNullIdForName(sqls.sqlSelectCaId, caName);
 
         final String sql = "DELETE FROM CA_HAS_USER WHERE CA_ID=? AND USER_ID=?";
         PreparedStatement ps = null;
         try {
             ps = prepareStatement(sql);
-            ps.setInt(1, getIdForName("CA", caName));
+            ps.setInt(1, caId);
             ps.setInt(2, id);
             boolean bo = ps.executeUpdate() > 0;
             if (bo) {
@@ -2529,7 +2514,7 @@ class CaManagerQueryExecutor {
         ParamUtil.requireNonNull("ca", ca);
 
         final NameId userIdent = user.getUserIdent();
-        Integer existingId = executeGetUserIdSql(userIdent.getName());
+        Integer existingId = getIdForName(sqls.sqlSelectUserId, userIdent.getName());
         if (existingId == null) {
             throw new CaMgmtException("user '" + userIdent.getName() + " ' does not exist");
         }
@@ -2571,7 +2556,7 @@ class CaManagerQueryExecutor {
 
     Map<String, CaHasUserEntry> getCaHasUsers(String user, CaIdNameMap idNameMap)
             throws CaMgmtException {
-        Integer existingId = executeGetUserIdSql(user);
+        Integer existingId = getIdForName(sqls.sqlSelectUserId, user);
         if (existingId == null) {
             throw new CaMgmtException("user '" + user + " ' does not exist");
         }
@@ -2607,11 +2592,11 @@ class CaManagerQueryExecutor {
         }
     }  // method getCaHasUsers
 
-    UserEntry getUser(final String username) throws CaMgmtException {
-        ParamUtil.requireNonNull("username", username);
-        NameId ident = new NameId(null, username);
+    UserEntry getUser(final String userName) throws CaMgmtException {
+        ParamUtil.requireNonNull("userName", userName);
+        NameId ident = new NameId(null, userName);
 
-        final String sql = sqls.sqlGetUser;
+        final String sql = sqls.sqlSelectUser;
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {
@@ -2665,8 +2650,16 @@ class CaManagerQueryExecutor {
         return X509Util.canonicalizName(x500Name);
     }
 
-    private int getIdForName(final String tableName, final String name) throws CaMgmtException {
-        final String sql = "SELECT ID FROM " + tableName + " WHERE NAME=?";
+    private int getNonNullIdForName(final String sql, final String name) throws CaMgmtException {
+        Integer id = getIdForName(sql, name);
+        if (id != null) {
+            return id.intValue();
+        }
+
+        throw new CaMgmtException("Found no entry named '" + name + "'");
+    }
+
+    private Integer getIdForName(final String sql, final String name) throws CaMgmtException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
@@ -2674,8 +2667,7 @@ class CaManagerQueryExecutor {
             ps.setString(1, name);
             rs = ps.executeQuery();
             if (!rs.next()) {
-                throw new CaMgmtException(
-                        "Found no entry named '" + name + "' in table '" + tableName + "'");
+                return null;
             }
 
             return rs.getInt("ID");
