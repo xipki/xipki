@@ -32,58 +32,68 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.proxy;
+package org.xipki.commons.security.pkcs11.proxy.msg;
 
 import java.io.IOException;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
-import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 
 /**
  *
  * <pre>
- * SlotIdentifier ::= SEQUENCE {
- *     id         INTEGER OPTIONAL,
- *     index      INTEGER OPTIONAL
- *     }
+ * GenECKeypairParams ::= SEQUENCE {
+ *     slotId               P11SlotIdentifier,
+ *     label                UTF8STRING,
+ *     curveId              OBJECT IDENTIFIER }
  * </pre>
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class Asn1P11SlotIdentifier extends ASN1Object {
+// CHECKSTYLE:SKIP
+public class Asn1GenECKeypairParams extends ASN1Object {
 
-    private final P11SlotIdentifier slotId;
+    private final Asn1P11SlotIdentifier slotId;
 
-    public Asn1P11SlotIdentifier(final P11SlotIdentifier slotId) {
+    private final String label;
+
+    private final ASN1ObjectIdentifier curveId;
+
+    public Asn1GenECKeypairParams(final Asn1P11SlotIdentifier slotId, final String label,
+            final ASN1ObjectIdentifier curveId) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        this.label = ParamUtil.requireNonBlank("label", label);
+        this.curveId = ParamUtil.requireNonNull("curveId", curveId);
     }
 
-    private Asn1P11SlotIdentifier(final ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 2, 2);
+    private Asn1GenECKeypairParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
+        Asn1Util.requireRange(seq, 3, 3);
         int idx = 0;
-        long id = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
-        int index = Asn1Util.getInteger(seq.getObjectAt(idx++)).intValue();
-        this.slotId = new P11SlotIdentifier(index, id);
+        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
+        label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
+        ParamUtil.requireNonBlank("label", label);
+
+        curveId = Asn1Util.getObjectIdentifier(seq.getObjectAt(idx++));
     }
 
-    public static Asn1P11SlotIdentifier getInstance(final Object obj)
+    public static Asn1GenECKeypairParams getInstance(final Object obj)
             throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1P11SlotIdentifier) {
-            return (Asn1P11SlotIdentifier) obj;
+        if (obj == null || obj instanceof Asn1GenECKeypairParams) {
+            return (Asn1GenECKeypairParams) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new Asn1P11SlotIdentifier((ASN1Sequence) obj);
+                return new Asn1GenECKeypairParams((ASN1Sequence) obj);
             } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {
@@ -98,13 +108,22 @@ public class Asn1P11SlotIdentifier extends ASN1Object {
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(new ASN1Integer(slotId.getId()));
-        vector.add(new ASN1Integer(slotId.getIndex()));
+        vector.add(slotId);
+        vector.add(new DERUTF8String(label));
+        vector.add(curveId);
         return new DERSequence(vector);
     }
 
-    public P11SlotIdentifier getSlotId() {
+    public Asn1P11SlotIdentifier getSlotId() {
         return slotId;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public ASN1ObjectIdentifier getCurveId() {
+        return curveId;
     }
 
 }

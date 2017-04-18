@@ -34,7 +34,6 @@
 
 package org.xipki.commons.security.pkcs11.proxy;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -44,7 +43,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -64,6 +62,15 @@ import org.xipki.commons.security.pkcs11.P11MechanismFilter;
 import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 import org.xipki.commons.security.pkcs11.P11SlotRefreshResult;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1GenECKeypairParams;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1GenRSAKeypairParams;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11EntityIdentifier;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11ObjectIdentifier;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11ObjectIdentifiers;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11SlotIdentifier;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1RemoveObjectsParams;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1EntityIdAndCert;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1GenDSAKeypairParams;
 import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.X509Util;
 
@@ -102,7 +109,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
 
         // certificates
         List<P11ObjectIdentifier> certIds =
-                getObjectIdsFromServer(P11ProxyConstants.ACTION_getCertIdentifiers);
+                getObjectIdsFromServer(P11ProxyConstants.ACTION_GET_CERT_IDS);
         for (P11ObjectIdentifier certId : certIds) {
             X509Cert cert = getCertificate(certId);
             if (cert != null) {
@@ -112,7 +119,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
 
         // keys
         List<P11ObjectIdentifier> keyIds =
-                getObjectIdsFromServer(P11ProxyConstants.ACTION_getIdentityIdentifiers);
+                getObjectIdsFromServer(P11ProxyConstants.ACTION_GET_IDENTITY_IDS);
         for (P11ObjectIdentifier keyId : keyIds) {
             byte[] id = keyId.getId();
             java.security.PublicKey pubKey = null;
@@ -145,7 +152,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
     private PublicKey getPublicKey(final P11ObjectIdentifier objectId)
             throws P11UnknownEntityException, P11TokenException {
         P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objectId);
-        ASN1Encodable resp = module.send(P11ProxyConstants.ACTION_getPublicKey,
+        byte[] resp = module.send(P11ProxyConstants.ACTION_GET_PUBLICKEY,
                 new Asn1P11EntityIdentifier(entityId));
         if (resp == null) {
             return null;
@@ -162,16 +169,15 @@ public class ProxyP11Slot extends AbstractP11Slot {
 
     private X509Cert getCertificate(final P11ObjectIdentifier certId) throws P11TokenException {
         P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, certId);
-        ASN1Encodable resp = module.send(P11ProxyConstants.ACTION_getCertificate,
+        byte[] resp = module.send(P11ProxyConstants.ACTION_GET_CERT,
                 new Asn1P11EntityIdentifier(entityId));
         if (resp == null) {
             return null;
         }
 
         try {
-            byte[] encoded = resp.toASN1Primitive().getEncoded();
-            return new X509Cert(X509Util.parseCert(encoded), encoded);
-        } catch (CertificateException | IOException ex) {
+            return new X509Cert(X509Util.parseCert(resp), resp);
+        } catch (CertificateException ex) {
             throw new P11TokenException("could not parse certificate:" + ex.getMessage(), ex);
         }
     }
@@ -183,10 +189,10 @@ public class ProxyP11Slot extends AbstractP11Slot {
         }
 
         Asn1RemoveObjectsParams params = new Asn1RemoveObjectsParams(slotId, id, label);
-        ASN1Encodable resp = module.send(P11ProxyConstants.ACTION_removeObjects, params);
+        byte[] resp = module.send(P11ProxyConstants.ACTION_REMOVE_OBJECTS, params);
         try {
-            return Asn1Util.getInteger(resp).intValue();
-        } catch (BadAsn1ObjectException ex) {
+            return ASN1Integer.getInstance(resp).getValue().intValue();
+        } catch (IllegalArgumentException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
         }
     }
@@ -194,7 +200,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
     @Override
     protected void doRemoveIdentity(final P11ObjectIdentifier objectId) throws P11TokenException {
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(slotId, objectId);
-        module.send(P11ProxyConstants.ACTION_removeIdentity, asn1EntityId);
+        module.send(P11ProxyConstants.ACTION_REMOVE_IDENTITY, asn1EntityId);
     }
 
     @Override
@@ -202,13 +208,13 @@ public class ProxyP11Slot extends AbstractP11Slot {
             throws P11TokenException, XiSecurityException {
         Asn1EntityIdAndCert asn1 = new Asn1EntityIdAndCert(
                 new P11EntityIdentifier(slotId, objectId), cert);
-        module.send(P11ProxyConstants.ACTION_addCert, asn1);
+        module.send(P11ProxyConstants.ACTION_ADD_CERT, asn1);
     }
 
     @Override
     protected void doRemoveCerts(final P11ObjectIdentifier objectId) throws P11TokenException {
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(slotId, objectId);
-        module.send(P11ProxyConstants.ACTION_removeCerts, asn1EntityId);
+        module.send(P11ProxyConstants.ACTION_REMOVE_CERTS, asn1EntityId);
     }
 
     @Override
@@ -216,7 +222,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
             final String label) throws P11TokenException {
         Asn1GenRSAKeypairParams asn1 = new Asn1GenRSAKeypairParams(asn1SlotId, label, keysize,
                 publicExponent);
-        ASN1Encodable resp = module.send(P11ProxyConstants.ACTION_genKeypair_RSA, asn1);
+        byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_RSA, asn1);
         return parseGenerateKeypairResult(resp);
     }
 
@@ -226,7 +232,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
             final BigInteger g, final String label) throws P11TokenException {
     // CHECKSTYLE:ON
         Asn1GenDSAKeypairParams asn1 = new Asn1GenDSAKeypairParams(asn1SlotId, label, p, q, g);
-        ASN1Encodable resp = module.send(P11ProxyConstants.ACTION_genKeypair_DSA, asn1);
+        byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_DSA, asn1);
         return parseGenerateKeypairResult(resp);
     }
 
@@ -234,11 +240,11 @@ public class ProxyP11Slot extends AbstractP11Slot {
     protected P11Identity doGenerateECKeypair(final ASN1ObjectIdentifier curveId,
             final String label) throws P11TokenException {
         Asn1GenECKeypairParams asn1 = new Asn1GenECKeypairParams(asn1SlotId, label, curveId);
-        ASN1Encodable resp = module.send(P11ProxyConstants.ACTION_genKeypair_EC, asn1);
+        byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC, asn1);
         return parseGenerateKeypairResult(resp);
     }
 
-    private P11Identity parseGenerateKeypairResult(final ASN1Encodable resp)
+    private P11Identity parseGenerateKeypairResult(final byte[] resp)
             throws P11TokenException {
         if (resp == null) {
             throw new P11TokenException("server returned no result");
@@ -264,12 +270,12 @@ public class ProxyP11Slot extends AbstractP11Slot {
             final X509Certificate newCert) throws XiSecurityException, P11TokenException {
         Asn1EntityIdAndCert asn1 = new Asn1EntityIdAndCert(
                 new P11EntityIdentifier(slotId, objectId), newCert);
-        module.send(P11ProxyConstants.ACTION_updateCerificate, asn1);
+        module.send(P11ProxyConstants.ACTION_UPDATE_CERT, asn1);
     }
 
     private List<Long> getMechanismsFromServer() throws P11TokenException {
         Asn1P11SlotIdentifier asn1SlotId = new Asn1P11SlotIdentifier(slotId);
-        ASN1Encodable resp = module.send(P11ProxyConstants.ACTION_getMechanisms, asn1SlotId);
+        byte[] resp = module.send(P11ProxyConstants.ACTION_GET_MECHANISMS, asn1SlotId);
         ASN1Sequence seq = requireSequence(resp);
         final int n = seq.size();
 
@@ -281,10 +287,10 @@ public class ProxyP11Slot extends AbstractP11Slot {
         return mechs;
     }
 
-    private List<P11ObjectIdentifier> getObjectIdsFromServer(final int action)
+    private List<P11ObjectIdentifier> getObjectIdsFromServer(final short action)
             throws P11TokenException {
         Asn1P11SlotIdentifier asn1SlotId = new Asn1P11SlotIdentifier(slotId);
-        ASN1Encodable resp = module.send(action, asn1SlotId);
+        byte[] resp = module.send(action, asn1SlotId);
 
         List<Asn1P11ObjectIdentifier> asn1ObjectIds;
         try {
@@ -300,12 +306,12 @@ public class ProxyP11Slot extends AbstractP11Slot {
         return objectIds;
     }
 
-    private ASN1Sequence requireSequence(final ASN1Encodable response) throws P11TokenException {
-        if (!(response instanceof ASN1Sequence)) {
-            throw new P11TokenException("response is not ASN1Sequence, but "
-                    + response.getClass().getName());
+    private ASN1Sequence requireSequence(final byte[] response) throws P11TokenException {
+        try {
+            return ASN1Sequence.getInstance(response);
+        } catch (IllegalArgumentException ex) {
+            throw new P11TokenException("response is not ASN1Sequence", ex);
         }
-        return (ASN1Sequence) response;
     }
 
     ProxyP11Module getModule() {

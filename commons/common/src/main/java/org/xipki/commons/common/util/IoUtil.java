@@ -195,6 +195,34 @@ public class IoUtil {
         return sb.toString();
     }
 
+    public static void writeShort(short value, byte[] dest, int destOffset) {
+        dest[destOffset] = (byte) (value >> 8);
+        dest[destOffset + 1] = (byte) (0xFF & value);
+    }
+
+    public static short parseShort(byte[] bytes, int offset) {
+        return (short) ((toInt(bytes[offset]) << 8)
+                | toInt(bytes[offset + 1]));
+    }
+
+    public static void writeInt(int value, byte[] dest, int destOffset) {
+        dest[destOffset] = (byte) (value >> 24);
+        dest[destOffset + 1] = (byte) (0xFF & (value >> 16));
+        dest[destOffset + 2] = (byte) (0xFF & (value >> 8));
+        dest[destOffset + 3] = (byte) (0xFF & value);
+    }
+
+    public static int parseInt(byte[] bytes, int offset) {
+        return toInt(bytes[offset]) << 24
+                | toInt(bytes[offset + 1]) << 16
+                | toInt(bytes[offset + 2]) << 8
+                | toInt(bytes[offset + 3]);
+    }
+
+    private static int toInt(byte bb) {
+        return (bb < 0) ? 256 + bb : bb;
+    }
+
     public static String base64Encode(final byte[] data, final boolean withLineBreak) {
 
         String b64Str = Base64.getEncoder().encodeToString(data);

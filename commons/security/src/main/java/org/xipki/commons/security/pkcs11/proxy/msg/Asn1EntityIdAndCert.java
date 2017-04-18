@@ -32,111 +32,99 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.proxy;
+package org.xipki.commons.security.pkcs11.proxy.msg;
 
 import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
 import org.xipki.commons.security.pkcs11.P11EntityIdentifier;
-import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
-import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 
 /**
- *
  * <pre>
- * EntityIdentifer ::= SEQUENCE {
- *     slotId     SlotIdentifier,
- *     keyId      KeyIdentifier
- *     }
+ * EntityIdAndCert ::= SEQUENCE {
+ *     entityId             EntityIdentifer,
+ *     certificate          Certificate }
  * </pre>
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class Asn1P11EntityIdentifier extends ASN1Object {
+public class Asn1EntityIdAndCert extends ASN1Object {
 
-    private final Asn1P11SlotIdentifier slotId;
+    private final Asn1P11EntityIdentifier entityId;
 
-    private final Asn1P11ObjectIdentifier objectId;
+    private final Certificate certificate;
 
-    private final P11EntityIdentifier entityId;
-
-    public Asn1P11EntityIdentifier(final P11SlotIdentifier slotId,
-            final P11ObjectIdentifier objectId) {
-        ParamUtil.requireNonNull("slotId", slotId);
-        ParamUtil.requireNonNull("objectId", objectId);
-
-        this.slotId = new Asn1P11SlotIdentifier(slotId);
-        this.objectId = new Asn1P11ObjectIdentifier(objectId);
-        this.entityId = new P11EntityIdentifier(slotId, objectId);
-    }
-
-    public Asn1P11EntityIdentifier(final Asn1P11SlotIdentifier slotId,
-            final Asn1P11ObjectIdentifier objectId) {
-        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-        this.objectId = ParamUtil.requireNonNull("objectId", objectId);
-        this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
-    }
-
-    public Asn1P11EntityIdentifier(final P11EntityIdentifier entityId) {
+    public Asn1EntityIdAndCert(final Asn1P11EntityIdentifier entityId,
+            final Certificate certificate) {
         this.entityId = ParamUtil.requireNonNull("entityId", entityId);
-        this.slotId = new Asn1P11SlotIdentifier(entityId.getSlotId());
-        this.objectId = new Asn1P11ObjectIdentifier(entityId.getObjectId());
+        this.certificate = ParamUtil.requireNonNull("certificate", certificate);
     }
 
-    private Asn1P11EntityIdentifier(final ASN1Sequence seq) throws BadAsn1ObjectException {
+    public Asn1EntityIdAndCert(final P11EntityIdentifier entityId,
+            final X509Certificate certificate) {
+        ParamUtil.requireNonNull("entityId", entityId);
+        ParamUtil.requireNonNull("certificate", certificate);
+        this.entityId = new Asn1P11EntityIdentifier(entityId);
+        byte[] encoded;
+        try {
+            encoded = certificate.getEncoded();
+        } catch (CertificateEncodingException ex) {
+            throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(),
+                    ex);
+        }
+        this.certificate = Certificate.getInstance(encoded);
+    }
+
+    private Asn1EntityIdAndCert(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
-        this.slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
-        this.objectId = Asn1P11ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
-        this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
+        this.entityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
+        this.certificate = Asn1Util.getCertificate(seq.getObjectAt(idx++));
     }
 
-    public static Asn1P11EntityIdentifier getInstance(final Object obj)
-            throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1P11EntityIdentifier) {
-            return (Asn1P11EntityIdentifier) obj;
+    public static Asn1EntityIdAndCert getInstance(final Object obj) throws BadAsn1ObjectException {
+        if (obj == null || obj instanceof Asn1EntityIdAndCert) {
+            return (Asn1EntityIdAndCert) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new Asn1P11EntityIdentifier((ASN1Sequence) obj);
+                return new Asn1EntityIdAndCert((ASN1Sequence) obj);
             } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
-                    ex);
+            throw new BadAsn1ObjectException("unable to parse object: " + ex.getMessage(), ex);
         }
     }
 
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(slotId);
-        vector.add(objectId);
+        vector.add(entityId);
+        vector.add(certificate);
         return new DERSequence(vector);
     }
 
-    public Asn1P11SlotIdentifier getSlotId() {
-        return slotId;
-    }
-
-    public Asn1P11ObjectIdentifier getObjectId() {
-        return objectId;
-    }
-
-    public P11EntityIdentifier getEntityId() {
+    public Asn1P11EntityIdentifier getEntityId() {
         return entityId;
+    }
+
+    public Certificate getCertificate() {
+        return certificate;
     }
 
 }

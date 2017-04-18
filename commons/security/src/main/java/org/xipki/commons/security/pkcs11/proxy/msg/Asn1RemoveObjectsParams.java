@@ -32,79 +32,95 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.proxy;
+package org.xipki.commons.security.pkcs11.proxy.msg;
 
 import java.io.IOException;
-import java.math.BigInteger;
+import java.util.Arrays;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
+import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 
 /**
  *
  * <pre>
- * GenRSAKeypairParams ::= SEQUENCE {
- *     slotId               P11SlotIdentifier
- *     label                UTF8STRING,
- *     p                    INTEGER,
- *     q                    INTEGER,
- *     g                    INTEGER}
+ * RemoveObjectsParams ::= SEQUENCE {
+ *     slotId     SlotIdentifier,
+ *     id         OCTET STRING OPTIONAL, -- at least one of id and label must be present
+ *     label      UTF8String OPTIONAL }
  * </pre>
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-// CHECKSTYLE:SKIP
-public class Asn1GenDSAKeypairParams extends ASN1Object {
+public class Asn1RemoveObjectsParams extends ASN1Object {
 
     private final Asn1P11SlotIdentifier slotId;
 
-    private final String label;
+    private final byte[] objectId;
 
-    private final BigInteger p; // CHECKSTYLE:SKIP
+    private final String objectLabel;
 
-    private final BigInteger q; // CHECKSTYLE:SKIP
+    public Asn1RemoveObjectsParams(final P11SlotIdentifier slotId, final byte[] objectId,
+            final String objectLabel) {
+        ParamUtil.requireNonNull("slotId", slotId);
+        if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
+            throw new IllegalArgumentException(
+                    "at least one of objectId and objectLabel must not be null");
+        }
 
-    private final BigInteger g; // CHECKSTYLE:SKIP
-
-    // CHECKSTYLE:OFF
-    public Asn1GenDSAKeypairParams(final Asn1P11SlotIdentifier slotId, final String label,
-            final BigInteger p, final BigInteger q, final BigInteger g) {
-    // CHECKSTYLE:ON
-        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
-        this.label = ParamUtil.requireNonBlank("label", label);
-        this.p = ParamUtil.requireNonNull("p", p);
-        this.q = ParamUtil.requireNonNull("q", q);
-        this.g = ParamUtil.requireNonNull("g", g);
+        this.objectId = objectId;
+        this.objectLabel = objectLabel;
+        this.slotId = new Asn1P11SlotIdentifier(slotId);
     }
 
-    private Asn1GenDSAKeypairParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 5, 5);
+    private Asn1RemoveObjectsParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
+        Asn1Util.requireRange(seq, 2, 3);
         int idx = 0;
         slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
-        label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-        p = Asn1Util.getInteger(seq.getObjectAt(idx++));
-        q = Asn1Util.getInteger(seq.getObjectAt(idx++));
-        g = Asn1Util.getInteger(seq.getObjectAt(idx++));
+        final int size = seq.size();
+        ASN1Encodable asn1Id = null;
+        ASN1Encodable asn1Label = null;
+        if (size == 2) {
+            ASN1Encodable asn1 = seq.getObjectAt(1);
+            if (asn1 instanceof ASN1String) {
+                asn1Label = asn1;
+            } else {
+                asn1Id = asn1;
+            }
+        } else {
+            asn1Id = seq.getObjectAt(idx++);
+            asn1Label = seq.getObjectAt(idx++);
+        }
+
+        objectId = (asn1Id == null) ? null : Asn1Util.getOctetStringBytes(asn1Id);
+        objectLabel = (asn1Label == null) ? null : Asn1Util.getUtf8String(seq.getObjectAt(idx++));
+
+        if ((objectId == null || objectId.length == 0) && StringUtil.isBlank(objectLabel)) {
+            throw new BadAsn1ObjectException("invalid object Asn1RemoveObjectsParams: "
+                    + "at least one of id and label must not be null");
+        }
     }
 
-    public static Asn1GenDSAKeypairParams getInstance(final Object obj)
+    public static Asn1RemoveObjectsParams getInstance(final Object obj)
             throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1GenDSAKeypairParams) {
-            return (Asn1GenDSAKeypairParams) obj;
+        if (obj == null || obj instanceof Asn1RemoveObjectsParams) {
+            return (Asn1RemoveObjectsParams) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new Asn1GenDSAKeypairParams((ASN1Sequence) obj);
+                return new Asn1RemoveObjectsParams((ASN1Sequence) obj);
             } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {
@@ -120,10 +136,7 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
         vector.add(slotId);
-        vector.add(new DERUTF8String(label));
-        vector.add(new ASN1Integer(p));
-        vector.add(new ASN1Integer(q));
-        vector.add(new ASN1Integer(g));
+        vector.add(new DERUTF8String(objectLabel));
         return new DERSequence(vector);
     }
 
@@ -131,20 +144,12 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
         return slotId;
     }
 
-    public String getLabel() {
-        return label;
+    public byte[] getObjectId() {
+        return Arrays.copyOf(objectId, objectId.length);
     }
 
-    public BigInteger getP() {
-        return p;
-    }
-
-    public BigInteger getQ() {
-        return q;
-    }
-
-    public BigInteger getG() {
-        return g;
+    public String getObjectLabel() {
+        return objectLabel;
     }
 
 }

@@ -4,8 +4,10 @@
     <!-- exactly one module must be named 'default' -->
     <module name="default">
       <nativeLibraries>
+        <!-- module id 0x7505 for name "default", computed as
+             SHA1("default".getBytes("UTF-8")[1..15] -->
         <nativeLibrary>
-          <path>proxy:url=https://localhost:9443/p11proxy/default</path>
+          <path>proxy:url=https://localhost:9443/p11proxy,module=0x7505</path>
         </nativeLibrary>
       </nativeLibraries>
       <includeSlots>

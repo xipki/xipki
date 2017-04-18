@@ -32,54 +32,57 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.proxy;
+package org.xipki.commons.security.pkcs11.proxy.msg;
 
 import java.io.IOException;
 
-import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.xipki.commons.common.util.ParamUtil;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERSequence;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
 
 /**
  *
  * <pre>
- * ASN1P11Params ::= CHOICE {
- *     rsaPkcsPssParams   [0]  RSA-PKCS-PSS-Parameters }
+ * Mechanism ::= SEQUENCE {
+ *     mechanism     INTEGER,
+ *     params        P11Params OPTIONAL }
  * </pre>
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class Asn1P11Params extends ASN1Object {
+public class Asn1Mechanism extends ASN1Object {
 
-    private final ASN1Encodable p11Params;
+    private final long mechanism;
 
-    public Asn1P11Params(final ASN1Encodable p11Params) {
-        this.p11Params = ParamUtil.requireNonNull("p11Params", p11Params);
+    private final Asn1P11Params params;
+
+    public Asn1Mechanism(final long mechanism, final Asn1P11Params params) {
+        this.mechanism = mechanism;
+        this.params = params;
     }
 
-    private Asn1P11Params(final ASN1TaggedObject taggedObject) throws BadAsn1ObjectException {
-        int tagNo = taggedObject.getTagNo();
-        if (tagNo == 0) {
-            this.p11Params = Asn1RSAPkcsPssParams.getInstance(taggedObject.getObject());
-        } else {
-            throw new BadAsn1ObjectException("invalid tag " + tagNo);
-        }
+    private Asn1Mechanism(final ASN1Sequence seq) throws BadAsn1ObjectException {
+        Asn1Util.requireRange(seq, 1, 2);
+        int size = seq.size();
+        int idx = 0;
+        this.mechanism = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
+        this.params = (size > 1)  ? Asn1P11Params.getInstance(seq.getObjectAt(idx++)) : null;
     }
 
-    public static Asn1P11Params getInstance(final Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1P11Params) {
-            return (Asn1P11Params) obj;
+    public static Asn1Mechanism getInstance(final Object obj) throws BadAsn1ObjectException {
+        if (obj == null || obj instanceof Asn1Mechanism) {
+            return (Asn1Mechanism) obj;
         }
 
         try {
-            if (obj instanceof ASN1TaggedObject) {
-                return new Asn1P11Params((ASN1TaggedObject) obj);
+            if (obj instanceof ASN1Sequence) {
+                return new Asn1Mechanism((ASN1Sequence) obj);
             } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {
@@ -93,19 +96,20 @@ public class Asn1P11Params extends ASN1Object {
 
     @Override
     public ASN1Primitive toASN1Primitive() {
-        int tagNo;
-        if (p11Params instanceof Asn1RSAPkcsPssParams) {
-            tagNo = 0;
-        } else {
-            throw new RuntimeException("invalid ASN1P11Param type "
-                    + p11Params.getClass().getName());
+        ASN1EncodableVector vector = new ASN1EncodableVector();
+        vector.add(new ASN1Integer(mechanism));
+        if (params != null) {
+            vector.add(params);
         }
-
-        return new DERTaggedObject(tagNo, p11Params);
+        return new DERSequence(vector);
     }
 
-    public ASN1Encodable getP11Params() {
-        return p11Params;
+    public long getMechanism() {
+        return mechanism;
+    }
+
+    public Asn1P11Params getParams() {
+        return params;
     }
 
 }

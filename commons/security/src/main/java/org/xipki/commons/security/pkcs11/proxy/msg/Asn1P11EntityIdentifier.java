@@ -32,58 +32,81 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.proxy;
+package org.xipki.commons.security.pkcs11.proxy.msg;
 
 import java.io.IOException;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
+import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
+import org.xipki.commons.security.pkcs11.P11EntityIdentifier;
+import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 
 /**
  *
  * <pre>
- * Mechanism ::= SEQUENCE {
- *     mechanism     INTEGER,
- *     params        P11Params OPTIONAL,
- *     }
+ * EntityIdentifer ::= SEQUENCE {
+ *     slotId     SlotIdentifier,
+ *     keyId      KeyIdentifier }
  * </pre>
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class Asn1Mechanism extends ASN1Object {
+public class Asn1P11EntityIdentifier extends ASN1Object {
 
-    private final long mechanism;
+    private final Asn1P11SlotIdentifier slotId;
 
-    private final Asn1P11Params params;
+    private final Asn1P11ObjectIdentifier objectId;
 
-    public Asn1Mechanism(final long mechanism, final Asn1P11Params params) {
-        this.mechanism = mechanism;
-        this.params = params;
+    private final P11EntityIdentifier entityId;
+
+    public Asn1P11EntityIdentifier(final P11SlotIdentifier slotId,
+            final P11ObjectIdentifier objectId) {
+        ParamUtil.requireNonNull("slotId", slotId);
+        ParamUtil.requireNonNull("objectId", objectId);
+
+        this.slotId = new Asn1P11SlotIdentifier(slotId);
+        this.objectId = new Asn1P11ObjectIdentifier(objectId);
+        this.entityId = new P11EntityIdentifier(slotId, objectId);
     }
 
-    private Asn1Mechanism(final ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 1, 2);
-        int size = seq.size();
+    public Asn1P11EntityIdentifier(final Asn1P11SlotIdentifier slotId,
+            final Asn1P11ObjectIdentifier objectId) {
+        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        this.objectId = ParamUtil.requireNonNull("objectId", objectId);
+        this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
+    }
+
+    public Asn1P11EntityIdentifier(final P11EntityIdentifier entityId) {
+        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
+        this.slotId = new Asn1P11SlotIdentifier(entityId.getSlotId());
+        this.objectId = new Asn1P11ObjectIdentifier(entityId.getObjectId());
+    }
+
+    private Asn1P11EntityIdentifier(final ASN1Sequence seq) throws BadAsn1ObjectException {
+        Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
-        this.mechanism = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
-        this.params = (size > 1)  ? Asn1P11Params.getInstance(seq.getObjectAt(idx++)) : null;
+        this.slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
+        this.objectId = Asn1P11ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
+        this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
     }
 
-    public static Asn1Mechanism getInstance(final Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1Mechanism) {
-            return (Asn1Mechanism) obj;
+    public static Asn1P11EntityIdentifier getInstance(final Object obj)
+            throws BadAsn1ObjectException {
+        if (obj == null || obj instanceof Asn1P11EntityIdentifier) {
+            return (Asn1P11EntityIdentifier) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new Asn1Mechanism((ASN1Sequence) obj);
+                return new Asn1P11EntityIdentifier((ASN1Sequence) obj);
             } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {
@@ -98,19 +121,21 @@ public class Asn1Mechanism extends ASN1Object {
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(new ASN1Integer(mechanism));
-        if (params != null) {
-            vector.add(params);
-        }
+        vector.add(slotId);
+        vector.add(objectId);
         return new DERSequence(vector);
     }
 
-    public long getMechanism() {
-        return mechanism;
+    public Asn1P11SlotIdentifier getSlotId() {
+        return slotId;
     }
 
-    public Asn1P11Params getParams() {
-        return params;
+    public Asn1P11ObjectIdentifier getObjectId() {
+        return objectId;
+    }
+
+    public P11EntityIdentifier getEntityId() {
+        return entityId;
     }
 
 }
