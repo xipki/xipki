@@ -37,7 +37,6 @@ package org.xipki.commons.security.pkcs11.proxy;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.xipki.commons.security.exception.P11TokenException;
@@ -46,6 +45,10 @@ import org.xipki.commons.security.pkcs11.P11Identity;
 import org.xipki.commons.security.pkcs11.P11Params;
 import org.xipki.commons.security.pkcs11.P11RSAPkcsPssParams;
 import org.xipki.commons.security.pkcs11.P11Slot;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11EntityIdentifier;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11Params;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1RSAPkcsPssParams;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1SignTemplate;
 
 /**
  * @author Lijun Liao
@@ -70,7 +73,7 @@ class ProxyP11Identity extends P11Identity {
         }
         Asn1SignTemplate signTemplate = new Asn1SignTemplate(asn1EntityId, mechanism, p11Param,
                 content);
-        ASN1Encodable result = ((ProxyP11Slot) slot).getModule().send(P11ProxyConstants.ACTION_sign,
+        byte[] result = ((ProxyP11Slot) slot).getModule().send(P11ProxyConstants.ACTION_SIGN,
                 signTemplate);
 
         ASN1OctetString octetString;

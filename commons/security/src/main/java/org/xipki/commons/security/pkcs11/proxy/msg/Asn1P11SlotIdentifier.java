@@ -32,64 +32,57 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.proxy;
+package org.xipki.commons.security.pkcs11.proxy.msg;
 
 import java.io.IOException;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
+import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 
 /**
  *
  * <pre>
- * SignTemplate ::= SEQUENCE {
- *     entityId       EntityIdentifier,
- *     mechanism      Mechanism,
- *     message        OCTET STRING
- *     }
+ * SlotIdentifier ::= SEQUENCE {
+ *     id         INTEGER,
+ *     index      INTEGER }
  * </pre>
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class Asn1SignTemplate extends ASN1Object {
+public class Asn1P11SlotIdentifier extends ASN1Object {
 
-    private final Asn1P11EntityIdentifier identityId;
+    private final P11SlotIdentifier slotId;
 
-    private final Asn1Mechanism mechanism;
+    public Asn1P11SlotIdentifier(final P11SlotIdentifier slotId) {
+        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+    }
 
-    private final byte[] message;
-
-    private Asn1SignTemplate(final ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 3, 3);
+    private Asn1P11SlotIdentifier(final ASN1Sequence seq) throws BadAsn1ObjectException {
+        Asn1Util.requireRange(seq, 2, 2);
         int idx = 0;
-        this.identityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
-        this.mechanism = Asn1Mechanism.getInstance(seq.getObjectAt(idx++));
-        this.message = Asn1Util.getOctetStringBytes(seq.getObjectAt(idx++));
+        long id = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
+        int index = Asn1Util.getInteger(seq.getObjectAt(idx++)).intValue();
+        this.slotId = new P11SlotIdentifier(index, id);
     }
 
-    public Asn1SignTemplate(final Asn1P11EntityIdentifier identityId, final long mechanism,
-            final Asn1P11Params parameter, final byte[] message) {
-        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
-        this.message = ParamUtil.requireNonNull("message", message);
-        this.mechanism = new Asn1Mechanism(mechanism, parameter);
-    }
-
-    public static Asn1SignTemplate getInstance(final Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1SignTemplate) {
-            return (Asn1SignTemplate) obj;
+    public static Asn1P11SlotIdentifier getInstance(final Object obj)
+            throws BadAsn1ObjectException {
+        if (obj == null || obj instanceof Asn1P11SlotIdentifier) {
+            return (Asn1P11SlotIdentifier) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new Asn1SignTemplate((ASN1Sequence) obj);
+                return new Asn1P11SlotIdentifier((ASN1Sequence) obj);
             } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {
@@ -104,21 +97,13 @@ public class Asn1SignTemplate extends ASN1Object {
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(identityId);
-        vector.add(mechanism);
-        vector.add(new DEROctetString(message));
+        vector.add(new ASN1Integer(slotId.getId()));
+        vector.add(new ASN1Integer(slotId.getIndex()));
         return new DERSequence(vector);
     }
 
-    public byte[] getMessage() {
-        return message;
+    public P11SlotIdentifier getSlotId() {
+        return slotId;
     }
 
-    public Asn1P11EntityIdentifier getIdentityId() {
-        return identityId;
-    }
-
-    public Asn1Mechanism getMechanism() {
-        return mechanism;
-    }
 }

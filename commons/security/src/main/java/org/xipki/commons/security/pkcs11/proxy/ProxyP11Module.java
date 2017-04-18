@@ -41,32 +41,13 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.cmp.ErrorMsgContent;
-import org.bouncycastle.asn1.cmp.GenMsgContent;
-import org.bouncycastle.asn1.cmp.GenRepContent;
-import org.bouncycastle.asn1.cmp.InfoTypeAndValue;
-import org.bouncycastle.asn1.cmp.PKIBody;
-import org.bouncycastle.asn1.cmp.PKIHeader;
-import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
-import org.bouncycastle.asn1.cmp.PKIMessage;
-import org.bouncycastle.asn1.cmp.PKIStatusInfo;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.cert.cmp.GeneralPKIMessage;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.ConfPairs;
@@ -74,18 +55,15 @@ import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
-import org.xipki.commons.security.exception.P11DuplicateEntityException;
 import org.xipki.commons.security.exception.P11TokenException;
-import org.xipki.commons.security.exception.P11UnknownEntityException;
-import org.xipki.commons.security.exception.P11UnsupportedMechanismException;
 import org.xipki.commons.security.pkcs11.AbstractP11Module;
 import org.xipki.commons.security.pkcs11.P11Module;
 import org.xipki.commons.security.pkcs11.P11ModuleConf;
 import org.xipki.commons.security.pkcs11.P11Slot;
 import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
-import org.xipki.commons.security.util.CmpFailureUtil;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11SlotIdentifier;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1ServerCaps;
 
 /**
  * @author Lijun Liao
@@ -98,21 +76,17 @@ public class ProxyP11Module extends AbstractP11Module {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProxyP11Module.class);
 
-    private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
+    private static final String REQUEST_MIMETYPE = "application/x-xipki-pkcs11";
 
-    private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
-
-    private final GeneralName sender = P11ProxyConstants.REMOTE_P11_CMP_CLIENT;
-
-    private final GeneralName recipient = P11ProxyConstants.REMOTE_P11_CMP_SERVER;
+    private static final String RESPONSE_MIMETYPE = "application/x-xipki-pkcs11";
 
     private final Random random = new Random();
 
-    private int version;
+    private final short version = P11ProxyConstants.VERSION_V1_0;
 
     private URL serverUrl;
 
-    private URL getCapsUrl;
+    private short moduleId;
 
     private boolean readOnly;
 
@@ -133,12 +107,22 @@ public class ProxyP11Module extends AbstractP11Module {
             throw new IllegalArgumentException("invalid url: " + urlStr);
         }
 
-        urlStr = urlStr + "?operation=GetCaps";
-        try {
-            getCapsUrl = new URL(urlStr);
-        } catch (MalformedURLException ex) {
-            throw new IllegalArgumentException("invalid url: " + urlStr);
+        String moduleStr = confPairs.getValue("module");
+        if (moduleStr == null) {
+            throw new IllegalArgumentException("module not specified");
         }
+
+        try {
+            moduleStr = moduleStr.trim();
+            if (moduleStr.startsWith("0x") || moduleStr.startsWith("0X")) {
+                moduleId = Short.parseShort(moduleStr.substring(2), 16);
+            } else {
+                moduleId = Short.parseShort(moduleStr.trim());
+            }
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("invalid module: " + moduleStr);
+        }
+
         refresh();
     }
 
@@ -152,23 +136,31 @@ public class ProxyP11Module extends AbstractP11Module {
         return readOnly || super.isReadOnly();
     }
 
-    void refresh() throws P11TokenException {
-        ServerCaps caps = getServerCaps();
-        if (caps.getVersions().contains(1)) {
-            version = 1;
-        } else {
+    public void refresh() throws P11TokenException {
+        byte[] resp = send(P11ProxyConstants.ACTION_GET_SERVER_CAPS, null);
+
+        Asn1ServerCaps caps;
+        try {
+            caps = Asn1ServerCaps.getInstance(resp);
+        } catch (BadAsn1ObjectException ex) {
+            throw new P11TokenException("response is a valid Asn1ServerCaps", ex);
+        }
+
+        if (!caps.getVersions().contains(version)) {
             throw new P11TokenException(
                     "Server does not support any version supported by the client");
         }
         this.readOnly = caps.isReadOnly();
 
-        ASN1Encodable resp = send(P11ProxyConstants.ACTION_getSlotIds, null);
-        if (!(resp instanceof ASN1Sequence)) {
-            throw new P11TokenException("response is not ASN1Sequence, but "
-                    + resp.getClass().getName());
+        resp = send(P11ProxyConstants.ACTION_GET_SLOT_IDS, null);
+
+        ASN1Sequence seq;
+        try {
+            seq = ASN1Sequence.getInstance(resp);
+        } catch (IllegalArgumentException ex) {
+            throw new P11TokenException("response is not ASN1Sequence", ex);
         }
 
-        ASN1Sequence seq = (ASN1Sequence) resp;
         final int n = seq.size();
 
         Set<P11Slot> slots = new HashSet<>();
@@ -209,7 +201,7 @@ public class ProxyP11Module extends AbstractP11Module {
         }
     }
 
-    byte[] send(final byte[] request) throws IOException {
+    protected byte[] send(final byte[] request) throws IOException {
         ParamUtil.requireNonNull("request", request);
         HttpURLConnection httpUrlConnection = IoUtil.openHttpConn(serverUrl);
         httpUrlConnection.setDoOutput(true);
@@ -218,11 +210,32 @@ public class ProxyP11Module extends AbstractP11Module {
         int size = request.length;
 
         httpUrlConnection.setRequestMethod("POST");
-        httpUrlConnection.setRequestProperty("Content-Type", CMP_REQUEST_MIMETYPE);
+        httpUrlConnection.setRequestProperty("Content-Type", REQUEST_MIMETYPE);
         httpUrlConnection.setRequestProperty("Content-Length", java.lang.Integer.toString(size));
         OutputStream outputstream = httpUrlConnection.getOutputStream();
         outputstream.write(request);
         outputstream.flush();
+
+        if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            try {
+                try {
+                    InputStream is = httpUrlConnection.getInputStream();
+                    if (is != null) {
+                        is.close();
+                    }
+                } catch (IOException ex) {
+                    InputStream errStream = httpUrlConnection.getErrorStream();
+                    if (errStream != null) {
+                        errStream.close();
+                    }
+                }
+            } catch (Throwable th) {
+                // ignore it
+            }
+
+            throw new IOException("bad response: code=" + httpUrlConnection.getResponseCode()
+                    + ", message=" + httpUrlConnection.getResponseMessage());
+        }
 
         InputStream inputstream = null;
         try {
@@ -239,7 +252,7 @@ public class ProxyP11Module extends AbstractP11Module {
             String responseContentType = httpUrlConnection.getContentType();
             boolean isValidContentType = false;
             if (responseContentType != null) {
-                if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE)) {
+                if (responseContentType.equalsIgnoreCase(RESPONSE_MIMETYPE)) {
                     isValidContentType = true;
                 }
             }
@@ -265,189 +278,135 @@ public class ProxyP11Module extends AbstractP11Module {
         }
     } // method send
 
-    ASN1Encodable send(final int action, final ASN1Encodable content) throws P11TokenException {
-        ASN1EncodableVector vec = new ASN1EncodableVector();
-        vec.add(new ASN1Integer(version));
-        vec.add(new ASN1Integer(action));
-        vec.add((content != null) ? content : DERNull.INSTANCE);
-        InfoTypeAndValue itvReq = new InfoTypeAndValue(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg,
-                new DERSequence(vec));
+    /**
+     * The request is constructed as follows:
+     * <pre>
+     * 0 - - - 1 - - - 2 - - - 3 - - - 4 - - - 5 - - - 6 - - - 7 - - - 8
+     * |    Version    |        Transaction ID         |   Body ...    |
+     * |   ... Length  |     Action    |   Module ID   |   Content...  |
+     * |   .Content               | <-- 10 + Length (offset).
+     *
+     * </pre>
+     * @param action action
+     * @param content content
+     * @return result.
+     * @throws P11TokenException If error occurred.
+     */
+    public byte[] send(final short action, final ASN1Object content)
+            throws P11TokenException {
+        byte[] encodedContent;
+        if (content == null) {
+            encodedContent = null;
+        } else {
+            try {
+                encodedContent = content.getEncoded();
+            } catch (IOException ex) {
+                throw new P11TokenException("could encode the content", ex);
+            }
+        }
 
-        GenMsgContent genMsgContent = new GenMsgContent(itvReq);
-        PKIHeader header = buildPkiHeader(null);
-        PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
-        PKIMessage request = new PKIMessage(header, body);
+        int bodyLen = 4;
+        if (encodedContent != null) {
+            bodyLen += encodedContent.length;
+        }
 
-        byte[] encodedRequest;
+        byte[] request = new byte[10 + bodyLen];
+
+        // version
+        IoUtil.writeShort(version, request, 0);
+
+        // transaction id
+        byte[] transactionId = randomTransactionId();
+        System.arraycopy(transactionId, 0, request, 2, 4);
+
+        // length
+        IoUtil.writeInt(bodyLen, request, 6);
+
+        // action
+        IoUtil.writeShort(action, request, 10);
+
+        // module ID
+        IoUtil.writeShort(moduleId, request, 12);
+
+        //content
+        if (encodedContent != null) {
+            System.arraycopy(encodedContent, 0, request, 14, encodedContent.length);
+        }
+
+        byte[] response;
         try {
-            encodedRequest = request.getEncoded();
+            response = send(request);
         } catch (IOException ex) {
-            final String msg = "could not encode the PKI request";
+            final String msg = "could not send the request";
             LOG.error(msg + " {}", request);
             throw new P11TokenException(msg + ": " + ex.getMessage(), ex);
         }
 
-        byte[] encodedResponse;
-        try {
-            encodedResponse = send(encodedRequest);
-        } catch (IOException ex) {
-            final String msg = "could not send the PKI request";
-            LOG.error(msg + " {}", request);
-            throw new P11TokenException(msg + ": " + ex.getMessage(), ex);
+        int respLen = response.length;
+        if (respLen < 12) {
+            throw new P11TokenException("response too short");
         }
 
-        GeneralPKIMessage response;
-        try {
-            response = new GeneralPKIMessage(encodedResponse);
-        } catch (IOException ex) {
-            final String msg = "could not decode the received PKI message";
-            LOG.error(msg + ": {}", Hex.toHexString(encodedResponse));
-            throw new P11TokenException(msg + ": " + ex.getMessage(), ex);
+        // Length
+        int respBodyLen = IoUtil.parseInt(response, 6);
+        if (respBodyLen + 10 != respLen) {
+            throw new P11TokenException("message lengt unmatch");
         }
 
-        PKIHeader respHeader = response.getHeader();
-        ASN1OctetString tid = respHeader.getTransactionID();
-        GeneralName rec = respHeader.getRecipient();
-        if (!sender.equals(rec)) {
-            LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
+        // RC
+        short rc = IoUtil.parseShort(response, 10);
+        if (rc != 0) {
+            throw new P11TokenException(
+                    "server returned RC " + P11ProxyConstants.getReturnCodeName(rc));
         }
 
-        return extractItvInfoValue(action, response);
+        // Version
+        short respVersion = IoUtil.parseShort(response, 0);
+        if (version != respVersion) {
+            throw new P11TokenException("version of response and request unmatch");
+        }
+
+        // TransactionID
+        if (!equals(transactionId, response, 2)) {
+            throw new P11TokenException("version of response and request unmatch");
+        }
+
+        if (respLen < 14) {
+            throw new P11TokenException("too short successful response");
+        }
+
+        short respAction = IoUtil.parseShort(response, 12);
+        if (action != respAction) {
+            throw new P11TokenException("action of response and request unmatch");
+        }
+
+        int respContentLen = respLen - 14;
+        if (respContentLen == 0) {
+            return null;
+        }
+
+        byte[] respContent = new byte[respContentLen];
+        System.arraycopy(response, 14, respContent, 0, respContentLen);
+        return respContent;
     } // method send
 
-    private PKIHeader buildPkiHeader(final ASN1OctetString tid) {
-        PKIHeaderBuilder hdrBuilder = new PKIHeaderBuilder(PKIHeader.CMP_2000, sender, recipient);
-        hdrBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
-
-        ASN1OctetString tmpTid = (tid == null) ? new DEROctetString(randomTransactionId()) : tid;
-        hdrBuilder.setTransactionID(tmpTid);
-
-        return hdrBuilder.build();
-    }
-
     private byte[] randomTransactionId() {
-        byte[] tid = new byte[20];
+        byte[] tid = new byte[4];
         random.nextBytes(tid);
         return tid;
     }
 
-    private ServerCaps getServerCaps() throws P11TokenException {
-        byte[] respBytes;
-        try {
-            HttpURLConnection conn = IoUtil.openHttpConn(getCapsUrl);
-            conn.setRequestMethod("GET");
-            checkResponseCode(conn);
-            InputStream respStream = conn.getInputStream();
-            respBytes = IoUtil.read(respStream);
-        } catch (IOException ex) {
-            throw new P11TokenException(ex.getMessage(), ex);
+    private static boolean equals(byte[] bytes, byte[] bytesB, int offsetB) {
+        if (bytesB.length - offsetB < bytes.length) {
+            return false;
         }
 
-        return new ServerCaps(respBytes);
+        for (int i = 0; i < bytes.length; i++) {
+            if (bytes[i] != bytesB[offsetB + i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    private ASN1Encodable extractItvInfoValue(final int action, final GeneralPKIMessage response)
-            throws P11TokenException {
-        PKIBody respBody = response.getBody();
-        int bodyType = respBody.getType();
-
-        if (PKIBody.TYPE_ERROR == bodyType) {
-            ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
-            PKIStatusInfo statusInfo = content.getPKIStatusInfo();
-            String failureInfo = null;
-            if (statusInfo.getStatusString() != null) {
-                int size = statusInfo.getStatusString().size();
-                if (size > 0) {
-                    failureInfo = statusInfo.getStatusString().getStringAt(0).getString();
-                }
-            }
-
-            if (failureInfo == null) {
-                throw new P11TokenException("server answered with ERROR: "
-                        + CmpFailureUtil.formatPkiStatusInfo(statusInfo));
-            }
-
-            if (failureInfo.startsWith(P11ProxyConstants.ERROR_P11_TOKENERROR)) {
-                ConfPairs pairs = new ConfPairs(failureInfo);
-                String errorMesage = pairs.getValue(P11ProxyConstants.ERROR_P11_TOKENERROR);
-                throw new P11TokenException(errorMesage);
-            } else if (failureInfo.startsWith(P11ProxyConstants.ERROR_UNKNOWN_ENTITY)) {
-                ConfPairs pairs = new ConfPairs(failureInfo);
-                String errorMesage = pairs.getValue(P11ProxyConstants.ERROR_UNKNOWN_ENTITY);
-                throw new P11UnknownEntityException(errorMesage);
-            } else if (failureInfo.startsWith(P11ProxyConstants.ERROR_UNSUPPORTED_MECHANISM)) {
-                ConfPairs pairs = new ConfPairs(failureInfo);
-                String errorMesage = pairs.getValue(P11ProxyConstants.ERROR_UNSUPPORTED_MECHANISM);
-                throw new P11UnsupportedMechanismException(errorMesage);
-            } else if (failureInfo.startsWith(P11ProxyConstants.ERROR_DUPLICATE_ENTITY)) {
-                ConfPairs pairs = new ConfPairs(failureInfo);
-                String errorMesage = pairs.getValue(P11ProxyConstants.ERROR_UNSUPPORTED_MECHANISM);
-                throw new P11DuplicateEntityException(errorMesage);
-            } else {
-                throw new P11TokenException("server answered with ERROR: "
-                        + CmpFailureUtil.formatPkiStatusInfo(statusInfo));
-            }
-        } else if (PKIBody.TYPE_GEN_REP != bodyType) {
-            throw new P11TokenException("unknown PKI body type " + bodyType
-                    + " instead the expected [" + PKIBody.TYPE_GEN_REP + ", "
-                    + PKIBody.TYPE_ERROR + "]");
-        }
-
-        GenRepContent genRep = (GenRepContent) respBody.getContent();
-
-        InfoTypeAndValue[] itvs = genRep.toInfoTypeAndValueArray();
-        InfoTypeAndValue itv = null;
-        if (itvs != null && itvs.length > 0) {
-            for (InfoTypeAndValue m : itvs) {
-                if (ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.equals(m.getInfoType())) {
-                    itv = m;
-                    break;
-                }
-            }
-        }
-        if (itv == null) {
-            throw new P11TokenException("the response does not contain InfoTypeAndValue '"
-                    + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "'");
-        }
-
-        ASN1Encodable itvValue = itv.getInfoValue();
-        if (itvValue == null) {
-            throw new P11TokenException("value of InfoTypeAndValue '"
-                    + ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId() + "' is incorrect");
-        }
-
-        try {
-            ASN1Sequence seq = Asn1Util.getSequence(itvValue);
-            Asn1Util.requireRange(seq, 2, 3);
-
-            int receivedversion = Asn1Util.getInteger(seq.getObjectAt(0)).intValue();
-            if (receivedversion != version) {
-                throw new P11TokenException("version '"
-                        + receivedversion + "' is not the expected '" + version + "'");
-            }
-
-            int receivedAction = Asn1Util.getInteger(seq.getObjectAt(1)).intValue();
-            if (receivedAction != action) {
-                throw new P11TokenException("action '"
-                        + receivedAction + "' is not the expected '" + action + "'");
-            }
-
-            return (seq.size() > 2) ? seq.getObjectAt(2) : null;
-        } catch (BadAsn1ObjectException ex) {
-            throw new P11TokenException("bad ASN1 object: " + ex.getMessage(), ex);
-        }
-    } // method extractItvInfoValue
-
-    private void checkResponseCode(final HttpURLConnection conn) throws P11TokenException {
-        ParamUtil.requireNonNull("conn", conn);
-        try {
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                conn.getInputStream().close();
-                throw new P11TokenException("bad response: code=" + conn.getResponseCode()
-                        + ", message=" + conn.getResponseMessage());
-            }
-        } catch (IOException ex) {
-            throw new P11TokenException("IOException: " + ex.getMessage(), ex);
-        }
-    }
 }

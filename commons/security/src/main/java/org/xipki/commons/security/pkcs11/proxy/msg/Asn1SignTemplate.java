@@ -32,16 +32,15 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.proxy;
+package org.xipki.commons.security.pkcs11.proxy.msg;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
@@ -49,38 +48,47 @@ import org.xipki.commons.security.exception.BadAsn1ObjectException;
 /**
  *
  * <pre>
- * P11ObjectIdentifiers ::= SEQUENCE OF P11ObjectIdentifier
+ * SignTemplate ::= SEQUENCE {
+ *     entityId       EntityIdentifier,
+ *     mechanism      Mechanism,
+ *     message        OCTET STRING }
  * </pre>
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class Asn1P11ObjectIdentifiers extends ASN1Object {
+public class Asn1SignTemplate extends ASN1Object {
 
-    private final List<Asn1P11ObjectIdentifier> objectIds;
+    private final Asn1P11EntityIdentifier identityId;
 
-    public Asn1P11ObjectIdentifiers(final List<Asn1P11ObjectIdentifier> objectIds) {
-        this.objectIds = ParamUtil.requireNonNull("objectIds", objectIds);
+    private final Asn1Mechanism mechanism;
+
+    private final byte[] message;
+
+    private Asn1SignTemplate(final ASN1Sequence seq) throws BadAsn1ObjectException {
+        Asn1Util.requireRange(seq, 3, 3);
+        int idx = 0;
+        this.identityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
+        this.mechanism = Asn1Mechanism.getInstance(seq.getObjectAt(idx++));
+        this.message = Asn1Util.getOctetStringBytes(seq.getObjectAt(idx++));
     }
 
-    private Asn1P11ObjectIdentifiers(final ASN1Sequence seq) throws BadAsn1ObjectException {
-        this.objectIds = new LinkedList<>();
-        final int size = seq.size();
-        for (int i = 0; i < size; i++) {
-            objectIds.add(Asn1P11ObjectIdentifier.getInstance(seq.getObjectAt(i)));
-        }
+    public Asn1SignTemplate(final Asn1P11EntityIdentifier identityId, final long mechanism,
+            final Asn1P11Params parameter, final byte[] message) {
+        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+        this.message = ParamUtil.requireNonNull("message", message);
+        this.mechanism = new Asn1Mechanism(mechanism, parameter);
     }
 
-    public static Asn1P11ObjectIdentifiers getInstance(final Object obj)
-            throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1P11ObjectIdentifiers) {
-            return (Asn1P11ObjectIdentifiers) obj;
+    public static Asn1SignTemplate getInstance(final Object obj) throws BadAsn1ObjectException {
+        if (obj == null || obj instanceof Asn1SignTemplate) {
+            return (Asn1SignTemplate) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new Asn1P11ObjectIdentifiers((ASN1Sequence) obj);
+                return new Asn1SignTemplate((ASN1Sequence) obj);
             } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {
@@ -94,15 +102,22 @@ public class Asn1P11ObjectIdentifiers extends ASN1Object {
 
     @Override
     public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vec = new ASN1EncodableVector();
-        for (Asn1P11ObjectIdentifier objectId : objectIds) {
-            vec.add(objectId);
-        }
-        return new DERSequence(vec);
+        ASN1EncodableVector vector = new ASN1EncodableVector();
+        vector.add(identityId);
+        vector.add(mechanism);
+        vector.add(new DEROctetString(message));
+        return new DERSequence(vector);
     }
 
-    public List<Asn1P11ObjectIdentifier> getObjectIds() {
-        return objectIds;
+    public byte[] getMessage() {
+        return message;
     }
 
+    public Asn1P11EntityIdentifier getIdentityId() {
+        return identityId;
+    }
+
+    public Asn1Mechanism getMechanism() {
+        return mechanism;
+    }
 }
