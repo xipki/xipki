@@ -32,94 +32,77 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.proxy;
+package org.xipki.commons.security.pkcs11.proxy.msg;
 
 import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
-import org.xipki.commons.security.pkcs11.P11EntityIdentifier;
 
 /**
+ *
+ * <pre>
+ * P11ObjectIdentifiers ::= SEQUENCE OF P11ObjectIdentifier
+ * </pre>
  *
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class Asn1EntityIdAndCert extends ASN1Object {
+public class Asn1P11ObjectIdentifiers extends ASN1Object {
 
-    private final Asn1P11EntityIdentifier entityId;
+    private final List<Asn1P11ObjectIdentifier> objectIds;
 
-    private final Certificate certificate;
-
-    public Asn1EntityIdAndCert(final Asn1P11EntityIdentifier entityId,
-            final Certificate certificate) {
-        this.entityId = ParamUtil.requireNonNull("entityId", entityId);
-        this.certificate = ParamUtil.requireNonNull("certificate", certificate);
+    public Asn1P11ObjectIdentifiers(final List<Asn1P11ObjectIdentifier> objectIds) {
+        this.objectIds = ParamUtil.requireNonNull("objectIds", objectIds);
     }
 
-    public Asn1EntityIdAndCert(final P11EntityIdentifier entityId,
-            final X509Certificate certificate) {
-        ParamUtil.requireNonNull("entityId", entityId);
-        ParamUtil.requireNonNull("certificate", certificate);
-        this.entityId = new Asn1P11EntityIdentifier(entityId);
-        byte[] encoded;
-        try {
-            encoded = certificate.getEncoded();
-        } catch (CertificateEncodingException ex) {
-            throw new IllegalArgumentException("could not encode certificate: " + ex.getMessage(),
-                    ex);
+    private Asn1P11ObjectIdentifiers(final ASN1Sequence seq) throws BadAsn1ObjectException {
+        this.objectIds = new LinkedList<>();
+        final int size = seq.size();
+        for (int i = 0; i < size; i++) {
+            objectIds.add(Asn1P11ObjectIdentifier.getInstance(seq.getObjectAt(i)));
         }
-        this.certificate = Certificate.getInstance(encoded);
     }
 
-    private Asn1EntityIdAndCert(final ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 2, 2);
-        int idx = 0;
-        this.entityId = Asn1P11EntityIdentifier.getInstance(seq.getObjectAt(idx++));
-        this.certificate = Asn1Util.getCertificate(seq.getObjectAt(idx++));
-    }
-
-    public static Asn1EntityIdAndCert getInstance(final Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1EntityIdAndCert) {
-            return (Asn1EntityIdAndCert) obj;
+    public static Asn1P11ObjectIdentifiers getInstance(final Object obj)
+            throws BadAsn1ObjectException {
+        if (obj == null || obj instanceof Asn1P11ObjectIdentifiers) {
+            return (Asn1P11ObjectIdentifiers) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new Asn1EntityIdAndCert((ASN1Sequence) obj);
+                return new Asn1P11ObjectIdentifiers((ASN1Sequence) obj);
             } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {
                 throw new BadAsn1ObjectException("unknown object: " + obj.getClass().getName());
             }
         } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("unable to parse object: " + ex.getMessage(), ex);
+            throw new BadAsn1ObjectException("unable to parse encoded object: " + ex.getMessage(),
+                    ex);
         }
     }
 
     @Override
     public ASN1Primitive toASN1Primitive() {
-        ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(entityId);
-        vector.add(certificate);
-        return new DERSequence(vector);
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        for (Asn1P11ObjectIdentifier objectId : objectIds) {
+            vec.add(objectId);
+        }
+        return new DERSequence(vec);
     }
 
-    public Asn1P11EntityIdentifier getEntityId() {
-        return entityId;
-    }
-
-    public Certificate getCertificate() {
-        return certificate;
+    public List<Asn1P11ObjectIdentifier> getObjectIds() {
+        return objectIds;
     }
 
 }

@@ -36,27 +36,16 @@ package org.xipki.commons.remotep11.server;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1OutputStream;
-import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.exception.BadAsn1ObjectException;
-import org.xipki.commons.security.exception.P11TokenException;
-import org.xipki.commons.security.pkcs11.P11CryptService;
-import org.xipki.commons.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.commons.security.pkcs11.proxy.ServerCaps;
 
 /**
  * @author Lijun Liao
@@ -69,113 +58,44 @@ public class HttpProxyServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String CT_REQUEST = "application/pkixcmp";
+    private static final String REQUEST_MIMETYPE = "application/x-xipki-pkcs11";
 
-    private static final String CT_RESPONSE = "application/pkixcmp";
+    private static final String RESPONSE_MIMETYPE = "application/x-xipki-pkcs11";
 
-    private final CmpResponder responder;
-
+    private final P11ProxyResponder responder;
+    
     private LocalP11CryptServicePool localP11CryptServicePool;
 
     public HttpProxyServlet() {
-        responder = new CmpResponder();
-    }
-
-    @Override
-    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException {
-        String operation = request.getParameter("operation");
-        try {
-            if (!"GetCaps".equalsIgnoreCase(operation)) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            } else {
-                if (localP11CryptServicePool == null) {
-                    LOG.error("localP11CryptService in servlet not configured");
-                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    response.setContentLength(0);
-                    return;
-                }
-
-                String moduleName = extractModuleName(request);
-                if (moduleName == null) {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    return;
-                }
-                P11CryptService service = localP11CryptServicePool.getP11CryptService(moduleName);
-                if (service == null) {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    return;
-                }
-
-                boolean readOnly;
-                try {
-                    readOnly = service.getModule().isReadOnly();
-                } catch (P11TokenException ex) {
-                    LogUtil.error(LOG, ex, "localP11CryptService in servlet not configured");
-                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    return;
-                }
-                ServerCaps serverCaps = new ServerCaps(readOnly, CmpResponder.getVersions());
-                String respText = serverCaps.getCaps();
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getOutputStream().write(respText.getBytes());
-                response.getOutputStream().flush();
-            }
-        } catch (EOFException ex) {
-            LogUtil.warn(LOG, ex, "connection reset by peer");
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.setContentLength(0);
-        } catch (Throwable th) {
-            LogUtil.error(LOG, th, "Throwable thrown, this should not happen.");
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.setContentLength(0);
-        } finally {
-            response.flushBuffer();
-        }
+        responder = new P11ProxyResponder();
     }
 
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            String moduleName = extractModuleName(request);
-            if (moduleName == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
+            boolean success = true;
+
+            if (success && !REQUEST_MIMETYPE.equalsIgnoreCase(request.getContentType())) {
+                success = false;
+                response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
             }
 
-            if (localP11CryptServicePool == null) {
+            if (success && localP11CryptServicePool == null) {
+                success = false;
                 LOG.error("localP11CryptService in servlet not configured");
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.setContentLength(0);
-                return;
             }
 
-            if (!CT_REQUEST.equalsIgnoreCase(request.getContentType())) {
-                response.setContentLength(0);
-                response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                response.flushBuffer();
-                return;
+            if (success) {
+                byte[] requestBytes = IoUtil.read(request.getInputStream());
+                byte[] responseBytes = responder.processRequest(localP11CryptServicePool,
+                        requestBytes);
+
+                response.setContentType(RESPONSE_MIMETYPE);
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getOutputStream().write(responseBytes);
             }
-
-            PKIMessage pkiReq;
-            try {
-                pkiReq = generatePkiMessage(request.getInputStream());
-            } catch (Exception ex) {
-                response.setContentLength(0);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                LogUtil.error(LOG, ex, "could not parse the request (PKIMessage)");
-                return;
-            }
-
-            PKIMessage pkiResp = responder.processPkiMessage(localP11CryptServicePool,
-                    moduleName, pkiReq);
-
-            response.setContentType(CT_RESPONSE);
-            response.setStatus(HttpServletResponse.SC_OK);
-            ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
-            asn1Out.writeObject(pkiResp);
-            asn1Out.flush();
         } catch (EOFException ex) {
             LogUtil.warn(LOG, ex, "connection reset by peer");
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -189,55 +109,9 @@ public class HttpProxyServlet extends HttpServlet {
         }
     } // method doPost
 
-    protected PKIMessage generatePkiMessage(final InputStream is) throws BadAsn1ObjectException {
-        ParamUtil.requireNonNull("is", is);
-        ASN1InputStream asn1Stream = new ASN1InputStream(is);
-
-        try {
-            return PKIMessage.getInstance(asn1Stream.readObject());
-        } catch (IOException | IllegalArgumentException ex) {
-            throw new BadAsn1ObjectException("could not parse PKIMessage: " + ex.getMessage(), ex);
-        } finally {
-            try {
-                asn1Stream.close();
-            } catch (IOException ex) {
-                LOG.error("could not close ASN1Stream: {}", ex.getMessage());
-            }
-        }
-    }
-
     public void setLocalP11CryptServicePool(
             final LocalP11CryptServicePool localP11CryptServicePool) {
         this.localP11CryptServicePool = localP11CryptServicePool;
     }
 
-    private static String extractModuleName(final HttpServletRequest request)
-            throws UnsupportedEncodingException {
-        String encodedUrl = request.getRequestURI();
-
-        String moduleName = null;
-        String constructedPath = null;
-
-        constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
-        String servletPath = request.getServletPath();
-        if (!servletPath.endsWith("/")) {
-            servletPath += "/";
-            if (servletPath.startsWith(constructedPath)) {
-                moduleName = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
-            }
-        }
-
-        int indexOf = constructedPath.indexOf(servletPath);
-        if (indexOf >= 0) {
-            constructedPath = constructedPath.substring(indexOf + servletPath.length());
-        }
-
-        if (moduleName == null) {
-            int moduleNameEndIndex = constructedPath.indexOf('/');
-            moduleName = (moduleNameEndIndex == -1) ? constructedPath
-                    : constructedPath.substring(0, moduleNameEndIndex);
-        }
-
-        return moduleName;
-    }
 }

@@ -32,9 +32,10 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.proxy;
+package org.xipki.commons.security.pkcs11.proxy.msg;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -42,50 +43,66 @@ import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
-import org.xipki.commons.security.pkcs11.P11RSAPkcsPssParams;
 
 /**
-*
-* <pre>
-* RSAPkcsPssParams ::= SEQUENCE {
-*     contentHash       INTEGER,
-*     mgfHash           INTEGER,
-*     saltLength        INTEGER
-*     }
-* </pre>
-*
-* @author Lijun Liao
-* @since 2.0.0
-*/
+ *
+ * <pre>
+ * GenRSAKeypairParams ::= SEQUENCE {
+ *     slotId               P11SlotIdentifier,
+ *     label                UTF8STRING,
+ *     keysize              INTEGER,
+ *     publicExponent       INTEGER OPTIONAL }
+ * </pre>
+ *
+ * @author Lijun Liao
+ * @since 2.0.0
+ */
 
 // CHECKSTYLE:SKIP
-public class Asn1RSAPkcsPssParams extends ASN1Object {
+public class Asn1GenRSAKeypairParams extends ASN1Object {
 
-    private final P11RSAPkcsPssParams pkcsPssParams;
+    private final Asn1P11SlotIdentifier slotId;
 
-    public Asn1RSAPkcsPssParams(final P11RSAPkcsPssParams pkcsPssParams) {
-        this.pkcsPssParams = ParamUtil.requireNonNull("pkcsPssParams", pkcsPssParams);
+    private final String label;
+
+    private final int keysize;
+
+    private final BigInteger publicExponent;
+
+    public Asn1GenRSAKeypairParams(final Asn1P11SlotIdentifier slotId, final String label,
+            final int keysize, final BigInteger publicExponent) {
+        this.slotId = ParamUtil.requireNonNull("slotId", slotId);
+        this.label = ParamUtil.requireNonBlank("label", label);
+        this.keysize = ParamUtil.requireMin("keysize", keysize, 1);
+        this.publicExponent = publicExponent;
     }
 
-    private Asn1RSAPkcsPssParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 3, 3);
+    private Asn1GenRSAKeypairParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
+        Asn1Util.requireRange(seq, 3, 4);
+        final int size = seq.size();
         int idx = 0;
-        long contentHash = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
-        long mgfHash = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
-        int saltLength = Asn1Util.getInteger(seq.getObjectAt(idx++)).intValue();
-        this.pkcsPssParams = new P11RSAPkcsPssParams(contentHash, mgfHash, saltLength);
-    } // constructor
+        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
+        label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
+        ParamUtil.requireNonBlank("label", label);
 
-    public static Asn1RSAPkcsPssParams getInstance(final Object obj) throws BadAsn1ObjectException {
-        if (obj == null || obj instanceof Asn1RSAPkcsPssParams) {
-            return (Asn1RSAPkcsPssParams) obj;
+        keysize = Asn1Util.getInteger(seq.getObjectAt(idx++)).intValue();
+        ParamUtil.requireMin("keysize", keysize, 1);
+
+        publicExponent = (size > 3) ? Asn1Util.getInteger(seq.getObjectAt(idx++)) : null;
+    }
+
+    public static Asn1GenRSAKeypairParams getInstance(final Object obj)
+            throws BadAsn1ObjectException {
+        if (obj == null || obj instanceof Asn1GenRSAKeypairParams) {
+            return (Asn1GenRSAKeypairParams) obj;
         }
 
         try {
             if (obj instanceof ASN1Sequence) {
-                return new Asn1RSAPkcsPssParams((ASN1Sequence) obj);
+                return new Asn1GenRSAKeypairParams((ASN1Sequence) obj);
             } else if (obj instanceof byte[]) {
                 return getInstance(ASN1Primitive.fromByteArray((byte[]) obj));
             } else {
@@ -100,14 +117,29 @@ public class Asn1RSAPkcsPssParams extends ASN1Object {
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(new ASN1Integer(pkcsPssParams.getHashAlgorithm()));
-        vector.add(new ASN1Integer(pkcsPssParams.getMaskGenerationFunction()));
-        vector.add(new ASN1Integer(pkcsPssParams.getSaltLength()));
+        vector.add(slotId);
+        vector.add(new DERUTF8String(label));
+        vector.add(new ASN1Integer(keysize));
+        if (publicExponent != null) {
+            vector.add(new ASN1Integer(publicExponent));
+        }
         return new DERSequence(vector);
     }
 
-    public P11RSAPkcsPssParams getPkcsPssParams() {
-        return pkcsPssParams;
+    public Asn1P11SlotIdentifier getSlotId() {
+        return slotId;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public int getKeysize() {
+        return keysize;
+    }
+
+    public BigInteger getPublicExponent() {
+        return publicExponent;
     }
 
 }

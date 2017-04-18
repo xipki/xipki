@@ -32,41 +32,4 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.shell.p11;
-
-import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.Completion;
-import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.pkcs11.P11CryptService;
-import org.xipki.commons.security.shell.SecurityCommandSupport;
-import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
-
-/**
- * @author Lijun Liao
- * @since 2.0.0
- */
-
-@Command(scope = "xipki-tk", name = "refresh",
-        description = "refresh PKCS#11 module")
-@Service
-public class P11RefreshSlotCmd extends SecurityCommandSupport {
-
-    @Option(name = "--module",
-            description = "name of the PKCS#11 module.")
-    @Completion(P11ModuleNameCompleter.class)
-    private String moduleName = DEFAULT_P11MODULE_NAME;
-
-    @Override
-    protected Object doExecute() throws Exception {
-        P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-        if (p11Service == null) {
-            throw new IllegalCmdParamException("undefined module " + moduleName);
-        }
-        p11Service.refresh();
-        println("refreshed module " + moduleName);
-        return null;
-    }
-
-}
+package org.xipki.commons.security.pkcs11.proxy.msg;

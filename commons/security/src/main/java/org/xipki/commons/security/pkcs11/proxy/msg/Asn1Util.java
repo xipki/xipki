@@ -32,7 +32,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs11.proxy;
+package org.xipki.commons.security.pkcs11.proxy.msg;
 
 import java.math.BigInteger;
 

@@ -34,7 +34,8 @@
 
 package org.xipki.commons.security.pkcs11.proxy;
 
-import org.bouncycastle.asn1.x509.GeneralName;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Lijun Liao
@@ -43,55 +44,117 @@ import org.bouncycastle.asn1.x509.GeneralName;
 
 public class P11ProxyConstants {
 
-    public static final GeneralName REMOTE_P11_CMP_SERVER =
-            new GeneralName(GeneralName.uniformResourceIdentifier,
-                    "http://xipki.org/pkcs11proxy/server");
+    public static final short VERSION_V1_0             = 0x0100;
 
-    public static final GeneralName REMOTE_P11_CMP_CLIENT =
-            new GeneralName(GeneralName.uniformResourceIdentifier,
-                    "http://xipki.org/pkcs11proxy/client");
+    /* Return Code */
+    public static final short RC_SUCCESS               = 0x0000;
 
-    public static final int VERSION_V1 = 0;
+    public static final short RC_INTERNAL_ERROR        = 0x0001;
 
-    public static final String ERROR_UNKNOWN_ENTITY = "P11_UNKNOWN_ENTITY";
+    public static final short RC_UNSUPPORTED_VERSION   = 0x0002;
 
-    public static final String ERROR_DUPLICATE_ENTITY = "P11_DUPLICATE_ENTITY";
+    public static final short RC_UNSUPPORTED_ACTION    = 0x0003;
 
-    public static final String ERROR_UNSUPPORTED_MECHANISM = "P11_UNSUPPORTED_MECHANISM";
+    public static final short RC_BAD_REQUEST           = 0x0004;
 
-    public static final String ERROR_P11_TOKENERROR = "P11_TOKEN_ERROR";
+    public static final short RC_UNKNOWN_MODULE        = 0x0101;
 
-    public static final int ACTION_getPublicKey = 1;
+    public static final short RC_UNKNOWN_ENTITY        = 0x0102;
 
-    public static final int ACTION_getCertificate = 2;
+    public static final short RC_DUPLICATE_ENTITY      = 0x0103;
 
-    public static final int ACTION_getSlotIds = 3;
+    public static final short RC_UNSUPPORTED_MECHANISM = 0x0104;
 
-    public static final int ACTION_getIdentityIdentifiers = 4;
+    public static final short RC_P11_TOKENERROR        = 0x0105;
 
-    public static final int ACTION_getCertIdentifiers = 5;
+    /* Action */
+    /**
+     * Will be used in the response if the server cannot detect the action.
+     */
+    public static final short ACTION_NOPE              = 0x0000;
 
-    public static final int ACTION_getMechanisms = 6;
+    public static final short ACTION_GET_SERVER_CAPS   = 0x0001;
 
-    public static final int ACTION_sign = 20;
+    public static final short ACTION_GET_PUBLICKEY     = 0x0101;
 
-    public static final int ACTION_genKeypair_RSA = 30;
+    public static final short ACTION_GET_CERT          = 0x0102;
 
-    public static final int ACTION_genKeypair_DSA = 31;
+    public static final short ACTION_GET_SLOT_IDS      = 0x0103;
 
-    public static final int ACTION_genKeypair_EC = 33;
+    public static final short ACTION_GET_IDENTITY_IDS  = 0x0104;
 
-    public static final int ACTION_addCert = 40;
+    public static final short ACTION_GET_CERT_IDS      = 0x0105;
 
-    public static final int ACTION_removeIdentity = 41;
+    public static final short ACTION_GET_MECHANISMS    = 0x0106;
 
-    public static final int ACTION_removeCerts = 42;
+    public static final short ACTION_SIGN              = 0x0120;
 
-    public static final int ACTION_updateCerificate = 43;
+    public static final short ACTION_GEN_KEYPAIR_RSA   = 0x0130;
 
-    public static final int ACTION_removeObjects = 44;
+    public static final short ACTION_GEN_KEYPAIR_DSA   = 0x0131;
+
+    public static final short ACTION_GEN_KEYPAIR_EC    = 0x0133;
+
+    public static final short ACTION_ADD_CERT          = 0x0140;
+
+    public static final short ACTION_REMOVE_IDENTITY   = 0x0141;
+
+    public static final short ACTION_REMOVE_CERTS      = 0x0142;
+
+    public static final short ACTION_UPDATE_CERT       = 0x0143;
+
+    public static final short ACTION_REMOVE_OBJECTS    = 0x0144;
+
+    private static final Map<Short, String> rcMap;
+
+    private static final Map<Short, String> actionMap;
+
+    static {
+        // RC
+        rcMap = new HashMap<>();
+        rcMap.put(RC_BAD_REQUEST,              "RC_BAD_REQUEST");
+        rcMap.put(RC_DUPLICATE_ENTITY,         "RC_DUPLICATE_ENTITY");
+        rcMap.put(RC_INTERNAL_ERROR,           "RC_INTERNAL_ERROR");
+        rcMap.put(RC_P11_TOKENERROR,           "RC_P11_TOKENERROR");
+        rcMap.put(RC_SUCCESS,                  "RC_SUCCESS");
+        rcMap.put(RC_UNKNOWN_ENTITY,           "RC_UNKNOWN_ENTITY");
+        rcMap.put(RC_UNKNOWN_MODULE,           "RC_UNKNOWN_MODULE");
+        rcMap.put(RC_UNSUPPORTED_ACTION,       "RC_UNSUPPORTED_ACTION");
+        rcMap.put(RC_UNSUPPORTED_MECHANISM,    "RC_UNSUPPORTED_MECHANISM");
+        rcMap.put(RC_UNSUPPORTED_VERSION,      "RC_UNSUPPORTED_VERSION");
+
+        // action
+        actionMap = new HashMap<>();
+        actionMap.put(ACTION_ADD_CERT,         "ACTION_ADD_CERT");
+        actionMap.put(ACTION_GEN_KEYPAIR_DSA,  "ACTION_GEN_KEYPAIR_DSA");
+        actionMap.put(ACTION_GEN_KEYPAIR_EC,   "ACTION_GEN_KEYPAIR_EC");
+        actionMap.put(ACTION_GEN_KEYPAIR_RSA,  "ACTION_GEN_KEYPAIR_RSA");
+        actionMap.put(ACTION_GET_CERT,         "ACTION_GET_CERT");
+        actionMap.put(ACTION_GET_CERT_IDS,     "ACTION_GET_CERT_IDS");
+        actionMap.put(ACTION_GET_IDENTITY_IDS, "ACTION_GET_IDENTITY_IDS");
+        actionMap.put(ACTION_GET_MECHANISMS,   "ACTION_GET_MECHANISMS");
+        actionMap.put(ACTION_GET_PUBLICKEY,    "ACTION_GET_PUBLICKEY");
+        actionMap.put(ACTION_GET_SERVER_CAPS,  "ACTION_GET_SERVER_CAPS");
+        actionMap.put(ACTION_GET_SLOT_IDS,     "ACTION_GET_SLOT_IDS");
+        actionMap.put(ACTION_NOPE,             "ACTION_NOPE");
+        actionMap.put(ACTION_REMOVE_CERTS,     "ACTION_REMOVE_CERTS");
+        actionMap.put(ACTION_REMOVE_IDENTITY,  "ACTION_REMOVE_IDENTITY");
+        actionMap.put(ACTION_REMOVE_OBJECTS,   "ACTION_REMOVE_OBJECTS");
+        actionMap.put(ACTION_SIGN,             "ACTION_SIGN");
+        actionMap.put(ACTION_UPDATE_CERT,      "ACTION_UPDATE_CERT");
+    }
 
     private P11ProxyConstants() {
+    }
+
+    public static String getReturnCodeName(short rc) {
+        String name = rcMap.get(rc);
+        return (name == null) ? Short.toString(rc) : name;
+    }
+
+    public static String getActionName(short action) {
+        String name = actionMap.get(action);
+        return (name == null) ? Short.toString(action) : name;
     }
 
 }

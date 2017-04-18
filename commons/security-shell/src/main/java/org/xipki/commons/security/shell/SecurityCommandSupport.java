@@ -63,7 +63,7 @@ public abstract class SecurityCommandSupport extends XipkiCommandSupport {
     protected SecurityFactory securityFactory;
 
     @Reference (optional = true)
-    protected P11CryptServiceFactory p11CryppServiceFactory;
+    protected P11CryptServiceFactory p11CryptServiceFactory;
 
     protected P11Slot getSlot(final String moduleName, final int slotIndex)
             throws XiSecurityException, P11TokenException, IllegalCmdParamException {
@@ -74,7 +74,7 @@ public abstract class SecurityCommandSupport extends XipkiCommandSupport {
 
     protected P11Module getP11Module(final String moduleName)
             throws XiSecurityException, P11TokenException, IllegalCmdParamException {
-        P11CryptService p11Service = p11CryppServiceFactory.getP11CryptService(moduleName);
+        P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
         if (p11Service == null) {
             throw new IllegalCmdParamException("undefined module " + moduleName);
         }
