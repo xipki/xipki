@@ -36,6 +36,7 @@ package org.xipki.commons.security;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
@@ -72,6 +73,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.password.PasswordResolver;
 import org.xipki.commons.security.exception.NoIdleSignerException;
 import org.xipki.commons.security.exception.XiSecurityException;
+import org.xipki.commons.security.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao
@@ -96,6 +98,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     private final PrivateKey privateKey;
 
+    private final AlgorithmCode algorithmCode;
+
     private PublicKey publicKey;
 
     private X509Certificate[] certificateChain;
@@ -117,15 +121,18 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         }
     }
 
-    public DefaultConcurrentContentSigner(final List<ContentSigner> signers) {
+    public DefaultConcurrentContentSigner(final List<ContentSigner> signers)
+            throws NoSuchAlgorithmException {
         this(signers, null);
     }
 
     public DefaultConcurrentContentSigner(final List<ContentSigner> signers,
-            final PrivateKey privateKey) {
+            final PrivateKey privateKey) throws NoSuchAlgorithmException {
         ParamUtil.requireNonEmpty("signers", signers);
 
         this.algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();
+        this.algorithmCode = AlgorithmUtil.getSignatureAlgorithmCode(algorithmIdentifier);
+
         for (ContentSigner signer : signers) {
             idleSigners.addLast(signer);
         }
@@ -136,6 +143,11 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public AlgorithmCode getAlgorithmCode() {
+        return algorithmCode;
     }
 
     private ContentSigner borrowContentSigner() throws NoIdleSignerException {

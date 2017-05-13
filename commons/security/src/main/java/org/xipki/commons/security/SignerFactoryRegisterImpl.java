@@ -46,7 +46,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
@@ -207,8 +206,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
             return signerBuilder.createSigner(signatureAlgId, parallelism,
                     securityFactory.getRandom4Sign());
-        } catch (NoSuchAlgorithmException | OperatorCreationException | NoSuchPaddingException
-                | XiSecurityException ex) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | XiSecurityException ex) {
             throw new ObjectCreationException(String.format("%s: %s", ex.getClass().getName(),
                     ex.getMessage()));
         }

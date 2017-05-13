@@ -34,6 +34,7 @@
 
 package org.xipki.commons.security;
 
+import java.security.cert.CRLReason;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -150,6 +151,32 @@ public enum CrlReason {
         }
 
         throw new IllegalArgumentException("invalid CrlReason code " + reasonCode);
+    }
+
+    public static CrlReason fromReason(CRLReason reason) {
+        if (reason == CRLReason.AA_COMPROMISE) {
+            return AA_COMPROMISE;
+        } else if (reason == CRLReason.AFFILIATION_CHANGED) {
+            return AFFILIATION_CHANGED;
+        } else if (reason == CRLReason.CA_COMPROMISE) {
+            return CA_COMPROMISE;
+        } else if (reason == CRLReason.CERTIFICATE_HOLD) {
+            return CERTIFICATE_HOLD;
+        } else if (reason == CRLReason.CESSATION_OF_OPERATION) {
+            return CESSATION_OF_OPERATION;
+        } else if (reason == CRLReason.KEY_COMPROMISE) {
+            return KEY_COMPROMISE;
+        } else if (reason == CRLReason.PRIVILEGE_WITHDRAWN) {
+            return PRIVILEGE_WITHDRAWN;
+        } else if (reason == CRLReason.REMOVE_FROM_CRL) {
+            return REMOVE_FROM_CRL;
+        } else if (reason == CRLReason.SUPERSEDED) {
+            return SUPERSEDED;
+        } else if (reason == CRLReason.UNSPECIFIED) {
+            return UNSPECIFIED;
+        } else {
+            throw new IllegalArgumentException("invald CRLReason " + reason);
+        }
     }
 
     public static CrlReason forNameOrText(final String text) {

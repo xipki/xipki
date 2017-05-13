@@ -81,6 +81,14 @@ Feature xipki-database-tool
 
      reset and initialize the CA and OCSP databases
 
+   * `xipki-db:initdb`
+
+     reset and initialize database
+
+   * `xipki-db:initdb-pki`
+
+     reset and initialize the CA and OCSP databases
+
    * `xipki-db:initdb-ca`
 
      reset and initialize the CA database

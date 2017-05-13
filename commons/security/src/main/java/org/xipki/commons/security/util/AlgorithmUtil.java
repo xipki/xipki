@@ -66,6 +66,7 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.AlgorithmCode;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.SignatureAlgoControl;
 import org.xipki.commons.security.SignerConf;
@@ -76,6 +77,8 @@ import org.xipki.commons.security.SignerConf;
  */
 
 public class AlgorithmUtil {
+
+    private static final Map<String, AlgorithmCode> algNameCodeMap;
 
     // CHECKSTYLE:SKIP
     private static final List<String> curveNames;
@@ -101,6 +104,69 @@ public class AlgorithmUtil {
         Collections.sort(nameList);
         curveNames = Collections.unmodifiableList(nameList);
         curveNameOidMap = Collections.unmodifiableMap(nameOidMap);
+
+        // Algorithm Name and Code Map
+        Map<String, AlgorithmCode> map = new HashMap<>();
+        // ECDSA
+        map.put("SHA1WITHECDSA", AlgorithmCode.SHA1WITHECDSA);
+        map.put("SHA224WITHECDSA", AlgorithmCode.SHA224WITHECDSA);
+        map.put("SHA256WITHECDSA", AlgorithmCode.SHA256WITHECDSA);
+        map.put("SHA384WITHECDSA", AlgorithmCode.SHA384WITHECDSA);
+        map.put("SHA512WITHECDSA", AlgorithmCode.SHA512WITHECDSA);
+        map.put("SHA3-224WITHECDSA", AlgorithmCode.SHA3_224WITHECDSA);
+        map.put("SHA3-256WITHECDSA", AlgorithmCode.SHA3_256WITHECDSA);
+        map.put("SHA3-384WITHECDSA", AlgorithmCode.SHA3_384WITHECDSA);
+        map.put("SHA3-512WITHECDSA", AlgorithmCode.SHA3_512WITHECDSA);
+        map.put("SHA1WITHPLAIN-ECDSA", AlgorithmCode.SHA1WITHPLAIN_ECDSA);
+        map.put("SHA224WITHPLAIN-ECDSA", AlgorithmCode.SHA224WITHPLAIN_ECDSA);
+        map.put("SHA256WITHPLAIN-ECDSA", AlgorithmCode.SHA256WITHPLAIN_ECDSA);
+        map.put("SHA384WITHPLAIN-ECDSA", AlgorithmCode.SHA384WITHPLAIN_ECDSA);
+        map.put("SHA512WITHPLAIN-ECDSA", AlgorithmCode.SHA512WITHPLAIN_ECDSA);
+        // DSA
+        map.put("SHA1WITHDSA", AlgorithmCode.SHA1WITHDSA);
+        map.put("SHA224WITHDSA", AlgorithmCode.SHA224WITHDSA);
+        map.put("SHA256WITHDSA", AlgorithmCode.SHA256WITHDSA);
+        map.put("SHA384WITHDSA", AlgorithmCode.SHA384WITHDSA);
+        map.put("SHA512WITHDSA", AlgorithmCode.SHA512WITHDSA);
+        map.put("SHA3-224WITHDSA", AlgorithmCode.SHA3_224WITHDSA);
+        map.put("SHA3-256WITHDSA", AlgorithmCode.SHA3_256WITHDSA);
+        map.put("SHA3-384WITHDSA", AlgorithmCode.SHA3_384WITHDSA);
+        map.put("SHA3-512WITHDSA", AlgorithmCode.SHA3_512WITHDSA);
+        // RSA
+        map.put("SHA1WITHDSA", AlgorithmCode.SHA1WITHDSA);
+        map.put("SHA224WITHRSA", AlgorithmCode.SHA224WITHRSA);
+        map.put("SHA256WITHRSA", AlgorithmCode.SHA256WITHRSA);
+        map.put("SHA384WITHRSA", AlgorithmCode.SHA384WITHRSA);
+        map.put("SHA512WITHRSA", AlgorithmCode.SHA512WITHRSA);
+        map.put("SHA3-224WITHRSA", AlgorithmCode.SHA3_224WITHRSA);
+        map.put("SHA3-256WITHRSA", AlgorithmCode.SHA3_256WITHRSA);
+        map.put("SHA3-384WITHRSA", AlgorithmCode.SHA3_384WITHRSA);
+        map.put("SHA3-512WITHRSA", AlgorithmCode.SHA3_512WITHRSA);
+
+        // RSAandMGF1
+        map.put("SHA1WITHRSAANDMGF1", AlgorithmCode.SHA1WITHRSAANDMGF1);
+        map.put("SHA224WITHRSA", AlgorithmCode.SHA224WITHRSA);
+        map.put("SHA256WITHRSA", AlgorithmCode.SHA256WITHRSA);
+        map.put("SHA384WITHRSA", AlgorithmCode.SHA384WITHRSA);
+        map.put("SHA512WITHRSA", AlgorithmCode.SHA512WITHRSA);
+        map.put("SHA3-224WITHRSA", AlgorithmCode.SHA3_224WITHRSA);
+        map.put("SHA3-256WITHRSA", AlgorithmCode.SHA3_256WITHRSA);
+        map.put("SHA3-384WITHRSA", AlgorithmCode.SHA3_384WITHRSA);
+        map.put("SHA3-512WITHRSA", AlgorithmCode.SHA3_512WITHRSA);
+
+        // SHA
+        map.put("SHA1", AlgorithmCode.SHA1);
+        map.put("SHA224", AlgorithmCode.SHA224);
+        map.put("SHA256", AlgorithmCode.SHA256);
+        map.put("SHA384", AlgorithmCode.SHA384);
+        map.put("SHA512", AlgorithmCode.SHA512);
+
+        map.put("SHA3-224", AlgorithmCode.SHA3_224);
+        map.put("SHA3-256", AlgorithmCode.SHA3_256);
+        map.put("SHA3-384", AlgorithmCode.SHA3_384);
+        map.put("SHA3-512", AlgorithmCode.SHA3_512);
+
+        algNameCodeMap = Collections.unmodifiableMap(map);
     }
 
     private AlgorithmUtil() {
@@ -125,6 +191,12 @@ public class AlgorithmUtil {
         }
         return hashAlgoType.getLength();
     } // method getHashOutputSizeInOctets
+
+    public static AlgorithmCode getSignatureAlgorithmCode(final AlgorithmIdentifier algId)
+            throws NoSuchAlgorithmException {
+        String algName = getSignatureAlgoName(algId);
+        return algNameCodeMap.get(algName.toUpperCase());
+    } // method getSignatureAlgoName
 
     public static String getSignatureAlgoName(final AlgorithmIdentifier sigAlgId)
             throws NoSuchAlgorithmException {
@@ -159,8 +231,6 @@ public class AlgorithmUtil {
             return "SHA384withPLAIN-ECDSA";
         } else if (BSIObjectIdentifiers.ecdsa_plain_SHA512.equals(algOid)) {
             return "SHA512withPLAIN-ECDSA";
-        } else if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid)) {
-            return "SHA1withDSA";
         } else if (X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid)) {
             return "SHA1withDSA";
         } else if (NISTObjectIdentifiers.dsa_with_sha224.equals(algOid)) {
@@ -202,6 +272,8 @@ public class AlgorithmUtil {
             ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
             if (X509ObjectIdentifiers.id_SHA1.equals(digestAlgOid)) {
                 return "SHA1withRSAandMGF1";
+            } else if (NISTObjectIdentifiers.id_sha224.equals(digestAlgOid)) {
+                return "SHA224withRSAandMGF1";
             } else if (NISTObjectIdentifiers.id_sha256.equals(digestAlgOid)) {
                 return "SHA256withRSAandMGF1";
             } else if (NISTObjectIdentifiers.id_sha384.equals(digestAlgOid)) {
