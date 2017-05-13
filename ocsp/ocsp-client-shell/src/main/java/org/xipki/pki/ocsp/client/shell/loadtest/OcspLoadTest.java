@@ -37,7 +37,6 @@ package org.xipki.pki.ocsp.client.shell.loadtest;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.cert.X509Certificate;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -111,27 +110,12 @@ public class OcspLoadTest extends LoadExecutor {
                 SingleResp singleResp = singleResponses[0];
                 CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
-                String status;
-                if (singleCertStatus == null) {
-                    status = "good";
-                } else if (singleCertStatus instanceof RevokedStatus) {
-                    RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
-                    Date revTime = revStatus.getRevocationTime();
-
-                    if (revStatus.hasRevocationReason()) {
-                        int reason = revStatus.getRevocationReason();
-                        status = "revoked, reason = " + reason + ", revocationTime = " + revTime;
-                    } else {
-                        status = "revoked, no reason, revocationTime = " + revTime;
-                    }
-                } else if (singleCertStatus instanceof UnknownStatus) {
-                    status = "unknown";
-                } else {
+                if (!(singleCertStatus == null
+                        || singleCertStatus instanceof RevokedStatus
+                        || singleCertStatus instanceof UnknownStatus)) {
                     LOG.warn("status: ERROR");
                     return false;
                 }
-
-                LOG.info("SN: {}, status: {}", sn, status);
                 return true;
             } // end if
         } // method testNext

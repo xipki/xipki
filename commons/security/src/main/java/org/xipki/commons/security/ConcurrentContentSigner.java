@@ -75,6 +75,12 @@ public interface ConcurrentContentSigner {
     AlgorithmIdentifier getAlgorithmIdentifier();
 
     /**
+     * Returns the algorithm code in XiPKI context.
+     * @return algorithm code
+     */
+    AlgorithmCode getAlgorithmCode();
+
+    /**
      * Get the private key.
      * @return the private key if possible. {@code null} may be returned.
      */

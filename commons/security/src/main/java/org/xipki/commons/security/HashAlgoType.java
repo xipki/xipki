@@ -54,15 +54,16 @@ import org.xipki.commons.security.pkcs11.P11Constants;
 
 public enum HashAlgoType {
 
-    SHA1(20, "1.3.14.3.2.26", "SHA1", "S1"),
-    SHA224(28, "2.16.840.1.101.3.4.2.4", "SHA224", "S224"),
-    SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256", "S256"),
-    SHA384(48, "2.16.840.1.101.3.4.2.2", "SHA384", "S384"),
-    SHA512(64, "2.16.840.1.101.3.4.2.3", "SHA512", "S512"),
-    SHA3_224(28, "2.16.840.1.101.3.4.2.7", "SHA3-224", "S3-224", "SHA3224"),
-    SHA3_256(32, "2.16.840.1.101.3.4.2.8", "SHA3-256", "S3-256", "SHA3256"),
-    SHA3_384(48, "2.16.840.1.101.3.4.2.9", "SHA3-384", "S3-384", "SHA3384"),
-    SHA3_512(64, "2.16.840.1.101.3.4.2.10", "SHA3-512", "S3-512", "SHA3512");
+    SHA1(20, AlgorithmCode.SHA1, "1.3.14.3.2.26", "SHA1", "S1"),
+    SHA224(28, AlgorithmCode.SHA224, "2.16.840.1.101.3.4.2.4", "SHA224", "S224"),
+    SHA256(32, AlgorithmCode.SHA256, "2.16.840.1.101.3.4.2.1", "SHA256", "S256"),
+    SHA384(48, AlgorithmCode.SHA384, "2.16.840.1.101.3.4.2.2", "SHA384", "S384"),
+    SHA512(64, AlgorithmCode.SHA512, "2.16.840.1.101.3.4.2.3", "SHA512", "S512"),
+    SHA3_224(28, AlgorithmCode.SHA3_224, "2.16.840.1.101.3.4.2.7", "SHA3-224", "S3-224", "SHA3224"),
+    SHA3_256(32, AlgorithmCode.SHA3_256, "2.16.840.1.101.3.4.2.8", "SHA3-256", "S3-256", "SHA3256"),
+    SHA3_384(48, AlgorithmCode.SHA3_384, "2.16.840.1.101.3.4.2.9", "SHA3-384", "S3-384", "SHA3384"),
+    SHA3_512(64, AlgorithmCode.SHA3_512, "2.16.840.1.101.3.4.2.10", "SHA3-512", "S3-512",
+            "SHA3512");
 
     private final int length;
 
@@ -76,13 +77,17 @@ public enum HashAlgoType {
 
     private final String shortName;
 
-    HashAlgoType(final int length, final String oid, final String name, final String shortName) {
-        this(length, oid, name, shortName, null);
+    private final AlgorithmCode algorithmCode;
+
+    HashAlgoType(final int length, final AlgorithmCode algorithmCode, final String oid,
+            final String name, final String shortName) {
+        this(length, algorithmCode, oid, name, shortName, null);
     }
 
-    HashAlgoType(final int length, final String oid, final String name, final String shortName,
-            final String canonicalizedName) {
+    HashAlgoType(final int length, final AlgorithmCode algorithmCode, final String oid,
+            final String name, final String shortName, final String canonicalizedName) {
         this.length = length;
+        this.algorithmCode = algorithmCode;
         this.oid = new ASN1ObjectIdentifier(oid).intern();
         this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
         this.name = name;
@@ -92,6 +97,10 @@ public enum HashAlgoType {
 
     public int getLength() {
         return length;
+    }
+
+    public AlgorithmCode getAlgorithmCode() {
+        return algorithmCode;
     }
 
     public ASN1ObjectIdentifier getOid() {

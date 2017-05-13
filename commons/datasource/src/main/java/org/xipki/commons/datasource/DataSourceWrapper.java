@@ -653,6 +653,10 @@ public abstract class DataSourceWrapper {
     }
 
     public void releaseResources(final Statement ps, final ResultSet rs) {
+        releaseResources(ps, rs, true);
+    }
+
+    public void releaseResources(final Statement ps, final ResultSet rs, boolean returnConnection) {
         if (rs != null) {
             try {
                 rs.close();
@@ -674,7 +678,7 @@ public abstract class DataSourceWrapper {
             } catch (Throwable th) {
                 LOG.warn("could not close statement", th);
             } finally {
-                if (conn != null) {
+                if (returnConnection && conn != null) {
                     returnConnection(conn);
                 }
             }

@@ -34,6 +34,7 @@
 
 package org.xipki.commons.security.pkcs11;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
@@ -166,8 +167,13 @@ public class P11ContentSignerBuilder {
         } // end for
 
         PrivateKey privateKey = new P11PrivateKey(cryptService, identityId);
-        DefaultConcurrentContentSigner concurrentSigner =
-                new DefaultConcurrentContentSigner(signers, privateKey);
+        DefaultConcurrentContentSigner concurrentSigner;
+        try {
+            concurrentSigner = new DefaultConcurrentContentSigner(signers, privateKey);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new XiSecurityException(ex.getMessage(), ex);
+        }
+
         if (certificateChain != null) {
             concurrentSigner.setCertificateChain(certificateChain);
         } else {
