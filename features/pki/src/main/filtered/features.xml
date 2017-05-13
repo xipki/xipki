@@ -36,7 +36,6 @@
   </feature>
   <feature name="xipki-cabase" version="${project.version}"
       description="common feature for CA server and client">
-    <feature prerequisite="true">xipki-audit</feature>
     <feature prerequisite="true">xipki-datasource</feature>
     <feature prerequisite="true">xipki-security</feature>
     <bundle start-level="70">mvn:org.xipki.pki/ca-common/${project.version}</bundle>
@@ -100,7 +99,6 @@
   <feature name="xipki-ocspserver" version="${project.version}" description="OCSP server">
     <feature prerequisite="true">xipki-datasource</feature>
     <feature prerequisite="true">xipki-security</feature>
-    <feature>xipki-audit</feature>
     <bundle start-level="70">mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
   </feature>
