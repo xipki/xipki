@@ -45,10 +45,10 @@ import org.xipki.commons.dbtool.LiquibaseDatabaseConf;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-db", name = "initdb",
+@Command(scope = "xipki-db", name = "initdb-pki",
         description = "reset and initialize the CA and OCSP databases")
 @Service
-public class InitDbAllCmd extends LiquibaseCommandSupport {
+public class InitDbPkiCmd extends LiquibaseCommandSupport {
 
     private static final String CA_SCHMEA_FILE = "xipki/sql/ca-init.xml";
 

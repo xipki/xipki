@@ -1,0 +1,31 @@
+##########################################################################
+# For details of the configuration please refer to                       #
+#   https://github.com/brettwooldridge/HikariCP                          #
+#   https://mariadb.com/kb/en/mariadb/about-mariadb-connector-j/#license #
+##########################################################################
+
+################## MySQL/MariaDB via MariaDB Connector #################
+
+dataSourceClassName = org.mariadb.jdbc.MariaDbDataSource 
+
+# choice 1
+dataSource.serverName = 127.0.0.1
+dataSource.port = 3306
+dataSource.databaseName = ocspcache
+
+# choice 2
+#dataSource.url = jdbc:mariadb://localhost:3306/ocspcache
+
+#dataSource.properties = key1=value1&key2=value2
+dataSource.user = root
+# encrypted password 123456
+dataSource.password = PBE:B9A/zfIDGOTc+xhshvJGWMMdft32EjtEZPWGH9M0JvoWFA==
+
+autoCommit = true
+readOnly = false
+maximumPoolSize = 20
+minimumIdle = 10
+connectionTimeout = 10000
+idleTimeout = 600000
+maxLifetime = 1800000
+transactionIsolation = TRANSACTION_READ_COMMITTED

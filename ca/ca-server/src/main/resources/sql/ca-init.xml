@@ -63,7 +63,7 @@
       <column name="TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="CERT" type="CLOB"/>
+      <column name="CERT" type="VARCHAR(4000)"/>
       <column name="CONF" type="CLOB"/>
     </createTable>
     <!-- table SCEP -->
@@ -101,7 +101,7 @@
       <column name="SIGNER_TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
-      <column name="SIGNER_CERT" type="CLOB"/>
+      <column name="SIGNER_CERT" type="VARCHAR(4000)"/>
       <column name="CRL_CONTROL" type="VARCHAR(1000)"/>
       <column name="SIGNER_CONF" type="CLOB"/>
     </createTable>
@@ -111,7 +111,7 @@
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="NAME" type="VARCHAR(45)" remarks="duplication is not permitted"/>
-      <column name="CERT" type="CLOB"/>
+      <column name="CERT" type="VARCHAR(4000)"/>
     </createTable>
     <addUniqueConstraint tableName="REQUESTOR" columnNames="NAME" constraintName="CONST_REQUESTOR_NAME"/>
     <!-- table PUBLISHER -->
@@ -208,7 +208,7 @@
       <column name="KEEP_EXPIRED_CERT_DAYS" type="SMALLINT" defaultValueNumeric="-1" 
           remarks="How long in days should certificates after the expiration be kept. Negative value for kept-for-ever"/>
       <column name="EXTRA_CONTROL" type="VARCHAR(500)"/>
-      <column name="CERT" type="CLOB">
+      <column name="CERT" type="VARCHAR(4000)">
         <constraints nullable="false"/>
       </column>
       <column name="SIGNER_CONF" type="CLOB">

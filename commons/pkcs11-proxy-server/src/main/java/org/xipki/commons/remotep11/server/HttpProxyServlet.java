@@ -63,7 +63,7 @@ public class HttpProxyServlet extends HttpServlet {
     private static final String RESPONSE_MIMETYPE = "application/x-xipki-pkcs11";
 
     private final P11ProxyResponder responder;
-    
+
     private LocalP11CryptServicePool localP11CryptServicePool;
 
     public HttpProxyServlet() {

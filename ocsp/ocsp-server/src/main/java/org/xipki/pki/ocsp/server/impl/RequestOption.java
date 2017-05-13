@@ -51,6 +51,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.commons.common.InvalidConfException;
+import org.xipki.commons.common.TripleState;
 import org.xipki.commons.common.util.IoUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.CertpathValidationModel;
@@ -88,11 +89,13 @@ class RequestOption {
 
     private final boolean validateSignature;
 
+    private final int maxRequestListCount;
+
     private final int maxRequestSize;
 
     private final Collection<Integer> versions;
 
-    private final boolean nonceRequired;
+    private final TripleState nonceOccurrence;
 
     private final int nonceMinLen;
 
@@ -113,32 +116,39 @@ class RequestOption {
         signatureRequired = conf.isSignatureRequired();
         validateSignature = conf.isValidateSignature();
 
+        // Request nonce
         NonceType nonceConf = conf.getNonce();
         int minLen = 4;
         int maxLen = 32;
-        // Request nonce
-        if (nonceConf != null) {
-            nonceRequired = nonceConf.isRequired();
-            if (nonceConf.getMinLen() != null) {
-                minLen = nonceConf.getMinLen();
-            }
-
-            if (nonceConf.getMaxLen() != null) {
-                maxLen = nonceConf.getMaxLen();
-            }
+        String str = nonceConf.getOccurrence().toLowerCase();
+        if ("forbidden".equals(str)) {
+            nonceOccurrence = TripleState.FORBIDDEN;
+        } else if ("optional".equals(str)) {
+            nonceOccurrence = TripleState.OPTIONAL;
+        } else if ("required".equals(str)) {
+            nonceOccurrence = TripleState.REQUIRED;
         } else {
-            nonceRequired = false;
+            throw new InvalidConfException("invalid nonce.occurrence '" + str
+                    + "', only forbidded, optional, and required are allowed");
         }
 
-        int tmpMaxSize = 0;
-        if (conf.getMaxRequestSize() != null) {
-            tmpMaxSize = conf.getMaxRequestSize().intValue();
+        if (nonceConf.getMinLen() != null) {
+            minLen = nonceConf.getMinLen();
         }
 
-        if (tmpMaxSize < 255) {
-            tmpMaxSize = 4096;
+        if (nonceConf.getMaxLen() != null) {
+            maxLen = nonceConf.getMaxLen();
         }
-        this.maxRequestSize = tmpMaxSize;
+
+        this.maxRequestListCount = conf.getMaxRequestListCount();
+        if (this.maxRequestListCount < 1) {
+            throw new InvalidConfException("invalid maxRequestListCount " + maxRequestListCount);
+        }
+
+        this.maxRequestSize = conf.getMaxRequestSize();
+        if (this.maxRequestSize < 100) {
+            throw new InvalidConfException("invalid maxRequestSize " + maxRequestSize);
+        }
 
         this.nonceMinLen = minLen;
         this.nonceMaxLen = maxLen;
@@ -146,11 +156,13 @@ class RequestOption {
         // Request versions
 
         VersionsType versionsConf = conf.getVersions();
-        if (versionsConf == null) {
-            this.versions = null;
-        } else {
-            this.versions = new HashSet<>();
-            this.versions.addAll(versionsConf.getVersion());
+        this.versions = new HashSet<>();
+        for (String m : versionsConf.getVersion()) {
+            if ("v1".equalsIgnoreCase(m)) {
+                this.versions.add(0);
+            } else {
+                throw new InvalidConfException("invalid OCSP request version '" + m + "'");
+            }
         }
 
         // Request hash algorithms
@@ -230,8 +242,12 @@ class RequestOption {
         return supportsHttpGet;
     }
 
-    public boolean isNonceRequired() {
-        return nonceRequired;
+    public TripleState getNonceOccurrence() {
+        return nonceOccurrence;
+    }
+
+    public int getMaxRequestListCount() {
+        return maxRequestListCount;
     }
 
     public int getMaxRequestSize() {

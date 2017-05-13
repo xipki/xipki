@@ -1,0 +1,34 @@
+############################################################
+#    For details of the configuration please refer to      #
+#      https://github.com/brettwooldridge/HikariCP         #
+############################################################
+
+################## Oracle #################
+
+dataSourceClassName = oracle.jdbc.pool.OracleDataSource
+
+# database can be either identified by choice 1 (serverName, portNumber,
+# databaseName and driverType) or choice 2 (only URL).
+# choice 1
+dataSource.serverName = 127.0.0.1
+dataSource.portNumber = 1521
+dataSource.databaseName = XE
+dataSource.driverType = thin
+
+# choice 2
+#dataSource.URL = jdbc:oracle:thin:@localhost:1521:XE
+
+dataSource.user = orauserocspcrl
+# encrypted password 123456
+dataSource.password = PBE:B9A/zfIDGOTc+xhshvJGWMMdft32EjtEZPWGH9M0JvoWFA==
+dataSource.implicitCachingEnabled = true
+dataSource.explicitCachingEnabled = true
+
+autoCommit = true
+readOnly = false
+maximumPoolSize = 20
+minimumIdle = 10
+connectionTimeout = 10000
+idleTimeout = 600000
+maxLifetime = 1800000
+transactionIsolation = TRANSACTION_READ_COMMITTED

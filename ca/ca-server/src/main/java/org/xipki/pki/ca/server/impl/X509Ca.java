@@ -55,6 +55,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
@@ -200,7 +201,7 @@ public class X509Ca {
 
     }
 
-    private class ScheduledExpiredCertsRemover implements Runnable {
+    private class ExpiredCertsRemover implements Runnable {
 
         private boolean inProcess;
 
@@ -229,9 +230,9 @@ public class X509Ca {
             }
         } // method run
 
-    } // class ScheduledExpiredCertsRemover
+    } // class ExpiredCertsRemover
 
-    private class ScheduledCrlGenerationService implements Runnable {
+    private class CrlGenerationService implements Runnable {
 
         @Override
         public void run() {
@@ -375,9 +376,9 @@ public class X509Ca {
             }
         } // method doRun
 
-    } // class ScheduledCrlGenerationService
+    } // class CrlGenerationService
 
-    private class ScheduledSuspendedCertsRevoker implements Runnable {
+    private class SuspendedCertsRevoker implements Runnable {
 
         private boolean inProcess;
 
@@ -407,7 +408,7 @@ public class X509Ca {
             }
         } // method run
 
-    } // class ScheduledSuspendedCertsRevoker
+    } // class SuspendedCertsRevoker
 
     private static final long MS_PER_SECOND = 1000L;
 
@@ -492,15 +493,18 @@ public class X509Ca {
             publisher.caAdded(caCert);
         }
 
+        Random random = new Random();
         // CRL generation services
         this.crlGenerationService = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
-                new ScheduledCrlGenerationService(), 1, 1, TimeUnit.MINUTES);
+                new CrlGenerationService(), 60 + random.nextInt(60), 60, TimeUnit.SECONDS);
 
+        final int minutesOfDay = 24 * 60;
         this.expiredCertsRemover = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
-                new ScheduledExpiredCertsRemover(), 1, 1, TimeUnit.DAYS);
+                new ExpiredCertsRemover(), minutesOfDay + random.nextInt(60), minutesOfDay,
+                TimeUnit.MINUTES);
 
         this.suspendedCertsRevoker = caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
-                new ScheduledSuspendedCertsRevoker(), 30, 60, TimeUnit.MINUTES);
+                new SuspendedCertsRevoker(), random.nextInt(60), 60, TimeUnit.MINUTES);
     } // constructor
 
     public X509CaInfo getCaInfo() {

@@ -34,47 +34,29 @@
 
 package org.xipki.pki.ocsp.server.impl.store.crl;
 
-import java.math.BigInteger;
-
-import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
-
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
 
-class CertWithInfo {
+class ImportCrlException extends Exception {
 
-    private final BigInteger serialNumber;
+    private static final long serialVersionUID = 1L;
 
-    private Certificate cert;
-
-    private String profileName;
-
-    CertWithInfo(final BigInteger serialNumber) {
-        this.serialNumber = ParamUtil.requireNonNull("serialNumber", serialNumber);
+    public ImportCrlException() {
+        super();
     }
 
-    public void setProfileName(final String profileName) {
-        this.profileName = StringUtil.isBlank(profileName) ? null : profileName;
+    public ImportCrlException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public void setCert(Certificate cert) {
-        this.cert = cert;
+    public ImportCrlException(String message) {
+        super(message);
     }
 
-    public BigInteger getSerialNumber() {
-        return serialNumber;
-    }
-
-    public Certificate getCert() {
-        return cert;
-    }
-
-    public String getProfileName() {
-        return profileName;
+    public ImportCrlException(Throwable cause) {
+        super(cause);
     }
 
 }

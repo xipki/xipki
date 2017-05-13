@@ -34,11 +34,16 @@
 
 package org.xipki.pki.ocsp.server.impl.store.db;
 
+import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.commons.security.CrlReason;
@@ -58,13 +63,39 @@ public class IssuerEntry {
 
     private final Date notBefore;
 
+    private final X509Certificate cert;
+
     private CertRevocationInfo revocationInfo;
 
-    public IssuerEntry(final int id, final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
-            final Date caNotBefore) {
-        this.issuerHashMap = ParamUtil.requireNonEmpty("issuerHashMap", issuerHashMap);
-        this.notBefore = ParamUtil.requireNonNull("caNotBefore", caNotBefore);
+    private CrlInfo crlInfo;
+
+    public IssuerEntry(final int id, final X509Certificate cert)
+            throws CertificateEncodingException {
         this.id = id;
+        this.cert = ParamUtil.requireNonNull("cert", cert);
+        this.notBefore = cert.getNotBefore();
+        this.issuerHashMap = getIssuerHashAndKeys(cert.getEncoded());
+    }
+
+    private static Map<HashAlgoType, IssuerHashNameAndKey> getIssuerHashAndKeys(byte[] encodedCert)
+            throws CertificateEncodingException {
+        byte[] encodedName;
+        byte[] encodedKey;
+        try {
+            Certificate bcCert = Certificate.getInstance(encodedCert);
+            encodedName = bcCert.getSubject().getEncoded("DER");
+            encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+        } catch (IllegalArgumentException | IOException ex) {
+            throw new CertificateEncodingException(ex.getMessage(), ex);
+        }
+
+        Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<>();
+        for (HashAlgoType ha : HashAlgoType.values()) {
+            IssuerHashNameAndKey ih = new IssuerHashNameAndKey(ha, ha.hash(encodedName),
+                    ha.hash(encodedKey));
+            hashes.put(ha, ih);
+        }
+        return hashes;
     }
 
     public int getId() {
@@ -83,6 +114,14 @@ public class IssuerEntry {
         this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE, revocationTime, null);
     }
 
+    public void setCrlInfo(CrlInfo crlInfo) {
+        this.crlInfo = crlInfo;
+    }
+
+    public CrlInfo getCrlInfo() {
+        return crlInfo;
+    }
+
     public CertRevocationInfo getRevocationInfo() {
         return revocationInfo;
     }
@@ -91,8 +130,15 @@ public class IssuerEntry {
         return notBefore;
     }
 
-    Collection<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
+    public X509Certificate getCert() {
+        return cert;
+    }
+
+    public Collection<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
         return Collections.unmodifiableCollection(issuerHashMap.values());
     }
 
+    public IssuerHashNameAndKey getIssuerHashNameAndKey(final HashAlgoType hashAlgo) {
+        return issuerHashMap.get(hashAlgo);
+    }
 }

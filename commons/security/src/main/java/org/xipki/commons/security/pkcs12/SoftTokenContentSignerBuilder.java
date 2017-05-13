@@ -288,7 +288,7 @@ public class SoftTokenContentSignerBuilder {
 
     public ConcurrentContentSigner createSigner(final AlgorithmIdentifier signatureAlgId,
             final int parallelism, final SecureRandom random)
-            throws OperatorCreationException, NoSuchPaddingException {
+            throws XiSecurityException, NoSuchPaddingException {
         ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
@@ -303,7 +303,7 @@ public class SoftTokenContentSignerBuilder {
             try {
                 algoName = AlgorithmUtil.getSignatureAlgoName(signatureAlgId);
             } catch (NoSuchAlgorithmException ex) {
-                throw new OperatorCreationException(ex.getMessage());
+                throw new XiSecurityException(ex.getMessage());
             }
 
             boolean useGivenProvider = true;
@@ -311,7 +311,7 @@ public class SoftTokenContentSignerBuilder {
             if (algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS)) {
                 BcContentSignerBuilder signerBuilder;
                 if (!(key instanceof RSAPrivateKey)) {
-                    throw new OperatorCreationException("unsupported key "
+                    throw new XiSecurityException("unsupported key "
                             + key.getClass().getName() + " for RSAPSS");
                 }
 
@@ -377,13 +377,13 @@ public class SoftTokenContentSignerBuilder {
                     signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId,
                             AlgorithmUtil.isDSAPlainSigAlg(signatureAlgId));
                 } else {
-                    throw new OperatorCreationException("unsupported key "
+                    throw new XiSecurityException("unsupported key "
                             + key.getClass().getName());
                 }
             } catch (InvalidKeyException ex) {
-                throw new OperatorCreationException("invalid key", ex);
+                throw new XiSecurityException("invalid key", ex);
             } catch (NoSuchAlgorithmException ex) {
-                throw new OperatorCreationException("no such algorithm", ex);
+                throw new XiSecurityException("no such algorithm", ex);
             }
 
             for (int i = 0; i < parallelism; i++) {
@@ -391,12 +391,23 @@ public class SoftTokenContentSignerBuilder {
                     signerBuilder.setSecureRandom(random);
                 }
 
-                ContentSigner signer = signerBuilder.build(keyparam);
+                ContentSigner signer;
+                try {
+                    signer = signerBuilder.build(keyparam);
+                } catch (OperatorCreationException ex) {
+                    throw new XiSecurityException("operator creation error", ex);
+                }
                 signers.add(signer);
             }
         }
 
-        ConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, key);
+        ConcurrentContentSigner concurrentSigner;
+        try {
+            concurrentSigner = new DefaultConcurrentContentSigner(signers, key);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new XiSecurityException(ex.getMessage(), ex);
+        }
+
         if (certificateChain != null) {
             concurrentSigner.setCertificateChain(certificateChain);
         } else {

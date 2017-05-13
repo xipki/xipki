@@ -58,6 +58,8 @@
       <column name="CERT" type="VARCHAR(4000)">
         <constraints nullable="false"/>
       </column>
+      <column name="CRL_INFO" type="VARCHAR(1000)"
+          remarks="CRL information if this issuer is imported from a CRL"/>
     </createTable>
     <!-- table CERT -->
     <createTable tableName="CERT"
@@ -79,11 +81,9 @@
       </column>
       <column name="NBEFORE" type="BIGINT"
           remarks="notBefore of certificate, seconds since January 1, 1970, 00:00:00 GMT">
-        <constraints nullable="false"/>
       </column>
       <column name="NAFTER" type="BIGINT"
           remarks="notAfter of certificate, seconds since January 1, 1970, 00:00:00 GMT">
-        <constraints nullable="false"/>
       </column>
       <column name="REV" type="SMALLINT"
           remarks="whether the certificate is revoked">

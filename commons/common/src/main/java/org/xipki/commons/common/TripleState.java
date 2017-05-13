@@ -32,7 +32,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.mgmt.api;
+package org.xipki.commons.common;
 
 import org.xipki.commons.common.util.ParamUtil;
 

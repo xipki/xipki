@@ -913,8 +913,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             }
         }
 
-        LOG.info("stopped CA system");
         auditLogPciEvent(true, "SHUTDOWN");
+        LOG.info("stopped CA system");
     } // method shutdown
 
     @Override

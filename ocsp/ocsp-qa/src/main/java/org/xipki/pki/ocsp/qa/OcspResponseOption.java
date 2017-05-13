@@ -34,9 +34,12 @@
 
 package org.xipki.pki.ocsp.qa;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.commons.common.util.StringUtil;
+import org.xipki.commons.security.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao
@@ -104,8 +107,12 @@ public class OcspResponseOption {
         return signatureAlgName;
     }
 
-    public void setSignatureAlgName(final String signatureAlgName) {
-        this.signatureAlgName = signatureAlgName;
+    public void setSignatureAlgName(final String signatureAlgName) throws NoSuchAlgorithmException {
+        if (StringUtil.isBlank(signatureAlgName)) {
+            this.signatureAlgName = null;
+        } else {
+            this.signatureAlgName = AlgorithmUtil.canonicalizeSignatureAlgo(signatureAlgName);
+        }
     }
 
 }

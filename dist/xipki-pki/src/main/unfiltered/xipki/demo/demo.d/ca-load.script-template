@@ -7,8 +7,18 @@ feature:install -r xipki-database-tool
 echo "Sleeping 1 second"
 sleep 1
 
-xipki-db:initdb \
+xipki-db:initdb-pki \
   --force
+
+xipki-db:initdb \
+  --force \
+  --db-conf  xipki/ocsp-config/ocsp-cache-db.properties \
+  --db-schema xipki/sql/ocsp-cache-init.xml
+
+xipki-db:initdb \
+  --force \
+  --db-conf  xipki/ocsp-config/ocsp-crl-db.properties \
+  --db-schema xipki/sql/ocsp-init.xml
 
 feature:uninstall xipki-database-tool
 

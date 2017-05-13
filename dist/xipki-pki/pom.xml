@@ -105,6 +105,7 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
+              <outputDirectory>${output.directory}/xipki</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.pki</groupId>
@@ -112,7 +113,13 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>sql/**</includes>
-                  <outputDirectory>${output.directory}/xipki</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.pki</groupId>
+                  <artifactId>ocsp-server</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>sql/**</includes>
                 </artifactItem>
               </artifactItems>
             </configuration>

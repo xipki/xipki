@@ -6,10 +6,11 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   targetNamespace="http://xipki.org/pki/ocsp/conf/v2"
   elementFormDefault="qualified">
-  <!-- CertStore -->
+  <!-- Root Element -->
   <xs:element name="OCSPServer">
     <xs:complexType>
       <xs:all>
+        <xs:element name="responseCache" type="responseCacheType" minOccurs="0"/>
         <xs:element name="responders" type="respondersType"/>
         <xs:element name="signers" type="signersType"/>
         <xs:element name="stores" type="storesType"/>
@@ -19,8 +20,18 @@
         <xs:element name="auditOptions" type="auditOptionsType" minOccurs="0"/>
         <xs:element name="certprofileOptions" type="certprofileOptionsType" minOccurs="0"/>
       </xs:all>
+      <xs:attribute name="master" type="xs:boolean" use="required"/>
     </xs:complexType>
   </xs:element>
+  <!-- Response Cache -->
+  <xs:complexType name="responseCacheType">
+    <xs:all>
+      <!-- Database to store the cached OCSP response -->
+      <xs:element name="datasource" type="datasourceType"/>
+      <!-- how long in seconds the response should be cached -->
+      <xs:element name="validity" type="xs:int" default="86400" />
+    </xs:all>
+  </xs:complexType>
   <!-- Responders -->
   <xs:complexType name="respondersType">
     <xs:sequence>
@@ -109,10 +120,23 @@
             The default is false.
           </xs:documentation>
         </xs:annotation>
-      </xs:element>    
-      <xs:element name="maxRequestSize" type="xs:int" minOccurs="0"/>
-      <xs:element name="versions" type="versionsType" minOccurs="0"/>
-      <xs:element name="nonce" type="nonceType" minOccurs="0"/>
+      </xs:element>
+      <xs:element name="maxRequestListCount" type="xs:int">
+        <xs:annotation>
+          <xs:documentation>
+            Maximal count of entries contained in one RequestList.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="maxRequestSize" type="xs:int">
+        <xs:annotation>
+          <xs:documentation>
+            Maximal size in byte of a request
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="versions" type="versionsType"/>
+      <xs:element name="nonce" type="nonceType"/>
       <xs:element name="signatureRequired" type="xs:boolean"/>
       <xs:element name="validateSignature" type="xs:boolean"/>
       <xs:element name="hashAlgorithms" minOccurs="0">
@@ -201,7 +225,8 @@
   </xs:complexType>
   <xs:complexType name="nonceType">
     <xs:all>
-      <xs:element name="required" type="xs:boolean"/>
+      <!-- valid values are forbidden, optional and required -->
+      <xs:element name="occurrence" type="xs:string"/>
       <xs:element name="minLen" type="xs:int" minOccurs="0"/>
       <xs:element name="maxLen" type="xs:int" minOccurs="0"/>
     </xs:all>
@@ -337,7 +362,13 @@
   </xs:complexType>
   <xs:complexType name="versionsType">
     <xs:sequence>
-      <xs:element name="version" type="xs:int" maxOccurs="unbounded"/>
+      <xs:element name="version" type="xs:string" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            version of the request, current support values are v1.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>      
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="fileOrValueType">

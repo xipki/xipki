@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<OCSPServer xmlns="http://xipki.org/pki/ocsp/conf/v2">
+<OCSPServer master="true" xmlns="http://xipki.org/pki/ocsp/conf/v2">
+  <!-- responseCache -->
+  <responseCache>
+    <datasource name="datasource-cache">
+      <conf>
+        <file>xipki/ocsp-config/ocsp-cache-db.properties</file>
+      </conf>
+    </datasource>
+    <!-- how long (in seconds) the response will be cached in database -->
+    <validity>86400</validity>
+  </responseCache>
   <!-- responders -->
   <responders>
     <responder name="responder1">
@@ -42,6 +52,11 @@
         <file>xipki/ca-config/ocsp-db.properties</file>
       </conf>
     </datasource>
+    <datasource name="datasource-crl">
+      <conf>
+        <file>xipki/ocsp-config/ocsp-crl-db.properties</file>
+      </conf>
+    </datasource>
   </datasources>
   <!-- stores -->
   <stores>
@@ -69,18 +84,20 @@
     <store name="crlstore1">
       <source>
         <type>CRL</type>
+        <datasource>datasource-crl</datasource>
         <conf>
 # CRL file
+#
+# The optional file ${crl.file}.revocation contains the revocation information of the CA itself.
+#
+# Just create the file ${crl.file}.UPDATEME to tell responder to update the CRL.
+# 
 # required
 crl.file = output/SubCAwithCRL1.crl
 
 # CRL url
 # optional, default is none
 crl.url = http://example.org/crl
-
-# DeltaCRL file
-# optional. Default is none
-#deltaCrl.file = ...;
 
 # Where use thisUpdate and nextUpdate of CRL in the corresponding fields
 # of OCSP response. The default value is true.
@@ -93,10 +110,6 @@ caCert.file = output/SubCAwithCRL1.der
 # certificate used to verify the CRL signature.
 # Required for indirect CRL, otherwise optional
 #issuerCert.file = ...
-
-# When CA certificate is revoked. UTC DateTime yyyyMMddhhmmss, e.g. 20160418165058
-# optional, but required if CA is revoked.
-# caRevocation.time = 201604181650
 
 # Folder containing the DER-encoded certificates suffixed with ".der" and ".crt"
 # optional.
@@ -115,8 +128,14 @@ certs.dir = output
   <requestOptions>
     <requestOption name="request1">
       <supportsHttpGet>true</supportsHttpGet>
+      <maxRequestListCount>10</maxRequestListCount>
+      <maxRequestSize>4096</maxRequestSize>
+      <versions>
+        <version>v1</version>
+      </versions>
       <nonce>
-        <required>false</required>
+        <!-- valid values are optionl, required and forbidden -->
+        <occurrence>optional</occurrence>
         <minLen>4</minLen>
         <maxLen>32</maxLen>
       </nonce>

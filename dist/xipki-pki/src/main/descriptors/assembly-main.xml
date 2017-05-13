@@ -26,6 +26,18 @@
       <destName>ocsp-db.properties</destName>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>${output.directory}/xipki/ocsp-config/example/ocsp-cache-db.properties-hsqldb</source>
+      <outputDirectory>xipki/ocsp-config</outputDirectory>
+      <destName>ocsp-cache-db.properties</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${output.directory}/xipki/ocsp-config/example/ocsp-crl-db.properties-hsqldb</source>
+      <outputDirectory>xipki/ocsp-config</outputDirectory>
+      <destName>ocsp-crl-db.properties</destName>
+      <fileMode>0644</fileMode>
+    </file>
   </files>
   <componentDescriptors>
     <componentDescriptor>${shared.dir}/descriptors/component-common.xml</componentDescriptor>

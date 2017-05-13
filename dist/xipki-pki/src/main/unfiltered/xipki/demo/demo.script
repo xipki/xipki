@@ -237,6 +237,11 @@ if { $printUsage equals "true" } {
 
   source file:./xipki/demo/rest.script
 
+  # Force the OCSP responder to import the CRL to database
+  xipki-cmd:copy-file -f \
+    xipki/ocsp-config/example/foo.crl.UPDATEME \
+    output/SubCAwithCRL1.crl.UPDATEME 
+  
   feature:install -r xipki-ocspserver
 
   source file:./xipki/demo/ocsp.script

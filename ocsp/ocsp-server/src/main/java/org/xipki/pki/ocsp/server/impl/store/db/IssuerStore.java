@@ -50,9 +50,9 @@ import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
 
 public class IssuerStore {
 
-    private final Set<Integer> ids;
-
     private final List<IssuerEntry> entries;
+
+    private Set<Integer> ids;
 
     public IssuerStore(final List<IssuerEntry> entries) {
         this.entries = new ArrayList<>(entries.size());
@@ -113,6 +113,13 @@ public class IssuerStore {
             ret.addAll(issuerEntry.getIssuerHashNameAndKeys());
         }
         return ret;
+    }
+
+    public void addIssuer(IssuerEntry issuer) {
+        this.entries.add(issuer);
+        Set<Integer> newIds = new HashSet<>(this.ids);
+        newIds.add(issuer.getId());
+        this.ids = Collections.unmodifiableSet(newIds);
     }
 
 }

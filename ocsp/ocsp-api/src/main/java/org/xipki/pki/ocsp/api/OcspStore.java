@@ -35,6 +35,7 @@
 package org.xipki.pki.ocsp.api;
 
 import java.math.BigInteger;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Set;
 
@@ -78,6 +79,9 @@ public abstract class OcspStore {
     public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
 
     public abstract boolean canResolveIssuer(@NonNull HashAlgoType hashAlgo,
+            @NonNull byte[] issuerNameHash, @NonNull byte[] issuerKeyHash);
+
+    public abstract X509Certificate getIssuerCert(@NonNull HashAlgoType hashAlgo,
             @NonNull byte[] issuerNameHash, @NonNull byte[] issuerKeyHash);
 
     public abstract CertStatusInfo getCertStatus(@NonNull Date time, @NonNull HashAlgoType hashAlgo,

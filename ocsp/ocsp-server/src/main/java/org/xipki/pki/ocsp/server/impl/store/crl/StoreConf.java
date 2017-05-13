@@ -36,10 +36,8 @@ package org.xipki.pki.ocsp.server.impl.store.crl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Properties;
 
-import org.xipki.commons.common.util.DateUtil;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.pki.ocsp.api.OcspStoreException;
 
@@ -61,11 +59,6 @@ class StoreConf {
     private static final String KEY_crl_url = "crl.url";
 
     /*
-     * optional
-     */
-    private static final String KEY_deltaCrl_file = "deltaCrl.file";
-
-    /*
      * Whether thisUpdate and nextUpdate of CRL are used in the corresponding fields
      * of OCSP response. The default value is true.
      *
@@ -84,12 +77,6 @@ class StoreConf {
     private static final String KEY_issuerCert_file = "issuerCert.file";
 
     /*
-     * When CA certificate is revoked. UTC dateTime yyyyMMddThhmmss, e.g. 20160418165058
-     * optional
-     */
-    private static final String KEY_caRevocation_time = "caRevocation.time";
-
-    /*
      * Folder containing the DER-encoded certificates suffixed with ".der" and ".crt"
      * optional.
      */
@@ -102,11 +89,6 @@ class StoreConf {
      */
     private String crlUrl;
 
-    /*
-     * optional, can be null
-     */
-    private String deltaCrlFile;
-
     private boolean useUpdateDatesFromCrl = true;
 
     private String caCertFile;
@@ -115,11 +97,6 @@ class StoreConf {
      * optional, can be null, but required for indirect CRL
      */
     private String issuerCertFile;
-
-    /*
-     * optional, can be null
-     */
-    private Date caRevocationTime;
 
     /*
      * optional, can be null
@@ -136,7 +113,6 @@ class StoreConf {
 
         this.crlFile = getRequiredProperty(props, KEY_crl_file);
         this.crlUrl = getOptionalProperty(props, KEY_crl_url);
-        this.deltaCrlFile = getOptionalProperty(props, KEY_deltaCrl_file);
         this.caCertFile = getRequiredProperty(props, KEY_caCert_file);
         this.issuerCertFile = getOptionalProperty(props, KEY_issuerCert_file);
         this.certsDir = getOptionalProperty(props, KEY_certs_dir);
@@ -156,12 +132,6 @@ class StoreConf {
         } else {
             this.useUpdateDatesFromCrl = true;
         }
-
-        propKey = KEY_caRevocation_time;
-        propValue = props.getProperty(propKey);
-        if (propValue != null) {
-            this.caRevocationTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(propValue);
-        }
     }
 
     String getCrlFile() {
@@ -170,10 +140,6 @@ class StoreConf {
 
     String getCrlUrl() {
         return crlUrl;
-    }
-
-    String getDeltaCrlFile() {
-        return deltaCrlFile;
     }
 
     boolean isUseUpdateDatesFromCrl() {
@@ -186,10 +152,6 @@ class StoreConf {
 
     String getIssuerCertFile() {
         return issuerCertFile;
-    }
-
-    Date getCaRevocationTime() {
-        return caRevocationTime;
     }
 
     String getCertsDir() {
