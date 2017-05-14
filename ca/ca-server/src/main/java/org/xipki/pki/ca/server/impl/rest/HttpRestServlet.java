@@ -350,14 +350,18 @@ public class HttpRestServlet extends HttpServlet {
                     CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED
                             : CrlReason.forNameOrText(strReason);
 
-                    Date invalidityTime = null;
-                    String strInvalidityTime = request.getParameter(
-                            RestfulAPIConstants.PARAM_invalidity_time);
-                    if (StringUtil.isNotBlank(strInvalidityTime)) {
-                        invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
-                    }
+                    if (reason == CrlReason.REMOVE_FROM_CRL) {
+                        ca.unrevokeCertificate(serialNumber, msgId);
+                    } else {
+                        Date invalidityTime = null;
+                        String strInvalidityTime = request.getParameter(
+                                RestfulAPIConstants.PARAM_invalidity_time);
+                        if (StringUtil.isNotBlank(strInvalidityTime)) {
+                            invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
+                        }
 
-                    ca.revokeCertificate(serialNumber, reason, invalidityTime, msgId);
+                        ca.revokeCertificate(serialNumber, reason, invalidityTime, msgId);
+                    }
                 } else if (RestfulAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
                     ca.removeCertificate(serialNumber, msgId);
                 }
