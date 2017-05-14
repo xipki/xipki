@@ -64,6 +64,7 @@ import org.xipki.commons.common.util.LogUtil;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
+import org.xipki.commons.datasource.springframework.dao.DataIntegrityViolationException;
 import org.xipki.commons.security.AlgorithmCode;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.util.X509Util;
@@ -88,10 +89,11 @@ class ResponseCacher {
 
     private static final String SQL_DELETE_EXPIRED_RESP = "DELETE FROM OCSP WHERE THIS_UPDATE<?";
 
-    private static final String SQL_DELETE_RESP = "DELETE FROM OCSP WHERE ID=?";
-
     private static final String SQL_ADD_RESP = "INSERT INTO OCSP (ID,IID,IDENT,"
             + "THIS_UPDATE,NEXT_UPDATE,RESP) VALUES (?,?,?,?,?,?)";
+
+    private static final String SQL_UPDATE_RESP = "UPDATE OCSP SET THIS_UPDATE=?,"
+            + "NEXT_UPDATE=?,RESP=? WHERE ID=?";
 
     private final BlockingDeque<Digest> idDigesters;
 
@@ -263,18 +265,17 @@ class ResponseCacher {
             throws DataAccessException {
         final String sql = sqlSelectOcsp;
         String ident = buildIdent(serialNumber, sigAlg, certHashAlg);
-        Long id = deriveId(issuerId, ident);
-        if (id == null) {
-            return null;
-        }
-
+        long id = deriveId(issuerId, ident);
         PreparedStatement ps = prepareStatement(sql);
         ResultSet rs = null;
-        long minNextUpdate = 0;
+
         try {
             ps.setLong(1, id);
             rs = ps.executeQuery();
             if (!rs.next()) {
+                // TODO: delete log
+                LOG.warn("TBD: NO ENTRY id {}, issuer {}, ident {}, serial {}, sigAlg, hashAlg",
+                        id, issuerId, ident, serialNumber, sigAlg, certHashAlg);
                 return null;
             }
 
@@ -290,10 +291,8 @@ class ResponseCacher {
 
             long nextUpdate = rs.getLong("NEXT_UPDATE");
             if (nextUpdate != 0) {
-                if (minNextUpdate == 0) {
-                    // nextUpdate must be at least in 600 seconds
-                    minNextUpdate = System.currentTimeMillis() / 1000 + 600;
-                }
+                // nextUpdate must be at least in 600 seconds
+                long minNextUpdate = System.currentTimeMillis() / 1000 + 600;
 
                 if (nextUpdate < minNextUpdate) {
                     return null;
@@ -335,27 +334,14 @@ class ResponseCacher {
                 return;
             }
 
-            Long id = deriveId(issuerId, ident);
-            if (id == null) {
-                return;
-            }
+            long id = deriveId(issuerId, ident);
 
             Connection conn = datasource.getConnection();
             try {
-                // delete first
-                String sql = SQL_DELETE_RESP;
+                String sql = SQL_ADD_RESP;
                 PreparedStatement ps = datasource.prepareStatement(conn, sql);
-                try {
-                    ps.setLong(1, id);
-                    ps.executeUpdate();
-                } catch (SQLException ex) {
-                    throw datasource.translate(sql, ex);
-                } finally {
-                    datasource.releaseResources(ps, null, false);
-                }
 
-                sql = SQL_ADD_RESP;
-                ps = datasource.prepareStatement(conn, sql);
+                Boolean dataIntegrityViolationException = null;
                 try {
                     int idx = 1;
                     ps.setLong(idx++, id);
@@ -368,8 +354,36 @@ class ResponseCacher {
                         ps.setNull(idx++, java.sql.Types.BIGINT);
                     }
                     ps.setString(idx++, Base64.toBase64String(encodedResp));
-
                     ps.execute();
+                } catch (SQLException ex) {
+                    DataAccessException dex = datasource.translate(sql, ex);
+                    if (dex instanceof DataIntegrityViolationException) {
+                        dataIntegrityViolationException = Boolean.TRUE;
+                    } else {
+                        throw dex;
+                    }
+                } finally {
+                    datasource.releaseResources(ps, null, false);
+                }
+
+                if (dataIntegrityViolationException == null) {
+                    LOG.debug("added cached OCSP response iid={}, ident={}", issuerId, ident);
+                    return;
+                }
+
+                sql = SQL_UPDATE_RESP;
+                ps = datasource.prepareStatement(conn, sql);
+                try {
+                    int idx = 1;
+                    ps.setLong(idx++, thisUpdate);
+                    if (nextUpdate != null && nextUpdate > 0) {
+                        ps.setLong(idx++, nextUpdate);
+                    } else {
+                        ps.setNull(idx++, java.sql.Types.BIGINT);
+                    }
+                    ps.setString(idx++, Base64.toBase64String(encodedResp));
+                    ps.setLong(idx++, id);
+                    ps.executeUpdate();
                 } catch (SQLException ex) {
                     throw datasource.translate(sql, ex);
                 } finally {
@@ -378,7 +392,6 @@ class ResponseCacher {
             } finally {
                 datasource.returnConnection(conn);
             }
-            LOG.debug("cached OCSP response iid={}, ident={}", issuerId, ident);
         } catch (DataAccessException ex) {
             LogUtil.error(LOG, ex,
                 "could not cache OCSP response iid=" + issuerId + ", ident=" + ident);
@@ -552,31 +565,27 @@ class ResponseCacher {
         return Hex.toHexString(snBytes);
     }
 
-    private Long deriveId(int issuerId, String ident) {
+    private long deriveId(int issuerId, String ident) {
         Digest digest = null;
         try {
             digest = idDigesters.poll(10, TimeUnit.SECONDS);
-        } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
-            return null;
+        } catch (InterruptedException ex) {
+            digest = HashAlgoType.SHA1.createDigest();
         }
 
+        byte[] hash = new byte[20];
         try {
             digest.update(intToBytes(issuerId), 0, 2);
             byte[] bytes = ident.getBytes();
             digest.update(bytes, 0, bytes.length);
-
+            digest.doFinal(hash, 0);
         } finally {
             idDigesters.addLast(digest);
         }
 
-        byte[] hash = new byte[20];
-        digest.doFinal(hash, 0);
-
         byte[] hiBytes = new byte[8];
         System.arraycopy(hash, 0, hiBytes, 0, 8);
-        BigInteger bi = new BigInteger(1, hiBytes);
-        bi = bi.clearBit(63);
-        return bi.longValue();
+        return new BigInteger(1, hiBytes).clearBit(63).longValue();
     }
 
     private static byte[] intToBytes(int value) {

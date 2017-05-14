@@ -826,10 +826,12 @@ public class OcspServer {
                             cacheDbIssuerId.intValue(), cacheDbSerialNumber, cacheDbSigAlgCode,
                             cacheDbCertHashAlgCode);
                     if (cachedResp != null) {
-                        // found cached response
-                        LOG.debug("use cached response for (cacheIssuer={} and serial={}",
+                        LOG.debug("use cached response for (cacheIssuer={} and serial={})",
                                 cacheDbIssuerId, cacheDbSerialNumber);
                         return cachedResp;
+                    } else {
+                        LOG.debug("found no cached response for (cacheIssuer={} and serial={})",
+                                cacheDbIssuerId, cacheDbSerialNumber);
                     }
                 } else if (master) {
                     // store the issuer certificate in cache database.
