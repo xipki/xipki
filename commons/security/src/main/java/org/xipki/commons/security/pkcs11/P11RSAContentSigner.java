@@ -54,6 +54,8 @@ import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.util.SignerUtil;
 
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -110,38 +112,38 @@ class P11RSAContentSigner implements ContentSigner {
 
         P11SlotIdentifier slotId = identityId.getSlotId();
         P11Slot slot = cryptService.getSlot(slotId);
-        if (slot.supportsMechanism(P11Constants.CKM_RSA_PKCS)) {
-            this.mechanism = P11Constants.CKM_RSA_PKCS;
-        } else if (slot.supportsMechanism(P11Constants.CKM_RSA_X_509)) {
-            this.mechanism = P11Constants.CKM_RSA_X_509;
+        if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_PKCS)) {
+            this.mechanism = PKCS11Constants.CKM_RSA_PKCS;
+        } else if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_X_509)) {
+            this.mechanism = PKCS11Constants.CKM_RSA_X_509;
         } else {
             switch (hashAlgo) {
             case SHA1:
-                this.mechanism = P11Constants.CKM_SHA1_RSA_PKCS;
+                this.mechanism = PKCS11Constants.CKM_SHA1_RSA_PKCS;
                 break;
             case SHA224:
-                this.mechanism = P11Constants.CKM_SHA224_RSA_PKCS;
+                this.mechanism = PKCS11Constants.CKM_SHA224_RSA_PKCS;
                 break;
             case SHA256:
-                this.mechanism = P11Constants.CKM_SHA256_RSA_PKCS;
+                this.mechanism = PKCS11Constants.CKM_SHA256_RSA_PKCS;
                 break;
             case SHA384:
-                this.mechanism = P11Constants.CKM_SHA384_RSA_PKCS;
+                this.mechanism = PKCS11Constants.CKM_SHA384_RSA_PKCS;
                 break;
             case SHA512:
-                this.mechanism = P11Constants.CKM_SHA512_RSA_PKCS;
+                this.mechanism = PKCS11Constants.CKM_SHA512_RSA_PKCS;
                 break;
             case SHA3_224:
-                this.mechanism = P11Constants.CKM_SHA3_224_RSA_PKCS;
+                this.mechanism = PKCS11Constants.CKM_SHA3_224_RSA_PKCS;
                 break;
             case SHA3_256:
-                this.mechanism = P11Constants.CKM_SHA3_256_RSA_PKCS;
+                this.mechanism = PKCS11Constants.CKM_SHA3_256_RSA_PKCS;
                 break;
             case SHA3_384:
-                this.mechanism = P11Constants.CKM_SHA3_384_RSA_PKCS;
+                this.mechanism = PKCS11Constants.CKM_SHA3_384_RSA_PKCS;
                 break;
             case SHA3_512:
-                this.mechanism = P11Constants.CKM_SHA3_512_RSA_PKCS;
+                this.mechanism = PKCS11Constants.CKM_SHA3_512_RSA_PKCS;
                 break;
             default:
                 throw new RuntimeException("should not reach here, unknown HashAlgoType "
@@ -153,7 +155,8 @@ class P11RSAContentSigner implements ContentSigner {
             }
         }
 
-        if (mechanism == P11Constants.CKM_RSA_PKCS || mechanism == P11Constants.CKM_RSA_X_509) {
+        if (mechanism == PKCS11Constants.CKM_RSA_PKCS
+                || mechanism == PKCS11Constants.CKM_RSA_X_509) {
             this.digestPkcsPrefix = SignerUtil.getDigestPkcsPrefix(hashAlgo);
             Digest digest = SignerUtil.getDigest(hashAlgo);
             this.outputStream = new DigestOutputStream(digest);
@@ -196,7 +199,7 @@ class P11RSAContentSigner implements ContentSigner {
         }
 
         try {
-            if (mechanism == P11Constants.CKM_RSA_X_509) {
+            if (mechanism == PKCS11Constants.CKM_RSA_X_509) {
                 dataToSign = SignerUtil.EMSA_PKCS1_v1_5_encoding(dataToSign, modulusBitLen);
             }
 

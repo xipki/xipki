@@ -67,7 +67,6 @@ import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.pkcs11.AbstractP11Slot;
-import org.xipki.commons.security.pkcs11.P11Constants;
 import org.xipki.commons.security.pkcs11.P11EntityIdentifier;
 import org.xipki.commons.security.pkcs11.P11Identity;
 import org.xipki.commons.security.pkcs11.P11MechanismFilter;
@@ -76,6 +75,7 @@ import org.xipki.commons.security.pkcs11.P11Params;
 import org.xipki.commons.security.pkcs11.P11RSAPkcsPssParams;
 import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 import org.xipki.commons.security.pkcs11.P11SlotRefreshResult;
+import org.xipki.commons.security.pkcs11.Pkcs11Functions;
 import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.X509Util;
 
@@ -101,6 +101,7 @@ import iaik.pkcs.pkcs11.objects.RSAPublicKey;
 import iaik.pkcs.pkcs11.objects.Storage;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 import iaik.pkcs.pkcs11.parameters.RSAPkcsPssParameters;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
 /**
@@ -504,9 +505,9 @@ class IaikP11Slot extends AbstractP11Slot {
         }
 
         try {
-            if (userType == P11Constants.CKU_USER) {
+            if (userType == PKCS11Constants.CKU_USER) {
                 session.login(Session.UserType.USER, tmpPin);
-            } else if (userType == P11Constants.CKU_SO) {
+            } else if (userType == PKCS11Constants.CKU_SO) {
                 session.login(Session.UserType.SO, tmpPin);
             } else {
                 session.login(userType, tmpPin);
@@ -833,14 +834,14 @@ class IaikP11Slot extends AbstractP11Slot {
             final String label) throws P11TokenException {
         RSAPrivateKey privateKey = new RSAPrivateKey();
         RSAPublicKey publicKey = new RSAPublicKey();
-        setKeyAttributes(label, P11Constants.CKK_RSA, publicKey, privateKey);
+        setKeyAttributes(label, PKCS11Constants.CKK_RSA, publicKey, privateKey);
 
         publicKey.getModulusBits().setLongValue((long) keysize);
         if (publicExponent != null) {
             publicKey.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
         }
 
-        return generateKeyPair(P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN, privateKey, publicKey);
+        return generateKeyPair(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN, privateKey, publicKey);
     }
 
     @Override
@@ -850,12 +851,12 @@ class IaikP11Slot extends AbstractP11Slot {
     // CHECKSTYLE:ON
         DSAPrivateKey privateKey = new DSAPrivateKey();
         DSAPublicKey publicKey = new DSAPublicKey();
-        setKeyAttributes(label, P11Constants.CKK_DSA, publicKey, privateKey);
+        setKeyAttributes(label, PKCS11Constants.CKK_DSA, publicKey, privateKey);
 
         publicKey.getPrime().setByteArrayValue(p.toByteArray());
         publicKey.getSubprime().setByteArrayValue(q.toByteArray());
         publicKey.getBase().setByteArrayValue(g.toByteArray());
-        return generateKeyPair(P11Constants.CKM_DSA_KEY_PAIR_GEN, privateKey, publicKey);
+        return generateKeyPair(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN, privateKey, publicKey);
     }
 
     @Override
@@ -863,7 +864,7 @@ class IaikP11Slot extends AbstractP11Slot {
             final String label) throws P11TokenException {
         ECDSAPrivateKey privateKey = new ECDSAPrivateKey();
         ECDSAPublicKey publicKey = new ECDSAPublicKey();
-        setKeyAttributes(label, P11Constants.CKK_EC, publicKey, privateKey);
+        setKeyAttributes(label, PKCS11Constants.CKK_EC, publicKey, privateKey);
         byte[] encodedCurveId;
         try {
             encodedCurveId = curveId.getEncoded();
@@ -872,7 +873,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
         try {
             publicKey.getEcdsaParams().setByteArrayValue(encodedCurveId);
-            return generateKeyPair(P11Constants.CKM_EC_KEY_PAIR_GEN, privateKey, publicKey);
+            return generateKeyPair(PKCS11Constants.CKM_EC_KEY_PAIR_GEN, privateKey, publicKey);
         } catch (P11TokenException ex) {
             X9ECParameters ecParams = ECNamedCurveTable.getByOID(curveId);
             if (ecParams == null) {
@@ -885,7 +886,7 @@ class IaikP11Slot extends AbstractP11Slot {
             } catch (IOException ex2) {
                 throw new P11TokenException(ex.getMessage(), ex);
             }
-            return generateKeyPair(P11Constants.CKM_EC_KEY_PAIR_GEN, privateKey, publicKey);
+            return generateKeyPair(PKCS11Constants.CKM_EC_KEY_PAIR_GEN, privateKey, publicKey);
         }
     }
 
@@ -910,7 +911,7 @@ class IaikP11Slot extends AbstractP11Slot {
                     keypair = session.generateKeyPair(Mechanism.get(mech), publicKey, privateKey);
                 } catch (TokenException ex) {
                     throw new P11TokenException("could not generate keypair "
-                            + P11Constants.getMechanismName(mech), ex);
+                            + Pkcs11Functions.mechanismCodeToString(mech), ex);
                 }
             } finally {
                 returnWritableSession(session);
