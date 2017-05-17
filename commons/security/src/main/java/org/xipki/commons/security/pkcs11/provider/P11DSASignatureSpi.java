@@ -49,8 +49,9 @@ import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.pkcs11.DigestOutputStream;
-import org.xipki.commons.security.pkcs11.P11Constants;
 import org.xipki.commons.security.util.SignerUtil;
+
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * @author Lijun Liao
@@ -178,8 +179,8 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
         }
 
         this.signingKey = (P11PrivateKey) privateKey;
-        if (signingKey.supportsMechanism(P11Constants.CKM_DSA)) {
-            mechanism = P11Constants.CKM_DSA;
+        if (signingKey.supportsMechanism(PKCS11Constants.CKM_DSA)) {
+            mechanism = PKCS11Constants.CKM_DSA;
             if (hashAlgo == null) {
                 outputStream = new ByteArrayOutputStream();
             } else {
@@ -187,32 +188,32 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
             }
         } else {
             if (hashAlgo == HashAlgoType.SHA1
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA1)) {
-                mechanism = P11Constants.CKM_DSA_SHA1;
+                    && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA1)) {
+                mechanism = PKCS11Constants.CKM_DSA_SHA1;
             } else if (hashAlgo == HashAlgoType.SHA224
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA224)) {
-                mechanism = P11Constants.CKM_DSA_SHA224;
+                    && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA224)) {
+                mechanism = PKCS11Constants.CKM_DSA_SHA224;
             } else if (hashAlgo == HashAlgoType.SHA256
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA256)) {
-                mechanism = P11Constants.CKM_DSA_SHA256;
+                    && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA256)) {
+                mechanism = PKCS11Constants.CKM_DSA_SHA256;
             } else if (hashAlgo == HashAlgoType.SHA384
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA384)) {
-                mechanism = P11Constants.CKM_DSA_SHA384;
+                    && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA384)) {
+                mechanism = PKCS11Constants.CKM_DSA_SHA384;
             } else if (hashAlgo == HashAlgoType.SHA512
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA512)) {
-                mechanism = P11Constants.CKM_DSA_SHA512;
+                    && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA512)) {
+                mechanism = PKCS11Constants.CKM_DSA_SHA512;
             } else if (hashAlgo == HashAlgoType.SHA3_224
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA3_224)) {
-                mechanism = P11Constants.CKM_DSA_SHA3_224;
+                    && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_224)) {
+                mechanism = PKCS11Constants.CKM_DSA_SHA3_224;
             } else if (hashAlgo == HashAlgoType.SHA3_256
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA3_256)) {
-                mechanism = P11Constants.CKM_DSA_SHA3_256;
+                    && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_256)) {
+                mechanism = PKCS11Constants.CKM_DSA_SHA3_256;
             } else if (hashAlgo == HashAlgoType.SHA3_384
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA3_384)) {
-                mechanism = P11Constants.CKM_DSA_SHA3_384;
+                    && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_384)) {
+                mechanism = PKCS11Constants.CKM_DSA_SHA3_384;
             } else if (hashAlgo == HashAlgoType.SHA3_512
-                    && signingKey.supportsMechanism(P11Constants.CKM_DSA_SHA3_512)) {
-                mechanism = P11Constants.CKM_DSA_SHA3_512;
+                    && signingKey.supportsMechanism(PKCS11Constants.CKM_DSA_SHA3_512)) {
+                mechanism = PKCS11Constants.CKM_DSA_SHA3_512;
             } else {
                 throw new InvalidKeyException("privateKey and algorithm does not match");
             }

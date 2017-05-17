@@ -103,7 +103,7 @@ public class P11ModuleConf {
                 for (String mechStr : mechType.getMechanism()) {
                     Long mech = null;
                     if (mechStr.startsWith("CKM_")) {
-                        mech = P11Constants.getMechanism(mechStr);
+                        mech = Pkcs11Functions.mechanismStringToCode(mechStr);
                     } else {
                         int radix = 10;
                         String value = mechStr.toLowerCase();

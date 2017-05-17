@@ -69,6 +69,8 @@ import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.commons.security.util.DSAParameterCache;
 import org.xipki.commons.security.util.X509Util;
 
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -238,7 +240,7 @@ public abstract class AbstractP11Slot implements P11Slot {
             List<Long> sortedMechs = new ArrayList<>(mechanisms);
             Collections.sort(sortedMechs);
             for (Long mech : sortedMechs) {
-                sb.append("\t").append(P11Constants.getMechanismDesc(mech)).append("\n");
+                sb.append("\t").append(Pkcs11Functions.getMechanismDesc(mech)).append("\n");
             }
 
             List<P11ObjectIdentifier> ids = getSortedObjectIds(certificates.keySet());
@@ -527,7 +529,7 @@ public abstract class AbstractP11Slot implements P11Slot {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + keysize);
         }
         assertWritable("generateRSAKeypair");
-        assertMechanismSupported(P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
+        assertMechanismSupported(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN);
 
         BigInteger tmpPublicExponent = publicExponent;
         if (tmpPublicExponent == null) {
@@ -549,7 +551,7 @@ public abstract class AbstractP11Slot implements P11Slot {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);
         }
         assertWritable("generateDSAKeypair");
-        assertMechanismSupported(P11Constants.CKM_DSA_KEY_PAIR_GEN);
+        assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
 
         DSAParameterSpec dsaParams = DSAParameterCache.getDSAParameterSpec(plength, qlength,
                 random);
@@ -571,7 +573,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         ParamUtil.requireNonNull("q", q);
         ParamUtil.requireNonNull("g", g);
         assertWritable("generateDSAKeypair");
-        assertMechanismSupported(P11Constants.CKM_DSA_KEY_PAIR_GEN);
+        assertMechanismSupported(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN);
 
         P11Identity identity = doGenerateDSAKeypair(p, q, g, label);
         addIdentity(identity);
@@ -586,7 +588,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         ParamUtil.requireNonBlank("curveNameOrOid", curveNameOrOid);
         ParamUtil.requireNonBlank("label", label);
         assertWritable("generateECKeypair");
-        assertMechanismSupported(P11Constants.CKM_EC_KEY_PAIR_GEN);
+        assertMechanismSupported(PKCS11Constants.CKM_EC_KEY_PAIR_GEN);
 
         ASN1ObjectIdentifier curveId = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveNameOrOid);
         if (curveId == null) {

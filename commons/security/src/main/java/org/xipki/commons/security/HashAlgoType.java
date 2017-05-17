@@ -45,7 +45,8 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.crypto.digests.SHA3Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.pkcs11.P11Constants;
+
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * @author Lijun Liao
@@ -170,23 +171,23 @@ public enum HashAlgoType {
     }
 
     public static HashAlgoType getInstanceForPkcs11HashMech(final long hashMech) {
-        if (hashMech == P11Constants.CKM_SHA_1) {
+        if (hashMech == PKCS11Constants.CKM_SHA_1) {
             return HashAlgoType.SHA1;
-        } else if (hashMech == P11Constants.CKM_SHA224) {
+        } else if (hashMech == PKCS11Constants.CKM_SHA224) {
             return HashAlgoType.SHA224;
-        } else if (hashMech == P11Constants.CKM_SHA256) {
+        } else if (hashMech == PKCS11Constants.CKM_SHA256) {
             return HashAlgoType.SHA256;
-        } else if (hashMech == P11Constants.CKM_SHA384) {
+        } else if (hashMech == PKCS11Constants.CKM_SHA384) {
             return HashAlgoType.SHA384;
-        } else if (hashMech == P11Constants.CKM_SHA512) {
+        } else if (hashMech == PKCS11Constants.CKM_SHA512) {
             return HashAlgoType.SHA512;
-        } else if (hashMech == P11Constants.CKM_SHA3_224) {
+        } else if (hashMech == PKCS11Constants.CKM_SHA3_224) {
             return HashAlgoType.SHA3_224;
-        } else if (hashMech == P11Constants.CKM_SHA3_256) {
+        } else if (hashMech == PKCS11Constants.CKM_SHA3_256) {
             return HashAlgoType.SHA3_256;
-        } else if (hashMech == P11Constants.CKM_SHA3_384) {
+        } else if (hashMech == PKCS11Constants.CKM_SHA3_384) {
             return HashAlgoType.SHA3_384;
-        } else if (hashMech == P11Constants.CKM_SHA3_512) {
+        } else if (hashMech == PKCS11Constants.CKM_SHA3_512) {
             return HashAlgoType.SHA3_512;
         } else {
             return null;
@@ -194,23 +195,23 @@ public enum HashAlgoType {
     }
 
     public static HashAlgoType getInstanceForPkcs11MgfMech(final long hashMech) {
-        if (hashMech == P11Constants.CKG_MGF1_SHA1) {
+        if (hashMech == PKCS11Constants.CKG_MGF1_SHA1) {
             return HashAlgoType.SHA1;
-        } else if (hashMech == P11Constants.CKG_MGF1_SHA224) {
+        } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA224) {
             return HashAlgoType.SHA224;
-        } else if (hashMech == P11Constants.CKG_MGF1_SHA256) {
+        } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA256) {
             return HashAlgoType.SHA256;
-        } else if (hashMech == P11Constants.CKG_MGF1_SHA384) {
+        } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA384) {
             return HashAlgoType.SHA384;
-        } else if (hashMech == P11Constants.CKG_MGF1_SHA512) {
+        } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA512) {
             return HashAlgoType.SHA512;
-        } else if (hashMech == P11Constants.CKG_MGF1_SHA3_224) {
+        } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_224) {
             return HashAlgoType.SHA3_224;
-        } else if (hashMech == P11Constants.CKG_MGF1_SHA3_256) {
+        } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_256) {
             return HashAlgoType.SHA3_256;
-        } else if (hashMech == P11Constants.CKG_MGF1_SHA3_384) {
+        } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_384) {
             return HashAlgoType.SHA3_384;
-        } else if (hashMech == P11Constants.CKG_MGF1_SHA3_512) {
+        } else if (hashMech == PKCS11Constants.CKG_MGF1_SHA3_512) {
             return HashAlgoType.SHA3_512;
         } else {
             return null;

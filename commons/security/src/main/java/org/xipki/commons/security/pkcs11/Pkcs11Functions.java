@@ -32,34 +32,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.exception;
+package org.xipki.commons.security.pkcs11;
 
-import org.xipki.commons.security.pkcs11.P11EntityIdentifier;
-import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
-import org.xipki.commons.security.pkcs11.Pkcs11Functions;
+import org.eclipse.jdt.annotation.NonNull;
+
+import iaik.pkcs.pkcs11.wrapper.Functions;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class P11UnsupportedMechanismException extends P11TokenException {
-
-    private static final long serialVersionUID = 1L;
-
-    public P11UnsupportedMechanismException(final long mechanism, final P11SlotIdentifier slotId) {
-        super("mechanism " + Pkcs11Functions.getMechanismDesc(mechanism)
-            + " is not supported by PKCS11 slot " + slotId);
+public class Pkcs11Functions {
+    public static String mechanismCodeToString(final long mechanism) {
+        return Functions.mechanismCodeToString(mechanism);
     }
 
-    public P11UnsupportedMechanismException(final long mechanism,
-            final P11EntityIdentifier entityId) {
-        super("mechanism " + Pkcs11Functions.getMechanismDesc(mechanism)
-            + " is not supported by PKCS11 entity " + entityId);
+    public static long mechanismStringToCode(@NonNull final String mechanismName) {
+        Long mech = Functions.mechanismStringToCode(mechanismName);
+        return mech == null ? -1 : mech.longValue();
     }
 
-    public P11UnsupportedMechanismException(final String message) {
-        super(message);
+    public static String getMechanismDesc(final long mechanism) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%#08x", mechanism));
+        String name = Functions.mechanismCodeToString(mechanism);
+        if (name != null) {
+            sb.append(" (").append(name).append(")");
+        }
+        return sb.toString();
+    }
+
+    private Pkcs11Functions() {
     }
 
 }

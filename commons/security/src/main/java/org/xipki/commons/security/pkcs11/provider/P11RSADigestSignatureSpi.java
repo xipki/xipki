@@ -49,7 +49,8 @@ import org.bouncycastle.asn1.x509.DigestInfo;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.NullDigest;
 import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.pkcs11.P11Constants;
+
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * @author Lijun Liao
@@ -203,7 +204,7 @@ public class P11RSADigestSignatureSpi extends SignatureSpi {
 
         try {
             byte[] bytes = derEncode(hash);
-            return signingKey.sign(P11Constants.CKM_RSA_PKCS, null, bytes);
+            return signingKey.sign(PKCS11Constants.CKM_RSA_PKCS, null, bytes);
         } catch (ArrayIndexOutOfBoundsException ex) {
             throw new SignatureException("key too small for signature type");
         } catch (Exception ex) {
