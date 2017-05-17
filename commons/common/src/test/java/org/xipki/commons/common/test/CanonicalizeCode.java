@@ -169,7 +169,7 @@ public class CanonicalizeCode {
             newFile.renameTo(file);
             System.out.println(file.getPath().substring(baseDirLen));
         }
-    } // method canonicalizeJavaFile
+    } // method canonicalizeFile
 
     private void checkWarnings() throws Exception {
         checkWarningsInDir(new File(baseDir));
@@ -244,7 +244,7 @@ public class CanonicalizeCode {
             System.out.println("Please check file " + file.getPath().substring(baseDirLen)
                     + ": no authors line");
         }
-    } // method checkWarningsInJavaFile
+    } // method checkWarningsInFile
 
     /**
      * replace tab by 4 spaces, delete white spaces at the end.
@@ -289,7 +289,7 @@ public class CanonicalizeCode {
         }
 
         return ret;
-    } // end canonicalizeJavaLine
+    } // end canonicalizeLine
 
     private static String removeTrailingSpaces(final String line) {
         final int n = line.length();
