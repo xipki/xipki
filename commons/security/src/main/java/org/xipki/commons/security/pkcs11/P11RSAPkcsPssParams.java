@@ -42,6 +42,8 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.commons.security.HashAlgoType;
 
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -89,31 +91,31 @@ public class P11RSAPkcsPssParams implements P11Params {
 
         switch (contentHashAlgo) {
         case SHA1:
-            this.hashAlgorithm = P11Constants.CKM_SHA_1;
+            this.hashAlgorithm = PKCS11Constants.CKM_SHA_1;
             break;
         case SHA224:
-            this.hashAlgorithm = P11Constants.CKM_SHA224;
+            this.hashAlgorithm = PKCS11Constants.CKM_SHA224;
             break;
         case SHA256:
-            this.hashAlgorithm = P11Constants.CKM_SHA256;
+            this.hashAlgorithm = PKCS11Constants.CKM_SHA256;
             break;
         case SHA384:
-            this.hashAlgorithm = P11Constants.CKM_SHA384;
+            this.hashAlgorithm = PKCS11Constants.CKM_SHA384;
             break;
         case SHA512:
-            this.hashAlgorithm = P11Constants.CKM_SHA512;
+            this.hashAlgorithm = PKCS11Constants.CKM_SHA512;
             break;
         case SHA3_224:
-            this.hashAlgorithm = P11Constants.CKM_SHA3_224;
+            this.hashAlgorithm = PKCS11Constants.CKM_SHA3_224;
             break;
         case SHA3_256:
-            this.hashAlgorithm = P11Constants.CKM_SHA3_256;
+            this.hashAlgorithm = PKCS11Constants.CKM_SHA3_256;
             break;
         case SHA3_384:
-            this.hashAlgorithm = P11Constants.CKM_SHA3_384;
+            this.hashAlgorithm = PKCS11Constants.CKM_SHA3_384;
             break;
         case SHA3_512:
-            this.hashAlgorithm = P11Constants.CKM_SHA3_512;
+            this.hashAlgorithm = PKCS11Constants.CKM_SHA3_512;
             break;
         default:
             throw new RuntimeException("should not reach here");
@@ -121,31 +123,31 @@ public class P11RSAPkcsPssParams implements P11Params {
 
         switch (mgfHashAlgo) {
         case SHA1:
-            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA1;
+            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA1;
             break;
         case SHA224:
-            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA224;
+            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA224;
             break;
         case SHA256:
-            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA256;
+            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA256;
             break;
         case SHA384:
-            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA384;
+            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA384;
             break;
         case SHA512:
-            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA512;
+            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA512;
             break;
         case SHA3_224:
-            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA3_224;
+            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_224;
             break;
         case SHA3_256:
-            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA3_256;
+            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_256;
             break;
         case SHA3_384:
-            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA3_384;
+            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_384;
             break;
         case SHA3_512:
-            this.maskGenerationFunction = P11Constants.CKG_MGF1_SHA3_512;
+            this.maskGenerationFunction = PKCS11Constants.CKG_MGF1_SHA3_512;
             break;
         default:
             throw new RuntimeException("should not reach here");

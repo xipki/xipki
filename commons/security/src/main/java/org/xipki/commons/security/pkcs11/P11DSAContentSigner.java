@@ -53,6 +53,7 @@ import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.util.SignerUtil;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * @author Lijun Liao
@@ -94,15 +95,15 @@ class P11DSAContentSigner implements ContentSigner {
         sigAlgHashMap.put(NISTObjectIdentifiers.id_dsa_with_sha3_512.getId(),
                 HashAlgoType.SHA3_512);
 
-        hashMechMap.put(HashAlgoType.SHA1, P11Constants.CKM_DSA_SHA1);
-        hashMechMap.put(HashAlgoType.SHA224, P11Constants.CKM_DSA_SHA224);
-        hashMechMap.put(HashAlgoType.SHA256, P11Constants.CKM_DSA_SHA256);
-        hashMechMap.put(HashAlgoType.SHA384, P11Constants.CKM_DSA_SHA384);
-        hashMechMap.put(HashAlgoType.SHA512, P11Constants.CKM_DSA_SHA512);
-        hashMechMap.put(HashAlgoType.SHA3_224, P11Constants.CKM_DSA_SHA3_224);
-        hashMechMap.put(HashAlgoType.SHA3_256, P11Constants.CKM_DSA_SHA3_256);
-        hashMechMap.put(HashAlgoType.SHA3_384, P11Constants.CKM_DSA_SHA3_384);
-        hashMechMap.put(HashAlgoType.SHA3_512, P11Constants.CKM_DSA_SHA3_512);
+        hashMechMap.put(HashAlgoType.SHA1, PKCS11Constants.CKM_DSA_SHA1);
+        hashMechMap.put(HashAlgoType.SHA224, PKCS11Constants.CKM_DSA_SHA224);
+        hashMechMap.put(HashAlgoType.SHA256, PKCS11Constants.CKM_DSA_SHA256);
+        hashMechMap.put(HashAlgoType.SHA384, PKCS11Constants.CKM_DSA_SHA384);
+        hashMechMap.put(HashAlgoType.SHA512, PKCS11Constants.CKM_DSA_SHA512);
+        hashMechMap.put(HashAlgoType.SHA3_224, PKCS11Constants.CKM_DSA_SHA3_224);
+        hashMechMap.put(HashAlgoType.SHA3_256, PKCS11Constants.CKM_DSA_SHA3_256);
+        hashMechMap.put(HashAlgoType.SHA3_384, PKCS11Constants.CKM_DSA_SHA3_384);
+        hashMechMap.put(HashAlgoType.SHA3_512, PKCS11Constants.CKM_DSA_SHA3_512);
     }
 
     P11DSAContentSigner(final P11CryptService cryptService, final P11EntityIdentifier identityId,
@@ -121,8 +122,8 @@ class P11DSAContentSigner implements ContentSigner {
 
         P11SlotIdentifier slotId = identityId.getSlotId();
         P11Slot slot = cryptService.getSlot(slotId);
-        if (slot.supportsMechanism(P11Constants.CKM_DSA)) {
-            this.mechanism = P11Constants.CKM_DSA;
+        if (slot.supportsMechanism(PKCS11Constants.CKM_DSA)) {
+            this.mechanism = PKCS11Constants.CKM_DSA;
             Digest digest = SignerUtil.getDigest(hashAlgo);
             this.outputStream = new DigestOutputStream(digest);
         } else {

@@ -61,6 +61,8 @@ import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.util.SignerUtil;
 
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -147,13 +149,13 @@ class P11RSAPSSContentSigner implements ContentSigner {
 
         P11SlotIdentifier slotId = identityId.getSlotId();
         P11Slot slot = cryptService.getSlot(slotId);
-        if (slot.supportsMechanism(P11Constants.CKM_RSA_PKCS_PSS)) {
-            this.mechanism = P11Constants.CKM_RSA_PKCS_PSS;
+        if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_PKCS_PSS)) {
+            this.mechanism = PKCS11Constants.CKM_RSA_PKCS_PSS;
             this.parameters = new P11RSAPkcsPssParams(asn1Params);
             Digest digest = SignerUtil.getDigest(hashAlgo);
             this.outputStream = new DigestOutputStream(digest);
-        } else if (slot.supportsMechanism(P11Constants.CKM_RSA_X_509)) {
-            this.mechanism = P11Constants.CKM_RSA_X_509;
+        } else if (slot.supportsMechanism(PKCS11Constants.CKM_RSA_X_509)) {
+            this.mechanism = PKCS11Constants.CKM_RSA_X_509;
             this.parameters = null;
             AsymmetricBlockCipher cipher = new P11PlainRSASigner();
             P11RSAKeyParameter keyParam;
@@ -168,31 +170,31 @@ class P11RSAPSSContentSigner implements ContentSigner {
         } else {
             switch (hashAlgo) {
             case SHA1:
-                this.mechanism = P11Constants.CKM_SHA1_RSA_PKCS_PSS;
+                this.mechanism = PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS;
                 break;
             case SHA224:
-                this.mechanism = P11Constants.CKM_SHA224_RSA_PKCS_PSS;
+                this.mechanism = PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS;
                 break;
             case SHA256:
-                this.mechanism = P11Constants.CKM_SHA256_RSA_PKCS_PSS;
+                this.mechanism = PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS;
                 break;
             case SHA384:
-                this.mechanism = P11Constants.CKM_SHA384_RSA_PKCS_PSS;
+                this.mechanism = PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS;
                 break;
             case SHA512:
-                this.mechanism = P11Constants.CKM_SHA512_RSA_PKCS_PSS;
+                this.mechanism = PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS;
                 break;
             case SHA3_224:
-                this.mechanism = P11Constants.CKM_SHA3_224_RSA_PKCS_PSS;
+                this.mechanism = PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS;
                 break;
             case SHA3_256:
-                this.mechanism = P11Constants.CKM_SHA3_256_RSA_PKCS_PSS;
+                this.mechanism = PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS;
                 break;
             case SHA3_384:
-                this.mechanism = P11Constants.CKM_SHA3_384_RSA_PKCS_PSS;
+                this.mechanism = PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS;
                 break;
             case SHA3_512:
-                this.mechanism = P11Constants.CKM_SHA3_512_RSA_PKCS_PSS;
+                this.mechanism = PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS;
                 break;
             default:
                 throw new RuntimeException("should not reach here, unknown HashAlgoType "

@@ -85,7 +85,6 @@ import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.P11UnknownEntityException;
 import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.pkcs11.AbstractP11Slot;
-import org.xipki.commons.security.pkcs11.P11Constants;
 import org.xipki.commons.security.pkcs11.P11EntityIdentifier;
 import org.xipki.commons.security.pkcs11.P11Identity;
 import org.xipki.commons.security.pkcs11.P11MechanismFilter;
@@ -94,6 +93,8 @@ import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 import org.xipki.commons.security.pkcs11.P11SlotRefreshResult;
 import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.X509Util;
+
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * @author Lijun Liao
@@ -143,55 +144,55 @@ class EmulatorP11Slot extends AbstractP11Slot {
     private static final String PROP_EC_EC_POINT = "ecPoint";
 
     private static final long[] supportedMechs = new long[]{
-        P11Constants.CKM_DSA_KEY_PAIR_GEN,
-        P11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN,
-        P11Constants.CKM_EC_KEY_PAIR_GEN,
+        PKCS11Constants.CKM_DSA_KEY_PAIR_GEN,
+        PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN,
+        PKCS11Constants.CKM_EC_KEY_PAIR_GEN,
 
-        P11Constants.CKM_RSA_X_509,
+        PKCS11Constants.CKM_RSA_X_509,
 
-        P11Constants.CKM_RSA_PKCS,
-        P11Constants.CKM_SHA1_RSA_PKCS,
-        P11Constants.CKM_SHA224_RSA_PKCS,
-        P11Constants.CKM_SHA256_RSA_PKCS,
-        P11Constants.CKM_SHA384_RSA_PKCS,
-        P11Constants.CKM_SHA512_RSA_PKCS,
-        P11Constants.CKM_SHA3_224_RSA_PKCS,
-        P11Constants.CKM_SHA3_256_RSA_PKCS,
-        P11Constants.CKM_SHA3_384_RSA_PKCS,
-        P11Constants.CKM_SHA3_512_RSA_PKCS,
+        PKCS11Constants.CKM_RSA_PKCS,
+        PKCS11Constants.CKM_SHA1_RSA_PKCS,
+        PKCS11Constants.CKM_SHA224_RSA_PKCS,
+        PKCS11Constants.CKM_SHA256_RSA_PKCS,
+        PKCS11Constants.CKM_SHA384_RSA_PKCS,
+        PKCS11Constants.CKM_SHA512_RSA_PKCS,
+        PKCS11Constants.CKM_SHA3_224_RSA_PKCS,
+        PKCS11Constants.CKM_SHA3_256_RSA_PKCS,
+        PKCS11Constants.CKM_SHA3_384_RSA_PKCS,
+        PKCS11Constants.CKM_SHA3_512_RSA_PKCS,
 
-        P11Constants.CKM_RSA_PKCS_PSS,
-        P11Constants.CKM_SHA1_RSA_PKCS_PSS,
-        P11Constants.CKM_SHA224_RSA_PKCS_PSS,
-        P11Constants.CKM_SHA256_RSA_PKCS_PSS,
-        P11Constants.CKM_SHA384_RSA_PKCS_PSS,
-        P11Constants.CKM_SHA512_RSA_PKCS_PSS,
-        P11Constants.CKM_SHA3_224_RSA_PKCS_PSS,
-        P11Constants.CKM_SHA3_256_RSA_PKCS_PSS,
-        P11Constants.CKM_SHA3_384_RSA_PKCS_PSS,
-        P11Constants.CKM_SHA3_512_RSA_PKCS_PSS,
+        PKCS11Constants.CKM_RSA_PKCS_PSS,
+        PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS,
+        PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS,
+        PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS,
+        PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS,
+        PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS,
+        PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS,
+        PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS,
+        PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS,
+        PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS,
 
-        P11Constants.CKM_DSA,
-        P11Constants.CKM_DSA_SHA1,
-        P11Constants.CKM_DSA_SHA224,
-        P11Constants.CKM_DSA_SHA256,
-        P11Constants.CKM_DSA_SHA384,
-        P11Constants.CKM_DSA_SHA512,
-        P11Constants.CKM_DSA_SHA3_224,
-        P11Constants.CKM_DSA_SHA3_256,
-        P11Constants.CKM_DSA_SHA3_384,
-        P11Constants.CKM_DSA_SHA3_512,
+        PKCS11Constants.CKM_DSA,
+        PKCS11Constants.CKM_DSA_SHA1,
+        PKCS11Constants.CKM_DSA_SHA224,
+        PKCS11Constants.CKM_DSA_SHA256,
+        PKCS11Constants.CKM_DSA_SHA384,
+        PKCS11Constants.CKM_DSA_SHA512,
+        PKCS11Constants.CKM_DSA_SHA3_224,
+        PKCS11Constants.CKM_DSA_SHA3_256,
+        PKCS11Constants.CKM_DSA_SHA3_384,
+        PKCS11Constants.CKM_DSA_SHA3_512,
 
-        P11Constants.CKM_ECDSA,
-        P11Constants.CKM_ECDSA_SHA1,
-        P11Constants.CKM_ECDSA_SHA224,
-        P11Constants.CKM_ECDSA_SHA256,
-        P11Constants.CKM_ECDSA_SHA384,
-        P11Constants.CKM_ECDSA_SHA512,
-        P11Constants.CKM_ECDSA_SHA3_224,
-        P11Constants.CKM_ECDSA_SHA3_256,
-        P11Constants.CKM_ECDSA_SHA3_384,
-        P11Constants.CKM_ECDSA_SHA3_512};
+        PKCS11Constants.CKM_ECDSA,
+        PKCS11Constants.CKM_ECDSA_SHA1,
+        PKCS11Constants.CKM_ECDSA_SHA224,
+        PKCS11Constants.CKM_ECDSA_SHA256,
+        PKCS11Constants.CKM_ECDSA_SHA384,
+        PKCS11Constants.CKM_ECDSA_SHA512,
+        PKCS11Constants.CKM_ECDSA_SHA3_224,
+        PKCS11Constants.CKM_ECDSA_SHA3_256,
+        PKCS11Constants.CKM_ECDSA_SHA3_384,
+        PKCS11Constants.CKM_ECDSA_SHA3_512};
 
     private static final FilenameFilter INFO_FILENAME_FILTER = new InfoFilenameFilter();
 
