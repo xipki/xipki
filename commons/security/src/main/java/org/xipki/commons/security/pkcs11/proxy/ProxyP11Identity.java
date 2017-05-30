@@ -45,6 +45,7 @@ import org.xipki.commons.security.pkcs11.P11Identity;
 import org.xipki.commons.security.pkcs11.P11Params;
 import org.xipki.commons.security.pkcs11.P11RSAPkcsPssParams;
 import org.xipki.commons.security.pkcs11.P11Slot;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1DigestSecretKeyTemplate;
 import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11EntityIdentifier;
 import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11Params;
 import org.xipki.commons.security.pkcs11.proxy.msg.Asn1RSAPkcsPssParams;
@@ -56,6 +57,10 @@ import org.xipki.commons.security.pkcs11.proxy.msg.Asn1SignTemplate;
  */
 
 class ProxyP11Identity extends P11Identity {
+
+    ProxyP11Identity(final P11Slot slot, final P11EntityIdentifier entityId) {
+        super(slot, entityId, 0);
+    }
 
     ProxyP11Identity(final P11Slot slot, final P11EntityIdentifier entityId,
             final PublicKey publicKey, final X509Certificate[] certificateChain) {
@@ -75,6 +80,24 @@ class ProxyP11Identity extends P11Identity {
                 content);
         byte[] result = ((ProxyP11Slot) slot).getModule().send(P11ProxyConstants.ACTION_SIGN,
                 signTemplate);
+
+        ASN1OctetString octetString;
+        try {
+            octetString = DEROctetString.getInstance(result);
+        } catch (IllegalArgumentException ex) {
+            throw new P11TokenException("the returned result is not OCTET STRING");
+        }
+
+        return (octetString == null) ? null : octetString.getOctets();
+    }
+
+    @Override
+    protected byte[] doDigestSecretKey(long mechanism) throws P11TokenException {
+        Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
+        Asn1DigestSecretKeyTemplate template = new Asn1DigestSecretKeyTemplate(
+                asn1EntityId, mechanism);
+        byte[] result = ((ProxyP11Slot) slot).getModule().send(
+                P11ProxyConstants.ACTION_DIGEST_SECRETKEY, template);
 
         ASN1OctetString octetString;
         try {

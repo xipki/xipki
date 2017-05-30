@@ -40,6 +40,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.XiSecurityException;
+import org.xipki.commons.security.pkcs11.P11NewKeyControl;
 import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.commons.security.pkcs11.P11Slot;
 import org.xipki.commons.security.shell.KeyGenCommandSupport;
@@ -58,6 +59,10 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
                     + "(required)")
     protected String label;
 
+    @Option(name = "--extractable", aliases = {"-x"},
+            description = "whether the key is extractable")
+    private Boolean extractable;
+
     @Option(name = "--slot",
             required = true,
             description = "slot index\n"
@@ -69,15 +74,24 @@ public abstract class P11KeyGenCommandSupport extends KeyGenCommandSupport {
     @Completion(P11ModuleNameCompleter.class)
     private String moduleName = DEFAULT_P11MODULE_NAME;
 
+    protected abstract boolean getDefaultExtractable();
+
     protected void finalize(final String keyType, final P11ObjectIdentifier objectId)
             throws Exception {
         ParamUtil.requireNonNull("objectId", objectId);
-        println("generated " + keyType + " keypair " + objectId);
+        println("generated " + keyType + " key " + objectId);
     }
 
     protected P11Slot getSlot()
             throws XiSecurityException, P11TokenException, IllegalCmdParamException {
         return getSlot(moduleName, slotIndex);
+    }
+
+    protected P11NewKeyControl getControl() {
+        P11NewKeyControl control = new P11NewKeyControl();
+        control.setExtractable((extractable == null)
+                ? getDefaultExtractable() : extractable.booleanValue());
+        return control;
     }
 
 }

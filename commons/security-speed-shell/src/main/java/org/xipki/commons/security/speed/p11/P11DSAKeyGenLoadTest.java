@@ -57,7 +57,8 @@ public class P11DSAKeyGenLoadTest extends P11KeyGenLoadTest {
 
     @Override
     protected void genKeypair() throws Exception {
-        P11ObjectIdentifier objId = slot.generateDSAKeypair(plength, qlength, getDummyLabel());
+        P11ObjectIdentifier objId = slot.generateDSAKeypair(plength, qlength, getDummyLabel(),
+                getControl());
         slot.removeIdentity(objId);
     }
 

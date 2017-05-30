@@ -36,8 +36,8 @@ package org.xipki.commons.security;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -66,6 +66,7 @@ import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.LogUtil;
@@ -96,7 +97,11 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     private final BlockingDeque<ContentSigner> busySigners = new LinkedBlockingDeque<>();
 
-    private final PrivateKey privateKey;
+    private final boolean mac;
+
+    private byte[] sha1DigestOfMacKey;
+
+    private final Key signingKey;
 
     private final AlgorithmCode algorithmCode;
 
@@ -121,28 +126,53 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         }
     }
 
-    public DefaultConcurrentContentSigner(final List<ContentSigner> signers)
+    public DefaultConcurrentContentSigner(final boolean mac,
+            final List<ContentSigner> signers)
             throws NoSuchAlgorithmException {
-        this(signers, null);
+        this(mac, signers, null);
     }
 
-    public DefaultConcurrentContentSigner(final List<ContentSigner> signers,
-            final PrivateKey privateKey) throws NoSuchAlgorithmException {
+    public DefaultConcurrentContentSigner(final boolean mac,
+            final List<ContentSigner> signers, final Key signingKey)
+            throws NoSuchAlgorithmException {
         ParamUtil.requireNonEmpty("signers", signers);
 
+        this.mac = mac;
         this.algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();
-        this.algorithmCode = AlgorithmUtil.getSignatureAlgorithmCode(algorithmIdentifier);
+        this.algorithmCode = AlgorithmUtil.getSigOrMacAlgorithmCode(algorithmIdentifier);
 
         for (ContentSigner signer : signers) {
             idleSigners.addLast(signer);
         }
 
-        this.privateKey = privateKey;
+        this.signingKey = signingKey;
         this.name = "defaultSigner-" + NAME_INDEX.getAndIncrement();
     }
 
+    @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean isMac() {
+        return mac;
+    }
+
+    public void setSha1DigestOfMacKey(byte[] sha1Digest) {
+        if (sha1Digest == null) {
+            this.sha1DigestOfMacKey = null;
+        } else if (sha1Digest.length == 20) {
+            this.sha1DigestOfMacKey = Arrays.copyOf(sha1Digest, 20);
+        } else {
+            throw new IllegalArgumentException("invalid sha1Digest.length ("
+                    + sha1Digest.length + " != 20)");
+        }
+    }
+
+    @Override
+    public byte[] getSha1DigestOfMacKey() {
+        return (sha1DigestOfMacKey == null) ? null : Arrays.copyOf(sha1DigestOfMacKey, 20);
     }
 
     @Override
@@ -194,8 +224,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public PrivateKey getPrivateKey() {
-        return privateKey;
+    public Key getSigningKey() {
+        return signingKey;
     }
 
     @Override

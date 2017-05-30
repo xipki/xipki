@@ -95,6 +95,12 @@ public class P11ProxyConstants {
 
     public static final short ACTION_GEN_KEYPAIR_EC    = 0x0133;
 
+    public static final short ACTION_DIGEST_SECRETKEY  = 0x0134;
+
+    public static final short ACTION_GEN_SECRET_KEY    = 0x0135;
+
+    public static final short ACTION_CREATE_SECRET_KEY = 0x0136;
+
     public static final short ACTION_ADD_CERT          = 0x0140;
 
     public static final short ACTION_REMOVE_IDENTITY   = 0x0141;

@@ -37,9 +37,9 @@ package org.xipki.commons.security.speed.p12;
 import java.security.SecureRandom;
 
 import org.xipki.commons.security.SecurityFactory;
-import org.xipki.commons.security.pkcs12.P12KeypairGenerationResult;
-import org.xipki.commons.security.pkcs12.P12KeypairGenerator;
-import org.xipki.commons.security.pkcs12.P12KeystoreGenerationParameters;
+import org.xipki.commons.security.pkcs12.P12KeyGenerationResult;
+import org.xipki.commons.security.pkcs12.P12KeyGenerator;
+import org.xipki.commons.security.pkcs12.KeystoreGenerationParameters;
 
 /**
  * @author Lijun Liao
@@ -57,10 +57,10 @@ public class P12ECSignLoadTest extends P12SignLoadTest {
     private static byte[] generateKeystore(final String curveNameOrOid) throws Exception {
         byte[] keystoreBytes = getPrecomputedECKeystore(curveNameOrOid);
         if (keystoreBytes == null) {
-            P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
+            KeystoreGenerationParameters params = new KeystoreGenerationParameters(
                     PASSWORD.toCharArray());
             params.setRandom(new SecureRandom());
-            P12KeypairGenerationResult identity = new P12KeypairGenerator().generateECKeypair(
+            P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
                     curveNameOrOid, params, null);
             keystoreBytes = identity.getKeystore();
         }

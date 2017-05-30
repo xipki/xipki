@@ -32,38 +32,23 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs12;
-
-import java.security.KeyStore;
-
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.KeypairGenerationResult;
+package org.xipki.commons.security.pkcs11;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
 
-public class P12KeypairGenerationResult extends KeypairGenerationResult {
+public class P11NewKeyControl {
 
-    private final byte[] keystore;
+    private boolean extractable;
 
-    private KeyStore keystoreObject;
-
-    public P12KeypairGenerationResult(final byte[] keystore) {
-        this.keystore = ParamUtil.requireNonNull("keystore", keystore);
+    public boolean isExtractable() {
+        return extractable;
     }
 
-    public byte[] getKeystore() {
-        return keystore;
-    }
-
-    public KeyStore getKeystoreObject() {
-        return keystoreObject;
-    }
-
-    public void setKeystoreObject(final KeyStore keystoreObject) {
-        this.keystoreObject = keystoreObject;
+    public void setExtractable(boolean extractable) {
+        this.extractable = extractable;
     }
 
 }

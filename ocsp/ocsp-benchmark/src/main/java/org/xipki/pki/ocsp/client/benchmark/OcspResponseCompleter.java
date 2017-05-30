@@ -32,28 +32,30 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.client.impl;
+package org.xipki.pki.ocsp.client.benchmark;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.eclipse.jetty.client.api.Response.CompleteListener;
+import org.eclipse.jetty.client.api.Result;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
-// CHECKSTYLE:SKIP
-class SHA256DigestCalculator extends AbstractDigestCalculator {
 
-    @Override
-    protected ASN1ObjectIdentifier getObjectIdentifier() {
-        return NISTObjectIdentifiers.id_sha256;
+class OcspResponseCompleter implements CompleteListener {
+
+    OcspResponseHandler handler;
+    OcspResponseContentListener contentListener;
+
+    public OcspResponseCompleter(OcspResponseHandler handler,
+            OcspResponseContentListener contentListener) {
+        this.handler = handler;
+        this.contentListener = contentListener;
     }
 
     @Override
-    protected Digest getDigester() {
-        return new SHA256Digest();
+    public void onComplete(Result result) {
+        handler.onComplete(result, contentListener);
     }
 
 }

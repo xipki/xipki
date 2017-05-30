@@ -35,7 +35,7 @@
 package org.xipki.commons.security;
 
 import java.io.IOException;
-import java.security.PrivateKey;
+import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -80,11 +80,15 @@ public interface ConcurrentContentSigner {
      */
     AlgorithmCode getAlgorithmCode();
 
+    boolean isMac();
+
+    byte[] getSha1DigestOfMacKey();
+
     /**
-     * Get the private key.
-     * @return the private key if possible. {@code null} may be returned.
+     * Get the signing key.
+     * @return the signing key if possible. {@code null} may be returned.
      */
-    PrivateKey getPrivateKey();
+    Key getSigningKey();
 
     void setPublicKey(@NonNull PublicKey publicKey);
 

@@ -61,9 +61,14 @@ public class P11ECKeyGenCmd extends P11KeyGenCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         P11Slot slot = getSlot();
-        P11ObjectIdentifier objId = slot.generateECKeypair(curveName, label);
+        P11ObjectIdentifier objId = slot.generateECKeypair(curveName, label, getControl());
         finalize("EC", objId);
         return null;
+    }
+
+    @Override
+    protected boolean getDefaultExtractable() {
+        return false;
     }
 
 }

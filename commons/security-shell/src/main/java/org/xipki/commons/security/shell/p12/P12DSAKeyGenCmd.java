@@ -38,8 +38,8 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.pkcs12.P12KeypairGenerationResult;
-import org.xipki.commons.security.pkcs12.P12KeypairGenerator;
+import org.xipki.commons.security.pkcs12.P12KeyGenerationResult;
+import org.xipki.commons.security.pkcs12.P12KeyGenerator;
 
 /**
  * @author Lijun Liao
@@ -51,6 +51,10 @@ import org.xipki.commons.security.pkcs12.P12KeypairGenerator;
 @Service
 // CHECKSTYLE:SKIP
 public class P12DSAKeyGenCmd extends P12KeyGenCommandSupport {
+
+    @Option(name = "--subject", aliases = "-s",
+            description = "subject of the self-signed certificate")
+    private String subject;
 
     @Option(name = "--plen",
             description = "bit length of the prime")
@@ -76,9 +80,9 @@ public class P12DSAKeyGenCmd extends P12KeyGenCommandSupport {
             }
         }
 
-        P12KeypairGenerationResult keypair = new P12KeypairGenerator().generateDSAKeypair(plen,
+        P12KeyGenerationResult keypair = new P12KeyGenerator().generateDSAKeypair(plen,
                 qlen, getKeyGenParameters(), subject);
-        saveKeypair(keypair);
+        saveKey(keypair);
 
         return null;
     }

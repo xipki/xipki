@@ -38,14 +38,12 @@ import java.util.List;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.commons.console.karaf.XipkiCommandSupport;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.console.karaf.completer.HashAlgCompleter;
 import org.xipki.commons.console.karaf.completer.SigAlgCompleter;
 import org.xipki.commons.security.util.AlgorithmUtil;
-import org.xipki.pki.ocsp.client.api.OcspRequestor;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 
 /**
@@ -89,9 +87,6 @@ public abstract class OcspStatusCommandSupport extends XipkiCommandSupport {
     @Option(name = "--sign",
             description = "sign request")
     protected Boolean signRequest = Boolean.FALSE;
-
-    @Reference
-    protected OcspRequestor requestor;
 
     protected RequestOptions getRequestOptions() throws Exception {
         ASN1ObjectIdentifier hashAlgOid = AlgorithmUtil.getHashAlg(hashAlgo);

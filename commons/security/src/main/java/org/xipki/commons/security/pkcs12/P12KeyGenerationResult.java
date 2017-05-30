@@ -32,28 +32,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.client.impl;
+package org.xipki.commons.security.pkcs12;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA3Digest;
+import java.security.KeyStore;
+
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.KeypairGenerationResult;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
-// CHECKSTYLE:SKIP
-class SHA3_224DigestCalculator extends AbstractDigestCalculator {
 
-    @Override
-    protected ASN1ObjectIdentifier getObjectIdentifier() {
-        return NISTObjectIdentifiers.id_sha3_224;
+public class P12KeyGenerationResult extends KeypairGenerationResult {
+
+    private final byte[] keystore;
+
+    private KeyStore keystoreObject;
+
+    public P12KeyGenerationResult(final byte[] keystore) {
+        this.keystore = ParamUtil.requireNonNull("keystore", keystore);
     }
 
-    @Override
-    protected Digest getDigester() {
-        return new SHA3Digest(224);
+    public byte[] getKeystore() {
+        return keystore;
+    }
+
+    public KeyStore getKeystoreObject() {
+        return keystoreObject;
+    }
+
+    public void setKeystoreObject(final KeyStore keystoreObject) {
+        this.keystoreObject = keystoreObject;
     }
 
 }

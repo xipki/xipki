@@ -15,6 +15,7 @@
   <modules>
     <module>ocsp-client-api</module>
     <module>ocsp-client-impl</module>
+    <module>ocsp-benchmark</module>
     <module>ocsp-client-shell</module>
     <module>ocsp-qa</module>
     <module>ocsp-qa-shell</module>

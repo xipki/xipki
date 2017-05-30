@@ -46,7 +46,9 @@ import org.xipki.commons.security.pkcs11.P11EntityIdentifier;
 import org.xipki.commons.security.pkcs11.P11Identity;
 import org.xipki.commons.security.pkcs11.P11Params;
 
+import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
+import iaik.pkcs.pkcs11.objects.SecretKey;
 
 /**
  * @author Lijun Liao
@@ -55,15 +57,22 @@ import iaik.pkcs.pkcs11.objects.PrivateKey;
 
 class IaikP11Identity extends P11Identity {
 
-    private final PrivateKey privateKey;
+    private final Key signingKey;
 
     private final int expectedSignatureLen;
+
+    IaikP11Identity(final IaikP11Slot slot, final P11EntityIdentifier identityId,
+            final SecretKey signingKey) {
+        super(slot, identityId, 0);
+        this.signingKey = ParamUtil.requireNonNull("signingKey", signingKey);
+        this.expectedSignatureLen = 0;
+    }
 
     IaikP11Identity(final IaikP11Slot slot, final P11EntityIdentifier identityId,
             final PrivateKey privateKey, final PublicKey publicKey,
             final X509Certificate[] certificateChain) {
         super(slot, identityId, publicKey, certificateChain);
-        this.privateKey = ParamUtil.requireNonNull("privateKey", privateKey);
+        this.signingKey = ParamUtil.requireNonNull("privateKey", privateKey);
 
         int keyBitLen = getSignatureKeyBitLength();
         if (publicKey instanceof RSAPublicKey) {
@@ -81,13 +90,33 @@ class IaikP11Identity extends P11Identity {
     }
 
     @Override
+    protected byte[] doDigestSecretKey(long mechanism)
+            throws P11TokenException {
+        if (! (signingKey instanceof SecretKey)) {
+            throw new P11TokenException("could not digest asymmetric key");
+        }
+
+        Boolean bv = ((SecretKey) signingKey).getExtractable().getBooleanValue();
+        if (bv != null && !bv.booleanValue()) {
+            throw new P11TokenException("could not digest unextractable key");
+        }
+
+        bv = ((SecretKey) signingKey).getNeverExtractable().getBooleanValue();
+        if (bv != null && bv.booleanValue()) {
+            throw new P11TokenException("could not digest unextractable key");
+        }
+
+        return ((IaikP11Slot) slot).digestKey(mechanism, this);
+    }
+
+    @Override
     protected byte[] doSign(final long mechanism, final P11Params parameters, final byte[] content)
             throws P11TokenException {
         return ((IaikP11Slot) slot).sign(mechanism, parameters, content, this);
     }
 
-    PrivateKey getPrivateKey() {
-        return privateKey;
+    Key getSigningKey() {
+        return signingKey;
     }
 
     int getExpectedSignatureLen() {

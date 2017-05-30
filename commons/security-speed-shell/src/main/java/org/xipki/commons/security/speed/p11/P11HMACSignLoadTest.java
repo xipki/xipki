@@ -32,28 +32,43 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.client.impl;
+package org.xipki.commons.security.speed.p11;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA3Digest;
+import java.security.SecureRandom;
+
+import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.SecurityFactory;
+import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
+import org.xipki.commons.security.pkcs11.P11Slot;
+import org.xipki.commons.security.speed.p12.P12HMACSignLoadTest;
+
+import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
 // CHECKSTYLE:SKIP
-class SHA3_256DigestCalculator extends AbstractDigestCalculator {
+public class P11HMACSignLoadTest extends P11SignLoadTest {
 
-    @Override
-    protected ASN1ObjectIdentifier getObjectIdentifier() {
-        return NISTObjectIdentifiers.id_sha3_256;
+    public P11HMACSignLoadTest(final SecurityFactory securityFactory, final P11Slot slot,
+            final String signatureAlgorithm)
+            throws Exception {
+        super(securityFactory, slot, signatureAlgorithm,
+                generateKey(slot, signatureAlgorithm),
+                "PKCS#11 HMAC signature creation");
     }
 
-    @Override
-    protected Digest getDigester() {
-        return new SHA3Digest(256);
+    private static P11ObjectIdentifier generateKey(final P11Slot slot,
+            final String signatureAlgorithm)
+            throws Exception {
+        ParamUtil.requireNonNull("slot", slot);
+        int keysize = P12HMACSignLoadTest.getKeysize(signatureAlgorithm);
+        byte[] keyBytes = new byte[keysize / 8];
+        new SecureRandom().nextBytes(keyBytes);
+        return slot.createSecretKey(PKCS11Constants.CKK_GENERIC_SECRET, keyBytes,
+                "loadtest-" + System.currentTimeMillis(),
+                getNewKeyControl());
     }
 
 }

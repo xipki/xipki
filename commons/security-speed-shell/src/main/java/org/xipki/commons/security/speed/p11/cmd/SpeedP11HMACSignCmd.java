@@ -32,28 +32,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.client.impl;
+package org.xipki.commons.security.speed.p11.cmd;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA384Digest;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.common.LoadExecutor;
+import org.xipki.commons.security.speed.cmd.completer.HMACSigAlgCompleter;
+import org.xipki.commons.security.speed.p11.P11HMACSignLoadTest;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
+
+@Command(scope = "xipki-tk", name = "speed-hmac-sign",
+        description = "performance test of PKCS#11 HMAC signature creation")
+@Service
 // CHECKSTYLE:SKIP
-class SHA384DigestCalculator extends AbstractDigestCalculator {
+public class SpeedP11HMACSignCmd extends SpeedP11CommandSupport {
+
+    @Option(name = "--sig-algo",
+            required = true,
+            description = "signature algorithm\n"
+                    + "(required)")
+    @Completion(HMACSigAlgCompleter.class)
+    private String sigAlgo;
 
     @Override
-    protected ASN1ObjectIdentifier getObjectIdentifier() {
-        return NISTObjectIdentifiers.id_sha384;
-    }
-
-    @Override
-    protected Digest getDigester() {
-        return new SHA384Digest();
+    protected LoadExecutor getTester() throws Exception {
+        return new P11HMACSignLoadTest(securityFactory, getSlot(), sigAlgo);
     }
 
 }

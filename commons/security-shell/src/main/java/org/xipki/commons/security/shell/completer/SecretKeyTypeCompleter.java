@@ -32,28 +32,30 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.client.impl;
+package org.xipki.commons.security.shell.completer;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA3Digest;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
-// CHECKSTYLE:SKIP
-class SHA3_384DigestCalculator extends AbstractDigestCalculator {
+
+@Service
+public class SecretKeyTypeCompleter extends AbstractDynamicEnumCompleter {
+
+    private static final Set<String> TYPES = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList("DES3", "AES", "GENERIC")));
 
     @Override
-    protected ASN1ObjectIdentifier getObjectIdentifier() {
-        return NISTObjectIdentifiers.id_sha3_384;
-    }
-
-    @Override
-    protected Digest getDigester() {
-        return new SHA3Digest(384);
+    protected Set<String> getEnums() {
+        return TYPES;
     }
 
 }

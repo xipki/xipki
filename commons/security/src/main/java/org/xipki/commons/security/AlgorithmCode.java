@@ -91,6 +91,17 @@ public enum AlgorithmCode {
     SHA384WITHPLAIN_ECDSA((byte) 0x44),
     SHA512WITHPLAIN_ECDSA((byte) 0x45),
 
+    // HMAC
+    HMAC_SHA1((byte) 0x51),
+    HMAC_SHA224((byte) 0x52),
+    HMAC_SHA256((byte) 0x53),
+    HMAC_SHA384((byte) 0x54),
+    HMAC_SHA512((byte) 0x55),
+    HMAC_SHA3_224((byte) 0x56),
+    HMAC_SHA3_256((byte) 0x57),
+    HMAC_SHA3_384((byte) 0x58),
+    HMAC_SHA3_512((byte) 0x9),
+
     // Hash Algorithm
     SHA1((byte) 0xE1),
     SHA224((byte) 0xE2),

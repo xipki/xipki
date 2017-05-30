@@ -153,11 +153,12 @@ public class EmulatorP11Module extends AbstractP11Module {
                         + " passwords are configured, but 1 is permitted");
             }
 
-            PrivateKeyCryptor privateKeyCryptor = new PrivateKeyCryptor(pwd.get(0));
+            char[] firstPwd = pwd.get(0);
+            PrivateKeyCryptor privateKeyCryptor = new PrivateKeyCryptor(firstPwd);
 
             int maxSessions = 20;
             P11Slot slot = new EmulatorP11Slot(moduleConf.getName(), slotDir, slotId,
-                    moduleConf.isReadOnly(), privateKeyCryptor,
+                    moduleConf.isReadOnly(), firstPwd, privateKeyCryptor,
                     moduleConf.getP11MechanismFilter(), maxSessions);
             slots.add(slot);
         }

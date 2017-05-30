@@ -32,46 +32,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.client.impl;
+package org.xipki.commons.security.pkcs12;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import java.security.SecureRandom;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.operator.DigestCalculator;
+import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
 
-public abstract class AbstractDigestCalculator implements DigestCalculator {
+public class KeystoreGenerationParameters {
 
-    private ByteArrayOutputStream out = new ByteArrayOutputStream();
+    private final char[] password;
 
-    protected abstract ASN1ObjectIdentifier getObjectIdentifier();
+    private SecureRandom random;
 
-    protected abstract Digest getDigester();
-
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return new AlgorithmIdentifier(getObjectIdentifier(), DERNull.INSTANCE);
+    public KeystoreGenerationParameters(final char[] password) {
+        this.password = ParamUtil.requireNonNull("password", password);
     }
 
-    public OutputStream getOutputStream() {
-        return out;
+    public SecureRandom getRandom() {
+        return random;
     }
 
-    public byte[] getDigest() {
-        byte[] bytes = out.toByteArray();
-        out.reset();
-        Digest digester = getDigester();
-        digester.update(bytes, 0, bytes.length);
-        byte[] digest = new byte[digester.getDigestSize()];
-        digester.doFinal(digest, 0);
-        return digest;
+    public void setRandom(final SecureRandom random) {
+        this.random = random;
+    }
+
+    public char[] getPassword() {
+        return password;
     }
 
 }

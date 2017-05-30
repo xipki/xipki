@@ -108,7 +108,7 @@ public class KeyUtil {
     public static KeyStore getKeyStore(final String storeType)
             throws KeyStoreException, NoSuchProviderException {
         ParamUtil.requireNonBlank("storeType", storeType);
-        if ("JKS".equalsIgnoreCase(storeType)) {
+        if ("JKS".equalsIgnoreCase(storeType) || "JCEKS".equalsIgnoreCase(storeType)) {
             return KeyStore.getInstance(storeType);
         } else {
             return KeyStore.getInstance(storeType, "BC");

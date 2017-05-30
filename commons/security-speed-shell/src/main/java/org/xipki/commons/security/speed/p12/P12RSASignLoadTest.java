@@ -38,9 +38,9 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import org.xipki.commons.security.SecurityFactory;
-import org.xipki.commons.security.pkcs12.P12KeypairGenerationResult;
-import org.xipki.commons.security.pkcs12.P12KeypairGenerator;
-import org.xipki.commons.security.pkcs12.P12KeystoreGenerationParameters;
+import org.xipki.commons.security.pkcs12.P12KeyGenerationResult;
+import org.xipki.commons.security.pkcs12.P12KeyGenerator;
+import org.xipki.commons.security.pkcs12.KeystoreGenerationParameters;
 
 /**
  * @author Lijun Liao
@@ -61,10 +61,10 @@ public class P12RSASignLoadTest extends P12SignLoadTest {
             throws Exception {
         byte[] keystoreBytes = getPrecomputedRSAKeystore(keysize, publicExponent);
         if (keystoreBytes == null) {
-            P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
+            KeystoreGenerationParameters params = new KeystoreGenerationParameters(
                     PASSWORD.toCharArray());
             params.setRandom(new SecureRandom());
-            P12KeypairGenerationResult identity = new P12KeypairGenerator().generateRSAKeypair(
+            P12KeyGenerationResult identity = new P12KeyGenerator().generateRSAKeypair(
                     keysize, publicExponent, params, null);
             keystoreBytes = identity.getKeystore();
         }

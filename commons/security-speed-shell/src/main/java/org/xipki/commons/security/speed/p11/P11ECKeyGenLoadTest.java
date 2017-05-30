@@ -54,7 +54,8 @@ public class P11ECKeyGenLoadTest extends P11KeyGenLoadTest {
 
     @Override
     protected void genKeypair() throws Exception {
-        P11ObjectIdentifier objId = slot.generateECKeypair(curveNameOrOid, getDummyLabel());
+        P11ObjectIdentifier objId = slot.generateECKeypair(curveNameOrOid, getDummyLabel(),
+                getControl());
         slot.removeIdentity(objId);
     }
 

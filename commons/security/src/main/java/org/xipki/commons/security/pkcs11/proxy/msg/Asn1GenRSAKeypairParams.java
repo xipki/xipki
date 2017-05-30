@@ -46,6 +46,8 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
+import org.xipki.commons.security.pkcs11.P11NewKeyControl;
+import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 
 /**
  *
@@ -53,6 +55,7 @@ import org.xipki.commons.security.exception.BadAsn1ObjectException;
  * GenRSAKeypairParams ::= SEQUENCE {
  *     slotId               P11SlotIdentifier,
  *     label                UTF8STRING,
+ *     control              NewKeyControl,
  *     keysize              INTEGER,
  *     publicExponent       INTEGER OPTIONAL }
  * </pre>
@@ -64,34 +67,36 @@ import org.xipki.commons.security.exception.BadAsn1ObjectException;
 // CHECKSTYLE:SKIP
 public class Asn1GenRSAKeypairParams extends ASN1Object {
 
-    private final Asn1P11SlotIdentifier slotId;
+    private final P11SlotIdentifier slotId;
 
     private final String label;
+
+    private final P11NewKeyControl control;
 
     private final int keysize;
 
     private final BigInteger publicExponent;
 
-    public Asn1GenRSAKeypairParams(final Asn1P11SlotIdentifier slotId, final String label,
-            final int keysize, final BigInteger publicExponent) {
+    public Asn1GenRSAKeypairParams(final P11SlotIdentifier slotId, final String label,
+            final P11NewKeyControl control, final int keysize, final BigInteger publicExponent) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.label = ParamUtil.requireNonBlank("label", label);
+        this.control = ParamUtil.requireNonNull("control", control);
         this.keysize = ParamUtil.requireMin("keysize", keysize, 1);
         this.publicExponent = publicExponent;
     }
 
     private Asn1GenRSAKeypairParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 3, 4);
+        Asn1Util.requireRange(seq, 4, 5);
         final int size = seq.size();
         int idx = 0;
-        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
+        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getSlotId();
         label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-        ParamUtil.requireNonBlank("label", label);
-
+        control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
         keysize = Asn1Util.getInteger(seq.getObjectAt(idx++)).intValue();
         ParamUtil.requireMin("keysize", keysize, 1);
 
-        publicExponent = (size > 3) ? Asn1Util.getInteger(seq.getObjectAt(idx++)) : null;
+        publicExponent = (size > 4) ? Asn1Util.getInteger(seq.getObjectAt(idx++)) : null;
     }
 
     public static Asn1GenRSAKeypairParams getInstance(final Object obj)
@@ -117,7 +122,7 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(slotId);
+        vector.add(new Asn1P11SlotIdentifier(slotId));
         vector.add(new DERUTF8String(label));
         vector.add(new ASN1Integer(keysize));
         if (publicExponent != null) {
@@ -126,12 +131,16 @@ public class Asn1GenRSAKeypairParams extends ASN1Object {
         return new DERSequence(vector);
     }
 
-    public Asn1P11SlotIdentifier getSlotId() {
+    public P11SlotIdentifier getSlotId() {
         return slotId;
     }
 
     public String getLabel() {
         return label;
+    }
+
+    public P11NewKeyControl getControl() {
+        return control;
     }
 
     public int getKeysize() {

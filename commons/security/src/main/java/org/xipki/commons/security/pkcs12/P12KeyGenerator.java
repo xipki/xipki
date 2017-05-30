@@ -50,6 +50,9 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -77,7 +80,7 @@ import org.xipki.commons.security.util.X509Util;
  * @since 2.0.0
  */
 
-public class P12KeypairGenerator {
+public class P12KeyGenerator {
 
     private static class KeyPairWithSubjectPublicKeyInfo {
 
@@ -135,12 +138,12 @@ public class P12KeypairGenerator {
 
     private static final long DAY = 24L * 60 * 60 * 1000;
 
-    public P12KeypairGenerator() throws Exception {
+    public P12KeyGenerator() throws Exception {
     }
 
     // CHECKSTYLE:SKIP
-    public P12KeypairGenerationResult generateRSAKeypair(final int keysize,
-            final BigInteger publicExponent, final P12KeystoreGenerationParameters params,
+    public P12KeyGenerationResult generateRSAKeypair(final int keysize,
+            final BigInteger publicExponent, final KeystoreGenerationParameters params,
             final String selfSignedCertSubject)
             throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genRSAKeypair(keysize, publicExponent,
@@ -149,19 +152,53 @@ public class P12KeypairGenerator {
     }
 
     // CHECKSTYLE:SKIP
-    public P12KeypairGenerationResult generateDSAKeypair(final int plength, final int qlength,
-            final P12KeystoreGenerationParameters params, final String selfSignedCertSubject)
+    public P12KeyGenerationResult generateDSAKeypair(final int plength, final int qlength,
+            final KeystoreGenerationParameters params, final String selfSignedCertSubject)
             throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genDSAKeypair(plength, qlength, params.getRandom());
         return generateIdentity(kp, params, selfSignedCertSubject);
     }
 
     // CHECKSTYLE:SKIP
-    public P12KeypairGenerationResult generateECKeypair(final String curveNameOrOid,
-            final P12KeystoreGenerationParameters params, final String selfSignedCertSubject)
+    public P12KeyGenerationResult generateECKeypair(final String curveNameOrOid,
+            final KeystoreGenerationParameters params, final String selfSignedCertSubject)
             throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genECKeypair(curveNameOrOid, params.getRandom());
         return generateIdentity(kp, params, selfSignedCertSubject);
+    }
+
+    public P12KeyGenerationResult generateSecretKey(final String algorithm, final int keyBitLen,
+            final KeystoreGenerationParameters params)
+            throws Exception {
+        if (keyBitLen % 8 != 0) {
+            throw new IllegalArgumentException(
+                    "keyBitLen (" + keyBitLen + ") must be multiple of 8");
+        }
+
+        SecureRandom random = params.getRandom();
+        if (random == null) {
+            random = new SecureRandom();
+        }
+
+        byte[] keyValue = new byte[keyBitLen / 8];
+        random.nextBytes(keyValue);
+        SecretKey secretKey = new SecretKeySpec(keyValue, algorithm);
+
+        KeyStore ks = KeyUtil.getKeyStore("JCEKS");
+        ks.load(null, params.getPassword());
+
+        ks.setKeyEntry("main", secretKey, params.getPassword(), null);
+
+        ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
+        try {
+            ks.store(ksStream, params.getPassword());
+        } finally {
+            ksStream.flush();
+        }
+
+        P12KeyGenerationResult result = new P12KeyGenerationResult(ksStream.toByteArray());
+        result.setKeystoreObject(ks);
+        return result;
     }
 
     // CHECKSTYLE:SKIP
@@ -203,8 +240,8 @@ public class P12KeypairGenerator {
         return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
     }
 
-    private static P12KeypairGenerationResult generateIdentity(
-            final KeyPairWithSubjectPublicKeyInfo kp, final P12KeystoreGenerationParameters params,
+    private static P12KeyGenerationResult generateIdentity(
+            final KeyPairWithSubjectPublicKeyInfo kp, final KeystoreGenerationParameters params,
             final String selfSignedCertSubject)
             throws Exception {
         Date now = new Date();
@@ -236,7 +273,7 @@ public class P12KeypairGenerator {
             ksStream.flush();
         }
 
-        P12KeypairGenerationResult result = new P12KeypairGenerationResult(ksStream.toByteArray());
+        P12KeyGenerationResult result = new P12KeyGenerationResult(ksStream.toByteArray());
         result.setKeystoreObject(ks);
         return result;
     } // method generateIdentity

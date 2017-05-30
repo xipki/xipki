@@ -35,8 +35,7 @@
 package org.xipki.pki.ocsp.client.shell.loadtest;
 
 import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -47,6 +46,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.commons.common.util.BigIntegerRange;
 import org.xipki.commons.common.util.CollectionUtil;
 import org.xipki.commons.common.util.FileBigIntegerIterator;
@@ -56,6 +56,7 @@ import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
+import org.xipki.pki.ocsp.client.benchmark.OcspLoadTest;
 import org.xipki.pki.ocsp.client.shell.OcspStatusCommandSupport;
 
 /**
@@ -131,12 +132,7 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
 
-        URL serverUrl;
-        try {
-            serverUrl = new URL(serverUrlS);
-        } catch (MalformedURLException ex) {
-            throw new RuntimeException("invalid URL: " + serverUrlS);
-        }
+        URI serverUrl = new URI(serverUrlS);
 
         Iterator<BigInteger> serialNumberIterator;
 
@@ -178,12 +174,11 @@ public class OcspStatusLoadTestCmd extends OcspStatusCommandSupport {
             description.append("maxCerts: ").append(maxCerts).append("\n");
             description.append("hash: ").append(hashAlgo);
 
-            X509Certificate issuerCert = X509Util.parseCert(issuerCertFile);
+            Certificate issuerCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
 
             RequestOptions options = getRequestOptions();
-
-            OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumberIterator, issuerCert,
-                    serverUrl, options, maxCerts, description.toString());
+            OcspLoadTest loadTest = new OcspLoadTest(issuerCert, serverUrl, options,
+                    serialNumberIterator, maxCerts, description.toString());
             loadTest.setDuration(duration);
             loadTest.setThreads(numThreads);
             loadTest.test();

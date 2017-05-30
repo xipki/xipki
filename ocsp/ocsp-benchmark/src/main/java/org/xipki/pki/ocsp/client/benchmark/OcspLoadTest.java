@@ -32,30 +32,22 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.client.shell.loadtest;
+package org.xipki.pki.ocsp.client.benchmark;
 
 import java.math.BigInteger;
-import java.net.URL;
-import java.security.cert.X509Certificate;
+import java.net.URI;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.bouncycastle.cert.ocsp.BasicOCSPResp;
-import org.bouncycastle.cert.ocsp.CertificateStatus;
-import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.bouncycastle.cert.ocsp.RevokedStatus;
-import org.bouncycastle.cert.ocsp.SingleResp;
-import org.bouncycastle.cert.ocsp.UnknownStatus;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.pki.ocsp.client.api.OcspRequestor;
 import org.xipki.pki.ocsp.client.api.OcspRequestorException;
 import org.xipki.pki.ocsp.client.api.OcspResponseException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
-import org.xipki.pki.ocsp.client.shell.OcspUtils;
 
 /**
  * @author Lijun Liao
@@ -66,6 +58,14 @@ public class OcspLoadTest extends LoadExecutor {
 
     final class Testor implements Runnable {
 
+        private OcspBenchmark requestor;
+
+        Testor() throws Exception {
+            OcspResponseHandler responseHandler =  new OcspResponseHandler(OcspLoadTest.this, 1);
+            this.requestor = new OcspBenchmark();
+            this.requestor.init(responseHandler, responderUrl, issuerCert, requestOptions);
+        }
+
         @Override
         public void run() {
             while (!stop() && getErrorAccout() < 10) {
@@ -73,81 +73,59 @@ public class OcspLoadTest extends LoadExecutor {
                 if (sn == null) {
                     break;
                 }
-                int numFailed = testNext(sn) ? 0 : 1;
-                account(1, numFailed);
+                testNext(sn);
+            }
+
+            try {
+                requestor.stop();
+            } catch (Exception ex) {
+                LOG.warn("got IOException in requestor.stop()");
             }
         }
 
-        private boolean testNext(final BigInteger sn) {
-            BasicOCSPResp basicResp;
+        private void testNext(final BigInteger sn) {
             try {
-                OCSPResp response = requestor.ask(caCert, sn, serverUrl, options, null);
-                basicResp = OcspUtils.extractBasicOcspResp(response);
+                requestor.ask(new BigInteger[]{sn});
             } catch (OcspRequestorException ex) {
                 LOG.warn("OCSPRequestorException: {}", ex.getMessage());
-                return false;
+                account(1, 1);
             } catch (OcspResponseException ex) {
                 LOG.warn("OCSPResponseException: {}", ex.getMessage());
-                return false;
+                account(1, 1);
             } catch (Throwable th) {
                 LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
-                return false;
+                account(1, 1);
             }
-
-            SingleResp[] singleResponses = basicResp.getResponses();
-
-            if (singleResponses == null || singleResponses.length == 0) {
-                LOG.warn("received no status from server");
-                return false;
-            }
-
-            final int n = singleResponses.length;
-            if (n != 1) {
-                LOG.warn("received status with {} single responses from server, {}", n,
-                        "but 1 was requested");
-                return false;
-            } else {
-                SingleResp singleResp = singleResponses[0];
-                CertificateStatus singleCertStatus = singleResp.getCertStatus();
-
-                if (!(singleCertStatus == null
-                        || singleCertStatus instanceof RevokedStatus
-                        || singleCertStatus instanceof UnknownStatus)) {
-                    LOG.warn("status: ERROR");
-                    return false;
-                }
-                return true;
-            } // end if
         } // method testNext
 
     } // class Testor
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspLoadTest.class);
 
-    private final OcspRequestor requestor;
+    private final Certificate issuerCert;
+
+    private final URI responderUrl;
+
+    private final RequestOptions requestOptions;
 
     private final Iterator<BigInteger> serials;
-
-    private X509Certificate caCert;
-
-    private URL serverUrl;
-
-    private RequestOptions options;
 
     private final int maxRequests;
 
     private AtomicInteger processedRequests = new AtomicInteger(0);
 
-    public OcspLoadTest(final OcspRequestor requestor, final Iterator<BigInteger> serials,
-            final X509Certificate caCert, final URL serverUrl, final RequestOptions options,
+    public OcspLoadTest(
+            final Certificate issuerCert, final URI responderUrl,
+            final RequestOptions requestOptions,
+            final Iterator<BigInteger> serials,
             final int maxRequests, final String description) {
         super(description);
+
+        this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
+        this.responderUrl = ParamUtil.requireNonNull("responderUrl", responderUrl);
+        this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
         this.maxRequests = maxRequests;
-        this.requestor = ParamUtil.requireNonNull("requestor", requestor);
         this.serials = ParamUtil.requireNonNull("serials", serials);
-        this.caCert = ParamUtil.requireNonNull("caCert", caCert);
-        this.serverUrl = ParamUtil.requireNonNull("serverUrl", serverUrl);
-        this.options = ParamUtil.requireNonNull("options", options);
     }
 
     @Override

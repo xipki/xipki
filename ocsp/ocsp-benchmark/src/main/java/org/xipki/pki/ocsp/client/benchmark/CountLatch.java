@@ -32,28 +32,66 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.client.impl;
+package org.xipki.pki.ocsp.client.benchmark;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA224Digest;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
-// CHECKSTYLE:SKIP
-class SHA224DigestCalculator extends AbstractDigestCalculator {
 
-    @Override
-    protected ASN1ObjectIdentifier getObjectIdentifier() {
-        return NISTObjectIdentifiers.id_sha224;
+class CountLatch {
+
+    private class Sync extends AbstractQueuedSynchronizer {
+        private static final long serialVersionUID = 1L;
+
+        public Sync() {
+        }
+
+        @Override
+        protected int tryAcquireShared(int arg) {
+            return count.get() == releaseValue ? 1 : -1;
+        }
+
+        @Override
+        protected boolean tryReleaseShared(int arg) {
+            return true;
+        }
     }
 
-    @Override
-    protected Digest getDigester() {
-        return new SHA224Digest();
+    private final Sync sync;
+    private final AtomicLong count;
+    private volatile long releaseValue;
+
+    public CountLatch(final long initial, final long releaseValue) {
+        this.releaseValue = releaseValue;
+        this.count = new AtomicLong(initial);
+        this.sync = new Sync();
     }
 
+    public void await() throws InterruptedException {
+        sync.acquireSharedInterruptibly(1);
+    }
+
+    public long countUp() {
+        final long current = count.incrementAndGet();
+        if (current == releaseValue) {
+            sync.releaseShared(0);
+        }
+        return current;
+    }
+
+    public long countDown() {
+        final long current = count.decrementAndGet();
+        if (current == releaseValue) {
+            sync.releaseShared(0);
+        }
+        return current;
+    }
+
+    public long getCount() {
+        return count.get();
+    }
 }

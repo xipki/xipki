@@ -32,28 +32,30 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.client.impl;
+package org.xipki.pki.ocsp.client.benchmark;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA3Digest;
+import java.nio.ByteBuffer;
+
+import org.eclipse.jetty.client.api.Response;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
-// CHECKSTYLE:SKIP
-class SHA3_512DigestCalculator extends AbstractDigestCalculator {
+
+class OcspResponseContentListener implements Response.ContentListener {
+
+    private byte[] bytes;
 
     @Override
-    protected ASN1ObjectIdentifier getObjectIdentifier() {
-        return NISTObjectIdentifiers.id_sha3_512;
+    public void onContent(Response response, ByteBuffer content) {
+        byte[] bb = new byte[content.remaining()];
+        content.get(bb);
+        this.bytes = bb;
     }
 
-    @Override
-    protected Digest getDigester() {
-        return new SHA3Digest(512);
+    public byte[] getBytes() {
+        return bytes;
     }
 
 }
