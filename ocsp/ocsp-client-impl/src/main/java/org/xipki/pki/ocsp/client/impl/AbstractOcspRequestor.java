@@ -47,15 +47,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.ocsp.CertID;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.OCSPException;
@@ -63,7 +65,6 @@ import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
-import org.bouncycastle.operator.DigestCalculator;
 import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.commons.common.RequestResponseDebug;
 import org.xipki.commons.common.RequestResponsePair;
@@ -117,7 +118,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     @Override
     public OCSPResp ask(final X509Certificate issuerCert, final X509Certificate cert,
             final URL responderUrl, final RequestOptions requestOptions,
-            final RequestResponseDebug debug) throws OcspResponseException, OcspRequestorException {
+            final RequestResponseDebug debug)
+            throws OcspResponseException, OcspRequestorException {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
         ParamUtil.requireNonNull("cert", cert);
 
@@ -129,8 +131,8 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             throw new OcspRequestorException(ex.getMessage(), ex);
         }
 
-        return ask(issuerCert, new BigInteger[]{cert.getSerialNumber()}, responderUrl,
-                requestOptions, debug);
+        return ask(issuerCert, new BigInteger[]{cert.getSerialNumber()},
+                responderUrl, requestOptions, debug);
     }
 
     @Override
@@ -161,14 +163,16 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     @Override
     public OCSPResp ask(final X509Certificate issuerCert, final BigInteger serialNumber,
             final URL responderUrl, final RequestOptions requestOptions,
-            final RequestResponseDebug debug) throws OcspResponseException, OcspRequestorException {
+            final RequestResponseDebug debug)
+            throws OcspResponseException, OcspRequestorException {
         return ask(issuerCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions, debug);
     }
 
     @Override
     public OCSPResp ask(final X509Certificate issuerCert, final BigInteger[] serialNumbers,
             final URL responderUrl, final RequestOptions requestOptions,
-            final RequestResponseDebug debug) throws OcspResponseException, OcspRequestorException {
+            final RequestResponseDebug debug)
+            throws OcspResponseException, OcspRequestorException {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
         ParamUtil.requireNonNull("requestOptions", requestOptions);
         ParamUtil.requireNonNull("responderUrl", responderUrl);
@@ -316,46 +320,14 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     } // method ask
 
     private OCSPReq buildRequest(final X509Certificate caCert, final BigInteger[] serialNumbers,
-            final byte[] nonce, final RequestOptions requestOptions) throws OcspRequestorException {
+            final byte[] nonce, final RequestOptions requestOptions)
+            throws OcspRequestorException {
         HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(requestOptions.getHashAlgorithmId());
         if (hashAlgo == null) {
             throw new OcspRequestorException("unknown HashAlgo "
                     + requestOptions.getHashAlgorithmId().getId());
         }
         List<AlgorithmIdentifier> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
-
-        DigestCalculator digestCalculator;
-        switch (hashAlgo) {
-        case SHA1:
-            digestCalculator = new SHA1DigestCalculator();
-            break;
-        case SHA224:
-            digestCalculator = new SHA224DigestCalculator();
-            break;
-        case SHA256:
-            digestCalculator = new SHA256DigestCalculator();
-            break;
-        case SHA384:
-            digestCalculator = new SHA384DigestCalculator();
-            break;
-        case SHA512:
-            digestCalculator = new SHA512DigestCalculator();
-            break;
-        case SHA3_224:
-            digestCalculator = new SHA3_224DigestCalculator();
-            break;
-        case SHA3_256:
-            digestCalculator = new SHA3_256DigestCalculator();
-            break;
-        case SHA3_384:
-            digestCalculator = new SHA3_384DigestCalculator();
-            break;
-        case SHA3_512:
-            digestCalculator = new SHA3_512DigestCalculator();
-            break;
-        default:
-            throw new RuntimeException("unknown HashAlgoType: " + hashAlgo);
-        }
 
         OCSPReqBuilder reqBuilder = new OCSPReqBuilder();
         List<Extension> extensions = new LinkedList<>();
@@ -388,11 +360,23 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         }
 
         try {
-            for (BigInteger serialNumber : serialNumbers) {
-                CertificateID certId = new CertificateID(digestCalculator,
-                        new X509CertificateHolder(caCert.getEncoded()), serialNumber);
+            DEROctetString issuerNameHash = new DEROctetString(hashAlgo.hash(
+                    caCert.getSubjectX500Principal().getEncoded()));
 
-                reqBuilder.addRequest(certId);
+            TBSCertificate tbsCert;
+            try {
+                tbsCert = TBSCertificate.getInstance(caCert.getTBSCertificate());
+            } catch (CertificateEncodingException ex) {
+                throw new OcspRequestorException(ex);
+            }
+            DEROctetString issuerKeyHash = new DEROctetString(hashAlgo.hash(
+                    tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
+
+            for (BigInteger serialNumber : serialNumbers) {
+                CertID certId = new CertID(hashAlgo.getAlgorithmIdentifier(),
+                        issuerNameHash, issuerKeyHash, new ASN1Integer(serialNumber));
+
+                reqBuilder.addRequest(new CertificateID(certId));
             }
 
             if (requestOptions.isSignRequest()) {
@@ -435,7 +419,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             } else {
                 return reqBuilder.build();
             } // end if
-        } catch (OCSPException | CertificateEncodingException | IOException ex) {
+        } catch (OCSPException | IOException ex) {
             throw new OcspRequestorException(ex.getMessage(), ex);
         }
     } // method buildRequest

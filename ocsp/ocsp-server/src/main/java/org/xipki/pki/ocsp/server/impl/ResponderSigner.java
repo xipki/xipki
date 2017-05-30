@@ -78,36 +78,52 @@ class ResponderSigner {
 
     private final RespID responderIdByKey;
 
+    private final boolean macSigner;
+
     ResponderSigner(final List<ConcurrentContentSigner> signers)
             throws CertificateException, IOException {
         this.signers = ParamUtil.requireNonEmpty("signers", signers);
-        X509Certificate[] tmpCertificateChain = signers.get(0).getCertificateChain();
-        if (tmpCertificateChain == null || tmpCertificateChain.length == 0) {
-            throw new CertificateException("no certificate is bound with the signer");
-        }
-        int len = tmpCertificateChain.length;
-        if (len > 1) {
-            X509Certificate cert = tmpCertificateChain[len - 1];
-            if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
-                len--;
+        ConcurrentContentSigner firstSigner = signers.get(0);
+        this.macSigner = firstSigner.isMac();
+
+        if (this.macSigner) {
+            this.responderIdByName = null;
+            this.certificate = null;
+            this.certificateChain = null;
+            this.bcCertificate = null;
+            this.bcCertificateChain = null;
+
+            byte[] keySha1 = firstSigner.getSha1DigestOfMacKey();
+            this.responderIdByKey = new RespID(new ResponderID(new DEROctetString(keySha1)));
+        } else {
+            X509Certificate[] tmpCertificateChain = firstSigner.getCertificateChain();
+            if (tmpCertificateChain == null || tmpCertificateChain.length == 0) {
+                throw new CertificateException("no certificate is bound with the signer");
             }
+            int len = tmpCertificateChain.length;
+            if (len > 1) {
+                X509Certificate cert = tmpCertificateChain[len - 1];
+                if (cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal())) {
+                    len--;
+                }
+            }
+            this.certificateChain = new X509Certificate[len];
+            System.arraycopy(tmpCertificateChain, 0, this.certificateChain, 0, len);
+
+            this.certificate = certificateChain[0];
+
+            this.bcCertificate = new X509CertificateHolder(this.certificate.getEncoded());
+            this.bcCertificateChain = new X509CertificateHolder[this.certificateChain.length];
+            for (int i = 0; i < certificateChain.length; i++) {
+                this.bcCertificateChain[i] = new X509CertificateHolder(
+                        this.certificateChain[i].getEncoded());
+            }
+
+            this.responderIdByName = new RespID(this.bcCertificate.getSubject());
+            byte[] keySha1 = HashAlgoType.SHA1.hash(
+                    this.bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
+            this.responderIdByKey = new RespID(new ResponderID(new DEROctetString(keySha1)));
         }
-        this.certificateChain = new X509Certificate[len];
-        System.arraycopy(tmpCertificateChain, 0, this.certificateChain, 0, len);
-
-        this.certificate = certificateChain[0];
-
-        this.bcCertificate = new X509CertificateHolder(this.certificate.getEncoded());
-        this.bcCertificateChain = new X509CertificateHolder[this.certificateChain.length];
-        for (int i = 0; i < certificateChain.length; i++) {
-            this.bcCertificateChain[i] = new X509CertificateHolder(
-                    this.certificateChain[i].getEncoded());
-        }
-
-        this.responderIdByName = new RespID(this.bcCertificate.getSubject());
-        byte[] keySha1 = HashAlgoType.SHA1.hash(
-                this.bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
-        this.responderIdByKey = new RespID(new ResponderID(new DEROctetString(keySha1)));
 
         algoSignerMap = new HashMap<>();
         for (ConcurrentContentSigner signer : signers) {
@@ -115,6 +131,10 @@ class ResponderSigner {
             algoSignerMap.put(algoName, signer);
         }
     } // constructor
+
+    public boolean isMacSigner() {
+        return macSigner;
+    }
 
     public ConcurrentContentSigner getFirstSigner() {
         return signers.get(0);

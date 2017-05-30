@@ -42,8 +42,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.pkcs12.P12KeypairGenerationResult;
-import org.xipki.commons.security.pkcs12.P12KeystoreGenerationParameters;
+import org.xipki.commons.security.pkcs12.P12KeyGenerationResult;
+import org.xipki.commons.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.commons.security.shell.KeyGenCommandSupport;
 
 /**
@@ -61,21 +61,17 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
     protected String keyOutFile;
 
     @Option(name = "--password",
-            description = "password of the PKCS#12 file")
+            description = "password of the keystore file")
     protected String password;
 
-    @Option(name = "--subject", aliases = "-s",
-            description = "subject of the self-signed certificate")
-    protected String subject;
-
-    protected void saveKeypair(final P12KeypairGenerationResult keypair) throws IOException {
-        ParamUtil.requireNonNull("keypair", keypair);
+    protected void saveKey(final P12KeyGenerationResult keyGenerationResult) throws IOException {
+        ParamUtil.requireNonNull("keyGenerationResult", keyGenerationResult);
         File p12File = new File(keyOutFile);
-        saveVerbose("saved PKCS#12 keystore to file", p12File, keypair.getKeystore());
+        saveVerbose("saved PKCS#12 keystore to file", p12File, keyGenerationResult.getKeystore());
     }
 
-    protected P12KeystoreGenerationParameters getKeyGenParameters() throws IOException {
-        P12KeystoreGenerationParameters params = new P12KeystoreGenerationParameters(
+    protected KeystoreGenerationParameters getKeyGenParameters() throws IOException {
+        KeystoreGenerationParameters params = new KeystoreGenerationParameters(
                 getPassword());
 
         SecureRandom random = securityFactory.getRandom4Key();

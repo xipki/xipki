@@ -48,6 +48,7 @@ import java.util.StringTokenizer;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
@@ -75,6 +76,7 @@ import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.IssuerHash;
 import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.util.X509Util;
+import org.xipki.pki.ocsp.client.api.OcspRequestor;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 
 /**
@@ -131,6 +133,9 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
     @Completion(FilePathCompleter.class)
     private Boolean isAttrCert = Boolean.FALSE;
 
+    @Reference
+    private OcspRequestor requestor;
+
     static {
         EXTENSION_OIDNAME_MAP.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff,
                 "ArchiveCutoff");
@@ -165,16 +170,17 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             String ocspUrl = null;
 
             X500Name issuerX500Name = null;
-            if (isAttrCert) {
-                issuerX500Name = X500Name.getInstance(
-                        issuerCert.getSubjectX500Principal().getEncoded());
-            }
 
             for (String certFile : certFiles) {
                 BigInteger sn;
                 List<String> ocspUrls;
 
                 if (isAttrCert) {
+                    if (issuerX500Name == null) {
+                        issuerX500Name = X500Name.getInstance(
+                                issuerCert.getSubjectX500Principal().getEncoded());
+                    }
+
                     X509AttributeCertificateHolder cert =
                             new X509AttributeCertificateHolder(IoUtil.read(certFile));
                     // no signature validation
@@ -296,12 +302,12 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
 
     public static List<String> extractOcspUrls(final X509Certificate cert)
             throws CertificateEncodingException {
-        byte[] extValue = X509Util.getCoreExtValue(cert, Extension.authorityInfoAccess);
-        if (extValue == null) {
+        byte[] extnValue = X509Util.getCoreExtValue(cert, Extension.authorityInfoAccess);
+        if (extnValue == null) {
             return Collections.emptyList();
         }
 
-        AuthorityInformationAccess aia = AuthorityInformationAccess.getInstance(extValue);
+        AuthorityInformationAccess aia = AuthorityInformationAccess.getInstance(extnValue);
         return extractOcspUrls(aia);
     }
 

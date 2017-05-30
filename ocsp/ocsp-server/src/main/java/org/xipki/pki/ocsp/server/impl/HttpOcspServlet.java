@@ -127,6 +127,14 @@ public class HttpOcspServlet extends HttpServlet {
     private void processRequest(final HttpServletRequest request,
             final HttpServletResponse response, final ResponderAndRelativeUri respAndUri,
             final boolean getMethod) throws ServletException, IOException {
+        if (server == null) {
+            String message = "responder in servlet not configured";
+            LOG.error(message);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
+            return;
+        }
+
         Responder responder = respAndUri.getResponder();
         AuditEvent event = null;
         AuditLevel auditLevel = AuditLevel.INFO;
@@ -143,18 +151,6 @@ public class HttpOcspServlet extends HttpServlet {
         }
 
         try {
-            if (server == null) {
-                String message = "responder in servlet not configured";
-                LOG.error(message);
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.setContentLength(0);
-
-                auditLevel = AuditLevel.ERROR;
-                auditStatus = AuditStatus.FAILED;
-                auditMessage = message;
-                return;
-            }
-
             InputStream requestStream;
             if (getMethod) {
                 String relativeUri = respAndUri.getRelativeUri();
@@ -285,9 +281,7 @@ public class HttpOcspServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } catch (Throwable th) {
-            final String message = "Throwable thrown, this should not happen!";
-            LogUtil.error(LOG, th, message);
-
+            LOG.error("Throwable thrown, this should not happen!", th);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
 

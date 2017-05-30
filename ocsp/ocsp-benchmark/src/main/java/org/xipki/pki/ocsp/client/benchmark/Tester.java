@@ -32,37 +32,41 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.commons.security.pkcs12;
+package org.xipki.pki.ocsp.client.benchmark;
 
-import java.security.SecureRandom;
+import java.math.BigInteger;
+import java.net.URI;
+import java.util.Arrays;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.commons.common.util.BigIntegerRange;
+import org.xipki.commons.common.util.IoUtil;
+import org.xipki.commons.common.util.RangeBigIntegerIterator;
+import org.xipki.pki.ocsp.client.api.RequestOptions;
 
-/**
- * @author Lijun Liao
- * @since 2.0.0
- */
+public class Tester {
 
-public class P12KeystoreGenerationParameters {
+    public static void main(String[] args) {
+        try {
+            String issuerCertFile = "/home/lliao/source/xipki/dist/xipki-pki/"
+                    + "xipki-pki-2.2.0-SNAPSHOT/output/SubCAwithCRL1.der";
+            URI serverUrl = new URI("http://localhost:8080/ocsp/responder2");
+            Certificate issuerCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
 
-    private final char[] password;
+            BigIntegerRange serialNumbers = new BigIntegerRange(BigInteger.valueOf(1),
+                    BigInteger.valueOf(2));
+            RangeBigIntegerIterator serialNumberIterator =
+                    new RangeBigIntegerIterator(Arrays.asList(serialNumbers), true);
 
-    private SecureRandom random;
-
-    public P12KeystoreGenerationParameters(final char[] password) {
-        this.password = ParamUtil.requireNonNull("password", password);
-    }
-
-    public SecureRandom getRandom() {
-        return random;
-    }
-
-    public void setRandom(final SecureRandom random) {
-        this.random = random;
-    }
-
-    public char[] getPassword() {
-        return password;
+            RequestOptions options = new RequestOptions();
+            OcspLoadTest loadTest = new OcspLoadTest(issuerCert, serverUrl, options,
+                    serialNumberIterator, 0, "dummy");
+            loadTest.setDuration("30s");
+            loadTest.setThreads(10);
+            loadTest.test();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
 }

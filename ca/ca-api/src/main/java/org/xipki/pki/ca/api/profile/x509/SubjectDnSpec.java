@@ -140,7 +140,8 @@ public class SubjectDnSpec {
                 tmpForwardDNs.add(oid);
             }
         } catch (Exception ex) {
-            throw new RuntimeException("could not load RDN order: " + ex.getMessage(), ex);
+            throw new ExceptionInInitializerError(new Exception(
+                    "could not load RDN order: " + ex.getMessage(), ex));
         } finally {
             try {
                 reader.close();
@@ -203,7 +204,8 @@ public class SubjectDnSpec {
                 LOG.info("area/country codes: {}", list);
             }
         } catch (Exception ex) {
-            throw new RuntimeException("could not load area code: " + ex.getMessage(), ex);
+            throw new ExceptionInInitializerError(new Exception(
+                    "could not load area code: " + ex.getMessage(), ex));
         } finally {
             try {
                 reader.close();

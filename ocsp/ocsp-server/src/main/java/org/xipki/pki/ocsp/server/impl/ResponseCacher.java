@@ -65,6 +65,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
 import org.xipki.commons.datasource.springframework.dao.DataIntegrityViolationException;
+import org.xipki.commons.datasource.springframework.jdbc.DuplicateKeyException;
 import org.xipki.commons.security.AlgorithmCode;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.util.X509Util;
@@ -221,8 +222,8 @@ class ResponseCacher {
         return (issuer == null) ? null : issuer.getId();
     }
 
-    int storeIssuer(X509Certificate issuerCert)
-            throws DataAccessException, CertificateException, InvalidConfException {
+    Integer storeIssuer(X509Certificate issuerCert)
+            throws CertificateException, InvalidConfException, DataAccessException {
         if (!master) {
             throw new IllegalStateException("storeIssuer is not permitted in slave mode");
         }
@@ -235,29 +236,35 @@ class ResponseCacher {
 
         byte[] encodedCert = issuerCert.getEncoded();
         String sha1FpCert = HashAlgoType.SHA1.base64Hash(encodedCert);
+
         int maxId = (int) datasource.getMax(null, "ISSUER", "ID");
         int id = maxId + 1;
-
-        final String sql = SQL_ADD_ISSUER;
-        PreparedStatement ps = null;
         try {
-            ps = prepareStatement(sql);
-            int idx = 1;
-            ps.setInt(idx++, id);
-            ps.setString(idx++, sha1FpCert);
-            ps.setString(idx++, Base64.toBase64String(encodedCert));
+            final String sql = SQL_ADD_ISSUER;
+            PreparedStatement ps = null;
+            try {
+                ps = prepareStatement(sql);
+                int idx = 1;
+                ps.setInt(idx++, id);
+                ps.setString(idx++, sha1FpCert);
+                ps.setString(idx++, Base64.toBase64String(encodedCert));
 
-            ps.execute();
+                ps.execute();
 
-            IssuerEntry newInfo = new IssuerEntry(id, issuerCert);
-            issuerStore.addIssuer(newInfo);
-        } catch (SQLException ex) {
-            throw datasource.translate(sql, ex);
-        } finally {
-            datasource.releaseResources(ps, null);
+                IssuerEntry newInfo = new IssuerEntry(id, issuerCert);
+                issuerStore.addIssuer(newInfo);
+                return id;
+            } catch (SQLException ex) {
+                throw datasource.translate(sql, ex);
+            } finally {
+                datasource.releaseResources(ps, null);
+            }
+        } catch (DataAccessException ex) {
+            if (ex instanceof DuplicateKeyException) {
+                return id;
+            }
+            throw ex;
         }
-
-        return id;
     }
 
     OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber,
@@ -273,9 +280,6 @@ class ResponseCacher {
             ps.setLong(1, id);
             rs = ps.executeQuery();
             if (!rs.next()) {
-                // TODO: delete log
-                LOG.warn("TBD: NO ENTRY id {}, issuer {}, ident {}, serial {}, sigAlg, hashAlg",
-                        id, issuerId, ident, serialNumber, sigAlg, certHashAlg);
                 return null;
             }
 
@@ -393,8 +397,10 @@ class ResponseCacher {
                 datasource.returnConnection(conn);
             }
         } catch (DataAccessException ex) {
-            LogUtil.error(LOG, ex,
-                "could not cache OCSP response iid=" + issuerId + ", ident=" + ident);
+            LOG.info("could not cache OCSP response iid={}, ident={}", issuerId, ident);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("could not cache OCSP response iid=" + issuerId + ", ident=" + ident, ex);
+            }
         }
     }
 

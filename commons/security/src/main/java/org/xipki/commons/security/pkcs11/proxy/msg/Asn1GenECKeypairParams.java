@@ -45,6 +45,8 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
+import org.xipki.commons.security.pkcs11.P11NewKeyControl;
+import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 
 /**
  *
@@ -52,6 +54,7 @@ import org.xipki.commons.security.exception.BadAsn1ObjectException;
  * GenECKeypairParams ::= SEQUENCE {
  *     slotId               P11SlotIdentifier,
  *     label                UTF8STRING,
+ *     control              NewKeyControl,
  *     curveId              OBJECT IDENTIFIER }
  * </pre>
  *
@@ -62,26 +65,28 @@ import org.xipki.commons.security.exception.BadAsn1ObjectException;
 // CHECKSTYLE:SKIP
 public class Asn1GenECKeypairParams extends ASN1Object {
 
-    private final Asn1P11SlotIdentifier slotId;
+    private final P11SlotIdentifier slotId;
 
     private final String label;
 
+    private final P11NewKeyControl control;
+
     private final ASN1ObjectIdentifier curveId;
 
-    public Asn1GenECKeypairParams(final Asn1P11SlotIdentifier slotId, final String label,
-            final ASN1ObjectIdentifier curveId) {
+    public Asn1GenECKeypairParams(final P11SlotIdentifier slotId, final String label,
+            final P11NewKeyControl control, final ASN1ObjectIdentifier curveId) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.label = ParamUtil.requireNonBlank("label", label);
+        this.control = ParamUtil.requireNonNull("control", control);
         this.curveId = ParamUtil.requireNonNull("curveId", curveId);
     }
 
     private Asn1GenECKeypairParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
-        Asn1Util.requireRange(seq, 3, 3);
+        Asn1Util.requireRange(seq, 4, 4);
         int idx = 0;
-        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
+        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getSlotId();
         label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-        ParamUtil.requireNonBlank("label", label);
-
+        control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
         curveId = Asn1Util.getObjectIdentifier(seq.getObjectAt(idx++));
     }
 
@@ -108,18 +113,22 @@ public class Asn1GenECKeypairParams extends ASN1Object {
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(slotId);
+        vector.add(new Asn1P11SlotIdentifier(slotId));
         vector.add(new DERUTF8String(label));
         vector.add(curveId);
         return new DERSequence(vector);
     }
 
-    public Asn1P11SlotIdentifier getSlotId() {
+    public P11SlotIdentifier getSlotId() {
         return slotId;
     }
 
     public String getLabel() {
         return label;
+    }
+
+    public P11NewKeyControl getControl() {
+        return control;
     }
 
     public ASN1ObjectIdentifier getCurveId() {

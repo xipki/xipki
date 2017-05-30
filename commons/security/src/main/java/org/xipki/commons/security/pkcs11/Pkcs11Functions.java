@@ -55,7 +55,7 @@ public class Pkcs11Functions {
 
     public static String getMechanismDesc(final long mechanism) {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%#08x", mechanism));
+        sb.append(String.format("%#010x", mechanism));
         String name = Functions.mechanismCodeToString(mechanism);
         if (name != null) {
             sb.append(" (").append(name).append(")");

@@ -101,7 +101,7 @@ public class HttpProxyServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } catch (Throwable th) {
-            LogUtil.error(LOG, th, "Throwable thrown, this should not happen.");
+            LOG.error("Throwable thrown, this should not happen.", th);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } finally {

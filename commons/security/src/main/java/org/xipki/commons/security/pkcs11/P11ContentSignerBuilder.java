@@ -166,10 +166,11 @@ public class P11ContentSignerBuilder {
             signers.add(signer);
         } // end for
 
+        final boolean mac = false;
         PrivateKey privateKey = new P11PrivateKey(cryptService, identityId);
         DefaultConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(signers, privateKey);
+            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, privateKey);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }

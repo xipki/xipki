@@ -98,7 +98,7 @@ if { $printUsage equals "true" } {
     echo "Sleeping 1 second"
     sleep 1
 
-    echo "Loadtest OCSP status (database based cert source)"
+    echo "Loadtest OCSP status"
     xipki-ocsp:loadtest-status \
       --issuer output/SubCA1.der \
       --cert output/TLS_C2.der \
@@ -106,7 +106,7 @@ if { $printUsage equals "true" } {
       --duration $duration \
       --thread $threads
 
-    echo "Loadtest OCSP status (CRL based cert source)"
+    echo "Loadtest OCSP status"
     xipki-ocsp:loadtest-status \
       --issuer output/SubCAwithCRL1.der \
       --cert output/OCSP2.der \

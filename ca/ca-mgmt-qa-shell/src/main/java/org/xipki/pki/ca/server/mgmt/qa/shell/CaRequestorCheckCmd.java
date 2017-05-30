@@ -120,7 +120,7 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
         boolean ra = isEnabled(raS, false, "ra");
         boolean bo = entry.isRa();
         if (ra != bo) {
-            throw new UnexpectedException("ra: is '" + bo + "', expected '" + ra + "'");
+            throw new CmdFailure("ra: is '" + bo + "', expected '" + ra + "'");
         }
 
         if (permissions != null) {

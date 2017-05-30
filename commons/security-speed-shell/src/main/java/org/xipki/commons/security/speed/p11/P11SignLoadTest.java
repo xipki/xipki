@@ -45,6 +45,7 @@ import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.ConcurrentContentSigner;
 import org.xipki.commons.security.SecurityFactory;
 import org.xipki.commons.security.SignerConf;
+import org.xipki.commons.security.pkcs11.P11NewKeyControl;
 import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.commons.security.pkcs11.P11Slot;
 import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
@@ -114,6 +115,12 @@ public abstract class P11SignLoadTest extends LoadExecutor {
         } catch (Exception ex) {
             LogUtil.error(LOG, ex, "could not delete PKCS#11 key " + objectId);
         }
+    }
+
+    protected static P11NewKeyControl getNewKeyControl() {
+        P11NewKeyControl control = new P11NewKeyControl();
+        control.setExtractable(true);
+        return control;
     }
 
     @Override

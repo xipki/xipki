@@ -32,28 +32,23 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.client.impl;
+package org.xipki.commons.security.speed.cmd.completer;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.commons.console.karaf.AbstractEnumCompleter;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
-// CHECKSTYLE:SKIP
-class SHA1DigestCalculator extends AbstractDigestCalculator {
 
-    @Override
-    protected ASN1ObjectIdentifier getObjectIdentifier() {
-        return OIWObjectIdentifiers.idSHA1;
-    }
+@Service
+//CHECKSTYLE:SKIP
+public class HMACSigAlgCompleter extends AbstractEnumCompleter {
 
-    @Override
-    protected Digest getDigester() {
-        return new SHA1Digest();
+    public HMACSigAlgCompleter() {
+        setTokens("HMACSHA1,HMACSHA224,HMACSHA256,HMACSHA384,HMACSHA512,HMACSHA3-224,"
+                + ",HMACSHA3-256,,HMACSHA3-384,,HMACSHA3-512");
     }
 
 }

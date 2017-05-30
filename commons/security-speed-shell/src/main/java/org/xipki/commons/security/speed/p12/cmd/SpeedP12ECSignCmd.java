@@ -40,6 +40,7 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.console.karaf.completer.ECCurveNameCompleter;
+import org.xipki.commons.security.speed.cmd.completer.ECDSASigAlgCompleter;
 import org.xipki.commons.security.speed.p12.P12ECSignLoadTest;
 
 /**
@@ -59,6 +60,13 @@ public class SpeedP12ECSignCmd extends SpeedP12SignCommandSupport {
                     + "(required)")
     @Completion(ECCurveNameCompleter.class)
     private String curveName;
+
+    @Option(name = "--sig-algo",
+            required = true,
+            description = "signature algorithm\n"
+                    + "(required)")
+    @Completion(ECDSASigAlgCompleter.class)
+    private String sigAlgo;
 
     @Override
     protected LoadExecutor getTester() throws Exception {

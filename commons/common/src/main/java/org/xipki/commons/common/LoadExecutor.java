@@ -189,7 +189,7 @@ public abstract class LoadExecutor {
         return errorAccount.get();
     }
 
-    protected void account(final int all, final int failed) {
+    public void account(final int all, final int failed) {
         processLog.addNumProcessed(all);
         errorAccount.addAndGet(failed);
     }
@@ -222,10 +222,22 @@ public abstract class LoadExecutor {
         final long account = processLog.getNumProcessed();
         StringBuilder sb = new StringBuilder();
         long elapsedTimeMs = processLog.getTotalElapsedTime();
-        sb.append("finished in " + StringUtil.formatTime(elapsedTimeMs / 1000, false) + "\n");
-        sb.append("account: " + account + " " + unit + "\n");
-        sb.append(" failed: " + errorAccount.get() + " " + unit + "\n");
-        sb.append("average: " + processLog.getTotalAverageSpeed() + " " + unit + "/s\n");
+        sb.append("finished in ")
+            .append(StringUtil.formatTime(elapsedTimeMs / 1000, false)).append("\n")
+            .append("account: ")
+            .append(StringUtil.formatAccount(account, 1))
+            .append(" ")
+            .append(unit).append("\n")
+            .append(" failed: ")
+            .append(StringUtil.formatAccount(errorAccount.get(), 1))
+            .append(" ")
+            .append(unit).append("\n")
+            .append("average: ")
+            .append(StringUtil.formatAccount(processLog.getTotalAverageSpeed(), 1))
+            .append(" ")
+            .append(unit)
+            .append("/s\n");
+
         System.out.println(sb.toString());
     }
 

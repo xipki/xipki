@@ -126,7 +126,6 @@ import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.commons.security.SecurityFactory;
 import org.xipki.commons.security.SignerConf;
 import org.xipki.commons.security.exception.NoIdleSignerException;
-import org.xipki.commons.security.util.AlgorithmUtil;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ocsp.api.CertStatus;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
@@ -648,10 +647,25 @@ public class OcspServer {
             CertprofileOption certprofileOption = (cfoName == null) ? null
                     : certprofileOptions.get(cfoName);
 
+            ResponseOption responseOption = responseOptions.get(option.getResponseOptionName());
+            ResponderSigner signer = signers.get(option.getSignerName());
+            if (signer.isMacSigner()) {
+                if (responseOption.isResponderIdByName()) {
+                    throw new InvalidConfException(
+                            "could not use ResponderIdByName for signer "
+                            + option.getSignerName());
+                }
+
+                if (EmbedCertsMode.NONE != responseOption.getEmbedCertsMode()) {
+                    throw new InvalidConfException(
+                            "could not embed certifcate in response for signer "
+                            + option.getSignerName());
+                }
+            }
+
             Responder responder = new Responder(option,
                     requestOptions.get(option.getRequestOptionName()),
-                    responseOptions.get(option.getResponseOptionName()), auditOption,
-                    certprofileOption, signers.get(option.getSignerName()), statusStores);
+                    responseOption, auditOption, certprofileOption, signer, statusStores);
             responders.put(name, responder);
         } // end for
     } // method doInit
@@ -813,8 +827,7 @@ public class OcspServer {
                 }
                 cacheDbCertHashAlgCode = certHashAlgo.getAlgorithmCode();
 
-                cacheDbSigAlgCode = AlgorithmUtil.getSignatureAlgorithmCode(
-                        concurrentSigner.getAlgorithmIdentifier());
+                cacheDbSigAlgCode = concurrentSigner.getAlgorithmCode();
 
                 byte[] nameHash = certId.getIssuerNameHash();
                 byte[] keyHash = certId.getIssuerKeyHash();
@@ -919,7 +932,7 @@ public class OcspServer {
 
                 // cache response in database
                 if (canCacheDb && repControl.canCacheInfo) {
-                    // Don't cache the response with status UNKNOWN, since this may results in DDoS
+                    // Don't cache the response with status UNKNOWN, since this may result in DDoS
                     // of storage
                     responseCacher.storeOcspResponse(cacheDbIssuerId.intValue(),
                             cacheDbSerialNumber, repControl.cacheThisUpdate,
@@ -942,7 +955,7 @@ public class OcspServer {
                         "OCSPRespBuilder.build() with OCSPException");
                 return createUnsuccessfulOcspResp(OcspResponseStatus.internalError);
             }
-        } catch (Throwable th) {
+        } catch (Exception th) {
             LogUtil.error(LOG, th);
             fillAuditEvent(event, AuditLevel.ERROR, AuditStatus.FAILED, "internal error");
             return createUnsuccessfulOcspResp(OcspResponseStatus.internalError);

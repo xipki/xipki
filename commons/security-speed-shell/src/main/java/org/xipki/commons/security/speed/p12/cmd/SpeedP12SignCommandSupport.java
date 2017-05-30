@@ -34,7 +34,6 @@
 
 package org.xipki.commons.security.speed.p12.cmd;
 
-import org.apache.karaf.shell.api.action.Option;
 import org.xipki.commons.security.speed.cmd.SingleSpeedCommandSupport;
 
 /**
@@ -43,11 +42,5 @@ import org.xipki.commons.security.speed.cmd.SingleSpeedCommandSupport;
  */
 
 public abstract class SpeedP12SignCommandSupport extends SingleSpeedCommandSupport {
-
-    @Option(name = "--sig-algo",
-            required = true,
-            description = "signature algorithm\n"
-                    + "(required)")
-    protected String sigAlgo;
 
 }

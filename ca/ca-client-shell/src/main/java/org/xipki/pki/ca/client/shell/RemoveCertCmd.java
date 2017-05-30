@@ -34,12 +34,12 @@
 
 package org.xipki.pki.ca.client.shell;
 
-import java.rmi.UnexpectedException;
 import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.RequestResponseDebug;
+import org.xipki.commons.console.karaf.CmdFailure;
 import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ca.client.api.CertIdOrError;
@@ -81,7 +81,7 @@ public class RemoveCertCmd extends UnRevRemoveCertCommandSupport {
 
         if (certIdOrError.getError() != null) {
             PkiStatusInfo error = certIdOrError.getError();
-            throw new UnexpectedException("removing certificate failed: " + error);
+            throw new CmdFailure("removing certificate failed: " + error);
         } else {
             println("removed certificate");
         }

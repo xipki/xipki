@@ -54,7 +54,7 @@ import org.xipki.commons.security.shell.completer.P11ModuleNameCompleter;
 @Command(scope = "xipki-tk", name = "token-info",
         description = "list objects in PKCS#11 device")
 @Service
-public class P11ListSlotCmd extends SecurityCommandSupport {
+public class P11TokenInfoCmd extends SecurityCommandSupport {
 
     @Option(name = "--verbose", aliases = "-v",
             description = "show object information verbosely")
@@ -81,6 +81,7 @@ public class P11ListSlotCmd extends SecurityCommandSupport {
 
         P11Slot slot = getSlot(moduleName, slotIndex);
         slot.showDetails(System.out, verbose);
+        System.out.println();
         System.out.flush();
         return null;
     }

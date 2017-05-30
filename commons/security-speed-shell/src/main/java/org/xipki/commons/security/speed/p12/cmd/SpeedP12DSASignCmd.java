@@ -35,9 +35,11 @@
 package org.xipki.commons.security.speed.p12.cmd;
 
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.common.LoadExecutor;
+import org.xipki.commons.security.speed.cmd.completer.DSASigAlgCompleter;
 import org.xipki.commons.security.speed.p12.P12DSASignLoadTest;
 
 /**
@@ -58,6 +60,13 @@ public class SpeedP12DSASignCmd extends SpeedP12SignCommandSupport {
     @Option(name = "--qlen",
             description = "bit length of the sub-prime")
     private Integer qlen;
+
+    @Option(name = "--sig-algo",
+            required = true,
+            description = "signature algorithm\n"
+                    + "(required)")
+    @Completion(DSASigAlgCompleter.class)
+    private String sigAlgo;
 
     @Override
     protected LoadExecutor getTester() throws Exception {

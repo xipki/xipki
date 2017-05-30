@@ -35,6 +35,7 @@
   <properties>
     <karaf.version>4.0.8</karaf.version>
     <karaf-plugin.version>4.0.8</karaf-plugin.version>
+    <jetty.version>9.2.19.v20160908</jetty.version>
     <bc.version>1.56</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
     <servlet-api.version>2.5</servlet-api.version>
@@ -107,6 +108,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-client</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk15on</artifactId>
         <version>${bc.version}</version>
@@ -124,6 +130,11 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
       <dependency>

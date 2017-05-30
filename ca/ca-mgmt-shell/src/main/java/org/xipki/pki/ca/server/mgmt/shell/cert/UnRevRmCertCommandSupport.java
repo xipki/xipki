@@ -36,7 +36,6 @@ package org.xipki.pki.ca.server.mgmt.shell.cert;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.rmi.UnexpectedException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -95,7 +94,7 @@ public abstract class UnRevRmCertCommandSupport extends CaCommandSupport {
             X509Certificate caCert = ((X509CaEntry) ca).getCertificate();
             X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
             if (!X509Util.issues(caCert, cert)) {
-                throw new UnexpectedException(
+                throw new CmdFailure(
                         "certificate '" + certFile + "' is not issued by CA " + caName);
             }
             serialNumber = cert.getSerialNumber();

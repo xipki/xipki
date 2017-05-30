@@ -65,7 +65,7 @@ import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 
 public class Asn1RemoveObjectsParams extends ASN1Object {
 
-    private final Asn1P11SlotIdentifier slotId;
+    private final P11SlotIdentifier slotId;
 
     private final byte[] objectId;
 
@@ -81,13 +81,13 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
 
         this.objectId = objectId;
         this.objectLabel = objectLabel;
-        this.slotId = new Asn1P11SlotIdentifier(slotId);
+        this.slotId = slotId;
     }
 
     private Asn1RemoveObjectsParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 3);
         int idx = 0;
-        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
+        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getSlotId();
         final int size = seq.size();
         ASN1Encodable asn1Id = null;
         ASN1Encodable asn1Label = null;
@@ -135,12 +135,12 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
     @Override
     public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector vector = new ASN1EncodableVector();
-        vector.add(slotId);
+        vector.add(new Asn1P11SlotIdentifier(slotId));
         vector.add(new DERUTF8String(objectLabel));
         return new DERSequence(vector);
     }
 
-    public Asn1P11SlotIdentifier getSlotId() {
+    public P11SlotIdentifier getSlotId() {
         return slotId;
     }
 

@@ -614,10 +614,6 @@ public class X509Util {
             throws CertificateEncodingException {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
         ParamUtil.requireNonNull("cert", cert);
-        boolean isCa = issuerCert.getBasicConstraints() >= 0;
-        if (!isCa) {
-            return false;
-        }
 
         boolean issues = issuerCert.getSubjectX500Principal().equals(
                 cert.getIssuerX500Principal());
@@ -633,6 +629,31 @@ public class X509Util {
             long issuerNotBefore = issuerCert.getNotBefore().getTime();
             long issuerNotAfter = issuerCert.getNotAfter().getTime();
             long notBefore = cert.getNotBefore().getTime();
+            issues = notBefore <= issuerNotAfter && notBefore >= issuerNotBefore;
+        }
+
+        return issues;
+    }
+
+    public static boolean issues(final org.bouncycastle.asn1.x509.Certificate issuerCert,
+            final org.bouncycastle.asn1.x509.Certificate cert)
+            throws CertificateEncodingException {
+        ParamUtil.requireNonNull("issuerCert", issuerCert);
+        ParamUtil.requireNonNull("cert", cert);
+
+        boolean issues = issuerCert.getSubject().equals(cert.getIssuer());
+        if (issues) {
+            byte[] ski = extractSki(issuerCert);
+            byte[] aki = extractAki(cert);
+            if (ski != null) {
+                issues = Arrays.equals(ski, aki);
+            }
+        }
+
+        if (issues) {
+            long issuerNotBefore = issuerCert.getStartDate().getDate().getTime();
+            long issuerNotAfter = issuerCert.getEndDate().getDate().getTime();
+            long notBefore = cert.getStartDate().getDate().getTime();
             issues = notBefore <= issuerNotAfter && notBefore >= issuerNotBefore;
         }
 

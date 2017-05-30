@@ -39,8 +39,8 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.commons.console.karaf.completer.ECCurveNameCompleter;
-import org.xipki.commons.security.pkcs12.P12KeypairGenerationResult;
-import org.xipki.commons.security.pkcs12.P12KeypairGenerator;
+import org.xipki.commons.security.pkcs12.P12KeyGenerationResult;
+import org.xipki.commons.security.pkcs12.P12KeyGenerator;
 
 /**
  * @author Lijun Liao
@@ -53,6 +53,10 @@ import org.xipki.commons.security.pkcs12.P12KeypairGenerator;
 // CHECKSTYLE:SKIP
 public class P12ECKeyGenCmd extends P12KeyGenCommandSupport {
 
+    @Option(name = "--subject", aliases = "-s",
+            description = "subject of the self-signed certificate")
+    protected String subject;
+
     @Option(name = "--curve",
             description = "EC curve name or OID")
     @Completion(ECCurveNameCompleter.class)
@@ -60,9 +64,9 @@ public class P12ECKeyGenCmd extends P12KeyGenCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        P12KeypairGenerationResult keypair = new P12KeypairGenerator().generateECKeypair(curveName,
+        P12KeyGenerationResult keypair = new P12KeyGenerator().generateECKeypair(curveName,
                 getKeyGenParameters(), subject);
-        saveKeypair(keypair);
+        saveKey(keypair);
 
         return null;
     }

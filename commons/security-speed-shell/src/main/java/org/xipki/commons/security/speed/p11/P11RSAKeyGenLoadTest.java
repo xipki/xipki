@@ -61,7 +61,7 @@ public class P11RSAKeyGenLoadTest extends P11KeyGenLoadTest {
     @Override
     protected void genKeypair() throws Exception {
         P11ObjectIdentifier objId = slot.generateRSAKeypair(keysize, publicExponent,
-                getDummyLabel());
+                getDummyLabel(), getControl());
         slot.removeIdentity(objId);
     }
 

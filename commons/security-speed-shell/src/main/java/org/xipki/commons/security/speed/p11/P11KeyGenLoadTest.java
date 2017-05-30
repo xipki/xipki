@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.security.pkcs11.P11NewKeyControl;
 import org.xipki.commons.security.pkcs11.P11Slot;
 
 /**
@@ -76,6 +77,12 @@ public abstract class P11KeyGenLoadTest extends LoadExecutor {
 
     protected String getDummyLabel() {
         return "loadtest-" + idx.getAndIncrement();
+    }
+
+    protected P11NewKeyControl getControl() {
+        P11NewKeyControl control = new P11NewKeyControl();
+        control.setExtractable(true);
+        return control;
     }
 
     @Override

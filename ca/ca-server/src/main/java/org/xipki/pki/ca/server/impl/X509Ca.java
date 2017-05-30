@@ -1873,8 +1873,9 @@ public class X509Ca {
                 try {
                     cert = X509Util.toX509Cert(bcCert);
                 } catch (CertificateException ex) {
-                    throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-                            "should not happen, could not parse generated certificate");
+                    String message = "should not happen, could not parse generated certificate";
+                    LOG.error(message, ex);
+                    throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
                 }
 
                 if (!verifySignature(cert)) {

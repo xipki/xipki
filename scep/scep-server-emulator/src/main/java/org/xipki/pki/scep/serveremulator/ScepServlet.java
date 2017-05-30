@@ -284,8 +284,7 @@ public class ScepServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } catch (Throwable th) {
-            final String message = "Throwable thrown, this should not happen!";
-            LogUtil.error(LOG, th, message);
+            LOG.error("Throwable thrown, this should not happen!", th);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
             auditLevel = AuditLevel.ERROR;

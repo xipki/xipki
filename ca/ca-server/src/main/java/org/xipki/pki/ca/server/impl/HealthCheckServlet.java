@@ -126,8 +126,7 @@ public class HealthCheckServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         } catch (Throwable th) {
-            final String message = "Throwable thrown, this should not happen!";
-            LOG.warn(message, th);
+            LOG.error("Throwable thrown, this should not happen!", th);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         }
