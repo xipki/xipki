@@ -34,6 +34,8 @@
 
 package org.xipki.commons.security.pkcs11.emulator;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -43,12 +45,13 @@ import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
@@ -58,9 +61,13 @@ import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
@@ -83,11 +90,11 @@ import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.P11UnknownEntityException;
-import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.pkcs11.AbstractP11Slot;
 import org.xipki.commons.security.pkcs11.P11EntityIdentifier;
 import org.xipki.commons.security.pkcs11.P11Identity;
 import org.xipki.commons.security.pkcs11.P11MechanismFilter;
+import org.xipki.commons.security.pkcs11.P11NewKeyControl;
 import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 import org.xipki.commons.security.pkcs11.P11SlotRefreshResult;
@@ -118,6 +125,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     private static final String DIR_PRIV_KEY = "privkey";
     private static final String DIR_PUB_KEY = "pubkey";
+    private static final String DIR_SEC_KEY = "seckey";
     private static final String DIR_CERT = "cert";
 
     private static final String INFO_FILE_SUFFIX = ".info";
@@ -147,6 +155,29 @@ class EmulatorP11Slot extends AbstractP11Slot {
         PKCS11Constants.CKM_DSA_KEY_PAIR_GEN,
         PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN,
         PKCS11Constants.CKM_EC_KEY_PAIR_GEN,
+        PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN,
+
+        // Digest
+        PKCS11Constants.CKM_SHA_1,
+        PKCS11Constants.CKM_SHA224,
+        PKCS11Constants.CKM_SHA256,
+        PKCS11Constants.CKM_SHA384,
+        PKCS11Constants.CKM_SHA512,
+        PKCS11Constants.CKM_SHA3_224,
+        PKCS11Constants.CKM_SHA3_256,
+        PKCS11Constants.CKM_SHA3_384,
+        PKCS11Constants.CKM_SHA3_512,
+
+        // HMAC
+        PKCS11Constants.CKM_SHA_1_HMAC,
+        PKCS11Constants.CKM_SHA224_HMAC,
+        PKCS11Constants.CKM_SHA256_HMAC,
+        PKCS11Constants.CKM_SHA384_HMAC,
+        PKCS11Constants.CKM_SHA512_HMAC,
+        PKCS11Constants.CKM_SHA3_224_HMAC,
+        PKCS11Constants.CKM_SHA3_256_HMAC,
+        PKCS11Constants.CKM_SHA3_384_HMAC,
+        PKCS11Constants.CKM_SHA3_512_HMAC,
 
         PKCS11Constants.CKM_RSA_X_509,
 
@@ -204,7 +235,11 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     private final File pubKeyDir;
 
+    private final File secKeyDir;
+
     private final File certDir;
+
+    private final char[] password;
 
     private final PrivateKeyCryptor privateKeyCryptor;
 
@@ -216,12 +251,14 @@ class EmulatorP11Slot extends AbstractP11Slot {
     private static final Logger LOG = LoggerFactory.getLogger(EmulatorP11Slot.class);
 
     EmulatorP11Slot(final String moduleName, final File slotDir, final P11SlotIdentifier slotId,
-            final boolean readOnly, final PrivateKeyCryptor privateKeyCryptor,
+            final boolean readOnly, final char[] password,
+            final PrivateKeyCryptor privateKeyCryptor,
             final P11MechanismFilter mechanismFilter, final int maxSessions)
             throws P11TokenException {
         super(moduleName, slotId, readOnly, mechanismFilter);
 
         this.slotDir = ParamUtil.requireNonNull("slotDir", slotDir);
+        this.password = ParamUtil.requireNonNull("password", password);
         this.privateKeyCryptor = ParamUtil.requireNonNull("privateKeyCryptor", privateKeyCryptor);
         this.maxSessions = ParamUtil.requireMin("maxSessions", maxSessions, 1);
 
@@ -233,6 +270,11 @@ class EmulatorP11Slot extends AbstractP11Slot {
         this.pubKeyDir = new File(slotDir, DIR_PUB_KEY);
         if (!this.pubKeyDir.exists()) {
             this.pubKeyDir.mkdirs();
+        }
+
+        this.secKeyDir = new File(slotDir, DIR_SEC_KEY);
+        if (!this.secKeyDir.exists()) {
+            this.secKeyDir.mkdirs();
         }
 
         this.certDir = new File(slotDir, DIR_CERT);
@@ -260,8 +302,52 @@ class EmulatorP11Slot extends AbstractP11Slot {
             ret.addMechanism(mech);
         }
 
-        // Certificates
+        // Secret Keys
+        File[] secKeyInfoFiles = secKeyDir.listFiles(INFO_FILENAME_FILTER);
 
+        if (secKeyInfoFiles != null && secKeyInfoFiles.length != 0) {
+            for (File secKeyInfoFile : secKeyInfoFiles) {
+                byte[] id = getKeyIdFromInfoFilename(secKeyInfoFile.getName());
+                String hexId = Hex.toHexString(id);
+
+                try {
+                    Properties props = loadProperties(secKeyInfoFile);
+                    String label = props.getProperty(PROP_LABEL);
+
+                    P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
+                    byte[] encodedValue = IoUtil.read(
+                            new File(secKeyDir, hexId + VALUE_FILE_SUFFIX));
+
+                    KeyStore ks = KeyStore.getInstance("JCEKS");
+                    ks.load(new ByteArrayInputStream(encodedValue), password);
+                    SecretKey key = null;
+                    Enumeration<String> aliases = ks.aliases();
+                    while (aliases.hasMoreElements()) {
+                        String alias = aliases.nextElement();
+                        if (ks.isKeyEntry(alias)) {
+                            key = (SecretKey) ks.getKey(alias, password);
+                            break;
+                        }
+                    }
+
+                    EmulatorP11Identity identity = new EmulatorP11Identity(this,
+                            new P11EntityIdentifier(slotId, p11ObjId), key,
+                            maxSessions, random);
+                    LOG.info("added PKCS#11 secret key {}", p11ObjId);
+                    ret.addIdentity(identity);
+                } catch (InvalidKeyException | ClassCastException ex) {
+                    LogUtil.warn(LOG, ex,
+                            "InvalidKeyException while initializing key with key-id " + hexId);
+                    continue;
+                } catch (Throwable th) {
+                    LOG.error("unexpected exception while initializing key with key-id " + hexId,
+                            th);
+                    continue;
+                }
+            }
+        }
+
+        // Certificates
         File[] certInfoFiles = certDir.listFiles(INFO_FILENAME_FILTER);
         if (certInfoFiles != null) {
             for (File infoFile : certInfoFiles) {
@@ -281,50 +367,51 @@ class EmulatorP11Slot extends AbstractP11Slot {
         // Private / Public keys
         File[] privKeyInfoFiles = privKeyDir.listFiles(INFO_FILENAME_FILTER);
 
-        if (privKeyInfoFiles == null || privKeyInfoFiles.length == 0) {
-            return ret;
-        }
+        if (privKeyInfoFiles != null && privKeyInfoFiles.length != 0) {
+            for (File privKeyInfoFile : privKeyInfoFiles) {
+                byte[] id = getKeyIdFromInfoFilename(privKeyInfoFile.getName());
+                String hexId = Hex.toHexString(id);
 
-        for (File privKeyInfoFile : privKeyInfoFiles) {
-            byte[] id = getKeyIdFromInfoFilename(privKeyInfoFile.getName());
-            String hexId = Hex.toHexString(id);
+                try {
+                    Properties props = loadProperties(privKeyInfoFile);
+                    String label = props.getProperty(PROP_LABEL);
 
-            try {
-                Properties props = loadProperties(privKeyInfoFile);
-                String label = props.getProperty(PROP_LABEL);
+                    P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
+                    X509Cert cert = ret.getCertForId(id);
+                    java.security.PublicKey publicKey = (cert == null) ? readPublicKey(id)
+                            : cert.getCert().getPublicKey();
 
-                P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
-                X509Cert cert = ret.getCertForId(id);
-                java.security.PublicKey publicKey = (cert == null) ? readPublicKey(id)
-                        : cert.getCert().getPublicKey();
-
-                if (publicKey == null) {
-                    LOG.warn("Neither public key nor certificate is associated with private key {}",
+                    if (publicKey == null) {
+                        LOG.warn(
+                            "Neither public key nor certificate is associated with private key {}",
                             p11ObjId);
+                        continue;
+                    }
+
+                    byte[] encodedValue = IoUtil.read(
+                            new File(privKeyDir, hexId + VALUE_FILE_SUFFIX));
+
+                    PKCS8EncryptedPrivateKeyInfo epki =
+                            new PKCS8EncryptedPrivateKeyInfo(encodedValue);
+                    PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
+
+                    X509Certificate[] certs = (cert == null) ? null
+                            : new X509Certificate[]{cert.getCert()};
+
+                    EmulatorP11Identity identity = new EmulatorP11Identity(this,
+                            new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey, certs,
+                            maxSessions, random);
+                    LOG.info("added PKCS#11 key {}", p11ObjId);
+                    ret.addIdentity(identity);
+                } catch (InvalidKeyException ex) {
+                    LogUtil.warn(LOG, ex,
+                            "InvalidKeyException while initializing key with key-id " + hexId);
+                    continue;
+                } catch (Throwable th) {
+                    LOG.error("unexpected exception while initializing key with key-id " + hexId,
+                            th);
                     continue;
                 }
-
-                byte[] encodedValue = IoUtil.read(new File(privKeyDir, hexId + VALUE_FILE_SUFFIX));
-
-                PKCS8EncryptedPrivateKeyInfo epki = new PKCS8EncryptedPrivateKeyInfo(encodedValue);
-                PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
-
-                X509Certificate[] certs = (cert == null) ? null
-                        : new X509Certificate[]{cert.getCert()};
-
-                EmulatorP11Identity identity = new EmulatorP11Identity(this,
-                        new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey, certs,
-                        maxSessions, random);
-                LOG.info("added PKCS#11 key {}", p11ObjId);
-                ret.addIdentity(identity);
-            } catch (InvalidKeyException ex) {
-                LogUtil.warn(LOG, ex,
-                        "InvalidKeyException while initializing key with key-id " + hexId);
-                continue;
-            } catch (Throwable th) {
-                LogUtil.warn(LOG, th,
-                        "unexpected exception while initializing key with key-id " + hexId);
-                continue;
             }
         }
 
@@ -518,6 +605,25 @@ class EmulatorP11Slot extends AbstractP11Slot {
         return ids.size();
     }
 
+    private void savePkcs11SecretKey(final byte[] id, final String label,
+            final SecretKey secretKey) throws P11TokenException {
+        byte[] encrytedValue;
+        try {
+            KeyStore ks = KeyStore.getInstance("JCEKS");
+            ks.load(null, password);
+            ks.setKeyEntry("main", secretKey, password, null);
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            ks.store(outStream, password);
+            outStream.flush();
+            encrytedValue = outStream.toByteArray();
+        } catch (NoSuchAlgorithmException | KeyStoreException
+                | CertificateException | IOException ex) {
+            throw new P11TokenException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        }
+
+        savePkcs11Entry(secKeyDir, id, label, encrytedValue);
+    }
+
     private void savePkcs11PrivateKey(final byte[] id, final String label,
             final PrivateKey privateKey) throws P11TokenException {
         PKCS8EncryptedPrivateKeyInfo encryptedPrivKeyInfo = privateKeyCryptor.encrypt(privateKey);
@@ -650,12 +756,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     private void savePkcs11Cert(final byte[] id, final String label, final X509Certificate cert)
-            throws XiSecurityException, P11TokenException {
-        try {
-            savePkcs11Entry(certDir, id, label, cert.getEncoded());
-        } catch (CertificateEncodingException ex) {
-            throw new XiSecurityException(ex.getMessage(), ex);
-        }
+            throws P11TokenException, CertificateException {
+        savePkcs11Entry(certDir, id, label, cert.getEncoded());
     }
 
     private static void savePkcs11Entry(final File dir, final byte[] id, final String label,
@@ -689,6 +791,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         int num = deletePkcs11Entry(privKeyDir, id, label);
         num += deletePkcs11Entry(pubKeyDir, id, label);
         num += deletePkcs11Entry(certDir, id, label);
+        num += deletePkcs11Entry(secKeyDir, id, label);
         return num;
     }
 
@@ -697,7 +800,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
         boolean b1 = removePkcs11Entry(certDir, objectId);
         boolean b2 = removePkcs11Entry(privKeyDir, objectId);
         boolean b3 = removePkcs11Entry(pubKeyDir, objectId);
-        if (! (b1 || b2 || b3)) {
+        boolean b4 = removePkcs11Entry(secKeyDir, objectId);
+        if (! (b1 || b2 || b3 || b4)) {
             throw new P11UnknownEntityException(slotId, objectId);
         }
     }
@@ -709,13 +813,64 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     @Override
     protected void doAddCert(final P11ObjectIdentifier objectId, final X509Certificate cert)
-            throws P11TokenException, XiSecurityException {
+            throws P11TokenException, CertificateException {
         savePkcs11Cert(objectId.getId(), objectId.getLabel(), cert);
     }
 
     @Override
+    protected P11Identity doGenerateSecretKey(long keyType, int keysize, String label,
+            P11NewKeyControl control)
+            throws P11TokenException {
+        if (keysize % 8 != 0) {
+            throw new IllegalArgumentException("keysize is not multiple of 8: " + keysize);
+        }
+        byte[] keyBytes = new byte[keysize / 8];
+        random.nextBytes(keyBytes);
+        SecretKey key = new SecretKeySpec(keyBytes, getSecretKeyAlgorithm(keyType));
+        return saveP11Entity(key, label);
+    }
+
+    @Override
+    protected P11Identity doCreateSecretKey(long keyType, byte[] keyValue, String label,
+            P11NewKeyControl control)
+            throws P11TokenException {
+        SecretKey key = new SecretKeySpec(keyValue, getSecretKeyAlgorithm(keyType));
+        return saveP11Entity(key, label);
+    }
+
+    private static String getSecretKeyAlgorithm(long keyType) {
+        String algorithm;
+        if (PKCS11Constants.CKK_GENERIC_SECRET == keyType) {
+            algorithm = "generic";
+        } else if (PKCS11Constants.CKK_AES == keyType) {
+            algorithm = "AES";
+        } else if (PKCS11Constants.CKK_SHA_1_HMAC == keyType) {
+            algorithm = "HMACSHA1";
+        } else if (PKCS11Constants.CKK_SHA224_HMAC == keyType) {
+            algorithm = "HMACSHA224";
+        } else if (PKCS11Constants.CKK_SHA256_HMAC == keyType) {
+            algorithm = "HMACSHA256";
+        } else if (PKCS11Constants.CKK_SHA384_HMAC == keyType) {
+            algorithm = "HMACSHA384";
+        } else if (PKCS11Constants.CKK_SHA512_HMAC == keyType) {
+            algorithm = "HMACSHA512";
+        } else if (PKCS11Constants.CKK_SHA3_224_HMAC == keyType) {
+            algorithm = "HMACSHA3-224";
+        } else if (PKCS11Constants.CKK_SHA3_256_HMAC == keyType) {
+            algorithm = "HMACSHA3-256";
+        } else if (PKCS11Constants.CKK_SHA3_384_HMAC == keyType) {
+            algorithm = "HMACSHA3-384";
+        } else if (PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
+            algorithm = "HMACSHA3-512";
+        } else {
+            throw new IllegalArgumentException("unsupported keyType " + keyType);
+        }
+        return algorithm;
+    }
+
+    @Override
     protected P11Identity doGenerateRSAKeypair(final int keysize, final BigInteger publicExponent,
-            final String label) throws P11TokenException {
+            final String label, P11NewKeyControl control) throws P11TokenException {
         KeyPair keypair;
         try {
             keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent, random);
@@ -729,7 +884,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
     @Override
     // CHECKSTYLE:OFF
     protected P11Identity doGenerateDSAKeypair(final BigInteger p, final BigInteger q,
-            final BigInteger g, final String label) throws P11TokenException {
+            final BigInteger g, final String label, P11NewKeyControl control)
+            throws P11TokenException {
     // CHECKSTYLE:ON
         DSAParameters dsaParams = new DSAParameters(p, q, g);
         KeyPair keypair;
@@ -744,7 +900,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     @Override
     protected P11Identity doGenerateECKeypair(final ASN1ObjectIdentifier curveId,
-            final String label) throws P11TokenException {
+            final String label, P11NewKeyControl control) throws P11TokenException {
         KeyPair keypair;
         try {
             keypair = KeyUtil.generateECKeypairForCurveNameOrOid(curveId.getId(), random);
@@ -771,9 +927,24 @@ class EmulatorP11Slot extends AbstractP11Slot {
         }
     }
 
+    private P11Identity saveP11Entity(@NonNull final SecretKey key, @NonNull final String label)
+            throws P11TokenException {
+        byte[] id = generateId();
+        savePkcs11SecretKey(id, label, key);
+        P11EntityIdentifier identityId = new P11EntityIdentifier(slotId,
+                new P11ObjectIdentifier(id, label));
+        try {
+            return new EmulatorP11Identity(this,identityId, key, maxSessions, random);
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException ex) {
+            throw new P11TokenException(
+                    "could not construct KeyStoreP11Identity: " + ex.getMessage(), ex);
+        }
+    }
+
     @Override
     protected void doUpdateCertificate(final P11ObjectIdentifier objectId,
-            final X509Certificate newCert) throws XiSecurityException, P11TokenException {
+            final X509Certificate newCert)
+            throws P11TokenException, CertificateException {
         removePkcs11Cert(objectId);
         doAddCert(objectId, newCert);
     }

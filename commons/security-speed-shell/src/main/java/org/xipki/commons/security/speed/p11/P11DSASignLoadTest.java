@@ -54,7 +54,8 @@ public class P11DSASignLoadTest extends P11SignLoadTest {
 
     private static P11ObjectIdentifier generateKey(final P11Slot slot, final int plength,
             final int qlength) throws Exception {
-        return slot.generateDSAKeypair(plength, qlength, "loadtest-" + System.currentTimeMillis());
+        return slot.generateDSAKeypair(plength, qlength, "loadtest-" + System.currentTimeMillis(),
+                getNewKeyControl());
     }
 
 }

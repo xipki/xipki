@@ -80,6 +80,12 @@ public abstract class P12SignLoadTest extends LoadExecutor {
 
     public P12SignLoadTest(final SecurityFactory securityFactory, final String signatureAlgorithm,
             final byte[] keystore, final String description) throws Exception {
+        this("PKCS12", securityFactory, signatureAlgorithm, keystore, description);
+    }
+
+    public P12SignLoadTest(final String tokenType,
+            final SecurityFactory securityFactory, final String signatureAlgorithm,
+            final byte[] keystore, final String description) throws Exception {
         super(description);
 
         ParamUtil.requireNonNull("securityFactory", securityFactory);
@@ -88,7 +94,7 @@ public abstract class P12SignLoadTest extends LoadExecutor {
 
         SignerConf signerConf = SignerConf.getKeystoreSignerConf(
                 new ByteArrayInputStream(keystore), PASSWORD, signatureAlgorithm, 20);
-        this.signer = securityFactory.createSigner("PKCS12", signerConf, (X509Certificate) null);
+        this.signer = securityFactory.createSigner(tokenType, signerConf, (X509Certificate) null);
     }
 
     @Override

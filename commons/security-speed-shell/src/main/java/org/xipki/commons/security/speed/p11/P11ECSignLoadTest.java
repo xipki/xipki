@@ -56,7 +56,8 @@ public class P11ECSignLoadTest extends P11SignLoadTest {
             throws Exception {
         ParamUtil.requireNonNull("slot", slot);
         ParamUtil.requireNonNull("curveNameOrOid", curveNameOrOid);
-        return slot.generateECKeypair(curveNameOrOid, "loadtest-" + System.currentTimeMillis());
+        return slot.generateECKeypair(curveNameOrOid, "loadtest-" + System.currentTimeMillis(),
+                getNewKeyControl());
     }
 
 }

@@ -62,7 +62,8 @@ public class P11RSASignLoadTest extends P11SignLoadTest {
             final BigInteger publicExponent) throws Exception {
         ParamUtil.requireNonNull("slot", slot);
         return slot.generateRSAKeypair(
-                keysize, publicExponent, "loadtest-" + System.currentTimeMillis());
+                keysize, publicExponent, "loadtest-" + System.currentTimeMillis(),
+                getNewKeyControl());
     }
 
 }

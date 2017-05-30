@@ -129,7 +129,9 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             final X509Certificate[] certificateChain) throws ObjectCreationException {
         ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf,
                 certificateChain);
-        validateSigner(signer, type, conf);
+        if (!signer.isMac()) {
+            validateSigner(signer, type, conf);
+        }
         return signer;
     }
 
@@ -243,7 +245,8 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
         }
 
         ConcurrentContentSigner signer = signerFactoryRegister.newSigner(this, type, conf, certs);
-        return new KeyCertPair(signer.getPrivateKey(), signer.getCertificate());
+        PrivateKey privateKey = (PrivateKey) signer.getSigningKey();
+        return new KeyCertPair(privateKey, signer.getCertificate());
     }
 
     @Override

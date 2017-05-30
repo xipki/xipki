@@ -37,6 +37,7 @@ package org.xipki.commons.security.pkcs11;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
@@ -45,7 +46,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.P11UnknownEntityException;
 import org.xipki.commons.security.exception.P11UnsupportedMechanismException;
-import org.xipki.commons.security.exception.XiSecurityException;
 
 /**
  * @author Lijun Liao
@@ -83,7 +83,7 @@ public interface P11Slot {
     P11ObjectIdentifier getObjectIdForLabel(String label);
 
     void updateCertificate(@NonNull P11ObjectIdentifier objectId, @NonNull X509Certificate newCert)
-            throws P11TokenException, XiSecurityException;
+            throws P11TokenException, CertificateException;
 
     /**
      *
@@ -99,32 +99,44 @@ public interface P11Slot {
     void removeCerts(@NonNull P11ObjectIdentifier objectId) throws P11TokenException;
 
     P11ObjectIdentifier addCert(@NonNull X509Certificate cert)
-            throws P11TokenException, XiSecurityException;
+            throws P11TokenException, CertificateException;
 
     void addCert(@NonNull P11ObjectIdentifier objectId, @NonNull X509Certificate cert)
-            throws P11TokenException, XiSecurityException;
+            throws P11TokenException, CertificateException;
 
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateRSAKeypair(int keysize, @NonNull BigInteger publicExponent,
-            @NonNull String label) throws P11TokenException, XiSecurityException;
+            @NonNull String label, @NonNull P11NewKeyControl control)
+            throws P11TokenException;
 
     // CHECKSTYLE:SKIP
-    P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, @NonNull String label)
-            throws P11TokenException, XiSecurityException;
+    P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, @NonNull String label,
+            @NonNull P11NewKeyControl control)
+            throws P11TokenException;
 
     // CHECKSTYLE:OFF
     P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
-            @NonNull String label)  throws P11TokenException, XiSecurityException;
+            @NonNull String label, @NonNull P11NewKeyControl control)
+            throws P11TokenException;
     // CHECKSTYLE:ON
 
     // CHECKSTYLE:SKIP
-    P11ObjectIdentifier generateECKeypair(@NonNull String curveNameOrOid, @NonNull String label)
-            throws P11TokenException, XiSecurityException;
+    P11ObjectIdentifier generateECKeypair(@NonNull String curveNameOrOid, @NonNull String label,
+            @NonNull P11NewKeyControl control)
+            throws P11TokenException;
+
+    P11ObjectIdentifier generateSecretKey(long keyType, int keysize, @NonNull String label,
+            @NonNull P11NewKeyControl control)
+            throws P11TokenException;
+
+    P11ObjectIdentifier createSecretKey(long keyType, byte[] keyValue, @NonNull String label,
+            @NonNull P11NewKeyControl control)
+            throws P11TokenException;
 
     X509Certificate exportCert(@NonNull P11ObjectIdentifier objectId)
-            throws P11TokenException, XiSecurityException;
+            throws P11TokenException, CertificateException;
 
     void showDetails(@NonNull OutputStream stream, boolean verbose)
-            throws P11TokenException, XiSecurityException, IOException;
+            throws P11TokenException, IOException;
 
 }

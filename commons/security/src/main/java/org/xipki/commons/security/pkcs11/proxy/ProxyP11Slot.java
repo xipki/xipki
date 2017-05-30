@@ -47,30 +47,30 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.StringUtil;
 import org.xipki.commons.security.X509Cert;
 import org.xipki.commons.security.exception.BadAsn1ObjectException;
 import org.xipki.commons.security.exception.P11TokenException;
 import org.xipki.commons.security.exception.P11UnknownEntityException;
-import org.xipki.commons.security.exception.XiSecurityException;
 import org.xipki.commons.security.pkcs11.AbstractP11Slot;
 import org.xipki.commons.security.pkcs11.P11EntityIdentifier;
 import org.xipki.commons.security.pkcs11.P11Identity;
 import org.xipki.commons.security.pkcs11.P11MechanismFilter;
+import org.xipki.commons.security.pkcs11.P11NewKeyControl;
 import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.commons.security.pkcs11.P11SlotIdentifier;
 import org.xipki.commons.security.pkcs11.P11SlotRefreshResult;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1CreateSecretKeyParams;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1EntityIdAndCert;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1GenDSAKeypairParams;
 import org.xipki.commons.security.pkcs11.proxy.msg.Asn1GenECKeypairParams;
 import org.xipki.commons.security.pkcs11.proxy.msg.Asn1GenRSAKeypairParams;
+import org.xipki.commons.security.pkcs11.proxy.msg.Asn1GenSecretKeyParams;
 import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11EntityIdentifier;
 import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11ObjectIdentifier;
 import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11ObjectIdentifiers;
 import org.xipki.commons.security.pkcs11.proxy.msg.Asn1P11SlotIdentifier;
 import org.xipki.commons.security.pkcs11.proxy.msg.Asn1RemoveObjectsParams;
-import org.xipki.commons.security.pkcs11.proxy.msg.Asn1EntityIdAndCert;
-import org.xipki.commons.security.pkcs11.proxy.msg.Asn1GenDSAKeypairParams;
 import org.xipki.commons.security.util.KeyUtil;
 import org.xipki.commons.security.util.X509Util;
 
@@ -81,18 +81,16 @@ import org.xipki.commons.security.util.X509Util;
 
 public class ProxyP11Slot extends AbstractP11Slot {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProxyP11Slot.class);
-
     private final ProxyP11Module module;
 
-    private final Asn1P11SlotIdentifier asn1SlotId;
+    private final P11SlotIdentifier slotId;
 
     ProxyP11Slot(final ProxyP11Module module, final P11SlotIdentifier slotId,
             final boolean readOnly, final P11MechanismFilter mechanismFilter)
             throws P11TokenException {
         super(module.getName(), slotId, readOnly, mechanismFilter);
         this.module = module;
-        this.asn1SlotId = new Asn1P11SlotIdentifier(slotId);
+        this.slotId = slotId;
         refresh();
     }
 
@@ -117,7 +115,6 @@ public class ProxyP11Slot extends AbstractP11Slot {
             }
         }
 
-        // keys
         List<P11ObjectIdentifier> keyIds =
                 getObjectIdsFromServer(P11ProxyConstants.ACTION_GET_IDENTITY_IDS);
         for (P11ObjectIdentifier keyId : keyIds) {
@@ -128,17 +125,18 @@ public class ProxyP11Slot extends AbstractP11Slot {
                 pubKey = cert.getCert().getPublicKey();
             } else {
                 pubKey = getPublicKey(keyId);
-                if (pubKey == null) {
-                    LOG.warn("Neither public key nor certificate is associated with private key {}",
-                            keyId);
-                    continue;
-                }
             }
 
-            X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
+            P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, keyId);
+            ProxyP11Identity identity;
+            if (pubKey == null) {
+                identity = new ProxyP11Identity(this, entityId);
+            } else {
+                X509Certificate[] certs = (cert == null)
+                        ? null : new X509Certificate[]{cert.getCert()};
 
-            ProxyP11Identity identity = new ProxyP11Identity(this,
-                    new P11EntityIdentifier(slotId, keyId), pubKey, certs);
+                identity = new ProxyP11Identity(this, entityId, pubKey, certs);
+            }
             refreshResult.addIdentity(identity);
         }
 
@@ -205,7 +203,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
 
     @Override
     protected void doAddCert(final P11ObjectIdentifier objectId, final X509Certificate cert)
-            throws P11TokenException, XiSecurityException {
+            throws P11TokenException, CertificateException {
         Asn1EntityIdAndCert asn1 = new Asn1EntityIdAndCert(
                 new P11EntityIdentifier(slotId, objectId), cert);
         module.send(P11ProxyConstants.ACTION_ADD_CERT, asn1);
@@ -218,10 +216,30 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
 
     @Override
+    protected P11Identity doGenerateSecretKey(long keyType, int keysize, String label,
+            final P11NewKeyControl control)
+            throws P11TokenException {
+        Asn1GenSecretKeyParams asn1 = new Asn1GenSecretKeyParams(
+                slotId, label, control, keyType, keysize);
+        byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_SECRET_KEY, asn1);
+        return parseGenerateSecretKeyResult(resp);
+    }
+
+    @Override
+    protected P11Identity doCreateSecretKey(long keyType, byte[] keyValue, String label,
+            final P11NewKeyControl control)
+            throws P11TokenException {
+        Asn1CreateSecretKeyParams asn1 = new Asn1CreateSecretKeyParams(
+                slotId, label, control, keyType, keyValue);
+        byte[] resp = module.send(P11ProxyConstants.ACTION_CREATE_SECRET_KEY, asn1);
+        return parseGenerateSecretKeyResult(resp);
+    }
+
+    @Override
     protected P11Identity doGenerateRSAKeypair(final int keysize, final BigInteger publicExponent,
-            final String label) throws P11TokenException {
-        Asn1GenRSAKeypairParams asn1 = new Asn1GenRSAKeypairParams(asn1SlotId, label, keysize,
-                publicExponent);
+            final String label, final P11NewKeyControl control) throws P11TokenException {
+        Asn1GenRSAKeypairParams asn1 = new Asn1GenRSAKeypairParams(slotId, label, control,
+                keysize, publicExponent);
         byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_RSA, asn1);
         return parseGenerateKeypairResult(resp);
     }
@@ -229,17 +247,20 @@ public class ProxyP11Slot extends AbstractP11Slot {
     @Override
     // CHECKSTYLE:OFF
     protected P11Identity doGenerateDSAKeypair(final BigInteger p, final BigInteger q,
-            final BigInteger g, final String label) throws P11TokenException {
+            final BigInteger g, final String label, final P11NewKeyControl control)
+            throws P11TokenException {
     // CHECKSTYLE:ON
-        Asn1GenDSAKeypairParams asn1 = new Asn1GenDSAKeypairParams(asn1SlotId, label, p, q, g);
+        Asn1GenDSAKeypairParams asn1 = new Asn1GenDSAKeypairParams(slotId, label,
+                control, p, q, g);
         byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_DSA, asn1);
         return parseGenerateKeypairResult(resp);
     }
 
     @Override
     protected P11Identity doGenerateECKeypair(final ASN1ObjectIdentifier curveId,
-            final String label) throws P11TokenException {
-        Asn1GenECKeypairParams asn1 = new Asn1GenECKeypairParams(asn1SlotId, label, curveId);
+            final String label, final P11NewKeyControl control) throws P11TokenException {
+        Asn1GenECKeypairParams asn1 = new Asn1GenECKeypairParams(slotId, label, control,
+                curveId);
         byte[] resp = module.send(P11ProxyConstants.ACTION_GEN_KEYPAIR_EC, asn1);
         return parseGenerateKeypairResult(resp);
     }
@@ -265,9 +286,29 @@ public class ProxyP11Slot extends AbstractP11Slot {
         return new ProxyP11Identity(this, entityId, publicKey, null);
     }
 
+    private P11Identity parseGenerateSecretKeyResult(final byte[] resp)
+            throws P11TokenException {
+        if (resp == null) {
+            throw new P11TokenException("server returned no result");
+        }
+        Asn1P11EntityIdentifier ei;
+        try {
+            ei = Asn1P11EntityIdentifier.getInstance(resp);
+        } catch (BadAsn1ObjectException ex) {
+            throw new P11TokenException(
+                    "invalid ASN1 object Asn1P11EntityIdentifier: " + ex.getMessage(), ex);
+        }
+        if (!slotId.equals(ei.getSlotId().getSlotId())) {
+            throw new P11TokenException("");
+        }
+        P11EntityIdentifier entityId = ei.getEntityId();
+        return new ProxyP11Identity(this, entityId);
+    }
+
     @Override
     protected void doUpdateCertificate(final P11ObjectIdentifier objectId,
-            final X509Certificate newCert) throws XiSecurityException, P11TokenException {
+            final X509Certificate newCert)
+            throws P11TokenException, CertificateException {
         Asn1EntityIdAndCert asn1 = new Asn1EntityIdAndCert(
                 new P11EntityIdentifier(slotId, objectId), newCert);
         module.send(P11ProxyConstants.ACTION_UPDATE_CERT, asn1);

@@ -40,16 +40,16 @@ import org.xipki.commons.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
 
-public class P12KeystoreGenerationParameters {
+public class KeystoreGenerationParameters {
 
     private final char[] password;
 
     private SecureRandom random;
 
-    public P12KeystoreGenerationParameters(final char[] password) {
+    public KeystoreGenerationParameters(final char[] password) {
         this.password = ParamUtil.requireNonNull("password", password);
     }
 

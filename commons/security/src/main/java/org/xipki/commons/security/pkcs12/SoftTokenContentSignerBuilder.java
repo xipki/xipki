@@ -105,7 +105,7 @@ public class SoftTokenContentSignerBuilder {
         private RSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
                 final boolean useNssForPss)
             throws NoSuchAlgorithmException, NoSuchPaddingException {
-            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgId(signatureAlgId));
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
             this.useNssForPss = useNssForPss;
         }
 
@@ -154,7 +154,7 @@ public class SoftTokenContentSignerBuilder {
 
         private DSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
                 final boolean plain) throws NoSuchAlgorithmException {
-            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgId(signatureAlgId));
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
             this.plain = plain;
         }
 
@@ -181,7 +181,7 @@ public class SoftTokenContentSignerBuilder {
 
         private ECDSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
                 final boolean plain) throws NoSuchAlgorithmException {
-            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgId(signatureAlgId));
+            super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
             this.plain = plain;
         }
 
@@ -401,9 +401,10 @@ public class SoftTokenContentSignerBuilder {
             }
         }
 
+        final boolean mac = false;
         ConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(signers, key);
+            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, key);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }

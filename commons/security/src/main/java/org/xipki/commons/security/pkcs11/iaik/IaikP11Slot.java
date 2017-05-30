@@ -70,6 +70,7 @@ import org.xipki.commons.security.pkcs11.AbstractP11Slot;
 import org.xipki.commons.security.pkcs11.P11EntityIdentifier;
 import org.xipki.commons.security.pkcs11.P11Identity;
 import org.xipki.commons.security.pkcs11.P11MechanismFilter;
+import org.xipki.commons.security.pkcs11.P11NewKeyControl;
 import org.xipki.commons.security.pkcs11.P11ObjectIdentifier;
 import org.xipki.commons.security.pkcs11.P11Params;
 import org.xipki.commons.security.pkcs11.P11RSAPkcsPssParams;
@@ -92,15 +93,18 @@ import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.DSAPublicKey;
 import iaik.pkcs.pkcs11.objects.ECDSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
+import iaik.pkcs.pkcs11.objects.GenericSecretKey;
 import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.objects.KeyPair;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.PublicKey;
 import iaik.pkcs.pkcs11.objects.RSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.RSAPublicKey;
+import iaik.pkcs.pkcs11.objects.SecretKey;
 import iaik.pkcs.pkcs11.objects.Storage;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 import iaik.pkcs.pkcs11.parameters.RSAPkcsPssParameters;
+import iaik.pkcs.pkcs11.wrapper.Functions;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
@@ -211,6 +215,17 @@ class IaikP11Slot extends AbstractP11Slot {
             }
         }
 
+        // secret keys
+        List<SecretKey> secretKeys = getAllSecretKeyObjects();
+        for (SecretKey secKey : secretKeys) {
+            byte[] keyId = secKey.getId().getByteArrayValue();
+            if (keyId == null || keyId.length == 0) {
+                continue;
+            }
+
+            analyseSingleKey(secKey, ret);
+        }
+
         // first get the list of all CA certificates
         List<X509PublicKeyCertificate> p11Certs = getAllCertificateObjects();
         for (X509PublicKeyCertificate p11Cert : p11Certs) {
@@ -231,19 +246,19 @@ class IaikP11Slot extends AbstractP11Slot {
                 analyseSingleKey(privKey, ret);
             } catch (XiSecurityException ex) {
                 LogUtil.error(LOG, ex,
-                        "XiSecurityException while initializing key with id " + hex(keyId));
+                        "XiSecurityException while initializing private key with id " + hex(keyId));
                 continue;
             } catch (Throwable th) {
                 String label = "";
                 if (privKey.getLabel() != null) {
                     label = new String(privKey.getLabel().getCharArrayValue());
                 }
-                LogUtil.error(LOG, th,
-                        "unexpected exception while initializing key with id " + hex(keyId)
-                        + " and label " + label);
+                LOG.error(
+                        "unexpected exception while initializing private key with id " + hex(keyId)
+                        + " and label " + label, th);
                 continue;
             }
-        } // end for (PrivateKey signatureKey : signatureKeys)
+        }
 
         return ret;
     } // method refresh
@@ -273,6 +288,16 @@ class IaikP11Slot extends AbstractP11Slot {
         countSessions.lazySet(0);
     }
 
+    private void analyseSingleKey(final SecretKey secretKey,
+            final P11SlotRefreshResult refreshResult) {
+        byte[] id = secretKey.getId().getByteArrayValue();
+        P11ObjectIdentifier objectId = new P11ObjectIdentifier(id, toString(secretKey.getLabel()));
+
+        IaikP11Identity identity = new IaikP11Identity(this,
+                new P11EntityIdentifier(slotId, objectId), secretKey);
+        refreshResult.addIdentity(identity);
+    }
+
     private void analyseSingleKey(final PrivateKey privKey,
             final P11SlotRefreshResult refreshResult)
             throws P11TokenException, XiSecurityException {
@@ -292,13 +317,62 @@ class IaikP11Slot extends AbstractP11Slot {
             pubKey = generatePublicKey(p11PublicKey);
         }
 
-        P11ObjectIdentifier objectId = new P11ObjectIdentifier(privKey.getId().getByteArrayValue(),
-                toString(privKey.getLabel()));
+        P11ObjectIdentifier objectId = new P11ObjectIdentifier(id, toString(privKey.getLabel()));
 
         X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
         IaikP11Identity identity = new IaikP11Identity(this,
                 new P11EntityIdentifier(slotId, objectId), privKey, pubKey, certs);
         refreshResult.addIdentity(identity);
+    }
+
+    byte[] digestKey(final long mechanism, final IaikP11Identity identity)
+            throws P11TokenException {
+        ParamUtil.requireNonNull("identity", identity);
+        assertMechanismSupported(mechanism);
+        Key signingKey = identity.getSigningKey();
+        if (!(signingKey instanceof SecretKey)) {
+            throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
+        }
+
+        if (LOG.isTraceEnabled()) {
+            LOG.debug("digest (init, digestKey, then finish)\n{}", signingKey);
+        }
+
+        Session session = borrowIdleSession();
+        if (session == null) {
+            throw new P11TokenException("no idle session available");
+        }
+
+        int digestLen;
+        if (PKCS11Constants.CKM_SHA_1 == mechanism) {
+            digestLen = 20;
+        } else if (PKCS11Constants.CKM_SHA224 == mechanism
+                || PKCS11Constants.CKM_SHA3_224 == mechanism) {
+            digestLen = 28;
+        } else if (PKCS11Constants.CKM_SHA256 == mechanism
+                || PKCS11Constants.CKM_SHA3_256 == mechanism) {
+            digestLen = 32;
+        } else if (PKCS11Constants.CKM_SHA384 == mechanism
+                || PKCS11Constants.CKM_SHA3_384 == mechanism) {
+            digestLen = 48;
+        } else if (PKCS11Constants.CKM_SHA512 == mechanism
+                || PKCS11Constants.CKM_SHA3_512 == mechanism) {
+            digestLen = 64;
+        } else {
+            throw new P11TokenException("unsupported mechnism " + mechanism);
+        }
+
+        try {
+            session.digestInit(Mechanism.get(mechanism));
+            session.digestKey((SecretKey) signingKey);
+            byte[] digest = new byte[digestLen];
+            session.digestFinal(digest, 0, digestLen);
+            return digest;
+        } catch (TokenException e) {
+            throw new P11TokenException(e);
+        } finally {
+            returnIdleSession(session);
+        }
     }
 
     byte[] sign(final long mechanism, final P11Params parameters, final byte[] content,
@@ -311,7 +385,7 @@ class IaikP11Slot extends AbstractP11Slot {
             return singleSign(mechanism, parameters, content, identity);
         }
 
-        PrivateKey signingKey = identity.getPrivateKey();
+        Key signingKey = identity.getSigningKey();
         Mechanism mechanismObj = getMechanism(mechanism, parameters);
         if (LOG.isTraceEnabled()) {
             LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
@@ -331,7 +405,24 @@ class IaikP11Slot extends AbstractP11Slot {
                 session.signUpdate(content, i, blockLen);
             }
 
-            return session.signFinal(identity.getExpectedSignatureLen());
+            int expectedSignatureLen = identity.getExpectedSignatureLen();
+            if (mechanism == PKCS11Constants.CKM_SHA_1_HMAC) {
+                expectedSignatureLen = 20;
+            } else if (mechanism == PKCS11Constants.CKM_SHA224_HMAC
+                    || mechanism == PKCS11Constants.CKM_SHA3_224) {
+                expectedSignatureLen = 28;
+            } else if (mechanism == PKCS11Constants.CKM_SHA256_HMAC
+                    || mechanism == PKCS11Constants.CKM_SHA3_256) {
+                expectedSignatureLen = 32;
+            } else if (mechanism == PKCS11Constants.CKM_SHA384_HMAC
+                    || mechanism == PKCS11Constants.CKM_SHA3_384) {
+                expectedSignatureLen = 48;
+            } else if (mechanism == PKCS11Constants.CKM_SHA512_HMAC
+                    || mechanism == PKCS11Constants.CKM_SHA3_512) {
+                expectedSignatureLen = 64;
+            }
+
+            return session.signFinal(expectedSignatureLen);
         } catch (TokenException e) {
             throw new P11TokenException(e);
         } finally {
@@ -341,10 +432,10 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private byte[] singleSign(final long mechanism, final P11Params parameters,
             final byte[] content, final IaikP11Identity identity) throws P11TokenException {
-        PrivateKey signingKey = identity.getPrivateKey();
+        Key signingKey = identity.getSigningKey();
         Mechanism mechanismObj = getMechanism(mechanism, parameters);
         if (LOG.isTraceEnabled()) {
-            LOG.debug("sign with private key:\n{}", signingKey);
+            LOG.debug("sign with signing key:\n{}", signingKey);
         }
 
         Session session = borrowIdleSession();
@@ -540,6 +631,36 @@ class IaikP11Slot extends AbstractP11Slot {
         } finally {
             returnIdleSession(session);
         }
+    }
+
+    private List<SecretKey> getAllSecretKeyObjects() throws P11TokenException {
+        Session session = borrowIdleSession();
+
+        try {
+            SecretKey template = new SecretKey();
+            List<Storage> tmpObjects = getObjects(session, template);
+            if (CollectionUtil.isEmpty(tmpObjects)) {
+                return Collections.emptyList();
+            }
+
+            final int n = tmpObjects.size();
+            LOG.info("found {} private keys", n);
+
+            List<SecretKey> keys = new ArrayList<>(n);
+            for (Storage tmpObject : tmpObjects) {
+                SecretKey key = (SecretKey) tmpObject;
+                keys.add(key);
+            }
+
+            return keys;
+        } finally {
+            returnIdleSession(session);
+        }
+    }
+
+    private SecretKey getSecretKeyObject(final byte[] keyId, final char[] keyLabel)
+            throws P11TokenException {
+        return (SecretKey) getKeyObject(new SecretKey(), keyId, keyLabel);
     }
 
     private PrivateKey getPrivateKeyObject(final byte[] keyId, final char[] keyLabel)
@@ -816,7 +937,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected void doAddCert(final P11ObjectIdentifier objectId, final X509Certificate cert)
-            throws P11TokenException, XiSecurityException {
+            throws P11TokenException {
         X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
                 new X509Cert(cert), objectId.getId(), objectId.getLabelChars());
         Session session = borrowWritableSession();
@@ -830,11 +951,121 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
+    protected P11Identity doGenerateSecretKey(long keyType, int keysize, String label,
+            P11NewKeyControl control)
+            throws P11TokenException {
+        if (keysize % 8 != 0) {
+            throw new IllegalArgumentException("keysize is not multiple of 8: " + keysize);
+        }
+
+        // The SecretKey class does not support the specification of valueLen
+        // So we use GenericSecretKey and set the KeyType manual.
+        GenericSecretKey template = new GenericSecretKey();
+        template.getKeyType().setLongValue(keyType);
+
+        template.getToken().setBooleanValue(true);
+        template.getLabel().setCharArrayValue(label.toCharArray());
+        template.getSign().setBooleanValue(true);
+        template.getSensitive().setBooleanValue(true);
+        template.getExtractable().setBooleanValue(control.isExtractable());
+        template.getValueLen().setLongValue((long) (keysize / 8));
+
+        long mechanism;
+        if (PKCS11Constants.CKK_AES == keyType) {
+            mechanism = PKCS11Constants.CKM_AES_KEY_GEN;
+        } else if (PKCS11Constants.CKK_DES3 == keyType) {
+            mechanism = PKCS11Constants.CKM_DES3_KEY_GEN;
+        } else if (PKCS11Constants.CKK_GENERIC_SECRET == keyType) {
+            mechanism = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
+        } else if (PKCS11Constants.CKK_SHA_1_HMAC == keyType
+                || PKCS11Constants.CKK_SHA224_HMAC == keyType
+                || PKCS11Constants.CKK_SHA256_HMAC == keyType
+                || PKCS11Constants.CKK_SHA384_HMAC == keyType
+                || PKCS11Constants.CKK_SHA512_HMAC == keyType
+                || PKCS11Constants.CKK_SHA3_224_HMAC == keyType
+                || PKCS11Constants.CKK_SHA3_256_HMAC == keyType
+                || PKCS11Constants.CKK_SHA3_384_HMAC == keyType
+                || PKCS11Constants.CKK_SHA3_512_HMAC == keyType) {
+            mechanism = PKCS11Constants.CKM_GENERIC_SECRET_KEY_GEN;
+        } else {
+            throw new IllegalArgumentException("unsupported key type "
+                    + Functions.toFullHexString((int)keyType));
+        }
+
+        Mechanism mech = Mechanism.get(mechanism);
+        SecretKey key;
+        Session session = borrowWritableSession();
+        try {
+            if (labelExists(session, label)) {
+                throw new IllegalArgumentException(
+                        "label " + label + " exists, please specify another one");
+            }
+
+            byte[] id = generateKeyId(session);
+            template.getId().setByteArrayValue(id);
+            try {
+                key = (SecretKey) session.generateKey(mech, template);
+            } catch (TokenException ex) {
+                throw new P11TokenException("could not generate generic secret key using "
+                        + mech.getName(), ex);
+            }
+
+            P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
+            P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId);
+
+            return new IaikP11Identity(this, entityId, key);
+        } finally {
+            returnWritableSession(session);
+        }
+    }
+
+    @Override
+    protected P11Identity doCreateSecretKey(long keyType, byte[] keyValue, String label,
+            P11NewKeyControl control)
+            throws P11TokenException {
+        // The SecretKey class does not support the specification of valueLen
+        // So we use GenericSecretKey and set the KeyType manual.
+        GenericSecretKey template = new GenericSecretKey();
+        template.getKeyType().setLongValue(keyType);
+
+        template.getToken().setBooleanValue(true);
+        template.getLabel().setCharArrayValue(label.toCharArray());
+        template.getSign().setBooleanValue(true);
+        template.getSensitive().setBooleanValue(true);
+        template.getExtractable().setBooleanValue(control.isExtractable());
+        template.getValue().setByteArrayValue(keyValue);
+
+        SecretKey key;
+        Session session = borrowWritableSession();
+        try {
+            if (labelExists(session, label)) {
+                throw new IllegalArgumentException(
+                        "label " + label + " exists, please specify another one");
+            }
+
+            byte[] id = generateKeyId(session);
+            template.getId().setByteArrayValue(id);
+            try {
+                key = (SecretKey) session.createObject(template);
+            } catch (TokenException ex) {
+                throw new P11TokenException("could not create secret key", ex);
+            }
+
+            P11ObjectIdentifier objId = new P11ObjectIdentifier(id, label);
+            P11EntityIdentifier entityId = new P11EntityIdentifier(slotId, objId);
+
+            return new IaikP11Identity(this, entityId, key);
+        } finally {
+            returnWritableSession(session);
+        }
+    }
+
+    @Override
     protected P11Identity doGenerateRSAKeypair(final int keysize, final BigInteger publicExponent,
-            final String label) throws P11TokenException {
+            final String label, P11NewKeyControl control) throws P11TokenException {
         RSAPrivateKey privateKey = new RSAPrivateKey();
         RSAPublicKey publicKey = new RSAPublicKey();
-        setKeyAttributes(label, PKCS11Constants.CKK_RSA, publicKey, privateKey);
+        setKeyAttributes(label, PKCS11Constants.CKK_RSA, control, publicKey, privateKey);
 
         publicKey.getModulusBits().setLongValue((long) keysize);
         if (publicExponent != null) {
@@ -847,11 +1078,12 @@ class IaikP11Slot extends AbstractP11Slot {
     @Override
     // CHECKSTYLE:OFF
     protected P11Identity doGenerateDSAKeypair(final BigInteger p, final BigInteger q,
-            final BigInteger g, final String label) throws P11TokenException {
+            final BigInteger g, final String label, P11NewKeyControl control)
+            throws P11TokenException {
     // CHECKSTYLE:ON
         DSAPrivateKey privateKey = new DSAPrivateKey();
         DSAPublicKey publicKey = new DSAPublicKey();
-        setKeyAttributes(label, PKCS11Constants.CKK_DSA, publicKey, privateKey);
+        setKeyAttributes(label, PKCS11Constants.CKK_DSA, control, publicKey, privateKey);
 
         publicKey.getPrime().setByteArrayValue(p.toByteArray());
         publicKey.getSubprime().setByteArrayValue(q.toByteArray());
@@ -861,10 +1093,10 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected P11Identity doGenerateECKeypair(final ASN1ObjectIdentifier curveId,
-            final String label) throws P11TokenException {
+            final String label, P11NewKeyControl control) throws P11TokenException {
         ECDSAPrivateKey privateKey = new ECDSAPrivateKey();
         ECDSAPublicKey publicKey = new ECDSAPublicKey();
-        setKeyAttributes(label, PKCS11Constants.CKK_EC, publicKey, privateKey);
+        setKeyAttributes(label, PKCS11Constants.CKK_EC, control, publicKey, privateKey);
         byte[] encodedCurveId;
         try {
             encodedCurveId = curveId.getEncoded();
@@ -963,6 +1195,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     private static void setKeyAttributes(final String label, final long keyType,
+            final P11NewKeyControl control,
             final PublicKey publicKey, final PrivateKey privateKey) {
         if (privateKey != null) {
             privateKey.getToken().setBooleanValue(true);
@@ -971,6 +1204,7 @@ class IaikP11Slot extends AbstractP11Slot {
             privateKey.getSign().setBooleanValue(true);
             privateKey.getPrivate().setBooleanValue(true);
             privateKey.getSensitive().setBooleanValue(true);
+            privateKey.getExtractable().setBooleanValue(control.isExtractable());
         }
 
         if (publicKey != null) {
@@ -984,7 +1218,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected void doUpdateCertificate(final P11ObjectIdentifier objectId,
-            final X509Certificate newCert) throws XiSecurityException, P11TokenException {
+            final X509Certificate newCert) throws P11TokenException {
         removeCerts(objectId);
         try {
             Thread.sleep(1000);
@@ -1040,7 +1274,20 @@ class IaikP11Slot extends AbstractP11Slot {
     protected void doRemoveIdentity(final P11ObjectIdentifier objectId) throws P11TokenException {
         Session session = borrowWritableSession();
         try {
-            PrivateKey privKey = getPrivateKeyObject(objectId.getId(), objectId.getLabelChars());
+            byte[] id = objectId.getId();
+            char[] label = objectId.getLabelChars();
+            SecretKey secretKey = getSecretKeyObject(id, label);
+            if (secretKey != null) {
+                try {
+                    session.destroyObject(secretKey);
+                } catch (TokenException ex) {
+                    String msg = "could not delete secret key " + objectId;
+                    LogUtil.error(LOG, ex, msg);
+                    throw new P11TokenException(msg);
+                }
+            }
+
+            PrivateKey privKey = getPrivateKeyObject(id, label);
             if (privKey != null) {
                 try {
                     session.destroyObject(privKey);
@@ -1051,7 +1298,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 }
             }
 
-            PublicKey pubKey = getPublicKeyObject(objectId.getId(), objectId.getLabelChars());
+            PublicKey pubKey = getPublicKeyObject(id, label);
             if (pubKey != null) {
                 try {
                     session.destroyObject(pubKey);
@@ -1062,8 +1309,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 }
             }
 
-            X509PublicKeyCertificate[] certs = getCertificateObjects(objectId.getId(),
-                    objectId.getLabelChars());
+            X509PublicKeyCertificate[] certs = getCertificateObjects(id, label);
             if (certs != null && certs.length > 0) {
                 for (int i = 0; i < certs.length; i++) {
                     try {

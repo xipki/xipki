@@ -100,7 +100,7 @@ public class IaikP11Module extends AbstractP11Module {
                 continue;
             }
 
-            if (slotInfo.isTokenPresent()) {
+            if (!slotInfo.isTokenPresent()) {
                 slotList[i] = null;
                 LOG.info("ignore slot[{}] (id={} without token", i, slot.getSlotID());
             }
@@ -182,7 +182,7 @@ public class IaikP11Module extends AbstractP11Module {
                 }
             }
         } catch (Throwable th) {
-            LogUtil.error(LOG, th, "unexpected Exception");
+            LOG.error("unexpected Exception", th);
             close(moduleConf.getName(), module);
             throw new P11TokenException(th.getMessage());
         }

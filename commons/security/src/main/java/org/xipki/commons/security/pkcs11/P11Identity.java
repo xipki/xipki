@@ -70,7 +70,15 @@ public abstract class P11Identity implements Comparable<P11Identity> {
 
     protected X509Certificate[] certificateChain;
 
-    public P11Identity(final P11Slot slot, final P11EntityIdentifier identityId,
+    protected P11Identity(final P11Slot slot, final P11EntityIdentifier identityId,
+            final int signatureBitLen) {
+        this.slot = ParamUtil.requireNonNull("slot", slot);
+        this.identityId = ParamUtil.requireNonNull("identityId", identityId);
+        this.publicKey = null;
+        this.signatureKeyBitLength = signatureBitLen;
+    } // constructor
+
+    protected P11Identity(final P11Slot slot, final P11EntityIdentifier identityId,
             final PublicKey publicKey, final X509Certificate[] certificateChain) {
         this.slot = ParamUtil.requireNonNull("slot", slot);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
@@ -120,7 +128,20 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     }
 
     protected abstract byte[] doSign(final long mechanism, @Nullable final P11Params parameters,
-            @NonNull final byte[] content) throws P11TokenException, XiSecurityException;
+            @NonNull final byte[] content) throws P11TokenException;
+
+    public byte[] digestSecretKey(long mechanism)
+            throws P11TokenException, XiSecurityException {
+        slot.assertMechanismSupported(mechanism);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("digest secret with mechanism {}",
+                    Pkcs11Functions.getMechanismDesc(mechanism));
+        }
+        return doDigestSecretKey(mechanism);
+    }
+
+    protected abstract byte[] doDigestSecretKey(final long mechanism)
+            throws P11TokenException;
 
     public P11EntityIdentifier getIdentityId() {
         return identityId;
@@ -170,6 +191,20 @@ public abstract class P11Identity implements Comparable<P11Identity> {
     }
 
     public boolean supportsMechanism(final long mechanism, final P11Params parameters) {
+        if (publicKey == null) {
+            if (PKCS11Constants.CKM_SHA_1_HMAC == mechanism
+                    || PKCS11Constants.CKM_SHA224_HMAC == mechanism
+                    || PKCS11Constants.CKM_SHA256_HMAC == mechanism
+                    || PKCS11Constants.CKM_SHA384_HMAC == mechanism
+                    || PKCS11Constants.CKM_SHA512_HMAC == mechanism
+                    || PKCS11Constants.CKM_SHA3_224_HMAC == mechanism
+                    || PKCS11Constants.CKM_SHA3_256_HMAC == mechanism
+                    || PKCS11Constants.CKM_SHA3_384_HMAC == mechanism
+                    || PKCS11Constants.CKM_SHA3_512_HMAC == mechanism) {
+                return true;
+            }
+        }
+
         if (publicKey instanceof RSAPublicKey) {
             if (PKCS11Constants.CKM_RSA_9796 == mechanism
                     || PKCS11Constants.CKM_RSA_PKCS == mechanism

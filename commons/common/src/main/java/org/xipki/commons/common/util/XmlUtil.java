@@ -80,9 +80,8 @@ public class XmlUtil {
         try {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (ParserConfigurationException ex) {
-            System.err.println("could not initialize the XMLDocumentBuilder. Message: "
-                    + ex.getMessage());
-            System.err.println("could not initialize the XMLDocumentBuilder" + ex.getMessage());
+            throw new ExceptionInInitializerError(new Exception(
+                    "could not initialize the XMLDocumentBuilder", ex));
         }
         if (builder != null) {
             document = builder.newDocument();

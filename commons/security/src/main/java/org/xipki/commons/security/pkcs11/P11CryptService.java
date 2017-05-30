@@ -69,7 +69,7 @@ public class P11CryptService {
                 LogUtil.warn(LOG, ex, "P11TokenException while initializing slot " + slotId);
                 continue;
             } catch (Throwable th) {
-                LogUtil.warn(LOG, th, "unexpected error while initializing slot " + slotId);
+                LOG.error("unexpected error while initializing slot " + slotId, th);
                 continue;
             }
 
