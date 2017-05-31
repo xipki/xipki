@@ -4,12 +4,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>xipki-group</artifactId>
+    <artifactId>xipki-parent</artifactId>
     <groupId>org.xipki</groupId>
     <version>2.2.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xipki.pki</groupId>
-  <artifactId>scep-group</artifactId>
+  <artifactId>scep-parent</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
