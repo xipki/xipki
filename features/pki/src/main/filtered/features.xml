@@ -107,30 +107,9 @@
     <bundle start-level="70">mvn:org.xipki.pki/ocsp-client-api/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-client-impl/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocspbenchmark" version="${project.version}" description="OCSP benchmark client">
-    <feature prerequisite="true">xipki-security</feature>
-    <bundle start-level="70">mvn:org.xipki.pki/ocsp-client-api/${project.version}</bundle>
-    <bundle start-level="80">wrap:mvn:com.typesafe.netty/netty-reactive-streams/2.0.0-M1</bundle>
-    <bundle start-level="80">wrap:mvn:org.reactivestreams/reactive-streams/1.0.0</bundle>
-    <bundle start-level="80">mvn:io.netty/netty-codec-dns/4.1.11.Final</bundle>
-    <bundle start-level="80">mvn:io.netty/netty-resolver/4.1.11.Final</bundle>
-    <bundle start-level="80">mvn:io.netty/netty-resolver-dns/4.1.11.Final</bundle>
-    <bundle start-level="80">mvn:io.netty/netty-transport-native-unix-common/4.1.11.Final</bundle>
-    <bundle start-level="80">mvn:io.netty/netty-common/4.1.11.Final</bundle>
-    <bundle start-level="80">mvn:io.netty/netty-transport-native-epoll/4.1.11.Final/jar/linux-x86_64</bundle>
-    <bundle start-level="80">mvn:io.netty/netty-transport/4.1.11.Final</bundle>
-    <bundle start-level="80">mvn:io.netty/netty-handler/4.1.11.Final</bundle>
-    <bundle start-level="80">mvn:io.netty/netty-codec/4.1.11.Final</bundle>
-    <bundle start-level="80">mvn:io.netty/netty-codec-http/4.1.11.Final</bundle>
-    <bundle start-level="80">mvn:io.netty/netty-buffer/4.1.11.Final</bundle>
-    <bundle start-level="80">wrap:mvn:org.asynchttpclient/async-http-client-netty-utils/2.1.0-alpha19</bundle>
-    <bundle start-level="80">wrap:mvn:org.asynchttpclient/async-http-client/2.1.0-alpha19</bundle>
-    <bundle start-level="80">mvn:org.xipki.pki/ocsp-benchmark/${project.version}</bundle>
-  </feature>
   <feature name="xipki-ocspclient-shell" version="${project.version}"
       description="OCSP client shell">
     <feature prerequisite="true">xipki-ocspclient</feature>
-    <feature prerequisite="true">xipki-ocspbenchmark</feature>
     <feature prerequisite="true">xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-client-shell/${project.version}</bundle>
   </feature>

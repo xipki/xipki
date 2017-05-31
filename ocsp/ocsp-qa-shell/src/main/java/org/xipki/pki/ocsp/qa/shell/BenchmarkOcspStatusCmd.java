@@ -56,7 +56,6 @@ import org.xipki.commons.console.karaf.IllegalCmdParamException;
 import org.xipki.commons.console.karaf.completer.FilePathCompleter;
 import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
-import org.xipki.pki.ocsp.client.benchmark.OcspLoadTest;
 import org.xipki.pki.ocsp.client.shell.OcspStatusCommandSupport;
 import org.xipki.pki.ocsp.qa.benchmark.OcspLoadTest;
 

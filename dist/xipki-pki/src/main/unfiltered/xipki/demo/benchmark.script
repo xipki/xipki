@@ -98,14 +98,8 @@ if { $printUsage equals "true" } {
 
     echo "Sleeping 1 second"
     sleep 1
-
-<<<<<<< HEAD:dist/xipki-pki/src/main/unfiltered/xipki/demo/benchmark.script
     echo "OCSP status benchmark"
     xipki-qa:benchmark-ocsp-status \
-=======
-    echo "Loadtest OCSP status"
-    xipki-ocsp:loadtest-status \
->>>>>>> 0c6092b73c1d09481e83f9c6a743ccc5a3791570:dist/xipki-pki/src/main/unfiltered/xipki/demo/loadtest.script
       --issuer output/SubCA1.der \
       --cert output/TLS_C2.der \
       --url $URL \
@@ -113,11 +107,7 @@ if { $printUsage equals "true" } {
       --thread $threads
 
     echo "Loadtest OCSP status"
-<<<<<<< HEAD:dist/xipki-pki/src/main/unfiltered/xipki/demo/benchmark.script
     xipki-qa:benchmark-ocsp-status \
-=======
-    xipki-ocsp:loadtest-status \
->>>>>>> 0c6092b73c1d09481e83f9c6a743ccc5a3791570:dist/xipki-pki/src/main/unfiltered/xipki/demo/loadtest.script
       --issuer output/SubCAwithCRL1.der \
       --cert output/OCSP2.der \
       --url $URL_CRL \
