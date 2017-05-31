@@ -9,7 +9,7 @@
     <version>7</version>
   </parent>
   <groupId>org.xipki</groupId>
-  <artifactId>xipki-group</artifactId>
+  <artifactId>xipki-parent</artifactId>
   <packaging>pom</packaging>
   <version>2.2.0-SNAPSHOT</version>
   <name>XiPKI :: ${project.artifactId}</name>
@@ -51,7 +51,7 @@
     <jdt-annotation.version>2.0.0</jdt-annotation.version>
     <!-- JDBC -->
     <jdbc.postgresql.version>9.4.1212</jdbc.postgresql.version>
-    <jdbc.h2.version>1.4.193</jdbc.h2.version>
+    <jdbc.h2.version>1.4.195</jdbc.h2.version>
     <jdbc.hsqldb.version>2.3.4</jdbc.hsqldb.version>
     <jdbc.mariadb.version>1.5.7</jdbc.mariadb.version>
   </properties>
