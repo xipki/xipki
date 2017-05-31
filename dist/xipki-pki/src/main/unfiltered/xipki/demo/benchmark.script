@@ -1,0 +1,129 @@
+printUsage = "false"
+
+argsValid = "false"
+
+if { "$1" equals "" } {
+  printUsage = "true"
+  argsValid = "true"
+} {
+  action = $1
+  if { "$action" equals "help" } {
+    printUsage = "true"
+    argsValid = "true"
+  } {
+    list = [enroll ocsp revoke]; each ($list) {
+      if { "$action" equals $it } {
+        argsValid = "true"
+      }
+    }
+  }
+}
+
+if { $argsValid equals "false" } {
+  echo "invalid arguments $args"
+  echo ""
+  printUsage = "true"
+}
+
+if { $printUsage equals "true" } {
+  echo "Usage: "
+  echo ""
+  echo "source file:./xipki/demo/benchmark.script <test type> [<durataion> [<threads>]]"
+  echo "test type:       enroll, ocsp, revoke"
+  echo "duration:        duration in seconds, default is 15"
+  echo "threads:         number of threads, default is 5"
+} {
+  if { "$2" equals "" } {
+    argsValid = "true"
+    duration = "15s"
+    threads = 5
+  } {
+    argsValid = "true"
+    duration = "$2"
+    if { "$3" equals "" } {
+      threads = 5
+    } {
+      threads = "$3"
+    }
+  }
+
+  if { "$action" equals "enroll" } {
+    feature:install -r xipki-caclient-shell
+
+    echo "Sleeping 1 second"
+    sleep 1
+
+    # Loadtest Template
+    echo "Template enroll benchmark"
+    xipki-cli:benchmark-template-enroll \
+      --template xipki/demo/demo.d/loadtest-template.xml \
+      --duration $duration \
+      --thread $threads
+
+    # Loadtest RSA key
+    echo "Enroll benchmark"
+    xipki-cli:benchmark-enroll \
+      --key-type RSA \
+      --subject "CN=xipki.org,O=example PKI company RSA,C=DE" \
+      --profile TLS \
+      -n 3 \
+      --random-dn O \
+      --duration $duration \
+      --thread $threads
+
+    feature:uninstall xipki-caclient-shell
+  }
+
+  if { "$action" equals "revoke" } {
+    feature:install -r xipki-caclient-shell
+
+    echo "Sleeping 1 second"
+    sleep 1
+
+    echo "Revoke benchmark"
+    xipki-cli:benchmark-revoke \
+      --issuer output/SubCA1.der \
+      --ca-db xipki/ca-config/ca-db.properties \
+      --duration $duration \
+      --thread $threads
+
+    feature:uninstall xipki-caclient-shell
+  }
+
+  if { "$action" equals "ocsp" } {
+    feature:install -r xipki-ocspqa-shell
+
+    URL = http://localhost:8080/ocsp/responder1
+    URL_CRL = http://localhost:8080/ocsp/responder2
+
+    echo "Sleeping 1 second"
+    sleep 1
+
+<<<<<<< HEAD:dist/xipki-pki/src/main/unfiltered/xipki/demo/benchmark.script
+    echo "OCSP status benchmark"
+    xipki-qa:benchmark-ocsp-status \
+=======
+    echo "Loadtest OCSP status"
+    xipki-ocsp:loadtest-status \
+>>>>>>> 0c6092b73c1d09481e83f9c6a743ccc5a3791570:dist/xipki-pki/src/main/unfiltered/xipki/demo/loadtest.script
+      --issuer output/SubCA1.der \
+      --cert output/TLS_C2.der \
+      --url $URL \
+      --duration $duration \
+      --thread $threads
+
+    echo "Loadtest OCSP status"
+<<<<<<< HEAD:dist/xipki-pki/src/main/unfiltered/xipki/demo/benchmark.script
+    xipki-qa:benchmark-ocsp-status \
+=======
+    xipki-ocsp:loadtest-status \
+>>>>>>> 0c6092b73c1d09481e83f9c6a743ccc5a3791570:dist/xipki-pki/src/main/unfiltered/xipki/demo/loadtest.script
+      --issuer output/SubCAwithCRL1.der \
+      --cert output/OCSP2.der \
+      --url $URL_CRL \
+      --duration $duration \
+      --thread $threads
+
+    feature:uninstall xipki-ocspqa-shell
+  }
+}

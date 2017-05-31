@@ -672,6 +672,10 @@ public class OcspServer {
 
     public void shutdown() {
         LOG.info("stopped OCSP Responder");
+        if (responseCacher != null) {
+            responseCacher.shutdown();
+        }
+
         for (OcspStore store : stores.values()) {
             try {
                 store.shutdown();

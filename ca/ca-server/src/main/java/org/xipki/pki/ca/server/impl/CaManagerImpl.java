@@ -907,9 +907,9 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         for (String dsName :datasources.keySet()) {
             DataSourceWrapper ds = datasources.get(dsName);
             try {
-                ds.shutdown();
+                ds.close();
             } catch (Exception ex) {
-                LogUtil.warn(LOG, ex, "could not shutdown datasource " + dsName);
+                LogUtil.warn(LOG, ex, "could not close datasource " + dsName);
             }
         }
 

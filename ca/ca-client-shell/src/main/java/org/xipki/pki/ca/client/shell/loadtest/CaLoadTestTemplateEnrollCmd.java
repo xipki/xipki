@@ -49,7 +49,7 @@ import org.xipki.pki.ca.client.shell.loadtest.jaxb.EnrollTemplateType;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "loadtest-template-enroll",
+@Command(scope = "xipki-cli", name = "benchmark-template-enroll",
         description = "CA client template enroll load test")
 @Service
 public class CaLoadTestTemplateEnrollCmd extends CaLoadTestCommandSupport {

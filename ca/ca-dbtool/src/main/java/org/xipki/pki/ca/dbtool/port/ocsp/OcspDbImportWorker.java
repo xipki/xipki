@@ -108,9 +108,9 @@ public class OcspDbImportWorker extends DbPortWorker {
             certStoreImporter.shutdown();
         } finally {
             try {
-                datasource.shutdown();
+                datasource.close();
             } catch (Throwable th) {
-                LOG.error("datasource.shutdown()", th);
+                LOG.error("datasource.close()", th);
             }
             long end = System.currentTimeMillis();
             System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));

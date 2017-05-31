@@ -206,7 +206,19 @@ Feature xipki-security-shell
    * `xipki-tk:refresh`
 
      refresh PKCS#11 module
+     
+   * `xipki-tk:create-secretkey`
+     
+     create secret key with given value in PKCS#11 device
 
+   * `xipki-tk:secretkey`
+     
+     generate secret key in PKCS#11 device
+     
+   * `xipki-tk:secretkey-p12`
+     
+     generate secret key in JCEKS (not PKCS#12) keystore
+     
    * `xipki-tk:rsa`
 
      generate RSA keypair in PKCS#11 device
@@ -867,17 +879,17 @@ Feature xipki-caclient-shell
 
      unrevoke certificate
 
-   * `xipki-cli:loadtest-enroll`
+   * `xipki-cli:benchmark-enroll`
 
-     CA client enroll load test
+     CA client enroll benchmark
 
-   * `xipki-cli:loadtest-loadtest-revoke`
+   * `xipki-cli:benchmark-revoke`
 
-     CA client revoke load test
+     CA client revoke benchmark
 
-   * `xipki-cli:loadtest-template-enroll`
+   * `xipki-cli:benchmark-template-enroll`
 
-     CA client template enroll load test
+     CA client template enroll benchmark
 
 Feature xipki-caqa-shell
 -----
@@ -970,13 +982,15 @@ Feature xipki-ocspclient-shell
 
 	 request certificate status
 
-   * `xipki-ocsp:loadtest-status`
-
-	 OCSP Load test
-
 Feature xipki-ocspqa-shell
 -----
 
    * `xipki-qa:ocsp-status`
 
 	 request certificate status (QA)
+
+   * `xipki-qa:benchmark-ocsp-status`
+
+     OCSP Benchmark
+
+	 

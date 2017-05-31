@@ -556,6 +556,10 @@ public class DbCertStatusStore extends OcspStore {
             scheduledThreadPoolExecutor.shutdown();
             scheduledThreadPoolExecutor = null;
         }
+
+        if (datasource != null) {
+            datasource.close();
+        }
     }
 
     @Override

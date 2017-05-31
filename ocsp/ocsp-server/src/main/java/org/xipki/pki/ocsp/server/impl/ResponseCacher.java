@@ -135,8 +135,6 @@ class ResponseCacher {
 
     } // class ExpiredResponsesCleaner
 
-    private final DataSourceWrapper datasource;
-
     private final String sqlSelectIssuerCert;
 
     private final String sqlSelectOcsp;
@@ -144,6 +142,8 @@ class ResponseCacher {
     private final boolean master;
 
     private final int validity;
+
+    private DataSourceWrapper datasource;
 
     private AtomicBoolean onService;
 
@@ -192,8 +192,9 @@ class ResponseCacher {
     }
 
     void shutdown() {
-        if (scheduledThreadPoolExecutor == null) {
-            return;
+        if (datasource != null) {
+            datasource.close();
+            datasource = null;
         }
 
         if (responseCleaner != null) {
@@ -206,15 +207,17 @@ class ResponseCacher {
             issuerUpdater = null;
         }
 
-        scheduledThreadPoolExecutor.shutdown();
-        while (!scheduledThreadPoolExecutor.isTerminated()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                LOG.error("interrupted: {}", ex.getMessage());
+        if (scheduledThreadPoolExecutor != null) {
+            scheduledThreadPoolExecutor.shutdown();
+            while (!scheduledThreadPoolExecutor.isTerminated()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    LOG.error("interrupted: {}", ex.getMessage());
+                }
             }
+            scheduledThreadPoolExecutor = null;
         }
-        scheduledThreadPoolExecutor = null;
     }
 
     Integer getIssuerId(HashAlgoType hashAlgo, byte[] nameHash, byte[] keyHash) {

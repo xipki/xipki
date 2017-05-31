@@ -620,11 +620,11 @@ public abstract class DataSourceWrapper {
         }
     }
 
-    public void shutdown() {
+    public void close() {
         try {
             service.close();
         } catch (Exception ex) {
-            LOG.warn("could not shutdown datasource: {}", ex.getMessage());
+            LOG.warn("could not close datasource: {}", ex.getMessage());
             LOG.debug("could not close datasource", ex);
         }
     }

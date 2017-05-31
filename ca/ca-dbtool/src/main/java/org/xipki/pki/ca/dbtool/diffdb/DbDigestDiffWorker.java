@@ -150,16 +150,16 @@ public class DbDigestDiffWorker extends DbPortWorker {
         } finally {
             if (refDatasource != null) {
                 try {
-                    refDatasource.shutdown();
+                    refDatasource.close();
                 } catch (Throwable th) {
-                    LOG.error("refDatasource.shutdown()", th);
+                    LOG.error("refDatasource.close()", th);
                 }
             }
 
             try {
-                datasource.shutdown();
+                datasource.close();
             } catch (Throwable th) {
-                LOG.error("datasource.shutdown()", th);
+                LOG.error("datasource.close()", th);
             }
             long end = System.currentTimeMillis();
             System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));

@@ -137,6 +137,10 @@
 
   <feature name="xipki-ocspqa-shell" version="${project.version}" description="OCSP QA shell">
     <feature prerequisite="true">xipki-ocspclient-shell</feature>
+    <bundle start-level="80">mvn:org.eclipse.jetty/jetty-io/${jetty.version}</bundle>
+    <bundle start-level="80">mvn:org.eclipse.jetty/jetty-util/${jetty.version}</bundle>
+    <bundle start-level="80">mvn:org.eclipse.jetty/jetty-http/${jetty.version}</bundle>
+    <bundle start-level="80">mvn:org.eclipse.jetty/jetty-client/${jetty.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-qa/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ocsp-qa-shell/${project.version}</bundle>
   </feature>
