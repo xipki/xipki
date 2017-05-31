@@ -21,11 +21,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>ocsp-benchmark</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xipki.commons</groupId>
       <artifactId>security</artifactId>
       <version>${project.version}</version>
