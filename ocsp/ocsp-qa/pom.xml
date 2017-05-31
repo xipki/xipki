@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>ocsp-group</artifactId>
+    <artifactId>ocsp-parent</artifactId>
     <groupId>org.xipki.pki</groupId>
     <version>2.2.0-SNAPSHOT</version>
   </parent>
@@ -13,6 +13,11 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ocsp-client-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xipki.commons</groupId>
       <artifactId>security</artifactId>
       <version>${project.version}</version>
@@ -20,6 +25,15 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

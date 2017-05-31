@@ -58,7 +58,7 @@ import org.xipki.commons.security.SecurityFactory;
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-cli", name = "loadtest-revoke",
+@Command(scope = "xipki-cli", name = "benchmark-revoke",
         description = "CA client revoke load test")
 @Service
 public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
@@ -155,7 +155,7 @@ public class CaLoadTestRevokeCmd extends CaLoadTestCommandSupport {
             loadTest.test();
         } finally {
             if (caDataSource != null) {
-                caDataSource.shutdown();
+                caDataSource.close();
             }
 
             if (serialNumberIterator instanceof FileBigIntegerIterator) {
