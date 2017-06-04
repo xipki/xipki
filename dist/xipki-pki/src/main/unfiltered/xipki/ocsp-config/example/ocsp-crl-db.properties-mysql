@@ -3,6 +3,11 @@
 #      https://github.com/brettwooldridge/HikariCP         #
 ############################################################
 
+# Further analysis is required due to the text in
+#   https://github.com/brettwooldridge/HikariCP
+# "MySQL and MariaDB DataSources are known to be broken with respect to network
+# timeout support. Use jdbcUrl configuration instead."
+
 ################## MySQL/MariaDB via MySQL Connector #################
 
 dataSourceClassName = com.mysql.jdbc.jdbc2.optional.MysqlDataSource

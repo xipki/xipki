@@ -4,6 +4,11 @@
 #   https://mariadb.com/kb/en/mariadb/about-mariadb-connector-j/#license #
 ##########################################################################
 
+# Further analysis is required due to the text in
+#   https://github.com/brettwooldridge/HikariCP
+# "MySQL and MariaDB DataSources are known to be broken with respect to network
+# timeout support. Use jdbcUrl configuration instead."
+
 ################## MySQL/MariaDB via MariaDB Connector #################
 
 dataSourceClassName = org.mariadb.jdbc.MariaDbDataSource 
