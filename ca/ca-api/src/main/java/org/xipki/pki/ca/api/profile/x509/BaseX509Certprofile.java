@@ -74,12 +74,12 @@ import org.xipki.pki.ca.api.profile.KeyParametersOption.AllowAllParametersOption
 import org.xipki.pki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.pki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.pki.ca.api.profile.KeyParametersOption.RSAParametersOption;
-import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.security.util.X509Util;
 import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.RdnControl;
 import org.xipki.pki.ca.api.profile.StringType;
+import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

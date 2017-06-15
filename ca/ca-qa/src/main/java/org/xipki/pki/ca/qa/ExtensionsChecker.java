@@ -166,13 +166,13 @@ import org.xipki.pki.ca.qa.internal.QaPolicyMappingsOption;
 import org.xipki.pki.ca.qa.internal.QaPolicyQualifierInfo;
 import org.xipki.pki.ca.qa.internal.QaPolicyQualifierInfo.QaCpsUriPolicyQualifier;
 import org.xipki.pki.ca.qa.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
+import org.xipki.pki.ca.qa.internal.QaPolicyQualifiers;
+import org.xipki.pki.ca.qa.internal.QaTlsFeature;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.util.X509Util;
-import org.xipki.pki.ca.qa.internal.QaPolicyQualifiers;
-import org.xipki.pki.ca.qa.internal.QaTlsFeature;
 
 /**
  * @author Lijun Liao

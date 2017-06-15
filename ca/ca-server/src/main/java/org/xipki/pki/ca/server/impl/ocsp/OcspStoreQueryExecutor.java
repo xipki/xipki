@@ -59,11 +59,11 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
+import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.pki.ca.api.X509CertWithDbId;
 
 /**
  * @author Lijun Liao

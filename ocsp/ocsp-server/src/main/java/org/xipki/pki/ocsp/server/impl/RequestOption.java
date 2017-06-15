@@ -60,11 +60,11 @@ import org.xipki.pki.ocsp.server.impl.jaxb.NonceType;
 import org.xipki.pki.ocsp.server.impl.jaxb.RequestOptionType;
 import org.xipki.pki.ocsp.server.impl.jaxb.RequestOptionType.CertpathValidation;
 import org.xipki.pki.ocsp.server.impl.jaxb.RequestOptionType.HashAlgorithms;
+import org.xipki.pki.ocsp.server.impl.jaxb.VersionsType;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.pki.ocsp.server.impl.jaxb.VersionsType;
 
 /**
  * @author Lijun Liao

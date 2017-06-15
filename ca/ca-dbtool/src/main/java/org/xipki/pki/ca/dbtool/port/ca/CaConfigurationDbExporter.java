@@ -64,7 +64,6 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.Publishers;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.Requestors;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.Responders;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CAConfigurationType.Sceps;
-import org.xipki.pki.ca.dbtool.port.DbPorter;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaHasProfileType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaHasPublisherType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CaHasRequestorType;
@@ -79,6 +78,7 @@ import org.xipki.pki.ca.dbtool.jaxb.ca.PublisherType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.RequestorType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ResponderType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.ScepType;
+import org.xipki.pki.ca.dbtool.port.DbPorter;
 
 /**
  * @author Lijun Liao
