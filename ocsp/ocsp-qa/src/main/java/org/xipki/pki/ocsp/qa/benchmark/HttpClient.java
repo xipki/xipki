@@ -169,6 +169,18 @@ public final class HttpClient {
                     "could not get connection: " + ex.getMessage(), ex);
         }
 
+        if (!channel.isActive()) {
+            throw new OcspRequestorException("channel is not active");
+        }
+
+        if (!channel.isOpen()) {
+            throw new OcspRequestorException("channel is not open");
+        }
+
+        if (!channel.isWritable()) {
+            throw new OcspRequestorException("channel is not writable");
+        }
+
         this.responseHandler.incrementNumPendingRequests();
         this.channel.writeAndFlush(request);
     }

@@ -79,7 +79,7 @@ class OcspResponseHandler {
         this.freeSourceLatch = new CountLatch(0, 0);
     }
 
-    public void incrementNumPendingRequests() {
+    public synchronized void incrementNumPendingRequests() {
         numPendingRequests.incrementAndGet();
         manageLatches();
     }
@@ -93,12 +93,14 @@ class OcspResponseHandler {
             success = false;
         }
 
-        numPendingRequests.decrementAndGet();
-        loadTestAccount.account(1, success ? 0 : 1);
-        manageLatches();
+        synchronized (this) {
+            numPendingRequests.decrementAndGet();
+            loadTestAccount.account(1, success ? 0 : 1);
+            manageLatches();
+        }
     }
 
-    public void onError() {
+    public synchronized void onError() {
         numPendingRequests.decrementAndGet();
         loadTestAccount.account(1, 1);
         manageLatches();
