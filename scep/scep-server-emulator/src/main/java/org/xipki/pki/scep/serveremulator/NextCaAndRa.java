@@ -35,7 +35,7 @@
 package org.xipki.pki.scep.serveremulator;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

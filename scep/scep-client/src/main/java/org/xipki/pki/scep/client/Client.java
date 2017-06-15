@@ -62,7 +62,7 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.util.CollectionStore;
 import org.bouncycastle.util.encoders.Base64;
 import org.eclipse.jdt.annotation.NonNull;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.OperationNotSupportedException;
 import org.xipki.pki.scep.client.exception.ScepClientException;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;

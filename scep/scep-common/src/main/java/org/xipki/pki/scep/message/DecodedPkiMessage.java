@@ -69,7 +69,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.CollectionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.transaction.FailInfo;
 import org.xipki.pki.scep.transaction.MessageType;

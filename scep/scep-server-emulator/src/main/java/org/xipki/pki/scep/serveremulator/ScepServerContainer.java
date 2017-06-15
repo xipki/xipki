@@ -40,7 +40,7 @@ import java.util.List;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

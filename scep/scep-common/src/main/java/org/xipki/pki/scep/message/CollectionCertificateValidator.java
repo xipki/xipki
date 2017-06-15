@@ -39,7 +39,7 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 
 /**
