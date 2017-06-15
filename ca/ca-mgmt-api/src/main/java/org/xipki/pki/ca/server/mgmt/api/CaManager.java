@@ -46,8 +46,6 @@ import java.util.Set;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.commons.security.CrlReason;
 import org.xipki.pki.ca.server.mgmt.api.conf.CaConf;
 import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
 import org.xipki.pki.ca.server.mgmt.api.x509.ChangeScepEntry;
@@ -55,6 +53,8 @@ import org.xipki.pki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCrlSignerEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.CrlReason;
 
 /**
  * @author Lijun Liao

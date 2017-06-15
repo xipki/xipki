@@ -34,7 +34,7 @@
 
 package org.xipki.pki.ca.certprofile.internal;
 
-import org.xipki.commons.common.ObjectCreationException;
+import org.xipki.common.ObjectCreationException;
 import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.pki.ca.api.profile.x509.X509CertprofileFactory;
 import org.xipki.pki.ca.certprofile.XmlX509Certprofile;

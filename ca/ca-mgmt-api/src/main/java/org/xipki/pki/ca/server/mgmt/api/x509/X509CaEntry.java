@@ -40,16 +40,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.commons.common.util.CompareUtil;
-import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.KeyUsage;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.util.CompareUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.KeyUsage;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

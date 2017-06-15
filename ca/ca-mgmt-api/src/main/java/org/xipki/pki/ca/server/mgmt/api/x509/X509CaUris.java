@@ -36,7 +36,7 @@ package org.xipki.pki.ca.server.mgmt.api.x509;
 
 import java.util.List;
 
-import org.xipki.commons.common.util.CollectionUtil;
+import org.xipki.common.util.CollectionUtil;
 
 /**
  * @author Lijun Liao

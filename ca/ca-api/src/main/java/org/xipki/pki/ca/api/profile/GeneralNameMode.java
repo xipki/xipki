@@ -38,8 +38,8 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

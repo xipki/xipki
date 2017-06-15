@@ -34,9 +34,9 @@
 
 package org.xipki.pki.ca.server.impl;
 
-import org.xipki.commons.audit.AuditLevel;
-import org.xipki.commons.audit.AuditStatus;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.audit.AuditLevel;
+import org.xipki.audit.AuditStatus;
+import org.xipki.common.util.ParamUtil;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 

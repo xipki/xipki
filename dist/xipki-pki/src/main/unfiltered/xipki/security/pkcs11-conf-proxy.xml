@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<PKCS11Conf xmlns="http://xipki.org/commons/security/pkcs11/conf/v2">
+<PKCS11Conf xmlns="http://xipki.org/security/pkcs11/conf/v2">
   <modules>
     <!-- exactly one module must be named 'default' -->
     <module name="default">

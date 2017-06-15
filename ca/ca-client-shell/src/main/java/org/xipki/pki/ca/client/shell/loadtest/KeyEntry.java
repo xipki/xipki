@@ -57,9 +57,9 @@ import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.util.AlgorithmUtil;
-import org.xipki.commons.security.util.KeyUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.KeyUtil;
 
 /**
  * @author Lijun Liao

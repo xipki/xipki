@@ -50,20 +50,20 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.TripleState;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.CertpathValidationModel;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.util.KeyUtil;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.TripleState;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.server.impl.jaxb.CertCollectionType;
 import org.xipki.pki.ocsp.server.impl.jaxb.CertCollectionType.Keystore;
 import org.xipki.pki.ocsp.server.impl.jaxb.NonceType;
 import org.xipki.pki.ocsp.server.impl.jaxb.RequestOptionType;
 import org.xipki.pki.ocsp.server.impl.jaxb.RequestOptionType.CertpathValidation;
 import org.xipki.pki.ocsp.server.impl.jaxb.RequestOptionType.HashAlgorithms;
+import org.xipki.security.CertpathValidationModel;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.util.KeyUtil;
+import org.xipki.security.util.X509Util;
 import org.xipki.pki.ocsp.server.impl.jaxb.VersionsType;
 
 /**

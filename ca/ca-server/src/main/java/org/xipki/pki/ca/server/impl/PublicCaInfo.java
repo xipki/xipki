@@ -47,12 +47,12 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.X509Cert;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
+import org.xipki.security.X509Cert;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

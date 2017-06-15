@@ -38,7 +38,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

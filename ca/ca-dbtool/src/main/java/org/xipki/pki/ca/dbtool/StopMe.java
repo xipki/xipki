@@ -36,7 +36,7 @@ package org.xipki.pki.ca.dbtool;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

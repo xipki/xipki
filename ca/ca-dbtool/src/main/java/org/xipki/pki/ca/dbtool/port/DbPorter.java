@@ -45,10 +45,10 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.DataSourceWrapper;
-import org.xipki.commons.datasource.springframework.dao.DataAccessException;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.DbSchemaInfo;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.jaxb.ca.FileOrBinaryType;

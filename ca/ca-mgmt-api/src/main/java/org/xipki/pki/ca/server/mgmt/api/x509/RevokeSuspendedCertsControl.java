@@ -34,10 +34,10 @@
 
 package org.xipki.pki.ca.server.mgmt.api.x509;
 
-import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.CrlReason;
+import org.xipki.common.ConfPairs;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.profile.CertValidity;
+import org.xipki.security.CrlReason;
 
 /**
  * Example configuration

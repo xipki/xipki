@@ -42,7 +42,7 @@ import java.util.Set;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.console.karaf.CmdFailure;
 
 /**
  * @author Lijun Liao

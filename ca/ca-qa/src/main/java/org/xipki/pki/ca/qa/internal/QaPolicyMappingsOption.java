@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyIdMappingType;
 import org.xipki.pki.ca.certprofile.x509.jaxb.PolicyMappings;
 

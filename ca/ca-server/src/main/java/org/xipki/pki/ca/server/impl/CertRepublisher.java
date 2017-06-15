@@ -46,16 +46,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.EndOfQueue;
-import org.xipki.commons.common.ProcessLog;
-import org.xipki.commons.common.QueueEntry;
-import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.X509Cert;
+import org.xipki.common.EndOfQueue;
+import org.xipki.common.ProcessLog;
+import org.xipki.common.QueueEntry;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.publisher.x509.X509CertificateInfo;
 import org.xipki.pki.ca.server.impl.store.CertificateStore;
+import org.xipki.security.X509Cert;
 
 /**
  * @author Lijun Liao

@@ -35,7 +35,7 @@
 package org.xipki.pki.ca.api.publisher.x509;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.xipki.commons.common.ObjectCreationException;
+import org.xipki.common.ObjectCreationException;
 
 /**
  * @author Lijun Liao

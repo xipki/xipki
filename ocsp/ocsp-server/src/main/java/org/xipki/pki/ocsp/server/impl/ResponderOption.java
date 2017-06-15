@@ -38,8 +38,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.api.OcspMode;
 import org.xipki.pki.ocsp.server.impl.jaxb.ResponderType;
 

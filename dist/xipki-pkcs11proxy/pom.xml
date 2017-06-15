@@ -89,7 +89,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.apache.karaf</groupId>
-                  <artifactId>apache-karaf</artifactId>
+                  <artifactId>apache-karaf-minimal</artifactId>
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
                   <outputDirectory>${project.build.directory}/apache-karaf</outputDirectory>
@@ -119,6 +119,8 @@
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>              
               </descriptors>
               <features>
+                <feature>aries-blueprint</feature>
+                <feature>wrap</feature>
                 <!-- project-core features -->
                 <feature>xipki-httpserver</feature>
                 <feature>xipki-pkcs11-proxy</feature>

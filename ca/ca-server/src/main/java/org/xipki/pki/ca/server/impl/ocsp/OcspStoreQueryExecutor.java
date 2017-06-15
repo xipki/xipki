@@ -53,16 +53,16 @@ import java.util.Map;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.DataSourceWrapper;
-import org.xipki.commons.datasource.springframework.dao.DataAccessException;
-import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.X509Cert;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.X509Cert;
+import org.xipki.security.util.X509Util;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 
 /**

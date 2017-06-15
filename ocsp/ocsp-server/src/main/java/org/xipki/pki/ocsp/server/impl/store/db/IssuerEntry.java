@@ -44,11 +44,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.commons.security.CrlReason;
-import org.xipki.commons.security.HashAlgoType;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.CrlReason;
+import org.xipki.security.HashAlgoType;
 
 /**
  * @author Lijun Liao

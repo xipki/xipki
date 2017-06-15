@@ -34,7 +34,7 @@
 
 package org.xipki.pki.ca.server.impl;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

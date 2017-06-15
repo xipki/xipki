@@ -135,7 +135,7 @@
               <outputDirectory>${output.directory}/xipki</outputDirectory>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki.commons</groupId>
+                  <groupId>org.xipki</groupId>
                   <artifactId>security</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>

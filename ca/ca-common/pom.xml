@@ -4,8 +4,8 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>ca-parent</artifactId>
     <groupId>org.xipki.pki</groupId>
+    <artifactId>ca-parent</artifactId>
     <version>2.2.0-SNAPSHOT</version>
   </parent>
   <packaging>bundle</packaging>
@@ -13,7 +13,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.commons</groupId>
+      <groupId>org.xipki</groupId>
       <artifactId>security</artifactId>
       <version>${project.version}</version>
     </dependency>

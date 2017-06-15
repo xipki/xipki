@@ -60,11 +60,11 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.ObjectIdentifiers;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.client.api.OcspRequestorException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.ObjectIdentifiers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

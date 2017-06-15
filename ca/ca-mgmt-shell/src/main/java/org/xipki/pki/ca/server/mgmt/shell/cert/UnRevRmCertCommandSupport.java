@@ -41,15 +41,15 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.util.IoUtil;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.shell.CaCommandSupport;
 import org.xipki.pki.ca.server.mgmt.shell.completer.CaNameCompleter;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

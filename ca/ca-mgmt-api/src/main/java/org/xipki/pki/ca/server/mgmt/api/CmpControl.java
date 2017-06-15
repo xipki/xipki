@@ -37,12 +37,12 @@ package org.xipki.pki.ca.server.mgmt.api;
 import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 
-import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.AlgorithmValidator;
-import org.xipki.commons.security.CollectionAlgorithmValidator;
+import org.xipki.common.ConfPairs;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.security.AlgorithmValidator;
+import org.xipki.security.CollectionAlgorithmValidator;
 
 /**
  * @author Lijun Liao

@@ -54,13 +54,13 @@ import java.util.regex.Pattern;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.ObjectIdentifiers;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.Range;
 import org.xipki.pki.ca.api.profile.RdnControl;
 import org.xipki.pki.ca.api.profile.StringType;
+import org.xipki.security.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao

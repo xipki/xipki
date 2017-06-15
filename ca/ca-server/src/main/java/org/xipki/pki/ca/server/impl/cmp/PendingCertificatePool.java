@@ -42,8 +42,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.publisher.x509.X509CertificateInfo;
 
 /**

@@ -36,8 +36,8 @@ package org.xipki.pki.ca.api.profile.x509;
 
 import java.util.List;
 
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

@@ -64,13 +64,9 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.w3c.dom.Element;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.common.util.XmlUtil;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.ObjectIdentifiers;
-import org.xipki.commons.security.TlsExtensionType;
-import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.XmlUtil;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.api.profile.x509.X509CertVersion;
@@ -150,6 +146,10 @@ import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.SignatureAlgorithms;
 import org.xipki.pki.ca.certprofile.x509.jaxb.X509ProfileType.Subject;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.TlsExtensionType;
+import org.xipki.security.util.AlgorithmUtil;
 import org.xml.sax.SAXException;
 
 /**

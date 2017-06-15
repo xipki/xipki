@@ -39,8 +39,8 @@ import java.util.List;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.console.karaf.CmdFailure;
+import org.xipki.common.ConfPairs;
+import org.xipki.console.karaf.CmdFailure;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaStatus;

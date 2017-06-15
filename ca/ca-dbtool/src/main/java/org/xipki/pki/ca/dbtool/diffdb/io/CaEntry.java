@@ -39,8 +39,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.dbtool.DbToolBase;
 import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;
 

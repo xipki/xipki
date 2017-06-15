@@ -34,9 +34,9 @@
 
 package org.xipki.pki.ca.server.mgmt.api.x509;
 
-import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.util.StringUtil;
+import org.xipki.common.ConfPairs;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.StringUtil;
 
 /**
  *

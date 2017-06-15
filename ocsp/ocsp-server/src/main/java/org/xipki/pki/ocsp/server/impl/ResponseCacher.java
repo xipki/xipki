@@ -59,20 +59,20 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.DataSourceWrapper;
-import org.xipki.commons.datasource.springframework.dao.DataAccessException;
-import org.xipki.commons.datasource.springframework.dao.DataIntegrityViolationException;
-import org.xipki.commons.datasource.springframework.jdbc.DuplicateKeyException;
-import org.xipki.commons.security.AlgorithmCode;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.springframework.dao.DataAccessException;
+import org.xipki.datasource.springframework.dao.DataIntegrityViolationException;
+import org.xipki.datasource.springframework.jdbc.DuplicateKeyException;
 import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
 import org.xipki.pki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.pki.ocsp.server.impl.store.db.IssuerEntry;
 import org.xipki.pki.ocsp.server.impl.store.db.IssuerStore;
+import org.xipki.security.AlgorithmCode;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

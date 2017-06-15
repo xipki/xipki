@@ -44,14 +44,14 @@ import java.util.Enumeration;
 
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
-import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.util.KeyUtil;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.scep.client.CaCertValidator;
 import org.xipki.pki.scep.client.CaIdentifier;
 import org.xipki.pki.scep.client.PreprovisionedCaCertValidator;
 import org.xipki.pki.scep.client.ScepClient;
+import org.xipki.security.util.KeyUtil;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

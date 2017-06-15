@@ -36,9 +36,9 @@ package org.xipki.pki.ca.server.impl.store;
 
 import java.util.Date;
 
-import org.xipki.commons.common.LruCache;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.common.LruCache;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataSourceWrapper;
 
 /**
  * @author Lijun Liao

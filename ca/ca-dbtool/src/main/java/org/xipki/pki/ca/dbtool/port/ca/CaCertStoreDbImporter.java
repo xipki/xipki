@@ -63,16 +63,13 @@ import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.ProcessLog;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.common.util.XmlUtil;
-import org.xipki.commons.datasource.DataSourceWrapper;
-import org.xipki.commons.datasource.springframework.dao.DataAccessException;
-import org.xipki.commons.security.FpIdCalculator;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.ProcessLog;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.common.util.XmlUtil;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.DeltaCRLCache;
 import org.xipki.pki.ca.dbtool.jaxb.ca.CertStoreType.PublishQueue;
@@ -95,6 +92,9 @@ import org.xipki.pki.ca.dbtool.xmlio.ca.RequestType;
 import org.xipki.pki.ca.dbtool.xmlio.ca.RequestsReader;
 import org.xipki.pki.ca.dbtool.xmlio.ca.UserType;
 import org.xipki.pki.ca.dbtool.xmlio.ca.UsersReader;
+import org.xipki.security.FpIdCalculator;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

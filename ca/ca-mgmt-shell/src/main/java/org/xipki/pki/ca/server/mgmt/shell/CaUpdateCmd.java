@@ -44,14 +44,13 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.console.karaf.completer.SignerTypeCompleter;
-import org.xipki.commons.console.karaf.completer.YesNoCompleter;
-import org.xipki.commons.password.PasswordResolver;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
+import org.xipki.console.karaf.completer.SignerTypeCompleter;
+import org.xipki.console.karaf.completer.YesNoCompleter;
+import org.xipki.password.PasswordResolver;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.profile.CertValidity;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
@@ -66,6 +65,7 @@ import org.xipki.pki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullComplet
 import org.xipki.pki.ca.server.mgmt.shell.completer.PermissionCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ResponderNamePlusNullCompleter;
 import org.xipki.pki.ca.server.mgmt.shell.completer.ValidityModeCompleter;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

@@ -64,21 +64,21 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.audit.AuditEvent;
-import org.xipki.commons.audit.AuditLevel;
-import org.xipki.commons.audit.AuditStatus;
-import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.RandomUtil;
-import org.xipki.commons.security.ConcurrentContentSigner;
-import org.xipki.commons.security.SecurityFactory;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.audit.AuditEvent;
+import org.xipki.audit.AuditLevel;
+import org.xipki.audit.AuditStatus;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.RandomUtil;
 import org.xipki.pki.ca.common.cmp.CmpUtil;
 import org.xipki.pki.ca.common.cmp.ProtectionResult;
 import org.xipki.pki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.pki.ca.server.impl.CaAuditConstants;
 import org.xipki.pki.ca.server.mgmt.api.CmpControl;
 import org.xipki.pki.ca.server.mgmt.api.RequestorInfo;
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.SecurityFactory;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

@@ -36,7 +36,7 @@ package org.xipki.pki.ca.dbtool.xmlio.ocsp;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.dbtool.xmlio.DbiXmlWriter;
 import org.xipki.pki.ca.dbtool.xmlio.IdentifidDbObjectType;
 import org.xipki.pki.ca.dbtool.xmlio.InvalidDataObjectException;

@@ -37,7 +37,7 @@ package org.xipki.pki.ca.server.impl.store;
 import java.util.Arrays;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

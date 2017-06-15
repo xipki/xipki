@@ -36,7 +36,7 @@ package org.xipki.pki.ca.server.mgmt.api.conf;
 
 import java.util.List;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.CaHasRequestorEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;

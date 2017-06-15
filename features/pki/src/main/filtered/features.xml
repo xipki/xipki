@@ -7,9 +7,9 @@
   -->
   <feature name="xipki-httpserver" version="${project.version}" description="HTTP server">
     <bundle><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
-    <bundle>mvn:org.xipki.commons/common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/common/${project.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki.commons/password/${project.version}</bundle>
+    <bundle>mvn:org.xipki/password/${project.version}</bundle>
     <bundle>mvn:io.netty/netty-codec/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-codec-http/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-resolver/${netty.version}</bundle>
@@ -20,25 +20,25 @@
     <bundle>mvn:io.netty/netty-buffer/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
     <bundle>mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/linux-x86_64</bundle>
-    <bundle>mvn:org.xipki.commons/servlet-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki.commons/http-server/${project.version}</bundle>
+    <bundle>mvn:org.xipki/servlet-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/http-server/${project.version}</bundle>
   </feature>
   
   <feature name="xipki-password" version="${project.version}" description="password">
     <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle start-level="70"><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
-    <bundle start-level="70">mvn:org.xipki.commons/common/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki.commons/password/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
   </feature>
   <feature name="xipki-security" version="${project.version}" description="security">
     <feature prerequisite="true">xipki-password</feature>
     <bundle start-level="70">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki.commons/security/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/security/${project.version}</bundle>
   </feature>
   <feature name="xipki-shell-base" description="shall base">
     <feature prerequisite="true">xipki-security</feature>
-    <bundle start-level="80">mvn:org.xipki.commons/shell-base/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/shell-base/${project.version}</bundle>
   </feature>
   <feature name="xipki-jdbc" version="${project.version}" description="JDBC drivers">
     <bundle start-level="75">mvn:com.h2database/h2/${jdbc.h2.version}</bundle>
@@ -51,7 +51,7 @@
     <feature prerequisite="true">xipki-password</feature>
     <feature prerequisite="true">xipki-jdbc</feature>
     <bundle start-level="70">mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki.commons/datasource/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/datasource/${project.version}</bundle>
   </feature>
   <feature name="xipki-cabase" version="${project.version}"
       description="common feature for CA server and client">
@@ -95,8 +95,8 @@
   </feature>
   <feature name="xipki-security-shell" version="${project.version}" description="CA security shell">
     <feature prerequisite="true">xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.commons/security-shell/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.commons/security-speed-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/security-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/security-speed-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-scepclient-shell" version="${project.version}"
       description="SCEP client shell">
@@ -150,18 +150,18 @@
     <feature prerequisite="true">xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle start-level="80">mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.commons/database-tool/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/database-tool/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit" version="${project.version}" description="Audit">
     <bundle start-level="70"><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
-    <bundle start-level="80">mvn:org.xipki.commons/audit/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki/audit/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}" description="Syslog audit">
     <feature prerequisite="true">xipki-audit</feature>
     <bundle start-level="70">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
     <bundle start-level="70"><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
-    <bundle start-level="70">mvn:org.xipki.commons/audit-syslog/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/audit-syslog/${project.version}</bundle>
   </feature>
 </features>

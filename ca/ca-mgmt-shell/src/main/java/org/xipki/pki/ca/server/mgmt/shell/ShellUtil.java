@@ -37,14 +37,14 @@ package org.xipki.pki.ca.server.mgmt.shell;
 import java.util.Set;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.password.PasswordResolver;
-import org.xipki.commons.security.SecurityFactory;
+import org.xipki.common.ConfPairs;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.password.PasswordResolver;
 import org.xipki.pki.ca.server.mgmt.api.PermissionConstants;
+import org.xipki.security.SecurityFactory;
 
 /**
  * @author Lijun Liao

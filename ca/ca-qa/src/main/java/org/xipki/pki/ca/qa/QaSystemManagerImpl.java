@@ -54,10 +54,10 @@ import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.qa.jaxb.FileOrValueType;
 import org.xipki.pki.ca.qa.jaxb.ObjectFactory;

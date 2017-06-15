@@ -51,9 +51,9 @@ import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.RespID;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.ConcurrentContentSigner;
-import org.xipki.commons.security.HashAlgoType;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.HashAlgoType;
 
 /**
  * @author Lijun Liao

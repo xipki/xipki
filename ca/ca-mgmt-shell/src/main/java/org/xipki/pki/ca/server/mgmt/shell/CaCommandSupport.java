@@ -38,11 +38,11 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.security.SecurityFactory;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.XipkiCommandSupport;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
+import org.xipki.security.SecurityFactory;
 
 /**
  * @author Lijun Liao

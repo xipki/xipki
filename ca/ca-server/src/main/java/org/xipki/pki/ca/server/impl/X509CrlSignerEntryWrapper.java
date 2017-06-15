@@ -41,19 +41,19 @@ import java.util.Arrays;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
-import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.ObjectCreationException;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.ConcurrentContentSigner;
-import org.xipki.commons.security.KeyUsage;
-import org.xipki.commons.security.SecurityFactory;
-import org.xipki.commons.security.SignerConf;
-import org.xipki.commons.security.exception.XiSecurityException;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.ObjectCreationException;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.KeyUsage;
+import org.xipki.security.SecurityFactory;
+import org.xipki.security.SignerConf;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

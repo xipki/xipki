@@ -39,8 +39,8 @@ import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.HashAlgoType;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.security.HashAlgoType;
 
 /**
  * @author Lijun Liao

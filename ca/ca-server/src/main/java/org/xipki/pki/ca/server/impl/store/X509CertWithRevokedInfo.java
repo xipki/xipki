@@ -34,7 +34,7 @@
 
 package org.xipki.pki.ca.server.impl.store;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 
 /**

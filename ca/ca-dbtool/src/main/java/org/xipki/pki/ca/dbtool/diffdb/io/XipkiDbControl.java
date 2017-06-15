@@ -34,8 +34,8 @@
 
 package org.xipki.pki.ca.dbtool.diffdb.io;
 
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataSourceWrapper;
 
 /**
  * @author Lijun Liao

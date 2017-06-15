@@ -53,11 +53,9 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.commons.common.qa.ValidationIssue;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.ObjectIdentifiers;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.qa.ValidationIssue;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.profile.CertprofileException;
 import org.xipki.pki.ca.api.profile.RdnControl;
@@ -65,6 +63,8 @@ import org.xipki.pki.ca.api.profile.StringType;
 import org.xipki.pki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.pki.ca.api.profile.x509.SubjectControl;
 import org.xipki.pki.ca.api.profile.x509.SubjectDnSpec;
+import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

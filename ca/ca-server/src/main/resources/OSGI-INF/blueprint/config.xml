@@ -9,9 +9,9 @@
       <cm:property name="caConfFile" value="xipki/ca-config/ca.properties"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <reference id="securityFactory" interface="org.xipki.commons.security.SecurityFactory"/>
+  <reference id="securityFactory" interface="org.xipki.security.SecurityFactory"/>
   <reference id="auditServiceRegister"
-      interface="org.xipki.commons.audit.AuditServiceRegister"/>
+      interface="org.xipki.audit.AuditServiceRegister"/>
   <reference id="x509CertProfileFactoryRegister"
       interface="org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegister"/>
   <reference id="x509CertPublisherFactoryRegister"
@@ -30,7 +30,7 @@
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
-  <service ref="cmpServlet" interface="org.xipki.commons.http.servlet.HttpServlet">
+  <service ref="cmpServlet" interface="org.xipki.http.servlet.HttpServlet">
     <service-properties>
       <entry key="alias" value="/cmp"/>
     </service-properties>
@@ -40,7 +40,7 @@
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
-  <service ref="restServlet" interface="org.xipki.commons.http.servlet.HttpServlet">
+  <service ref="restServlet" interface="org.xipki.http.servlet.HttpServlet">
     <service-properties>
       <entry key="alias" value="/rest"/>
     </service-properties>
@@ -50,7 +50,7 @@
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
-  <service ref="scepServlet" interface="org.xipki.commons.http.servlet.HttpServlet">
+  <service ref="scepServlet" interface="org.xipki.http.servlet.HttpServlet">
     <service-properties>
       <entry key="alias" value="/scep"/>
     </service-properties>
@@ -59,7 +59,7 @@
   <bean id="healthServlet" class="org.xipki.pki.ca.server.impl.HealthCheckServlet">
     <property name="responderManager" ref="caManager"/>
   </bean>
-  <service ref="healthServlet" interface="org.xipki.commons.http.servlet.HttpServlet">
+  <service ref="healthServlet" interface="org.xipki.http.servlet.HttpServlet">
     <service-properties>
       <entry key="alias" value="/health"/>
     </service-properties>

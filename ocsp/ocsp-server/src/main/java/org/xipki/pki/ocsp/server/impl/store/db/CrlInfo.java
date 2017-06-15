@@ -40,10 +40,10 @@ import java.util.Date;
 
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.common.util.DateUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
+import org.xipki.common.ConfPairs;
+import org.xipki.common.util.DateUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao

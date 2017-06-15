@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.server.impl.jaxb.AuditOptionType;
 import org.xipki.pki.ocsp.server.impl.jaxb.MappingType;
 

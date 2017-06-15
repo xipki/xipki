@@ -39,16 +39,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.CompareUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.SignerConf;
-import org.xipki.commons.security.exception.XiSecurityException;
-import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.common.ConfPairs;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.CompareUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.profile.CertValidity;
+import org.xipki.security.SignerConf;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

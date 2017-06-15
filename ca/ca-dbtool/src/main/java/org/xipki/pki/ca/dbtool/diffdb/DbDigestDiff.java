@@ -53,16 +53,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.ProcessLog;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.DataSourceWrapper;
-import org.xipki.commons.datasource.springframework.dao.DataAccessException;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.ProcessLog;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.StopMe;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbSchemaType;
 import org.xipki.pki.ca.dbtool.diffdb.io.TargetDigestRetriever;
 import org.xipki.pki.ca.dbtool.diffdb.io.XipkiDbControl;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

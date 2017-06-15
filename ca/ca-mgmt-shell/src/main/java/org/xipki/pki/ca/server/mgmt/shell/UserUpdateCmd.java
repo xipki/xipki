@@ -37,7 +37,7 @@ package org.xipki.pki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.ChangeUserEntry;
 

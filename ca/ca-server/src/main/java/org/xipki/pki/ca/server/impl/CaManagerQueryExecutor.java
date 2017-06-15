@@ -62,18 +62,13 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.ObjectCreationException;
-import org.xipki.commons.common.util.DateUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.datasource.DataSourceWrapper;
-import org.xipki.commons.datasource.springframework.dao.DataAccessException;
-import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.commons.security.SecurityFactory;
-import org.xipki.commons.security.SignerConf;
-import org.xipki.commons.security.exception.XiSecurityException;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.ObjectCreationException;
+import org.xipki.common.util.DateUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.profile.CertValidity;
@@ -106,6 +101,11 @@ import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaUris;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509ChangeCaEntry;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CrlSignerEntry;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.SecurityFactory;
+import org.xipki.security.SignerConf;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

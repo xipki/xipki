@@ -9,9 +9,9 @@
       <cm:property name="confFile" value="xipki/ocsp-config/ocsp-responder.xml"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <reference id="securityFactory" interface="org.xipki.commons.security.SecurityFactory"/>
+  <reference id="securityFactory" interface="org.xipki.security.SecurityFactory"/>
   <reference id="auditServiceRegister"
-      interface="org.xipki.commons.audit.AuditServiceRegister"/>
+      interface="org.xipki.audit.AuditServiceRegister"/>
   <reference id="ocspStoreFactoryRegister"
       interface="org.xipki.pki.ocsp.api.OcspStoreFactoryRegister"/>
   <bean id="ocspServer" class="org.xipki.pki.ocsp.server.impl.OcspServer" 
@@ -27,7 +27,7 @@
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <!-- register it as a servlet service for the web extender -->
-  <service ref="ocspServlet" interface="org.xipki.commons.http.servlet.HttpServlet">
+  <service ref="ocspServlet" interface="org.xipki.http.servlet.HttpServlet">
     <service-properties>
       <entry key="alias" value="/ocsp"/>
     </service-properties>
@@ -36,7 +36,7 @@
   <bean id="healthServlet" class="org.xipki.pki.ocsp.server.impl.HealthCheckServlet">
     <property name="server" ref="ocspServer"/>
   </bean>
-  <service ref="healthServlet" interface="org.xipki.commons.http.servlet.HttpServlet">
+  <service ref="healthServlet" interface="org.xipki.http.servlet.HttpServlet">
     <service-properties>
       <entry key="alias" value="/health/ocsp"/>
     </service-properties>

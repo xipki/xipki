@@ -45,14 +45,8 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.commons.security.ConcurrentContentSigner;
-import org.xipki.commons.security.SecurityFactory;
-import org.xipki.commons.security.SignerConf;
-import org.xipki.commons.security.X509Cert;
-import org.xipki.commons.security.exception.XiSecurityException;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
@@ -64,6 +58,12 @@ import org.xipki.pki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.pki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.pki.ca.server.mgmt.api.x509.RevokeSuspendedCertsControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.SecurityFactory;
+import org.xipki.security.SignerConf;
+import org.xipki.security.X509Cert;
+import org.xipki.security.exception.XiSecurityException;
 
 /**
  * @author Lijun Liao

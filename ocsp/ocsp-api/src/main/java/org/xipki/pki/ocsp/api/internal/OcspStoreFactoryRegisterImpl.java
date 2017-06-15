@@ -38,8 +38,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.ObjectCreationException;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.ObjectCreationException;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.api.OcspStore;
 import org.xipki.pki.ocsp.api.OcspStoreFactory;
 import org.xipki.pki.ocsp.api.OcspStoreFactoryRegister;

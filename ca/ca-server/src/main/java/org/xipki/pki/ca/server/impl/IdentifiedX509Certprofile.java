@@ -69,13 +69,8 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.ExtensionExistence;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.KeyUsage;
-import org.xipki.commons.security.ObjectIdentifiers;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.BadFormatException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
@@ -98,6 +93,11 @@ import org.xipki.pki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.pki.ca.api.profile.x509.X509CertprofileUtil;
 import org.xipki.pki.ca.server.impl.util.CaUtil;
 import org.xipki.pki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.security.ExtensionExistence;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.KeyUsage;
+import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

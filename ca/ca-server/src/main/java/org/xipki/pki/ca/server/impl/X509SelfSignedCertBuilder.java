@@ -64,18 +64,11 @@ import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.ConfPairs;
-import org.xipki.commons.common.InvalidConfException;
-import org.xipki.commons.common.ObjectCreationException;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.ConcurrentContentSigner;
-import org.xipki.commons.security.SecurityFactory;
-import org.xipki.commons.security.SignerConf;
-import org.xipki.commons.security.exception.NoIdleSignerException;
-import org.xipki.commons.security.exception.XiSecurityException;
-import org.xipki.commons.security.util.KeyUtil;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.ConfPairs;
+import org.xipki.common.InvalidConfException;
+import org.xipki.common.ObjectCreationException;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.OperationException;
 import org.xipki.pki.ca.api.OperationException.ErrorCode;
@@ -86,6 +79,13 @@ import org.xipki.pki.ca.api.profile.ExtensionValues;
 import org.xipki.pki.ca.api.profile.x509.SubjectInfo;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.SecurityFactory;
+import org.xipki.security.SignerConf;
+import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.KeyUtil;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

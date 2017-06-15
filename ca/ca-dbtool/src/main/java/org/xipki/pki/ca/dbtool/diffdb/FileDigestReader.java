@@ -51,12 +51,12 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.springframework.dao.DataAccessException;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.diffdb.io.CaEntry;
 import org.xipki.pki.ca.dbtool.diffdb.io.CertsBundle;
 import org.xipki.pki.ca.dbtool.diffdb.io.DbDigestEntry;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

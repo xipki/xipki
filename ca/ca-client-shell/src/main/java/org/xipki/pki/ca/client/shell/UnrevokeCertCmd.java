@@ -38,12 +38,12 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.common.RequestResponseDebug;
-import org.xipki.commons.console.karaf.CmdFailure;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.RequestResponseDebug;
+import org.xipki.console.karaf.CmdFailure;
+import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.pki.ca.client.api.CertIdOrError;
 import org.xipki.pki.ca.common.cmp.PkiStatusInfo;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

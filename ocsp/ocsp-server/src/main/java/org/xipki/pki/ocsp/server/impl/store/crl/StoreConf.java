@@ -38,7 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.xipki.commons.common.util.StringUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.pki.ocsp.api.OcspStoreException;
 
 /**

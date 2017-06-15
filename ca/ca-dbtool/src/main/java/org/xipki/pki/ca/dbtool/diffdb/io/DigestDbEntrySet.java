@@ -37,7 +37,7 @@ package org.xipki.pki.ca.dbtool.diffdb.io;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.commons.common.QueueEntry;
+import org.xipki.common.QueueEntry;
 
 /**
  * @author Lijun Liao

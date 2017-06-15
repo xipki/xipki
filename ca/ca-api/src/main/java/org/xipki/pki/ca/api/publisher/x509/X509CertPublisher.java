@@ -39,14 +39,14 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.xipki.commons.audit.AuditServiceRegister;
-import org.xipki.commons.datasource.DataSourceWrapper;
-import org.xipki.commons.password.PasswordResolver;
-import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.commons.security.X509Cert;
+import org.xipki.audit.AuditServiceRegister;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.password.PasswordResolver;
 import org.xipki.pki.ca.api.EnvParameterResolver;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.api.publisher.CertPublisherException;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.X509Cert;
 
 /**
  * @author Lijun Liao

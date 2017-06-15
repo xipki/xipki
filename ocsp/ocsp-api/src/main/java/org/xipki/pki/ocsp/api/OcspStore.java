@@ -41,12 +41,12 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.xipki.commons.audit.AuditService;
-import org.xipki.commons.audit.AuditServiceRegister;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.datasource.DataSourceWrapper;
-import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.commons.security.HashAlgoType;
+import org.xipki.audit.AuditService;
+import org.xipki.audit.AuditServiceRegister;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.HashAlgoType;
 
 /**
  * @author Lijun Liao

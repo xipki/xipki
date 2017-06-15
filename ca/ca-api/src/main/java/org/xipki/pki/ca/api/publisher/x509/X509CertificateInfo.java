@@ -42,14 +42,14 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.X509Cert;
-import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.api.X509CertWithDbId;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.X509Cert;
+import org.xipki.security.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

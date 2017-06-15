@@ -151,7 +151,7 @@ Install
 
 * In case if the real PKCS#11 device instead of the emulator is used:
 
-  * In file etc/org.xipki.commons.security.pkcs11.cfg, change the pkcs11.confFile as follows:
+  * In file etc/org.xipki.security.pkcs11.cfg, change the pkcs11.confFile as follows:
 
     ```sh
     pkcs11.confFile = xipki/security/pkcs11-conf-hsm.xml

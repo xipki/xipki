@@ -36,7 +36,7 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 import java.sql.SQLException;
 
-import org.xipki.commons.datasource.DataSourceWrapper;
+import org.xipki.datasource.DataSourceWrapper;
 
 /**
  * @author Lijun Liao

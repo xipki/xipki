@@ -34,9 +34,9 @@
 
 package org.xipki.pki.ca.server.impl.store;
 
-import org.xipki.commons.security.CertRevocationInfo;
 import org.xipki.pki.ca.api.X509CertWithDbId;
 import org.xipki.pki.ca.server.mgmt.api.x509.CertWithStatusInfo;
+import org.xipki.security.CertRevocationInfo;
 
 /**
  * @author Lijun Liao

@@ -34,7 +34,7 @@
 
 package org.xipki.pki.ca.qa.internal;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.certprofile.x509.jaxb.InhibitAnyPolicy;
 
 /**

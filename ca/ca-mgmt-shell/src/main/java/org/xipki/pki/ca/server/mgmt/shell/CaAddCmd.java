@@ -40,9 +40,9 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ca.server.mgmt.api.x509.X509CaEntry;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

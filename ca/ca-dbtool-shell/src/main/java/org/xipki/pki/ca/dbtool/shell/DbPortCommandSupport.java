@@ -39,10 +39,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.console.karaf.XipkiCommandSupport;
-import org.xipki.commons.datasource.DataSourceFactory;
-import org.xipki.commons.password.PasswordResolver;
+import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.XipkiCommandSupport;
+import org.xipki.datasource.DataSourceFactory;
+import org.xipki.password.PasswordResolver;
 import org.xipki.pki.ca.dbtool.port.DbPortWorker;
 
 /**

@@ -37,7 +37,7 @@ package org.xipki.pki.ca.server.mgmt.api.x509;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.NameId;
 import org.xipki.pki.ca.server.mgmt.api.CaMgmtException;
 import org.xipki.pki.ca.server.mgmt.api.ChangeCaEntry;

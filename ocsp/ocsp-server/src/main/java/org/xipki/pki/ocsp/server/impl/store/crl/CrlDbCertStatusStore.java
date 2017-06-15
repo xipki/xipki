@@ -49,21 +49,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.audit.AuditLevel;
-import org.xipki.commons.audit.AuditStatus;
-import org.xipki.commons.audit.PciAuditEvent;
-import org.xipki.commons.common.util.DateUtil;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.datasource.DataSourceWrapper;
-import org.xipki.commons.security.CertRevocationInfo;
-import org.xipki.commons.security.CrlReason;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.audit.AuditLevel;
+import org.xipki.audit.AuditStatus;
+import org.xipki.audit.PciAuditEvent;
+import org.xipki.common.util.DateUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.pki.ocsp.api.OcspStoreException;
 import org.xipki.pki.ocsp.server.impl.store.db.DbCertStatusStore;
+import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.CrlReason;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

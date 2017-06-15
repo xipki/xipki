@@ -42,12 +42,12 @@ import javax.net.ssl.SSLSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.HealthCheckResult;
-import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.http.servlet.AbstractHttpServlet;
-import org.xipki.commons.http.servlet.ServletURI;
-import org.xipki.commons.http.servlet.SslReverseProxyMode;
+import org.xipki.common.HealthCheckResult;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.http.servlet.AbstractHttpServlet;
+import org.xipki.http.servlet.ServletURI;
+import org.xipki.http.servlet.SslReverseProxyMode;
 import org.xipki.pki.ca.server.impl.cmp.CmpResponderManager;
 import org.xipki.pki.ca.server.impl.cmp.X509CaCmpResponder;
 

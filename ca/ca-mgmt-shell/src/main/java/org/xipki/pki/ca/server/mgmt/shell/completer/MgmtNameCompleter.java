@@ -35,7 +35,7 @@
 package org.xipki.pki.ca.server.mgmt.shell.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
-import org.xipki.commons.console.karaf.AbstractDynamicEnumCompleter;
+import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 import org.xipki.pki.ca.server.mgmt.api.CaManager;
 
 /**

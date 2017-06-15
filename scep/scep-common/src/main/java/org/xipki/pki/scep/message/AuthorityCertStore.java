@@ -36,7 +36,7 @@ package org.xipki.pki.scep.message;
 
 import java.security.cert.X509Certificate;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.KeyUsage;
 
 /**

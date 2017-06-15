@@ -37,9 +37,9 @@ package org.xipki.pki.ca.server.impl.store;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.CompareUtil;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.CompareUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

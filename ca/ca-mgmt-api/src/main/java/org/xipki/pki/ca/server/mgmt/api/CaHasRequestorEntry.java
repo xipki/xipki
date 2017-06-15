@@ -36,9 +36,9 @@ package org.xipki.pki.ca.server.mgmt.api;
 
 import java.util.Set;
 
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.CompareUtil;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.CompareUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.NameId;
 
 /**

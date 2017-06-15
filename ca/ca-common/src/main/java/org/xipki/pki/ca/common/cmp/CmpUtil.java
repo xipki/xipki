@@ -52,9 +52,9 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.ConcurrentContentSigner;
-import org.xipki.commons.security.exception.NoIdleSignerException;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.exception.NoIdleSignerException;
 
 /**
  * @author Lijun Liao

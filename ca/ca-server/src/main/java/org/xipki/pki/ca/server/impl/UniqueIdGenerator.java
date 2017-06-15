@@ -37,7 +37,7 @@ package org.xipki.pki.ca.server.impl;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntBinaryOperator;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * Idea: http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram

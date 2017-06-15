@@ -37,11 +37,11 @@ package org.xipki.pki.ca.dbtool.port.ocsp;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.datasource.DataSourceWrapper;
-import org.xipki.commons.datasource.springframework.dao.DataAccessException;
-import org.xipki.commons.security.HashAlgoType;
+import org.xipki.common.util.StringUtil;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ca.dbtool.port.DbPorter;
+import org.xipki.security.HashAlgoType;
 
 /**
  * @author Lijun Liao

@@ -38,7 +38,7 @@ import java.security.cert.X509CRL;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.commons.common.RequestResponseDebug;
+import org.xipki.common.RequestResponseDebug;
 import org.xipki.pki.ca.client.api.CaClientException;
 import org.xipki.pki.ca.client.api.PkiErrorException;
 
