@@ -35,7 +35,6 @@
 package org.xipki.pki.ocsp.qa.benchmark;
 
 import java.math.BigInteger;
-import java.net.URI;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.pki.ocsp.client.api.OcspRequestorException;
-import org.xipki.pki.ocsp.client.api.OcspResponseException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 
 /**
@@ -61,7 +59,7 @@ public class OcspLoadTest extends LoadExecutor {
         private OcspBenchmark requestor;
 
         Testor() throws Exception {
-            OcspResponseHandler responseHandler =  new OcspResponseHandler(OcspLoadTest.this, 10);
+            OcspResponseHandler responseHandler =  new OcspResponseHandler(OcspLoadTest.this, 1);
             this.requestor = new OcspBenchmark();
             this.requestor.init(responseHandler, responderUrl, issuerCert, requestOptions);
         }
@@ -89,9 +87,6 @@ public class OcspLoadTest extends LoadExecutor {
             } catch (OcspRequestorException ex) {
                 LOG.warn("OCSPRequestorException: {}", ex.getMessage());
                 account(1, 1);
-            } catch (OcspResponseException ex) {
-                LOG.warn("OCSPResponseException: {}", ex.getMessage());
-                account(1, 1);
             } catch (Throwable th) {
                 LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
                 account(1, 1);
@@ -104,7 +99,7 @@ public class OcspLoadTest extends LoadExecutor {
 
     private final Certificate issuerCert;
 
-    private final URI responderUrl;
+    private final String responderUrl;
 
     private final RequestOptions requestOptions;
 
@@ -115,7 +110,7 @@ public class OcspLoadTest extends LoadExecutor {
     private AtomicInteger processedRequests = new AtomicInteger(0);
 
     public OcspLoadTest(
-            final Certificate issuerCert, final URI responderUrl,
+            final Certificate issuerCert, final String responderUrl,
             final RequestOptions requestOptions,
             final Iterator<BigInteger> serials,
             final int maxRequests, final String description) {

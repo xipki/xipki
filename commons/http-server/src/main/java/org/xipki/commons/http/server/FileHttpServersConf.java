@@ -32,46 +32,63 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.qa.benchmark;
+package org.xipki.commons.http.server;
 
-import java.math.BigInteger;
-import java.net.URI;
-import java.util.Arrays;
+import java.io.File;
+import java.net.URL;
 
-import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.commons.common.util.BigIntegerRange;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.RangeBigIntegerIterator;
-import org.xipki.pki.ocsp.client.api.RequestOptions;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.SchemaFactory;
+
+import org.xipki.httpserver.v1.Httpservers;
+import org.xipki.httpserver.v1.ObjectFactory;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-public class Tester {
+public class FileHttpServersConf implements HttpServersConf {
 
-    public static void main(String[] args) {
+    private String confFile;
+
+    private Httpservers conf;
+
+    public void setConfFile(String confFile) throws Exception {
+        this.confFile = confFile;
+
+        Object root;
         try {
-            String issuerCertFile = "/home/lliao/source/xipki/dist/xipki-pki/"
-                    + "xipki-pki-2.2.0-SNAPSHOT/output/SubCAwithCRL1.der";
-            URI serverUrl = new URI("http://localhost:8080/ocsp/responder2");
-            Certificate issuerCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
+            JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+            Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
+            final SchemaFactory schemaFact = SchemaFactory.newInstance(
+                    javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            URL url = ObjectFactory.class.getResource("/xsd/httpserver.xsd");
+            jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
 
-            BigIntegerRange serialNumbers = new BigIntegerRange(BigInteger.valueOf(1),
-                    BigInteger.valueOf(2));
-            RangeBigIntegerIterator serialNumberIterator =
-                    new RangeBigIntegerIterator(Arrays.asList(serialNumbers), true);
-
-            RequestOptions options = new RequestOptions();
-            OcspLoadTest loadTest = new OcspLoadTest(issuerCert, serverUrl, options,
-                    serialNumberIterator, 0, "dummy");
-            loadTest.setDuration("30s");
-            loadTest.setThreads(10);
-            loadTest.test();
+            root = jaxbUnmarshaller.unmarshal(new File(confFile));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            throw new Exception("parsing configuration file failed, message: " + ex.getMessage(),
+                    ex);
         }
+
+        if (root instanceof Httpservers) {
+            this.conf = (Httpservers) root;
+        } else if (root instanceof JAXBElement) {
+            this.conf = (Httpservers) ((JAXBElement<?>) root).getValue();
+        } else {
+            throw new Exception("invalid root element type");
+        }
+    }
+
+    public String getConfFile() {
+        return confFile;
+    }
+
+    public Httpservers getConf() {
+        return conf;
     }
 
 }

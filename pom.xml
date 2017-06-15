@@ -35,10 +35,10 @@
   <properties>
     <karaf.version>4.0.8</karaf.version>
     <karaf-plugin.version>4.0.8</karaf-plugin.version>
-    <jetty.version>9.2.19.v20160908</jetty.version>
+    <netty.version>4.1.11.Final</netty.version>
+    <netty-tcnative.version>2.0.3.Final</netty-tcnative.version>
     <bc.version>1.57</bc.version>
     <slf4j.version>1.7.7</slf4j.version>
-    <servlet-api.version>2.5</servlet-api.version>
     <jscep.version>2.4.0</jscep.version>
     <junit.version>4.8.2</junit.version>
     <pkcs11-wrapper.version>1.4.0</pkcs11-wrapper.version>
@@ -108,9 +108,25 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-client</artifactId>
-        <version>${jetty.version}</version>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-handler</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-codec-http</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-transport-native-epoll</artifactId>
+        <version>${netty.version}</version>
+        <classifier>linux-x86_64</classifier>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-tcnative-boringssl-static</artifactId>
+        <version>${netty-tcnative.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
@@ -146,11 +162,6 @@
         <groupId>com.cloudbees</groupId>
         <artifactId>syslog-java-client</artifactId>
         <version>${syslog-java-client.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>${servlet-api.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jdt</groupId>
@@ -322,7 +333,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>${slf4j.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

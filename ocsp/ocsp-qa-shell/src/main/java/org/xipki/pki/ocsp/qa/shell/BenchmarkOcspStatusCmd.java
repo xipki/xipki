@@ -35,7 +35,6 @@
 package org.xipki.pki.ocsp.qa.shell;
 
 import java.math.BigInteger;
-import java.net.URI;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -101,7 +100,7 @@ public class BenchmarkOcspStatusCmd extends OcspStatusCommandSupport {
             required = true,
             description = "OCSP responder URL\n"
                     + "required")
-    private String serverUrlS;
+    private String serverUrl;
 
     @Option(name = "--max-num",
             description = "maximal number of certificates to be asked\n"
@@ -131,8 +130,6 @@ public class BenchmarkOcspStatusCmd extends OcspStatusCommandSupport {
         if (numThreads < 1) {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
-
-        URI serverUrl = new URI(serverUrlS);
 
         Iterator<BigInteger> serialNumberIterator;
 

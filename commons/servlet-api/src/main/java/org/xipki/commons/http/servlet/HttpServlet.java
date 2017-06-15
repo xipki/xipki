@@ -32,30 +32,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.qa.benchmark;
+package org.xipki.commons.http.servlet;
 
-import java.nio.ByteBuffer;
+import javax.net.ssl.SSLSession;
 
-import org.eclipse.jetty.client.api.Response;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-class OcspResponseContentListener implements Response.ContentListener {
+public interface HttpServlet {
 
-    private byte[] bytes;
+    boolean needsTlsSessionInfo();
 
-    @Override
-    public void onContent(Response response, ByteBuffer content) {
-        byte[] bb = new byte[content.remaining()];
-        content.get(bb);
-        this.bytes = bb;
-    }
-
-    public byte[] getBytes() {
-        return bytes;
-    }
+    /**
+     * @param request
+     *          The request. Must not be {@code null}.
+.     * @param servletUri
+     *          The servlet URI (URI part after the servlet alias). Must not be {@code null}.
+     * @param sslSession
+     *          SSLSession associated with this connection.  May be {@code null}.
+     * @param sslReverseProxyMode
+     *          Mode of the SSL reverse proxy. Must not be {@code null}.
+     * @return
+     * @throws Exception
+     */
+    FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
+            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception;
 
 }

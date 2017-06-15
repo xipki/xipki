@@ -32,30 +32,17 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.qa.benchmark;
+package org.xipki.commons.http.server;
 
-import org.eclipse.jetty.client.api.Response.CompleteListener;
-import org.eclipse.jetty.client.api.Result;
+import org.xipki.httpserver.v1.Httpservers;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-class OcspResponseCompleter implements CompleteListener {
+public interface HttpServersConf {
 
-    OcspResponseHandler handler;
-    OcspResponseContentListener contentListener;
-
-    public OcspResponseCompleter(OcspResponseHandler handler,
-            OcspResponseContentListener contentListener) {
-        this.handler = handler;
-        this.contentListener = contentListener;
-    }
-
-    @Override
-    public void onComplete(Result result) {
-        handler.onComplete(result, contentListener);
-    }
+    public Httpservers getConf();
 
 }

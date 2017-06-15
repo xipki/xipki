@@ -359,7 +359,8 @@ public class LruCache<K, V> {
         return new LinkedHashMap<>(map);
     }
 
-    @Override public final synchronized String toString() {
+    @Override
+    public final synchronized String toString() {
         int accesses = hitCount + missCount;
         int hitPercent = (accesses == 0) ? 0 : (100 * hitCount / accesses);
         return String.format("LruCache[maxSize=%d,hits=%d,misses=%d,hitRate=%d%%]",
