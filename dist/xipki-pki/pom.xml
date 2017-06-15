@@ -14,7 +14,7 @@
   <properties>
     <app.name>PKI</app.name>
     <features.artifactId>pki</features.artifactId>
-    <boot.features>http-whiteboard,xipki-jdbc,xipki-audit</boot.features>
+    <boot.features>xipki-httpserver, xipki-jdbc, xipki-audit</boot.features>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
   </properties>
@@ -89,7 +89,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.apache.karaf</groupId>
-                  <artifactId>apache-karaf</artifactId>
+                  <artifactId>apache-karaf-minimal</artifactId>
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
                   <outputDirectory>${project.build.directory}/apache-karaf</outputDirectory>
@@ -207,8 +207,10 @@
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>              
               </descriptors>
               <features>
-                <feature>http-whiteboard</feature>
+                <feature>aries-blueprint</feature>
+                <feature>wrap</feature>
                 <!-- project-core features -->
+                <feature>xipki-httpserver</feature>
                 <feature>xipki-caserver</feature>
                 <feature>xipki-camgmt-shell</feature>
                 <feature>xipki-caclient-shell</feature>

@@ -84,10 +84,10 @@ public class DefaultHttpOcspRequestor extends AbstractOcspRequestor {
             urlBuilder.append(urlEncodedReq);
 
             URL newUrl = new URL(urlBuilder.toString());
-            httpUrlConnection = IoUtil.openHttpConn(newUrl);;
+            httpUrlConnection = IoUtil.openHttpConn(newUrl);
             httpUrlConnection.setRequestMethod("GET");
         } else {
-            httpUrlConnection = IoUtil.openHttpConn(responderUrl);;
+            httpUrlConnection = IoUtil.openHttpConn(responderUrl);
             httpUrlConnection.setDoOutput(true);
             httpUrlConnection.setUseCaches(false);
 

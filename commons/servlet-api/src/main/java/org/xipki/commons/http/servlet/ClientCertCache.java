@@ -32,40 +32,56 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ca.server.impl;
+package org.xipki.commons.http.servlet;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.net.ssl.SSLSession;
 
-import org.xipki.commons.common.LruCache;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.util.X509Util;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.util.CharsetUtil;
 
 /**
  * @author Lijun Liao
  * @since 2.1.0
  */
 
-public class ClientCertCache {
+class ClientCertCache {
+    private static CertificateFactory cf;
 
-    private static final LruCache<String, X509Certificate> clientCerts = new LruCache<>(50);
-
-    public static X509Certificate getTlsClientCert(final HttpServletRequest request,
-            final boolean sslCertInHttpHeader)
-            throws IOException {
-
-        X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
-                "javax.servlet.request.X509Certificate");
-        X509Certificate clientCert = (certs == null || certs.length < 1) ? null : certs[0];
-        if (clientCert != null) {
-            return clientCert;
+    static {
+        try {
+            cf = CertificateFactory.getInstance("X509");
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
+    }
 
-        if (!sslCertInHttpHeader) {
-            return null;
+    private static final SimpleLruCache<String, X509Certificate> clientCerts =
+            new SimpleLruCache<>(100);
+
+    public static X509Certificate getTlsClientCert(
+            final HttpRequest request, final SSLSession session, final SslReverseProxyMode mode)
+            throws IOException {
+        if (mode == SslReverseProxyMode.NONE || mode == null) {
+            if (session == null) {
+                return null;
+            }
+
+            Certificate[] certs = session.getPeerCertificates();
+            Certificate cert = (certs == null || certs.length < 1) ? null : certs[0];
+            if (cert != null) {
+                return (X509Certificate) cert;
+            }
+        } else if (mode != SslReverseProxyMode.APACHE) {
+            throw new RuntimeException(
+                    "Should not reach here, unknown SslReverseProxyMode " + mode);
         }
 
         // check whether this application is behind a reverse proxy and the TLS client certificate
@@ -74,27 +90,32 @@ public class ClientCertCache {
         // For more details please refer to
         // http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#envvars
         // http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start
-        String clientVerify = request.getHeader("SSL_CLIENT_VERIFY");
-        if (StringUtil.isBlank(clientVerify)) {
+        String clientVerify = request.headers().get("SSL_CLIENT_VERIFY");
+        if (clientVerify == null || clientVerify.isEmpty()) {
             return null;
         }
 
-        if ("SUCCESS".equalsIgnoreCase(clientVerify.trim())) {
+        if (!"SUCCESS".equalsIgnoreCase(clientVerify.trim())) {
             return null;
         }
 
-        String pemClientCert = request.getHeader("SSL_CLIENT_CERT");
-        if (StringUtil.isBlank(pemClientCert)) {
+        String pemClientCert = request.headers().get("SSL_CLIENT_CERT");
+        if (pemClientCert == null || pemClientCert.isEmpty()) {
             return null;
         }
 
-        clientCert = clientCerts.get(pemClientCert);
+        X509Certificate clientCert = clientCerts.get(pemClientCert);
         if (clientCert != null) {
             return clientCert;
         }
 
         try {
-            clientCert = X509Util.parsePemEncodedCert(pemClientCert);
+            String b64 = pemClientCert.replace("-----BEGIN CERTIFICATE-----", "")
+                    .replace("-----END CERTIFICATE-----", "");
+            byte[] encoded = Base64.getDecoder().decode(
+                                b64.getBytes(CharsetUtil.US_ASCII));
+            clientCert = (X509Certificate)
+                    cf.generateCertificate(new ByteArrayInputStream(encoded));
         } catch (CertificateException ex) {
             throw new IOException("could not parse Certificate", ex);
         }

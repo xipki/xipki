@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (c) 2013 - 2017 Lijun Liao
+-->
+<xs:schema xmlns="http://xipki.org/httpserver/v1"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://xipki.org/httpserver/v1"
+  elementFormDefault="qualified">
+  <xs:element name="httpservers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="httpserver" type="httpserverType" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="httpserverType">
+    <xs:all>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="port" type="xs:int"/>
+      <xs:element name="threads" type="xs:int" minOccurs="0"/>
+      <xs:element name="reverseProxy" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Type of the reverse proxy before this HTTP service. Current valid 
+            values are
+              - NONE: no reverse proxy
+              - APACHE: Apache HTTP server as reverse proxy
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="tls" type="tlsType" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="enabled" type="xs:boolean" default="true"/>
+  </xs:complexType>
+  <xs:complexType name="tlsType">
+    <xs:all>
+      <xs:element name="provider" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            valid values are:
+              - JDK: use the JDK provider
+              - OPENSSL: use the OpenSSL provider
+              - OPENSSL_REFCNT: use OpenSSL-based implementation which does not
+                                have finalizers and instead implements
+                                ReferenceCounted.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="clientauth" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            allowed values:
+              none   - no client authentication;
+              optional - client authentication is wanted;
+              require - client authentication is needed</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="protocols" type="protocolsType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            current allowed values:
+              TLSv1.1
+              TLSv1.2
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ciphersuites" type="ciphersuitesType" minOccurs="0"/>
+      <xs:element name="keystore" type="keystoreType"/>
+      <xs:element name="truststore" type="truststoreType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Required is client authentication is wanted or needed.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="protocolsType">
+    <xs:sequence>
+      <xs:element name="protocol" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ciphersuitesType">
+    <xs:sequence>
+      <xs:element name="ciphersuite" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="keystoreType">
+    <xs:all>
+      <xs:element name="store" type="fileOrValueType"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="password" type="xs:string"/>
+      <xs:element name="keyAlias" type="xs:string" minOccurs="0"/>
+      <xs:element name="keyPassword" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:complexType name="truststoreType">
+    <xs:all>
+      <xs:element name="store" type="fileOrValueType"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="password" type="xs:string"/>
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:complexType name="fileOrValueType">
+    <xs:choice>
+      <xs:element name="value" type="xs:base64Binary"/>
+      <xs:element name="file" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>
+
+</xs:schema>

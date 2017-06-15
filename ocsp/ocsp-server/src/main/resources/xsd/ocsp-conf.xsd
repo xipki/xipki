@@ -40,10 +40,18 @@
   </xs:complexType>
   <xs:complexType name="responderType">
     <xs:all>
-      <xs:element name="servletPaths" minOccurs="0">
+      <xs:element name="servletPaths">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="servletPath" type="xs:string" maxOccurs="unbounded"/>
+            <xs:element name="servletPath" type="xs:string" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+To answer OCSP request via URI http://example.com/foo/abc, you can use the
+combination (servlet.alias = '/', servletPath = '/foo/abc') or
+(servlet.alias = '/foo', servletPath = '/abc').
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
           </xs:sequence>
         </xs:complexType>
       </xs:element>

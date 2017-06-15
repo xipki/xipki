@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.URLDecoder;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.cert.Certificate;
@@ -60,7 +59,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -115,6 +113,7 @@ import org.xipki.commons.common.util.XmlUtil;
 import org.xipki.commons.datasource.DataSourceFactory;
 import org.xipki.commons.datasource.DataSourceWrapper;
 import org.xipki.commons.datasource.springframework.dao.DataAccessException;
+import org.xipki.commons.http.servlet.ServletURI;
 import org.xipki.commons.password.PasswordResolverException;
 import org.xipki.commons.security.AlgorithmCode;
 import org.xipki.commons.security.CertRevocationInfo;
@@ -160,36 +159,24 @@ import org.xml.sax.SAXException;
 
 public class OcspServer {
 
-    private static class ServletPathResponderName implements Comparable<ServletPathResponderName> {
+    private static class SizeComparableString implements Comparable<SizeComparableString> {
 
-        private final String path;
+        private String str;
 
-        private final String responderName;
-
-        ServletPathResponderName(final String path, final String responderName) {
-            this.path = ParamUtil.requireNonNull("path", path);
-            this.responderName = ParamUtil.requireNonBlank("responderName", responderName);
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public String getResponderName() {
-            return responderName;
+        public SizeComparableString(String str) {
+            this.str = ParamUtil.requireNonNull("str", str);
         }
 
         @Override
-        public int compareTo(final ServletPathResponderName obj) {
-            int diff = obj.path.length() - path.length();
-            if (diff == 0) {
+        public int compareTo(SizeComparableString obj) {
+            if (str.length() == obj.str.length()) {
                 return 0;
             }
 
-            return (diff > 0) ? 1 : -1;
+            return (str.length() > obj.str.length()) ? 1 : -1;
         }
 
-    } // class ServletPathResponderName
+    }
 
     private static class OcspRespControl {
         boolean canCacheInfo;
@@ -238,7 +225,9 @@ public class OcspServer {
 
     private Map<String, OcspStore> stores = new HashMap<>();
 
-    private List<ServletPathResponderName> servletPaths = new ArrayList<>();
+    private List<String> servletPaths = new ArrayList<>();
+
+    private Map<String, Responder> path2responderMap = new HashMap<>();
 
     private AtomicBoolean initialized = new AtomicBoolean(false);
 
@@ -254,43 +243,26 @@ public class OcspServer {
         this.confFile = confFile;
     }
 
-    ResponderAndRelativeUri getResponderAndRelativeUri(final HttpServletRequest request)
-            throws UnsupportedEncodingException {
-        ParamUtil.requireNonNull("request", request);
-        String requestUri = request.getRequestURI();
-        String servletPath = request.getServletPath();
-
-        String path = "";
-        int len = servletPath.length();
-        if (requestUri.length() > len + 1) {
-            path = requestUri.substring(len + 1);
-        }
-
-        ServletPathResponderName entry = null;
-        for (ServletPathResponderName m : servletPaths) {
-            if (path.startsWith(m.getPath())) {
-                entry = m;
-                break;
+    Responder getResponder(final ServletURI servletUri) throws UnsupportedEncodingException {
+        String path = servletUri.path();
+        for (String servletPath : servletPaths) {
+            if (path.startsWith(servletPath)) {
+                return path2responderMap.get(servletPath);
             }
         }
+        return null;
+    }
 
-        if (entry == null) {
-            return null;
+    Object[] getServletPathAndResponder(final ServletURI servletUri)
+            throws UnsupportedEncodingException {
+        String path = servletUri.path();
+        for (String servletPath : servletPaths) {
+            if (path.startsWith(servletPath)) {
+                return new Object[]{servletPath, path2responderMap.get(servletPath)};
+            }
         }
-
-        String relativeUri = "";
-        if (entry.getPath().length() > 0) {
-            len += 1 + entry.getPath().length();
-        }
-
-        if (requestUri.length() > len + 1) {
-            relativeUri = requestUri.substring(len + 1);
-            relativeUri = URLDecoder.decode(relativeUri, "UTF-8");
-        }
-
-        return new ResponderAndRelativeUri(responders.get(entry.getResponderName()),
-                relativeUri);
-    } // method getResponderAndRelativeUri
+        return null;
+    }
 
     public Responder getResponder(final String name) {
         ParamUtil.requireNonBlank("name", name);
@@ -608,29 +580,6 @@ public class OcspServer {
             stores.put(m.getName(), store);
         }
 
-        // sort the servlet paths
-        Set<String> pathTexts = new HashSet<>();
-        for (String responderName : responderOptions.keySet()) {
-            ServletPathResponderName path = new ServletPathResponderName(
-                    responderName, responderName);
-            pathTexts.add(path.getPath());
-            this.servletPaths.add(path);
-        }
-
-        for (String name : responderOptions.keySet()) {
-            ResponderOption option = responderOptions.get(name);
-            List<String> paths = option.getServletPaths();
-            for (String path : paths) {
-                if (pathTexts.contains(path)) {
-                    throw new InvalidConfException(
-                            "duplicated definition of servlet path '" + path + "'");
-                }
-                this.servletPaths.add(new ServletPathResponderName(path, name));
-            }
-        }
-
-        Collections.sort(this.servletPaths);
-
         // responders
         for (String name : responderOptions.keySet()) {
             ResponderOption option = responderOptions.get(name);
@@ -668,6 +617,27 @@ public class OcspServer {
                     responseOption, auditOption, certprofileOption, signer, statusStores);
             responders.put(name, responder);
         } // end for
+
+        // servlet paths
+        List<SizeComparableString> tmpList = new LinkedList<>();
+        for (String name : responderOptions.keySet()) {
+            Responder responder = responders.get(name);
+            ResponderOption option = responderOptions.get(name);
+            List<String> strs = option.getServletPaths();
+            for (String path : strs) {
+                tmpList.add(new SizeComparableString(path));
+                path2responderMap.put(path, responder);
+            }
+        }
+
+        // Sort the servlet paths according to the length of path. The first one is the
+        // longest, and the last one is the shortest.
+        Collections.sort(tmpList);
+        List<String> list2 = new ArrayList<>(tmpList.size());
+        for (SizeComparableString m : tmpList) {
+            list2.add(m.str);
+        }
+        this.servletPaths = list2;
     } // method doInit
 
     public void shutdown() {

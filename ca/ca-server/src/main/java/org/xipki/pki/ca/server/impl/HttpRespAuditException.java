@@ -38,6 +38,8 @@ import org.xipki.commons.audit.AuditLevel;
 import org.xipki.commons.audit.AuditStatus;
 import org.xipki.commons.common.util.ParamUtil;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 /**
  * @author Lijun Liao
  * @since 2.1.0
@@ -47,7 +49,7 @@ public class HttpRespAuditException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private final int httpStatus;
+    private final HttpResponseStatus httpStatus;
 
     private final String httpErrorMessage;
 
@@ -57,12 +59,12 @@ public class HttpRespAuditException extends Exception {
 
     private final AuditStatus auditStatus;
 
-    public HttpRespAuditException(final int httpStatus, final String auditMessage,
+    public HttpRespAuditException(final HttpResponseStatus httpStatus, final String auditMessage,
             final AuditLevel auditLevel, final AuditStatus auditStatus) {
         this(httpStatus, null, auditMessage, auditLevel, auditStatus);
     }
 
-    public HttpRespAuditException(final int httpStatus, final String httpErrorMessage,
+    public HttpRespAuditException(final HttpResponseStatus httpStatus, final String httpErrorMessage,
             final String auditMessage, final AuditLevel auditLevel, final AuditStatus auditStatus) {
         this.httpStatus = httpStatus;
         this.httpErrorMessage = httpErrorMessage;
@@ -71,7 +73,7 @@ public class HttpRespAuditException extends Exception {
         this.auditStatus = ParamUtil.requireNonNull("auditStatus", auditStatus);
     }
 
-    public int getHttpStatus() {
+    public HttpResponseStatus getHttpStatus() {
         return httpStatus;
     }
 

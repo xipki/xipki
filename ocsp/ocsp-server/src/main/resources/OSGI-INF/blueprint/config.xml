@@ -27,7 +27,7 @@
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <!-- register it as a servlet service for the web extender -->
-  <service ref="ocspServlet" interface="javax.servlet.Servlet">
+  <service ref="ocspServlet" interface="org.xipki.commons.http.servlet.HttpServlet">
     <service-properties>
       <entry key="alias" value="/ocsp"/>
     </service-properties>
@@ -36,7 +36,7 @@
   <bean id="healthServlet" class="org.xipki.pki.ocsp.server.impl.HealthCheckServlet">
     <property name="server" ref="ocspServer"/>
   </bean>
-  <service ref="healthServlet" interface="javax.servlet.Servlet">
+  <service ref="healthServlet" interface="org.xipki.commons.http.servlet.HttpServlet">
     <service-properties>
       <entry key="alias" value="/health/ocsp"/>
     </service-properties>

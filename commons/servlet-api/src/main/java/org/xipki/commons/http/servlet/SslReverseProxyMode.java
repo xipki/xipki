@@ -32,30 +32,16 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.qa.benchmark;
-
-import org.eclipse.jetty.client.api.Response.CompleteListener;
-import org.eclipse.jetty.client.api.Result;
+package org.xipki.commons.http.servlet;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-class OcspResponseCompleter implements CompleteListener {
+public enum SslReverseProxyMode {
 
-    OcspResponseHandler handler;
-    OcspResponseContentListener contentListener;
-
-    public OcspResponseCompleter(OcspResponseHandler handler,
-            OcspResponseContentListener contentListener) {
-        this.handler = handler;
-        this.contentListener = contentListener;
-    }
-
-    @Override
-    public void onComplete(Result result) {
-        handler.onComplete(result, contentListener);
-    }
+    NONE,
+    APACHE;
 
 }

@@ -34,21 +34,19 @@
 
 package org.xipki.pki.ca.server.impl.cmp;
 
+import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
+import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
+import static io.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_ALLOWED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
+import static io.netty.handler.codec.http.HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE;
+
 import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLDecoder;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.net.ssl.SSLSession;
 
-import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.cmp.PKIHeader;
 import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
@@ -61,22 +59,26 @@ import org.xipki.commons.audit.AuditService;
 import org.xipki.commons.audit.AuditServiceRegister;
 import org.xipki.commons.audit.AuditStatus;
 import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.commons.http.servlet.AbstractHttpServlet;
+import org.xipki.commons.http.servlet.ServletURI;
+import org.xipki.commons.http.servlet.SslReverseProxyMode;
 import org.xipki.pki.ca.api.RequestType;
 import org.xipki.pki.ca.server.impl.CaAuditConstants;
-import org.xipki.pki.ca.server.impl.ClientCertCache;
 import org.xipki.pki.ca.server.impl.HttpRespAuditException;
+
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class HttpCmpServlet extends HttpServlet {
+public class HttpCmpServlet extends AbstractHttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpCmpServlet.class);
-
-    private static final long serialVersionUID = 1L;
 
     private static final String CT_REQUEST = "application/pkixcmp";
 
@@ -86,16 +88,25 @@ public class HttpCmpServlet extends HttpServlet {
 
     private AuditServiceRegister auditServiceRegister;
 
-    private boolean sslCertInHttpHeader;
-
     public HttpCmpServlet() {
     }
 
     @Override
-    public void doPost(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException {
-        X509Certificate clientCert = ClientCertCache.getTlsClientCert(request, sslCertInHttpHeader);
+    public boolean needsTlsSessionInfo() {
+        return true;
+    }
 
+    @Override
+    public FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
+            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode)
+            throws Exception {
+        HttpVersion version = request.protocolVersion();
+        HttpMethod method = request.method();
+        if (method != HttpMethod.POST) {
+            return createErrorResponse(version, METHOD_NOT_ALLOWED);
+        }
+
+        X509Certificate clientCert = getClientCert(request, sslSession, sslReverseProxyMode);
         AuditService auditService = auditServiceRegister.getAuditService();
         AuditEvent event = new AuditEvent(new Date());
         event.setApplicationName(CaAuditConstants.APPNAME);
@@ -109,29 +120,26 @@ public class HttpCmpServlet extends HttpServlet {
             if (responderManager == null) {
                 String message = "responderManager in servlet not configured";
                 LOG.error(message);
-                throw new HttpRespAuditException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                throw new HttpRespAuditException(INTERNAL_SERVER_ERROR,
                         message, AuditLevel.ERROR, AuditStatus.FAILED);
             }
 
-            if (!CT_REQUEST.equalsIgnoreCase(request.getContentType())) {
-                String message = "unsupported media type " + request.getContentType();
-                throw new HttpRespAuditException(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
+            String reqContentType = request.headers().get("Content-Type");
+            if (!CT_REQUEST.equalsIgnoreCase(reqContentType)) {
+                String message = "unsupported media type " + reqContentType;
+                throw new HttpRespAuditException(UNSUPPORTED_MEDIA_TYPE,
                         message, AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            String requestUri = request.getRequestURI();
-            String servletPath = request.getServletPath();
-
             String caName = null;
             X509CaCmpResponder responder = null;
-            int len = servletPath.length();
-            if (requestUri.length() > len + 1) {
-                String caAlias = URLDecoder.decode(requestUri.substring(len + 1), "UTF-8");
+            if (servletUri.path().length() > 1) {
+                // skip the first char which is always '/'
+                String caAlias = servletUri.path().substring(1);
                 caName = responderManager.getCaNameForAlias(caAlias);
                 if (caName == null) {
-                    caName = caAlias;
+                    caName = caAlias.toUpperCase();
                 }
-                caName = caName.toUpperCase();
                 responder = responderManager.getX509CaResponder(caName);
             }
 
@@ -145,19 +153,20 @@ public class HttpCmpServlet extends HttpServlet {
                     message = "CA '" + caName + "' is out of service";
                 }
                 LOG.warn(message);
-                throw new HttpRespAuditException(HttpServletResponse.SC_NOT_FOUND, message,
+                throw new HttpRespAuditException(NOT_FOUND, message,
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
             event.addEventData(CaAuditConstants.NAME_CA, responder.getCa().getCaIdent().getName());
 
+            byte[] reqContent = readContent(request);
             PKIMessage pkiReq;
             try {
-                pkiReq = generatePkiMessage(request.getInputStream());
+                pkiReq = PKIMessage.getInstance(reqContent);
             } catch (Exception ex) {
                 LogUtil.error(LOG, ex, "could not parse the request (PKIMessage)");
-                throw new HttpRespAuditException(HttpServletResponse.SC_BAD_REQUEST, "bad request",
-                        AuditLevel.INFO, AuditStatus.FAILED);
+                throw new HttpRespAuditException(BAD_REQUEST,
+                        "bad request", AuditLevel.INFO, AuditStatus.FAILED);
             }
 
             PKIHeader reqHeader = pkiReq.getHeader();
@@ -171,52 +180,27 @@ public class HttpCmpServlet extends HttpServlet {
             respHeader.setTransactionID(tid);
 
             PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, tidStr, event);
-            response.setContentType(HttpCmpServlet.CT_RESPONSE);
-            response.setStatus(HttpServletResponse.SC_OK);
-            ASN1OutputStream asn1Out = new ASN1OutputStream(response.getOutputStream());
-            asn1Out.writeObject(pkiResp);
-            asn1Out.flush();
+            byte[] encodedPkiResp = pkiResp.getEncoded();
+            return createOKResponse(version, CT_RESPONSE, encodedPkiResp);
         } catch (HttpRespAuditException ex) {
             auditStatus = ex.getAuditStatus();
             auditLevel = ex.getAuditLevel();
             auditMessage = ex.getAuditMessage();
-            response.setContentLength(0);
-            response.setStatus(ex.getHttpStatus());
-        } catch (EOFException ex) {
-            LogUtil.warn(LOG, ex, "connection reset by peer");
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.setContentLength(0);
+            return createErrorResponse(version, ex.getHttpStatus());
         } catch (Throwable th) {
-            LOG.error("Throwable thrown, this should not happen!", th);
-
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.setContentLength(0);
+            if (th instanceof EOFException) {
+                LogUtil.warn(LOG, th, "connection reset by peer");
+            } else {
+                LOG.error("Throwable thrown, this should not happen!", th);
+            }
             auditLevel = AuditLevel.ERROR;
             auditStatus = AuditStatus.FAILED;
             auditMessage = "internal error";
+            return createErrorResponse(version, INTERNAL_SERVER_ERROR);
         } finally {
-            try {
-                response.flushBuffer();
-            } finally {
-                audit(auditService, event, auditLevel, auditStatus, auditMessage);
-            }
+            audit(auditService, event, auditLevel, auditStatus, auditMessage);
         }
-    } // method doPost
-
-    protected PKIMessage generatePkiMessage(final InputStream is) throws IOException {
-        ParamUtil.requireNonNull("is", is);
-        ASN1InputStream asn1Stream = new ASN1InputStream(is);
-
-        try {
-            return PKIMessage.getInstance(asn1Stream.readObject());
-        } finally {
-            try {
-                asn1Stream.close();
-            } catch (Exception ex) {
-                LOG.error("could not close ASN1Stream: {}", ex.getMessage());
-            }
-        }
-    }
+    } // method service
 
     public void setResponderManager(final CmpResponderManager responderManager) {
         this.responderManager = responderManager;
@@ -224,10 +208,6 @@ public class HttpCmpServlet extends HttpServlet {
 
     public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = auditServiceRegister;
-    }
-
-    public void setSslCertInHttpHeader(final boolean sslCertInHttpHeader) {
-        this.sslCertInHttpHeader = sslCertInHttpHeader;
     }
 
     private static void audit(final AuditService auditService, final AuditEvent event,

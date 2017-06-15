@@ -35,20 +35,21 @@
 package org.xipki.pki.ocsp.qa.benchmark;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.eclipse.jetty.client.api.Response;
-import org.eclipse.jetty.client.api.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.LoadExecutor;
 import org.xipki.commons.common.concurrent.CountLatch;
 import org.xipki.commons.common.util.ParamUtil;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 /**
  * @author Lijun Liao
@@ -70,8 +71,10 @@ class OcspResponseHandler {
     private final CountLatch freeSourceLatch;
 
     public OcspResponseHandler(LoadExecutor loadTestAccount, int maxPendingRequests) {
-        this.loadTestAccount = ParamUtil.requireNonNull("loadTestAccount", loadTestAccount);
-        this.maxPendingRequests = ParamUtil.requireMin("maxPendingRequests", maxPendingRequests, 1);
+        this.loadTestAccount = ParamUtil.requireNonNull("loadTestAccount",
+                loadTestAccount);
+        this.maxPendingRequests = ParamUtil.requireMin("maxPendingRequests",
+                maxPendingRequests, 1);
         this.finishLatch = new CountLatch(0, 0);
         this.freeSourceLatch = new CountLatch(0, 0);
     }
@@ -81,38 +84,43 @@ class OcspResponseHandler {
         manageLatches();
     }
 
-    public void onComplete(Result result, OcspResponseContentListener contentListener) {
-        boolean failed;
+    public void onComplete(FullHttpResponse response) {
+        boolean success;
         try {
-            if (result.isFailed()) {
-                failed = true;
-                LOG.warn("failed", result.getFailure());
-            } else {
-                failed = !processResponse(result.getResponse(), contentListener);
-            }
+            success = onComplete0(response);
         } catch (Throwable th) {
             LOG.warn("unexpected exception", th);
-            failed = true;
+            success = false;
         }
 
         numPendingRequests.decrementAndGet();
-        loadTestAccount.account(1, failed ? 1 : 0);
+        loadTestAccount.account(1, success ? 0 : 1);
         manageLatches();
     }
 
-    private boolean processResponse(Response response,
-            OcspResponseContentListener contentListener) {
+    public void onError() {
+        numPendingRequests.decrementAndGet();
+        loadTestAccount.account(1, 1);
+        manageLatches();
+    }
+
+    private boolean onComplete0(FullHttpResponse response) {
         if (response == null) {
             LOG.warn("bad response: response is null");
             return false;
         }
 
-        if (response.getStatus() != HttpURLConnection.HTTP_OK) {
-            LOG.warn("bad response: {} - {}", response.getStatus(), response.getReason());
+        if (response.decoderResult().isFailure()) {
+            LOG.warn("failed: {}", response.decoderResult());
             return false;
         }
 
-        String responseContentType = response.getHeaders().get("Content-Type");
+        if (response.status().code() != HttpResponseStatus.OK.code()) {
+            LOG.warn("bad response: {}", response.status());
+            return false;
+        }
+
+        String responseContentType = response.headers().get("Content-Type");
         if (responseContentType == null) {
             LOG.warn("bad response: mandatory Content-Type not specified");
             return false;
@@ -121,11 +129,13 @@ class OcspResponseHandler {
             return false;
         }
 
-        byte[] respBytes = contentListener.getBytes();
-        if (respBytes == null) {
+        ByteBuf buf = response.content();
+        if (buf == null || buf.readableBytes() == 0) {
             LOG.warn("no body in response");
             return false;
         }
+        byte[] respBytes = new byte[buf.readableBytes()];
+        buf.getBytes(buf.readerIndex(), respBytes);
 
         OCSPResp ocspResp;
         try {

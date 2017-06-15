@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
   <cm:property-placeholder persistent-id="org.xipki.commons.security.pkcs11proxy"
       update-strategy="reload">
   </cm:property-placeholder>
@@ -21,7 +20,7 @@
   </bean>
 
   <!-- register it as a servlet service for the web extender -->
-  <service ref="serverServlet" interface="javax.servlet.Servlet">
+  <service ref="serverServlet" interface="org.xipki.commons.http.servlet.HttpServlet">
     <service-properties>
       <entry key="alias" value="/p11proxy"/>
     </service-properties>

@@ -25,7 +25,7 @@ dataSource.useServerPrepStmts = true
 
 autoCommit = true
 readOnly = false
-maximumPoolSize = 20
+maximumPoolSize = 30
 minimumIdle = 10
 connectionTimeout = 10000
 idleTimeout = 600000

@@ -1917,7 +1917,7 @@ class CertStoreQueryExecutor {
 
         String namePattern = X509Util.getRfc4519Name(new X500Name(rdns2));
 
-        final String sql = sqls.sqlLatestSerialForSubjectLike;;
+        final String sql = sqls.sqlLatestSerialForSubjectLike;
         ResultSet rs = null;
         PreparedStatement ps;
         try {

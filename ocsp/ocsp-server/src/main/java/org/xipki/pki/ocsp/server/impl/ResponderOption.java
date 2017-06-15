@@ -89,24 +89,19 @@ class ResponderOption {
         List<String> list = new ArrayList<>(conf.getStores().getStore());
         this.storeNames = Collections.unmodifiableList(list);
 
-        if (conf.getServletPaths() == null) {
-            this.servletPaths = Collections.emptyList();
-        } else {
-            List<String> paths = conf.getServletPaths().getServletPath();
-            for (String path : paths) {
-                int len = path.length();
-                if (len > 0 && path.charAt(0) == '/') {
-                    throw new InvalidConfException(
-                            "servlet path '" + path + "' must not start with '/'");
-                }
-                if (len > 1 && path.charAt(len - 1) == '/') {
-                    throw new InvalidConfException(
-                            "servlet path '" + path + "' must not end with '/'");
-                }
+        List<String> paths = conf.getServletPaths().getServletPath();
+        for (String path : paths) {
+            if (path.isEmpty()) {
+                continue;
             }
-            list = new ArrayList<>(paths);
-            this.servletPaths = Collections.unmodifiableList(list);
+
+            if (path.charAt(0) != '/') {
+                throw new InvalidConfException(
+                        "servlet path '" + path + "' must start with '/'");
+            }
         }
+        list = new ArrayList<>(paths);
+        this.servletPaths = Collections.unmodifiableList(list);
     } // constructor
 
     public OcspMode getMode() {

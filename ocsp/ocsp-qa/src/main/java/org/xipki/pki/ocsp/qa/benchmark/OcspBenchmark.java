@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ocsp.qa.benchmark;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -43,7 +42,6 @@ import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -62,19 +60,18 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.util.encoders.Base64;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.api.ContentProvider;
-import org.eclipse.jetty.client.api.Request;
-import org.eclipse.jetty.client.util.InputStreamContentProvider;
-import org.eclipse.jetty.http.HttpMethod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.commons.common.util.ParamUtil;
 import org.xipki.commons.security.HashAlgoType;
 import org.xipki.commons.security.ObjectIdentifiers;
 import org.xipki.pki.ocsp.client.api.OcspRequestorException;
-import org.xipki.pki.ocsp.client.api.OcspResponseException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * @author Lijun Liao
@@ -83,14 +80,11 @@ import org.xipki.pki.ocsp.client.api.RequestOptions;
 
 class OcspBenchmark {
 
-    // result in maximal 254 Base-64 encoded octets
     public static final int MAX_LEN_GET = 190;
 
     public static final String CT_REQUEST = "application/ocsp-request";
 
     public static final String CT_RESPONSE = "application/ocsp-response";
-
-    private static final Logger LOG = LoggerFactory.getLogger(OcspBenchmark.class);
 
     private final Extension[] extnType = new Extension[0];
 
@@ -106,21 +100,19 @@ class OcspBenchmark {
 
     private RequestOptions requestOptions;
 
-    private URI responderUrl;
+    private String responderRawPath;
 
     private HttpClient httpClient;
 
-    private OcspResponseHandler responseHandler;
-
-    public void init(final OcspResponseHandler responseHandler, final URI responderUrl,
+    public void init(final OcspResponseHandler responseHandler, final String responderUrl,
             final Certificate issuerCert, final RequestOptions requestOptions)
             throws Exception {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
+        ParamUtil.requireNonNull("responseHandler", responseHandler);
         this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
-        this.responderUrl = ParamUtil.requireNonNull("responderUrl", responderUrl);
-        this.responseHandler = ParamUtil.requireNonNull("responseHandler", responseHandler);
 
-        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(requestOptions.getHashAlgorithmId());
+        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(
+                requestOptions.getHashAlgorithmId());
         if (hashAlgo == null) {
             throw new OcspRequestorException("unknown HashAlgo "
                     + requestOptions.getHashAlgorithmId().getId());
@@ -154,41 +146,33 @@ class OcspBenchmark {
             this.extensions = new Extension[]{extn};
         }
 
-        this.httpClient = new HttpClient();
-        this.httpClient.setFollowRedirects(false);
+        URI uri = new URI(responderUrl);
+        this.responderRawPath = uri.getRawPath();
+        if (!this.responderRawPath.endsWith("/")) {
+            this.responderRawPath += "/";
+        }
+        this.httpClient = new HttpClient(responderUrl, responseHandler);
         this.httpClient.start();
     }
 
     public void stop() throws Exception {
-        try {
-            responseHandler.waitForFinish(10, TimeUnit.SECONDS);
-        } catch (InterruptedException ex) {
-            LOG.warn("got InterruptedException in waitForFinish");
-        }
-
-        httpClient.stop();
+        httpClient.shutdown();
     }
 
     public void ask(final BigInteger[] serialNumbers)
-            throws OcspResponseException, OcspRequestorException {
-        try {
-            responseHandler.waitForResource();
-        } catch (InterruptedException ex) {
-            throw new OcspRequestorException("could not get connection: " + ex.getMessage(), ex);
-        }
-
+            throws OcspRequestorException {
         OCSPReq ocspReq = buildRequest(serialNumbers);
         byte[] encodedReq;
         try {
             encodedReq = ocspReq.getEncoded();
         } catch (IOException ex) {
-            throw new OcspRequestorException("could not encode OCSP request: " + ex.getMessage(),
-                    ex);
+            throw new OcspRequestorException(
+                    "could not encode OCSP request: " + ex.getMessage(), ex);
         }
 
         int size = encodedReq.length;
 
-        Request request;
+        FullHttpRequest request;
 
         if (size <= MAX_LEN_GET && requestOptions.isUseHttpGetForRequest()) {
             String b64Request = Base64.toBase64String(encodedReq);
@@ -199,28 +183,21 @@ class OcspBenchmark {
                 throw new OcspRequestorException(ex.getMessage());
             }
             StringBuilder urlBuilder = new StringBuilder();
-            String baseUrl = responderUrl.toString();
-            urlBuilder.append(baseUrl);
-            if (!baseUrl.endsWith("/")) {
-                urlBuilder.append('/');
-            }
+            urlBuilder.append(responderRawPath);
             urlBuilder.append(urlEncodedReq);
-            String url = urlBuilder.toString();
-            request = httpClient.newRequest(url)
-                    .method(HttpMethod.GET)
-                    .header("Content-Type", CT_REQUEST);
-        } else {
-            ContentProvider contentProvider = new InputStreamContentProvider(
-                    new ByteArrayInputStream(encodedReq));
-            request = httpClient.newRequest(responderUrl)
-                    .method(HttpMethod.POST)
-                    .content(contentProvider, CT_REQUEST);
-        }
+            String newRawpath = urlBuilder.toString();
 
-        OcspResponseContentListener contentListener = new OcspResponseContentListener();
-        responseHandler.incrementNumPendingRequests();
-        request.onResponseContent(contentListener);
-        request.send(new OcspResponseCompleter(responseHandler, contentListener));
+            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
+                    HttpMethod.GET, newRawpath);
+        } else {
+            ByteBuf content = Unpooled.wrappedBuffer(encodedReq);
+            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
+                    HttpMethod.POST, responderRawPath, content);
+            request.headers().addInt("Content-Length", content.readableBytes());
+        }
+        request.headers().add("Content-Type", CT_REQUEST);
+
+        httpClient.send(request);
     } // method ask
 
     private OCSPReq buildRequest(final BigInteger[] serialNumbers)
@@ -230,7 +207,8 @@ class OcspBenchmark {
         if (requestOptions.isUseNonce() || extensions != null) {
             List<Extension> extns = new ArrayList<>(2);
             if (requestOptions.isUseNonce()) {
-                Extension extn = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
+                Extension extn = new Extension(
+                        OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
                         new DEROctetString(nextNonce(requestOptions.getNonceLen())));
                 extns.add(extn);
             }

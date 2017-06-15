@@ -32,30 +32,17 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.qa.benchmark;
+package org.xipki.commons.http.server;
 
-import java.nio.ByteBuffer;
-
-import org.eclipse.jetty.client.api.Response;
+import org.xipki.httpserver.v1.Httpservers;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-class OcspResponseContentListener implements Response.ContentListener {
+public interface HttpServersConf {
 
-    private byte[] bytes;
-
-    @Override
-    public void onContent(Response response, ByteBuffer content) {
-        byte[] bb = new byte[content.remaining()];
-        content.get(bb);
-        this.bytes = bb;
-    }
-
-    public byte[] getBytes() {
-        return bytes;
-    }
+    public Httpservers getConf();
 
 }

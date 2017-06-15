@@ -32,32 +32,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.pki.ocsp.server.impl;
+package org.xipki.commons.http.servlet;
 
-import org.xipki.commons.common.util.ParamUtil;
+import javax.net.ssl.SSLSession;
+
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
 
-class ResponderAndRelativeUri {
+public interface HttpServlet {
 
-    private final Responder responder;
+    boolean needsTlsSessionInfo();
 
-    private final String relativeUri;
-
-    ResponderAndRelativeUri(final Responder responder, final String relativeUri) {
-        this.responder = ParamUtil.requireNonNull("responder", responder);
-        this.relativeUri = ParamUtil.requireNonNull("relativeUri", relativeUri);
-    }
-
-    public Responder getResponder() {
-        return responder;
-    }
-
-    public String getRelativeUri() {
-        return relativeUri;
-    }
+    /**
+     * @param request
+     *          The request. Must not be {@code null}.
+.     * @param servletUri
+     *          The servlet URI (URI part after the servlet alias). Must not be {@code null}.
+     * @param sslSession
+     *          SSLSession associated with this connection.  May be {@code null}.
+     * @param sslReverseProxyMode
+     *          Mode of the SSL reverse proxy. Must not be {@code null}.
+     * @return
+     * @throws Exception
+     */
+    FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
+            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception;
 
 }
