@@ -58,13 +58,12 @@ import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.audit.AuditEvent;
-import org.xipki.commons.audit.AuditLevel;
-import org.xipki.commons.audit.AuditService;
-import org.xipki.commons.audit.AuditStatus;
-import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.audit.AuditEvent;
+import org.xipki.audit.AuditLevel;
+import org.xipki.audit.AuditService;
+import org.xipki.audit.AuditStatus;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.message.CaCaps;
 import org.xipki.pki.scep.message.NextCaMessage;
@@ -72,6 +71,7 @@ import org.xipki.pki.scep.transaction.CaCapability;
 import org.xipki.pki.scep.transaction.Operation;
 import org.xipki.pki.scep.util.ScepConstants;
 import org.xipki.pki.scep.util.ScepUtil;
+import org.xipki.security.util.X509Util;
 
 /**
  * URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.exe

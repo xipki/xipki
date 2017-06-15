@@ -41,8 +41,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.ScepClientException;
 
 /**

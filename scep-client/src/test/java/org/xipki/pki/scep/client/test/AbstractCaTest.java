@@ -54,7 +54,6 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.xipki.commons.security.util.X509Util;
 import org.xipki.pki.scep.client.CaCertValidator;
 import org.xipki.pki.scep.client.CaIdentifier;
 import org.xipki.pki.scep.client.EnrolmentResponse;
@@ -68,6 +67,7 @@ import org.xipki.pki.scep.serveremulator.ScepServerContainer;
 import org.xipki.pki.scep.transaction.CaCapability;
 import org.xipki.pki.scep.transaction.PkiStatus;
 import org.xipki.pki.scep.util.ScepUtil;
+import org.xipki.security.util.X509Util;
 
 import junit.framework.Assert;
 

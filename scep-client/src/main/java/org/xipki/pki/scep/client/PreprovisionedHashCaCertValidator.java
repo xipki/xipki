@@ -40,7 +40,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 
 /**

@@ -43,7 +43,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.ScepClientException;
 import org.xipki.pki.scep.message.PkiMessage;
 import org.xipki.pki.scep.transaction.FailInfo;
