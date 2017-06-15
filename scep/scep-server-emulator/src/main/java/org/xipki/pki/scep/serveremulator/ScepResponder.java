@@ -61,10 +61,9 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.audit.AuditEvent;
-import org.xipki.commons.audit.AuditStatus;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.audit.AuditEvent;
+import org.xipki.audit.AuditStatus;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.message.CaCaps;
@@ -81,6 +80,7 @@ import org.xipki.pki.scep.transaction.Nonce;
 import org.xipki.pki.scep.transaction.PkiStatus;
 import org.xipki.pki.scep.transaction.TransactionId;
 import org.xipki.pki.scep.util.ScepUtil;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

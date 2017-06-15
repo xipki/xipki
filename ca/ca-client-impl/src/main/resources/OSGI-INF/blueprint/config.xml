@@ -10,7 +10,7 @@
       <cm:property name="clientConfFile" value="xipki/client-config/ca-client.xml"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <reference id="securityFactory" interface="org.xipki.commons.security.SecurityFactory"/>
+  <reference id="securityFactory" interface="org.xipki.security.SecurityFactory"/>
   <bean id="caClient" class="org.xipki.pki.ca.client.impl.CaClientImpl"
       init-method="init" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>

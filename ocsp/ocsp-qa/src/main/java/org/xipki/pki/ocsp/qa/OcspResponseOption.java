@@ -38,8 +38,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.util.AlgorithmUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.security.util.AlgorithmUtil;
 
 /**
  * @author Lijun Liao

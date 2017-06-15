@@ -41,7 +41,7 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.xipki.commons.common.RequestResponseDebug;
+import org.xipki.common.RequestResponseDebug;
 
 /**
  * @author Lijun Liao

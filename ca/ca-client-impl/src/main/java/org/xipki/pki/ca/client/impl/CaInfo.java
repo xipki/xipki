@@ -37,7 +37,7 @@ package org.xipki.pki.ca.client.impl;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
 
 /**

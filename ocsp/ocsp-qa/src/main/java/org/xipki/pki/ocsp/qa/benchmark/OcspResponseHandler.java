@@ -43,9 +43,9 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.LoadExecutor;
-import org.xipki.commons.common.concurrent.CountLatch;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.LoadExecutor;
+import org.xipki.common.concurrent.CountLatch;
+import org.xipki.common.util.ParamUtil;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.FullHttpResponse;

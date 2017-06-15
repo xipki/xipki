@@ -38,7 +38,7 @@ import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

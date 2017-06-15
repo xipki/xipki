@@ -76,11 +76,11 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.LogUtil;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.util.KeyUtil;
+import org.xipki.common.util.LogUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.crypto.ScepHashAlgoType;
 import org.xipki.pki.scep.util.ScepUtil;
+import org.xipki.security.util.KeyUtil;
 
 /**
  * @author Lijun Liao

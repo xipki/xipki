@@ -41,7 +41,7 @@ import org.bouncycastle.cms.KeyTransRecipient;
 import org.bouncycastle.cms.RecipientId;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 
 /**
  * @author Lijun Liao

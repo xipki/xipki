@@ -64,20 +64,20 @@ import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.xipki.commons.common.RequestResponseDebug;
-import org.xipki.commons.common.RequestResponsePair;
-import org.xipki.commons.common.util.BigIntegerRange;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.IssuerHash;
-import org.xipki.commons.security.ObjectIdentifiers;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.RequestResponsePair;
+import org.xipki.common.util.BigIntegerRange;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.StringUtil;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ocsp.client.api.OcspRequestor;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.IssuerHash;
+import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

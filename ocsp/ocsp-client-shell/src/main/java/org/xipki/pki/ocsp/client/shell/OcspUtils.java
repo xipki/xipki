@@ -37,7 +37,7 @@ package org.xipki.pki.ocsp.client.shell;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.client.api.InvalidOcspResponseException;
 import org.xipki.pki.ocsp.client.api.OcspResponseException;
 

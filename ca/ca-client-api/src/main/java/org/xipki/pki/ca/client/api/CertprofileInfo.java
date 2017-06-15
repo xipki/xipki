@@ -34,8 +34,8 @@
 
 package org.xipki.pki.ca.client.api;
 
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 
 /**
  * @author Lijun Liao

@@ -39,8 +39,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.pki.scep.transaction.Operation;
 import org.xipki.pki.scep.transaction.TransactionException;
 

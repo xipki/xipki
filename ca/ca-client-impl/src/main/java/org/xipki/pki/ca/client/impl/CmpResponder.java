@@ -36,8 +36,8 @@ package org.xipki.pki.ca.client.impl;
 
 import java.security.cert.X509Certificate;
 
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.AlgorithmValidator;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.security.AlgorithmValidator;
 
 /**
  * @author Lijun Liao

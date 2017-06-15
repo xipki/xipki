@@ -46,17 +46,17 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.commons.common.util.BigIntegerRange;
-import org.xipki.commons.common.util.CollectionUtil;
-import org.xipki.commons.common.util.FileBigIntegerIterator;
-import org.xipki.commons.common.util.IoUtil;
-import org.xipki.commons.common.util.RangeBigIntegerIterator;
-import org.xipki.commons.console.karaf.IllegalCmdParamException;
-import org.xipki.commons.console.karaf.completer.FilePathCompleter;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.util.BigIntegerRange;
+import org.xipki.common.util.CollectionUtil;
+import org.xipki.common.util.FileBigIntegerIterator;
+import org.xipki.common.util.IoUtil;
+import org.xipki.common.util.RangeBigIntegerIterator;
+import org.xipki.console.karaf.IllegalCmdParamException;
+import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 import org.xipki.pki.ocsp.client.shell.OcspStatusCommandSupport;
 import org.xipki.pki.ocsp.qa.benchmark.OcspLoadTest;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

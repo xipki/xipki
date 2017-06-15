@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.commons.common.util.ParamUtil;
+import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.client.api.OcspRequestorException;
 
 import io.netty.bootstrap.Bootstrap;

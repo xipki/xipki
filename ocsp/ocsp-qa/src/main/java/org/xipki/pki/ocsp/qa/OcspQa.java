@@ -64,17 +64,17 @@ import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.xipki.commons.common.qa.ValidationIssue;
-import org.xipki.commons.common.qa.ValidationResult;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.CrlReason;
-import org.xipki.commons.security.HashAlgoType;
-import org.xipki.commons.security.IssuerHash;
-import org.xipki.commons.security.ObjectIdentifiers;
-import org.xipki.commons.security.SecurityFactory;
-import org.xipki.commons.security.util.AlgorithmUtil;
-import org.xipki.commons.security.util.KeyUtil;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.qa.ValidationIssue;
+import org.xipki.common.qa.ValidationResult;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.security.CrlReason;
+import org.xipki.security.HashAlgoType;
+import org.xipki.security.IssuerHash;
+import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.SecurityFactory;
+import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.util.KeyUtil;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

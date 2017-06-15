@@ -39,9 +39,9 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.security.ObjectIdentifiers;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao

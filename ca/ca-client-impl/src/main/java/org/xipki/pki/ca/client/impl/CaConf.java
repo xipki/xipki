@@ -43,10 +43,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.commons.common.util.ParamUtil;
-import org.xipki.commons.common.util.StringUtil;
-import org.xipki.commons.security.util.X509Util;
+import org.xipki.common.util.ParamUtil;
+import org.xipki.common.util.StringUtil;
 import org.xipki.pki.ca.client.api.CertprofileInfo;
+import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao
