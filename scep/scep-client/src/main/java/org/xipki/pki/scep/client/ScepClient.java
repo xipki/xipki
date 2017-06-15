@@ -62,7 +62,7 @@ public class ScepClient extends Client {
         ParamUtil.requireNonNull("url", url);
         try {
             URL tmpUrl = new URL(url);
-            HttpURLConnection httpConn = IoUtil.openHttpConn(tmpUrl);;
+            HttpURLConnection httpConn = IoUtil.openHttpConn(tmpUrl);
             httpConn.setRequestMethod("GET");
             return parseResponse(httpConn);
         } catch (IOException ex) {

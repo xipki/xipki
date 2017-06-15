@@ -23,6 +23,8 @@
     <module>security</module>
     <module>security-shell</module>
     <module>security-speed-shell</module>
+    <module>servlet-api</module>
+    <module>http-server</module>
     <module>pkcs11-proxy-server</module>
   </modules>
 </project>

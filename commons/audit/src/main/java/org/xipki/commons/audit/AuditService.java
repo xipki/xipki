@@ -34,13 +34,10 @@
 
 package org.xipki.commons.audit;
 
-import java.io.CharArrayWriter;
 import java.util.List;
 import java.util.Objects;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Lijun Liao
@@ -49,8 +46,6 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AuditService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AuditService.class);
-
     public abstract void doLogEvent(@NonNull AuditEvent event);
 
     public abstract void doLogEvent(@NonNull PciAuditEvent event);
@@ -58,6 +53,7 @@ public abstract class AuditService {
     public final void logEvent(@NonNull AuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
 
+        /*
         switch (event.getLevel()) {
         case DEBUG:
             if (LOG.isDebugEnabled()) {
@@ -65,9 +61,12 @@ public abstract class AuditService {
             }
             break;
         default:
-            LOG.info("AuditEvent {}", createMessage(event));
+            if (LOG.isInfoEnabled()) {
+                LOG.info("AuditEvent {}", createMessage(event));
+            }
             break;
         } // end switch
+        */
 
         doLogEvent(event);
     }
@@ -75,6 +74,7 @@ public abstract class AuditService {
     public final void logEvent(@NonNull PciAuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
 
+        /*
         CharArrayWriter msg = event.toCharArrayWriter("");
         AuditLevel al = event.getLevel();
         switch (al) {
@@ -84,9 +84,12 @@ public abstract class AuditService {
             }
             break;
         default:
-            LOG.info("PciAuditEvent {} | {}", al.getAlignedText(), msg);
+            if (LOG.isInfoEnabled()) {
+                LOG.info("PciAuditEvent {} | {}", al.getAlignedText(), msg);
+            }
             break;
         } // end switch
+        */
 
         doLogEvent(event);
     }
