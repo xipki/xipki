@@ -36,6 +36,7 @@ package org.xipki.common;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -201,7 +202,7 @@ public abstract class LoadExecutor {
     protected boolean stop() {
         return interrupted
                 || errorAccount.get() > 0
-                || System.currentTimeMillis() - processLog.startTime() >= duration * 1000L;
+                || System.currentTimeMillis() - processLog.startTimeMs() >= duration * 1000L;
     }
 
     protected void printHeader() {
@@ -220,23 +221,26 @@ public abstract class LoadExecutor {
         processLog.printTrailer();
 
         final long account = processLog.numProcessed();
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(400);
         long elapsedTimeMs = processLog.totalElapsedTime();
-        sb.append("finished in ")
-            .append(StringUtil.formatTime(elapsedTimeMs / 1000, false)).append("\n")
-            .append("account: ")
-            .append(StringUtil.formatAccount(account, 1))
-            .append(" ")
-            .append(unit).append("\n")
-            .append(" failed: ")
-            .append(StringUtil.formatAccount(errorAccount.get(), 1))
-            .append(" ")
-            .append(unit).append("\n")
-            .append("average: ")
-            .append(StringUtil.formatAccount(processLog.totalAverageSpeed(), 1))
-            .append(" ")
-            .append(unit)
-            .append("/s\n");
+        
+        String text = new Date(processLog.startTimeMs()).toString();
+        sb.append(" started at: ").append(text).append("\n");
+        
+        text = new Date(processLog.endTimeMs()).toString();
+        sb.append("finished at: ").append(text).append("\n");
+        
+        text = StringUtil.formatTime(elapsedTimeMs / 1000, false);
+        sb.append("   duration: ").append(text).append("\n");
+        
+        text = StringUtil.formatAccount(account, 1);
+        sb.append("    account: ").append(text).append(" ").append(unit).append("\n");
+        
+        text = StringUtil.formatAccount(errorAccount.get(), 1);
+        sb.append("     failed: ").append(text).append(" ").append(unit).append("\n");
+        
+        text = StringUtil.formatAccount(processLog.totalAverageSpeed(), 1);
+        sb.append("    average: ").append(text).append(" ").append(unit).append("/s\n");
 
         System.out.println(sb.toString());
     }

@@ -60,6 +60,8 @@ public class ProcessLog {
     private final boolean hasTotal;
 
     private long startTimeMs;
+    
+    private long endTimeMs;
 
     private AtomicLong numProcessed;
 
@@ -123,7 +125,8 @@ public class ProcessLog {
 
     public void finish() {
         finished.set(true);
-        totalElapsedTimeMs = System.currentTimeMillis() - startTimeMs;
+        endTimeMs = System.currentTimeMillis();
+        totalElapsedTimeMs = endTimeMs - startTimeMs;
 
         totalAverageSpeed = 0;
         if (totalElapsedTimeMs > 0) {
@@ -162,8 +165,12 @@ public class ProcessLog {
         measureDeque.add(new MeasurePoint(startTimeMs, 0));
     }
 
-    public long startTime() {
+    public long startTimeMs() {
         return startTimeMs;
+    }
+
+    public long endTimeMs() {
+        return endTimeMs;
     }
 
     public long addNumProcessed(final long numProcessed) {
