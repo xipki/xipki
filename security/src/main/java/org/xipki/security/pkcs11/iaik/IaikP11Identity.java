@@ -74,7 +74,7 @@ class IaikP11Identity extends P11Identity {
         super(slot, identityId, publicKey, certificateChain);
         this.signingKey = ParamUtil.requireNonNull("privateKey", privateKey);
 
-        int keyBitLen = getSignatureKeyBitLength();
+        int keyBitLen = signatureKeyBitLength();
         if (publicKey instanceof RSAPublicKey) {
             expectedSignatureLen = (keyBitLen + 7) / 8;
         } else if (publicKey instanceof ECPublicKey) {
@@ -115,11 +115,11 @@ class IaikP11Identity extends P11Identity {
         return ((IaikP11Slot) slot).sign(mechanism, parameters, content, this);
     }
 
-    Key getSigningKey() {
+    Key signingKey() {
         return signingKey;
     }
 
-    int getExpectedSignatureLen() {
+    int expectedSignatureLen() {
         return expectedSignatureLen;
     }
 

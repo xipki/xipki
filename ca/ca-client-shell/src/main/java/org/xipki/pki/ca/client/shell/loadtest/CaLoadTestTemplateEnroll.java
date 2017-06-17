@@ -138,14 +138,14 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
                 return false;
             }
 
-            Set<String> ids = result.getAllIds();
+            Set<String> ids = result.allIds();
             if (ids.size() < certRequests.size()) {
                 return false;
             }
 
             for (String id : ids) {
                 CertOrError certOrError = result.getCertificateOrError(id);
-                X509Certificate cert = (X509Certificate) certOrError.getCertificate();
+                X509Certificate cert = (X509Certificate) certOrError.certificate();
 
                 if (cert == null) {
                     return false;
@@ -250,7 +250,7 @@ public class CaLoadTestTemplateEnroll extends LoadExecutor {
             CertTemplate certTemplate = certTempBuilder.build();
             CertRequest certRequest = new CertRequest(certId, certTemplate, null);
             CertRequestWithProfile requestWithCertprofile = new CertRequestWithProfile(
-                    loadtestEntry.getCertprofile(), certRequest);
+                    loadtestEntry.certprofile(), certRequest);
             certRequests.put(certId, requestWithCertprofile);
         }
         return certRequests;

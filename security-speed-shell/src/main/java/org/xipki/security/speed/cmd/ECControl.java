@@ -49,7 +49,7 @@ public class ECControl {
         this.curveName = ParamUtil.requireNonBlank("curveName", curveName);
     }
 
-    public String getCurveName() {
+    public String curveName() {
         return curveName;
     }
 

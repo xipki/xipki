@@ -71,7 +71,7 @@ public class BSpeedP12RSAKeyGenCmd extends BatchSpeedCommandSupport {
             return null;
         }
 
-        return new P12RSAKeyGenLoadTest(control.getModulusLen(), toBigInt("0x10001"),
+        return new P12RSAKeyGenLoadTest(control.modulusLen(), toBigInt("0x10001"),
                 securityFactory);
     }
 

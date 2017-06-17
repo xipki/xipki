@@ -47,7 +47,7 @@ public class RSAControl {
         this.modulusLen = modulusLen;
     }
 
-    public int getModulusLen() {
+    public int modulusLen() {
         return modulusLen;
     }
 

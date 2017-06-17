@@ -196,13 +196,13 @@ public class CmpUtil {
     public static InfoTypeAndValue buildInfoTypeAndValue(final CmpUtf8Pairs utf8Pairs) {
         ParamUtil.requireNonNull("utf8Pairs", utf8Pairs);
         return new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-                new DERUTF8String(utf8Pairs.getEncoded()));
+                new DERUTF8String(utf8Pairs.encoded()));
     }
 
     public static AttributeTypeAndValue buildAttributeTypeAndValue(final CmpUtf8Pairs utf8Pairs) {
         ParamUtil.requireNonNull("utf8Pairs", utf8Pairs);
         return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
-                new DERUTF8String(utf8Pairs.getEncoded()));
+                new DERUTF8String(utf8Pairs.encoded()));
     }
 
 }

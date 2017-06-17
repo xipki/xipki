@@ -162,7 +162,7 @@ public class LoadTestEntry {
         return subject.getX500Name(index);
     }
 
-    public String getCertprofile() {
+    public String certprofile() {
         return certprofile;
     }
 

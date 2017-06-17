@@ -123,7 +123,7 @@ public class RequestOptions {
         this.useNonce = useNonce;
     }
 
-    public int getNonceLen() {
+    public int nonceLen() {
         return nonceLen;
     }
 
@@ -131,7 +131,7 @@ public class RequestOptions {
         this.nonceLen = ParamUtil.requireMin("nonceLen", nonceLen, 1);
     }
 
-    public ASN1ObjectIdentifier getHashAlgorithmId() {
+    public ASN1ObjectIdentifier hashAlgorithmId() {
         return hashAlgorithmId;
     }
 
@@ -139,7 +139,7 @@ public class RequestOptions {
         this.hashAlgorithmId = hashAlgorithmId;
     }
 
-    public List<AlgorithmIdentifier> getPreferredSignatureAlgorithms() {
+    public List<AlgorithmIdentifier> preferredSignatureAlgorithms() {
         return preferredSignatureAlgorithms;
     }
 

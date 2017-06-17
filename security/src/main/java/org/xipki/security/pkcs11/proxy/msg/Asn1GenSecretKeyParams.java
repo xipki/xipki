@@ -88,9 +88,9 @@ public class Asn1GenSecretKeyParams extends ASN1Object {
     private Asn1GenSecretKeyParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 5, 5);
         int idx = 0;
-        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getSlotId();
+        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
         label = Asn1Util.getUtf8String(seq.getObjectAt(idx++));
-        control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).getControl();
+        control = Asn1NewKeyControl.getInstance(seq.getObjectAt(idx++)).control();
         keyType = Asn1Util.getInteger(seq.getObjectAt(idx++)).longValue();
         keysize = Asn1Util.getInteger(seq.getObjectAt(idx++)).intValue();
         ParamUtil.requireMin("keysize", keysize, 1);
@@ -126,23 +126,23 @@ public class Asn1GenSecretKeyParams extends ASN1Object {
         return new DERSequence(vector);
     }
 
-    public P11SlotIdentifier getSlotId() {
+    public P11SlotIdentifier slotId() {
         return slotId;
     }
 
-    public String getLabel() {
+    public String label() {
         return label;
     }
 
-    public P11NewKeyControl getControl() {
+    public P11NewKeyControl control() {
         return control;
     }
 
-    public long getKeyType() {
+    public long keyType() {
         return keyType;
     }
 
-    public int getKeysize() {
+    public int keysize() {
         return keysize;
     }
 

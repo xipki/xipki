@@ -77,7 +77,7 @@ public class CertRevocationInfo {
         this.reason = ParamUtil.requireNonNull("reason", reason);
     }
 
-    public CrlReason getReason() {
+    public CrlReason reason() {
         return reason;
     }
 
@@ -89,7 +89,7 @@ public class CertRevocationInfo {
      * Gets the revocation time.
      * @return revocation time, never be null
      */
-    public Date getRevocationTime() {
+    public Date revocationTime() {
         if (revocationTime == null) {
             revocationTime = new Date();
         }
@@ -100,7 +100,7 @@ public class CertRevocationInfo {
      * Get the invalidity time.
      * @return invalidity time, may be null
      */
-    public Date getInvalidityTime() {
+    public Date invalidityTime() {
         return invalidityTime;
     }
 

@@ -146,11 +146,11 @@ public class ExtensionExistence extends ASN1Object {
         return new DERSequence(vector);
     }
 
-    public List<ASN1ObjectIdentifier> getNeedExtensions() {
+    public List<ASN1ObjectIdentifier> needExtensions() {
         return needExtensions;
     }
 
-    public List<ASN1ObjectIdentifier> getWantExtensions() {
+    public List<ASN1ObjectIdentifier> wantExtensions() {
         return wantExtensions;
     }
 

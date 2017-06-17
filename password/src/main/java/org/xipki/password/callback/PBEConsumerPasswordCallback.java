@@ -100,14 +100,14 @@ public class PBEConsumerPasswordCallback implements PasswordCallback {
     public void init(final String conf) throws PasswordResolverException {
         ParamUtil.requireNonBlank("conf", conf);
         ConfPairs pairs = new ConfPairs(conf);
-        String str = pairs.getValue("name");
+        String str = pairs.value("name");
         if (StringUtil.isBlank(str)) {
             throw new PasswordResolverException("name must not be null");
         }
         this.passwordName = str;
         PasswordProducer.registerPasswordConsumer(this.passwordName);
 
-        str = pairs.getValue("tries");
+        str = pairs.value("tries");
         if (StringUtil.isNotBlank(str)) {
             int intValue = Integer.parseInt(str);
             if (intValue > 0) {

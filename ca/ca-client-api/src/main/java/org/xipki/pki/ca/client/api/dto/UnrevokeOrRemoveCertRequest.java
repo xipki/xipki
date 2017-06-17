@@ -52,7 +52,7 @@ public class UnrevokeOrRemoveCertRequest {
     public boolean addRequestEntry(final UnrevokeOrRemoveCertEntry requestEntry) {
         ParamUtil.requireNonNull("requestEntry", requestEntry);
         for (UnrevokeOrRemoveCertEntry re : requestEntries) {
-            if (re.getId().equals(requestEntry.getId())) {
+            if (re.id().equals(requestEntry.id())) {
                 return false;
             }
         }
@@ -61,7 +61,7 @@ public class UnrevokeOrRemoveCertRequest {
         return true;
     }
 
-    public List<UnrevokeOrRemoveCertEntry> getRequestEntries() {
+    public List<UnrevokeOrRemoveCertEntry> requestEntries() {
         return Collections.unmodifiableList(requestEntries);
     }
 }

@@ -53,7 +53,7 @@ public class KeystoreGenerationParameters {
         this.password = ParamUtil.requireNonNull("password", password);
     }
 
-    public SecureRandom getRandom() {
+    public SecureRandom random() {
         return random;
     }
 
@@ -61,7 +61,7 @@ public class KeystoreGenerationParameters {
         this.random = random;
     }
 
-    public char[] getPassword() {
+    public char[] password() {
         return password;
     }
 

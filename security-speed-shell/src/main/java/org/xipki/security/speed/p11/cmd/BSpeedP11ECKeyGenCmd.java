@@ -71,7 +71,7 @@ public class BSpeedP11ECKeyGenCmd extends BSpeedP11CommandSupport {
         }
 
         P11Slot slot = getSlot();
-        return new P11ECKeyGenLoadTest(slot, control.getCurveName());
+        return new P11ECKeyGenLoadTest(slot, control.curveName());
     }
 
 }

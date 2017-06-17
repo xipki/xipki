@@ -81,7 +81,7 @@ public class BSpeedP11ECSignCmd extends BSpeedP11CommandSupport {
         }
 
         P11Slot slot = getSlot();
-        return new P11ECSignLoadTest(securityFactory, slot, sigAlgo, control.getCurveName());
+        return new P11ECSignLoadTest(securityFactory, slot, sigAlgo, control.curveName());
     }
 
 }

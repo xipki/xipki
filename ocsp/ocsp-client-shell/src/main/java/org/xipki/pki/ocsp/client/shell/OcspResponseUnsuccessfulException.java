@@ -64,11 +64,11 @@ public class OcspResponseUnsuccessfulException extends OcspResponseException {
         this.status = status;
     }
 
-    public int getStatus() {
+    public int status() {
         return status;
     }
 
-    public String getStatusText() {
+    public String statusText() {
         return getOcspResponseStatus(status);
     }
 

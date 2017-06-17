@@ -50,11 +50,11 @@ public class MeasurePoint {
         this.measureAccount = measureAccount;
     }
 
-    public long getMeasureTime() {
+    public long measureTime() {
         return measureTime;
     }
 
-    public long getMeasureAccount() {
+    public long measureAccount() {
         return measureAccount;
     }
 

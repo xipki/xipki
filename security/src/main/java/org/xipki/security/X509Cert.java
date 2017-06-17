@@ -95,27 +95,27 @@ public class X509Cert {
         }
     }
 
-    public X509Certificate getCert() {
+    public X509Certificate cert() {
         return cert;
     }
 
-    public byte[] getEncodedCert() {
+    public byte[] encodedCert() {
         return encodedCert;
     }
 
-    public String getSubject() {
+    public String subject() {
         return subject;
     }
 
-    public X500Name getSubjectAsX500Name() {
+    public X500Name subjectAsX500Name() {
         return subjectAsX500Name;
     }
 
-    public byte[] getSubjectKeyIdentifier() {
+    public byte[] subjectKeyIdentifier() {
         return Arrays.copyOf(subjectKeyIdentifer, subjectKeyIdentifer.length);
     }
 
-    public X509CertificateHolder getCertHolder() {
+    public X509CertificateHolder certHolder() {
         if (certHolder != null) {
             return certHolder;
         }

@@ -166,7 +166,7 @@ class OcspResponseHandler {
         return true;
     }
 
-    public int getMaxPendingRequests() {
+    public int maxPendingRequests() {
         return maxPendingRequests;
     }
 

@@ -128,16 +128,16 @@ public class CmpUtf8Pairs {
         pairs.remove(name);
     }
 
-    public String getValue(final String name) {
+    public String value(final String name) {
         ParamUtil.requireNonNull(name, name);
         return pairs.get(name);
     }
 
-    public Set<String> getNames() {
+    public Set<String> names() {
         return Collections.unmodifiableSet(pairs.keySet());
     }
 
-    public String getEncoded() {
+    public String encoded() {
         StringBuilder sb = new StringBuilder();
         List<String> names = new LinkedList<>();
         for (String name : pairs.keySet()) {
@@ -169,12 +169,12 @@ public class CmpUtf8Pairs {
 
     @Override
     public String toString() {
-        return getEncoded();
+        return encoded();
     }
 
     @Override
     public int hashCode() {
-        return getEncoded().hashCode();
+        return encoded().hashCode();
     }
 
     @Override

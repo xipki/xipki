@@ -70,14 +70,14 @@ public class UncategorizedSqlException extends UncategorizedDataAccessException 
     /**
      * Return the underlying SQLException.
      */
-    public SQLException getSqlException() {
+    public SQLException cause() {
         return (SQLException) getCause();
     }
 
     /**
      * Return the SQL that led to the problem.
      */
-    public String getSql() {
+    public String sql() {
         return this.sql;
     }
 

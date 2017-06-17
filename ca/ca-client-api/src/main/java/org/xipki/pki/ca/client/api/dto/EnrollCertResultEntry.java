@@ -58,11 +58,11 @@ public class EnrollCertResultEntry extends ResultEntry {
         this.status = status;
     }
 
-    public CMPCertificate getCert() {
+    public CMPCertificate cert() {
         return cert;
     }
 
-    public int getStatus() {
+    public int status() {
         return status;
     }
 

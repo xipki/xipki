@@ -239,11 +239,11 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
                     sns.add(from);
                 } else {
                     BigIntegerRange range = new BigIntegerRange(from, to);
-                    if (range.getDiff().compareTo(BigInteger.valueOf(10)) > 0) {
+                    if (range.diff().compareTo(BigInteger.valueOf(10)) > 0) {
                         throw new IllegalCmdParamException("to many serial numbers");
                     }
 
-                    BigInteger sn = range.getFrom();
+                    BigInteger sn = range.from();
                     while (range.isInRange(sn)) {
                         sns.add(sn);
                         sn = sn.add(BigInteger.ONE);
@@ -272,7 +272,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
         }
 
         IssuerHash issuerHash = new IssuerHash(
-                HashAlgoType.getNonNullHashAlgoType(options.getHashAlgorithmId()),
+                HashAlgoType.getNonNullHashAlgoType(options.hashAlgorithmId()),
                 Certificate.getInstance(issuerCert.getEncoded()));
         OCSPResp response;
         try {
@@ -282,14 +282,14 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             if (debug != null && debug.size() > 0) {
                 RequestResponsePair reqResp = debug.get(0);
                 if (saveReq) {
-                    byte[] bytes = reqResp.getRequest();
+                    byte[] bytes = reqResp.request();
                     if (bytes != null) {
                         IoUtil.save(reqout, bytes);
                     }
                 }
 
                 if (saveResp) {
-                    byte[] bytes = reqResp.getResponse();
+                    byte[] bytes = reqResp.response();
                     if (bytes != null) {
                         IoUtil.save(respout, bytes);
                     }

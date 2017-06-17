@@ -74,7 +74,7 @@ public abstract class BSpeedP11CommandSupport extends BatchSpeedCommandSupport {
         if (p11Service == null) {
             throw new IllegalCmdParamException("undefined module " + moduleName);
         }
-        P11Module module = p11Service.getModule();
+        P11Module module = p11Service.module();
         P11SlotIdentifier slotId = module.getSlotIdForIndex(slotIndex);
         return module.getSlot(slotId);
     }

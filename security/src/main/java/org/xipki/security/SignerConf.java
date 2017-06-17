@@ -78,11 +78,11 @@ public class SignerConf {
         }
     }
 
-    public HashAlgoType getHashAlgo() {
+    public HashAlgoType hashAlgo() {
         return hashAlgo;
     }
 
-    public SignatureAlgoControl getSignatureAlgoControl() {
+    public SignatureAlgoControl signatureAlgoControl() {
         return signatureAlgoControl;
     }
 
@@ -95,7 +95,7 @@ public class SignerConf {
     }
 
     public String getConfValue(String name) {
-        return confPairs.getValue(name);
+        return confPairs.value(name);
     }
 
     public String getConf() {
@@ -272,7 +272,7 @@ public class SignerConf {
 
         try {
             ConfPairs pairs = new ConfPairs(conf);
-            String value = pairs.getValue("password");
+            String value = pairs.value("password");
             if (value != null && !StringUtil.startsWithIgnoreCase(value, "PBE:")) {
                 pairs.putPair("password", "<sensitive>");
             }

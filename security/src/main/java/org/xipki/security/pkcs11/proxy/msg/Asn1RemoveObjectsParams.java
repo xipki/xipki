@@ -87,7 +87,7 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
     private Asn1RemoveObjectsParams(final ASN1Sequence seq) throws BadAsn1ObjectException {
         Asn1Util.requireRange(seq, 2, 3);
         int idx = 0;
-        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).getSlotId();
+        slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++)).slotId();
         final int size = seq.size();
         ASN1Encodable asn1Id = null;
         ASN1Encodable asn1Label = null;
@@ -140,15 +140,15 @@ public class Asn1RemoveObjectsParams extends ASN1Object {
         return new DERSequence(vector);
     }
 
-    public P11SlotIdentifier getSlotId() {
+    public P11SlotIdentifier slotId() {
         return slotId;
     }
 
-    public byte[] getObjectId() {
+    public byte[] ojectId() {
         return Arrays.copyOf(objectId, objectId.length);
     }
 
-    public String getObjectLabel() {
+    public String objectLabel() {
         return objectLabel;
     }
 

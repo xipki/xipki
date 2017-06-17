@@ -574,15 +574,15 @@ public abstract class DataSourceWrapper {
         this.cacheSeqNameSqls = new LruCache<>(100);
     }
 
-    public final String getDatasourceName() {
+    public final String datasourceName() {
         return name;
     }
 
-    public final DatabaseType getDatabaseType() {
+    public final DatabaseType databaseType() {
         return this.databaseType;
     }
 
-    public final int getMaximumPoolSize() {
+    public final int maximumPoolSize() {
         return service.getMaximumPoolSize();
     }
 
@@ -1267,34 +1267,34 @@ public abstract class DataSourceWrapper {
 
         if (errorCode != null) {
             // look for grouped error codes.
-            if (sqlErrorCodes.getBadSqlGrammarCodes().contains(errorCode)) {
+            if (sqlErrorCodes.badSqlGrammarCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new BadSqlGrammarException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getInvalidResultSetAccessCodes().contains(errorCode)) {
+            } else if (sqlErrorCodes.invalidResultSetAccessCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new InvalidResultSetAccessException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getDuplicateKeyCodes().contains(errorCode)) {
+            } else if (sqlErrorCodes.duplicateKeyCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new DuplicateKeyException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getDataIntegrityViolationCodes().contains(errorCode)) {
+            } else if (sqlErrorCodes.dataIntegrityViolationCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new DataIntegrityViolationException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getPermissionDeniedCodes().contains(errorCode)) {
+            } else if (sqlErrorCodes.permissionDeniedCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new PermissionDeniedDataAccessException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getDataAccessResourceFailureCodes().contains(errorCode)) {
+            } else if (sqlErrorCodes.dataAccessResourceFailureCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new DataAccessResourceFailureException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getTransientDataAccessResourceCodes().contains(errorCode)) {
+            } else if (sqlErrorCodes.transientDataAccessResourceCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new TransientDataAccessResourceException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getCannotAcquireLockCodes().contains(errorCode)) {
+            } else if (sqlErrorCodes.cannotAcquireLockCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new CannotAcquireLockException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getDeadlockLoserCodes().contains(errorCode)) {
+            } else if (sqlErrorCodes.deadlockLoserCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new DeadlockLoserDataAccessException(buildMessage(tmpSql, sqlEx), sqlEx);
-            } else if (sqlErrorCodes.getCannotSerializeTransactionCodes().contains(errorCode)) {
+            } else if (sqlErrorCodes.cannotSerializeTransactionCodes().contains(errorCode)) {
                 logTranslation(tmpSql, sqlEx);
                 return new CannotSerializeTransactionException(buildMessage(tmpSql, sqlEx), sqlEx);
             }
@@ -1303,15 +1303,15 @@ public abstract class DataSourceWrapper {
         // try SQLState
         if (sqlState != null && sqlState.length() >= 2) {
             String classCode = sqlState.substring(0, 2);
-            if (sqlStateCodes.getBadSqlGrammarCodes().contains(classCode)) {
+            if (sqlStateCodes.badSqlGrammarCodes().contains(classCode)) {
                 return new BadSqlGrammarException(buildMessage(tmpSql, sqlEx), ex);
-            } else if (sqlStateCodes.getDataIntegrityViolationCodes().contains(classCode)) {
+            } else if (sqlStateCodes.dataIntegrityViolationCodes().contains(classCode)) {
                 return new DataIntegrityViolationException(buildMessage(tmpSql, ex), ex);
-            } else if (sqlStateCodes.getDataAccessResourceFailureCodes().contains(classCode)) {
+            } else if (sqlStateCodes.dataAccessResourceFailureCodes().contains(classCode)) {
                 return new DataAccessResourceFailureException(buildMessage(tmpSql, ex), ex);
-            } else if (sqlStateCodes.getTransientDataAccessResourceCodes().contains(classCode)) {
+            } else if (sqlStateCodes.transientDataAccessResourceCodes().contains(classCode)) {
                 return new TransientDataAccessResourceException(buildMessage(tmpSql, ex), ex);
-            } else if (sqlStateCodes.getConcurrencyFailureCodes().contains(classCode)) {
+            } else if (sqlStateCodes.concurrencyFailureCodes().contains(classCode)) {
                 return new ConcurrencyFailureException(buildMessage(tmpSql, ex), ex);
             }
         }

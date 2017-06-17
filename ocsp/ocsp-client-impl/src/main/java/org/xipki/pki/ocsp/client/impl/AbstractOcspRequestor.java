@@ -179,7 +179,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
         byte[] nonce = null;
         if (requestOptions.isUseNonce()) {
-            nonce = nextNonce(requestOptions.getNonceLen());
+            nonce = nextNonce(requestOptions.nonceLen());
         }
 
         OCSPReq ocspReq = buildRequest(issuerCert, serialNumbers, nonce, requestOptions);
@@ -322,12 +322,12 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     private OCSPReq buildRequest(final X509Certificate caCert, final BigInteger[] serialNumbers,
             final byte[] nonce, final RequestOptions requestOptions)
             throws OcspRequestorException {
-        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(requestOptions.getHashAlgorithmId());
+        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(requestOptions.hashAlgorithmId());
         if (hashAlgo == null) {
             throw new OcspRequestorException("unknown HashAlgo "
-                    + requestOptions.getHashAlgorithmId().getId());
+                    + requestOptions.hashAlgorithmId().getId());
         }
-        List<AlgorithmIdentifier> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
+        List<AlgorithmIdentifier> prefSigAlgs = requestOptions.preferredSignatureAlgorithms();
 
         OCSPReqBuilder reqBuilder = new OCSPReqBuilder();
         List<Extension> extensions = new LinkedList<>();
@@ -373,7 +373,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                     tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
 
             for (BigInteger serialNumber : serialNumbers) {
-                CertID certId = new CertID(hashAlgo.getAlgorithmIdentifier(),
+                CertID certId = new CertID(hashAlgo.algorithmIdentifier(),
                         issuerNameHash, issuerKeyHash, new ASN1Integer(serialNumber));
 
                 reqBuilder.addRequest(new CertificateID(certId));
@@ -401,7 +401,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                         }
 
                         try {
-                            signer = getSecurityFactory().createSigner(signerType,
+                            signer = securityFactory().createSigner(signerType,
                                     new SignerConf(signerConf), cert);
                         } catch (Exception ex) {
                             throw new OcspRequestorException("could not create signer: "
@@ -430,7 +430,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         return nonce;
     }
 
-    public String getSignerConf() {
+    public String signerConf() {
         return signerConf;
     }
 
@@ -439,7 +439,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         this.signerConf = signerConf;
     }
 
-    public String getSignerCertFile() {
+    public String signerCertFile() {
         return signerCertFile;
     }
 
@@ -452,7 +452,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         this.signerCertFile = signerCertFile;
     }
 
-    public String getSignerType() {
+    public String signerType() {
         return signerType;
     }
 
@@ -461,7 +461,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         this.signerType = ParamUtil.requireNonBlank("signerType", signerType);
     }
 
-    public SecurityFactory getSecurityFactory() {
+    public SecurityFactory securityFactory() {
         return securityFactory;
     }
 

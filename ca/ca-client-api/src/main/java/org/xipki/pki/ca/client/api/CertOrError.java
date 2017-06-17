@@ -60,11 +60,11 @@ public class CertOrError {
         this.error = ParamUtil.requireNonNull("error", error);
     }
 
-    public Certificate getCertificate() {
+    public Certificate certificate() {
         return certificate;
     }
 
-    public PkiStatusInfo getError() {
+    public PkiStatusInfo error() {
         return error;
     }
 

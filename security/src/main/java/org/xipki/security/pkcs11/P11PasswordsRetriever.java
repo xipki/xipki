@@ -122,7 +122,7 @@ public class P11PasswordsRetriever {
         return null;
     }
 
-    public PasswordResolver getPasswordResolver() {
+    public PasswordResolver passwordResolver() {
         return passwordResolver;
     }
 

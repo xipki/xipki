@@ -118,7 +118,7 @@ public class PciAuditEvent {
         this.level = AuditLevel.INFO;
     }
 
-    public AuditLevel getLevel() {
+    public AuditLevel level() {
         return level;
     }
 
@@ -126,7 +126,7 @@ public class PciAuditEvent {
         this.level = Objects.requireNonNull(level, "level must not be null");
     }
 
-    public String getUserId() {
+    public String userId() {
         if (isBlank(this.userId)) {
             return UNDEFINED;
         }
@@ -138,7 +138,7 @@ public class PciAuditEvent {
         this.userId = userId;
     }
 
-    public String getEventType() {
+    public String eventType() {
         if (isBlank(this.eventType)) {
             return UNDEFINED;
         }
@@ -150,15 +150,15 @@ public class PciAuditEvent {
         this.eventType = eventType;
     }
 
-    public String getDate() {
+    public String date() {
         return date;
     }
 
-    public String getTime() {
+    public String time() {
         return time;
     }
 
-    public String getStatus() {
+    public String status() {
         if (isBlank(this.status)) {
             return UNDEFINED;
         }
@@ -170,7 +170,7 @@ public class PciAuditEvent {
         this.status = status;
     }
 
-    public String getOrigination() {
+    public String origination() {
         if (isBlank(origination)) {
             origination = getHostAddress();
         }
@@ -182,7 +182,7 @@ public class PciAuditEvent {
         this.origination = origination;
     }
 
-    public String getAffectedResource() {
+    public String affectedResource() {
         if (isBlank(this.affectedResource)) {
             return UNDEFINED;
         }
@@ -204,15 +204,15 @@ public class PciAuditEvent {
             buffer.append(prefix);
         }
 
-        buffer.append(replaceDelimiter(getUserId(), delimiter, replaceDelimiter)).append(delimiter);
-        buffer.append(replaceDelimiter(getEventType(), delimiter, replaceDelimiter))
+        buffer.append(replaceDelimiter(userId(), delimiter, replaceDelimiter)).append(delimiter);
+        buffer.append(replaceDelimiter(eventType(), delimiter, replaceDelimiter))
                 .append(delimiter);
-        buffer.append(replaceDelimiter(getDate(), delimiter, replaceDelimiter)).append(delimiter);
-        buffer.append(replaceDelimiter(getTime(), delimiter, replaceDelimiter)).append(delimiter);
-        buffer.append(replaceDelimiter(getStatus(), delimiter, replaceDelimiter)).append(delimiter);
-        buffer.append(replaceDelimiter(getOrigination(), delimiter, replaceDelimiter))
+        buffer.append(replaceDelimiter(date(), delimiter, replaceDelimiter)).append(delimiter);
+        buffer.append(replaceDelimiter(time(), delimiter, replaceDelimiter)).append(delimiter);
+        buffer.append(replaceDelimiter(status(), delimiter, replaceDelimiter)).append(delimiter);
+        buffer.append(replaceDelimiter(origination(), delimiter, replaceDelimiter))
                 .append(delimiter);
-        buffer.append(replaceDelimiter(getAffectedResource(), delimiter, replaceDelimiter));
+        buffer.append(replaceDelimiter(affectedResource(), delimiter, replaceDelimiter));
 
         return buffer;
     }

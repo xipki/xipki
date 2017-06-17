@@ -184,7 +184,7 @@ public class AlgorithmUtil {
 
         // SHA
         for (HashAlgoType hashAlgo : HashAlgoType.values()) {
-            map.put(hashAlgo.getOid().getId(), hashAlgo.getAlgorithmCode());
+            map.put(hashAlgo.oid().getId(), hashAlgo.algorithmCode());
         }
 
         algNameCodeMap = Collections.unmodifiableMap(map);
@@ -200,7 +200,7 @@ public class AlgorithmUtil {
         if (hashAlgo == null) {
             throw new NoSuchAlgorithmException("Unsupported hash algorithm " + hashAlgName);
         }
-        return hashAlgo.getOid();
+        return hashAlgo.oid();
     } // method getHashAlg
 
     public static int getHashOutputSizeInOctets(final ASN1ObjectIdentifier hashAlgo)
@@ -210,7 +210,7 @@ public class AlgorithmUtil {
         if (hashAlgoType == null) {
             throw new NoSuchAlgorithmException("Unsupported hash algorithm " + hashAlgo.getId());
         }
-        return hashAlgoType.getLength();
+        return hashAlgoType.length();
     } // method getHashOutputSizeInOctets
 
     public static AlgorithmCode getSigOrMacAlgorithmCode(final AlgorithmIdentifier algId)
@@ -639,11 +639,11 @@ public class AlgorithmUtil {
     public static AlgorithmIdentifier getSigAlgId(final PublicKey pubKey,
             final SignerConf signerConf) throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("signerConf", signerConf);
-        if (signerConf.getHashAlgo() == null) {
+        if (signerConf.hashAlgo() == null) {
             return getSigAlgId(signerConf.getConfValue("algo"));
         } else {
-            SignatureAlgoControl algoControl = signerConf.getSignatureAlgoControl();
-            HashAlgoType hashAlgo = signerConf.getHashAlgo();
+            SignatureAlgoControl algoControl = signerConf.signatureAlgoControl();
+            HashAlgoType hashAlgo = signerConf.hashAlgo();
             boolean rsaMgf1 = (algoControl == null) ? false : algoControl.isRsaMgf1();
             boolean dsaPlain = (algoControl == null) ? false : algoControl.isDsaPlain();
 
@@ -1019,7 +1019,7 @@ public class AlgorithmUtil {
                 throw new NoSuchAlgorithmException("unknown signature algorithm" + algOid.getId());
             }
 
-            digestAlgOid = digestAlg.getOid();
+            digestAlgOid = digestAlg.oid();
         }
 
         return new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
@@ -1133,8 +1133,8 @@ public class AlgorithmUtil {
     public static RSASSAPSSparams createPSSRSAParams(final HashAlgoType digestAlg)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonNull("digestAlg", digestAlg);
-        int saltSize = digestAlg.getLength();
-        AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlg.getOid(),
+        int saltSize = digestAlg.length();
+        AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlg.oid(),
                 DERNull.INSTANCE);
         return new RSASSAPSSparams(digAlgId,
             new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),

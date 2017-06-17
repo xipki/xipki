@@ -65,7 +65,7 @@ public class ScepServerContainer {
         tmpServer.setHandler(context);
 
         for (ScepServer m : scepServers) {
-            String servletPattern = "/" + m.getName() + "/pkiclient.exe/*";
+            String servletPattern = "/" + m.name() + "/pkiclient.exe/*";
             ScepServlet servlet = m.getServlet();
             context.addServlet(new ServletHolder(servlet), servletPattern);
         }

@@ -78,7 +78,7 @@ class ProxyP11Identity extends P11Identity {
         }
         Asn1SignTemplate signTemplate = new Asn1SignTemplate(asn1EntityId, mechanism, p11Param,
                 content);
-        byte[] result = ((ProxyP11Slot) slot).getModule().send(P11ProxyConstants.ACTION_SIGN,
+        byte[] result = ((ProxyP11Slot) slot).module().send(P11ProxyConstants.ACTION_SIGN,
                 signTemplate);
 
         ASN1OctetString octetString;
@@ -96,7 +96,7 @@ class ProxyP11Identity extends P11Identity {
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
         Asn1DigestSecretKeyTemplate template = new Asn1DigestSecretKeyTemplate(
                 asn1EntityId, mechanism);
-        byte[] result = ((ProxyP11Slot) slot).getModule().send(
+        byte[] result = ((ProxyP11Slot) slot).module().send(
                 P11ProxyConstants.ACTION_DIGEST_SECRETKEY, template);
 
         ASN1OctetString octetString;

@@ -63,11 +63,11 @@ public final class EnvelopedDataDecryptorInstance {
         this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
     }
 
-    public KeyTransRecipient getRecipient() {
+    public KeyTransRecipient recipient() {
         return recipient;
     }
 
-    public RecipientId getRecipientId() {
+    public RecipientId recipientId() {
         return recipientId;
     }
 

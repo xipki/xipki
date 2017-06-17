@@ -146,11 +146,11 @@ public class ProcessLog {
         System.out.flush();
     }
 
-    public long getNumProcessed() {
+    public long numProcessed() {
         return numProcessed.get();
     }
 
-    public long getTotal() {
+    public long total() {
         return total;
     }
 
@@ -162,7 +162,7 @@ public class ProcessLog {
         measureDeque.add(new MeasurePoint(startTimeMs, 0));
     }
 
-    public long getStartTime() {
+    public long startTime() {
         return startTimeMs;
     }
 
@@ -212,10 +212,10 @@ public class ProcessLog {
 
         // current speed
         long currentSpeed = 0;
-        long t2inms = nowMs - referenceMeasurePoint.getMeasureTime(); // in ms
+        long t2inms = nowMs - referenceMeasurePoint.measureTime(); // in ms
         if (t2inms > 0) {
             currentSpeed =
-                    (tmpNumProcessed - referenceMeasurePoint.getMeasureAccount()) * 1000 / t2inms;
+                    (tmpNumProcessed - referenceMeasurePoint.measureAccount()) * 1000 / t2inms;
         }
         sb.append(StringUtil.formatAccount(currentSpeed, true));
 
@@ -251,7 +251,7 @@ public class ProcessLog {
         System.out.flush();
     } // method printStatus
 
-    public long getTotalElapsedTime() {
+    public long totalElapsedTime() {
         if (finished.get()) {
             return totalElapsedTimeMs;
         }
@@ -259,7 +259,7 @@ public class ProcessLog {
         return System.currentTimeMillis() - startTimeMs;
     }
 
-    public int getTotalAverageSpeed() {
+    public int totalAverageSpeed() {
         if (finished.get()) {
             return totalAverageSpeed;
         }

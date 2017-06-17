@@ -58,7 +58,7 @@ public class EnrollCertResult {
         this.caCertificate = caCertificate;
     }
 
-    public Certificate getCaCertificate() {
+    public Certificate caCertificate() {
         return caCertificate;
     }
 
@@ -67,7 +67,7 @@ public class EnrollCertResult {
         return certificatesOrErrors.get(id);
     }
 
-    public Set<String> getAllIds() {
+    public Set<String> allIds() {
         return certificatesOrErrors.keySet();
     }
 

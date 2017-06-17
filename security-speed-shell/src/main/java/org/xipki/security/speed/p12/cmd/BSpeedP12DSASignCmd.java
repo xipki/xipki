@@ -69,12 +69,12 @@ public class BSpeedP12DSASignCmd extends BSpeedP12SignCommandSupport {
         if (control == null) {
             return null;
         }
-        if (control.getPlen() == 1024) {
+        if (control.plen() == 1024) {
             sigAlgo = "SHA1withDSA";
         }
 
-        return new P12DSASignLoadTest(securityFactory, sigAlgo, control.getPlen(),
-                control.getQlen());
+        return new P12DSASignLoadTest(securityFactory, sigAlgo, control.plen(),
+                control.qlen());
     }
 
 }

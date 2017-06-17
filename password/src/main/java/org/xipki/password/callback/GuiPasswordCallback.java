@@ -97,13 +97,13 @@ public class GuiPasswordCallback implements PasswordCallback {
         }
 
         ConfPairs pairs = new ConfPairs(conf);
-        String str = pairs.getValue("quorum");
+        String str = pairs.value("quorum");
         quorum = Integer.valueOf(str);
         if (quorum < 1 || quorum > 10) {
             throw new PasswordResolverException("quorum " + quorum + " is not in [1,10]");
         }
 
-        str = pairs.getValue("tries");
+        str = pairs.value("tries");
         if (StringUtil.isNotBlank(str)) {
             int intValue = Integer.parseInt(str);
             if (intValue > 0) {

@@ -77,7 +77,7 @@ public class InvalidResultSetAccessException extends InvalidDataAccessResourceUs
     /**
      * Return the wrapped SQLException.
      */
-    public SQLException getSqlException() {
+    public SQLException cause() {
         return (SQLException) getCause();
     }
 
@@ -85,7 +85,7 @@ public class InvalidResultSetAccessException extends InvalidDataAccessResourceUs
      * Return the SQL that caused the problem.
      * @return the offending SQL, if known
      */
-    public String getSql() {
+    public String sql() {
         return this.sql;
     }
 

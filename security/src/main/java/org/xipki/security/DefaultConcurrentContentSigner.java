@@ -176,7 +176,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public AlgorithmCode getAlgorithmCode() {
+    public AlgorithmCode algorithmCode() {
         return algorithmCode;
     }
 

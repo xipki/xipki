@@ -84,7 +84,7 @@ public class AuditEvent {
         this.level = AuditLevel.INFO;
     }
 
-    public AuditLevel getLevel() {
+    public AuditLevel level() {
         return level;
     }
 
@@ -92,7 +92,7 @@ public class AuditEvent {
         this.level = level;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
@@ -100,7 +100,7 @@ public class AuditEvent {
         this.name = name;
     }
 
-    public String getApplicationName() {
+    public String applicationName() {
         return applicationName;
     }
 
@@ -109,11 +109,11 @@ public class AuditEvent {
                 "applicationName must not be null");
     }
 
-    public Date getTimestamp() {
+    public Date timestamp() {
         return timestamp;
     }
 
-    public List<AuditEventData> getEventDatas() {
+    public List<AuditEventData> eventDatas() {
         return Collections.unmodifiableList(eventDatas);
     }
 
@@ -131,7 +131,7 @@ public class AuditEvent {
         int idx = -1;
         for (int i = 0; i < eventDatas.size(); i++) {
             AuditEventData ed = eventDatas.get(i);
-            if (ed.getName().equals(eventData.getName())) {
+            if (ed.name().equals(eventData.name())) {
                 idx = i;
                 break;
             }
@@ -151,7 +151,7 @@ public class AuditEvent {
 
         AuditEventData tbr = null;
         for (AuditEventData ed : eventDatas) {
-            if (ed.getName().equals(eventDataName)) {
+            if (ed.name().equals(eventDataName)) {
                 tbr = ed;
             }
         }
@@ -165,7 +165,7 @@ public class AuditEvent {
         return removed;
     }
 
-    public AuditStatus getStatus() {
+    public AuditStatus status() {
         return status;
     }
 
@@ -177,7 +177,7 @@ public class AuditEvent {
         this.duration = System.currentTimeMillis() - timestamp.getTime();
     }
 
-    public long getDuration() {
+    public long duration() {
         return duration;
     }
 

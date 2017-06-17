@@ -67,7 +67,7 @@ public abstract class P12KeyGenCommandSupport extends KeyGenCommandSupport {
     protected void saveKey(final P12KeyGenerationResult keyGenerationResult) throws IOException {
         ParamUtil.requireNonNull("keyGenerationResult", keyGenerationResult);
         File p12File = new File(keyOutFile);
-        saveVerbose("saved PKCS#12 keystore to file", p12File, keyGenerationResult.getKeystore());
+        saveVerbose("saved PKCS#12 keystore to file", p12File, keyGenerationResult.keystore());
     }
 
     protected KeystoreGenerationParameters getKeyGenParameters() throws IOException {

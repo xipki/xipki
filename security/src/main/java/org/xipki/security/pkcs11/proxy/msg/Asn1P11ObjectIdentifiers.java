@@ -101,7 +101,7 @@ public class Asn1P11ObjectIdentifiers extends ASN1Object {
         return new DERSequence(vec);
     }
 
-    public List<Asn1P11ObjectIdentifier> getObjectIds() {
+    public List<Asn1P11ObjectIdentifier> objectIds() {
         return objectIds;
     }
 

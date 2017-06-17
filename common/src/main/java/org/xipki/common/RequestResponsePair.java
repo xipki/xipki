@@ -45,7 +45,7 @@ public class RequestResponsePair {
 
     private byte[] response;
 
-    public byte[] getRequest() {
+    public byte[] request() {
         return request;
     }
 
@@ -53,7 +53,7 @@ public class RequestResponsePair {
         this.request = request;
     }
 
-    public byte[] getResponse() {
+    public byte[] response() {
         return response;
     }
 

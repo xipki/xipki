@@ -58,7 +58,7 @@ public class P12HMACSignLoadTest extends P12SignLoadTest {
         int keysize = getKeysize(signatureAlgorithm);
         P12KeyGenerationResult identity = new P12KeyGenerator().generateSecretKey(
                 "GENERIC", keysize, new KeystoreGenerationParameters(PASSWORD.toCharArray()));
-        return identity.getKeystore();
+        return identity.keystore();
     }
 
     public static int getKeysize(String hmacAlgorithm) {

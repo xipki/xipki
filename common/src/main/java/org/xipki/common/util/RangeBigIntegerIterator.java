@@ -60,7 +60,7 @@ public class RangeBigIntegerIterator implements Iterator<BigInteger> {
         this.sizeRanges = ranges.size();
         this.loop = loop;
         this.currentIndex = 0;
-        this.currentNumber = ranges.get(0).getFrom();
+        this.currentNumber = ranges.get(0).from();
     }
 
     @Override
@@ -87,7 +87,7 @@ public class RangeBigIntegerIterator implements Iterator<BigInteger> {
             }
 
             this.currentNumber = (this.currentIndex < sizeRanges)
-                    ? ranges.get(this.currentIndex).getFrom() : null;
+                    ? ranges.get(this.currentIndex).from() : null;
         }
 
         return ret;

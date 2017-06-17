@@ -179,12 +179,12 @@ public class ConfPairs {
         pairs.remove(name);
     }
 
-    public String getValue(final String name) {
+    public String value(final String name) {
         ParamUtil.requireNonNull("name", name);
         return pairs.get(name);
     }
 
-    public Set<String> getNames() {
+    public Set<String> names() {
         return Collections.unmodifiableSet(pairs.keySet());
     }
 

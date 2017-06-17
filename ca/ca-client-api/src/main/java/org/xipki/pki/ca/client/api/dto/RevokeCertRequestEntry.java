@@ -71,15 +71,15 @@ public class RevokeCertRequestEntry extends IssuerSerialEntry {
         this.invalidityDate = invalidityDate;
     }
 
-    public int getReason() {
+    public int reason() {
         return reason;
     }
 
-    public Date getInvalidityDate() {
+    public Date invalidityDate() {
         return invalidityDate;
     }
 
-    public byte[] getAuthorityKeyIdentifier() {
+    public byte[] authorityKeyIdentifier() {
         return authorityKeyIdentifier;
     }
 

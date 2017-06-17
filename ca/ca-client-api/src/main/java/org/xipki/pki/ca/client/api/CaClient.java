@@ -60,7 +60,7 @@ import org.xipki.pki.ca.client.api.dto.UnrevokeOrRemoveCertRequest;
 
 public interface CaClient {
 
-    Set<String> getCaNames();
+    Set<String> caNames();
 
     Set<CertprofileInfo> getCertprofiles(@NonNull String caName) throws CaClientException;
 

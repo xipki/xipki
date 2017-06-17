@@ -56,7 +56,7 @@ public class P11ModuleNameCompleter extends AbstractDynamicEnumCompleter {
 
     @Override
     protected Set<String> getEnums() {
-        Set<String> names = p11CryptServiceFactory.getModuleNames();
+        Set<String> names = p11CryptServiceFactory.moduleNames();
         if (CollectionUtil.isEmpty(names)) {
             return Collections.emptySet();
         }

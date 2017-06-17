@@ -78,7 +78,7 @@ public interface ConcurrentContentSigner {
      * Returns the algorithm code in XiPKI context.
      * @return algorithm code
      */
-    AlgorithmCode getAlgorithmCode();
+    AlgorithmCode algorithmCode();
 
     boolean isMac();
 

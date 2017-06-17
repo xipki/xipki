@@ -55,11 +55,11 @@ public class CsrEnrollCertRequest extends IdentifiedObject {
         this.csr = ParamUtil.requireNonNull("csr", csr);
     }
 
-    public CertificationRequest getCsr() {
+    public CertificationRequest csr() {
         return csr;
     }
 
-    public String getCertprofile() {
+    public String certprofile() {
         return certprofile;
     }
 
