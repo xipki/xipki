@@ -43,7 +43,6 @@ import javax.net.ssl.SSLSession;
 
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.cert.ocsp.OCSPReq;
-import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,113 +93,89 @@ public class HttpOcspServlet extends AbstractHttpServlet {
     @Override
     public FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
             SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
-        HttpVersion version = request.protocolVersion();
-        HttpMethod method = request.method();
-
-        boolean viaGet;
-        if (method == HttpMethod.GET) {
-            viaGet = true;
-        } else if (method == HttpMethod.POST) {
-            viaGet = false;
-        } else {
-            return createErrorResponse(version, METHOD_NOT_ALLOWED);
-        }
-
         if (server == null) {
             String message = "responder in servlet not configured";
             LOG.error(message);
-            return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            return createErrorResponse(request.protocolVersion(),
+                    HttpResponseStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Responder responder = null;
-        String b64OcspReq = null;
-
-        if (viaGet) {
-            Object[] objs = server.getServletPathAndResponder(servletUri);
-            if (objs != null) {
-                String path = servletUri.path();
-                String servletPath = (String) objs[0];
-                responder = (Responder) objs[1];
-                int offset = servletPath.length();
-                // GET URI contains the request and must be much longer than 10.
-                if (path.length() - offset > 10) {
-                    if (path.charAt(offset) == '/') {
-                        offset++;
-                    }
-                    b64OcspReq = servletUri.path().substring(offset);
-                }
-            }
+        HttpMethod method = request.method();
+        if (method == HttpMethod.GET) {
+            return serviceGet(request, servletUri, sslSession, sslReverseProxyMode);
+        } else if (method == HttpMethod.POST) {
+            return servicePost(request, servletUri, sslSession, sslReverseProxyMode);
         } else {
-            responder = server.getResponder(servletUri);
+            return createErrorResponse(request.protocolVersion(), METHOD_NOT_ALLOWED);
         }
 
+    }
+
+    private FullHttpResponse servicePost(FullHttpRequest request, ServletURI servletUri,
+            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
+        HttpVersion version = request.protocolVersion();
+
+        Responder responder = server.getResponder(servletUri);
         if (responder == null) {
             return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
         }
 
-        if (viaGet) {
-            if (b64OcspReq == null) {
-                return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
-            } else if (!responder.requestOption().supportsHttpGet()) {
-                return createErrorResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED);
-            }
+        AuditService auditService = null;
+        if (responder.auditOption() != null) {
+            auditService = (auditServiceRegister == null) ? null
+                    : auditServiceRegister.getAuditService();
         }
 
+        boolean audit = (auditService != null);
+
+        AuditLevel auditLevel = null;
+        AuditStatus auditStatus = null;
         AuditEvent event = null;
-        AuditLevel auditLevel = AuditLevel.INFO;
-        AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
         String auditMessage = null;
 
-        AuditService auditService = (auditServiceRegister == null) ? null
-                : auditServiceRegister.getAuditService();
+        if (audit) {
+            auditLevel = AuditLevel.INFO;
+            auditStatus = AuditStatus.SUCCESSFUL;
 
-        if (responder.auditOption() != null) {
             event = new AuditEvent(new Date());
             event.setApplicationName(OcspAuditConstants.APPNAME);
             event.setName(OcspAuditConstants.NAME_PERF);
         }
 
         try {
-            byte[] content;
-            if (viaGet) {
-                // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
-                // POST, we support GET for longer requests anyway.
-                if (b64OcspReq.length() > responder.requestOption().maxRequestSize()) {
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "request too large";
-                    return createErrorResponse(version,
-                            HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
-                }
-
-                // TODO: check whether it is URL decoded
-                content = Base64.decode(b64OcspReq);
-            } else {
-                // accept only "application/ocsp-request" as content type
-                String reqContentType = request.headers().get("Content-Type");
-                if (!CT_REQUEST.equalsIgnoreCase(reqContentType)) {
+            // accept only "application/ocsp-request" as content type
+            String reqContentType = request.headers().get("Content-Type");
+            if (!CT_REQUEST.equalsIgnoreCase(reqContentType)) {
+                if (audit) {
                     auditStatus = AuditStatus.FAILED;
                     auditMessage = "unsupported media type " + reqContentType;
-                    return createErrorResponse(version, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
                 }
 
-                int contentLen = request.content().readableBytes();
-                // request too long
-                if (contentLen > responder.requestOption().maxRequestSize()) {
+                return createErrorResponse(version, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
+            }
+
+            int contentLen = request.content().readableBytes();
+            // request too long
+            if (contentLen > responder.requestOption().maxRequestSize()) {
+                if (audit) {
                     auditStatus = AuditStatus.FAILED;
                     auditMessage = "request too large";
-                    return createErrorResponse(version,
-                            HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
-                } // if (CT_REQUEST)
+                }
 
-                content = readContent(request);
-            } // end if (getMethod)
+                return createErrorResponse(version,
+                        HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
+            } // if (CT_REQUEST)
+
+            byte[] content = readContent(request);
 
             OCSPRequest ocspRequest;
             try {
                 ocspRequest = OCSPRequest.getInstance(content);
             } catch (Exception ex) {
-                auditStatus = AuditStatus.FAILED;
-                auditMessage = "bad request";
+                if (audit) {
+                    auditStatus = AuditStatus.FAILED;
+                    auditMessage = "bad request";
+                }
 
                 LogUtil.error(LOG, ex, "could not parse the request (OCSPRequest)");
                 return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
@@ -209,23 +184,152 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             OCSPReq ocspReq = new OCSPReq(ocspRequest);
 
             OcspRespWithCacheInfo ocspRespWithCacheInfo =
-                    server.answer(responder, ocspReq, viaGet, event);
+                    server.answer(responder, ocspReq, false, event);
             if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
                 auditMessage = "processRequest returned null, this should not happen";
                 LOG.error(auditMessage);
-                auditLevel = AuditLevel.ERROR;
-                auditStatus = AuditStatus.FAILED;
+
+                if (audit) {
+                    auditLevel = AuditLevel.ERROR;
+                    auditStatus = AuditStatus.FAILED;
+                }
+
                 return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
             }
 
-            OCSPResp resp = ocspRespWithCacheInfo.response();
-            byte[] encodedOcspResp = resp.getEncoded();
+            byte[] encodedOcspResp = ocspRespWithCacheInfo.response();
+            return createOKResponse(version, CT_RESPONSE, encodedOcspResp);
+        } catch (Throwable th) {
+            if (th instanceof EOFException) {
+                LogUtil.warn(LOG, th, "Connection reset by peer");
+            } else {
+                LOG.error("Throwable thrown, this should not happen!", th);
+            }
+
+            if (audit) {
+                auditLevel = AuditLevel.ERROR;
+                auditStatus = AuditStatus.FAILED;
+            }
+            auditMessage = "internal error";
+            return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        } finally {
+            if (audit) {
+                if (auditLevel != null) {
+                    event.setLevel(auditLevel);
+                }
+
+                if (auditStatus != null) {
+                    event.setStatus(auditStatus);
+                }
+
+                if (auditMessage != null) {
+                    event.addEventData(OcspAuditConstants.NAME_message, auditMessage);
+                }
+
+                event.finish();
+                auditService.logEvent(event);
+            }
+        } // end external try
+    } // method servicePost
+
+    private FullHttpResponse serviceGet(FullHttpRequest request, ServletURI servletUri,
+            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
+        HttpVersion version = request.protocolVersion();
+
+        Object[] objs = server.getServletPathAndResponder(servletUri);
+        if (objs == null) {
+            return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
+        }
+
+        String path = servletUri.path();
+        String servletPath = (String) objs[0];
+        Responder responder = (Responder) objs[1];
+
+        if (!responder.requestOption().supportsHttpGet()) {
+            return createErrorResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED);
+        }
+
+        String b64OcspReq;
+
+        int offset = servletPath.length();
+        // GET URI contains the request and must be much longer than 10.
+        if (path.length() - offset > 10) {
+            if (path.charAt(offset) == '/') {
+                offset++;
+            }
+            b64OcspReq = servletUri.path().substring(offset);
+        } else {
+            return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
+        }
+
+        AuditService auditService = null;
+        if (responder.auditOption() != null) {
+            auditService = (auditServiceRegister == null) ? null
+                    : auditServiceRegister.getAuditService();
+        }
+
+        boolean audit = (auditService != null);
+
+        AuditLevel auditLevel = null;
+        AuditStatus auditStatus = null;
+        AuditEvent event = null;
+        String auditMessage = null;
+
+        if (audit) {
+            auditLevel = AuditLevel.INFO;
+            auditStatus = AuditStatus.SUCCESSFUL;
+
+            event = new AuditEvent(new Date());
+            event.setApplicationName(OcspAuditConstants.APPNAME);
+            event.setName(OcspAuditConstants.NAME_PERF);
+        }
+
+        try {
+            // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
+            // POST, we support GET for longer requests anyway.
+            if (b64OcspReq.length() > responder.requestOption().maxRequestSize()) {
+                if (audit) {
+                    auditStatus = AuditStatus.FAILED;
+                    auditMessage = "request too large";
+                }
+                return createErrorResponse(version, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
+            }
+
+            byte[] content = Base64.decode(b64OcspReq);
+
+            OCSPRequest ocspRequest;
+            try {
+                ocspRequest = OCSPRequest.getInstance(content);
+            } catch (Exception ex) {
+                if (audit) {
+                    auditStatus = AuditStatus.FAILED;
+                    auditMessage = "bad request";
+                }
+                LogUtil.error(LOG, ex, "could not parse the request (OCSPRequest)");
+                return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
+            }
+
+            OCSPReq ocspReq = new OCSPReq(ocspRequest);
+
+            OcspRespWithCacheInfo ocspRespWithCacheInfo =
+                    server.answer(responder, ocspReq, true, event);
+            if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
+                auditMessage = "processRequest returned null, this should not happen";
+                LOG.error(auditMessage);
+                if (audit) {
+                    auditLevel = AuditLevel.ERROR;
+                    auditStatus = AuditStatus.FAILED;
+                }
+                return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            byte[] encodedOcspResp = ocspRespWithCacheInfo.response();
 
             FullHttpResponse response = createOKResponse(version, CT_RESPONSE, encodedOcspResp);
 
             ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.cacheInfo();
-            if (viaGet && cacheInfo != null) {
-                encodedOcspResp = resp.getEncoded();
+            if (cacheInfo != null) {
+                encodedOcspResp = ocspRespWithCacheInfo.response();
                 long now = System.currentTimeMillis();
 
                 HttpHeaders headers = response.headers();
@@ -276,12 +380,14 @@ public class HttpOcspServlet extends AbstractHttpServlet {
                 LOG.error("Throwable thrown, this should not happen!", th);
             }
 
-            auditLevel = AuditLevel.ERROR;
-            auditStatus = AuditStatus.FAILED;
-            auditMessage = "internal error";
+            if (audit) {
+                auditLevel = AuditLevel.ERROR;
+                auditStatus = AuditStatus.FAILED;
+                auditMessage = "internal error";
+            }
             return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
         } finally {
-            if (event != null) {
+            if (audit) {
                 if (auditLevel != null) {
                     event.setLevel(auditLevel);
                 }
@@ -298,7 +404,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
                 auditService.logEvent(event);
             }
         } // end external try
-    } // method processRequest
+    } // method serviceGet
 
     public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
         this.auditServiceRegister = ParamUtil.requireNonNull("auditServiceRegister",

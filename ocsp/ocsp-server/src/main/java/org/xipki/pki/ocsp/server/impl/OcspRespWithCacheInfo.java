@@ -34,8 +34,6 @@
 
 package org.xipki.pki.ocsp.server.impl;
 
-import org.bouncycastle.cert.ocsp.OCSPResp;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -67,16 +65,16 @@ class OcspRespWithCacheInfo {
 
     } // class ResponseCacheInfo
 
-    private final OCSPResp response;
+    private byte[] response;
 
-    private final ResponseCacheInfo cacheInfo;
+    private ResponseCacheInfo cacheInfo;
 
-    OcspRespWithCacheInfo(final OCSPResp response, final ResponseCacheInfo cacheInfo) {
+    OcspRespWithCacheInfo(final byte[] response, final ResponseCacheInfo cacheInfo) {
         this.response = response;
         this.cacheInfo = cacheInfo;
     }
 
-    public OCSPResp response() {
+    public byte[] response() {
         return response;
     }
 

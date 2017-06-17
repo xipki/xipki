@@ -308,18 +308,12 @@ class ResponseCacher {
 
             long thisUpdate = rs.getLong("THIS_UPDATE");
             String b64Resp = rs.getString("RESP");
-            OCSPResp resp;
-            try {
-                resp = new OCSPResp(Base64.decode(b64Resp));
-            } catch (IOException ex) {
-                LOG.warn("could not parse OCSPResp");
-                return null;
-            }
+            byte[] encoded = Base64.decode(b64Resp);
             ResponseCacheInfo cacheInfo = new ResponseCacheInfo(thisUpdate);
             if (nextUpdate != 0) {
                 cacheInfo.setNextUpdate(nextUpdate);
             }
-            return new OcspRespWithCacheInfo(resp, cacheInfo);
+            return new OcspRespWithCacheInfo(encoded, cacheInfo);
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
         } finally {
