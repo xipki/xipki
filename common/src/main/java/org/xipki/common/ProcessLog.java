@@ -60,7 +60,7 @@ public class ProcessLog {
     private final boolean hasTotal;
 
     private long startTimeMs;
-    
+
     private long endTimeMs;
 
     private AtomicLong numProcessed;
