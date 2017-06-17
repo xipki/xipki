@@ -223,22 +223,22 @@ public abstract class LoadExecutor {
         final long account = processLog.numProcessed();
         StringBuilder sb = new StringBuilder(400);
         long elapsedTimeMs = processLog.totalElapsedTime();
-        
+
         String text = new Date(processLog.startTimeMs()).toString();
         sb.append(" started at: ").append(text).append("\n");
-        
+
         text = new Date(processLog.endTimeMs()).toString();
         sb.append("finished at: ").append(text).append("\n");
-        
+
         text = StringUtil.formatTime(elapsedTimeMs / 1000, false);
         sb.append("   duration: ").append(text).append("\n");
-        
+
         text = StringUtil.formatAccount(account, 1);
         sb.append("    account: ").append(text).append(" ").append(unit).append("\n");
-        
+
         text = StringUtil.formatAccount(errorAccount.get(), 1);
         sb.append("     failed: ").append(text).append(" ").append(unit).append("\n");
-        
+
         text = StringUtil.formatAccount(processLog.totalAverageSpeed(), 1);
         sb.append("    average: ").append(text).append(" ").append(unit).append("/s\n");
 
