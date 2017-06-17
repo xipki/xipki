@@ -44,15 +44,15 @@ import org.xipki.pki.ocsp.client.api.OcspRequestorException;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -71,14 +71,6 @@ public final class HttpClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpClient.class);
 
-    private static boolean useEpollLinux;
-
-    static {
-        boolean linux = System.getProperty("os.name").toLowerCase().contains("linux");
-        useEpollLinux = linux ? Epoll.isAvailable() : false;
-        LOG.info("linux epoll available: {}", useEpollLinux);
-    }
-
     private class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
 
         public HttpClientInitializer() {
@@ -87,8 +79,8 @@ public final class HttpClient {
         @Override
         public void initChannel(SocketChannel ch) {
             ChannelPipeline pipeline = ch.pipeline();
-            pipeline.addLast(new ReadTimeoutHandler(10, TimeUnit.SECONDS))
-                .addLast(new WriteTimeoutHandler(10, TimeUnit.SECONDS))
+            pipeline.addLast(new ReadTimeoutHandler(60, TimeUnit.SECONDS))
+                .addLast(new WriteTimeoutHandler(60, TimeUnit.SECONDS))
                 .addLast(new HttpClientCodec())
                 .addLast(new HttpObjectAggregator(65536))
                 .addLast(new HttpClientHandler());
@@ -109,21 +101,23 @@ public final class HttpClient {
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             ctx.close();
+            LOG.warn("error", cause);
             responseHandler.onError();
         }
     }
 
-    private final String uri;
+    private String uri;
 
-    private final OcspResponseHandler responseHandler;
+    private OcspResponseHandler responseHandler;
 
-    private EventLoopGroup group;
+    private EventLoopGroup workerGroup;
 
     private Channel channel;
 
-    public HttpClient(String uri, OcspResponseHandler responseHandler) {
+    public HttpClient(String uri, OcspResponseHandler responseHandler, EventLoopGroup workerGroup) {
         this.uri = ParamUtil.requireNonNull("uri", uri);
         this.responseHandler = ParamUtil.requireNonNull("responseHandler", responseHandler);
+        this.workerGroup = ParamUtil.requireNonNull("workerGroup", workerGroup);
     }
 
     public void start() throws Exception {
@@ -144,16 +138,16 @@ public final class HttpClient {
 
         Class<? extends SocketChannel> channelClass;
         // Configure the client.
-        if (useEpollLinux) {
-            this.group = new EpollEventLoopGroup(1);
+        if (workerGroup instanceof EpollEventLoopGroup) {
             channelClass = EpollSocketChannel.class;
         } else {
-            this.group = new NioEventLoopGroup(1);
             channelClass = NioSocketChannel.class;
         }
 
         Bootstrap bootstrap = new Bootstrap();
-        bootstrap.group(this.group)
+        bootstrap.group(workerGroup)
+            .option(ChannelOption.SO_KEEPALIVE, true)
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
             .channel(channelClass)
             .handler(new HttpClientInitializer());
 
@@ -162,43 +156,22 @@ public final class HttpClient {
     }
 
     public void send(FullHttpRequest request) throws OcspRequestorException {
-        try {
-            responseHandler.waitForResource();
-        } catch (InterruptedException ex) {
-            throw new OcspRequestorException(
-                    "could not get connection: " + ex.getMessage(), ex);
-        }
-
         if (!channel.isActive()) {
             throw new OcspRequestorException("channel is not active");
         }
 
-        if (!channel.isOpen()) {
-            throw new OcspRequestorException("channel is not open");
-        }
-
-        if (!channel.isWritable()) {
-            throw new OcspRequestorException("channel is not writable");
-        }
-
-        this.responseHandler.incrementNumPendingRequests();
-        this.channel.writeAndFlush(request);
+        ChannelFuture future = this.channel.writeAndFlush(request);
+        future.awaitUninterruptibly();
     }
 
     public void shutdown() {
-        try {
-            responseHandler.waitForFinish(10, TimeUnit.SECONDS);
-        } catch (InterruptedException ex) {
-            LOG.warn("got InterruptedException in waitForFinish");
-        }
-
         if (channel != null) {
             channel = null;
         }
 
-        if (group != null) {
-            group.shutdownGracefully();
-            group = null;
+        if (workerGroup != null) {
+            workerGroup.shutdownGracefully();
+            workerGroup = null;
         }
     }
 }

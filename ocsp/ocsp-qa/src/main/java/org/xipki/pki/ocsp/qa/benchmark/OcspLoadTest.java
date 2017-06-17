@@ -47,6 +47,11 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.client.api.OcspRequestorException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -59,9 +64,11 @@ public class OcspLoadTest extends LoadExecutor {
         private OcspBenchmark requestor;
 
         Testor() throws Exception {
-            OcspResponseHandler responseHandler =  new OcspResponseHandler(OcspLoadTest.this, 1);
+            OcspResponseHandler responseHandler =
+                    new OcspResponseHandler(OcspLoadTest.this, parseResponse);
             this.requestor = new OcspBenchmark();
-            this.requestor.init(responseHandler, responderUrl, issuerCert, requestOptions);
+            this.requestor.init(responseHandler, workerGroup, responderUrl, issuerCert,
+                    requestOptions);
         }
 
         @Override
@@ -97,6 +104,8 @@ public class OcspLoadTest extends LoadExecutor {
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspLoadTest.class);
 
+    private static boolean useEpollLinux;
+
     private final Certificate issuerCert;
 
     private final String responderUrl;
@@ -107,13 +116,22 @@ public class OcspLoadTest extends LoadExecutor {
 
     private final int maxRequests;
 
+    private final EventLoopGroup workerGroup;
+
+    private final boolean parseResponse;
+
     private AtomicInteger processedRequests = new AtomicInteger(0);
+
+    static {
+        boolean linux = System.getProperty("os.name").toLowerCase().contains("linux");
+        useEpollLinux = linux ? Epoll.isAvailable() : false;
+        LOG.info("linux epoll available: {}", useEpollLinux);
+    }
 
     public OcspLoadTest(
             final Certificate issuerCert, final String responderUrl,
-            final RequestOptions requestOptions,
-            final Iterator<BigInteger> serials,
-            final int maxRequests, final String description) {
+            final RequestOptions requestOptions, final Iterator<BigInteger> serials,
+            final int maxRequests, final boolean parseResponse, final String description) {
         super(description);
 
         this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
@@ -121,6 +139,12 @@ public class OcspLoadTest extends LoadExecutor {
         this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
         this.maxRequests = maxRequests;
         this.serials = ParamUtil.requireNonNull("serials", serials);
+        this.parseResponse = parseResponse;
+        if (useEpollLinux) {
+            workerGroup = new EpollEventLoopGroup(1);
+        } else {
+            workerGroup = new NioEventLoopGroup(1);
+        }
     }
 
     @Override

@@ -96,6 +96,10 @@ public class BenchmarkOcspStatusCmd extends OcspStatusCommandSupport {
             description = "number of threads")
     private Integer numThreads = 5;
 
+    @Option(name = "--analyze-response",
+            description = "whether to analyze the received OCSP response")
+    private Boolean analyzeResponse = Boolean.FALSE;
+
     @Option(name = "--url",
             required = true,
             description = "OCSP responder URL\n"
@@ -175,7 +179,7 @@ public class BenchmarkOcspStatusCmd extends OcspStatusCommandSupport {
 
             RequestOptions options = getRequestOptions();
             OcspLoadTest loadTest = new OcspLoadTest(issuerCert, serverUrl, options,
-                    serialNumberIterator, maxCerts, description.toString());
+                    serialNumberIterator, maxCerts, analyzeResponse, description.toString());
             loadTest.setDuration(duration);
             loadTest.setThreads(numThreads);
             loadTest.test();

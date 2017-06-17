@@ -35,8 +35,6 @@
 package org.xipki.pki.ocsp.qa.benchmark;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.OCSPException;
@@ -44,7 +42,6 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.LoadExecutor;
-import org.xipki.common.concurrent.CountLatch;
 import org.xipki.common.util.ParamUtil;
 
 import io.netty.buffer.ByteBuf;
@@ -60,28 +57,14 @@ class OcspResponseHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspResponseHandler.class);
 
-    private final AtomicInteger numPendingRequests = new AtomicInteger(0);
-
     private final LoadExecutor loadTestAccount;
 
-    private final int maxPendingRequests;
+    private final boolean analyzeResponse;
 
-    private final CountLatch finishLatch;
-
-    private final CountLatch freeSourceLatch;
-
-    public OcspResponseHandler(LoadExecutor loadTestAccount, int maxPendingRequests) {
+    public OcspResponseHandler(LoadExecutor loadTestAccount, boolean analyzeResponse) {
         this.loadTestAccount = ParamUtil.requireNonNull("loadTestAccount",
                 loadTestAccount);
-        this.maxPendingRequests = ParamUtil.requireMin("maxPendingRequests",
-                maxPendingRequests, 1);
-        this.finishLatch = new CountLatch(0, 0);
-        this.freeSourceLatch = new CountLatch(0, 0);
-    }
-
-    public synchronized void incrementNumPendingRequests() {
-        numPendingRequests.incrementAndGet();
-        manageLatches();
+        this.analyzeResponse = analyzeResponse;
     }
 
     public void onComplete(FullHttpResponse response) {
@@ -93,17 +76,11 @@ class OcspResponseHandler {
             success = false;
         }
 
-        synchronized (this) {
-            numPendingRequests.decrementAndGet();
-            loadTestAccount.account(1, success ? 0 : 1);
-            manageLatches();
-        }
+        loadTestAccount.account(1, success ? 0 : 1);
     }
 
     public synchronized void onError() {
-        numPendingRequests.decrementAndGet();
         loadTestAccount.account(1, 1);
-        manageLatches();
     }
 
     private boolean onComplete0(FullHttpResponse response) {
@@ -139,6 +116,16 @@ class OcspResponseHandler {
         byte[] respBytes = new byte[buf.readableBytes()];
         buf.getBytes(buf.readerIndex(), respBytes);
 
+        if (!analyzeResponse) {
+            // a valid response should at least of size 100.
+            if (respBytes.length < 100) {
+                LOG.warn("bad response: response too short");
+                return false;
+            } else {
+                return true;
+            }
+        }
+
         OCSPResp ocspResp;
         try {
             ocspResp = new OCSPResp(respBytes);
@@ -156,51 +143,16 @@ class OcspResponseHandler {
         }
 
         if (ocspResp.getStatus() != 0) {
+            LOG.warn("bad response: response status is other than OK");
             return false;
         }
 
         if (!(respObject instanceof BasicOCSPResp)) {
+            LOG.warn("bad response: response is not BasiOCSPResp");
             return false;
         }
 
         return true;
-    }
-
-    public int maxPendingRequests() {
-        return maxPendingRequests;
-    }
-
-    public void waitForResource() throws InterruptedException {
-        freeSourceLatch.await();
-    }
-
-    public void waitForFinish(int timeout, TimeUnit timeUnit)
-            throws InterruptedException {
-        finishLatch.await();
-    }
-
-    private synchronized void manageLatches() {
-        // freeSourceLatch have either count value 1 (not finished) or 0 (finished).
-        boolean isFinish = finishLatch.getCount() == 0;
-        boolean expectedFinish = numPendingRequests.get() == 0;
-        if (isFinish != expectedFinish) {
-            if (expectedFinish) {
-                finishLatch.countDown();
-            } else {
-                finishLatch.countUp();
-            }
-        }
-
-        // freeSourceLatch have either count value 1 (no free source) or 0 (with free source).
-        boolean isWithFreeSource = freeSourceLatch.getCount() == 0;
-        boolean expectedWithFreeSource = numPendingRequests.get() < maxPendingRequests;
-        if (isWithFreeSource != expectedWithFreeSource) {
-            if (expectedWithFreeSource) {
-                freeSourceLatch.countDown();
-            } else {
-                freeSourceLatch.countUp();
-            }
-        }
     }
 
 }
