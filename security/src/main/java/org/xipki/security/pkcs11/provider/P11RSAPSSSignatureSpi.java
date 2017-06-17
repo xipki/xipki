@@ -181,22 +181,27 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
             this.baseDigest = mgfDigest;
         }
 
+        @Override
         public String getAlgorithmName() {
             return "NULL";
         }
 
+        @Override
         public int getDigestSize() {
             return baseDigest.getDigestSize();
         }
 
+        @Override
         public void update(final byte in) {
             baOut.write(in);
         }
 
+        @Override
         public void update(final byte[] in, final int inOff, final int len) {
             baOut.write(in, inOff, len);
         }
 
+        @Override
         public int doFinal(final byte[] out, final int outOff) {
             byte[] res = baOut.toByteArray();
 
@@ -212,6 +217,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
             return res.length;
         }
 
+        @Override
         public void reset() {
             baOut.reset();
             baseDigest.reset();
@@ -278,7 +284,7 @@ public class P11RSAPSSSignatureSpi extends SignatureSpi {
                 saltLength, trailer);
 
         P11RSAKeyParameter p11KeyParam = P11RSAKeyParameter.getInstance(
-                signingKey.getP11CryptService(), signingKey.getIdentityId());
+                signingKey.p11CryptService(), signingKey.identityId());
         if (random == null) {
             pss.init(true, p11KeyParam);
         } else {

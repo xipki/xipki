@@ -62,7 +62,7 @@ public class Nonce {
         this(bytes, true);
     }
 
-    public byte[] getBytes() {
+    public byte[] bytes() {
         return Arrays.copyOf(bytes, bytes.length);
     }
 

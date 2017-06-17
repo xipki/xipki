@@ -82,7 +82,7 @@ public class BSpeedP11RSASignCmd extends BSpeedP11CommandSupport {
         }
 
         P11Slot slot = getSlot();
-        return new P11RSASignLoadTest(securityFactory, slot, sigAlgo, control.getModulusLen(),
+        return new P11RSASignLoadTest(securityFactory, slot, sigAlgo, control.modulusLen(),
                                 toBigInt("0x10001"));
     }
 

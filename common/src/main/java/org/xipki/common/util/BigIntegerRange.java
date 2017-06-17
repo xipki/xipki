@@ -56,15 +56,15 @@ public class BigIntegerRange {
         this.diff = to.subtract(from);
     }
 
-    public BigInteger getFrom() {
+    public BigInteger from() {
         return from;
     }
 
-    public BigInteger getTo() {
+    public BigInteger to() {
         return to;
     }
 
-    public BigInteger getDiff() {
+    public BigInteger diff() {
         return diff;
     }
 

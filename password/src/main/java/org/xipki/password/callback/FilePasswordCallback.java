@@ -104,7 +104,7 @@ public class FilePasswordCallback implements PasswordCallback {
     public void init(final String conf) throws PasswordResolverException {
         ParamUtil.requireNonBlank("conf", conf);
         ConfPairs pairs = new ConfPairs(conf);
-        passwordFile = pairs.getValue("file");
+        passwordFile = pairs.value("file");
         if (StringUtil.isBlank(passwordFile)) {
             throw new PasswordResolverException("invalid configuration " + conf
                     + ", no file is specified");

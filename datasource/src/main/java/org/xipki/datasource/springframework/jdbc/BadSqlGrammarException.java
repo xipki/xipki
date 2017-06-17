@@ -69,14 +69,14 @@ public class BadSqlGrammarException extends InvalidDataAccessResourceUsageExcept
     /**
      * Return the wrapped SQLException.
      */
-    public SQLException getSqlException() {
+    public SQLException cause() {
         return (SQLException) getCause();
     }
 
     /**
      * Return the SQL that caused the problem.
      */
-    public String getSql() {
+    public String sql() {
         return this.sql;
     }
 

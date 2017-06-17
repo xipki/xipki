@@ -66,7 +66,7 @@ public class P12RSASignLoadTest extends P12SignLoadTest {
             params.setRandom(new SecureRandom());
             P12KeyGenerationResult identity = new P12KeyGenerator().generateRSAKeypair(
                     keysize, publicExponent, params, null);
-            keystoreBytes = identity.getKeystore();
+            keystoreBytes = identity.keystore();
         }
         return keystoreBytes;
     }

@@ -51,7 +51,7 @@ public abstract class FingerprintCertificateValidator implements CaCertValidator
 
     private ScepHashAlgoType hashAlgo;
 
-    public ScepHashAlgoType getHashAlgo() {
+    public ScepHashAlgoType hashAlgo() {
         return hashAlgo;
     }
 

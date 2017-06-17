@@ -70,7 +70,7 @@ public class BSpeedP12RSASignCmd extends BSpeedP12SignCommandSupport {
             return null;
         }
 
-        return new P12RSASignLoadTest(securityFactory, sigAlgo, control.getModulusLen(),
+        return new P12RSASignLoadTest(securityFactory, sigAlgo, control.modulusLen(),
                         toBigInt("0x10001"));
     }
 }

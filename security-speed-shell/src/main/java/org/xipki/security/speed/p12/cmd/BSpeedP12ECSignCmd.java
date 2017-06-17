@@ -69,7 +69,7 @@ public class BSpeedP12ECSignCmd extends BSpeedP12SignCommandSupport {
             return null;
         }
 
-        return new P12ECSignLoadTest(securityFactory, sigAlgo, control.getCurveName());
+        return new P12ECSignLoadTest(securityFactory, sigAlgo, control.curveName());
     }
 
 }

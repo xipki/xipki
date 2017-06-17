@@ -128,7 +128,7 @@ class P11ECDSAContentSigner implements ContentSigner {
             throw new XiSecurityException("unsupported signature algorithm " + algOid);
         }
 
-        P11Slot slot = cryptService.getSlot(identityId.getSlotId());
+        P11Slot slot = cryptService.getSlot(identityId.slotId());
         if (slot.supportsMechanism(PKCS11Constants.CKM_ECDSA)) {
             this.mechanism = PKCS11Constants.CKM_ECDSA;
             Digest digest = SignerUtil.getDigest(hashAlgo);

@@ -66,7 +66,7 @@ public class P12DSASignLoadTest extends P12SignLoadTest {
             params.setRandom(new SecureRandom());
             P12KeyGenerationResult identity = new P12KeyGenerator().generateDSAKeypair(
                     plength, qlength, params, null);
-            keystoreBytes = identity.getKeystore();
+            keystoreBytes = identity.keystore();
         }
         return keystoreBytes;
     }

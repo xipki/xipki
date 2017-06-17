@@ -66,11 +66,11 @@ public enum ScepHashAlgoType {
         this.name = name;
     }
 
-    public int getLength() {
+    public int length() {
         return length;
     }
 
-    public String getOid() {
+    public String oid() {
         return oid;
     }
 

@@ -72,7 +72,7 @@ public class BSpeedP11DSAKeyGenCmd extends BSpeedP11CommandSupport {
         }
 
         P11Slot slot = getSlot();
-        return new P11DSAKeyGenLoadTest(slot, control.getPlen(), control.getQlen());
+        return new P11DSAKeyGenLoadTest(slot, control.plen(), control.qlen());
     }
 
 }

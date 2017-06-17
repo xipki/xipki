@@ -96,9 +96,9 @@ public abstract class P11SignLoadTest extends LoadExecutor {
         this.slot = slot;
         this.objectId = objectId;
 
-        P11SlotIdentifier slotId = slot.getSlotId();
-        SignerConf signerConf = SignerConf.getPkcs11SignerConf(slot.getModuleName(),
-                null, slotId.getId(), null, objectId.getId(), signatureAlgorithm, 20);
+        P11SlotIdentifier slotId = slot.slotId();
+        SignerConf signerConf = SignerConf.getPkcs11SignerConf(slot.moduleName(),
+                null, slotId.id(), null, objectId.id(), signatureAlgorithm, 20);
         try {
             this.signer = securityFactory.createSigner("PKCS11", signerConf,
                     (X509Certificate) null);

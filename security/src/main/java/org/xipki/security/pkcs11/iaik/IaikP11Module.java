@@ -79,7 +79,7 @@ public class IaikP11Module extends AbstractP11Module {
         try {
             slotList = module.getSlotList(Module.SlotRequirement.ALL_SLOTS);
         } catch (Throwable th) {
-            final String msg = "could not getSlotList of module " + moduleConf.getName();
+            final String msg = "could not getSlotList of module " + moduleConf.name();
             LogUtil.error(LOG, th, msg);
             throw new P11TokenException(msg);
         }
@@ -133,13 +133,13 @@ public class IaikP11Module extends AbstractP11Module {
 
             List<char[]> pwd;
             try {
-                pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
+                pwd = moduleConf.passwordRetriever().getPassword(slotId);
             } catch (PasswordResolverException ex) {
                 throw new P11TokenException("PasswordResolverException: " + ex.getMessage(), ex);
             }
-            P11Slot p11Slot = new IaikP11Slot(moduleConf.getName(), slotId, slot,
-                    moduleConf.isReadOnly(), moduleConf.getUserType(), pwd,
-                    moduleConf.getMaxMessageSize(), moduleConf.getP11MechanismFilter());
+            P11Slot p11Slot = new IaikP11Slot(moduleConf.name(), slotId, slot,
+                    moduleConf.isReadOnly(), moduleConf.userType(), pwd,
+                    moduleConf.maxMessageSize(), moduleConf.p11MechanismFilter());
 
             slots.add(p11Slot);
         }
@@ -157,9 +157,9 @@ public class IaikP11Module extends AbstractP11Module {
         Module module;
 
         try {
-            module = Module.getInstance(moduleConf.getNativeLibrary());
+            module = Module.getInstance(moduleConf.nativeLibrary());
         } catch (IOException ex) {
-            final String msg = "could not load the PKCS#11 module " + moduleConf.getName();
+            final String msg = "could not load the PKCS#11 module " + moduleConf.name();
             LogUtil.error(LOG, ex, msg);
             throw new P11TokenException(msg, ex);
         }
@@ -169,7 +169,7 @@ public class IaikP11Module extends AbstractP11Module {
         } catch (PKCS11Exception ex) {
             if (ex.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
                 LogUtil.error(LOG, ex);
-                close(moduleConf.getName(), module);
+                close(moduleConf.name(), module);
                 throw new P11TokenException(ex.getMessage(), ex);
             } else {
                 LOG.info("PKCS#11 module already initialized");
@@ -183,7 +183,7 @@ public class IaikP11Module extends AbstractP11Module {
             }
         } catch (Throwable th) {
             LOG.error("unexpected Exception", th);
-            close(moduleConf.getName(), module);
+            close(moduleConf.name(), module);
             throw new P11TokenException(th.getMessage());
         }
 
@@ -192,7 +192,7 @@ public class IaikP11Module extends AbstractP11Module {
 
     @Override
     public void close() {
-        for (P11SlotIdentifier slotId : getSlotIdentifiers()) {
+        for (P11SlotIdentifier slotId : slotIdentifiers()) {
             try {
                 getSlot(slotId).close();
             } catch (Throwable th) {
@@ -200,7 +200,7 @@ public class IaikP11Module extends AbstractP11Module {
             }
         }
 
-        close(conf.getNativeLibrary(), module);
+        close(conf.nativeLibrary(), module);
     }
 
     private static void close(final String modulePath, final Module module) {

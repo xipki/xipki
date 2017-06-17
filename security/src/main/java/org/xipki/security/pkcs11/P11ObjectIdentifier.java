@@ -60,7 +60,7 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
         this.idHex = Hex.toHexString(id).toUpperCase();
     }
 
-    public byte[] getId() {
+    public byte[] id() {
         return id;
     }
 
@@ -68,15 +68,15 @@ public class P11ObjectIdentifier implements Comparable<P11ObjectIdentifier> {
         return Arrays.equals(id, this.id);
     }
 
-    public String getIdHex() {
+    public String idHex() {
         return idHex;
     }
 
-    public String getLabel() {
+    public String label() {
         return label;
     }
 
-    public char[] getLabelChars() {
+    public char[] labelChars() {
         return label.toCharArray();
     }
 

@@ -91,7 +91,7 @@ public class DecodedNextCaMessage {
     public DecodedNextCaMessage() {
     }
 
-    public AuthorityCertStore getAuthorityCertStore() {
+    public AuthorityCertStore authorityCertStore() {
         return authorityCertStore;
     }
 
@@ -99,7 +99,7 @@ public class DecodedNextCaMessage {
         this.authorityCertStore = authorityCertStore;
     }
 
-    public X509Certificate getSignatureCert() {
+    public X509Certificate signatureCert() {
         return signatureCert;
     }
 
@@ -115,11 +115,11 @@ public class DecodedNextCaMessage {
         this.signatureValid = signatureValid;
     }
 
-    public ASN1ObjectIdentifier getDigestAlgorithm() {
+    public ASN1ObjectIdentifier digestAlgorithm() {
         return digestAlgorithm;
     }
 
-    public String getFailureMessage() {
+    public String failureMessage() {
         return failureMessage;
     }
 
@@ -131,7 +131,7 @@ public class DecodedNextCaMessage {
         return signatureValid;
     }
 
-    public Date getSigningTime() {
+    public Date signingTime() {
         return signingTime;
     }
 

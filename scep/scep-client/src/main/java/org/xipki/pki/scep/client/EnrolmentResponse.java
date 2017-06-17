@@ -64,18 +64,18 @@ public final class EnrolmentResponse {
 
     public EnrolmentResponse(final PkiMessage pkcsRep) throws ScepClientException {
         ParamUtil.requireNonNull("pkcsRep", pkcsRep);
-        MessageType messageType = pkcsRep.getMessageType();
+        MessageType messageType = pkcsRep.messageType();
         if (MessageType.CertRep != messageType) {
             throw new ScepClientException(
                     "messageType must not be other than CertRep: " + messageType);
         }
         this.pkcsRep = pkcsRep;
 
-        if (PkiStatus.SUCCESS != pkcsRep.getPkiStatus()) {
+        if (PkiStatus.SUCCESS != pkcsRep.pkiStatus()) {
             return;
         }
 
-        ASN1Encodable messageData = pkcsRep.getMessageData();
+        ASN1Encodable messageData = pkcsRep.messageData();
         if (!(messageData instanceof ContentInfo)) {
             throw new ScepClientException("pkcsRep is not a ContentInfo");
         }
@@ -102,32 +102,32 @@ public final class EnrolmentResponse {
      * @return <tt>true</tt> for a pending response, <tt>false</tt> otherwise.
      */
     public boolean isPending() {
-        return pkcsRep.getPkiStatus() == PkiStatus.PENDING;
+        return pkcsRep.pkiStatus() == PkiStatus.PENDING;
     }
 
     public boolean isFailure() {
-        return pkcsRep.getPkiStatus() == PkiStatus.FAILURE;
+        return pkcsRep.pkiStatus() == PkiStatus.FAILURE;
     }
 
     public boolean isSuccess() {
-        return pkcsRep.getPkiStatus() == PkiStatus.SUCCESS;
+        return pkcsRep.pkiStatus() == PkiStatus.SUCCESS;
     }
 
-    public List<X509Certificate> getCertificates() {
+    public List<X509Certificate> certificates() {
         if (isSuccess()) {
             return certificates;
         }
         throw new IllegalStateException();
     }
 
-    public FailInfo getFailInfo() {
+    public FailInfo failInfo() {
         if (isFailure()) {
-            return pkcsRep.getFailInfo();
+            return pkcsRep.failInfo();
         }
         throw new IllegalStateException();
     }
 
-    public PkiMessage getPkcsRep() {
+    public PkiMessage pkcsRep() {
         return pkcsRep;
     }
 

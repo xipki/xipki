@@ -86,9 +86,9 @@ public class P11ContentSignerBuilder {
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
 
         P11Identity identity = cryptService.getIdentity(identityId);
-        X509Certificate signerCertInP11 = identity.getCertificate();
+        X509Certificate signerCertInP11 = identity.certificate();
         PublicKey publicKeyInP11 = (signerCertInP11 != null) ? signerCertInP11.getPublicKey()
-                : identity.getPublicKey();
+                : identity.publicKey();
 
         if (publicKeyInP11 == null) {
             throw new XiSecurityException("public key with " + identityId + " does not exist");
@@ -112,7 +112,7 @@ public class P11ContentSignerBuilder {
         }
 
         if (cert != null) {
-            Certificate[] certsInKeystore = identity.getCertificateChain();
+            Certificate[] certsInKeystore = identity.certificateChain();
             if (certsInKeystore != null && certsInKeystore.length > 1) {
                 for (int i = 1; i < certsInKeystore.length; i++) {
                     caCerts.add(certsInKeystore[i]);

@@ -173,23 +173,23 @@ public class SqlStateCodes {
         concurrencyFailureCodes = toSet(CF_TRANSACTION_ROLLBACK);
     }
 
-    public Set<String> getBadSqlGrammarCodes() {
+    public Set<String> badSqlGrammarCodes() {
         return badSqlGrammarCodes;
     }
 
-    public Set<String> getDataIntegrityViolationCodes() {
+    public Set<String> dataIntegrityViolationCodes() {
         return dataIntegrityViolationCodes;
     }
 
-    public Set<String> getDataAccessResourceFailureCodes() {
+    public Set<String> dataAccessResourceFailureCodes() {
         return dataAccessResourceFailureCodes;
     }
 
-    public Set<String> getTransientDataAccessResourceCodes() {
+    public Set<String> transientDataAccessResourceCodes() {
         return transientDataAccessResourceCodes;
     }
 
-    public Set<String> getConcurrencyFailureCodes() {
+    public Set<String> concurrencyFailureCodes() {
         return concurrencyFailureCodes;
     }
 

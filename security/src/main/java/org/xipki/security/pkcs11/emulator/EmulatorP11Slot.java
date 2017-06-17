@@ -379,7 +379,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
                     P11ObjectIdentifier p11ObjId = new P11ObjectIdentifier(id, label);
                     X509Cert cert = ret.getCertForId(id);
                     java.security.PublicKey publicKey = (cert == null) ? readPublicKey(id)
-                            : cert.getCert().getPublicKey();
+                            : cert.cert().getPublicKey();
 
                     if (publicKey == null) {
                         LOG.warn(
@@ -396,7 +396,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
                     PrivateKey privateKey = privateKeyCryptor.decrypt(epki);
 
                     X509Certificate[] certs = (cert == null) ? null
-                            : new X509Certificate[]{cert.getCert()};
+                            : new X509Certificate[]{cert.cert()};
 
                     EmulatorP11Identity identity = new EmulatorP11Identity(this,
                             new P11EntityIdentifier(slotId, p11ObjId), privateKey, publicKey, certs,
@@ -418,7 +418,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         return ret;
     } // method refresh
 
-    File getSlotDir() {
+    File slotDir() {
         return slotDir;
     }
 
@@ -503,8 +503,8 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     private boolean removePkcs11Entry(final File dir, final P11ObjectIdentifier objectId)
             throws P11TokenException {
-        byte[] id = objectId.getId();
-        String label = objectId.getLabel();
+        byte[] id = objectId.id();
+        String label = objectId.label();
         if (id != null) {
             String hextId = Hex.toHexString(id);
             File infoFile = new File(dir, hextId + INFO_FILE_SUFFIX);
@@ -808,13 +808,13 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     @Override
     protected void doRemoveCerts(final P11ObjectIdentifier objectId) throws P11TokenException {
-        deletePkcs11Entry(certDir, objectId.getId());
+        deletePkcs11Entry(certDir, objectId.id());
     }
 
     @Override
     protected void doAddCert(final P11ObjectIdentifier objectId, final X509Certificate cert)
             throws P11TokenException, CertificateException {
-        savePkcs11Cert(objectId.getId(), objectId.getLabel(), cert);
+        savePkcs11Cert(objectId.id(), objectId.label(), cert);
     }
 
     @Override

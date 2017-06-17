@@ -83,7 +83,7 @@ public class FileHttpServersConf implements HttpServersConf {
         }
     }
 
-    public String getConfFile() {
+    public String confFile() {
         return confFile;
     }
 

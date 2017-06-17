@@ -136,15 +136,15 @@ public class CaEmulator {
         }
     }
 
-    public PrivateKey getCaKey() {
+    public PrivateKey caKey() {
         return caKey;
     }
 
-    public Certificate getCaCert() {
+    public Certificate caCert() {
         return caCert;
     }
 
-    public byte[] getCaCertBytes() {
+    public byte[] caCertBytes() {
         return Arrays.copyOf(caCertBytes, caCertBytes.length);
     }
 

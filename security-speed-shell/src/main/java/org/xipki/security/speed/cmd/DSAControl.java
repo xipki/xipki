@@ -49,11 +49,11 @@ public class DSAControl {
         this.qlen = qlen;
     }
 
-    public int getPlen() {
+    public int plen() {
         return plen;
     }
 
-    public int getQlen() {
+    public int qlen() {
         return qlen;
     }
 

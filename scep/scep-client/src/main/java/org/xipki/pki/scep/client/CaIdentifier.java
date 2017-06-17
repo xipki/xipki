@@ -73,11 +73,11 @@ public class CaIdentifier {
         this.profile = profile;
     }
 
-    public String getUrl() {
+    public String url() {
         return url;
     }
 
-    public String getProfile() {
+    public String profile() {
         return profile;
     }
 
@@ -89,7 +89,7 @@ public class CaIdentifier {
     public String buildGetUrl(final Operation operation, final String message) {
         ParamUtil.requireNonNull("operation", operation);
         StringBuilder ub = new StringBuilder(url);
-        ub.append('?').append("operation=").append(operation.getCode());
+        ub.append('?').append("operation=").append(operation.code());
         if (!StringUtil.isBlank(message)) {
             String urlMessage;
             try {
@@ -105,7 +105,7 @@ public class CaIdentifier {
     public String buildPostUrl(final Operation operation) {
         ParamUtil.requireNonNull("operation", operation);
         StringBuilder ub = new StringBuilder(url);
-        ub.append('?').append("operation=").append(operation.getCode());
+        ub.append('?').append("operation=").append(operation.code());
         return ub.toString();
     }
 

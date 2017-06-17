@@ -72,7 +72,7 @@ public class BSpeedP11RSAKeyGenCmd extends BSpeedP11CommandSupport {
         }
 
         P11Slot slot = getSlot();
-        return new P11RSAKeyGenLoadTest(slot, control.getModulusLen(), toBigInt("0x10001"));
+        return new P11RSAKeyGenLoadTest(slot, control.modulusLen(), toBigInt("0x10001"));
     }
 
 }

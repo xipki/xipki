@@ -298,26 +298,26 @@ public class EmulatorP11Identity extends P11Identity {
 
         P11RSAPkcsPssParams pssParam = (P11RSAPkcsPssParams) parameters;
         HashAlgoType contentHash = HashAlgoType.getInstanceForPkcs11HashMech(
-                pssParam.getHashAlgorithm());
+                pssParam.hashAlgorithm());
         if (contentHash == null) {
             throw new P11TokenException(
-                    "unsupported HashAlgorithm " + pssParam.getHashAlgorithm());
+                    "unsupported HashAlgorithm " + pssParam.hashAlgorithm());
         } else if (hashAlgo != null && contentHash != hashAlgo) {
             throw new P11TokenException("Invalid parameters: invalid hash algorithm");
         }
 
         HashAlgoType mgfHash = HashAlgoType.getInstanceForPkcs11MgfMech(
-                pssParam.getMaskGenerationFunction());
+                pssParam.maskGenerationFunction());
         if (mgfHash == null) {
             throw new P11TokenException(
-                    "unsupported MaskGenerationFunction " + pssParam.getHashAlgorithm());
+                    "unsupported MaskGenerationFunction " + pssParam.hashAlgorithm());
         }
 
         byte[] hashValue = (hashAlgo == null) ? contentToSign : hashAlgo.hash(contentToSign);
         byte[] encodedHashValue;
         try {
             encodedHashValue = SignerUtil.EMSA_PSS_ENCODE(contentHash, hashValue, mgfHash,
-                    (int) pssParam.getSaltLength(), getSignatureKeyBitLength(), random);
+                    (int) pssParam.saltLength(), signatureKeyBitLength(), random);
         } catch (XiSecurityException ex) {
             throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
         }
@@ -326,7 +326,7 @@ public class EmulatorP11Identity extends P11Identity {
 
     private byte[] rsaPkcsSign(final byte[] contentToSign, final HashAlgoType hashAlgo)
             throws P11TokenException {
-        int modulusBitLen = getSignatureKeyBitLength();
+        int modulusBitLen = signatureKeyBitLength();
         byte[] paddedHash;
         try {
             if (hashAlgo == null) {
@@ -376,7 +376,7 @@ public class EmulatorP11Identity extends P11Identity {
         try {
             sig.update(hash);
             byte[] x962Signature = sig.sign();
-            return SignerUtil.convertX962DSASigToPlain(x962Signature, getSignatureKeyBitLength());
+            return SignerUtil.convertX962DSASigToPlain(x962Signature, signatureKeyBitLength());
         } catch (SignatureException ex) {
             throw new P11TokenException("SignatureException: " + ex.getMessage(), ex);
         } catch (XiSecurityException ex) {
@@ -386,7 +386,7 @@ public class EmulatorP11Identity extends P11Identity {
         }
     }
 
-    Key getSigningKey() {
+    Key signingKey() {
         return signingKey;
     }
 

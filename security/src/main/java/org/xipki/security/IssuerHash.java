@@ -58,7 +58,7 @@ public class IssuerHash {
         this.issuerNameHash = ParamUtil.requireNonNull("issuerNameHash", issuerNameHash);
         this.issuerKeyHash = ParamUtil.requireNonNull("issuerKeyHash", issuerKeyHash);
 
-        final int len = hashAlgo.getLength();
+        final int len = hashAlgo.length();
         ParamUtil.requireRange("issuerNameHash.length", issuerNameHash.length, len, len);
         ParamUtil.requireRange("issuerKeyHash.length", issuerKeyHash.length, len, len);
     }
@@ -74,15 +74,15 @@ public class IssuerHash {
         this.issuerKeyHash = HashCalculator.hash(hashAlgo, encodedKey);
     }
 
-    public HashAlgoType getHashAlgo() {
+    public HashAlgoType hashAlgo() {
         return hashAlgo;
     }
 
-    public byte[] getIssuerNameHash() {
+    public byte[] issuerNameHash() {
         return Arrays.copyOf(issuerNameHash, issuerNameHash.length);
     }
 
-    public byte[] getIssuerKeyHash() {
+    public byte[] issuerKeyHash() {
         return Arrays.copyOf(issuerKeyHash, issuerKeyHash.length);
     }
 

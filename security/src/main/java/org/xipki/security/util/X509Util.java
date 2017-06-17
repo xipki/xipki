@@ -437,7 +437,7 @@ public class X509Util {
 
         int usage = 0;
         for (KeyUsage keyUsage : usages) {
-            usage |= keyUsage.getBcUsage();
+            usage |= keyUsage.bcUsage();
         }
 
         return new org.bouncycastle.asn1.x509.KeyUsage(usage);
@@ -484,8 +484,8 @@ public class X509Util {
     public static boolean hasKeyusage(final X509Certificate cert, final KeyUsage usage) {
         ParamUtil.requireNonNull("cert", cert);
         boolean[] keyusage = cert.getKeyUsage();
-        if (keyusage != null && keyusage.length > usage.getBit()) {
-            return keyusage[usage.getBit()];
+        if (keyusage != null && keyusage.length > usage.bit()) {
+            return keyusage[usage.bit()];
         }
         return false;
     }
@@ -769,14 +769,14 @@ public class X509Util {
                     + accessMethodAndLocation);
         }
 
-        Set<String> oids = pairs.getNames();
+        Set<String> oids = pairs.names();
         if (oids == null || oids.size() != 1) {
             throw new BadInputException("invalid accessMethodAndLocation "
                     + accessMethodAndLocation);
         }
 
         String accessMethodS = oids.iterator().next();
-        String taggedValue = pairs.getValue(accessMethodS);
+        String taggedValue = pairs.value(accessMethodS);
         ASN1ObjectIdentifier accessMethod = new ASN1ObjectIdentifier(accessMethodS);
 
         GeneralName location = createGeneralName(taggedValue);

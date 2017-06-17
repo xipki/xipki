@@ -96,7 +96,7 @@ public class ScepServlet extends HttpServlet {
         this.responder = ParamUtil.requireNonNull("responder", responder);
     }
 
-    public AuditService getAuditService() {
+    public AuditService auditService() {
         return auditService;
     }
 
@@ -132,7 +132,7 @@ public class ScepServlet extends HttpServlet {
         OutputStream respStream = response.getOutputStream();
 
         try {
-            CaCaps caCaps = responder.getCaCaps();
+            CaCaps caCaps = responder.caCaps();
             if (post && !caCaps.containsCapability(CaCapability.POSTPKIOperation)) {
                 final String message = "HTTP POST is not supported";
                 LOG.error(message);
@@ -198,28 +198,28 @@ public class ScepServlet extends HttpServlet {
                 response.setContentType(CT_RESPONSE);
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
-            } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
+            } else if (Operation.GetCACaps.code().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
                 response.setContentType(ScepConstants.CT_TEXT_PLAIN);
-                byte[] caCapsBytes = responder.getCaCaps().getBytes();
+                byte[] caCapsBytes = responder.caCaps().bytes();
                 respStream.write(caCapsBytes);
                 response.setContentLength(caCapsBytes.length);
-            } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
+            } else if (Operation.GetCACert.code().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
                 byte[] respBytes;
                 String ct;
-                if (responder.getRaEmulator() == null) {
+                if (responder.raEmulator() == null) {
                     ct = ScepConstants.CT_X509_CA_CERT;
-                    respBytes = responder.getCaEmulator().getCaCertBytes();
+                    respBytes = responder.caEmulator().caCertBytes();
                 } else {
                     ct = ScepConstants.CT_X509_CA_RA_CERT;
                     CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
                     try {
                         cmsSignedDataGen.addCertificate(new X509CertificateHolder(
-                                responder.getCaEmulator().getCaCert()));
+                                responder.caEmulator().caCert()));
                         ct = ScepConstants.CT_X509_CA_RA_CERT;
                         cmsSignedDataGen.addCertificate(new X509CertificateHolder(
-                                responder.getRaEmulator().getRaCert()));
+                                responder.raEmulator().raCert()));
                         CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(
                                 new CMSAbsentContent());
                         respBytes = degenerateSignedData.getEncoded();
@@ -237,8 +237,8 @@ public class ScepServlet extends HttpServlet {
                 response.setContentType(ct);
                 response.setContentLength(respBytes.length);
                 respStream.write(respBytes);
-            } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
-                if (responder.getNextCaAndRa() == null) {
+            } else if (Operation.GetNextCACert.code().equalsIgnoreCase(operation)) {
+                if (responder.nextCaAndRa() == null) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setContentLength(0);
 
@@ -250,10 +250,10 @@ public class ScepServlet extends HttpServlet {
                 try {
                     NextCaMessage nextCaMsg = new NextCaMessage();
                     nextCaMsg.setCaCert(X509Util.toX509Cert(
-                            responder.getNextCaAndRa().getCaCert()));
-                    if (responder.getNextCaAndRa().getRaCert() != null) {
+                            responder.nextCaAndRa().caCert()));
+                    if (responder.nextCaAndRa().raCert() != null) {
                         X509Certificate raCert = X509Util.toX509Cert(
-                                responder.getNextCaAndRa().getRaCert());
+                                responder.nextCaAndRa().raCert());
                         nextCaMsg.setRaCerts(Arrays.asList(raCert));
                     }
 

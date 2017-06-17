@@ -59,11 +59,11 @@ public class TlsExtensionType implements Comparable<TlsExtensionType> {
         this.name = name;
     }
 
-    public int getCode() {
+    public int code() {
         return code;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 

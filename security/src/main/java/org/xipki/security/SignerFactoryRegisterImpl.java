@@ -219,10 +219,10 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
                         type, keystoreStream, password, keyLabel, password, certificateChain);
 
                 AlgorithmIdentifier signatureAlgId;
-                if (conf.getHashAlgo() == null) {
+                if (conf.hashAlgo() == null) {
                     signatureAlgId = AlgorithmUtil.getSigAlgId(null, conf);
                 } else {
-                    PublicKey pubKey = signerBuilder.getCert().getPublicKey();
+                    PublicKey pubKey = signerBuilder.certificate().getPublicKey();
                     signatureAlgId = AlgorithmUtil.getSigAlgId(pubKey, conf);
                 }
 
@@ -286,7 +286,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
         P11Slot slot;
         try {
             p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-            P11Module module = p11Service.getModule();
+            P11Module module = p11Service.module();
             P11SlotIdentifier p11SlotId;
             if (slotId != null) {
                 p11SlotId = module.getSlotIdForId(slotId);
@@ -307,7 +307,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
             String str2 = (keyId != null) ? "id " + Hex.toHexString(keyId) : "label " + keyLabel;
             throw new ObjectCreationException("cound not find identity with " + str2);
         }
-        P11EntityIdentifier entityId = new P11EntityIdentifier(slot.getSlotId(), p11ObjId);
+        P11EntityIdentifier entityId = new P11EntityIdentifier(slot.slotId(), p11ObjId);
 
         try {
             AlgorithmIdentifier macAlgId = null;
@@ -326,10 +326,10 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
                 return signerBuilder.createSigner(macAlgId, parallelism);
             } else {
                 AlgorithmIdentifier signatureAlgId;
-                if (conf.getHashAlgo() == null) {
+                if (conf.hashAlgo() == null) {
                     signatureAlgId = AlgorithmUtil.getSigAlgId(null, conf);
                 } else {
-                    PublicKey pubKey = slot.getIdentity(p11ObjId).getPublicKey();
+                    PublicKey pubKey = slot.getIdentity(p11ObjId).publicKey();
                     signatureAlgId = AlgorithmUtil.getSigAlgId(pubKey, conf);
                 }
 
