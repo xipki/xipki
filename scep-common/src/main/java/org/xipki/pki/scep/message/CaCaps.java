@@ -73,7 +73,7 @@ public class CaCaps {
         refresh();
     }
 
-    public Set<CaCapability> getCapabilities() {
+    public Set<CaCapability> capabilities() {
         return Collections.unmodifiableSet(capabilities);
     }
 
@@ -117,7 +117,7 @@ public class CaCaps {
 
         StringBuilder sb = new StringBuilder();
         for (CaCapability cap : capabilities) {
-            sb.append(cap.getText()).append("\n");
+            sb.append(cap.text()).append("\n");
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
@@ -127,7 +127,7 @@ public class CaCaps {
         return capabilities.contains(CaCapability.POSTPKIOperation);
     }
 
-    public ScepHashAlgoType getMostSecureHashAlgo() {
+    public ScepHashAlgoType mostSecureHashAlgo() {
         if (capabilities.contains(CaCapability.SHA512)) {
             return ScepHashAlgoType.SHA512;
         } else if (capabilities.contains(CaCapability.SHA256)) {
@@ -155,7 +155,7 @@ public class CaCaps {
         return capabilities.equals(other.capabilities);
     }
 
-    public byte[] getBytes() {
+    public byte[] bytes() {
         return Arrays.copyOf(bytes, bytes.length);
     }
 

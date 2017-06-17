@@ -64,11 +64,11 @@ public class IssuerAndSubject extends ASN1Object {
         this.subject = ParamUtil.requireNonNull("subject", subject);
     }
 
-    public X500Name getIssuer() {
+    public X500Name issuer() {
         return issuer;
     }
 
-    public X500Name getSubject() {
+    public X500Name subject() {
         return subject;
     }
 
