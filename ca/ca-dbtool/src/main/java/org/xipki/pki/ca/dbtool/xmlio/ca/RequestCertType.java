@@ -60,7 +60,7 @@ public class RequestCertType extends IdentifidDbObjectType {
 
     private Long cid;
 
-    public Long getRid() {
+    public Long rid() {
         return rid;
     }
 
@@ -68,7 +68,7 @@ public class RequestCertType extends IdentifidDbObjectType {
         this.rid = rid;
     }
 
-    public Long getCid() {
+    public Long cid() {
         return cid;
     }
 
@@ -90,7 +90,7 @@ public class RequestCertType extends IdentifidDbObjectType {
         validate();
 
         writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_ID, getId());
+        writeIfNotNull(writer, TAG_ID, id());
         writeIfNotNull(writer, TAG_RID, rid);
         writeIfNotNull(writer, TAG_CID, cid);
         writer.writeEndElement();

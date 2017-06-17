@@ -125,7 +125,7 @@ public class Asn1ServerCaps extends ASN1Object {
         }
     }
 
-    public Set<Short> getVersions() {
+    public Set<Short> versions() {
         return versions;
     }
 

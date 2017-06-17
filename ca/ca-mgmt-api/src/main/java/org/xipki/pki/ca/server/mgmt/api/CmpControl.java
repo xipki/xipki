@@ -104,7 +104,7 @@ public class CmpControl {
     public CmpControl(final CmpControlEntry dbEntry) throws InvalidConfException {
         ParamUtil.requireNonNull("dbEntry", dbEntry);
 
-        ConfPairs pairs = new ConfPairs(dbEntry.getConf());
+        ConfPairs pairs = new ConfPairs(dbEntry.conf());
         this.confirmCert = getBoolean(pairs, KEY_CONFIRM_CERT, false);
         this.sendCaCert = getBoolean(pairs, KEY_SEND_CA, false);
         this.sendResponderCert = getBoolean(pairs, KEY_SEND_RESPONDER, true);
@@ -119,28 +119,28 @@ public class CmpControl {
         this.confirmWaitTimeMs = this.confirmWaitTime * 1000L;
 
         // protection algorithms
-        String str = pairs.getValue(KEY_PROTECTION_SIGALGO);
+        String str = pairs.value(KEY_PROTECTION_SIGALGO);
         Set<String> algos = (str == null) ? null : StringUtil.splitAsSet(str, ALGO_DELIMITER);
         try {
             this.sigAlgoValidator = new CollectionAlgorithmValidator(algos);
         } catch (NoSuchAlgorithmException ex) {
             throw new InvalidConfException("invalid " + KEY_PROTECTION_SIGALGO + ": " + str, ex);
         }
-        algos = this.sigAlgoValidator.getAlgoNames();
+        algos = this.sigAlgoValidator.algoNames();
         pairs.putPair(KEY_PROTECTION_SIGALGO, StringUtil.collectionAsString(algos, ALGO_DELIMITER));
 
         // popo algorithms
-        str = pairs.getValue(KEY_POPO_SIGALGO);
+        str = pairs.value(KEY_POPO_SIGALGO);
         algos = (str == null) ? null : StringUtil.splitAsSet(str, ALGO_DELIMITER);
         try {
             this.popoAlgoValidator = new CollectionAlgorithmValidator(algos);
         } catch (NoSuchAlgorithmException ex) {
             throw new InvalidConfException("invalid " + KEY_POPO_SIGALGO + ": " + str, ex);
         }
-        algos = this.popoAlgoValidator.getAlgoNames();
+        algos = this.popoAlgoValidator.algoNames();
         pairs.putPair(KEY_POPO_SIGALGO, StringUtil.collectionAsString(algos, ALGO_DELIMITER));
 
-        this.dbEntry = new CmpControlEntry(dbEntry.getName(), pairs.getEncoded());
+        this.dbEntry = new CmpControlEntry(dbEntry.name(), pairs.getEncoded());
     } // constructor
 
     public CmpControl(final String name, final Boolean confirmCert, final Boolean sendCaCert,
@@ -186,7 +186,7 @@ public class CmpControl {
             throw new InvalidConfException("invalid sigAlgos", ex);
         }
         pairs.putPair(KEY_PROTECTION_SIGALGO,
-            StringUtil.collectionAsString(this.sigAlgoValidator.getAlgoNames(), ALGO_DELIMITER));
+            StringUtil.collectionAsString(this.sigAlgoValidator.algoNames(), ALGO_DELIMITER));
 
         try {
             this.popoAlgoValidator = new CollectionAlgorithmValidator(popoAlgos);
@@ -194,7 +194,7 @@ public class CmpControl {
             throw new InvalidConfException("invalid popoAlgos", ex);
         }
         pairs.putPair(KEY_POPO_SIGALGO,
-            StringUtil.collectionAsString(this.popoAlgoValidator.getAlgoNames(), ALGO_DELIMITER));
+            StringUtil.collectionAsString(this.popoAlgoValidator.algoNames(), ALGO_DELIMITER));
 
         this.dbEntry = new CmpControlEntry(name, pairs.getEncoded());
     } // constructor
@@ -207,15 +207,15 @@ public class CmpControl {
         return confirmCert;
     }
 
-    public int getMessageTimeBias() {
+    public int messageTimeBias() {
         return messageTimeBias;
     }
 
-    public int getConfirmWaitTime() {
+    public int confirmWaitTime() {
         return confirmWaitTime;
     }
 
-    public long getConfirmWaitTimeMs() {
+    public long confirmWaitTimeMs() {
         return confirmWaitTimeMs;
     }
 
@@ -235,22 +235,22 @@ public class CmpControl {
         return groupEnroll;
     }
 
-    public AlgorithmValidator getSigAlgoValidator() {
+    public AlgorithmValidator sigAlgoValidator() {
         return sigAlgoValidator;
     }
 
-    public AlgorithmValidator getPopoAlgoValidator() {
+    public AlgorithmValidator popoAlgoValidator() {
         return popoAlgoValidator;
     }
 
-    public CmpControlEntry getDbEntry() {
+    public CmpControlEntry dbEntry() {
         return dbEntry;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(500);
-        sb.append("name: ").append(dbEntry.getName()).append('\n');
+        sb.append("name: ").append(dbEntry.name()).append('\n');
         sb.append("confirmCert: ").append(getYesNo(confirmCert)).append('\n');
         sb.append("sendCaCert: ").append(getYesNo(sendCaCert)).append("\n");
         sb.append("sendResponderCert: ").append(getYesNo(sendResponderCert)).append("\n");
@@ -259,26 +259,26 @@ public class CmpControl {
         sb.append("messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
         sb.append("confirmWaitTime: ").append(confirmWaitTime).append(" s").append('\n');
         sb.append("signature algos: ")
-            .append(StringUtil.collectionAsString(sigAlgoValidator.getAlgoNames(), ALGO_DELIMITER))
+            .append(StringUtil.collectionAsString(sigAlgoValidator.algoNames(), ALGO_DELIMITER))
             .append('\n');
         sb.append("popo algos: ")
-            .append(StringUtil.collectionAsString(popoAlgoValidator.getAlgoNames(), ALGO_DELIMITER))
+            .append(StringUtil.collectionAsString(popoAlgoValidator.algoNames(), ALGO_DELIMITER))
             .append('\n');
-        sb.append("conf: ").append(dbEntry.getConf());
+        sb.append("conf: ").append(dbEntry.conf());
 
         return sb.toString();
     }
 
     private static boolean getBoolean(final ConfPairs pairs, final String key,
             final boolean defaultValue) {
-        String str = pairs.getValue(key);
+        String str = pairs.value(key);
         boolean ret = StringUtil.isBlank(str) ? defaultValue : Boolean.parseBoolean(str);
         pairs.putPair(key, Boolean.toString(ret));
         return ret;
     }
 
     private static int getInt(final ConfPairs pairs, final String key, final int defaultValue) {
-        String str = pairs.getValue(key);
+        String str = pairs.value(key);
         int ret = StringUtil.isBlank(str) ? defaultValue : Integer.parseInt(str);
         pairs.putPair(key, Integer.toString(ret));
         return ret;

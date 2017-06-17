@@ -163,7 +163,7 @@ public class HttpRestServlet extends AbstractHttpServlet {
                 ca = responderManager.getX509CaResponder(caName).getCa();
             }
 
-            if (caName == null || ca == null || ca.getCaInfo().getStatus() != CaStatus.ACTIVE) {
+            if (caName == null || ca == null || ca.caInfo().status() != CaStatus.ACTIVE) {
                 String message;
                 if (caName == null) {
                     message = "no CA is specified";
@@ -177,7 +177,7 @@ public class HttpRestServlet extends AbstractHttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            event.addEventData(CaAuditConstants.NAME_CA, ca.getCaIdent().getName());
+            event.addEventData(CaAuditConstants.NAME_CA, ca.caIdent().name());
             event.addEventType(command);
 
             RequestorInfo requestor;
@@ -228,14 +228,14 @@ public class HttpRestServlet extends AbstractHttpServlet {
                 throw new OperationException(ErrorCode.NOT_PERMITTED, "no requestor specified");
             }
 
-            event.addEventData(CaAuditConstants.NAME_requestor, requestor.getIdent().getName());
+            event.addEventData(CaAuditConstants.NAME_requestor, requestor.ident().name());
 
             String respCt = null;
             byte[] respBytes = null;
 
             if (RestfulAPIConstants.CMD_cacert.equalsIgnoreCase(command)) {
                 respCt = RestfulAPIConstants.CT_pkix_cert;
-                respBytes = ca.getCaInfo().getCertificate().getEncodedCert();
+                respBytes = ca.caInfo().certificate().encodedCert();
             } else if (RestfulAPIConstants.CMD_enroll_cert.equalsIgnoreCase(command)) {
                 String profile = servletUri.parameter(RestfulAPIConstants.PARAM_profile);
                 if (StringUtil.isBlank(profile)) {
@@ -288,12 +288,12 @@ public class HttpRestServlet extends AbstractHttpServlet {
                 X509CertificateInfo certInfo = ca.generateCertificate(certTemplate,
                         requestor, RequestType.REST, null, msgId);
 
-                if (ca.getCaInfo().isSaveRequest()) {
+                if (ca.caInfo().isSaveRequest()) {
                     long dbId = ca.addRequest(encodedCsr);
-                    ca.addRequestCert(dbId, certInfo.getCert().getCertId());
+                    ca.addRequestCert(dbId, certInfo.cert().certId());
                 }
 
-                X509Cert cert = certInfo.getCert();
+                X509Cert cert = certInfo.cert();
                 if (cert == null) {
                     String message = "could not generate certificate";
                     LOG.warn(message);
@@ -301,7 +301,7 @@ public class HttpRestServlet extends AbstractHttpServlet {
                             null, message, AuditLevel.INFO, AuditStatus.FAILED);
                 }
                 respCt = RestfulAPIConstants.CT_pkix_cert;
-                respBytes = cert.getEncodedCert();
+                respBytes = cert.encodedCert();
             } else if (RestfulAPIConstants.CMD_revoke_cert.equalsIgnoreCase(command)
                     || RestfulAPIConstants.CMD_delete_cert.equalsIgnoreCase(command)) {
                 int permission;
@@ -418,9 +418,9 @@ public class HttpRestServlet extends AbstractHttpServlet {
                     RestfulAPIConstants.PKISTATUS_accepted);
             return resp;
         } catch (OperationException ex) {
-            ErrorCode code = ex.getErrorCode();
+            ErrorCode code = ex.errorCode();
             LOG.warn("generate certificate, OperationException: code={}, message={}",
-                    code.name(), ex.getErrorMessage());
+                    code.name(), ex.errorMessage());
 
             HttpResponseStatus sc;
             String failureInfo;
@@ -488,7 +488,7 @@ public class HttpRestServlet extends AbstractHttpServlet {
                 auditMessage = code.name();
                 break;
             default:
-                auditMessage = code.name() + ": " + ex.getErrorMessage();
+                auditMessage = code.name() + ": " + ex.errorMessage();
                 break;
             } // end switch code
 
@@ -500,10 +500,10 @@ public class HttpRestServlet extends AbstractHttpServlet {
             }
             return resp;
         } catch (HttpRespAuditException ex) {
-            auditStatus = ex.getAuditStatus();
-            auditLevel = ex.getAuditLevel();
-            auditMessage = ex.getAuditMessage();
-            return createErrorResponse(version, ex.getHttpStatus());
+            auditStatus = ex.auditStatus();
+            auditLevel = ex.auditLevel();
+            auditMessage = ex.auditMessage();
+            return createErrorResponse(version, ex.httpStatus());
         } catch (Throwable th) {
             if (th instanceof EOFException) {
                 LogUtil.warn(LOG, th, "connection reset by peer");

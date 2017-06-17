@@ -60,11 +60,11 @@ public class CertprofileOption {
                 : Collections.unmodifiableSet(new HashSet<>(excludes));
     }
 
-    public Set<String> getIncludes() {
+    public Set<String> includes() {
         return includes;
     }
 
-    public Set<String> getExcludes() {
+    public Set<String> excludes() {
         return excludes;
     }
 

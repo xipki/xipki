@@ -55,7 +55,7 @@ public class X509CertWithDbId extends X509Cert {
         super(cert, encodedCert);
     }
 
-    public Long getCertId() {
+    public Long certId() {
         return certId;
     }
 

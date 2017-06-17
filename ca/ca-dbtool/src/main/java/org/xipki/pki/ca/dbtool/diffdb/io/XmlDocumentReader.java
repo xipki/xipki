@@ -89,7 +89,7 @@ public class XmlDocumentReader {
         });
     }
 
-    public String getValue(final String xpathExpression) throws XPathExpressionException {
+    public String value(final String xpathExpression) throws XPathExpressionException {
         ParamUtil.requireNonNull("xpathExpression", xpathExpression);
         Node node = getNode(xpathExpression);
         return (node != null) ? node.getFirstChild().getTextContent() : null;

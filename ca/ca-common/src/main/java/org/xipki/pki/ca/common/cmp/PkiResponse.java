@@ -56,11 +56,11 @@ public class PkiResponse {
         return pkiMessage.hasProtection();
     }
 
-    public GeneralPKIMessage getPkiMessage() {
+    public GeneralPKIMessage pkiMessage() {
         return pkiMessage;
     }
 
-    public ProtectionVerificationResult getProtectionVerificationResult() {
+    public ProtectionVerificationResult protectionVerificationResult() {
         return protectionVerificationResult;
     }
 

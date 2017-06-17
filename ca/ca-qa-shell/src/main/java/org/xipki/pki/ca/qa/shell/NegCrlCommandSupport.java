@@ -60,7 +60,7 @@ public abstract class NegCrlCommandSupport extends ClientCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        Set<String> caNames = caClient.getCaNames();
+        Set<String> caNames = caClient.caNames();
         if (isEmpty(caNames)) {
             throw new IllegalCmdParamException("no CA is configured");
         }

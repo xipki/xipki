@@ -132,10 +132,10 @@ public class ListCertCmd extends CaCommandSupport {
     private String format(int index, CertListInfo info) {
         StringBuilder sb = new StringBuilder(300);
         sb.append(StringUtil.formatAccount(index, 4)).append(" | ");
-        sb.append(StringUtil.formatText(info.getSerialNumber().toString(16), 20)).append(" | ");
-        sb.append(DateUtil.toUtcTimeyyyyMMddhhmmss(info.getNotBefore())).append(" | ");
-        sb.append(DateUtil.toUtcTimeyyyyMMddhhmmss(info.getNotAfter())).append(" | ");
-        sb.append(info.getSubject());
+        sb.append(StringUtil.formatText(info.serialNumber().toString(16), 20)).append(" | ");
+        sb.append(DateUtil.toUtcTimeyyyyMMddhhmmss(info.notBefore())).append(" | ");
+        sb.append(DateUtil.toUtcTimeyyyyMMddhhmmss(info.notAfter())).append(" | ");
+        sb.append(info.subject());
         return sb.toString();
     }
 

@@ -91,7 +91,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
     public void digest() throws Exception {
         System.out.println("digesting database");
 
-        final long total = getCount("CERT");
+        final long total = count("CERT");
         ProcessLog processLog = new ProcessLog(total);
 
         Map<Integer, String> caIdDirMap = getCaIds();
@@ -129,7 +129,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
 
     private Map<Integer, String> getCaIds() throws DataAccessException, IOException {
         Map<Integer, String> caIdDirMap = new HashMap<>();
-        final String sql = dbControl.getCaSql();
+        final String sql = dbControl.caSql();
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -186,11 +186,11 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
             }
 
             for (IdentifiedDbDigestEntry cert : certs) {
-                long id = cert.getId();
+                long id = cert.id();
                 if (lastProcessedId < id) {
                     lastProcessedId = id;
                 }
-                caEntryContainer.addDigestEntry(cert.getCaId().intValue(), id, cert.getContent());
+                caEntryContainer.addDigestEntry(cert.caId().intValue(), id, cert.content());
             }
             processLog.addNumProcessed(certs.size());
             processLog.printStatus();
@@ -202,7 +202,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
 
         processLog.printTrailer();
 
-        System.out.println(" digested " + processLog.getNumProcessed() + " certificates");
+        System.out.println(" digested " + processLog.numProcessed() + " certificates");
     } // method doDigest
 
     static String toAsciiFilename(final String filename) {

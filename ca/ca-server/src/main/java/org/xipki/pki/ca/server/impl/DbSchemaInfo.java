@@ -85,11 +85,11 @@ public class DbSchemaInfo {
         }
     } // constructor
 
-    public Set<String> getVariableNames() {
+    public Set<String> variableNames() {
         return Collections.unmodifiableSet(variables.keySet());
     }
 
-    public String getVariableValue(String variableName) {
+    public String variableValue(String variableName) {
         ParamUtil.requireNonNull("variableName", variableName);
         return variables.get(variableName);
     }

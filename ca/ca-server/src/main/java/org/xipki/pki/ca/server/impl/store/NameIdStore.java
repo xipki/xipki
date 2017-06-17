@@ -94,7 +94,7 @@ class NameIdStore {
         return entries.get(name);
     }
 
-    public String getTable() {
+    public String table() {
         return table;
     }
 

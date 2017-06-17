@@ -52,11 +52,11 @@ public class CertificatePolicyQualifier {
         this.userNotice = userNotice;
     }
 
-    public String getCpsUri() {
+    public String cpsUri() {
         return cpsUri;
     }
 
-    public String getUserNotice() {
+    public String userNotice() {
         return userNotice;
     }
 

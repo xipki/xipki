@@ -92,15 +92,15 @@ class CaConf {
         this.healthUrl = StringUtil.isBlank(healthUrl) ? url.replace("cmp", "health") : healthUrl;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public String getUrl() {
+    public String url() {
         return url;
     }
 
-    public String getHealthUrl() {
+    public String healthUrl() {
         return healthUrl;
     }
 
@@ -117,20 +117,20 @@ class CaConf {
         } else {
             this.profiles = new HashMap<>();
             for (CertprofileInfo m : certProfiles) {
-                this.profiles.put(m.getName(), m);
+                this.profiles.put(m.name(), m);
             }
         }
     }
 
-    public X509Certificate getCert() {
+    public X509Certificate cert() {
         return cert;
     }
 
-    public X500Name getSubject() {
+    public X500Name subject() {
         return subject;
     }
 
-    public Set<String> getProfileNames() {
+    public Set<String> profileNames() {
         return profiles.keySet();
     }
 
@@ -139,7 +139,7 @@ class CaConf {
         return profiles.containsKey(profileName.toUpperCase());
     }
 
-    public CertprofileInfo getProfile(final String profileName) {
+    public CertprofileInfo profile(final String profileName) {
         ParamUtil.requireNonNull("profileName", profileName);
         return profiles.get(profileName);
     }
@@ -148,7 +148,7 @@ class CaConf {
         return cert != null;
     }
 
-    public CmpResponder getResponder() {
+    public CmpResponder responder() {
         return responder;
     }
 
@@ -172,11 +172,11 @@ class CaConf {
         this.requestor = requestor;
     }
 
-    public String getRequestorName() {
+    public String requestorName() {
         return requestorName;
     }
 
-    public X509CmpRequestor getRequestor() {
+    public X509CmpRequestor requestor() {
         return requestor;
     }
 
@@ -192,11 +192,11 @@ class CaConf {
         this.cmpControl = cmpControl;
     }
 
-    public ClientCmpControl getCmpControl() {
+    public ClientCmpControl cmpControl() {
         return cmpControl;
     }
 
-    public byte[] getSubjectKeyIdentifier() {
+    public byte[] subjectKeyIdentifier() {
         return (subjectKeyIdentifier == null) ? null
                 : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
     }

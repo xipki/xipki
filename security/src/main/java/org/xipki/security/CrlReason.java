@@ -130,11 +130,11 @@ public enum CrlReason {
         this.desription = description;
     }
 
-    public int getCode() {
+    public int code() {
         return code;
     }
 
-    public String getDescription() {
+    public String description() {
         return desription;
     }
 

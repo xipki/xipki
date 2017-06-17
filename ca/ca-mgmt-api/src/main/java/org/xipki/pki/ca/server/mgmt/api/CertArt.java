@@ -51,7 +51,7 @@ public enum CertArt {
         this.code = code;
     }
 
-    public int getCode() {
+    public int code() {
         return code;
     }
 

@@ -71,7 +71,7 @@ public class BSpeedP12DSAKeyGenCmd extends BatchSpeedCommandSupport {
             return null;
         }
 
-        return new P12DSAKeyGenLoadTest(control.getPlen(), control.getQlen(), securityFactory);
+        return new P12DSAKeyGenLoadTest(control.plen(), control.qlen(), securityFactory);
     }
 
 }

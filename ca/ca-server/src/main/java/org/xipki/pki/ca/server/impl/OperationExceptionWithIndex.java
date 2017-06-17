@@ -50,22 +50,22 @@ public class OperationExceptionWithIndex extends OperationException {
     private final int index;
 
     public OperationExceptionWithIndex(final int index, OperationException underlying) {
-        super(underlying.getErrorCode());
+        super(underlying.errorCode());
         this.index = index;
         this.underlying = underlying;
     }
 
     @Override
-    public ErrorCode getErrorCode() {
-        return underlying.getErrorCode();
+    public ErrorCode errorCode() {
+        return underlying.errorCode();
     }
 
     @Override
-    public String getErrorMessage() {
-        return underlying.getErrorMessage();
+    public String errorMessage() {
+        return underlying.errorMessage();
     }
 
-    public int getIndex() {
+    public int index() {
         return index;
     }
 

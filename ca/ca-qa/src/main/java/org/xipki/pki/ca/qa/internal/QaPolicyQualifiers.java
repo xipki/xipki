@@ -77,7 +77,7 @@ public class QaPolicyQualifiers {
         this.policyQualifiers = Collections.unmodifiableList(list);
     }
 
-    public List<QaPolicyQualifierInfo> getPolicyQualifiers() {
+    public List<QaPolicyQualifierInfo> policyQualifiers() {
         return policyQualifiers;
     }
 

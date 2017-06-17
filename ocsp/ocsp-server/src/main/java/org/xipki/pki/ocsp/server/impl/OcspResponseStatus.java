@@ -54,7 +54,7 @@ public enum OcspResponseStatus {
         this.status = status;
     }
 
-    public int getStatus() {
+    public int status() {
         return status;
     }
 

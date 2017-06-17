@@ -65,11 +65,11 @@ public class RegistrationNumberOption {
         }
     }
 
-    public Pattern getRegex() {
+    public Pattern regex() {
         return regex;
     }
 
-    public String getConstant() {
+    public String constant() {
         return constant;
     }
 

@@ -82,9 +82,9 @@ public class CaInfoCmd extends CaCommandSupport {
             if (entry == null) {
                 throw new CmdFailure("could not find CA '" + caName + "'");
             } else {
-                if (CaStatus.ACTIVE == entry.getStatus()) {
+                if (CaStatus.ACTIVE == entry.status()) {
                     boolean started = caManager.getSuccessfulCaNames().contains(
-                            entry.getIdent().getName());
+                            entry.ident().name());
                     sb.append("started: ").append(started).append("\n");
                 }
                 Set<String> aliases = caManager.getAliasesForCa(caName);

@@ -149,11 +149,11 @@ public class CrlControl {
             this.minute = ParamUtil.requireRange("minute", minute, 0, 59);
         }
 
-        public int getHour() {
+        public int hour() {
             return hour;
         }
 
-        public int getMinute() {
+        public int minute() {
             return minute;
         }
 
@@ -261,10 +261,10 @@ public class CrlControl {
             throw new InvalidConfException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
 
-        String str = props.getValue(KEY_UPDATE_MODE);
+        String str = props.value(KEY_UPDATE_MODE);
         this.updateMode = (str == null) ? UpdateMode.interval : UpdateMode.forName(str);
 
-        str = props.getValue(KEY_INVALIDITY_DATE);
+        str = props.value(KEY_INVALIDITY_DATE);
         if (str != null) {
             this.invalidityDateMode = TripleState.forValue(str);
         }
@@ -278,7 +278,7 @@ public class CrlControl {
         this.xipkiCertsetProfilenameIncluded = getBoolean(props,
                 KEY_XIPKI_CERTSET_PROFILENAME, true);
 
-        str = props.getValue(KEY_EYTENSIONS);
+        str = props.value(KEY_EYTENSIONS);
         if (str == null) {
             this.extensionOids = Collections.emptySet();
         } else {
@@ -303,7 +303,7 @@ public class CrlControl {
             this.deltaCrlIntervals = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
             this.extendedNextUpdate = getBoolean(props, KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
             this.overlapMinutes = getInteger(props, KEY_OVERLAP_MINUTES, 60);
-            str = props.getValue(KEY_INTERVAL_TIME);
+            str = props.value(KEY_INTERVAL_TIME);
             if (str != null) {
                 List<String> tokens = StringUtil.split(str.trim(), ":");
                 if (tokens.size() != 2) {
@@ -374,7 +374,7 @@ public class CrlControl {
         return getConf();
     }
 
-    public UpdateMode getUpdateMode() {
+    public UpdateMode updateMode() {
         return updateMode;
     }
 
@@ -394,27 +394,27 @@ public class CrlControl {
         return includeExpiredCerts;
     }
 
-    public int getFullCrlIntervals() {
+    public int fullCrlIntervals() {
         return fullCrlIntervals;
     }
 
-    public int getDeltaCrlIntervals() {
+    public int deltaCrlIntervals() {
         return deltaCrlIntervals;
     }
 
-    public int getOverlapMinutes() {
+    public int overlapMinutes() {
         return overlapMinutes;
     }
 
-    public Integer getIntervalMinutes() {
+    public Integer intervalMinutes() {
         return intervalMinutes;
     }
 
-    public HourMinute getIntervalDayTime() {
+    public HourMinute intervalDayTime() {
         return intervalDayTime;
     }
 
-    public Set<String> getExtensionOids() {
+    public Set<String> extensionOids() {
         return extensionOids;
     }
 
@@ -434,7 +434,7 @@ public class CrlControl {
         return excludeReason;
     }
 
-    public TripleState getInvalidityDateMode() {
+    public TripleState invalidityDateMode() {
         return invalidityDateMode;
     }
 
@@ -526,7 +526,7 @@ public class CrlControl {
 
     private static int getInteger(final ConfPairs props, final String propKey, final int dfltValue)
             throws InvalidConfException {
-        String str = props.getValue(propKey);
+        String str = props.value(propKey);
         if (str != null) {
             try {
                 return Integer.parseInt(str.trim());
@@ -539,7 +539,7 @@ public class CrlControl {
 
     private static boolean getBoolean(final ConfPairs props, final String propKey,
             final boolean dfltValue) throws InvalidConfException {
-        String str = props.getValue(propKey);
+        String str = props.value(propKey);
         if (str != null) {
             str = str.trim();
             if ("true".equalsIgnoreCase(str)) {

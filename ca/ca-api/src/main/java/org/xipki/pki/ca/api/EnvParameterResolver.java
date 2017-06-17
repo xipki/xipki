@@ -45,8 +45,8 @@ import org.eclipse.jdt.annotation.NonNull;
 
 public interface EnvParameterResolver {
 
-    Set<String> getAllParameterNames();
+    Set<String> allParameterNames();
 
-    String getParameterValue(@NonNull String parameterName);
+    String parameter(@NonNull String parameterName);
 
 }

@@ -174,7 +174,7 @@ public class SignerUtil {
         ParamUtil.requireNonNull("hashValue", hashValue);
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
 
-        final int hashLen = hashAlgo.getLength();
+        final int hashLen = hashAlgo.length();
         ParamUtil.requireRange("hashValue.length", hashValue.length, hashLen, hashLen);
 
         int blockSize = (modulusBigLength + 7) / 8;
@@ -240,7 +240,7 @@ public class SignerUtil {
             final HashAlgoType mgfDigest, final int saltLen, final int modulusBitLength,
             final SecureRandom random)
             throws XiSecurityException {
-        final int hLen = contentDigest.getLength();
+        final int hLen = contentDigest.length();
         final byte[] salt = new byte[saltLen];
         final byte[] mDash = new byte[8 + saltLen + hLen];
         final byte trailer = (byte)0xBC;
@@ -297,7 +297,7 @@ public class SignerUtil {
     private static byte[] maskGeneratorFunction1(final HashAlgoType mgfDigest,
             final byte[] Z, // CHECKSTYLE:SKIP
             final int length) {
-        int mgfhLen = mgfDigest.getLength();
+        int mgfhLen = mgfDigest.length();
         byte[] mask = new byte[length];
         int counter = 0;
 

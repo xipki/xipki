@@ -66,14 +66,14 @@ public class CmpResponderEntryWrapper {
     public void setDbEntry(final CmpResponderEntry dbEntry) {
         this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
         signer = null;
-        if (dbEntry.getCertificate() != null) {
+        if (dbEntry.certificate() != null) {
             subjectAsX500Name = X500Name.getInstance(
-                    dbEntry.getCertificate().getSubjectX500Principal().getEncoded());
+                    dbEntry.certificate().getSubjectX500Principal().getEncoded());
             subjectAsGeneralName = new GeneralName(subjectAsX500Name);
         }
     }
 
-    public ConcurrentContentSigner getSigner() {
+    public ConcurrentContentSigner signer() {
         return signer;
     }
 
@@ -87,16 +87,16 @@ public class CmpResponderEntryWrapper {
             throw new ObjectCreationException("dbEntry is null");
         }
 
-        X509Certificate responderCert = dbEntry.getCertificate();
+        X509Certificate responderCert = dbEntry.certificate();
         dbEntry.setConfFaulty(true);
-        signer = securityFactory.createSigner(dbEntry.getType(), new SignerConf(dbEntry.getConf()),
+        signer = securityFactory.createSigner(dbEntry.type(), new SignerConf(dbEntry.conf()),
                 responderCert);
         if (signer.getCertificate() == null) {
             throw new ObjectCreationException("signer without certificate is not allowed");
         }
         dbEntry.setConfFaulty(false);
 
-        if (dbEntry.getBase64Cert() == null) {
+        if (dbEntry.base64Cert() == null) {
             dbEntry.setCertificate(signer.getCertificate());
             subjectAsX500Name = X500Name.getInstance(
                     signer.getCertificateAsBcObject().getSubject());
@@ -104,7 +104,7 @@ public class CmpResponderEntryWrapper {
         }
     } // method initSigner
 
-    public CmpResponderEntry getDbEntry() {
+    public CmpResponderEntry dbEntry() {
         return dbEntry;
     }
 
@@ -112,11 +112,11 @@ public class CmpResponderEntryWrapper {
         return (signer == null) ? false : signer.isHealthy();
     }
 
-    public GeneralName getSubjectAsGeneralName() {
+    public GeneralName subjectAsGeneralName() {
         return subjectAsGeneralName;
     }
 
-    public X500Name getSubjectAsX500Name() {
+    public X500Name subjectAsX500Name() {
         return subjectAsX500Name;
     }
 

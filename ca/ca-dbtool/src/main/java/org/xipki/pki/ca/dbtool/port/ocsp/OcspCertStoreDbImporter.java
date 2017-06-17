@@ -220,7 +220,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         final long total = certstore.getCountCerts() - numProcessedBefore;
         final ProcessLog processLog = new ProcessLog(total);
 
-        System.out.println(getImportingText() + "certificates from ID " + minId);
+        System.out.println(importingText() + "certificates from ID " + minId);
         processLog.printHeader();
 
         PreparedStatement psCert = prepareStatement(SQL_ADD_CERT);
@@ -230,10 +230,10 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         OcspDbEntryType type = OcspDbEntryType.CERT;
 
         DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
-                baseDir + File.separator + type.getDirName() + ".mf");
+                baseDir + File.separator + type.dirName() + ".mf");
         try {
             while (certsFileIterator.hasNext()) {
-                String certsFile = baseDir + File.separator + type.getDirName() + File.separator
+                String certsFile = baseDir + File.separator + type.dirName() + File.separator
                         + certsFileIterator.next();
 
                 // extract the toId from the filename
@@ -273,7 +273,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
         processLog.printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
-        System.out.println(getImportedText() + processLog.getNumProcessed() + " certificates");
+        System.out.println(importedText() + processLog.numProcessed() + " certificates");
     } // method importCert
 
     private long doImportCert(final PreparedStatement psCert, final PreparedStatement psCerthash,
@@ -309,13 +309,13 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
                 OcspCertType cert = (OcspCertType) certs.next();
 
-                long id = cert.getId();
+                long id = cert.id();
                 if (id < minId) {
                     continue;
                 }
 
                 numEntriesInBatch++;
-                String filename = cert.getFile();
+                String filename = cert.file();
 
                 // rawcert
                 ZipEntry certZipEnty = zipFile.getEntry(filename);
@@ -336,17 +336,17 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                 try {
                     int idx = 1;
                     psCert.setLong(idx++, id);
-                    psCert.setInt(idx++, cert.getIid());
+                    psCert.setInt(idx++, cert.iid());
                     psCert.setString(idx++,
                             tbsCert.getSerialNumber().getPositiveValue().toString(16));
-                    psCert.setLong(idx++, cert.getUpdate());
+                    psCert.setLong(idx++, cert.update());
                     psCert.setLong(idx++, tbsCert.getStartDate().getDate().getTime() / 1000);
                     psCert.setLong(idx++, tbsCert.getEndDate().getDate().getTime() / 1000);
-                    setBoolean(psCert, idx++, cert.getRev().booleanValue());
-                    setInt(psCert, idx++, cert.getRr());
-                    setLong(psCert, idx++, cert.getRt());
-                    setLong(psCert, idx++, cert.getRit());
-                    psCert.setString(idx++, cert.getProfile());
+                    setBoolean(psCert, idx++, cert.rev().booleanValue());
+                    setInt(psCert, idx++, cert.rr());
+                    setLong(psCert, idx++, cert.rt());
+                    setLong(psCert, idx++, cert.rit());
+                    psCert.setString(idx++, cert.profile());
                     psCert.addBatch();
                 } catch (SQLException ex) {
                     throw translate(SQL_ADD_CERT, ex);
@@ -355,7 +355,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                 // certhash
                 try {
                     int idx = 1;
-                    psCerthash.setLong(idx++, cert.getId());
+                    psCerthash.setLong(idx++, cert.id());
                     psCerthash.setString(idx++, sha1(encodedCert));
                     psCerthash.setString(idx++, sha224(encodedCert));
                     psCerthash.setString(idx++, sha256(encodedCert));
@@ -369,7 +369,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                 // rawcert
                 try {
                     int idx = 1;
-                    psRawcert.setLong(idx++, cert.getId());
+                    psRawcert.setLong(idx++, cert.id());
                     psRawcert.setString(idx++,
                             X509Util.cutX500Name(tbsCert.getSubject(), maxX500nameLen));
                     psRawcert.setString(idx++, Base64.toBase64String(encodedCert));
@@ -416,7 +416,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     lastSuccessfulCertId = id;
                     processLog.addNumProcessed(numEntriesInBatch);
                     numEntriesInBatch = 0;
-                    echoToFile((numProcessedInLastProcess + processLog.getNumProcessed())
+                    echoToFile((numProcessedInLastProcess + processLog.numProcessed())
                             + ":" + lastSuccessfulCertId, processLogFile);
                     processLog.printStatus();
                 }

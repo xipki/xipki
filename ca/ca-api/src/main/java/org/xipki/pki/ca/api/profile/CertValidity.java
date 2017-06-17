@@ -59,7 +59,7 @@ public class CertValidity implements Comparable<CertValidity> {
             this.suffix = suffix;
         }
 
-        public String getSuffix() {
+        public String suffix() {
             return suffix;
         }
 
@@ -113,11 +113,11 @@ public class CertValidity implements Comparable<CertValidity> {
         return new CertValidity(validity, unit);
     } // method getInstance
 
-    public int getValidity() {
+    public int validity() {
         return validity;
     }
 
-    public Unit getUnit() {
+    public Unit unit() {
         return unit;
     }
 
@@ -150,7 +150,7 @@ public class CertValidity implements Comparable<CertValidity> {
         }
     } // method add
 
-    private int getApproxHours() {
+    private int approxHours() {
         switch (unit) {
         case HOUR:
             return validity;
@@ -179,8 +179,8 @@ public class CertValidity implements Comparable<CertValidity> {
 
             return (validity < obj.validity) ? -1 : 1;
         } else {
-            int thisHours = getApproxHours();
-            int thatHours = obj.getApproxHours();
+            int thisHours = approxHours();
+            int thatHours = obj.approxHours();
             if (thisHours == thatHours) {
                 return 0;
             } else {

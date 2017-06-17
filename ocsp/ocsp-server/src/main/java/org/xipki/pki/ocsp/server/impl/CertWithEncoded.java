@@ -59,7 +59,7 @@ public class CertWithEncoded {
         this.encoded = cert.getEncoded();
     }
 
-    public X509Certificate getCertificate() {
+    public X509Certificate certificate() {
         return certificate;
     }
 

@@ -94,7 +94,7 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCommandSupport {
             X509Certificate cert = X509Util.parseCert(certFile);
             RequestResponseDebug debug = getRequestResponseDebug();
             try {
-                certIdOrError = caClient.revokeCert(caName, cert, crlReason.getCode(),
+                certIdOrError = caClient.revokeCert(caName, cert, crlReason.code(),
                         invalidityDate, debug);
             } finally {
                 saveRequestResponse(debug);
@@ -103,14 +103,14 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCommandSupport {
         } else {
             RequestResponseDebug debug = getRequestResponseDebug();
             try {
-                certIdOrError = caClient.revokeCert(caName, getSerialNumber(), crlReason.getCode(),
+                certIdOrError = caClient.revokeCert(caName, getSerialNumber(), crlReason.code(),
                         invalidityDate, debug);
             } finally {
                 saveRequestResponse(debug);
             }
         }
 
-        if (certIdOrError.getError() == null) {
+        if (certIdOrError.error() == null) {
             throw new CmdFailure("revocation sucessful but expected failure");
         }
         return null;

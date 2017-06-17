@@ -69,8 +69,8 @@ public class ShellUtil {
         }
 
         ConfPairs pairs = new ConfPairs(signerConf);
-        String keystoreConf = pairs.getValue("keystore");
-        String passwordHint = pairs.getValue("password");
+        String keystoreConf = pairs.value("keystore");
+        String passwordHint = pairs.value("password");
 
         if (passwordHint == null) {
             throw new IllegalArgumentException("password is not set in " + signerConf);
@@ -93,7 +93,7 @@ public class ShellUtil {
             password = passwordResolver.resolvePassword(passwordHint);
         }
 
-        String keyLabel = pairs.getValue("key-label");
+        String keyLabel = pairs.value("key-label");
         keystoreBytes = securityFactory.extractMinimalKeyStore(keystoreType, keystoreBytes,
                 keyLabel, password, null);
 

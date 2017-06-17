@@ -146,61 +146,61 @@ class PublicCaInfo {
         this.deltaCrlUris = CollectionUtil.unmodifiableList(deltaCrlUris);
     } // constructor
 
-    public List<String> getCaCertUris() {
+    public List<String> caCertUris() {
         return caCertUris;
     }
 
-    public List<String> getOcspUris() {
+    public List<String> ocspUris() {
         return ocspUris;
     }
 
-    public List<String> getCrlUris() {
+    public List<String> crlUris() {
         return crlUris;
     }
 
-    public List<String> getDeltaCrlUris() {
+    public List<String> deltaCrlUris() {
         return deltaCrlUris;
     }
 
-    public X509Certificate getCrlSignerCertificate() {
+    public X509Certificate crlSignerCertificate() {
         return crlSignerCertificate;
     }
 
     public void setCrlSignerCertificate(final X509Certificate crlSignerCert) {
-        this.crlSignerCertificate = caCertificate.getCert().equals(crlSignerCert)
+        this.crlSignerCertificate = caCertificate.cert().equals(crlSignerCert)
                 ? null : crlSignerCert;
     }
 
-    public X500Principal getSubject() {
+    public X500Principal subject() {
         return subject;
     }
 
-    public X500Name getX500Subject() {
+    public X500Name x500Subject() {
         return x500Subject;
     }
 
-    public String getC14nSubject() {
+    public String c14nSubject() {
         return c14nSubject;
     }
 
-    public GeneralNames getSubjectAltName() {
+    public GeneralNames subjectAltName() {
         return subjectAltName;
     }
 
-    public byte[] getSubjectKeyIdentifer() {
+    public byte[] subjectKeyIdentifer() {
         if (caCertificate != null) {
-            return caCertificate.getSubjectKeyIdentifier();
+            return caCertificate.subjectKeyIdentifier();
         } else {
             return (subjectKeyIdentifier == null) ? null
                     : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
         }
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
         return serialNumber;
     }
 
-    public X509Cert getCaCertificate() {
+    public X509Cert caCertificate() {
         return caCertificate;
     }
 

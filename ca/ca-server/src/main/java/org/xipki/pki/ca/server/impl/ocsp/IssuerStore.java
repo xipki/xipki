@@ -60,9 +60,9 @@ class IssuerStore {
     void addIdentityEntry(final IssuerEntry entry) {
         ParamUtil.requireNonNull("entry", entry);
         for (IssuerEntry existingEntry : entries) {
-            if (existingEntry.getId() == entry.getId()) {
+            if (existingEntry.id() == entry.id()) {
                 throw new IllegalArgumentException(
-                        "issuer with the same id " + entry.getId() + " already available");
+                        "issuer with the same id " + entry.id() + " already available");
             }
         }
 
@@ -72,8 +72,8 @@ class IssuerStore {
     Integer getIdForSubject(final String subject) {
         ParamUtil.requireNonBlank("subject", subject);
         for (IssuerEntry entry : entries) {
-            if (entry.getSubject().equals(subject)) {
-                return entry.getId();
+            if (entry.subject().equals(subject)) {
+                return entry.id();
             }
         }
 
@@ -84,7 +84,7 @@ class IssuerStore {
         ParamUtil.requireNonNull("sha1FpCert", sha1FpCert);
         for (IssuerEntry entry : entries) {
             if (entry.matchSha1Fp(sha1FpCert)) {
-                return entry.getId();
+                return entry.id();
             }
         }
 
@@ -95,7 +95,7 @@ class IssuerStore {
         ParamUtil.requireNonNull("encodedCert", encodedCert);
         for (IssuerEntry entry : entries) {
             if (entry.matchCert(encodedCert)) {
-                return entry.getId();
+                return entry.id();
             }
         }
 

@@ -59,15 +59,15 @@ public class AuthorityCertStore {
         this.encryptionCert = encryptionCert;
     }
 
-    public X509Certificate getSignatureCert() {
+    public X509Certificate signatureCert() {
         return signatureCert;
     }
 
-    public X509Certificate getEncryptionCert() {
+    public X509Certificate encryptionCert() {
         return encryptionCert;
     }
 
-    public X509Certificate getCaCert() {
+    public X509Certificate caCert() {
         return caCert;
     }
 
@@ -117,8 +117,8 @@ public class AuthorityCertStore {
     } // method getInstance
 
     private static boolean hasKeyusage(final boolean[] keyusage, final KeyUsage usage) {
-        if (keyusage != null && keyusage.length > usage.getBit()) {
-            return keyusage[usage.getBit()];
+        if (keyusage != null && keyusage.length > usage.bit()) {
+            return keyusage[usage.bit()];
         }
         return false;
     }

@@ -53,7 +53,7 @@ public class ByCaRequestorInfo implements RequestorInfo {
     }
 
     @Override
-    public NameId getIdent() {
+    public NameId ident() {
         return ident;
     }
 

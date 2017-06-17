@@ -55,11 +55,11 @@ public class KeyCertPair {
         this.certificate = ParamUtil.requireNonNull("certificate", certificate);
     }
 
-    public PrivateKey getPrivateKey() {
+    public PrivateKey privateKey() {
         return privateKey;
     }
 
-    public X509Certificate getCertificate() {
+    public X509Certificate certificate() {
         return certificate;
     }
 

@@ -45,11 +45,11 @@ import org.eclipse.jdt.annotation.NonNull;
 
 public interface QaSystemManager {
 
-    Set<String> getIssuerNames();
+    Set<String> issuerNames();
 
     X509IssuerInfo getIssuer(@NonNull String issuerName);
 
-    Set<String> getCertprofileNames();
+    Set<String> certprofileNames();
 
     X509CertprofileQa getCertprofile(@NonNull String certprofileName);
 

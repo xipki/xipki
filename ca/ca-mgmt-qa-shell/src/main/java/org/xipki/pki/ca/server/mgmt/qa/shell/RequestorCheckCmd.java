@@ -64,11 +64,11 @@ public class RequestorCheckCmd extends RequestorUpdateCmd {
         }
 
         byte[] ex = IoUtil.read(certFile);
-        if (cr.getBase64Cert() == null) {
+        if (cr.base64Cert() == null) {
             throw new CmdFailure("Cert: is not configured explicitly as expected");
         }
 
-        if (!Arrays.equals(ex, Base64.decode(cr.getBase64Cert()))) {
+        if (!Arrays.equals(ex, Base64.decode(cr.base64Cert()))) {
             throw new CmdFailure("Cert: the expected one and the actual one differ");
         }
 

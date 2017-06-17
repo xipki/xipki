@@ -174,11 +174,11 @@ public abstract class LiquibaseCommandSupport extends XipkiCommandSupport {
     private void printDatabaseInfo(final LiquibaseDatabaseConf dbParams, final String schemaFile) {
         StringBuilder msg = new StringBuilder();
         msg.append("\n--------------------------------------------\n");
-        msg.append("     driver: ").append(dbParams.getDriver()).append("\n");
-        msg.append("       user: ").append(dbParams.getUsername()).append("\n");
-        msg.append("        URL: ").append(dbParams.getUrl()).append("\n");
-        if (dbParams.getSchema() != null) {
-            msg.append("     schema: ").append(dbParams.getSchema()).append("\n");
+        msg.append("     driver: ").append(dbParams.driver()).append("\n");
+        msg.append("       user: ").append(dbParams.username()).append("\n");
+        msg.append("        URL: ").append(dbParams.url()).append("\n");
+        if (dbParams.schema() != null) {
+            msg.append("     schema: ").append(dbParams.schema()).append("\n");
         }
         msg.append("schema file: ").append(schemaFile).append("\n");
 

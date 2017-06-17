@@ -133,9 +133,9 @@ public class HttpsHostnameVerifier implements HostnameVerifier {
         }
 
         ConfPairs pairs = new ConfPairs(commonnameHostMap);
-        Set<String> commonNames = pairs.getNames();
+        Set<String> commonNames = pairs.names();
         for (String commonName :commonNames) {
-            String str = pairs.getValue(commonName);
+            String str = pairs.value(commonName);
             Set<String> hosts = StringUtil.splitAsSet(str, ",; \t");
             hostnameMap.put(commonName, hosts);
         }

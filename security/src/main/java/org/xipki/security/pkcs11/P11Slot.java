@@ -54,21 +54,21 @@ import org.xipki.security.exception.P11UnsupportedMechanismException;
 
 public interface P11Slot {
 
-    String getModuleName();
+    String moduleName();
 
     boolean isReadOnly();
 
-    P11SlotIdentifier getSlotId();
+    P11SlotIdentifier slotId();
 
-    Set<P11ObjectIdentifier> getIdentityIdentifiers();
+    Set<P11ObjectIdentifier> identityIdentifiers();
 
-    Set<P11ObjectIdentifier> getCertIdentifiers();
+    Set<P11ObjectIdentifier> certIdentifiers();
 
     boolean hasIdentity(P11ObjectIdentifier objectId);
 
     void close();
 
-    Set<Long> getMechanisms();
+    Set<Long> mechanisms();
 
     boolean supportsMechanism(long mechanism);
 

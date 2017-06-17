@@ -55,7 +55,7 @@ public class CaEntryContainer {
         ParamUtil.requireNonEmpty("caEntries", caEntries);
         caEntryMap = new HashMap<>(caEntries.size());
         for (CaEntry m : caEntries) {
-            caEntryMap.put(m.getCaId(), m);
+            caEntryMap.put(m.caId(), m);
         }
     }
 
@@ -75,7 +75,7 @@ public class CaEntryContainer {
             try {
                 m.close();
             } catch (IOException ex) {
-                sb.append("could not close CAEntry '").append(m.getCaId());
+                sb.append("could not close CAEntry '").append(m.caId());
                 sb.append("': ").append(ex.getMessage()).append(", ");
             }
         }

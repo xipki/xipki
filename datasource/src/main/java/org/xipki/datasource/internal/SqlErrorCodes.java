@@ -192,43 +192,43 @@ public class SqlErrorCodes {
         return useSqlStateForTranslation;
     }
 
-    public Set<String> getBadSqlGrammarCodes() {
+    public Set<String> badSqlGrammarCodes() {
         return badSqlGrammarCodes;
     }
 
-    public Set<String> getInvalidResultSetAccessCodes() {
+    public Set<String> invalidResultSetAccessCodes() {
         return invalidResultSetAccessCodes;
     }
 
-    public Set<String> getDuplicateKeyCodes() {
+    public Set<String> duplicateKeyCodes() {
         return duplicateKeyCodes;
     }
 
-    public Set<String> getDataIntegrityViolationCodes() {
+    public Set<String> dataIntegrityViolationCodes() {
         return dataIntegrityViolationCodes;
     }
 
-    public Set<String> getPermissionDeniedCodes() {
+    public Set<String> permissionDeniedCodes() {
         return permissionDeniedCodes;
     }
 
-    public Set<String> getDataAccessResourceFailureCodes() {
+    public Set<String> dataAccessResourceFailureCodes() {
         return dataAccessResourceFailureCodes;
     }
 
-    public Set<String> getTransientDataAccessResourceCodes() {
+    public Set<String> transientDataAccessResourceCodes() {
         return transientDataAccessResourceCodes;
     }
 
-    public Set<String> getCannotAcquireLockCodes() {
+    public Set<String> cannotAcquireLockCodes() {
         return cannotAcquireLockCodes;
     }
 
-    public Set<String> getDeadlockLoserCodes() {
+    public Set<String> deadlockLoserCodes() {
         return deadlockLoserCodes;
     }
 
-    public Set<String> getCannotSerializeTransactionCodes() {
+    public Set<String> cannotSerializeTransactionCodes() {
         return cannotSerializeTransactionCodes;
     }
 

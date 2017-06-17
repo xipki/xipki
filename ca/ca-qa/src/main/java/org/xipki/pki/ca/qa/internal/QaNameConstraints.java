@@ -86,11 +86,11 @@ public class QaNameConstraints extends QaExtension {
         }
     }
 
-    public List<QaGeneralSubtree> getPermittedSubtrees() {
+    public List<QaGeneralSubtree> permittedSubtrees() {
         return permittedSubtrees;
     }
 
-    public List<QaGeneralSubtree> getExcludedSubtrees() {
+    public List<QaGeneralSubtree> excludedSubtrees() {
         return excludedSubtrees;
     }
 

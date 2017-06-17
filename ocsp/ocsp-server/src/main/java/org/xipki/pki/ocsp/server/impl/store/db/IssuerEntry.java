@@ -98,7 +98,7 @@ public class IssuerEntry {
         return hashes;
     }
 
-    public int getId() {
+    public int id() {
         return id;
     }
 
@@ -118,23 +118,23 @@ public class IssuerEntry {
         this.crlInfo = crlInfo;
     }
 
-    public CrlInfo getCrlInfo() {
+    public CrlInfo crlInfo() {
         return crlInfo;
     }
 
-    public CertRevocationInfo getRevocationInfo() {
+    public CertRevocationInfo revocationInfo() {
         return revocationInfo;
     }
 
-    public Date getNotBefore() {
+    public Date notBefore() {
         return notBefore;
     }
 
-    public X509Certificate getCert() {
+    public X509Certificate cert() {
         return cert;
     }
 
-    public Collection<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
+    public Collection<IssuerHashNameAndKey> issuerHashNameAndKeys() {
         return Collections.unmodifiableCollection(issuerHashMap.values());
     }
 

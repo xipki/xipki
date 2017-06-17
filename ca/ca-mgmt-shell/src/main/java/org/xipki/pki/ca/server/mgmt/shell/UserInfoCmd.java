@@ -70,8 +70,8 @@ public class UserInfoCmd extends CaCommandSupport {
         for (String ca : caHasUsers.keySet()) {
             CaHasUserEntry entry = caHasUsers.get(ca);
             sb.append("\n----- CA ").append(ca).append("-----");
-            sb.append("\nprofiles: ").append(entry.getProfiles()).append("\n");
-            sb.append("\npermission: ").append(entry.getPermission());
+            sb.append("\nprofiles: ").append(entry.profiles()).append("\n");
+            sb.append("\npermission: ").append(entry.permission());
         }
         println(sb.toString());
         return null;

@@ -55,7 +55,7 @@ public abstract class DbPortWorker implements Runnable {
     public DbPortWorker() {
     }
 
-    public final Exception getException() {
+    public final Exception exception() {
         return exception;
     }
 

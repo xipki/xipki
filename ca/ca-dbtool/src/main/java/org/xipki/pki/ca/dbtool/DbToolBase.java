@@ -150,14 +150,14 @@ public class DbToolBase {
         connection = null;
     }
 
-    public long getMin(final String table, final String column) throws DataAccessException {
+    public long min(final String table, final String column) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
         return datasource.getMin(connection, table, column);
     }
 
-    public long getMin(final String table, final String column, final String condition)
+    public long min(final String table, final String column, final String condition)
             throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
@@ -165,14 +165,14 @@ public class DbToolBase {
         return datasource.getMin(connection, table, column, condition);
     }
 
-    public long getMax(final String table, final String column) throws DataAccessException {
+    public long max(final String table, final String column) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
 
         return datasource.getMax(connection, table, column);
     }
 
-    public long getMax(final String table, final String column, final String condition)
+    public long max(final String table, final String column, final String condition)
             throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
         ParamUtil.requireNonBlank("column", column);
@@ -180,7 +180,7 @@ public class DbToolBase {
         return datasource.getMax(connection, table, column, condition);
     }
 
-    public int getCount(final String table) throws DataAccessException {
+    public int count(final String table) throws DataAccessException {
         ParamUtil.requireNonBlank("table", table);
 
         return datasource.getCount(connection, table);

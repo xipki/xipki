@@ -57,7 +57,7 @@ public class ExtensionValue {
         return critical;
     }
 
-    public ASN1Encodable getValue() {
+    public ASN1Encodable value() {
         return value;
     }
 

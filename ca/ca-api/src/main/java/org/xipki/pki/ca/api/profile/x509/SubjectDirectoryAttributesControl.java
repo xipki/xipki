@@ -54,7 +54,7 @@ public class SubjectDirectoryAttributesControl {
         this.types = new ArrayList<>(types);
     }
 
-    public List<ASN1ObjectIdentifier> getTypes() {
+    public List<ASN1ObjectIdentifier> types() {
         return types;
     }
 

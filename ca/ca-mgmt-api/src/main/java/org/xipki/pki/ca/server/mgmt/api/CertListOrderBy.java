@@ -54,7 +54,7 @@ public enum CertListOrderBy {
         this.text = text;
     }
 
-    public String getText() {
+    public String text() {
         return text;
     }
 

@@ -77,11 +77,11 @@ public class EnrollCertResultResp {
         resultEntries.add(resultEntry);
     }
 
-    public List<CMPCertificate> getCaCertificates() {
+    public List<CMPCertificate> caCertificates() {
         return caCertificates;
     }
 
-    public List<ResultEntry> getResultEntries() {
+    public List<ResultEntry> resultEntries() {
         return resultEntries;
     }
 

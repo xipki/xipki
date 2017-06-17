@@ -121,7 +121,7 @@ class P11DSAContentSigner implements ContentSigner {
             throw new XiSecurityException("unsupported signature algorithm " + algOid);
         }
 
-        P11SlotIdentifier slotId = identityId.getSlotId();
+        P11SlotIdentifier slotId = identityId.slotId();
         P11Slot slot = cryptService.getSlot(slotId);
         if (slot.supportsMechanism(PKCS11Constants.CKM_DSA)) {
             this.mechanism = PKCS11Constants.CKM_DSA;

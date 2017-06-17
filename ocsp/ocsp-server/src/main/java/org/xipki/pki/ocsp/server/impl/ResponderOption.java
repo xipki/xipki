@@ -104,7 +104,7 @@ class ResponderOption {
         this.servletPaths = Collections.unmodifiableList(list);
     } // constructor
 
-    public OcspMode getMode() {
+    public OcspMode mode() {
         return mode;
     }
 
@@ -112,31 +112,31 @@ class ResponderOption {
         return inheritCaRevocation;
     }
 
-    public String getSignerName() {
+    public String signerName() {
         return signerName;
     }
 
-    public String getRequestOptionName() {
+    public String requestOptionName() {
         return requestOptionName;
     }
 
-    public String getResponseOptionName() {
+    public String responseOptionName() {
         return responseOptionName;
     }
 
-    public String getAuditOptionName() {
+    public String auditOptionName() {
         return auditOptionName;
     }
 
-    public List<String> getStoreNames() {
+    public List<String> storeNames() {
         return storeNames;
     }
 
-    public String getCertprofileOptionName() {
+    public String certprofileOptionName() {
         return certprofileOptionName;
     }
 
-    public List<String> getServletPaths() {
+    public List<String> servletPaths() {
         return servletPaths;
     }
 

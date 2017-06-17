@@ -59,15 +59,15 @@ public class PublisherCheckCmd extends PublisherUpdateCmd {
             throw new CmdFailure("publisher named '" + name + "' is not configured");
         }
 
-        if (cp.getType() != null) {
+        if (cp.type() != null) {
             String ex = type;
-            String is = cp.getType();
+            String is = cp.type();
             MgmtQaShellUtil.assertEquals("type", ex, is);
         }
 
-        if (cp.getConf() != null) {
+        if (cp.conf() != null) {
             String ex = conf;
-            String is = cp.getConf();
+            String is = cp.conf();
             MgmtQaShellUtil.assertEquals("signer conf", ex, is);
         }
 

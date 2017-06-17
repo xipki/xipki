@@ -74,15 +74,15 @@ public class ScepHttpResponse {
                 new ByteArrayInputStream(ParamUtil.requireNonNull("contentBytes", contentBytes)));
     }
 
-    public String getContentType() {
+    public String contentType() {
         return contentType;
     }
 
-    public int getContentLength() {
+    public int contentLength() {
         return contentLength;
     }
 
-    public String getEncoding() {
+    public String encoding() {
         return contentEncoding;
     }
 
@@ -90,7 +90,7 @@ public class ScepHttpResponse {
         this.contentEncoding = contentEncoding;
     }
 
-    public InputStream getContent() {
+    public InputStream content() {
         return content;
     }
 

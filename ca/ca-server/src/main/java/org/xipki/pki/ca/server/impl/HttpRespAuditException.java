@@ -73,23 +73,23 @@ public class HttpRespAuditException extends Exception {
         this.auditStatus = ParamUtil.requireNonNull("auditStatus", auditStatus);
     }
 
-    public HttpResponseStatus getHttpStatus() {
+    public HttpResponseStatus httpStatus() {
         return httpStatus;
     }
 
-    public String getHttpErrorMessage() {
+    public String httpErrorMessage() {
         return httpErrorMessage;
     }
 
-    public String getAuditMessage() {
+    public String auditMessage() {
         return auditMessage;
     }
 
-    public AuditLevel getAuditLevel() {
+    public AuditLevel auditLevel() {
         return auditLevel;
     }
 
-    public AuditStatus getAuditStatus() {
+    public AuditStatus auditStatus() {
         return auditStatus;
     }
 

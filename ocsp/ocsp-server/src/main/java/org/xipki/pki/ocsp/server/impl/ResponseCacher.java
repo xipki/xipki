@@ -222,7 +222,7 @@ class ResponseCacher {
 
     Integer getIssuerId(HashAlgoType hashAlgo, byte[] nameHash, byte[] keyHash) {
         IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, nameHash, keyHash);
-        return (issuer == null) ? null : issuer.getId();
+        return (issuer == null) ? null : issuer.id();
     }
 
     Integer storeIssuer(X509Certificate issuerCert)
@@ -231,8 +231,8 @@ class ResponseCacher {
             throw new IllegalStateException("storeIssuer is not permitted in slave mode");
         }
 
-        for (Integer id : issuerStore.getIds()) {
-            if (issuerStore.getIssuerForId(id).getCert().equals(issuerCert)) {
+        for (Integer id : issuerStore.ids()) {
+            if (issuerStore.getIssuerForId(id).cert().equals(issuerCert)) {
                 return id;
             }
         }
@@ -454,8 +454,8 @@ class ResponseCacher {
                                 = caInfoEntry.getIssuerHashNameAndKey(HashAlgoType.SHA1);
                         for (IssuerEntry existingIssuer : caInfos) {
                             if (existingIssuer.matchHash(HashAlgoType.SHA1,
-                                    sha1IssuerHash.getIssuerNameHash(),
-                                    sha1IssuerHash.getIssuerKeyHash())) {
+                                    sha1IssuerHash.issuerNameHash(),
+                                    sha1IssuerHash.issuerKeyHash())) {
                                 LOG.error(
                                     "found at least two issuers with the same subject and key");
                                 return false;
@@ -508,7 +508,7 @@ class ResponseCacher {
             ps = null;
             rs = null;
 
-            Set<Integer> currentIds = issuerStore.getIds();
+            Set<Integer> currentIds = issuerStore.ids();
 
             for (Integer id : ids) {
                 if (currentIds.contains(id)) {
@@ -568,8 +568,8 @@ class ResponseCacher {
             AlgorithmCode sigAlg, AlgorithmCode certHashAlg) {
         byte[] snBytes = serialNumber.toByteArray();
         byte[] bytes = new byte[2 + snBytes.length];
-        bytes[0] = sigAlg.getCode();
-        bytes[1] = (certHashAlg == null) ? 0 : certHashAlg.getCode();
+        bytes[0] = sigAlg.code();
+        bytes[1] = (certHashAlg == null) ? 0 : certHashAlg.code();
         System.arraycopy(snBytes, 0, bytes, 2, snBytes.length);
         return Hex.toHexString(snBytes);
     }

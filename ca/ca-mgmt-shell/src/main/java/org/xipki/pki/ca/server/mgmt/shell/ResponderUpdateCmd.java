@@ -96,7 +96,7 @@ public class ResponderUpdateCmd extends CaCommandSupport {
             if (entry == null) {
                 throw new IllegalCmdParamException("please specify the signerType");
             }
-            tmpSignerType = entry.getType();
+            tmpSignerType = entry.type();
         }
 
         return ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf, passwordResolver,

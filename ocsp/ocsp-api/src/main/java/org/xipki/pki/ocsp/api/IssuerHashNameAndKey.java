@@ -56,7 +56,7 @@ public class IssuerHashNameAndKey {
             final byte[] issuerKeyHash) {
         this.algo = ParamUtil.requireNonNull("algo", algo);
 
-        int len = algo.getLength();
+        int len = algo.length();
         if (issuerNameHash == null || issuerNameHash.length != len) {
             throw new IllegalArgumentException("issuerNameHash is invalid");
         }
@@ -76,15 +76,15 @@ public class IssuerHashNameAndKey {
                 && Arrays.equals(this.issuerKeyHash, issuerKeyHash);
     }
 
-    public HashAlgoType getAlgo() {
+    public HashAlgoType algo() {
         return algo;
     }
 
-    public byte[] getIssuerNameHash() {
+    public byte[] issuerNameHash() {
         return Arrays.copyOf(issuerNameHash, issuerNameHash.length);
     }
 
-    public byte[] getIssuerKeyHash() {
+    public byte[] issuerKeyHash() {
         return Arrays.copyOf(issuerKeyHash, issuerKeyHash.length);
     }
 

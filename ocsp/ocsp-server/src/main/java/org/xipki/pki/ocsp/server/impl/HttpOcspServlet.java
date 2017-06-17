@@ -141,7 +141,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
         if (viaGet) {
             if (b64OcspReq == null) {
                 return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
-            } else if (!responder.getRequestOption().supportsHttpGet()) {
+            } else if (!responder.requestOption().supportsHttpGet()) {
                 return createErrorResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED);
             }
         }
@@ -154,7 +154,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
         AuditService auditService = (auditServiceRegister == null) ? null
                 : auditServiceRegister.getAuditService();
 
-        if (responder.getAuditOption() != null) {
+        if (responder.auditOption() != null) {
             event = new AuditEvent(new Date());
             event.setApplicationName(OcspAuditConstants.APPNAME);
             event.setName(OcspAuditConstants.NAME_PERF);
@@ -165,7 +165,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             if (viaGet) {
                 // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
                 // POST, we support GET for longer requests anyway.
-                if (b64OcspReq.length() > responder.getRequestOption().getMaxRequestSize()) {
+                if (b64OcspReq.length() > responder.requestOption().maxRequestSize()) {
                     auditStatus = AuditStatus.FAILED;
                     auditMessage = "request too large";
                     return createErrorResponse(version,
@@ -185,7 +185,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
 
                 int contentLen = request.content().readableBytes();
                 // request too long
-                if (contentLen > responder.getRequestOption().getMaxRequestSize()) {
+                if (contentLen > responder.requestOption().maxRequestSize()) {
                     auditStatus = AuditStatus.FAILED;
                     auditMessage = "request too large";
                     return createErrorResponse(version,
@@ -210,7 +210,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
 
             OcspRespWithCacheInfo ocspRespWithCacheInfo =
                     server.answer(responder, ocspReq, viaGet, event);
-            if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.getResponse() == null) {
+            if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
                 auditMessage = "processRequest returned null, this should not happen";
                 LOG.error(auditMessage);
                 auditLevel = AuditLevel.ERROR;
@@ -218,12 +218,12 @@ public class HttpOcspServlet extends AbstractHttpServlet {
                 return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
             }
 
-            OCSPResp resp = ocspRespWithCacheInfo.getResponse();
+            OCSPResp resp = ocspRespWithCacheInfo.response();
             byte[] encodedOcspResp = resp.getEncoded();
 
             FullHttpResponse response = createOKResponse(version, CT_RESPONSE, encodedOcspResp);
 
-            ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.getCacheInfo();
+            ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.cacheInfo();
             if (viaGet && cacheInfo != null) {
                 encodedOcspResp = resp.getEncoded();
                 long now = System.currentTimeMillis();
@@ -234,13 +234,13 @@ public class HttpOcspServlet extends AbstractHttpServlet {
                 headers.add("Date", now);
                 // RFC 5019 6.2: Last-Modified: date and time at which the OCSP responder
                 // last modified the response.
-                headers.add("Last-Modified", cacheInfo.getThisUpdate());
+                headers.add("Last-Modified", cacheInfo.thisUpdate());
                 // RFC 5019 6.2: Expires: This date and time will be the same as the
                 // nextUpdate time-stamp in the OCSP
                 // response itself.
                 // This is overridden by max-age on HTTP/1.1 compatible components
-                if (cacheInfo.getNextUpdate() != null) {
-                    headers.add("Expires", cacheInfo.getNextUpdate());
+                if (cacheInfo.nextUpdate() != null) {
+                    headers.add("Expires", cacheInfo.nextUpdate());
                 }
                 // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
                 // HEX representation of the SHA1 hash of the OCSPResponse structure.
@@ -252,15 +252,15 @@ public class HttpOcspServlet extends AbstractHttpServlet {
 
                 // Max age must be in seconds in the cache-control header
                 long maxAge;
-                if (responder.getResponseOption().getCacheMaxAge() != null) {
-                    maxAge = responder.getResponseOption().getCacheMaxAge().longValue();
+                if (responder.responseOption().cacheMaxAge() != null) {
+                    maxAge = responder.responseOption().cacheMaxAge().longValue();
                 } else {
                     maxAge = OcspServer.DFLT_CACHE_MAX_AGE;
                 }
 
-                if (cacheInfo.getNextUpdate() != null) {
+                if (cacheInfo.nextUpdate() != null) {
                     maxAge = Math.min(maxAge,
-                            (cacheInfo.getNextUpdate() - cacheInfo.getThisUpdate()) / 1000);
+                            (cacheInfo.nextUpdate() - cacheInfo.thisUpdate()) / 1000);
                 }
 
                 headers.add("Cache-Control",

@@ -53,11 +53,11 @@ public class ProtectionVerificationResult {
         this.protectionResult = ParamUtil.requireNonNull("protectionResult", protectionResult);
     }
 
-    public Object getRequestor() {
+    public Object requestor() {
         return requestor;
     }
 
-    public ProtectionResult getProtectionResult() {
+    public ProtectionResult protectionResult() {
         return protectionResult;
     }
 

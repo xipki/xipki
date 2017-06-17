@@ -81,13 +81,13 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
             final Asn1P11ObjectIdentifier objectId) {
         this.slotId = ParamUtil.requireNonNull("slotId", slotId);
         this.objectId = ParamUtil.requireNonNull("objectId", objectId);
-        this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
+        this.entityId = new P11EntityIdentifier(slotId.slotId(), objectId.objectId());
     }
 
     public Asn1P11EntityIdentifier(final P11EntityIdentifier entityId) {
         this.entityId = ParamUtil.requireNonNull("entityId", entityId);
-        this.slotId = new Asn1P11SlotIdentifier(entityId.getSlotId());
-        this.objectId = new Asn1P11ObjectIdentifier(entityId.getObjectId());
+        this.slotId = new Asn1P11SlotIdentifier(entityId.slotId());
+        this.objectId = new Asn1P11ObjectIdentifier(entityId.objectId());
     }
 
     private Asn1P11EntityIdentifier(final ASN1Sequence seq) throws BadAsn1ObjectException {
@@ -95,7 +95,7 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
         int idx = 0;
         this.slotId = Asn1P11SlotIdentifier.getInstance(seq.getObjectAt(idx++));
         this.objectId = Asn1P11ObjectIdentifier.getInstance(seq.getObjectAt(idx++));
-        this.entityId = new P11EntityIdentifier(slotId.getSlotId(), objectId.getObjectId());
+        this.entityId = new P11EntityIdentifier(slotId.slotId(), objectId.objectId());
     }
 
     public static Asn1P11EntityIdentifier getInstance(final Object obj)
@@ -126,15 +126,15 @@ public class Asn1P11EntityIdentifier extends ASN1Object {
         return new DERSequence(vector);
     }
 
-    public Asn1P11SlotIdentifier getSlotId() {
+    public Asn1P11SlotIdentifier slotId() {
         return slotId;
     }
 
-    public Asn1P11ObjectIdentifier getObjectId() {
+    public Asn1P11ObjectIdentifier objectId() {
         return objectId;
     }
 
-    public P11EntityIdentifier getEntityId() {
+    public P11EntityIdentifier entityId() {
         return entityId;
     }
 

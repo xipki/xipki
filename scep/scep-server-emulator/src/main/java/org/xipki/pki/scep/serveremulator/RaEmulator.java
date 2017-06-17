@@ -55,11 +55,11 @@ public class RaEmulator {
         this.raCert = ParamUtil.requireNonNull("raCert", raCert);
     }
 
-    public PrivateKey getRaKey() {
+    public PrivateKey raKey() {
         return raKey;
     }
 
-    public Certificate getRaCert() {
+    public Certificate raCert() {
         return raCert;
     }
 

@@ -76,7 +76,7 @@ public abstract class OcspStore {
     public OcspStore() {
     }
 
-    public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
+    public abstract Set<IssuerHashNameAndKey> issuerHashNameAndKeys();
 
     public abstract boolean canResolveIssuer(@NonNull HashAlgoType hashAlgo,
             @NonNull byte[] issuerNameHash, @NonNull byte[] issuerKeyHash);
@@ -104,7 +104,7 @@ public abstract class OcspStore {
         this.name = ParamUtil.requireNonBlank("name", name);
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
@@ -112,7 +112,7 @@ public abstract class OcspStore {
         this.auditServiceRegister = auditServiceRegister;
     }
 
-    public AuditService getAuditService() {
+    public AuditService auditService() {
         return auditServiceRegister.getAuditService();
     }
 
@@ -132,7 +132,7 @@ public abstract class OcspStore {
         this.includeArchiveCutoff = includeArchiveCutoff;
     }
 
-    public int getRetentionInterval() {
+    public int retentionInterval() {
         return retentionInterval;
     }
 

@@ -122,31 +122,31 @@ public class X509IssuerInfo {
         this.caNotAfter = this.cert.getNotAfter();
     } // constructor
 
-    public Set<String> getCaIssuerUrls() {
+    public Set<String> caIssuerUrls() {
         return caIssuerUrls;
     }
 
-    public Set<String> getOcspUrls() {
+    public Set<String> ocspUrls() {
         return ocspUrls;
     }
 
-    public Set<String> getCrlUrls() {
+    public Set<String> crlUrls() {
         return crlUrls;
     }
 
-    public Set<String> getDeltaCrlUrls() {
+    public Set<String> deltaCrlUrls() {
         return deltaCrlUrls;
     }
 
-    public X509Certificate getCert() {
+    public X509Certificate cert() {
         return cert;
     }
 
-    public byte[] getSubjectKeyIdentifier() {
+    public byte[] subjectKeyIdentifier() {
         return Arrays.copyOf(ski, ski.length);
     }
 
-    public Certificate getBcCert() {
+    public Certificate bcCert() {
         return bcCert;
     }
 
@@ -154,11 +154,11 @@ public class X509IssuerInfo {
         return cutoffNotAfter;
     }
 
-    public Date getCaNotBefore() {
+    public Date caNotBefore() {
         return caNotBefore;
     }
 
-    public Date getCaNotAfter() {
+    public Date caNotAfter() {
         return caNotAfter;
     }
 

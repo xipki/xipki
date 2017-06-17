@@ -78,7 +78,7 @@ public class DbiXmlWriter {
         writeNewline();
     }
 
-    public String getRootElementName() {
+    public String rootElementName() {
         return rootElementName;
     }
 

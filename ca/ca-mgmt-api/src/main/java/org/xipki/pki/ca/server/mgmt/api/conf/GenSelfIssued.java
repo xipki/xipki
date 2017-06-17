@@ -61,19 +61,19 @@ public class GenSelfIssued {
         this.serialNumber = serialNumber;
     }
 
-    public String getProfile() {
+    public String profile() {
         return profile;
     }
 
-    public byte[] getCsr() {
+    public byte[] csr() {
         return csr;
     }
 
-    public String getCertFilename() {
+    public String certFilename() {
         return certFilename;
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
         return serialNumber;
     }
 }

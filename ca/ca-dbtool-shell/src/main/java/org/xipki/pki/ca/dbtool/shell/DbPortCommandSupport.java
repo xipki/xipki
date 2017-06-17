@@ -80,7 +80,7 @@ public abstract class DbPortCommandSupport extends XipkiCommandSupport {
             }
         }
 
-        Exception ex = myRun.getException();
+        Exception ex = myRun.exception();
         if (ex != null) {
             String errMsg = ex.getMessage();
             if (StringUtil.isBlank(errMsg)) {

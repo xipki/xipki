@@ -59,31 +59,31 @@ public class QaGeneralSubtree {
         }
     }
 
-    public String getRfc822Name() {
+    public String rfc822Name() {
         return jaxb.getRfc822Name();
     }
 
-    public String getDnsName() {
+    public String dnsName() {
         return jaxb.getDnsName();
     }
 
-    public String getDirectoryName() {
+    public String directoryName() {
         return jaxb.getDirectoryName();
     }
 
-    public String getUri() {
+    public String uri() {
         return jaxb.getUri();
     }
 
-    public String getIpAddress() {
+    public String ipAddress() {
         return jaxb.getIpAddress();
     }
 
-    public Integer getMinimum() {
+    public Integer minimum() {
         return jaxb.getMinimum();
     }
 
-    public Integer getMaximum() {
+    public Integer maximum() {
         return jaxb.getMaximum();
     }
 

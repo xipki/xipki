@@ -104,16 +104,16 @@ public class CmpUtf8PairsTest {
 
     private static void check(final CmpUtf8Pairs confPairs, final String expEncoded,
             final Map<String, String> expNameValues) {
-        String isEncoded = confPairs.getEncoded();
+        String isEncoded = confPairs.encoded();
         Assert.assertEquals("encoded", expEncoded, isEncoded);
 
-        Set<String> isNames = confPairs.getNames();
+        Set<String> isNames = confPairs.names();
         Assert.assertEquals("names", expNameValues.size(), isNames.size());
 
         for (String m : isNames) {
             String expValue = expNameValues.get(m);
             Assert.assertNotNull("name " + m + " is not expected", expValue);
-            Assert.assertEquals("value of name " + m, expValue, confPairs.getValue(m));
+            Assert.assertEquals("value of name " + m, expValue, confPairs.value(m));
         }
     }
 

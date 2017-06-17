@@ -136,7 +136,7 @@ class ResponderSigner {
         return macSigner;
     }
 
-    public ConcurrentContentSigner getFirstSigner() {
+    public ConcurrentContentSigner firstSigner() {
         return signers.get(0);
     }
 
@@ -162,19 +162,19 @@ class ResponderSigner {
         return byName ? responderIdByName :  responderIdByKey;
     }
 
-    public X509Certificate getCertificate() {
+    public X509Certificate certificate() {
         return certificate;
     }
 
-    public X509Certificate[] getCertificateChain() {
+    public X509Certificate[] certificateChain() {
         return certificateChain;
     }
 
-    public X509CertificateHolder getBcCertificate() {
+    public X509CertificateHolder bcCertificate() {
         return bcCertificate;
     }
 
-    public X509CertificateHolder[] getBcCertificateChain() {
+    public X509CertificateHolder[] bcCertificateChain() {
         return bcCertificateChain;
     }
 

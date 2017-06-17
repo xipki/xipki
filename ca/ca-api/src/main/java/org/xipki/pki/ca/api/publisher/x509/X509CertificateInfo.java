@@ -95,8 +95,8 @@ public class X509CertificateInfo {
         this.issuer = ParamUtil.requireNonNull("issuer", issuer);
         this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
         this.requestor = ParamUtil.requireNonNull("requestor", requestor);
-        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(cert.getCert().getSigAlgOID());
-        byte[] params = cert.getCert().getSigAlgParams();
+        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(cert.cert().getSigAlgOID());
+        byte[] params = cert.cert().getSigAlgParams();
 
         try {
             AlgorithmIdentifier algId;
@@ -112,27 +112,27 @@ public class X509CertificateInfo {
         }
     }
 
-    public byte[] getSubjectPublicKey() {
+    public byte[] subjectPublicKey() {
         return subjectPublicKey;
     }
 
-    public X509CertWithDbId getCert() {
+    public X509CertWithDbId cert() {
         return cert;
     }
 
-    public NameId getIssuer() {
+    public NameId issuer() {
         return issuer;
     }
 
-    public X509Cert getIssuerCert() {
+    public X509Cert issuerCert() {
         return issuerCert;
     }
 
-    public NameId getProfile() {
+    public NameId profile() {
         return profile;
     }
 
-    public String getWarningMessage() {
+    public String warningMessage() {
         return warningMessage;
     }
 
@@ -140,11 +140,11 @@ public class X509CertificateInfo {
         this.warningMessage = warningMessage;
     }
 
-    public NameId getRequestor() {
+    public NameId requestor() {
         return requestor;
     }
 
-    public Integer getUser() {
+    public Integer user() {
         return user;
     }
 
@@ -156,7 +156,7 @@ public class X509CertificateInfo {
         return revocationInfo != null;
     }
 
-    public CertRevocationInfo getRevocationInfo() {
+    public CertRevocationInfo revocationInfo() {
         return revocationInfo;
     }
 
@@ -172,11 +172,11 @@ public class X509CertificateInfo {
         this.alreadyIssued = alreadyIssued;
     }
 
-    public RequestType getReqType() {
+    public RequestType reqType() {
         return reqType;
     }
 
-    public byte[] getTransactionId() {
+    public byte[] transactionId() {
         return transactionId;
     }
 
@@ -188,7 +188,7 @@ public class X509CertificateInfo {
         this.transactionId = transactionId;
     }
 
-    public X500Name getRequestedSubject() {
+    public X500Name requestedSubject() {
         return requestedSubject;
     }
 
@@ -196,7 +196,7 @@ public class X509CertificateInfo {
         this.requestedSubject = requestedSubject;
     }
 
-    public HashAlgoType getHashAlgo() {
+    public HashAlgoType hashAlgo() {
         return hashAlgo;
     }
 

@@ -61,12 +61,12 @@ public class QaPolicyMappingsOption extends QaExtension {
         }
     }
 
-    public String getSubjectDomainPolicy(final String issuerDomainPolicy) {
+    public String subjectDomainPolicy(final String issuerDomainPolicy) {
         ParamUtil.requireNonNull("issuerDomainPolicy", issuerDomainPolicy);
         return policyMappings.get(issuerDomainPolicy);
     }
 
-    public Set<String> getIssuerDomainPolicies() {
+    public Set<String> issuerDomainPolicies() {
         return policyMappings.keySet();
     }
 

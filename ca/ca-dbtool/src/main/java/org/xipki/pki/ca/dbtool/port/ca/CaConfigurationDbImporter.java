@@ -181,14 +181,14 @@ class CaConfigurationDbImporter extends DbPorter {
             ps = prepareStatement(sql);
 
             for (ResponderType responder : responders.getResponder()) {
-                byte[] certBytes = getBinary(responder.getCert());
+                byte[] certBytes = binary(responder.getCert());
                 String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
                 try {
                     int idx = 1;
                     ps.setString(idx++, responder.getName());
                     ps.setString(idx++, responder.getType());
                     ps.setString(idx++, b64Cert);
-                    ps.setString(idx++, getValue(responder.getConf()));
+                    ps.setString(idx++, value(responder.getConf()));
 
                     ps.executeUpdate();
                 } catch (SQLException ex) {
@@ -238,7 +238,7 @@ class CaConfigurationDbImporter extends DbPorter {
             ps = prepareStatement(sql);
 
             for (CrlsignerType crlsigner : crlsigners.getCrlsigner()) {
-                byte[] certBytes = getBinary(crlsigner.getSignerCert());
+                byte[] certBytes = binary(crlsigner.getSignerCert());
                 String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
                 try {
                     int idx = 1;
@@ -246,7 +246,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, crlsigner.getSignerType());
                     ps.setString(idx++, b64Cert);
                     ps.setString(idx++, crlsigner.getCrlControl());
-                    ps.setString(idx++, getValue(crlsigner.getSignerConf()));
+                    ps.setString(idx++, value(crlsigner.getSignerConf()));
                     ps.executeUpdate();
                 } catch (SQLException ex) {
                     System.err.println("could not import CRLSIGNER with NAME="
@@ -269,7 +269,7 @@ class CaConfigurationDbImporter extends DbPorter {
             ps = prepareStatement(sql);
 
             for (RequestorType requestor : requestors.getRequestor()) {
-                byte[] certBytes = getBinary(requestor.getCert());
+                byte[] certBytes = binary(requestor.getCert());
                 String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
                 try {
                     int idx = 1;
@@ -303,7 +303,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setInt(idx++, publisher.getId());
                     ps.setString(idx++, publisher.getName());
                     ps.setString(idx++, publisher.getType());
-                    ps.setString(idx++, getValue(publisher.getConf()));
+                    ps.setString(idx++, value(publisher.getConf()));
 
                     ps.executeUpdate();
                 } catch (SQLException ex) {
@@ -333,7 +333,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setInt(idx++, art);
                     ps.setString(idx++, certprofile.getType());
 
-                    String conf = getValue(certprofile.getConf());
+                    String conf = value(certprofile.getConf());
                     ps.setString(idx++, conf);
 
                     ps.executeUpdate();
@@ -374,7 +374,7 @@ class CaConfigurationDbImporter extends DbPorter {
                 int art = (ca.getArt() == null) ? 1 : ca.getArt();
 
                 try {
-                    byte[] certBytes = getBinary(ca.getCert());
+                    byte[] certBytes = binary(ca.getCert());
                     X509Certificate cert = X509Util.parseCert(certBytes);
 
                     int idx = 1;
@@ -411,7 +411,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     setLong(ps, idx++, ca.getRevInvTime());
                     ps.setString(idx++, ca.getValidityMode());
                     ps.setString(idx++, ca.getExtraControl());
-                    ps.setString(idx++, getValue(ca.getSignerConf()));
+                    ps.setString(idx++, value(ca.getSignerConf()));
 
                     ps.executeUpdate();
                 } catch (SQLException ex) {
@@ -535,7 +535,7 @@ class CaConfigurationDbImporter extends DbPorter {
         PreparedStatement ps = prepareStatement(sql);
         try {
             for (ScepType entry : sceps.getScep()) {
-                byte[] certBytes = getBinary(entry.getResponderCert());
+                byte[] certBytes = binary(entry.getResponderCert());
                 String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
                 try {
                     int idx = 1;
@@ -546,7 +546,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, entry.getResponderType());
                     ps.setString(idx++, b64Cert);
                     ps.setString(idx++, entry.getControl());
-                    ps.setString(idx++, getValue(entry.getResponderConf()));
+                    ps.setString(idx++, value(entry.getResponderConf()));
                     ps.executeUpdate();
                 } catch (SQLException ex) {
                     System.err.println("could not import SCEP with ID=" + entry.getCaId());

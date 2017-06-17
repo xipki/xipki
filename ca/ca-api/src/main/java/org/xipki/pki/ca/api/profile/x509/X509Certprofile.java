@@ -71,15 +71,15 @@ public abstract class X509Certprofile {
     public void shutdown() {
     }
 
-    public X509CertVersion getVersion() {
+    public X509CertVersion version() {
         return X509CertVersion.v3;
     }
 
-    public List<String> getSignatureAlgorithms() {
+    public List<String> signatureAlgorithms() {
         return null;
     }
 
-    public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior() {
+    public SpecialX509CertprofileBehavior specialCertprofileBehavior() {
         return null;
     }
 
@@ -91,7 +91,7 @@ public abstract class X509Certprofile {
         return false;
     }
 
-    public AuthorityInfoAccessControl getAiaControl() {
+    public AuthorityInfoAccessControl aiaControl() {
         return null;
     }
 
@@ -124,7 +124,7 @@ public abstract class X509Certprofile {
         return true;
     }
 
-    public String getParameter(@NonNull final String paramName) {
+    public String parameter(@NonNull final String paramName) {
         return null;
     }
 
@@ -132,36 +132,36 @@ public abstract class X509Certprofile {
         return false;
     }
 
-    public TimeZone getTimezone() {
+    public TimeZone timezone() {
         return timeZone;
     }
 
-    public Set<ExtKeyUsageControl> getExtendedKeyUsages() {
+    public Set<ExtKeyUsageControl> extendedKeyUsages() {
         return null;
     }
 
     /**
      * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod.
      */
-    public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes() {
+    public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> subjectInfoAccessModes() {
         return null;
     }
 
-    public abstract Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls();
+    public abstract Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls();
 
     public abstract void initialize(@Nullable String data) throws CertprofileException;
 
-    public abstract X509CertLevel getCertLevel();
+    public abstract X509CertLevel certLevel();
 
-    public abstract Set<KeyUsageControl> getKeyUsage();
+    public abstract Set<KeyUsageControl> keyUsage();
 
-    public abstract Integer getPathLenBasicConstraint();
+    public abstract Integer pathLenBasicConstraint();
 
     public abstract void setEnvParameterResolver(@Nullable EnvParameterResolver parameterResolver);
 
     public abstract Date getNotBefore(@Nullable Date notBefore);
 
-    public abstract CertValidity getValidity();
+    public abstract CertValidity validity();
 
     public abstract SubjectPublicKeyInfo checkPublicKey(@NonNull SubjectPublicKeyInfo publicKey)
             throws BadCertTemplateException;
@@ -181,7 +181,7 @@ public abstract class X509Certprofile {
     /**
      * @return maximal size of the certificate, 0 or negative value indicates accepting all sizes.
      */
-    public int getMaxCertSize() {
+    public int maxCertSize() {
         return 0;
     }
 

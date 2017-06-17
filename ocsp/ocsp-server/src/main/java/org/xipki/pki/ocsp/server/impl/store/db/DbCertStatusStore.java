@@ -93,16 +93,16 @@ public class DbCertStatusStore extends OcspStore {
         }
 
         public boolean match(final IssuerEntry issuer) {
-            if (id != issuer.getId()) {
+            if (id != issuer.id()) {
                 return false;
             }
 
             if (revocationTimeMs == null) {
-                return issuer.getRevocationInfo() == null;
+                return issuer.revocationInfo() == null;
             }
 
-            return (issuer.getRevocationInfo() == null) ? false
-                    : revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
+            return (issuer.revocationInfo() == null) ? false
+                    : revocationTimeMs == issuer.revocationInfo().revocationTime().getTime();
         }
 
     } // class SimpleIssuerEntry
@@ -171,7 +171,7 @@ public class DbCertStatusStore extends OcspStore {
 
                     // no change in the issuerStore
                     Set<Integer> newIds = newIssuers.keySet();
-                    Set<Integer> ids = (issuerStore != null) ? issuerStore.getIds()
+                    Set<Integer> ids = (issuerStore != null) ? issuerStore.ids()
                             : Collections.emptySet();
 
                     boolean issuersUnchanged = (ids.size() == newIds.size())
@@ -223,8 +223,8 @@ public class DbCertStatusStore extends OcspStore {
                             = caInfoEntry.getIssuerHashNameAndKey(HashAlgoType.SHA1);
                     for (IssuerEntry existingIssuer : caInfos) {
                         if (existingIssuer.matchHash(HashAlgoType.SHA1,
-                                sha1IssuerHash.getIssuerNameHash(),
-                                sha1IssuerHash.getIssuerKeyHash())) {
+                                sha1IssuerHash.issuerNameHash(),
+                                sha1IssuerHash.issuerKeyHash())) {
                             throw new Exception(
                                 "found at least two issuers with the same subject and key");
                         }
@@ -300,17 +300,17 @@ public class DbCertStatusStore extends OcspStore {
                 return CertStatusInfo.getIssuerUnknownCertStatusInfo(new Date(), null);
             }
 
-            CrlInfo crlInfo = issuer.getCrlInfo();
+            CrlInfo crlInfo = issuer.crlInfo();
 
             Date thisUpdate;
             Date nextUpdate = null;
 
             if (crlInfo != null && crlInfo.isUseCrlUpdates()) {
-                thisUpdate = crlInfo.getThisUpdate();
+                thisUpdate = crlInfo.thisUpdate();
 
                 // this.nextUpdate is still in the future (10 seconds buffer)
-                if (crlInfo.getNextUpdate().getTime() > System.currentTimeMillis() + 10 * 1000) {
-                    nextUpdate = crlInfo.getNextUpdate();
+                if (crlInfo.nextUpdate().getTime() > System.currentTimeMillis() + 10 * 1000) {
+                    nextUpdate = crlInfo.nextUpdate();
                 }
             } else {
                 thisUpdate = new Date();
@@ -332,7 +332,7 @@ public class DbCertStatusStore extends OcspStore {
 
             try {
                 int idx = 1;
-                ps.setInt(idx++, issuer.getId());
+                ps.setInt(idx++, issuer.id());
                 ps.setString(idx++, serialNumber.toString(16));
 
                 rs = ps.executeQuery();
@@ -414,7 +414,7 @@ public class DbCertStatusStore extends OcspStore {
             }
 
             if (includeCrlId && crlInfo != null) {
-                certStatusInfo.setCrlId(crlInfo.getCrlId());
+                certStatusInfo.setCrlId(crlInfo.crlId());
             }
 
             if (includeArchiveCutoff) {
@@ -422,10 +422,10 @@ public class DbCertStatusStore extends OcspStore {
                     Date date;
                     // expired certificate remains in status store for ever
                     if (retentionInterval < 0) {
-                        date = issuer.getNotBefore();
+                        date = issuer.notBefore();
                     } else {
                         long nowInMs = System.currentTimeMillis();
-                        long dateInMs = Math.max(issuer.getNotBefore().getTime(),
+                        long dateInMs = Math.max(issuer.notBefore().getTime(),
                                 nowInMs - DAY * retentionInterval);
                         date = new Date(dateInMs);
                     }
@@ -513,12 +513,12 @@ public class DbCertStatusStore extends OcspStore {
             Set<X509Certificate> includeIssuers = null;
             Set<X509Certificate> excludeIssuers = null;
 
-            if (CollectionUtil.isNonEmpty(storeConf.getCaCertsIncludes())) {
-                includeIssuers = parseCerts(storeConf.getCaCertsIncludes());
+            if (CollectionUtil.isNonEmpty(storeConf.caCertsIncludes())) {
+                includeIssuers = parseCerts(storeConf.caCertsIncludes());
             }
 
-            if (CollectionUtil.isNonEmpty(storeConf.getCaCertsExcludes())) {
-                excludeIssuers = parseCerts(storeConf.getCaCertsExcludes());
+            if (CollectionUtil.isNonEmpty(storeConf.caCertsExcludes())) {
+                excludeIssuers = parseCerts(storeConf.caCertsExcludes());
             }
 
             this.issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
@@ -572,19 +572,19 @@ public class DbCertStatusStore extends OcspStore {
     public X509Certificate getIssuerCert(HashAlgoType hashAlgo, byte[] issuerNameHash,
             byte[] issuerKeyHash) {
         IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
-        return (issuer == null) ? null : issuer.getCert();
+        return (issuer == null) ? null : issuer.cert();
     }
 
     @Override
-    public Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
-        return issuerStore.getIssuerHashNameAndKeys();
+    public Set<IssuerHashNameAndKey> issuerHashNameAndKeys() {
+        return issuerStore.issuerHashNameAndKeys();
     }
 
     @Override
     public CertRevocationInfo getCaRevocationInfo(final HashAlgoType hashAlgo,
             final byte[] issuerNameHash, final byte[] issuerKeyHash) {
         IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
-        return (issuer == null) ? null : issuer.getRevocationInfo();
+        return (issuer == null) ? null : issuer.revocationInfo();
     }
 
     protected boolean isInitialized() {

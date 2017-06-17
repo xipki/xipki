@@ -52,11 +52,11 @@ public class SerialWithId {
         this.serial = serial;
     }
 
-    public BigInteger getSerial() {
+    public BigInteger serial() {
         return serial;
     }
 
-    public long getId() {
+    public long id() {
         return id;
     }
 

@@ -154,15 +154,15 @@ public class P11RSAPkcsPssParams implements P11Params {
         }
     }
 
-    public long getHashAlgorithm() {
+    public long hashAlgorithm() {
         return hashAlgorithm;
     }
 
-    public long getMaskGenerationFunction() {
+    public long maskGenerationFunction() {
         return maskGenerationFunction;
     }
 
-    public long getSaltLength() {
+    public long saltLength() {
         return saltLength;
     }
 

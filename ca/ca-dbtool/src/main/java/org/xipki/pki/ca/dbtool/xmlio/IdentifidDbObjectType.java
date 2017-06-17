@@ -47,7 +47,7 @@ public abstract class IdentifidDbObjectType extends DbDataObject {
 
     private Long id;
 
-    public Long getId() {
+    public Long id() {
         return id;
     }
 

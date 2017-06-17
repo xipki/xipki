@@ -46,9 +46,9 @@ import org.eclipse.jdt.annotation.NonNull;
 
 public abstract class AuditService {
 
-    public abstract void doLogEvent(@NonNull AuditEvent event);
+    public abstract void logEvent0(@NonNull AuditEvent event);
 
-    public abstract void doLogEvent(@NonNull PciAuditEvent event);
+    public abstract void logEvent0(@NonNull PciAuditEvent event);
 
     public final void logEvent(@NonNull AuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
@@ -68,7 +68,7 @@ public abstract class AuditService {
         } // end switch
         */
 
-        doLogEvent(event);
+        logEvent0(event);
     }
 
     public final void logEvent(@NonNull PciAuditEvent event) {
@@ -91,45 +91,45 @@ public abstract class AuditService {
         } // end switch
         */
 
-        doLogEvent(event);
+        logEvent0(event);
     }
 
     protected static String createMessage(final AuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
-        String applicationName = event.getApplicationName();
+        String applicationName = event.applicationName();
         if (applicationName == null) {
             applicationName = "undefined";
         }
 
-        String name = event.getName();
+        String name = event.name();
         if (name == null) {
             name = "undefined";
         }
 
         StringBuilder sb = new StringBuilder(150);
 
-        sb.append(event.getLevel().getAlignedText()).append(" | ");
+        sb.append(event.level().alignedText()).append(" | ");
         sb.append(applicationName).append(" - ").append(name);
 
-        AuditStatus status = event.getStatus();
+        AuditStatus status = event.status();
         if (status == null) {
             status = AuditStatus.UNDEFINED;
         }
         sb.append(":\tstatus: ").append(status.name());
-        List<AuditEventData> eventDataArray = event.getEventDatas();
+        List<AuditEventData> eventDataArray = event.eventDatas();
 
-        long duration = event.getDuration();
+        long duration = event.duration();
         if (duration >= 0) {
             sb.append("\tduration: ").append(duration);
         }
 
         if ((eventDataArray != null) && (eventDataArray.size() > 0)) {
             for (AuditEventData m : eventDataArray) {
-                if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
+                if (duration >= 0 && "duration".equalsIgnoreCase(m.name())) {
                     continue;
                 }
 
-                sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
+                sb.append("\t").append(m.name()).append(": ").append(m.value());
             }
         }
 

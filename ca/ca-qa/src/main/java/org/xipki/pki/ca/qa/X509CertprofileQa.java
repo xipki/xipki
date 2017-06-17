@@ -125,9 +125,9 @@ public class X509CertprofileQa {
             certProfile = new XmlX509Certprofile();
             certProfile.initialize(conf);
 
-            this.publicKeyChecker = new PublicKeyChecker(certProfile.getKeyAlgorithms());
-            this.subjectChecker = new SubjectChecker(certProfile.getSpecialBehavior(),
-                    certProfile.getSubjectControl());
+            this.publicKeyChecker = new PublicKeyChecker(certProfile.keyAlgorithms());
+            this.subjectChecker = new SubjectChecker(certProfile.specialBehavior(),
+                    certProfile.subjectControl());
             this.extensionsChecker = new ExtensionsChecker(conf, certProfile);
         } catch (RuntimeException ex) {
             LogUtil.error(LOG, ex);
@@ -155,7 +155,7 @@ public class X509CertprofileQa {
         issue = new ValidationIssue("X509.SIZE", "certificate size");
         resultIssues.add(issue);
 
-        Integer maxSize = certProfile.getMaxSize();
+        Integer maxSize = certProfile.maxSize();
         if (maxSize != 0) {
             int size = certBytes.length;
             if (size > maxSize) {
@@ -181,10 +181,10 @@ public class X509CertprofileQa {
         resultIssues.add(issue);
         int versionNumber = tbsCert.getVersionNumber();
 
-        X509CertVersion expVersion = certProfile.getVersion();
-        if (versionNumber != expVersion.getVersionNumber()) {
+        X509CertVersion expVersion = certProfile.version();
+        if (versionNumber != expVersion.versionNumber()) {
             issue.setFailureMessage("is '" + versionNumber
-                    + "' but expected '" + expVersion.getVersionNumber() + "'");
+                    + "' but expected '" + expVersion.versionNumber() + "'");
         }
 
         // serialNumber
@@ -200,7 +200,7 @@ public class X509CertprofileQa {
         }
 
         // signatureAlgorithm
-        List<String> signatureAlgorithms = certProfile.getSignatureAlgorithms();
+        List<String> signatureAlgorithms = certProfile.signatureAlgorithms();
         if (CollectionUtil.isNonEmpty(signatureAlgorithms)) {
             issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
             resultIssues.add(issue);
@@ -265,18 +265,18 @@ public class X509CertprofileQa {
 
         if (cert.getNotAfter().before(cert.getNotBefore())) {
             issue.setFailureMessage("notAfter must not be before notBefore");
-        } else if (cert.getNotBefore().before(issuerInfo.getCaNotBefore())) {
+        } else if (cert.getNotBefore().before(issuerInfo.caNotBefore())) {
             issue.setFailureMessage("notBefore must not be before CA's notBefore");
         } else {
-            CertValidity validity = certProfile.getValidity();
+            CertValidity validity = certProfile.validity();
             Date expectedNotAfter = validity.add(cert.getNotBefore());
             if (expectedNotAfter.getTime() > MAX_CERT_TIME_MS) {
                 expectedNotAfter = new Date(MAX_CERT_TIME_MS);
             }
 
             if (issuerInfo.isCutoffNotAfter()
-                    && expectedNotAfter.after(issuerInfo.getCaNotAfter())) {
-                expectedNotAfter = issuerInfo.getCaNotAfter();
+                    && expectedNotAfter.after(issuerInfo.caNotAfter())) {
+                expectedNotAfter = issuerInfo.caNotAfter();
             }
 
             if (Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND) {
@@ -292,7 +292,7 @@ public class X509CertprofileQa {
         issue = new ValidationIssue("X509.SIG", "whether certificate is signed by CA");
         resultIssues.add(issue);
         try {
-            cert.verify(issuerInfo.getCert().getPublicKey(), "BC");
+            cert.verify(issuerInfo.cert().getPublicKey(), "BC");
         } catch (Exception ex) {
             issue.setFailureMessage("invalid signature");
         }
@@ -300,7 +300,7 @@ public class X509CertprofileQa {
         // issuer
         issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
         resultIssues.add(issue);
-        if (!cert.getIssuerX500Principal().equals(issuerInfo.getCert().getSubjectX500Principal())) {
+        if (!cert.getIssuerX500Principal().equals(issuerInfo.cert().getSubjectX500Principal())) {
             issue.setFailureMessage(
                     "issue in certificate does not equal the subject of CA certificate");
         }

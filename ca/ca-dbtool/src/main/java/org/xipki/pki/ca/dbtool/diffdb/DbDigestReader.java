@@ -112,7 +112,7 @@ abstract class DbDigestReader implements DigestReader {
 
     boolean init() {
         try {
-            retriever = getRetriever();
+            retriever = retriever();
             executor = Executors.newFixedThreadPool(1);
             executor.execute(retriever);
             return true;
@@ -123,20 +123,20 @@ abstract class DbDigestReader implements DigestReader {
         }
     }
 
-    protected abstract Retriever getRetriever() throws DataAccessException;
+    protected abstract Retriever retriever() throws DataAccessException;
 
     @Override
-    public X509Certificate getCaCert() {
+    public X509Certificate caCert() {
         return caCert;
     }
 
     @Override
-    public String getCaSubjectName() {
+    public String caSubjectName() {
         return caSubjectName;
     }
 
     @Override
-    public int getTotalAccount() {
+    public int totalAccount() {
         return totalAccount;
     }
 
@@ -164,16 +164,16 @@ abstract class DbDigestReader implements DigestReader {
         }
 
         certSet = (DigestDbEntrySet) next;
-        if (certSet.getException() != null) {
-            throw certSet.getException();
+        if (certSet.exception() != null) {
+            throw certSet.exception();
         }
 
         List<BigInteger> serialNumbers = new LinkedList<>();
         Map<BigInteger, DbDigestEntry> certsMap = new HashMap<>();
-        for (IdentifiedDbDigestEntry m : certSet.getEntries()) {
-            BigInteger sn = m.getContent().getSerialNumber();
+        for (IdentifiedDbDigestEntry m : certSet.entries()) {
+            BigInteger sn = m.content().serialNumber();
             serialNumbers.add(sn);
-            certsMap.put(sn, m.getContent());
+            certsMap.put(sn, m.content());
         }
 
         return new CertsBundle(certsMap, serialNumbers);

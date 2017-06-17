@@ -51,7 +51,7 @@ public class QaInhibitAnyPolicy extends QaExtension {
         this.skipCerts = jaxb.getSkipCerts();
     }
 
-    public int getSkipCerts() {
+    public int skipCerts() {
         return skipCerts;
     }
 

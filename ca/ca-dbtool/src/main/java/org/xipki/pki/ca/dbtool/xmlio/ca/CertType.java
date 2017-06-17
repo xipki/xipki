@@ -148,7 +148,7 @@ public class CertType extends IdentifidDbObjectType {
 
     private String rs;
 
-    public Integer getArt() {
+    public Integer art() {
         return art;
     }
 
@@ -156,7 +156,7 @@ public class CertType extends IdentifidDbObjectType {
         this.art = art;
     }
 
-    public Integer getCaId() {
+    public Integer caId() {
         return caId;
     }
 
@@ -164,7 +164,7 @@ public class CertType extends IdentifidDbObjectType {
         this.caId = caId;
     }
 
-    public String getSn() {
+    public String sn() {
         return sn;
     }
 
@@ -180,7 +180,7 @@ public class CertType extends IdentifidDbObjectType {
         this.ee = ee;
     }
 
-    public Integer getPid() {
+    public Integer pid() {
         return pid;
     }
 
@@ -188,7 +188,7 @@ public class CertType extends IdentifidDbObjectType {
         this.pid = pid;
     }
 
-    public Integer getRid() {
+    public Integer rid() {
         return rid;
     }
 
@@ -196,7 +196,7 @@ public class CertType extends IdentifidDbObjectType {
         this.rid = rid;
     }
 
-    public Long getUpdate() {
+    public Long update() {
         return update;
     }
 
@@ -204,7 +204,7 @@ public class CertType extends IdentifidDbObjectType {
         this.update = update;
     }
 
-    public Boolean getRev() {
+    public Boolean rev() {
         return rev;
     }
 
@@ -212,7 +212,7 @@ public class CertType extends IdentifidDbObjectType {
         this.rev = rev;
     }
 
-    public Integer getRr() {
+    public Integer rr() {
         return rr;
     }
 
@@ -220,7 +220,7 @@ public class CertType extends IdentifidDbObjectType {
         this.rr = rr;
     }
 
-    public Long getRt() {
+    public Long rt() {
         return rt;
     }
 
@@ -228,7 +228,7 @@ public class CertType extends IdentifidDbObjectType {
         this.rt = rt;
     }
 
-    public Long getRit() {
+    public Long rit() {
         return rit;
     }
 
@@ -236,7 +236,7 @@ public class CertType extends IdentifidDbObjectType {
         this.rit = rit;
     }
 
-    public String getTid() {
+    public String tid() {
         return tid;
     }
 
@@ -244,7 +244,7 @@ public class CertType extends IdentifidDbObjectType {
         this.tid = tid;
     }
 
-    public Integer getReqType() {
+    public Integer reqType() {
         return reqType;
     }
 
@@ -252,7 +252,7 @@ public class CertType extends IdentifidDbObjectType {
         this.reqType = reqType;
     }
 
-    public Long getFpRs() {
+    public Long fpRs() {
         return fpRs;
     }
 
@@ -260,7 +260,7 @@ public class CertType extends IdentifidDbObjectType {
         this.fpRs = fpRs;
     }
 
-    public String getRs() {
+    public String rs() {
         return rs;
     }
 
@@ -268,7 +268,7 @@ public class CertType extends IdentifidDbObjectType {
         this.rs = rs;
     }
 
-    public String getFile() {
+    public String file() {
         return file;
     }
 
@@ -296,7 +296,7 @@ public class CertType extends IdentifidDbObjectType {
         }
     }
 
-    public Integer getUid() {
+    public Integer uid() {
         return uid;
     }
 
@@ -312,7 +312,7 @@ public class CertType extends IdentifidDbObjectType {
         validate();
 
         writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_ID, getId());
+        writeIfNotNull(writer, TAG_ID, id());
         writeIfNotNull(writer, TAG_ART, art);
         writeIfNotNull(writer, TAG_CAID, caId);
         writeIfNotNull(writer, TAG_SN, sn);

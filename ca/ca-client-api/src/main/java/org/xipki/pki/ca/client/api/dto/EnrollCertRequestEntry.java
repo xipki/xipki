@@ -60,15 +60,15 @@ public class EnrollCertRequestEntry extends IdentifiedObject {
         this.popo = popo;
     }
 
-    public String getCertprofile() {
+    public String certprofile() {
         return certprofile;
     }
 
-    public CertRequest getCertReq() {
+    public CertRequest certReq() {
         return certReq;
     }
 
-    public ProofOfPossession getPopo() {
+    public ProofOfPossession popo() {
         return popo;
     }
 

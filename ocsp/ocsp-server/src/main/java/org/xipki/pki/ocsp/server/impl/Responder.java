@@ -74,31 +74,31 @@ class Responder {
         this.certprofileOption = certprofileOption;
     }
 
-    public ResponderOption getResponderOption() {
+    public ResponderOption responderOption() {
         return responderOption;
     }
 
-    public RequestOption getRequestOption() {
+    public RequestOption requestOption() {
         return requestOption;
     }
 
-    public ResponseOption getResponseOption() {
+    public ResponseOption responseOption() {
         return responseOption;
     }
 
-    public AuditOption getAuditOption() {
+    public AuditOption auditOption() {
         return auditOption;
     }
 
-    public CertprofileOption getCertprofileOption() {
+    public CertprofileOption certprofileOption() {
         return certprofileOption;
     }
 
-    public ResponderSigner getSigner() {
+    public ResponderSigner signer() {
         return signer;
     }
 
-    public List<OcspStore> getStores() {
+    public List<OcspStore> stores() {
         return stores;
     }
 

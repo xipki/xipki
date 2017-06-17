@@ -71,7 +71,7 @@ public abstract class CrlCommandSupport extends ClientCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        Set<String> caNames = caClient.getCaNames();
+        Set<String> caNames = caClient.caNames();
         if (isEmpty(caNames)) {
             throw new CmdFailure("no CA is configured");
         }

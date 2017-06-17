@@ -97,7 +97,7 @@ public class CaEntry {
 
     public static List<String[]> splitCaSignerConfs(final String conf) throws XiSecurityException {
         ConfPairs pairs = new ConfPairs(conf);
-        String str = pairs.getValue("algo");
+        String str = pairs.value("algo");
         List<String> list = StringUtil.split(str, ":");
         if (list == null) {
             throw new XiSecurityException("no algo is defined in CA signerConf");
@@ -118,11 +118,11 @@ public class CaEntry {
         return signerConfs;
     }
 
-    public NameId getIdent() {
+    public NameId ident() {
         return ident;
     }
 
-    public CertValidity getMaxValidity() {
+    public CertValidity maxValidity() {
         return maxValidity;
     }
 
@@ -130,7 +130,7 @@ public class CaEntry {
         this.maxValidity = maxValidity;
     }
 
-    public int getKeepExpiredCertInDays() {
+    public int keepExpiredCertInDays() {
         return keepExpiredCertInDays;
     }
 
@@ -138,11 +138,11 @@ public class CaEntry {
         this.keepExpiredCertInDays = days;
     }
 
-    public String getSignerConf() {
+    public String signerConf() {
         return signerConf;
     }
 
-    public CaStatus getStatus() {
+    public CaStatus status() {
         return status;
     }
 
@@ -150,7 +150,7 @@ public class CaEntry {
         this.status = status;
     }
 
-    public String getSignerType() {
+    public String signerType() {
         return signerType;
     }
 
@@ -158,11 +158,11 @@ public class CaEntry {
         this.cmpControlName = (cmpControlName == null) ? null : cmpControlName.toUpperCase();
     }
 
-    public String getCmpControlName() {
+    public String cmpControlName() {
         return cmpControlName;
     }
 
-    public String getResponderName() {
+    public String responderName() {
         return responderName;
     }
 
@@ -194,7 +194,7 @@ public class CaEntry {
         this.saveRequest = saveRequest;
     }
 
-    public ValidityMode getValidityMode() {
+    public ValidityMode validityMode() {
         return validityMode;
     }
 
@@ -202,7 +202,7 @@ public class CaEntry {
         this.validityMode = ParamUtil.requireNonNull("mode", mode);
     }
 
-    public int getPermission() {
+    public int permission() {
         return permission;
     }
 
@@ -210,11 +210,11 @@ public class CaEntry {
         this.permission = permission;
     }
 
-    public int getExpirationPeriod() {
+    public int expirationPeriod() {
         return expirationPeriod;
     }
 
-    public String getExtraControl() {
+    public String extraControl() {
         return extraControl;
     }
 
@@ -233,9 +233,9 @@ public class CaEntry {
 
     public String toString(final boolean verbose, final boolean ignoreSensitiveInfo) {
         StringBuilder sb = new StringBuilder(500);
-        sb.append("id: ").append(ident.getId()).append('\n');
-        sb.append("name: ").append(ident.getName()).append('\n');
-        sb.append("status: ").append((status == null) ? "null" : status.getStatus()).append('\n');
+        sb.append("id: ").append(ident.id()).append('\n');
+        sb.append("name: ").append(ident.name()).append('\n');
+        sb.append("status: ").append((status == null) ? "null" : status.status()).append('\n');
         sb.append("maxValidity: ").append(maxValidity).append("\n");
         sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
         sb.append("signerType: ").append(signerType).append('\n');

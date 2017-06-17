@@ -54,11 +54,11 @@ public class IdentifiedDbDigestEntry {
         this.id = id;
     }
 
-    public long getId() {
+    public long id() {
         return id;
     }
 
-    public DbDigestEntry getContent() {
+    public DbDigestEntry content() {
         return content;
     }
 
@@ -66,7 +66,7 @@ public class IdentifiedDbDigestEntry {
         this.caId = caId;
     }
 
-    public Integer getCaId() {
+    public Integer caId() {
         return caId;
     }
 

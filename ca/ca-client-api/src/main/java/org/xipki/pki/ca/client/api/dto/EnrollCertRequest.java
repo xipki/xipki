@@ -64,20 +64,20 @@ public class EnrollCertRequest {
         this.type = ParamUtil.requireNonNull("type", type);
     }
 
-    public Type getType() {
+    public Type type() {
         return type;
     }
 
     public boolean addRequestEntry(final EnrollCertRequestEntry requestEntry) {
         ParamUtil.requireNonNull("requestEntry", requestEntry);
-        String id = requestEntry.getId();
-        ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
+        String id = requestEntry.id();
+        ASN1Integer certReqId = requestEntry.certReq().getCertReqId();
         for (EnrollCertRequestEntry re : requestEntries) {
-            if (re.getId().equals(id)) {
+            if (re.id().equals(id)) {
                 return false;
             }
 
-            if (re.getCertReq().getCertReqId().equals(certReqId)) {
+            if (re.certReq().getCertReqId().equals(certReqId)) {
                 return false;
             }
         }
@@ -86,7 +86,7 @@ public class EnrollCertRequest {
         return true;
     }
 
-    public List<EnrollCertRequestEntry> getRequestEntries() {
+    public List<EnrollCertRequestEntry> requestEntries() {
         return Collections.unmodifiableList(requestEntries);
     }
 

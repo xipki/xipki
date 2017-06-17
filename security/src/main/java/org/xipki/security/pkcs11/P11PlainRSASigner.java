@@ -70,12 +70,12 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher {
 
     @Override
     public int getInputBlockSize() {
-        return (param.getKeysize() + 7) / 8;
+        return (param.keysize() + 7) / 8;
     }
 
     @Override
     public int getOutputBlockSize() {
-        return (param.getKeysize() + 7) / 8;
+        return (param.keysize() + 7) / 8;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher {
         System.arraycopy(in, inOff, content, content.length - len, len);
 
         try {
-            P11Identity identity = param.getP11CryptService().getIdentity(param.getIdentityId());
+            P11Identity identity = param.p11CryptService().getIdentity(param.identityId());
             return identity.sign(PKCS11Constants.CKM_RSA_X_509, null, content);
         } catch (XiSecurityException | P11TokenException ex) {
             throw new InvalidCipherTextException(ex.getMessage(), ex);

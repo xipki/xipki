@@ -157,7 +157,7 @@ public class HttpCmpServlet extends AbstractHttpServlet {
                         AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            event.addEventData(CaAuditConstants.NAME_CA, responder.getCa().getCaIdent().getName());
+            event.addEventData(CaAuditConstants.NAME_CA, responder.getCa().caIdent().name());
 
             byte[] reqContent = readContent(request);
             PKIMessage pkiReq;
@@ -183,10 +183,10 @@ public class HttpCmpServlet extends AbstractHttpServlet {
             byte[] encodedPkiResp = pkiResp.getEncoded();
             return createOKResponse(version, CT_RESPONSE, encodedPkiResp);
         } catch (HttpRespAuditException ex) {
-            auditStatus = ex.getAuditStatus();
-            auditLevel = ex.getAuditLevel();
-            auditMessage = ex.getAuditMessage();
-            return createErrorResponse(version, ex.getHttpStatus());
+            auditStatus = ex.auditStatus();
+            auditLevel = ex.auditLevel();
+            auditMessage = ex.auditMessage();
+            return createErrorResponse(version, ex.httpStatus());
         } catch (Throwable th) {
             if (th instanceof EOFException) {
                 LogUtil.warn(LOG, th, "connection reset by peer");

@@ -84,15 +84,15 @@ public class BSpeedP11DSASignCmd extends BSpeedP11CommandSupport {
 
         P11Slot slot = getSlot();
 
-        if (control.getPlen() == 1024) {
+        if (control.plen() == 1024) {
             if (!"SHA1withDSA".equalsIgnoreCase(sigAlgo)) {
                 throw new IllegalCmdParamException(
                         "only SHA1withDSA is permitted for DSA with 1024 bit");
             }
         }
 
-        return new P11DSASignLoadTest(securityFactory, slot, sigAlgo, control.getPlen(),
-                control.getQlen());
+        return new P11DSASignLoadTest(securityFactory, slot, sigAlgo, control.plen(),
+                control.qlen());
     }
 
 }

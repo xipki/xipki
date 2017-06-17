@@ -109,15 +109,15 @@ public class Asn1SignTemplate extends ASN1Object {
         return new DERSequence(vector);
     }
 
-    public byte[] getMessage() {
+    public byte[] message() {
         return message;
     }
 
-    public Asn1P11EntityIdentifier getIdentityId() {
+    public Asn1P11EntityIdentifier identityId() {
         return identityId;
     }
 
-    public Asn1Mechanism getMechanism() {
+    public Asn1Mechanism mechanism() {
         return mechanism;
     }
 }

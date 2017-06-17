@@ -70,7 +70,7 @@ public class BSpeedP12ECKeyGenCmd extends BatchSpeedCommandSupport {
             return null;
         }
 
-        return new P12ECKeyGenLoadTest(control.getCurveName(), securityFactory);
+        return new P12ECKeyGenLoadTest(control.curveName(), securityFactory);
     }
 
 }

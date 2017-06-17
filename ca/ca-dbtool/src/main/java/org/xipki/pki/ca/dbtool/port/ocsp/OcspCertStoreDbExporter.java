@@ -206,14 +206,14 @@ class OcspCertStoreDbExporter extends DbPorter {
     } // method exportIssuer
 
     private Exception exportCert(final CertStoreType certstore, final File processLogFile) {
-        final File entriesDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
+        final File entriesDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
         entriesDir.mkdirs();
 
         FileOutputStream certsFileOs = null;
 
         try {
             certsFileOs = new FileOutputStream(
-                    new File(baseDir, OcspDbEntryType.CERT.getDirName() + ".mf"), true);
+                    new File(baseDir, OcspDbEntryType.CERT.dirName() + ".mf"), true);
             doExportCert(certstore, processLogFile, certsFileOs);
             return null;
         } catch (Exception ex) {
@@ -230,7 +230,7 @@ class OcspCertStoreDbExporter extends DbPorter {
 
     private void doExportCert(final CertStoreType certstore, final File processLogFile,
             final FileOutputStream certsFileOs) throws Exception {
-        File certsDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
+        File certsDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
         Long minId = null;
         if (processLogFile.exists()) {
             byte[] content = IoUtil.read(processLogFile);
@@ -241,19 +241,19 @@ class OcspCertStoreDbExporter extends DbPorter {
         }
 
         if (minId == null) {
-            minId = getMin("CERT", "ID");
+            minId = min("CERT", "ID");
         }
 
-        System.out.println(getExportingText() + "tables CERT, CHASH and CRAW from ID " + minId);
+        System.out.println(exportingText() + "tables CERT, CHASH and CRAW from ID " + minId);
 
         final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,PN,CERT "
                 + "FROM CERT INNER JOIN CRAW ON CERT.ID>=? AND CERT.ID=CRAW.CID";
         final String certSql = datasource.buildSelectFirstSql(numCertsPerSelect, "ID ASC", coreSql);
 
-        final long maxId = getMax("CERT", "ID");
+        final long maxId = max("CERT", "ID");
 
         int numProcessedBefore = certstore.getCountCerts();
-        final long total = getCount("CERT") - numProcessedBefore;
+        final long total = count("CERT") - numProcessedBefore;
         ProcessLog processLog = new ProcessLog(total);
 
         PreparedStatement certPs = prepareStatement(certSql);
@@ -424,7 +424,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         // all successful, delete the processLogFile
         processLogFile.delete();
 
-        System.out.println(getExportedText() + processLog.getNumProcessed()
+        System.out.println(exportedText() + processLog.numProcessed()
                 + " certificates from tables CERT, CHASH and CRAW");
     } // method doExportCert
 

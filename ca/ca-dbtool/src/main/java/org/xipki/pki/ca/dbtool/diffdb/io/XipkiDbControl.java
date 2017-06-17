@@ -86,27 +86,27 @@ public class XipkiDbControl {
         this.certCoreSql = sb.toString();
     } // constructor
 
-    public String getTblCa() {
+    public String tblCa() {
         return tblCa;
     }
 
-    public String getTblCerthash() {
+    public String tblCerthash() {
         return tblCerthash;
     }
 
-    public String getColCaId() {
+    public String colCaId() {
         return colCaId;
     }
 
-    public String getColCerthash() {
+    public String colCerthash() {
         return colCerthash;
     }
 
-    public String getCaSql() {
+    public String caSql() {
         return caSql;
     }
 
-    public String getCertSql(final DataSourceWrapper datasource, final int rows) {
+    public String certSql(final DataSourceWrapper datasource, final int rows) {
         return datasource.buildSelectFirstSql(rows, "ID ASC", certCoreSql);
     }
 

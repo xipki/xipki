@@ -213,15 +213,15 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
     private Exception exportEntries(final CaDbEntryType type, final CertStoreType certstore,
             final File processLogFile, final Long idProcessedInLastProcess) {
         String tablesText = (CaDbEntryType.CERT == type)
-                ? "tables CERT and CRAW" : "table " + type.getTableName();
+                ? "tables CERT and CRAW" : "table " + type.tableName();
 
-        File dir = new File(baseDir, type.getDirName());
+        File dir = new File(baseDir, type.dirName());
         dir.mkdirs();
 
         FileOutputStream entriesFileOs = null;
         try {
             entriesFileOs = new FileOutputStream(
-                    new File(baseDir, type.getDirName() + ".mf"), true);
+                    new File(baseDir, type.dirName() + ".mf"), true);
             doExportEntries(type, certstore, processLogFile, entriesFileOs,
                     idProcessedInLastProcess);
             return null;
@@ -244,11 +244,11 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             final File processLogFile, final FileOutputStream filenameListOs,
             final Long idProcessedInLastProcess) throws Exception {
         final int numEntriesPerSelect = Math.max(1,
-                Math.round(type.getSqlBatchFactor() * numCertsPerSelect));
+                Math.round(type.sqlBatchFactor() * numCertsPerSelect));
         final int numEntriesPerZip = Math.max(1,
-                Math.round(type.getSqlBatchFactor() * numCertsInBundle));
-        final File entriesDir = new File(baseDir, type.getDirName());
-        final String tableName = type.getTableName();
+                Math.round(type.sqlBatchFactor() * numCertsInBundle));
+        final File entriesDir = new File(baseDir, type.dirName());
+        final String tableName = type.tableName();
 
         int numProcessedBefore;
         String coreSql;
@@ -288,15 +288,15 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         if (idProcessedInLastProcess != null) {
             minId = idProcessedInLastProcess + 1;
         } else {
-            minId = getMin(tableName, "ID");
+            minId = min(tableName, "ID");
         }
 
         String tablesText = (CaDbEntryType.CERT == type)
-                ? "tables " + tableName + " and CRAW" : "table " + type.getTableName();
-        System.out.println(getExportingText() + tablesText + " from ID " + minId);
+                ? "tables " + tableName + " and CRAW" : "table " + type.tableName();
+        System.out.println(exportingText() + tablesText + " from ID " + minId);
 
-        final long maxId = getMax(tableName, "ID");
-        long total = getCount(tableName) - numProcessedBefore;
+        final long maxId = max(tableName, "ID");
+        long total = count(tableName) - numProcessedBefore;
         if (total < 1) {
             total = 1; // to avoid exception
         }
@@ -310,7 +310,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
         int sum = 0;
         File currentEntriesZipFile = new File(baseDir,
-                "tmp-" + type.getDirName() + "-" + System.currentTimeMillis() + ".zip");
+                "tmp-" + type.dirName() + "-" + System.currentTimeMillis() + ".zip");
         ZipOutputStream currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
 
         long minIdOfCurrentFile = -1;
@@ -548,7 +548,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                     sum++;
 
                     if (numEntriesInCurrentFile == numEntriesPerZip) {
-                        String currentEntriesFilename = buildFilename(type.getDirName() + "_",
+                        String currentEntriesFilename = buildFilename(type.dirName() + "_",
                                 ".zip", minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
                         finalizeZip(currentEntriesZip, "overview.xml", entriesInCurrentFile);
                         currentEntriesZipFile.renameTo(
@@ -566,7 +566,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         numEntriesInCurrentFile = 0;
                         minIdOfCurrentFile = -1;
                         maxIdOfCurrentFile = -1;
-                        currentEntriesZipFile = new File(baseDir, "tmp-" + type.getDirName() + "-"
+                        currentEntriesZipFile = new File(baseDir, "tmp-" + type.dirName() + "-"
                                 + System.currentTimeMillis() + ".zip");
                         currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
                     }
@@ -584,7 +584,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
             if (numEntriesInCurrentFile > 0) {
                 finalizeZip(currentEntriesZip, "overview.xml", entriesInCurrentFile);
 
-                String currentEntriesFilename = buildFilename(type.getDirName() + "_", ".zip",
+                String currentEntriesFilename = buildFilename(type.dirName() + "_", ".zip",
                         minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
                 currentEntriesZipFile.renameTo(new File(entriesDir, currentEntriesFilename));
 
@@ -609,7 +609,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         processLog.printTrailer();
         // all successful, delete the processLogFile
         processLogFile.delete();
-        System.out.println(getExportedText() + sum + " entries from " + tablesText);
+        System.out.println(exportedText() + sum + " entries from " + tablesText);
     } // method doExportEntries
 
     private void exportPublishQueue(final CertStoreType certstore)
@@ -619,8 +619,8 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         StringBuilder sqlBuilder = new StringBuilder("SELECT CID,PID,CA_ID");
         sqlBuilder.append(" FROM PUBLISHQUEUE WHERE CID>=? AND CID<? ORDER BY CID ASC");
         final String sql = sqlBuilder.toString();
-        final int minId = (int) getMin("PUBLISHQUEUE", "CID");
-        final int maxId = (int) getMax("PUBLISHQUEUE", "CID");
+        final int minId = (int) min("PUBLISHQUEUE", "CID");
+        final int maxId = (int) max("PUBLISHQUEUE", "CID");
 
         PublishQueue queue = new PublishQueue();
         certstore.setPublishQueue(queue);

@@ -233,12 +233,12 @@ public class OcspStatusCmd extends BaseOcspStatusCommandSupport {
 
                 if (revStatus.hasRevocationReason()) {
                     int reason = revStatus.getRevocationReason();
-                    if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.getCode()
+                    if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.code()
                             && revTime.getTime() == 0) {
                         status = "unknown (RFC6960)";
                     } else {
                         StringBuilder sb = new StringBuilder("revoked, reason = ");
-                        sb.append(CrlReason.forReasonCode(reason).getDescription());
+                        sb.append(CrlReason.forReasonCode(reason).description());
                         sb.append(", revocationTime = ").append(revTime);
                         if (invTime != null) {
                             sb.append(", invalidityTime = ").append(invTime);

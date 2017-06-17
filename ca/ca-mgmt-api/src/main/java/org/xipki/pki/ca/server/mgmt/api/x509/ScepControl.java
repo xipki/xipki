@@ -79,7 +79,7 @@ public class ScepControl {
         this.includeSignerCert = getBoolean(props, KEY_SIGNERCERT_INCLUDED, true);
     }
 
-    public String getConf() {
+    public String conf() {
         ConfPairs pairs = new ConfPairs();
         pairs.putPair(KEY_CACERT_INCLUDED, Boolean.toString(includeCaCert));
         pairs.putPair(KEY_SIGNERCERT_INCLUDED, Boolean.toString(includeSignerCert));
@@ -105,7 +105,7 @@ public class ScepControl {
 
     @Override
     public String toString() {
-        return getConf();
+        return conf();
     }
 
     @Override
@@ -130,7 +130,7 @@ public class ScepControl {
 
     private static boolean getBoolean(final ConfPairs props, final String propKey,
             final boolean dfltValue) throws InvalidConfException {
-        String str = props.getValue(propKey);
+        String str = props.value(propKey);
         if (str != null) {
             str = str.trim();
             if ("true".equalsIgnoreCase(str)) {

@@ -62,11 +62,11 @@ public class QaCertificatePolicies extends QaExtension {
                     : new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
         }
 
-        public String getPolicyId() {
+        public String policyId() {
             return policyId;
         }
 
-        public QaPolicyQualifiers getPolicyQualifiers() {
+        public QaPolicyQualifiers policyQualifiers() {
             return policyQualifiers;
         }
 
@@ -85,14 +85,14 @@ public class QaCertificatePolicies extends QaExtension {
         this.policyInformations = Collections.unmodifiableList(list);
     }
 
-    public List<QaCertificatePolicyInformation> getPolicyInformations() {
+    public List<QaCertificatePolicyInformation> policyInformations() {
         return policyInformations;
     }
 
-    public QaCertificatePolicyInformation getPolicyInformation(final String policyId) {
+    public QaCertificatePolicyInformation policyInformation(final String policyId) {
         ParamUtil.requireNonBlank("policyId", policyId);
         for (QaCertificatePolicyInformation entry : policyInformations) {
-            if (entry.getPolicyId().equals(policyId)) {
+            if (entry.policyId().equals(policyId)) {
                 return entry;
             }
         }

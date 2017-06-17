@@ -182,7 +182,7 @@ abstract class CmpResponder {
                 statusText = "missing time-stamp";
             }
         } else {
-            long messageTimeBias = cmpControl.getMessageTimeBias();
+            long messageTimeBias = cmpControl.messageTimeBias();
             if (messageTimeBias < 0) {
                 messageTimeBias *= -1;
             }
@@ -217,7 +217,7 @@ abstract class CmpResponder {
             try {
                 ProtectionVerificationResult verificationResult = verifyProtection(tidStr,
                         message, cmpControl);
-                ProtectionResult pr = verificationResult.getProtectionResult();
+                ProtectionResult pr = verificationResult.protectionResult();
                 switch (pr) {
                 case VALID:
                     errorStatus = null;
@@ -240,7 +240,7 @@ abstract class CmpResponder {
                     throw new RuntimeException(
                         "should not reach here, unknown ProtectionResult " + pr);
                 } // end switch
-                requestor = (CmpRequestorInfo) verificationResult.getRequestor();
+                requestor = (CmpRequestorInfo) verificationResult.requestor();
             } catch (Exception ex) {
                 LogUtil.error(LOG, ex, "tid=" + tidStr + ": could not verify the signature");
                 errorStatus = "request has invalid signature based protection";
@@ -251,7 +251,7 @@ abstract class CmpResponder {
 
             requestor = getRequestor(reqHeader);
             if (requestor != null) {
-                if (tlsClientCert.equals(requestor.getCert().getCert())) {
+                if (tlsClientCert.equals(requestor.cert().cert())) {
                     authorized = true;
                 }
             }
@@ -308,7 +308,7 @@ abstract class CmpResponder {
 
         PKIHeader header = protectedMsg.getHeader();
         AlgorithmIdentifier protectionAlg = header.getProtectionAlg();
-        if (!cmpControl.getSigAlgoValidator().isAlgorithmPermitted(protectionAlg)) {
+        if (!cmpControl.sigAlgoValidator().isAlgorithmPermitted(protectionAlg)) {
             LOG.warn("SIG_ALGO_FORBIDDEN: {}",
                     pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
             return new ProtectionVerificationResult(null, ProtectionResult.SIGALGO_FORBIDDEN);
@@ -321,7 +321,7 @@ abstract class CmpResponder {
         }
 
         ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(
-                requestor.getCert().getCert());
+                requestor.cert().cert());
         if (verifierProvider == null) {
             LOG.warn("tid={}: not authorized requestor '{}'", tid, header.getSender());
             return new ProtectionVerificationResult(requestor,

@@ -58,7 +58,7 @@ public class CaHasUserEntry {
         this.userIdent = ParamUtil.requireNonNull("userIdent", userIdent);
     }
 
-    public int getPermission() {
+    public int permission() {
         return permission;
     }
 
@@ -66,7 +66,7 @@ public class CaHasUserEntry {
         this.permission = permission;
     }
 
-    public NameId getUserIdent() {
+    public NameId userIdent() {
         return userIdent;
     }
 
@@ -74,7 +74,7 @@ public class CaHasUserEntry {
         this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toUpperCaseSet(profiles));
     }
 
-    public Set<String> getProfiles() {
+    public Set<String> profiles() {
         return profiles;
     }
 

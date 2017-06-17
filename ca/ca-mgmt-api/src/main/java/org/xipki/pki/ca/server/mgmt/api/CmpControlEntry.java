@@ -62,11 +62,11 @@ public class CmpControlEntry {
         this.faulty = faulty;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public String getConf() {
+    public String conf() {
         return conf;
     }
 

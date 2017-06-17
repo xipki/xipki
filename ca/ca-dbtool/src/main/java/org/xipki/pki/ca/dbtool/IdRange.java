@@ -55,11 +55,11 @@ public class IdRange {
         this.to = to;
     }
 
-    public long getFrom() {
+    public long from() {
         return from;
     }
 
-    public long getTo() {
+    public long to() {
         return to;
     }
 

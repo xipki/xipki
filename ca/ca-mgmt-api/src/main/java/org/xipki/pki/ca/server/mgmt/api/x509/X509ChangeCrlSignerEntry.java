@@ -58,11 +58,11 @@ public class X509ChangeCrlSignerEntry {
         this.name = ParamUtil.requireNonBlank("name", name).toUpperCase();
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public String getSignerType() {
+    public String signerType() {
         return signerType;
     }
 
@@ -70,7 +70,7 @@ public class X509ChangeCrlSignerEntry {
         this.signerType = signerType;
     }
 
-    public String getSignerConf() {
+    public String signerConf() {
         return signerConf;
     }
 
@@ -78,7 +78,7 @@ public class X509ChangeCrlSignerEntry {
         this.signerConf = signerConf;
     }
 
-    public String getBase64Cert() {
+    public String base64Cert() {
         return base64Cert;
     }
 
@@ -86,7 +86,7 @@ public class X509ChangeCrlSignerEntry {
         this.base64Cert = base64Cert;
     }
 
-    public String getCrlControl() {
+    public String crlControl() {
         return crlControl;
     }
 

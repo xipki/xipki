@@ -49,7 +49,7 @@ public class IdentifiedObject {
         this.id = ParamUtil.requireNonBlank("id", id);
     }
 
-    public String getId() {
+    public String id() {
         return id;
     }
 

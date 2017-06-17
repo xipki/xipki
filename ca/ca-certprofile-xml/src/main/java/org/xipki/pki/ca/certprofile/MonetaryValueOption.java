@@ -63,19 +63,19 @@ class MonetaryValueOption {
                 : Integer.toString(currency.getNumeric());
     }
 
-    public Iso4217CurrencyCode getCurrency() {
+    public Iso4217CurrencyCode currency() {
         return currency;
     }
 
-    public Range2Type getAmountRange() {
+    public Range2Type amountRange() {
         return amountRange;
     }
 
-    public Range2Type getExponentRange() {
+    public Range2Type exponentRange() {
         return exponentRange;
     }
 
-    public String getCurrencyString() {
+    public String currencyString() {
         return currencyString;
     }
 

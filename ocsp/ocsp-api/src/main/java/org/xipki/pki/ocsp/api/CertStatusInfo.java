@@ -74,35 +74,35 @@ public class CertStatusInfo {
         this.certprofile = certprofile;
     }
 
-    public Date getThisUpdate() {
+    public Date thisUpdate() {
         return thisUpdate;
     }
 
-    public Date getNextUpdate() {
+    public Date nextUpdate() {
         return nextUpdate;
     }
 
-    public CertStatus getCertStatus() {
+    public CertStatus certStatus() {
         return certStatus;
     }
 
-    public CertRevocationInfo getRevocationInfo() {
+    public CertRevocationInfo revocationInfo() {
         return revocationInfo;
     }
 
-    public HashAlgoType getCertHashAlgo() {
+    public HashAlgoType certHashAlgo() {
         return certHashAlgo;
     }
 
-    public byte[] getCertHash() {
+    public byte[] certHash() {
         return certHash;
     }
 
-    public String getCertprofile() {
+    public String certprofile() {
         return certprofile;
     }
 
-    public CrlID getCrlId() {
+    public CrlID crlId() {
         return crlId;
     }
 
@@ -110,7 +110,7 @@ public class CertStatusInfo {
         this.crlId = crlId;
     }
 
-    public Date getArchiveCutOff() {
+    public Date archiveCutOff() {
         return archiveCutOff;
     }
 

@@ -45,11 +45,11 @@ import org.xipki.pki.ca.dbtool.diffdb.io.CertsBundle;
 
 public interface DigestReader {
 
-    X509Certificate getCaCert();
+    X509Certificate caCert();
 
-    String getCaSubjectName();
+    String caSubjectName();
 
-    int getTotalAccount();
+    int totalAccount();
 
     CertsBundle nextCerts() throws Exception;
 

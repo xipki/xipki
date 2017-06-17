@@ -73,15 +73,15 @@ public class PkiStatusInfo {
         this.statusMessage = (text == null) ? null : text.getStringAt(0).getString();
     }
 
-    public int getStatus() {
+    public int status() {
         return status;
     }
 
-    public int getPkiFailureInfo() {
+    public int pkiFailureInfo() {
         return pkiFailureInfo;
     }
 
-    public String getStatusMessage() {
+    public String statusMessage() {
         return statusMessage;
     }
 

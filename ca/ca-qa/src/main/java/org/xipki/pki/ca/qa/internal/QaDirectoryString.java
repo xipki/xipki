@@ -53,11 +53,11 @@ public class QaDirectoryString {
         this.text = ParamUtil.requireNonBlank("text", text);
     }
 
-    public DirectoryStringType getType() {
+    public DirectoryStringType type() {
         return type;
     }
 
-    public String getText() {
+    public String text() {
         return text;
     }
 

@@ -138,9 +138,9 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
 
         X509Certificate cert = null;
         if (result != null) {
-            String id = result.getAllIds().iterator().next();
+            String id = result.allIds().iterator().next();
             CertOrError certOrError = result.getCertificateOrError(id);
-            cert = (X509Certificate) certOrError.getCertificate();
+            cert = (X509Certificate) certOrError.certificate();
         }
 
         if (cert != null) {

@@ -55,15 +55,15 @@ class SystemEvent {
         this.eventTime = eventTime;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public String getOwner() {
+    public String owner() {
         return owner;
     }
 
-    public long getEventTime() {
+    public long eventTime() {
         return eventTime;
     }
 

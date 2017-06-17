@@ -85,7 +85,7 @@ public class DbDigestEntry {
         this.revInvTime = revInvTime;
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
         return serialNumber;
     }
 
@@ -93,36 +93,36 @@ public class DbDigestEntry {
         return revoked;
     }
 
-    public int getRevReason() {
+    public int revReason() {
         return revReason;
     }
 
-    public Long getRevTime() {
+    public Long revTime() {
         return revTime;
     }
 
-    public Long getRevInvTime() {
+    public Long revInvTime() {
         return revInvTime;
     }
 
-    public String getBase64Sha1() {
+    public String base64Sha1() {
         return base64Sha1;
     }
 
     @Override
     public String toString() {
-        return getEncoded();
+        return encoded();
     }
 
-    public String getEncodedOmitSeriaNumber() {
-        return getEncoded(false);
+    public String encodedOmitSeriaNumber() {
+        return encoded(false);
     }
 
-    public String getEncoded() {
-        return getEncoded(true);
+    public String encoded() {
+        return encoded(true);
     }
 
-    private String getEncoded(final boolean withSerialNumber) {
+    private String encoded(final boolean withSerialNumber) {
         StringBuilder sb = new StringBuilder();
         if (withSerialNumber) {
             sb.append(serialNumber.toString(16)).append(";");

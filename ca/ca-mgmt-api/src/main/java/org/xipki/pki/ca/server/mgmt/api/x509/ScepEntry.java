@@ -106,7 +106,7 @@ public class ScepEntry {
         }
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
@@ -114,27 +114,27 @@ public class ScepEntry {
         return active;
     }
 
-    public X509Certificate getCertificate() {
+    public X509Certificate certificate() {
         return certificate;
     }
 
-    public String getBase64Cert() {
+    public String base64Cert() {
         return base64Cert;
     }
 
-    public Set<String> getCertProfiles() {
+    public Set<String> certProfiles() {
         return certProfiles;
     }
 
-    public String getControl() {
+    public String control() {
         return control;
     }
 
-    public String getResponderType() {
+    public String responderType() {
         return responderType;
     }
 
-    public String getResponderConf() {
+    public String responderConf() {
         return responderConf;
     }
 
@@ -146,7 +146,7 @@ public class ScepEntry {
         this.confFaulty = faulty;
     }
 
-    public NameId getCaIdent() {
+    public NameId caIdent() {
         return caIdent;
     }
 

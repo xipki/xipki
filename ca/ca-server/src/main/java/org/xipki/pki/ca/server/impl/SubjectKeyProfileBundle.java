@@ -60,19 +60,19 @@ public class SubjectKeyProfileBundle {
         this.revoked = revoked;
     }
 
-    public int getCertId() {
+    public int certId() {
         return certId;
     }
 
-    public long getSubjectFp() {
+    public long subjectFp() {
         return subjectFp;
     }
 
-    public long getKeyFp() {
+    public long keyFp() {
         return keyFp;
     }
 
-    public String getProfile() {
+    public String profile() {
         return profile;
     }
 

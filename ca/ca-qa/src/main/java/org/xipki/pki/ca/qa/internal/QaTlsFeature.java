@@ -58,7 +58,7 @@ public class QaTlsFeature extends QaExtension {
         }
     }
 
-    public Set<Integer> getFeatures() {
+    public Set<Integer> features() {
         return features;
     }
 

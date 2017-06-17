@@ -305,7 +305,7 @@ class IaikP11Slot extends AbstractP11Slot {
         java.security.PublicKey pubKey = null;
         X509Cert cert = refreshResult.getCertForId(id);
         if (cert != null) {
-            pubKey = cert.getCert().getPublicKey();
+            pubKey = cert.cert().getPublicKey();
         } else {
             PublicKey p11PublicKey = getPublicKeyObject(id, null);
             if (p11PublicKey == null) {
@@ -319,7 +319,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
         P11ObjectIdentifier objectId = new P11ObjectIdentifier(id, toString(privKey.getLabel()));
 
-        X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.getCert()};
+        X509Certificate[] certs = (cert == null) ? null : new X509Certificate[]{cert.cert()};
         IaikP11Identity identity = new IaikP11Identity(this,
                 new P11EntityIdentifier(slotId, objectId), privKey, pubKey, certs);
         refreshResult.addIdentity(identity);
@@ -329,7 +329,7 @@ class IaikP11Slot extends AbstractP11Slot {
             throws P11TokenException {
         ParamUtil.requireNonNull("identity", identity);
         assertMechanismSupported(mechanism);
-        Key signingKey = identity.getSigningKey();
+        Key signingKey = identity.signingKey();
         if (!(signingKey instanceof SecretKey)) {
             throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
         }
@@ -385,7 +385,7 @@ class IaikP11Slot extends AbstractP11Slot {
             return singleSign(mechanism, parameters, content, identity);
         }
 
-        Key signingKey = identity.getSigningKey();
+        Key signingKey = identity.signingKey();
         Mechanism mechanismObj = getMechanism(mechanism, parameters);
         if (LOG.isTraceEnabled()) {
             LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
@@ -405,7 +405,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 session.signUpdate(content, i, blockLen);
             }
 
-            int expectedSignatureLen = identity.getExpectedSignatureLen();
+            int expectedSignatureLen = identity.expectedSignatureLen();
             if (mechanism == PKCS11Constants.CKM_SHA_1_HMAC) {
                 expectedSignatureLen = 20;
             } else if (mechanism == PKCS11Constants.CKM_SHA224_HMAC
@@ -432,7 +432,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private byte[] singleSign(final long mechanism, final P11Params parameters,
             final byte[] content, final IaikP11Identity identity) throws P11TokenException {
-        Key signingKey = identity.getSigningKey();
+        Key signingKey = identity.signingKey();
         Mechanism mechanismObj = getMechanism(mechanism, parameters);
         if (LOG.isTraceEnabled()) {
             LOG.debug("sign with signing key:\n{}", signingKey);
@@ -471,8 +471,8 @@ class IaikP11Slot extends AbstractP11Slot {
         if (parameters instanceof P11RSAPkcsPssParams) {
             P11RSAPkcsPssParams param = (P11RSAPkcsPssParams) parameters;
             RSAPkcsPssParameters paramObj = new RSAPkcsPssParameters(
-                    Mechanism.get(param.getHashAlgorithm()), param.getMaskGenerationFunction(),
-                    param.getSaltLength());
+                    Mechanism.get(param.hashAlgorithm()), param.maskGenerationFunction(),
+                    param.saltLength());
             ret.setParameters(paramObj);
         } else {
             throw new P11TokenException("unknown P11Parameters " + parameters.getClass().getName());
@@ -916,8 +916,8 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     protected void doRemoveCerts(final P11ObjectIdentifier objectId) throws P11TokenException {
-        X509PublicKeyCertificate[] existingCerts = getCertificateObjects(objectId.getId(),
-                objectId.getLabelChars());
+        X509PublicKeyCertificate[] existingCerts = getCertificateObjects(objectId.id(),
+                objectId.labelChars());
         if (existingCerts == null || existingCerts.length == 0) {
             LOG.warn("could not find certificates " + objectId);
             return;
@@ -939,7 +939,7 @@ class IaikP11Slot extends AbstractP11Slot {
     protected void doAddCert(final P11ObjectIdentifier objectId, final X509Certificate cert)
             throws P11TokenException {
         X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
-                new X509Cert(cert), objectId.getId(), objectId.getLabelChars());
+                new X509Cert(cert), objectId.id(), objectId.labelChars());
         Session session = borrowWritableSession();
         try {
             session.createObject(newCaCertTemp);
@@ -1185,12 +1185,12 @@ class IaikP11Slot extends AbstractP11Slot {
         newCertTemp.getToken().setBooleanValue(true);
         newCertTemp.getCertificateType().setLongValue(CertificateType.X_509_PUBLIC_KEY);
         newCertTemp.getSubject().setByteArrayValue(
-                cert.getCert().getSubjectX500Principal().getEncoded());
+                cert.cert().getSubjectX500Principal().getEncoded());
         newCertTemp.getIssuer().setByteArrayValue(
-                cert.getCert().getIssuerX500Principal().getEncoded());
+                cert.cert().getIssuerX500Principal().getEncoded());
         newCertTemp.getSerialNumber().setByteArrayValue(
-                cert.getCert().getSerialNumber().toByteArray());
-        newCertTemp.getValue().setByteArrayValue(cert.getEncodedCert());
+                cert.cert().getSerialNumber().toByteArray());
+        newCertTemp.getValue().setByteArrayValue(cert.encodedCert());
         return newCertTemp;
     }
 
@@ -1227,7 +1227,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
 
         X509PublicKeyCertificate newCertTemp = createPkcs11Template(new X509Cert(newCert),
-                objectId.getId(), objectId.getLabelChars());
+                objectId.id(), objectId.labelChars());
 
         Session session = borrowWritableSession();
         try {
@@ -1274,8 +1274,8 @@ class IaikP11Slot extends AbstractP11Slot {
     protected void doRemoveIdentity(final P11ObjectIdentifier objectId) throws P11TokenException {
         Session session = borrowWritableSession();
         try {
-            byte[] id = objectId.getId();
-            char[] label = objectId.getLabelChars();
+            byte[] id = objectId.id();
+            char[] label = objectId.labelChars();
             SecretKey secretKey = getSecretKeyObject(id, label);
             if (secretKey != null) {
                 try {

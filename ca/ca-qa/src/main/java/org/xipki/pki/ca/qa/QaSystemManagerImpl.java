@@ -95,7 +95,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
         jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
     }
 
-    public String getConfFile() {
+    public String confFile() {
         return confFile;
     }
 
@@ -191,7 +191,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
     }
 
     @Override
-    public Set<String> getIssuerNames() {
+    public Set<String> issuerNames() {
         return Collections.unmodifiableSet(x509IssuerInfoMap.keySet());
     }
 
@@ -202,7 +202,7 @@ public class QaSystemManagerImpl implements QaSystemManager {
     }
 
     @Override
-    public Set<String> getCertprofileNames() {
+    public Set<String> certprofileNames() {
         return Collections.unmodifiableSet(x509ProfileMap.keySet());
     }
 

@@ -120,7 +120,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
                         lastProcessedId = id;
                     }
 
-                    String hash = rs.getString(dbControl.getColCerthash());
+                    String hash = rs.getString(dbControl.colCerthash());
                     BigInteger serial = new BigInteger(rs.getString("SN"), 16);
                     boolean revoked = rs.getBoolean("REV");
 
@@ -150,7 +150,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
                 releaseResources(null, rs);
             }
 
-            if (result.getEntries().isEmpty()) {
+            if (result.entries().isEmpty()) {
                 endReached = true;
                 outQueue.put(EndOfQueue.INSTANCE);
             } else {
@@ -174,10 +174,10 @@ public class XipkiDbDigestReader extends DbDigestReader {
 
         StringBuilder sb = new StringBuilder();
         sb.append("ID,SN,REV,RR,RT,RIT,");
-        sb.append(dbControl.getColCerthash());
-        sb.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
-        sb.append(" ON CERT.").append(dbControl.getColCaId()).append("=").append(caId);
-        sb.append(" AND CERT.ID>=? AND CERT.ID=").append(dbControl.getTblCerthash()).append(".CID");
+        sb.append(dbControl.colCerthash());
+        sb.append(" FROM CERT INNER JOIN ").append(dbControl.tblCerthash());
+        sb.append(" ON CERT.").append(dbControl.colCaId()).append("=").append(caId);
+        sb.append(" AND CERT.ID>=? AND CERT.ID=").append(dbControl.tblCerthash()).append(".CID");
 
         this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", sb.toString());
 
@@ -186,12 +186,12 @@ public class XipkiDbDigestReader extends DbDigestReader {
         }
     }
 
-    public int getCaId() {
+    public int caId() {
         return caId;
     }
 
     @Override
-    protected Retriever getRetriever() throws DataAccessException {
+    protected Retriever retriever() throws DataAccessException {
         return new XipkiDbRetriever();
     }
 
@@ -215,7 +215,7 @@ public class XipkiDbDigestReader extends DbDigestReader {
         try {
             stmt = datasource.createStatement(conn);
 
-            sql = "SELECT CERT FROM " + dbControl.getTblCa() + " WHERE ID=" + caId;
+            sql = "SELECT CERT FROM " + dbControl.tblCa() + " WHERE ID=" + caId;
             rs = stmt.executeQuery(sql);
             if (!rs.next()) {
                 throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
@@ -224,13 +224,13 @@ public class XipkiDbDigestReader extends DbDigestReader {
             caCert = X509Util.parseBase64EncodedCert(rs.getString("CERT"));
             rs.close();
 
-            sql = "SELECT COUNT(*) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
+            sql = "SELECT COUNT(*) FROM CERT WHERE " + dbControl.colCaId() + "=" + caId;
             rs = stmt.executeQuery(sql);
 
             totalAccount = rs.next() ? rs.getInt(1) : 0;
             rs.close();
 
-            sql = "SELECT MIN(ID) FROM CERT WHERE " + dbControl.getColCaId() + "=" + caId;
+            sql = "SELECT MIN(ID) FROM CERT WHERE " + dbControl.colCaId() + "=" + caId;
             rs = stmt.executeQuery(sql);
             minId = rs.next() ? rs.getLong(1) : 1;
 

@@ -105,7 +105,7 @@ public class CheckCertCmd extends XipkiCommandSupport {
 
     @Override
     protected Object doExecute() throws Exception {
-        Set<String> issuerNames = qaSystemManager.getIssuerNames();
+        Set<String> issuerNames = qaSystemManager.issuerNames();
         if (isEmpty(issuerNames)) {
             throw new IllegalCmdParamException("no issuer is configured");
         }
@@ -152,7 +152,7 @@ public class CheckCertCmd extends XipkiCommandSupport {
         sb.append(result.isAllSuccessful() ? "valid" : "invalid");
 
         if (verbose.booleanValue()) {
-            for (ValidationIssue issue : result.getValidationIssues()) {
+            for (ValidationIssue issue : result.validationIssues()) {
                 sb.append("\n");
                 format(issue, "    ", sb);
             }
@@ -167,11 +167,11 @@ public class CheckCertCmd extends XipkiCommandSupport {
 
     private static void format(final ValidationIssue issue, final String prefix,
             final StringBuilder sb) {
-        sb.append(prefix).append(issue.getCode());
-        sb.append(", ").append(issue.getDescription());
+        sb.append(prefix).append(issue.code());
+        sb.append(", ").append(issue.description());
         sb.append(", ").append(issue.isFailed() ? "failed" : "successful");
-        if (issue.getFailureMessage() != null) {
-            sb.append(", ").append(issue.getFailureMessage());
+        if (issue.failureMessage() != null) {
+            sb.append(", ").append(issue.failureMessage());
         }
     }
 

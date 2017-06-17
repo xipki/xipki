@@ -60,35 +60,35 @@ public class IssuerStore {
 
         for (IssuerEntry entry : entries) {
             for (IssuerEntry existingEntry : this.entries) {
-                if (existingEntry.getId() == entry.getId()) {
+                if (existingEntry.id() == entry.id()) {
                     throw new IllegalArgumentException(
-                            "issuer with the same id " + entry.getId() + " already available");
+                            "issuer with the same id " + entry.id() + " already available");
                 }
             }
             this.entries.add(entry);
-            idSet.add(entry.getId());
+            idSet.add(entry.id());
         }
 
         this.ids = Collections.unmodifiableSet(idSet);
     }
 
-    public int getSize() {
+    public int size() {
         return ids.size();
     }
 
-    public Set<Integer> getIds() {
+    public Set<Integer> ids() {
         return ids;
     }
 
     public Integer getIssuerIdForFp(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
             final byte[] issuerKeyHash) {
         IssuerEntry issuerEntry = getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
-        return (issuerEntry == null) ? null : issuerEntry.getId();
+        return (issuerEntry == null) ? null : issuerEntry.id();
     }
 
     public IssuerEntry getIssuerForId(final int id) {
         for (IssuerEntry entry : entries) {
-            if (entry.getId() == id) {
+            if (entry.id() == id) {
                 return entry;
             }
         }
@@ -107,10 +107,10 @@ public class IssuerStore {
         return null;
     }
 
-    public Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys() {
+    public Set<IssuerHashNameAndKey> issuerHashNameAndKeys() {
         Set<IssuerHashNameAndKey> ret = new HashSet<>();
         for (IssuerEntry issuerEntry : entries) {
-            ret.addAll(issuerEntry.getIssuerHashNameAndKeys());
+            ret.addAll(issuerEntry.issuerHashNameAndKeys());
         }
         return ret;
     }
@@ -118,7 +118,7 @@ public class IssuerStore {
     public void addIssuer(IssuerEntry issuer) {
         this.entries.add(issuer);
         Set<Integer> newIds = new HashSet<>(this.ids);
-        newIds.add(issuer.getId());
+        newIds.add(issuer.id());
         this.ids = Collections.unmodifiableSet(newIds);
     }
 

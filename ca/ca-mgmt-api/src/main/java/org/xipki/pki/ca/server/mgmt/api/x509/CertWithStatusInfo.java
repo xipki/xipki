@@ -54,7 +54,7 @@ public class CertWithStatusInfo {
     public CertWithStatusInfo() {
     }
 
-    public Certificate getCert() {
+    public Certificate cert() {
         return cert;
     }
 
@@ -62,7 +62,7 @@ public class CertWithStatusInfo {
         this.cert = cert;
     }
 
-    public String getCertprofile() {
+    public String certprofile() {
         return certprofile;
     }
 
@@ -70,7 +70,7 @@ public class CertWithStatusInfo {
         this.certprofile = certprofile;
     }
 
-    public CertRevocationInfo getRevocationInfo() {
+    public CertRevocationInfo revocationInfo() {
         return revocationInfo;
     }
 

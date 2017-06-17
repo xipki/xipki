@@ -76,11 +76,11 @@ public class ProfileExportCmd extends CaCommandSupport {
                     "no certificate profile named " + name + " is defined");
         }
 
-        if (StringUtil.isBlank(entry.getConf())) {
+        if (StringUtil.isBlank(entry.conf())) {
             println("cert profile does not have conf");
         } else {
             saveVerbose("saved cert profile configuration to", new File(confFile),
-                    entry.getConf().getBytes("UTF-8"));
+                    entry.conf().getBytes("UTF-8"));
         }
         return null;
     }

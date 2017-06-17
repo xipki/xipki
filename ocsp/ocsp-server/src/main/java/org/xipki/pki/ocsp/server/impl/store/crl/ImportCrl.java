@@ -330,16 +330,16 @@ public class ImportCrl {
                         crl.getNextUpdate(), crlId);
             }
         } else {
-            if (crlNumber.compareTo(crlInfo.getCrlNumber()) < 0) {
+            if (crlNumber.compareTo(crlInfo.crlNumber()) < 0) {
                 // It is permitted if the CRL number equals to the one in Database,
                 // which enables the resume of importing process if error occurred.
                 throw new ImportCrlException("Given CRL is not newer than existing CRL.");
             }
 
             if (isDeltaCrl) {
-                BigInteger lastFullCrlNumber = crlInfo.getBaseCrlNumber();
+                BigInteger lastFullCrlNumber = crlInfo.baseCrlNumber();
                 if (lastFullCrlNumber == null) {
-                    lastFullCrlNumber = crlInfo.getCrlNumber();
+                    lastFullCrlNumber = crlInfo.crlNumber();
                 }
 
                 if (!baseCrlNumber.equals(lastFullCrlNumber)) {
@@ -389,8 +389,8 @@ public class ImportCrl {
             Date revTime = null;
             Date revInvTime = null;
             if (caRevInfo != null) {
-                revTime = caRevInfo.getRevocationTime();
-                revInvTime = caRevInfo.getInvalidityTime();
+                revTime = caRevInfo.revocationTime();
+                revInvTime = caRevInfo.invalidityTime();
             }
 
             if (revTime != null) {
@@ -493,7 +493,7 @@ public class ImportCrl {
                     }
 
                     ps.setInt(offset++, 1);
-                    ps.setInt(offset++, reason.getCode());
+                    ps.setInt(offset++, reason.code());
                     ps.setLong(offset++, rt.getTime() / 1000);
                     if (rit != null) {
                         ps.setLong(offset++, rit.getTime() / 1000);

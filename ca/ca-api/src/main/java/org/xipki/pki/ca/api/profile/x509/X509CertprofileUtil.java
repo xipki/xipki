@@ -65,7 +65,7 @@ public class X509CertprofileUtil {
         GeneralNameMode mode = null;
         if (modes != null) {
             for (GeneralNameMode m : modes) {
-                if (m.getTag().getTag() == tag) {
+                if (m.tag().tag() == tag) {
                     mode = m;
                     break;
                 }
@@ -93,7 +93,7 @@ public class X509CertprofileUtil {
             }
 
             ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
-            if (mode != null && !mode.getAllowedTypes().contains(type)) {
+            if (mode != null && !mode.allowedTypes().contains(type)) {
                 throw new BadCertTemplateException(
                         "otherName.type " + type.getId() + " is not allowed");
             }

@@ -75,7 +75,7 @@ public class GetCertCmd extends ClientCommandSupport {
     protected Object doExecute() throws Exception {
         ScepClient client = getScepClient();
         BigInteger serial = toBigInt(serialNumber);
-        X509Certificate caCert = client.getAuthorityCertStore().getCaCert();
+        X509Certificate caCert = client.authorityCertStore().caCert();
         X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
         List<X509Certificate> certs = client.scepGetCert(getIdentityKey(), getIdentityCert(),
                 caSubject, serial);

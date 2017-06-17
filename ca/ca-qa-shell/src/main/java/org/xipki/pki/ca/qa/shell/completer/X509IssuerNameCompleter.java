@@ -54,7 +54,7 @@ public class X509IssuerNameCompleter extends AbstractDynamicEnumCompleter {
 
     @Override
     protected Set<String> getEnums() {
-        return qaSystemManager.getIssuerNames();
+        return qaSystemManager.issuerNames();
     }
 
 }

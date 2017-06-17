@@ -116,13 +116,13 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
         StoreConf storeConf = new StoreConf(conf);
-        this.crlFilename = IoUtil.expandFilepath(storeConf.getCrlFile());
-        this.crlUrl = storeConf.getCrlUrl();
-        this.certsDirName = (storeConf.getCertsDir() == null) ? null
-                : IoUtil.expandFilepath(storeConf.getCertsDir());
-        this.caCert = parseCert(storeConf.getCaCertFile());
-        if (storeConf.getIssuerCertFile() != null) {
-            this.issuerCert = parseCert(storeConf.getIssuerCertFile());
+        this.crlFilename = IoUtil.expandFilepath(storeConf.crlFile());
+        this.crlUrl = storeConf.crlUrl();
+        this.certsDirName = (storeConf.certsDir() == null) ? null
+                : IoUtil.expandFilepath(storeConf.certsDir());
+        this.caCert = parseCert(storeConf.caCertFile());
+        if (storeConf.issuerCertFile() != null) {
+            this.issuerCert = parseCert(storeConf.issuerCertFile());
         } else {
             this.issuerCert = null;
         }
@@ -248,7 +248,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
         event.setAffectedResource("CRL-Updater");
         event.setStatus(auditStatus);
         event.setLevel(auditLevel);
-        getAuditService().logEvent(event);
+        auditService().logEvent(event);
     }
 
 }

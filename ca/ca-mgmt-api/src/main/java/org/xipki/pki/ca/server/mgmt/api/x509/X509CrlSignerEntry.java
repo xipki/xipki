@@ -91,7 +91,7 @@ public class X509CrlSignerEntry {
         }
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
@@ -103,19 +103,19 @@ public class X509CrlSignerEntry {
         return certFaulty || confFaulty;
     }
 
-    public String getType() {
+    public String type() {
         return signerType;
     }
 
-    public String getConf() {
+    public String conf() {
         return signerConf;
     }
 
-    public String getBase64Cert() {
+    public String base64Cert() {
         return base64Cert;
     }
 
-    public X509Certificate getCertificate() {
+    public X509Certificate certificate() {
         return cert;
     }
 
@@ -126,7 +126,7 @@ public class X509CrlSignerEntry {
         this.cert = certificate;
     }
 
-    public String getCrlControl() {
+    public String crlControl() {
         return crlControl;
     }
 

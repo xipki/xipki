@@ -97,7 +97,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
     protected BaseX509Certprofile() {
     }
 
-    public abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
+    public abstract Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms();
 
     protected String[] sortRdns(final RdnControl control, final String[] values) {
         ParamUtil.requireNonNull("values", values);
@@ -106,7 +106,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             return values;
         }
 
-        List<Pattern> patterns = control.getPatterns();
+        List<Pattern> patterns = control.patterns();
         if (CollectionUtil.isEmpty(patterns)) {
             return values;
         }
@@ -133,7 +133,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
      *
      * @return the SubjectControl, must not be <code>null</code>.
      */
-    protected abstract SubjectControl getSubjectControl();
+    protected abstract SubjectControl subjectControl();
 
     @Override
     public Date getNotBefore(final Date notBefore) {
@@ -149,11 +149,11 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         verifySubjectDnOccurence(requestedSubject);
 
         RDN[] requstedRdns = requestedSubject.getRDNs();
-        SubjectControl scontrol = getSubjectControl();
+        SubjectControl scontrol = subjectControl();
 
         List<RDN> rdns = new LinkedList<>();
 
-        for (ASN1ObjectIdentifier type : scontrol.getTypes()) {
+        for (ASN1ObjectIdentifier type : scontrol.types()) {
             RdnControl control = scontrol.getControl(type);
             if (control == null) {
                 continue;
@@ -214,7 +214,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             } // if
         } // for
 
-        Set<String> subjectDnGroups = scontrol.getGroups();
+        Set<String> subjectDnGroups = scontrol.groups();
         if (CollectionUtil.isNonEmpty(subjectDnGroups)) {
             Set<String> consideredGroups = new HashSet<>();
             final int n = rdns.size();
@@ -265,7 +265,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             throws BadCertTemplateException {
         ParamUtil.requireNonNull("publicKey", publicKey);
 
-        Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = getKeyAlgorithms();
+        Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = keyAlgorithms();
         if (CollectionUtil.isEmpty(keyAlgorithms)) {
             return publicKey;
         }
@@ -297,13 +297,13 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             }
 
             // point encoding
-            if (ecOption.getPointEncodings() != null) {
+            if (ecOption.pointEncodings() != null) {
                 byte[] keyData = publicKey.getPublicKeyData().getBytes();
                 if (keyData.length < 1) {
                     throw new BadCertTemplateException("invalid publicKeyData");
                 }
                 byte pointEncoding = keyData[0];
-                if (!ecOption.getPointEncodings().contains(pointEncoding)) {
+                if (!ecOption.pointEncodings().contains(pointEncoding)) {
                     throw new BadCertTemplateException(String.format(
                             "not accepted EC point encoding '%s'", pointEncoding));
                 }
@@ -380,7 +380,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             throws BadCertTemplateException {
         ParamUtil.requireNonNull("requestedSubject", requestedSubject);
 
-        SubjectControl occurences = getSubjectControl();
+        SubjectControl occurences = subjectControl();
         if (occurences == null) {
             return;
         }
@@ -394,23 +394,23 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             }
 
             RDN[] rdns = requestedSubject.getRDNs(type);
-            if (rdns.length > occu.getMaxOccurs() || rdns.length < occu.getMinOccurs()) {
+            if (rdns.length > occu.maxOccurs() || rdns.length < occu.minOccurs()) {
                 throw new BadCertTemplateException(String.format(
                         "occurrence of subject DN of type %s not within the allowed range. "
                         + "%d is not within [%d, %d]", oidToDisplayName(type),  rdns.length,
-                        occu.getMinOccurs(), occu.getMaxOccurs()));
+                        occu.minOccurs(), occu.maxOccurs()));
             }
         }
 
-        for (ASN1ObjectIdentifier m : occurences.getTypes()) {
+        for (ASN1ObjectIdentifier m : occurences.types()) {
             RdnControl occurence = occurences.getControl(m);
-            if (occurence.getMinOccurs() == 0) {
+            if (occurence.minOccurs() == 0) {
                 continue;
             }
 
             boolean present = false;
             for (ASN1ObjectIdentifier type : types) {
-                if (occurence.getType().equals(type)) {
+                if (occurence.type().equals(type)) {
                     present = true;
                     break;
                 }
@@ -419,7 +419,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             if (!present) {
                 throw new BadCertTemplateException(String.format(
                         "required subject DN of type %s is not present",
-                        oidToDisplayName(occurence.getType())));
+                        oidToDisplayName(occurence.type())));
             }
         }
     } // method verifySubjectDnOccurence
@@ -517,9 +517,9 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
         StringType stringType = null;
 
         if (option != null) {
-            stringType = option.getStringType();
-            String prefix = option.getPrefix();
-            String suffix = option.getSuffix();
+            stringType = option.stringType();
+            String prefix = option.prefix();
+            String suffix = option.suffix();
 
             if (prefix != null || suffix != null) {
                 String locTmpText = tmpText.toLowerCase();
@@ -533,7 +533,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                 }
             }
 
-            List<Pattern> patterns = option.getPatterns();
+            List<Pattern> patterns = option.patterns();
             if (patterns != null) {
                 Pattern pattern = patterns.get(index);
                 if (!pattern.matcher(tmpText).matches()) {
@@ -555,8 +555,8 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
             tmpText = sb.toString();
 
             int len = tmpText.length();
-            Range range = option.getStringLengthRange();
-            Integer minLen = (range == null) ? null : range.getMin();
+            Range range = option.stringLengthRange();
+            Integer minLen = (range == null) ? null : range.min();
 
             if (minLen != null && len < minLen) {
                 throw new BadCertTemplateException(
@@ -564,7 +564,7 @@ public abstract class BaseX509Certprofile extends X509Certprofile {
                         ObjectIdentifiers.oidToDisplayName(type), tmpText, len, minLen));
             }
 
-            Integer maxLen = (range == null) ? null : range.getMax();
+            Integer maxLen = (range == null) ? null : range.max();
 
             if (maxLen != null && len > maxLen) {
                 throw new BadCertTemplateException(

@@ -226,7 +226,7 @@ class RequestOption {
         }
     } // constructor
 
-    public Set<HashAlgoType> getHashAlgos() {
+    public Set<HashAlgoType> hashAlgos() {
         return hashAlgos;
     }
 
@@ -242,23 +242,23 @@ class RequestOption {
         return supportsHttpGet;
     }
 
-    public TripleState getNonceOccurrence() {
+    public TripleState nonceOccurrence() {
         return nonceOccurrence;
     }
 
-    public int getMaxRequestListCount() {
+    public int maxRequestListCount() {
         return maxRequestListCount;
     }
 
-    public int getMaxRequestSize() {
+    public int maxRequestSize() {
         return maxRequestSize;
     }
 
-    public int getNonceMinLen() {
+    public int nonceMinLen() {
         return nonceMinLen;
     }
 
-    public int getNonceMaxLen() {
+    public int nonceMaxLen() {
         return nonceMaxLen;
     }
 
@@ -266,15 +266,15 @@ class RequestOption {
         return hashAlgos.contains(hashAlgo);
     }
 
-    public CertpathValidationModel getCertpathValidationModel() {
+    public CertpathValidationModel certpathValidationModel() {
         return certpathValidationModel;
     }
 
-    public Set<CertWithEncoded> getTrustAnchors() {
+    public Set<CertWithEncoded> trustAnchors() {
         return trustAnchors;
     }
 
-    public Set<X509Certificate> getCerts() {
+    public Set<X509Certificate> certs() {
         return certs;
     }
 

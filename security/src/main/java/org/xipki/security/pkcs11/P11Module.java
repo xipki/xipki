@@ -53,7 +53,7 @@ public interface P11Module {
 
     boolean isReadOnly();
 
-    List<P11SlotIdentifier> getSlotIdentifiers();
+    List<P11SlotIdentifier> slotIdentifiers();
 
     P11Slot getSlot(@NonNull P11SlotIdentifier slotId) throws P11TokenException;
 

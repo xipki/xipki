@@ -62,7 +62,7 @@ public class CertStatusCmd extends UnRevRmCertCommandSupport {
     @Override
     protected Object doExecute() throws Exception {
         CertWithStatusInfo certInfo = caManager.getCert(caName, getSerialNumber());
-        X509Certificate cert = (X509Certificate) certInfo.getCert();
+        X509Certificate cert = (X509Certificate) certInfo.cert();
 
         if (cert == null) {
             System.out.println("certificate unknown");
@@ -70,12 +70,12 @@ public class CertStatusCmd extends UnRevRmCertCommandSupport {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("certificate profile: ").append(certInfo.getCertprofile()).append("\n");
+        sb.append("certificate profile: ").append(certInfo.certprofile()).append("\n");
         sb.append("status: ");
-        if (certInfo.getRevocationInfo() == null) {
+        if (certInfo.revocationInfo() == null) {
             sb.append("good");
         } else {
-            sb.append("revoked with ").append(certInfo.getRevocationInfo());
+            sb.append("revoked with ").append(certInfo.revocationInfo());
         }
         println(sb.toString());
 

@@ -68,7 +68,7 @@ public class CaHasRequestorEntry {
         this.ra = ra;
     }
 
-    public int getPermission() {
+    public int permission() {
         return permission;
     }
 
@@ -76,7 +76,7 @@ public class CaHasRequestorEntry {
         this.permission = permission;
     }
 
-    public NameId getRequestorIdent() {
+    public NameId requestorIdent() {
         return requestorIdent;
     }
 
@@ -84,7 +84,7 @@ public class CaHasRequestorEntry {
         this.profiles = CollectionUtil.unmodifiableSet(CollectionUtil.toUpperCaseSet(profiles));
     }
 
-    public Set<String> getProfiles() {
+    public Set<String> profiles() {
         return profiles;
     }
 

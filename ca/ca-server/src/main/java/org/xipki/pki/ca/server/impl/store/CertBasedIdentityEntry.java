@@ -64,11 +64,11 @@ class CertBasedIdentityEntry {
         this.cert = Base64.decode(b64Cert);
     }
 
-    int getId() {
+    int id() {
         return id;
     }
 
-    String getSubject() {
+    String subject() {
         return subject;
     }
 

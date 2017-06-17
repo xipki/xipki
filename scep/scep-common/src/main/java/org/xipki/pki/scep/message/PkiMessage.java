@@ -134,19 +134,19 @@ public class PkiMessage {
         this.senderNonce = ParamUtil.requireNonNull("senderNonce", senderNonce);
     }
 
-    public TransactionId getTransactionId() {
+    public TransactionId transactionId() {
         return transactionId;
     }
 
-    public Nonce getSenderNonce() {
+    public Nonce senderNonce() {
         return senderNonce;
     }
 
-    public final MessageType getMessageType() {
+    public final MessageType messageType() {
         return messageType;
     }
 
-    public Nonce getRecipientNonce() {
+    public Nonce recipientNonce() {
         return recipientNonce;
     }
 
@@ -154,7 +154,7 @@ public class PkiMessage {
         this.recipientNonce = recipientNonce;
     }
 
-    public PkiStatus getPkiStatus() {
+    public PkiStatus pkiStatus() {
         return pkiStatus;
     }
 
@@ -162,7 +162,7 @@ public class PkiMessage {
         this.pkiStatus = pkiStatus;
     }
 
-    public FailInfo getFailInfo() {
+    public FailInfo failInfo() {
         return failInfo;
     }
 
@@ -170,7 +170,7 @@ public class PkiMessage {
         this.failInfo = failInfo;
     }
 
-    public ASN1Encodable getMessageData() {
+    public ASN1Encodable messageData() {
         return messageData;
     }
 
@@ -212,32 +212,32 @@ public class PkiMessage {
         ASN1EncodableVector vec = new ASN1EncodableVector();
         // messageType
         addAttribute(vec, ScepObjectIdentifiers.ID_MESSAGE_TYPE,
-                new DERPrintableString(Integer.toString(messageType.getCode())));
+                new DERPrintableString(Integer.toString(messageType.code())));
 
         // senderNonce
         addAttribute(vec, ScepObjectIdentifiers.ID_SENDER_NONCE,
-                new DEROctetString(senderNonce.getBytes()));
+                new DEROctetString(senderNonce.bytes()));
 
         // transactionID
         addAttribute(vec, ScepObjectIdentifiers.ID_TRANSACTION_ID,
-                new DERPrintableString(transactionId.getId()));
+                new DERPrintableString(transactionId.id()));
 
         // failInfo
         if (failInfo != null) {
             addAttribute(vec, ScepObjectIdentifiers.ID_FAILINFO,
-                    new DERPrintableString(Integer.toString(failInfo.getCode())));
+                    new DERPrintableString(Integer.toString(failInfo.code())));
         }
 
         // pkiStatus
         if (pkiStatus != null) {
             addAttribute(vec, ScepObjectIdentifiers.ID_PKI_STATUS,
-                    new DERPrintableString(Integer.toString(pkiStatus.getCode())));
+                    new DERPrintableString(Integer.toString(pkiStatus.code())));
         }
 
         // recipientNonce
         if (recipientNonce != null) {
             addAttribute(vec, ScepObjectIdentifiers.ID_RECIPIENT_NONCE,
-                    new DEROctetString(recipientNonce.getBytes()));
+                    new DEROctetString(recipientNonce.bytes()));
         }
 
         for (ASN1ObjectIdentifier type : signedAttributes.keySet()) {

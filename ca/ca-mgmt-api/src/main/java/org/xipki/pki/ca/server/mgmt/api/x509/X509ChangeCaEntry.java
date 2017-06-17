@@ -69,7 +69,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
         super(ident);
     }
 
-    public Integer getSerialNoBitLen() {
+    public Integer serialNoBitLen() {
         return serialNoBitLen;
     }
 
@@ -80,7 +80,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
         this.serialNoBitLen = serialNoBitLen;
     }
 
-    public List<String> getCrlUris() {
+    public List<String> crlUris() {
         return crlUris;
     }
 
@@ -88,7 +88,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
         this.crlUris = crlUris;
     }
 
-    public List<String> getDeltaCrlUris() {
+    public List<String> deltaCrlUris() {
         return deltaCrlUris;
     }
 
@@ -96,7 +96,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
         this.deltaCrlUris = deltaCrlUris;
     }
 
-    public List<String> getOcspUris() {
+    public List<String> ocspUris() {
         return ocspUris;
     }
 
@@ -104,7 +104,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
         this.ocspUris = ocspUris;
     }
 
-    public List<String> getCaCertUris() {
+    public List<String> caCertUris() {
         return caCertUris;
     }
 
@@ -112,7 +112,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
         this.caCertUris = caCertUris;
     }
 
-    public X509Certificate getCert() {
+    public X509Certificate cert() {
         return cert;
     }
 
@@ -120,7 +120,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
         this.cert = cert;
     }
 
-    public String getCrlSignerName() {
+    public String crlSignerName() {
         return crlSignerName;
     }
 
@@ -128,7 +128,7 @@ public class X509ChangeCaEntry extends ChangeCaEntry {
         this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toUpperCase();
     }
 
-    public Integer getNumCrls() {
+    public Integer numCrls() {
         return numCrls;
     }
 

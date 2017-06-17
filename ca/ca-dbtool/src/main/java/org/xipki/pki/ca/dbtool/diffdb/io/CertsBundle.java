@@ -57,11 +57,11 @@ public class CertsBundle {
         this.serialNumbers = ParamUtil.requireNonEmpty("serialNumbers", serialNumbers);
     }
 
-    public Map<BigInteger, DbDigestEntry> getCerts() {
+    public Map<BigInteger, DbDigestEntry> certs() {
         return certs;
     }
 
-    public List<BigInteger> getSerialNumbers() {
+    public List<BigInteger> serialNumbers() {
         return serialNumbers;
     }
 

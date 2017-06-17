@@ -96,7 +96,7 @@ public class CaEntry {
         createNewCsvFile();
     }
 
-    public int getCaId() {
+    public int caId() {
         return caId;
     }
 
@@ -117,7 +117,7 @@ public class CaEntry {
         }
         numInCsvFile++;
 
-        csvOutputStream.write(reportEntry.getEncoded().getBytes());
+        csvOutputStream.write(reportEntry.encoded().getBytes());
         csvOutputStream.write('\n');
 
         if (numInCsvFile == DFLT_NUM_CERTS_IN_BUNDLE) {

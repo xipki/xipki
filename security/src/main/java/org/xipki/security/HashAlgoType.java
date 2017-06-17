@@ -96,15 +96,15 @@ public enum HashAlgoType {
         this.canonicalizedName = canonicalizedName;
     }
 
-    public int getLength() {
+    public int length() {
         return length;
     }
 
-    public AlgorithmCode getAlgorithmCode() {
+    public AlgorithmCode algorithmCode() {
         return algorithmCode;
     }
 
-    public ASN1ObjectIdentifier getOid() {
+    public ASN1ObjectIdentifier oid() {
         return oid;
     }
 
@@ -218,7 +218,7 @@ public enum HashAlgoType {
         }
     }
 
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
+    public AlgorithmIdentifier algorithmIdentifier() {
         return algId;
     }
 

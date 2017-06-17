@@ -104,7 +104,7 @@ public class Asn1P11Params extends ASN1Object {
         return new DERTaggedObject(tagNo, p11Params);
     }
 
-    public ASN1Encodable getP11Params() {
+    public ASN1Encodable p11Params() {
         return p11Params;
     }
 

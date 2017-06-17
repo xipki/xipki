@@ -59,11 +59,11 @@ public class CertIdOrError {
         this.error = ParamUtil.requireNonNull("error", error);
     }
 
-    public CertId getCertId() {
+    public CertId certId() {
         return certId;
     }
 
-    public PkiStatusInfo getError() {
+    public PkiStatusInfo error() {
         return error;
     }
 

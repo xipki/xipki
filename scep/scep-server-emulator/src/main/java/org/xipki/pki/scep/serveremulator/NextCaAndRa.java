@@ -53,11 +53,11 @@ public class NextCaAndRa {
         this.raCert = raCert;
     }
 
-    public Certificate getCaCert() {
+    public Certificate caCert() {
         return caCert;
     }
 
-    public Certificate getRaCert() {
+    public Certificate raCert() {
         return raCert;
     }
 

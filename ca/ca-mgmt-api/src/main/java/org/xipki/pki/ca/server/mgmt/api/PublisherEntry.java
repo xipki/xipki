@@ -59,15 +59,15 @@ public class PublisherEntry {
         this.conf = conf;
     }
 
-    public NameId getIdent() {
+    public NameId ident() {
         return ident;
     }
 
-    public String getType() {
+    public String type() {
         return type;
     }
 
-    public String getConf() {
+    public String conf() {
         return conf;
     }
 
@@ -82,8 +82,8 @@ public class PublisherEntry {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
-        sb.append("id: ").append(ident.getId()).append('\n');
-        sb.append("name: ").append(ident.getName()).append('\n');
+        sb.append("id: ").append(ident.id()).append('\n');
+        sb.append("name: ").append(ident.name()).append('\n');
         sb.append("faulty: ").append(faulty).append('\n');
         sb.append("type: ").append(type).append('\n');
         sb.append("conf: ").append(conf);

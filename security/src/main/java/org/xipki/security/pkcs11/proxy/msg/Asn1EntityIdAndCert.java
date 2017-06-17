@@ -119,11 +119,11 @@ public class Asn1EntityIdAndCert extends ASN1Object {
         return new DERSequence(vector);
     }
 
-    public Asn1P11EntityIdentifier getEntityId() {
+    public Asn1P11EntityIdentifier entityId() {
         return entityId;
     }
 
-    public Certificate getCertificate() {
+    public Certificate certificate() {
         return certificate;
     }
 

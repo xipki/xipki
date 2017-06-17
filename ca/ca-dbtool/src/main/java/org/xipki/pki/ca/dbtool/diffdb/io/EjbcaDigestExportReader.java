@@ -108,12 +108,12 @@ public class EjbcaDigestExportReader {
         }
 
         private void query(final IdRange idRange) {
-            DigestDbEntrySet result = new DigestDbEntrySet(idRange.getFrom());
+            DigestDbEntrySet result = new DigestDbEntrySet(idRange.from());
 
             ResultSet rs = null;
             try {
-                selectCertStmt.setLong(1, idRange.getFrom());
-                selectCertStmt.setLong(2, idRange.getTo() + 1);
+                selectCertStmt.setLong(1, idRange.from());
+                selectCertStmt.setLong(2, idRange.to() + 1);
 
                 rs = selectCertStmt.executeQuery();
 
@@ -142,7 +142,7 @@ public class EjbcaDigestExportReader {
                             String b64Cert = certRs.getString("base64Cert");
                             Certificate cert = Certificate.getInstance(Base64.decode(b64Cert));
                             for (EjbcaCaInfo entry : fpCaInfoMap.values()) {
-                                if (entry.getSubject().equals(cert.getIssuer())) {
+                                if (entry.subject().equals(cert.getIssuer())) {
                                     caInfo = entry;
                                     break;
                                 }
@@ -181,7 +181,7 @@ public class EjbcaDigestExportReader {
                             revInvTime, hash);
 
                     IdentifiedDbDigestEntry idCert = new IdentifiedDbDigestEntry(cert, id);
-                    idCert.setCaId(caInfo.getCaId());
+                    idCert.setCaId(caInfo.caId());
 
                     result.addEntry(idCert);
                 }
@@ -260,7 +260,7 @@ public class EjbcaDigestExportReader {
         for (int i = 0; i < size; i++) {
             try {
                 DigestDbEntrySet result = outQueue.take();
-                numCerts += result.getEntries().size();
+                numCerts += result.entries().size();
                 results.add(result);
             } catch (InterruptedException ex) {
                 throw new DataAccessException("InterruptedException " + ex.getMessage(), ex);
@@ -271,25 +271,25 @@ public class EjbcaDigestExportReader {
         List<IdentifiedDbDigestEntry> ret = new ArrayList<>(numCerts);
 
         for (DigestDbEntrySet result : results) {
-            if (result.getException() == null) {
-                ret.addAll(result.getEntries());
+            if (result.exception() == null) {
+                ret.addAll(result.entries());
                 continue;
             }
 
             throw new DataAccessException(
-                    String.format("could not read from ID %s: %s", result.getStartId(),
-                            result.getException().getMessage()),
-                    result.getException());
+                    String.format("could not read from ID %s: %s", result.startId(),
+                            result.exception().getMessage()),
+                    result.exception());
         }
 
         return ret;
     } // method readCerts
 
-    public int getNumThreads() {
+    public int numThreads() {
         return numThreads;
     }
 
-    public int getNumSkippedCerts() {
+    public int numSkippedCerts() {
         return numSkippedCerts.get();
     }
 

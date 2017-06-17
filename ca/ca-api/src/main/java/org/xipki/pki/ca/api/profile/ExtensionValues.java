@@ -75,7 +75,7 @@ public class ExtensionValues {
         return true;
     }
 
-    public Set<ASN1ObjectIdentifier> getExtensionTypes() {
+    public Set<ASN1ObjectIdentifier> extensionTypes() {
         return Collections.unmodifiableSet(extensions.keySet());
     }
 

@@ -108,7 +108,7 @@ public class CrlSignerUpdateCmd extends CaCommandSupport {
                 if (entry == null) {
                     throw new IllegalCmdParamException("please specify the signerType");
                 }
-                tmpSignerType = entry.getType();
+                tmpSignerType = entry.type();
             }
 
             signerConf = ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf,

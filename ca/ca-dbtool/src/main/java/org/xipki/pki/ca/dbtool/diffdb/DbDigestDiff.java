@@ -116,16 +116,16 @@ public class DbDigestDiff {
         this.targetDbControl = new XipkiDbControl(dbSchemaType);
 
         // number of threads
-        this.numTargetThreads = Math.min(numThreads.getNumTargetThreads(),
-                        targetDatasource.getMaximumPoolSize() - 1);
+        this.numTargetThreads = Math.min(numThreads.numTargetThreads(),
+                        targetDatasource.maximumPoolSize() - 1);
 
-        if (this.numTargetThreads != numThreads.getNumTargetThreads()) {
+        if (this.numTargetThreads != numThreads.numTargetThreads()) {
             LOG.info("reduce the numTargetThreads from {} to {}", numTargetThreads,
                     this.numTargetThreads);
         }
     } // constuctor
 
-    public Set<byte[]> getIncludeCaCerts() {
+    public Set<byte[]> includeCaCerts() {
         return includeCaCerts;
     }
 
@@ -155,7 +155,7 @@ public class DbDigestDiff {
             List<Integer> refCaIds = new LinkedList<>();
 
             XipkiDbControl refDbControl = new XipkiDbControl(refDbSchemaType);
-            String refSql = "SELECT ID FROM " + refDbControl.getTblCa();
+            String refSql = "SELECT ID FROM " + refDbControl.tblCa();
 
             Statement refStmt = null;
             try {
@@ -189,7 +189,7 @@ public class DbDigestDiff {
     private void diffSingleCa(final DigestReader refReader,
             final Map<Integer, byte[]> caIdCertBytesMap)
             throws CertificateException, IOException, InterruptedException {
-        X509Certificate caCert = refReader.getCaCert();
+        X509Certificate caCert = refReader.caCert();
         byte[] caCertBytes = caCert.getEncoded();
 
         if (includeCaCerts != null && !includeCaCerts.isEmpty()) {
@@ -201,7 +201,7 @@ public class DbDigestDiff {
                 }
             }
             if (!include) {
-                System.out.println("skipped CA " + refReader.getCaSubjectName());
+                System.out.println("skipped CA " + refReader.caSubjectName());
             }
         }
 
@@ -233,8 +233,8 @@ public class DbDigestDiff {
 
         try {
             reporter.start();
-            ProcessLog processLog = new ProcessLog(refReader.getTotalAccount());
-            System.out.println("Processing certificates of CA \n\t'" + refReader.getCaSubjectName()
+            ProcessLog processLog = new ProcessLog(refReader.totalAccount());
+            System.out.println("Processing certificates of CA \n\t'" + refReader.caSubjectName()
                 + "'");
             processLog.printHeader();
 
@@ -278,7 +278,7 @@ public class DbDigestDiff {
     private static Map<Integer, byte[]> getCas(final DataSourceWrapper datasource,
             final XipkiDbControl dbControl) throws DataAccessException {
         // get a list of available CAs in the target database
-        String sql = "SELECT ID,CERT FROM " + dbControl.getTblCa();
+        String sql = "SELECT ID,CERT FROM " + dbControl.tblCa();
         Connection conn = datasource.getConnection();
         Statement stmt = datasource.createStatement(conn);
         Map<Integer, byte[]> caIdCertMap = new HashMap<>(5);

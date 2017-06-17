@@ -496,8 +496,8 @@ public class SubjectDnSpec {
     public static void fixRdnControl(final RdnControl control) throws CertprofileException {
         ParamUtil.requireNonNull("control", control);
 
-        ASN1ObjectIdentifier type = control.getType();
-        StringType stringType = control.getStringType();
+        ASN1ObjectIdentifier type = control.type();
+        StringType stringType = control.stringType();
         if (stringType != null) {
             if (STRING_TYPE_SET.containsKey(type)
                     && !STRING_TYPE_SET.get(type).contains(stringType)) {
@@ -511,7 +511,7 @@ public class SubjectDnSpec {
             }
         }
 
-        if (control.getPatterns() == null && PATTERNS.containsKey(type)) {
+        if (control.patterns() == null && PATTERNS.containsKey(type)) {
             control.setPatterns(Arrays.asList(PATTERNS.get(type)));
         }
 
@@ -521,15 +521,15 @@ public class SubjectDnSpec {
             return;
         }
 
-        Range isRange = control.getStringLengthRange();
+        Range isRange = control.stringLengthRange();
         if (isRange == null) {
             control.setStringLengthRange(specRange);
             return;
         }
 
         boolean changed = false;
-        Integer specMin = specRange.getMin();
-        Integer min = isRange.getMin();
+        Integer specMin = specRange.min();
+        Integer min = isRange.min();
         if (min == null) {
             changed = true;
             min = specMin;
@@ -538,8 +538,8 @@ public class SubjectDnSpec {
             min = specMin;
         }
 
-        Integer specMax = specRange.getMax();
-        Integer max = isRange.getMax();
+        Integer specMax = specRange.max();
+        Integer max = isRange.max();
         if (max == null) {
             changed = true;
             max = specMax;

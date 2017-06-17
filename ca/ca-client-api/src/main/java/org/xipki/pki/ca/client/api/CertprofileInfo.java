@@ -56,15 +56,15 @@ public class CertprofileInfo {
         this.conf = StringUtil.isBlank(conf) ? null : conf;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public String getType() {
+    public String type() {
         return type;
     }
 
-    public String getConf() {
+    public String conf() {
         return conf;
     }
 

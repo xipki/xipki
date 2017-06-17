@@ -109,7 +109,7 @@ public class DbDigestReporter {
         startTime = new Date();
     }
 
-    public String getReportDirname() {
+    public String reportDirname() {
         return reportDirname;
     }
 
@@ -133,16 +133,16 @@ public class DbDigestReporter {
         ParamUtil.requireNonNull("refCert", refCert);
         ParamUtil.requireNonNull("targetCert", targetCert);
 
-        if (refCert.getSerialNumber().equals(targetCert.getSerialNumber())) {
+        if (refCert.serialNumber().equals(targetCert.serialNumber())) {
             throw new IllegalArgumentException(
                     "refCert and targetCert do not have the same serialNumber");
         }
 
         numDiff.incrementAndGet();
         StringBuilder sb = new StringBuilder(140);
-        sb.append(refCert.getSerialNumber().toString(16)).append('\t');
-        sb.append(refCert.getEncodedOmitSeriaNumber()).append('\t');
-        sb.append(targetCert.getEncodedOmitSeriaNumber()).append('\n');
+        sb.append(refCert.serialNumber().toString(16)).append('\t');
+        sb.append(refCert.encodedOmitSeriaNumber()).append('\t');
+        sb.append(targetCert.encodedOmitSeriaNumber()).append('\n');
         String msg = sb.toString();
         synchronized (diffWriter) {
             diffWriter.write(msg);

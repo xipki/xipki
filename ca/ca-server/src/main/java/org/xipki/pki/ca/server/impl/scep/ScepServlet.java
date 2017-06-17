@@ -169,7 +169,7 @@ public class ScepServlet extends AbstractHttpServlet {
             }
 
             Scep responder = responderManager.getScep(scepName);
-            if (responder == null || responder.getStatus() != CaStatus.ACTIVE
+            if (responder == null || responder.status() != CaStatus.ACTIVE
                     || !responder.supportsCertProfile(certProfileName)) {
                 auditMessage = "unknown SCEP '" + scepName + "/" + certProfileName + "'";
                 LOG.warn(auditMessage);
@@ -212,7 +212,7 @@ public class ScepServlet extends AbstractHttpServlet {
                     auditStatus = AuditStatus.FAILED;
                     return createErrorResponse(version, BAD_REQUEST);
                 } catch (OperationException ex) {
-                    ErrorCode code = ex.getErrorCode();
+                    ErrorCode code = ex.errorCode();
 
                     HttpResponseStatus httpCode;
                     switch (code) {
@@ -253,15 +253,15 @@ public class ScepServlet extends AbstractHttpServlet {
 
                 byte[] bodyBytes = ci.getEncoded();
                 return createOKResponse(version, CT_RESPONSE, bodyBytes);
-            } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
+            } else if (Operation.GetCACaps.code().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
-                byte[] caCapsBytes = responder.getCaCaps().getBytes();
+                byte[] caCapsBytes = responder.caCaps().bytes();
                 return createOKResponse(version, ScepConstants.CT_TEXT_PLAIN, caCapsBytes);
-            } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
+            } else if (Operation.GetCACert.code().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
-                byte[] respBytes = responder.getCaCertResp().getBytes();
+                byte[] respBytes = responder.caCertResp().bytes();
                 return createOKResponse(version, ScepConstants.CT_X509_CA_RA_CERT, respBytes);
-            } else if (Operation.GetNextCACert.getCode().equalsIgnoreCase(operation)) {
+            } else if (Operation.GetNextCACert.code().equalsIgnoreCase(operation)) {
                 auditMessage = "SCEP operation '" + operation + "' is not permitted";
                 auditStatus = AuditStatus.FAILED;
                 return createErrorResponse(version, FORBIDDEN);

@@ -74,7 +74,7 @@ public class XipkiDigestExportReader {
         this.dbControl = ParamUtil.requireNonNull("dbControl", dbControl);
         this.numRowsPerSelect = ParamUtil.requireMin("numRowsPerSelect", numRowsPerSelect, 1);
 
-        this.selectCertSql = dbControl.getCertSql(datasource, numRowsPerSelect);
+        this.selectCertSql = dbControl.certSql(datasource, numRowsPerSelect);
 
         Connection conn = datasource.getConnection();
         try {
@@ -95,9 +95,9 @@ public class XipkiDigestExportReader {
             rs = selectCertStmt.executeQuery();
 
             while (rs.next()) {
-                int caId = rs.getInt(dbControl.getColCaId());
+                int caId = rs.getInt(dbControl.colCaId());
                 long id = rs.getLong("ID");
-                String hash = rs.getString(dbControl.getColCerthash());
+                String hash = rs.getString(dbControl.colCerthash());
                 BigInteger serial = new BigInteger(rs.getString("SN"), 16);
                 boolean revoked = rs.getBoolean("REV");
 

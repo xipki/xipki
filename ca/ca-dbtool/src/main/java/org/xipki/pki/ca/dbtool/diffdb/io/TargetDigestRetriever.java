@@ -107,10 +107,10 @@ public class TargetDigestRetriever {
                 }
 
                 try {
-                    Map<BigInteger, DbDigestEntry> refCerts = bundle.getCerts();
+                    Map<BigInteger, DbDigestEntry> refCerts = bundle.certs();
                     Map<BigInteger, DbDigestEntry> resp = query(bundle);
 
-                    List<BigInteger> serialNumbers = bundle.getSerialNumbers();
+                    List<BigInteger> serialNumbers = bundle.serialNumbers();
                     int size = serialNumbers.size();
 
                     for (BigInteger serialNumber : serialNumbers) {
@@ -149,9 +149,9 @@ public class TargetDigestRetriever {
 
         private Map<BigInteger, DbDigestEntry> query(CertsBundle bundle)
             throws DataAccessException {
-            List<BigInteger> serialNumbers = bundle.getSerialNumbers();
+            List<BigInteger> serialNumbers = bundle.serialNumbers();
             int size = serialNumbers.size();
-            boolean batchSupported = datasource.getDatabaseType() != DatabaseType.H2;
+            boolean batchSupported = datasource.databaseType() != DatabaseType.H2;
 
             return (batchSupported && size == numPerSelect)
                 ? getCertsViaInArraySelectInB(inArraySelectStmt, serialNumbers)
@@ -199,24 +199,24 @@ public class TargetDigestRetriever {
 
         StringBuilder buffer = new StringBuilder(200);
         buffer.append("REV,RR,RT,RIT,");
-        buffer.append(dbControl.getColCerthash());
-        buffer.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
-        buffer.append(" ON CERT.").append(dbControl.getColCaId()).append('=').append(caId);
+        buffer.append(dbControl.colCerthash());
+        buffer.append(" FROM CERT INNER JOIN ").append(dbControl.tblCerthash());
+        buffer.append(" ON CERT.").append(dbControl.colCaId()).append('=').append(caId);
         buffer.append(" AND CERT.SN=?");
-        buffer.append(" AND CERT.ID=").append(dbControl.getTblCerthash()).append(".CID");
+        buffer.append(" AND CERT.ID=").append(dbControl.tblCerthash()).append(".CID");
 
         singleCertSql = datasource.buildSelectFirstSql(1, buffer.toString());
 
         buffer = new StringBuilder(200);
         buffer.append("SN,REV,RR,RT,RIT,");
-        buffer.append(dbControl.getColCerthash());
-        buffer.append(" FROM CERT INNER JOIN ").append(dbControl.getTblCerthash());
-        buffer.append(" ON CERT.").append(dbControl.getColCaId()).append('=').append(caId);
+        buffer.append(dbControl.colCerthash());
+        buffer.append(" FROM CERT INNER JOIN ").append(dbControl.tblCerthash());
+        buffer.append(" ON CERT.").append(dbControl.colCaId()).append('=').append(caId);
         buffer.append(" AND CERT.SN IN (?");
         for (int i = 1; i < numPerSelect; i++) {
             buffer.append(",?");
         }
-        buffer.append(") AND CERT.ID=").append(dbControl.getTblCerthash());
+        buffer.append(") AND CERT.ID=").append(dbControl.tblCerthash());
         buffer.append(".CID");
         inArrayCertsSql = datasource.buildSelectFirstSql(numPerSelect, buffer.toString());
 
@@ -308,7 +308,7 @@ public class TargetDigestRetriever {
                     revInvTime = null;
                 }
             }
-            String sha1Fp = rs.getString(dbControl.getColCerthash());
+            String sha1Fp = rs.getString(dbControl.colCerthash());
             DbDigestEntry certB = new DbDigestEntry(serialNumber, revoked, revReason, revTime,
                     revInvTime, sha1Fp);
             ret.put(serialNumber, certB);
@@ -338,7 +338,7 @@ public class TargetDigestRetriever {
                     revInvTime = null;
                 }
             }
-            String sha1Fp = rs.getString(dbControl.getColCerthash());
+            String sha1Fp = rs.getString(dbControl.colCerthash());
             return new DbDigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
         } catch (SQLException ex) {
             throw datasource.translate(singleCertSql, ex);

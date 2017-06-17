@@ -78,7 +78,7 @@ public abstract class SecurityCommandSupport extends XipkiCommandSupport {
         if (p11Service == null) {
             throw new IllegalCmdParamException("undefined module " + moduleName);
         }
-        return p11Service.getModule();
+        return p11Service.module();
     }
 
     protected String toUtcTimeyyyyMMddhhmmssZ(final Date date) {

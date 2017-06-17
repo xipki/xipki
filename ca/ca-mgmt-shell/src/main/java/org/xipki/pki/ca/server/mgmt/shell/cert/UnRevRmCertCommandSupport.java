@@ -91,7 +91,7 @@ public abstract class UnRevRmCertCommandSupport extends CaCommandSupport {
         if (serialNumberS != null) {
             serialNumber = toBigInt(serialNumberS);
         } else if (certFile != null) {
-            X509Certificate caCert = ((X509CaEntry) ca).getCertificate();
+            X509Certificate caCert = ((X509CaEntry) ca).certificate();
             X509Certificate cert = X509Util.parseCert(IoUtil.read(certFile));
             if (!X509Util.issues(caCert, cert)) {
                 throw new CmdFailure(

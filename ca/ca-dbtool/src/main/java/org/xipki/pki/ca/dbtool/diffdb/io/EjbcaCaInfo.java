@@ -63,19 +63,19 @@ public class EjbcaCaInfo {
         this.caDirname = ParamUtil.requireNonNull("caDirname", caDirname);
     }
 
-    public int getCaId() {
+    public int caId() {
         return caId;
     }
 
-    public X500Name getSubject() {
+    public X500Name subject() {
         return subject;
     }
 
-    public String getHexSha1() {
+    public String hexSha1() {
         return hexSha1;
     }
 
-    public String getCaDirname() {
+    public String caDirname() {
         return caDirname;
     }
 

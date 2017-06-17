@@ -61,7 +61,7 @@ public class ByUserRequestorInfo implements RequestorInfo {
     }
 
     @Override
-    public NameId getIdent() {
+    public NameId ident() {
         return ident;
     }
 
@@ -70,17 +70,17 @@ public class ByUserRequestorInfo implements RequestorInfo {
         return false;
     }
 
-    public int getUserId() {
-        return caHasUser.getUserIdent().getId();
+    public int userId() {
+        return caHasUser.userIdent().id();
     }
 
-    public CaHasUserEntry getCaHasUser() {
+    public CaHasUserEntry caHasUser() {
         return caHasUser;
     }
 
     @Override
     public boolean isCertProfilePermitted(String certprofile) {
-        Set<String> profiles = caHasUser.getProfiles();
+        Set<String> profiles = caHasUser.profiles();
         if (CollectionUtil.isEmpty(profiles)) {
             return false;
         }
@@ -90,7 +90,7 @@ public class ByUserRequestorInfo implements RequestorInfo {
 
     @Override
     public boolean isPermitted(int permission) {
-        return PermissionConstants.contains(caHasUser.getPermission(), permission);
+        return PermissionConstants.contains(caHasUser.permission(), permission);
     }
 
     @Override

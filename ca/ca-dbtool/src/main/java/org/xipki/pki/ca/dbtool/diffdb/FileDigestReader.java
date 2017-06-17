@@ -102,17 +102,17 @@ public class FileDigestReader implements DigestReader {
     }
 
     @Override
-    public X509Certificate getCaCert() {
+    public X509Certificate caCert() {
         return caCert;
     }
 
     @Override
-    public String getCaSubjectName() {
+    public String caSubjectName() {
         return this.caSubjectName;
     }
 
     @Override
-    public int getTotalAccount() {
+    public int totalAccount() {
         return totalAccount;
     }
 
@@ -135,8 +135,8 @@ public class FileDigestReader implements DigestReader {
                 throw new DataAccessException("IOException: " + ex.getMessage());
             }
 
-            serialNumbers.add(line.getSerialNumber());
-            certs.put(line.getSerialNumber(), line);
+            serialNumbers.add(line.serialNumber());
+            certs.put(line.serialNumber(), line);
             ik++;
             if (ik >= numCertsInOneBlock) {
                 break;

@@ -109,15 +109,15 @@ class ResponseOption {
         return includeCerthash;
     }
 
-    public Long getCacheMaxAge() {
+    public Long cacheMaxAge() {
         return cacheMaxAge;
     }
 
-    public EmbedCertsMode getEmbedCertsMode() {
+    public EmbedCertsMode embedCertsMode() {
         return embedCertsMode;
     }
 
-    public HashAlgoType getCertHashAlgo() {
+    public HashAlgoType certHashAlgo() {
         return certHashAlgo;
     }
 

@@ -112,19 +112,19 @@ class OcspBenchmark {
         this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
 
         HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(
-                requestOptions.getHashAlgorithmId());
+                requestOptions.hashAlgorithmId());
         if (hashAlgo == null) {
             throw new OcspRequestorException("unknown HashAlgo "
-                    + requestOptions.getHashAlgorithmId().getId());
+                    + requestOptions.hashAlgorithmId().getId());
         }
 
-        this.issuerhashAlg = hashAlgo.getAlgorithmIdentifier();
+        this.issuerhashAlg = hashAlgo.algorithmIdentifier();
         this.issuerNameHash = new DEROctetString(hashAlgo.hash(
                         issuerCert.getSubject().getEncoded()));
         this.issuerKeyHash = new DEROctetString(hashAlgo.hash(
                         issuerCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
 
-        List<AlgorithmIdentifier> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
+        List<AlgorithmIdentifier> prefSigAlgs = requestOptions.preferredSignatureAlgorithms();
         if (prefSigAlgs == null || prefSigAlgs.size() == 0) {
             this.extensions = null;
         } else {
@@ -209,7 +209,7 @@ class OcspBenchmark {
             if (requestOptions.isUseNonce()) {
                 Extension extn = new Extension(
                         OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
-                        new DEROctetString(nextNonce(requestOptions.getNonceLen())));
+                        new DEROctetString(nextNonce(requestOptions.nonceLen())));
                 extns.add(extn);
             }
 

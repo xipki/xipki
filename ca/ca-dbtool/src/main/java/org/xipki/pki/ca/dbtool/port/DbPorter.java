@@ -78,15 +78,15 @@ public class DbPorter extends DbToolBase {
             this.sqlBatchFactor = sqlBatchFactor;
         }
 
-        public String getDirName() {
+        public String dirName() {
             return dirName;
         }
 
-        public String getTableName() {
+        public String tableName() {
             return tableName;
         }
 
-        public float getSqlBatchFactor() {
+        public float sqlBatchFactor() {
             return sqlBatchFactor;
         }
 
@@ -113,15 +113,15 @@ public class DbPorter extends DbToolBase {
             this.sqlBatchFactor = sqlBatchFactor;
         }
 
-        public String getDirName() {
+        public String dirName() {
             return dirName;
         }
 
-        public String getTableName() {
+        public String tableName() {
             return tableName;
         }
 
-        public float getSqlBatchFactor() {
+        public float sqlBatchFactor() {
             return sqlBatchFactor;
         }
 
@@ -160,9 +160,9 @@ public class DbPorter extends DbToolBase {
         this.evaulateOnly = evaluateOnly;
 
         DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
-        String str = dbSchemaInfo.getVariableValue("VERSION");
+        String str = dbSchemaInfo.variableValue("VERSION");
         this.dbSchemaVersion = Integer.parseInt(str);
-        str = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
+        str = dbSchemaInfo.variableValue("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(str);
     }
 
@@ -192,7 +192,7 @@ public class DbPorter extends DbToolBase {
         return ret;
     }
 
-    protected String getValue(final FileOrValueType fileOrValue) throws IOException {
+    protected String value(final FileOrValueType fileOrValue) throws IOException {
         if (fileOrValue == null) {
             return null;
         }
@@ -239,7 +239,7 @@ public class DbPorter extends DbToolBase {
         return ret;
     }
 
-    protected byte[] getBinary(final FileOrBinaryType fileOrValue) throws IOException {
+    protected byte[] binary(final FileOrBinaryType fileOrValue) throws IOException {
         if (fileOrValue == null) {
             return null;
         }
@@ -252,19 +252,19 @@ public class DbPorter extends DbToolBase {
         return IoUtil.read(file);
     }
 
-    protected String getImportingText() {
+    protected String importingText() {
         return evaulateOnly ? "evaluating import " : "importing ";
     }
 
-    protected String getImportedText() {
+    protected String importedText() {
         return evaulateOnly ? " evaluated import " : " imported ";
     }
 
-    protected String getExportingText() {
+    protected String exportingText() {
         return evaulateOnly ? "evaluating export " : "exporting ";
     }
 
-    protected String getExportedText() {
+    protected String exportedText() {
         return evaulateOnly ? " evaluated export " : " exported ";
     }
 

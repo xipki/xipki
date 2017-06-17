@@ -72,7 +72,7 @@ class CaCertRespBytes {
         }
     }
 
-    byte[] getBytes() {
+    byte[] bytes() {
         return Arrays.copyOf(bytes, bytes.length);
     }
 

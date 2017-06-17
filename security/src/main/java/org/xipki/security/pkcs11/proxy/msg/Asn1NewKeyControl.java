@@ -111,7 +111,7 @@ public class Asn1NewKeyControl extends ASN1Object {
         return new DERSequence(vector);
     }
 
-    public P11NewKeyControl getControl() {
+    public P11NewKeyControl control() {
         return control;
     }
 

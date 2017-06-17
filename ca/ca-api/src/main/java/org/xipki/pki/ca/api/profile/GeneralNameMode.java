@@ -64,11 +64,11 @@ public class GeneralNameMode {
                 : CollectionUtil.unmodifiableSet(allowedTypes);
     }
 
-    public GeneralNameTag getTag() {
+    public GeneralNameTag tag() {
         return tag;
     }
 
-    public Set<ASN1ObjectIdentifier> getAllowedTypes() {
+    public Set<ASN1ObjectIdentifier> allowedTypes() {
         return allowedTypes;
     }
 

@@ -79,7 +79,7 @@ public class NegUnrevokeCertCmd extends UnRevRemoveCertCommandSupport {
             }
         }
 
-        if (certIdOrError.getError() == null) {
+        if (certIdOrError.error() == null) {
             throw new CmdFailure("releasing revocation successful but expected failure");
         }
         return null;

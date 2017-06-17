@@ -107,7 +107,7 @@ public class OcspCertType extends IdentifidDbObjectType {
 
     private Long rit;
 
-    public Integer getIid() {
+    public Integer iid() {
         return iid;
     }
 
@@ -115,7 +115,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         this.iid = iid;
     }
 
-    public String getSn() {
+    public String sn() {
         return sn;
     }
 
@@ -123,7 +123,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         this.sn = sn;
     }
 
-    public String getProfile() {
+    public String profile() {
         return profile;
     }
 
@@ -131,7 +131,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         this.profile = profile;
     }
 
-    public Long getUpdate() {
+    public Long update() {
         return update;
     }
 
@@ -139,7 +139,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         this.update = update;
     }
 
-    public Boolean getRev() {
+    public Boolean rev() {
         return rev;
     }
 
@@ -147,7 +147,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         this.rev = rev;
     }
 
-    public Integer getRr() {
+    public Integer rr() {
         return rr;
     }
 
@@ -155,7 +155,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         this.rr = rr;
     }
 
-    public Long getRt() {
+    public Long rt() {
         return rt;
     }
 
@@ -163,7 +163,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         this.rt = rt;
     }
 
-    public Long getRit() {
+    public Long rit() {
         return rit;
     }
 
@@ -171,7 +171,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         this.rit = rit;
     }
 
-    public String getFile() {
+    public String file() {
         return file;
     }
 
@@ -202,7 +202,7 @@ public class OcspCertType extends IdentifidDbObjectType {
         validate();
 
         writer.writeStartElement(TAG_ROOT);
-        writeIfNotNull(writer, TAG_ID, getId());
+        writeIfNotNull(writer, TAG_ID, id());
         writeIfNotNull(writer, TAG_IID, iid);
         writeIfNotNull(writer, TAG_SN, sn);
         writeIfNotNull(writer, TAG_UPDATE, update);

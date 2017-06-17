@@ -52,7 +52,7 @@ public interface P11CryptServiceFactory {
     P11CryptService getP11CryptService(@NonNull String moduleName)
             throws P11TokenException, XiSecurityException;
 
-    Set<String> getModuleNames();
+    Set<String> moduleNames();
 
     void shutdown();
 

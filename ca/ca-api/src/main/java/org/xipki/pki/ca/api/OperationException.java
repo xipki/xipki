@@ -82,11 +82,11 @@ public class OperationException extends Exception {
         this(errorCode, getMessage(throwable));
     }
 
-    public ErrorCode getErrorCode() {
+    public ErrorCode errorCode() {
         return errorCode;
     }
 
-    public String getErrorMessage() {
+    public String errorMessage() {
         return errorMessage;
     }
 

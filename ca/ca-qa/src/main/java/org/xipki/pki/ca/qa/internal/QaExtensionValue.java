@@ -59,7 +59,7 @@ public class QaExtensionValue {
         return critical;
     }
 
-    public byte[] getValue() {
+    public byte[] value() {
         return Arrays.copyOf(value, value.length);
     }
 

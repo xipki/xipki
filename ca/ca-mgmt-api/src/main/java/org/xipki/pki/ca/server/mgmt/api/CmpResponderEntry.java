@@ -83,19 +83,19 @@ public class CmpResponderEntry {
         }
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public String getType() {
+    public String type() {
         return type;
     }
 
-    public String getConf() {
+    public String conf() {
         return conf;
     }
 
-    public X509Certificate getCertificate() {
+    public X509Certificate certificate() {
         return certificate;
     }
 
@@ -106,7 +106,7 @@ public class CmpResponderEntry {
         this.certificate = certificate;
     }
 
-    public String getBase64Cert() {
+    public String base64Cert() {
         return base64Cert;
     }
 

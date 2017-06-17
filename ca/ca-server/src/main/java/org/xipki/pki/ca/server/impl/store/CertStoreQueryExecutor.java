@@ -127,9 +127,9 @@ class CertStoreQueryExecutor {
         this.idGenerator = ParamUtil.requireNonNull("idGenerator", idGenerator);
 
         DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
-        String str = dbSchemaInfo.getVariableValue("VERSION");
+        String str = dbSchemaInfo.variableValue("VERSION");
         this.dbSchemaVersion = Integer.parseInt(str);
-        str = dbSchemaInfo.getVariableValue("X500NAME_MAXLEN");
+        str = dbSchemaInfo.variableValue("X500NAME_MAXLEN");
         this.maxX500nameLen = Integer.parseInt(str);
         this.sqls = new SQLs(datasource);
     } // constructor
@@ -145,10 +145,10 @@ class CertStoreQueryExecutor {
         ParamUtil.requireNonNull("requestor", requestor);
 
         long certId = idGenerator.nextId();
-        X509Certificate cert = certificate.getCert();
+        X509Certificate cert = certificate.cert();
 
         long fpPk = FpIdCalculator.hash(encodedSubjectPublicKey);
-        String subjectText = X509Util.cutText(certificate.getSubject(), maxX500nameLen);
+        String subjectText = X509Util.cutText(certificate.subject(), maxX500nameLen);
         long fpSubject = X509Util.fpCanonicalizedName(cert.getSubjectX500Principal());
 
         String reqSubjectText = null;
@@ -163,8 +163,8 @@ class CertStoreQueryExecutor {
             }
         }
 
-        String b64FpCert = base64Fp(certificate.getEncodedCert());
-        String b64Cert = Base64.toBase64String(certificate.getEncodedCert());
+        String b64FpCert = base64Fp(certificate.encodedCert());
+        String b64Cert = Base64.toBase64String(certificate.encodedCert());
         String tid = (transactionId == null) ? null : Base64.toBase64String(transactionId);
 
         long currentTimeSeconds = System.currentTimeMillis() / 1000;
@@ -182,7 +182,7 @@ class CertStoreQueryExecutor {
 
             // cert
             int idx = 2;
-            psAddcert.setInt(idx++, CertArt.X509PKC.getCode());
+            psAddcert.setInt(idx++, CertArt.X509PKC.code());
             psAddcert.setLong(idx++, currentTimeSeconds);
             psAddcert.setString(idx++, serialNumber.toString(16));
             psAddcert.setString(idx++, subjectText);
@@ -191,14 +191,14 @@ class CertStoreQueryExecutor {
             psAddcert.setLong(idx++, notBeforeSeconds);
             psAddcert.setLong(idx++, notAfterSeconds);
             setBoolean(psAddcert, idx++, false);
-            psAddcert.setInt(idx++, certProfile.getId());
-            psAddcert.setInt(idx++, ca.getId());
-            setInt(psAddcert, idx++, requestor.getId());
+            psAddcert.setInt(idx++, certProfile.id());
+            psAddcert.setInt(idx++, ca.id());
+            setInt(psAddcert, idx++, requestor.id());
             setInt(psAddcert, idx++, userId);
             psAddcert.setLong(idx++, fpPk);
             boolean isEeCert = cert.getBasicConstraints() == -1;
             psAddcert.setInt(idx++, isEeCert ? 1 : 0);
-            psAddcert.setInt(idx++, reqType.getCode());
+            psAddcert.setInt(idx++, reqType.code());
             psAddcert.setString(idx++, tid);
 
             // rawcert
@@ -235,7 +235,7 @@ class CertStoreQueryExecutor {
 
                 if (th instanceof SQLException) {
                     LOG.error("datasource {} could not add certificate with id {}: {}",
-                            datasource.getDatasourceName(), certId, th.getMessage());
+                            datasource.datasourceName(), certId, th.getMessage());
                     throw datasource.translate(sql, (SQLException) th);
                 } else {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
@@ -266,8 +266,8 @@ class CertStoreQueryExecutor {
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
             int idx = 1;
-            ps.setInt(idx++, publisher.getId());
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, publisher.id());
+            ps.setInt(idx++, ca.id());
             ps.setLong(idx++, certId);
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -283,7 +283,7 @@ class CertStoreQueryExecutor {
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
             int idx = 1;
-            ps.setInt(idx++, publisher.getId());
+            ps.setInt(idx++, publisher.id());
             ps.setLong(idx++, certId);
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -299,7 +299,7 @@ class CertStoreQueryExecutor {
         final String sql = SQLs.SQL_MAXID_DELTACRL_CACHE;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
-            ps.setInt(1, ca.getId());
+            ps.setInt(1, ca.id());
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) {
                 return 0;
@@ -318,7 +318,7 @@ class CertStoreQueryExecutor {
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
             ps.setLong(1, maxId + 1);
-            ps.setInt(2, ca.getId());
+            ps.setInt(2, ca.id());
             ps.executeUpdate();
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);
@@ -349,11 +349,11 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             if (ca != null) {
-                ps.setInt(idx++, ca.getId());
+                ps.setInt(idx++, ca.id());
             }
 
             if (publisher != null) {
-                ps.setInt(idx++, publisher.getId());
+                ps.setInt(idx++, publisher.id());
             }
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -370,7 +370,7 @@ class CertStoreQueryExecutor {
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
-            ps.setInt(1, ca.getId());
+            ps.setInt(1, ca.id());
             rs = ps.executeQuery();
             if (!rs.next()) {
                 return 0;
@@ -391,7 +391,7 @@ class CertStoreQueryExecutor {
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
-            ps.setInt(1, ca.getId());
+            ps.setInt(1, ca.id());
             rs = ps.executeQuery();
             if (!rs.next()) {
                 return 0L;
@@ -412,7 +412,7 @@ class CertStoreQueryExecutor {
         ResultSet rs = null;
         try {
             ps = borrowPreparedStatement(sql);
-            ps.setInt(1, ca.getId());
+            ps.setInt(1, ca.id());
             rs = ps.executeQuery();
             return rs.next();
         } catch (SQLException ex) {
@@ -454,7 +454,7 @@ class CertStoreQueryExecutor {
 
             int idx = 1;
             ps.setLong(idx++, crlId);
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             setLong(ps, idx++, crlNumber);
             Date date = crl.getThisUpdate();
             ps.setLong(idx++, date.getTime() / 1000);
@@ -483,33 +483,33 @@ class CertStoreQueryExecutor {
                 = getCertWithRevocationInfo(ca, serialNumber, idNameMap);
         if (certWithRevInfo == null) {
             LOG.warn("certificate with CA={} and serialNumber={} does not exist",
-                    ca.getName(), LogUtil.formatCsn(serialNumber));
+                    ca.name(), LogUtil.formatCsn(serialNumber));
             return null;
         }
 
-        CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
+        CertRevocationInfo currentRevInfo = certWithRevInfo.revInfo();
         if (currentRevInfo != null) {
-            CrlReason currentReason = currentRevInfo.getReason();
+            CrlReason currentReason = currentRevInfo.reason();
             if (currentReason == CrlReason.CERTIFICATE_HOLD) {
-                if (revInfo.getReason() == CrlReason.CERTIFICATE_HOLD) {
+                if (revInfo.reason() == CrlReason.CERTIFICATE_HOLD) {
                     throw new OperationException(ErrorCode.CERT_REVOKED,
                             "certificate already revoked with the requested reason "
-                            + currentReason.getDescription());
+                            + currentReason.description());
                 } else {
-                    revInfo.setRevocationTime(currentRevInfo.getRevocationTime());
-                    revInfo.setInvalidityTime(currentRevInfo.getInvalidityTime());
+                    revInfo.setRevocationTime(currentRevInfo.revocationTime());
+                    revInfo.setInvalidityTime(currentRevInfo.invalidityTime());
                 }
             } else if (!force) {
                 throw new OperationException(ErrorCode.CERT_REVOKED,
-                    "certificate already revoked with reason " + currentReason.getDescription());
+                    "certificate already revoked with reason " + currentReason.description());
             }
         }
 
-        long certId = certWithRevInfo.getCert().getCertId().longValue();
-        long revTimeSeconds = revInfo.getRevocationTime().getTime() / 1000;
+        long certId = certWithRevInfo.cert().certId().longValue();
+        long revTimeSeconds = revInfo.revocationTime().getTime() / 1000;
         Long invTimeSeconds = null;
-        if (revInfo.getInvalidityTime() != null) {
-            invTimeSeconds = revInfo.getInvalidityTime().getTime() / 1000;
+        if (revInfo.invalidityTime() != null) {
+            invTimeSeconds = revInfo.invalidityTime().getTime() / 1000;
         }
 
         PreparedStatement ps = borrowPreparedStatement(SQLs.SQL_REVOKE_CERT);
@@ -519,7 +519,7 @@ class CertStoreQueryExecutor {
             setBoolean(ps, idx++, true);
             ps.setLong(idx++, revTimeSeconds);
             setLong(ps, idx++, invTimeSeconds);
-            ps.setInt(idx++, revInfo.getReason().getCode());
+            ps.setInt(idx++, revInfo.reason().code());
             ps.setLong(idx++, certId);
 
             int count = ps.executeUpdate();
@@ -536,7 +536,7 @@ class CertStoreQueryExecutor {
         }
 
         if (publishToDeltaCrlCache) {
-            publishToDeltaCrlCache(ca, certWithRevInfo.getCert().getCert().getSerialNumber());
+            publishToDeltaCrlCache(ca, certWithRevInfo.cert().cert().getSerialNumber());
         }
 
         certWithRevInfo.setRevInfo(revInfo);
@@ -555,29 +555,29 @@ class CertStoreQueryExecutor {
                 getCertWithRevocationInfo(ca, serialNumber, idNameMap);
         if (certWithRevInfo == null) {
             LOG.warn("certificate with CA={} and serialNumber={} does not exist",
-                    ca.getName(), LogUtil.formatCsn(serialNumber));
+                    ca.name(), LogUtil.formatCsn(serialNumber));
             return null;
         }
 
-        CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
+        CertRevocationInfo currentRevInfo = certWithRevInfo.revInfo();
         if (currentRevInfo == null) {
             throw new OperationException(ErrorCode.CERT_UNREVOKED, "certificate is not revoked");
         }
 
-        CrlReason currentReason = currentRevInfo.getReason();
+        CrlReason currentReason = currentRevInfo.reason();
         if (currentReason != CrlReason.CERTIFICATE_HOLD) {
             throw new OperationException(ErrorCode.CERT_REVOKED,
                     "certificate is revoked but not with reason "
-                    + CrlReason.CERTIFICATE_HOLD.getDescription());
+                    + CrlReason.CERTIFICATE_HOLD.description());
         }
 
-        long certId = certWithRevInfo.getCert().getCertId().longValue();
+        long certId = certWithRevInfo.cert().certId().longValue();
 
         PreparedStatement ps = borrowPreparedStatement(SQLs.SQL_REVOKE_SUSPENDED_CERT);
         try {
             int idx = 1;
             ps.setLong(idx++, System.currentTimeMillis() / 1000);
-            ps.setInt(idx++, reason.getCode());
+            ps.setInt(idx++, reason.code());
             ps.setLong(idx++, certId);
 
             int count = ps.executeUpdate();
@@ -594,7 +594,7 @@ class CertStoreQueryExecutor {
         }
 
         if (publishToDeltaCrlCache) {
-            publishToDeltaCrlCache(ca, certWithRevInfo.getCert().getCert().getSerialNumber());
+            publishToDeltaCrlCache(ca, certWithRevInfo.cert().cert().getSerialNumber());
         }
 
         currentRevInfo.setReason(reason);
@@ -611,26 +611,26 @@ class CertStoreQueryExecutor {
                 getCertWithRevocationInfo(ca, serialNumber, idNamMap);
         if (certWithRevInfo == null) {
             LOG.warn("certificate with CA={} and serialNumber={} does not exist",
-                    ca.getName(), LogUtil.formatCsn(serialNumber));
+                    ca.name(), LogUtil.formatCsn(serialNumber));
             return null;
         }
 
-        CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
+        CertRevocationInfo currentRevInfo = certWithRevInfo.revInfo();
         if (currentRevInfo == null) {
             throw new OperationException(ErrorCode.CERT_UNREVOKED, "certificate is not revoked");
         }
 
-        CrlReason currentReason = currentRevInfo.getReason();
+        CrlReason currentReason = currentRevInfo.reason();
         if (!force) {
             if (currentReason != CrlReason.CERTIFICATE_HOLD) {
                 throw new OperationException(ErrorCode.NOT_PERMITTED,
                         "could not unrevoke certificate revoked with reason "
-                        + currentReason.getDescription());
+                        + currentReason.description());
             }
         }
 
         final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
-        long certId = certWithRevInfo.getCert().getCertId().longValue();
+        long certId = certWithRevInfo.cert().certId().longValue();
         long currentTimeSeconds = System.currentTimeMillis() / 1000;
 
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -657,10 +657,10 @@ class CertStoreQueryExecutor {
         }
 
         if (publishToDeltaCrlCache) {
-            publishToDeltaCrlCache(ca, certWithRevInfo.getCert().getCert().getSerialNumber());
+            publishToDeltaCrlCache(ca, certWithRevInfo.cert().cert().getSerialNumber());
         }
 
-        return certWithRevInfo.getCert();
+        return certWithRevInfo.cert();
     } // method unrevokeCert
 
     private void publishToDeltaCrlCache(final NameId ca, final BigInteger serialNumber)
@@ -674,7 +674,7 @@ class CertStoreQueryExecutor {
             ps = borrowPreparedStatement(sql);
             int idx = 1;
             ps.setLong(idx++, id);
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setString(idx++, serialNumber.toString(16));
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -689,7 +689,7 @@ class CertStoreQueryExecutor {
             throws OperationException, DataAccessException {
         X509CertWithRevocationInfo crtWithRevInfo
                 = getCertWithRevocationInfo(ca, serialNumber, idNameMap);
-        return (crtWithRevInfo == null) ? null : crtWithRevInfo.getCert();
+        return (crtWithRevInfo == null) ? null : crtWithRevInfo.cert();
     }
 
     void removeCertificate(final NameId ca, final BigInteger serialNumber)
@@ -702,7 +702,7 @@ class CertStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setString(idx++, serialNumber.toString(16));
 
             int count = ps.executeUpdate();
@@ -727,8 +727,8 @@ class CertStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setInt(idx++, publisher.getId());
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, publisher.id());
+            ps.setInt(idx++, ca.id());
             rs = ps.executeQuery();
             List<Long> ret = new ArrayList<>();
             while (rs.next() && ret.size() < numEntries) {
@@ -752,7 +752,7 @@ class CertStoreQueryExecutor {
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setInt(idx++, ee ? 1 : 0);
             rs = ps.executeQuery();
             return rs.next();
@@ -776,7 +776,7 @@ class CertStoreQueryExecutor {
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
-            ps.setInt(1, ca.getId());
+            ps.setInt(1, ca.id());
             rs = ps.executeQuery();
             rs.next();
             return rs.getLong(1);
@@ -801,7 +801,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setLong(idx++, startId - 1);
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             rs = ps.executeQuery();
             List<SerialWithId> ret = new ArrayList<>();
             while (rs.next() && ret.size() < numEntries) {
@@ -837,7 +837,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setLong(idx++, startId - 1);
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             if (notExpiredAt != null) {
                 ps.setLong(idx++, notExpiredAt.getTime() / 1000 + 1);
             }
@@ -872,7 +872,7 @@ class CertStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setLong(idx++, expiredAt);
             rs = ps.executeQuery();
             List<BigInteger> ret = new ArrayList<>();
@@ -900,9 +900,9 @@ class CertStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setLong(idx++, latestLastUpdate + 1);
-            ps.setInt(idx++, CrlReason.CERTIFICATE_HOLD.getCode());
+            ps.setInt(idx++, CrlReason.CERTIFICATE_HOLD.code());
             rs = ps.executeQuery();
             List<BigInteger> ret = new ArrayList<>();
             while (rs.next() && ret.size() < numEntries) {
@@ -928,7 +928,7 @@ class CertStoreQueryExecutor {
         String b64Crl = null;
         try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             if (crlNumber != null) {
                 ps.setLong(idx++, crlNumber.longValue());
             }
@@ -962,7 +962,7 @@ class CertStoreQueryExecutor {
         ResultSet rs = null;
         try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             setBoolean(ps, idx++, false);
             rs = ps.executeQuery();
 
@@ -990,7 +990,7 @@ class CertStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setInt(idx++, crlNumber + 1);
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -1048,8 +1048,8 @@ class CertStoreQueryExecutor {
         certWithMeta.setCertId(certId);
         X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta,
                 ca, caCert, cert.getPublicKey().getEncoded(),
-                idNameMap.getCertprofile(certprofileId),
-                idNameMap.getRequestor(requestorId));
+                idNameMap.certprofile(certprofileId),
+                idNameMap.requestor(requestorId));
         if (!revoked) {
             return certInfo;
         }
@@ -1116,7 +1116,7 @@ class CertStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setString(idx++, serial.toString(16));
             rs = ps.executeQuery();
             if (!rs.next()) {
@@ -1155,7 +1155,7 @@ class CertStoreQueryExecutor {
         X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, certBytes);
         certWithMeta.setCertId(certId);
 
-        String profileName = idNameMap.getCertprofileName(certprofileId);
+        String profileName = idNameMap.certprofileName(certprofileId);
         X509CertWithRevocationInfo ret = new X509CertWithRevocationInfo();
         ret.setCertprofile(profileName);
         ret.setCert(certWithMeta);
@@ -1186,7 +1186,7 @@ class CertStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setString(idx++, serial.toString(16));
             rs = ps.executeQuery();
             if (!rs.next()) {
@@ -1217,8 +1217,8 @@ class CertStoreQueryExecutor {
                     .getTBSCertificate().getSubjectPublicKeyInfo().getEncoded();
             X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta, ca,
                     caCert, subjectPublicKeyInfo,
-                    idNameMap.getCertprofile(certprofileId),
-                    idNameMap.getRequestor(requestorId));
+                    idNameMap.certprofile(certprofileId),
+                    idNameMap.requestor(requestorId));
 
             if (!revoked) {
                 return certInfo;
@@ -1245,7 +1245,7 @@ class CertStoreQueryExecutor {
 
         try {
             ps.setLong(1, cid);
-            ps.setInt(2, ca.getId());
+            ps.setInt(2, ca.id());
             rs = ps.executeQuery();
             if (!rs.next()) {
                 return null;
@@ -1271,7 +1271,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setString(idx++, serial.toString(16));
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
 
             rs = ps.executeQuery();
             if (!rs.next()) {
@@ -1331,7 +1331,7 @@ class CertStoreQueryExecutor {
         for (Long certId : certIds) {
             X509CertWithDbId cert = getCertForId(certId);
             if (cert != null) {
-                certs.add(cert.getCert());
+                certs.add(cert.cert());
             }
         }
 
@@ -1349,7 +1349,7 @@ class CertStoreQueryExecutor {
 
         Long reqId = null;
         try {
-            ps.setInt(1, ca.getId());
+            ps.setInt(1, ca.id());
             ps.setString(2, serialNumber.toString(16));
             rs = ps.executeQuery();
 
@@ -1463,7 +1463,7 @@ class CertStoreQueryExecutor {
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
-            ps.setInt(1, ca.getId());
+            ps.setInt(1, ca.id());
 
             if (idxNotBefore != null) {
                 long time = validFrom.getTime() / 1000;
@@ -1568,8 +1568,8 @@ class CertStoreQueryExecutor {
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
-            ps.setInt(1, ca.getId());
-            ps.setInt(2, user.getId());
+            ps.setInt(1, ca.id());
+            ps.setInt(2, user.id());
             rs = ps.executeQuery();
 
             if (!rs.next()) {
@@ -1602,7 +1602,7 @@ class CertStoreQueryExecutor {
 
         try {
             ps.setString(1, serial.toString(16));
-            ps.setInt(2, ca.getId());
+            ps.setInt(2, ca.id());
             rs = ps.executeQuery();
 
             if (!rs.next()) {
@@ -1639,7 +1639,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setLong(idx++, startId - 1);
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setLong(idx++, notExpiredAt.getTime() / 1000 + 1);
             if (withEe) {
                 setBoolean(ps, idx++, onlyUserCerts);
@@ -1685,7 +1685,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setLong(idx++, startId - 1);
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             rs = ps.executeQuery();
             while (rs.next()) {
                 long id = rs.getLong("ID");
@@ -1737,7 +1737,7 @@ class CertStoreQueryExecutor {
                 } else {
                     long lastUpdate = rs.getLong("LUPDATE");
                     revInfo = new CertRevInfoWithSerial(id, new BigInteger(serial, 16),
-                            CrlReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
+                            CrlReason.REMOVE_FROM_CRL.code(), new Date(1000 * lastUpdate), null);
                 }
                 ret.add(revInfo);
             } catch (SQLException ex) {
@@ -1773,7 +1773,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             ps.setLong(idx++, subjectFp);
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             rs = ps.executeQuery();
             if (!rs.next()) {
                 return CertStatus.UNKNOWN;
@@ -1795,7 +1795,7 @@ class CertStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setLong(idx++, subjectFp);
             rs = ps.executeQuery();
             return rs.next();
@@ -1815,7 +1815,7 @@ class CertStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setLong(idx++, keyFp);
             rs = ps.executeQuery();
             return rs.next();
@@ -1960,7 +1960,7 @@ class CertStoreQueryExecutor {
 
         try {
             int idx = 1;
-            ps.setInt(idx++, profile.getId());
+            ps.setInt(idx++, profile.id());
             ps.setString(idx++, "%cn=" + commonName + "%");
 
             rs = ps.executeQuery();

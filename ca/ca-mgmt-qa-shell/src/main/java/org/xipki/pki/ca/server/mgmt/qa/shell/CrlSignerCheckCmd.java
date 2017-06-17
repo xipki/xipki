@@ -55,7 +55,7 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
     @Override
     protected Object doExecute() throws Exception {
         X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
-        String name = ey.getName();
+        String name = ey.name();
         println("checking CRL signer " + name);
 
         X509CrlSignerEntry cs = caManager.getCrlSigner(name);
@@ -63,21 +63,21 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
             throw new CmdFailure("CRL signer named '" + name + "' is not configured");
         }
 
-        if (ey.getSignerType() != null) {
-            String ex = ey.getSignerType();
-            String is = cs.getType();
+        if (ey.signerType() != null) {
+            String ex = ey.signerType();
+            String is = cs.type();
             MgmtQaShellUtil.assertEquals("signer type", ex, is);
         }
 
-        if (ey.getSignerConf() != null) {
-            String ex = ey.getSignerConf();
-            String is = cs.getConf();
+        if (ey.signerConf() != null) {
+            String ex = ey.signerConf();
+            String is = cs.conf();
             MgmtQaShellUtil.assertEquals("signer conf", ex, is);
         }
 
-        if (ey.getCrlControl() != null) {
-            CrlControl ex = new CrlControl(ey.getCrlControl());
-            CrlControl is = new CrlControl(cs.getCrlControl());
+        if (ey.crlControl() != null) {
+            CrlControl ex = new CrlControl(ey.crlControl());
+            CrlControl is = new CrlControl(cs.crlControl());
 
             if (!ex.equals(is)) {
                 throw new CmdFailure("CRL control: is '" + is.getConf() + "', but expected '"
@@ -85,9 +85,9 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
             }
         }
 
-        if (ey.getBase64Cert() != null) {
-            String ex = ey.getBase64Cert();
-            String is = cs.getBase64Cert();
+        if (ey.base64Cert() != null) {
+            String ex = ey.base64Cert();
+            String is = cs.base64Cert();
             MgmtQaShellUtil.assertEquals("certificate", ex, is);
         }
 

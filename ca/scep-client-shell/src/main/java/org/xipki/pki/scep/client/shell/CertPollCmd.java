@@ -79,7 +79,7 @@ public class CertPollCmd extends ClientCommandSupport {
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
 
         ScepClient client = getScepClient();
-        X509Certificate caCert = client.getAuthorityCertStore().getCaCert();
+        X509Certificate caCert = client.authorityCertStore().caCert();
         X500Name caSubject = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
         EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(), getIdentityCert(), csr,
@@ -92,7 +92,7 @@ public class CertPollCmd extends ClientCommandSupport {
             throw new CmdFailure("server returned 'pending'");
         }
 
-        List<X509Certificate> certs = resp.getCertificates();
+        List<X509Certificate> certs = resp.certificates();
         if (certs == null || certs.isEmpty()) {
             throw new CmdFailure("received no certficate from server");
         }

@@ -56,11 +56,11 @@ public class CertificatePolicyInformation {
         this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
     }
 
-    public String getCertPolicyId() {
+    public String certPolicyId() {
         return certPolicyId;
     }
 
-    public List<CertificatePolicyQualifier> getQualifiers() {
+    public List<CertificatePolicyQualifier> qualifiers() {
         return qualifiers;
     }
 

@@ -83,11 +83,11 @@ class StoreConf {
         }
     }
 
-    Set<String> getCaCertsIncludes() {
+    Set<String> caCertsIncludes() {
         return caCertsIncludes;
     }
 
-    Set<String> getCaCertsExcludes() {
+    Set<String> caCertsExcludes() {
         return caCertsExcludes;
     }
 

@@ -48,7 +48,7 @@ public interface RequestorInfo {
 
     static final String NAME_BY_CA = "BY-CA";
 
-    NameId getIdent();
+    NameId ident();
 
     boolean isRa();
 

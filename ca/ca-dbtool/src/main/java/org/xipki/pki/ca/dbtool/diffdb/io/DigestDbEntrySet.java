@@ -60,7 +60,7 @@ public class DigestDbEntrySet implements QueueEntry, Comparable<DigestDbEntrySet
         this.exception = exception;
     }
 
-    public Exception getException() {
+    public Exception exception() {
         return exception;
     }
 
@@ -68,11 +68,11 @@ public class DigestDbEntrySet implements QueueEntry, Comparable<DigestDbEntrySet
         entries.add(entry);
     }
 
-    public long getStartId() {
+    public long startId() {
         return startId;
     }
 
-    public List<IdentifiedDbDigestEntry> getEntries() {
+    public List<IdentifiedDbDigestEntry> entries() {
         return entries;
     }
 

@@ -54,7 +54,7 @@ public class ChangeUserEntry {
         this.ident = ParamUtil.requireNonNull("ident", ident);
     }
 
-    public NameId getIdent() {
+    public NameId ident() {
         return ident;
     }
 
@@ -70,7 +70,7 @@ public class ChangeUserEntry {
         this.password = password;
     }
 
-    public String getPassword() {
+    public String password() {
         return password;
     }
 

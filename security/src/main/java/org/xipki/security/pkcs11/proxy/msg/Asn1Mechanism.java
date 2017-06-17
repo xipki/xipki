@@ -104,11 +104,11 @@ public class Asn1Mechanism extends ASN1Object {
         return new DERSequence(vector);
     }
 
-    public long getMechanism() {
+    public long mechanism() {
         return mechanism;
     }
 
-    public Asn1P11Params getParams() {
+    public Asn1P11Params params() {
         return params;
     }
 

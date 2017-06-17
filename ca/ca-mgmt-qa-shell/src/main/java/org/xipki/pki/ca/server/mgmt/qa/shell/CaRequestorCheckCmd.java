@@ -107,7 +107,7 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
         Set<CaHasRequestorEntry> entries = caManager.getRequestorsForCa(caName);
         CaHasRequestorEntry entry = null;
         for (CaHasRequestorEntry m : entries) {
-            if (m.getRequestorIdent().getName().equals(requestorName)) {
+            if (m.requestorIdent().name().equals(requestorName)) {
                 entry = m;
                 break;
             }
@@ -126,8 +126,8 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
         if (permissions != null) {
             int intPermission = ShellUtil.getPermission(permissions);
 
-            if (intPermission != entry.getPermission()) {
-                throw new CmdFailure("permissions: is '" + entry.getPermission()
+            if (intPermission != entry.permission()) {
+                throw new CmdFailure("permissions: is '" + entry.permission()
                         + "', but expected '" + intPermission + "'");
             }
         }
@@ -139,8 +139,8 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
                 }
             }
 
-            if (!profiles.equals(entry.getProfiles())) {
-                throw new CmdFailure("profiles: is '" + entry.getProfiles()
+            if (!profiles.equals(entry.profiles())) {
+                throw new CmdFailure("profiles: is '" + entry.profiles()
                         + "', but expected '" + profiles + "'");
             }
         }

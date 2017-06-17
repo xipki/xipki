@@ -70,7 +70,7 @@ public class ProfessionInfoOption {
         this.addProfessionalInfo = addProfessionalInfo;
     }
 
-    public byte[] getAddProfessionalInfo() {
+    public byte[] addProfessionalInfo() {
         return addProfessionalInfo;
     }
 
@@ -78,19 +78,19 @@ public class ProfessionInfoOption {
         this.addProfessionalInfo = addProfessionalInfo;
     }
 
-    public NamingAuthority getNamingAuthority() {
+    public NamingAuthority namingAuthority() {
         return namingAuthority;
     }
 
-    public List<String> getProfessionItems() {
+    public List<String> professionItems() {
         return professionItems;
     }
 
-    public List<ASN1ObjectIdentifier> getProfessionOids() {
+    public List<ASN1ObjectIdentifier> professionOids() {
         return professionOids;
     }
 
-    public RegistrationNumberOption getRegistrationNumberOption() {
+    public RegistrationNumberOption registrationNumberOption() {
         return registrationNumberOption;
     }
 

@@ -55,11 +55,11 @@ class CmpResponder {
         this.sigAlgoValidator = ParamUtil.requireNonNull("sigAlgoValidator", sigAlgoValidator);
     }
 
-    public X509Certificate getCert() {
+    public X509Certificate cert() {
         return cert;
     }
 
-    public AlgorithmValidator getSigAlgoValidator() {
+    public AlgorithmValidator sigAlgoValidator() {
         return sigAlgoValidator;
     }
 

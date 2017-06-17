@@ -192,7 +192,7 @@ public class KeyParametersOption {
         public ECParamatersOption() {
         }
 
-        public Set<ASN1ObjectIdentifier> getCurveOids() {
+        public Set<ASN1ObjectIdentifier> curveOids() {
             return curveOids;
         }
 
@@ -200,7 +200,7 @@ public class KeyParametersOption {
             this.curveOids = curveOids;
         }
 
-        public Set<Byte> getPointEncodings() {
+        public Set<Byte> pointEncodings() {
             return pointEncodings;
         }
 

@@ -201,7 +201,7 @@ public abstract class LoadExecutor {
     protected boolean stop() {
         return interrupted
                 || errorAccount.get() > 0
-                || System.currentTimeMillis() - processLog.getStartTime() >= duration * 1000L;
+                || System.currentTimeMillis() - processLog.startTime() >= duration * 1000L;
     }
 
     protected void printHeader() {
@@ -219,9 +219,9 @@ public abstract class LoadExecutor {
     protected void printSummary() {
         processLog.printTrailer();
 
-        final long account = processLog.getNumProcessed();
+        final long account = processLog.numProcessed();
         StringBuilder sb = new StringBuilder();
-        long elapsedTimeMs = processLog.getTotalElapsedTime();
+        long elapsedTimeMs = processLog.totalElapsedTime();
         sb.append("finished in ")
             .append(StringUtil.formatTime(elapsedTimeMs / 1000, false)).append("\n")
             .append("account: ")
@@ -233,7 +233,7 @@ public abstract class LoadExecutor {
             .append(" ")
             .append(unit).append("\n")
             .append("average: ")
-            .append(StringUtil.formatAccount(processLog.getTotalAverageSpeed(), 1))
+            .append(StringUtil.formatAccount(processLog.totalAverageSpeed(), 1))
             .append(" ")
             .append(unit)
             .append("/s\n");

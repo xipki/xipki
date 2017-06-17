@@ -62,7 +62,7 @@ class AuditOption {
         this.certprofileMapping = Collections.unmodifiableMap(map);
     }
 
-    public Map<String, String> getCertprofileMapping() {
+    public Map<String, String> certprofileMapping() {
         return certprofileMapping;
     }
 

@@ -75,10 +75,10 @@ class X509CrlSignerEntryWrapper {
 
     public void setDbEntry(final X509CrlSignerEntry dbEntry) throws InvalidConfException {
         this.dbEntry = dbEntry;
-        this.crlControl = new CrlControl(dbEntry.getCrlControl());
+        this.crlControl = new CrlControl(dbEntry.crlControl());
     }
 
-    public CrlControl getCrlControl() {
+    public CrlControl crlControl() {
         return crlControl;
     }
 
@@ -93,16 +93,16 @@ class X509CrlSignerEntryWrapper {
             throw new XiSecurityException("dbEntry is null");
         }
 
-        if ("CA".equals(dbEntry.getType())) {
+        if ("CA".equals(dbEntry.type())) {
             return;
         }
 
         dbEntry.setConfFaulty(true);
 
-        X509Certificate responderCert = dbEntry.getCertificate();
+        X509Certificate responderCert = dbEntry.certificate();
         try {
-            signer = securityFactory.createSigner(dbEntry.getType(),
-                    new SignerConf(dbEntry.getConf()), responderCert);
+            signer = securityFactory.createSigner(dbEntry.type(),
+                    new SignerConf(dbEntry.conf()), responderCert);
         } catch (ObjectCreationException ex1) {
             throw new XiSecurityException("signer without certificate is not allowed");
         }
@@ -112,7 +112,7 @@ class X509CrlSignerEntryWrapper {
             throw new XiSecurityException("signer without certificate is not allowed");
         }
 
-        if (dbEntry.getBase64Cert() == null) {
+        if (dbEntry.base64Cert() == null) {
             dbEntry.setCertificate(signerCert);
         }
 
@@ -138,20 +138,20 @@ class X509CrlSignerEntryWrapper {
         dbEntry.setConfFaulty(false);
     } // method initSigner
 
-    public X509CrlSignerEntry getDbEntry() {
+    public X509CrlSignerEntry dbEntry() {
         return dbEntry;
     }
 
-    public X509Certificate getCert() {
-        return (signer == null) ? dbEntry.getCertificate() : signer.getCertificate();
+    public X509Certificate cert() {
+        return (signer == null) ? dbEntry.certificate() : signer.getCertificate();
     }
 
-    public byte[] getSubjectKeyIdentifier() {
+    public byte[] subjectKeyIdentifier() {
         return (subjectKeyIdentifier == null) ? null
                 : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
     }
 
-    public ConcurrentContentSigner getSigner() {
+    public ConcurrentContentSigner signer() {
         return signer;
     }
 

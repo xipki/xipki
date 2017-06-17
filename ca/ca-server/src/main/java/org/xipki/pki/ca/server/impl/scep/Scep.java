@@ -168,18 +168,18 @@ public class Scep {
     public Scep(final ScepEntry dbEntry, final CaManagerImpl caManager) throws CaMgmtException {
         this.caManager = ParamUtil.requireNonNull("caManager", caManager);
         this.dbEntry = ParamUtil.requireNonNull("dbEntry", dbEntry);
-        this.name = dbEntry.getName();
-        this.caIdent = dbEntry.getCaIdent();
-        this.certProfiles = dbEntry.getCertProfiles();
+        this.name = dbEntry.name();
+        this.caIdent = dbEntry.caIdent();
+        this.certProfiles = dbEntry.certProfiles();
         try {
-            this.control = new ScepControl(dbEntry.getControl());
+            this.control = new ScepControl(dbEntry.control());
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex);
         }
         LOG.info("SCEP {}: caCert.included={}, signerCert.included={}", this.caIdent,
                 this.control.isIncludeCaCert(), this.control.isIncludeSignerCert());
 
-        String type = dbEntry.getResponderType();
+        String type = dbEntry.responderType();
         if (!"PKCS12".equalsIgnoreCase(type) && !"JKS".equalsIgnoreCase(type)) {
             throw new CaMgmtException("unsupported SCEP responder type '" + type + "'");
         }
@@ -187,16 +187,16 @@ public class Scep {
         KeyCertPair privKeyAndCert;
         try {
             // ResponderConf does not contain algo.
-            SignerConf signerConf = new SignerConf(dbEntry.getResponderConf(), HashAlgoType.SHA256,
+            SignerConf signerConf = new SignerConf(dbEntry.responderConf(), HashAlgoType.SHA256,
                     new SignatureAlgoControl());
-            privKeyAndCert = caManager.getSecurityFactory().createPrivateKeyAndCert(
-                    dbEntry.getResponderType(), signerConf, dbEntry.getCertificate());
+            privKeyAndCert = caManager.securityFactory().createPrivateKeyAndCert(
+                    dbEntry.responderType(), signerConf, dbEntry.certificate());
         } catch (ObjectCreationException ex) {
             throw new CaMgmtException(ex);
         }
 
-        this.responderKey = privKeyAndCert.getPrivateKey();
-        this.responderCert = privKeyAndCert.getCertificate();
+        this.responderKey = privKeyAndCert.privateKey();
+        this.responderCert = privKeyAndCert.certificate();
 
         if (!(responderCert.getPublicKey() instanceof RSAPublicKey)) {
             throw new IllegalArgumentException(
@@ -229,41 +229,41 @@ public class Scep {
         this.maxSigningTimeBiasInMs = ms;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public NameId getCaIdent() {
+    public NameId caIdent() {
         return caIdent;
     }
 
-    public ScepEntry getDbEntry() {
+    public ScepEntry dbEntry() {
         return dbEntry;
     }
 
-    public CaCaps getCaCaps() {
+    public CaCaps caCaps() {
         return caCaps;
     }
 
-    public CaCertRespBytes getCaCertResp() throws OperationException {
+    public CaCertRespBytes caCertResp() throws OperationException {
         refreshCa();
         return caCertRespBytes;
     }
 
     public boolean supportsCertProfile(final String profileName) throws CaMgmtException {
         if (certProfiles.contains("ALL") || certProfiles.contains(profileName.toUpperCase())) {
-            return caManager.getX509Ca(caIdent).supportsCertProfile(profileName);
+            return caManager.x509Ca(caIdent).supportsCertProfile(profileName);
         } else {
             return false;
         }
     }
 
-    public CaStatus getStatus() {
+    public CaStatus status() {
         if (!dbEntry.isActive() || dbEntry.isFaulty()) {
             return CaStatus.INACTIVE;
         }
         try {
-            return caManager.getX509Ca(caIdent).getCaInfo().getStatus();
+            return caManager.x509Ca(caIdent).caInfo().status();
         } catch (CaMgmtException ex) {
             LogUtil.error(LOG, ex);
             return CaStatus.INACTIVE;
@@ -273,7 +273,7 @@ public class Scep {
     public ContentInfo servicePkiOperation(final CMSSignedData requestContent,
             final String certProfileName, final String msgId, final AuditEvent event)
             throws MessageDecodingException, OperationException {
-        CaStatus status = getStatus();
+        CaStatus status = status();
 
         if (CaStatus.ACTIVE != status) {
             LOG.warn("SCEP {} is not active", caIdent);
@@ -284,12 +284,12 @@ public class Scep {
                 envelopedDataDecryptor, null);
 
         PkiMessage rep = doServicePkiOperation(requestContent, req, certProfileName, msgId, event);
-        audit(event, CaAuditConstants.NAME_SCEP_pkiStatus, rep.getPkiStatus().toString());
-        if (rep.getPkiStatus() == PkiStatus.FAILURE) {
+        audit(event, CaAuditConstants.NAME_SCEP_pkiStatus, rep.pkiStatus().toString());
+        if (rep.pkiStatus() == PkiStatus.FAILURE) {
             event.setStatus(AuditStatus.FAILED);
         }
-        if (rep.getFailInfo() != null) {
-            audit(event, CaAuditConstants.NAME_SCEP_failInfo, rep.getFailInfo().toString());
+        if (rep.failInfo() != null) {
+            audit(event, CaAuditConstants.NAME_SCEP_failInfo, rep.failInfo().toString());
         }
         return encodeResponse(rep, req);
     } // method servicePkiOperation
@@ -301,11 +301,11 @@ public class Scep {
         ParamUtil.requireNonNull("requestContent", requestContent);
         ParamUtil.requireNonNull("req", req);
 
-        String tid = req.getTransactionId().getId();
+        String tid = req.transactionId().id();
         // verify and decrypt the request
         audit(event, CaAuditConstants.NAME_tid, tid);
-        if (req.getFailureMessage() != null) {
-            audit(event, CaAuditConstants.NAME_SCEP_failureMessage, req.getFailureMessage());
+        if (req.failureMessage() != null) {
+            audit(event, CaAuditConstants.NAME_SCEP_failureMessage, req.failureMessage());
         }
         Boolean bo = req.isSignatureValid();
         if (bo != null && !bo.booleanValue()) {
@@ -316,11 +316,11 @@ public class Scep {
             audit(event, CaAuditConstants.NAME_SCEP_decryption, "failed");
         }
 
-        PkiMessage rep = new PkiMessage(req.getTransactionId(), MessageType.CertRep,
+        PkiMessage rep = new PkiMessage(req.transactionId(), MessageType.CertRep,
                 Nonce.randomNonce());
-        rep.setRecipientNonce(req.getSenderNonce());
+        rep.setRecipientNonce(req.senderNonce());
 
-        if (req.getFailureMessage() != null) {
+        if (req.failureMessage() != null) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
         }
@@ -337,7 +337,7 @@ public class Scep {
             rep.setFailInfo(FailInfo.badRequest);
         }
 
-        Date signingTime = req.getSigningTime();
+        Date signingTime = req.signingTime();
         if (maxSigningTimeBiasInMs > 0) {
             boolean isTimeBad = false;
             if (signingTime == null) {
@@ -358,7 +358,7 @@ public class Scep {
         } // end if
 
         // check the digest algorithm
-        String oid = req.getDigestAlgorithm().getId();
+        String oid = req.digestAlgorithm().getId();
         ScepHashAlgoType hashAlgoType = ScepHashAlgoType.forNameOrOid(oid);
         if (hashAlgoType == null) {
             LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
@@ -388,7 +388,7 @@ public class Scep {
         }
 
         // check the content encryption algorithm
-        ASN1ObjectIdentifier encOid = req.getContentEncryptionAlgorithm();
+        ASN1ObjectIdentifier encOid = req.contentEncryptionAlgorithm();
         if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid)) {
             if (!caCaps.containsCapability(CaCapability.DES3)) {
                 LOG.warn("tid={}: encryption with DES3 algorithm is not permitted", tid, encOid);
@@ -407,31 +407,31 @@ public class Scep {
             rep.setFailInfo(FailInfo.badAlg);
         }
 
-        if (rep.getPkiStatus() == PkiStatus.FAILURE) {
+        if (rep.pkiStatus() == PkiStatus.FAILURE) {
             return rep;
         }
 
         X509Ca ca;
         try {
-            ca = caManager.getX509Ca(caIdent);
+            ca = caManager.x509Ca(caIdent);
         } catch (CaMgmtException ex) {
             LogUtil.error(LOG, ex, tid + "=" + tid + ",could not get X509CA");
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
 
-        X500Name caX500Name = ca.getCaInfo().getCertificate().getSubjectAsX500Name();
+        X500Name caX500Name = ca.caInfo().certificate().subjectAsX500Name();
 
         try {
             SignedData signedData;
 
-            MessageType mt = req.getMessageType();
+            MessageType mt = req.messageType();
             audit(event, CaAuditConstants.NAME_SCEP_messageType, mt.toString());
 
             switch (mt) {
             case PKCSReq:
             case RenewalReq:
             case UpdateReq:
-                CertificationRequest csr = CertificationRequest.getInstance(req.getMessageData());
+                CertificationRequest csr = CertificationRequest.getInstance(req.messageData());
                 X500Name reqSubject = csr.getCertificationRequestInfo().getSubject();
                 String reqSubjectText = X509Util.getRfc4519Name(reqSubject);
                 LOG.info("tid={}, subject={}", tid, reqSubjectText);
@@ -444,7 +444,7 @@ public class Scep {
                 }
 
                 CertificationRequestInfo csrReqInfo = csr.getCertificationRequestInfo();
-                X509Certificate reqSignatureCert = req.getSignatureCert();
+                X509Certificate reqSignatureCert = req.signatureCert();
                 boolean selfSigned = reqSignatureCert.getSubjectX500Principal().equals(
                         reqSignatureCert.getIssuerX500Principal());
 
@@ -498,7 +498,7 @@ public class Scep {
                             throw FailInfoException.BAD_REQUEST;
                         }
 
-                        Integer userId = knowCertRes.getUserId();
+                        Integer userId = knowCertRes.userId();
                         if (userId == null) {
                             LOG.warn("tid={}: could not extract user from the signature cert", tid);
                             throw FailInfoException.BAD_REQUEST;
@@ -534,19 +534,19 @@ public class Scep {
                     }
                 }*/
 
-                signedData = buildSignedData(cert.getCert().getCert());
+                signedData = buildSignedData(cert.cert().cert());
                 break;
             case CertPoll:
-                IssuerAndSubject is = IssuerAndSubject.getInstance(req.getMessageData());
-                audit(event, CaAuditConstants.NAME_issuer, X509Util.getRfc4519Name(is.getIssuer()));
+                IssuerAndSubject is = IssuerAndSubject.getInstance(req.messageData());
+                audit(event, CaAuditConstants.NAME_issuer, X509Util.getRfc4519Name(is.issuer()));
                 audit(event, CaAuditConstants.NAME_subject,
-                        X509Util.getRfc4519Name(is.getSubject()));
+                        X509Util.getRfc4519Name(is.subject()));
 
-                ensureIssuedByThisCa(caX500Name, is.getIssuer());
-                signedData = pollCert(ca, is.getSubject(), req.getTransactionId());
+                ensureIssuedByThisCa(caX500Name, is.issuer());
+                signedData = pollCert(ca, is.subject(), req.transactionId());
                 break;
             case GetCert:
-                IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
+                IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.messageData());
                 BigInteger serial = isn.getSerialNumber().getPositiveValue();
                 audit(event, CaAuditConstants.NAME_issuer, X509Util.getRfc4519Name(isn.getName()));
                 audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
@@ -554,7 +554,7 @@ public class Scep {
                 signedData = getCert(ca, isn.getSerialNumber().getPositiveValue());
                 break;
             case GetCRL:
-                isn = IssuerAndSerialNumber.getInstance(req.getMessageData());
+                isn = IssuerAndSerialNumber.getInstance(req.messageData());
                 serial = isn.getSerialNumber().getPositiveValue();
                 audit(event, CaAuditConstants.NAME_issuer, X509Util.getRfc4519Name(isn.getName()));
                 audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
@@ -562,7 +562,7 @@ public class Scep {
                 signedData = getCrl(ca, serial);
                 break;
             default:
-                LOG.error("unknown SCEP messageType '{}'", req.getMessageType());
+                LOG.error("unknown SCEP messageType '{}'", req.messageType());
                 throw FailInfoException.BAD_REQUEST;
             } // end switch<
 
@@ -572,7 +572,7 @@ public class Scep {
         } catch (FailInfoException ex) {
             LogUtil.error(LOG, ex);
             rep.setPkiStatus(PkiStatus.FAILURE);
-            rep.setFailInfo(ex.getFailInfo());
+            rep.setFailInfo(ex.failInfo());
         }
 
         return rep;
@@ -597,7 +597,7 @@ public class Scep {
 
     private SignedData pollCert(final X509Ca ca, final X500Name subject, final TransactionId tid)
             throws FailInfoException, OperationException {
-        byte[] tidBytes = getTransactionIdBytes(tid.getId());
+        byte[] tidBytes = getTransactionIdBytes(tid.id());
         List<X509Certificate> certs = ca.getCertificate(subject, tidBytes);
         if (CollectionUtil.isEmpty(certs)) {
             certs = ca.getCertificate(subject, null);
@@ -609,7 +609,7 @@ public class Scep {
 
         if (certs.size() > 1) {
             LOG.warn("given certId (subject: {}) and transactionId {} match multiple certificates",
-                X509Util.getRfc4519Name(subject), tid.getId());
+                X509Util.getRfc4519Name(subject), tid.id());
             throw FailInfoException.BAD_CERTID;
         }
 
@@ -623,7 +623,7 @@ public class Scep {
             cmsSignedDataGen.addCertificate(certHolder);
             if (control.isIncludeCaCert()) {
                 refreshCa();
-                cmsSignedDataGen.addCertificate(caCert.getCertHolder());
+                cmsSignedDataGen.addCertificate(caCert.certHolder());
             }
             CMSSignedData signedData = cmsSignedDataGen.generate(new CMSAbsentContent());
             return SignedData.getInstance(signedData.toASN1Structure().getContent());
@@ -658,14 +658,14 @@ public class Scep {
         ParamUtil.requireNonNull("request", request);
 
         String signatureAlgorithm = getSignatureAlgorithm(responderKey,
-                request.getDigestAlgorithm());
+                request.digestAlgorithm());
         ContentInfo ci;
         try {
             X509Certificate[] cmsCertSet = control.isIncludeSignerCert()
                     ? new X509Certificate[]{responderCert} : null;
 
             ci = response.encode(responderKey, signatureAlgorithm, responderCert, cmsCertSet,
-                    request.getSignatureCert(), request.getContentEncryptionAlgorithm());
+                    request.signatureCert(), request.contentEncryptionAlgorithm());
         } catch (MessageEncodingException ex) {
             LogUtil.error(LOG, ex, "could not encode response");
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
@@ -679,13 +679,13 @@ public class Scep {
         if (!requestor.isPermitted(permission)) {
             throw new OperationException(ErrorCode.NOT_PERMITTED,
                     PermissionConstants.getTextForCode(permission) + " is not permitted for user "
-                    + requestor.getCaHasUser().getUserIdent().getName());
+                    + requestor.caHasUser().userIdent().name());
         }
 
         if (!requestor.isCertProfilePermitted(certProfile)) {
             throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "Certificate profile " + certProfile + " is not permitted for user "
-                    + requestor.getCaHasUser().getUserIdent().getName());
+                    + requestor.caHasUser().userIdent().name());
         }
     }
 
@@ -750,14 +750,14 @@ public class Scep {
 
     private void refreshCa() throws OperationException {
         try {
-            X509Ca ca = caManager.getX509Ca(caIdent);
-            X509Cert currentCaCert = ca.getCaInfo().getCertificate();
+            X509Ca ca = caManager.x509Ca(caIdent);
+            X509Cert currentCaCert = ca.caInfo().certificate();
             if (currentCaCert.equals(caCert)) {
                 return;
             }
 
             caCert = currentCaCert;
-            caCertRespBytes = new CaCertRespBytes(currentCaCert.getCert(), responderCert);
+            caCertRespBytes = new CaCertRespBytes(currentCaCert.cert(), responderCert);
         } catch (CaMgmtException | CertificateException | CMSException ex) {
             throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
         }

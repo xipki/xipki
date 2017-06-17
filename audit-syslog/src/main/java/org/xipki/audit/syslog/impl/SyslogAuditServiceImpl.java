@@ -123,7 +123,7 @@ public class SyslogAuditServiceImpl extends AuditService {
     }
 
     @Override
-    public void doLogEvent(@NonNull final AuditEvent event) {
+    public void logEvent0(@NonNull final AuditEvent event) {
         if (!initialized) {
             LOG.error("syslog audit not initialized");
             return;
@@ -134,24 +134,24 @@ public class SyslogAuditServiceImpl extends AuditService {
             sb.append(prefix);
         }
 
-        AuditStatus status = event.getStatus();
+        AuditStatus status = event.status();
         if (status == null) {
             status = AuditStatus.UNDEFINED;
         }
 
         sb.append("\tstatus: ").append(status.name());
 
-        long duration = event.getDuration();
+        long duration = event.duration();
         if (duration >= 0) {
             sb.append("\tduration: ").append(Long.toString(duration));
         }
 
-        List<AuditEventData> eventDataArray = event.getEventDatas();
+        List<AuditEventData> eventDataArray = event.eventDatas();
         for (AuditEventData m : eventDataArray) {
-            if (duration >= 0 && "duration".equalsIgnoreCase(m.getName())) {
+            if (duration >= 0 && "duration".equalsIgnoreCase(m.name())) {
                 continue;
             }
-            sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
+            sb.append("\t").append(m.name()).append(": ").append(m.value());
         }
 
         final int n = sb.size();
@@ -166,15 +166,15 @@ public class SyslogAuditServiceImpl extends AuditService {
         if (notEmpty(localname)) {
             sm.setHostname(localname);
         }
-        sm.setAppName(event.getApplicationName());
-        sm.setSeverity(getSeverity(event.getLevel()));
+        sm.setAppName(event.applicationName());
+        sm.setSeverity(getSeverity(event.level()));
 
-        Date timestamp = event.getTimestamp();
+        Date timestamp = event.timestamp();
         if (timestamp != null) {
             sm.setTimestamp(timestamp);
         }
 
-        sm.setMsgId(event.getName());
+        sm.setMsgId(event.name());
         sm.setMsg(sb);
 
         try {
@@ -186,7 +186,7 @@ public class SyslogAuditServiceImpl extends AuditService {
     } // method logEvent(AuditEvent)
 
     @Override
-    public void doLogEvent(@NonNull final PciAuditEvent event) {
+    public void logEvent0(@NonNull final PciAuditEvent event) {
         if (!initialized) {
             LOG.error("syslog audit not initialiazed");
             return;
@@ -206,7 +206,7 @@ public class SyslogAuditServiceImpl extends AuditService {
             sm.setHostname(localname);
         }
 
-        sm.setSeverity(getSeverity(event.getLevel()));
+        sm.setSeverity(getSeverity(event.level()));
         sm.setMsg(msg);
 
         try {

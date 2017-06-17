@@ -95,11 +95,11 @@ public class P12KeyGenerator {
             this.subjectPublicKeyInfo = X509Util.toRfc3279Style(subjectPublicKeyInfo);
         }
 
-        public KeyPair getKeypair() {
+        public KeyPair kypair() {
             return keypair;
         }
 
-        public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
+        public SubjectPublicKeyInfo subjectPublicKeyInfo() {
             return subjectPublicKeyInfo;
         }
 
@@ -120,15 +120,15 @@ public class P12KeyGenerator {
             this.jceCert = X509Util.toX509Cert(cert.toASN1Structure());
         }
 
-        public X509CertificateHolder getCert() {
+        public X509CertificateHolder cert() {
             return cert;
         }
 
-        public Certificate getJceCert() {
+        public Certificate jceCert() {
             return jceCert;
         }
 
-        public PrivateKey getKey() {
+        public PrivateKey key() {
             return key;
         }
 
@@ -147,7 +147,7 @@ public class P12KeyGenerator {
             final String selfSignedCertSubject)
             throws Exception {
         KeyPairWithSubjectPublicKeyInfo kp = genRSAKeypair(keysize, publicExponent,
-                params.getRandom());
+                params.random());
         return generateIdentity(kp, params, selfSignedCertSubject);
     }
 
@@ -155,7 +155,7 @@ public class P12KeyGenerator {
     public P12KeyGenerationResult generateDSAKeypair(final int plength, final int qlength,
             final KeystoreGenerationParameters params, final String selfSignedCertSubject)
             throws Exception {
-        KeyPairWithSubjectPublicKeyInfo kp = genDSAKeypair(plength, qlength, params.getRandom());
+        KeyPairWithSubjectPublicKeyInfo kp = genDSAKeypair(plength, qlength, params.random());
         return generateIdentity(kp, params, selfSignedCertSubject);
     }
 
@@ -163,7 +163,7 @@ public class P12KeyGenerator {
     public P12KeyGenerationResult generateECKeypair(final String curveNameOrOid,
             final KeystoreGenerationParameters params, final String selfSignedCertSubject)
             throws Exception {
-        KeyPairWithSubjectPublicKeyInfo kp = genECKeypair(curveNameOrOid, params.getRandom());
+        KeyPairWithSubjectPublicKeyInfo kp = genECKeypair(curveNameOrOid, params.random());
         return generateIdentity(kp, params, selfSignedCertSubject);
     }
 
@@ -175,7 +175,7 @@ public class P12KeyGenerator {
                     "keyBitLen (" + keyBitLen + ") must be multiple of 8");
         }
 
-        SecureRandom random = params.getRandom();
+        SecureRandom random = params.random();
         if (random == null) {
             random = new SecureRandom();
         }
@@ -185,13 +185,13 @@ public class P12KeyGenerator {
         SecretKey secretKey = new SecretKeySpec(keyValue, algorithm);
 
         KeyStore ks = KeyUtil.getKeyStore("JCEKS");
-        ks.load(null, params.getPassword());
+        ks.load(null, params.password());
 
-        ks.setKeyEntry("main", secretKey, params.getPassword(), null);
+        ks.setKeyEntry("main", secretKey, params.password(), null);
 
         ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
         try {
-            ks.store(ksStream, params.getPassword());
+            ks.store(ksStream, params.password());
         } finally {
             ksStream.flush();
         }
@@ -250,25 +250,25 @@ public class P12KeyGenerator {
 
         String dnStr = (selfSignedCertSubject == null) ? "CN=DUMMY" : selfSignedCertSubject;
         X500Name subjectDn = new X500Name(dnStr);
-        SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
-        ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate());
+        SubjectPublicKeyInfo subjectPublicKeyInfo = kp.subjectPublicKeyInfo();
+        ContentSigner contentSigner = getContentSigner(kp.kypair().getPrivate());
 
         // Generate keystore
         X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(subjectDn,
                 BigInteger.valueOf(1), notBefore, notAfter, subjectDn, subjectPublicKeyInfo);
 
         KeyAndCertPair identity = new KeyAndCertPair(certGenerator.build(contentSigner),
-                kp.getKeypair().getPrivate());
+                kp.kypair().getPrivate());
 
         KeyStore ks = KeyUtil.getKeyStore("PKCS12");
-        ks.load(null, params.getPassword());
+        ks.load(null, params.password());
 
-        ks.setKeyEntry("main", identity.getKey(), params.getPassword(),
-                new Certificate[]{identity.getJceCert()});
+        ks.setKeyEntry("main", identity.key(), params.password(),
+                new Certificate[]{identity.jceCert()});
 
         ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
         try {
-            ks.store(ksStream, params.getPassword());
+            ks.store(ksStream, params.password());
         } finally {
             ksStream.flush();
         }
@@ -315,7 +315,7 @@ public class P12KeyGenerator {
             }
 
             builder = new BcECContentSignerBuilder(new AlgorithmIdentifier(sigOid),
-                    buildAlgId(hashAlgo.getOid()));
+                    buildAlgId(hashAlgo.oid()));
         } else {
             throw new IllegalArgumentException("unknown type of key " + key.getClass().getName());
         }

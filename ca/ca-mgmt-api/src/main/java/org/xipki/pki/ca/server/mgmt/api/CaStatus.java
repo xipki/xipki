@@ -52,7 +52,7 @@ public enum CaStatus {
         this.status = status;
     }
 
-    public String getStatus() {
+    public String status() {
         return status;
     }
 

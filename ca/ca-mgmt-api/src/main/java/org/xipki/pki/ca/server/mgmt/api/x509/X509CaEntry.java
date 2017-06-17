@@ -96,10 +96,10 @@ public class X509CaEntry extends CaEntry {
         this.serialNoBitLen = ParamUtil.requireRange("serialNoBitLen", serialNoBitLen, 63, 159);
         this.nextCrlNumber = ParamUtil.requireMin("nextCrlNumber", nextCrlNumber, 1);
 
-        this.cacertUris = caUris.getCacertUris();
-        this.ocspUris = caUris.getOcspUris();
-        this.crlUris = caUris.getCrlUris();
-        this.deltaCrlUris = caUris.getDeltaCrlUris();
+        this.cacertUris = caUris.cacertUris();
+        this.ocspUris = caUris.ocspUris();
+        this.crlUris = caUris.crlUris();
+        this.deltaCrlUris = caUris.deltaCrlUris();
     }
 
     public void setCertificate(final X509Certificate certificate) throws CaMgmtException {
@@ -123,7 +123,7 @@ public class X509CaEntry extends CaEntry {
         }
     }
 
-    public int getSerialNoBitLen() {
+    public int serialNoBitLen() {
         return serialNoBitLen;
     }
 
@@ -131,7 +131,7 @@ public class X509CaEntry extends CaEntry {
         this.serialNoBitLen = ParamUtil.requireMin("serialNoBitLen", serialNoBitLen, 63);
     }
 
-    public long getNextCrlNumber() {
+    public long nextCrlNumber() {
         return nextCrlNumber;
     }
 
@@ -139,47 +139,47 @@ public class X509CaEntry extends CaEntry {
         this.nextCrlNumber = crlNumber;
     }
 
-    public List<String> getCrlUris() {
+    public List<String> crlUris() {
         return crlUris;
     }
 
-    public String getCrlUrisAsString() {
+    public String crlUrisAsString() {
         return toString(crlUris);
     }
 
-    public List<String> getDeltaCrlUris() {
+    public List<String> deltaCrlUris() {
         return deltaCrlUris;
     }
 
-    public String getDeltaCrlUrisAsString() {
+    public String deltaCrlUrisAsString() {
         return toString(deltaCrlUris);
     }
 
-    public List<String> getOcspUris() {
+    public List<String> ocspUris() {
         return ocspUris;
     }
 
-    public String getOcspUrisAsString() {
+    public String ocspUrisAsString() {
         return toString(ocspUris);
     }
 
-    public List<String> getCacertUris() {
+    public List<String> cacertUris() {
         return cacertUris;
     }
 
-    public String getCacertUrisAsString() {
+    public String cacertUrisAsString() {
         return toString(cacertUris);
     }
 
-    public X509Certificate getCertificate() {
+    public X509Certificate certificate() {
         return cert;
     }
 
-    public int getNumCrls() {
+    public int numCrls() {
         return numCrls;
     }
 
-    public String getCrlSignerName() {
+    public String crlSignerName() {
         return crlSignerName;
     }
 
@@ -195,10 +195,10 @@ public class X509CaEntry extends CaEntry {
         }
         sb.append("serialNoBitLen: ").append(serialNoBitLen).append('\n');
         sb.append("nextCrlNumber: ").append(nextCrlNumber).append('\n');
-        sb.append("deltaCrlUris: ").append(getDeltaCrlUrisAsString()).append('\n');
-        sb.append("crlUris: ").append(getCrlUrisAsString()).append('\n');
-        sb.append("ocspUris: ").append(getOcspUrisAsString()).append('\n');
-        sb.append("caCertUris: ").append(getCacertUrisAsString()).append('\n');
+        sb.append("deltaCrlUris: ").append(deltaCrlUrisAsString()).append('\n');
+        sb.append("crlUris: ").append(crlUrisAsString()).append('\n');
+        sb.append("ocspUris: ").append(ocspUrisAsString()).append('\n');
+        sb.append("caCertUris: ").append(cacertUrisAsString()).append('\n');
         sb.append("cert: ").append("\n");
         if (cert == null) {
             sb.append("\tnull").append("\n");
@@ -226,15 +226,15 @@ public class X509CaEntry extends CaEntry {
         sb.append(revocationInfo == null ? "not revoked" : "revoked");
         sb.append("\n");
         if (revocationInfo != null) {
-            sb.append("\treason: ").append(revocationInfo.getReason().getDescription())
+            sb.append("\treason: ").append(revocationInfo.reason().description())
                 .append("\n");
-            sb.append("\trevoked at ").append(revocationInfo.getRevocationTime()).append("\n");
+            sb.append("\trevoked at ").append(revocationInfo.revocationTime()).append("\n");
         }
 
         return sb.toString();
     } // method toString
 
-    public CertRevocationInfo getRevocationInfo() {
+    public CertRevocationInfo revocationInfo() {
         return revocationInfo;
     }
 
@@ -242,15 +242,15 @@ public class X509CaEntry extends CaEntry {
         this.revocationInfo = revocationInfo;
     }
 
-    public Date getCrlBaseTime() {
+    public Date crlBaseTime() {
         return (cert == null) ? null : cert.getNotBefore();
     }
 
-    public String getSubject() {
+    public String subject() {
         return subject;
     }
 
-    public String getHexSha1OfCert() {
+    public String hexSha1OfCert() {
         return hexSha1OfCert;
     }
 
@@ -322,7 +322,7 @@ public class X509CaEntry extends CaEntry {
 
     @Override
     public int hashCode() {
-        return getIdent().hashCode();
+        return ident().hashCode();
     }
 
 }

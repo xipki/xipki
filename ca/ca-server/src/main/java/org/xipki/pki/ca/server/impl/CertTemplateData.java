@@ -67,27 +67,27 @@ public class CertTemplateData {
         this.notAfter = notAfter;
     }
 
-    public X500Name getSubject() {
+    public X500Name subject() {
         return subject;
     }
 
-    public SubjectPublicKeyInfo getPublicKeyInfo() {
+    public SubjectPublicKeyInfo publicKeyInfo() {
         return publicKeyInfo;
     }
 
-    public Date getNotBefore() {
+    public Date notBefore() {
         return notBefore;
     }
 
-    public Date getNotAfter() {
+    public Date notAfter() {
         return notAfter;
     }
 
-    public String getCertprofileName() {
+    public String certprofileName() {
         return certprofileName;
     }
 
-    public Extensions getExtensions() {
+    public Extensions extensions() {
         return extensions;
     }
 

@@ -61,11 +61,11 @@ public class NameId {
         this.id = id;
     }
 
-    public Integer getId() {
+    public Integer id() {
         return id;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 

@@ -62,7 +62,7 @@ public class P12ECSignLoadTest extends P12SignLoadTest {
             params.setRandom(new SecureRandom());
             P12KeyGenerationResult identity = new P12KeyGenerator().generateECKeypair(
                     curveNameOrOid, params, null);
-            keystoreBytes = identity.getKeystore();
+            keystoreBytes = identity.keystore();
         }
         return keystoreBytes;
     }

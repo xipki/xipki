@@ -49,7 +49,7 @@ public class NumThreads {
         this.numTargetThreads = ParamUtil.requireMin("numTargetThreads", numTargetThreads, 1);
     }
 
-    public int getNumTargetThreads() {
+    public int numTargetThreads() {
         return numTargetThreads;
     }
 

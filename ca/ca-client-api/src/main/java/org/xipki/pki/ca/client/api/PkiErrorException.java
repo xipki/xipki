@@ -57,7 +57,7 @@ public class PkiErrorException extends Exception {
     }
 
     public PkiErrorException(final org.xipki.pki.ca.common.cmp.PkiStatusInfo statusInfo) {
-        this(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
+        this(statusInfo.status(), statusInfo.pkiFailureInfo(), statusInfo.statusMessage());
     }
 
     public PkiErrorException(final int status, final int pkiFailureInfo,
@@ -74,15 +74,15 @@ public class PkiErrorException extends Exception {
         this.statusMessage = null;
     }
 
-    public int getStatus() {
+    public int status() {
         return status;
     }
 
-    public int getPkiFailureInfo() {
+    public int pkiFailureInfo() {
         return pkiFailureInfo;
     }
 
-    public String getStatusMessage() {
+    public String statusMessage() {
         return statusMessage;
     }
 

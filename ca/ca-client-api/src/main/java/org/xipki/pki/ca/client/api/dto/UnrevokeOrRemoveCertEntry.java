@@ -58,7 +58,7 @@ public class UnrevokeOrRemoveCertEntry extends IssuerSerialEntry {
         super(id, issuer, serialNumber);
     }
 
-    public byte[] getAuthorityKeyIdentifier() {
+    public byte[] authorityKeyIdentifier() {
         return authorityKeyIdentifier;
     }
 

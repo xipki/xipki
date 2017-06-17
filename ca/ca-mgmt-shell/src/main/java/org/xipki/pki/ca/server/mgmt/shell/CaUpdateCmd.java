@@ -229,7 +229,7 @@ public class CaUpdateCmd extends CaCommandSupport {
                 if (caEntry == null) {
                     throw new IllegalCmdParamException("please specify the signerType");
                 }
-                tmpSignerType = caEntry.getSignerType();
+                tmpSignerType = caEntry.signerType();
             }
 
             signerConf = ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf,

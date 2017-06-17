@@ -50,7 +50,7 @@ public class RevokeCertResultEntry extends ResultEntry {
         this.certId = certId;
     }
 
-    public CertId getCertId() {
+    public CertId certId() {
         return certId;
     }
 

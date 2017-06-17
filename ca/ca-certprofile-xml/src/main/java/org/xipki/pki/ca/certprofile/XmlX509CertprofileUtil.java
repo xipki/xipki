@@ -777,8 +777,8 @@ public class XmlX509CertprofileUtil {
 
         int idx = 0;
         for (CertificatePolicyInformation policyInfo : policyInfos) {
-            String policyId = policyInfo.getCertPolicyId();
-            List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
+            String policyId = policyInfo.certPolicyId();
+            List<CertificatePolicyQualifier> qualifiers = policyInfo.qualifiers();
 
             ASN1Sequence policyQualifiers = null;
             if (CollectionUtil.isNonEmpty(qualifiers)) {
@@ -799,10 +799,10 @@ public class XmlX509CertprofileUtil {
         List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
         for (CertificatePolicyQualifier qualifier : qualifiers) {
             PolicyQualifierInfo qualifierInfo;
-            if (qualifier.getCpsUri() != null) {
-                qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());
-            } else if (qualifier.getUserNotice() != null) {
-                UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
+            if (qualifier.cpsUri() != null) {
+                qualifierInfo = new PolicyQualifierInfo(qualifier.cpsUri());
+            } else if (qualifier.userNotice() != null) {
+                UserNotice userNotice = new UserNotice(null, qualifier.userNotice());
                 qualifierInfo = new PolicyQualifierInfo(PKCSObjectIdentifiers.id_spq_ets_unotice,
                         userNotice);
             } else {

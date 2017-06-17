@@ -81,7 +81,7 @@ public class CrlInfo {
         String str = getNotBlankValue(pairs, CRL_NUMBER);
         this.crlNumber = new BigInteger(str, 16);
 
-        str = pairs.getValue(BASE_CRL_NUMBER);
+        str = pairs.value(BASE_CRL_NUMBER);
         if (StringUtil.isNotBlank(str)) {
             this.baseCrlNumber = new BigInteger(str, 16);
         }
@@ -100,7 +100,7 @@ public class CrlInfo {
     }
 
     private static final String getNotBlankValue(ConfPairs pairs, String name) {
-        String str = pairs.getValue(name);
+        String str = pairs.value(name);
         if (StringUtil.isBlank(str)) {
             throw new IllegalArgumentException(name + " is not specified");
         }
@@ -130,7 +130,7 @@ public class CrlInfo {
         return pairs.getEncoded();
     }
 
-    public BigInteger getCrlNumber() {
+    public BigInteger crlNumber() {
         return crlNumber;
     }
 
@@ -138,7 +138,7 @@ public class CrlInfo {
         this.crlNumber = ParamUtil.requireNonNull("crlNumber", crlNumber);
     }
 
-    public BigInteger getBaseCrlNumber() {
+    public BigInteger baseCrlNumber() {
         return baseCrlNumber;
     }
 
@@ -146,7 +146,7 @@ public class CrlInfo {
         this.baseCrlNumber = baseCrlNumber;
     }
 
-    public Date getThisUpdate() {
+    public Date thisUpdate() {
         return thisUpdate;
     }
 
@@ -154,7 +154,7 @@ public class CrlInfo {
         this.thisUpdate = ParamUtil.requireNonNull("thisUpdate", thisUpdate);
     }
 
-    public Date getNextUpdate() {
+    public Date nextUpdate() {
         return nextUpdate;
     }
 
@@ -170,7 +170,7 @@ public class CrlInfo {
         this.useCrlUpdates = useCrlUpdates;
     }
 
-    public CrlID getCrlId() {
+    public CrlID crlId() {
         return crlId;
     }
 
