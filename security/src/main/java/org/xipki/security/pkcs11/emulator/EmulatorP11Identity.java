@@ -158,7 +158,7 @@ public class EmulatorP11Identity extends P11Identity {
     } // constructor
 
     @Override
-    protected byte[] doDigestSecretKey(long mechanism)
+    protected byte[] digestSecretKey0(long mechanism)
             throws P11TokenException {
         if (!(signingKey instanceof SecretKey)) {
             throw new P11TokenException("digestSecretKey could not be applied to non-SecretKey");
@@ -173,7 +173,7 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     @Override
-    protected byte[] doSign(final long mechanism, final P11Params parameters, final byte[] content)
+    protected byte[] sign0(final long mechanism, final P11Params parameters, final byte[] content)
             throws P11TokenException {
         if (PKCS11Constants.CKM_ECDSA == mechanism) {
             return dsaAndEcdsaSign(content, null);

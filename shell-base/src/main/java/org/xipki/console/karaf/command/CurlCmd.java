@@ -108,7 +108,7 @@ public class CurlCmd extends XipkiCommandSupport {
     private String userPassword;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
 
         byte[] dataBytes = null;
         if (postData != null) {

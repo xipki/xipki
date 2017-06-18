@@ -114,7 +114,7 @@ public class KeystoreConvertCmd extends SecurityCommandSupport {
     private String outKeyPass;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         KeyStore srcKs = KeyUtil.getKeyStore(inType);
 
         char[] inPwd;

@@ -364,7 +364,7 @@ public abstract class Client {
             throw new IllegalArgumentException("identityCert is not self-signed");
         }
 
-        return doEnrol(MessageType.PKCSReq, csr, identityKey, identityCert);
+        return enroll(MessageType.PKCSReq, csr, identityKey, identityCert);
     }
 
     public EnrolmentResponse scepRenewalReq(final CertificationRequest csr,
@@ -381,7 +381,7 @@ public abstract class Client {
             throw new IllegalArgumentException("identityCert must not be self-signed");
         }
 
-        return doEnrol(MessageType.RenewalReq, csr, identityKey, identityCert);
+        return enroll(MessageType.RenewalReq, csr, identityKey, identityCert);
     }
 
     public EnrolmentResponse scepUpdateReq(final CertificationRequest csr,
@@ -398,10 +398,10 @@ public abstract class Client {
             throw new IllegalArgumentException("identityCert must not be self-signed");
         }
 
-        return doEnrol(MessageType.UpdateReq, csr, identityKey, identityCert);
+        return enroll(MessageType.UpdateReq, csr, identityKey, identityCert);
     }
 
-    private EnrolmentResponse doEnrol(final MessageType messageType, final CertificationRequest csr,
+    private EnrolmentResponse enroll(final MessageType messageType, final CertificationRequest csr,
             final PrivateKey identityKey, final X509Certificate identityCert)
             throws ScepClientException {
         TransactionId tid;

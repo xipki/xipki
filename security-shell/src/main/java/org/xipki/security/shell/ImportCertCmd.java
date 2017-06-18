@@ -88,7 +88,7 @@ public class ImportCertCmd extends SecurityCommandSupport {
     private List<String> certFiles;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         File realKsFile = new File(IoUtil.expandFilepath(ksFile));
         KeyStore ks = KeyStore.getInstance(ksType);
         char[] password = readPasswordIfNotSet(ksPwd);

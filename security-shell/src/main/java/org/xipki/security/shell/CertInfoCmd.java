@@ -89,7 +89,7 @@ public class CertInfoCmd extends SecurityCommandSupport {
     protected String hashAlgo = "SHA256";
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Certificate cert = Certificate.getInstance(IoUtil.read(inFile));
 
         if (serial != null && serial) {

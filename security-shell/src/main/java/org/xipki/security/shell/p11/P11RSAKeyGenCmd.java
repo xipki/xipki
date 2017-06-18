@@ -61,7 +61,7 @@ public class P11RSAKeyGenCmd extends P11KeyGenCommandSupport {
     private String publicExponent = "0x10001";
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         if (keysize % 1024 != 0) {
             throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
         }

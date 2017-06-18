@@ -124,10 +124,10 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         if (LOG.isDebugEnabled()) {
             LOG.debug("sign with mechanism {}", Pkcs11Functions.getMechanismDesc(mechanism));
         }
-        return doSign(mechanism, parameters, content);
+        return sign0(mechanism, parameters, content);
     }
 
-    protected abstract byte[] doSign(final long mechanism, @Nullable final P11Params parameters,
+    protected abstract byte[] sign0(final long mechanism, @Nullable final P11Params parameters,
             @NonNull final byte[] content) throws P11TokenException;
 
     public byte[] digestSecretKey(long mechanism)
@@ -137,10 +137,10 @@ public abstract class P11Identity implements Comparable<P11Identity> {
             LOG.debug("digest secret with mechanism {}",
                     Pkcs11Functions.getMechanismDesc(mechanism));
         }
-        return doDigestSecretKey(mechanism);
+        return digestSecretKey0(mechanism);
     }
 
-    protected abstract byte[] doDigestSecretKey(final long mechanism)
+    protected abstract byte[] digestSecretKey0(final long mechanism)
             throws P11TokenException;
 
     public P11EntityIdentifier identityId() {

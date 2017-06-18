@@ -83,7 +83,7 @@ public class P11ProviderTestCmd extends P11SecurityCommandSupport {
     private Boolean dsaPlain = Boolean.FALSE;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         KeyStore ks = KeyStore.getInstance("PKCS11", XiSecurityConstants.PROVIDER_NAME_XIPKI);
         ks.load(null, null);
         if (verbose.booleanValue()) {

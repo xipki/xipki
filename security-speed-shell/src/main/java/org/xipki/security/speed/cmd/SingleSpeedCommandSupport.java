@@ -55,7 +55,7 @@ public abstract class SingleSpeedCommandSupport extends SecurityCommandSupport {
     protected abstract LoadExecutor getTester() throws Exception;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         LoadExecutor tester = getTester();
         tester.setDuration(duration);
         tester.setThreads(Math.min(20, numThreads));

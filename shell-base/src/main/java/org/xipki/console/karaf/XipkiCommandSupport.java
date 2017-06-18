@@ -64,12 +64,12 @@ public abstract class XipkiCommandSupport implements Action {
     @Reference
     protected Session session;
 
-    protected abstract Object doExecute() throws Exception;
+    protected abstract Object execute0() throws Exception;
 
     @Override
     public Object execute() throws Exception {
         try {
-            return doExecute();
+            return execute0();
         } catch (Exception ex) {
             LOG.debug("Exception caught while executing command", ex);
             throw new Exception(ex.getClass().getName() + ": " + ex.getMessage());
@@ -170,10 +170,10 @@ public abstract class XipkiCommandSupport implements Action {
 
     protected static boolean isEnabled(final String enabledS, final boolean defaultEnabled,
             final String optionName) {
-        return (enabledS == null) ? defaultEnabled : internIsEnabled(enabledS, optionName);
+        return (enabledS == null) ? defaultEnabled : isEnabled(enabledS, optionName);
     }
 
-    private static boolean internIsEnabled(final String enabledS, final String optionName) {
+    private static boolean isEnabled(final String enabledS, final String optionName) {
         if ("yes".equalsIgnoreCase(enabledS)
                 || "enabled".equalsIgnoreCase(enabledS)
                 || "true".equalsIgnoreCase(enabledS)) {
