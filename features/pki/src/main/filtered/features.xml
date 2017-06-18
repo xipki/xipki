@@ -5,34 +5,33 @@
   <!-- Note: instead of defining all features monolithically in a central features file,
     Project-plugins should be defined in their own feature descriptors and then aggregated later
   -->
-  <feature name="xipki-httpserver" version="${project.version}" description="HTTP server">
-    <bundle><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
-    <bundle>mvn:org.xipki/common/${project.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki/password/${project.version}</bundle>
-    <bundle>mvn:io.netty/netty-codec/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-codec-http/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-resolver/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-transport/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle>
-    <bundle>mvn:io.netty/netty-common/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-buffer/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
-    <bundle>mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/linux-x86_64</bundle>
-    <bundle>mvn:org.xipki/servlet-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/http-server/${project.version}</bundle>
+  <feature name="netty" version="${netty.version}" description="Netty">
+    <bundle start-level="65">mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/linux-x86_64</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-codec/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-codec-http/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-resolver/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport-native-unix-common/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-transport-native-epoll/${netty.version}/jar/linux-x86_64</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-common/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-buffer/${netty.version}</bundle>
+    <bundle start-level="65">mvn:io.netty/netty-handler/${netty.version}</bundle>
   </feature>
-  
   <feature name="xipki-password" version="${project.version}" description="password">
-    <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
-    <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle start-level="70"><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
   </feature>
+  <feature name="xipki-httpserver" version="${project.version}" description="HTTP server">
+    <feature prerequisite="true">netty</feature>
+    <feature prerequisite="true">xipki-password</feature>
+    <bundle start-level="70">mvn:org.xipki/servlet-api/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki/http-server/${project.version}</bundle>
+  </feature>
   <feature name="xipki-security" version="${project.version}" description="security">
     <feature prerequisite="true">xipki-password</feature>
+    <bundle start-level="70">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle start-level="70">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/security/${project.version}</bundle>
   </feature>

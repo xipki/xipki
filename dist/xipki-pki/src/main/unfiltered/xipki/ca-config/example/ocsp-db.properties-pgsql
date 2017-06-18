@@ -12,7 +12,7 @@ dataSource.portNumber = 5432
 dataSource.databaseName = ocsp
 dataSource.user = pguser1
 # encrypted password 123456
-dataSource.password = PBE:B9A/zfIDGOTc+xhshvJGWMMdft32EjtEZPWGH9M0JvoWFA==
+dataSource.password = PBE:AQfQCHpihEtIv+5+HIxZgpsJyxD4316KZeDJsa2J1g+mbtOq6m/3/lHSrFandkU1Ho59Fw==
 
 dataSource.prepareThreshold = 0
 

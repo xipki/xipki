@@ -10,7 +10,7 @@ dataSourceClassName = org.h2.jdbcx.JdbcDataSource
 dataSource.url = jdbc:h2:./xipki/db/h2/ca
 dataSource.user = root
 # encrypted password 123456
-dataSource.password = PBE:B9B3GLTSTCrjEB53BiirBAxt5XxNP+KjcPkPbGfRBEz+pA==
+dataSource.password = PBE:AQfQCHpihEtIv+5+HIxZgpsJyxD4316KZeDJsa2J1g+mbtOq6m/3/lHSrFandkU1Ho59Fw==
 
 autoCommit = true
 readOnly = false

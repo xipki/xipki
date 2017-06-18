@@ -191,7 +191,7 @@ if { $printUsage equals "true" } {
   xipki-caqa:responder-check \
     --name responder1 \
     --signer-type PKCS12 \
-    --signer-conf password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA256withRSA
+    --signer-conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:xipki/security/tlskeys/tls-server-keystore.p12,algo=SHA256withRSA
 
   xipki-ca:responder-add \
     --name qa-responder1 \
@@ -444,7 +444,7 @@ if { $printUsage equals "true" } {
   }
 
   if { $TOKEN_TYPE equals "PKCS12" } {
-    CA_SIGNER_CONF_RCA = "password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO"
+    CA_SIGNER_CONF_RCA = "password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/RCA1.p12,algo=$CA_SIGNER_ALGO"
   }
 
   echo "neg-gen-rca: CA named RCA1 already exists"

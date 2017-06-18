@@ -24,7 +24,7 @@ xipki-ca:scep-add \
   --ca SubCAwithCRL1 \
   --profile ALL \
   --resp-type PKCS12 \
-  --resp-conf password=PBE:B9CjOslSXytEihDHr0A7Lxc+HmOp1jiIGAatrQwQdYYcaw==,keystore=file:output/SCEP1.p12 \
+  --resp-conf password=PBE:AQfQj/oIsHT0tGydAasTIJz0xhCA0KBFQoVh11UwhiQ/PMWZOpnXbErRLbX3Jc9VcQIqXg==,keystore=file:output/SCEP1.p12 \
   --control caCert.included=false,signerCert.included=true
   
 ## add user

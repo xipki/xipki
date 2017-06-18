@@ -10,7 +10,7 @@ dataSourceClassName = org.h2.jdbcx.JdbcDataSource
 dataSource.url = jdbc:h2:./xipki/db/h2/ocspcache
 dataSource.user = root
 # encrypted password 123456
-dataSource.password = PBE:B9A/zfIDGOTc+xhshvJGWMMdft32EjtEZPWGH9M0JvoWFA==
+dataSource.password = PBE:B9APBE:AQfQCHpihEtIv+5+HIxZgpsJyxD4316KZeDJsa2J1g+mbtOq6m/3/lHSrFandkU1Ho59Fw==
 
 autoCommit = true
 readOnly = false

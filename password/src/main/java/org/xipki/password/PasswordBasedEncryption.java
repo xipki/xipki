@@ -35,16 +35,14 @@
 package org.xipki.password;
 
 import java.security.GeneralSecurityException;
-import java.security.Security;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -54,65 +52,82 @@ import org.xipki.common.util.ParamUtil;
 
 public class PasswordBasedEncryption {
 
-    private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
-
-    private static Object initializedLock = new Object();
-
-    private static AtomicBoolean initialized = new AtomicBoolean(false);
-
     private PasswordBasedEncryption() {
     }
 
-    private static void init() {
-        synchronized (initializedLock) {
-            if (initialized.get()) {
-                return;
-            }
-
-            if (Security.getProperty("BC") == null) {
-                Security.addProvider(new BouncyCastleProvider());
-            }
-
-            initialized.set(true);
-        }
-    }
-
-    public static byte[] encrypt(final byte[] plaintext, final char[] password,
+    /**
+     *
+     * @return iv and the cipher text in form of
+     *           len(iv) of 1 byte | iv of len(iv) bytes | cipher text.
+     */
+    public static byte[] encrypt(final PBEAlgo algo, byte[] plaintext, final char[] password,
             final int iterationCount, final byte[] salt) throws GeneralSecurityException {
         ParamUtil.requireNonNull("plaintext", plaintext);
         ParamUtil.requireNonNull("password", password);
         ParamUtil.requireMin("iterationCount", iterationCount, 1);
         ParamUtil.requireNonNull("salt", salt);
 
-        init();
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algo.algoName());
 
         PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
         SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
 
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGO, "BC");
+        Cipher cipher = Cipher.getInstance(algo.algoName());
         PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
         cipher.init(Cipher.ENCRYPT_MODE, pbeKey, pbeParameterSpec);
         pbeKeySpec.clearPassword();
 
-        return cipher.doFinal(plaintext);
+        byte[] iv = cipher.getIV();
+        int ivLen = (iv == null) ? 0 : iv.length;
+        if (ivLen > 255) {
+            throw new GeneralSecurityException("IV too long: " + ivLen);
+        }
+
+        byte[] cipherText = cipher.doFinal(plaintext);
+        byte[] ret = new byte[1 + ivLen + cipherText.length];
+        // length of IV
+        ret[0] = (byte) (ivLen & 0xFF);
+        if (ivLen > 0) {
+            System.arraycopy(iv, 0, ret, 1, ivLen);
+        }
+
+        System.arraycopy(cipherText, 0, ret, 1 + ivLen, cipherText.length);
+        return ret;
     }
 
-    public static byte[] decrypt(final byte[] cipherText, final char[] password,
-            final int iterationCount, final byte[] salt) throws GeneralSecurityException {
-        ParamUtil.requireNonNull("ciperText", cipherText);
+    public static byte[] decrypt(final PBEAlgo algo, final byte[] cipherTextWithIv,
+            final char[] password, final int iterationCount, final byte[] salt)
+            throws GeneralSecurityException {
+        ParamUtil.requireNonNull("cipherTextWithIv", cipherTextWithIv);
         ParamUtil.requireNonNull("password", password);
         ParamUtil.requireMin("iterationCount", iterationCount, 1);
         ParamUtil.requireNonNull("salt", salt);
 
-        init();
         PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
 
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(CIPHER_ALGO, "BC");
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algo.algoName());
         SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
 
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGO, "BC");
-        PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
+        Cipher cipher = Cipher.getInstance(algo.algoName());
+
+        // extract the IV and cipherText
+        byte bb = cipherTextWithIv[0];
+        int ivLen = (bb < 0) ? 256 + bb : bb;
+
+        PBEParameterSpec pbeParameterSpec;
+        if (ivLen == 0) {
+            pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
+        } else {
+            byte[] iv = new byte[ivLen];
+            System.arraycopy(cipherTextWithIv, 1, iv, 0, ivLen);
+            pbeParameterSpec = new PBEParameterSpec(salt, iterationCount,
+                    new IvParameterSpec(iv));
+        }
+
+        int cipherTextOffset = 1 + ivLen;
+        byte[] cipherText = new byte[cipherTextWithIv.length - cipherTextOffset];
+        System.arraycopy(cipherTextWithIv, 1 + ivLen, cipherText, 0, cipherText.length);
+
         cipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParameterSpec);
         return cipher.doFinal(cipherText);
     }

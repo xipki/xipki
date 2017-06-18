@@ -27,7 +27,7 @@ dataSource.databaseName = ocspcache
 #dataSource.properties = key1=value1&key2=value2
 dataSource.user = root
 # encrypted password 123456
-dataSource.password = PBE:B9A/zfIDGOTc+xhshvJGWMMdft32EjtEZPWGH9M0JvoWFA==
+dataSource.password = PBE:AQfQCHpihEtIv+5+HIxZgpsJyxD4316KZeDJsa2J1g+mbtOq6m/3/lHSrFandkU1Ho59Fw==
 
 autoCommit = true
 readOnly = false
