@@ -36,13 +36,40 @@ package org.xipki.password;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
 
-public interface SinglePasswordResolver {
+// CHECKSTYLE:SKIP
+public enum PBEAlgo {
 
-    boolean canResolveProtocol(String protocol);
+    PBEWithHmacSHA256AndAES_256(1, "PBEWithHmacSHA256AndAES_256");
 
-    char[] resolvePassword(String passwordHint) throws PasswordResolverException;
+    private int code;
+
+    private String algoName;
+
+    private PBEAlgo(int code, String algoName) {
+        this.code = code;
+        this.algoName = algoName;
+    }
+
+    public int code() {
+        return code;
+    }
+
+    public String algoName() {
+        return algoName;
+    }
+
+    public static PBEAlgo forCode(int code) {
+        for (PBEAlgo value : values()) {
+            if (value.code == code) {
+                return value;
+            }
+        }
+
+        return null;
+    }
 
 }
+

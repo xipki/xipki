@@ -45,6 +45,7 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.password.OBFPasswordService;
+import org.xipki.password.PBEAlgo;
 import org.xipki.password.PBEPasswordService;
 
 /**
@@ -114,8 +115,9 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
             password = StringUtil.merge(parts);
         }
 
-        String passwordHint = PBEPasswordService.encryptPassword(iterationCount, masterPassword,
-                password);
+        String passwordHint = PBEPasswordService.encryptPassword(
+                PBEAlgo.PBEWithHmacSHA256AndAES_256,
+                iterationCount, masterPassword, password);
         if (outFile != null) {
             saveVerbose("saved the encrypted password to file", new File(outFile),
                     passwordHint.getBytes());
