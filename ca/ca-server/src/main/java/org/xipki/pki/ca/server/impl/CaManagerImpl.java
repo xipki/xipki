@@ -511,7 +511,8 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
                 } catch (DataAccessException | PasswordResolverException | IOException
                         | RuntimeException ex) {
                     throw new CaMgmtException(ex.getClass().getName()
-                            + " while parsing datasource " + datasourceFile, ex);
+                            + " while parsing datasource "
+                            + datasourceFile + ": " + ex.getMessage(), ex);
                 }
             }
 
