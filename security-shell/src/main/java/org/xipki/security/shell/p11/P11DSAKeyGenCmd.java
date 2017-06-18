@@ -61,7 +61,7 @@ public class P11DSAKeyGenCmd extends P11KeyGenCommandSupport {
     private Integer qlen;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         if (plen % 1024 != 0) {
             throw new IllegalCmdParamException("plen is not multiple of 1024: " + plen);
         }

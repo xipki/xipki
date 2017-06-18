@@ -71,7 +71,7 @@ public class CaPublisherCheckCmd extends CaCommandSupport {
     private String publisherName;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         println("checking CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
 
         if (caManager.getCa(caName) == null) {

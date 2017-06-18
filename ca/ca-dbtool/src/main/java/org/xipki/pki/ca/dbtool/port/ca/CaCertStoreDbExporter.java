@@ -222,8 +222,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         try {
             entriesFileOs = new FileOutputStream(
                     new File(baseDir, type.dirName() + ".mf"), true);
-            doExportEntries(type, certstore, processLogFile, entriesFileOs,
-                    idProcessedInLastProcess);
+            exportEntries(type, certstore, processLogFile, entriesFileOs, idProcessedInLastProcess);
             return null;
         } catch (Exception ex) {
             // delete the temporary files
@@ -238,9 +237,9 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                 IoUtil.closeStream(entriesFileOs);
             }
         }
-    } // method exportCrl
+    }
 
-    private void doExportEntries(final CaDbEntryType type, final CertStoreType certstore,
+    private void exportEntries(final CaDbEntryType type, final CertStoreType certstore,
             final File processLogFile, final FileOutputStream filenameListOs,
             final Long idProcessedInLastProcess) throws Exception {
         final int numEntriesPerSelect = Math.max(1,
@@ -610,7 +609,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
         // all successful, delete the processLogFile
         processLogFile.delete();
         System.out.println(exportedText() + sum + " entries from " + tablesText);
-    } // method doExportEntries
+    } // method exportEntries
 
     private void exportPublishQueue(final CertStoreType certstore)
             throws DataAccessException, IOException, JAXBException {

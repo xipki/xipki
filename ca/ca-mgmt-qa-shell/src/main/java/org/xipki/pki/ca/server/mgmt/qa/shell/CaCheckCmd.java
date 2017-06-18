@@ -60,7 +60,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CaUpdateCmd;
 public class CaCheckCmd extends CaUpdateCmd {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         X509ChangeCaEntry ey = getChangeCaEntry();
         String caName = ey.ident().name();
         println("checking CA" + caName);
@@ -252,7 +252,7 @@ public class CaCheckCmd extends CaUpdateCmd {
 
         println(" checked CA" + caName);
         return null;
-    } // method doExecute
+    } // method execute0
 
     private CmdFailure buildUnexpectedException(final String field, final Object is,
             final Object expected) {

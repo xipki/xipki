@@ -65,7 +65,7 @@ public class CaInfoCmd extends CaCommandSupport {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         StringBuilder sb = new StringBuilder();
         if (caName == null) {
             sb.append("successful CAs:\n");
@@ -95,6 +95,6 @@ public class CaInfoCmd extends CaCommandSupport {
 
         println(sb.toString());
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

@@ -417,7 +417,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                     }
 
                     try {
-                        long lastId = doImportEntries(type, entriesFile, minId, processLogFile,
+                        long lastId = importEntries(type, entriesFile, minId, processLogFile,
                                 processLog, numProcessedBefore, statements, sqls);
                         minId = lastId + 1;
                     } catch (Exception ex) {
@@ -454,7 +454,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
         }
     }
 
-    private long doImportEntries(final CaDbEntryType type, final String entriesZipFile,
+    private long importEntries(final CaDbEntryType type, final String entriesZipFile,
             final long minId, final File processLogFile, final ProcessLog processLog,
             final int numProcessedInLastProcess, final PreparedStatement[] statements,
             final String[] sqls)
@@ -786,7 +786,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
             recoverAutoCommit();
             zipFile.close();
         }
-    } // method doImportEntries
+    } // method importEntries
 
     private static DbiXmlReader createReader(final CaDbEntryType type, final InputStream is)
             throws XMLStreamException, InvalidDataObjectException {

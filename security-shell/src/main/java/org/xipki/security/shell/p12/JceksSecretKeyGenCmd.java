@@ -65,7 +65,7 @@ public class JceksSecretKeyGenCmd extends P12KeyGenCommandSupport {
     private Integer keysize;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         if (!("AES".equalsIgnoreCase(keyType)
                 || "DES3".equalsIgnoreCase(keyType)
                 || "GENERIC".equalsIgnoreCase(keyType))) {

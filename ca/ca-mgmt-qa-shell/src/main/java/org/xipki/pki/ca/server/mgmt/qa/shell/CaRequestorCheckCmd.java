@@ -97,7 +97,7 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
     private Set<String> profiles;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         println("checking CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
 
         if (caManager.getCa(caName) == null) {
@@ -147,6 +147,6 @@ public class CaRequestorCheckCmd extends CaCommandSupport {
 
         println(" checked CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

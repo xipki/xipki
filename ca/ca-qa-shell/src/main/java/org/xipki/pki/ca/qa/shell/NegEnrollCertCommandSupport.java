@@ -107,7 +107,7 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
             @NonNull SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         EnrollCertRequest request = new EnrollCertRequest(EnrollCertRequest.Type.CERT_REQ);
 
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
@@ -148,6 +148,6 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
         }
 
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

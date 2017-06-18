@@ -108,7 +108,7 @@ public class DbDigestExportWorker extends DbPortWorker {
     } // constructor
 
     @Override
-    public void doRun() throws Exception {
+    protected void run0() throws Exception {
         long start = System.currentTimeMillis();
 
         try {
@@ -132,7 +132,7 @@ public class DbDigestExportWorker extends DbPortWorker {
             long end = System.currentTimeMillis();
             System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
         }
-    } // method doRun
+    } // method run0
 
     public static DbSchemaType detectDbSchemaType(final DataSourceWrapper datasource)
             throws DataAccessException {

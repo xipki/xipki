@@ -167,7 +167,7 @@ public class ScepResponder {
 
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
 
-        PkiMessage rep = doServicePkiOperation(req, event);
+        PkiMessage rep = servicePkiOperation0(req, event);
         event.addEventData(ScepAuditConstants.NAME_pkiStatus, rep.pkiStatus());
         if (rep.pkiStatus() == PkiStatus.FAILURE) {
             event.setStatus(AuditStatus.FAILED);
@@ -203,7 +203,7 @@ public class ScepResponder {
         }
     }
 
-    private PkiMessage doServicePkiOperation(final DecodedPkiMessage req,
+    private PkiMessage servicePkiOperation0(final DecodedPkiMessage req,
             final AuditEvent event) throws MessageDecodingException, CaException {
 
         TransactionId tid = req.transactionId();
@@ -426,7 +426,7 @@ public class ScepResponder {
         } // end switch
 
         return rep;
-    } // method doServicePkiOperation
+    } // method servicePkiOperation0
 
     private ContentInfo createSignedData(final CertificateList crl) throws CaException {
         CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();

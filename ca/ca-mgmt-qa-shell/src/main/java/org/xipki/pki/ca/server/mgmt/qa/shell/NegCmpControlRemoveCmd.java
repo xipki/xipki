@@ -50,11 +50,11 @@ import org.xipki.pki.ca.server.mgmt.shell.CmpControlRemoveCmd;
 public class NegCmpControlRemoveCmd extends CmpControlRemoveCmd {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         println("neg-cmpcontrol-rm");
 
         try {
-            super.doExecute();
+            super.execute0();
         } catch (Exception ex) {
             return null;
         }

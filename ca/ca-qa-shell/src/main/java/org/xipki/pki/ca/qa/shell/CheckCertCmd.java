@@ -104,7 +104,7 @@ public class CheckCertCmd extends XipkiCommandSupport {
     private QaSystemManager qaSystemManager;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Set<String> issuerNames = qaSystemManager.issuerNames();
         if (isEmpty(issuerNames)) {
             throw new IllegalCmdParamException("no issuer is configured");
@@ -163,7 +163,7 @@ public class CheckCertCmd extends XipkiCommandSupport {
             throw new CmdFailure("certificate is invalid");
         }
         return null;
-    } // method doExecute
+    } // method execute0
 
     private static void format(final ValidationIssue issue, final String prefix,
             final StringBuilder sb) {

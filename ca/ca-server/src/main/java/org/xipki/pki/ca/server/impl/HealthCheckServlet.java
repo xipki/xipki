@@ -137,7 +137,7 @@ public class HealthCheckServlet extends AbstractHttpServlet {
             }
             return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
         }
-    } // method doGet
+    } // method service0
 
     public void setResponderManager(final CmpResponderManager responderManager) {
         this.responderManager = ParamUtil.requireNonNull("responderManager", responderManager);

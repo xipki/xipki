@@ -228,7 +228,7 @@ class CertRepublisher {
 
     boolean republish() {
         try {
-            return doRepublish();
+            return republish0();
         } finally {
             if (processLog != null) {
                 processLog.finish();
@@ -237,7 +237,7 @@ class CertRepublisher {
         }
     }
 
-    private boolean doRepublish() {
+    private boolean republish0() {
         long total;
         try {
             total = certstore.getCountOfCerts(ca, onlyRevokedCerts);

@@ -517,7 +517,7 @@ public class HttpRestServlet extends AbstractHttpServlet {
         } finally {
             audit(auditService, event, auditLevel, auditStatus, auditMessage);
         }
-    } // method doService
+    } // method service
 
     public void setResponderManager(final CmpResponderManager responderManager) {
         this.responderManager = responderManager;

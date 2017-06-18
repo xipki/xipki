@@ -62,7 +62,7 @@ public class PublisherInfoCmd extends CaCommandSupport {
     private String name;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         StringBuilder sb = new StringBuilder();
 
         if (name == null) {
@@ -93,6 +93,6 @@ public class PublisherInfoCmd extends CaCommandSupport {
 
         println(sb.toString());
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

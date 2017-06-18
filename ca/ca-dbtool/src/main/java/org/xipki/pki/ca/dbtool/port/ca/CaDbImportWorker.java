@@ -98,7 +98,7 @@ public class CaDbImportWorker extends DbPortWorker {
     }
 
     @Override
-    public void doRun() throws Exception {
+    protected void run0() throws Exception {
         File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if (resume) {
             if (!processLogFile.exists()) {
@@ -135,6 +135,6 @@ public class CaDbImportWorker extends DbPortWorker {
             long end = System.currentTimeMillis();
             System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
         }
-    } // method doRun
+    } // method run0
 
 }

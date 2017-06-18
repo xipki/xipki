@@ -67,7 +67,7 @@ public class RevokeCertCmd extends UnRevRmCertCommandSupport {
     private String invalidityDateS;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         CrlReason crlReason = CrlReason.forNameOrText(reason);
 
         if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {

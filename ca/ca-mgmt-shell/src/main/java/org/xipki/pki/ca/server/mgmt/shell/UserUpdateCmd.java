@@ -70,7 +70,7 @@ public class UserUpdateCmd extends CaCommandSupport {
     private String password;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Boolean realActive;
         if (active != null) {
             if (inactive != null) {

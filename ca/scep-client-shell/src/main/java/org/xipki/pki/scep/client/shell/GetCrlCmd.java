@@ -72,7 +72,7 @@ public class GetCrlCmd extends ClientCommandSupport {
     private String outputFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Certificate cert = Certificate.getInstance(IoUtil.read(certFile));
         ScepClient client = getScepClient();
         X509CRL crl = client.scepGetCrl(getIdentityKey(), getIdentityCert(),

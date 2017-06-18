@@ -65,7 +65,7 @@ public class UserAddCmd extends CaCommandSupport {
     private Boolean inactive = Boolean.FALSE;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         if (password == null) {
             password = new String(readPassword());
         }

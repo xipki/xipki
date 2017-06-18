@@ -283,7 +283,7 @@ public class Scep {
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent,
                 envelopedDataDecryptor, null);
 
-        PkiMessage rep = doServicePkiOperation(requestContent, req, certProfileName, msgId, event);
+        PkiMessage rep = servicePkiOperation0(requestContent, req, certProfileName, msgId, event);
         audit(event, CaAuditConstants.NAME_SCEP_pkiStatus, rep.pkiStatus().toString());
         if (rep.pkiStatus() == PkiStatus.FAILURE) {
             event.setStatus(AuditStatus.FAILED);
@@ -294,7 +294,7 @@ public class Scep {
         return encodeResponse(rep, req);
     } // method servicePkiOperation
 
-    private PkiMessage doServicePkiOperation(final CMSSignedData requestContent,
+    private PkiMessage servicePkiOperation0(final CMSSignedData requestContent,
             final DecodedPkiMessage req, final String certProfileName, final String msgId,
             final AuditEvent event)
             throws MessageDecodingException, OperationException {
@@ -576,7 +576,7 @@ public class Scep {
         }
 
         return rep;
-    } // method doServicePkiOperation
+    } // method servicePkiOperation0
 
     private SignedData getCert(final X509Ca ca, final BigInteger serialNumber)
             throws FailInfoException, OperationException {

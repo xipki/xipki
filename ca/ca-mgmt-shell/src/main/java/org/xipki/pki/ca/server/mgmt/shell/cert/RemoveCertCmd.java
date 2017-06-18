@@ -48,7 +48,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 public class RemoveCertCmd extends UnRevRmCertCommandSupport {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         boolean successful =
                 caManager.removeCertificate(caName, getSerialNumber());
         output(successful, "removed", "could not remove", "certificate");

@@ -117,6 +117,6 @@ public class HealthCheckServlet extends AbstractHttpServlet {
             }
             return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
         }
-    } // method doGet
+    }
 
 }

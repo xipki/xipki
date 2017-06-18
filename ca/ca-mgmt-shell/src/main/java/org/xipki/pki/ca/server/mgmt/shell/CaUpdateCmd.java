@@ -295,7 +295,7 @@ public class CaUpdateCmd extends CaCommandSupport {
     } // method getChangeCaEntry
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         boolean bo = caManager.changeCa(getChangeCaEntry());
         output(bo, "updated", "could not update", "CA " + caName);
         return null;

@@ -75,7 +75,7 @@ public class PublisherAddCmd extends CaCommandSupport {
     private String confFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         if (conf == null && confFile != null) {
             conf = new String(IoUtil.read(confFile));
         }

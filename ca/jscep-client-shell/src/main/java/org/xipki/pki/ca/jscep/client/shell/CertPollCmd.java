@@ -77,7 +77,7 @@ public class CertPollCmd extends ClientCommandSupport {
     private String outputFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));
 
         Client client = getScepClient();

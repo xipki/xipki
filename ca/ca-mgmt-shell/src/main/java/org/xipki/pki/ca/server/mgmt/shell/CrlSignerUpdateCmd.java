@@ -124,7 +124,7 @@ public class CrlSignerUpdateCmd extends CaCommandSupport {
     } // method getCrlSignerChangeEntry
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         boolean bo = caManager.changeCrlSigner(getCrlSignerChangeEntry());
         output(bo, "updated", "could not update", "CRL signer " + name);
         return null;

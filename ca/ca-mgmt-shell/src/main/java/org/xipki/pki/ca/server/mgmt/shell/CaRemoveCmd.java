@@ -55,7 +55,7 @@ public class CaRemoveCmd extends CaCommandSupport {
     private String name;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         boolean bo = caManager.removeCa(name);
         output(bo, "removed", "could not remove", "CA " + name);
         return null;

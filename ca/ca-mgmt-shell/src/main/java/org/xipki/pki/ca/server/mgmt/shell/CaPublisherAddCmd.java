@@ -68,7 +68,7 @@ public class CaPublisherAddCmd extends CaCommandSupport {
     private List<String> publisherNames;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         for (String publisherName : publisherNames) {
             boolean bo = caManager.addPublisherToCa(publisherName, caName);
             output(bo, "added", "could not add", "publisher " + publisherName + " to CA " + caName);

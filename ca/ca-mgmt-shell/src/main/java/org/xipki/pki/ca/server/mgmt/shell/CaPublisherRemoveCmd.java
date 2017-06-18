@@ -66,7 +66,7 @@ public class CaPublisherRemoveCmd extends CaCommandSupport {
     private String publisherName;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         boolean bo = caManager.removePublisherFromCa(publisherName, caName);
         output(bo, "removed", "could not remove",
                 "publisher " + publisherName + " from CA " + caName);

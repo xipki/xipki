@@ -53,7 +53,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CrlSignerUpdateCmd;
 public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         X509ChangeCrlSignerEntry ey = getCrlSignerChangeEntry();
         String name = ey.name();
         println("checking CRL signer " + name);
@@ -93,6 +93,6 @@ public class CrlSignerCheckCmd extends CrlSignerUpdateCmd {
 
         println(" checked CRL signer " + name);
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

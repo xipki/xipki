@@ -254,7 +254,7 @@ public class X509CaCmpResponder extends CmpResponder {
     }
 
     @Override
-    protected PKIMessage doProcessPkiMessage(PKIMessage request, final RequestorInfo requestor,
+    protected PKIMessage processPkiMessage0(PKIMessage request, final RequestorInfo requestor,
             final ASN1OctetString tid, final GeneralPKIMessage message,
             final String msgId, final AuditEvent event) {
         if (!(requestor instanceof CmpRequestorInfo)) {
@@ -357,7 +357,7 @@ public class X509CaCmpResponder extends CmpResponder {
         }
 
         return new PKIMessage(respHeader.build(), respBody);
-    } // method doProcessPKIMessage
+    } // method processPKIMessage0
 
     /**
      * handle the PKI body with the choice {@code cr}.

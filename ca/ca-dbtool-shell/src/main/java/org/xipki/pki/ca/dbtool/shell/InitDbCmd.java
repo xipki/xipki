@@ -97,7 +97,7 @@ public class InitDbCmd extends XipkiCommandSupport {
     private String dbSchemaFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         LiquibaseDatabaseConf dbConf = getDatabaseConf();
         resetAndInit(dbConf, dbSchemaFile);
         return null;

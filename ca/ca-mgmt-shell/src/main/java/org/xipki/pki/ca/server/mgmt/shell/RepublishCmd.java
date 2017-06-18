@@ -72,7 +72,7 @@ public class RepublishCmd extends CaCommandSupport {
     private List<String> publisherNames;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         if (publisherNames == null) {
             throw new RuntimeException("should not reach here");
         }

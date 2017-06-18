@@ -49,7 +49,7 @@ import org.xipki.console.karaf.CmdFailure;
 public class CaSystemUnlockCmd extends CaCommandSupport {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         boolean unlocked = caManager.unlockCa();
 
         if (unlocked) {

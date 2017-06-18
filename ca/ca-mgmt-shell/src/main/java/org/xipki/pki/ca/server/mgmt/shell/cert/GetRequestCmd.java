@@ -59,7 +59,7 @@ public class GetRequestCmd extends UnRevRmCertCommandSupport {
     private String outputFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         byte[] request = caManager.getCertRequest(caName, getSerialNumber());
         if (request == null) {
             System.out.println("certificate request unknown");

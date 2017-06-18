@@ -108,7 +108,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
 
         Exception exception = null;
         try {
-            doDigest(certsReader, processLog, caEntryContainer);
+            digest0(certsReader, processLog, caEntryContainer);
         } catch (Exception ex) {
             // delete the temporary files
             deleteTmpFiles(baseDir, "tmp-");
@@ -166,7 +166,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         return caIdDirMap;
     } // method getCaIds
 
-    private void doDigest(final XipkiDigestExportReader certsReader, final ProcessLog processLog,
+    private void digest0(final XipkiDigestExportReader certsReader, final ProcessLog processLog,
             final CaEntryContainer caEntryContainer) throws Exception {
         long lastProcessedId = 0;
         System.out.println("digesting certificates from ID " + (lastProcessedId + 1));
@@ -203,7 +203,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
         processLog.printTrailer();
 
         System.out.println(" digested " + processLog.numProcessed() + " certificates");
-    } // method doDigest
+    } // method digest0
 
     static String toAsciiFilename(final String filename) {
         final int n = filename.length();

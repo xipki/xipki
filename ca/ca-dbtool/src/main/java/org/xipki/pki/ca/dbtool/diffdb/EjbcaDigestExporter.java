@@ -162,9 +162,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
             if (tblCertHasId) {
                 EjbcaDigestExportReader certsReader = new EjbcaDigestExportReader(datasource, cas,
                         numThreads);
-                doDigestWithTableId(certsReader, processLog, caEntryContainer, cas);
+                digestWithTableId(certsReader, processLog, caEntryContainer, cas);
             } else {
-                doDigestNoTableId(processLog, caEntryContainer, cas);
+                digestNoTableId(processLog, caEntryContainer, cas);
             }
         } catch (Exception ex) {
             // delete the temporary files
@@ -228,7 +228,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
         return cas;
     } // method getCas
 
-    private void doDigestNoTableId(final ProcessLog processLog,
+    private void digestNoTableId(final ProcessLog processLog,
             final CaEntryContainer caEntryContainer, final Map<String, EjbcaCaInfo> caInfos)
             throws Exception {
         int skippedAccount = 0;
@@ -353,9 +353,9 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 .append(" certificates (see log for details)");
         }
         System.out.println(sb.toString());
-    } // method doDigestNoTableId
+    } // method digestNoTableId
 
-    private void doDigestWithTableId(final EjbcaDigestExportReader certsReader,
+    private void digestWithTableId(final EjbcaDigestExportReader certsReader,
             final ProcessLog processLog, final CaEntryContainer caEntryContainer,
             final Map<String, EjbcaCaInfo> caInfos) throws Exception {
         final int minCertId = (int) min("CertificateData", "id");
@@ -408,6 +408,6 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                 .append(" certificates (see log for details)");
         }
         System.out.println(sb.toString());
-    } // method doDigestWithTableId
+    } // method digestWithTableId
 
 }

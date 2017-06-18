@@ -134,7 +134,7 @@ public class CaDbExportWorker extends DbPortWorker {
     } // method checkDestFolder
 
     @Override
-    public void doRun() throws Exception {
+    protected void run0() throws Exception {
         long start = System.currentTimeMillis();
         try {
             if (!resume) {
@@ -160,7 +160,7 @@ public class CaDbExportWorker extends DbPortWorker {
             long end = System.currentTimeMillis();
             System.out.println("Finished in " + StringUtil.formatTime((end - start) / 1000, false));
         }
-    } // method doRun
+    } // method run0
 
     private static Marshaller getMarshaller() throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);

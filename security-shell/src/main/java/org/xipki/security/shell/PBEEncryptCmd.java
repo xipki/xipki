@@ -79,7 +79,7 @@ public class PBEEncryptCmd extends SecurityCommandSupport {
     private Integer mquorum = 1;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         ParamUtil.requireRange("iterationCount", iterationCount, 1, 65535);
         ParamUtil.requireRange("k", quorum, 1, 10);
         ParamUtil.requireRange("mk", mquorum, 1, 10);

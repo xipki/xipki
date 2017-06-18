@@ -79,7 +79,7 @@ public class CrlInfoCmd extends SecurityCommandSupport {
     private Boolean nextUpdate;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         CertificateList crl = CertificateList.getInstance(IoUtil.read(inFile));
 
         if (crlNumber != null && crlNumber) {

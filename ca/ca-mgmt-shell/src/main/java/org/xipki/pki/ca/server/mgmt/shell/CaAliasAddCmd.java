@@ -64,7 +64,7 @@ public class CaAliasAddCmd extends CaCommandSupport {
     private String caAlias;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         boolean bo = caManager.addCaAlias(caAlias, caName);
         output(bo, "added", "could not add",
                 "CA alias " + caAlias + " associated with CA " + caName);

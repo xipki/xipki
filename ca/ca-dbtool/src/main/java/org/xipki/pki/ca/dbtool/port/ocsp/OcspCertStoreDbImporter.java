@@ -145,7 +145,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
 
         try {
             for (IssuerType issuer : issuers.getIssuer()) {
-                doImportIssuer(issuer, ps);
+                importIssuer0(issuer, ps);
             }
         } finally {
             releaseResources(ps, null);
@@ -153,7 +153,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         System.out.println(" imported table ISSUER");
     }
 
-    private void doImportIssuer(final IssuerType issuer, final PreparedStatement ps)
+    private void importIssuer0(final IssuerType issuer, final PreparedStatement ps)
             throws DataAccessException, CertificateException, IOException {
         try {
             String certFilename = issuer.getCertFile();
@@ -194,7 +194,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             System.err.println("could not import issuer with id=" + issuer.getId());
             throw ex;
         }
-    } // method doImportIssuer
+    } // method importIssuer0
 
     private void importCert(final CertStoreType certstore, final File processLogFile)
             throws Exception {
@@ -254,7 +254,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                 }
 
                 try {
-                    long lastId = doImportCert(psCert, psCerthash, psRawcert, certsFile, minId,
+                    long lastId = importCert0(psCert, psCerthash, psRawcert, certsFile, minId,
                             processLogFile, processLog, numProcessedBefore);
                     minId = lastId + 1;
                 } catch (Exception ex) {
@@ -276,7 +276,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
         System.out.println(importedText() + processLog.numProcessed() + " certificates");
     } // method importCert
 
-    private long doImportCert(final PreparedStatement psCert, final PreparedStatement psCerthash,
+    private long importCert0(final PreparedStatement psCert, final PreparedStatement psCerthash,
             final PreparedStatement psRawcert, final String certsZipFile, final long minId,
             final File processLogFile, final ProcessLog processLog,
             final int numProcessedInLastProcess) throws Exception {
@@ -427,6 +427,6 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
             recoverAutoCommit();
             zipFile.close();
         }
-    } // method doImportCert
+    } // method importCert0
 
 }

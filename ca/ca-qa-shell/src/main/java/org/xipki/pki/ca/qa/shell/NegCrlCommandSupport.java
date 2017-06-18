@@ -59,7 +59,7 @@ public abstract class NegCrlCommandSupport extends ClientCommandSupport {
     protected abstract X509CRL retrieveCrl() throws CaClientException, PkiErrorException;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Set<String> caNames = caClient.caNames();
         if (isEmpty(caNames)) {
             throw new IllegalCmdParamException("no CA is configured");
@@ -91,6 +91,6 @@ public abstract class NegCrlCommandSupport extends ClientCommandSupport {
         }
 
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

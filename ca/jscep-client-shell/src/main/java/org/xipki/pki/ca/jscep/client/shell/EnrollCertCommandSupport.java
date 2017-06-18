@@ -76,7 +76,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
             @NonNull X509Certificate identityCert) throws ClientException, TransactionException;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Client client = getScepClient();
 
         PKCS10CertificationRequest csr = new PKCS10CertificationRequest(IoUtil.read(csrFile));

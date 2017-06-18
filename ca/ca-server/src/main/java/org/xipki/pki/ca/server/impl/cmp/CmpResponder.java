@@ -130,7 +130,7 @@ abstract class CmpResponder {
         return getRequestor((X500Name) requestSender.getName());
     } // method getRequestor
 
-    protected abstract PKIMessage doProcessPkiMessage(@Nullable PKIMessage request,
+    protected abstract PKIMessage processPkiMessage0(@Nullable PKIMessage request,
             @NonNull RequestorInfo requestor,
             @NonNull ASN1OctetString transactionId, @NonNull GeneralPKIMessage pkiMessage,
             @NonNull String msgId, @NonNull AuditEvent event);
@@ -278,7 +278,7 @@ abstract class CmpResponder {
                     errorStatus);
         }
 
-        PKIMessage resp = doProcessPkiMessage(pkiMessage, requestor, tid, message, msgId, event);
+        PKIMessage resp = processPkiMessage0(pkiMessage, requestor, tid, message, msgId, event);
 
         if (isProtected) {
             resp = addProtection(resp, event);

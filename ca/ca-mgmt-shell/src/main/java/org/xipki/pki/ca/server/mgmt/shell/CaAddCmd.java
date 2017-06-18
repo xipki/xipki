@@ -60,7 +60,7 @@ public class CaAddCmd extends CaAddOrGenCommandSupport {
     private String certFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         X509CaEntry caEntry = getCaEntry();
         if (certFile != null) {
             X509Certificate caCert = X509Util.parseCert(certFile);

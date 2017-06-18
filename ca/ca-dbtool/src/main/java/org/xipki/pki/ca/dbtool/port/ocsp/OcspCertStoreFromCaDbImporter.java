@@ -273,7 +273,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
 
         try {
             for (CaType issuer : cas) {
-                doImportIssuer(issuer, sql, ps, cas, relatedCaIds);
+                importIssuer0(issuer, sql, ps, cas, relatedCaIds);
             }
         } finally {
             releaseResources(ps, null);
@@ -283,7 +283,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
         return relatedCaIds;
     }
 
-    private void doImportIssuer(final CaType issuer, final String sql,
+    private void importIssuer0(final CaType issuer, final String sql,
             final PreparedStatement ps, final List<CaType> cas, final List<Integer> relatedCaIds)
             throws IOException, DataAccessException, CertificateException {
         try {
@@ -337,7 +337,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             System.err.println("could not import issuer with id=" + issuer.getId());
             throw ex;
         }
-    } // method doImportIssuer
+    } // method importIssuer0
 
     private void importCert(final CertStoreType certstore, final Map<Integer, String> profileMap,
             final boolean revokedOnly, final List<Integer> caIds, final File processLogFile)
@@ -400,7 +400,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                 }
 
                 try {
-                    long lastId = doImportCert(statments, certsFile, profileMap, revokedOnly, caIds,
+                    long lastId = importCert0(statments, certsFile, profileMap, revokedOnly, caIds,
                             minId, processLogFile, processLog, numProcessedBefore, importLog);
                     minId = lastId + 1;
                 } catch (Exception ex) {
@@ -423,7 +423,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                 + importedText() + importLog.numProcessed() + " certificates");
     } // method importCert
 
-    private long doImportCert(final ImportStatements statments, final String certsZipFile,
+    private long importCert0(final ImportStatements statments, final String certsZipFile,
             final Map<Integer, String> profileMap, final boolean revokedOnly,
             final List<Integer> caIds, final long minId, final File processLogFile,
             final ProcessLog processLog, final int numProcessedInLastProcess,
@@ -612,6 +612,6 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             recoverAutoCommit();
             zipFile.close();
         }
-    } // method doImportCert
+    } // method importCert0
 
 }

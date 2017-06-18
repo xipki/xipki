@@ -62,7 +62,7 @@ public class P11CertUpdateCmd extends P11SecurityCommandSupport {
     private String certFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         P11Slot slot = getSlot();
         P11ObjectIdentifier objIdentifier = getObjectIdentifier();
         X509Certificate newCert = X509Util.parseCert(certFile);

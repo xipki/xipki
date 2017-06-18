@@ -57,7 +57,7 @@ public class LoadConfCmd extends CaCommandSupport {
     private String confFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         CaConf caConf = new CaConf(confFile, securityFactory);
         boolean bo = caManager.loadConf(caConf);
         output(bo, "loaded", "could not load", "configuration " + confFile);

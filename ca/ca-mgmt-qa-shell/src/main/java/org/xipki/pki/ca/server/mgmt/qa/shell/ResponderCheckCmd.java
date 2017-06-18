@@ -56,7 +56,7 @@ import org.xipki.pki.ca.server.mgmt.shell.ResponderUpdateCmd;
 public class ResponderCheckCmd extends ResponderUpdateCmd {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         println("checking responder " + name);
 
         CmpResponderEntry cr = caManager.getResponder(name);

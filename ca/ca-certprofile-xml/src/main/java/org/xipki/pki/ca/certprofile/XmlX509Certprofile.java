@@ -316,7 +316,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
             }
 
             X509ProfileType conf = XmlX509CertprofileUtil.parse(new ByteArrayInputStream(bytes));
-            doInitialize(conf);
+            initialize0(conf);
         } catch (RuntimeException ex) {
             LogUtil.error(LOG, ex);
             throw new CertprofileException(
@@ -329,7 +329,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
 
         reset();
         try {
-            doInitialize(conf);
+            initialize0(conf);
         } catch (RuntimeException ex) {
             LogUtil.error(LOG, ex);
             throw new CertprofileException(
@@ -337,7 +337,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
         }
     } // method initialize
 
-    private void doInitialize(X509ProfileType conf) throws CertprofileException {
+    private void initialize0(X509ProfileType conf) throws CertprofileException {
         if (conf.getVersion() != null) {
             String versionText = conf.getVersion();
             this.version = X509CertVersion.forName(versionText);
@@ -563,7 +563,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile {
                 }
             }
         }
-    } // method doInitialize
+    } // method initialize0
 
     private void initSubjectToSubjectAltNames(ExtensionsType extensionsType)
             throws CertprofileException {

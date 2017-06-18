@@ -202,7 +202,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
              @NonNull SignatureAlgoControl signatureAlgoControl) throws Exception;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         hashAlgo = hashAlgo.trim().toUpperCase();
         if (hashAlgo.indexOf('-') != -1) {
             hashAlgo = hashAlgo.replaceAll("-", "");
@@ -368,7 +368,7 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
         File file = new File(outputFilename);
         saveVerbose("saved CSR to file", file, csr.getEncoded());
         return null;
-    } // method doExecute
+    } // method execute0
 
     protected X500Name getSubject(final String subjectText) {
         ParamUtil.requireNonBlank("subjectText", subjectText);

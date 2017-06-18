@@ -214,7 +214,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         try {
             certsFileOs = new FileOutputStream(
                     new File(baseDir, OcspDbEntryType.CERT.dirName() + ".mf"), true);
-            doExportCert(certstore, processLogFile, certsFileOs);
+            exportCert0(certstore, processLogFile, certsFileOs);
             return null;
         } catch (Exception ex) {
             // delete the temporary files
@@ -228,7 +228,7 @@ class OcspCertStoreDbExporter extends DbPorter {
         }
     } // method exportCert
 
-    private void doExportCert(final CertStoreType certstore, final File processLogFile,
+    private void exportCert0(final CertStoreType certstore, final File processLogFile,
             final FileOutputStream certsFileOs) throws Exception {
         File certsDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
         Long minId = null;
@@ -426,7 +426,7 @@ class OcspCertStoreDbExporter extends DbPorter {
 
         System.out.println(exportedText() + processLog.numProcessed()
                 + " certificates from tables CERT, CHASH and CRAW");
-    } // method doExportCert
+    } // method exportCert0
 
     private void finalizeZip(final ZipOutputStream zipOutStream, final DbiXmlWriter certsType)
             throws JAXBException, IOException, XMLStreamException {

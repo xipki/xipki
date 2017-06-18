@@ -55,7 +55,7 @@ public class ResponderRemoveCmd extends CaCommandSupport {
     private String name;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         boolean bo = caManager.removeResponder(name);
         output(bo, "removed", "could not remove", "CMP responder " + name);
         return null;

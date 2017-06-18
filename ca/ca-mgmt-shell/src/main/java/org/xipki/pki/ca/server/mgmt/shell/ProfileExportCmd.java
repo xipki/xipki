@@ -69,7 +69,7 @@ public class ProfileExportCmd extends CaCommandSupport {
     private String confFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         CertprofileEntry entry = caManager.getCertprofile(name);
         if (entry == null) {
             throw new IllegalCmdParamException(

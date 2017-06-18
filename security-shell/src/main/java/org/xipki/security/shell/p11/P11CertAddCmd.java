@@ -76,7 +76,7 @@ public class P11CertAddCmd extends SecurityCommandSupport {
     private String moduleName = DEFAULT_P11MODULE_NAME;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         X509Certificate cert = X509Util.parseCert(certFile);
         P11Slot slot = getSlot(moduleName, slotIndex);
         P11ObjectIdentifier objectId = slot.addCert(cert);

@@ -50,11 +50,11 @@ import org.xipki.pki.ca.server.mgmt.shell.CaRevokeCmd;
 public class NegCaRevokeCmd extends CaRevokeCmd {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         println("neg-ca-revoke");
 
         try {
-            super.doExecute();
+            super.execute0();
         } catch (Exception ex) {
             return null;
         }

@@ -50,11 +50,11 @@ import org.xipki.pki.ca.server.mgmt.shell.ClearPublishQueueCmd;
 public class NegClearPublishQueueCmd extends ClearPublishQueueCmd {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         println("neg-clear-publishqueue");
 
         try {
-            super.doExecute();
+            super.execute0();
         } catch (Exception ex) {
             return null;
         }

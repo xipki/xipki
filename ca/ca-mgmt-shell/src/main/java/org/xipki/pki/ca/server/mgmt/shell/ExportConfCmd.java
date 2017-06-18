@@ -66,7 +66,7 @@ public class ExportConfCmd extends CaCommandSupport {
     private List<String> caNames;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         boolean bo = caManager.exportConf(confFile, caNames);
         output(bo, "exported", "could not export", "configuration to file " + confFile);
         return null;

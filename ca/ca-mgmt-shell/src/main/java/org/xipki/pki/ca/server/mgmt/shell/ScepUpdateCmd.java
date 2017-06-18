@@ -136,7 +136,7 @@ public class ScepUpdateCmd extends CaCommandSupport {
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Boolean realActive;
         if (active != null) {
             if (inactive != null) {
@@ -194,6 +194,6 @@ public class ScepUpdateCmd extends CaCommandSupport {
         boolean bo = caManager.changeScep(entry);
         output(bo, "updated", "could not update", "SCEP responder " + caName);
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

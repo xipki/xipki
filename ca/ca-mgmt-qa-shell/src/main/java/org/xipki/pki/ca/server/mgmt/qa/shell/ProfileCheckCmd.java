@@ -52,7 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.ProfileUpdateCmd;
 public class ProfileCheckCmd extends ProfileUpdateCmd {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         println("checking profile " + name);
 
         if (type == null && conf == null && confFile == null) {

@@ -85,7 +85,7 @@ public class ResponderAddCmd extends CaCommandSupport {
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         String base64Cert = null;
         X509Certificate signerCert = null;
         if (certFile != null) {

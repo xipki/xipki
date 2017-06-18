@@ -207,7 +207,7 @@ class RequestOption {
         } // end switch
 
         try {
-            Set<X509Certificate> tmpCerts = doGetCerts(certpathConf.getTrustAnchors());
+            Set<X509Certificate> tmpCerts = getCerts(certpathConf.getTrustAnchors());
             trustAnchors = new HashSet<>(tmpCerts.size());
             for (X509Certificate m : tmpCerts) {
                 trustAnchors.add(new CertWithEncoded(m));
@@ -219,7 +219,7 @@ class RequestOption {
 
         CertCollectionType certsType = certpathConf.getCerts();
         try {
-            this.certs = (certsType == null) ? null : doGetCerts(certsType);
+            this.certs = (certsType == null) ? null : getCerts(certsType);
         } catch (Exception ex) {
             throw new InvalidConfException(
                     "could not initialize the certs: " + ex.getMessage(), ex);
@@ -282,7 +282,7 @@ class RequestOption {
         return versions == null || versions.contains(version);
     }
 
-    private static Set<X509Certificate> doGetCerts(final CertCollectionType conf)
+    private static Set<X509Certificate> getCerts(final CertCollectionType conf)
             throws KeyStoreException, NoSuchAlgorithmException, NoSuchProviderException,
                 CertificateException, IOException {
         ParamUtil.requireNonNull("conf", conf);

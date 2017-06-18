@@ -50,11 +50,11 @@ import org.xipki.pki.ca.server.mgmt.shell.ProfileRemoveCmd;
 public class NegProfileRemoveCmd extends ProfileRemoveCmd {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         println("neg-profile-rm");
 
         try {
-            super.doExecute();
+            super.execute0();
         } catch (Exception ex) {
             return null;
         }

@@ -49,7 +49,7 @@ import org.xipki.console.karaf.CmdFailure;
 public class CaSystemRestartCmd extends CaCommandSupport {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         boolean successful = caManager.restartCaSystem();
         if (!successful) {
             throw new CmdFailure("could not restart CA system");
@@ -69,6 +69,6 @@ public class CaSystemRestartCmd extends CaCommandSupport {
 
         println(sb.toString());
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

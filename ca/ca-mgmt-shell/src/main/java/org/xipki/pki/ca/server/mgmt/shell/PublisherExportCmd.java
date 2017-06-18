@@ -71,7 +71,7 @@ public class PublisherExportCmd extends CaCommandSupport {
     private String confFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         PublisherEntry entry = caManager.getPublisher(name);
         if (entry == null) {
             throw new IllegalCmdParamException("no publisher named " + name + " is defined");

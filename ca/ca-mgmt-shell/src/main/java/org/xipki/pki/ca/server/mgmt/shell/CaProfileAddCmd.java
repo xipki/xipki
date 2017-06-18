@@ -66,7 +66,7 @@ public class CaProfileAddCmd extends CaCommandSupport {
     private String profileName;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append("certificate profile ").append(profileName);
         sb.append(" to CA ").append(caName);

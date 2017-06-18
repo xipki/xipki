@@ -225,7 +225,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
             @NonNull SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
 
         ConcurrentContentSigner signer = getSigner(
@@ -402,7 +402,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
         saveVerbose("saved certificate to file", certFile, cert.getEncoded());
 
         return null;
-    } // method doExecute
+    } // method execute0
 
     private static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
             final List<String> oidTexts) throws InvalidOidOrNameException {

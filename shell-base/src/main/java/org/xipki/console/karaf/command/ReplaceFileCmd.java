@@ -77,7 +77,7 @@ public class ReplaceFileCmd extends XipkiCommandSupport {
     private String newText;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         File sourceFile = new File(expandFilepath(source));
         if (!sourceFile.exists()) {
             System.err.println(source + " does not exist");

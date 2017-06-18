@@ -99,7 +99,7 @@ public class ShellUtil {
 
         pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
         return pairs.getEncoded();
-    } // method doExecute
+    } // method execute0
 
     public static int getPermission(Set<String> permissions) throws IllegalCmdParamException {
         int ret = 0;

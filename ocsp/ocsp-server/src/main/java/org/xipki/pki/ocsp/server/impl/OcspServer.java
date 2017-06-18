@@ -301,7 +301,7 @@ public class OcspServer {
         }
 
         try {
-            doInit();
+            init0();
             initialized.set(true);
         } finally {
             if (initialized.get()) {
@@ -313,7 +313,7 @@ public class OcspServer {
         }
     }
 
-    private void doInit()
+    private void init0()
             throws InvalidConfException, DataAccessException, PasswordResolverException {
         if (confFile == null) {
             throw new IllegalStateException("confFile is not set");
@@ -658,7 +658,7 @@ public class OcspServer {
             list2.add(m.str);
         }
         this.servletPaths = list2;
-    } // method doInit
+    } // method init0
 
     public void shutdown() {
         LOG.info("stopped OCSP Responder");

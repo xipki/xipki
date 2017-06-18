@@ -99,7 +99,7 @@ public class EnrollCertCmd extends CaCommandSupport {
     private String notAfterS;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         CaEntry ca = caManager.getCa(caName);
         if (ca == null) {
             throw new CmdFailure("CA " + caName + " not available");

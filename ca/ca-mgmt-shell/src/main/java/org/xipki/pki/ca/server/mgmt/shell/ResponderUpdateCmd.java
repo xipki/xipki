@@ -104,7 +104,7 @@ public class ResponderUpdateCmd extends CaCommandSupport {
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         String cert = null;
         if (CaManager.NULL.equalsIgnoreCase(certFile)) {
             cert = CaManager.NULL;

@@ -364,7 +364,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         PKIMessage request = buildPkiMessage(csr, notBefore, notAfter);
         Map<BigInteger, String> reqIdIdMap = new HashMap<>();
         reqIdIdMap.put(MINUS_ONE, csr.id());
-        return internRequestCertificate(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
+        return requestCertificate0(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
     }
 
     public EnrollCertResultResp requestCertificate(final EnrollCertRequest req,
@@ -392,10 +392,10 @@ abstract class X509CmpRequestor extends CmpRequestor {
             exptectedBodyType = PKIBody.TYPE_CROSS_CERT_REP;
         }
 
-        return internRequestCertificate(request, reqIdIdMap, exptectedBodyType, debug);
+        return requestCertificate0(request, reqIdIdMap, exptectedBodyType, debug);
     }
 
-    private EnrollCertResultResp internRequestCertificate(final PKIMessage reqMessage,
+    private EnrollCertResultResp requestCertificate0(final PKIMessage reqMessage,
             final Map<BigInteger, String> reqIdIdMap, final int expectedBodyType,
             final RequestResponseDebug debug) throws CmpRequestorException, PkiErrorException {
         PkiResponse response = signAndSend(reqMessage, debug);
@@ -510,7 +510,7 @@ abstract class X509CmpRequestor extends CmpRequestor {
         checkProtection(response);
 
         return result;
-    } // method internRequestCertificate
+    } // method requestCertificate0
 
     private PKIMessage buildCertConfirmRequest(final ASN1OctetString tid,
             final CertificateConfirmationContentBuilder certConfirmBuilder)

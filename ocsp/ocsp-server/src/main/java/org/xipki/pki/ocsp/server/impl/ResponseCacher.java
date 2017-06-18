@@ -416,7 +416,7 @@ class ResponseCacher {
     }
 
     private void updateCacheStore() {
-        boolean stillOnService = doUpdateCacheStore();
+        boolean stillOnService = updateCacheStore0();
         this.onService.set(stillOnService);
         if (!stillOnService) {
             LOG.error("OCSP response cacher is out of service");
@@ -429,7 +429,7 @@ class ResponseCacher {
      * update the cache store.
      * @return whether the ResponseCacher is on service.
      */
-    private boolean doUpdateCacheStore() {
+    private boolean updateCacheStore0() {
         try {
             if (this.issuerStore == null) {
                 PreparedStatement ps = null;
@@ -546,7 +546,7 @@ class ResponseCacher {
         }
 
         return true;
-    } // method updateCacheStore
+    } // method updateCacheStore0
 
     private PreparedStatement prepareStatement(String sqlQuery) throws DataAccessException {
         Connection conn = datasource.getConnection();

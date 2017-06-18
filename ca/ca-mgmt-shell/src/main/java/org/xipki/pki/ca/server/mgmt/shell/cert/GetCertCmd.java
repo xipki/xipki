@@ -75,7 +75,7 @@ public class GetCertCmd extends CaCommandSupport {
     private String outputFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         CertWithStatusInfo certInfo = caManager.getCert(caName, toBigInt(serialNumberS));
         X509Certificate cert = (X509Certificate) certInfo.cert();
 

@@ -50,11 +50,11 @@ import org.xipki.pki.ca.server.mgmt.shell.CmpControlUpdateCmd;
 public class NegCmpControlUpdateCmd extends CmpControlUpdateCmd {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         println("neg-cmpcontrol-up");
 
         try {
-            super.doExecute();
+            super.execute0();
         } catch (Exception ex) {
             return null;
         }

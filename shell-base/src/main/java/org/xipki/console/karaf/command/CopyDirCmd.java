@@ -69,7 +69,7 @@ public class CopyDirCmd extends XipkiCommandSupport {
     private String dest;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         File sourceDir = new File(expandFilepath(source));
         if (!sourceDir.exists()) {
             System.err.println(source + " does not exist");

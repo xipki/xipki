@@ -67,7 +67,7 @@ public class RequestorAddCmd extends CaCommandSupport {
     private String certFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         String base64Cert = IoUtil.base64Encode(IoUtil.read(certFile), false);
         CmpRequestorEntry entry = new CmpRequestorEntry(new NameId(null, name), base64Cert);
 

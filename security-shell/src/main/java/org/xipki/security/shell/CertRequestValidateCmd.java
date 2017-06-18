@@ -61,7 +61,7 @@ public class CertRequestValidateCmd extends SecurityCommandSupport {
     private String csrFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
         String sigAlgo = AlgorithmUtil.getSignatureAlgoName(csr.getSignatureAlgorithm());
         boolean bo = securityFactory.verifyPopo(csr, null);

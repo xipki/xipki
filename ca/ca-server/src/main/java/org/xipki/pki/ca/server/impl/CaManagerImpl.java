@@ -662,7 +662,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     @Override
     public boolean restartCaSystem() {
         reset();
-        boolean caSystemStarted = doStartCaSystem();
+        boolean caSystemStarted = startCaSystem0();
 
         if (!caSystemStarted) {
             String msg = "could not restart CA system";
@@ -690,7 +690,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     public void startCaSystem() {
         boolean caSystemStarted = false;
         try {
-            caSystemStarted = doStartCaSystem();
+            caSystemStarted = startCaSystem0();
         } catch (Throwable th) {
             LogUtil.error(LOG, th, "could not start CA system");
         }
@@ -703,7 +703,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         auditLogPciEvent(caSystemStarted, "START");
     } // method startCaSystem
 
-    private boolean doStartCaSystem() {
+    private boolean startCaSystem0() {
         if (caSystemSetuped) {
             return true;
         }
@@ -808,7 +808,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         }
 
         return true;
-    } // method doStartCaSystem
+    } // method startCaSystem0
 
     private boolean startCa(final String caName) {
         X509CaInfo caEntry = caInfos.get(caName);

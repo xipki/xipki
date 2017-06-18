@@ -95,7 +95,7 @@ public class ListCertCmd extends CaCommandSupport {
      * @return comma-separated serial numbers (in hex).
      */
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Date validFrom = getDate(validFromS);
         Date validTo = getDate(validToS);
         X500Name subjectPattern = null;

@@ -74,7 +74,7 @@ public class PublisherUpdateCmd extends CaCommandSupport {
     protected String confFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         if (type == null && conf == null && confFile == null) {
             throw new IllegalCmdParamException("nothing to update");
         }

@@ -79,7 +79,7 @@ public class CaGenRcaCmd extends CaAddOrGenCommandSupport {
     private String rcaCertOutFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         X509CaEntry caEntry = getCaEntry();
         byte[] csr = IoUtil.read(csrFile);
         BigInteger serialNumber = null;

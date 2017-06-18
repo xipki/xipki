@@ -89,7 +89,7 @@ public class CaRevokeCmd extends CaCommandSupport {
     private String invalidityDateS;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         CrlReason crlReason = CrlReason.forNameOrText(reason);
 
         if (!PERMITTED_REASONS.contains(crlReason)) {
@@ -114,6 +114,6 @@ public class CaRevokeCmd extends CaCommandSupport {
         boolean bo = caManager.revokeCa(caName, revInfo);
         output(bo, "revoked", "could not revoke", "CA " + caName);
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

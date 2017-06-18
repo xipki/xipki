@@ -84,7 +84,7 @@ public class CaUserAddCmd extends CaCommandSupport {
     private Set<String> profiles;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         CaHasUserEntry entry = new CaHasUserEntry(new NameId(null, userName));
         entry.setProfiles(profiles);
         int intPermission = ShellUtil.getPermission(permissions);

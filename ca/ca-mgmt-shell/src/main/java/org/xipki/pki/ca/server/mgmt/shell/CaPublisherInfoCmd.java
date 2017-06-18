@@ -62,7 +62,7 @@ public class CaPublisherInfoCmd extends CaCommandSupport {
     private String caName;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         if (caManager.getCa(caName) == null) {
             throw new CmdFailure("could not find CA '" + caName + "'");
         }

@@ -57,7 +57,7 @@ public class ConfirmCmd extends XipkiCommandSupport {
     private String prompt;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         boolean toContinue = confirm(
                 prompt + "\nDo you want to continue", 3);
         if (!toContinue) {

@@ -73,7 +73,7 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCommandSupport {
     private String invalidityDateS;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         if (!(certFile == null ^ getSerialNumber() == null)) {
             throw new IllegalCmdParamException("exactly one of cert and serial must be specified");
         }
@@ -114,6 +114,6 @@ public class NegRevokeCertCmd extends UnRevRemoveCertCommandSupport {
             throw new CmdFailure("revocation sucessful but expected failure");
         }
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

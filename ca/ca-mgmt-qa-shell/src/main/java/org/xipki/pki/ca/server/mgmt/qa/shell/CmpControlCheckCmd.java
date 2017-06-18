@@ -52,7 +52,7 @@ import org.xipki.pki.ca.server.mgmt.shell.CmpControlUpdateCmd;
 public class CmpControlCheckCmd extends CmpControlUpdateCmd {
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         println("checking CMP control " + name);
 
         CmpControlEntry ce = caManager.getCmpControl(name);

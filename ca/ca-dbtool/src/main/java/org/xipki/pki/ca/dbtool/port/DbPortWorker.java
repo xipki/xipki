@@ -66,13 +66,13 @@ public abstract class DbPortWorker implements Runnable {
     @Override
     public void run() {
         try {
-            doRun();
+            run0();
         } catch (Exception ex) {
             LOG.error("exception thrown", ex);
             exception = ex;
         }
     }
 
-    protected abstract void doRun() throws Exception;
+    protected abstract void run0() throws Exception;
 
 }

@@ -86,7 +86,7 @@ public class P11SecretKeyCreateCmd extends P11KeyGenCommandSupport {
     private String password;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         long p11KeyType;
         if ("AES".equalsIgnoreCase(keyType)) {
             p11KeyType = PKCS11Constants.CKK_AES;

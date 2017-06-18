@@ -57,7 +57,7 @@ public class UserInfoCmd extends CaCommandSupport {
     private String name;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         UserEntry userEntry = caManager.getUser(name);
         if (userEntry == null) {
             throw new CmdFailure("no user named '" + name + "' is configured");

@@ -67,7 +67,7 @@ public class RequestorInfoCmd extends CaCommandSupport {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         StringBuilder sb = new StringBuilder();
 
         if (name == null) {
@@ -98,6 +98,6 @@ public class RequestorInfoCmd extends CaCommandSupport {
 
         println(sb.toString());
         return null;
-    } // method doExecute
+    } // method execute0
 
 }
