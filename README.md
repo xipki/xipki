@@ -21,8 +21,7 @@ Just drop me an email.
 Prerequisite
 ------------
 * JRE / JDK 8
-  * OpenJDK: none
-  * Oracle: [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+  * OpenJDK/Oracle: [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 Tested Platforms
 ----------------
