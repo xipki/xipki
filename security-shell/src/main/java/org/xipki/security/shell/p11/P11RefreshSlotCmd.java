@@ -59,7 +59,7 @@ public class P11RefreshSlotCmd extends SecurityCommandSupport {
     private String moduleName = DEFAULT_P11MODULE_NAME;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
         if (p11Service == null) {
             throw new IllegalCmdParamException("undefined module " + moduleName);

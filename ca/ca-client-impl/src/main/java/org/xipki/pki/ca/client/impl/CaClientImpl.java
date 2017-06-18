@@ -248,10 +248,10 @@ public final class CaClientImpl implements CaClient {
     } // method autoConfCas
 
     public void init() throws CaClientException {
-        doInit(true);
+        init0(true);
     }
 
-    private synchronized void doInit(final boolean force) throws CaClientException {
+    private synchronized void init0(final boolean force) throws CaClientException {
         if (confFile == null) {
             throw new IllegalStateException("confFile is not set");
         }
@@ -752,7 +752,7 @@ public final class CaClientImpl implements CaClient {
     public X509CRL downloadCrl(final String caName, final BigInteger crlNumber,
             final RequestResponseDebug debug) throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("caName", caName);
-        doInit(false);
+        init0(false);
 
         CaConf ca = casMap.get(caName.trim());
         if (ca == null) {
@@ -856,7 +856,7 @@ public final class CaClientImpl implements CaClient {
         ParamUtil.requireNonNull("pop", pop);
         ParamUtil.requireNonNull("profileName", profileName);
 
-        doInit(false);
+        init0(false);
         String tmpCaName = caName;
         if (tmpCaName == null) {
             // detect the CA name
@@ -962,7 +962,7 @@ public final class CaClientImpl implements CaClient {
             final int reason) throws CaClientException {
         ParamUtil.requireNonNull("issuer", issuer);
 
-        doInit(false);
+        init0(false);
         final String id = "cert-1";
         RevokeCertRequestEntry entry = new RevokeCertRequestEntry(id, issuer, serial, reason, null);
         RevokeCertRequest request = new RevokeCertRequest();
@@ -1025,7 +1025,7 @@ public final class CaClientImpl implements CaClient {
             final RequestResponseDebug debug) throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
-        doInit(false);
+        init0(false);
         List<UnrevokeOrRemoveCertEntry> requestEntries = request.requestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
             return Collections.emptyMap();
@@ -1093,7 +1093,7 @@ public final class CaClientImpl implements CaClient {
             throws CaClientException, PkiErrorException {
         ParamUtil.requireNonNull("request", request);
 
-        doInit(false);
+        init0(false);
         List<UnrevokeOrRemoveCertEntry> requestEntries = request.requestEntries();
         if (CollectionUtil.isEmpty(requestEntries)) {
             return Collections.emptyMap();
@@ -1123,7 +1123,7 @@ public final class CaClientImpl implements CaClient {
     public Set<CertprofileInfo> getCertprofiles(final String caName) throws CaClientException {
         ParamUtil.requireNonNull("caName", caName);
 
-        doInit(false);
+        init0(false);
         CaConf ca = casMap.get(caName.trim());
         if (ca == null) {
             return Collections.emptySet();
@@ -1149,7 +1149,7 @@ public final class CaClientImpl implements CaClient {
         HealthCheckResult healthCheckResult = new HealthCheckResult(name);
 
         try {
-            doInit(false);
+            init0(false);
         } catch (CaClientException ex) {
             LogUtil.error(LOG, ex, "could not initialize CaCleint");
             healthCheckResult.setHealthy(false);

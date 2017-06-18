@@ -199,7 +199,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11SlotRefreshResult doRefresh()
+    protected P11SlotRefreshResult refresh0()
             throws P11TokenException {
         Mechanism[] mechanisms;
         try {
@@ -915,7 +915,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void doRemoveCerts(final P11ObjectIdentifier objectId) throws P11TokenException {
+    protected void removeCerts0(final P11ObjectIdentifier objectId) throws P11TokenException {
         X509PublicKeyCertificate[] existingCerts = getCertificateObjects(objectId.id(),
                 objectId.labelChars());
         if (existingCerts == null || existingCerts.length == 0) {
@@ -936,7 +936,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void doAddCert(final P11ObjectIdentifier objectId, final X509Certificate cert)
+    protected void addCert0(final P11ObjectIdentifier objectId, final X509Certificate cert)
             throws P11TokenException {
         X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
                 new X509Cert(cert), objectId.id(), objectId.labelChars());
@@ -951,7 +951,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity doGenerateSecretKey(long keyType, int keysize, String label,
+    protected P11Identity generateSecretKey0(long keyType, int keysize, String label,
             P11NewKeyControl control)
             throws P11TokenException {
         if (keysize % 8 != 0) {
@@ -1020,7 +1020,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity doCreateSecretKey(long keyType, byte[] keyValue, String label,
+    protected P11Identity createSecretKey0(long keyType, byte[] keyValue, String label,
             P11NewKeyControl control)
             throws P11TokenException {
         // The SecretKey class does not support the specification of valueLen
@@ -1061,7 +1061,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity doGenerateRSAKeypair(final int keysize, final BigInteger publicExponent,
+    protected P11Identity generateRSAKeypair0(final int keysize, final BigInteger publicExponent,
             final String label, P11NewKeyControl control) throws P11TokenException {
         RSAPrivateKey privateKey = new RSAPrivateKey();
         RSAPublicKey publicKey = new RSAPublicKey();
@@ -1077,7 +1077,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     @Override
     // CHECKSTYLE:OFF
-    protected P11Identity doGenerateDSAKeypair(final BigInteger p, final BigInteger q,
+    protected P11Identity generateDSAKeypair0(final BigInteger p, final BigInteger q,
             final BigInteger g, final String label, P11NewKeyControl control)
             throws P11TokenException {
     // CHECKSTYLE:ON
@@ -1092,7 +1092,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity doGenerateECKeypair(final ASN1ObjectIdentifier curveId,
+    protected P11Identity generateECKeypair0(final ASN1ObjectIdentifier curveId,
             final String label, P11NewKeyControl control) throws P11TokenException {
         ECDSAPrivateKey privateKey = new ECDSAPrivateKey();
         ECDSAPublicKey publicKey = new ECDSAPublicKey();
@@ -1217,7 +1217,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void doUpdateCertificate(final P11ObjectIdentifier objectId,
+    protected void updateCertificate0(final P11ObjectIdentifier objectId,
             final X509Certificate newCert) throws P11TokenException {
         removeCerts(objectId);
         try {
@@ -1271,7 +1271,7 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void doRemoveIdentity(final P11ObjectIdentifier objectId) throws P11TokenException {
+    protected void removeIdentity0(final P11ObjectIdentifier objectId) throws P11TokenException {
         Session session = borrowWritableSession();
         try {
             byte[] id = objectId.id();

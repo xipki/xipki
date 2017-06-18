@@ -69,7 +69,7 @@ public class P11SecretKeyGenCmd extends P11KeyGenCommandSupport {
     private Integer keysize;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         long p11KeyType;
         if ("AES".equalsIgnoreCase(keyType)) {
             p11KeyType = PKCS11Constants.CKK_AES;

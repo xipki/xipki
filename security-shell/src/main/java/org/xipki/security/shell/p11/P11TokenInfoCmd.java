@@ -70,7 +70,7 @@ public class P11TokenInfoCmd extends SecurityCommandSupport {
     private Integer slotIndex;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         P11Module module = getP11Module(moduleName);
         println("module: " + moduleName);
         List<P11SlotIdentifier> slots = module.slotIdentifiers();

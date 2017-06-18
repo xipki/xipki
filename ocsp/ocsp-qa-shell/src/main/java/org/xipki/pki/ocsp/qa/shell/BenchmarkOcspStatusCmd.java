@@ -112,7 +112,7 @@ public class BenchmarkOcspStatusCmd extends OcspStatusCommandSupport {
     private Integer maxCerts = 0;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         int ii = 0;
         if (serialNumberList != null) {
             ii++;
@@ -190,6 +190,6 @@ public class BenchmarkOcspStatusCmd extends OcspStatusCommandSupport {
         }
 
         return null;
-    } // end doExecute
+    } // end execute0
 
 }

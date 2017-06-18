@@ -65,7 +65,7 @@ public class HealthCmd extends ClientCommandSupport {
     private Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Set<String> caNames = caClient.caNames();
         if (isEmpty(caNames)) {
             throw new IllegalCmdParamException("no CA is configured");
@@ -96,6 +96,6 @@ public class HealthCmd extends ClientCommandSupport {
         }
         System.out.println(sb.toString());
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

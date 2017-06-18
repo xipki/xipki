@@ -309,11 +309,11 @@ public class FileUtils {
             return;
         }
         for (final Closeable closeable : closeables) {
-            doCloseQuietly(closeable);
+            closeQuietly0(closeable);
         }
     }
 
-    private static void doCloseQuietly(final Closeable closable) {
+    private static void closeQuietly0(final Closeable closable) {
         if (closable == null) {
             return;
         }

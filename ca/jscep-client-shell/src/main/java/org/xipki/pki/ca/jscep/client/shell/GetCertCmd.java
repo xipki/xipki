@@ -71,7 +71,7 @@ public class GetCertCmd extends ClientCommandSupport {
     private String outputFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Client client = getScepClient();
         BigInteger serial = toBigInt(serialNumber);
         CertStore certs = client.getCertificate(getIdentityCert(), getIdentityKey(), serial, null);

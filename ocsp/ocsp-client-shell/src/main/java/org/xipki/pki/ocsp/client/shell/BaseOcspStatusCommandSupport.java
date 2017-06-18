@@ -154,7 +154,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
             throws Exception;
 
     @Override
-    protected final Object doExecute() throws Exception {
+    protected final Object execute0() throws Exception {
         if (StringUtil.isBlank(serialNumberList) && isEmpty(certFiles)) {
             throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
         }
@@ -298,7 +298,7 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
         } // end finally
 
         return processResponse(response, respIssuer, issuerHash, sns, encodedCerts);
-    } // method doExecute
+    } // method execute0
 
     public static List<String> extractOcspUrls(final X509Certificate cert)
             throws CertificateEncodingException {

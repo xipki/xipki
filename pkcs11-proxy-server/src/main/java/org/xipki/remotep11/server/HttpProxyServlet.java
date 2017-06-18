@@ -106,7 +106,7 @@ public class HttpProxyServlet extends AbstractHttpServlet {
             }
             return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
         }
-    } // method doPost
+    } // method service
 
     public void setLocalP11CryptServicePool(
             final LocalP11CryptServicePool localP11CryptServicePool) {

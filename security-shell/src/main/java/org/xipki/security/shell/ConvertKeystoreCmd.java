@@ -99,7 +99,7 @@ public class ConvertKeystoreCmd extends SecurityCommandSupport {
     private String outPwd;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         File realInFile = new File(IoUtil.expandFilepath(inFile));
         File realOutFile = new File(IoUtil.expandFilepath(outFile));
 

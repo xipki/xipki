@@ -98,7 +98,7 @@ public class CsrEnrollCertCmd extends ClientCommandSupport {
     private String caName;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         CertificationRequest csr = CertificationRequest.getInstance(IoUtil.read(csrFile));
 
         Date notBefore = StringUtil.isNotBlank(notBeforeS)

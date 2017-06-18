@@ -95,7 +95,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11SlotRefreshResult doRefresh()
+    protected P11SlotRefreshResult refresh0()
             throws P11TokenException {
         P11SlotRefreshResult refreshResult = new P11SlotRefreshResult();
 
@@ -196,13 +196,13 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void doRemoveIdentity(final P11ObjectIdentifier objectId) throws P11TokenException {
+    protected void removeIdentity0(final P11ObjectIdentifier objectId) throws P11TokenException {
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(slotId, objectId);
         module.send(P11ProxyConstants.ACTION_REMOVE_IDENTITY, asn1EntityId);
     }
 
     @Override
-    protected void doAddCert(final P11ObjectIdentifier objectId, final X509Certificate cert)
+    protected void addCert0(final P11ObjectIdentifier objectId, final X509Certificate cert)
             throws P11TokenException, CertificateException {
         Asn1EntityIdAndCert asn1 = new Asn1EntityIdAndCert(
                 new P11EntityIdentifier(slotId, objectId), cert);
@@ -210,13 +210,13 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void doRemoveCerts(final P11ObjectIdentifier objectId) throws P11TokenException {
+    protected void removeCerts0(final P11ObjectIdentifier objectId) throws P11TokenException {
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(slotId, objectId);
         module.send(P11ProxyConstants.ACTION_REMOVE_CERTS, asn1EntityId);
     }
 
     @Override
-    protected P11Identity doGenerateSecretKey(long keyType, int keysize, String label,
+    protected P11Identity generateSecretKey0(long keyType, int keysize, String label,
             final P11NewKeyControl control)
             throws P11TokenException {
         Asn1GenSecretKeyParams asn1 = new Asn1GenSecretKeyParams(
@@ -226,7 +226,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity doCreateSecretKey(long keyType, byte[] keyValue, String label,
+    protected P11Identity createSecretKey0(long keyType, byte[] keyValue, String label,
             final P11NewKeyControl control)
             throws P11TokenException {
         Asn1CreateSecretKeyParams asn1 = new Asn1CreateSecretKeyParams(
@@ -236,7 +236,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity doGenerateRSAKeypair(final int keysize, final BigInteger publicExponent,
+    protected P11Identity generateRSAKeypair0(final int keysize, final BigInteger publicExponent,
             final String label, final P11NewKeyControl control) throws P11TokenException {
         Asn1GenRSAKeypairParams asn1 = new Asn1GenRSAKeypairParams(slotId, label, control,
                 keysize, publicExponent);
@@ -246,7 +246,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
 
     @Override
     // CHECKSTYLE:OFF
-    protected P11Identity doGenerateDSAKeypair(final BigInteger p, final BigInteger q,
+    protected P11Identity generateDSAKeypair0(final BigInteger p, final BigInteger q,
             final BigInteger g, final String label, final P11NewKeyControl control)
             throws P11TokenException {
     // CHECKSTYLE:ON
@@ -257,7 +257,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity doGenerateECKeypair(final ASN1ObjectIdentifier curveId,
+    protected P11Identity generateECKeypair0(final ASN1ObjectIdentifier curveId,
             final String label, final P11NewKeyControl control) throws P11TokenException {
         Asn1GenECKeypairParams asn1 = new Asn1GenECKeypairParams(slotId, label, control,
                 curveId);
@@ -306,7 +306,7 @@ public class ProxyP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void doUpdateCertificate(final P11ObjectIdentifier objectId,
+    protected void updateCertificate0(final P11ObjectIdentifier objectId,
             final X509Certificate newCert)
             throws P11TokenException, CertificateException {
         Asn1EntityIdAndCert asn1 = new Asn1EntityIdAndCert(

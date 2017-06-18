@@ -67,7 +67,7 @@ public abstract class BatchSpeedCommandSupport extends SecurityCommandSupport {
     protected abstract LoadExecutor nextTester() throws Exception;
 
     @Override
-    protected Object doExecute() throws InterruptedException {
+    protected Object execute0() throws InterruptedException {
         while (true) {
             println("============================================");
             LoadExecutor tester;

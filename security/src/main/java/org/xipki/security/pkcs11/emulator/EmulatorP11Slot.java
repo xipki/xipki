@@ -295,7 +295,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11SlotRefreshResult doRefresh()
+    protected P11SlotRefreshResult refresh0()
             throws P11TokenException {
         P11SlotRefreshResult ret = new P11SlotRefreshResult();
         for (long mech : supportedMechs) {
@@ -796,7 +796,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void doRemoveIdentity(final P11ObjectIdentifier objectId) throws P11TokenException {
+    protected void removeIdentity0(final P11ObjectIdentifier objectId) throws P11TokenException {
         boolean b1 = removePkcs11Entry(certDir, objectId);
         boolean b2 = removePkcs11Entry(privKeyDir, objectId);
         boolean b3 = removePkcs11Entry(pubKeyDir, objectId);
@@ -807,18 +807,18 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void doRemoveCerts(final P11ObjectIdentifier objectId) throws P11TokenException {
+    protected void removeCerts0(final P11ObjectIdentifier objectId) throws P11TokenException {
         deletePkcs11Entry(certDir, objectId.id());
     }
 
     @Override
-    protected void doAddCert(final P11ObjectIdentifier objectId, final X509Certificate cert)
+    protected void addCert0(final P11ObjectIdentifier objectId, final X509Certificate cert)
             throws P11TokenException, CertificateException {
         savePkcs11Cert(objectId.id(), objectId.label(), cert);
     }
 
     @Override
-    protected P11Identity doGenerateSecretKey(long keyType, int keysize, String label,
+    protected P11Identity generateSecretKey0(long keyType, int keysize, String label,
             P11NewKeyControl control)
             throws P11TokenException {
         if (keysize % 8 != 0) {
@@ -831,7 +831,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity doCreateSecretKey(long keyType, byte[] keyValue, String label,
+    protected P11Identity createSecretKey0(long keyType, byte[] keyValue, String label,
             P11NewKeyControl control)
             throws P11TokenException {
         SecretKey key = new SecretKeySpec(keyValue, getSecretKeyAlgorithm(keyType));
@@ -869,7 +869,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity doGenerateRSAKeypair(final int keysize, final BigInteger publicExponent,
+    protected P11Identity generateRSAKeypair0(final int keysize, final BigInteger publicExponent,
             final String label, P11NewKeyControl control) throws P11TokenException {
         KeyPair keypair;
         try {
@@ -883,7 +883,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
 
     @Override
     // CHECKSTYLE:OFF
-    protected P11Identity doGenerateDSAKeypair(final BigInteger p, final BigInteger q,
+    protected P11Identity generateDSAKeypair0(final BigInteger p, final BigInteger q,
             final BigInteger g, final String label, P11NewKeyControl control)
             throws P11TokenException {
     // CHECKSTYLE:ON
@@ -899,7 +899,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected P11Identity doGenerateECKeypair(final ASN1ObjectIdentifier curveId,
+    protected P11Identity generateECKeypair0(final ASN1ObjectIdentifier curveId,
             final String label, P11NewKeyControl control) throws P11TokenException {
         KeyPair keypair;
         try {
@@ -942,11 +942,11 @@ class EmulatorP11Slot extends AbstractP11Slot {
     }
 
     @Override
-    protected void doUpdateCertificate(final P11ObjectIdentifier objectId,
+    protected void updateCertificate0(final P11ObjectIdentifier objectId,
             final X509Certificate newCert)
             throws P11TokenException, CertificateException {
         removePkcs11Cert(objectId);
-        doAddCert(objectId, newCert);
+        addCert0(objectId, newCert);
     }
 
 }

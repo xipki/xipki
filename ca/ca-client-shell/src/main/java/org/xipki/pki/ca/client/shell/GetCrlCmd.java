@@ -84,7 +84,7 @@ public class GetCrlCmd extends CrlCommandSupport {
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Set<String> caNames = caClient.caNames();
         if (isEmpty(caNames)) {
             throw new IllegalCmdParamException("no CA is configured");
@@ -148,6 +148,6 @@ public class GetCrlCmd extends CrlCommandSupport {
 
         saveVerbose("saved baseCRL to file", new File(baseCrlOut), crl.getEncoded());
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

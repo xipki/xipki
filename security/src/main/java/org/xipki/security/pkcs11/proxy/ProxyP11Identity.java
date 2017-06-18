@@ -68,7 +68,7 @@ class ProxyP11Identity extends P11Identity {
     }
 
     @Override
-    protected byte[] doSign(final long mechanism, final P11Params parameters, final byte[] content)
+    protected byte[] sign0(final long mechanism, final P11Params parameters, final byte[] content)
             throws P11TokenException {
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
         Asn1P11Params p11Param = null;
@@ -92,7 +92,7 @@ class ProxyP11Identity extends P11Identity {
     }
 
     @Override
-    protected byte[] doDigestSecretKey(long mechanism) throws P11TokenException {
+    protected byte[] digestSecretKey0(long mechanism) throws P11TokenException {
         Asn1P11EntityIdentifier asn1EntityId = new Asn1P11EntityIdentifier(identityId);
         Asn1DigestSecretKeyTemplate template = new Asn1DigestSecretKeyTemplate(
                 asn1EntityId, mechanism);

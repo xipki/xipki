@@ -82,7 +82,7 @@ public class ExtractCertFromCrlCmd extends SecurityCommandSupport {
     private String outFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         X509CRL crl = X509Util.parseCrl(crlFile);
         String oidExtnCerts = ObjectIdentifiers.id_xipki_ext_crlCertset.getId();
         byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
@@ -127,7 +127,7 @@ public class ExtractCertFromCrlCmd extends SecurityCommandSupport {
 
         saveVerbose("extracted " + n + " certificates to", new File(outFile), out.toByteArray());
         return null;
-    } // method doExecute
+    } // method execute0
 
     private static byte[] removingTagAndLenFromExtensionValue(final byte[] encodedExtensionValue) {
         DEROctetString derOctet = (DEROctetString) DEROctetString.getInstance(

@@ -65,7 +65,7 @@ public class FileListCmd extends XipkiCommandSupport {
     private String targetPath;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         File target = new File(expandFilepath(targetPath));
         if (!target.exists()) {
             throw new IllegalCmdParamException(

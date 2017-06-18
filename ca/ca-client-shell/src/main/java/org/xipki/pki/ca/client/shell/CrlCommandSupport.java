@@ -70,7 +70,7 @@ public abstract class CrlCommandSupport extends ClientCommandSupport {
     protected abstract X509CRL retrieveCrl() throws CaClientException, PkiErrorException;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         Set<String> caNames = caClient.caNames();
         if (isEmpty(caNames)) {
             throw new CmdFailure("no CA is configured");
@@ -103,6 +103,6 @@ public abstract class CrlCommandSupport extends ClientCommandSupport {
 
         saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
         return null;
-    } // method doExecute
+    } // method execute0
 
 }

@@ -105,7 +105,7 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
     private Integer maxRequests = 0;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object execute0() throws Exception {
         if (numThreads < 1) {
             throw new IllegalCmdParamException("invalid number of threads " + numThreads);
         }
@@ -153,6 +153,6 @@ public class CaLoadTestEnrollCmd extends CaLoadTestCommandSupport {
         loadTest.test();
 
         return null;
-    } // method doExecute
+    } // method execute0
 
 }
