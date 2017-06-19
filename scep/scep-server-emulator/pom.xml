@@ -28,9 +28,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.aggregate</groupId>
-      <artifactId>jetty-all-server</artifactId>
-      <version>8.1.17.v20150415</version>
+      <groupId>org.xipki</groupId>
+      <artifactId>http-server</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

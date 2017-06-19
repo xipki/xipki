@@ -174,9 +174,15 @@ public class ServletListener {
                 if (len == mLen) {
                     uriText = "/";
                     alias = m;
-                } else if (rawPath.charAt(mLen) == '/') {
-                    uriText = (len == mLen + 1) ? "/" : rawPath.substring(mLen);
-                    alias = m;
+                } else {
+                    char ch = rawPath.charAt(mLen);
+                    if (ch == '/') {
+                        uriText = (len == mLen + 1) ? "/" : rawPath.substring(mLen);
+                        alias = m;
+                    } else if (ch == '?') {
+                        uriText = rawPath.substring(mLen);
+                        alias = m;
+                    }
                 }
             }
 

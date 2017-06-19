@@ -50,7 +50,7 @@ import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * @author Lijun Liao
- * @since 2.2.0O
+ * @since 2.2.0
  */
 
 public abstract class AbstractHttpServlet implements HttpServlet {
