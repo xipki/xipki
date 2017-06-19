@@ -37,15 +37,11 @@ package org.xipki.pki.scep.serveremulator;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.net.ssl.SSLSession;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.cmp.PKIMessage;
@@ -64,14 +60,23 @@ import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditStatus;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.http.servlet.AbstractHttpServlet;
+import org.xipki.http.servlet.ServletURI;
+import org.xipki.http.servlet.SslReverseProxyMode;
 import org.xipki.pki.scep.exception.MessageDecodingException;
 import org.xipki.pki.scep.message.CaCaps;
 import org.xipki.pki.scep.message.NextCaMessage;
 import org.xipki.pki.scep.transaction.CaCapability;
 import org.xipki.pki.scep.transaction.Operation;
 import org.xipki.pki.scep.util.ScepConstants;
-import org.xipki.pki.scep.util.ScepUtil;
 import org.xipki.security.util.X509Util;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 
 /**
  * URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.exe
@@ -80,11 +85,9 @@ import org.xipki.security.util.X509Util;
  * @since 2.0.0
  */
 
-public class ScepServlet extends HttpServlet {
+public class ScepServlet extends AbstractHttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScepServlet.class);
-
-    private static final long serialVersionUID = 1L;
 
     private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;
 
@@ -105,31 +108,28 @@ public class ScepServlet extends HttpServlet {
     }
 
     @Override
-    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException {
-        service(request, response, false);
-    }
+    public FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
+            SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode) throws Exception {
+        HttpVersion version = request.protocolVersion();
 
-    @Override
-    public void doPost(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException {
-        service(request, response, true);
-    }
-
-    private void service(final HttpServletRequest request, final HttpServletResponse response,
-            final boolean post) throws ServletException, IOException {
-        String servletPath = request.getServletPath();
+        HttpMethod method = request.method();
+        boolean post;
+        if (HttpMethod.GET.equals(method)) {
+            post = false;
+        } else if (HttpMethod.POST.equals(method)) {
+            post = true;
+        } else {
+            return createErrorResponse(version, HttpResponseStatus.METHOD_NOT_ALLOWED);
+        }
 
         AuditEvent event = new AuditEvent(new Date());
         event.setApplicationName(ScepAuditConstants.APPNAME);
         event.setName(ScepAuditConstants.NAME_PERF);
-        event.addEventData(ScepAuditConstants.NAME_servletPath, servletPath);
+        event.addEventData(ScepAuditConstants.NAME_servletPath, request.uri());
 
         AuditLevel auditLevel = AuditLevel.INFO;
         AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
         String auditMessage = null;
-
-        OutputStream respStream = response.getOutputStream();
 
         try {
             CaCaps caCaps = responder.caCaps();
@@ -137,15 +137,12 @@ public class ScepServlet extends HttpServlet {
                 final String message = "HTTP POST is not supported";
                 LOG.error(message);
 
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.setContentLength(0);
-
                 auditMessage = message;
                 auditStatus = AuditStatus.FAILED;
-                return;
+                return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
             }
 
-            String operation = request.getParameter("operation");
+            String operation = servletUri.parameter("operation");
             event.addEventData(ScepAuditConstants.NAME_operation, operation);
 
             if ("PKIOperation".equalsIgnoreCase(operation)) {
@@ -154,9 +151,11 @@ public class ScepServlet extends HttpServlet {
                 try {
                     byte[] content;
                     if (post) {
-                        content = ScepUtil.read(request.getInputStream());
+                        ByteBuf buf = request.content();
+                        content = new byte[buf.readableBytes()];
+                        buf.getBytes(buf.readerIndex(), content);
                     } else {
-                        String b64 = request.getParameter("message");
+                        String b64 = servletUri.parameter("message");
                         content = Base64.decode(b64);
                     }
 
@@ -164,12 +163,10 @@ public class ScepServlet extends HttpServlet {
                 } catch (Exception ex) {
                     final String message = "invalid request";
                     LogUtil.error(LOG, ex, message);
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.setContentLength(0);
 
                     auditMessage = message;
                     auditStatus = AuditStatus.FAILED;
-                    return;
+                    return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
                 }
 
                 ContentInfo ci;
@@ -178,32 +175,24 @@ public class ScepServlet extends HttpServlet {
                 } catch (MessageDecodingException ex) {
                     final String message = "could not decrypt and/or verify the request";
                     LogUtil.error(LOG, ex, message);
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.setContentLength(0);
 
                     auditMessage = message;
                     auditStatus = AuditStatus.FAILED;
-                    return;
+                    return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
                 } catch (CaException ex) {
                     final String message = "system internal error";
                     LogUtil.error(LOG, ex, message);
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    response.setContentLength(0);
 
                     auditMessage = message;
                     auditStatus = AuditStatus.FAILED;
-                    return;
+                    return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
                 }
                 byte[] respBytes = ci.getEncoded();
-                response.setContentType(CT_RESPONSE);
-                response.setContentLength(respBytes.length);
-                respStream.write(respBytes);
+                return createOKResponse(version, CT_RESPONSE, respBytes);
             } else if (Operation.GetCACaps.code().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
-                response.setContentType(ScepConstants.CT_TEXT_PLAIN);
                 byte[] caCapsBytes = responder.caCaps().bytes();
-                respStream.write(caCapsBytes);
-                response.setContentLength(caCapsBytes.length);
+                return createOKResponse(version, ScepConstants.CT_TEXT_PLAIN, caCapsBytes);
             } else if (Operation.GetCACert.code().equalsIgnoreCase(operation)) {
                 // CA-Ident is ignored
                 byte[] respBytes;
@@ -226,25 +215,20 @@ public class ScepServlet extends HttpServlet {
                     } catch (CMSException ex) {
                         final String message = "system internal error";
                         LogUtil.error(LOG, ex, message);
-                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                        response.setContentLength(0);
 
                         auditMessage = message;
                         auditStatus = AuditStatus.FAILED;
-                        return;
+                        return createErrorResponse(version,
+                                HttpResponseStatus.INTERNAL_SERVER_ERROR);
                     }
-                } // end if (responder.getRAEmulator() == null) {
-                response.setContentType(ct);
-                response.setContentLength(respBytes.length);
-                respStream.write(respBytes);
+                }
+
+                return createOKResponse(version, ct, respBytes);
             } else if (Operation.GetNextCACert.code().equalsIgnoreCase(operation)) {
                 if (responder.nextCaAndRa() == null) {
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.setContentLength(0);
-
                     auditMessage = "SCEP operation '" + operation + "' is not permitted";
                     auditStatus = AuditStatus.FAILED;
-                    return;
+                    return createErrorResponse(version, HttpResponseStatus.FORBIDDEN);
                 }
 
                 try {
@@ -259,43 +243,33 @@ public class ScepServlet extends HttpServlet {
 
                     ContentInfo signedData = responder.encode(nextCaMsg);
                     byte[] respBytes = signedData.getEncoded();
-                    response.setContentType(ScepConstants.CT_X509_NEXT_CA_CERT);
-                    response.setContentLength(respBytes.length);
-                    response.getOutputStream().write(respBytes);
+                    return createOKResponse(version, ScepConstants.CT_X509_NEXT_CA_CERT, respBytes);
                 } catch (Exception ex) {
                     final String message = "system internal error";
                     LogUtil.error(LOG, ex, message);
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    response.setContentLength(0);
 
                     auditMessage = message;
                     auditStatus = AuditStatus.FAILED;
+                    return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
                 }
             } else {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.setContentLength(0);
-
                 auditMessage = "unknown SCEP operation '" + operation + "'";
                 auditStatus = AuditStatus.FAILED;
+
+                return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
             } // end if ("PKIOperation".equalsIgnoreCase(operation))
         } catch (EOFException ex) {
             final String message = "connection reset by peer";
             LogUtil.warn(LOG, ex, message);
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.setContentLength(0);
+            return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
         } catch (Throwable th) {
             LOG.error("Throwable thrown, this should not happen!", th);
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.setContentLength(0);
             auditLevel = AuditLevel.ERROR;
             auditStatus = AuditStatus.FAILED;
             auditMessage = "internal error";
+            return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
         } finally {
-            try {
-                response.flushBuffer();
-            } finally {
-                audit(auditService, event, auditLevel, auditStatus, auditMessage);
-            }
+            audit(auditService, event, auditLevel, auditStatus, auditMessage);
         } // end try
     } // method service
 
