@@ -34,11 +34,8 @@
 
 package org.xipki.http.servlet;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -60,7 +57,6 @@ public class ServletURI {
     private Map<String, String> parameters;
 
     public ServletURI(String rawPath) throws URISyntaxException {
-        // TODO: debug to make sure rawPath mostly starts with "/"
         if (rawPath == null || rawPath.isEmpty() || "/".equals(rawPath)) {
             path = "/";
         } else {
@@ -77,18 +73,8 @@ public class ServletURI {
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            String encoded = URLEncoder.encode("http://localhost/a b?c d=e=f", "utF-8");
-            System.out.println(encoded);
-            System.out.println(URLDecoder.decode(encoded, "utf-8"));
-            URI uri = new URI("abc/?a=aa&b=bb#ff");
-            System.out.println("path: " + uri.getPath());
-            System.out.println("quey: " + uri.getQuery());
-            System.out.println("fragement: " + uri.getFragment());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+    public void setPath(String path) {
+        this.path = (path == null || path.isEmpty()) ? "/" : path;
     }
 
     public String path() {
@@ -120,12 +106,6 @@ public class ServletURI {
             if (idx != -1 && idx != token.length()) {
                 String pn = token.substring(0, idx);
                 String pv = token.substring(idx + 1);
-                try {
-                    pn = URLDecoder.decode(pn, "UTF-8");
-                    pv = URLDecoder.decode(pv, "UTF-8");
-                } catch (UnsupportedEncodingException ex) {
-                    throw new RuntimeException("should not happen: " + ex.getMessage());
-                }
                 parameters.put(pn, pv);
             }
         }
