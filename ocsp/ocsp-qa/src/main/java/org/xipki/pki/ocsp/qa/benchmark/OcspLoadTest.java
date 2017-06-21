@@ -140,10 +140,11 @@ public class OcspLoadTest extends LoadExecutor {
         this.maxRequests = maxRequests;
         this.serials = ParamUtil.requireNonNull("serials", serials);
         this.parseResponse = parseResponse;
+        final int n = Runtime.getRuntime().availableProcessors();
         if (useEpollLinux) {
-            workerGroup = new EpollEventLoopGroup(1);
+            workerGroup = new EpollEventLoopGroup(n);
         } else {
-            workerGroup = new NioEventLoopGroup(1);
+            workerGroup = new NioEventLoopGroup(n);
         }
     }
 
