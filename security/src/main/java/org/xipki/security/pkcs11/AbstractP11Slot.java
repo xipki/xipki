@@ -256,9 +256,13 @@ public abstract class AbstractP11Slot implements P11Slot {
             }
 
             sb.append("\nsupported by device but ignored mechanisms:\n");
-            Collections.sort(ignoreMechs);
-            for (Long mech : ignoreMechs) {
-                sb.append("\t").append(Pkcs11Functions.getMechanismDesc(mech)).append("\n");
+            if (ignoreMechs.isEmpty()) {
+                sb.append("\tNONE\n");
+            } else {
+                Collections.sort(ignoreMechs);
+                for (Long mech : ignoreMechs) {
+                    sb.append("\t").append(Pkcs11Functions.getMechanismDesc(mech)).append("\n");
+                }
             }
 
             List<P11ObjectIdentifier> ids = getSortedObjectIds(certificates.keySet());
