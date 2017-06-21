@@ -86,6 +86,8 @@ class ResponseCacher {
 
     private static final String SQL_SELECT_ISSUER_ID = "SELECT ID FROM ISSUER";
 
+    private static final String SQL_DELETE_ISSUER= "DELETE FROM ISSUER WHERE ID=?";
+
     private static final String SQL_SELECT_ISSUER = "SELECT ID,CERT FROM ISSUER";
 
     private static final String SQL_DELETE_EXPIRED_RESP = "DELETE FROM OCSP WHERE THIS_UPDATE<?";
@@ -143,9 +145,9 @@ class ResponseCacher {
 
     private final int validity;
 
-    private DataSourceWrapper datasource;
+    private final AtomicBoolean onService;
 
-    private AtomicBoolean onService;
+    private DataSourceWrapper datasource;
 
     private IssuerStore issuerStore;
 
@@ -225,7 +227,7 @@ class ResponseCacher {
         return (issuer == null) ? null : issuer.id();
     }
 
-    Integer storeIssuer(X509Certificate issuerCert)
+    synchronized Integer storeIssuer(X509Certificate issuerCert)
             throws CertificateException, InvalidConfException, DataAccessException {
         if (!master) {
             throw new IllegalStateException("storeIssuer is not permitted in slave mode");
@@ -274,8 +276,8 @@ class ResponseCacher {
             AlgorithmCode sigAlg, AlgorithmCode certHashAlg)
             throws DataAccessException {
         final String sql = sqlSelectOcsp;
-        String ident = buildIdent(serialNumber, sigAlg, certHashAlg);
-        long id = deriveId(issuerId, ident);
+        byte[] identBytes = buildIdent(serialNumber, sigAlg, certHashAlg);
+        long id = deriveId(issuerId, identBytes);
         PreparedStatement ps = prepareStatement(sql);
         ResultSet rs = null;
 
@@ -291,6 +293,7 @@ class ResponseCacher {
                 return null;
             }
 
+            String ident = Hex.toHexString(identBytes);
             String dbIdent = rs.getString("IDENT");
             if (!ident.equals(dbIdent)) {
                 return null;
@@ -324,7 +327,8 @@ class ResponseCacher {
     void storeOcspResponse(int issuerId, BigInteger serialNumber, long thisUpdate,
             Long nextUpdate, AlgorithmCode sigAlgCode, AlgorithmCode certHashAlgCode,
             OCSPResp response) {
-        String ident = buildIdent(serialNumber, sigAlgCode, certHashAlgCode);
+        byte[] identBytes = buildIdent(serialNumber, sigAlgCode, certHashAlgCode);
+        String ident = Hex.toHexString(identBytes);
         try {
             byte[] encodedResp;
             try {
@@ -335,7 +339,7 @@ class ResponseCacher {
                 return;
             }
 
-            long id = deriveId(issuerId, ident);
+            long id = deriveId(issuerId, identBytes);
 
             Connection conn = datasource.getConnection();
             try {
@@ -432,41 +436,7 @@ class ResponseCacher {
     private boolean updateCacheStore0() {
         try {
             if (this.issuerStore == null) {
-                PreparedStatement ps = null;
-                ResultSet rs = null;
-
-                try {
-                    ps = prepareStatement(SQL_SELECT_ISSUER);
-                    rs = ps.executeQuery();
-                    List<IssuerEntry> caInfos = new LinkedList<>();
-                    while (rs.next()) {
-                        int id = rs.getInt("ID");
-                        String b64Cert = rs.getString("CERT");
-                        X509Certificate cert = X509Util.parseBase64EncodedCert(b64Cert);
-                        IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
-                        IssuerHashNameAndKey sha1IssuerHash
-                                = caInfoEntry.getIssuerHashNameAndKey(HashAlgoType.SHA1);
-                        for (IssuerEntry existingIssuer : caInfos) {
-                            if (existingIssuer.matchHash(HashAlgoType.SHA1,
-                                    sha1IssuerHash.issuerNameHash(),
-                                    sha1IssuerHash.issuerKeyHash())) {
-                                LOG.error(
-                                    "found at least two issuers with the same subject and key");
-                                return false;
-                            }
-                        }
-                        caInfos.add(caInfoEntry);
-                    } // end while (rs.next())
-
-                    this.issuerStore = new IssuerStore(caInfos);
-                    LOG.info("Updated issuers");
-                } catch (SQLException ex) {
-                    throw datasource.translate(SQL_SELECT_ISSUER, ex);
-                } finally {
-                    datasource.releaseResources(ps, rs, false);
-                }
-
-                return true;
+                return initIssuerStore();
             }
 
             // check for new issuers
@@ -548,6 +518,61 @@ class ResponseCacher {
         return true;
     } // method updateCacheStore0
 
+    private boolean initIssuerStore() throws DataAccessException, CertificateException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            ps = prepareStatement(SQL_SELECT_ISSUER);
+            rs = ps.executeQuery();
+            List<IssuerEntry> caInfos = new LinkedList<>();
+
+            PreparedStatement deleteIssuerStmt = null;
+
+            while (rs.next()) {
+                int id = rs.getInt("ID");
+                String b64Cert = rs.getString("CERT");
+                X509Certificate cert = X509Util.parseBase64EncodedCert(b64Cert);
+                IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
+                IssuerHashNameAndKey sha1IssuerHash
+                        = caInfoEntry.getIssuerHashNameAndKey(HashAlgoType.SHA1);
+
+                boolean duplicated = false;
+                for (IssuerEntry existingIssuer : caInfos) {
+                    if (existingIssuer.matchHash(HashAlgoType.SHA1,
+                            sha1IssuerHash.issuerNameHash(), sha1IssuerHash.issuerKeyHash())) {
+                        duplicated = true;
+                        break;
+                    }
+                }
+
+                String subject = cert.getSubjectX500Principal().getName();
+                if (duplicated) {
+                    if (deleteIssuerStmt == null) {
+                        deleteIssuerStmt = prepareStatement(SQL_DELETE_ISSUER);
+                    }
+
+                    deleteIssuerStmt.setInt(1, id);
+                    deleteIssuerStmt.executeUpdate();
+
+                    LOG.warn("Delete duplicated issuer {}: {}", id, subject);
+                } else {
+                    LOG.info("added issuer {}: {}", id, subject);
+                    caInfos.add(caInfoEntry);
+                }
+            } // end while (rs.next())
+
+            this.issuerStore = new IssuerStore(caInfos);
+            LOG.info("Updated issuers");
+        } catch (SQLException ex) {
+            throw datasource.translate(SQL_SELECT_ISSUER, ex);
+        } finally {
+            datasource.releaseResources(ps, rs, false);
+        }
+
+        return true;
+    }
+
     private PreparedStatement prepareStatement(String sqlQuery) throws DataAccessException {
         Connection conn = datasource.getConnection();
         try {
@@ -558,45 +583,54 @@ class ResponseCacher {
         }
     }
 
-    private static String buildIdent(BigInteger serialNumber,
+    private static byte[] buildIdent(BigInteger serialNumber,
             AlgorithmCode sigAlg, AlgorithmCode certHashAlg) {
         byte[] snBytes = serialNumber.toByteArray();
         byte[] bytes = new byte[2 + snBytes.length];
         bytes[0] = sigAlg.code();
         bytes[1] = (certHashAlg == null) ? 0 : certHashAlg.code();
         System.arraycopy(snBytes, 0, bytes, 2, snBytes.length);
-        return Hex.toHexString(snBytes);
+        return bytes;
     }
 
-    private long deriveId(int issuerId, String ident) {
+    private long deriveId(int issuerId, byte[] identBytes) {
         Digest digest = null;
         try {
-            digest = idDigesters.poll(10, TimeUnit.SECONDS);
+            digest = idDigesters.poll(2, TimeUnit.SECONDS);
         } catch (InterruptedException ex) {
             digest = HashAlgoType.SHA1.createDigest();
         }
 
         byte[] hash = new byte[20];
         try {
-            digest.update(intToBytes(issuerId), 0, 2);
-            byte[] bytes = ident.getBytes();
-            digest.update(bytes, 0, bytes.length);
+            digest.reset();
+            digest.update(int2Bytes(issuerId), 0, 2);
+            digest.update(identBytes, 0, identBytes.length);
             digest.doFinal(hash, 0);
         } finally {
             idDigesters.addLast(digest);
         }
 
-        byte[] hiBytes = new byte[8];
-        System.arraycopy(hash, 0, hiBytes, 0, 8);
-        return new BigInteger(1, hiBytes).clearBit(63).longValue();
+        return (b2l(hash[0]) & 0x7FL) << 56 |
+                b2l(hash[1]) << 48 |
+                b2l(hash[2]) << 40 |
+                b2l(hash[3]) << 32 |
+                b2l(hash[4]) << 24 |
+                b2l(hash[5]) << 16 |
+                b2l(hash[6]) << 8 |
+                b2l(hash[7]);
     }
 
-    private static byte[] intToBytes(int value) {
+    private static byte[] int2Bytes(int value) {
         if (value < 65535) {
             return new byte[]{(byte) (value >> 8), (byte) value};
         } else {
             throw new IllegalArgumentException("value is too large");
         }
+    }
+
+    private static final long b2l(byte bb) {
+        return bb < 0 ? 256 + bb : (long) bb;
     }
 
 }

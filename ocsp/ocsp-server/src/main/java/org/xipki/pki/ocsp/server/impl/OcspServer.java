@@ -976,26 +976,28 @@ public class OcspServer {
     private OcspRespWithCacheInfo processCertReq(Req req, BasicOCSPRespBuilder builder,
             Responder responder, RequestOption reqOpt, ResponseOption repOpt,
             OcspRespControl repControl, AuditEvent event) throws IOException {
+        final boolean audit = (event != null);
+
         CertificateID certId = req.getCertID();
         String certIdHashAlgo = certId.getHashAlgOID().getId();
         HashAlgoType reqHashAlgo = HashAlgoType.getHashAlgoType(certIdHashAlgo);
         if (reqHashAlgo == null) {
             LOG.warn("unknown CertID.hashAlgorithm {}", certIdHashAlgo);
-            if (event != null) {
+            if (audit) {
                 fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED,
                         "unknown CertID.hashAlgorithm " + certIdHashAlgo);
             }
             return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
         } else if (!reqOpt.allows(reqHashAlgo)) {
             LOG.warn("CertID.hashAlgorithm {} not allowed", certIdHashAlgo);
-            if (event != null) {
+            if (audit) {
                 fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED,
                         "not allowed CertID.hashAlgorithm " + certIdHashAlgo);
             }
             return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
         }
 
-        if (event != null) {
+        if (audit) {
             event.addEventData(OcspAuditConstants.NAME_serial, certId.getSerialNumber());
         }
 
@@ -1023,8 +1025,10 @@ public class OcspServer {
 
         if (certStatusInfo == null) {
             if (exceptionOccurs) {
-                fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED,
-                        "no CertStatusStore can answer the request");
+                if (audit) {
+                    fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED,
+                            "no CertStatusStore can answer the request");
+                }
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
             } else {
                 certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(new Date(), null);
@@ -1061,7 +1065,7 @@ public class OcspServer {
             } // end if
         } // end if
 
-        if (event != null) {
+        if (audit) {
             String certprofile = certStatusInfo.certprofile();
             String auditCertType;
             if (certprofile != null) {
@@ -1076,8 +1080,7 @@ public class OcspServer {
             event.addEventData(OcspAuditConstants.NAME_type, auditCertType);
         }
 
-        // certStatusInfo must not be null in any case, since at least one store
-        // is configured
+        // certStatusInfo must not be null in any case, since at least one store is configured
         Date thisUpdate = certStatusInfo.thisUpdate();
         if (thisUpdate == null) {
             thisUpdate = new Date();
@@ -1091,12 +1094,10 @@ public class OcspServer {
         case GOOD:
             bcCertStatus = null;
             break;
-
         case ISSUER_UNKNOWN:
             repControl.canCacheInfo = false;
             bcCertStatus = new UnknownStatus();
             break;
-
         case UNKNOWN:
         case IGNORE:
             repControl.canCacheInfo = false;
@@ -1145,7 +1146,7 @@ public class OcspServer {
                 encodedCertHash = bcCertHash.getEncoded();
             } catch (IOException ex) {
                 LogUtil.error(LOG, ex, "answer() bcCertHash.getEncoded");
-                if (event != null) {
+                if (audit) {
                     fillAuditEvent(event, AuditLevel.ERROR, AuditStatus.FAILED,
                             "CertHash.getEncoded() with IOException");
                 }
@@ -1176,7 +1177,7 @@ public class OcspServer {
             certStatusText = "should-not-happen";
         }
 
-        if (event != null) {
+        if (audit) {
             event.setLevel(AuditLevel.INFO);
             event.setStatus(AuditStatus.SUCCESSFUL);
             event.addEventData(OcspAuditConstants.NAME_status, certStatusText);
@@ -1364,6 +1365,8 @@ public class OcspServer {
             final RequestOption requestOption, final AuditEvent event)
             throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException,
                 OcspResponderException {
+        final boolean audit = (event != null);
+
         if (!request.isSigned()) {
             if (!requestOption.isSignatureRequired()) {
                 return null;
@@ -1371,7 +1374,9 @@ public class OcspServer {
 
             String message = "signature in request required";
             LOG.warn(message);
-            fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
+            if (audit) {
+                fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
+            }
             return unsuccesfulOCSPRespMap.get(OcspResponseStatus.sigRequired);
         }
 
@@ -1383,7 +1388,9 @@ public class OcspServer {
         if (certs == null || certs.length < 1) {
             String message = "no certificate found in request to verify the signature";
             LOG.warn(message);
-            fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
+            if (audit) {
+                fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
+            }
             return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
         }
 
@@ -1391,9 +1398,12 @@ public class OcspServer {
         try {
             cvp = securityFactory.getContentVerifierProvider(certs[0]);
         } catch (InvalidKeyException ex) {
+            String message = ex.getMessage();
             LOG.warn("securityFactory.getContentVerifierProvider, InvalidKeyException: {}",
-                    ex.getMessage());
-            fillAuditEvent(event, AuditLevel.ERROR, AuditStatus.FAILED, ex.getMessage());
+                    message);
+            if (audit) {
+                fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
+            }
             return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
         }
 
@@ -1401,7 +1411,9 @@ public class OcspServer {
         if (!sigValid) {
             String message = "request signature is invalid";
             LOG.warn(message);
-            fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
+            if (audit) {
+                fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
+            }
             return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
         }
 
@@ -1413,7 +1425,9 @@ public class OcspServer {
 
         String message = "could not build certpath for the request's signer certificate";
         LOG.warn(message);
-        fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
+        if (audit) {
+            fillAuditEvent(event, AuditLevel.INFO, AuditStatus.FAILED, message);
+        }
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
     } // method checkSignature
 

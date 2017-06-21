@@ -147,7 +147,7 @@ public class DbCertStatusStore extends OcspStore {
 
         storeUpdateInProcess.set(true);
         try {
-            if (isInitialized()) {
+            if (initialized) {
                 final String sql = "SELECT ID,REV,RT,S1C FROM ISSUER";
                 PreparedStatement ps = borrowPreparedStatement(sql);
                 ResultSet rs = null;
@@ -269,18 +269,18 @@ public class DbCertStatusStore extends OcspStore {
 
         // wait for max. 0.5 second
         int num = 5;
-        while (!isInitialized() && (num-- > 0)) {
+        while (!initialized && (num-- > 0)) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
             }
         }
 
-        if (!isInitialized()) {
+        if (!initialized) {
             throw new OcspStoreException("initialization of CertStore is still in process");
         }
 
-        if (isInitializationFailed()) {
+        if (initializationFailed) {
             throw new OcspStoreException("initialization of CertStore failed");
         }
 
@@ -309,7 +309,7 @@ public class DbCertStatusStore extends OcspStore {
                 thisUpdate = crlInfo.thisUpdate();
 
                 // this.nextUpdate is still in the future (10 seconds buffer)
-                if (crlInfo.nextUpdate().getTime() > System.currentTimeMillis() + 10 * 1000) {
+                if (crlInfo.nextUpdate().getTime() - System.currentTimeMillis() > 10 * 1000) {
                     nextUpdate = crlInfo.nextUpdate();
                 }
             } else {
@@ -341,22 +341,22 @@ public class DbCertStatusStore extends OcspStore {
                     unknown = false;
 
                     long timeInSec = time.getTime() / 1000;
-                    long notBeforeInSec = rs.getLong("NBEFORE");
                     if (!ignore && ignoreNotYetValidCert) {
+                        long notBeforeInSec = rs.getLong("NBEFORE");
                         if (notBeforeInSec != 0 && timeInSec < notBeforeInSec) {
                             ignore = true;
                         }
                     }
 
-                    long notAfterInSec = rs.getLong("NAFTER");
                     if (!ignore && ignoreExpiredCert) {
+                        long notAfterInSec = rs.getLong("NAFTER");
                         if (notAfterInSec != 0 && timeInSec > notAfterInSec) {
                             ignore = true;
                         }
                     }
 
-                    certprofile = rs.getString("PN");
                     if (!ignore) {
+                        certprofile = rs.getString("PN");
                         ignore = (certprofile != null) && (certprofileOption != null)
                                 && !certprofileOption.include(certprofile);
                     }
