@@ -1247,6 +1247,10 @@ public class OcspServer {
         }
     }
 
+    public AuditServiceRegister auditServiceRegister() {
+        return auditServiceRegister;
+    }
+
     public void setOcspStoreFactoryRegister(
             final OcspStoreFactoryRegister ocspStoreFactoryRegister) {
         this.ocspStoreFactoryRegister = ocspStoreFactoryRegister;

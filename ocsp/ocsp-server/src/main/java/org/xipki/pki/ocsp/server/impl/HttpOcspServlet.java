@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditService;
-import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -79,15 +78,13 @@ public class HttpOcspServlet extends AbstractHttpServlet {
 
     private static final String CT_RESPONSE = "application/ocsp-response";
 
-    private AuditServiceRegister auditServiceRegister;
-
     private OcspServer server;
 
     public HttpOcspServlet() {
     }
 
     public void setServer(final OcspServer server) {
-        this.server = server;
+        this.server = ParamUtil.requireNonNull("server", server);
     }
 
     @Override
@@ -122,8 +119,8 @@ public class HttpOcspServlet extends AbstractHttpServlet {
 
         AuditService auditService = null;
         if (responder.auditOption() != null) {
-            auditService = (auditServiceRegister == null) ? null
-                    : auditServiceRegister.getAuditService();
+            auditService = (server.auditServiceRegister() == null) ? null
+                    : server.auditServiceRegister().getAuditService();
         }
 
         boolean audit = (auditService != null);
@@ -264,8 +261,8 @@ public class HttpOcspServlet extends AbstractHttpServlet {
 
         AuditService auditService = null;
         if (responder.auditOption() != null) {
-            auditService = (auditServiceRegister == null) ? null
-                    : auditServiceRegister.getAuditService();
+            auditService = (server.auditServiceRegister() == null) ? null
+                    : server.auditServiceRegister().getAuditService();
         }
 
         boolean audit = (auditService != null);
@@ -405,10 +402,5 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             }
         } // end external try
     } // method serviceGet
-
-    public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
-        this.auditServiceRegister = ParamUtil.requireNonNull("auditServiceRegister",
-                auditServiceRegister);
-    }
 
 }

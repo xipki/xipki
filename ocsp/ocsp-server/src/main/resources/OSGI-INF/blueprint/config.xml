@@ -24,7 +24,6 @@
   <!-- create the servlet and inject our own app factory -->
   <bean id="ocspServlet" class="org.xipki.pki.ocsp.server.impl.HttpOcspServlet">
     <property name="server" ref="ocspServer"/>
-    <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <!-- register it as a servlet service for the web extender -->
   <service ref="ocspServlet" interface="org.xipki.http.servlet.HttpServlet">
