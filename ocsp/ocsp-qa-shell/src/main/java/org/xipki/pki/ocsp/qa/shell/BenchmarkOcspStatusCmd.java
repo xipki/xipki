@@ -55,7 +55,7 @@ import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 import org.xipki.pki.ocsp.client.shell.OcspStatusCommandSupport;
-import org.xipki.pki.ocsp.qa.benchmark.OcspLoadTest;
+import org.xipki.pki.ocsp.qa.benchmark.OcspBenchmark;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -107,9 +107,9 @@ public class BenchmarkOcspStatusCmd extends OcspStatusCommandSupport {
     private String serverUrl;
 
     @Option(name = "--max-num",
-            description = "maximal number of certificates to be asked\n"
+            description = "maximal number of OCSP queries\n"
                     + "0 for unlimited")
-    private Integer maxCerts = 0;
+    private Integer maxRequests = 0;
 
     @Override
     protected Object execute0() throws Exception {
@@ -172,14 +172,14 @@ public class BenchmarkOcspStatusCmd extends OcspStatusCommandSupport {
             StringBuilder description = new StringBuilder();
             description.append("issuer cert: ").append(issuerCertFile).append("\n");
             description.append("server URL: ").append(serverUrl.toString()).append("\n");
-            description.append("maxCerts: ").append(maxCerts).append("\n");
+            description.append("maxRequest: ").append(maxRequests).append("\n");
             description.append("hash: ").append(hashAlgo);
 
             Certificate issuerCert = Certificate.getInstance(IoUtil.read(issuerCertFile));
 
             RequestOptions options = getRequestOptions();
-            OcspLoadTest loadTest = new OcspLoadTest(issuerCert, serverUrl, options,
-                    serialNumberIterator, maxCerts, analyzeResponse, description.toString());
+            OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl, options,
+                    serialNumberIterator, maxRequests, analyzeResponse, description.toString());
             loadTest.setDuration(duration);
             loadTest.setThreads(numThreads);
             loadTest.test();

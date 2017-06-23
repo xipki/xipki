@@ -35,216 +35,209 @@
 package org.xipki.pki.ocsp.qa.benchmark;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.ocsp.CertID;
-import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.cert.ocsp.CertificateID;
+import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
-import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xipki.common.LoadExecutor;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.client.api.OcspRequestorException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
-import org.xipki.security.HashAlgoType;
-import org.xipki.security.ObjectIdentifiers;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.EventLoopGroup;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 /**
  * @author Lijun Liao
- * @since 2.2.0
+ * @since 2.0.0
  */
 
-class OcspBenchmark {
+public class OcspBenchmark extends LoadExecutor {
 
-    public static final int MAX_LEN_GET = 190;
+    final class Testor implements Runnable {
 
-    public static final String CT_REQUEST = "application/ocsp-request";
+        private OcspBenchRequestor requestor;
 
-    public static final String CT_RESPONSE = "application/ocsp-response";
-
-    private final Extension[] extnType = new Extension[0];
-
-    private final SecureRandom random = new SecureRandom();
-
-    private static final ConcurrentHashMap<BigInteger, byte[]> requests = new ConcurrentHashMap<>();
-
-    private AlgorithmIdentifier issuerhashAlg;
-
-    private ASN1OctetString issuerNameHash;
-
-    private ASN1OctetString issuerKeyHash;
-
-    private Extension[] extensions;
-
-    private RequestOptions requestOptions;
-
-    private String responderRawPath;
-
-    private HttpClient httpClient;
-
-    public void init(OcspResponseHandler responseHandler, EventLoopGroup workerGroup,
-            String responderUrl, Certificate issuerCert, RequestOptions requestOptions)
-            throws Exception {
-        ParamUtil.requireNonNull("issuerCert", issuerCert);
-        ParamUtil.requireNonNull("responseHandler", responseHandler);
-        this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
-
-        HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(
-                requestOptions.hashAlgorithmId());
-        if (hashAlgo == null) {
-            throw new OcspRequestorException("unknown HashAlgo "
-                    + requestOptions.hashAlgorithmId().getId());
+        Testor() throws Exception {
+            this.requestor = new OcspBenchRequestor();
+            this.requestor.init(OcspBenchmark.this, responderUrl, issuerCert, requestOptions);
         }
 
-        this.issuerhashAlg = hashAlgo.algorithmIdentifier();
-        this.issuerNameHash = new DEROctetString(hashAlgo.hash(
-                        issuerCert.getSubject().getEncoded()));
-        this.issuerKeyHash = new DEROctetString(hashAlgo.hash(
-                        issuerCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
-
-        List<AlgorithmIdentifier> prefSigAlgs = requestOptions.preferredSignatureAlgorithms();
-        if (prefSigAlgs == null || prefSigAlgs.size() == 0) {
-            this.extensions = null;
-        } else {
-            ASN1EncodableVector vec = new ASN1EncodableVector();
-            for (AlgorithmIdentifier algId : prefSigAlgs) {
-                ASN1Sequence prefSigAlgObj = new DERSequence(algId);
-                vec.add(prefSigAlgObj);
-            }
-
-            ASN1Sequence extnValue = new DERSequence(vec);
-            Extension extn;
-            try {
-                extn = new Extension(ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs, false,
-                        new DEROctetString(extnValue));
-            } catch (IOException ex) {
-                throw new OcspRequestorException(ex.getMessage(), ex);
-            }
-
-            this.extensions = new Extension[]{extn};
-        }
-
-        URI uri = new URI(responderUrl);
-        this.responderRawPath = uri.getRawPath();
-        if (!this.responderRawPath.endsWith("/")) {
-            this.responderRawPath += "/";
-        }
-        this.httpClient = new HttpClient(responderUrl, responseHandler, workerGroup);
-        this.httpClient.start();
-    }
-
-    public void stop() throws Exception {
-        httpClient.shutdown();
-    }
-
-    public void ask(final BigInteger[] serialNumbers)
-            throws OcspRequestorException {
-        byte[] ocspReq = buildRequest(serialNumbers);
-        int size = ocspReq.length;
-
-        FullHttpRequest request;
-
-        if (size <= MAX_LEN_GET && requestOptions.isUseHttpGetForRequest()) {
-            String b64Request = Base64.toBase64String(ocspReq);
-            String urlEncodedReq;
-            try {
-                urlEncodedReq = URLEncoder.encode(b64Request, "UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                throw new OcspRequestorException(ex.getMessage());
-            }
-            StringBuilder urlBuilder = new StringBuilder();
-            urlBuilder.append(responderRawPath);
-            urlBuilder.append(urlEncodedReq);
-            String newRawpath = urlBuilder.toString();
-
-            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
-                    HttpMethod.GET, newRawpath);
-        } else {
-            ByteBuf content = Unpooled.wrappedBuffer(ocspReq);
-            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
-                    HttpMethod.POST, responderRawPath, content);
-            request.headers().addInt("Content-Length", content.readableBytes());
-        }
-        request.headers().add("Content-Type", CT_REQUEST);
-
-        httpClient.send(request);
-    } // method ask
-
-    private byte[] buildRequest(final BigInteger[] serialNumbers)
-            throws OcspRequestorException {
-        boolean canCache = (serialNumbers.length == 1) && !requestOptions.isUseNonce();
-        if (canCache) {
-            byte[] request = requests.get(serialNumbers[0]);
-            if (request != null) {
-               return request;
-            }
-        }
-
-        OCSPReqBuilder reqBuilder = new OCSPReqBuilder();
-
-        if (requestOptions.isUseNonce() || extensions != null) {
-            List<Extension> extns = new ArrayList<>(2);
-            if (requestOptions.isUseNonce()) {
-                Extension extn = new Extension(
-                        OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
-                        new DEROctetString(nextNonce(requestOptions.nonceLen())));
-                extns.add(extn);
-            }
-
-            if (extensions != null) {
-                for (Extension extn : extensions) {
-                    extns.add(extn);
+        @Override
+        public void run() {
+            while (!stop()) {
+                BigInteger sn = nextSerialNumber();
+                if (sn == null) {
+                    break;
                 }
+                testNext(sn);
             }
-            reqBuilder.setRequestExtensions(new Extensions(extns.toArray(extnType)));
+
+            try {
+                requestor.shutdown();
+            } catch (Exception ex) {
+                LOG.warn("got IOException in requestor.stop()");
+            }
+        }
+
+        private void testNext(final BigInteger sn) {
+            try {
+                requestor.ask(new BigInteger[]{sn});
+            } catch (OcspRequestorException ex) {
+                LOG.warn("OCSPRequestorException: {}", ex.getMessage());
+                account(1, 1);
+            } catch (Throwable th) {
+                LOG.warn("{}: {}", th.getClass().getName(), th.getMessage());
+                account(1, 1);
+            }
+        } // method testNext
+
+    } // class Testor
+
+    private static final Logger LOG = LoggerFactory.getLogger(OcspBenchmark.class);
+
+    private final Certificate issuerCert;
+
+    private final String responderUrl;
+
+    private final RequestOptions requestOptions;
+
+    private final Iterator<BigInteger> serials;
+
+    private final int maxRequests;
+
+    private final boolean parseResponse;
+
+    private AtomicInteger processedRequests = new AtomicInteger(0);
+
+    public OcspBenchmark(
+            final Certificate issuerCert, final String responderUrl,
+            final RequestOptions requestOptions, final Iterator<BigInteger> serials,
+            final int maxRequests, final boolean parseResponse, final String description) {
+        super(description);
+
+        this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
+        this.responderUrl = ParamUtil.requireNonNull("responderUrl", responderUrl);
+        this.requestOptions = ParamUtil.requireNonNull("requestOptions", requestOptions);
+        this.maxRequests = maxRequests;
+        this.serials = ParamUtil.requireNonNull("serials", serials);
+        this.parseResponse = parseResponse;
+    }
+
+    @Override
+    protected Runnable getTestor() throws Exception {
+        return new Testor();
+    }
+
+    private BigInteger nextSerialNumber() {
+        if (maxRequests > 0) {
+            int num = processedRequests.getAndAdd(1);
+            if (num >= maxRequests) {
+                return null;
+            }
         }
 
         try {
-            for (BigInteger serialNumber : serialNumbers) {
-                CertID certId = new CertID(issuerhashAlg, issuerNameHash, issuerKeyHash,
-                        new ASN1Integer(serialNumber));
-                reqBuilder.addRequest(new CertificateID(certId));
-            }
-
-            byte[] request = reqBuilder.build().getEncoded();
-            if (canCache) {
-                requests.put(serialNumbers[0], request);
-            }
-            return request;
-        } catch (OCSPException | IOException ex) {
-            throw new OcspRequestorException(ex.getMessage(), ex);
+            return this.serials.next();
+        } catch (NoSuchElementException ex) {
+            return null;
         }
-    } // method buildRequest
+    }
 
-    private byte[] nextNonce(final int nonceLen) {
-        byte[] nonce = new byte[nonceLen];
-        random.nextBytes(nonce);
-        return nonce;
+    public void onComplete(FullHttpResponse response) {
+        boolean success;
+        try {
+            success = onComplete0(response);
+        } catch (Throwable th) {
+            LOG.warn("unexpected exception", th);
+            success = false;
+        }
+
+        account(1, success ? 0 : 1);
+    }
+
+    public synchronized void onError() {
+        account(1, 1);
+    }
+
+    private boolean onComplete0(FullHttpResponse response) {
+        if (response == null) {
+            LOG.warn("bad response: response is null");
+            return false;
+        }
+
+        if (response.decoderResult().isFailure()) {
+            LOG.warn("failed: {}", response.decoderResult());
+            return false;
+        }
+
+        if (response.status().code() != HttpResponseStatus.OK.code()) {
+            LOG.warn("bad response: {}", response.status());
+            return false;
+        }
+
+        String responseContentType = response.headers().get("Content-Type");
+        if (responseContentType == null) {
+            LOG.warn("bad response: mandatory Content-Type not specified");
+            return false;
+        } else if (!responseContentType.equalsIgnoreCase("application/ocsp-response")) {
+            LOG.warn("bad response: Content-Type {} unsupported", responseContentType);
+            return false;
+        }
+
+        ByteBuf buf = response.content();
+        if (buf == null || buf.readableBytes() == 0) {
+            LOG.warn("no body in response");
+            return false;
+        }
+        byte[] respBytes = new byte[buf.readableBytes()];
+        buf.getBytes(buf.readerIndex(), respBytes);
+
+        if (!parseResponse) {
+            // a valid response should at least of size 100.
+            if (respBytes.length < 100) {
+                LOG.warn("bad response: response too short");
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        OCSPResp ocspResp;
+        try {
+            ocspResp = new OCSPResp(respBytes);
+        } catch (IOException ex) {
+            LOG.warn("could not parse OCSP response", ex);
+            return false;
+        }
+
+        Object respObject;
+        try {
+            respObject = ocspResp.getResponseObject();
+        } catch (OCSPException ex) {
+            LOG.warn("responseObject is invalid", ex);
+            return false;
+        }
+
+        if (ocspResp.getStatus() != 0) {
+            LOG.warn("bad response: response status is other than OK");
+            return false;
+        }
+
+        if (!(respObject instanceof BasicOCSPResp)) {
+            LOG.warn("bad response: response is not BasiOCSPResp");
+            return false;
+        }
+
+        return true;
     }
 
 }
