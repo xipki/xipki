@@ -51,8 +51,10 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -67,9 +69,11 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
  * @since 2.2.0
  */
 
-public final class HttpClient {
+final class HttpClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpClient.class);
+
+    private static boolean useEpollLinux;
 
     private class HttpClientInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -108,16 +112,22 @@ public final class HttpClient {
 
     private String uri;
 
-    private OcspResponseHandler responseHandler;
+    private OcspBenchmark responseHandler;
 
     private EventLoopGroup workerGroup;
 
     private Channel channel;
 
-    public HttpClient(String uri, OcspResponseHandler responseHandler, EventLoopGroup workerGroup) {
+    static {
+        boolean linux = System.getProperty("os.name").toLowerCase().contains("linux");
+        useEpollLinux = linux ? Epoll.isAvailable() : false;
+        LOG.info("linux epoll available: {}", useEpollLinux);
+    }
+
+    public HttpClient(String uri, OcspBenchmark responseHandler) {
         this.uri = ParamUtil.requireNonNull("uri", uri);
         this.responseHandler = ParamUtil.requireNonNull("responseHandler", responseHandler);
-        this.workerGroup = ParamUtil.requireNonNull("workerGroup", workerGroup);
+        this.workerGroup = useEpollLinux ? new EpollEventLoopGroup(1) : new NioEventLoopGroup(1);
     }
 
     public void start() throws Exception {
@@ -168,10 +178,6 @@ public final class HttpClient {
         if (channel != null) {
             channel = null;
         }
-
-        if (workerGroup != null) {
-            workerGroup.shutdownGracefully();
-            workerGroup = null;
-        }
+        this.workerGroup.shutdownGracefully();
     }
 }
