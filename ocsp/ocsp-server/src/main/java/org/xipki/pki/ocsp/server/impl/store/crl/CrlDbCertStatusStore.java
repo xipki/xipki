@@ -44,7 +44,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -62,7 +61,6 @@ import org.xipki.pki.ocsp.api.OcspStoreException;
 import org.xipki.pki.ocsp.server.impl.store.db.DbCertStatusStore;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
-import org.xipki.security.HashAlgoType;
 import org.xipki.security.util.X509Util;
 
 /**
@@ -110,8 +108,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     private boolean crlUpdateFailed;
 
     @Override
-    public void init(final String conf, final DataSourceWrapper datasource,
-            final Set<HashAlgoType> certHashAlgos) throws OcspStoreException {
+    public void init(final String conf, final DataSourceWrapper datasource)
+            throws OcspStoreException {
         ParamUtil.requireNonBlank("conf", conf);
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
@@ -130,7 +128,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
         initializeStore(datasource);
 
-        super.init(conf, datasource, certHashAlgos);
+        super.init(conf, datasource);
     }
 
     @Override

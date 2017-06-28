@@ -46,7 +46,6 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
-import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.console.karaf.CmdFailure;
@@ -103,8 +102,13 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
     @Completion(CaNameCompleter.class)
     private String caName;
 
+    /**
+     *
+     * @param signatureAlgoControl
+     *          Control of the signature algorithm
+     */
     protected abstract ConcurrentContentSigner getSigner(
-            @NonNull SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
+            SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
 
     @Override
     protected Object execute0() throws Exception {

@@ -34,8 +34,6 @@
 
 package org.xipki.security.pkcs11;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import iaik.pkcs.pkcs11.wrapper.Functions;
 
 /**
@@ -48,7 +46,12 @@ public class Pkcs11Functions {
         return Functions.mechanismCodeToString(mechanism);
     }
 
-    public static long mechanismStringToCode(@NonNull final String mechanismName) {
+    /**
+     *
+     * @param mechanismName
+     *          Mechanism name. Must not be {@code null}.
+     */
+    public static long mechanismStringToCode(final String mechanismName) {
         Long mech = Functions.mechanismStringToCode(mechanismName);
         return mech == null ? -1 : mech.longValue();
     }

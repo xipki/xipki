@@ -71,7 +71,6 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
-import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.DateUtil;
@@ -221,8 +220,13 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     @Completion(ExtensionNameCompleter.class)
     private List<String> wantExtensionTypes;
 
+    /**
+     *
+     * @param signatureAlgoControl
+     *          Signature algorithm control. Must not be {@code null}.
+     */
     protected abstract ConcurrentContentSigner getSigner(
-            @NonNull SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
+            SignatureAlgoControl signatureAlgoControl) throws ObjectCreationException;
 
     @Override
     protected Object execute0() throws Exception {

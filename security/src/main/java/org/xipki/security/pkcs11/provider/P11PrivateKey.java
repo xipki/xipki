@@ -40,7 +40,6 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
@@ -113,7 +112,12 @@ public class P11PrivateKey implements PrivateKey {
         return keysize;
     }
 
-    public byte[] sign(final long mechanism, @Nullable final P11Params parameters,
+    /**
+     *
+     * @param parameters
+     *          Parameters. Could be {@code null}.
+     */
+    public byte[] sign(final long mechanism, final P11Params parameters,
             final byte[] content) throws XiSecurityException, P11TokenException {
         return p11CryptService.getIdentity(identityId).sign(mechanism, parameters, content);
     }

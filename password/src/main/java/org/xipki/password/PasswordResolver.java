@@ -34,8 +34,6 @@
 
 package org.xipki.password;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -43,6 +41,12 @@ import org.eclipse.jdt.annotation.NonNull;
 
 public interface PasswordResolver {
 
-    char[] resolvePassword(@NonNull String passwordHint) throws PasswordResolverException;
+    /**
+     *
+     * @param passwordHint
+     *          Hint of the password. Must not be {@code null}.
+     * @return the resolved password
+     */
+    char[] resolvePassword(String passwordHint) throws PasswordResolverException;
 
 }

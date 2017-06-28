@@ -124,7 +124,7 @@ class SimpleLruCache<K, V> {
      * Remove the eldest entries until the total of remaining entries is at or
      * below the requested size.
      *
-     * @param pMaxSize the maximum size of the cache before returning. May be -1
+     * @param pMaxSize the maximum size of the cache before returning. Could be -1
      *            to evict even 0-sized elements.
      */
     private void trimToSize(final int maxSize) {

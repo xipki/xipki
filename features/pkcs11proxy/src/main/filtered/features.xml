@@ -17,7 +17,6 @@
   </feature>
   <feature name="xipki-httpserver" version="${project.version}" description="HTTP server">
     <feature prerequisite="true">netty</feature>
-    <bundle start-level="70"><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/servlet-api/${project.version}</bundle>
@@ -26,7 +25,6 @@
   <feature name="xipki-pkcs11-proxy" version="${project.version}" description="PKCS#11 proxy">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
     <bundle>mvn:org.xipki/common/${project.version}</bundle>
     <bundle>mvn:org.xipki/password/${project.version}</bundle>

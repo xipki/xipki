@@ -44,8 +44,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.BadFormatException;
 import org.xipki.pki.ca.api.EnvParameterResolver;
@@ -95,7 +93,14 @@ public abstract class X509Certprofile {
         return null;
     }
 
-    public String incSerialNumber(@Nullable final String currentSerialNumber)
+    /**
+     *
+     * @param currentSerialNumber
+     *          Current serial number. Could be {@code null}.
+     * @return the incremented serial number
+     * @throws BadFormatException
+     */
+    public String incSerialNumber(final String currentSerialNumber)
             throws BadFormatException {
         try {
             int currentSn = (currentSerialNumber == null) ? 0
@@ -124,7 +129,13 @@ public abstract class X509Certprofile {
         return true;
     }
 
-    public String parameter(@NonNull final String paramName) {
+    /**
+     *
+     * @param paramName
+     *          Parameter name. Must not be {@code null}.
+     * @return parameter value.
+     */
+    public String parameter(final String paramName) {
         return null;
     }
 
@@ -149,7 +160,12 @@ public abstract class X509Certprofile {
 
     public abstract Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls();
 
-    public abstract void initialize(@Nullable String data) throws CertprofileException;
+    /**
+     *
+     * @param data
+     *          Configuration. Could be {@code null}.
+     */
+    public abstract void initialize(String data) throws CertprofileException;
 
     public abstract X509CertLevel certLevel();
 
@@ -157,23 +173,61 @@ public abstract class X509Certprofile {
 
     public abstract Integer pathLenBasicConstraint();
 
-    public abstract void setEnvParameterResolver(@Nullable EnvParameterResolver parameterResolver);
+    /**
+     *
+     * @param parameterResolver
+     *          Parameter resolver. Could be {@code null}.
+     */
+    public abstract void setEnvParameterResolver(EnvParameterResolver parameterResolver);
 
-    public abstract Date getNotBefore(@Nullable Date notBefore);
+    /**
+     *
+     * @param notBefore
+     *          Requested NotBefore. Could be {@code null}.
+     * @return the granted NotBefore.
+     */
+    public abstract Date getNotBefore(Date notBefore);
 
     public abstract CertValidity validity();
 
-    public abstract SubjectPublicKeyInfo checkPublicKey(@NonNull SubjectPublicKeyInfo publicKey)
+    /**
+     *
+     * @param publicKey
+     *          Requested public key. Must not be {@code null}.
+     * @return the granted public key.
+     */
+    public abstract SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
             throws BadCertTemplateException;
 
-    public abstract SubjectInfo getSubject(@NonNull X500Name requestedSubject)
+    /**
+     *
+     * @param requestedSubject
+     *          Requested subject. Must not be {@code null}.
+     * @return the granted subject
+     */
+    public abstract SubjectInfo getSubject(X500Name requestedSubject)
             throws CertprofileException, BadCertTemplateException;
 
+    /**
+     *
+     * @param extensionControls
+     *          Extension controls. Must not be {@code null}.
+     * @param requestedSubject
+     *          Requested subject. Must not be {@code null}.
+     * @param grantedSubject
+     *          Granted subject. Must not be {@code null}.
+     * @param requestedExtensions
+     *          Requested extensions. Could be {@code null}.
+     * @param notBefore
+     *          NotBefore. Must not be {@code null}.
+     * @param notAfter
+     *          NotAfter. Must not be {@code null}.
+     * @return extensions of the certificate to be issued.
+     */
     public abstract ExtensionValues getExtensions(
-            @NonNull Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
-            @NonNull X500Name requestedSubject, @NonNull X500Name grantedSubject,
-            @Nullable Extensions requestedExtensions, @NonNull Date notBefore,
-            @NonNull Date notAfter)
+            Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
+            X500Name requestedSubject, X500Name grantedSubject,
+            Extensions requestedExtensions, Date notBefore, Date notAfter)
             throws CertprofileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();

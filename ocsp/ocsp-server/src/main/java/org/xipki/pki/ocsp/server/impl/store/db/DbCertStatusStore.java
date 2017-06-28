@@ -490,8 +490,8 @@ public class DbCertStatusStore extends OcspStore {
     }
 
     @Override
-    public void init(final String conf, final DataSourceWrapper datasource,
-            final Set<HashAlgoType> certHashAlgos) throws OcspStoreException {
+    public void init(final String conf, final DataSourceWrapper datasource)
+            throws OcspStoreException {
         ParamUtil.requireNonNull("conf", conf);
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 

@@ -45,7 +45,6 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.BadCertTemplateException;
 import org.xipki.pki.ca.api.profile.GeneralNameMode;
@@ -57,8 +56,17 @@ import org.xipki.pki.ca.api.profile.GeneralNameMode;
 
 public class X509CertprofileUtil {
 
-    public static GeneralName createGeneralName(@NonNull final GeneralName requestedName,
-            @NonNull final Set<GeneralNameMode> modes) throws BadCertTemplateException {
+    /**
+     *
+     * @param requestedName
+     *          Requested name. Must not be {@code null}.
+     * @param modes
+     *          Modes to be considered. Must not be {@code null}.
+     * @return
+     * @throws BadCertTemplateException
+     */
+    public static GeneralName createGeneralName(final GeneralName requestedName,
+            final Set<GeneralNameMode> modes) throws BadCertTemplateException {
         ParamUtil.requireNonNull("requestedName", requestedName);
 
         int tag = requestedName.getTagNo();

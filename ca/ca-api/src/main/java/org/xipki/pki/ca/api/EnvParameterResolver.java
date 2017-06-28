@@ -36,8 +36,6 @@ package org.xipki.pki.ca.api;
 
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -47,6 +45,12 @@ public interface EnvParameterResolver {
 
     Set<String> allParameterNames();
 
-    String parameter(@NonNull String parameterName);
+    /**
+     *
+     * @param parameterName
+     *          Name of the parameter.
+     * @return the value of parameter.
+     */
+    String parameter(String parameterName);
 
 }

@@ -62,8 +62,6 @@ import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.cert.AttributeCertificateIssuer;
 import org.bouncycastle.cert.X509AttributeCertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.BigIntegerRange;
@@ -144,13 +142,34 @@ public abstract class BaseOcspStatusCommandSupport extends OcspStatusCommandSupp
         EXTENSION_OIDNAME_MAP.put(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
     }
 
-    protected abstract void checkParameters(@Nullable X509Certificate respIssuer,
-            @NonNull List<BigInteger> serialNumbers, @Nullable Map<BigInteger, byte[]> encodedCerts)
+    /**
+     *
+     * @param respIssuer
+     *          Expected responder issuer. Could be {@code null}.
+     * @param serialNumbers
+     *          Expected serial numbers. Must not be {@code null}.
+     * @param encodedCerts
+     *          Map of serial number and the corresponding certificate. Could be {@code null}.
+     */
+    protected abstract void checkParameters(X509Certificate respIssuer,
+            List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
             throws Exception;
 
-    protected abstract Object processResponse(@NonNull OCSPResp response,
-            @Nullable X509Certificate respIssuer, @NonNull IssuerHash issuerHash,
-            @NonNull List<BigInteger> serialNumbers, @Nullable Map<BigInteger, byte[]> encodedCerts)
+    /**
+     * @param response
+     *          OCSP response. Must not be {@code null}.
+     * @param respIssuer
+     *          Expected responder issuer. Could be {@code null}.
+     * @param issuerHash
+     *          Expected issuer hash. Must not be {@code null}.
+     * @param serialNumbers
+     *          Expected serial numbers. Must not be {@code null}.
+     * @param encodedCerts
+     *          Map of serial number and the corresponding certificate. Could be {@code null}.
+     */
+    protected abstract Object processResponse(OCSPResp response,
+            X509Certificate respIssuer, IssuerHash issuerHash,
+            List<BigInteger> serialNumbers,  Map<BigInteger, byte[]> encodedCerts)
             throws Exception;
 
     @Override

@@ -512,8 +512,6 @@ public class OcspServer {
         } // end if
 
         // responders
-        Map<String, Set<HashAlgoType>> storeCertHashAlgoSet = new HashMap<>();
-
         Map<String, ResponderOption> responderOptions = new HashMap<>();
 
         for (ResponderType m : conf.getResponders().getResponder()) {
@@ -568,26 +566,10 @@ public class OcspServer {
                 }
             }
 
-            List<String> names = option.storeNames();
-
             List<StoreType> storeDefs = conf.getStores().getStore();
             Set<String> storeNames = new HashSet<>(storeDefs.size());
             for (StoreType storeDef : storeDefs) {
                 storeNames.add(storeDef.getName());
-            }
-
-            for (String name : names) {
-                if (!storeNames.contains(name)) {
-                    throw new InvalidConfException("no store named '" + name + "' is defined");
-                }
-
-                Set<HashAlgoType> hashAlgoSet = storeCertHashAlgoSet.get(name);
-                if (hashAlgoSet == null) {
-                    hashAlgoSet = new HashSet<>(5);
-                    storeCertHashAlgoSet.put(name, hashAlgoSet);
-                }
-
-                hashAlgoSet.addAll(certHashAlgos);
             }
 
             responderOptions.put(m.getName(), option);
@@ -595,8 +577,7 @@ public class OcspServer {
 
         // stores
         for (StoreType m : conf.getStores().getStore()) {
-            OcspStore store = newStore(m, datasources,
-                    storeCertHashAlgoSet.get(m.getName()));
+            OcspStore store = newStore(m, datasources);
             stores.put(m.getName(), store);
         }
 
@@ -1317,7 +1298,7 @@ public class OcspServer {
     } // method initSigner
 
     private OcspStore newStore(final StoreType conf,
-            final Map<String, DataSourceWrapper> datasources, final Set<HashAlgoType> certHashAlgos)
+            final Map<String, DataSourceWrapper> datasources)
             throws InvalidConfException {
         OcspStore store;
         String type = conf.getSource().getType();
@@ -1356,7 +1337,7 @@ public class OcspServer {
             }
         }
         try {
-            store.init(conf.getSource().getConf(), datasource, certHashAlgos);
+            store.init(conf.getSource().getConf(), datasource);
         } catch (OcspStoreException ex) {
             throw new InvalidConfException("CertStatusStoreException of store " + conf.getName()
                     + ":" + ex.getMessage(), ex);

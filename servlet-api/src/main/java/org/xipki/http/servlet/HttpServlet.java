@@ -54,7 +54,7 @@ public interface HttpServlet {
 .     * @param servletUri
      *          The servlet URI (URI part after the servlet alias). Must not be {@code null}.
      * @param sslSession
-     *          SSLSession associated with this connection.  May be {@code null}.
+     *          SSLSession associated with this connection. Could be {@code null}.
      * @param sslReverseProxyMode
      *          Mode of the SSL reverse proxy. Must not be {@code null}.
      * @return

@@ -67,8 +67,6 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ca.api.BadCertTemplateException;
@@ -255,11 +253,31 @@ class IdentifiedX509Certprofile {
         return subjectInfo;
     }
 
-    public ExtensionValues getExtensions(@NonNull final X500Name requestedSubject,
-            @NonNull final X500Name grantedSubject, @Nullable final Extensions requestedExtensions,
-            @NonNull final SubjectPublicKeyInfo publicKeyInfo,
-            @NonNull final PublicCaInfo publicCaInfo, @Nullable final X509Certificate crlSignerCert,
-            @NonNull final Date notBefore, @NonNull final Date notAfter)
+    /**
+     *
+     * @param requestedSubject
+     *          Subject requested subject. Must not be {@code null}.
+     * @param grantedSubject
+     *          Granted subject. Must not be {@code null}.
+     * @param requestedExtensions
+     *          Extensions requested by the requestor. Could be {@code null}.
+     * @param publicKeyInfo
+     *          Subject public key. Must not be {@code null}.
+     * @param publicCaInfo
+     *          CA information. Must not be {@code null}.
+     * @param crlSignerCert
+     *          CRL signer certificate. Could be {@code null}.
+     * @param notBefore
+     *          NotBefore. Must not be {@code null}.
+     * @param notAfter
+     *          NotAfter. Must not be {@code null}.
+     * @return the extensions of the certificate to be issued.
+     */
+    public ExtensionValues getExtensions(final X500Name requestedSubject,
+            final X500Name grantedSubject, final Extensions requestedExtensions,
+            final SubjectPublicKeyInfo publicKeyInfo,
+            final PublicCaInfo publicCaInfo, final X509Certificate crlSignerCert,
+            final Date notBefore, final Date notAfter)
             throws CertprofileException, BadCertTemplateException {
         ParamUtil.requireNonNull("publicKeyInfo", publicKeyInfo);
         ExtensionValues values = new ExtensionValues();

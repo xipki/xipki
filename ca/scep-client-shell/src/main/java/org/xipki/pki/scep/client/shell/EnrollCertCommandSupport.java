@@ -41,7 +41,6 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.completer.FilePathCompleter;
@@ -70,9 +69,22 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     @Completion(FilePathCompleter.class)
     private String outputFile;
 
-    protected abstract EnrolmentResponse requestCertificate(@NonNull ScepClient client,
-            @NonNull CertificationRequest csr, @NonNull PrivateKey identityKey,
-            @NonNull X509Certificate identityCert) throws ScepClientException;
+    /**
+     *
+     * @param client
+     *          SCEP client. Must not be {@code null}.
+     * @param csr
+     *          CSR. Must not be {@code null}.
+     * @param identityKey
+     *          Identity key. Must not be {@code null}.
+     * @param identityCert
+     *          Identity certificate. Must not be {@code null}.
+     * @return
+     * @throws ScepClientException
+     */
+    protected abstract EnrolmentResponse requestCertificate(ScepClient client,
+            CertificationRequest csr, PrivateKey identityKey,
+            X509Certificate identityCert) throws ScepClientException;
 
     @Override
     protected Object execute0() throws Exception {

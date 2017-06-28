@@ -18,7 +18,6 @@
     <bundle start-level="65">mvn:io.netty/netty-handler/${netty.version}</bundle>
   </feature>
   <feature name="xipki-password" version="${project.version}" description="password">
-    <bundle start-level="70"><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle start-level="70">mvn:org.xipki/common/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki/password/${project.version}</bundle>
   </feature>
@@ -154,12 +153,10 @@
     <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit" version="${project.version}" description="Audit">
-    <bundle start-level="70"><![CDATA[wrap:mvn:org.eclipse.jdt/org.eclipse.jdt.annotation/${jdt-annotation.version}/$Bundle-SymbolicName=org.eclipse.jdt.annotation&Bundle-Version=${jdt-annotation.version}]]></bundle>
     <bundle start-level="80">mvn:org.xipki/audit/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}" description="Syslog audit">
     <feature prerequisite="true">xipki-audit</feature>
-    <bundle start-level="70">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsr305/${jsr305.version}</bundle>
     <bundle start-level="70"><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
     <bundle start-level="70">mvn:org.xipki/audit-syslog/${project.version}</bundle>
   </feature>

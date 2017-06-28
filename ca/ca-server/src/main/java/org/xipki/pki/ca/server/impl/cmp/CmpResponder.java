@@ -60,8 +60,6 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -130,10 +128,25 @@ abstract class CmpResponder {
         return getRequestor((X500Name) requestSender.getName());
     } // method getRequestor
 
-    protected abstract PKIMessage processPkiMessage0(@Nullable PKIMessage request,
-            @NonNull RequestorInfo requestor,
-            @NonNull ASN1OctetString transactionId, @NonNull GeneralPKIMessage pkiMessage,
-            @NonNull String msgId, @NonNull AuditEvent event);
+    /**
+     *
+     * @param request
+     *          Original request. Will only be used for the storage. Could be{@code null}.
+     * @param requestor
+     *          Requestor. Must not be {@code null}.
+     * @param transactionId
+     *          Transaction id. Must not be {@code null}.
+     * @param pkiMessage
+     *          PKI message. Must not be {@code null}.
+     * @param msgId
+     *          Message id. Must not be {@code null}.
+     * @param event
+     *          Audit event. Must not be {@code null}.
+     * @return
+     */
+    protected abstract PKIMessage processPkiMessage0(PKIMessage request,
+            RequestorInfo requestor, ASN1OctetString transactionId,
+            GeneralPKIMessage pkiMessage, String msgId, AuditEvent event);
 
     public PKIMessage processPkiMessage(final PKIMessage pkiMessage,
             final X509Certificate tlsClientCert, final String tidStr, final AuditEvent event) {

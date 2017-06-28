@@ -216,9 +216,9 @@ public class OcspCertPublisher extends X509CertPublisher {
     }
 
     @Override
-    public boolean caRevoked(final X509Cert caCert, final CertRevocationInfo revocationInfo) {
+    public boolean caRevoked(final X509Cert caCert, final CertRevocationInfo revInfo) {
         try {
-            queryExecutor.revokeCa(caCert, revocationInfo);
+            queryExecutor.revokeCa(caCert, revInfo);
             return true;
         } catch (Exception ex) {
             String issuerText = X509Util.getRfc4519Name(caCert.cert().getIssuerX500Principal());

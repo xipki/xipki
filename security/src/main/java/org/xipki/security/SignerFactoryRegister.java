@@ -36,8 +36,6 @@ package org.xipki.security;
 
 import java.security.cert.X509Certificate;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.common.ObjectCreationException;
 
 /**
@@ -48,15 +46,20 @@ import org.xipki.common.ObjectCreationException;
 public interface SignerFactoryRegister {
 
     /**
-     *
-     * @param type type of the signer
-     * @param conf configuration
-     * @param certificateChain certificate chain
+     * @param securityFactory
+     *          Security factory. Must not be {@code null}.
+     * @param type
+     *          Type of the signer. Must not be {@code null}.
+     * @param conf
+     *          Configuration. Must not be {@code null}.
+     * @param certificateChain
+     *          Certificate chain. Could be {@code null}-
      * @return new signer.
-     * @throws ObjectCreationException if signer could not be created.
+     * @throws ObjectCreationException
+     *           If signer could not be created.
      */
-    ConcurrentContentSigner newSigner(@NonNull SecurityFactory securityFactory,
-            @NonNull String type, @NonNull SignerConf conf,
-            @Nullable X509Certificate[] certificateChain) throws ObjectCreationException;
+    ConcurrentContentSigner newSigner(SecurityFactory securityFactory,
+            String type, SignerConf conf, X509Certificate[] certificateChain)
+            throws ObjectCreationException;
 
 }

@@ -77,8 +77,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.util.encoders.Base64;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -3431,7 +3429,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
     }
 
     @Override
-    public boolean exportConf(@NonNull String zipFilename, @Nullable List<String> caNames)
+    public boolean exportConf(String zipFilename, List<String> caNames)
             throws CaMgmtException, IOException {
         List<String> upperCaNames;
         if (caNames == null) {

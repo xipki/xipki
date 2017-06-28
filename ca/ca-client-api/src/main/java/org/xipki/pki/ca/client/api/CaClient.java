@@ -45,8 +45,6 @@ import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequest;
@@ -62,68 +60,240 @@ public interface CaClient {
 
     Set<String> caNames();
 
-    Set<CertprofileInfo> getCertprofiles(@NonNull String caName) throws CaClientException;
+    /**
+     *
+     * @param caName
+     *          CA name. Must not be {@code null}
+     * @return
+     * @throws CaClientException
+     */
+    Set<CertprofileInfo> getCertprofiles(String caName) throws CaClientException;
 
-    EnrollCertResult requestCert(@Nullable String caName, @NonNull CertificationRequest csr,
-            @NonNull String profile, @Nullable Date notBefore,
-            @Nullable Date notAfter, @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param caName
+     *          CA name. Could be {@code null}.
+     * @param csr
+     *          CSR. Must not be{@code null}.
+     * @param profile
+     *          Certificate profile name. Must not be{@code null}.
+     * @param notBefore
+     *          NotBefore. Could be {@code null}.
+     * @param notAfter
+     *          NotAfter. Could be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    EnrollCertResult requestCert(String caName, CertificationRequest csr,
+            String profile, Date notBefore, Date notAfter, RequestResponseDebug debug)
             throws CaClientException, PkiErrorException;
 
-    EnrollCertResult requestCerts(@Nullable String caName, @NonNull EnrollCertRequest request,
-            @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param caName
+     *          CA name. Could be {@code null}.
+     * @param request
+     *          Request. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    EnrollCertResult requestCerts(String caName, EnrollCertRequest request,
+            RequestResponseDebug debug)
             throws CaClientException, PkiErrorException;
 
-    CertIdOrError revokeCert(@Nullable String caName, @NonNull BigInteger serial, int reason,
-            @Nullable Date invalidityTime, @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param caName
+     *          CA name. Could be {@code null}.
+     * @param serial
+     *          Serial number of the target certificate. Must not be {@code null}.
+     * @param reason
+     *          Revocation reason.
+     * @param invalidityTime
+     *          Invalidity time. Could be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    CertIdOrError revokeCert(String caName, BigInteger serial, int reason,
+            Date invalidityTime, RequestResponseDebug debug)
             throws CaClientException, PkiErrorException;
 
-    CertIdOrError revokeCert(@Nullable String caName, @NonNull X509Certificate cert, int reason,
-            @Nullable Date invalidityTime, @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param caName
+     *          CA name. Could be {@code null}.
+     * @param cert
+     *          Target certificate. Must not be {@code null}.
+     * @param reason
+     *          Revocation reason.
+     * @param invalidityTime
+     *          Invalidity time. Could be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    CertIdOrError revokeCert(String caName, X509Certificate cert, int reason,
+            Date invalidityTime, RequestResponseDebug debug)
             throws CaClientException, PkiErrorException;
 
-    Map<String, CertIdOrError> revokeCerts(@NonNull RevokeCertRequest request,
-            @Nullable RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+    /**
+     *
+     * @param request
+     *          Request. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    Map<String, CertIdOrError> revokeCerts(RevokeCertRequest request,
+            RequestResponseDebug debug) throws CaClientException, PkiErrorException;
 
-    X509CRL downloadCrl(@NonNull String caName, @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param caName
+     *          CA name. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    X509CRL downloadCrl(String caName, RequestResponseDebug debug)
             throws CaClientException, PkiErrorException;
 
-    X509CRL downloadCrl(@NonNull String caName, @Nullable BigInteger crlNumber,
-            @Nullable RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+    /**
+     *
+     * @param caName
+     *          CA name. Must not be {@code null}.
+     * @param crlNumber
+     *          CRL number. {@code null} to download the current CRL.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    X509CRL downloadCrl(String caName, BigInteger crlNumber,
+            RequestResponseDebug debug) throws CaClientException, PkiErrorException;
 
-    X509CRL generateCrl(@NonNull String caName, @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param caName
+     *          CA name. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    X509CRL generateCrl(String caName, RequestResponseDebug debug)
             throws CaClientException, PkiErrorException;
 
-    String getCaNameByIssuer(@NonNull X500Name issuer) throws CaClientException;
+    /**
+     *
+     * @param issuer
+     *          Issuer's subject.
+     */
+    String getCaNameByIssuer(X500Name issuer) throws CaClientException;
 
-    byte[] envelope(@NonNull CertRequest certRequest, @NonNull ProofOfPossession popo,
-            @NonNull String profileName, @Nullable String caName)
+    /**
+     *
+     * @param certRequest
+     *          Core request to enroll certificate. Must not be {@code null}.
+     * @param popo
+     *          ProofOfPossession. Must not be {@code null}.
+     * @param profileName
+     *          Certificate profile name. Must not be {@code null}.
+     * @param caName
+     *          CA name. Could be {@code null}.
+     */
+    byte[] envelope(CertRequest certRequest, ProofOfPossession popo,
+            String profileName, String caName)
             throws CaClientException;
 
-    byte[] envelopeRevocation(@NonNull X500Name issuer, @NonNull BigInteger serial, int reason)
+    /**
+     *
+     * @param issuer
+     *          Issuer of the certificate. Must not be {@code null}.
+     * @param serial
+     *          Serial number of the certificate. Must not be {@code null}.
+     * @param reason
+     *          Revocation reason.
+     */
+    byte[] envelopeRevocation(X500Name issuer, BigInteger serial, int reason)
             throws CaClientException;
 
-    byte[] envelopeRevocation(@NonNull X509Certificate cert, int reason) throws CaClientException;
+    /**
+     *
+     * @param cert
+     *          Certificate. Must not be {@code null}.
+     * @param reason
+     *          Revocation reason.
+     */
+    byte[] envelopeRevocation(X509Certificate cert, int reason) throws CaClientException;
 
-    CertIdOrError unrevokeCert(@Nullable String caName, @NonNull BigInteger serial,
-            @Nullable RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+    /**
+     *
+     * @param caName
+     *          CA name. Could be {@code null}.
+     * @param serial
+     *          Serial number of the certificate. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    CertIdOrError unrevokeCert(String caName, BigInteger serial,
+            RequestResponseDebug debug) throws CaClientException, PkiErrorException;
 
-    CertIdOrError unrevokeCert(@Nullable String caName, @NonNull X509Certificate cert,
-            @Nullable RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+    /**
+     *
+     * @param caName
+     *          CA name. Could be {@code null}.
+     * @param cert
+     *          Target certificate. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    CertIdOrError unrevokeCert(String caName, X509Certificate cert,
+            RequestResponseDebug debug) throws CaClientException, PkiErrorException;
 
-    Map<String, CertIdOrError> unrevokeCerts(@NonNull UnrevokeOrRemoveCertRequest request,
-            @Nullable RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+    /**
+     *
+     * @param request
+     *          Request. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    Map<String, CertIdOrError> unrevokeCerts(UnrevokeOrRemoveCertRequest request,
+            RequestResponseDebug debug) throws CaClientException, PkiErrorException;
 
-    CertIdOrError removeCert(@Nullable String caName, @NonNull BigInteger serial,
-            @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param caName
+     *          CA name. Could be {@code null}.
+     * @param serial
+     *          Serial number of the target certificate.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    CertIdOrError removeCert(String caName, BigInteger serial, RequestResponseDebug debug)
             throws CaClientException, PkiErrorException;
 
-    CertIdOrError removeCert(@Nullable String caName, @NonNull X509Certificate cert,
-            @Nullable RequestResponseDebug debug) throws CaClientException, PkiErrorException;
+    /**
+     *
+     * @param caName
+     *          CA name. Could be {@code null}.
+     * @param cert
+     *          Target certificate.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    CertIdOrError removeCert(String caName, X509Certificate cert,
+            RequestResponseDebug debug) throws CaClientException, PkiErrorException;
 
-    Map<String, CertIdOrError> removeCerts(@NonNull UnrevokeOrRemoveCertRequest request,
-            @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param request
+     *          Request. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    Map<String, CertIdOrError> removeCerts(UnrevokeOrRemoveCertRequest request,
+            RequestResponseDebug debug)
             throws CaClientException, PkiErrorException;
 
-    HealthCheckResult getHealthCheckResult(@NonNull String caName) throws CaClientException;
+    /**
+     *
+     * @param caName
+     *          CA name. Must not be {@code null}.
+     */
+    HealthCheckResult getHealthCheckResult(String caName) throws CaClientException;
 
 }

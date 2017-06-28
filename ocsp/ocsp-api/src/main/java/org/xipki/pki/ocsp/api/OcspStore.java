@@ -39,8 +39,6 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.common.util.ParamUtil;
@@ -78,23 +76,84 @@ public abstract class OcspStore {
 
     public abstract Set<IssuerHashNameAndKey> issuerHashNameAndKeys();
 
-    public abstract boolean canResolveIssuer(@NonNull HashAlgoType hashAlgo,
-            @NonNull byte[] issuerNameHash, @NonNull byte[] issuerKeyHash);
+    /**
+     *
+     * @param hashAlgo
+     *          Hash algorithm. Must not be {@code null}.
+     * @param issuerNameHash
+     *          Hash of the issuer's subject. Must not be {@code null}.
+     * @param issuerKeyHash
+     *          Hash of the issuer's public key. Must not be {@code null}.
+     * @return whether this OCSP store knows the given issuer.
+     * FIXME: rename it to knowsIssuer.
+     */
+    public abstract boolean canResolveIssuer(HashAlgoType hashAlgo,
+            byte[] issuerNameHash, byte[] issuerKeyHash);
 
-    public abstract X509Certificate getIssuerCert(@NonNull HashAlgoType hashAlgo,
-            @NonNull byte[] issuerNameHash, @NonNull byte[] issuerKeyHash);
+    /**
+     *
+     * @param hashAlgo
+     *          Hash algorithm. Must not be {@code null}.
+     * @param issuerNameHash
+     *          Hash of the issuer's subject. Must not be {@code null}.
+     * @param issuerKeyHash
+     *          Hash of the issuer's public key. Must not be {@code null}.
+     * @return the certificate of the given issuer.
+     */
+    public abstract X509Certificate getIssuerCert(HashAlgoType hashAlgo,
+            byte[] issuerNameHash, byte[] issuerKeyHash);
 
-    public abstract CertStatusInfo getCertStatus(@NonNull Date time, @NonNull HashAlgoType hashAlgo,
-            @NonNull byte[] issuerNameHash, @NonNull byte[] issuerKeyHash,
-            @NonNull BigInteger serialNumber, boolean includeCertHash,
-            @Nullable HashAlgoType certHashAlg, @Nullable CertprofileOption certprofileOption)
+    /**
+     *
+     * @param time
+     *          Time of the certificate status. Must not be {@code null}.
+     * @param hashAlgo
+     *          Hash algorithm to compute issuerNameHash and issuerKeyHash.
+     *          Must not be {@code null}.
+     * @param issuerNameHash
+     *          Hash of the issuer's subject. Must not be {@code null}.
+     * @param issuerKeyHash
+     *          Hash of the issuer's public key. Must not be {@code null}.
+     * @param serialNumber
+     *          Serial number of the target certificate. Must not be {@code null}.
+     * @param includeCertHash
+     *          Whether to include the hash of target certificate in the response.
+     * @param certHashAlg
+     *          Hash algorithm of the certHash. If {@code null}, the algorithm specified
+     *          in the parameter hashAlgo will be applied.
+     * @param certprofileOption
+     *          Option of the certificate profile. Could be {@code null}.
+     * @return the certificate status.
+     */
+    public abstract CertStatusInfo getCertStatus(Date time, HashAlgoType hashAlgo,
+            byte[] issuerNameHash, byte[] issuerKeyHash, BigInteger serialNumber,
+            boolean includeCertHash, HashAlgoType certHashAlg,
+            CertprofileOption certprofileOption)
             throws OcspStoreException;
 
-    public abstract void init(@Nullable String conf, @Nullable DataSourceWrapper datasource,
-            @NonNull Set<HashAlgoType> certHashAlgos) throws OcspStoreException;
+    /**
+     *
+     * @param conf
+     *          Configuration. Could be {@code null}.
+     * @param datasource
+     *          Datasource. Could be {@code null}.
+     */
+    public abstract void init(String conf, DataSourceWrapper datasource)
+            throws OcspStoreException;
 
-    public abstract CertRevocationInfo getCaRevocationInfo(@NonNull HashAlgoType hashAlgo,
-            @NonNull byte[] issuerNameHash, @NonNull byte[] issuerKeyHash);
+    /**
+     *
+     * @param hashAlgo
+     *          Hash algorithm to compute issuerNameHash and issuerKeyHash.
+     *          Must not be {@code null}.
+     * @param issuerNameHash
+     *          Hash of the issuer's subject. Must not be {@code null}.
+     * @param issuerKeyHash
+     *          Hash of the issuer's public key. Must not be {@code null}.
+     * @return the revocation information of the queried certificate.
+     */
+    public abstract CertRevocationInfo getCaRevocationInfo(HashAlgoType hashAlgo,
+            byte[] issuerNameHash, byte[] issuerKeyHash);
 
     public abstract void shutdown() throws OcspStoreException;
 

@@ -37,8 +37,6 @@ package org.xipki.pki.ca.api.publisher.x509;
 import java.security.cert.X509CRL;
 import java.util.Map;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.password.PasswordResolver;
@@ -55,9 +53,17 @@ import org.xipki.security.X509Cert;
 
 public abstract class X509CertPublisher {
 
-    public abstract void initialize(@Nullable String conf,
-            @Nullable PasswordResolver passwordResolver,
-            @NonNull Map<String, DataSourceWrapper> datasources) throws CertPublisherException;
+    /**
+     *
+     * @param conf
+     *          Configuration. Could be {@code null}.
+     * @param passwordResolver
+     *          Password resolver. Could be {@code null}.
+     * @param datasources
+     *          Datasources. Must not be {@code null}.
+     */
+    public abstract void initialize(String conf, PasswordResolver passwordResolver,
+            Map<String, DataSourceWrapper> datasources) throws CertPublisherException;
 
     public void shutdown() {
     }
@@ -66,32 +72,99 @@ public abstract class X509CertPublisher {
 
     public abstract boolean isAsyn();
 
-    public abstract void setEnvParameterResolver(@Nullable EnvParameterResolver parameterResolver);
+    /**
+     *
+     * @param parameterResolver
+     *          Parameter resolver. Could be {@code null}.
+     */
+    public abstract void setEnvParameterResolver(EnvParameterResolver parameterResolver);
 
-    public abstract boolean caAdded(@NonNull X509Cert caCert);
+    /**
+     *
+     * @param caCert
+     *          CA certificate to be published. Must not be {@code null}.
+     * @return whether the CA is published.
+     */
+    public abstract boolean caAdded(X509Cert caCert);
 
-    public abstract boolean certificateAdded(@NonNull X509CertificateInfo certInfo);
+    /**
+     *
+     * @param certInfo
+     *          Certificate to be published.
+     * @return whether the certificate is published.
+     */
+    public abstract boolean certificateAdded(X509CertificateInfo certInfo);
 
-    public abstract boolean certificateRevoked(@NonNull X509Cert caCert,
-            @NonNull X509CertWithDbId cert, @Nullable String certprofile,
-            @NonNull CertRevocationInfo revInfo);
+    /**
+     *
+     * @param caCert
+     *          CA certificate. Must not be {@code null}.
+     * @param cert
+     *          Target certificate. Must not be {@code null}.
+     * @param certprofile
+     *          Certificate profile. Could be {@code null}.
+     * @param revInfo
+     *          Revocation information. Must not be {@code null}.
+     * @return whether the revocation is published.
+     */
+    public abstract boolean certificateRevoked(X509Cert caCert,
+            X509CertWithDbId cert, String certprofile, CertRevocationInfo revInfo);
 
-    public abstract boolean certificateUnrevoked(@NonNull X509Cert caCert,
-            @NonNull X509CertWithDbId cert);
+    /**
+     *
+     * @param caCert
+     *          CA certificate. Must not be {@code null}.
+     * @param cert
+     *          Target certificate. Must not be {@code null}.
+     * @return whether the unrevocation is published.
+     */
+    public abstract boolean certificateUnrevoked(X509Cert caCert, X509CertWithDbId cert);
 
-    public abstract boolean certificateRemoved(@NonNull X509Cert caCert,
-            @NonNull X509CertWithDbId cert);
+    /**
+     *
+     * @param caCert
+     *          CA certificate. Must not be {@code null}.
+     * @param cert
+     *          Target certificate. Must not be {@code null}.
+     * @return whether the remove is published.
+     */
+    public abstract boolean certificateRemoved(X509Cert caCert, X509CertWithDbId cert);
 
-    public abstract boolean crlAdded(@NonNull X509Cert caCert, @NonNull X509CRL crl);
+    /**
+     *
+     * @param caCert
+     *          CA certificate. Must not be {@code null}.
+     * @param crl
+     *          CRL to be published. Must not be {@code null}.
+     * @return whether the CRL is published.
+     */
+    public abstract boolean crlAdded(X509Cert caCert, X509CRL crl);
 
-    public abstract boolean caRevoked(@NonNull X509Cert caCert,
-            @NonNull CertRevocationInfo revocationInfo);
+    /**
+     *
+     * @param caCert
+     *          CA certificate. Must not be {@code null}.
+     * @param revInfo
+     *          Revocation information. Must not be {@code null}.
+     * @return whether the CA revocation is published.
+     */
+    public abstract boolean caRevoked(X509Cert caCert, CertRevocationInfo revInfo);
 
-    public abstract boolean caUnrevoked(@NonNull X509Cert caCert);
+    /**
+     *
+     * @param caCert
+     *          CA certificate. Must not be {@code null}.
+     * @return whether the CA unrevocation is published.
+     */
+    public abstract boolean caUnrevoked(X509Cert caCert);
 
     public abstract boolean isHealthy();
 
-    public abstract void setAuditServiceRegister(
-            @NonNull AuditServiceRegister auditServiceRegister);
+    /**
+     *
+     * @param auditServiceRegister
+     *          AuditServiceRegister to be set. Must not be {@code null}.
+     */
+    public abstract void setAuditServiceRegister(AuditServiceRegister auditServiceRegister);
 
 }
