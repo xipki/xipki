@@ -79,7 +79,6 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.EC5Util;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.util.encoders.Hex;
-import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.IoUtil;
@@ -911,7 +910,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         return saveP11Entity(keypair, label);
     }
 
-    private P11Identity saveP11Entity(@NonNull final KeyPair keypair, @NonNull final String label)
+    private P11Identity saveP11Entity(final KeyPair keypair, final String label)
             throws P11TokenException {
         byte[] id = generateId();
         savePkcs11PrivateKey(id, label, keypair.getPrivate());
@@ -927,7 +926,7 @@ class EmulatorP11Slot extends AbstractP11Slot {
         }
     }
 
-    private P11Identity saveP11Entity(@NonNull final SecretKey key, @NonNull final String label)
+    private P11Identity saveP11Entity(final SecretKey key, final String label)
             throws P11TokenException {
         byte[] id = generateId();
         savePkcs11SecretKey(id, label, key);

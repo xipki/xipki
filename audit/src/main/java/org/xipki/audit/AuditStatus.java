@@ -36,9 +36,6 @@ package org.xipki.audit;
 
 import java.util.Objects;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -50,8 +47,7 @@ public enum AuditStatus {
     FAILED,
     UNDEFINED;
 
-    @Nullable
-    public static final AuditStatus forName(@NonNull final String name) {
+    public static final AuditStatus forName(final String name) {
         Objects.requireNonNull(name, "name must not be null");
         for (AuditStatus v : values()) {
             if (v.name().equals(name)) {

@@ -44,7 +44,6 @@ import java.security.SignatureException;
 import java.security.SignatureSpi;
 import java.security.spec.AlgorithmParameterSpec;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
@@ -158,7 +157,7 @@ public abstract class P11DSASignatureSpi extends SignatureSpi {
 
     private P11PrivateKey signingKey;
 
-    private P11DSASignatureSpi(@Nullable final HashAlgoType hashAlgo) {
+    private P11DSASignatureSpi(final HashAlgoType hashAlgo) {
         this.hashAlgo = hashAlgo;
     }
 

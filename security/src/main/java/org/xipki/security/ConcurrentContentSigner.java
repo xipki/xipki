@@ -57,8 +57,6 @@ import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.password.PasswordResolver;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
@@ -90,7 +88,12 @@ public interface ConcurrentContentSigner {
      */
     Key getSigningKey();
 
-    void setPublicKey(@NonNull PublicKey publicKey);
+    /**
+     *
+     * @param publicKey
+     *          Public key of this signer. Must not be {@code null}.
+     */
+    void setPublicKey(PublicKey publicKey);
 
     PublicKey getPublicKey();
 
@@ -98,37 +101,98 @@ public interface ConcurrentContentSigner {
 
     X509CertificateHolder getCertificateAsBcObject();
 
-    void setCertificateChain(@Nullable X509Certificate[] certchain);
+    /**
+     *
+     * @param certchain
+     *          Certificate chain of this signer. Could be {@code null}.
+     */
+    void setCertificateChain(X509Certificate[] certchain);
 
     X509Certificate[] getCertificateChain();
 
     X509CertificateHolder[] getCertificateChainAsBcObjects();
 
-    void initialize(@Nullable String conf, @Nullable PasswordResolver passwordResolver)
+    /**
+     *
+     * @param conf
+     *          Configuration. Could be {@code null}.
+     * @param passwordResolver
+     *          Password resolver. Could be {@code null}.
+     * @throws XiSecurityException
+     */
+    void initialize(String conf, PasswordResolver passwordResolver)
             throws XiSecurityException;
 
-    POPOSigningKey build(@NonNull ProofOfPossessionSigningKeyBuilder builder)
+    /**
+     *
+     * @param builder
+     *          Signing key builder. Must not be {@code null}.
+     */
+    POPOSigningKey build(ProofOfPossessionSigningKeyBuilder builder)
             throws NoIdleSignerException;
 
-    ProtectedPKIMessage build(@NonNull ProtectedPKIMessageBuilder builder)
+    /**
+     *
+     * @param builder
+     *          Protected PKI message builder. Must not be {@code null}.
+     */
+    ProtectedPKIMessage build(ProtectedPKIMessageBuilder builder)
             throws NoIdleSignerException, CMPException;
 
-    X509CRLHolder build(@NonNull X509v2CRLBuilder builder) throws NoIdleSignerException;
+    /**
+     *
+     * @param builder
+     *          CRL builder. Must not be {@code null}.
+     */
+    X509CRLHolder build(X509v2CRLBuilder builder) throws NoIdleSignerException;
 
-    X509CertificateHolder build(@NonNull X509v3CertificateBuilder builder)
+    /**
+     *
+     * @param builder
+     *          Certificate builder. Must not be {@code null}.
+     */
+    X509CertificateHolder build(X509v3CertificateBuilder builder)
             throws NoIdleSignerException;
 
-    OCSPReq build(@NonNull OCSPReqBuilder builder, X509CertificateHolder[] chain)
+    /**
+     * @param builder
+     *          OCSP request builder. Must not be {@code null}.
+     * @param chain
+     *          Certificates to be embedded in the response. Could be {@code null}.
+     *
+     */
+    OCSPReq build(OCSPReqBuilder builder, X509CertificateHolder[] chain)
             throws NoIdleSignerException, OCSPException;
 
-    BasicOCSPResp build(@NonNull BasicOCSPRespBuilder builder,
-            @Nullable X509CertificateHolder[] chain, @NonNull Date producedAt)
+    /**
+     *
+     * @param builder
+     *          Basic OCSP response builder. Must not be {@code null}.
+     * @param chain
+     *          Certificates to be embedded in the response. Could be {@code null}.
+     * @param producedAt
+     *          When the OCSP response is produced. Must not be {@code null}.
+     */
+    BasicOCSPResp build(BasicOCSPRespBuilder builder,
+            X509CertificateHolder[] chain, Date producedAt)
             throws NoIdleSignerException, OCSPException;
 
-    PKCS10CertificationRequest build(@NonNull PKCS10CertificationRequestBuilder builder)
+    /**
+     *
+     * @param builder
+     *          PKCS#10 request builder. Must not be {@code null}.
+     * @return
+     * @throws NoIdleSignerException
+     */
+    PKCS10CertificationRequest build(PKCS10CertificationRequestBuilder builder)
             throws NoIdleSignerException;
 
-    byte[] sign(@NonNull byte[] data) throws NoIdleSignerException, IOException;
+    /**
+     *
+     * @param data
+     *          Data to be signed. Must not be {@code null}.
+     */
+    byte[] sign(byte[] data) throws NoIdleSignerException, IOException;
 
     boolean isHealthy();
 

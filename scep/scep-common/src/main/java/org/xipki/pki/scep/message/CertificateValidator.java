@@ -36,9 +36,6 @@ package org.xipki.pki.scep.message;
 
 import java.security.cert.X509Certificate;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -46,7 +43,14 @@ import org.eclipse.jdt.annotation.Nullable;
 
 public interface CertificateValidator {
 
-    boolean trustCertificate(@NonNull X509Certificate target,
-            @Nullable X509Certificate[] otherCerts);
+    /**
+     *
+     * @param target
+     *          The certificate to be verified. Must not be {@code null}.
+     * @param otherCerts
+     *          Additional certificate that may be used. Could be {@code null}.
+     * @return
+     */
+    boolean trustCertificate(X509Certificate target, X509Certificate[] otherCerts);
 
 }

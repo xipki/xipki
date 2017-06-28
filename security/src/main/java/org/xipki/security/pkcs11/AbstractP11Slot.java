@@ -53,7 +53,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.util.encoders.Hex;
-import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
@@ -107,7 +106,11 @@ public abstract class AbstractP11Slot implements P11Slot {
         this.readOnly = readOnly;
     }
 
-    protected static String hex(@NonNull final byte[] bytes) {
+    /**
+     * @param bytes
+     *          Data to be encoded. Must not be {@code null}.
+     */
+    protected static String hex(final byte[] bytes) {
         return Hex.toHexString(bytes).toUpperCase();
     }
 
@@ -125,34 +128,100 @@ public abstract class AbstractP11Slot implements P11Slot {
         return sb.toString();
     }
 
+    /**
+     *
+     * @param objectId
+     *          Object identifier. Must not be {@code null}.
+     * @param cert
+     *          Certificate to be added. Must not be {@code null}.
+     */
     protected abstract void updateCertificate0(final P11ObjectIdentifier objectId,
             final X509Certificate newCert) throws P11TokenException, CertificateException;
 
+    /**
+     *
+     * @param objectId
+     *          Object identifier. Must not be {@code null}.
+     */
     protected abstract void removeIdentity0(P11ObjectIdentifier objectId) throws P11TokenException;
 
-    protected abstract void addCert0(@NonNull final P11ObjectIdentifier objectId,
-            @NonNull final X509Certificate cert) throws P11TokenException, CertificateException;
+    /**
+     *
+     * @param objectId
+     *          Object identifier. Must not be {@code null}.
+     * @param cert
+     *          Certificate to be added. Must not be {@code null}.
+     */
+    protected abstract void addCert0(final P11ObjectIdentifier objectId,
+            final X509Certificate cert) throws P11TokenException, CertificateException;
 
+    /**
+     *
+     * @param label
+     *          Label of the generated key. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     */
     protected abstract P11Identity generateSecretKey0(long keyType, int keysize,
-            @NonNull String label, @NonNull P11NewKeyControl control) throws P11TokenException;
+            String label, P11NewKeyControl control) throws P11TokenException;
 
+    /**
+     *
+     * @param keyValue
+     *          Key value. Must not be {@code null}.
+     * @param label
+     *          Label of the created key. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     */
     protected abstract P11Identity createSecretKey0(long keyType, byte[] keyValue,
-            @NonNull String label, @NonNull P11NewKeyControl control) throws P11TokenException;
+            String label, P11NewKeyControl control) throws P11TokenException;
 
+    /**
+     *
+     * @param p
+     *          p of DSA. Must not be {@code null}.
+     * @param q
+     *          q of DSA. Must not be {@code null}.
+     * @param g
+     *          g of DSA. Must not be {@code null}.
+     * @param label
+     *          Label of the generated keys. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     */
     // CHECKSTYLE:OFF
     protected abstract P11Identity generateDSAKeypair0(final BigInteger p, final BigInteger q,
-            final BigInteger g, @NonNull final String label, @NonNull P11NewKeyControl control)
+            final BigInteger g, final String label, P11NewKeyControl control)
             throws P11TokenException;
     // CHECKSTYLE:ON
 
+    /**
+     *
+     * @param curveId
+     *         Object identifier of the EC curve. Must not be {@code null}.
+     * @param label
+     *          Label of the generated keys. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     */
     // CHECKSTYLE:SKIP
-    protected abstract P11Identity generateECKeypair0(@NonNull ASN1ObjectIdentifier curveId,
-            @NonNull String label, @NonNull P11NewKeyControl control) throws P11TokenException;
+    protected abstract P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
+            String label, P11NewKeyControl control) throws P11TokenException;
 
+    /**
+     *
+     * @param publicExponent
+     *          RSA public exponent. Could be {@code null}.
+     * @param label
+     *          Label of the generated keys. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     */
     // CHECKSTYLE:SKIP
     protected abstract P11Identity generateRSAKeypair0(int keysize,
-            @NonNull BigInteger publicExponent, @NonNull String label,
-            @NonNull P11NewKeyControl control) throws P11TokenException;
+            BigInteger publicExponent, String label, P11NewKeyControl control)
+            throws P11TokenException;
 
     protected abstract P11SlotRefreshResult refresh0()
             throws P11TokenException;
@@ -160,7 +229,12 @@ public abstract class AbstractP11Slot implements P11Slot {
     protected abstract void removeCerts0(final P11ObjectIdentifier objectId)
             throws P11TokenException;
 
-    protected X509Cert getCertForId(@NonNull final byte[] id) {
+    /**
+     *
+     * @param id
+     *          Identifier of the certificate. Must not be {@code null}.
+     */
+    protected X509Cert getCertForId(final byte[] id) {
         for (P11ObjectIdentifier objId : certificates.keySet()) {
             if (objId.matchesId(id)) {
                 return certificates.get(objId);
@@ -175,7 +249,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         }
     }
 
-    private void updateCaCertsOfIdentity(@NonNull final P11Identity identity) {
+    private void updateCaCertsOfIdentity(final P11Identity identity) {
         X509Certificate[] certchain = identity.certificateChain();
         if (certchain == null || certchain.length == 0) {
             return;
@@ -191,7 +265,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         }
     }
 
-    private X509Certificate[] buildCertPath(@NonNull final X509Certificate cert) {
+    private X509Certificate[] buildCertPath(final X509Certificate cert) {
         List<X509Certificate> certs = new LinkedList<>();
         X509Certificate cur = cert;
         while (cur != null) {
@@ -201,7 +275,7 @@ public abstract class AbstractP11Slot implements P11Slot {
         return certs.toArray(new X509Certificate[0]);
     }
 
-    private X509Certificate getIssuerForCert(@NonNull final X509Certificate cert) {
+    private X509Certificate getIssuerForCert(final X509Certificate cert) {
         try {
             if (X509Util.isSelfSigned(cert)) {
                 return null;
@@ -597,7 +671,7 @@ public abstract class AbstractP11Slot implements P11Slot {
 
     @Override
     public P11ObjectIdentifier generateDSAKeypair(final int plength, final int qlength,
-            final String label, @NonNull P11NewKeyControl control) throws P11TokenException {
+            final String label, P11NewKeyControl control) throws P11TokenException {
         ParamUtil.requireMin("plength", plength, 1024);
         if (plength % 1024 != 0) {
             throw new IllegalArgumentException("key size is not multiple of 1024: " + plength);

@@ -36,7 +36,6 @@ package org.xipki.audit.internal;
 
 import java.io.CharArrayWriter;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -57,7 +56,7 @@ public class Slf4jAuditServiceImpl extends AuditService {
     }
 
     @Override
-    public void logEvent0(@NonNull final AuditEvent event) {
+    protected void logEvent0(final AuditEvent event) {
         switch (event.level()) {
         case DEBUG:
             if (LOG.isDebugEnabled()) {
@@ -73,7 +72,7 @@ public class Slf4jAuditServiceImpl extends AuditService {
     }
 
     @Override
-    public void logEvent0(@NonNull final PciAuditEvent event) {
+    protected void logEvent0(final PciAuditEvent event) {
         CharArrayWriter msg = event.toCharArrayWriter("");
         AuditLevel al = event.level();
         switch (al) {

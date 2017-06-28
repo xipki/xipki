@@ -45,8 +45,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.common.ObjectCreationException;
 import org.xipki.password.PasswordResolver;
 
@@ -59,50 +57,119 @@ public interface SecurityFactory {
 
     PasswordResolver getPasswordResolver();
 
-    KeyCertPair createPrivateKeyAndCert(@NonNull String type, @Nullable SignerConf conf,
-            @Nullable X509Certificate cert) throws ObjectCreationException;
+    /**
+     *
+     * @param type
+     *          Type of the signer. Must not be {@code null}.
+     * @param conf
+     *          Configuration of the signer. Could be {@code null}.
+     * @param cert
+     *          Certificate of the signer. If not {@code null}, it will be used; otherwise
+     *          the certificates contained in the token will be used.
+     * @return the new pair of key and certificate
+     */
+    KeyCertPair createPrivateKeyAndCert(String type, SignerConf conf,
+            X509Certificate cert) throws ObjectCreationException;
 
-    ConcurrentContentSigner createSigner(@NonNull String type, @Nullable SignerConf conf,
-            @Nullable X509Certificate cert) throws ObjectCreationException;
+    /**
+     *
+     * @param type
+     *          Type of the signer. Must not be {@code null}.
+     * @param conf
+     *          Configuration of the signer. Could be {@code null}.
+     * @param cert
+     *          Certificate of the signer. If not {@code null}, it will be used; otherwise
+     *          the certificates contained in the token will be used.
+     * @return the new signer
+     */
+    ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate cert)
+            throws ObjectCreationException;
 
-    ConcurrentContentSigner createSigner(@NonNull String type, @Nullable SignerConf conf,
-            @Nullable X509Certificate[] certs) throws ObjectCreationException;
+    /**
+     *
+     * @param type
+     *          Type of the signer. Must not be {@code null}.
+     * @param conf
+     *          Configuration of the signer. Could be {@code null}.
+     * @param certs
+     *          Certificates of the signer. If not {@code null}, it will be used; otherwise
+     *          the certificates contained in the token will be used.
+     * @return the new signer
+     */
+    ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate[] certs)
+            throws ObjectCreationException;
 
-    ContentVerifierProvider getContentVerifierProvider(@NonNull PublicKey publicKey)
-            throws InvalidKeyException;
-
-    ContentVerifierProvider getContentVerifierProvider(@NonNull X509Certificate cert)
-            throws InvalidKeyException;
-
-    ContentVerifierProvider getContentVerifierProvider(@NonNull X509CertificateHolder cert)
+    /**
+     *
+     * @param publicKey
+     *          Signature verification key. Must not be {@code null}.
+     */
+    ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
             throws InvalidKeyException;
 
     /**
      *
-     * @param csr CSR to be verified
-     * @param algoValidator signature algorithms validator. <code>null</null> to accept all
-     *            algorithms
-     * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
-     *         <code>false</code> otherwise.
+     * @param cert
+     *          Certificate that contains the signature verification key. Must not be {@code null}.
      */
-    boolean verifyPopo(@NonNull PKCS10CertificationRequest csr, AlgorithmValidator algoValidator);
+    ContentVerifierProvider getContentVerifierProvider(X509Certificate cert)
+            throws InvalidKeyException;
 
     /**
      *
-     * @param csr CSR to be verified
-     * @param algoValidator signature algorithms validator. <code>null</null> to accept all
-     *            algorithms
+     * @param cert
+     *          Certificate that contains the signature verification key. Must not be {@code null}.
+     */
+    ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert)
+            throws InvalidKeyException;
+
+    /**
+     *
+     * @param csr
+     *          CSR to be verified. Must not be {@code null}.
+     * @param algoValidator
+     *          Signature algorithms validator. <code>null</null> to accept all algorithms
      * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
      *         <code>false</code> otherwise.
      */
-    boolean verifyPopo(@NonNull CertificationRequest csr, AlgorithmValidator algoValidator);
+    boolean verifyPopo(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator);
 
-    PublicKey generatePublicKey(@NonNull SubjectPublicKeyInfo subjectPublicKeyInfo)
+    /**
+     *
+     * @param csr
+     *          CSR to be verified. Must not be {@code null}.
+     * @param algoValidator
+     *          Signature algorithms validator. <code>null</null> to accept all algorithms
+     * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
+     *         <code>false</code> otherwise.
+     */
+    boolean verifyPopo(CertificationRequest csr, AlgorithmValidator algoValidator);
+
+    /**
+     *
+     * @param subjectPublicKeyInfo
+     *          From which the public key will be created. Must not be {@code null}.
+     */
+    PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
             throws InvalidKeyException;
 
-    byte[] extractMinimalKeyStore(@NonNull String keystoreType, @NonNull byte[] keystoreBytes,
-            @Nullable String keyname, @NonNull char[] password,
-            @Nullable X509Certificate[] newCertChain) throws KeyStoreException;
+    /**
+     *
+     * @param keystoreType
+     *          Type of the keystore. Must not be {@code null}.
+     * @param keystoreBytes
+     *          Content of the keystpre. Must not be {@code null}.
+     * @param keyname
+     *          Name (alias) of the key. Could be {@code null}.
+     * @param password
+     *          Password of the keystore and key. Must not be {@code null}.
+     * @param newCertChain
+     *          New certificates. If not {@code null}, the certificates in the keystore will be
+     *          replaced.
+     */
+    byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
+            char[] password, X509Certificate[] newCertChain)
+            throws KeyStoreException;
 
     SecureRandom getRandom4Sign();
 
