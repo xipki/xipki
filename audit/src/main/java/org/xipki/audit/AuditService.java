@@ -37,8 +37,6 @@ package org.xipki.audit;
 import java.util.List;
 import java.util.Objects;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 /**
  * @author Lijun Liao
  * @since 2.0.0
@@ -46,11 +44,16 @@ import org.eclipse.jdt.annotation.NonNull;
 
 public abstract class AuditService {
 
-    public abstract void logEvent0(@NonNull AuditEvent event);
+    protected abstract void logEvent0(AuditEvent event);
 
-    public abstract void logEvent0(@NonNull PciAuditEvent event);
+    protected abstract void logEvent0(PciAuditEvent event);
 
-    public final void logEvent(@NonNull AuditEvent event) {
+    /**
+     *
+     * @param event
+     *          Audit event. Must not be {@code null}-
+     */
+    public final void logEvent(AuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
 
         /*
@@ -71,7 +74,12 @@ public abstract class AuditService {
         logEvent0(event);
     }
 
-    public final void logEvent(@NonNull PciAuditEvent event) {
+    /**
+     *
+     * @param event
+     *          Audit event. Must not be {@code null}-
+     */
+    public final void logEvent(PciAuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
 
         /*

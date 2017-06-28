@@ -36,7 +36,6 @@ package org.xipki.security.pkcs11;
 
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.P11UnknownEntityException;
 
@@ -55,7 +54,13 @@ public interface P11Module {
 
     List<P11SlotIdentifier> slotIdentifiers();
 
-    P11Slot getSlot(@NonNull P11SlotIdentifier slotId) throws P11TokenException;
+    /**
+     *
+     * @param slotId
+     *          Slot identifier. Must not be {@code null}.
+
+     */
+    P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException;
 
     P11SlotIdentifier getSlotIdForIndex(int index) throws P11UnknownEntityException;
 

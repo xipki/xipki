@@ -46,9 +46,6 @@
     <snakeyaml.version>1.17</snakeyaml.version>
     <hikaricp.version>2.6.2</hikaricp.version>
     <syslog-java-client.version>1.0.8</syslog-java-client.version>
-    <!-- dependency of syslog-java-client -->
-    <jsr305.version>3.0.1_1</jsr305.version>
-    <jdt-annotation.version>2.0.0</jdt-annotation.version>
     <!-- JDBC -->
     <jdbc.postgresql.version>9.4.1212</jdbc.postgresql.version>
     <jdbc.h2.version>1.4.195</jdbc.h2.version>
@@ -174,11 +171,6 @@
         <groupId>com.cloudbees</groupId>
         <artifactId>syslog-java-client</artifactId>
         <version>${syslog-java-client.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.annotation</artifactId>
-        <version>${jdt-annotation.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.karaf.shell</groupId>

@@ -41,7 +41,6 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.eclipse.jdt.annotation.NonNull;
 import org.jscep.client.Client;
 import org.jscep.client.ClientException;
 import org.jscep.client.EnrollmentResponse;
@@ -71,9 +70,20 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     @Completion(FilePathCompleter.class)
     private String outputFile;
 
-    protected abstract EnrollmentResponse requestCertificate(@NonNull Client client,
-            @NonNull PKCS10CertificationRequest csr, @NonNull PrivateKey identityKey,
-            @NonNull X509Certificate identityCert) throws ClientException, TransactionException;
+    /**
+     *
+     * @param client
+     *          Client. Must not be {@code null}.
+     * @param csr
+     *          CSR. Must not be {@code null}.
+     * @param identityKey
+     *          Identity key. Must not be {@code null}.
+     * @param identityCert
+     *          Identity certificate. Must not be {@code null}.
+     */
+    protected abstract EnrollmentResponse requestCertificate(Client client,
+            PKCS10CertificationRequest csr, PrivateKey identityKey,
+            X509Certificate identityCertÔ) throws ClientException, TransactionException;
 
     @Override
     protected Object execute0() throws Exception {

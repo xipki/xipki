@@ -40,8 +40,6 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.ParamUtil;
@@ -127,8 +125,15 @@ public abstract class P11Identity implements Comparable<P11Identity> {
         return sign0(mechanism, parameters, content);
     }
 
-    protected abstract byte[] sign0(final long mechanism, @Nullable final P11Params parameters,
-            @NonNull final byte[] content) throws P11TokenException;
+    /**
+     *
+     * @param parameters
+     *          Parameters. Could be {@code null}.
+     * @param content
+     *          Content to be signed. Must not be {@code null}.
+     */
+    protected abstract byte[] sign0(final long mechanism, final P11Params parameters,
+            final byte[] content) throws P11TokenException;
 
     public byte[] digestSecretKey(long mechanism)
             throws P11TokenException, XiSecurityException {

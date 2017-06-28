@@ -61,7 +61,6 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.util.CollectionStore;
 import org.bouncycastle.util.encoders.Base64;
-import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.OperationNotSupportedException;
 import org.xipki.pki.scep.client.exception.ScepClientException;
@@ -115,11 +114,27 @@ public abstract class Client {
         this.caCertValidator = ParamUtil.requireNonNull("caCertValidator", caCertValidator);
     }
 
-    protected abstract ScepHttpResponse httpPost(@NonNull final String url,
-            @NonNull final String requestContentType, @NonNull final byte[] request)
+    /**
+     *
+     * @param url
+     *          SCEP server URL. Must not be {@code null}.
+     * @param requestContentType
+     *          Content type of the HTTP request. Must not be {@code null}.
+     * @param request
+     *          HTTP request. Must not be {@code null}.
+     * @return
+     * @throws ScepClientException
+     */
+    protected abstract ScepHttpResponse httpPost(final String url,
+            final String requestContentType, final byte[] request)
             throws ScepClientException;
 
-    protected abstract ScepHttpResponse httpGet(@NonNull final String url)
+    /**
+     *
+     * @param url
+     *          URL. Must not be {@code null}.
+     */
+    protected abstract ScepHttpResponse httpGet(final String url)
             throws ScepClientException;
 
     public boolean isHttpGetOnly() {

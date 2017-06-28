@@ -34,7 +34,6 @@
 
 package org.xipki.password.callback;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.password.PasswordResolverException;
 
 /**
@@ -44,8 +43,20 @@ import org.xipki.password.PasswordResolverException;
 
 public interface PasswordCallback {
 
-    void init(@Nullable String conf) throws PasswordResolverException;
+    /**
+     *
+     * @param conf
+     *          Configuration. Could be {@code null}.
+     */
+    void init(String conf) throws PasswordResolverException;
 
-    char[] getPassword(@Nullable String prompt, String testToken) throws PasswordResolverException;
+    /**
+     *
+     * @param prompt
+     *          Prompt shown to use while asking password. Could be {@code null}.
+     * @param testToken
+     *          Token used to test whether the retrieved password is correct. Could be {@code null}.
+     */
+    char[] getPassword(String prompt, String testToken) throws PasswordResolverException;
 
 }

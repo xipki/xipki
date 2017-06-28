@@ -72,7 +72,6 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
@@ -198,8 +197,13 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
     @Completion(ExtensionNameCompleter.class)
     private List<String> wantExtensionTypes;
 
+    /**
+     *
+     * @param signatureAlgoControl
+     *          The signature control. Must not be {@code null}.
+     */
     protected abstract ConcurrentContentSigner getSigner(
-             @NonNull SignatureAlgoControl signatureAlgoControl) throws Exception;
+             SignatureAlgoControl signatureAlgoControl) throws Exception;
 
     @Override
     protected Object execute0() throws Exception {

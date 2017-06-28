@@ -65,7 +65,6 @@ import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
-import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.CollectionUtil;
@@ -112,8 +111,19 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     protected AbstractOcspRequestor() {
     }
 
-    protected abstract byte[] send(@NonNull byte[] request, @NonNull URL responderUrl,
-            @NonNull RequestOptions requestOptions) throws IOException;
+    /**
+     *
+     * @param request
+     *          Request. Must not be {@code null}.
+     * @param responderUrl
+     *          Responder URL. Must not be {@code null}.
+     * @param requestOptions
+     *           Request options. Must not be {@code null}.
+     * @return
+     * @throws IOException
+     */
+    protected abstract byte[] send(byte[] request, URL responderUrl,
+            RequestOptions requestOptions) throws IOException;
 
     @Override
     public OCSPResp ask(final X509Certificate issuerCert, final X509Certificate cert,

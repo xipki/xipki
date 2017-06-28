@@ -39,7 +39,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.X509Cert;
 
@@ -86,7 +85,12 @@ public class P11SlotRefreshResult {
         this.certificates.put(objectId, certificate);
     }
 
-    public X509Cert getCertForId(@NonNull final byte[] id) {
+    /**
+     *
+     * @param id
+     *          Identifier. Must not be {@code null}.
+     */
+    public X509Cert getCertForId(final byte[] id) {
         for (P11ObjectIdentifier objId : certificates.keySet()) {
             if (objId.matchesId(id)) {
                 return certificates.get(objId);

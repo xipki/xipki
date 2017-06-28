@@ -39,8 +39,6 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.common.RequestResponseDebug;
 
 /**
@@ -50,24 +48,76 @@ import org.xipki.common.RequestResponseDebug;
 
 public interface OcspRequestor {
 
-    OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull X509Certificate cert,
-            @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
-            @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param issuerCert
+     *          Issuer certificate. Must not be {@code null}.
+     * @param cert
+     *          Target certificate. Must not be {@code null}.
+     * @param responderUrl
+     *          Responder URL. Must not be {@code null}.
+     * @param requestOptions
+     *          Request options. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    OCSPResp ask(X509Certificate issuerCert, X509Certificate cert,
+            URL responderUrl, RequestOptions requestOptions,
+            RequestResponseDebug debug)
             throws OcspResponseException, OcspRequestorException;
 
-    OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull X509Certificate[] certs,
-            @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
-            @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param issuerCert
+     *          Issuer certificate. Must not be {@code null}.
+     * @param certs
+     *          Target certificates. Must not be {@code null}.
+     * @param responderUrl
+     *          Responder URL. Must not be {@code null}.
+     * @param requestOptions
+     *          Request options. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs,
+            URL responderUrl, RequestOptions requestOptions,
+            RequestResponseDebug debug)
             throws OcspResponseException, OcspRequestorException;
 
-    OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull BigInteger serialNumber,
-            @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
-            @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param issuerCert
+     *          Issuer certificate. Must not be {@code null}.
+     * @param serialNumber
+     *          Serial number of the target certificate. Must not be {@code null}.
+     * @param responderUrl
+     *          Responder URL. Must not be {@code null}.
+     * @param requestOptions
+     *          Request options. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber,
+            URL responderUrl, RequestOptions requestOptions,
+            RequestResponseDebug debug)
             throws OcspResponseException, OcspRequestorException;
 
-    OCSPResp ask(@NonNull X509Certificate issuerCert, @NonNull BigInteger[] serialNumbers,
-            @NonNull URL responderUrl, @NonNull RequestOptions requestOptions,
-            @Nullable RequestResponseDebug debug)
+    /**
+     *
+     * @param issuerCert
+     *          Issuer certificate. Must not be {@code null}.
+     * @param serialNumbers
+     *          Serial numbers of the target certificates. Must not be {@code null}.
+     * @param responderUrl
+     *          Responder URL. Must not be {@code null}.
+     * @param requestOptions
+     *          Request options. Must not be {@code null}.
+     * @param debug
+     *          Request/response debug control. Could be {@code null}.
+     */
+    OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers,
+            URL responderUrl, RequestOptions requestOptions,
+            RequestResponseDebug debug)
             throws OcspResponseException, OcspRequestorException;
 
 }

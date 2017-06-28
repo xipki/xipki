@@ -41,8 +41,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.P11UnknownEntityException;
 import org.xipki.security.exception.P11UnsupportedMechanismException;
@@ -82,61 +80,158 @@ public interface P11Slot {
 
     P11ObjectIdentifier getObjectIdForLabel(String label);
 
-    void updateCertificate(@NonNull P11ObjectIdentifier objectId, @NonNull X509Certificate newCert)
+    /**
+     *
+     * @param objectId
+     *          Object identifier. Must not be {@code null}.
+     * @param cert
+     *          Certificate to be added. Must not be {@code null}.
+     */
+    void updateCertificate(P11ObjectIdentifier objectId, X509Certificate newCert)
             throws P11TokenException, CertificateException;
 
     /**
      *
-     * @param id id of the objects to be deleted. At least one of id and label must not be null.
-     * @param label label of the objects to be deleted
+     * @param id
+     *         Id of the objects to be deleted. At least one of id and label must not be
+     *         {@code null}.
+     * @param label
+     *         Label of the objects to be deleted
      * @return how many objects have been deleted
-     * @throws P11TokenException if PKCS#11 error happens.
+     * @throws P11TokenException
+     *           If PKCS#11 error happens.
      */
-    int removeObjects(@Nullable byte[] id, @Nullable String label) throws P11TokenException;
+    int removeObjects(byte[] id, String label) throws P11TokenException;
 
-    void removeIdentity(@NonNull P11ObjectIdentifier objectId) throws P11TokenException;
+    /**
+     *
+     * @param objectId
+     *          Object identifier. Must not be {@code null}.
+     */
+    void removeIdentity(P11ObjectIdentifier objectId) throws P11TokenException;
 
-    void removeCerts(@NonNull P11ObjectIdentifier objectId) throws P11TokenException;
+    /**
+     *
+     * @param objectId
+     *          Object identifier. Must not be {@code null}.
+     */
+    void removeCerts(P11ObjectIdentifier objectId) throws P11TokenException;
 
-    P11ObjectIdentifier addCert(@NonNull X509Certificate cert)
+    /**
+     *
+     * @param cert
+     *          Certificate to be added. Must not be {@code null}.
+     */
+    P11ObjectIdentifier addCert(X509Certificate cert)
             throws P11TokenException, CertificateException;
 
-    void addCert(@NonNull P11ObjectIdentifier objectId, @NonNull X509Certificate cert)
+    /**
+     *
+     * @param objectId
+     *          Object identifier. Must not be {@code null}.
+     * @param cert
+     *          Certificate to be added. Must not be {@code null}.
+     */
+    void addCert(P11ObjectIdentifier objectId, X509Certificate cert)
             throws P11TokenException, CertificateException;
 
+    /**
+     *
+     * @param publicExponent
+     *          RSA public exponent. Could be {@code null}.
+     * @param label
+     *          Label of the generated keys. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     */
     // CHECKSTYLE:SKIP
-    P11ObjectIdentifier generateRSAKeypair(int keysize, @NonNull BigInteger publicExponent,
-            @NonNull String label, @NonNull P11NewKeyControl control)
+    P11ObjectIdentifier generateRSAKeypair(int keysize, BigInteger publicExponent,
+            String label, P11NewKeyControl control)
             throws P11TokenException;
 
+    /**
+     *
+     * @param label
+     *          Label of the generated keys. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     */
     // CHECKSTYLE:SKIP
-    P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, @NonNull String label,
-            @NonNull P11NewKeyControl control)
+    P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, String label,
+            P11NewKeyControl control)
             throws P11TokenException;
 
+    /**
+     *
+     * @param p
+     *          p of DSA. Must not be {@code null}.
+     * @param q
+     *          q of DSA. Must not be {@code null}.
+     * @param g
+     *          g of DSA. Must not be {@code null}.
+     * @param label
+     *          Label of the generated keys. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     */
     // CHECKSTYLE:OFF
     P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
-            @NonNull String label, @NonNull P11NewKeyControl control)
+            String label, P11NewKeyControl control)
             throws P11TokenException;
     // CHECKSTYLE:ON
 
+    /**
+     *
+     * @param curveId
+     *         Object identifier of the EC curve. Must not be {@code null}.
+     * @param label
+     *          Label of the generated keys. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     */
     // CHECKSTYLE:SKIP
-    P11ObjectIdentifier generateECKeypair(@NonNull String curveNameOrOid, @NonNull String label,
-            @NonNull P11NewKeyControl control)
+    P11ObjectIdentifier generateECKeypair(String curveNameOrOid, String label,
+            P11NewKeyControl control)
             throws P11TokenException;
 
-    P11ObjectIdentifier generateSecretKey(long keyType, int keysize, @NonNull String label,
-            @NonNull P11NewKeyControl control)
+    /**
+     *
+     * @param label
+     *          Label of the generated key. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     */
+    P11ObjectIdentifier generateSecretKey(long keyType, int keysize, String label,
+            P11NewKeyControl control)
             throws P11TokenException;
 
-    P11ObjectIdentifier createSecretKey(long keyType, byte[] keyValue, @NonNull String label,
-            @NonNull P11NewKeyControl control)
+    /**
+     *
+     * @param keyValue
+     *          Key value. Must not be {@code null}.
+     * @param label
+     *          Label of the generated key. Must not be {@code null}.
+     * @param control
+     *          Control of the key generation process. Must not be {@code null}.
+     */
+    P11ObjectIdentifier createSecretKey(long keyType, byte[] keyValue, String label,
+            P11NewKeyControl control)
             throws P11TokenException;
 
-    X509Certificate exportCert(@NonNull P11ObjectIdentifier objectId)
+    /**
+     *
+     * @param objectId
+     *          Object identifier. Must not be {@code null}.
+     */
+    X509Certificate exportCert(P11ObjectIdentifier objectId)
             throws P11TokenException, CertificateException;
 
-    void showDetails(@NonNull OutputStream stream, boolean verbose)
+    /**
+     *
+     * @param stream
+     *          Output stream. Must not be {@code null}.
+     */
+    void showDetails(OutputStream stream, boolean verbose)
             throws P11TokenException, IOException;
 
 }
