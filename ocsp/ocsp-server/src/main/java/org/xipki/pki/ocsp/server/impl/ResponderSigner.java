@@ -127,7 +127,7 @@ class ResponderSigner {
 
         algoSignerMap = new HashMap<>();
         for (ConcurrentContentSigner signer : signers) {
-            String algoName = getSignatureAlgorithmName(signer.getAlgorithmIdentifier());
+            String algoName = signer.getAlgorithmName();
             algoSignerMap.put(algoName, signer);
         }
     } // constructor

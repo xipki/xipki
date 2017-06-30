@@ -41,7 +41,6 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
@@ -70,7 +69,7 @@ public interface ConcurrentContentSigner {
 
     String getName();
 
-    AlgorithmIdentifier getAlgorithmIdentifier();
+    String getAlgorithmName();
 
     /**
      * Returns the algorithm code in XiPKI context.

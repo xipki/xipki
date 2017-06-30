@@ -47,9 +47,10 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.xipki.common.util.ParamUtil;
@@ -114,14 +115,27 @@ public class SoftTokenMacContentSignerBuilder {
 
     public ConcurrentContentSigner createSigner(final AlgorithmIdentifier signatureAlgId,
             final int parallelism, final SecureRandom random)
-            throws XiSecurityException, NoSuchPaddingException {
+            throws XiSecurityException {
         ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
         List<ContentSigner> signers = new ArrayList<>(parallelism);
 
+        boolean gmac = false;
+        ASN1ObjectIdentifier oid = signatureAlgId.getAlgorithm();
+        if (oid.equals(NISTObjectIdentifiers.id_aes128_GCM) ||
+                oid.equals(NISTObjectIdentifiers.id_aes192_GCM) ||
+                oid.equals(NISTObjectIdentifiers.id_aes256_GCM)) {
+            gmac = true;
+        }
+
         for (int i = 0; i < parallelism; i++) {
-            ContentSigner signer = new HmacContentSigner(signatureAlgId, key);
+            ContentSigner signer;
+            if (gmac) {
+                signer = new AESGmacContentSigner(oid, key);
+            } else {
+                signer = new HmacContentSigner(signatureAlgId, key);
+            }
             signers.add(signer);
         }
 

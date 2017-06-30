@@ -341,13 +341,7 @@ public class SecurityFactoryImpl extends AbstractSecurityFactory {
             return;
         }
 
-        String signatureAlgoName;
-        try {
-            signatureAlgoName = AlgorithmUtil.getSignatureAlgoName(
-                    signer.getAlgorithmIdentifier());
-        } catch (NoSuchAlgorithmException ex) {
-            throw new ObjectCreationException(ex.getMessage(), ex);
-        }
+        String signatureAlgoName = signer.getAlgorithmName();
 
         try {
             byte[] dummyContent = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};

@@ -100,7 +100,12 @@ public enum AlgorithmCode {
     HMAC_SHA3_224((byte) 0x56),
     HMAC_SHA3_256((byte) 0x57),
     HMAC_SHA3_384((byte) 0x58),
-    HMAC_SHA3_512((byte) 0x9),
+    HMAC_SHA3_512((byte) 0x59),
+
+    // AES-GMAC
+    AES128_GMAC((byte) 0x61),
+    AES192_GMAC((byte) 0x62),
+    AES256_GMAC((byte) 0x63),
 
     // Hash Algorithm
     SHA1((byte) 0xE1),

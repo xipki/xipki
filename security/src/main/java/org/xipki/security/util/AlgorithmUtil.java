@@ -118,6 +118,11 @@ public class AlgorithmUtil {
         map.put(NISTObjectIdentifiers.id_hmacWithSHA3_384.getId(), AlgorithmCode.HMAC_SHA384);
         map.put(NISTObjectIdentifiers.id_hmacWithSHA3_512.getId(), AlgorithmCode.HMAC_SHA512);
 
+        // GMAC
+        map.put(NISTObjectIdentifiers.id_aes128_GCM.getId(), AlgorithmCode.AES128_GMAC);
+        map.put(NISTObjectIdentifiers.id_aes192_GCM.getId(), AlgorithmCode.AES192_GMAC);
+        map.put(NISTObjectIdentifiers.id_aes256_GCM.getId(), AlgorithmCode.AES256_GMAC);
+
         // ECDSA
         map.put(X9ObjectIdentifiers.ecdsa_with_SHA1.getId(), AlgorithmCode.SHA1WITHECDSA);
         map.put(X9ObjectIdentifiers.ecdsa_with_SHA224.getId(), AlgorithmCode.SHA224WITHECDSA);
@@ -213,7 +218,7 @@ public class AlgorithmUtil {
         return hashAlgoType.length();
     } // method getHashOutputSizeInOctets
 
-    public static AlgorithmCode getSigOrMacAlgorithmCode(final AlgorithmIdentifier algId)
+    public static AlgorithmCode getSigOrMacAlgoCode(final AlgorithmIdentifier algId)
             throws NoSuchAlgorithmException {
         ASN1ObjectIdentifier oid = algId.getAlgorithm();
         AlgorithmCode code = algNameCodeMap.get(oid.getId());
@@ -251,6 +256,39 @@ public class AlgorithmUtil {
                     + oid.getId());
         }
     } // method getSignatureAlgoName
+
+    public static String getSigOrMacAlgoName(final AlgorithmIdentifier sigAlgId)
+            throws NoSuchAlgorithmException {
+        ParamUtil.requireNonNull("sigAlgId", sigAlgId);
+        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
+        if (NISTObjectIdentifiers.id_aes128_GCM.equals(algOid)) {
+            return "AES128GMAC";
+        } else if (NISTObjectIdentifiers.id_aes192_GCM.equals(algOid)) {
+            return "AES192GMAC";
+        } else if (NISTObjectIdentifiers.id_aes256_GCM.equals(algOid)) {
+            return "AES256GMAC";
+        } else if (PKCSObjectIdentifiers.id_hmacWithSHA1.equals(algOid)) {
+            return "HMACSHA1";
+        } else if (PKCSObjectIdentifiers.id_hmacWithSHA224.equals(algOid)) {
+            return "HMACSHA224";
+        } else if (PKCSObjectIdentifiers.id_hmacWithSHA256.equals(algOid)) {
+            return "HMACSHA256";
+        } else if (PKCSObjectIdentifiers.id_hmacWithSHA384.equals(algOid)) {
+            return "HMACSHA384";
+        } else if (PKCSObjectIdentifiers.id_hmacWithSHA512.equals(algOid)) {
+            return "HMACSHA512";
+        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_224.equals(algOid)) {
+            return "HMACSHA3-224";
+        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_256.equals(algOid)) {
+            return "HMACSHA3-256";
+        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_384.equals(algOid)) {
+            return "HMACSHA3-384";
+        } else if (NISTObjectIdentifiers.id_hmacWithSHA3_512.equals(algOid)) {
+            return "HMACSHA3-512";
+        } else {
+            return getSignatureAlgoName(sigAlgId);
+        }
+    }
 
     public static String getSignatureAlgoName(final AlgorithmIdentifier sigAlgId)
             throws NoSuchAlgorithmException {
@@ -371,24 +409,30 @@ public class AlgorithmUtil {
         }
 
         ASN1ObjectIdentifier oid;
-        if ("HMACSHA1".equalsIgnoreCase(algoS)) {
+        if ("HMACSHA1".equals(algoS)) {
             oid = PKCSObjectIdentifiers.id_hmacWithSHA1;
-        } else if ("HMACSHA224".equalsIgnoreCase(algoS)) {
+        } else if ("HMACSHA224".equals(algoS)) {
             oid = PKCSObjectIdentifiers.id_hmacWithSHA224;
-        } else if ("HMACSHA256".equalsIgnoreCase(algoS)) {
+        } else if ("HMACSHA256".equals(algoS)) {
             oid = PKCSObjectIdentifiers.id_hmacWithSHA256;
-        } else if ("HMACSHA384".equalsIgnoreCase(algoS)) {
+        } else if ("HMACSHA384".equals(algoS)) {
             oid = PKCSObjectIdentifiers.id_hmacWithSHA384;
-        } else if ("HMACSHA512".equalsIgnoreCase(algoS)) {
+        } else if ("HMACSHA512".equals(algoS)) {
             oid = PKCSObjectIdentifiers.id_hmacWithSHA512;
-        } else if ("HMACSHA3-224".equalsIgnoreCase(algoS)) {
+        } else if ("HMACSHA3-224".equals(algoS)) {
             oid = NISTObjectIdentifiers.id_hmacWithSHA3_224;
-        } else if ("HMACSHA3-256".equalsIgnoreCase(algoS)) {
+        } else if ("HMACSHA3-256".equals(algoS)) {
             oid = NISTObjectIdentifiers.id_hmacWithSHA3_256;
-        } else if ("HMACSHA3-384".equalsIgnoreCase(algoS)) {
+        } else if ("HMACSHA3-384".equals(algoS)) {
             oid = NISTObjectIdentifiers.id_hmacWithSHA3_384;
-        } else if ("HMACSHA3-512".equalsIgnoreCase(algoS)) {
+        } else if ("HMACSHA3-512".equals(algoS)) {
             oid = NISTObjectIdentifiers.id_hmacWithSHA3_512;
+        } else if ("AES128GMAC".equals(algoS)) {
+            oid = NISTObjectIdentifiers.id_aes128_GCM;
+        } else if ("AES192GMAC".equals(algoS)) {
+            oid = NISTObjectIdentifiers.id_aes192_GCM;
+        } else if ("AES256GMAC".equals(algoS)) {
+            oid = NISTObjectIdentifiers.id_aes256_GCM;
         } else {
             throw new NoSuchAlgorithmException("unsupported signature algorithm " + algoS);
         }
