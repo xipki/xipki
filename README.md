@@ -108,35 +108,44 @@ Install
 
 * Add JDBC drivers (optional)
 
-  This step is only required if you want to use database other than H2, HSQLDB, MySQL, MariaDB and PostgreSQL.
+  This step is only required if you want to use database other than HSQLDB.
 
-  Assume that the JDBC bundle can be identified by the URL `mvn:<jdbc-group-id>/<jdbc-artifact-id>/<jdbc-version>`.
 
-  * Download JDBC drivers
-
-    Due to the license restrictions I cannot provide the JDBC drivers of MySQL, Oracle and DB2.
+  * Get the JDBC drivers
 
     * Oracle
-      Driver: `ojdbc7.jar`
-      Download URL: http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html
+      * Driver: `ojdbc7.jar`
+      * Download URL: http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html
 
     * DB2
-      Driver: `db2jcc4.jar`
+      * Driver: `db2jcc4.jar`
 
-    * MySQL/MariaDB
+    * MySQL
+      * Driver: mysql-connector-java.jar
+      * Download URL: https://dev.mysql.com/downloads/connector/j
+      * In debian, use the `mysql-connector-java.jar` from the package `libmysql-java` (e.g.
+      under /usr/share/java/mysql-connector-java.jar)
 
-      You can access MySQL and MariaDB via both MariaDB and MySQL connector. The MariaDB connector library is delivered, and the MySQL connector library can be retrieved as follows: 1) For debian, use the `mysql-connector-java.jar` from the package `libmysql-java` (e.g. under /usr/share/java/mysql-connector-java.jar); 2) for non-debian, use the driver `mysql-connector-java.jar` which can be download from https://dev.mysql.com/downloads/connector/j
+    * MariaDB
+      * Driver: mariadb-java-client-`<version>`.jar
+      * Download URL: https://downloads.mariadb.org/connector-java/
+    
+    * PostgreSQL
+      * Driver: postgresql-`<version>`.jar
+      * Download URL: https://jdbc.postgresql.org/download.html
+    
+    * H2
+      * Driver: h2-`<version>`.jar
+      * Download URL: http://www.h2database.com/html/download.html
 
-  * Create folders `system/<jdbc-group-id-part1>/.../<jdbc-group-id-partn>/<jdbc-artifact-id>/<jdbc-version>`
+  * Copy the jar file to the folder `lib/jdbc`.
 
-  * Copy the bundle to `system/<jdbc-group-id-part1>/.../<jdbc-group-id-partn>/<jdbc-artifact-id>/<jdbc-version>` and rename it to `<jdbc-artifact-id>-<jdbc-version>.jar`
-
-  * Append the bundle URL to the feature `xipki-jdbc` in the file `system/org/xipki/features/pki/<version>/pki-<version>-features.xml`.
+  * Append the bundle URL to the feature `xipki-jdbc` in the file `system/org/xipki/features/jdbc/<version>/jdbc-<version>-features.xml`.
 
     ```sh
     <feature name="xipki-jdbc" description="JDBC drivers">
       ...
-      <bundle start-level="75">mvn:..</bundle>
+      <bundle start-level="75">file:lib/jdbc/....jar</bundle>
     </feature>
     ```
     Note that if the bundle is not an OSGi-bundle, the URL must be prepended by the prefix "wrap:". In general, a bundle contains the header Export-Package in the manifest file META-INF/MANIFEST.MF.
@@ -144,7 +153,7 @@ Install
     ```sh
     <feature name="xipki-jdbc" description="JDBC drivers">
       ...
-      <bundle start-level="75">wrap:mvn:..</bundle>
+      <bundle start-level="75">wrap:file:..</bundle>
     </feature>
     ```
 

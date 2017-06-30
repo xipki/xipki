@@ -2,8 +2,7 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pkcs11proxy-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
-
-  <feature name="netty" version="${netty.version}" description="Netty">
+  <feature name="netty" version="${netty.version}" description="netty">
     <bundle start-level="65">mvn:io.netty/netty-tcnative/${netty-tcnative.version}/jar/linux-x86_64</bundle>
     <bundle start-level="65">mvn:io.netty/netty-codec/${netty.version}</bundle>
     <bundle start-level="65">mvn:io.netty/netty-codec-http/${netty.version}</bundle>

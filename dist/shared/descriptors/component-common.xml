@@ -37,7 +37,7 @@
     </fileSet>
     <!-- Copy over start scripts -->
     <fileSet>
-      <directory>${project.build.directory}/apache-karaf/apache-karaf-minimal-${karaf.version}/bin</directory>
+      <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
       <excludes>
         <exclude>*.bat</exclude>
       </excludes>
@@ -47,7 +47,7 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/apache-karaf/apache-karaf-minimal-${karaf.version}/bin</directory>
+      <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
       <includes>
         <include>*.bat</include>
       </includes>
@@ -58,7 +58,7 @@
     </fileSet>
     <!-- Expanded Karaf -->
     <fileSet>
-      <directory>${project.build.directory}/apache-karaf/apache-karaf-minimal-${karaf.version}</directory>
+      <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}</directory>
       <outputDirectory>.</outputDirectory>
       <excludes>
         <exclude>bin/**</exclude>
@@ -69,6 +69,8 @@
         <exclude>NOTICE</exclude>
         <exclude>RELEASE-NOTES</exclude>
         <exclude>karaf-manual*</exclude>
+        <!-- We use only the OSGi core apache felix instead of eclipse.osgi. -->
+        <exclude>**/org.eclipse.osgi/**</exclude>
       </excludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -88,7 +90,7 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/apache-karaf/apache-karaf-minimal-${karaf.version}/LICENSE</source>
+      <source>${project.build.directory}/apache-karaf-minimal-${karaf.version}/LICENSE</source>
       <outputDirectory>license</outputDirectory>
       <destName>karaf-LICENSE.txt</destName>
       <fileMode>0644</fileMode>

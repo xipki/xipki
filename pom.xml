@@ -46,11 +46,6 @@
     <snakeyaml.version>1.17</snakeyaml.version>
     <hikaricp.version>2.6.2</hikaricp.version>
     <syslog-java-client.version>1.0.8</syslog-java-client.version>
-    <!-- JDBC -->
-    <jdbc.postgresql.version>9.4.1212</jdbc.postgresql.version>
-    <jdbc.h2.version>1.4.195</jdbc.h2.version>
-    <jdbc.hsqldb.version>2.3.4</jdbc.hsqldb.version>
-    <jdbc.mariadb.version>2.0.1</jdbc.mariadb.version>
   </properties>
   <repositories>
     <repository>

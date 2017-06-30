@@ -13,10 +13,9 @@
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
     <app.name>PKI</app.name>
-    <features.artifactId>pki</features.artifactId>
-    <boot.features>xipki-httpserver, xipki-jdbc, xipki-audit</boot.features>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
+    <jdbc.hsqldb.version>2.3.4</jdbc.hsqldb.version>
   </properties>
   <dependencies>
     <dependency>
@@ -79,6 +78,25 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
+            <!-- Copy the JDBC jars -->
+            <id>jdbc</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <stripVersion>true</stripVersion>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.hsqldb</groupId>
+                  <artifactId>hsqldb</artifactId>
+                  <version>${jdbc.hsqldb.version}</version>
+                  <outputDirectory>${output.directory}/lib/jdbc</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
             <!-- Uncompress the standard Karaf distribution -->
             <id>unpack</id>
             <phase>generate-resources</phase>
@@ -92,7 +110,7 @@
                   <artifactId>apache-karaf-minimal</artifactId>
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
-                  <outputDirectory>${project.build.directory}/apache-karaf</outputDirectory>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -204,6 +222,7 @@
               <repository>${output.directory}/system</repository>
               <descriptors>
                 <descriptor>mvn:org.xipki.features/pki/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.features/jdbc/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>

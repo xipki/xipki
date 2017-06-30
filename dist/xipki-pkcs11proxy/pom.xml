@@ -13,8 +13,6 @@
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
     <app.name>PKCS#11 proxy</app.name>
-    <features.artifactId>pkcs11proxy</features.artifactId>
-    <boot.features>xipki-httpserver, xipki-pkcs11-proxy</boot.features>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
   </properties>
@@ -92,7 +90,7 @@
                   <artifactId>apache-karaf-minimal</artifactId>
                   <version>${karaf.version}</version>
                   <type>tar.gz</type>
-                  <outputDirectory>${project.build.directory}/apache-karaf</outputDirectory>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
