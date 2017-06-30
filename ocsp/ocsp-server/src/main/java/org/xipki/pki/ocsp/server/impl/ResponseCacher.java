@@ -598,6 +598,10 @@ class ResponseCacher {
         try {
             digest = idDigesters.poll(2, TimeUnit.SECONDS);
         } catch (InterruptedException ex) {
+            // do nothing
+        }
+
+        if (digest == null) {
             digest = HashAlgoType.SHA1.createDigest();
         }
 
