@@ -75,6 +75,7 @@ public class P11MacContentSignerBuilder {
             final int parallelism) throws XiSecurityException, P11TokenException {
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
+        // FIXME: consider the AES GMAC
         List<ContentSigner> signers = new ArrayList<>(parallelism);
         for (int i = 0; i < parallelism; i++) {
             ContentSigner signer = new P11MacContentSigner(

@@ -91,7 +91,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     private final String name;
 
-    private final AlgorithmIdentifier algorithmIdentifier;
+    private final String algorithmName;
 
     private final BlockingDeque<ContentSigner> idleSigners = new LinkedBlockingDeque<>();
 
@@ -138,8 +138,9 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         ParamUtil.requireNonEmpty("signers", signers);
 
         this.mac = mac;
-        this.algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();
-        this.algorithmCode = AlgorithmUtil.getSigOrMacAlgorithmCode(algorithmIdentifier);
+        AlgorithmIdentifier algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();
+        this.algorithmName = AlgorithmUtil.getSigOrMacAlgoName(algorithmIdentifier);
+        this.algorithmCode = AlgorithmUtil.getSigOrMacAlgoCode(algorithmIdentifier);
 
         for (ContentSigner signer : signers) {
             idleSigners.addLast(signer);
@@ -305,8 +306,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return algorithmIdentifier;
+    public String getAlgorithmName() {
+        return algorithmName;
     }
 
     @Override
