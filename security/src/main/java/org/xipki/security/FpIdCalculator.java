@@ -36,13 +36,13 @@ package org.xipki.security;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
+import org.xipki.common.concurrent.ConcurrentBagEntry;
+import org.xipki.common.concurrent.ConcurrentBag;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -54,16 +54,16 @@ public class FpIdCalculator {
 
     private static final int PARALLELISM = 50;
 
-    private static final BlockingDeque<Digest> MDS = getMD5MessageDigests();
+    private static final ConcurrentBag<ConcurrentBagEntry<Digest>> MDS = getMD5MessageDigests();
 
     private FpIdCalculator() {
     }
 
-    private static BlockingDeque<Digest> getMD5MessageDigests() {
-        BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
+    private static ConcurrentBag<ConcurrentBagEntry<Digest>> getMD5MessageDigests() {
+        ConcurrentBag<ConcurrentBagEntry<Digest>> mds = new ConcurrentBag<>();
         for (int i = 0; i < PARALLELISM; i++) {
             Digest md = new SHA1Digest();
-            mds.addLast(md);
+            mds.add(new ConcurrentBagEntry<>(md));
         }
         return mds;
     }
@@ -90,20 +90,21 @@ public class FpIdCalculator {
     public static long hash(final byte[] data) {
         ParamUtil.requireNonNull("data", data);
 
-        Digest md = null;
+        ConcurrentBagEntry<Digest> md0 = null;
         for (int i = 0; i < 3; i++) {
             try {
-                md = MDS.poll(10, TimeUnit.SECONDS);
+                md0 = MDS.borrow(10, TimeUnit.SECONDS);
                 break;
             } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
             }
         }
 
-        if (md == null) {
+        if (md0 == null) {
             throw new RuntimeOperatorException("could not get idle MessageDigest");
         }
 
         try {
+            Digest md = md0.value();
             md.reset();
             md.update(data, 0, data.length);
             byte[] bytes = new byte[md.getDigestSize()];
@@ -111,7 +112,7 @@ public class FpIdCalculator {
 
             return bytesToLong(bytes);
         } finally {
-            MDS.addLast(md);
+            MDS.requite(md0);
         }
     }
 
