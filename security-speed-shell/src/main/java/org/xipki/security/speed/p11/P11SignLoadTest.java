@@ -34,6 +34,7 @@
 
 package org.xipki.security.speed.p11;
 
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 import org.slf4j.Logger;
@@ -59,7 +60,11 @@ public abstract class P11SignLoadTest extends LoadExecutor {
 
     class Testor implements Runnable {
 
-        final byte[] data = new byte[] {1, 2, 3, 4};
+        final byte[] data = new byte[1024];
+
+        public Testor() {
+            new SecureRandom().nextBytes(data);
+        }
 
         @Override
         public void run() {

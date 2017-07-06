@@ -48,8 +48,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -60,6 +59,8 @@ import javax.crypto.SecretKey;
 import org.bouncycastle.crypto.macs.HMac;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.concurrent.ConcurrentBagEntry;
+import org.xipki.common.concurrent.ConcurrentBag;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.XiSecurityConstants;
@@ -86,9 +87,10 @@ public class EmulatorP11Identity extends P11Identity {
 
     private final Key signingKey;
 
-    private final BlockingDeque<Cipher> rsaCiphers = new LinkedBlockingDeque<>();
+    private final ConcurrentBag<ConcurrentBagEntry<Cipher>> rsaCiphers = new ConcurrentBag<>();
 
-    private final BlockingDeque<Signature> dsaSignatures = new LinkedBlockingDeque<>();
+    private final ConcurrentBag<ConcurrentBagEntry<Signature>> dsaSignatures =
+            new ConcurrentBag<>();
 
     private final SecureRandom random;
 
@@ -134,7 +136,7 @@ public class EmulatorP11Identity extends P11Identity {
                     }
                 }
                 rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
-                rsaCiphers.add(rsaCipher);
+                rsaCiphers.add(new ConcurrentBagEntry<>(rsaCipher));
             }
         } else {
             String algorithm;
@@ -152,7 +154,7 @@ public class EmulatorP11Identity extends P11Identity {
             for (int i = 0; i < maxSessions; i++) {
                 Signature dsaSignature = Signature.getInstance(algorithm, "BC");
                 dsaSignature.initSign(privateKey, random);
-                dsaSignatures.add(dsaSignature);
+                dsaSignatures.add(new ConcurrentBagEntry<>(dsaSignature));
             }
         }
     } // constructor
@@ -343,21 +345,25 @@ public class EmulatorP11Identity extends P11Identity {
     }
 
     private byte[] rsaX509Sign(final byte[] dataToSign) throws P11TokenException {
-        Cipher cipher;
+        ConcurrentBagEntry<Cipher> cipher;
         try {
-            cipher = rsaCiphers.takeFirst();
+            cipher = rsaCiphers.borrow(5000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ex) {
             throw new P11TokenException("could not take any idle signer");
         }
 
+        if (cipher == null) {
+            throw new P11TokenException("no idle RSA cipher available");
+        }
+
         try {
-            return cipher.doFinal(dataToSign);
+            return cipher.value().doFinal(dataToSign);
         } catch (BadPaddingException ex) {
             throw new P11TokenException("BadPaddingException: " + ex.getMessage(), ex);
         } catch (IllegalBlockSizeException ex) {
             throw new P11TokenException("IllegalBlockSizeException: " + ex.getMessage(), ex);
         } finally {
-            rsaCiphers.add(cipher);
+            rsaCiphers.requite(cipher);
         }
     }
 
@@ -365,15 +371,20 @@ public class EmulatorP11Identity extends P11Identity {
             throws P11TokenException {
         byte[] hash = (hashAlgo == null) ? dataToSign : hashAlgo.hash(dataToSign);
 
-        Signature sig;
+        ConcurrentBagEntry<Signature> sig0;
         try {
-            sig = dsaSignatures.takeFirst();
+            sig0 = dsaSignatures.borrow(5000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ex) {
             throw new P11TokenException(
                     "InterruptedException occurs while retrieving idle signature");
         }
 
+        if (sig0 == null) {
+            throw new P11TokenException("no idle DSA Signature available");
+        }
+
         try {
+            Signature sig = sig0.value();
             sig.update(hash);
             byte[] x962Signature = sig.sign();
             return SignerUtil.convertX962DSASigToPlain(x962Signature, signatureKeyBitLength());
@@ -382,7 +393,7 @@ public class EmulatorP11Identity extends P11Identity {
         } catch (XiSecurityException ex) {
             throw new P11TokenException("XiSecurityException: " + ex.getMessage(), ex);
         } finally {
-            dsaSignatures.add(sig);
+            dsaSignatures.requite(sig0);
         }
     }
 
