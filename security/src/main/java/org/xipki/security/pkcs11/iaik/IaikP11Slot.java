@@ -46,8 +46,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -58,6 +56,8 @@ import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.concurrent.ConcurrentBag;
+import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -131,9 +131,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private final AtomicLong countSessions = new AtomicLong(0);
 
-    private final BlockingDeque<Session> idleSessions = new LinkedBlockingDeque<>();
-
-    private final BlockingDeque<Session> busySessions = new LinkedBlockingDeque<>();
+    private final ConcurrentBag<ConcurrentBagEntry<Session>> sessions = new ConcurrentBag<>();
 
     private boolean writableSessionInUse;
 
@@ -189,7 +187,7 @@ class IaikP11Slot extends AbstractP11Slot {
         this.maxSessionCount = (int) maxSessionCount2;
         LOG.info("maxSessionCount: {}", this.maxSessionCount);
 
-        idleSessions.addLast(session);
+        sessions.add(new ConcurrentBagEntry<Session>(session));
         refresh();
     } // constructor
 
@@ -272,8 +270,8 @@ class IaikP11Slot extends AbstractP11Slot {
                     writableSession.closeSession();
                 }
 
-                for (Session session : idleSessions) {
-                    session.closeSession();
+                for (ConcurrentBagEntry<Session> session : sessions.values()) {
+                    session.value().closeSession();
                 }
             } catch (Throwable th) {
                 LogUtil.error(LOG, th, "could not slot.getToken().closeAllSessions()");
@@ -283,7 +281,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
 
         // clear the session pool
-        idleSessions.clear();
+        sessions.close();
         countSessions.lazySet(0);
     }
 
@@ -337,8 +335,8 @@ class IaikP11Slot extends AbstractP11Slot {
             LOG.debug("digest (init, digestKey, then finish)\n{}", signingKey);
         }
 
-        Session session = borrowIdleSession();
-        if (session == null) {
+        ConcurrentBagEntry<Session> session0 = borrowSession();
+        if (session0 == null) {
             throw new P11TokenException("no idle session available");
         }
 
@@ -362,6 +360,7 @@ class IaikP11Slot extends AbstractP11Slot {
         }
 
         try {
+            Session session = session0.value();
             session.digestInit(Mechanism.get(mechanism));
             session.digestKey((SecretKey) signingKey);
             byte[] digest = new byte[digestLen];
@@ -370,7 +369,7 @@ class IaikP11Slot extends AbstractP11Slot {
         } catch (TokenException e) {
             throw new P11TokenException(e);
         } finally {
-            returnIdleSession(session);
+            sessions.requite(session0);
         }
     }
 
@@ -390,12 +389,13 @@ class IaikP11Slot extends AbstractP11Slot {
             LOG.debug("sign (init, update, then finish) with private key:\n{}", signingKey);
         }
 
-        Session session = borrowIdleSession();
-        if (session == null) {
+        ConcurrentBagEntry<Session> session0 = borrowSession();
+        if (session0 == null) {
             throw new P11TokenException("no idle session available");
         }
 
         try {
+            Session session = session0.value();
             session.signInit(mechanismObj, signingKey);
             for (int i = 0; i < len; i += maxMessageSize) {
                 int blockLen = Math.min(maxMessageSize, len - i);
@@ -425,7 +425,7 @@ class IaikP11Slot extends AbstractP11Slot {
         } catch (TokenException e) {
             throw new P11TokenException(e);
         } finally {
-            returnIdleSession(session);
+            sessions.requite(session0);
         }
     }
 
@@ -437,13 +437,14 @@ class IaikP11Slot extends AbstractP11Slot {
             LOG.debug("sign with signing key:\n{}", signingKey);
         }
 
-        Session session = borrowIdleSession();
-        if (session == null) {
+        ConcurrentBagEntry<Session> session0 = borrowSession();
+        if (session0 == null) {
             throw new P11TokenException("no idle session available");
         }
 
         byte[] signature;
         try {
+            Session session = session0.value();
             synchronized (session) {
                 session.signInit(mechanismObj, signingKey);
                 signature = session.sign(content);
@@ -451,7 +452,7 @@ class IaikP11Slot extends AbstractP11Slot {
         } catch (TokenException ex) {
             throw new P11TokenException(ex.getMessage(), ex);
         } finally {
-            returnIdleSession(session);
+            sessions.requite(session0);
         }
 
         if (LOG.isDebugEnabled()) {
@@ -491,19 +492,24 @@ class IaikP11Slot extends AbstractP11Slot {
         return session;
     }
 
-    private Session borrowIdleSession() throws P11TokenException {
-        Session session = null;
+    private ConcurrentBagEntry<Session> borrowSession() throws P11TokenException {
+        ConcurrentBagEntry<Session> session = null;
         if (countSessions.get() < maxSessionCount) {
-            session = idleSessions.poll();
+            try {
+                session = sessions.borrow(1, TimeUnit.NANOSECONDS);
+            } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
+            }
+
             if (session == null) {
                 // create new session
-                session = openSession(false);
+                session = new ConcurrentBagEntry<>(openSession(false));
+                sessions.add(session);
             }
         }
 
         if (session == null) {
             try {
-                session = idleSessions.poll(timeOutWaitNewSession, TimeUnit.MILLISECONDS);
+                session = sessions.borrow(timeOutWaitNewSession, TimeUnit.MILLISECONDS);
             } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
             }
         }
@@ -511,26 +517,8 @@ class IaikP11Slot extends AbstractP11Slot {
         if (session == null) {
             throw new P11TokenException("no idle session");
         }
-        busySessions.addLast(session);
-        login(session);
+        login(session.value());
         return session;
-    }
-
-    private void returnIdleSession(final Session session) {
-        if (session == null) {
-            return;
-        }
-
-        boolean isBusySession = busySessions.remove(session);
-        if (isBusySession) {
-            idleSessions.addLast(session);
-        } else {
-            final String msg =
-                    "session has not been borrowed before or has been returned more than once: "
-                    + session;
-            LOG.error(msg);
-            throw new IllegalStateException(msg);
-        }
     }
 
     private void firstLogin(final Session session, final List<char[]> password)
@@ -608,9 +596,10 @@ class IaikP11Slot extends AbstractP11Slot {
     }
 
     private List<PrivateKey> getAllPrivateObjects() throws P11TokenException {
-        Session session = borrowIdleSession();
+        ConcurrentBagEntry<Session> session0 = borrowSession();
 
         try {
+            Session session = session0.value();
             PrivateKey template = new PrivateKey();
             List<Storage> tmpObjects = getObjects(session, template);
             if (CollectionUtil.isEmpty(tmpObjects)) {
@@ -628,14 +617,15 @@ class IaikP11Slot extends AbstractP11Slot {
 
             return privateKeys;
         } finally {
-            returnIdleSession(session);
+            sessions.requite(session0);
         }
     }
 
     private List<SecretKey> getAllSecretKeyObjects() throws P11TokenException {
-        Session session = borrowIdleSession();
+        ConcurrentBagEntry<Session> session0 = borrowSession();
 
         try {
+            Session session = session0.value();
             SecretKey template = new SecretKey();
             List<Storage> tmpObjects = getObjects(session, template);
             if (CollectionUtil.isEmpty(tmpObjects)) {
@@ -653,7 +643,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
             return keys;
         } finally {
-            returnIdleSession(session);
+            sessions.requite(session0);
         }
     }
 
@@ -674,7 +664,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private Key getKeyObject(final Key template, final byte[] keyId, final char[] keyLabel)
             throws P11TokenException {
-        Session session = borrowIdleSession();
+        ConcurrentBagEntry<Session> session0 = borrowSession();
 
         try {
             if (keyId != null) {
@@ -684,6 +674,7 @@ class IaikP11Slot extends AbstractP11Slot {
                 template.getLabel().setCharArrayValue(keyLabel);
             }
 
+            Session session = session0.value();
             List<Storage> tmpObjects = getObjects(session, template, 2);
             if (CollectionUtil.isEmpty(tmpObjects)) {
                 return null;
@@ -696,7 +687,7 @@ class IaikP11Slot extends AbstractP11Slot {
 
             return (Key) tmpObjects.get(0);
         } finally {
-            returnIdleSession(session);
+            sessions.requite(session0);
         }
     }
 
@@ -851,12 +842,12 @@ class IaikP11Slot extends AbstractP11Slot {
 
     private List<X509PublicKeyCertificate> getAllCertificateObjects() throws P11TokenException {
         X509PublicKeyCertificate template = new X509PublicKeyCertificate();
-        Session session = borrowIdleSession();
+        ConcurrentBagEntry<Session> session = borrowSession();
         List<Storage> tmpObjects;
         try {
-            tmpObjects = getObjects(session, template);
+            tmpObjects = getObjects(session.value(), template);
         } finally {
-            returnIdleSession(session);
+            sessions.requite(session);
         }
 
         List<X509PublicKeyCertificate> certs = new ArrayList<>(tmpObjects.size());
@@ -1249,11 +1240,11 @@ class IaikP11Slot extends AbstractP11Slot {
         }
 
         List<Storage> tmpObjects;
-        Session session = borrowIdleSession();
+        ConcurrentBagEntry<Session> session = borrowSession();
         try {
-            tmpObjects = getObjects(session, template);
+            tmpObjects = getObjects(session.value(), template);
         } finally {
-            returnIdleSession(session);
+            sessions.requite(session);
         }
 
         if (CollectionUtil.isEmpty(tmpObjects)) {

@@ -35,14 +35,14 @@
 package org.xipki.security;
 
 import java.util.Base64;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.concurrent.ConcurrentBagEntry;
+import org.xipki.common.concurrent.ConcurrentBag;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -54,8 +54,8 @@ class HashCalculator {
 
     private static final int PARALLELISM = 50;
 
-    private static final ConcurrentHashMap<HashAlgoType, BlockingDeque<Digest>> MDS_MAP =
-            new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<HashAlgoType, ConcurrentBag<ConcurrentBagEntry<Digest>>>
+        MDS_MAP = new ConcurrentHashMap<>();
 
     static {
         MDS_MAP.put(HashAlgoType.SHA1, getMessageDigests(HashAlgoType.SHA1));
@@ -72,11 +72,12 @@ class HashCalculator {
     private HashCalculator() {
     }
 
-    private static BlockingDeque<Digest> getMessageDigests(final HashAlgoType hashAlgo) {
-        BlockingDeque<Digest> mds = new LinkedBlockingDeque<>();
+    private static ConcurrentBag<ConcurrentBagEntry<Digest>> getMessageDigests(
+            final HashAlgoType hashAlgo) {
+        ConcurrentBag<ConcurrentBagEntry<Digest>> mds = new ConcurrentBag<>();
         for (int i = 0; i < PARALLELISM; i++) {
             Digest md = hashAlgo.createDigest();
-            mds.addLast(md);
+            mds.add(new ConcurrentBagEntry<Digest>(md));
         }
         return mds;
     }
@@ -122,29 +123,30 @@ class HashCalculator {
             throw new IllegalArgumentException("unknown hash algo " + hashAlgoType);
         }
 
-        BlockingDeque<Digest> mds = MDS_MAP.get(hashAlgoType);
+        ConcurrentBag<ConcurrentBagEntry<Digest>> mds = MDS_MAP.get(hashAlgoType);
 
-        Digest md = null;
+        ConcurrentBagEntry<Digest> md0 = null;
         for (int i = 0; i < 3; i++) {
             try {
-                md = mds.poll(10, TimeUnit.SECONDS);
+                md0 = mds.borrow(10, TimeUnit.SECONDS);
                 break;
             } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
             }
         }
 
-        if (md == null) {
+        if (md0 == null) {
             throw new RuntimeOperatorException("could not get idle MessageDigest");
         }
 
         try {
+            Digest md = md0.value();
             md.reset();
             md.update(data, 0, data.length);
             byte[] bytes = new byte[md.getDigestSize()];
             md.doFinal(bytes, 0);
             return bytes;
         } finally {
-            mds.addLast(md);
+            mds.requite(md0);
         }
     } // method hash
 
