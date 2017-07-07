@@ -43,13 +43,14 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
+import org.bouncycastle.asn1.ocsp.BasicOCSPResponse;
+import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
@@ -58,20 +59,20 @@ import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
-import org.bouncycastle.cert.ocsp.BasicOCSPResp;
-import org.bouncycastle.cert.ocsp.BasicOCSPRespBuilder;
 import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.cert.ocsp.OCSPReq;
-import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.concurrent.ConcurrentBag;
+import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.password.PasswordResolver;
+import org.xipki.security.bcbugfix.XipkiBasicOCSPRespBuilder;
+import org.xipki.security.bcbugfix.XipkiOCSPReqBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
@@ -93,9 +94,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     private final String algorithmName;
 
-    private final BlockingDeque<ContentSigner> idleSigners = new LinkedBlockingDeque<>();
-
-    private final BlockingDeque<ContentSigner> busySigners = new LinkedBlockingDeque<>();
+    private final ConcurrentBag<ConcurrentBagEntry<ContentSigner>> signers = new ConcurrentBag<>();
 
     private final boolean mac;
 
@@ -143,7 +142,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         this.algorithmCode = AlgorithmUtil.getSigOrMacAlgoCode(algorithmIdentifier);
 
         for (ContentSigner signer : signers) {
-            idleSigners.addLast(signer);
+            this.signers.add(new ConcurrentBagEntry<ContentSigner>(signer));
         }
 
         this.signingKey = signingKey;
@@ -181,18 +180,19 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         return algorithmCode;
     }
 
-    private ContentSigner borrowContentSigner() throws NoIdleSignerException {
+    private ConcurrentBagEntry<ContentSigner> borrowContentSigner()
+            throws NoIdleSignerException {
         return borrowContentSigner(defaultSignServiceTimeout);
     }
 
     /**
      * @param timeout timeout in milliseconds, 0 for infinitely.
      */
-    private ContentSigner borrowContentSigner(final int soTimeout) throws NoIdleSignerException {
-        ContentSigner signer = null;
+    private ConcurrentBagEntry<ContentSigner> borrowContentSigner(final int soTimeout)
+            throws NoIdleSignerException {
+        ConcurrentBagEntry<ContentSigner> signer = null;
         try {
-            signer = (soTimeout == 0) ? idleSigners.takeFirst()
-                    : idleSigners.pollFirst(soTimeout, TimeUnit.MILLISECONDS);
+            signer = signers.borrow(soTimeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
         }
 
@@ -200,23 +200,11 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             throw new NoIdleSignerException("no idle signer available");
         }
 
-        busySigners.addLast(signer);
         return signer;
     }
 
-    private void returnContentSigner(final ContentSigner signer) {
-        ParamUtil.requireNonNull("signer", signer);
-
-        boolean isBusySigner = busySigners.remove(signer);
-        if (isBusySigner) {
-            idleSigners.addLast(signer);
-        } else {
-            final String msg =
-                    "signer has not been borrowed before or has been returned more than once: "
-                    + signer;
-            LOG.error(msg);
-            throw new IllegalStateException(msg);
-        }
+    private void returnContentSigner(final ConcurrentBagEntry<ContentSigner> signer) {
+        signers.requite(signer);
     }
 
     @Override
@@ -288,12 +276,12 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public boolean isHealthy() {
-        ContentSigner signer = null;
+        ConcurrentBagEntry<ContentSigner> signer = null;
         try {
             signer = borrowContentSigner();
-            OutputStream stream = signer.getOutputStream();
+            OutputStream stream = signer.value().getOutputStream();
             stream.write(new byte[]{1, 2, 3, 4});
-            byte[] signature = signer.getSignature();
+            byte[] signature = signer.value().getSignature();
             return signature != null && signature.length > 0;
         } catch (Exception ex) {
             LogUtil.error(LOG, ex);
@@ -317,9 +305,9 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     @Override
     public POPOSigningKey build(final ProofOfPossessionSigningKeyBuilder builder)
             throws NoIdleSignerException {
-        ContentSigner contentSigner = borrowContentSigner();
+        ConcurrentBagEntry<ContentSigner> contentSigner = borrowContentSigner();
         try {
-            return builder.build(contentSigner);
+            return builder.build(contentSigner.value());
         } finally {
             returnContentSigner(contentSigner);
         }
@@ -328,9 +316,9 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     @Override
     public ProtectedPKIMessage build(final ProtectedPKIMessageBuilder builder)
             throws NoIdleSignerException, CMPException {
-        ContentSigner contentSigner = borrowContentSigner();
+        ConcurrentBagEntry<ContentSigner> contentSigner = borrowContentSigner();
         try {
-            return builder.build(contentSigner);
+            return builder.build(contentSigner.value());
         } finally {
             returnContentSigner(contentSigner);
         }
@@ -338,9 +326,9 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public X509CRLHolder build(final X509v2CRLBuilder builder) throws NoIdleSignerException {
-        ContentSigner contentSigner = borrowContentSigner();
+        ConcurrentBagEntry<ContentSigner> contentSigner = borrowContentSigner();
         try {
-            return builder.build(contentSigner);
+            return builder.build(contentSigner.value());
         } finally {
             returnContentSigner(contentSigner);
         }
@@ -349,32 +337,32 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     @Override
     public X509CertificateHolder build(final X509v3CertificateBuilder builder)
             throws NoIdleSignerException {
-        ContentSigner contentSigner = borrowContentSigner();
+        ConcurrentBagEntry<ContentSigner> contentSigner = borrowContentSigner();
         try {
-            return builder.build(contentSigner);
+            return builder.build(contentSigner.value());
         } finally {
             returnContentSigner(contentSigner);
         }
     }
 
     @Override
-    public OCSPReq build(final OCSPReqBuilder builder, final X509CertificateHolder[] chain)
+    public OCSPRequest build(final XipkiOCSPReqBuilder builder, final Certificate[] chain)
             throws NoIdleSignerException, OCSPException {
-        ContentSigner contentSigner = borrowContentSigner();
+        ConcurrentBagEntry<ContentSigner> contentSigner = borrowContentSigner();
         try {
-            return builder.build(contentSigner, chain);
+            return builder.build(contentSigner.value(), chain);
         } finally {
             returnContentSigner(contentSigner);
         }
     }
 
     @Override
-    public BasicOCSPResp build(final BasicOCSPRespBuilder builder,
-            final X509CertificateHolder[] chain, final Date producedAt)
+    public BasicOCSPResponse build(final XipkiBasicOCSPRespBuilder builder,
+            final Certificate[] chain, final Date producedAt)
             throws NoIdleSignerException, OCSPException {
-        ContentSigner contentSigner = borrowContentSigner();
+        ConcurrentBagEntry<ContentSigner> contentSigner = borrowContentSigner();
         try {
-            return builder.build(contentSigner, chain, producedAt);
+            return builder.build(contentSigner.value(), chain, producedAt);
         } finally {
             returnContentSigner(contentSigner);
         }
@@ -383,9 +371,9 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     @Override
     public PKCS10CertificationRequest build(final PKCS10CertificationRequestBuilder builder)
             throws NoIdleSignerException {
-        ContentSigner contentSigner = borrowContentSigner();
+        ConcurrentBagEntry<ContentSigner> contentSigner = borrowContentSigner();
         try {
-            return builder.build(contentSigner);
+            return builder.build(contentSigner.value());
         } finally {
             returnContentSigner(contentSigner);
         }
@@ -393,11 +381,11 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     @Override
     public byte[] sign(final byte[] data) throws NoIdleSignerException, IOException {
-        ContentSigner contentSigner = borrowContentSigner();
+        ConcurrentBagEntry<ContentSigner> contentSigner = borrowContentSigner();
         try {
-            OutputStream signatureStream = contentSigner.getOutputStream();
+            OutputStream signatureStream = contentSigner.value().getOutputStream();
             signatureStream.write(data);
-            return contentSigner.getSignature();
+            return contentSigner.value().getSignature();
         } finally {
             returnContentSigner(contentSigner);
         }

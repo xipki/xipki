@@ -147,14 +147,17 @@ public class Asn1GenDSAKeypairParams extends ASN1Object {
         return control;
     }
 
+    // CHECKSTYLE:SKIP
     public BigInteger p() {
         return p;
     }
 
+    // CHECKSTYLE:SKIP
     public BigInteger q() {
         return q;
     }
 
+    // CHECKSTYLE:SKIP
     public BigInteger g() {
         return g;
     }
