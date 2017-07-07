@@ -86,7 +86,7 @@ import org.xipki.security.HashAlgoType;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
-import org.xipki.security.bcbugfix.XipkiOCSPReqBuilder;
+import org.xipki.security.bc.XipkiOCSPReqBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.util.X509Util;
 
