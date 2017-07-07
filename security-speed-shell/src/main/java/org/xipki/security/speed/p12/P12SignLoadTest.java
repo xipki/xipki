@@ -38,6 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -58,7 +59,11 @@ public abstract class P12SignLoadTest extends LoadExecutor {
 
     class Testor implements Runnable {
 
-        final byte[] data = new byte[] {1, 2, 3, 4};
+        private final byte[] data = new byte[1024];
+
+        public Testor() {
+            new SecureRandom().nextBytes(data);
+        }
 
         @Override
         public void run() {

@@ -41,6 +41,9 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
+import org.bouncycastle.asn1.ocsp.BasicOCSPResponse;
+import org.bouncycastle.asn1.ocsp.OCSPRequest;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
@@ -49,14 +52,12 @@ import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
-import org.bouncycastle.cert.ocsp.BasicOCSPResp;
-import org.bouncycastle.cert.ocsp.BasicOCSPRespBuilder;
 import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.cert.ocsp.OCSPReq;
-import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.password.PasswordResolver;
+import org.xipki.security.bcbugfix.XipkiBasicOCSPRespBuilder;
+import org.xipki.security.bcbugfix.XipkiOCSPReqBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 
@@ -117,7 +118,6 @@ public interface ConcurrentContentSigner {
      *          Configuration. Could be {@code null}.
      * @param passwordResolver
      *          Password resolver. Could be {@code null}.
-     * @throws XiSecurityException
      */
     void initialize(String conf, PasswordResolver passwordResolver)
             throws XiSecurityException;
@@ -160,7 +160,7 @@ public interface ConcurrentContentSigner {
      *          Certificates to be embedded in the response. Could be {@code null}.
      *
      */
-    OCSPReq build(OCSPReqBuilder builder, X509CertificateHolder[] chain)
+    OCSPRequest build(XipkiOCSPReqBuilder builder, Certificate[] chain)
             throws NoIdleSignerException, OCSPException;
 
     /**
@@ -172,16 +172,14 @@ public interface ConcurrentContentSigner {
      * @param producedAt
      *          When the OCSP response is produced. Must not be {@code null}.
      */
-    BasicOCSPResp build(BasicOCSPRespBuilder builder,
-            X509CertificateHolder[] chain, Date producedAt)
-            throws NoIdleSignerException, OCSPException;
+    BasicOCSPResponse build(XipkiBasicOCSPRespBuilder builder,
+           Certificate[] chain, Date producedAt)
+           throws NoIdleSignerException, OCSPException;
 
     /**
      *
      * @param builder
      *          PKCS#10 request builder. Must not be {@code null}.
-     * @return
-     * @throws NoIdleSignerException
      */
     PKCS10CertificationRequest build(PKCS10CertificationRequestBuilder builder)
             throws NoIdleSignerException;
