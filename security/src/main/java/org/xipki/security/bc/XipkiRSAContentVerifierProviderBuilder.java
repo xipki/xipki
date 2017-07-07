@@ -32,17 +32,18 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.bcbugfix;
+package org.xipki.security.bc;
 
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Signer;
-import org.bouncycastle.crypto.signers.ECDSASigner;
+import org.bouncycastle.crypto.signers.RSADigestSigner;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
-import org.xipki.security.pkcs12.DSAPlainDigestSigner;
-import org.xipki.security.util.AlgorithmUtil;
+import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.SignerUtil;
 
 /**
  * @author Lijun Liao
@@ -50,26 +51,29 @@ import org.xipki.security.util.AlgorithmUtil;
  */
 
 // CHECKSTYLE:SKIP
-public class XipkiECContentVerifierProviderBuilder extends BcECContentVerifierProviderBuilder {
-
+public class XipkiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierProviderBuilder {
     private DigestAlgorithmIdentifierFinder digestAlgorithmFinder;
 
-    public XipkiECContentVerifierProviderBuilder(
+    public XipkiRSAContentVerifierProviderBuilder(
             DigestAlgorithmIdentifierFinder digestAlgorithmFinder) {
         super(digestAlgorithmFinder);
         this.digestAlgorithmFinder = digestAlgorithmFinder;
     }
 
-    protected Signer createSigner(AlgorithmIdentifier sigAlgId)
-            throws OperatorCreationException {
-        boolean plainDsa = AlgorithmUtil.isPlainECDSASigAlg(sigAlgId);
-        if (!plainDsa) {
-            return super.createSigner(sigAlgId);
-        }
+    @Override
+    protected Signer createSigner(AlgorithmIdentifier sigAlgId) throws OperatorCreationException {
+        if (PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm())) {
+            try {
+                return SignerUtil.createPSSRSASigner(sigAlgId);
+            } catch (XiSecurityException ex) {
+                throw new OperatorCreationException(ex.getMessage(), ex);
+            }
+        } else {
+            AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
+            Digest dig = digestProvider.get(digAlg);
 
-        AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
-        Digest dig = digestProvider.get(digAlg);
-        return new DSAPlainDigestSigner(new ECDSASigner(), dig);
+            return new RSADigestSigner(dig);
+        }
     }
 
 }

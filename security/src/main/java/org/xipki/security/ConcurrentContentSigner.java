@@ -56,8 +56,8 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.bcbugfix.XipkiBasicOCSPRespBuilder;
-import org.xipki.security.bcbugfix.XipkiOCSPReqBuilder;
+import org.xipki.security.bc.XipkiBasicOCSPRespBuilder;
+import org.xipki.security.bc.XipkiOCSPReqBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 

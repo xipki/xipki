@@ -1,6 +1,6 @@
 // #THIRDPARTY# BouncyCastle
 
-package org.xipki.security.bcbugfix;
+package org.xipki.security.bc;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
