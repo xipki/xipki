@@ -199,7 +199,14 @@ public class OcspServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
 
+    private static final Extension[] EXTENSION_ARRAY_TYPE = new Extension[0];
+
     private static final byte[] DERNullBytes = new byte[]{5, 0};
+
+    private static final int DERNullBytesLen = 2;
+
+    private static final OCSPResponseStatus SUCCESSFUL_STATUS =
+            new OCSPResponseStatus(OcspResponseStatus.successful.status());
 
     private static final Map<OcspResponseStatus, OcspRespWithCacheInfo> unsuccesfulOCSPRespMap;
 
@@ -779,6 +786,7 @@ public class OcspServer {
             }
 
             if (CollectionUtil.isNonEmpty(criticalExtensionOids)) {
+                LOG.warn("could not process critial request extensions: {}", criticalExtensionOids);
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
             }
 
@@ -795,8 +803,8 @@ public class OcspServer {
             for (int i = 0; i < requestsSize; i++) {
                 requestList[i] = Request.getInstance(requestList0.getObjectAt(i));
             }
-            boolean canCacheDb = responseCacher != null && responseCacher.isOnService()
-                    && nonceExtn == null && requestsSize == 1;
+            boolean canCacheDb = (requestsSize == 1) && (responseCacher != null)
+                    && (nonceExtn == null) && responseCacher.isOnService();
             if (canCacheDb) {
                 // try to find the cached response
                 CertID certId = requestList[0].getReqCert();
@@ -836,12 +844,7 @@ public class OcspServer {
                             cacheDbIssuerId.intValue(), cacheDbSerialNumber, cacheDbSigAlgCode,
                             cacheDbCertHashAlgCode);
                     if (cachedResp != null) {
-                        LOG.debug("use cached response for (cacheIssuer={} and serial={})",
-                                cacheDbIssuerId, cacheDbSerialNumber);
                         return cachedResp;
-                    } else {
-                        LOG.debug("found no cached response for (cacheIssuer={} and serial={})",
-                                cacheDbIssuerId, cacheDbSerialNumber);
                     }
                 } else if (master) {
                     // store the issuer certificate in cache database.
@@ -877,7 +880,7 @@ public class OcspServer {
                     failureOcspResp = processCertReq(requestList[i], basicOcspBuilder, responder,
                             reqOpt, repOpt, repControl, singleEvent);
                 } finally {
-                    if (singleEvent != null) {
+                    if (audit) {
                         singleEvent.finish();
                         auditServiceRegister.getAuditService().logEvent(singleEvent);
                     }
@@ -891,12 +894,12 @@ public class OcspServer {
             if (repControl.includeExtendedRevokeExtension) {
                 responseExtensions.add(
                         new Extension(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke, true,
-                                Arrays.copyOf(DERNullBytes, DERNullBytes.length)));
+                                Arrays.copyOf(DERNullBytes, DERNullBytesLen)));
             }
 
-            if (CollectionUtil.isNonEmpty(responseExtensions)) {
+            if (!responseExtensions.isEmpty()) {
                 basicOcspBuilder.setResponseExtensions(
-                        new Extensions(responseExtensions.toArray(new Extension[0])));
+                        new Extensions(responseExtensions.toArray(EXTENSION_ARRAY_TYPE)));
             }
 
             org.bouncycastle.asn1.x509.Certificate[] certsInResp;
@@ -932,11 +935,8 @@ public class OcspServer {
                     throw new OCSPException("can't encode object.", ex);
                 }
 
-                ResponseBytes rb = new ResponseBytes(
-                        OCSPObjectIdentifiers.id_pkix_ocsp_basic, octs);
-
-                OCSPResponse ocspResp = new OCSPResponse(
-                        new OCSPResponseStatus(OcspResponseStatus.successful.status()), rb);
+                OCSPResponse ocspResp = new OCSPResponse(SUCCESSFUL_STATUS,
+                        new ResponseBytes(OCSPObjectIdentifiers.id_pkix_ocsp_basic, octs));
 
                 // cache response in database
                 if (canCacheDb && repControl.canCacheInfo) {
@@ -1009,13 +1009,14 @@ public class OcspServer {
         OcspStore answeredStore = null;
         boolean exceptionOccurs = false;
 
+        byte[] nameHash = certId.getIssuerNameHash().getOctets();
+        byte[] keyHash = certId.getIssuerKeyHash().getOctets();
+        BigInteger serial = certId.getSerialNumber().getValue();
+
         Date now = new Date();
         for (OcspStore store : responder.stores()) {
             try {
-                certStatusInfo = store.getCertStatus(now, reqHashAlgo,
-                        certId.getIssuerNameHash().getOctets(),
-                        certId.getIssuerKeyHash().getOctets(),
-                        certId.getSerialNumber().getValue(),
+                certStatusInfo = store.getCertStatus(now, reqHashAlgo, nameHash, keyHash, serial,
                         repOpt.isIncludeCerthash(), repOpt.certHashAlgo(),
                         responder.certprofileOption());
                 if (certStatusInfo != null
@@ -1026,8 +1027,8 @@ public class OcspServer {
             } catch (OcspStoreException ex) {
                 exceptionOccurs = true;
                 LogUtil.error(LOG, ex, "getCertStatus() of CertStatusStore " + store.name());
-            } // end try
-        } // end for
+            }
+        }
 
         if (certStatusInfo == null) {
             if (exceptionOccurs) {
@@ -1042,8 +1043,7 @@ public class OcspServer {
         } else if (answeredStore != null
                 && responder.responderOption().isInheritCaRevocation()) {
             CertRevocationInfo caRevInfo = answeredStore.getCaRevocationInfo(
-                    reqHashAlgo, certId.getIssuerNameHash().getOctets(),
-                    certId.getIssuerKeyHash().getOctets());
+                    reqHashAlgo, nameHash, keyHash);
             if (caRevInfo != null) {
                 CertStatus certStatus = certStatusInfo.certStatus();
                 boolean replaced = false;
@@ -1173,15 +1173,17 @@ public class OcspServer {
             extensions.add(extension);
         }
 
-        String certStatusText;
-        if (bcCertStatus instanceof UnknownStatus) {
-            certStatusText = "unknown";
-        } else if (bcCertStatus instanceof RevokedStatus) {
-            certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
-        } else if (bcCertStatus == null) {
-            certStatusText = "good";
-        } else {
-            certStatusText = "should-not-happen";
+        String certStatusText = null;
+        if (audit || LOG.isDebugEnabled()) {
+            if (bcCertStatus instanceof UnknownStatus) {
+                certStatusText = "unknown";
+            } else if (bcCertStatus instanceof RevokedStatus) {
+                certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
+            } else if (bcCertStatus == null) {
+                certStatusText = "good";
+            } else {
+                certStatusText = "should-not-happen";
+            }
         }
 
         if (audit) {
@@ -1214,7 +1216,7 @@ public class OcspServer {
 
         Extensions extns = null;
         if (CollectionUtil.isNonEmpty(extensions)) {
-            extns = new Extensions(extensions.toArray(new Extension[0]));
+            extns = new Extensions(extensions.toArray(EXTENSION_ARRAY_TYPE));
         }
 
         builder.addResponse(certId, bcCertStatus, thisUpdate, nextUpdate, extns);
