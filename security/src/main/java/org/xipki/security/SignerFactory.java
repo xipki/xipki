@@ -49,7 +49,6 @@ public interface SignerFactory {
      *
      * @param type
      *          Type of the signer. Must no be {@code null}.
-     * @return
      */
     boolean canCreateSigner(String type);
 

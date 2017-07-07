@@ -123,9 +123,9 @@ public class SoftTokenMacContentSignerBuilder {
 
         boolean gmac = false;
         ASN1ObjectIdentifier oid = signatureAlgId.getAlgorithm();
-        if (oid.equals(NISTObjectIdentifiers.id_aes128_GCM) ||
-                oid.equals(NISTObjectIdentifiers.id_aes192_GCM) ||
-                oid.equals(NISTObjectIdentifiers.id_aes256_GCM)) {
+        if (oid.equals(NISTObjectIdentifiers.id_aes128_GCM)
+                || oid.equals(NISTObjectIdentifiers.id_aes192_GCM)
+                || oid.equals(NISTObjectIdentifiers.id_aes256_GCM)) {
             gmac = true;
         }
 

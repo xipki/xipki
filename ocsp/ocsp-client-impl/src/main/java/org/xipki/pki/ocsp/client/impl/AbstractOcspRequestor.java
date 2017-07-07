@@ -54,15 +54,17 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.ocsp.CertID;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
+import org.bouncycastle.asn1.ocsp.OCSPRequest;
+import org.bouncycastle.asn1.ocsp.Request;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.TBSCertificate;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.cert.ocsp.OCSPReq;
-import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.xipki.common.RequestResponseDebug;
@@ -84,6 +86,7 @@ import org.xipki.security.HashAlgoType;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.bcbugfix.XipkiOCSPReqBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.util.X509Util;
 
@@ -192,7 +195,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             nonce = nextNonce(requestOptions.nonceLen());
         }
 
-        OCSPReq ocspReq = buildRequest(issuerCert, serialNumbers, nonce, requestOptions);
+        OCSPRequest ocspReq = buildRequest(issuerCert, serialNumbers, nonce, requestOptions);
         byte[] encodedReq;
         try {
             encodedReq = ocspReq.getEncoded();
@@ -275,10 +278,13 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
             throw new OcspTargetUnmatchedException(sb.toString());
         }
 
-        CertificateID certId = ocspReq.getRequestList()[0].getCertID();
-        ASN1ObjectIdentifier issuerHashAlg = certId.getHashAlgOID();
-        byte[] issuerKeyHash = certId.getIssuerKeyHash();
-        byte[] issuerNameHash = certId.getIssuerNameHash();
+        Request reqAt0 =
+                Request.getInstance(ocspReq.getTbsRequest().getRequestList().getObjectAt(0));
+
+        CertID certId = reqAt0.getReqCert();
+        ASN1ObjectIdentifier issuerHashAlg = certId.getHashAlgorithm().getAlgorithm();
+        byte[] issuerKeyHash = certId.getIssuerKeyHash().getOctets();
+        byte[] issuerNameHash = certId.getIssuerNameHash().getOctets();
 
         if (serialNumbers.length == 1) {
             SingleResp singleResp = singleResponses[0];
@@ -329,7 +335,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         return ocspResp;
     } // method ask
 
-    private OCSPReq buildRequest(final X509Certificate caCert, final BigInteger[] serialNumbers,
+    private OCSPRequest buildRequest(final X509Certificate caCert, final BigInteger[] serialNumbers,
             final byte[] nonce, final RequestOptions requestOptions)
             throws OcspRequestorException {
         HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(requestOptions.hashAlgorithmId());
@@ -339,7 +345,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         }
         List<AlgorithmIdentifier> prefSigAlgs = requestOptions.preferredSignatureAlgorithms();
 
-        OCSPReqBuilder reqBuilder = new OCSPReqBuilder();
+        XipkiOCSPReqBuilder reqBuilder = new XipkiOCSPReqBuilder();
         List<Extension> extensions = new LinkedList<>();
         if (nonce != null) {
             Extension extn = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
@@ -386,7 +392,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                 CertID certId = new CertID(hashAlgo.algorithmIdentifier(),
                         issuerNameHash, issuerKeyHash, new ASN1Integer(serialNumber));
 
-                reqBuilder.addRequest(new CertificateID(certId));
+                reqBuilder.addRequest(certId);
             }
 
             if (requestOptions.isSignRequest()) {
@@ -422,7 +428,12 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
                 reqBuilder.setRequestorName(signer.getCertificateAsBcObject().getSubject());
                 try {
-                    return signer.build(reqBuilder, signer.getCertificateChainAsBcObjects());
+                    X509CertificateHolder[] certChain0 = signer.getCertificateChainAsBcObjects();
+                    Certificate[] certChain = new Certificate[certChain0.length];
+                    for (int i = 0; i < certChain.length; i++) {
+                        certChain[i] = certChain0[i].toASN1Structure();
+                    }
+                    return signer.build(reqBuilder, certChain);
                 } catch (NoIdleSignerException ex) {
                     throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage());
                 }

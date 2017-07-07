@@ -46,20 +46,20 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.bouncycastle.asn1.ocsp.OCSPResponse;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.InvalidConfException;
+import org.xipki.common.concurrent.ConcurrentBag;
+import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
@@ -98,7 +98,7 @@ class ResponseCacher {
     private static final String SQL_UPDATE_RESP = "UPDATE OCSP SET THIS_UPDATE=?,"
             + "NEXT_UPDATE=?,RESP=? WHERE ID=?";
 
-    private final BlockingDeque<Digest> idDigesters;
+    private final ConcurrentBag<ConcurrentBagEntry<Digest>> idDigesters;
 
     private class IssuerUpdater implements Runnable {
 
@@ -167,10 +167,10 @@ class ResponseCacher {
                 "IID,IDENT,THIS_UPDATE,NEXT_UPDATE,RESP FROM OCSP WHERE ID=?");
         this.onService = new AtomicBoolean(false);
 
-        this.idDigesters = new LinkedBlockingDeque<>();
+        this.idDigesters = new ConcurrentBag<>();
         for (int i = 0; i < 20; i++) {
             Digest md = HashAlgoType.SHA1.createDigest();
-            idDigesters.addLast(md);
+            idDigesters.add(new ConcurrentBagEntry<Digest>(md));
         }
     }
 
@@ -326,7 +326,7 @@ class ResponseCacher {
 
     void storeOcspResponse(int issuerId, BigInteger serialNumber, long thisUpdate,
             Long nextUpdate, AlgorithmCode sigAlgCode, AlgorithmCode certHashAlgCode,
-            OCSPResp response) {
+            OCSPResponse response) {
         byte[] identBytes = buildIdent(serialNumber, sigAlgCode, certHashAlgCode);
         String ident = Hex.toHexString(identBytes);
         try {
@@ -594,25 +594,26 @@ class ResponseCacher {
     }
 
     private long deriveId(int issuerId, byte[] identBytes) {
-        Digest digest = null;
+        ConcurrentBagEntry<Digest> digest0 = null;
         try {
-            digest = idDigesters.poll(2, TimeUnit.SECONDS);
+            digest0 = idDigesters.borrow(2, TimeUnit.SECONDS);
         } catch (InterruptedException ex) {
             // do nothing
         }
 
-        if (digest == null) {
-            digest = HashAlgoType.SHA1.createDigest();
+        if (digest0 == null) {
+            digest0 = new ConcurrentBagEntry<Digest>(HashAlgoType.SHA1.createDigest());
         }
 
         byte[] hash = new byte[20];
         try {
+            Digest digest = digest0.value();
             digest.reset();
             digest.update(int2Bytes(issuerId), 0, 2);
             digest.update(identBytes, 0, identBytes.length);
             digest.doFinal(hash, 0);
         } finally {
-            idDigesters.addLast(digest);
+            idDigesters.requite(digest0);
         }
 
         return (b2l(hash[0]) & 0x7FL) << 56 |

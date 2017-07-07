@@ -49,8 +49,7 @@ import org.bouncycastle.asn1.ocsp.ResponderID;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.ocsp.RespID;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgoType;
@@ -66,17 +65,17 @@ class ResponderSigner {
 
     private final List<ConcurrentContentSigner> signers;
 
-    private final X509CertificateHolder bcCertificate;
+    private final Certificate bcCertificate;
 
     private final X509Certificate certificate;
 
-    private final X509CertificateHolder[] bcCertificateChain;
+    private final Certificate[] bcCertificateChain;
 
     private final X509Certificate[] certificateChain;
 
-    private final RespID responderIdByName;
+    private final ResponderID responderIdByName;
 
-    private final RespID responderIdByKey;
+    private final ResponderID responderIdByKey;
 
     private final boolean macSigner;
 
@@ -94,7 +93,7 @@ class ResponderSigner {
             this.bcCertificateChain = null;
 
             byte[] keySha1 = firstSigner.getSha1DigestOfMacKey();
-            this.responderIdByKey = new RespID(new ResponderID(new DEROctetString(keySha1)));
+            this.responderIdByKey = new ResponderID(new DEROctetString(keySha1));
         } else {
             X509Certificate[] tmpCertificateChain = firstSigner.getCertificateChain();
             if (tmpCertificateChain == null || tmpCertificateChain.length == 0) {
@@ -111,18 +110,18 @@ class ResponderSigner {
             System.arraycopy(tmpCertificateChain, 0, this.certificateChain, 0, len);
 
             this.certificate = certificateChain[0];
-
-            this.bcCertificate = new X509CertificateHolder(this.certificate.getEncoded());
-            this.bcCertificateChain = new X509CertificateHolder[this.certificateChain.length];
-            for (int i = 0; i < certificateChain.length; i++) {
-                this.bcCertificateChain[i] = new X509CertificateHolder(
+            this.bcCertificate = Certificate.getInstance(this.certificate.getEncoded());
+            this.bcCertificateChain = new Certificate[this.certificateChain.length];
+            this.bcCertificateChain[0] = this.bcCertificate;
+            for (int i = 1; i < certificateChain.length; i++) {
+                this.bcCertificateChain[i] = Certificate.getInstance(
                         this.certificateChain[i].getEncoded());
             }
 
-            this.responderIdByName = new RespID(this.bcCertificate.getSubject());
+            this.responderIdByName = new ResponderID(this.bcCertificate.getSubject());
             byte[] keySha1 = HashAlgoType.SHA1.hash(
                     this.bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
-            this.responderIdByKey = new RespID(new ResponderID(new DEROctetString(keySha1)));
+            this.responderIdByKey = new ResponderID(new DEROctetString(keySha1));
         }
 
         algoSignerMap = new HashMap<>();
@@ -158,7 +157,7 @@ class ResponderSigner {
         return null;
     }
 
-    public RespID getResponder(final boolean byName) {
+    public ResponderID getResponder(final boolean byName) {
         return byName ? responderIdByName :  responderIdByKey;
     }
 
@@ -170,11 +169,11 @@ class ResponderSigner {
         return certificateChain;
     }
 
-    public X509CertificateHolder bcCertificate() {
+    public Certificate bcCertificate() {
         return bcCertificate;
     }
 
-    public X509CertificateHolder[] bcCertificateChain() {
+    public Certificate[] bcCertificateChain() {
         return bcCertificateChain;
     }
 

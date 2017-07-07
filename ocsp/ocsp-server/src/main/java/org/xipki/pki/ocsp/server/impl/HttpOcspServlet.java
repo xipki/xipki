@@ -42,7 +42,6 @@ import java.util.Date;
 import javax.net.ssl.SSLSession;
 
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
-import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,10 +177,8 @@ public class HttpOcspServlet extends AbstractHttpServlet {
                 return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
             }
 
-            OCSPReq ocspReq = new OCSPReq(ocspRequest);
-
             OcspRespWithCacheInfo ocspRespWithCacheInfo =
-                    server.answer(responder, ocspReq, false, event);
+                    server.answer(responder, ocspRequest, false, event);
             if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
                 auditMessage = "processRequest returned null, this should not happen";
                 LOG.error(auditMessage);
@@ -306,10 +303,8 @@ public class HttpOcspServlet extends AbstractHttpServlet {
                 return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
             }
 
-            OCSPReq ocspReq = new OCSPReq(ocspRequest);
-
             OcspRespWithCacheInfo ocspRespWithCacheInfo =
-                    server.answer(responder, ocspReq, true, event);
+                    server.answer(responder, ocspRequest, true, event);
             if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
                 auditMessage = "processRequest returned null, this should not happen";
                 LOG.error(auditMessage);

@@ -65,6 +65,7 @@ import org.xipki.security.exception.XiSecurityException;
 // CHECKSTYLE:SKIP
 public class AESGmacContentSigner implements ContentSigner {
 
+    // CHECKSTYLE:SKIP
     private class AESGmacOutputStream extends OutputStream {
 
         @Override

@@ -67,27 +67,30 @@ import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
+import org.bouncycastle.asn1.ocsp.BasicOCSPResponse;
+import org.bouncycastle.asn1.ocsp.CertID;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
+import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.ocsp.OCSPResponse;
+import org.bouncycastle.asn1.ocsp.OCSPResponseStatus;
+import org.bouncycastle.asn1.ocsp.Request;
+import org.bouncycastle.asn1.ocsp.ResponderID;
+import org.bouncycastle.asn1.ocsp.ResponseBytes;
 import org.bouncycastle.asn1.ocsp.RevokedInfo;
+import org.bouncycastle.asn1.ocsp.TBSRequest;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.ocsp.BasicOCSPResp;
-import org.bouncycastle.cert.ocsp.BasicOCSPRespBuilder;
-import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReq;
-import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.bouncycastle.cert.ocsp.OCSPRespBuilder;
-import org.bouncycastle.cert.ocsp.Req;
-import org.bouncycastle.cert.ocsp.RespID;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentVerifierProvider;
@@ -148,6 +151,7 @@ import org.xipki.security.HashAlgoType;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
+import org.xipki.security.bcbugfix.XipkiBasicOCSPRespBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.util.X509Util;
 import org.xml.sax.SAXException;
@@ -239,8 +243,8 @@ public class OcspServer {
             if (status == OcspResponseStatus.successful) {
                 continue;
             }
-            OCSPResp resp = new OCSPResp(new OCSPResponse(
-                    new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(status.status()), null));
+            OCSPResponse resp = new OCSPResponse(
+                    new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(status.status()), null);
             byte[] encoded;
             try {
                 encoded = resp.getEncoded();
@@ -658,7 +662,7 @@ public class OcspServer {
         auditLogPciEvent(true, "SHUTDOWN");
     }
 
-    public OcspRespWithCacheInfo answer(final Responder responder, final OCSPReq request,
+    public OcspRespWithCacheInfo answer(final Responder responder, final OCSPRequest request,
             final boolean viaGet, final AuditEvent event) {
         boolean audit = (event != null);
 
@@ -672,8 +676,9 @@ public class OcspServer {
             event.addEventData(OcspAuditConstants.NAME_mid, msgId);
         }
 
-        // BC returns 1 for v1(0) instead the real value 0.
-        int version = request.getVersionNumber() - 1;
+        TBSRequest tbsReq = request.getTbsRequest();
+
+        int version = tbsReq.getVersion().getValue().intValue();
         if (!reqOpt.isVersionAllowed(version)) {
             String message = "invalid request version " + version;
             LOG.warn(message);
@@ -691,8 +696,8 @@ public class OcspServer {
 
             List<Extension> responseExtensions = new ArrayList<>(2);
 
-            Req[] requestList = request.getRequestList();
-            int requestsSize = requestList.length;
+            ASN1Sequence requestList0 = tbsReq.getRequestList();
+            int requestsSize = requestList0.size();
             if (requestsSize > reqOpt.maxRequestListCount()) {
                 String message = requestsSize + " entries in RequestList, but maximal "
                         + reqOpt.maxRequestListCount() + " is allowed";
@@ -703,10 +708,10 @@ public class OcspServer {
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
             }
 
+            Extensions extensions = tbsReq.getRequestExtensions();
             Set<ASN1ObjectIdentifier> criticalExtensionOids = new HashSet<>();
-            Set<?> tmp = request.getCriticalExtensionOIDs();
-            if (tmp != null) {
-                for (Object oid : tmp) {
+            if (extensions != null) {
+                for (ASN1ObjectIdentifier oid : extensions.getCriticalExtensionOIDs()) {
                     criticalExtensionOids.add((ASN1ObjectIdentifier) oid);
                 }
             }
@@ -714,11 +719,12 @@ public class OcspServer {
             OcspRespControl repControl = new OcspRespControl();
             repControl.canCacheInfo = true;
 
-            RespID respId = signer.getResponder(repOpt.isResponderIdByName());
-            BasicOCSPRespBuilder basicOcspBuilder = new BasicOCSPRespBuilder(respId);
+            ResponderID respId = signer.getResponder(repOpt.isResponderIdByName());
+            XipkiBasicOCSPRespBuilder basicOcspBuilder = new XipkiBasicOCSPRespBuilder(respId);
             ASN1ObjectIdentifier extensionType = OCSPObjectIdentifiers.id_pkix_ocsp_nonce;
             criticalExtensionOids.remove(extensionType);
-            Extension nonceExtn = request.getExtension(extensionType);
+            Extension nonceExtn = (extensions == null)
+                    ? null : extensions.getExtension(extensionType);
             if (nonceExtn != null) {
                 if (reqOpt.nonceOccurrence() == TripleState.FORBIDDEN) {
                     String message = "nonce forbidden, but is present in the request";
@@ -762,10 +768,13 @@ public class OcspServer {
             if (responder.responderOption().mode() != OcspMode.RFC2560) {
                 extensionType = ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs;
                 criticalExtensionOids.remove(extensionType);
-                Extension ext = request.getExtension(extensionType);
-                if (ext != null) {
-                    ASN1Sequence preferredSigAlgs = ASN1Sequence.getInstance(ext.getParsedValue());
-                    concurrentSigner = signer.getSignerForPreferredSigAlgs(preferredSigAlgs);
+                if (extensions != null) {
+                    Extension ext = extensions.getExtension(extensionType);
+                    if (ext != null) {
+                        ASN1Sequence preferredSigAlgs =
+                                ASN1Sequence.getInstance(ext.getParsedValue());
+                        concurrentSigner = signer.getSignerForPreferredSigAlgs(preferredSigAlgs);
+                    }
                 }
             }
 
@@ -782,12 +791,16 @@ public class OcspServer {
             BigInteger cacheDbSerialNumber = null;
             Integer cacheDbIssuerId = null;
 
+            Request[] requestList = new Request[requestsSize];
+            for (int i = 0; i < requestsSize; i++) {
+                requestList[i] = Request.getInstance(requestList0.getObjectAt(i));
+            }
             boolean canCacheDb = responseCacher != null && responseCacher.isOnService()
                     && nonceExtn == null && requestsSize == 1;
             if (canCacheDb) {
                 // try to find the cached response
-                CertificateID certId = requestList[0].getCertID();
-                String certIdHashAlgo = certId.getHashAlgOID().getId();
+                CertID certId = requestList[0].getReqCert();
+                String certIdHashAlgo = certId.getHashAlgorithm().getAlgorithm().getId();
                 HashAlgoType reqHashAlgo = HashAlgoType.getHashAlgoType(certIdHashAlgo);
                 if (reqHashAlgo == null) {
                     LOG.warn("unknown CertID.hashAlgorithm {}", certIdHashAlgo);
@@ -813,10 +826,10 @@ public class OcspServer {
 
                 cacheDbSigAlgCode = concurrentSigner.algorithmCode();
 
-                byte[] nameHash = certId.getIssuerNameHash();
-                byte[] keyHash = certId.getIssuerKeyHash();
+                byte[] nameHash = certId.getIssuerNameHash().getOctets();
+                byte[] keyHash = certId.getIssuerKeyHash().getOctets();
                 cacheDbIssuerId = responseCacher.getIssuerId(reqHashAlgo, nameHash, keyHash);
-                cacheDbSerialNumber = certId.getSerialNumber();
+                cacheDbSerialNumber = certId.getSerialNumber().getValue();
 
                 if (cacheDbIssuerId != null) {
                     OcspRespWithCacheInfo cachedResp = responseCacher.getOcspResponse(
@@ -886,10 +899,10 @@ public class OcspServer {
                         new Extensions(responseExtensions.toArray(new Extension[0])));
             }
 
-            X509CertificateHolder[] certsInResp;
+            org.bouncycastle.asn1.x509.Certificate[] certsInResp;
             EmbedCertsMode certsMode = repOpt.embedCertsMode();
             if (certsMode == null || certsMode == EmbedCertsMode.SIGNER) {
-                certsInResp = new X509CertificateHolder[]{signer.bcCertificate()};
+                certsInResp = new org.bouncycastle.asn1.x509.Certificate[]{signer.bcCertificate()};
             } else if (certsMode == EmbedCertsMode.SIGNER_AND_CA) {
                 certsInResp = signer.bcCertificateChain();
             } else {
@@ -897,7 +910,7 @@ public class OcspServer {
                 certsInResp = null;
             }
 
-            BasicOCSPResp basicOcspResp;
+            BasicOCSPResponse basicOcspResp;
             try {
                 basicOcspResp = concurrentSigner.build(basicOcspBuilder, certsInResp, new Date());
             } catch (NoIdleSignerException ex) {
@@ -906,15 +919,24 @@ public class OcspServer {
                 LogUtil.error(LOG, ex, "answer() basicOcspBuilder.build");
                 if (audit) {
                     fillAuditEvent(event, AuditLevel.ERROR, AuditStatus.FAILED,
-                            "BasicOCSPRespBuilder.build() with OCSPException");
+                            "XipkiBasicOCSPRespBuilder.build() with OCSPException");
                 }
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
             }
 
-            OCSPRespBuilder ocspRespBuilder = new OCSPRespBuilder();
             try {
-                OCSPResp ocspResp = ocspRespBuilder.build(
-                        OcspResponseStatus.successful.status(), basicOcspResp);
+                ASN1OctetString octs;
+                try {
+                    octs = new DEROctetString(basicOcspResp.getEncoded());
+                } catch (IOException ex) {
+                    throw new OCSPException("can't encode object.", ex);
+                }
+
+                ResponseBytes rb = new ResponseBytes(
+                        OCSPObjectIdentifiers.id_pkix_ocsp_basic, octs);
+
+                OCSPResponse ocspResp = new OCSPResponse(
+                        new OCSPResponseStatus(OcspResponseStatus.successful.status()), rb);
 
                 // cache response in database
                 if (canCacheDb && repControl.canCacheInfo) {
@@ -954,13 +976,14 @@ public class OcspServer {
         }
     } // method ask
 
-    private OcspRespWithCacheInfo processCertReq(Req req, BasicOCSPRespBuilder builder,
+    private OcspRespWithCacheInfo processCertReq(Request req,
+            XipkiBasicOCSPRespBuilder builder,
             Responder responder, RequestOption reqOpt, ResponseOption repOpt,
             OcspRespControl repControl, AuditEvent event) throws IOException {
         final boolean audit = (event != null);
 
-        CertificateID certId = req.getCertID();
-        String certIdHashAlgo = certId.getHashAlgOID().getId();
+        CertID certId = req.getReqCert();
+        String certIdHashAlgo = certId.getHashAlgorithm().getAlgorithm().getId();
         HashAlgoType reqHashAlgo = HashAlgoType.getHashAlgoType(certIdHashAlgo);
         if (reqHashAlgo == null) {
             LOG.warn("unknown CertID.hashAlgorithm {}", certIdHashAlgo);
@@ -989,8 +1012,10 @@ public class OcspServer {
         Date now = new Date();
         for (OcspStore store : responder.stores()) {
             try {
-                certStatusInfo = store.getCertStatus(now, reqHashAlgo, certId.getIssuerNameHash(),
-                        certId.getIssuerKeyHash(), certId.getSerialNumber(),
+                certStatusInfo = store.getCertStatus(now, reqHashAlgo,
+                        certId.getIssuerNameHash().getOctets(),
+                        certId.getIssuerKeyHash().getOctets(),
+                        certId.getSerialNumber().getValue(),
                         repOpt.isIncludeCerthash(), repOpt.certHashAlgo(),
                         responder.certprofileOption());
                 if (certStatusInfo != null
@@ -1017,7 +1042,8 @@ public class OcspServer {
         } else if (answeredStore != null
                 && responder.responderOption().isInheritCaRevocation()) {
             CertRevocationInfo caRevInfo = answeredStore.getCaRevocationInfo(
-                    reqHashAlgo, certId.getIssuerNameHash(), certId.getIssuerKeyHash());
+                    reqHashAlgo, certId.getIssuerNameHash().getOctets(),
+                    certId.getIssuerKeyHash().getOctets());
             if (caRevInfo != null) {
                 CertStatus certStatus = certStatusInfo.certStatus();
                 boolean replaced = false;
@@ -1166,13 +1192,17 @@ public class OcspServer {
 
         if (LOG.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder(250);
-            sb.append("certHashAlgo: ").append(certId.getHashAlgOID().getId()).append(", ");
-            sb.append("issuerNameHash: ").append(
-                    Hex.toHexString(certId.getIssuerNameHash()).toUpperCase()).append(", ");
-            sb.append("issuerKeyHash: ") .append(
-                    Hex.toHexString(certId.getIssuerKeyHash()) .toUpperCase()).append(", ");
-            sb.append("serialNumber: ").append(LogUtil.formatCsn(certId.getSerialNumber()))
-                    .append(", ");
+            sb.append("certHashAlgo: ").append(certId.getHashAlgorithm().getAlgorithm().getId())
+                .append(", ");
+            sb.append("issuerNameHash: ")
+                .append(Hex.toHexString(certId.getIssuerNameHash().getOctets()).toUpperCase())
+                .append(", ");
+            sb.append("issuerKeyHash: ")
+                .append(Hex.toHexString(certId.getIssuerKeyHash().getOctets()).toUpperCase())
+                .append(", ");
+            sb.append("serialNumber: ")
+                .append(LogUtil.formatCsn(certId.getSerialNumber().getValue()))
+                .append(", ");
             sb.append("certStatus: ").append(certStatusText).append(", ");
             sb.append("thisUpdate: ").append(thisUpdate).append(", ");
             sb.append("nextUpdate: ").append(nextUpdate);
@@ -1346,13 +1376,13 @@ public class OcspServer {
         return store;
     } // method initStore
 
-    private OcspRespWithCacheInfo checkSignature(final OCSPReq request,
+    private OcspRespWithCacheInfo checkSignature(final OCSPRequest request,
             final RequestOption requestOption, final AuditEvent event)
             throws OCSPException, CertificateParsingException, InvalidAlgorithmParameterException,
                 OcspResponderException {
         final boolean audit = (event != null);
 
-        if (!request.isSigned()) {
+        if (request.getOptionalSignature() == null) {
             if (!requestOption.isSignatureRequired()) {
                 return null;
             }
@@ -1369,7 +1399,8 @@ public class OcspServer {
             return null;
         }
 
-        X509CertificateHolder[] certs = request.getCerts();
+        OCSPReq req = new OCSPReq(request);
+        X509CertificateHolder[] certs = req.getCerts();
         if (certs == null || certs.length < 1) {
             String message = "no certificate found in request to verify the signature";
             LOG.warn(message);
@@ -1392,7 +1423,7 @@ public class OcspServer {
             return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
         }
 
-        boolean sigValid = request.isSignatureValid(cvp);
+        boolean sigValid = req.isSignatureValid(cvp);
         if (!sigValid) {
             String message = "request signature is invalid";
             LOG.warn(message);
