@@ -222,7 +222,6 @@ public abstract class LoadExecutor {
 
         final long account = processLog.numProcessed();
         StringBuilder sb = new StringBuilder(400);
-        long elapsedTimeMs = processLog.totalElapsedTime();
 
         String text = new Date(processLog.startTimeMs()).toString();
         sb.append(" started at: ").append(text).append("\n");
@@ -230,6 +229,7 @@ public abstract class LoadExecutor {
         text = new Date(processLog.endTimeMs()).toString();
         sb.append("finished at: ").append(text).append("\n");
 
+        long elapsedTimeMs = processLog.totalElapsedTime();
         text = StringUtil.formatTime(elapsedTimeMs / 1000, false);
         sb.append("   duration: ").append(text).append("\n");
 
