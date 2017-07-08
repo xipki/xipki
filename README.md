@@ -108,7 +108,7 @@ Install
 
 * Add JDBC drivers (optional)
 
-  This step is only required if you want to use database other than HSQLDB.
+  This step is only required if you want to use database other than H2.
 
 
   * Get the JDBC drivers
@@ -134,13 +134,13 @@ Install
       * Driver: postgresql-`<version>`.jar
       * Download URL: https://jdbc.postgresql.org/download.html
     
-    * H2
-      * Driver: h2-`<version>`.jar
-      * Download URL: http://www.h2database.com/html/download.html
+    * HSQLDB
+      * Driver: hsqldb-`<version>`.jar
+      * Download URL: hsqldb.org
 
   * Copy the jar file to the folder `lib/jdbc`.
 
-  * Append the bundle URL to the feature `xipki-jdbc` in the file `system/org/xipki/features/jdbc/<version>/jdbc-<version>-features.xml`.
+  * Append the bundle URL to the feature `xipki-jdbc` in the file `lib/jdbc/features.xml`.
 
     ```sh
     <feature name="xipki-jdbc" description="JDBC drivers">

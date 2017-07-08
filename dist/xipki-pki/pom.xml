@@ -15,7 +15,7 @@
     <app.name>PKI</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
-    <jdbc.hsqldb.version>2.3.4</jdbc.hsqldb.version>
+    <jdbc.h2.version>1.4.195</jdbc.h2.version>
   </properties>
   <dependencies>
     <dependency>
@@ -88,9 +88,9 @@
               <stripVersion>true</stripVersion>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.hsqldb</groupId>
-                  <artifactId>hsqldb</artifactId>
-                  <version>${jdbc.hsqldb.version}</version>
+                  <groupId>com.h2database</groupId>
+                  <artifactId>h2</artifactId>
+                  <version>${jdbc.h2.version}</version>
                   <outputDirectory>${output.directory}/lib/jdbc</outputDirectory>
                 </artifactItem>
               </artifactItems>
@@ -222,7 +222,6 @@
               <repository>${output.directory}/system</repository>
               <descriptors>
                 <descriptor>mvn:org.xipki.features/pki/${project.version}/xml/features</descriptor>
-                <descriptor>mvn:org.xipki.features/jdbc/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
