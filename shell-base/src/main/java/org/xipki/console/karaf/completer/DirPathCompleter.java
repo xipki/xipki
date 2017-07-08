@@ -34,8 +34,7 @@
 
 package org.xipki.console.karaf.completer;
 
-import java.io.File;
-import java.util.List;
+import java.nio.file.Path;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
@@ -48,14 +47,13 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 @Service
 public class DirPathCompleter extends FileCompleter {
 
-    /* Comment in for karaf 4.1.*
     @Override
     protected boolean accept(Path path) {
         return path.toFile().isDirectory() && super.accept(path);
     }
-    */
 
     // This method is for karaf 4.0.*
+    /*
     @Override
     protected int matchFiles(final String buffer, final String translated, final File[] files,
             final List<String> candidates) {
@@ -83,5 +81,6 @@ public class DirPathCompleter extends FileCompleter {
 
         return index + separator().length();
     }
+    */
 
 }
