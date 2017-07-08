@@ -17,8 +17,6 @@
         <xs:element name="datasources" type="datasourcesType" minOccurs="0"/>
         <xs:element name="requestOptions" type="requestOptionsType"/>
         <xs:element name="responseOptions" type="responseOptionsType"/>
-        <xs:element name="auditOptions" type="auditOptionsType" minOccurs="0"/>
-        <xs:element name="certprofileOptions" type="certprofileOptionsType" minOccurs="0"/>
       </xs:all>
       <xs:attribute name="master" type="xs:boolean" use="required"/>
     </xs:complexType>
@@ -73,8 +71,6 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
       <xs:element name="signer" type="xs:string"/>
       <xs:element name="request" type="xs:string"/>
       <xs:element name="response" type="xs:string"/>
-      <xs:element name="audit" type="xs:string" minOccurs="0"/>
-      <xs:element name="certprofile" type="xs:string" minOccurs="0"/>
       <xs:element name="stores">
         <xs:complexType>
           <xs:sequence>
@@ -249,41 +245,6 @@ combination (servlet.alias = '/', servletPath = '/foo/abc') or
         </xs:annotation>
       </xs:element>
     </xs:all>
-  </xs:complexType>
-  <!-- audit -->
-  <xs:complexType name="auditOptionsType">
-    <xs:sequence>
-      <xs:element name="auditOption" type="auditOptionType" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="auditOptionType">
-    <xs:all>
-      <xs:element name="certprofileMappings" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="mapping" type="mappingType" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-    </xs:all>
-    <xs:attribute name="name" type="xs:string" use="required"/>    
-  </xs:complexType>
-  <xs:complexType name="mappingType">
-    <xs:attribute name="from" type="xs:string"/>
-    <xs:attribute name="to" type="xs:string"/>
-  </xs:complexType>
-  <!-- certprofile -->
-  <xs:complexType name="certprofileOptionsType">
-    <xs:sequence>
-      <xs:element name="certprofileOption" type="certprofileOptionType" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="certprofileOptionType">
-    <xs:all>
-       <xs:element name="includes" type="includesType" minOccurs="0"/>
-       <xs:element name="excludes" type="excludesType" minOccurs="0"/>
-    </xs:all>
-    <xs:attribute name="name" type="xs:string" use="required"/>    
   </xs:complexType>
   <!-- datasource -->
   <xs:complexType name="datasourcesType">

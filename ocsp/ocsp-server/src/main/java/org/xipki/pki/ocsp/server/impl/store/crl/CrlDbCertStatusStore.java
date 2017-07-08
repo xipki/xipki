@@ -48,9 +48,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.AuditLevel;
-import org.xipki.audit.AuditStatus;
-import org.xipki.audit.PciAuditEvent;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
@@ -181,7 +178,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
                 return;
             }
 
-            auditPciEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "a newer CRL is available");
+            LOG.info("UPDATE_CERTSTORE: a newer CRL is available");
             updateCrlSuccessful = false;
 
             X509CRL crl = X509Util.parseCrl(crlFilename);
@@ -230,23 +227,13 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
             updateMeFile.delete();
             crlUpdateInProcess.set(false);
             if (updateCrlSuccessful != null) {
-                AuditLevel auditLevel = updateCrlSuccessful ? AuditLevel.INFO : AuditLevel.ERROR;
-                AuditStatus auditStatus = updateCrlSuccessful ? AuditStatus.SUCCESSFUL
-                        : AuditStatus.FAILED;
-                auditPciEvent(auditLevel, "UPDATE_CRL", auditStatus.name());
+                if (updateCrlSuccessful.booleanValue()) {
+                    LOG.info("UPDATE_CRL: successful");
+                } else {
+                    LOG.warn("UPDATE_CRL: failed");
+                }
             }
         }
     } // method initializeStore
-
-    private void auditPciEvent(final AuditLevel auditLevel, final String eventType,
-            final String auditStatus) {
-        PciAuditEvent event = new PciAuditEvent(new Date());
-        event.setUserId("SYSTEM");
-        event.setEventType(eventType);
-        event.setAffectedResource("CRL-Updater");
-        event.setStatus(auditStatus);
-        event.setLevel(auditLevel);
-        auditService().logEvent(event);
-    }
 
 }

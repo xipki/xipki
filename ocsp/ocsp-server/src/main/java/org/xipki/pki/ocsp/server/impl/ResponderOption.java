@@ -58,10 +58,6 @@ class ResponderOption {
 
     private final String responseOptionName;
 
-    private final String auditOptionName;
-
-    private final String certprofileOptionName;
-
     private final String signerName;
 
     private final List<String> storeNames;
@@ -82,8 +78,6 @@ class ResponderOption {
         this.signerName = conf.getSigner();
         this.requestOptionName = conf.getRequest();
         this.responseOptionName = conf.getResponse();
-        this.auditOptionName = conf.getAudit();
-        this.certprofileOptionName = conf.getCertprofile();
         this.inheritCaRevocation = conf.isInheritCaRevocation();
 
         List<String> list = new ArrayList<>(conf.getStores().getStore());
@@ -124,16 +118,8 @@ class ResponderOption {
         return responseOptionName;
     }
 
-    public String auditOptionName() {
-        return auditOptionName;
-    }
-
     public List<String> storeNames() {
         return storeNames;
-    }
-
-    public String certprofileOptionName() {
-        return certprofileOptionName;
     }
 
     public List<String> servletPaths() {

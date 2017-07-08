@@ -21,7 +21,6 @@
       <signer>signer1</signer>
       <request>request1</request>
       <response>response1</response>
-      <!--audit>audit1</audit-->
       <stores>
         <store>dbstore1</store>
       </stores>
@@ -35,7 +34,6 @@
       <signer>signer1</signer>
       <request>request1</request>
       <response>response1</response>
-      <!--audit>audit1</audit-->
       <stores>
         <store>crlstore1</store>
       </stores>
@@ -178,9 +176,4 @@ certs.dir = output
       <!--certhashAlgorithm>SHA1</certhashAlgorithm-->
     </responseOption>
   </responseOptions>
-  <!-- auditOptions -->
-  <auditOptions>
-    <auditOption name="audit1">
-    </auditOption>
-  </auditOptions>
 </OCSPServer>

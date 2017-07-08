@@ -66,7 +66,6 @@ import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.pki.ocsp.api.CertStatusInfo;
-import org.xipki.pki.ocsp.api.CertprofileOption;
 import org.xipki.pki.ocsp.api.IssuerHashNameAndKey;
 import org.xipki.pki.ocsp.api.OcspStore;
 import org.xipki.pki.ocsp.api.OcspStoreException;
@@ -258,8 +257,8 @@ public class DbCertStatusStore extends OcspStore {
     @Override
     public CertStatusInfo getCertStatus(final Date time, final HashAlgoType hashAlgo,
             final byte[] issuerNameHash, final byte[] issuerKeyHash, final BigInteger serialNumber,
-            final boolean includeCertHash, final HashAlgoType certHashAlg,
-            final CertprofileOption certprofileOption) throws OcspStoreException {
+            final boolean includeCertHash, final HashAlgoType certHashAlg)
+            throws OcspStoreException {
         ParamUtil.requireNonNull("hashAlgo", hashAlgo);
         ParamUtil.requireNonNull("serialNumber", serialNumber);
 
@@ -353,12 +352,6 @@ public class DbCertStatusStore extends OcspStore {
                         if (notAfterInSec != 0 && timeInSec > notAfterInSec) {
                             ignore = true;
                         }
-                    }
-
-                    if (!ignore) {
-                        certprofile = rs.getString("PN");
-                        ignore = (certprofile != null) && (certprofileOption != null)
-                                && !certprofileOption.include(certprofile);
                     }
 
                     if (!ignore) {
@@ -496,13 +489,13 @@ public class DbCertStatusStore extends OcspStore {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
         sqlCs = datasource.buildSelectFirstSql(1,
-                "NBEFORE,NAFTER,REV,RR,RT,RIT,PN FROM CERT WHERE IID=? AND SN=?");
+                "NBEFORE,NAFTER,REV,RR,RT,RIT,FROM CERT WHERE IID=? AND SN=?");
         sqlCsMap = new HashMap<>();
 
         HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA1,  HashAlgoType.SHA224,
             HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512};
         for (HashAlgoType hashAlgo : hashAlgos) {
-            String coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT,RIT,PN," + hashAlgo.getShortName()
+            String coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT,RIT," + hashAlgo.getShortName()
                 + " FROM CERT INNER JOIN CHASH ON CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID";
             sqlCsMap.put(hashAlgo, datasource.buildSelectFirstSql(1, coreSql));
         }

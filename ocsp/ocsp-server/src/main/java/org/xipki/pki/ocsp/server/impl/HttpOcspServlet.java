@@ -37,7 +37,6 @@ package org.xipki.pki.ocsp.server.impl;
 import static io.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_ALLOWED;
 
 import java.io.EOFException;
-import java.util.Date;
 
 import javax.net.ssl.SSLSession;
 
@@ -45,10 +44,6 @@ import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.AuditEvent;
-import org.xipki.audit.AuditLevel;
-import org.xipki.audit.AuditService;
-import org.xipki.audit.AuditStatus;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.http.servlet.AbstractHttpServlet;
@@ -116,48 +111,16 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             return createErrorResponse(version, HttpResponseStatus.NOT_FOUND);
         }
 
-        AuditService auditService = null;
-        if (responder.auditOption() != null) {
-            auditService = (server.auditServiceRegister() == null) ? null
-                    : server.auditServiceRegister().getAuditService();
-        }
-
-        boolean audit = (auditService != null);
-
-        AuditLevel auditLevel = null;
-        AuditStatus auditStatus = null;
-        AuditEvent event = null;
-        String auditMessage = null;
-
-        if (audit) {
-            auditLevel = AuditLevel.INFO;
-            auditStatus = AuditStatus.SUCCESSFUL;
-
-            event = new AuditEvent(new Date());
-            event.setApplicationName(OcspAuditConstants.APPNAME);
-            event.setName(OcspAuditConstants.NAME_PERF);
-        }
-
         try {
             // accept only "application/ocsp-request" as content type
             String reqContentType = request.headers().get("Content-Type");
             if (!CT_REQUEST.equalsIgnoreCase(reqContentType)) {
-                if (audit) {
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "unsupported media type " + reqContentType;
-                }
-
                 return createErrorResponse(version, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
             }
 
             int contentLen = request.content().readableBytes();
             // request too long
             if (contentLen > responder.requestOption().maxRequestSize()) {
-                if (audit) {
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "request too large";
-                }
-
                 return createErrorResponse(version,
                         HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
             } // if (CT_REQUEST)
@@ -168,26 +131,14 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             try {
                 ocspRequest = OCSPRequest.getInstance(content);
             } catch (Exception ex) {
-                if (audit) {
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "bad request";
-                }
-
                 LogUtil.error(LOG, ex, "could not parse the request (OCSPRequest)");
                 return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
             }
 
             OcspRespWithCacheInfo ocspRespWithCacheInfo =
-                    server.answer(responder, ocspRequest, false, event);
+                    server.answer(responder, ocspRequest, false);
             if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
-                auditMessage = "processRequest returned null, this should not happen";
-                LOG.error(auditMessage);
-
-                if (audit) {
-                    auditLevel = AuditLevel.ERROR;
-                    auditStatus = AuditStatus.FAILED;
-                }
-
+                LOG.error("processRequest returned null, this should not happen");
                 return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
             }
 
@@ -199,30 +150,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             } else {
                 LOG.error("Throwable thrown, this should not happen!", th);
             }
-
-            if (audit) {
-                auditLevel = AuditLevel.ERROR;
-                auditStatus = AuditStatus.FAILED;
-            }
-            auditMessage = "internal error";
             return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-        } finally {
-            if (audit) {
-                if (auditLevel != null) {
-                    event.setLevel(auditLevel);
-                }
-
-                if (auditStatus != null) {
-                    event.setStatus(auditStatus);
-                }
-
-                if (auditMessage != null) {
-                    event.addEventData(OcspAuditConstants.NAME_message, auditMessage);
-                }
-
-                event.finish();
-                auditService.logEvent(event);
-            }
         } // end external try
     } // method servicePost
 
@@ -256,36 +184,10 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
         }
 
-        AuditService auditService = null;
-        if (responder.auditOption() != null) {
-            auditService = (server.auditServiceRegister() == null) ? null
-                    : server.auditServiceRegister().getAuditService();
-        }
-
-        boolean audit = (auditService != null);
-
-        AuditLevel auditLevel = null;
-        AuditStatus auditStatus = null;
-        AuditEvent event = null;
-        String auditMessage = null;
-
-        if (audit) {
-            auditLevel = AuditLevel.INFO;
-            auditStatus = AuditStatus.SUCCESSFUL;
-
-            event = new AuditEvent(new Date());
-            event.setApplicationName(OcspAuditConstants.APPNAME);
-            event.setName(OcspAuditConstants.NAME_PERF);
-        }
-
         try {
             // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
             // POST, we support GET for longer requests anyway.
             if (b64OcspReq.length() > responder.requestOption().maxRequestSize()) {
-                if (audit) {
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "request too large";
-                }
                 return createErrorResponse(version, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
             }
 
@@ -295,23 +197,13 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             try {
                 ocspRequest = OCSPRequest.getInstance(content);
             } catch (Exception ex) {
-                if (audit) {
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "bad request";
-                }
                 LogUtil.error(LOG, ex, "could not parse the request (OCSPRequest)");
                 return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
             }
 
             OcspRespWithCacheInfo ocspRespWithCacheInfo =
-                    server.answer(responder, ocspRequest, true, event);
+                    server.answer(responder, ocspRequest, true);
             if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
-                auditMessage = "processRequest returned null, this should not happen";
-                LOG.error(auditMessage);
-                if (audit) {
-                    auditLevel = AuditLevel.ERROR;
-                    auditStatus = AuditStatus.FAILED;
-                }
                 return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
             }
 
@@ -371,30 +263,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             } else {
                 LOG.error("Throwable thrown, this should not happen!", th);
             }
-
-            if (audit) {
-                auditLevel = AuditLevel.ERROR;
-                auditStatus = AuditStatus.FAILED;
-                auditMessage = "internal error";
-            }
             return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
-        } finally {
-            if (audit) {
-                if (auditLevel != null) {
-                    event.setLevel(auditLevel);
-                }
-
-                if (auditStatus != null) {
-                    event.setStatus(auditStatus);
-                }
-
-                if (auditMessage != null) {
-                    event.addEventData(OcspAuditConstants.NAME_message, auditMessage);
-                }
-
-                event.finish();
-                auditService.logEvent(event);
-            }
         } // end external try
     } // method serviceGet
 

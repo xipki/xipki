@@ -37,7 +37,6 @@ package org.xipki.pki.ocsp.server.impl;
 import java.util.List;
 
 import org.xipki.common.util.ParamUtil;
-import org.xipki.pki.ocsp.api.CertprofileOption;
 import org.xipki.pki.ocsp.api.OcspStore;
 
 /**
@@ -53,25 +52,18 @@ class Responder {
 
     private final ResponseOption responseOption;
 
-    private final AuditOption auditOption;
-
-    private final CertprofileOption certprofileOption;
-
     private final ResponderSigner signer;
 
     private final List<OcspStore> stores;
 
     Responder(final ResponderOption responderOption, final RequestOption requestOption,
-            final ResponseOption responseOption, final AuditOption auditOption,
-            final CertprofileOption certprofileOption, final ResponderSigner signer,
+            final ResponseOption responseOption, final ResponderSigner signer,
             final List<OcspStore> stores) {
         this.responderOption = ParamUtil.requireNonNull("responderOption", responderOption);
         this.requestOption = ParamUtil.requireNonNull("requestOption", requestOption);
         this.responseOption = ParamUtil.requireNonNull("responseOption", responseOption);
         this.signer = ParamUtil.requireNonNull("signer", signer);
         this.stores = ParamUtil.requireNonEmpty("stores", stores);
-        this.auditOption = auditOption;
-        this.certprofileOption = certprofileOption;
     }
 
     public ResponderOption responderOption() {
@@ -84,14 +76,6 @@ class Responder {
 
     public ResponseOption responseOption() {
         return responseOption;
-    }
-
-    public AuditOption auditOption() {
-        return auditOption;
-    }
-
-    public CertprofileOption certprofileOption() {
-        return certprofileOption;
     }
 
     public ResponderSigner signer() {

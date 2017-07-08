@@ -39,8 +39,6 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Set;
 
-import org.xipki.audit.AuditService;
-import org.xipki.audit.AuditServiceRegister;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
@@ -68,8 +66,6 @@ public abstract class OcspStore {
     protected boolean ignoreExpiredCert;
 
     protected boolean ignoreNotYetValidCert;
-
-    protected AuditServiceRegister auditServiceRegister;
 
     public OcspStore() {
     }
@@ -121,14 +117,11 @@ public abstract class OcspStore {
      * @param certHashAlg
      *          Hash algorithm of the certHash. If {@code null}, the algorithm specified
      *          in the parameter hashAlgo will be applied.
-     * @param certprofileOption
-     *          Option of the certificate profile. Could be {@code null}.
      * @return the certificate status.
      */
     public abstract CertStatusInfo getCertStatus(Date time, HashAlgoType hashAlgo,
             byte[] issuerNameHash, byte[] issuerKeyHash, BigInteger serialNumber,
-            boolean includeCertHash, HashAlgoType certHashAlg,
-            CertprofileOption certprofileOption)
+            boolean includeCertHash, HashAlgoType certHashAlg)
             throws OcspStoreException;
 
     /**
@@ -165,14 +158,6 @@ public abstract class OcspStore {
 
     public String name() {
         return name;
-    }
-
-    public void setAuditServiceRegister(final AuditServiceRegister auditServiceRegister) {
-        this.auditServiceRegister = auditServiceRegister;
-    }
-
-    public AuditService auditService() {
-        return auditServiceRegister.getAuditService();
     }
 
     public boolean isUnknownSerialAsGood() {

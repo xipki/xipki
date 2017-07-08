@@ -10,15 +10,12 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.SecurityFactory"/>
-  <reference id="auditServiceRegister"
-      interface="org.xipki.audit.AuditServiceRegister"/>
   <reference id="ocspStoreFactoryRegister"
       interface="org.xipki.pki.ocsp.api.OcspStoreFactoryRegister"/>
   <bean id="ocspServer" class="org.xipki.pki.ocsp.server.impl.OcspServer" 
       init-method="init" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
     <property name="securityFactory" ref="securityFactory"/>
-    <property name="auditServiceRegister" ref="auditServiceRegister"/>
     <property name="ocspStoreFactoryRegister" ref="ocspStoreFactoryRegister"/>
   </bean>
   <!-- create the servlet and inject our own app factory -->

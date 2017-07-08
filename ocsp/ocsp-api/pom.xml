@@ -14,11 +14,6 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>audit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki</groupId>
       <artifactId>datasource</artifactId>
       <version>${project.version}</version>
     </dependency>
