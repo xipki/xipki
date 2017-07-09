@@ -114,6 +114,8 @@ public abstract class OcspStore {
      *          Serial number of the target certificate. Must not be {@code null}.
      * @param includeCertHash
      *          Whether to include the hash of target certificate in the response.
+     * @param includeRit
+     *          Whether to include the revocation invalidity time in the response.
      * @param certHashAlg
      *          Hash algorithm of the certHash. If {@code null}, the algorithm specified
      *          in the parameter hashAlgo will be applied.
@@ -121,7 +123,7 @@ public abstract class OcspStore {
      */
     public abstract CertStatusInfo getCertStatus(Date time, HashAlgoType hashAlgo,
             byte[] issuerNameHash, byte[] issuerKeyHash, BigInteger serialNumber,
-            boolean includeCertHash, HashAlgoType certHashAlg)
+            boolean includeCertHash, boolean includeRit, HashAlgoType certHashAlg)
             throws OcspStoreException;
 
     /**

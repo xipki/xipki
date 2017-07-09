@@ -34,8 +34,6 @@
 
 package org.xipki.pki.ocsp.server.impl;
 
-import static io.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_ALLOWED;
-
 import java.io.EOFException;
 
 import javax.net.ssl.SSLSession;
@@ -97,7 +95,8 @@ public class HttpOcspServlet extends AbstractHttpServlet {
         } else if (method == HttpMethod.POST) {
             return servicePost(request, servletUri, sslSession, sslReverseProxyMode);
         } else {
-            return createErrorResponse(request.protocolVersion(), METHOD_NOT_ALLOWED);
+            return createErrorResponse(request.protocolVersion(),
+                    HttpResponseStatus.METHOD_NOT_ALLOWED);
         }
 
     }

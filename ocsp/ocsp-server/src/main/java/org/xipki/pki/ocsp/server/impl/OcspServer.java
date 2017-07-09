@@ -861,9 +861,9 @@ public class OcspServer {
         for (OcspStore store : responder.stores()) {
             try {
                 certStatusInfo = store.getCertStatus(now, reqHashAlgo, nameHash, keyHash, serial,
-                        repOpt.isIncludeCerthash(), repOpt.certHashAlgo());
-                if (certStatusInfo != null
-                        && certStatusInfo.certStatus() != CertStatus.ISSUER_UNKNOWN) {
+                        repOpt.isIncludeCerthash(), repOpt.isIncludeInvalidityDate(),
+                        repOpt.certHashAlgo());
+                if (certStatusInfo != null) {
                     answeredStore = store;
                     break;
                 }
@@ -1064,7 +1064,6 @@ public class OcspServer {
         result.setHealthy(healthy);
         return result;
     } // method healthCheck
-
 
     public void setOcspStoreFactoryRegister(
             final OcspStoreFactoryRegister ocspStoreFactoryRegister) {

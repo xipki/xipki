@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -121,7 +120,11 @@ public class DbCertStatusStore extends OcspStore {
 
     private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
 
+    private String sqlCsNoRit;
+
     private String sqlCs;
+
+    private Map<HashAlgoType, String> sqlCsNoRitMap;
 
     private Map<HashAlgoType, String> sqlCsMap;
 
@@ -148,7 +151,7 @@ public class DbCertStatusStore extends OcspStore {
         try {
             if (initialized) {
                 final String sql = "SELECT ID,REV,RT,S1C FROM ISSUER";
-                PreparedStatement ps = borrowPreparedStatement(sql);
+                PreparedStatement ps = preparedStatement(sql);
                 ResultSet rs = null;
 
                 try {
@@ -196,7 +199,7 @@ public class DbCertStatusStore extends OcspStore {
             } // end if(initialized)
 
             final String sql = "SELECT ID,NBEFORE,REV,RT,S1C,CERT,CRL_INFO FROM ISSUER";
-            PreparedStatement ps = borrowPreparedStatement(sql);
+            PreparedStatement ps = preparedStatement(sql);
 
             ResultSet rs = null;
             try {
@@ -257,22 +260,10 @@ public class DbCertStatusStore extends OcspStore {
     @Override
     public CertStatusInfo getCertStatus(final Date time, final HashAlgoType hashAlgo,
             final byte[] issuerNameHash, final byte[] issuerKeyHash, final BigInteger serialNumber,
-            final boolean includeCertHash, final HashAlgoType certHashAlg)
+            final boolean includeCertHash, final boolean includeRit, final HashAlgoType certHashAlg)
             throws OcspStoreException {
-        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
-        ParamUtil.requireNonNull("serialNumber", serialNumber);
-
         if (serialNumber.signum() != 1) { // non-positive serial number
             return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
-        }
-
-        // wait for max. 0.5 second
-        int num = 5;
-        while (!initialized && (num-- > 0)) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) { // CHECKSTYLE:SKIP
-            }
         }
 
         if (!initialized) {
@@ -287,16 +278,16 @@ public class DbCertStatusStore extends OcspStore {
         HashAlgoType certHashAlgo = null;
         if (includeCertHash) {
             certHashAlgo = (certHashAlg == null) ? hashAlgo : certHashAlg;
-            sql = sqlCsMap.get(certHashAlgo);
+            sql = (includeRit ? sqlCsMap : sqlCsNoRitMap).get(certHashAlgo);
         } else {
-            sql = sqlCs;
+            sql = includeRit ? sqlCs : sqlCsNoRit;
         }
 
         try {
             IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash,
                     issuerKeyHash);
             if (issuer == null) {
-                return CertStatusInfo.getIssuerUnknownCertStatusInfo(new Date(), null);
+                return null;
             }
 
             CrlInfo crlInfo = issuer.crlInfo();
@@ -324,16 +315,14 @@ public class DbCertStatusStore extends OcspStore {
             String b64CertHash = null;
             boolean revoked = false;
             int reason = 0;
-            long revocationTime = 0;
-            long invalidatityTime = 0;
+            long revTime = 0;
+            long invalTime = 0;
 
-            PreparedStatement ps = borrowPreparedStatement(sql);
+            PreparedStatement ps = datasource.prepareStatement(datasource.getConnection(), sql);
 
             try {
-                int idx = 1;
-                ps.setInt(idx++, issuer.id());
-                ps.setString(idx++, serialNumber.toString(16));
-
+                ps.setInt(1, issuer.id());
+                ps.setString(2, serialNumber.toString(16));
                 rs = ps.executeQuery();
 
                 if (rs.next()) {
@@ -362,8 +351,10 @@ public class DbCertStatusStore extends OcspStore {
                         revoked = rs.getBoolean("REV");
                         if (revoked) {
                             reason = rs.getInt("RR");
-                            revocationTime = rs.getLong("RT");
-                            invalidatityTime = rs.getLong("RIT");
+                            revTime = rs.getLong("RT");
+                            if (includeRit) {
+                                invalTime = rs.getLong("RIT");
+                            }
                         }
                     }
                 } // end if (rs.next())
@@ -385,18 +376,12 @@ public class DbCertStatusStore extends OcspStore {
                 if (ignore) {
                     certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
                 } else {
-                    byte[] certHash = null;
-                    if (b64CertHash != null) {
-                        certHash = Base64.decode(b64CertHash);
-                    }
-
+                    byte[] certHash = (b64CertHash == null) ? null : Base64.decode(b64CertHash);
                     if (revoked) {
-                        Date invTime = null;
-                        if (invalidatityTime != 0 && invalidatityTime != revocationTime) {
-                            invTime = new Date(invalidatityTime * 1000);
-                        }
+                        Date invTime = (invalTime == 0 || invalTime == revTime)
+                                ? null : new Date(invalTime * 1000);
                         CertRevocationInfo revInfo = new CertRevocationInfo(reason,
-                                new Date(revocationTime * 1000), invTime);
+                                new Date(revTime * 1000), invTime);
                         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
                                 certHashAlgo, certHash, thisUpdate, nextUpdate, certprofile);
                     } else {
@@ -438,17 +423,9 @@ public class DbCertStatusStore extends OcspStore {
      * @return the next idle preparedStatement, {@code null} will be returned if no
      *     PreparedStatement can be created within 5 seconds.
      */
-    private PreparedStatement borrowPreparedStatement(final String sqlQuery)
+    private PreparedStatement preparedStatement(final String sqlQuery)
             throws DataAccessException {
-        PreparedStatement ps = null;
-        Connection conn = datasource.getConnection();
-        if (conn != null) {
-            ps = datasource.prepareStatement(conn, sqlQuery);
-        }
-        if (ps == null) {
-            throw new DataAccessException("could not create prepared statement for " + sqlQuery);
-        }
-        return ps;
+        return datasource.prepareStatement(datasource.getConnection(), sqlQuery);
     }
 
     @Override
@@ -464,7 +441,7 @@ public class DbCertStatusStore extends OcspStore {
         final String sql = "SELECT ID FROM ISSUER";
 
         try {
-            PreparedStatement ps = borrowPreparedStatement(sql);
+            PreparedStatement ps = preparedStatement(sql);
             ResultSet rs = null;
             try {
                 rs = ps.executeQuery();
@@ -489,8 +466,12 @@ public class DbCertStatusStore extends OcspStore {
         this.datasource = ParamUtil.requireNonNull("datasource", datasource);
 
         sqlCs = datasource.buildSelectFirstSql(1,
-                "NBEFORE,NAFTER,REV,RR,RT,RIT,FROM CERT WHERE IID=? AND SN=?");
+                "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE IID=? AND SN=?");
+        sqlCsNoRit = datasource.buildSelectFirstSql(1,
+                "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE IID=? AND SN=?");
+
         sqlCsMap = new HashMap<>();
+        sqlCsNoRitMap = new HashMap<>();
 
         HashAlgoType[] hashAlgos = new HashAlgoType[]{HashAlgoType.SHA1,  HashAlgoType.SHA224,
             HashAlgoType.SHA256, HashAlgoType.SHA384, HashAlgoType.SHA512};
@@ -498,6 +479,10 @@ public class DbCertStatusStore extends OcspStore {
             String coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT,RIT," + hashAlgo.getShortName()
                 + " FROM CERT INNER JOIN CHASH ON CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID";
             sqlCsMap.put(hashAlgo, datasource.buildSelectFirstSql(1, coreSql));
+
+            coreSql = "NBEFORE,NAFTER,ID,REV,RR,RT," + hashAlgo.getShortName()
+                + " FROM CERT INNER JOIN CHASH ON CERT.IID=? AND CERT.SN=? AND CERT.ID=CHASH.CID";
+            sqlCsNoRitMap.put(hashAlgo, datasource.buildSelectFirstSql(1, coreSql));
         }
 
         StoreConf storeConf = new StoreConf(conf);

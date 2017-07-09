@@ -202,8 +202,8 @@ public class OcspBenchmark extends LoadExecutor {
         buf.getBytes(buf.readerIndex(), respBytes);
 
         if (!parseResponse) {
-            // a valid response should at least of size 100.
-            if (respBytes.length < 100) {
+            // a valid response should at least of size 10.
+            if (respBytes.length < 10) {
                 LOG.warn("bad response: response too short");
                 return false;
             } else {
