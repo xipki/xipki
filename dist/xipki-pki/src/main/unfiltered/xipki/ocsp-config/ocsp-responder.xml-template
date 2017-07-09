@@ -171,8 +171,8 @@ certs.dir = output
       <responderIdByName>true</responderIdByName>
       <embedCertsMode>SIGNER_AND_CA</embedCertsMode>
       <includeRevReason>true</includeRevReason>
-      <includeInvalidityDate>true</includeInvalidityDate>
-      <includeCertHash>true</includeCertHash>
+      <includeInvalidityDate>false</includeInvalidityDate>
+      <includeCertHash>false</includeCertHash>
       <!--certhashAlgorithm>SHA1</certhashAlgorithm-->
     </responseOption>
   </responseOptions>
