@@ -37,9 +37,9 @@ package org.xipki.security;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.ConfPairs;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -153,7 +153,7 @@ public class SignerConf {
         ConfPairs conf = new ConfPairs("password", password);
         conf.putPair("algo", signatureAlgorithm);
         conf.putPair("parallelism", Integer.toString(parallelism));
-        conf.putPair("keystore", "base64:" + Base64.toBase64String(IoUtil.read(keystoreStream)));
+        conf.putPair("keystore", "base64:" + Base64.encodeToString(IoUtil.read(keystoreStream)));
         return new SignerConf(conf.getEncoded());
     }
 

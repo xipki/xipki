@@ -60,7 +60,7 @@ import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.util.CollectionStore;
-import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.scep.client.exception.OperationNotSupportedException;
 import org.xipki.pki.scep.client.exception.ScepClientException;
@@ -186,7 +186,7 @@ public abstract class Client {
                 return httpPost(url, REQ_CONTENT_TYPE, request);
             } else {
                 String url = caId.buildGetUrl(operation,
-                        (request == null) ? null : Base64.toBase64String(request));
+                        (request == null) ? null : Base64.encodeToString(request));
                 return httpGet(url);
             }
         } // end if
