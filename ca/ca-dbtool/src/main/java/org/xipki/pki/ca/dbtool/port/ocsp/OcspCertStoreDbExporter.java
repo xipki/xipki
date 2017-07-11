@@ -51,10 +51,10 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ProcessLog;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
@@ -314,7 +314,7 @@ class OcspCertStoreDbExporter extends DbPorter {
                     }
 
                     String b64Cert = rs.getString("CERT");
-                    byte[] certBytes = Base64.decode(b64Cert);
+                    byte[] certBytes = Base64.decodeFast(b64Cert);
 
                     String sha1Cert = HashAlgoType.SHA1.hexHash(certBytes);
 

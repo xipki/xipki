@@ -47,10 +47,10 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ProcessLog;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
@@ -138,7 +138,7 @@ public class XipkiDigestExporter extends DbToolBase implements DbDigestExporter 
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 String b64Cert = rs.getString("CERT");
-                byte[] certBytes = Base64.decode(b64Cert);
+                byte[] certBytes = Base64.decodeFast(b64Cert);
 
                 Certificate cert = Certificate.getInstance(certBytes);
                 String commonName = X509Util.getCommonName(cert.getSubject());

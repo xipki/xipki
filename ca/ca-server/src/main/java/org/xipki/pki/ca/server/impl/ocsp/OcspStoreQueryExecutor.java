@@ -50,9 +50,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
@@ -203,7 +203,7 @@ class OcspStoreQueryExecutor {
 
         long certId = certificate.certId();
         byte[] encodedCert = certificate.encodedCert();
-        String b64Cert = Base64.toBase64String(encodedCert);
+        String b64Cert = Base64.encodeToString(encodedCert);
         String sha1Fp = HashAlgoType.SHA1.base64Hash(encodedCert);
         String sha224Fp = HashAlgoType.SHA224.base64Hash(encodedCert);
         String sha256Fp = HashAlgoType.SHA256.base64Hash(encodedCert);
@@ -520,7 +520,7 @@ class OcspStoreQueryExecutor {
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try {
-            String b64Cert = Base64.toBase64String(encodedCert);
+            String b64Cert = Base64.encodeToString(encodedCert);
             String subject = issuerCert.subject();
             int idx = 1;
             ps.setInt(idx++, id);

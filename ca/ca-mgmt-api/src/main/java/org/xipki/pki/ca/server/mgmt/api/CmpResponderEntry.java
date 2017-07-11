@@ -37,7 +37,7 @@ package org.xipki.pki.ca.server.mgmt.api;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -152,7 +152,7 @@ public class CmpResponderEntry {
             if (verbose) {
                 sb.append("\tencoded: ");
                 try {
-                    sb.append(Base64.toBase64String(certificate.getEncoded()));
+                    sb.append(Base64.encodeToString(certificate.getEncoded()));
                 } catch (CertificateEncodingException ex) {
                     sb.append("ERROR");
                 }

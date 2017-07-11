@@ -39,7 +39,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
-import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -213,7 +213,7 @@ public class X509CaEntry extends CaEntry {
             if (verbose) {
                 String b64EncodedCert = null;
                 try {
-                    b64EncodedCert = Base64.toBase64String(cert.getEncoded());
+                    b64EncodedCert = Base64.encodeToString(cert.getEncoded());
                 } catch (CertificateEncodingException ex) {
                     b64EncodedCert = "ERROR, could not encode the certificate";
                 }

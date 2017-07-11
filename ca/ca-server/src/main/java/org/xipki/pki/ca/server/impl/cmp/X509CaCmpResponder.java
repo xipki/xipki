@@ -109,13 +109,13 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.CertificateRequestMessage;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditStatus;
 import org.xipki.common.HealthCheckResult;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.LogUtil;
@@ -1219,7 +1219,7 @@ public class X509CaCmpResponder extends CmpResponder {
         if (version == 2) {
             // CACert
             sb.append("<CACert>");
-            sb.append(Base64.toBase64String(ca.caInfo().certificate().encodedCert()));
+            sb.append(Base64.encodeToString(ca.caInfo().certificate().encodedCert()));
             sb.append("</CACert>");
 
             // CMP control

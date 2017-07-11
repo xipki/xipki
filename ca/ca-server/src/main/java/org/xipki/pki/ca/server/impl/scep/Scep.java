@@ -63,7 +63,6 @@ import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +70,7 @@ import org.xipki.audit.AuditEvent;
 import org.xipki.audit.AuditStatus;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -724,29 +724,41 @@ public class Scep {
         }
     }
 
-    private static byte[] getTransactionIdBytes(final String tid) {
+    private static byte[] getTransactionIdBytes(final String tid)
+            throws OperationException {
+        byte[] bytes = null;
         final int n = tid.length();
         if (n % 2 != 0) { // neither hex nor base64 encoded
-            return tid.getBytes();
-        }
-
-        try {
-            return Hex.decode(tid);
-        } catch (Exception ex) {
-            if (n % 4 == 0) {
-                try {
-                    return Base64.decode(tid);
-                } catch (Exception ex2) {
-                    LOG.error("could not decode (hex or base64) '{}': {}", tid, ex2.getMessage());
+            bytes = tid.getBytes();
+        } else {
+            try {
+                bytes = Hex.decode(tid);
+            } catch (Exception ex) {
+                if (n % 4 == 0) {
+                    try {
+                        bytes = Base64.decode(tid);
+                    } catch (Exception ex2) {
+                        LOG.error("could not decode (hex or base64) '{}': {}", tid,
+                                ex2.getMessage());
+                    }
                 }
             }
         }
-        return tid.getBytes();
+
+        if (bytes == null) {
+            bytes = tid.getBytes();
+        }
+
+        if (bytes.length > 20) {
+            throw new OperationException(ErrorCode.BAD_REQUEST, "transactionID too long");
+        }
+
+        return bytes;
     } // method getTransactionIdBytes
 
     private static void audit(final AuditEvent audit, final String name, final String value) {
         audit.addEventData(name, (value == null) ? "null" : value);
-    } // method audit
+    }
 
     private void refreshCa() throws OperationException {
         try {

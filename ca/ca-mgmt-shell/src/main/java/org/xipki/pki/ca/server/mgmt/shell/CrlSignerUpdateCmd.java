@@ -41,7 +41,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
@@ -98,7 +98,7 @@ public class CrlSignerUpdateCmd extends CaCommandSupport {
         } else if (signerCert != null) {
             byte[] certBytes = IoUtil.read(signerCert);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));
-            signerCertConf = Base64.toBase64String(certBytes);
+            signerCertConf = Base64.encodeToString(certBytes);
         }
 
         if (signerConf != null) {

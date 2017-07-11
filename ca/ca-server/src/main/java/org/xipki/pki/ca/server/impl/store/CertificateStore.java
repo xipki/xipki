@@ -44,9 +44,9 @@ import java.util.List;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
@@ -96,7 +96,7 @@ public class CertificateStore {
         } catch (Exception ex) {
             LOG.error("could not save certificate {}: {}. Message: {}",
                     new Object[]{certInfo.cert().subject(),
-                        Base64.toBase64String(certInfo.cert().encodedCert()),
+                        Base64.encodeToString(certInfo.cert().encodedCert(), true),
                         ex.getMessage()});
             LOG.debug("error", ex);
             return false;

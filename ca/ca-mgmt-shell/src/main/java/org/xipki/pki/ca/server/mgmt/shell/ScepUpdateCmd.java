@@ -42,7 +42,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
@@ -156,7 +156,7 @@ public class ScepUpdateCmd extends CaCommandSupport {
         } else if (certFile != null) {
             byte[] certBytes = IoUtil.read(certFile);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));
-            certConf = Base64.toBase64String(certBytes);
+            certConf = Base64.encodeToString(certBytes);
         }
 
         ChangeScepEntry entry = new ChangeScepEntry(name);

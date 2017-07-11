@@ -39,9 +39,9 @@ import java.io.EOFException;
 import javax.net.ssl.SSLSession;
 
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.http.servlet.AbstractHttpServlet;
@@ -90,10 +90,10 @@ public class HttpOcspServlet extends AbstractHttpServlet {
         }
 
         HttpMethod method = request.method();
-        if (method == HttpMethod.GET) {
-            return serviceGet(request, servletUri, sslSession, sslReverseProxyMode);
-        } else if (method == HttpMethod.POST) {
+        if (HttpMethod.POST.equals(method)) {
             return servicePost(request, servletUri, sslSession, sslReverseProxyMode);
+        } else if (HttpMethod.GET.equals(method)) {
+            return serviceGet(request, servletUri, sslSession, sslReverseProxyMode);
         } else {
             return createErrorResponse(request.protocolVersion(),
                     HttpResponseStatus.METHOD_NOT_ALLOWED);
@@ -122,7 +122,7 @@ public class HttpOcspServlet extends AbstractHttpServlet {
             if (contentLen > responder.requestOption().maxRequestSize()) {
                 return createErrorResponse(version,
                         HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
-            } // if (CT_REQUEST)
+            }
 
             byte[] content = readContent(request);
 

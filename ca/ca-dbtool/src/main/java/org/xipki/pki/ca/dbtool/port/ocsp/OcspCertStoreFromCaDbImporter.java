@@ -57,11 +57,11 @@ import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificate;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.ProcessLog;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -327,7 +327,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
             setInt(ps, idx++, ca.getRevReason());
             setLong(ps, idx++, ca.getRevTime());
             setLong(ps, idx++, ca.getRevInvTime());
-            ps.setString(idx++, Base64.toBase64String(encodedCert));
+            ps.setString(idx++, Base64.encodeToString(encodedCert));
 
             ps.execute();
         } catch (SQLException ex) {
@@ -540,7 +540,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertStoreDbImporter {
                             psRawCert.setLong(idx++, id);
                             psRawCert.setString(idx++,
                                     X509Util.cutX500Name(tbsCert.getSubject(), maxX500nameLen));
-                            psRawCert.setString(idx++, Base64.toBase64String(encodedCert));
+                            psRawCert.setString(idx++, Base64.encodeToString(encodedCert));
                             psRawCert.addBatch();
                         } catch (SQLException ex) {
                             throw translate(SQL_ADD_CRAW, ex);

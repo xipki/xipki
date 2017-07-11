@@ -55,9 +55,9 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -376,7 +376,7 @@ public class DbCertStatusStore extends OcspStore {
                 if (ignore) {
                     certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
                 } else {
-                    byte[] certHash = (b64CertHash == null) ? null : Base64.decode(b64CertHash);
+                    byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
                     if (revoked) {
                         Date invTime = (invalTime == 0 || invalTime == revTime)
                                 ? null : new Date(invalTime * 1000);

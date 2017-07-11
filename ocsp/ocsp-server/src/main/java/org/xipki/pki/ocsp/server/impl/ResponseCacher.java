@@ -34,7 +34,6 @@
 
 package org.xipki.pki.ocsp.server.impl;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -51,15 +50,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.asn1.ocsp.OCSPResponse;
 import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.concurrent.ConcurrentBag;
 import org.xipki.common.concurrent.ConcurrentBagEntry;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
@@ -252,7 +249,7 @@ class ResponseCacher {
                 int idx = 1;
                 ps.setInt(idx++, id);
                 ps.setString(idx++, sha1FpCert);
-                ps.setString(idx++, Base64.toBase64String(encodedCert));
+                ps.setString(idx++, Base64.encodeToString(encodedCert));
 
                 ps.execute();
 
@@ -293,7 +290,7 @@ class ResponseCacher {
                 return null;
             }
 
-            String ident = Hex.toHexString(identBytes);
+            String ident = Base64.encodeToString(identBytes);
             String dbIdent = rs.getString("IDENT");
             if (!ident.equals(dbIdent)) {
                 return null;
@@ -311,7 +308,7 @@ class ResponseCacher {
 
             long thisUpdate = rs.getLong("THIS_UPDATE");
             String b64Resp = rs.getString("RESP");
-            byte[] encoded = Base64.decode(b64Resp);
+            byte[] encoded = Base64.decodeFast(b64Resp);
             ResponseCacheInfo cacheInfo = new ResponseCacheInfo(thisUpdate);
             if (nextUpdate != 0) {
                 cacheInfo.setNextUpdate(nextUpdate);
@@ -326,19 +323,10 @@ class ResponseCacher {
 
     void storeOcspResponse(int issuerId, BigInteger serialNumber, long thisUpdate,
             Long nextUpdate, AlgorithmCode sigAlgCode, AlgorithmCode certHashAlgCode,
-            OCSPResponse response) {
+            byte[] response) {
         byte[] identBytes = buildIdent(serialNumber, sigAlgCode, certHashAlgCode);
-        String ident = Hex.toHexString(identBytes);
+        String ident = Base64.encodeToString(identBytes);
         try {
-            byte[] encodedResp;
-            try {
-                encodedResp = response.getEncoded();
-            } catch (IOException ex) {
-                LogUtil.error(LOG, ex,
-                    "could not cache OCSP response iid=" + issuerId + ", ident=" + ident);
-                return;
-            }
-
             long id = deriveId(issuerId, identBytes);
 
             Connection conn = datasource.getConnection();
@@ -346,6 +334,7 @@ class ResponseCacher {
                 String sql = SQL_ADD_RESP;
                 PreparedStatement ps = datasource.prepareStatement(conn, sql);
 
+                String b64Response = Base64.encodeToString(response);
                 Boolean dataIntegrityViolationException = null;
                 try {
                     int idx = 1;
@@ -358,7 +347,7 @@ class ResponseCacher {
                     } else {
                         ps.setNull(idx++, java.sql.Types.BIGINT);
                     }
-                    ps.setString(idx++, Base64.toBase64String(encodedResp));
+                    ps.setString(idx++, b64Response);
                     ps.execute();
                 } catch (SQLException ex) {
                     DataAccessException dex = datasource.translate(sql, ex);
@@ -386,7 +375,7 @@ class ResponseCacher {
                     } else {
                         ps.setNull(idx++, java.sql.Types.BIGINT);
                     }
-                    ps.setString(idx++, Base64.toBase64String(encodedResp));
+                    ps.setString(idx++, b64Response);
                     ps.setLong(idx++, id);
                     ps.executeUpdate();
                 } catch (SQLException ex) {

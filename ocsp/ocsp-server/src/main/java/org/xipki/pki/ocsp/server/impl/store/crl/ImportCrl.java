@@ -81,9 +81,9 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.TBSCertificate;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -382,7 +382,7 @@ public class ImportCrl {
                 ps.setLong(offset++, caCert.getNotBefore().getTime() / 1000);
                 ps.setLong(offset++, caCert.getNotAfter().getTime() / 1000);
                 ps.setString(offset++, fpCaCert);
-                ps.setString(offset++, Base64.toBase64String(encodedCaCert));
+                ps.setString(offset++, Base64.encodeToString(encodedCaCert));
             }
 
             ps.setInt(offset++, (caRevInfo == null) ? 0 : 1);

@@ -247,6 +247,7 @@ public class OcspServer {
             unsuccesfulOCSPRespMap.put(status, new OcspRespWithCacheInfo(encoded, null));
         }
     }
+
     public OcspServer() {
         this.datasourceFactory = new DataSourceFactory();
     }
@@ -612,8 +613,6 @@ public class OcspServer {
                 return resp;
             }
 
-            List<Extension> responseExtensions = new ArrayList<>(2);
-
             ASN1Sequence requestList0 = tbsReq.getRequestList();
             int requestsSize = requestList0.size();
             if (requestsSize > reqOpt.maxRequestListCount()) {
@@ -640,6 +639,8 @@ public class OcspServer {
             criticalExtensionOids.remove(extensionType);
             Extension nonceExtn = (extensions == null)
                     ? null : extensions.getExtension(extensionType);
+
+            List<Extension> responseExtensions = new ArrayList<>(2);
             if (nonceExtn != null) {
                 if (reqOpt.nonceOccurrence() == TripleState.FORBIDDEN) {
                     LOG.warn("nonce forbidden, but is present in the request");
@@ -679,7 +680,7 @@ public class OcspServer {
                 }
             }
 
-            if (CollectionUtil.isNonEmpty(criticalExtensionOids)) {
+            if (!criticalExtensionOids.isEmpty()) {
                 LOG.warn("could not process critial request extensions: {}", criticalExtensionOids);
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
             }
@@ -774,13 +775,13 @@ public class OcspServer {
 
             org.bouncycastle.asn1.x509.Certificate[] certsInResp;
             EmbedCertsMode certsMode = repOpt.embedCertsMode();
-            if (certsMode == null || certsMode == EmbedCertsMode.SIGNER) {
+            if (certsMode == EmbedCertsMode.SIGNER) {
                 certsInResp = new org.bouncycastle.asn1.x509.Certificate[]{signer.bcCertificate()};
-            } else if (certsMode == EmbedCertsMode.SIGNER_AND_CA) {
-                certsInResp = signer.bcCertificateChain();
-            } else {
-                // NONE
+            } else if (certsMode == EmbedCertsMode.NONE) {
                 certsInResp = null;
+            } else {
+                // certsMode == EmbedCertsMode.SIGNER_AND_CA
+                certsInResp = signer.bcCertificateChain();
             }
 
             BasicOCSPResponse basicOcspResp;
@@ -803,6 +804,7 @@ public class OcspServer {
 
                 OCSPResponse ocspResp = new OCSPResponse(SUCCESSFUL_STATUS,
                         new ResponseBytes(OCSPObjectIdentifiers.id_pkix_ocsp_basic, octs));
+                byte[] encoded = ocspResp.getEncoded();
 
                 // cache response in database
                 if (canCacheDb && repControl.canCacheInfo) {
@@ -810,11 +812,9 @@ public class OcspServer {
                     // of storage
                     responseCacher.storeOcspResponse(cacheDbIssuerId.intValue(),
                             cacheDbSerialNumber, repControl.cacheThisUpdate,
-                            repControl.cacheNextUpdate, cacheDbSigAlgCode, cacheDbCertHashAlgCode,
-                            ocspResp);
+                            repControl.cacheNextUpdate, cacheDbSigAlgCode,
+                            cacheDbCertHashAlgCode, encoded);
                 }
-
-                byte[] encoded = ocspResp.getEncoded();
 
                 if (viaGet && repControl.canCacheInfo) {
                     ResponseCacheInfo cacheInfo = new ResponseCacheInfo(repControl.cacheThisUpdate);
@@ -826,7 +826,7 @@ public class OcspServer {
                     return new OcspRespWithCacheInfo(encoded, null);
                 }
             } catch (OCSPException ex) {
-                LogUtil.error(LOG, ex, "answer() ocspRespBuilder.build");
+                LogUtil.error(LOG, ex, "answer()");
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
             }
         } catch (Throwable th) {

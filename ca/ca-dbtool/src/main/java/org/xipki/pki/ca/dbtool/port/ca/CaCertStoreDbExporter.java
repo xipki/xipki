@@ -57,10 +57,10 @@ import javax.xml.stream.XMLStreamException;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ProcessLog;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -358,7 +358,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                     if (CaDbEntryType.CERT == type) {
                         String b64Cert = rs.getString("CERT");
-                        byte[] certBytes = Base64.decode(b64Cert);
+                        byte[] certBytes = Base64.decodeFast(b64Cert);
 
                         String sha1 = HashAlgoType.SHA1.hexHash(certBytes);
                         String certFileName = sha1 + ".der";
@@ -407,9 +407,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
 
                         String str = rs.getString("TID");
                         if (StringUtil.isNotBlank(str)) {
-                            // re-encode so that we have the canonicalized base64-string
-                            byte[] tid = Base64.decode(str);
-                            cert.setTid(Base64.toBase64String(tid));
+                            cert.setTid(str);
                         }
 
                         int userId = rs.getInt("UID");
@@ -436,7 +434,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                         ((CertsWriter) entriesInCurrentFile).add(cert);
                     } else if (CaDbEntryType.CRL == type) {
                         String b64Crl = rs.getString("CRL");
-                        byte[] crlBytes = Base64.decode(b64Crl);
+                        byte[] crlBytes = Base64.decodeFast(b64Crl);
 
                         X509CRL x509Crl = null;
                         try {
@@ -514,7 +512,7 @@ class CaCertStoreDbExporter extends AbstractCaCertStoreDbPorter {
                     } else if (CaDbEntryType.REQUEST == type) {
                         long update = rs.getLong("LUPDATE");
                         String b64Data = rs.getString("DATA");
-                        byte[] dataBytes = Base64.decode(b64Data);
+                        byte[] dataBytes = Base64.decodeFast(b64Data);
                         String sha1 = HashAlgoType.SHA1.hexHash(dataBytes);
                         final String dataFilename = sha1 + ".req";
                         if (!evaulateOnly) {

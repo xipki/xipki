@@ -68,7 +68,8 @@ class ResponseOption {
         this.responderIdByName = getBoolean(conf.isResponderIdByName(), true);
         this.includeInvalidityDate = getBoolean(conf.isIncludeInvalidityDate(), true);
         this.includeRevReason = getBoolean(conf.isIncludeRevReason(), true);
-        this.embedCertsMode = conf.getEmbedCertsMode();
+        this.embedCertsMode = (conf.getEmbedCertsMode() == null) ?
+                EmbedCertsMode.SIGNER : conf.getEmbedCertsMode();
         this.includeCerthash = getBoolean(conf.isIncludeCertHash(), false);
         CacheType cacheConf = conf.getCache();
         if (cacheConf != null && cacheConf.getCacheMaxAge() != null) {

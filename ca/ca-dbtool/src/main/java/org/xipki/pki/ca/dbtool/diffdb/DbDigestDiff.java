@@ -50,10 +50,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ProcessLog;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
@@ -288,7 +288,7 @@ public class DbDigestDiff {
             while (rs.next()) {
                 int id = rs.getInt("ID");
                 String b64Cert = rs.getString("CERT");
-                caIdCertMap.put(id, Base64.decode(b64Cert));
+                caIdCertMap.put(id, Base64.decodeFast(b64Cert));
             }
         } catch (SQLException ex) {
             throw datasource.translate(sql, ex);

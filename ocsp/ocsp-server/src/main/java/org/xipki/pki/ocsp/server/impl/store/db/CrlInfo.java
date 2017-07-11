@@ -39,8 +39,8 @@ import java.math.BigInteger;
 import java.util.Date;
 
 import org.bouncycastle.asn1.ocsp.CrlID;
-import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.ConfPairs;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -93,7 +93,7 @@ public class CrlInfo {
         this.nextUpdate = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
 
         str = getNotBlankValue(pairs, CRL_ID);
-        this.crlId = CrlID.getInstance(Base64.decode(str));
+        this.crlId = CrlID.getInstance(Base64.decodeFast(str));
 
         str = getNotBlankValue(pairs, USE_CRL_UPDATES);
         this.useCrlUpdates = Boolean.parseBoolean(str);
@@ -126,7 +126,7 @@ public class CrlInfo {
         pairs.putPair(USE_CRL_UPDATES, Boolean.toString(useCrlUpdates));
         pairs.putPair(THIS_UPDATE, DateUtil.toUtcTimeyyyyMMddhhmmss(thisUpdate));
         pairs.putPair(NEXT_UPDATE, DateUtil.toUtcTimeyyyyMMddhhmmss(nextUpdate));
-        pairs.putPair(CRL_ID, Base64.toBase64String(crlId.getEncoded()));
+        pairs.putPair(CRL_ID, Base64.encodeToString(crlId.getEncoded()));
         return pairs.getEncoded();
     }
 

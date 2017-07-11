@@ -50,11 +50,11 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ProcessLog;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
@@ -298,7 +298,7 @@ public class EjbcaDigestExporter extends DbToolBase implements DbDigestExporter 
                         continue;
                     }
 
-                    String hash = Base64.toBase64String(Hex.decode(hexCertFp));
+                    String hash = Base64.encodeToString(Hex.decode(hexCertFp));
 
                     String str = rs.getString("serialNumber");
                     BigInteger serial = new BigInteger(str);

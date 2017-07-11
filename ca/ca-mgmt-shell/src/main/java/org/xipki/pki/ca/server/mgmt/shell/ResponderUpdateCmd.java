@@ -41,7 +41,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
 import org.xipki.console.karaf.completer.FilePathCompleter;
@@ -111,7 +111,7 @@ public class ResponderUpdateCmd extends CaCommandSupport {
         } else if (certFile != null) {
             byte[] certBytes = IoUtil.read(certFile);
             X509Util.parseCert(new ByteArrayInputStream(certBytes));
-            cert = Base64.toBase64String(certBytes);
+            cert = Base64.encodeToString(certBytes);
         }
 
         boolean bo = caManager.changeResponder(name, signerType, getSignerConf(), cert);

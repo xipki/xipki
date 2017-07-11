@@ -36,8 +36,8 @@ package org.xipki.pki.ca.server.mgmt.shell;
 
 import java.util.Set;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.ConfPairs;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -97,7 +97,7 @@ public class ShellUtil {
         keystoreBytes = securityFactory.extractMinimalKeyStore(keystoreType, keystoreBytes,
                 keyLabel, password, null);
 
-        pairs.putPair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
+        pairs.putPair("keystore", "base64:" + Base64.encodeToString(keystoreBytes));
         return pairs.getEncoded();
     } // method execute0
 

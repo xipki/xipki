@@ -50,10 +50,10 @@ import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.TBSCertificate;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ProcessLog;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
@@ -372,7 +372,7 @@ class OcspCertStoreDbImporter extends AbstractOcspCertStoreDbImporter {
                     psRawcert.setLong(idx++, cert.id());
                     psRawcert.setString(idx++,
                             X509Util.cutX500Name(tbsCert.getSubject(), maxX500nameLen));
-                    psRawcert.setString(idx++, Base64.toBase64String(encodedCert));
+                    psRawcert.setString(idx++, Base64.encodeToString(encodedCert));
                     psRawcert.addBatch();
                 } catch (SQLException ex) {
                     throw translate(SQL_ADD_CRAW, ex);

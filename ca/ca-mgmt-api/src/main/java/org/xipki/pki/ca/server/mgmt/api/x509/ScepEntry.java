@@ -38,10 +38,10 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.LogUtil;
@@ -192,7 +192,7 @@ public class ScepEntry {
             if (verbose) {
                 sb.append("\tencoded: ");
                 try {
-                    sb.append(Base64.toBase64String(certificate.getEncoded()));
+                    sb.append(Base64.encodeToString(certificate.getEncoded()));
                 } catch (CertificateEncodingException ex) {
                     sb.append("ERROR");
                 }

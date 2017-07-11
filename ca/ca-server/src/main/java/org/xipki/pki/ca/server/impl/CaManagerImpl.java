@@ -76,7 +76,6 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -87,6 +86,7 @@ import org.xipki.audit.PciAuditEvent;
 import org.xipki.common.ConfPairs;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.IoUtil;
@@ -2995,7 +2995,7 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
 
         ksBytes = securityFactory.extractMinimalKeyStore(keystoreType, ksBytes, keyLabel,
                 securityFactory.getPasswordResolver().resolvePassword(passwordHint), certChain);
-        pairs.putPair("keystore", "base64:" + Base64.toBase64String(ksBytes));
+        pairs.putPair("keystore", "base64:" + Base64.encodeToString(ksBytes));
         return pairs.getEncoded();
     } // method canonicalizeSignerConf
 

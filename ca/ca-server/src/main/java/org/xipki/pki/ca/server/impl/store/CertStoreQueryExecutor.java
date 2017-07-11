@@ -65,9 +65,9 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -164,8 +164,8 @@ class CertStoreQueryExecutor {
         }
 
         String b64FpCert = base64Fp(certificate.encodedCert());
-        String b64Cert = Base64.toBase64String(certificate.encodedCert());
-        String tid = (transactionId == null) ? null : Base64.toBase64String(transactionId);
+        String b64Cert = Base64.encodeToString(certificate.encodedCert());
+        String tid = (transactionId == null) ? null : Base64.encodeToString(transactionId);
 
         long currentTimeSeconds = System.currentTimeMillis() / 1000;
         BigInteger serialNumber = cert.getSerialNumber();
@@ -445,7 +445,7 @@ class CertStoreQueryExecutor {
         long currentMaxCrlId = datasource.getMax(null, "CRL", "ID");
         long crlId = currentMaxCrlId + 1;
 
-        String b64Crl = Base64.toBase64String(crl.getEncoded());
+        String b64Crl = Base64.encodeToString(crl.getEncoded());
 
         PreparedStatement ps = null;
 
@@ -948,7 +948,7 @@ class CertStoreQueryExecutor {
             releaseDbResources(ps, rs);
         }
 
-        return (b64Crl == null) ? null : Base64.decode(b64Crl);
+        return (b64Crl == null) ? null : Base64.decodeFast(b64Crl);
     } // method getEncodedCrl
 
     int cleanupCrls(final NameId ca, final int numCrls)
@@ -1042,7 +1042,7 @@ class CertStoreQueryExecutor {
             releaseDbResources(ps, rs);
         }
 
-        byte[] encodedCert = Base64.decode(b64Cert);
+        byte[] encodedCert = Base64.decodeFast(b64Cert);
         X509Certificate cert = X509Util.parseCert(encodedCert);
         X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
         certWithMeta.setCertId(certId);
@@ -1084,7 +1084,7 @@ class CertStoreQueryExecutor {
         if (b64Cert == null) {
             return null;
         }
-        byte[] encodedCert = Base64.decode(b64Cert);
+        byte[] encodedCert = Base64.decodeFast(b64Cert);
         X509Certificate cert;
         try {
             cert = X509Util.parseCert(encodedCert);
@@ -1138,7 +1138,7 @@ class CertStoreQueryExecutor {
             releaseDbResources(ps, null);
         }
 
-        byte[] certBytes = Base64.decode(b64Cert);
+        byte[] certBytes = Base64.decodeFast(b64Cert);
         X509Certificate cert;
         try {
             cert = X509Util.parseCert(certBytes);
@@ -1208,7 +1208,7 @@ class CertStoreQueryExecutor {
         }
 
         try {
-            byte[] encodedCert = Base64.decode(b64Cert);
+            byte[] encodedCert = Base64.decodeFast(b64Cert);
             X509Certificate cert = X509Util.parseCert(encodedCert);
 
             X509CertWithDbId certWithMeta = new X509CertWithDbId(cert, encodedCert);
@@ -1307,7 +1307,7 @@ class CertStoreQueryExecutor {
         try {
             int idx = 1;
             if (transactionId != null) {
-                ps.setString(idx++, Base64.toBase64String(transactionId));
+                ps.setString(idx++, Base64.encodeToString(transactionId));
             }
             ps.setLong(idx++, fpSubject);
             ps.setLong(idx++, fpSubject);
@@ -1381,7 +1381,7 @@ class CertStoreQueryExecutor {
             releaseDbResources(ps, rs);
         }
 
-        return (b64Req == null) ? null : Base64.decode(b64Req);
+        return (b64Req == null) ? null : Base64.decodeFast(b64Req);
     }
 
     List<CertListInfo> listCertificates(final NameId ca, final X500Name subjectPattern,
@@ -1995,7 +1995,7 @@ class CertStoreQueryExecutor {
 
         long id = idGenerator.nextId();
         long currentTimeSeconds = System.currentTimeMillis() / 1000;
-        String b64Request = Base64.toBase64String(request);
+        String b64Request = Base64.encodeToString(request);
         final String sql = SQLs.SQL_ADD_REQUEST;
         PreparedStatement ps = borrowPreparedStatement(sql);
         try {

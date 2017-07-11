@@ -59,11 +59,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -787,7 +787,7 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, entry.cacertUrisAsString());
             ps.setString(idx++, entry.maxValidity().toString());
             byte[] encodedCert = entry.certificate().getEncoded();
-            ps.setString(idx++, Base64.toBase64String(encodedCert));
+            ps.setString(idx++, Base64.encodeToString(encodedCert));
             ps.setString(idx++, entry.signerType());
             ps.setString(idx++, entry.crlSignerName());
             ps.setString(idx++, entry.responderName());
@@ -920,7 +920,7 @@ class CaManagerQueryExecutor {
             int idx = 1;
             ps.setInt(idx++, dbEntry.ident().id());
             ps.setString(idx++, dbEntry.ident().name());
-            ps.setString(idx++, Base64.toBase64String(dbEntry.cert().getEncoded()));
+            ps.setString(idx++, Base64.encodeToString(dbEntry.cert().getEncoded()));
             ps.executeUpdate();
             if (LOG.isInfoEnabled()) {
                 LOG.info("added requestor '{}': {}", dbEntry.ident(), dbEntry.toString(false));
@@ -1024,7 +1024,7 @@ class CaManagerQueryExecutor {
             ps.setString(idx++, name);
             ps.setString(idx++, dbEntry.type());
             ps.setString(idx++, (dbEntry.certificate() == null) ? null
-                        : Base64.toBase64String(dbEntry.certificate().getEncoded()));
+                        : Base64.encodeToString(dbEntry.certificate().getEncoded()));
             ps.setString(idx++, crlControl);
             ps.setString(idx++, dbEntry.conf());
 
@@ -1293,7 +1293,7 @@ class CaManagerQueryExecutor {
                 String subject = X509Util.getRfc4519Name(cert.getSubjectX500Principal());
                 sb.append("cert: '").append(subject).append("'; ");
                 ps.setString(idxSubject, subject);
-                String base64Cert = Base64.toBase64String(cert.getEncoded());
+                String base64Cert = Base64.encodeToString(cert.getEncoded());
                 ps.setString(idxCert, base64Cert);
             }
 
@@ -2210,7 +2210,7 @@ class CaManagerQueryExecutor {
             String b64Cert = null;
             X509Certificate cert = dbEntry.certificate();
             if (cert != null) {
-                b64Cert = Base64.toBase64String(dbEntry.certificate().getEncoded());
+                b64Cert = Base64.encodeToString(dbEntry.certificate().getEncoded());
             }
             ps.setString(idx++, b64Cert);
             ps.setString(idx++, dbEntry.conf());

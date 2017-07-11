@@ -62,11 +62,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
@@ -589,7 +589,7 @@ public class CaConf {
     private String getBase64Binary(final FileOrBinaryType fileOrBinary, final ZipFile zipFile)
             throws IOException {
         byte[] binary = getBinary(fileOrBinary, zipFile);
-        return (binary == null) ? null : Base64.toBase64String(binary);
+        return (binary == null) ? null : Base64.encodeToString(binary);
     }
 
     private byte[] getBinary(final FileOrBinaryType fileOrBinary, final ZipFile zipFile)

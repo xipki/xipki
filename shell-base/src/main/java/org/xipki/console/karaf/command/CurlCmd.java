@@ -49,7 +49,7 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.console.karaf.IllegalCmdParamException;
@@ -149,7 +149,7 @@ public class CurlCmd extends XipkiCommandSupport {
                 }
 
                 httpConn.setRequestProperty("Authorization",
-                        "Basic " + Base64.toBase64String(userPassword.getBytes()));
+                        "Basic " + Base64.encodeToString(userPassword.getBytes()));
             }
 
             Map<String, List<String>> properties;

@@ -46,7 +46,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.XmlUtil;
@@ -182,7 +182,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
             for (ResponderType responder : responders.getResponder()) {
                 byte[] certBytes = binary(responder.getCert());
-                String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
+                String b64Cert = (certBytes == null) ? null : Base64.encodeToString(certBytes);
                 try {
                     int idx = 1;
                     ps.setString(idx++, responder.getName());
@@ -239,7 +239,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
             for (CrlsignerType crlsigner : crlsigners.getCrlsigner()) {
                 byte[] certBytes = binary(crlsigner.getSignerCert());
-                String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
+                String b64Cert = (certBytes == null) ? null : Base64.encodeToString(certBytes);
                 try {
                     int idx = 1;
                     ps.setString(idx++, crlsigner.getName());
@@ -270,7 +270,7 @@ class CaConfigurationDbImporter extends DbPorter {
 
             for (RequestorType requestor : requestors.getRequestor()) {
                 byte[] certBytes = binary(requestor.getCert());
-                String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
+                String b64Cert = (certBytes == null) ? null : Base64.encodeToString(certBytes);
                 try {
                     int idx = 1;
                     ps.setInt(idx++, requestor.getId());
@@ -391,7 +391,7 @@ class CaConfigurationDbImporter extends DbPorter {
                     ps.setString(idx++, ca.getOcspUris());
                     ps.setString(idx++, ca.getCacertUris());
                     ps.setString(idx++, ca.getMaxValidity());
-                    ps.setString(idx++, Base64.toBase64String(certBytes));
+                    ps.setString(idx++, Base64.encodeToString(certBytes));
                     ps.setString(idx++, ca.getSignerType());
                     ps.setString(idx++, ca.getCrlsignerName());
                     ps.setString(idx++, ca.getResponderName());
@@ -536,7 +536,7 @@ class CaConfigurationDbImporter extends DbPorter {
         try {
             for (ScepType entry : sceps.getScep()) {
                 byte[] certBytes = binary(entry.getResponderCert());
-                String b64Cert = (certBytes == null) ? null : Base64.toBase64String(certBytes);
+                String b64Cert = (certBytes == null) ? null : Base64.encodeToString(certBytes);
                 try {
                     int idx = 1;
                     ps.setString(idx++, entry.getName());

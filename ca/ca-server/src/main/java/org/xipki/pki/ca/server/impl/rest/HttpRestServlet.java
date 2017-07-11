@@ -48,7 +48,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.util.Arrays;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -56,6 +55,7 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.DateUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.RandomUtil;
@@ -188,7 +188,7 @@ public class HttpRestServlet extends AbstractHttpServlet {
                 byte[] password = null;
                 if (hdrValue.length() > 6) {
                     String b64 = hdrValue.substring(6);
-                    byte[] userPwd = Base64.decode(b64);
+                    byte[] userPwd = Base64.decodeFast(b64);
                     int idx = -1;
                     for (int i = 0; i < userPwd.length; i++) {
                         if (userPwd[i] == ':') {

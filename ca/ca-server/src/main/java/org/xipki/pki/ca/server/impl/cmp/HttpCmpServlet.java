@@ -50,7 +50,6 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.cmp.PKIHeader;
 import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.AuditEvent;
@@ -58,6 +57,7 @@ import org.xipki.audit.AuditLevel;
 import org.xipki.audit.AuditService;
 import org.xipki.audit.AuditServiceRegister;
 import org.xipki.audit.AuditStatus;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.http.servlet.AbstractHttpServlet;
 import org.xipki.http.servlet.ServletURI;
@@ -171,7 +171,7 @@ public class HttpCmpServlet extends AbstractHttpServlet {
 
             PKIHeader reqHeader = pkiReq.getHeader();
             ASN1OctetString tid = reqHeader.getTransactionID();
-            String tidStr = Base64.toBase64String(tid.getOctets());
+            String tidStr = Base64.encodeToString(tid.getOctets());
             event.addEventData(CaAuditConstants.NAME_tid, tidStr);
 
             PKIHeaderBuilder respHeader = new PKIHeaderBuilder(

@@ -38,8 +38,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 
 /**
@@ -73,7 +73,7 @@ public class DbDigestEntry {
         if (sha1Fp.length() == 28) {
             this.base64Sha1 = sha1Fp;
         } else if (sha1Fp.length() == 40) {
-            this.base64Sha1 = Base64.toBase64String(Hex.decode(sha1Fp));
+            this.base64Sha1 = Base64.encodeToString(Hex.decode(sha1Fp));
         } else {
             throw new IllegalArgumentException("invalid sha1Fp '" + sha1Fp + "'");
         }

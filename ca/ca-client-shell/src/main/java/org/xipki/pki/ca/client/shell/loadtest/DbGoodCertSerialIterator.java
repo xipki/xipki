@@ -45,7 +45,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.springframework.dao.DataAccessException;
@@ -94,7 +94,7 @@ class DbGoodCertSerialIterator implements Iterator<BigInteger> {
             int tmpCaId = -1;
             while (rs.next()) {
                 String b64DbCert = rs.getString("CERT");
-                byte[] dbCert = Base64.decode(b64DbCert);
+                byte[] dbCert = Base64.decodeFast(b64DbCert);
                 if (Arrays.equals(encodedCaCert, dbCert)) {
                     tmpCaId = rs.getInt("ID");
                     break;

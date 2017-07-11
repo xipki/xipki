@@ -60,10 +60,10 @@ import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.TBSCertificate;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.ProcessLog;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
@@ -584,7 +584,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                         psRawcert.setLong(idx++, cert.id());
                         psRawcert.setString(idx++, b64Sha1FpCert);
                         psRawcert.setString(idx++, cert.rs());
-                        psRawcert.setString(idx++, Base64.toBase64String(encodedCert));
+                        psRawcert.setString(idx++, Base64.encodeToString(encodedCert));
                         psRawcert.addBatch();
                     } catch (SQLException ex) {
                         throw translate(SQL_ADD_CRAW, ex);
@@ -653,7 +653,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                             psAddCrl.setLong(idx++, baseCrlNumber.longValue());
                         }
 
-                        String str = Base64.toBase64String(encodedCrl);
+                        String str = Base64.encodeToString(encodedCrl);
                         psAddCrl.setString(idx++, str);
 
                         psAddCrl.addBatch();
@@ -709,7 +709,7 @@ class CaCertStoreDbImporter extends AbstractCaCertStoreDbPorter {
                         int idx = 1;
                         psAddRequest.setLong(idx++, request.id());
                         psAddRequest.setLong(idx++, request.update());
-                        psAddRequest.setString(idx++, Base64.toBase64String(encodedRequest));
+                        psAddRequest.setString(idx++, Base64.encodeToString(encodedRequest));
                         psAddRequest.addBatch();
                     } catch (SQLException ex) {
                         System.err.println("could not import REQUEST with ID=" + request.id()

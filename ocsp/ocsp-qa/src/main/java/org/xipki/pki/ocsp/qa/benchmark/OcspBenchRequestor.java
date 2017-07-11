@@ -59,7 +59,7 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
-import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.pki.ocsp.client.api.OcspRequestorException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
@@ -165,7 +165,7 @@ class OcspBenchRequestor {
         FullHttpRequest request;
 
         if (size <= MAX_LEN_GET && requestOptions.isUseHttpGetForRequest()) {
-            String b64Request = Base64.toBase64String(ocspReq);
+            String b64Request = Base64.encodeToString(ocspReq);
             String urlEncodedReq;
             try {
                 urlEncodedReq = URLEncoder.encode(b64Request, "UTF-8");

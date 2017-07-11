@@ -37,10 +37,10 @@ package org.xipki.pki.ca.server.mgmt.api.x509;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.InvalidConfException;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
@@ -164,7 +164,7 @@ public class X509CrlSignerEntry {
             if (verbose) {
                 sb.append("\tencoded: ");
                 try {
-                    sb.append(Base64.toBase64String(cert.getEncoded()));
+                    sb.append(Base64.encodeToString(cert.getEncoded()));
                 } catch (CertificateEncodingException ex) {
                     sb.append("ERROR");
                 }
