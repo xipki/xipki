@@ -38,7 +38,6 @@ import java.io.EOFException;
 
 import javax.net.ssl.SSLSession;
 
-import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.Base64;
@@ -124,18 +123,8 @@ public class HttpOcspServlet extends AbstractHttpServlet {
                         HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
             }
 
-            byte[] content = readContent(request);
-
-            OCSPRequest ocspRequest;
-            try {
-                ocspRequest = OCSPRequest.getInstance(content);
-            } catch (Exception ex) {
-                LogUtil.error(LOG, ex, "could not parse the request (OCSPRequest)");
-                return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
-            }
-
-            OcspRespWithCacheInfo ocspRespWithCacheInfo =
-                    server.answer(responder, ocspRequest, false);
+            OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder,
+                    readContent(request), false);
             if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
                 LOG.error("processRequest returned null, this should not happen");
                 return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
@@ -190,18 +179,8 @@ public class HttpOcspServlet extends AbstractHttpServlet {
                 return createErrorResponse(version, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE);
             }
 
-            byte[] content = Base64.decode(b64OcspReq);
-
-            OCSPRequest ocspRequest;
-            try {
-                ocspRequest = OCSPRequest.getInstance(content);
-            } catch (Exception ex) {
-                LogUtil.error(LOG, ex, "could not parse the request (OCSPRequest)");
-                return createErrorResponse(version, HttpResponseStatus.BAD_REQUEST);
-            }
-
-            OcspRespWithCacheInfo ocspRespWithCacheInfo =
-                    server.answer(responder, ocspRequest, true);
+            OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder,
+                    Base64.decode(b64OcspReq), true);
             if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
                 return createErrorResponse(version, HttpResponseStatus.INTERNAL_SERVER_ERROR);
             }

@@ -34,6 +34,8 @@
 
 package org.xipki.security;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,6 +84,8 @@ public enum HashAlgoType {
 
     private final AlgorithmCode algorithmCode;
 
+    private final byte[] encoded;
+
     static {
         for (HashAlgoType type : HashAlgoType.values()) {
             map.put(type.oid.getId(), type);
@@ -99,7 +103,7 @@ public enum HashAlgoType {
         map.put("SHA3512", SHA3_512);
     }
 
-    HashAlgoType(final int length, final AlgorithmCode algorithmCode, final String oid,
+    private HashAlgoType(final int length, final AlgorithmCode algorithmCode, final String oid,
             final String name, final String shortName) {
         this.length = length;
         this.algorithmCode = algorithmCode;
@@ -107,6 +111,11 @@ public enum HashAlgoType {
         this.algId = new AlgorithmIdentifier(this.oid, DERNull.INSTANCE);
         this.name = name;
         this.shortName = shortName;
+        try {
+            this.encoded = new ASN1ObjectIdentifier(oid).getEncoded();
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("invalid oid: " + oid);
+        }
     }
 
     public int length() {
@@ -205,6 +214,15 @@ public enum HashAlgoType {
         } else {
             return null;
         }
+    }
+
+    public static HashAlgoType getInstanceForEncoded(byte[] encoded) {
+        for (HashAlgoType value : values()) {
+            if (Arrays.equals(encoded, value.encoded)) {
+                return value;
+            }
+        }
+        return null;
     }
 
     public AlgorithmIdentifier algorithmIdentifier() {

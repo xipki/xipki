@@ -43,7 +43,6 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.ocsp.ResponderID;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -140,15 +139,12 @@ class ResponderSigner {
     }
 
     public ConcurrentContentSigner getSignerForPreferredSigAlgs(
-            final ASN1Sequence preferredSigAlgs) {
-        if (preferredSigAlgs == null) {
+            final List<AlgorithmIdentifier> prefSigAlgs) {
+        if (prefSigAlgs == null) {
             return signers.get(0);
         }
 
-        int size = preferredSigAlgs.size();
-        for (int i = 0; i < size; i++) {
-            ASN1Sequence algObj = ASN1Sequence.getInstance(preferredSigAlgs.getObjectAt(i));
-            AlgorithmIdentifier sigAlgId = AlgorithmIdentifier.getInstance(algObj.getObjectAt(0));
+        for (AlgorithmIdentifier sigAlgId : prefSigAlgs) {
             String algoName = getSignatureAlgorithmName(sigAlgId);
             if (algoSignerMap.containsKey(algoName)) {
                 return algoSignerMap.get(algoName);
