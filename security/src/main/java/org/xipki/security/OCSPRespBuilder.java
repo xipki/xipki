@@ -62,7 +62,6 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentSigner;
-import org.xipki.common.util.IoUtil;
 
 /**
  * Generator for OCSP response objects.
@@ -172,7 +171,8 @@ public class OCSPRespBuilder {
     }
 
     // CHECKSTYLE:SKIP
-    public byte[] buildOCSPResponse(ContentSigner signer, byte[] encodedChain, Date producedAt)
+    public byte[] buildOCSPResponse(ContentSigner signer, byte[] encodedSigAlgId,
+            byte[] encodedChain, Date producedAt)
             throws OCSPException {
         Iterator<ResponseObject> it = list.iterator();
 
@@ -206,18 +206,18 @@ public class OCSPRespBuilder {
         }
 
         byte[] signature = signer.getSignature();
-        byte[] encodedSigAlgId;
-        try {
-            encodedSigAlgId = signer.getAlgorithmIdentifier().getEncoded();
-        } catch (IOException ex) {
-            throw new OCSPException("exception processing SignatureAlgorithm", ex);
+        if (encodedSigAlgId == null) {
+            try {
+                encodedSigAlgId = signer.getAlgorithmIdentifier().getEncoded();
+            } catch (IOException ex) {
+                throw new OCSPException("exception processing SignatureAlgorithm", ex);
+            }
         }
 
         // ----- Get the length -----
         // BasicOCSPResponse.signature
         int signatureBodyLen = signature.length + 1;
-        int signatureHeaderLen = getHeaderLen(signatureBodyLen);
-        int signatureLen = signatureHeaderLen + signatureBodyLen;
+        int signatureLen = getLen(signatureBodyLen);
 
         // BasicOCSPResponse
         int basicResponseBodyLen = encodedTbsResp.length + encodedSigAlgId.length
@@ -225,35 +225,30 @@ public class OCSPRespBuilder {
         if (encodedChain != null) {
             basicResponseBodyLen += encodedChain.length;
         }
-        int basicResponseHeaderLen = getHeaderLen(basicResponseBodyLen);
-        int basicResponseLen = basicResponseHeaderLen + basicResponseBodyLen;
+        int basicResponseLen = getLen(basicResponseBodyLen);
 
         // OCSPResponse.[0].responseBytes
         int responseBytesBodyLen = responseTypeBasic.length
-                + getHeaderLen(basicResponseLen) // Header of OCTET STRING
-                + basicResponseLen;
-        int responseBytesHeaderLen = getHeaderLen(responseBytesBodyLen);
-        int responseBytesLen = responseBytesHeaderLen + responseBytesBodyLen;
+                + getLen(basicResponseLen); // Header of OCTET STRING
+        int responseBytesLen = getLen(responseBytesBodyLen);
 
         // OCSPResponse.[0]
-        int taggedResponseBytesBodyLen = responseBytesLen;
-        int taggedResponseBytesHeaderLen = getHeaderLen(taggedResponseBytesBodyLen);
-        int taggedResponseBytesLen = taggedResponseBytesHeaderLen + taggedResponseBytesBodyLen;
+        int taggedResponseBytesLen = getLen(responseBytesLen);
 
         // OCSPResponse
         int ocspResponseBodyLen = successfulStatus.length
                     + taggedResponseBytesLen;
-        int ocspResponseHeaderLen = getHeaderLen(ocspResponseBodyLen);
+        int ocspResponseLen = getLen(ocspResponseBodyLen);
 
         // encode
-        byte[] out = new byte[ocspResponseHeaderLen + ocspResponseBodyLen];
+        byte[] out = new byte[ocspResponseLen];
         int offset = 0;
         offset += writeHeader((byte) 0x30, ocspResponseBodyLen, out, offset);
         // OCSPResponse.responseStatus
         offset += arraycopy(successfulStatus, out, offset);
 
         // OCSPResponse.[0]
-        offset += writeHeader((byte) 0xA0, taggedResponseBytesBodyLen, out, offset);
+        offset += writeHeader((byte) 0xA0, responseBytesLen, out, offset);
 
         // OCSPResponse.[0]responseBytes
         offset += writeHeader((byte) 0x30, responseBytesBodyLen, out, offset);
@@ -283,18 +278,20 @@ public class OCSPRespBuilder {
         return out;
     }
 
-    private static int getHeaderLen(int bodyLen) {
+    private static int getLen(int bodyLen) {
+        int headerLen;
         if (bodyLen < 0x80) {
-            return 2;
+            headerLen = 2;
         } else if (bodyLen < 0x100) {
-            return 3;
+            headerLen = 3;
         } else if (bodyLen < 0x10000) {
-            return 4;
+            headerLen = 4;
         } else if (bodyLen < 0x1000000) {
-            return 5;
+            headerLen = 5;
         } else {
-            return 6;
+            headerLen = 6;
         }
+        return headerLen + bodyLen;
     }
 
     private static int writeHeader(byte tag, int bodyLen, byte[] out, int offset) {

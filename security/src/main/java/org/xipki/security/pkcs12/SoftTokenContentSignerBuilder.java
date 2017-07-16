@@ -404,7 +404,7 @@ public class SoftTokenContentSignerBuilder {
         final boolean mac = false;
         ConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, key);
+            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, key, true);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }
