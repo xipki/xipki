@@ -68,18 +68,14 @@ import javax.xml.validation.SchemaFactory;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
-import org.bouncycastle.asn1.ocsp.BasicOCSPResponse;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.ocsp.OCSPResponse;
-import org.bouncycastle.asn1.ocsp.OCSPResponseStatus;
 import org.bouncycastle.asn1.ocsp.ResponderID;
-import org.bouncycastle.asn1.ocsp.ResponseBytes;
 import org.bouncycastle.asn1.ocsp.RevokedInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
@@ -142,7 +138,7 @@ import org.xipki.security.HashAlgoType;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
-import org.xipki.security.bc.XipkiBasicOCSPRespBuilder;
+import org.xipki.security.OCSPRespBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.util.X509Util;
 import org.xml.sax.SAXException;
@@ -205,9 +201,6 @@ public class OcspServer {
     private static final byte[] DERNullBytes = new byte[]{5, 0};
 
     private static final int DERNullBytesLen = 2;
-
-    private static final OCSPResponseStatus SUCCESSFUL_STATUS =
-            new OCSPResponseStatus(OcspResponseStatus.successful.status());
 
     private static final Map<OcspResponseStatus, OcspRespWithCacheInfo> unsuccesfulOCSPRespMap;
 
@@ -647,7 +640,7 @@ public class OcspServer {
             repControl.canCacheInfo = true;
 
             ResponderID respId = signer.getResponder(repOpt.isResponderIdByName());
-            XipkiBasicOCSPRespBuilder basicOcspBuilder = new XipkiBasicOCSPRespBuilder(respId);
+            OCSPRespBuilder basicOcspBuilder = new OCSPRespBuilder(respId);
 
             List<Extension> responseExtensions = new ArrayList<>(2);
             byte[] nonce = req.nonce();
@@ -773,20 +766,21 @@ public class OcspServer {
                         new Extensions(responseExtensions.toArray(EXTENSION_ARRAY_TYPE)));
             }
 
-            org.bouncycastle.asn1.x509.Certificate[] certsInResp;
+            byte[] certsInResp;
             EmbedCertsMode certsMode = repOpt.embedCertsMode();
             if (certsMode == EmbedCertsMode.SIGNER) {
-                certsInResp = new org.bouncycastle.asn1.x509.Certificate[]{signer.bcCertificate()};
+                certsInResp = signer.encodedSequenceOfCertificate();
             } else if (certsMode == EmbedCertsMode.NONE) {
                 certsInResp = null;
             } else {
                 // certsMode == EmbedCertsMode.SIGNER_AND_CA
-                certsInResp = signer.bcCertificateChain();
+                certsInResp = signer.encodedSequenceOfCertificateChain();
             }
 
-            BasicOCSPResponse basicOcspResp;
+            byte[] encodeOCSPResponse;
             try {
-                basicOcspResp = concurrentSigner.build(basicOcspBuilder, certsInResp, new Date());
+                encodeOCSPResponse = concurrentSigner.buildOCSPResponse(basicOcspBuilder,
+                        certsInResp, new Date());
             } catch (NoIdleSignerException ex) {
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
             } catch (OCSPException ex) {
@@ -794,40 +788,24 @@ public class OcspServer {
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
             }
 
-            try {
-                ASN1OctetString octs;
-                try {
-                    octs = new DEROctetString(basicOcspResp.getEncoded());
-                } catch (IOException ex) {
-                    throw new OCSPException("can't encode object.", ex);
-                }
+            // cache response in database
+            if (canCacheDb && repControl.canCacheInfo) {
+                // Don't cache the response with status UNKNOWN, since this may result in DDoS
+                // of storage
+                responseCacher.storeOcspResponse(cacheDbIssuerId.intValue(),
+                        cacheDbSerialNumber, repControl.cacheThisUpdate,
+                        repControl.cacheNextUpdate, cacheDbSigAlgCode,
+                        cacheDbCertHashAlgCode, encodeOCSPResponse);
+            }
 
-                OCSPResponse ocspResp = new OCSPResponse(SUCCESSFUL_STATUS,
-                        new ResponseBytes(OCSPObjectIdentifiers.id_pkix_ocsp_basic, octs));
-                byte[] encoded = ocspResp.getEncoded();
-
-                // cache response in database
-                if (canCacheDb && repControl.canCacheInfo) {
-                    // Don't cache the response with status UNKNOWN, since this may result in DDoS
-                    // of storage
-                    responseCacher.storeOcspResponse(cacheDbIssuerId.intValue(),
-                            cacheDbSerialNumber, repControl.cacheThisUpdate,
-                            repControl.cacheNextUpdate, cacheDbSigAlgCode,
-                            cacheDbCertHashAlgCode, encoded);
+            if (viaGet && repControl.canCacheInfo) {
+                ResponseCacheInfo cacheInfo = new ResponseCacheInfo(repControl.cacheThisUpdate);
+                if (repControl.cacheNextUpdate != Long.MAX_VALUE) {
+                    cacheInfo.setNextUpdate(repControl.cacheNextUpdate);
                 }
-
-                if (viaGet && repControl.canCacheInfo) {
-                    ResponseCacheInfo cacheInfo = new ResponseCacheInfo(repControl.cacheThisUpdate);
-                    if (repControl.cacheNextUpdate != Long.MAX_VALUE) {
-                        cacheInfo.setNextUpdate(repControl.cacheNextUpdate);
-                    }
-                    return new OcspRespWithCacheInfo(encoded, cacheInfo);
-                } else {
-                    return new OcspRespWithCacheInfo(encoded, null);
-                }
-            } catch (OCSPException ex) {
-                LogUtil.error(LOG, ex, "answer()");
-                return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
+                return new OcspRespWithCacheInfo(encodeOCSPResponse, cacheInfo);
+            } else {
+                return new OcspRespWithCacheInfo(encodeOCSPResponse, null);
             }
         } catch (Throwable th) {
             LogUtil.error(LOG, th);
@@ -836,7 +814,7 @@ public class OcspServer {
     } // method ask
 
     private OcspRespWithCacheInfo processCertReq(CertID certId,
-            XipkiBasicOCSPRespBuilder builder, Responder responder, RequestOption reqOpt,
+            OCSPRespBuilder builder, Responder responder, RequestOption reqOpt,
             ResponseOption repOpt, OcspRespControl repControl) throws IOException {
         HashAlgoType reqHashAlgo = certId.hashAlgorithm();
         if (!reqOpt.allows(reqHashAlgo)) {

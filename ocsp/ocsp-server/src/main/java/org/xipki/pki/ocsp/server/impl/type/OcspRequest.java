@@ -76,7 +76,7 @@ public class OcspRequest {
 
         @Override
         public String toString() {
-            return "tag=" + Integer.toHexString(0xFF & tag)
+            return "tag=0x" + Integer.toHexString(0xFF & tag)
                     + ", len=" + len
                     + ", readerIndex=" + readerIndex;
         }
