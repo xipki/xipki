@@ -56,6 +56,7 @@ import org.xipki.pki.ca.client.api.dto.EnrollCertRequest;
 import org.xipki.pki.ca.client.api.dto.EnrollCertRequestEntry;
 import org.xipki.pki.ca.client.shell.ClientCommandSupport;
 import org.xipki.pki.ca.client.shell.completer.CaNameCompleter;
+import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignatureAlgoControl;
@@ -125,7 +126,14 @@ public abstract class NegEnrollCertCommandSupport extends ClientCommandSupport {
 
         ProofOfPossessionSigningKeyBuilder popoBuilder =
                 new ProofOfPossessionSigningKeyBuilder(certReq);
-        POPOSigningKey popoSk = signer.build(popoBuilder);
+
+        ConcurrentBagEntrySigner signer0 = signer.borrowContentSigner();
+        POPOSigningKey popoSk;
+        try {
+            popoSk = popoBuilder.build(signer0.value());
+        } finally {
+            signer.requiteContentSigner(signer0);
+        }
         ProofOfPossession popo = new ProofOfPossession(popoSk);
 
         EnrollCertRequestEntry reqEntry = new EnrollCertRequestEntry("id-1", profile, certReq,

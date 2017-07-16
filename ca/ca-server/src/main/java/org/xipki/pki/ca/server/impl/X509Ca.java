@@ -143,6 +143,7 @@ import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl.HourMinute;
 import org.xipki.pki.ca.server.mgmt.api.x509.CrlControl.UpdateMode;
 import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.FpIdCalculator;
@@ -925,12 +926,19 @@ public class X509Ca {
             ConcurrentContentSigner concurrentSigner = (tmpCrlSigner == null)
                     ? caInfo.getSigner(null) : tmpCrlSigner;
 
-            X509CRLHolder crlHolder;
+            ConcurrentBagEntrySigner signer0;
             try {
-                crlHolder = concurrentSigner.build(crlBuilder);
+                signer0 = concurrentSigner.borrowContentSigner();
             } catch (NoIdleSignerException ex) {
                 throw new OperationException(ErrorCode.SYSTEM_FAILURE, "NoIdleSignerException: "
                         + ex.getMessage());
+            }
+
+            X509CRLHolder crlHolder;
+            try {
+                crlHolder = crlBuilder.build(signer0.value());
+            } finally {
+                concurrentSigner.requiteContentSigner(signer0);
             }
 
             try {
@@ -1850,11 +1858,18 @@ public class X509Ca {
                     }
                 }
 
-                X509CertificateHolder certHolder;
+                ConcurrentBagEntrySigner signer0;
                 try {
-                    certHolder = gct.signer.build(certBuilder);
+                    signer0 = gct.signer.borrowContentSigner();
                 } catch (NoIdleSignerException ex) {
                     throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
+                }
+
+                X509CertificateHolder certHolder;
+                try {
+                    certHolder = certBuilder.build(signer0.value());
+                } finally {
+                    gct.signer.requiteContentSigner(signer0);
                 }
 
                 Certificate bcCert = certHolder.toASN1Structure();

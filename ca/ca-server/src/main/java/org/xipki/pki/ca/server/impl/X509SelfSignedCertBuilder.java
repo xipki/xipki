@@ -57,6 +57,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
@@ -79,6 +80,7 @@ import org.xipki.pki.ca.api.profile.ExtensionValues;
 import org.xipki.pki.ca.api.profile.x509.SubjectInfo;
 import org.xipki.pki.ca.api.profile.x509.X509CertLevel;
 import org.xipki.pki.ca.server.mgmt.api.CaEntry;
+import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
@@ -285,7 +287,14 @@ class X509SelfSignedCertBuilder {
             addExtensions(certBuilder, certprofile, requestedSubject, grantedSubject, extensions,
                     tmpPublicKeyInfo, publicCaInfo, notBefore, notAfter);
 
-            Certificate bcCert = signer.build(certBuilder).toASN1Structure();
+            ConcurrentBagEntrySigner signer0 = signer.borrowContentSigner();
+            X509CertificateHolder certHolder;
+            try {
+                certHolder = certBuilder.build(signer0.value());
+            } finally {
+                signer.requiteContentSigner(signer0);
+            }
+            Certificate bcCert = certHolder.toASN1Structure();
             return X509Util.parseCert(bcCert.getEncoded());
         } catch (BadCertTemplateException ex) {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);

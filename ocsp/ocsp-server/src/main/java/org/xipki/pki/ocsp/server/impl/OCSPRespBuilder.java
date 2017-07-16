@@ -32,7 +32,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security;
+package org.xipki.pki.ocsp.server.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;

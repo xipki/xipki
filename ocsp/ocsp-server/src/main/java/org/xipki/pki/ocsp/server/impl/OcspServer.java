@@ -132,10 +132,10 @@ import org.xipki.pki.ocsp.server.impl.type.OcspRequest;
 import org.xipki.security.AlgorithmCode;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CertpathValidationModel;
+import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgoType;
-import org.xipki.security.OCSPRespBuilder;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
@@ -777,12 +777,18 @@ public class OcspServer {
                 certsInResp = signer.encodedSequenceOfCertificateChain();
             }
 
-            byte[] encodeOCSPResponse;
+            ConcurrentBagEntrySigner signer0;
             try {
-                encodeOCSPResponse = concurrentSigner.buildOCSPResponse(basicOcspBuilder,
-                        certsInResp, new Date());
+                signer0 = concurrentSigner.borrowContentSigner();
             } catch (NoIdleSignerException ex) {
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
+            }
+
+            byte[] encodeOCSPResponse;
+            try {
+                encodeOCSPResponse = basicOcspBuilder.buildOCSPResponse(signer0.value(),
+                        concurrentSigner.encodedAlgorithmIdentifier(),
+                        certsInResp, new Date());
             } catch (OCSPException ex) {
                 LogUtil.error(LOG, ex, "answer() basicOcspBuilder.build");
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);

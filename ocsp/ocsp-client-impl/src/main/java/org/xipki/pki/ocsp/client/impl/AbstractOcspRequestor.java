@@ -81,12 +81,12 @@ import org.xipki.pki.ocsp.client.api.OcspResponseException;
 import org.xipki.pki.ocsp.client.api.OcspTargetUnmatchedException;
 import org.xipki.pki.ocsp.client.api.RequestOptions;
 import org.xipki.pki.ocsp.client.api.ResponderUnreachableException;
+import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
-import org.xipki.security.bc.XipkiOCSPReqBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.util.X509Util;
 
@@ -427,15 +427,23 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
                 } // end synchronized
 
                 reqBuilder.setRequestorName(signer.getCertificateAsBcObject().getSubject());
+                X509CertificateHolder[] certChain0 = signer.getCertificateChainAsBcObjects();
+                Certificate[] certChain = new Certificate[certChain0.length];
+                for (int i = 0; i < certChain.length; i++) {
+                    certChain[i] = certChain0[i].toASN1Structure();
+                }
+
+                ConcurrentBagEntrySigner signer0;
                 try {
-                    X509CertificateHolder[] certChain0 = signer.getCertificateChainAsBcObjects();
-                    Certificate[] certChain = new Certificate[certChain0.length];
-                    for (int i = 0; i < certChain.length; i++) {
-                        certChain[i] = certChain0[i].toASN1Structure();
-                    }
-                    return signer.build(reqBuilder, certChain);
+                    signer0 = signer.borrowContentSigner();
                 } catch (NoIdleSignerException ex) {
                     throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage());
+                }
+
+                try {
+                    return reqBuilder.build(signer0.value(), certChain);
+                } finally {
+                    signer.requiteContentSigner(signer0);
                 }
             } else {
                 return reqBuilder.build();

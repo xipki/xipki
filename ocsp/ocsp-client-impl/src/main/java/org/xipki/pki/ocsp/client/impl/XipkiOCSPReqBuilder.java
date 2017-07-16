@@ -1,6 +1,6 @@
 // #THIRDPARTY# BouncyCastle
 
-package org.xipki.security.bc;
+package org.xipki.pki.ocsp.client.impl;
 
 import java.io.OutputStream;
 import java.util.ArrayList;

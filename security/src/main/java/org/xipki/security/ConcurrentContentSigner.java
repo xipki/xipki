@@ -38,24 +38,9 @@ import java.io.IOException;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.Date;
 
-import org.bouncycastle.asn1.crmf.POPOSigningKey;
-import org.bouncycastle.asn1.ocsp.OCSPRequest;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.X509v2CRLBuilder;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.cert.cmp.CMPException;
-import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
-import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
-import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
-import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.bc.XipkiOCSPReqBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 
@@ -122,73 +107,29 @@ public interface ConcurrentContentSigner {
 
     /**
      *
-     * @param builder
-     *          Signing key builder. Must not be {@code null}.
-     */
-    POPOSigningKey build(ProofOfPossessionSigningKeyBuilder builder)
-            throws NoIdleSignerException;
-
-    /**
-     *
-     * @param builder
-     *          Protected PKI message builder. Must not be {@code null}.
-     */
-    ProtectedPKIMessage build(ProtectedPKIMessageBuilder builder)
-            throws NoIdleSignerException, CMPException;
-
-    /**
-     *
-     * @param builder
-     *          CRL builder. Must not be {@code null}.
-     */
-    X509CRLHolder build(X509v2CRLBuilder builder) throws NoIdleSignerException;
-
-    /**
-     *
-     * @param builder
-     *          Certificate builder. Must not be {@code null}.
-     */
-    X509CertificateHolder build(X509v3CertificateBuilder builder)
-            throws NoIdleSignerException;
-
-    /**
-     * @param builder
-     *          OCSP request builder. Must not be {@code null}.
-     * @param chain
-     *          Certificates to be embedded in the response. Could be {@code null}.
-     *
-     */
-    OCSPRequest build(XipkiOCSPReqBuilder builder, Certificate[] chain)
-            throws NoIdleSignerException, OCSPException;
-
-    /**
-     *
-     * @param builder
-     *          PKCS#10 request builder. Must not be {@code null}.
-     */
-    PKCS10CertificationRequest build(PKCS10CertificationRequestBuilder builder)
-            throws NoIdleSignerException;
-
-    /**
-     *
-     * @param builder
-     *          Basic OCSP response builder. Must not be {@code null}.
-     * @param chain
-     *          Certificates to be embedded in the response. Could be {@code null}.
-     * @param producedAt
-     *          When the OCSP response is produced. Must not be {@code null}.
-     */
-    // CHECKSTYLE:SKIP
-    byte[] buildOCSPResponse(OCSPRespBuilder builder,
-           byte[] chain, Date producedAt)
-           throws NoIdleSignerException, OCSPException;
-
-    /**
-     *
      * @param data
      *          Data to be signed. Must not be {@code null}.
      */
     byte[] sign(byte[] data) throws NoIdleSignerException, IOException;
+
+    /**
+     * borrow a ContentSigner with implementation-dependent default timeout.
+     */
+    ConcurrentBagEntrySigner borrowContentSigner()
+            throws NoIdleSignerException;
+
+    /**
+     * @param timeout timeout in milliseconds, 0 for infinitely.
+     */
+    ConcurrentBagEntrySigner borrowContentSigner(final int soTimeout)
+            throws NoIdleSignerException;
+
+    void requiteContentSigner(final ConcurrentBagEntrySigner signer);
+
+    /**
+     * returns the encoded algorithm identifier if it never changes, otherwise {@code null}.
+     */
+    byte[] encodedAlgorithmIdentifier();
 
     boolean isHealthy();
 
