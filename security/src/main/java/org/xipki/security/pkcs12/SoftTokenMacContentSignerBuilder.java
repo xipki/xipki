@@ -129,6 +129,8 @@ public class SoftTokenMacContentSignerBuilder {
             gmac = true;
         }
 
+        boolean fixedAlgorithmIdentifier = !gmac;
+
         for (int i = 0; i < parallelism; i++) {
             ContentSigner signer;
             if (gmac) {
@@ -142,7 +144,8 @@ public class SoftTokenMacContentSignerBuilder {
         final boolean mac = true;
         DefaultConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, key);
+            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, key,
+                    fixedAlgorithmIdentifier);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }
