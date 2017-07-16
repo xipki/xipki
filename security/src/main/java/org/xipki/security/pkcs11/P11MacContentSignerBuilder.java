@@ -76,6 +76,7 @@ public class P11MacContentSignerBuilder {
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
         // FIXME: consider the AES GMAC
+        boolean fixedAlgorithmIdentifier = true; // for AES GMAC it is false.
         List<ContentSigner> signers = new ArrayList<>(parallelism);
         for (int i = 0; i < parallelism; i++) {
             ContentSigner signer = new P11MacContentSigner(
@@ -86,7 +87,8 @@ public class P11MacContentSignerBuilder {
         final boolean mac = true;
         DefaultConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, null);
+            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, null,
+                    fixedAlgorithmIdentifier);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }

@@ -96,6 +96,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
     private final boolean mac;
 
+    private final byte[] encodedAlgorithmIdentifier;
+
     private byte[] sha1DigestOfMacKey;
 
     private final Key signingKey;
@@ -124,13 +126,14 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     public DefaultConcurrentContentSigner(final boolean mac,
-            final List<ContentSigner> signers)
+            final List<ContentSigner> signers, final boolean fixedAlgorithmIdentifier)
             throws NoSuchAlgorithmException {
-        this(mac, signers, null);
+        this(mac, signers, null, fixedAlgorithmIdentifier);
     }
 
     public DefaultConcurrentContentSigner(final boolean mac,
-            final List<ContentSigner> signers, final Key signingKey)
+            final List<ContentSigner> signers, final Key signingKey,
+            final boolean fixedAlgorithmIdentifier)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonEmpty("signers", signers);
 
@@ -145,6 +148,16 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
 
         this.signingKey = signingKey;
         this.name = "defaultSigner-" + NAME_INDEX.getAndIncrement();
+
+        if (fixedAlgorithmIdentifier) {
+            try {
+                this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
+            } catch (IOException ex) {
+                throw new IllegalArgumentException("error processing algorithmIdentifier");
+            }
+        } else {
+            this.encodedAlgorithmIdentifier = null;
+        }
     }
 
     @Override
@@ -201,7 +214,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         return signer;
     }
 
-    private void returnContentSigner(final ConcurrentBagEntry<ContentSigner> signer) {
+    private void requiteContentSigner(final ConcurrentBagEntry<ContentSigner> signer) {
         signers.requite(signer);
     }
 
@@ -286,7 +299,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             return false;
         } finally {
             if (signer != null) {
-                returnContentSigner(signer);
+                requiteContentSigner(signer);
             }
         }
     }
@@ -307,7 +320,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         try {
             return builder.build(contentSigner.value());
         } finally {
-            returnContentSigner(contentSigner);
+            requiteContentSigner(contentSigner);
         }
     }
 
@@ -318,7 +331,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         try {
             return builder.build(contentSigner.value());
         } finally {
-            returnContentSigner(contentSigner);
+            requiteContentSigner(contentSigner);
         }
     }
 
@@ -328,7 +341,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         try {
             return builder.build(contentSigner.value());
         } finally {
-            returnContentSigner(contentSigner);
+            requiteContentSigner(contentSigner);
         }
     }
 
@@ -339,7 +352,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         try {
             return builder.build(contentSigner.value());
         } finally {
-            returnContentSigner(contentSigner);
+            requiteContentSigner(contentSigner);
         }
     }
 
@@ -350,7 +363,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         try {
             return builder.build(contentSigner.value(), chain);
         } finally {
-            returnContentSigner(contentSigner);
+            requiteContentSigner(contentSigner);
         }
     }
 
@@ -361,7 +374,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         try {
             return builder.build(contentSigner.value());
         } finally {
-            returnContentSigner(contentSigner);
+            requiteContentSigner(contentSigner);
         }
     }
 
@@ -371,9 +384,10 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             throws NoIdleSignerException, OCSPException {
         ConcurrentBagEntry<ContentSigner> contentSigner = borrowContentSigner();
         try {
-            return builder.buildOCSPResponse(contentSigner.value(), chain, producedAt);
+            return builder.buildOCSPResponse(contentSigner.value(), encodedAlgorithmIdentifier,
+                    chain, producedAt);
         } finally {
-            returnContentSigner(contentSigner);
+            requiteContentSigner(contentSigner);
         }
     }
 
@@ -385,7 +399,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
             signatureStream.write(data);
             return contentSigner.value().getSignature();
         } finally {
-            returnContentSigner(contentSigner);
+            requiteContentSigner(contentSigner);
         }
     }
 
