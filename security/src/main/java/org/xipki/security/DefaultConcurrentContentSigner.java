@@ -47,7 +47,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
-import org.bouncycastle.asn1.ocsp.BasicOCSPResponse;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -71,7 +70,6 @@ import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.password.PasswordResolver;
-import org.xipki.security.bc.XipkiBasicOCSPRespBuilder;
 import org.xipki.security.bc.XipkiOCSPReqBuilder;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
@@ -357,23 +355,23 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     @Override
-    public BasicOCSPResponse build(final XipkiBasicOCSPRespBuilder builder,
-            final Certificate[] chain, final Date producedAt)
-            throws NoIdleSignerException, OCSPException {
+    public PKCS10CertificationRequest build(final PKCS10CertificationRequestBuilder builder)
+            throws NoIdleSignerException {
         ConcurrentBagEntry<ContentSigner> contentSigner = borrowContentSigner();
         try {
-            return builder.build(contentSigner.value(), chain, producedAt);
+            return builder.build(contentSigner.value());
         } finally {
             returnContentSigner(contentSigner);
         }
     }
 
     @Override
-    public PKCS10CertificationRequest build(final PKCS10CertificationRequestBuilder builder)
-            throws NoIdleSignerException {
+    public byte[] buildOCSPResponse(final OCSPRespBuilder builder,
+            final byte[] chain, final Date producedAt)
+            throws NoIdleSignerException, OCSPException {
         ConcurrentBagEntry<ContentSigner> contentSigner = borrowContentSigner();
         try {
-            return builder.build(contentSigner.value());
+            return builder.buildOCSPResponse(contentSigner.value(), chain, producedAt);
         } finally {
             returnContentSigner(contentSigner);
         }
