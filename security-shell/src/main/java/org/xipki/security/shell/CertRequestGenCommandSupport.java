@@ -81,6 +81,7 @@ import org.xipki.console.karaf.completer.ExtensionNameCompleter;
 import org.xipki.console.karaf.completer.FilePathCompleter;
 import org.xipki.console.karaf.completer.HashAlgCompleter;
 import org.xipki.console.karaf.completer.KeyusageCompleter;
+import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.KeyUsage;
@@ -460,10 +461,17 @@ public abstract class CertRequestGenCommandSupport extends SecurityCommandSuppor
             }
         }
 
+        ConcurrentBagEntrySigner signer0;
         try {
-            return signer.build(csrBuilder);
+            signer0 = signer.borrowContentSigner();
         } catch (NoIdleSignerException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
+        }
+
+        try {
+            return csrBuilder.build(signer0.value());
+        } finally {
+            signer.requiteContentSigner(signer0);
         }
     }
 }

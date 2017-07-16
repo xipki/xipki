@@ -52,7 +52,10 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.exception.NoIdleSignerException;
 
@@ -139,7 +142,13 @@ public class CmpUtil {
             builder.addCMPCertificate(signerCert);
         }
 
-        ProtectedPKIMessage signedMessage = signer.build(builder);
+        ConcurrentBagEntrySigner signer0 = signer.borrowContentSigner();
+        ProtectedPKIMessage signedMessage;
+        try {
+            signedMessage = builder.build(signer0.value());
+        } finally {
+            signer.requiteContentSigner(signer0);
+        }
         return signedMessage.toASN1Structure();
     } // method addProtection
 
