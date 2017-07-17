@@ -34,8 +34,8 @@
 
 package org.xipki.security.speed.p12.cmd;
 
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
@@ -54,7 +54,7 @@ import org.xipki.security.speed.p12.P12DSASignLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP12DSASignCmd extends BSpeedP12SignCommandSupport {
 
-    private final BlockingDeque<DSAControl> queue = new LinkedBlockingDeque<>();
+    private final Queue<DSAControl> queue = new LinkedList<>();
 
     public BSpeedP12DSASignCmd() {
         queue.add(new DSAControl(1024, 160));
@@ -65,7 +65,7 @@ public class BSpeedP12DSASignCmd extends BSpeedP12SignCommandSupport {
 
     @Override
     protected LoadExecutor nextTester() throws Exception {
-        DSAControl control = queue.takeFirst();
+        DSAControl control = queue.poll();
         if (control == null) {
             return null;
         }
