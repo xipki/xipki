@@ -34,8 +34,6 @@
 
 package org.xipki.security;
 
-import java.io.ByteArrayInputStream;
-import java.security.Provider;
 import java.security.Security;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -53,7 +51,6 @@ public class Providers {
 
     public void init() {
         addBcProvider();
-        addNssProvider();
     }
 
     public void shutdown() {
@@ -66,38 +63,6 @@ public class Providers {
             return;
         }
         Security.addProvider(new BouncyCastleProvider());
-    }
-
-    @SuppressWarnings("restriction")
-    private void addNssProvider() {
-        String provName = XiSecurityConstants.PROVIDER_NAME_NSS;
-        // check whether there exists an NSS provider registered by OpenJDK
-        if (Security.getProvider(provName) != null) {
-            LOG.info("security provider {} already initialized by other service", provName);
-            return;
-        }
-
-        try {
-            StringBuilder sb = new StringBuilder();
-            sb.append("name=").append(XiSecurityConstants.PROVIDER_CORENAME_NSS).append("\n");
-            sb.append("nssDbMode=noDb\n");
-            sb.append("attributes=compatibility\n");
-            String nssLib = System.getProperty("NSSLIB");
-            if (nssLib != null) {
-                sb.append("\nnssLibraryDirectory=").append(nssLib);
-            }
-
-            Provider provider = new sun.security.pkcs11.SunPKCS11(
-                    new ByteArrayInputStream(sb.toString().getBytes()));
-            Security.addProvider(provider);
-            LOG.info("added security provider {}", provName);
-        } catch (Throwable th) {
-            final String msg = "could not initialize SunPKCS11 NSS provider";
-            if (LOG.isInfoEnabled()) {
-                LOG.info("{}: {}", msg, th.getMessage());
-            }
-            LOG.debug(msg, th);
-        }
     }
 
 }
