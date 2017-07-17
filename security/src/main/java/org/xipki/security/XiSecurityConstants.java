@@ -41,10 +41,6 @@ package org.xipki.security;
 
 public class XiSecurityConstants {
 
-    public static final String PROVIDER_NAME_NSS = "SunPKCS11-NSS";
-
-    public static final String PROVIDER_CORENAME_NSS = "NSS";
-
     public static final String PROVIDER_NAME_XIPKI = "XiPKI";
 
     public static final int CMP_CRL_REASON_REMOVE = -1;

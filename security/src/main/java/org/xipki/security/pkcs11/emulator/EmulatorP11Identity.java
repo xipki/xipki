@@ -41,7 +41,6 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
@@ -59,11 +58,10 @@ import javax.crypto.SecretKey;
 import org.bouncycastle.crypto.macs.HMac;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.concurrent.ConcurrentBag;
+import org.xipki.common.concurrent.ConcurrentBagEntry;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
-import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11EntityIdentifier;
@@ -112,10 +110,7 @@ public class EmulatorP11Identity extends P11Identity {
         this.random = ParamUtil.requireNonNull("random", random);
 
         if (this.publicKey instanceof RSAPublicKey) {
-            String providerName =
-                    (Security.getProvider(XiSecurityConstants.PROVIDER_NAME_NSS) != null)
-                        ? XiSecurityConstants.PROVIDER_NAME_NSS : "BC";
-
+            String providerName = "BC";
             LOG.info("use provider {}", providerName);
 
             for (int i = 0; i < maxSessions; i++) {

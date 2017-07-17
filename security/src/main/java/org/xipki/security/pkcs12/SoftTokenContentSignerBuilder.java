@@ -61,7 +61,6 @@ import java.util.Set;
 
 import javax.crypto.NoSuchPaddingException;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Digest;
@@ -76,14 +75,11 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.common.util.CollectionUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.SignatureSigner;
-import org.xipki.security.XiSecurityConstants;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
@@ -100,13 +96,9 @@ public class SoftTokenContentSignerBuilder {
     // CHECKSTYLE:SKIP
     private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
 
-        private final boolean useNssForPss;
-
-        private RSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId,
-                final boolean useNssForPss)
+        private RSAContentSignerBuilder(final AlgorithmIdentifier signatureAlgId)
             throws NoSuchAlgorithmException, NoSuchPaddingException {
             super(signatureAlgId, AlgorithmUtil.extractDigesetAlgFromSigAlg(signatureAlgId));
-            this.useNssForPss = useNssForPss;
         }
 
         protected Signer createSigner(final AlgorithmIdentifier sigAlgId,
@@ -122,26 +114,10 @@ public class SoftTokenContentSignerBuilder {
                 return new RSADigestSigner(dig);
             }
 
-            if (useNssForPss) {
-                if (Security.getProvider(XiSecurityConstants.PROVIDER_NAME_NSS) == null) {
-                    throw new OperatorCreationException("Provider "
-                            + XiSecurityConstants.PROVIDER_CORENAME_NSS + " is not available");
-                }
-                try {
-                    NssPlainRSASigner plainSigner = new NssPlainRSASigner();
-                    return SignerUtil.createPSSRSASigner(sigAlgId, plainSigner);
-                } catch (XiSecurityException | NoSuchPaddingException | NoSuchProviderException
-                        | NoSuchAlgorithmException ex) {
-                    throw new OperatorCreationException(
-                            "could not create PSS signer using underlying provider "
-                            + XiSecurityConstants.PROVIDER_NAME_NSS, ex);
-                }
-            } else {
-                try {
-                    return SignerUtil.createPSSRSASigner(sigAlgId);
-                } catch (XiSecurityException ex) {
-                    throw new OperatorCreationException(ex.getMessage(), ex);
-                }
+            try {
+                return SignerUtil.createPSSRSASigner(sigAlgId);
+            } catch (XiSecurityException ex) {
+                throw new OperatorCreationException(ex.getMessage(), ex);
             }
         }
 
@@ -201,8 +177,6 @@ public class SoftTokenContentSignerBuilder {
         }
 
     } // class ECDSAContentSignerBuilder
-
-    private static final Logger LOG = LoggerFactory.getLogger(SoftTokenContentSignerBuilder.class);
 
     private final PrivateKey key;
 
@@ -293,12 +267,9 @@ public class SoftTokenContentSignerBuilder {
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
         List<ContentSigner> signers = new ArrayList<>(parallelism);
-        ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
 
-        final String provName = XiSecurityConstants.PROVIDER_NAME_NSS;
-
-        if (Security.getProvider(provName) != null
-                && !(key instanceof ECPrivateKey)) {
+        final String provName = "SunJCE";
+        if (Security.getProvider(provName) != null) {
             String algoName;
             try {
                 algoName = AlgorithmUtil.getSignatureAlgoName(signatureAlgId);
@@ -306,58 +277,19 @@ public class SoftTokenContentSignerBuilder {
                 throw new XiSecurityException(ex.getMessage());
             }
 
-            boolean useGivenProvider = true;
-
-            if (algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS)) {
-                BcContentSignerBuilder signerBuilder;
-                if (!(key instanceof RSAPrivateKey)) {
-                    throw new XiSecurityException("unsupported key "
-                            + key.getClass().getName() + " for RSAPSS");
-                }
-
-                try {
-                    AsymmetricKeyParameter keyparam;
-                    try {
-                        signerBuilder = new RSAContentSignerBuilder(signatureAlgId, true);
-                        keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
-                    } catch (NoSuchAlgorithmException ex) {
-                        throw new OperatorCreationException("no such algorithm", ex);
+            try {
+                for (int i = 0; i < parallelism; i++) {
+                    Signature signature = Signature.getInstance(algoName, provName);
+                    signature.initSign(key);
+                    if (i == 0) {
+                        signature.update(new byte[]{1, 2, 3, 4});
+                        signature.sign();
                     }
-
-                    for (int i = 0; i < parallelism; i++) {
-                        if (random != null) {
-                            signerBuilder.setSecureRandom(random);
-                        }
-
-                        ContentSigner signer = signerBuilder.build(keyparam);
-                        signers.add(signer);
-                    }
-                } catch (Exception ex) {
-                    useGivenProvider = false;
-                    signers.clear();
+                    ContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
+                    signers.add(signer);
                 }
-            } else {
-                try {
-                    for (int i = 0; i < parallelism; i++) {
-                        Signature signature = Signature.getInstance(algoName, provName);
-                        signature.initSign(key);
-                        if (i == 0) {
-                            signature.update(new byte[]{1, 2, 3, 4});
-                            signature.sign();
-                        }
-                        ContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
-                        signers.add(signer);
-                    }
-                } catch (Exception ex) {
-                    useGivenProvider = false;
-                    signers.clear();
-                }
-            }
-
-            if (useGivenProvider) {
-                LOG.info("use {} to sign {} signature", provName, algoName);
-            } else {
-                LOG.info("could not use {} to sign {} signature", provName, algoName);
+            } catch (Exception ex) {
+                signers.clear();
             }
         }
 
@@ -367,7 +299,7 @@ public class SoftTokenContentSignerBuilder {
             try {
                 if (key instanceof RSAPrivateKey) {
                     keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
-                    signerBuilder = new RSAContentSignerBuilder(signatureAlgId, false);
+                    signerBuilder = new RSAContentSignerBuilder(signatureAlgId);
                 } else if (key instanceof DSAPrivateKey) {
                     keyparam = DSAUtil.generatePrivateKeyParameter(key);
                     signerBuilder = new DSAContentSignerBuilder(signatureAlgId,

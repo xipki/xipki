@@ -221,7 +221,7 @@ public final class HttpServer {
     public void start() {
         int numProcessors = Runtime.getRuntime().availableProcessors();
         Class<? extends ServerSocketChannel> channelClass;
-        int bossGroupThreads = (numProcessors == 1) ? 1 : numProcessors - 1;
+        int bossGroupThreads = numProcessors == 1 ? 1  : (numProcessors + 1)/ 2;
         if (useEpollLinux) {
             channelClass = EpollServerSocketChannel.class;
             this.bossGroup = new EpollEventLoopGroup(bossGroupThreads);

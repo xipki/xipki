@@ -8,7 +8,7 @@
     <artifactId>xipki-parent</artifactId>
     <version>2.2.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.xipki.pki</groupId>
+  <groupId>org.xipki</groupId>
   <artifactId>scep-parent</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
@@ -16,5 +16,7 @@
     <module>scep-common</module>
     <module>scep-server-emulator</module>
     <module>scep-client</module>
+    <module>scep-client-shell</module>
+    <module>jscep-client-shell</module>
   </modules>
 </project>
