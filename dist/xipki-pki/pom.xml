@@ -126,14 +126,14 @@
               <outputDirectory>${output.directory}/xipki</outputDirectory>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
+                  <groupId>org.xipki.ca</groupId>
                   <artifactId>ca-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>sql/**</includes>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
+                  <groupId>org.xipki.ocsp</groupId>
                   <artifactId>ocsp-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
@@ -160,42 +160,42 @@
                   <includes>xsd/**</includes>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
+                  <groupId>org.xipki.ca</groupId>
                   <artifactId>ca-certprofile-xml</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
+                  <groupId>org.xipki.ca</groupId>
                   <artifactId>ca-client-impl</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
+                  <groupId>org.xipki.ca</groupId>
                   <artifactId>ca-client-shell</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
+                  <groupId>org.xipki.ca</groupId>
                   <artifactId>ca-dbtool</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
+                  <groupId>org.xipki.ca</groupId>
                   <artifactId>ca-mgmt-api</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.pki</groupId>
+                  <groupId>org.xipki.ocsp</groupId>
                   <artifactId>ocsp-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>

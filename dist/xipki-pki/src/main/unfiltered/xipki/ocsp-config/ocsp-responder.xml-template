@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<OCSPServer master="true" xmlns="http://xipki.org/pki/ocsp/conf/v2">
+<OCSPServer master="true" xmlns="http://xipki.org/ocsp/conf/v2">
   <!-- responseCache -->
   <responseCache>
     <datasource name="datasource-cache">

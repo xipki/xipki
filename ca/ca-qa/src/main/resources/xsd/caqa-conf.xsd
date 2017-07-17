@@ -2,9 +2,9 @@
 <!--
  Copyright (c) 2013 - 2017 Lijun Liao
 -->
-<xs:schema xmlns="http://xipki.org/pki/ca/qa/qa/conf/v2"
+<xs:schema xmlns="http://xipki.org/ca/qa/qa/conf/v2"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://xipki.org/pki/ca/qa/qa/conf/v2"
+  targetNamespace="http://xipki.org/ca/qa/qa/conf/v2"
   elementFormDefault="qualified">
   <xs:element name="QAConf" type="QAConfType"/>
   <xs:complexType name="QAConfType">

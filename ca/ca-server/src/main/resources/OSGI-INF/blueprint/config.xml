@@ -4,7 +4,7 @@
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
-  <cm:property-placeholder persistent-id="org.xipki.pki.ca.server" update-strategy="reload">
+  <cm:property-placeholder persistent-id="org.xipki.ca.server" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="caConfFile" value="xipki/ca-config/ca.properties"/>
     </cm:default-properties>
@@ -13,10 +13,10 @@
   <reference id="auditServiceRegister"
       interface="org.xipki.audit.AuditServiceRegister"/>
   <reference id="x509CertProfileFactoryRegister"
-      interface="org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegister"/>
+      interface="org.xipki.ca.api.profile.x509.X509CertprofileFactoryRegister"/>
   <reference id="x509CertPublisherFactoryRegister"
-      interface="org.xipki.pki.ca.api.publisher.x509.X509CertPublisherFactoryRegister"/>
-  <bean id="caManager" class="org.xipki.pki.ca.server.impl.CaManagerImpl"
+      interface="org.xipki.ca.api.publisher.x509.X509CertPublisherFactoryRegister"/>
+  <bean id="caManager" class="org.xipki.ca.server.impl.CaManagerImpl"
       init-method="startCaSystem" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>
@@ -24,9 +24,9 @@
     <property name="x509CertProfileFactoryRegister" ref="x509CertProfileFactoryRegister"/>
     <property name="x509CertPublisherFactoryRegister" ref="x509CertPublisherFactoryRegister"/>
   </bean>
-  <service ref="caManager" interface="org.xipki.pki.ca.server.mgmt.api.CaManager"/>
+  <service ref="caManager" interface="org.xipki.ca.server.mgmt.api.CaManager"/>
   <!-- CMP servlet -->
-  <bean id="cmpServlet" class="org.xipki.pki.ca.server.impl.cmp.HttpCmpServlet">
+  <bean id="cmpServlet" class="org.xipki.ca.server.impl.cmp.HttpCmpServlet">
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
@@ -36,7 +36,7 @@
     </service-properties>
   </service>
   <!-- REST servlet -->
-  <bean id="restServlet" class="org.xipki.pki.ca.server.impl.rest.HttpRestServlet">
+  <bean id="restServlet" class="org.xipki.ca.server.impl.rest.HttpRestServlet">
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
@@ -46,7 +46,7 @@
     </service-properties>
   </service>
   <!-- SCEP servlet -->
-  <bean id="scepServlet" class="org.xipki.pki.ca.server.impl.scep.ScepServlet">
+  <bean id="scepServlet" class="org.xipki.ca.server.impl.scep.ScepServlet">
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
@@ -56,7 +56,7 @@
     </service-properties>
   </service>
   
-  <bean id="healthServlet" class="org.xipki.pki.ca.server.impl.HealthCheckServlet">
+  <bean id="healthServlet" class="org.xipki.ca.server.impl.HealthCheckServlet">
     <property name="responderManager" ref="caManager"/>
   </bean>
   <service ref="healthServlet" interface="org.xipki.http.servlet.HttpServlet">

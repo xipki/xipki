@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<CAConf xmlns="http://xipki.org/pki/ca/conf/v2" version="1">
+<CAConf xmlns="http://xipki.org/ca/conf/v2" version="1">
   <properties>
     <property name="profiles.dir">xipki/demo/profile</property>
     <property name="security.dir">xipki/security</property>

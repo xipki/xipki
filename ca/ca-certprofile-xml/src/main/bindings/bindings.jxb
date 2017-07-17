@@ -23,7 +23,7 @@
 
     <jxb:bindings schemaLocation="../resources/xsd/certprofile.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
-            <jxb:package name="org.xipki.pki.ca.certprofile.x509.jaxb"/>
+            <jxb:package name="org.xipki.ca.certprofile.x509.jaxb"/>
         </jxb:schemaBindings>
     </jxb:bindings>
 

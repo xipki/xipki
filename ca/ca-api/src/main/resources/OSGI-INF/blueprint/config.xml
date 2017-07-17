@@ -4,22 +4,22 @@
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
 
   <bean id="certprofileFactoryRegister"
-       class="org.xipki.pki.ca.api.internal.X509CertprofileFactoryRegisterImpl"/>
+       class="org.xipki.ca.api.internal.X509CertprofileFactoryRegisterImpl"/>
   <service ref="certprofileFactoryRegister"
-       interface="org.xipki.pki.ca.api.profile.x509.X509CertprofileFactoryRegister"/>
+       interface="org.xipki.ca.api.profile.x509.X509CertprofileFactoryRegister"/>
   <reference-list id="certprofileFactories"
-       interface="org.xipki.pki.ca.api.profile.x509.X509CertprofileFactory"
+       interface="org.xipki.ca.api.profile.x509.X509CertprofileFactory"
        availability="optional">
     <reference-listener ref="certprofileFactoryRegister" bind-method="bindService" 
          unbind-method="unbindService"/>
   </reference-list>
 
   <bean id="publisherFactoryRegister"
-       class="org.xipki.pki.ca.api.internal.X509CertPublisherFactoryRegisterImpl"/>
+       class="org.xipki.ca.api.internal.X509CertPublisherFactoryRegisterImpl"/>
   <service ref="publisherFactoryRegister"
-       interface="org.xipki.pki.ca.api.publisher.x509.X509CertPublisherFactoryRegister"/>
+       interface="org.xipki.ca.api.publisher.x509.X509CertPublisherFactoryRegister"/>
   <reference-list id="publisherFactories"
-       interface="org.xipki.pki.ca.api.publisher.x509.X509CertPublisherFactory"
+       interface="org.xipki.ca.api.publisher.x509.X509CertPublisherFactory"
        availability="optional">
     <reference-listener ref="publisherFactoryRegister" bind-method="bindService"
          unbind-method="unbindService"/>

@@ -2,9 +2,9 @@
 <!--
  Copyright (c) 2013 - 2017 Lijun Liao
 -->
-<xs:schema xmlns="http://xipki.org/pki/ca/dbtool/ocsp/v2"
+<xs:schema xmlns="http://xipki.org/ca/dbtool/ocsp/v2"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://xipki.org/pki/ca/dbtool/ocsp/v2"
+  targetNamespace="http://xipki.org/ca/dbtool/ocsp/v2"
   elementFormDefault="qualified">
   <!-- CertStore -->
   <xs:element name="CertStore" type="CertStoreType"/>

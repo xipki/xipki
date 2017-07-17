@@ -6,14 +6,14 @@
     default-activation="lazy">
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
-  <cm:property-placeholder persistent-id="org.xipki.pki.ca.qa" update-strategy="reload">
+  <cm:property-placeholder persistent-id="org.xipki.ca.qa" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="confFile" value="xipki/ca-qa/caqa-conf.xml"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <bean id="qaSystemManager" class="org.xipki.pki.ca.qa.QaSystemManagerImpl"
+  <bean id="qaSystemManager" class="org.xipki.ca.qa.QaSystemManagerImpl"
       init-method="init" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
   </bean>
-  <service ref="qaSystemManager" interface="org.xipki.pki.ca.qa.QaSystemManager"/>  
+  <service ref="qaSystemManager" interface="org.xipki.ca.qa.QaSystemManager"/>  
 </blueprint>

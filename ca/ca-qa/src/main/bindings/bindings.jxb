@@ -23,7 +23,7 @@
 
     <jxb:bindings schemaLocation="../resources/xsd/caqa-conf.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
-            <jxb:package name="org.xipki.pki.ca.qa.jaxb"/>
+            <jxb:package name="org.xipki.ca.qa.jaxb"/>
         </jxb:schemaBindings>
     </jxb:bindings>
 

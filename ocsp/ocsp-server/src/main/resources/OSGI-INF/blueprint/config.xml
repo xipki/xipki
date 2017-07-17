@@ -4,22 +4,22 @@
   xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
-  <cm:property-placeholder persistent-id="org.xipki.pki.ocsp.server" update-strategy="reload">
+  <cm:property-placeholder persistent-id="org.xipki.ocsp.server" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="confFile" value="xipki/ocsp-config/ocsp-responder.xml"/>
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.SecurityFactory"/>
   <reference id="ocspStoreFactoryRegister"
-      interface="org.xipki.pki.ocsp.api.OcspStoreFactoryRegister"/>
-  <bean id="ocspServer" class="org.xipki.pki.ocsp.server.impl.OcspServer" 
+      interface="org.xipki.ocsp.api.OcspStoreFactoryRegister"/>
+  <bean id="ocspServer" class="org.xipki.ocsp.server.impl.OcspServer" 
       init-method="init" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
     <property name="securityFactory" ref="securityFactory"/>
     <property name="ocspStoreFactoryRegister" ref="ocspStoreFactoryRegister"/>
   </bean>
   <!-- create the servlet and inject our own app factory -->
-  <bean id="ocspServlet" class="org.xipki.pki.ocsp.server.impl.HttpOcspServlet">
+  <bean id="ocspServlet" class="org.xipki.ocsp.server.impl.HttpOcspServlet">
     <property name="server" ref="ocspServer"/>
   </bean>
   <!-- register it as a servlet service for the web extender -->
@@ -29,7 +29,7 @@
     </service-properties>
   </service>
   <!-- create the servlet and inject our own app factory -->
-  <bean id="healthServlet" class="org.xipki.pki.ocsp.server.impl.HealthCheckServlet">
+  <bean id="healthServlet" class="org.xipki.ocsp.server.impl.HealthCheckServlet">
     <property name="server" ref="ocspServer"/>
   </bean>
   <service ref="healthServlet" interface="org.xipki.http.servlet.HttpServlet">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<enrollTemplate xmlns="http://xipki.org/pki/ca/client/loadtest/v2">
+<enrollTemplate xmlns="http://xipki.org/ca/client/loadtest/v2">
   <!-- the certificate profile must allow duplication of public key -->
   <!--
   <enrollCert>

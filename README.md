@@ -170,7 +170,7 @@ Install
 
 * If the CA is behind a reverse proxy apache httpd:
 
-  * In file etc/org.xipki.pki.ca.server.cfg, change the sslCertInHttpHeader as follows:
+  * In file etc/org.xipki.ca.server.cfg, change the sslCertInHttpHeader as follows:
 
     ```sh
     sslCertInHttpHeader = true

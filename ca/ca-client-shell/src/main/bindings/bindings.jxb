@@ -23,7 +23,7 @@
 
     <jxb:bindings schemaLocation="../resources/xsd/loadtest.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
-            <jxb:package name="org.xipki.pki.ca.client.shell.loadtest.jaxb"/>
+            <jxb:package name="org.xipki.ca.client.shell.loadtest.jaxb"/>
         </jxb:schemaBindings>
     </jxb:bindings>
 

@@ -23,7 +23,7 @@
 
     <jxb:bindings schemaLocation="../resources/xsd/caclient-conf.xsd" node="/xsd:schema">
         <jxb:schemaBindings>
-            <jxb:package name="org.xipki.pki.ca.client.impl.jaxb"/>
+            <jxb:package name="org.xipki.ca.client.impl.jaxb"/>
         </jxb:schemaBindings>
     </jxb:bindings>
 
