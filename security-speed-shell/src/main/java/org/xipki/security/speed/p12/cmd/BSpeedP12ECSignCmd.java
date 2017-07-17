@@ -34,8 +34,8 @@
 
 package org.xipki.security.speed.p12.cmd;
 
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
@@ -54,7 +54,7 @@ import org.xipki.security.speed.p12.P12ECSignLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP12ECSignCmd extends BSpeedP12SignCommandSupport {
 
-    private final BlockingDeque<ECControl> queue = new LinkedBlockingDeque<>();
+    private final Queue<ECControl> queue = new LinkedList<>();
 
     public BSpeedP12ECSignCmd() {
         for (String curveName : getECCurveNames()) {
@@ -64,7 +64,7 @@ public class BSpeedP12ECSignCmd extends BSpeedP12SignCommandSupport {
 
     @Override
     protected LoadExecutor nextTester() throws Exception {
-        ECControl control = queue.takeFirst();
+        ECControl control = queue.poll();
         if (control == null) {
             return null;
         }

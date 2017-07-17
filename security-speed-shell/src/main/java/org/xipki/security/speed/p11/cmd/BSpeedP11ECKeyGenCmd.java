@@ -34,8 +34,8 @@
 
 package org.xipki.security.speed.p11.cmd;
 
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
@@ -55,7 +55,7 @@ import org.xipki.security.speed.p11.P11ECKeyGenLoadTest;
 // CHECKSTYLE:SKIP
 public class BSpeedP11ECKeyGenCmd extends BSpeedP11CommandSupport {
 
-    private final BlockingDeque<ECControl> queue = new LinkedBlockingDeque<>();
+    private final Queue<ECControl> queue = new LinkedList<>();
 
     public BSpeedP11ECKeyGenCmd() {
         for (String curveName : getECCurveNames()) {
@@ -65,7 +65,7 @@ public class BSpeedP11ECKeyGenCmd extends BSpeedP11CommandSupport {
 
     @Override
     protected LoadExecutor nextTester() throws Exception {
-        ECControl control = queue.takeFirst();
+        ECControl control = queue.poll();
         if (control == null) {
             return null;
         }
