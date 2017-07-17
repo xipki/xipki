@@ -34,8 +34,8 @@
 
 package org.xipki.security.speed.p11.cmd;
 
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
@@ -65,7 +65,7 @@ public class BSpeedP11RSASignCmd extends BSpeedP11CommandSupport {
     @Completion(RSASigAlgCompleter.class)
     private String sigAlgo;
 
-    private final BlockingDeque<RSAControl> queue = new LinkedBlockingDeque<>();
+    private final Queue<RSAControl> queue = new LinkedList<>();
 
     public BSpeedP11RSASignCmd() {
         queue.add(new RSAControl(1024));
@@ -76,7 +76,7 @@ public class BSpeedP11RSASignCmd extends BSpeedP11CommandSupport {
 
     @Override
     protected LoadExecutor nextTester() throws Exception {
-        RSAControl control = queue.takeFirst();
+        RSAControl control = queue.poll();
         if (control == null) {
             return null;
         }
