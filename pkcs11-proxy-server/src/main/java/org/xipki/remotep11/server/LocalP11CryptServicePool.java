@@ -119,12 +119,8 @@ public class LocalP11CryptServicePool {
         } catch (UnsupportedEncodingException ex) {
             throw new XiSecurityException("Unsupported charset UTF-8");
         }
-        int intCode = 0x7FFF & ((byteToInt(hash[0]) << 8) | byteToInt(hash[1]));
+        int intCode = 0x7FFF & ((0xFF & hash[0]) << 8) | (0xFF & hash[1]);
         return (short) intCode;
-    }
-
-    private static int byteToInt(byte bb) {
-        return (bb < 0) ? 256 + bb : bb;
     }
 
 }
