@@ -590,7 +590,8 @@ class ResponseCacher {
             // do nothing
         }
 
-        if (digest0 == null) {
+        boolean newDigest = (digest0 == null);
+        if (newDigest) {
             digest0 = new ConcurrentBagEntry<Digest>(HashAlgoType.SHA1.createDigest());
         }
 
@@ -602,17 +603,21 @@ class ResponseCacher {
             digest.update(identBytes, 0, identBytes.length);
             digest.doFinal(hash, 0);
         } finally {
-            idDigesters.requite(digest0);
+            if (newDigest) {
+                idDigesters.add(digest0);
+            } else {
+                idDigesters.requite(digest0);
+            }
         }
 
-        return (b2l(hash[0]) & 0x7FL) << 56 |
-                b2l(hash[1]) << 48 |
-                b2l(hash[2]) << 40 |
-                b2l(hash[3]) << 32 |
-                b2l(hash[4]) << 24 |
-                b2l(hash[5]) << 16 |
-                b2l(hash[6]) << 8 |
-                b2l(hash[7]);
+        return ((0xFFL & hash[0]) & 0x7FL) << 56 |
+                (0xFFL & hash[1]) << 48 |
+                (0xFFL & hash[2]) << 40 |
+                (0xFFL & hash[3]) << 32 |
+                (0xFFL & hash[4]) << 24 |
+                (0xFFL & hash[5]) << 16 |
+                (0xFFL & hash[6]) << 8 |
+                (0xFFL & hash[7]);
     }
 
     private static byte[] int2Bytes(int value) {
@@ -621,10 +626,6 @@ class ResponseCacher {
         } else {
             throw new IllegalArgumentException("value is too large");
         }
-    }
-
-    private static final long b2l(byte bb) {
-        return bb < 0 ? 256 + bb : (long) bb;
     }
 
 }
