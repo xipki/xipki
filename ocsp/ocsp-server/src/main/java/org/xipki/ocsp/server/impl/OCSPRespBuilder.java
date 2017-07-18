@@ -36,32 +36,17 @@ package org.xipki.ocsp.server.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.ocsp.CertID;
-import org.bouncycastle.asn1.ocsp.CertStatus;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPResponseStatus;
-import org.bouncycastle.asn1.ocsp.ResponderID;
-import org.bouncycastle.asn1.ocsp.ResponseData;
-import org.bouncycastle.asn1.ocsp.RevokedInfo;
-import org.bouncycastle.asn1.ocsp.SingleResponse;
-import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.cert.ocsp.CertificateStatus;
 import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.cert.ocsp.RevokedStatus;
-import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentSigner;
+import org.xipki.ocsp.server.impl.type.CertID;
+import org.xipki.ocsp.server.impl.type.ResponseData;
+import org.xipki.ocsp.server.impl.type.SingleResponse;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.exception.NoIdleSignerException;
@@ -78,59 +63,9 @@ public class OCSPRespBuilder {
     private static final byte[] successfulStatus;
     private static final byte[] responseTypeBasic;
 
-    private List<ResponseObject> list = new ArrayList<>();
-    private Extensions responseExtensions = null;
-    private ResponderID responderId;
-
-    private class ResponseObject {
-        CertID certId;
-        CertStatus certStatus;
-        ASN1GeneralizedTime thisUpdate;
-        ASN1GeneralizedTime nextUpdate;
-        Extensions extensions;
-
-        public ResponseObject(
-            CertID certId,
-            CertificateStatus certStatus,
-            Date thisUpdate,
-            Date nextUpdate,
-            Extensions extensions) {
-            this.certId = certId;
-
-            if (certStatus == null) {
-                this.certStatus = new CertStatus();
-            } else if (certStatus instanceof UnknownStatus) {
-                this.certStatus = new CertStatus(2, DERNull.INSTANCE);
-            } else {
-                RevokedStatus rs = (RevokedStatus)certStatus;
-
-                if (rs.hasRevocationReason()) {
-                    this.certStatus = new CertStatus(new RevokedInfo(
-                            new ASN1GeneralizedTime(rs.getRevocationTime()),
-                            CRLReason.lookup(rs.getRevocationReason())));
-                } else {
-                    this.certStatus = new CertStatus(new RevokedInfo(
-                            new ASN1GeneralizedTime(rs.getRevocationTime()),
-                            null));
-                }
-            }
-
-            this.thisUpdate = new DERGeneralizedTime(thisUpdate);
-
-            if (nextUpdate != null) {
-                this.nextUpdate = new DERGeneralizedTime(nextUpdate);
-            } else {
-                this.nextUpdate = null;
-            }
-
-            this.extensions = extensions;
-        }
-
-        public SingleResponse toResponse()
-            throws Exception {
-            return new SingleResponse(certId, certStatus, thisUpdate, nextUpdate, extensions);
-        }
-    }
+    private List<SingleResponse> list = new LinkedList<>();
+    private byte[] responseExtensions = null;
+    private byte[] responderId;
 
     static {
         try {
@@ -145,7 +80,7 @@ public class OCSPRespBuilder {
      * basic constructor.
      */
     public OCSPRespBuilder(
-        ResponderID responderId) {
+        byte[] responderId) {
         this.responderId = responderId;
     }
 
@@ -158,9 +93,9 @@ public class OCSPRespBuilder {
      * @param certStatus status of the certificate - null if okay
      * @param singleExtensions optional extensions
      */
-    public void addResponse(CertID certId, CertificateStatus certStatus,
-            Date thisUpdate, Date nextUpdate, Extensions singleExtensions) {
-        list.add(new ResponseObject(certId, certStatus, thisUpdate, nextUpdate, singleExtensions));
+    public void addResponse(CertID certId, byte[] certStatus,
+            Date thisUpdate, Date nextUpdate, byte[] singleExtensions) {
+        list.add(new SingleResponse(certId, certStatus, thisUpdate, nextUpdate, singleExtensions));
     }
 
     /**
@@ -169,7 +104,7 @@ public class OCSPRespBuilder {
      * @param responseExtensions the extension object to carry.
      */
     public void setResponseExtensions(
-        Extensions  responseExtensions) {
+        byte[]  responseExtensions) {
         this.responseExtensions = responseExtensions;
     }
 
@@ -177,28 +112,11 @@ public class OCSPRespBuilder {
     public byte[] buildOCSPResponse(ConcurrentContentSigner signer, byte[] encodedSigAlgId,
             byte[] encodedChain, Date producedAt)
             throws OCSPException, NoIdleSignerException {
-        Iterator<ResponseObject> it = list.iterator();
+        ResponseData responseData = new ResponseData(0,
+                responderId, producedAt, list, responseExtensions);
 
-        ASN1EncodableVector responses = new ASN1EncodableVector();
-
-        while (it.hasNext()) {
-            try {
-                responses.add(((ResponseObject)it.next()).toResponse());
-            } catch (Exception ex) {
-                throw new OCSPException("exception creating Request", ex);
-            }
-        }
-
-        ResponseData  tbsResp = new ResponseData(responderId,
-                new ASN1GeneralizedTime(producedAt), new DERSequence(responses),
-                responseExtensions);
-
-        byte[] encodedTbsResp;
-        try {
-            encodedTbsResp = tbsResp.getEncoded(ASN1Encoding.DER);
-        } catch (Exception ex) {
-            throw new OCSPException("exception processing TBSRequest: " + ex.getMessage(), ex);
-        }
+        byte[] encodedTbsResp = new byte[responseData.encodedLength()];
+        responseData.write(encodedTbsResp, 0);
 
         ConcurrentBagEntrySigner signer0 = signer.borrowContentSigner();
 
@@ -316,21 +234,21 @@ public class OCSPRespBuilder {
             return 3;
         } else if (bodyLen < 0x10000) {
             out[offset++] = (byte) 0x82;
-            out[offset++] = (byte) (bodyLen >> 8);
+            out[offset++] = (byte) (       bodyLen >> 8);
             out[offset]   = (byte) (0xFF & bodyLen);
             return 4;
         } else if (bodyLen < 0x1000000) {
             out[offset++] = (byte) 0x83;
-            out[offset++] = (byte) (bodyLen >> 16);
-            out[offset++] = (byte) (bodyLen >> 8);
-            out[offset]   = (byte) (0xFF & bodyLen);
+            out[offset++] = (byte) (        bodyLen >> 16);
+            out[offset++] = (byte) (0xFF & (bodyLen >> 8));
+            out[offset]   = (byte) (0xFF &  bodyLen);
             return 5;
         } else {
             out[offset++] = (byte) 0x84;
-            out[offset++] = (byte) (bodyLen >> 24);
-            out[offset++] = (byte) (bodyLen >> 16);
-            out[offset++] = (byte) (bodyLen >> 8);
-            out[offset]   = (byte) (0xFF & bodyLen);
+            out[offset++] = (byte) (        bodyLen >> 24);
+            out[offset++] = (byte) (0xFF & (bodyLen >> 16));
+            out[offset++] = (byte) (0xFF & (bodyLen >> 8));
+            out[offset]   = (byte) (0xFF &  bodyLen);
             return 6;
         }
     }

@@ -610,7 +610,7 @@ class ResponseCacher {
             }
         }
 
-        return ((0xFFL & hash[0]) & 0x7FL) << 56 |
+        return  (0x7FL & hash[0]) << 56 | // ignore the first bit
                 (0xFFL & hash[1]) << 48 |
                 (0xFFL & hash[2]) << 40 |
                 (0xFFL & hash[3]) << 32 |

@@ -265,4 +265,13 @@ public enum HashAlgoType {
     public byte[] hash(final byte[] data) {
         return HashCalculator.hash(this, data);
     }
+
+    public int encodedLength() {
+        return encoded.length;
+    }
+
+    public int write(byte[] out, int offset) {
+        System.arraycopy(encoded, 0, out, offset, encoded.length);
+        return encoded.length;
+    }
 }

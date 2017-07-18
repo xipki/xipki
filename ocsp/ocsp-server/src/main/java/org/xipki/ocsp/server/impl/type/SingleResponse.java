@@ -34,65 +34,54 @@
 
 package org.xipki.ocsp.server.impl.type;
 
-import java.math.BigInteger;
+import java.util.Date;
 
 import org.bouncycastle.asn1.BERTags;
-import org.xipki.security.HashAlgoType;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-public class CertID extends ASN1Type {
+public class SingleResponse extends ASN1Type {
 
-    private final HashAlgoType hashAlgorithm;
+    private final CertID certId;
 
-    private final byte[] issuerNameHash;
+    private final byte[] certStatus;
 
-    private final byte[] issuerKeyHash;
+    private final Date thisUpdate;
 
-    private final BigInteger serialNumber;
+    private final Date nextUpdate;
+
+    private final byte[] extensions;
 
     private final int bodyLength;
 
     private final int encodedLength;
 
-    public CertID(HashAlgoType hashAlgorithm, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber) {
-        this.hashAlgorithm = hashAlgorithm;
-        this.issuerNameHash = issuerNameHash;
-        this.issuerKeyHash = issuerKeyHash;
-        this.serialNumber = serialNumber;
+    public SingleResponse(CertID certId, byte[] certStatus, Date thisUpdate, Date nextUpdate,
+            byte[] extensions) {
+        this.certId = certId;
+        this.certStatus = certStatus;
+        this.thisUpdate = thisUpdate;
+        this.nextUpdate = nextUpdate;
+        this.extensions = extensions;
 
-        int algIdLen = hashAlgorithm.encodedLength() + 2; // 2 is the length of encoded DERNull
+        int len = certId.encodedLength();
+        len += certStatus.length;
+        len += 17; // thisUpdate
+        if (nextUpdate != null) {
+            len += 2; // explicit tag
+            len += 17;
+        }
 
-        int len = getHeaderLen(algIdLen) + algIdLen;
-
-        len += 2 + issuerNameHash.length;
-        len += 2 + issuerKeyHash.length;
-
-        int snBytesLen = 1 + serialNumber.bitLength() / 8;
-        len += getHeaderLen(snBytesLen) + snBytesLen;
+        if (extensions != null) {
+            len += getHeaderLen(extensions.length); // explicit tag
+            len += extensions.length;
+        }
 
         this.bodyLength = len;
         this.encodedLength = getHeaderLen(bodyLength) + bodyLength;
-    }
-
-    public HashAlgoType hashAlgorithm() {
-        return hashAlgorithm;
-    }
-
-    public byte[] issuerNameHash() {
-        return issuerNameHash;
-    }
-
-    public byte[] issuerKeyHash() {
-        return issuerKeyHash;
-    }
-
-    public BigInteger serialNumber() {
-        return serialNumber;
     }
 
     @Override
@@ -100,31 +89,24 @@ public class CertID extends ASN1Type {
         return encodedLength;
     }
 
+    @Override
     public int write(final byte[] out, final int offset) {
         int idx = offset;
         idx += writeHeader(BERTags.SEQUENCE | BERTags.CONSTRUCTED, bodyLength, out, idx);
+        idx += certId.write(out, idx);
+        idx += arraycopy(certStatus, out, idx);
+        idx += writeGeneralizedTime(thisUpdate, out, idx);
+        if (nextUpdate != null) {
+            idx += writeHeader(BERTags.TAGGED | BERTags.CONSTRUCTED | 0,
+                    17, out, idx);
+            idx += writeGeneralizedTime(nextUpdate, out, idx);
+        }
 
-        // hashAlgorithm
-        int algIdLen = hashAlgorithm.encodedLength() + 2; // 2 is the length of encoded DERNull
-        idx += writeHeader(BERTags.SEQUENCE | BERTags.CONSTRUCTED, algIdLen, out, idx);
-        idx += hashAlgorithm.write(out, idx);
-        idx += writeHeader(BERTags.NULL, 0, out, idx);
-
-        // issuerNameHash
-        out[idx++] = BERTags.OCTET_STRING;
-        out[idx++] = (byte) issuerNameHash.length;
-        idx += arraycopy(issuerNameHash, out, idx);
-
-        // issuerKeyHash
-        out[idx++] = BERTags.OCTET_STRING;
-        out[idx++] = (byte) issuerKeyHash.length;
-        idx += arraycopy(issuerKeyHash, out, idx);
-
-        // serialNumbers
-        byte[] snBytes = serialNumber.toByteArray();
-        idx += writeHeader(BERTags.INTEGER, snBytes.length, out, idx);
-        idx += arraycopy(snBytes, out, idx);
-
+        if (extensions != null) {
+            idx += writeHeader(BERTags.TAGGED | BERTags.CONSTRUCTED | 1,
+                    extensions.length, out, idx);
+            idx += arraycopy(extensions, out, idx);
+        }
         return idx - offset;
     }
 

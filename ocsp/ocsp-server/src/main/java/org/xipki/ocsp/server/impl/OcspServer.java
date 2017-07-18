@@ -66,26 +66,21 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.ocsp.OCSPResponse;
-import org.bouncycastle.asn1.ocsp.ResponderID;
 import org.bouncycastle.asn1.ocsp.RevokedInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.ocsp.CertificateStatus;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReq;
-import org.bouncycastle.cert.ocsp.RevokedStatus;
-import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
@@ -182,6 +177,11 @@ public class OcspServer {
     }
 
     public static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
+
+    private static final byte[] bytes_certstatus_good = new byte[]{(byte) 0x80, 0x00};
+    private static final byte[] bytes_certstatus_unknown = new byte[]{(byte) 0x82, 0x00};
+    private static final byte[] bytes_certstatus_rfc6960_unknown =
+            Hex.decode("a116180f31393730303130313030303030305aa0030a0106");
 
     private static final ASN1ObjectIdentifier oidOcspNonce =
             OCSPObjectIdentifiers.id_pkix_ocsp_nonce;
@@ -638,9 +638,7 @@ public class OcspServer {
             OcspRespControl repControl = new OcspRespControl();
             repControl.canCacheInfo = true;
 
-            ResponderID respId = signer.getResponder(repOpt.isResponderIdByName());
-            OCSPRespBuilder basicOcspBuilder = new OCSPRespBuilder(respId);
-
+            byte[] responderId = signer.getResponder(repOpt.isResponderIdByName());
             List<Extension> responseExtensions = new ArrayList<>(2);
             byte[] nonce = req.nonce();
             if (nonce != null) {
@@ -745,9 +743,11 @@ public class OcspServer {
                 }
             }
 
+            OCSPRespBuilder builder = new OCSPRespBuilder(responderId);
+
             for (int i = 0; i < requestsSize; i++) {
                 OcspRespWithCacheInfo failureOcspResp = processCertReq(requestList.get(i),
-                        basicOcspBuilder, responder, reqOpt, repOpt, repControl);
+                        builder, responder, reqOpt, repOpt, repControl);
 
                 if (failureOcspResp != null) {
                     return failureOcspResp;
@@ -761,8 +761,8 @@ public class OcspServer {
             }
 
             if (!responseExtensions.isEmpty()) {
-                basicOcspBuilder.setResponseExtensions(
-                        new Extensions(responseExtensions.toArray(EXTENSION_ARRAY_TYPE)));
+                Extensions extns = new Extensions(responseExtensions.toArray(EXTENSION_ARRAY_TYPE));
+                builder.setResponseExtensions(extns.getEncoded());
             }
 
             byte[] certsInResp;
@@ -778,7 +778,7 @@ public class OcspServer {
 
             byte[] encodeOCSPResponse;
             try {
-                encodeOCSPResponse = basicOcspBuilder.buildOCSPResponse(concurrentSigner,
+                encodeOCSPResponse = builder.buildOCSPResponse(concurrentSigner,
                         concurrentSigner.encodedAlgorithmIdentifier(),
                         certsInResp, new Date());
             } catch (NoIdleSignerException ex) {
@@ -893,38 +893,38 @@ public class OcspServer {
 
         List<Extension> extensions = new LinkedList<>();
         boolean unknownAsRevoked = false;
-        CertificateStatus bcCertStatus;
+        byte[] certStatus;
         switch (certStatusInfo.certStatus()) {
         case GOOD:
-            bcCertStatus = null;
+            certStatus = bytes_certstatus_good;
             break;
         case ISSUER_UNKNOWN:
             repControl.canCacheInfo = false;
-            bcCertStatus = new UnknownStatus();
+            certStatus = bytes_certstatus_unknown;
             break;
         case UNKNOWN:
         case IGNORE:
             repControl.canCacheInfo = false;
             if (responder.responderOption().mode() == OcspMode.RFC2560) {
-                bcCertStatus = new UnknownStatus();
+                certStatus = bytes_certstatus_unknown;
             } else { // (ocspMode == OCSPMode.RFC6960)
                 unknownAsRevoked = true;
                 repControl.includeExtendedRevokeExtension = true;
-                bcCertStatus = new RevokedStatus(new Date(0L),
-                        CrlReason.CERTIFICATE_HOLD.code());
+                certStatus = bytes_certstatus_rfc6960_unknown;
             }
             break;
         case REVOKED:
             CertRevocationInfo revInfo = certStatusInfo.revocationInfo();
             ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(
                     revInfo.revocationTime());
-            org.bouncycastle.asn1.x509.CRLReason tmpReason = null;
+
+            RevokedInfo revokedInfo;
             if (repOpt.isIncludeRevReason()) {
-                tmpReason = org.bouncycastle.asn1.x509.CRLReason.lookup(
-                        revInfo.reason().code());
+                revokedInfo = new RevokedInfo(revTime, CRLReason.lookup(revInfo.reason().code()));
+            } else {
+                revokedInfo = new RevokedInfo(revTime, null);
             }
-            RevokedInfo tmpRevInfo = new RevokedInfo(revTime, tmpReason);
-            bcCertStatus = new RevokedStatus(tmpRevInfo);
+            certStatus = new org.bouncycastle.asn1.ocsp.CertStatus(revokedInfo).getEncoded();
 
             Date invalidityDate = revInfo.invalidityTime();
             if (repOpt.isIncludeInvalidityDate() && invalidityDate != null
@@ -968,14 +968,14 @@ public class OcspServer {
 
         if (LOG.isDebugEnabled()) {
             String certStatusText = null;
-            if (bcCertStatus instanceof UnknownStatus) {
-                certStatusText = "unknown";
-            } else if (bcCertStatus instanceof RevokedStatus) {
-                certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
-            } else if (bcCertStatus == null) {
+            if (Arrays.equals(certStatus, bytes_certstatus_good)) {
                 certStatusText = "good";
-            } else {
-                certStatusText = "should-not-happen";
+            } else if (Arrays.equals(certStatus, bytes_certstatus_unknown)) {
+                certStatusText = "unknown";
+            } else if (Arrays.equals(certStatus, bytes_certstatus_rfc6960_unknown)) {
+                certStatusText = "RFC6969_unknown";
+            } else  {
+                certStatusText = unknownAsRevoked ? "unknown_as_revoked" : "revoked";
             }
 
             StringBuilder sb = new StringBuilder(250);
@@ -999,18 +999,14 @@ public class OcspServer {
             LOG.debug(sb.toString());
         }
 
-        Extensions extns = null;
+        byte[] extns = null;
         if (CollectionUtil.isNonEmpty(extensions)) {
-            extns = new Extensions(extensions.toArray(EXTENSION_ARRAY_TYPE));
+            extns = new Extensions(extensions.toArray(EXTENSION_ARRAY_TYPE)).getEncoded();
         }
 
-        builder.addResponse(
-                new org.bouncycastle.asn1.ocsp.CertID(
-                        reqHashAlgo.algorithmIdentifier(),
-                        new DEROctetString(certId.issuerNameHash()),
-                        new DEROctetString(certId.issuerKeyHash()),
-                        new ASN1Integer(certId.serialNumber())),
-                bcCertStatus, thisUpdate, nextUpdate, extns);
+        CertID certId0 = new CertID(reqHashAlgo, certId.issuerNameHash(), certId.issuerKeyHash(),
+                certId.serialNumber());
+        builder.addResponse(certId0, certStatus, thisUpdate, nextUpdate, extns);
         repControl.cacheThisUpdate = Math.max(repControl.cacheThisUpdate, thisUpdate.getTime());
         if (nextUpdate != null) {
             repControl.cacheNextUpdate = Math.min(repControl.cacheNextUpdate, nextUpdate.getTime());
@@ -1213,7 +1209,6 @@ public class OcspServer {
         } catch (CertificateException ex) {
             return false;
         }
-
         Set<Certificate> certstore = new HashSet<>();
 
         Set<CertWithEncoded> trustAnchors = requestOption.trustAnchors();

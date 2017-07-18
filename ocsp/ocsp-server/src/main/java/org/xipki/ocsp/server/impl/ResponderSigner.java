@@ -74,9 +74,9 @@ class ResponderSigner {
 
     private final X509Certificate[] certificateChain;
 
-    private final ResponderID responderIdByName;
+    private final byte[] responderIdByName;
 
-    private final ResponderID responderIdByKey;
+    private final byte[] responderIdByKey;
 
     private final boolean macSigner;
 
@@ -94,7 +94,7 @@ class ResponderSigner {
             this.encodedSequenceOfCertificateChain = null;
 
             byte[] keySha1 = firstSigner.getSha1DigestOfMacKey();
-            this.responderIdByKey = new ResponderID(new DEROctetString(keySha1));
+            this.responderIdByKey = new ResponderID(new DEROctetString(keySha1)).getEncoded();
         } else {
             X509Certificate[] tmpCertificateChain = firstSigner.getCertificateChain();
             if (tmpCertificateChain == null || tmpCertificateChain.length == 0) {
@@ -125,10 +125,10 @@ class ResponderSigner {
             this.encodedSequenceOfCertificateChain =
                     new DERTaggedObject(true, 0, new DERSequence(bcCertificateChain)).getEncoded();
 
-            this.responderIdByName = new ResponderID(bcCertificate.getSubject());
+            this.responderIdByName = new ResponderID(bcCertificate.getSubject()).getEncoded();
             byte[] keySha1 = HashAlgoType.SHA1.hash(
                     bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
-            this.responderIdByKey = new ResponderID(new DEROctetString(keySha1));
+            this.responderIdByKey = new ResponderID(new DEROctetString(keySha1)).getEncoded();
         }
 
         algoSignerMap = new HashMap<>();
@@ -161,7 +161,7 @@ class ResponderSigner {
         return null;
     }
 
-    public ResponderID getResponder(final boolean byName) {
+    public byte[] getResponder(final boolean byName) {
         return byName ? responderIdByName :  responderIdByKey;
     }
 

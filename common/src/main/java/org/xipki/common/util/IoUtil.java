@@ -201,8 +201,8 @@ public class IoUtil {
     }
 
     public static short parseShort(byte[] bytes, int offset) {
-        return (short) (((0xFF & bytes[offset++]) << 8)
-                        | (0xFF & bytes[offset]));
+        return (short) ( (0xFF & bytes[offset++]) << 8
+                        | 0xFF & bytes[offset]);
     }
 
     public static void writeInt(int value, byte[] dest, int destOffset) {
@@ -213,10 +213,10 @@ public class IoUtil {
     }
 
     public static int parseInt(byte[] bytes, int offset) {
-        return    ((0xFF & bytes[offset++]) << 24)
-                | ((0xFF & bytes[offset++]) << 16)
-                | ((0xFF & bytes[offset++]) << 8)
-                | ( 0xFF & bytes[offset++]);
+        return    (0xFF & bytes[offset++]) << 24
+                | (0xFF & bytes[offset++]) << 16
+                | (0xFF & bytes[offset++]) << 8
+                |  0xFF & bytes[offset];
     }
 
     public static String base64Encode(final byte[] data, final boolean withLineBreak) {
