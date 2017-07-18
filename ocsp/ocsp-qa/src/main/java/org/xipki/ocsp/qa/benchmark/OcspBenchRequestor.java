@@ -98,7 +98,9 @@ class OcspBenchRequestor {
 
     private RequestOptions requestOptions;
 
-    private String responderRawPath;
+    private String responderRawPathPost;
+
+    private String responderRawPathGet;
 
     private HttpClient httpClient;
 
@@ -145,9 +147,11 @@ class OcspBenchRequestor {
         }
 
         URI uri = new URI(responderUrl);
-        this.responderRawPath = uri.getRawPath();
-        if (!this.responderRawPath.endsWith("/")) {
-            this.responderRawPath += "/";
+        this.responderRawPathPost = uri.getRawPath();
+        if (this.responderRawPathPost.endsWith("/")) {
+            this.responderRawPathGet = this.responderRawPathPost;
+        } else {
+            this.responderRawPathGet = this.responderRawPathPost + "/";
         }
         this.httpClient = new HttpClient(responderUrl, responseHandler);
         this.httpClient.start();
@@ -173,7 +177,7 @@ class OcspBenchRequestor {
                 throw new OcspRequestorException(ex.getMessage());
             }
             StringBuilder urlBuilder = new StringBuilder();
-            urlBuilder.append(responderRawPath);
+            urlBuilder.append(responderRawPathGet);
             urlBuilder.append(urlEncodedReq);
             String newRawpath = urlBuilder.toString();
 
@@ -182,7 +186,7 @@ class OcspBenchRequestor {
         } else {
             ByteBuf content = Unpooled.wrappedBuffer(ocspReq);
             request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
-                    HttpMethod.POST, responderRawPath, content);
+                    HttpMethod.POST, responderRawPathPost, content);
             request.headers().addInt("Content-Length", content.readableBytes());
         }
         request.headers().add("Content-Type", "application/ocsp-request");
