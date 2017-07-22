@@ -48,4 +48,18 @@ public class CompareUtil {
         return (oa == null) ? (ob == null) : oa.equals(ob);
     }
 
+    public static boolean areEqual(byte[] a1, int a1Pos, byte[] a2, int a2Pos, int len) {
+        if (a1Pos + len > a1.length || a2Pos + len > a2.length) {
+            throw new IndexOutOfBoundsException("len is too large");
+        }
+
+        for (int i = 0; i < len; i++) {
+            if (a1[a1Pos + i] != a2[a2Pos + i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }
