@@ -39,13 +39,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DefaultConcurrentContentSigner;
+import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 
@@ -75,11 +75,9 @@ public class P11MacContentSignerBuilder {
             final int parallelism) throws XiSecurityException, P11TokenException {
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
-        // FIXME: consider the AES GMAC
-        boolean fixedAlgorithmIdentifier = true; // for AES GMAC it is false.
-        List<ContentSigner> signers = new ArrayList<>(parallelism);
+        List<XiContentSigner> signers = new ArrayList<>(parallelism);
         for (int i = 0; i < parallelism; i++) {
-            ContentSigner signer = new P11MacContentSigner(
+            XiContentSigner signer = new P11MacContentSigner(
                     cryptService, identityId, signatureAlgId);
             signers.add(signer);
         } // end for
@@ -87,8 +85,7 @@ public class P11MacContentSignerBuilder {
         final boolean mac = true;
         DefaultConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, null,
-                    fixedAlgorithmIdentifier);
+            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, null);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }

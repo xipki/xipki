@@ -80,6 +80,8 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.SignatureSigner;
+import org.xipki.security.bc.XiContentSigner;
+import org.xipki.security.bc.XiWrappedContentSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
@@ -266,7 +268,7 @@ public class SoftTokenContentSignerBuilder {
         ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
-        List<ContentSigner> signers = new ArrayList<>(parallelism);
+        List<XiContentSigner> signers = new ArrayList<>(parallelism);
 
         final String provName = "SunJCE";
         if (Security.getProvider(provName) != null) {
@@ -285,7 +287,7 @@ public class SoftTokenContentSignerBuilder {
                         signature.update(new byte[]{1, 2, 3, 4});
                         signature.sign();
                     }
-                    ContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
+                    XiContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
                     signers.add(signer);
                 }
             } catch (Exception ex) {
@@ -329,14 +331,14 @@ public class SoftTokenContentSignerBuilder {
                 } catch (OperatorCreationException ex) {
                     throw new XiSecurityException("operator creation error", ex);
                 }
-                signers.add(signer);
+                signers.add(new XiWrappedContentSigner(signer, true));
             }
         }
 
         final boolean mac = false;
         ConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, key, true);
+            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, key);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }

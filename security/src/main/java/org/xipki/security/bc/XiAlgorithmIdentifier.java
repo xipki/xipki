@@ -32,60 +32,27 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ocsp.api;
+package org.xipki.security.bc;
 
-import java.util.Arrays;
+import java.io.IOException;
 
-import org.xipki.common.util.ParamUtil;
-import org.xipki.security.HashAlgoType;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
+ * @since 2.2.0
  */
 
-public class IssuerHashNameAndKey {
+public class XiAlgorithmIdentifier extends AlgorithmIdentifier {
 
-    private final HashAlgoType algo;
-
-    private final byte[] issuerNameHash;
-
-    private final byte[] issuerKeyHash;
-
-    public IssuerHashNameAndKey(final HashAlgoType algo, final byte[] issuerNameHash,
-            final byte[] issuerKeyHash) {
-        this.algo = ParamUtil.requireNonNull("algo", algo);
-
-        int len = algo.length();
-        if (issuerNameHash == null || issuerNameHash.length != len) {
-            throw new IllegalArgumentException("issuerNameHash is invalid");
-        }
-
-        if (issuerKeyHash == null || issuerKeyHash.length != len) {
-            throw new IllegalArgumentException("issuerKeyHash is invalid");
-        }
-
-        this.issuerNameHash = Arrays.copyOf(issuerNameHash, len);
-        this.issuerKeyHash = Arrays.copyOf(issuerKeyHash, len);
+    public XiAlgorithmIdentifier(ASN1ObjectIdentifier algorithm) {
+        super(algorithm);
     }
 
-    public boolean match(final HashAlgoType algo, final byte[] issuerNameHash,
-            final byte[] issuerKeyHash) {
-        return this.algo == algo
-                && Arrays.equals(this.issuerNameHash, issuerNameHash)
-                && Arrays.equals(this.issuerKeyHash, issuerKeyHash);
-    }
-
-    public HashAlgoType algo() {
-        return algo;
-    }
-
-    public byte[] issuerNameHash() {
-        return Arrays.copyOf(issuerNameHash, issuerNameHash.length);
-    }
-
-    public byte[] issuerKeyHash() {
-        return Arrays.copyOf(issuerKeyHash, issuerKeyHash.length);
+    @Override
+    public byte[] getEncoded() throws IOException {
+        return super.getEncoded();
     }
 
 }

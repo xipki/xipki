@@ -36,15 +36,17 @@ package org.xipki.security.pkcs12;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import javax.crypto.SecretKey;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.operator.ContentSigner;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
+import org.xipki.security.bc.XiContentSigner;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
 
 /**
@@ -52,7 +54,7 @@ import org.xipki.security.util.AlgorithmUtil;
  * @since 2.2.0
  */
 
-public class HmacContentSigner implements ContentSigner {
+public class HmacContentSigner implements XiContentSigner {
 
     private class HmacOutputStream extends OutputStream {
 
@@ -75,6 +77,8 @@ public class HmacContentSigner implements ContentSigner {
 
     private final AlgorithmIdentifier algorithmIdentifier;
 
+    private final byte[] encodedAlgorithmIdentifier;
+
     private final HmacOutputStream outputStream;
 
     private final HMac hmac;
@@ -82,14 +86,19 @@ public class HmacContentSigner implements ContentSigner {
     private final int outLen;
 
     public HmacContentSigner(AlgorithmIdentifier algorithmIdentifier,
-            SecretKey signingKey) {
+            SecretKey signingKey) throws XiSecurityException {
         this(null, algorithmIdentifier, signingKey);
     }
 
     public HmacContentSigner(HashAlgoType hashAlgo, AlgorithmIdentifier algorithmIdentifier,
-            SecretKey signingKey) {
+            SecretKey signingKey) throws XiSecurityException {
         this.algorithmIdentifier = ParamUtil.requireNonNull("algorithmIdentifier",
                 algorithmIdentifier);
+        try {
+            this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
+        } catch (IOException ex) {
+            throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
+        }
         ParamUtil.requireNonNull("signingKey", signingKey);
         if (hashAlgo == null) {
             hashAlgo = AlgorithmUtil.extractHashAlgoFromMacAlg(algorithmIdentifier);
@@ -105,6 +114,11 @@ public class HmacContentSigner implements ContentSigner {
     @Override
     public AlgorithmIdentifier getAlgorithmIdentifier() {
         return algorithmIdentifier;
+    }
+
+    @Override
+    public byte[] getEncodedAlgorithmIdentifier() {
+        return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
     }
 
     @Override

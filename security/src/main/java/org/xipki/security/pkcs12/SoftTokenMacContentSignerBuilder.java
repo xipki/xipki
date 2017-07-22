@@ -52,11 +52,11 @@ import javax.crypto.SecretKey;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.operator.ContentSigner;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.HashAlgoType;
+import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 
@@ -119,7 +119,7 @@ public class SoftTokenMacContentSignerBuilder {
         ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
         ParamUtil.requireMin("parallelism", parallelism, 1);
 
-        List<ContentSigner> signers = new ArrayList<>(parallelism);
+        List<XiContentSigner> signers = new ArrayList<>(parallelism);
 
         boolean gmac = false;
         ASN1ObjectIdentifier oid = signatureAlgId.getAlgorithm();
@@ -129,10 +129,8 @@ public class SoftTokenMacContentSignerBuilder {
             gmac = true;
         }
 
-        boolean fixedAlgorithmIdentifier = !gmac;
-
         for (int i = 0; i < parallelism; i++) {
-            ContentSigner signer;
+            XiContentSigner signer;
             if (gmac) {
                 signer = new AESGmacContentSigner(oid, key);
             } else {
@@ -144,8 +142,7 @@ public class SoftTokenMacContentSignerBuilder {
         final boolean mac = true;
         DefaultConcurrentContentSigner concurrentSigner;
         try {
-            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, key,
-                    fixedAlgorithmIdentifier);
+            concurrentSigner = new DefaultConcurrentContentSigner(mac, signers, key);
         } catch (NoSuchAlgorithmException ex) {
             throw new XiSecurityException(ex.getMessage(), ex);
         }

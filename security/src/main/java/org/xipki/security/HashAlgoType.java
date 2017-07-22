@@ -35,7 +35,6 @@
 package org.xipki.security;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -217,8 +216,25 @@ public enum HashAlgoType {
     }
 
     public static HashAlgoType getInstanceForEncoded(byte[] encoded) {
+        return getInstanceForEncoded(encoded, 0, encoded.length);
+    }
+
+    public static HashAlgoType getInstanceForEncoded(byte[] encoded, int offset, int len) {
         for (HashAlgoType value : values()) {
-            if (Arrays.equals(encoded, value.encoded)) {
+            byte[] ve = value.encoded;
+            if (ve.length != len) {
+                continue;
+            }
+
+            boolean equals = true;
+            for (int i = 0; i < len; i++) {
+                if (ve[i] != encoded[offset + i]) {
+                    equals = false;
+                    break;
+                }
+            }
+
+            if (equals) {
                 return value;
             }
         }
