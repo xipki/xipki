@@ -35,18 +35,20 @@
 package org.xipki.security.pkcs11;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 
@@ -56,7 +58,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
  * @author Lijun Liao
  * @since 2.2.0
  */
-class P11MacContentSigner implements ContentSigner {
+class P11MacContentSigner implements XiContentSigner {
 
     private static final Logger LOG = LoggerFactory.getLogger(P11MacContentSigner.class);
 
@@ -65,6 +67,8 @@ class P11MacContentSigner implements ContentSigner {
     private final P11EntityIdentifier identityId;
 
     private final AlgorithmIdentifier algorithmIdentifier;
+
+    private final byte[] encodedAlgorithmIdentifier;
 
     private final long mechanism;
 
@@ -76,6 +80,11 @@ class P11MacContentSigner implements ContentSigner {
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.algorithmIdentifier = ParamUtil.requireNonNull("macAlgId", macAlgId);
+        try {
+            this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
+        } catch (IOException ex) {
+            throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
+        }
 
         ASN1ObjectIdentifier oid = macAlgId.getAlgorithm();
         if (PKCSObjectIdentifiers.id_hmacWithSHA1.equals(oid)) {
@@ -106,6 +115,11 @@ class P11MacContentSigner implements ContentSigner {
     @Override
     public AlgorithmIdentifier getAlgorithmIdentifier() {
         return algorithmIdentifier;
+    }
+
+    @Override
+    public byte[] getEncodedAlgorithmIdentifier() {
+        return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
     }
 
     @Override

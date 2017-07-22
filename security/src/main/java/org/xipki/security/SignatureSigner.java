@@ -40,18 +40,20 @@ import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.util.Arrays;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.security.bc.XiContentSigner;
+import org.xipki.security.exception.XiSecurityException;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-public class SignatureSigner implements ContentSigner {
+public class SignatureSigner implements XiContentSigner {
 
     private class SignatureStream extends OutputStream {
 
@@ -90,6 +92,8 @@ public class SignatureSigner implements ContentSigner {
 
     private final AlgorithmIdentifier sigAlgId;
 
+    private final byte[] encodedSigAlgId;
+
     private final Signature signer;
 
     private final SignatureStream stream = new SignatureStream();
@@ -97,15 +101,25 @@ public class SignatureSigner implements ContentSigner {
     private final PrivateKey key;
 
     public SignatureSigner(final AlgorithmIdentifier sigAlgId, final Signature signer,
-            final PrivateKey key) {
+            final PrivateKey key) throws XiSecurityException {
         this.sigAlgId = ParamUtil.requireNonNull("sigAlgId", sigAlgId);
         this.signer = ParamUtil.requireNonNull("signer", signer);
         this.key = ParamUtil.requireNonNull("key", key);
+        try {
+            this.encodedSigAlgId = sigAlgId.getEncoded();
+        } catch (IOException ex) {
+            throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
+        }
     }
 
     @Override
     public AlgorithmIdentifier getAlgorithmIdentifier() {
         return sigAlgId;
+    }
+
+    @Override
+    public byte[] getEncodedAlgorithmIdentifier() {
+        return Arrays.copyOf(encodedSigAlgId, encodedSigAlgId.length);
     }
 
     @Override

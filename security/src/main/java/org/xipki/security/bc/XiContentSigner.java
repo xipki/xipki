@@ -32,20 +32,20 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security;
+package org.xipki.security.bc;
 
-import org.xipki.common.concurrent.ConcurrentBagEntry;
-import org.xipki.security.bc.XiContentSigner;
+import org.bouncycastle.operator.ContentSigner;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-public class ConcurrentBagEntrySigner extends ConcurrentBagEntry<XiContentSigner> {
+public interface XiContentSigner extends ContentSigner {
 
-    public ConcurrentBagEntrySigner(XiContentSigner value) {
-        super(value);
-    }
+    /**
+     * returns the encoded algorithm identifier.
+     */
+    byte[] getEncodedAlgorithmIdentifier();
 
 }

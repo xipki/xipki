@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -51,12 +52,12 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.signers.PSSSigner;
-import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
+import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.SignerUtil;
@@ -68,7 +69,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
  * @since 2.0.0
  */
 // CHECKSTYLE:SKIP
-class P11RSAPSSContentSigner implements ContentSigner {
+class P11RSAPSSContentSigner implements XiContentSigner {
     // CHECKSTYLE:SKIP
     private static class PSSSignerOutputStream extends OutputStream {
 
@@ -117,6 +118,8 @@ class P11RSAPSSContentSigner implements ContentSigner {
 
     private final AlgorithmIdentifier algorithmIdentifier;
 
+    private final byte[] encodedAlgorithmIdentifier;
+
     private final P11CryptService cryptService;
 
     private final P11EntityIdentifier identityId;
@@ -133,6 +136,11 @@ class P11RSAPSSContentSigner implements ContentSigner {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
+        try {
+            this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
+        } catch (IOException ex) {
+            throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
+        }
         ParamUtil.requireNonNull("random", random);
 
         if (!PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm())) {
@@ -214,6 +222,11 @@ class P11RSAPSSContentSigner implements ContentSigner {
     @Override
     public AlgorithmIdentifier getAlgorithmIdentifier() {
         return algorithmIdentifier;
+    }
+
+    @Override
+    public byte[] getEncodedAlgorithmIdentifier() {
+        return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
     }
 
     @Override
