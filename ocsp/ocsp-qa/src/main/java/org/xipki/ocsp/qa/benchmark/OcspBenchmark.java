@@ -68,7 +68,8 @@ public class OcspBenchmark extends LoadExecutor {
 
         Testor() throws Exception {
             this.requestor = new OcspBenchRequestor();
-            this.requestor.init(OcspBenchmark.this, responderUrl, issuerCert, requestOptions);
+            this.requestor.init(OcspBenchmark.this, responderUrl, issuerCert, requestOptions,
+                    queueSize);
         }
 
         @Override
@@ -116,12 +117,14 @@ public class OcspBenchmark extends LoadExecutor {
 
     private final boolean parseResponse;
 
+    private final int queueSize;
+
     private AtomicInteger processedRequests = new AtomicInteger(0);
 
-    public OcspBenchmark(
-            final Certificate issuerCert, final String responderUrl,
+    public OcspBenchmark(final Certificate issuerCert, final String responderUrl,
             final RequestOptions requestOptions, final Iterator<BigInteger> serials,
-            final int maxRequests, final boolean parseResponse, final String description) {
+            final int maxRequests, final boolean parseResponse, int queueSize,
+            final String description) {
         super(description);
 
         this.issuerCert = ParamUtil.requireNonNull("issuerCert", issuerCert);
@@ -130,6 +133,7 @@ public class OcspBenchmark extends LoadExecutor {
         this.maxRequests = maxRequests;
         this.serials = ParamUtil.requireNonNull("serials", serials);
         this.parseResponse = parseResponse;
+        this.queueSize = queueSize;
     }
 
     @Override

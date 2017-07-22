@@ -32,7 +32,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ocsp.server.impl.type;
+package org.xipki.common;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -50,7 +50,11 @@ public abstract class ASN1Type {
 
     public abstract int write(byte[] out, int offset);
 
-    protected static int getHeaderLen(int bodyLen) {
+    public static int getLen(int bodyLen) {
+        return getHeaderLen(bodyLen) + bodyLen;
+    }
+
+    public static int getHeaderLen(int bodyLen) {
         if (bodyLen <= 0x7F) {
             return 2;
         } else if (bodyLen <= 0xFF) {
@@ -64,10 +68,10 @@ public abstract class ASN1Type {
         }
     }
 
-    protected static int writeHeader(final int tag, final int bodyLen,
+    public static int writeHeader(final byte tag, final int bodyLen,
             final byte[] out, final int offset) {
         int idx = offset;
-        out[idx++] = (byte) tag;
+        out[idx++] = tag;
         if (bodyLen <= 0x7F) {
             out[idx++] = (byte) bodyLen;
         } else if (bodyLen <= 0xFF) {
@@ -92,7 +96,7 @@ public abstract class ASN1Type {
         return idx - offset;
     }
 
-    protected static int writeGeneralizedTime(final Date time,
+    public static int writeGeneralizedTime(final Date time,
             final byte[] out, final int offset) {
         OffsetDateTime offsetTime = time.toInstant().atOffset(ZoneOffset.UTC);
         int idx = offset;
@@ -129,7 +133,7 @@ public abstract class ASN1Type {
         return idx - offset;
     }
 
-    protected static int arraycopy(byte[] src, byte[] dest, int destPos) {
+    public static int arraycopy(byte[] src, byte[] dest, int destPos) {
         final int length = src.length;
         System.arraycopy(src, 0, dest, destPos, length);
         return length;
