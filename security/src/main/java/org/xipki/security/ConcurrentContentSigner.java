@@ -126,11 +126,6 @@ public interface ConcurrentContentSigner {
 
     void requiteContentSigner(final ConcurrentBagEntrySigner signer);
 
-    /**
-     * returns the encoded algorithm identifier if it never changes, otherwise {@code null}.
-     */
-    byte[] encodedAlgorithmIdentifier();
-
     boolean isHealthy();
 
     void shutdown();

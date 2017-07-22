@@ -32,20 +32,27 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security;
+package org.xipki.security.bc;
 
-import org.xipki.common.concurrent.ConcurrentBagEntry;
-import org.xipki.security.bc.XiContentSigner;
+import java.io.IOException;
+
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-public class ConcurrentBagEntrySigner extends ConcurrentBagEntry<XiContentSigner> {
+public class XiAlgorithmIdentifier extends AlgorithmIdentifier {
 
-    public ConcurrentBagEntrySigner(XiContentSigner value) {
-        super(value);
+    public XiAlgorithmIdentifier(ASN1ObjectIdentifier algorithm) {
+        super(algorithm);
+    }
+
+    @Override
+    public byte[] getEncoded() throws IOException {
+        return super.getEncoded();
     }
 
 }

@@ -48,13 +48,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.concurrent.ConcurrentBag;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.password.PasswordResolver;
+import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.AlgorithmUtil;
@@ -79,8 +79,6 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     private final ConcurrentBag<ConcurrentBagEntrySigner> signers = new ConcurrentBag<>();
 
     private final boolean mac;
-
-    private final byte[] encodedAlgorithmIdentifier;
 
     private byte[] sha1DigestOfMacKey;
 
@@ -109,15 +107,13 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         }
     }
 
-    public DefaultConcurrentContentSigner(final boolean mac,
-            final List<ContentSigner> signers, final boolean fixedAlgorithmIdentifier)
+    public DefaultConcurrentContentSigner(final boolean mac, final List<XiContentSigner> signers)
             throws NoSuchAlgorithmException {
-        this(mac, signers, null, fixedAlgorithmIdentifier);
+        this(mac, signers, null);
     }
 
     public DefaultConcurrentContentSigner(final boolean mac,
-            final List<ContentSigner> signers, final Key signingKey,
-            final boolean fixedAlgorithmIdentifier)
+            final List<XiContentSigner> signers, final Key signingKey)
             throws NoSuchAlgorithmException {
         ParamUtil.requireNonEmpty("signers", signers);
 
@@ -126,22 +122,12 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         this.algorithmName = AlgorithmUtil.getSigOrMacAlgoName(algorithmIdentifier);
         this.algorithmCode = AlgorithmUtil.getSigOrMacAlgoCode(algorithmIdentifier);
 
-        for (ContentSigner signer : signers) {
+        for (XiContentSigner signer : signers) {
             this.signers.add(new ConcurrentBagEntrySigner(signer));
         }
 
         this.signingKey = signingKey;
         this.name = "defaultSigner-" + NAME_INDEX.getAndIncrement();
-
-        if (fixedAlgorithmIdentifier) {
-            try {
-                this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
-            } catch (IOException ex) {
-                throw new IllegalArgumentException("error processing algorithmIdentifier");
-            }
-        } else {
-            this.encodedAlgorithmIdentifier = null;
-        }
     }
 
     @Override
@@ -310,13 +296,6 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
         } finally {
             requiteContentSigner(contentSigner);
         }
-    }
-
-    @Override
-    public byte[] encodedAlgorithmIdentifier() {
-        return (encodedAlgorithmIdentifier == null)
-                ? null
-                : Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
     }
 
 }

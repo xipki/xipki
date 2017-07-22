@@ -53,8 +53,10 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.util.Arrays;
+import org.xipki.common.util.IoUtil;
 import org.xipki.common.util.ParamUtil;
+import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.XiSecurityException;
 
 /**
@@ -63,7 +65,7 @@ import org.xipki.security.exception.XiSecurityException;
  */
 
 // CHECKSTYLE:SKIP
-public class AESGmacContentSigner implements ContentSigner {
+public class AESGmacContentSigner implements XiContentSigner {
 
     // CHECKSTYLE:SKIP
     private class AESGmacOutputStream extends OutputStream {
@@ -87,7 +89,9 @@ public class AESGmacContentSigner implements ContentSigner {
 
     private static final int tagByteLen = 16;
 
-    private final byte[] nonce = new byte[12];
+    private static final int nonceLen = 12;
+
+    private final byte[] nonce = new byte[nonceLen];
 
     private final SecureRandom random;
 
@@ -98,6 +102,10 @@ public class AESGmacContentSigner implements ContentSigner {
     private final SecretKey signingKey;
 
     private final OutputStream outputStream;
+
+    private final byte[] sigAlgIdTemplate;
+
+    private final int nonceOffset;
 
     public AESGmacContentSigner(ASN1ObjectIdentifier oid, SecretKey signingKey)
             throws XiSecurityException {
@@ -118,6 +126,14 @@ public class AESGmacContentSigner implements ContentSigner {
 
         this.random = new SecureRandom();
         this.outputStream = new AESGmacOutputStream();
+
+        GCMParameters params = new GCMParameters(nonce, tagByteLen);
+        try {
+            this.sigAlgIdTemplate = new AlgorithmIdentifier(oid, params).getEncoded();
+        } catch (IOException ex) {
+            throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
+        }
+        this.nonceOffset = IoUtil.getIndex(sigAlgIdTemplate, nonce);
 
         int keyLen = signingKey.getEncoded().length;
         if (keyLen == 16) {
@@ -149,6 +165,13 @@ public class AESGmacContentSigner implements ContentSigner {
     public AlgorithmIdentifier getAlgorithmIdentifier() {
         GCMParameters params = new GCMParameters(nonce, tagByteLen);
         return new AlgorithmIdentifier(oid, params);
+    }
+
+    @Override
+    public byte[] getEncodedAlgorithmIdentifier() {
+        byte[] bytes = Arrays.copyOf(sigAlgIdTemplate, sigAlgIdTemplate.length);
+        System.arraycopy(nonce, 0, bytes, nonceOffset, nonceLen);
+        return bytes;
     }
 
     @Override

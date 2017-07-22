@@ -35,7 +35,9 @@
 package org.xipki.security.pkcs11;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,12 +47,12 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.security.HashAlgoType;
+import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.P11TokenException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.SignerUtil;
@@ -62,7 +64,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
  * @since 2.0.0
  */
 //CHECKSTYLE:SKIP
-class P11ECDSAContentSigner implements ContentSigner {
+class P11ECDSAContentSigner implements XiContentSigner {
 
     private static final Logger LOG = LoggerFactory.getLogger(P11ECDSAContentSigner.class);
 
@@ -75,6 +77,8 @@ class P11ECDSAContentSigner implements ContentSigner {
     private final P11EntityIdentifier identityId;
 
     private final AlgorithmIdentifier algorithmIdentifier;
+
+    private final byte[] encodedAlgorithmIdentifier;
 
     private final long mechanism;
 
@@ -120,6 +124,11 @@ class P11ECDSAContentSigner implements ContentSigner {
         this.cryptService = ParamUtil.requireNonNull("cryptService", cryptService);
         this.identityId = ParamUtil.requireNonNull("identityId", identityId);
         this.algorithmIdentifier = ParamUtil.requireNonNull("signatureAlgId", signatureAlgId);
+        try {
+            this.encodedAlgorithmIdentifier = algorithmIdentifier.getEncoded();
+        } catch (IOException ex) {
+            throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
+        }
         this.plain = plain;
 
         String algOid = signatureAlgId.getAlgorithm().getId();
@@ -145,6 +154,11 @@ class P11ECDSAContentSigner implements ContentSigner {
     @Override
     public AlgorithmIdentifier getAlgorithmIdentifier() {
         return algorithmIdentifier;
+    }
+
+    @Override
+    public byte[] getEncodedAlgorithmIdentifier() {
+        return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
     }
 
     @Override
