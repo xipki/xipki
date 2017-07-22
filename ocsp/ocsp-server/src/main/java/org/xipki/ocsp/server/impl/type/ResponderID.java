@@ -34,45 +34,32 @@
 
 package org.xipki.ocsp.server.impl.type;
 
-import java.math.BigInteger;
+import java.io.IOException;
 
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.common.ASN1Type;
-import org.xipki.ocsp.api.RequestIssuer;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-public class CertID extends ASN1Type {
+public class ResponderID extends ASN1Type {
 
-    private final RequestIssuer issuer;
-
-    private final BigInteger serialNumber;
-
-    private final int bodyLength;
+    private final byte[] encoded;
 
     private final int encodedLength;
 
-    public CertID(RequestIssuer issuer, BigInteger serialNumber) {
-        this.issuer = issuer;
-        this.serialNumber = serialNumber;
-
-        int len = issuer.length();
-
-        int snBytesLen = 1 + serialNumber.bitLength() / 8;
-        len += getLen(snBytesLen);
-
-        this.bodyLength = len;
-        this.encodedLength = getLen(bodyLength);
+    public ResponderID(byte[] key) throws IOException {
+        this.encoded = new org.bouncycastle.asn1.ocsp.ResponderID(
+                new DEROctetString(key)).getEncoded();
+        this.encodedLength = encoded.length;
     }
 
-    public RequestIssuer issuer() {
-        return issuer;
-    }
-
-    public BigInteger serialNumber() {
-        return serialNumber;
+    public ResponderID(X500Name name) throws IOException {
+        this.encoded = new org.bouncycastle.asn1.ocsp.ResponderID(name).getEncoded();
+        this.encodedLength = encoded.length;
     }
 
     @Override
@@ -80,17 +67,9 @@ public class CertID extends ASN1Type {
         return encodedLength;
     }
 
-    public int write(final byte[] out, final int offset) {
-        int idx = offset;
-        idx += writeHeader((byte) 0x30, bodyLength, out, idx);
-        idx += issuer.write(out, idx);
-
-        // serialNumbers
-        byte[] snBytes = serialNumber.toByteArray();
-        idx += writeHeader((byte) 0x02, snBytes.length, out, idx);
-        idx += arraycopy(snBytes, out, idx);
-
-        return idx - offset;
+    @Override
+    public int write(byte[] out, int offset) {
+        return arraycopy(encoded, out, offset);
     }
 
 }

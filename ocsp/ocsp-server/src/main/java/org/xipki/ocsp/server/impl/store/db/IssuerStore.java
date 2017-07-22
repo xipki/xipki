@@ -40,8 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.xipki.ocsp.api.IssuerHashNameAndKey;
-import org.xipki.security.HashAlgoType;
+import org.xipki.ocsp.api.RequestIssuer;
 
 /**
  * @author Lijun Liao
@@ -80,9 +79,8 @@ public class IssuerStore {
         return ids;
     }
 
-    public Integer getIssuerIdForFp(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
-            final byte[] issuerKeyHash) {
-        IssuerEntry issuerEntry = getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
+    public Integer getIssuerIdForFp(RequestIssuer reqIssuer) {
+        IssuerEntry issuerEntry = getIssuerForFp(reqIssuer);
         return (issuerEntry == null) ? null : issuerEntry.id();
     }
 
@@ -96,23 +94,14 @@ public class IssuerStore {
         return null;
     }
 
-    public IssuerEntry getIssuerForFp(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
-            final byte[] issuerKeyHash) {
+    public IssuerEntry getIssuerForFp(final RequestIssuer reqIssuer) {
         for (IssuerEntry entry : entries) {
-            if (entry.matchHash(hashAlgo, issuerNameHash, issuerKeyHash)) {
+            if (entry.matchHash(reqIssuer)) {
                 return entry;
             }
         }
 
         return null;
-    }
-
-    public Set<IssuerHashNameAndKey> issuerHashNameAndKeys() {
-        Set<IssuerHashNameAndKey> ret = new HashSet<>();
-        for (IssuerEntry issuerEntry : entries) {
-            ret.addAll(issuerEntry.issuerHashNameAndKeys());
-        }
-        return ret;
     }
 
     public void addIssuer(IssuerEntry issuer) {

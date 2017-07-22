@@ -66,18 +66,16 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
+import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
-import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.ocsp.OCSPResponse;
 import org.bouncycastle.asn1.ocsp.RevokedInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReq;
@@ -85,6 +83,7 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ASN1Type;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
@@ -99,7 +98,6 @@ import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.http.servlet.ServletURI;
-import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.OcspMode;
 import org.xipki.ocsp.api.OcspStore;
@@ -122,15 +120,18 @@ import org.xipki.ocsp.server.impl.store.crl.CrlDbCertStatusStore;
 import org.xipki.ocsp.server.impl.store.db.DbCertStatusStore;
 import org.xipki.ocsp.server.impl.type.CertID;
 import org.xipki.ocsp.server.impl.type.EncodingException;
+import org.xipki.ocsp.server.impl.type.Extension;
+import org.xipki.ocsp.server.impl.type.Extensions;
+import org.xipki.ocsp.server.impl.type.OID;
 import org.xipki.ocsp.server.impl.type.OcspRequest;
+import org.xipki.ocsp.server.impl.type.ResponderID;
+import org.xipki.ocsp.server.impl.type.TaggedCertSequence;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.AlgorithmCode;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CertpathValidationModel;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgoType;
-import org.xipki.security.ObjectIdentifiers;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.exception.NoIdleSignerException;
@@ -178,28 +179,19 @@ public class OcspServer {
 
     public static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
+    private static final byte[] DERNullBytes = new byte[]{0x05, 0x00};
+
     private static final byte[] bytes_certstatus_good = new byte[]{(byte) 0x80, 0x00};
+
     private static final byte[] bytes_certstatus_unknown = new byte[]{(byte) 0x82, 0x00};
+
     private static final byte[] bytes_certstatus_rfc6960_unknown =
             Hex.decode("a116180f31393730303130313030303030305aa0030a0106");
 
-    private static final ASN1ObjectIdentifier oidOcspNonce =
-            OCSPObjectIdentifiers.id_pkix_ocsp_nonce;
-
-    private static final String idOcspNonce = oidOcspNonce.getId();
-
-    private static final ASN1ObjectIdentifier oidOcspPrefSigAlgs =
-            ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs;
-
-    private static final String idOcspPrefSigAlgs = oidOcspPrefSigAlgs.getId();
+    private static final Extension extension_pkix_ocsp_extendedRevoke =
+            new Extension(OID.ID_PKIX_OCSP_EXTENDEDREVOKE, true, DERNullBytes);
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
-
-    private static final Extension[] EXTENSION_ARRAY_TYPE = new Extension[0];
-
-    private static final byte[] DERNullBytes = new byte[]{5, 0};
-
-    private static final int DERNullBytesLen = 2;
 
     private static final Map<OcspResponseStatus, OcspRespWithCacheInfo> unsuccesfulOCSPRespMap;
 
@@ -633,22 +625,21 @@ public class OcspServer {
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
             }
 
-            Set<String> criticalExtensionTypes = req.criticalExtensionTypes();
-
             OcspRespControl repControl = new OcspRespControl();
             repControl.canCacheInfo = true;
 
-            byte[] responderId = signer.getResponder(repOpt.isResponderIdByName());
-            List<Extension> responseExtensions = new ArrayList<>(2);
-            byte[] nonce = req.nonce();
-            if (nonce != null) {
-                criticalExtensionTypes.remove(idOcspNonce);
+            ResponderID responderId = signer.getResponderId(repOpt.isResponderIdByName());
+            List<Extension> reqExtensions = req.extensions();
+            List<Extension> respExtensions = new LinkedList<>();
+
+            Extension nonceExtn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_NONCE);
+            if (nonceExtn != null) {
                 if (reqOpt.nonceOccurrence() == TripleState.FORBIDDEN) {
                     LOG.warn("nonce forbidden, but is present in the request");
                     return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
                 }
 
-                int len = nonce.length;
+                int len = nonceExtn.extnValueLength();
                 int min = reqOpt.nonceMinLen();
                 int max = reqOpt.nonceMaxLen();
 
@@ -658,9 +649,7 @@ public class OcspServer {
                 }
 
                 repControl.canCacheInfo = false;
-                responseExtensions.add(
-                        new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
-                                nonce));
+                respExtensions.add(nonceExtn);
             } else {
                 if (reqOpt.nonceOccurrence() == TripleState.REQUIRED) {
                     LOG.warn("nonce required, but is not present in the request");
@@ -670,17 +659,47 @@ public class OcspServer {
 
             ConcurrentContentSigner concurrentSigner = null;
             if (responder.responderOption().mode() != OcspMode.RFC2560) {
-                List<AlgorithmIdentifier> prefSigAlgs = req.prefSigAlgs();
-                if (prefSigAlgs != null) {
-                    criticalExtensionTypes.remove(idOcspPrefSigAlgs);
+                Extension extn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_PREFSIGALGS);
+                if (extn != null) {
+                    ASN1InputStream asn1Stream = new ASN1InputStream(extn.getExtnValueStream());
+
+                    List<AlgorithmIdentifier> prefSigAlgs;
+                    try {
+                        ASN1Sequence seq = ASN1Sequence.getInstance(asn1Stream.readObject());
+                        final int size = seq.size();
+                        prefSigAlgs = new ArrayList<>(size);
+                        for (int i = 0; i < size; i++) {
+                            prefSigAlgs.add(AlgorithmIdentifier.getInstance(seq.getObjectAt(i)));
+                        }
+                    } finally {
+                        asn1Stream.close();
+                    }
                     concurrentSigner = signer.getSignerForPreferredSigAlgs(prefSigAlgs);
                 }
             }
 
-            if (!criticalExtensionTypes.isEmpty()) {
-                LOG.warn("could not process critial request extensions: {}",
-                        criticalExtensionTypes);
-                return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+            if (!reqExtensions.isEmpty()) {
+                boolean flag = false;
+                for (Extension m : reqExtensions) {
+                    if (m.isCritical()) {
+                        flag = true;
+                        break;
+                    }
+                }
+
+                if (flag) {
+                    if (LOG.isWarnEnabled()) {
+                        List<OID> oids = new LinkedList<>();
+                        for (Extension m : reqExtensions) {
+                            if (m.isCritical()) {
+                                oids.add(m.extnType());
+                            }
+                        }
+                        LOG.warn("could not process critial request extensions: {}", oids);
+                    }
+
+                    return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+                }
             }
 
             if (concurrentSigner == null) {
@@ -693,13 +712,18 @@ public class OcspServer {
             Integer cacheDbIssuerId = null;
 
             boolean canCacheDb = (requestsSize == 1) && (responseCacher != null)
-                    && (nonce == null) && responseCacher.isOnService();
+                    && (nonceExtn == null) && responseCacher.isOnService();
             if (canCacheDb) {
                 // try to find the cached response
                 CertID certId = requestList.get(0);
-                HashAlgoType reqHashAlgo = certId.hashAlgorithm();
+                HashAlgoType reqHashAlgo = certId.issuer().hashAlgorithm();
                 if(!reqOpt.allows(reqHashAlgo)) {
-                    LOG.warn("CertID.hashAlgorithm {} not allowed", reqHashAlgo);
+                    if (reqHashAlgo != null) {
+                        LOG.warn("CertID.hashAlgorithm {} not allowed", reqHashAlgo);
+                    } else {
+                        LOG.warn("CertID.hashAlgorithm {} not allowed",
+                                certId.issuer().hashAlgorithmOID());
+                    }
                     return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
                 }
 
@@ -711,9 +735,7 @@ public class OcspServer {
 
                 cacheDbSigAlgCode = concurrentSigner.algorithmCode();
 
-                byte[] nameHash = certId.issuerNameHash();
-                byte[] keyHash = certId.issuerKeyHash();
-                cacheDbIssuerId = responseCacher.getIssuerId(reqHashAlgo, nameHash, keyHash);
+                cacheDbIssuerId = responseCacher.getIssuerId(certId.issuer());
                 cacheDbSerialNumber = certId.serialNumber();
 
                 if (cacheDbIssuerId != null) {
@@ -727,7 +749,7 @@ public class OcspServer {
                     // store the issuer certificate in cache database.
                     X509Certificate issuerCert = null;
                     for (OcspStore store : responder.stores()) {
-                        issuerCert = store.getIssuerCert(reqHashAlgo, nameHash, keyHash);
+                        issuerCert = store.getIssuerCert(certId.issuer());
                         if (issuerCert != null) {
                             break;
                         }
@@ -755,31 +777,28 @@ public class OcspServer {
             }
 
             if (repControl.includeExtendedRevokeExtension) {
-                responseExtensions.add(
-                        new Extension(ObjectIdentifiers.id_pkix_ocsp_extendedRevoke, true,
-                                Arrays.copyOf(DERNullBytes, DERNullBytesLen)));
+                respExtensions.add(extension_pkix_ocsp_extendedRevoke);
             }
 
-            if (!responseExtensions.isEmpty()) {
-                Extensions extns = new Extensions(responseExtensions.toArray(EXTENSION_ARRAY_TYPE));
-                builder.setResponseExtensions(extns.getEncoded());
+            if (!respExtensions.isEmpty()) {
+                Extensions extns = new Extensions(respExtensions);
+                builder.setResponseExtensions(extns);
             }
 
-            byte[] certsInResp;
+            TaggedCertSequence certsInResp;
             EmbedCertsMode certsMode = repOpt.embedCertsMode();
             if (certsMode == EmbedCertsMode.SIGNER) {
-                certsInResp = signer.encodedSequenceOfCertificate();
+                certsInResp = signer.sequenceOfCertificate();
             } else if (certsMode == EmbedCertsMode.NONE) {
                 certsInResp = null;
             } else {
                 // certsMode == EmbedCertsMode.SIGNER_AND_CA
-                certsInResp = signer.encodedSequenceOfCertificateChain();
+                certsInResp = signer.sequenceOfCertificateChain();
             }
 
             byte[] encodeOCSPResponse;
             try {
                 encodeOCSPResponse = builder.buildOCSPResponse(concurrentSigner,
-                        concurrentSigner.encodedAlgorithmIdentifier(),
                         certsInResp, new Date());
             } catch (NoIdleSignerException ex) {
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
@@ -816,28 +835,25 @@ public class OcspServer {
     private OcspRespWithCacheInfo processCertReq(CertID certId,
             OCSPRespBuilder builder, Responder responder, RequestOption reqOpt,
             ResponseOption repOpt, OcspRespControl repControl) throws IOException {
-        HashAlgoType reqHashAlgo = certId.hashAlgorithm();
+        HashAlgoType reqHashAlgo = certId.issuer().hashAlgorithm();
         if (!reqOpt.allows(reqHashAlgo)) {
             LOG.warn("CertID.hashAlgorithm {} not allowed", reqHashAlgo);
             return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
         }
 
         CertStatusInfo certStatusInfo = null;
-        OcspStore answeredStore = null;
         boolean exceptionOccurs = false;
 
-        byte[] nameHash = certId.issuerNameHash();
-        byte[] keyHash = certId.issuerKeyHash();
         BigInteger serial = certId.serialNumber();
 
         Date now = new Date();
         for (OcspStore store : responder.stores()) {
             try {
-                certStatusInfo = store.getCertStatus(now, reqHashAlgo, nameHash, keyHash, serial,
+                certStatusInfo = store.getCertStatus(now, certId.issuer(), serial,
                         repOpt.isIncludeCerthash(), repOpt.isIncludeInvalidityDate(),
+                        responder.responderOption().inheritCaRevocation(),
                         repOpt.certHashAlgo());
                 if (certStatusInfo != null) {
-                    answeredStore = store;
                     break;
                 }
             } catch (OcspStoreException ex) {
@@ -852,36 +868,6 @@ public class OcspServer {
             } else {
                 certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(new Date(), null);
             }
-        } else if (answeredStore != null
-                && responder.responderOption().isInheritCaRevocation()) {
-            CertRevocationInfo caRevInfo = answeredStore.getCaRevocationInfo(
-                    reqHashAlgo, nameHash, keyHash);
-            if (caRevInfo != null) {
-                CertStatus certStatus = certStatusInfo.certStatus();
-                boolean replaced = false;
-                if (certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN) {
-                    replaced = true;
-                } else if (certStatus == CertStatus.REVOKED) {
-                    if (certStatusInfo.revocationInfo().revocationTime().after(
-                            caRevInfo.revocationTime())) {
-                        replaced = true;
-                    }
-                }
-
-                if (replaced) {
-                    CertRevocationInfo newRevInfo;
-                    if (caRevInfo.reason() == CrlReason.CA_COMPROMISE) {
-                        newRevInfo = caRevInfo;
-                    } else {
-                        newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-                                caRevInfo.revocationTime(), caRevInfo.invalidityTime());
-                    }
-                    certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
-                            certStatusInfo.certHashAlgo(), certStatusInfo.certHash(),
-                            certStatusInfo.thisUpdate(), certStatusInfo.nextUpdate(),
-                            certStatusInfo.certprofile());
-                } // end if(replaced)
-            } // end if
         } // end if
 
         // certStatusInfo must not be null in any case, since at least one store is configured
@@ -929,8 +915,9 @@ public class OcspServer {
             Date invalidityDate = revInfo.invalidityTime();
             if (repOpt.isIncludeInvalidityDate() && invalidityDate != null
                     && !invalidityDate.equals(revInfo.revocationTime())) {
-                Extension extension = new Extension(Extension.invalidityDate,
-                        false, new ASN1GeneralizedTime(invalidityDate).getEncoded());
+                byte[] extnValue = new byte[17];
+                ASN1Type.writeGeneralizedTime(invalidityDate, extnValue, 0);
+                Extension extension = new Extension(OID.ID_INVALIDITY_DATE, false, extnValue);
                 extensions.add(extension);
             }
             break;
@@ -953,15 +940,14 @@ public class OcspServer {
                 return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
             }
 
-            Extension extension = new Extension(
-                    ISISMTTObjectIdentifiers.id_isismtt_at_certHash,
+            Extension extension = new Extension(OID.ID_ISISMTT_AT_CERTHASH,
                     false, encodedCertHash);
 
             extensions.add(extension);
         } // end if(certHash != null)
 
         if (certStatusInfo.archiveCutOff() != null) {
-            Extension extension = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff,
+            Extension extension = new Extension(OID.ID_PKIX_OCSP_ARCHIVE_CUTOFF,
                     false, new ASN1GeneralizedTime(certStatusInfo.archiveCutOff()).getEncoded());
             extensions.add(extension);
         }
@@ -979,14 +965,7 @@ public class OcspServer {
             }
 
             StringBuilder sb = new StringBuilder(250);
-            sb.append("certHashAlgo: ").append(certId.hashAlgorithm())
-                .append(", ");
-            sb.append("issuerNameHash: ")
-                .append(Hex.toHexString(certId.issuerNameHash()).toUpperCase())
-                .append(", ");
-            sb.append("issuerKeyHash: ")
-                .append(Hex.toHexString(certId.issuerKeyHash()).toUpperCase())
-                .append(", ");
+            sb.append("issuer: ").append(certId.issuer()).append(", ");
             sb.append("serialNumber: ")
                 .append(LogUtil.formatCsn(certId.serialNumber()))
                 .append(", ");
@@ -999,14 +978,13 @@ public class OcspServer {
             LOG.debug(sb.toString());
         }
 
-        byte[] extns = null;
-        if (CollectionUtil.isNonEmpty(extensions)) {
-            extns = new Extensions(extensions.toArray(EXTENSION_ARRAY_TYPE)).getEncoded();
+        if (CollectionUtil.isEmpty(extensions)) {
+            builder.addResponse(certId, certStatus, thisUpdate, nextUpdate, null);
+        } else{
+            builder.addResponse(certId, certStatus, thisUpdate, nextUpdate,
+                    new Extensions(extensions));
         }
 
-        CertID certId0 = new CertID(reqHashAlgo, certId.issuerNameHash(), certId.issuerKeyHash(),
-                certId.serialNumber());
-        builder.addResponse(certId0, certStatus, thisUpdate, nextUpdate, extns);
         repControl.cacheThisUpdate = Math.max(repControl.cacheThisUpdate, thisUpdate.getTime());
         if (nextUpdate != null) {
             repControl.cacheNextUpdate = Math.min(repControl.cacheNextUpdate, nextUpdate.getTime());
@@ -1324,6 +1302,22 @@ public class OcspServer {
             throw new InvalidConfException(
                     "parse profile failed, message: " + XmlUtil.getMessage(ex), ex);
         }
+    }
+
+    private static Extension removeExtension(List<Extension> extensions, OID extnType) {
+        Extension extn = null;
+        for (Extension m : extensions) {
+            if (extnType == m.extnType()) {
+                extn = m;
+                break;
+            }
+        }
+
+        if (extn != null) {
+            extensions.remove(extn);
+        }
+
+        return extn;
     }
 
 }

@@ -40,15 +40,18 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
-import org.bouncycastle.asn1.ocsp.OCSPResponseStatus;
 import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.util.encoders.Hex;
+import org.xipki.common.ASN1Type;
 import org.xipki.ocsp.server.impl.type.CertID;
+import org.xipki.ocsp.server.impl.type.Extensions;
+import org.xipki.ocsp.server.impl.type.ResponderID;
 import org.xipki.ocsp.server.impl.type.ResponseData;
 import org.xipki.ocsp.server.impl.type.SingleResponse;
+import org.xipki.ocsp.server.impl.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentBagEntrySigner;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.bc.XiContentSigner;
 import org.xipki.security.exception.NoIdleSignerException;
 
 /**
@@ -60,27 +63,18 @@ import org.xipki.security.exception.NoIdleSignerException;
 
 // CHECKSTYLE:SKIP
 public class OCSPRespBuilder {
-    private static final byte[] successfulStatus;
-    private static final byte[] responseTypeBasic;
+    private static final byte[] successfulStatus = Hex.decode("0a0100");
+    private static final byte[] responseTypeBasic = Hex.decode("06092b0601050507300101");
 
     private List<SingleResponse> list = new LinkedList<>();
-    private byte[] responseExtensions = null;
-    private byte[] responderId;
-
-    static {
-        try {
-            successfulStatus = new OCSPResponseStatus(OCSPResponseStatus.SUCCESSFUL).getEncoded();
-            responseTypeBasic = OCSPObjectIdentifiers.id_pkix_ocsp_basic.getEncoded();
-        } catch (IOException ex) {
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
+    private Extensions responseExtensions = null;
+    private ResponderID responderId;
 
     /**
      * basic constructor.
      */
     public OCSPRespBuilder(
-        byte[] responderId) {
+        ResponderID responderId) {
         this.responderId = responderId;
     }
 
@@ -94,7 +88,7 @@ public class OCSPRespBuilder {
      * @param singleExtensions optional extensions
      */
     public void addResponse(CertID certId, byte[] certStatus,
-            Date thisUpdate, Date nextUpdate, byte[] singleExtensions) {
+            Date thisUpdate, Date nextUpdate, Extensions singleExtensions) {
         list.add(new SingleResponse(certId, certStatus, thisUpdate, nextUpdate, singleExtensions));
     }
 
@@ -104,41 +98,37 @@ public class OCSPRespBuilder {
      * @param responseExtensions the extension object to carry.
      */
     public void setResponseExtensions(
-        byte[]  responseExtensions) {
+        Extensions  responseExtensions) {
         this.responseExtensions = responseExtensions;
     }
 
     // CHECKSTYLE:SKIP
-    public byte[] buildOCSPResponse(ConcurrentContentSigner signer, byte[] encodedSigAlgId,
-            byte[] encodedChain, Date producedAt)
+    public byte[] buildOCSPResponse(ConcurrentContentSigner signer,
+            TaggedCertSequence taggedCertSequence, Date producedAt)
             throws OCSPException, NoIdleSignerException {
         ResponseData responseData = new ResponseData(0,
                 responderId, producedAt, list, responseExtensions);
 
-        byte[] encodedTbsResp = new byte[responseData.encodedLength()];
-        responseData.write(encodedTbsResp, 0);
+        byte[] tbs = new byte[responseData.encodedLength()];
+        responseData.write(tbs, 0);
 
         ConcurrentBagEntrySigner signer0 = signer.borrowContentSigner();
 
         byte[] signature;
+        byte[] sigAlgId;
+
         try {
-            ContentSigner csigner0 = signer0.value();
+            XiContentSigner csigner0 = signer0.value();
             OutputStream sigOut = csigner0.getOutputStream();
             try {
-                sigOut.write(encodedTbsResp);
+                sigOut.write(tbs);
                 sigOut.close();
             } catch (IOException ex) {
                 throw new OCSPException("exception signing TBSRequest: " + ex.getMessage(), ex);
             }
 
             signature = csigner0.getSignature();
-            if (encodedSigAlgId == null) {
-                try {
-                    encodedSigAlgId = csigner0.getAlgorithmIdentifier().getEncoded();
-                } catch (IOException ex) {
-                    throw new OCSPException("exception processing SignatureAlgorithm", ex);
-                }
-            }
+            sigAlgId = csigner0.getEncodedAlgorithmIdentifier();
         } finally {
             signer.requiteContentSigner(signer0);
         }
@@ -149,10 +139,9 @@ public class OCSPRespBuilder {
         int signatureLen = getLen(signatureBodyLen);
 
         // BasicOCSPResponse
-        int basicResponseBodyLen = encodedTbsResp.length + encodedSigAlgId.length
-                + signatureLen;
-        if (encodedChain != null) {
-            basicResponseBodyLen += encodedChain.length;
+        int basicResponseBodyLen = tbs.length + sigAlgId.length + signatureLen;
+        if (taggedCertSequence != null) {
+            basicResponseBodyLen += taggedCertSequence.encodedLength();
         }
         int basicResponseLen = getLen(basicResponseBodyLen);
 
@@ -165,92 +154,49 @@ public class OCSPRespBuilder {
         int taggedResponseBytesLen = getLen(responseBytesLen);
 
         // OCSPResponse
-        int ocspResponseBodyLen = successfulStatus.length
-                    + taggedResponseBytesLen;
+        int ocspResponseBodyLen = successfulStatus.length + taggedResponseBytesLen;
         int ocspResponseLen = getLen(ocspResponseBodyLen);
 
         // encode
         byte[] out = new byte[ocspResponseLen];
         int offset = 0;
-        offset += writeHeader((byte) 0x30, ocspResponseBodyLen, out, offset);
+        offset += ASN1Type.writeHeader((byte) 0x30, ocspResponseBodyLen, out, offset);
         // OCSPResponse.responseStatus
         offset += arraycopy(successfulStatus, out, offset);
 
         // OCSPResponse.[0]
-        offset += writeHeader((byte) 0xA0, responseBytesLen, out, offset);
+        offset += ASN1Type.writeHeader((byte) 0xA0, responseBytesLen, out, offset);
 
         // OCSPResponse.[0]responseBytes
-        offset += writeHeader((byte) 0x30, responseBytesBodyLen, out, offset);
+        offset += ASN1Type.writeHeader((byte) 0x30, responseBytesBodyLen, out, offset);
 
         // OCSPResponse.[0]responseBytes.responseType
         offset += arraycopy(responseTypeBasic, out, offset);
 
         // OCSPResponse.[0]responseBytes.responseType
-        offset += writeHeader((byte) 0x04, basicResponseLen, out, offset); // OCET STRING
+        offset += ASN1Type.writeHeader((byte) 0x04, basicResponseLen, out, offset); // OCET STRING
 
         // BasicOCSPResponse
-        offset += writeHeader((byte) 0x30, basicResponseBodyLen, out, offset);
+        offset += ASN1Type.writeHeader((byte) 0x30, basicResponseBodyLen, out, offset);
         // BasicOCSPResponse.tbsResponseData
-        offset += arraycopy(encodedTbsResp, out, offset);
+        offset += arraycopy(tbs, out, offset);
 
         // BasicOCSPResponse.signatureAlgorithm
-        offset += arraycopy(encodedSigAlgId, out, offset);
+        offset += arraycopy(sigAlgId, out, offset);
 
         // BasicOCSPResponse.signature
-        offset += writeHeader((byte) 0x03, signatureBodyLen, out, offset);
+        offset += ASN1Type.writeHeader((byte) 0x03, signatureBodyLen, out, offset);
         out[offset++] = 0x00; // skipping bits
         offset += arraycopy(signature, out, offset);
 
-        if (encodedChain != null) {
-            offset += arraycopy(encodedChain, out, offset);
+        if (taggedCertSequence != null) {
+            offset += taggedCertSequence.write(out, offset);
         }
         return out;
     }
 
     private static int getLen(int bodyLen) {
-        int headerLen;
-        if (bodyLen < 0x80) {
-            headerLen = 2;
-        } else if (bodyLen < 0x100) {
-            headerLen = 3;
-        } else if (bodyLen < 0x10000) {
-            headerLen = 4;
-        } else if (bodyLen < 0x1000000) {
-            headerLen = 5;
-        } else {
-            headerLen = 6;
-        }
-        return headerLen + bodyLen;
-    }
-
-    private static int writeHeader(byte tag, int bodyLen, byte[] out, int offset) {
-        out[offset++] = tag;
-        if (bodyLen < 0x80) {
-            out[offset] = (byte) bodyLen;
-            return 2;
-        } else if (bodyLen < 0x100) {
-            out[offset++] = (byte) 0x81;
-            out[offset] = (byte) bodyLen;
-            return 3;
-        } else if (bodyLen < 0x10000) {
-            out[offset++] = (byte) 0x82;
-            out[offset++] = (byte) (       bodyLen >> 8);
-            out[offset]   = (byte) (0xFF & bodyLen);
-            return 4;
-        } else if (bodyLen < 0x1000000) {
-            out[offset++] = (byte) 0x83;
-            out[offset++] = (byte) (        bodyLen >> 16);
-            out[offset++] = (byte) (0xFF & (bodyLen >> 8));
-            out[offset]   = (byte) (0xFF &  bodyLen);
-            return 5;
-        } else {
-            out[offset++] = (byte) 0x84;
-            out[offset++] = (byte) (        bodyLen >> 24);
-            out[offset++] = (byte) (0xFF & (bodyLen >> 16));
-            out[offset++] = (byte) (0xFF & (bodyLen >> 8));
-            out[offset]   = (byte) (0xFF &  bodyLen);
-            return 6;
-        }
+        return ASN1Type.getHeaderLen(bodyLen) + bodyLen;
     }
 
     private static int arraycopy(byte[] src, byte[] dest, int destPos) {

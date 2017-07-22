@@ -37,15 +37,15 @@ package org.xipki.ocsp.server.impl.store.db;
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.common.util.CompareUtil;
 import org.xipki.common.util.ParamUtil;
-import org.xipki.ocsp.api.IssuerHashNameAndKey;
+import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgoType;
@@ -59,7 +59,7 @@ public class IssuerEntry {
 
     private final int id;
 
-    private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap;
+    private final Map<HashAlgoType, byte[]> issuerHashMap;
 
     private final Date notBefore;
 
@@ -77,7 +77,7 @@ public class IssuerEntry {
         this.issuerHashMap = getIssuerHashAndKeys(cert.getEncoded());
     }
 
-    private static Map<HashAlgoType, IssuerHashNameAndKey> getIssuerHashAndKeys(byte[] encodedCert)
+    private static Map<HashAlgoType, byte[]> getIssuerHashAndKeys(byte[] encodedCert)
             throws CertificateEncodingException {
         byte[] encodedName;
         byte[] encodedKey;
@@ -89,11 +89,22 @@ public class IssuerEntry {
             throw new CertificateEncodingException(ex.getMessage(), ex);
         }
 
-        Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<>();
+        Map<HashAlgoType, byte[]> hashes = new HashMap<>();
         for (HashAlgoType ha : HashAlgoType.values()) {
-            IssuerHashNameAndKey ih = new IssuerHashNameAndKey(ha, ha.hash(encodedName),
-                    ha.hash(encodedKey));
-            hashes.put(ha, ih);
+            int hlen = ha.length();
+            byte[] nameAndKeyHash = new byte[(2 + hlen) << 1];
+            int offset = 0;
+            nameAndKeyHash[offset++] = 0x04;
+            nameAndKeyHash[offset++] = (byte) hlen;
+            System.arraycopy(ha.hash(encodedName), 0, nameAndKeyHash, offset, hlen);
+            offset += hlen;
+
+            nameAndKeyHash[offset++] = 0x04;
+            nameAndKeyHash[offset++] = (byte) hlen;
+            System.arraycopy(ha.hash(encodedKey), 0, nameAndKeyHash, offset, hlen);
+            offset += hlen;
+
+            hashes.put(ha, nameAndKeyHash);
         }
         return hashes;
     }
@@ -102,16 +113,25 @@ public class IssuerEntry {
         return id;
     }
 
-    public boolean matchHash(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
-            final byte[] issuerKeyHash) {
-        IssuerHashNameAndKey issuerHash = issuerHashMap.get(hashAlgo);
-        return (issuerHash == null) ? false
-                : issuerHash.match(hashAlgo, issuerNameHash, issuerKeyHash);
+    public byte[] getEncodedHash(HashAlgoType hashAlgo) {
+        byte[] data = issuerHashMap.get(hashAlgo);
+        return Arrays.copyOf(data, data.length);
+    }
+
+    public boolean matchHash(final RequestIssuer reqIssuer) {
+        byte[] issuerHash = issuerHashMap.get(reqIssuer.hashAlgorithm());
+        if (issuerHash == null) {
+            return false;
+        }
+
+        return CompareUtil.areEqual(issuerHash, 0, reqIssuer.data(),
+                reqIssuer.nameHashFrom(), issuerHash.length);
     }
 
     public void setRevocationInfo(final Date revocationTime) {
         ParamUtil.requireNonNull("revocationTime", revocationTime);
-        this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE, revocationTime, null);
+        this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
+                revocationTime, null);
     }
 
     public void setCrlInfo(CrlInfo crlInfo) {
@@ -134,11 +154,4 @@ public class IssuerEntry {
         return cert;
     }
 
-    public Collection<IssuerHashNameAndKey> issuerHashNameAndKeys() {
-        return Collections.unmodifiableCollection(issuerHashMap.values());
-    }
-
-    public IssuerHashNameAndKey getIssuerHashNameAndKey(final HashAlgoType hashAlgo) {
-        return issuerHashMap.get(hashAlgo);
-    }
 }

@@ -37,7 +37,7 @@ package org.xipki.ocsp.server.impl.type;
 import java.util.Date;
 import java.util.List;
 
-import org.bouncycastle.asn1.BERTags;
+import org.xipki.common.ASN1Type;
 
 /**
  * @author Lijun Liao
@@ -48,20 +48,20 @@ public class ResponseData extends ASN1Type {
 
     private final int version;
 
-    private final byte[] responderId;
+    private final ResponderID responderId;
 
     private final Date producedAt;
 
     private final List<SingleResponse> responses;
 
-    private final byte[] extensions;
+    private final Extensions extensions;
 
     private final int bodyLength;
 
     private final int encodedLength;
 
-    public ResponseData(int version, byte[] responderId, Date producedAt,
-            List<SingleResponse> responses, byte[] extensions) {
+    public ResponseData(int version, ResponderID responderId, Date producedAt,
+            List<SingleResponse> responses, Extensions extensions) {
         if (version < 0 || version > 127) {
             throw new IllegalArgumentException("invalid version: " + version);
         }
@@ -75,7 +75,7 @@ public class ResponseData extends ASN1Type {
         if (version != 0) {
             len += 5;
         }
-        len += responderId.length;
+        len += responderId.encodedLength();
 
         // producedAt
         len += 17;
@@ -85,16 +85,15 @@ public class ResponseData extends ASN1Type {
         for (SingleResponse sr : responses) {
             responsesBodyLen += sr.encodedLength();
         }
-        len += getHeaderLen(responsesBodyLen) + responsesBodyLen;
+        len += getLen(responsesBodyLen);
 
         // extensions
         if (extensions != null) {
-            len += getHeaderLen(extensions.length); // explicit tag
-            len += extensions.length;
+            len += getLen(extensions.encodedLength()); // explicit tag
         }
 
         this.bodyLength = len;
-        this.encodedLength = getHeaderLen(bodyLength) + bodyLength;
+        this.encodedLength = getLen(bodyLength);
     }
 
     @Override
@@ -105,16 +104,16 @@ public class ResponseData extends ASN1Type {
     @Override
     public int write(final byte[] out, final int offset) {
         int idx = offset;
-        idx += writeHeader(BERTags.SEQUENCE | BERTags.CONSTRUCTED, bodyLength, out, idx);
+        idx += writeHeader((byte) 0x30, bodyLength, out, idx);
 
         // version
         if (version != 0) {
-            idx += writeHeader(BERTags.TAGGED | BERTags.CONSTRUCTED, 3, out, idx);
-            idx += writeHeader(BERTags.INTEGER, 1, out, idx);
+            idx += writeHeader((byte) 0xa0, 3, out, idx);
+            idx += writeHeader((byte) 0x02, 1, out, idx);
             out[idx++] = (byte) version;
         }
 
-        idx += arraycopy(responderId, out, idx);
+        idx += responderId.write(out, idx);
         idx += writeGeneralizedTime(producedAt, out, idx);
 
         // responses
@@ -122,15 +121,14 @@ public class ResponseData extends ASN1Type {
         for (SingleResponse sr : responses) {
             responsesBodyLen += sr.encodedLength();
         }
-        idx += writeHeader(BERTags.SEQUENCE | BERTags.CONSTRUCTED, responsesBodyLen, out, idx);
+        idx += writeHeader((byte) 0x30, responsesBodyLen, out, idx);
         for (SingleResponse sr : responses) {
             idx += sr.write(out, idx);
         }
 
         if (extensions != null) {
-            idx += writeHeader(BERTags.TAGGED | BERTags.CONSTRUCTED | 1,
-                    extensions.length, out, idx);
-            idx += arraycopy(extensions, out, idx);
+            idx += writeHeader((byte) 0xa1, extensions.encodedLength(), out, idx);
+            idx += extensions.write(out, idx);
         }
 
         return idx - offset;

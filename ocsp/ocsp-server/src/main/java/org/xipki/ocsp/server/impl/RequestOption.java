@@ -263,7 +263,7 @@ class RequestOption {
     }
 
     public boolean allows(final HashAlgoType hashAlgo) {
-        return hashAlgos.contains(hashAlgo);
+        return (hashAlgo == null) ? false : hashAlgos.contains(hashAlgo);
     }
 
     public CertpathValidationModel certpathValidationModel() {

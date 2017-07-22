@@ -34,63 +34,61 @@
 
 package org.xipki.ocsp.server.impl.type;
 
-import java.math.BigInteger;
+import java.io.IOException;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
+import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
+import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.common.ASN1Type;
-import org.xipki.ocsp.api.RequestIssuer;
+import org.xipki.common.util.CompareUtil;
+import org.xipki.security.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-public class CertID extends ASN1Type {
+public enum OID {
+    ID_PKIX_OCSP_NONCE (OCSPObjectIdentifiers.id_pkix_ocsp_nonce),
+    ID_PKIX_OCSP_PREFSIGALGS (ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs),
+    ID_PKIX_OCSP_EXTENDEDREVOKE (ObjectIdentifiers.id_pkix_ocsp_extendedRevoke),
+    ID_ISISMTT_AT_CERTHASH (ISISMTTObjectIdentifiers.id_isismtt_at_certHash),
+    ID_INVALIDITY_DATE(Extension.invalidityDate),
+    ID_PKIX_OCSP_ARCHIVE_CUTOFF (OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
 
-    private final RequestIssuer issuer;
+    private String id;
 
-    private final BigInteger serialNumber;
+    private byte[] encoded;
 
-    private final int bodyLength;
-
-    private final int encodedLength;
-
-    public CertID(RequestIssuer issuer, BigInteger serialNumber) {
-        this.issuer = issuer;
-        this.serialNumber = serialNumber;
-
-        int len = issuer.length();
-
-        int snBytesLen = 1 + serialNumber.bitLength() / 8;
-        len += getLen(snBytesLen);
-
-        this.bodyLength = len;
-        this.encodedLength = getLen(bodyLength);
+    private OID(ASN1ObjectIdentifier oid) {
+        this.id = oid.getId();
+        try {
+            this.encoded = oid.getEncoded();
+        } catch (IOException ex) {
+            throw new IllegalStateException("should not happen", ex);
+        }
     }
 
-    public RequestIssuer issuer() {
-        return issuer;
+    public String id() {
+        return id;
     }
 
-    public BigInteger serialNumber() {
-        return serialNumber;
-    }
-
-    @Override
     public int encodedLength() {
-        return encodedLength;
+        return encoded.length;
     }
 
-    public int write(final byte[] out, final int offset) {
-        int idx = offset;
-        idx += writeHeader((byte) 0x30, bodyLength, out, idx);
-        idx += issuer.write(out, idx);
+    public int write(byte[] out, int offset) {
+        return ASN1Type.arraycopy(encoded, out, offset);
+    }
 
-        // serialNumbers
-        byte[] snBytes = serialNumber.toByteArray();
-        idx += writeHeader((byte) 0x02, snBytes.length, out, idx);
-        idx += arraycopy(snBytes, out, idx);
-
-        return idx - offset;
+    public static OID getInstanceForEncoded(byte[] data, int offset) {
+        for (OID m : OID.values()) {
+            if (CompareUtil.areEqual(data, offset, m.encoded, 0, m.encoded.length)) {
+                return m;
+            }
+        }
+        return null;
     }
 
 }

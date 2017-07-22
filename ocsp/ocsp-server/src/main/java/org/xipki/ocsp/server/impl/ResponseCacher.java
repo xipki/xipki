@@ -63,7 +63,7 @@ import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.springframework.dao.DataAccessException;
 import org.xipki.datasource.springframework.dao.DataIntegrityViolationException;
 import org.xipki.datasource.springframework.jdbc.DuplicateKeyException;
-import org.xipki.ocsp.api.IssuerHashNameAndKey;
+import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.server.impl.store.db.IssuerEntry;
 import org.xipki.ocsp.server.impl.store.db.IssuerStore;
@@ -219,8 +219,8 @@ class ResponseCacher {
         }
     }
 
-    Integer getIssuerId(HashAlgoType hashAlgo, byte[] nameHash, byte[] keyHash) {
-        IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, nameHash, keyHash);
+    Integer getIssuerId(RequestIssuer reqIssuer) {
+        IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
         return (issuer == null) ? null : issuer.id();
     }
 
@@ -523,13 +523,12 @@ class ResponseCacher {
                 String b64Cert = rs.getString("CERT");
                 X509Certificate cert = X509Util.parseBase64EncodedCert(b64Cert);
                 IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
-                IssuerHashNameAndKey sha1IssuerHash
-                        = caInfoEntry.getIssuerHashNameAndKey(HashAlgoType.SHA1);
+                RequestIssuer reqIssuer = new RequestIssuer(HashAlgoType.SHA1,
+                        caInfoEntry.getEncodedHash(HashAlgoType.SHA1));
 
                 boolean duplicated = false;
                 for (IssuerEntry existingIssuer : caInfos) {
-                    if (existingIssuer.matchHash(HashAlgoType.SHA1,
-                            sha1IssuerHash.issuerNameHash(), sha1IssuerHash.issuerKeyHash())) {
+                    if (existingIssuer.matchHash(reqIssuer)) {
                         duplicated = true;
                         break;
                     }

@@ -64,11 +64,13 @@ import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.StringUtil;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.springframework.dao.DataAccessException;
+import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
-import org.xipki.ocsp.api.IssuerHashNameAndKey;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
+import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgoType;
 import org.xipki.security.util.X509Util;
 
@@ -221,12 +223,10 @@ public class DbCertStatusStore extends OcspStore {
                         CrlInfo crlInfo = new CrlInfo(crlInfoStr);
                         caInfoEntry.setCrlInfo(crlInfo);
                     }
-                    IssuerHashNameAndKey sha1IssuerHash
-                            = caInfoEntry.getIssuerHashNameAndKey(HashAlgoType.SHA1);
+                    RequestIssuer reqIssuer = new RequestIssuer(HashAlgoType.SHA1,
+                            caInfoEntry.getEncodedHash(HashAlgoType.SHA1));
                     for (IssuerEntry existingIssuer : caInfos) {
-                        if (existingIssuer.matchHash(HashAlgoType.SHA1,
-                                sha1IssuerHash.issuerNameHash(),
-                                sha1IssuerHash.issuerKeyHash())) {
+                        if (existingIssuer.matchHash(reqIssuer)) {
                             throw new Exception(
                                 "found at least two issuers with the same subject and key");
                         }
@@ -258,9 +258,10 @@ public class DbCertStatusStore extends OcspStore {
     } // method initIssuerStore
 
     @Override
-    public CertStatusInfo getCertStatus(final Date time, final HashAlgoType hashAlgo,
-            final byte[] issuerNameHash, final byte[] issuerKeyHash, final BigInteger serialNumber,
-            final boolean includeCertHash, final boolean includeRit, final HashAlgoType certHashAlg)
+    public CertStatusInfo getCertStatus(final Date time, final RequestIssuer reqIssuer,
+            final BigInteger serialNumber, final boolean includeCertHash,
+            final boolean includeRit, boolean inheritCaRevocation,
+            final HashAlgoType certHashAlg)
             throws OcspStoreException {
         if (serialNumber.signum() != 1) { // non-positive serial number
             return CertStatusInfo.getUnknownCertStatusInfo(new Date(), null);
@@ -275,19 +276,19 @@ public class DbCertStatusStore extends OcspStore {
         }
 
         String sql;
-        HashAlgoType certHashAlgo = null;
-        if (includeCertHash) {
-            certHashAlgo = (certHashAlg == null) ? hashAlgo : certHashAlg;
-            sql = (includeRit ? sqlCsMap : sqlCsNoRitMap).get(certHashAlgo);
-        } else {
-            sql = includeRit ? sqlCs : sqlCsNoRit;
-        }
 
         try {
-            IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash,
-                    issuerKeyHash);
+            IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
             if (issuer == null) {
                 return null;
+            }
+
+            HashAlgoType certHashAlgo = null;
+            if (includeCertHash) {
+                certHashAlgo = (certHashAlg == null) ? reqIssuer.hashAlgorithm() : certHashAlg;
+                sql = (includeRit ? sqlCsMap : sqlCsNoRitMap).get(certHashAlgo);
+            } else {
+                sql = includeRit ? sqlCs : sqlCsNoRit;
             }
 
             CrlInfo crlInfo = issuer.crlInfo();
@@ -412,10 +413,40 @@ public class DbCertStatusStore extends OcspStore {
                 }
             }
 
+            if ((!inheritCaRevocation) || issuer.revocationInfo() == null) {
+                return certStatusInfo;
+            }
+
+            CertRevocationInfo caRevInfo = issuer.revocationInfo();
+            CertStatus certStatus = certStatusInfo.certStatus();
+            boolean replaced = false;
+            if (certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN) {
+                replaced = true;
+            } else if (certStatus == CertStatus.REVOKED) {
+                if (certStatusInfo.revocationInfo().revocationTime().after(
+                        caRevInfo.revocationTime())) {
+                    replaced = true;
+                }
+            }
+
+            if (replaced) {
+                CertRevocationInfo newRevInfo;
+                if (caRevInfo.reason() == CrlReason.CA_COMPROMISE) {
+                    newRevInfo = caRevInfo;
+                } else {
+                    newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
+                            caRevInfo.revocationTime(), caRevInfo.invalidityTime());
+                }
+                certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
+                        certStatusInfo.certHashAlgo(), certStatusInfo.certHash(),
+                        certStatusInfo.thisUpdate(), certStatusInfo.nextUpdate(),
+                        certStatusInfo.certprofile());
+            }
             return certStatusInfo;
         } catch (DataAccessException ex) {
             throw new OcspStoreException(ex.getMessage(), ex);
         }
+
     } // method getCertStatus
 
     /**
@@ -541,28 +572,14 @@ public class DbCertStatusStore extends OcspStore {
     }
 
     @Override
-    public boolean canResolveIssuer(final HashAlgoType hashAlgo, final byte[] issuerNameHash,
-            final byte[] issuerKeyHash) {
-        return null != issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
+    public boolean canResolveIssuer(final RequestIssuer reqIssuer) {
+        return null != issuerStore.getIssuerForFp(reqIssuer);
     }
 
     @Override
-    public X509Certificate getIssuerCert(HashAlgoType hashAlgo, byte[] issuerNameHash,
-            byte[] issuerKeyHash) {
-        IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
+    public X509Certificate getIssuerCert(final RequestIssuer reqIssuer) {
+        IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
         return (issuer == null) ? null : issuer.cert();
-    }
-
-    @Override
-    public Set<IssuerHashNameAndKey> issuerHashNameAndKeys() {
-        return issuerStore.issuerHashNameAndKeys();
-    }
-
-    @Override
-    public CertRevocationInfo getCaRevocationInfo(final HashAlgoType hashAlgo,
-            final byte[] issuerNameHash, final byte[] issuerKeyHash) {
-        IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
-        return (issuer == null) ? null : issuer.revocationInfo();
     }
 
     protected boolean isInitialized() {

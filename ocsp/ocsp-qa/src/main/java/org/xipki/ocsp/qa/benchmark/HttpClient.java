@@ -113,7 +113,7 @@ final class HttpClient {
         }
     }
 
-    private static final int MAX_PENDING_REQUESTS = 1000;
+    private int queueSize = 1000;
 
     private String uri;
 
@@ -133,11 +133,13 @@ final class HttpClient {
         LOG.info("linux epoll available: {}", useEpollLinux);
     }
 
-    public HttpClient(String uri, OcspBenchmark responseHandler) {
+    public HttpClient(String uri, OcspBenchmark responseHandler, int queueSize) {
         this.uri = ParamUtil.requireNonNull("uri", uri);
+        if (queueSize > 0) {
+            this.queueSize = queueSize;
+        }
         this.responseHandler = ParamUtil.requireNonNull("responseHandler", responseHandler);
-        final int n = Runtime.getRuntime().availableProcessors();
-        this.workerGroup = useEpollLinux ? new EpollEventLoopGroup(n) : new NioEventLoopGroup(n);
+        this.workerGroup = useEpollLinux ? new EpollEventLoopGroup() : new NioEventLoopGroup(1);
     }
 
     public void start() throws Exception {
@@ -199,15 +201,17 @@ final class HttpClient {
 
     private void incrementPendingRequests() {
         synchronized (latch) {
-            if (++pendingRequests >= MAX_PENDING_REQUESTS){
-                latch.countUp();
+            if (++pendingRequests >= queueSize){
+                if (latch.getCount() == 0) {
+                    latch.countUp();
+                }
             }
         }
     }
 
     private void decrementPendingRequests() {
         synchronized (latch) {
-            if (--pendingRequests < MAX_PENDING_REQUESTS){
+            if (--pendingRequests < queueSize){
                 final int count = (int) latch.getCount();
                 if (count > 0) {
                     while (latch.getCount() != 0) {

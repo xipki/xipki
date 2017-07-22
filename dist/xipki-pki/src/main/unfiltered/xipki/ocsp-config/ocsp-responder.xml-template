@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OCSPServer master="true" xmlns="http://xipki.org/ocsp/conf/v2">
   <!-- responseCache -->
-  <responseCache>
+  <!-- responseCache/validity indicates how long (in seconds) the response will
+       be cached in database -->
+  <!--responseCache>
     <datasource name="datasource-cache">
       <conf>
         <file>xipki/ocsp-config/ocsp-cache-db.properties</file>
       </conf>
     </datasource>
-    <!-- how long (in seconds) the response will be cached in database -->
     <validity>86400</validity>
-  </responseCache>
+  </responseCache-->
   <!-- responders -->
   <responders>
     <responder name="responder1">

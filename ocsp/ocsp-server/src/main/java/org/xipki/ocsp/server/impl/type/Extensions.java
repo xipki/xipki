@@ -34,62 +34,46 @@
 
 package org.xipki.ocsp.server.impl.type;
 
-import java.math.BigInteger;
+import java.util.List;
 
 import org.xipki.common.ASN1Type;
-import org.xipki.ocsp.api.RequestIssuer;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-public class CertID extends ASN1Type {
+public class Extensions extends ASN1Type {
 
-    private final RequestIssuer issuer;
+    private final List<Extension> extensions;
 
-    private final BigInteger serialNumber;
+    private final int bodyLen;
 
-    private final int bodyLength;
+    private final int encodedLen;
 
-    private final int encodedLength;
+    public Extensions(List<Extension> extensions) {
+        int len = 0;
+        for (Extension m : extensions) {
+            len += m.encodedLength();
+        }
 
-    public CertID(RequestIssuer issuer, BigInteger serialNumber) {
-        this.issuer = issuer;
-        this.serialNumber = serialNumber;
-
-        int len = issuer.length();
-
-        int snBytesLen = 1 + serialNumber.bitLength() / 8;
-        len += getLen(snBytesLen);
-
-        this.bodyLength = len;
-        this.encodedLength = getLen(bodyLength);
-    }
-
-    public RequestIssuer issuer() {
-        return issuer;
-    }
-
-    public BigInteger serialNumber() {
-        return serialNumber;
+        this.bodyLen = len;
+        this.encodedLen = getLen(bodyLen);
+        this.extensions = extensions;
     }
 
     @Override
     public int encodedLength() {
-        return encodedLength;
+        return encodedLen;
     }
 
+    @Override
     public int write(final byte[] out, final int offset) {
         int idx = offset;
-        idx += writeHeader((byte) 0x30, bodyLength, out, idx);
-        idx += issuer.write(out, idx);
-
-        // serialNumbers
-        byte[] snBytes = serialNumber.toByteArray();
-        idx += writeHeader((byte) 0x02, snBytes.length, out, idx);
-        idx += arraycopy(snBytes, out, idx);
-
+        idx += writeHeader((byte) 0x30, bodyLen, out, idx);
+        for (Extension m : extensions) {
+            idx += m.write(out, idx);
+        }
         return idx - offset;
     }
 

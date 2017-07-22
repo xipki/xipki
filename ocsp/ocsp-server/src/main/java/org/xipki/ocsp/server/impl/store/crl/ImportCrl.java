@@ -310,7 +310,7 @@ public class ImportCrl {
                 String str = rs.getString("CRL_INFO");
                 if (str == null) {
                     throw new ImportCrlException(
-                            "Issuer for the given CA of CRL exists, but not imported from CRL");
+                        "RequestIssuer for the given CA of CRL exists, but not imported from CRL");
                 }
                 crlInfo = new CrlInfo(str);
             }

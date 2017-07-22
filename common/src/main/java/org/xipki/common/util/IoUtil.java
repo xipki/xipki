@@ -219,6 +219,23 @@ public class IoUtil {
                 |  0xFF & bytes[offset];
     }
 
+    public static int getIndex(byte[] arrayA, byte[] arrayB) {
+        int endIndex = arrayA.length - arrayB.length;
+        for (int i = 0; i < endIndex; i++) {
+            boolean found = true;
+            for (int j = 0; j < arrayB.length; j++) {
+                if (arrayA[i + j] != arrayB[j]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public static String base64Encode(final byte[] data, final boolean withLineBreak) {
 
         String b64Str = Base64.getEncoder().encodeToString(data);

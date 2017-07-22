@@ -104,8 +104,8 @@ class OcspBenchRequestor {
 
     private HttpClient httpClient;
 
-    public void init(OcspBenchmark responseHandler,
-            String responderUrl, Certificate issuerCert, RequestOptions requestOptions)
+    public void init(OcspBenchmark responseHandler, String responderUrl, Certificate issuerCert,
+            RequestOptions requestOptions, int queueSize)
             throws Exception {
         ParamUtil.requireNonNull("issuerCert", issuerCert);
         ParamUtil.requireNonNull("responseHandler", responseHandler);
@@ -153,7 +153,7 @@ class OcspBenchRequestor {
         } else {
             this.responderRawPathGet = this.responderRawPathPost + "/";
         }
-        this.httpClient = new HttpClient(responderUrl, responseHandler);
+        this.httpClient = new HttpClient(responderUrl, responseHandler, queueSize);
         this.httpClient.start();
     }
 

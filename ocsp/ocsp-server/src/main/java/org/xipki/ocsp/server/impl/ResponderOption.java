@@ -102,7 +102,7 @@ class ResponderOption {
         return mode;
     }
 
-    public boolean isInheritCaRevocation() {
+    public boolean inheritCaRevocation() {
         return inheritCaRevocation;
     }
 

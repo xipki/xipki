@@ -34,63 +34,49 @@
 
 package org.xipki.ocsp.server.impl.type;
 
-import java.math.BigInteger;
-
 import org.xipki.common.ASN1Type;
-import org.xipki.ocsp.api.RequestIssuer;
 
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-public class CertID extends ASN1Type {
+public class TaggedCertSequence extends ASN1Type {
 
-    private final RequestIssuer issuer;
+    private final byte[] encoded;
 
-    private final BigInteger serialNumber;
+    private final int encodedLen;
 
-    private final int bodyLength;
-
-    private final int encodedLength;
-
-    public CertID(RequestIssuer issuer, BigInteger serialNumber) {
-        this.issuer = issuer;
-        this.serialNumber = serialNumber;
-
-        int len = issuer.length();
-
-        int snBytesLen = 1 + serialNumber.bitLength() / 8;
-        len += getLen(snBytesLen);
-
-        this.bodyLength = len;
-        this.encodedLength = getLen(bodyLength);
+    public TaggedCertSequence(byte[] encodedCert) {
+        this(new byte[][]{encodedCert});
     }
 
-    public RequestIssuer issuer() {
-        return issuer;
-    }
+    public TaggedCertSequence(byte[][] encodedCerts) {
+        int seqBodyLen = 0;
+        for (int i = 0; i < encodedCerts.length; i++) {
+            seqBodyLen += encodedCerts[i].length;
+        }
 
-    public BigInteger serialNumber() {
-        return serialNumber;
+        int seqLen= getLen(seqBodyLen);
+        encodedLen = getLen(seqLen);
+
+        this.encoded = new byte[encodedLen];
+        int idx = 0;
+        idx += writeHeader((byte) 0xa0, seqLen, encoded, idx);
+        idx += writeHeader((byte) 0x30, seqBodyLen, encoded, idx);
+        for (int i = 0; i < encodedCerts.length; i++) {
+            idx += arraycopy(encodedCerts[i], encoded, idx);
+        }
     }
 
     @Override
     public int encodedLength() {
-        return encodedLength;
+        return encodedLen;
     }
 
-    public int write(final byte[] out, final int offset) {
-        int idx = offset;
-        idx += writeHeader((byte) 0x30, bodyLength, out, idx);
-        idx += issuer.write(out, idx);
-
-        // serialNumbers
-        byte[] snBytes = serialNumber.toByteArray();
-        idx += writeHeader((byte) 0x02, snBytes.length, out, idx);
-        idx += arraycopy(snBytes, out, idx);
-
-        return idx - offset;
+    @Override
+    public int write(byte[] out, int offset) {
+        return arraycopy(encoded, out, offset);
     }
 
 }
