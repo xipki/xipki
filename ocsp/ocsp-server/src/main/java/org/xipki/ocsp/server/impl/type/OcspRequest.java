@@ -81,11 +81,11 @@ public class OcspRequest {
 
     private final int version;
 
-    private final List<Extension> extensions;
+    private final List<ExtendedExtension> extensions;
 
     private final List<CertID> requestList;
 
-    public OcspRequest(int version, List<CertID> requestList, List<Extension> extensions) {
+    public OcspRequest(int version, List<CertID> requestList, List<ExtendedExtension> extensions) {
         this.version = version;
         this.requestList = requestList;
         this.extensions = extensions ;
@@ -147,7 +147,7 @@ public class OcspRequest {
         }
 
         // extensions
-        List<Extension> extensions = new LinkedList<>();
+        List<ExtendedExtension> extensions = new LinkedList<>();
         int extensionsOffset = hdrRequestList.readerIndex + hdrRequestList.len;
 
         if (extensionsOffset < hdrTbs.readerIndex + hdrTbs.len) {
@@ -162,7 +162,7 @@ public class OcspRequest {
             while (true) {
                 int extensionLen =
                         hdrExtension.readerIndex - hdrExtension.tagIndex + hdrExtension.len;
-                Extension extn = Extension.getInstance(
+                ExtendedExtension extn = ExtendedExtension.getInstance(
                         request, hdrExtension.tagIndex, extensionLen);
                 if (extn != null) {
                     extensions.add(extn);
@@ -214,7 +214,7 @@ public class OcspRequest {
             requestList.add(certId);
         }
 
-        List<Extension> extensions = new LinkedList<>();
+        List<ExtendedExtension> extensions = new LinkedList<>();
         if (extensions0 != null) {
             ASN1ObjectIdentifier[] extOids = extensions0.getExtensionOIDs();
             for (ASN1ObjectIdentifier oid : extOids) {
@@ -225,7 +225,7 @@ public class OcspRequest {
                 } catch (IOException ex) {
                     throw new EncodingException("error encoding Extension", ex);
                 }
-                extensions.add(Extension.getInstance(encoded, 0, encoded.length));
+                extensions.add(ExtendedExtension.getInstance(encoded, 0, encoded.length));
             }
         }
 
@@ -303,7 +303,7 @@ public class OcspRequest {
         return requestList;
     }
 
-    public List<Extension> extensions() {
+    public List<ExtendedExtension> extensions() {
         return extensions;
     }
 

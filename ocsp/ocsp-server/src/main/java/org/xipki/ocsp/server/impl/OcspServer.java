@@ -65,17 +65,11 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.asn1.ocsp.OCSPResponse;
-import org.bouncycastle.asn1.ocsp.RevokedInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReq;
@@ -83,7 +77,6 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.ASN1Type;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.InvalidConfException;
 import org.xipki.common.ObjectCreationException;
@@ -120,12 +113,14 @@ import org.xipki.ocsp.server.impl.store.crl.CrlDbCertStatusStore;
 import org.xipki.ocsp.server.impl.store.db.DbCertStatusStore;
 import org.xipki.ocsp.server.impl.type.CertID;
 import org.xipki.ocsp.server.impl.type.EncodingException;
+import org.xipki.ocsp.server.impl.type.ExtendedExtension;
 import org.xipki.ocsp.server.impl.type.Extension;
 import org.xipki.ocsp.server.impl.type.Extensions;
 import org.xipki.ocsp.server.impl.type.OID;
 import org.xipki.ocsp.server.impl.type.OcspRequest;
 import org.xipki.ocsp.server.impl.type.ResponderID;
 import org.xipki.ocsp.server.impl.type.TaggedCertSequence;
+import org.xipki.ocsp.server.impl.type.WritableOnlyExtension;
 import org.xipki.password.PasswordResolverException;
 import org.xipki.security.AlgorithmCode;
 import org.xipki.security.CertRevocationInfo;
@@ -188,8 +183,7 @@ public class OcspServer {
     private static final byte[] bytes_certstatus_rfc6960_unknown =
             Hex.decode("a116180f31393730303130313030303030305aa0030a0106");
 
-    private static final Extension extension_pkix_ocsp_extendedRevoke =
-            new Extension(OID.ID_PKIX_OCSP_EXTENDEDREVOKE, true, DERNullBytes);
+    private static final WritableOnlyExtension extension_pkix_ocsp_extendedRevoke;
 
     private static final Logger LOG = LoggerFactory.getLogger(OcspServer.class);
 
@@ -240,6 +234,12 @@ public class OcspServer {
             }
             unsuccesfulOCSPRespMap.put(status, new OcspRespWithCacheInfo(encoded, null));
         }
+
+        ExtendedExtension ext = new ExtendedExtension(OID.ID_PKIX_OCSP_EXTENDEDREVOKE,
+                true, DERNullBytes);
+        byte[] encoded = new byte[ext.encodedLength()];
+        ext.write(encoded, 0);
+        extension_pkix_ocsp_extendedRevoke = new WritableOnlyExtension(encoded);
     }
 
     public OcspServer() {
@@ -629,10 +629,10 @@ public class OcspServer {
             repControl.canCacheInfo = true;
 
             ResponderID responderId = signer.getResponderId(repOpt.isResponderIdByName());
-            List<Extension> reqExtensions = req.extensions();
+            List<ExtendedExtension> reqExtensions = req.extensions();
             List<Extension> respExtensions = new LinkedList<>();
 
-            Extension nonceExtn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_NONCE);
+            ExtendedExtension nonceExtn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_NONCE);
             if (nonceExtn != null) {
                 if (reqOpt.nonceOccurrence() == TripleState.FORBIDDEN) {
                     LOG.warn("nonce forbidden, but is present in the request");
@@ -659,7 +659,8 @@ public class OcspServer {
 
             ConcurrentContentSigner concurrentSigner = null;
             if (responder.responderOption().mode() != OcspMode.RFC2560) {
-                Extension extn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_PREFSIGALGS);
+                ExtendedExtension extn = removeExtension(reqExtensions,
+                        OID.ID_PKIX_OCSP_PREFSIGALGS);
                 if (extn != null) {
                     ASN1InputStream asn1Stream = new ASN1InputStream(extn.getExtnValueStream());
 
@@ -680,7 +681,7 @@ public class OcspServer {
 
             if (!reqExtensions.isEmpty()) {
                 boolean flag = false;
-                for (Extension m : reqExtensions) {
+                for (ExtendedExtension m : reqExtensions) {
                     if (m.isCritical()) {
                         flag = true;
                         break;
@@ -690,7 +691,7 @@ public class OcspServer {
                 if (flag) {
                     if (LOG.isWarnEnabled()) {
                         List<OID> oids = new LinkedList<>();
-                        for (Extension m : reqExtensions) {
+                        for (ExtendedExtension m : reqExtensions) {
                             if (m.isCritical()) {
                                 oids.add(m.extnType());
                             }
@@ -901,24 +902,14 @@ public class OcspServer {
             break;
         case REVOKED:
             CertRevocationInfo revInfo = certStatusInfo.revocationInfo();
-            ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(
+            certStatus = Template.getEncodeRevokedInfo(
+                    repOpt.isIncludeRevReason() ? revInfo.reason() : null,
                     revInfo.revocationTime());
-
-            RevokedInfo revokedInfo;
-            if (repOpt.isIncludeRevReason()) {
-                revokedInfo = new RevokedInfo(revTime, CRLReason.lookup(revInfo.reason().code()));
-            } else {
-                revokedInfo = new RevokedInfo(revTime, null);
-            }
-            certStatus = new org.bouncycastle.asn1.ocsp.CertStatus(revokedInfo).getEncoded();
 
             Date invalidityDate = revInfo.invalidityTime();
             if (repOpt.isIncludeInvalidityDate() && invalidityDate != null
                     && !invalidityDate.equals(revInfo.revocationTime())) {
-                byte[] extnValue = new byte[17];
-                ASN1Type.writeGeneralizedTime(invalidityDate, extnValue, 0);
-                Extension extension = new Extension(OID.ID_INVALIDITY_DATE, false, extnValue);
-                extensions.add(extension);
+                extensions.add(Template.getInvalidityDateExtension(invalidityDate));
             }
             break;
         default:
@@ -928,28 +919,11 @@ public class OcspServer {
 
         byte[] certHash = certStatusInfo.certHash();
         if (certHash != null) {
-            ASN1ObjectIdentifier hashAlgOid = certStatusInfo.certHashAlgo().oid();
-            AlgorithmIdentifier hashAlgId = new AlgorithmIdentifier(hashAlgOid, DERNull.INSTANCE);
-            CertHash bcCertHash = new CertHash(hashAlgId, certHash);
-
-            byte[] encodedCertHash;
-            try {
-                encodedCertHash = bcCertHash.getEncoded();
-            } catch (IOException ex) {
-                LogUtil.error(LOG, ex, "answer() bcCertHash.getEncoded");
-                return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
-            }
-
-            Extension extension = new Extension(OID.ID_ISISMTT_AT_CERTHASH,
-                    false, encodedCertHash);
-
-            extensions.add(extension);
-        } // end if(certHash != null)
+            extensions.add(Template.getCertHashExtension(certStatusInfo.certHashAlgo(), certHash));
+        }
 
         if (certStatusInfo.archiveCutOff() != null) {
-            Extension extension = new Extension(OID.ID_PKIX_OCSP_ARCHIVE_CUTOFF,
-                    false, new ASN1GeneralizedTime(certStatusInfo.archiveCutOff()).getEncoded());
-            extensions.add(extension);
+            extensions.add(Template.getArchiveOffExtension(certStatusInfo.archiveCutOff()));
         }
 
         if (LOG.isDebugEnabled()) {
@@ -1304,9 +1278,10 @@ public class OcspServer {
         }
     }
 
-    private static Extension removeExtension(List<Extension> extensions, OID extnType) {
-        Extension extn = null;
-        for (Extension m : extensions) {
+    private static ExtendedExtension removeExtension(List<ExtendedExtension> extensions,
+            OID extnType) {
+        ExtendedExtension extn = null;
+        for (ExtendedExtension m : extensions) {
             if (extnType == m.extnType()) {
                 extn = m;
                 break;

@@ -34,13 +34,38 @@
 
 package org.xipki.ocsp.server.impl.type;
 
-import org.xipki.common.ASN1Type;
-
 /**
  * @author Lijun Liao
  * @since 2.2.0
  */
 
-public abstract class Extension extends ASN1Type {
+public class WritableOnlyExtension extends Extension {
+
+    private final byte[] encoded;
+
+    private final int from;
+
+    private final int encodedLength;
+
+    public WritableOnlyExtension(byte[] encoded) {
+        this(encoded, 0, encoded.length);
+    }
+
+    public WritableOnlyExtension(byte[] encoded, int from, int encodedLength) {
+        this.encoded = encoded;
+        this.from = from;
+        this.encodedLength = encodedLength;
+    }
+
+    @Override
+    public int encodedLength() {
+        return encodedLength;
+    }
+
+    @Override
+    public int write(byte[] out, int offset) {
+        System.arraycopy(encoded, from, out, offset, encodedLength);
+        return encodedLength;
+    }
 
 }
