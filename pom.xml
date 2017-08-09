@@ -33,7 +33,7 @@
     </developer>
   </developers>
   <properties>
-    <karaf.version>4.1.2-SNAPSHOT</karaf.version>
+    <karaf.version>4.1.2</karaf.version>
     <karaf-plugin.version>4.1.0</karaf-plugin.version>
     <netty.version>4.1.12.Final</netty.version>
     <netty-tcnative.version>2.0.3.Final</netty-tcnative.version>
