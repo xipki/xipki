@@ -109,7 +109,7 @@ public class HealthCheckServlet extends AbstractHttpServlet {
                 responder = responderManager.getX509CaResponder(caName);
             }
 
-            if (caName == null || responder == null || !responder.isInService()) {
+            if (caName == null || responder == null || !responder.isOnService()) {
                 String auditMessage;
                 if (caName == null) {
                     auditMessage = "no CA is specified";

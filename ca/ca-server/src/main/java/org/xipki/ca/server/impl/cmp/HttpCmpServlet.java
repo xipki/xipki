@@ -143,7 +143,7 @@ public class HttpCmpServlet extends AbstractHttpServlet {
                 responder = responderManager.getX509CaResponder(caName);
             }
 
-            if (caName == null || responder == null || !responder.isInService()) {
+            if (caName == null || responder == null || !responder.isOnService()) {
                 String message;
                 if (caName == null) {
                     message = "no CA is specified";

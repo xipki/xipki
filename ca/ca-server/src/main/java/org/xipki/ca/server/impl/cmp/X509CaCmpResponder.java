@@ -220,8 +220,8 @@ public class X509CaCmpResponder extends CmpResponder {
     }
 
     @Override
-    public boolean isInService() {
-        if (!super.isInService()) {
+    public boolean isOnService() {
+        if (!super.isOnService()) {
             return false;
         }
 

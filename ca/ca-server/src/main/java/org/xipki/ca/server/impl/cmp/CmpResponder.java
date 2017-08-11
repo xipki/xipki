@@ -101,7 +101,7 @@ abstract class CmpResponder {
 
     protected abstract boolean intendsMe(GeneralName requestRecipient);
 
-    public boolean isInService() {
+    public boolean isOnService() {
         try {
             return getSigner() != null;
         } catch (Exception ex) {
