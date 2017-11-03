@@ -47,7 +47,7 @@
     <hikaricp.version>2.6.2</hikaricp.version>
     <syslog-java-client.version>1.0.8</syslog-java-client.version>
   </properties>
-  <repositories>
+  <!--repositories>
     <repository>
       <id>apache-snapshots</id>
       <name>Apache Snapshots Repository</name>
@@ -59,7 +59,7 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
-  </repositories>
+  </repositories-->
   <modules>
     <module>common</module>
     <module>audit</module>
