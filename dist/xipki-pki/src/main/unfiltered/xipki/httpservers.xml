@@ -13,7 +13,7 @@
     <!--reverseProxy>NONE</reverseProxy-->
     <tls>
       <!--provider>JDK</provider-->
-      <clientauth>require</clientauth>
+      <clientauth>optional</clientauth>
       <protocols>
         <protocol>TLSv1.2</protocol>
       </protocols>

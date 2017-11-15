@@ -12,7 +12,11 @@ echo "working dir: ${DIR}"
 
 CA_SHA1FP=`openssl sha1 ${DIR}/../../${CACERT} | cut -d '=' -f 2 | cut -d ' ' -f`
 
-SSL="-k --cert-type PKCS#12 --cert ${DIR}/../security/tlskeys/tls-client-keystore.p12:1234"
+# Use user and password to authorize
+OPTS="--insecure --user user1:password1"
+
+# Use TLS client certificate to authorize
+OPTS="--insecure --cert-type PKCS#12 --cert ${DIR}/../security/tlskeys/tls-client-keystore.p12:1234"
 
 filename=tls-`date +%s` 
 
@@ -28,13 +32,13 @@ openssl req -new -key ${filename}-key.pem -outform der \
 
 echo "get CA certificate"
 
-curl ${SSL} \
+curl ${OPTS} \
     --output cacert.der \
     "${BASE_URL}/cacert"
 
 echo "enroll certificate"
 
-curl ${SSL} \
+curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
     --data-binary "@${filename}.csr" \
     --output ${filename}.der -v \
@@ -45,28 +49,28 @@ SERIAL=0X`openssl x509 -inform der -serial -noout -in ${filename}.der | cut -d '
 
 echo "suspend certificate"
 
-curl ${SSL} --head \
+curl ${OPTS} \
     "${BASE_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
 
 echo "unsuspend certificate"
 
-curl ${SSL} --head \
+curl ${OPTS} \
     "${BASE_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=removeFromCRL"
 
 echo "revoke certificate"
 
-curl ${SSL} --head \
+curl ${OPTS} \
     "${BASE_URL}/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
 
 echo "generate new CRL"
 
-curl ${SSL} \
+curl ${OPTS} \
     --output new-crl.crl \
     "${BASE_URL}/new-crl"
 
 echo "get current CRL"
 
-curl ${SSL} \
+curl ${OPTS} \
     --output crl.crl \
     "${BASE_URL}/crl"
 
@@ -74,6 +78,6 @@ echo "get CRL for given CRL number"
 
 CRLNUMBER=`openssl crl -inform der -in crl.crl -crlnumber -noout | cut -d '=' -f 2`
 
-curl ${SSL} \
+curl ${OPTS} \
     --output crl-${CRLNUMBER}.crl \
     "${BASE_URL}/crl?crl-number=${CRLNUMBER}"
