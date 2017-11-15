@@ -219,6 +219,8 @@ Run Demo
 
 In the OSGi console, call `source file:./xipki/demo/demo.script` to demonstrate the whole life-cycle (key generation, database initialization, CA installation, certificate enrollment, OCSP server installation, OCSP status, etc.). The generated keys, certificates and CRLs are saved in the folder `output`, and the log files are located in the folder data/log.
 
+After that, you can enroll, suspend, unsuspend and revoke certificate, create and get CRL via the REST message by calling the shell script `xipki/demo/rest.sh` under Linux or `xipki/demo/rest-mac.sh` under Mac OS. The script will create multiple files, so please run this script within a new directory.
+
 Karaf Features
 -----
 
