@@ -211,7 +211,7 @@ public class HttpRestServlet extends AbstractHttpServlet {
                 NameId userIdent = ca.authenticateUser(user, password);
                 if (userIdent == null) {
                     throw new HttpRespAuditException(HttpResponseStatus.UNAUTHORIZED,
-                            "could not authencate user", AuditLevel.INFO, AuditStatus.FAILED);
+                            "could not authenticate user", AuditLevel.INFO, AuditStatus.FAILED);
                 }
                 requestor = ca.getByUserRequestor(userIdent);
             } else {
