@@ -42,6 +42,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 
 import io.netty.handler.codec.http.HttpRequest;
@@ -74,7 +75,13 @@ class ClientCertCache {
                 return null;
             }
 
-            Certificate[] certs = session.getPeerCertificates();
+            Certificate[] certs;
+            try {
+                certs = session.getPeerCertificates();
+            } catch (SSLPeerUnverifiedException ex) {
+                certs = null;
+            }
+
             Certificate cert = (certs == null || certs.length < 1) ? null : certs[0];
             if (cert != null) {
                 return (X509Certificate) cert;
