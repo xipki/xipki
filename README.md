@@ -221,6 +221,10 @@ Run Demo
 
   After that, you can enroll, suspend, unsuspend and revoke certificate, create and get CRL via the REST message by calling the shell script `xipki/demo/rest.sh` under Linux or `xipki/demo/rest-mac.sh` under Mac OS. The script will create multiple files, so please run this script within a new directory.
 
+* SDK
+  Stand-alone SDK with examples to enroll and revoke certificates via CMP and RESTFUL API can be found in the github project [xipki/xipki-sdk](https://github.com/xipki/xipki-sdk). 
+  Note that the stand-alone SDK is licensed under Apache License 2, which is different from this project.
+
 Karaf Features
 -----
 
