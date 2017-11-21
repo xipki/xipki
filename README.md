@@ -27,30 +27,27 @@ Tested Platforms
 ----------------
 * Database
   * DB2
-  * Oracle
-  * Oracle RAC
-  * PostgreSQL
-  * MySQL
-  * MariaDB
   * H2
   * HSQLDB
+  * MariaDB
+  * MySQL
+  * Oracle
+  * PostgreSQL
 
 * HSM
-  * Thales nCipher Solo (PCI Card)
-  * Thales nCipher Connect (network)
-  * Utimaco Se
   * [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
   * [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
+  * Thales nCipher Connect (network)
+  * Thales nCipher Solo (PCI Card)
+  * Utimaco Se
 
 * JVM
   * OpenJDK 8
+  * Oracle JDK 8
+  * Oracle JRE 8
 
 * OS
-  * CentOS
-  * Fedora
-  * Redhat
-  * SLES
-  * Ubuntu
+  * Linux (CentOS, Fedora, Redhat, SLES, Ubuntu)
   * Windows
   * Mac OS
   * Raspbian (tested on Raspberry Pi 2 Model B)
@@ -91,8 +88,6 @@ Alternative: Build and Assembly from Source Code
 
 Install
 -------
-
-* Copy the file `xipki-pki-<version>.tar.gz` to the destination folder
 
 * Unpack the assembled file
 
@@ -206,25 +201,29 @@ Run Demo
     preload bin/karaf
     ```
 
-    If you get error like
-    ```sh
-    Error occurred during initialization of VM
-    Could not reserve enough space for 2097152KB object heap
-    ```
-    please change the value of JAVA_MAX_MEM in the file `bin/setenv` or `bin/setenv.bat`.
-
     If you have changed the content within folder `$XIPKI_HOME/etc` or `$XIPKI_HOME/system`, please delete the folder `$XIPKI_HOME/data` before starting XiPKI.
 
 * Run the pre-configured OSGi-commands in OSGi console
 
   In the OSGi console, call `source file:./xipki/demo/demo.script` to demonstrate the whole life-cycle (key generation, database initialization, CA installation, certificate enrollment, OCSP server installation, OCSP status, etc.). The generated keys, certificates and CRLs are saved in the folder `output`, and the log files are located in the folder data/log.
 
-  After that, you can enroll, suspend, unsuspend and revoke certificate, create and get CRL via the REST message by calling the shell script `xipki/demo/rest.sh` under Linux or `xipki/demo/rest-mac.sh` under Mac OS. The script will create multiple files, so please run this script within a new directory.
+Enroll/Revoke Certificate
+-----
 
-* SDK
+* Embedded karaf commands
+  The karaf feature xipki-caclient-shell contains commands to to enroll/revoke
+  certificates via CMP, and xipki-scepclient-shell contains commands to enroll
+  certificates via SCEP. Please refer to [commands.md](commands.md) for more details.
+ 
+* XiPKI SDK
+  The stand-alone SDK ([xipki/xipki-sdk](https://github.com/xipki/xipki-sdk))
+  can be used to enroll and revoke certificates via CMP and RESTFUL API.
+  Note that it is licensed under Apache License 2, which is different from this project.
 
-  Stand-alone SDK with examples to enroll and revoke certificates via CMP and RESTFUL API can be found in the github project [xipki/xipki-sdk](https://github.com/xipki/xipki-sdk). 
-  Note that the stand-alone SDK is licensed under Apache License 2, which is different from this project.
+* RESTFUL API
+  The shell script `xipki/demo/rest.sh` under Linux or `xipki/demo/rest-mac.sh`
+  under Mac OS demonstrate the use of RESTFUL API. The script will create multiple
+  files, so please run this script within a new directory.
 
 Karaf Features
 -----
