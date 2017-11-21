@@ -5,21 +5,25 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xipki</groupId>
-    <artifactId>scep-parent</artifactId>
+    <artifactId>xipki-parent</artifactId>
     <version>2.2.1-SNAPSHOT</version>
   </parent>
-  <artifactId>scep-common</artifactId>
-  <name>XiPKI :: ${project.artifactId}</name>
+  <artifactId>jscep-client-shell</artifactId>
   <packaging>bundle</packaging>
+  <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <Karaf-Commands>*</Karaf-Commands>
+  </properties>
   <dependencies>
-     <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>common</artifactId>
-      <version>${project.version}</version>
+    <dependency>
+      <groupId>com.google.code.jscep</groupId>
+      <artifactId>jscep</artifactId>
+      <version>${jscep.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk15on</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>shell-base</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

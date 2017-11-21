@@ -23,9 +23,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.sdk</groupId>
       <artifactId>scep-common</artifactId>
-      <version>${project.version}</version>
+      <version>${xipki-sdk.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>

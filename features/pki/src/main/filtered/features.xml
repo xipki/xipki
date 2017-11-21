@@ -51,7 +51,7 @@
     <feature prerequisite="true">xipki-cabase</feature>
     <bundle start-level="70">mvn:org.xipki.ca/ca-certprofile-xml/${project.version}</bundle>
     <bundle start-level="70">mvn:org.xipki.ca/ca-mgmt-api/${project.version}</bundle>
-    <bundle start-level="70">mvn:org.xipki/scep-common/${project.version}</bundle>
+    <bundle start-level="70">mvn:org.xipki.sdk/scep-common/${xipki-sdk.version}</bundle>
     <bundle start-level="75">mvn:org.xipki.ca/ca-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}" description="CA management shell">
@@ -88,8 +88,8 @@
   <feature name="xipki-scepclient-shell" version="${project.version}"
       description="SCEP client shell">
     <feature prerequisite="true">xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki/scep-common/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/scep-client/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/scep-common/${xipki-sdk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/scep-client/${xipki-sdk.version}</bundle>
     <bundle start-level="80">mvn:org.xipki/scep-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-jscepclient-shell" version="${project.version}"
