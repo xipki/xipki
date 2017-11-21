@@ -33,6 +33,7 @@
     </developer>
   </developers>
   <properties>
+    <xipki-sdk.version>1.0.0-SNAPSHOT</xipki-sdk.version>
     <karaf.version>4.1.3</karaf.version>
     <karaf-plugin.version>4.1.3</karaf-plugin.version>
     <netty.version>4.1.16.Final</netty.version>
@@ -76,7 +77,8 @@
     <module>pkcs11-proxy-server</module>
     <module>ca</module>
     <module>ocsp</module>
-    <module>scep</module>
+    <module>scep-client-shell</module>
+    <module>jscep-client-shell</module>
     <module>features</module>
   </modules>
   <scm>

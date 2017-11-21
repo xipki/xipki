@@ -59,12 +59,24 @@ Download the released binary package `xipki-pki-<version>.tar.gz` from the URL h
 
 Alternative: Build and Assembly from Source Code
 ------------------
+* Get a copy of XiPKI-SDK code
+  ```sh
+  git clone https://github.com/xipki/xipki-sdk
+  ```
+
 * Get a copy of XiPKI code
   ```sh
   git clone https://github.com/xipki/xipki
   ```
 
 * Build
+  * Install the XiPKI-SDK artifacts (you may need to switch to the version used by the XiPKI project)
+
+    In folder `xipki-sdk`
+    ```sh
+    mvn clean install -DskipTests
+    ```
+
   * Install the third party artifacts that are not availablle in maven repositories
 
     In folder `xipki/ext`
