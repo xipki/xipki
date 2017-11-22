@@ -323,18 +323,21 @@ public class Scep {
         if (req.failureMessage() != null) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
+            return rep;
         }
 
         bo = req.isSignatureValid();
         if (bo != null && !bo.booleanValue()) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badMessageCheck);
+            return rep;
         }
 
         bo = req.isDecryptionSuccessful();
         if (bo != null && !bo.booleanValue()) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
+            return rep;
         }
 
         Date signingTime = req.signingTime();
@@ -354,6 +357,7 @@ public class Scep {
             if (isTimeBad) {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badTime);
+                return rep;
             }
         } // end if
 
@@ -364,27 +368,29 @@ public class Scep {
             LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badAlg);
-        } else {
-            boolean supported = false;
-            if (hashAlgoType == ScepHashAlgoType.SHA1) {
-                if (caCaps.containsCapability(CaCapability.SHA1)) {
-                    supported = true;
-                }
-            } else if (hashAlgoType == ScepHashAlgoType.SHA256) {
-                if (caCaps.containsCapability(CaCapability.SHA256)) {
-                    supported = true;
-                }
-            } else if (hashAlgoType == ScepHashAlgoType.SHA512) {
-                if (caCaps.containsCapability(CaCapability.SHA512)) {
-                    supported = true;
-                }
-            }
+            return rep;
+        }
 
-            if (!supported) {
-                LOG.warn("tid={}: unsupported digest algorithm {}", tid, oid);
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badAlg);
+        boolean supported = false;
+        if (hashAlgoType == ScepHashAlgoType.SHA1) {
+            if (caCaps.containsCapability(CaCapability.SHA1)) {
+                supported = true;
             }
+        } else if (hashAlgoType == ScepHashAlgoType.SHA256) {
+            if (caCaps.containsCapability(CaCapability.SHA256)) {
+                supported = true;
+            }
+        } else if (hashAlgoType == ScepHashAlgoType.SHA512) {
+            if (caCaps.containsCapability(CaCapability.SHA512)) {
+                supported = true;
+            }
+        }
+
+        if (!supported) {
+            LOG.warn("tid={}: unsupported digest algorithm {}", tid, oid);
+            rep.setPkiStatus(PkiStatus.FAILURE);
+            rep.setFailInfo(FailInfo.badAlg);
+            return rep;
         }
 
         // check the content encryption algorithm
@@ -394,20 +400,19 @@ public class Scep {
                 LOG.warn("tid={}: encryption with DES3 algorithm is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
+                return rep;
             }
         } else if (AES_ENC_ALGOS.contains(encOid)) {
             if (!caCaps.containsCapability(CaCapability.AES)) {
                 LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
+                return rep;
             }
         } else {
             LOG.warn("tid={}: encryption with algorithm {} is not permitted", tid, encOid);
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badAlg);
-        }
-
-        if (rep.pkiStatus() == PkiStatus.FAILURE) {
             return rep;
         }
 
