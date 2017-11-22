@@ -222,17 +222,18 @@ Run Demo
 Enroll/Revoke Certificate
 -----
 
-* Embedded karaf commands
+* Embedded karaf commands  
   The karaf feature xipki-caclient-shell contains commands to to enroll/revoke
   certificates via CMP, and xipki-scepclient-shell contains commands to enroll
   certificates via SCEP. Please refer to [commands.md](commands.md) for more details.
- 
-* XiPKI SDK
+* SCEP  
+  Any SCEP client. XiPKI provides also a SCEP client in ([xipki/xipki-sdk](https://github.com/xipki/xipki-sdk)).
+* XiPKI SDK  
   The stand-alone SDK ([xipki/xipki-sdk](https://github.com/xipki/xipki-sdk))
   can be used to enroll and revoke certificates via CMP and RESTFUL API.
   Note that it is licensed under Apache License 2, which is different from this project.
 
-* RESTFUL API
+* RESTFUL API  
   The shell script `xipki/demo/rest.sh` under Linux or `xipki/demo/rest-mac.sh`
   under Mac OS demonstrate the use of RESTFUL API. The script will create multiple
   files, so please run this script within a new directory.
