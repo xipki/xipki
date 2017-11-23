@@ -46,6 +46,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.security.auth.x500.X500Principal;
+
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -438,8 +440,9 @@ public class Scep {
             case UpdateReq:
                 CertificationRequest csr = CertificationRequest.getInstance(req.messageData());
                 X500Name reqSubject = csr.getCertificationRequestInfo().getSubject();
-                String reqSubjectText = X509Util.getRfc4519Name(reqSubject);
-                LOG.info("tid={}, subject={}", tid, reqSubjectText);
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("tid={}, subject={}", tid, X509Util.getRfc4519Name(reqSubject));
+                }
 
                 try {
                     ca.checkCsr(csr);
@@ -450,11 +453,19 @@ public class Scep {
 
                 CertificationRequestInfo csrReqInfo = csr.getCertificationRequestInfo();
                 X509Certificate reqSignatureCert = req.signatureCert();
-                boolean selfSigned = reqSignatureCert.getSubjectX500Principal().equals(
-                        reqSignatureCert.getIssuerX500Principal());
+                X500Principal reqSigCertSubject = reqSignatureCert.getSubjectX500Principal();
 
-                String cn = X509Util.getCommonName(csrReqInfo.getSubject());
-                if (cn == null) {
+                boolean selfSigned = reqSigCertSubject.equals(
+                        reqSignatureCert.getIssuerX500Principal());
+                if (selfSigned) {
+                    X500Name tmp = X500Name.getInstance(reqSigCertSubject.getEncoded());
+                    if (!tmp.equals(csrReqInfo.getSubject())) {
+                        LOG.warn("tid={}, self-signed identityCert.subject != csr.subject");
+                        throw FailInfoException.BAD_REQUEST;
+                    }
+                }
+
+                if (X509Util.getCommonName(csrReqInfo.getSubject()) == null) {
                     throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
                             "tid=" + tid + ": no CommonName in requested subject");
                 }

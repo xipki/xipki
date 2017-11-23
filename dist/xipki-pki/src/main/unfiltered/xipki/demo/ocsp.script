@@ -23,21 +23,12 @@ xipki-qa:ocsp-status \
 echo "QA: Unknown (now is before notBefore) (POST, DB)"
 xipki-qa:ocsp-status \
   --issuer output/SubCA1.der \
-  --cert output/TLS1.der \
+  --cert output/EE.Complex1.der \
   --exp-status unknown \
   --exp-sig-alg $SIGALGO \
   --nonce \
   --resp-issuer output/RCA1.der
-  
-echo "QA: Unknown (now is before notBefore) (POST, DB)"
-xipki-qa:ocsp-status \
-  --issuer output/SubCA1.der \
-  --cert output/TLS2.der \
-  --exp-status unknown \
-  --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/RCA1.der
-  
+
 echo "QA: Good (POST, DB)"
 xipki-qa:ocsp-status \
   --issuer output/SubCA1.der \
@@ -124,17 +115,7 @@ xipki-qa:ocsp-status \
 echo "QA: Unknown (now is before notBefore) (GET, DB)"
 xipki-qa:ocsp-status \
   --issuer output/SubCA1.der \
-  --cert output/TLS1.der \
-  --http-get \
-  --exp-status unknown \
-  --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/RCA1.der
-
-echo "QA: Unknown (now is before notBefore) (GET, DB)"
-xipki-qa:ocsp-status \
-  --issuer output/SubCA1.der \
-  --cert output/TLS2.der \
+  --cert output/EE.Complex1.der \
   --http-get \
   --exp-status unknown \
   --exp-sig-alg $SIGALGO \
@@ -234,17 +215,7 @@ xipki-qa:ocsp-status \
 echo "QA: Unknown (now is before notBefore) (POST, SIGNED, DB)"
 xipki-qa:ocsp-status \
   --issuer output/SubCA1.der \
-  --cert output/TLS1.der \
-  --sign \
-  --exp-status unknown \
-  --exp-sig-alg $SIGALGO \
-  --nonce \
-  --resp-issuer output/RCA1.der
-
-echo "QA: Unknown (now is before notBefore) (POST, SIGNED, DB)"
-xipki-qa:ocsp-status \
-  --issuer output/SubCA1.der \
-  --cert output/TLS2.der \
+  --cert output/EE.Complex1.der \
   --sign \
   --exp-status unknown \
   --exp-sig-alg $SIGALGO \

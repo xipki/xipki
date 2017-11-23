@@ -66,13 +66,13 @@ xipki-scep:getcrl \
   --password 1234 \
   --out output/SubCAwithCRL1-scep.crl
  
-## Renewal with same CommonName 
+## Renewal
 
 xipki-tk:req-p12 \
   --hash $HASH \
   --p12 output/SCEP-OCSP1-2.p12 \
   --password 1234 \
-  --subject "CN=SCEP-OCSP1,O=xipki,C=DE" \
+  --subject "CN=SCEP-OCSP1-2,O=xipki,C=DE" \
   --out output/SCEP-OCSP1-2.csr
 
 ## Enroll certificate via Renewal, hence signed by the old key SCEP-OCSP1.p12

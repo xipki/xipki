@@ -47,7 +47,7 @@
   </signatureAlgorithms>
   <certLevel>EndEntity</certLevel>
   <validity>5y</validity>
-  <notBeforeTime>midnight</notBeforeTime>
+  <notBeforeTime>current</notBeforeTime>
   <duplicateKey>true</duplicateKey>
   <serialNumberInReq>false</serialNumberInReq>
   <keyAlgorithms>
