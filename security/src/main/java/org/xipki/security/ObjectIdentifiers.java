@@ -76,6 +76,9 @@ public class ObjectIdentifiers {
     public static final ASN1ObjectIdentifier id_xipki_cmp_cmpGenmsg
             = id_xipki_cmp.branch("1");
 
+    public static final ASN1ObjectIdentifier id_xipki_cmp_cacerts
+            = id_xipki_cmp.branch("2");
+
     // Signature
     public static final String id_alg_SHA1withRSA = "1.2.840.113549.1.1.5";
 

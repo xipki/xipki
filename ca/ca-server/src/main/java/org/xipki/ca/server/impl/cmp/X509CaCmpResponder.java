@@ -197,6 +197,7 @@ public class X509CaCmpResponder extends CmpResponder {
     static {
         KNOWN_GENMSG_IDS.add(CMPObjectIdentifiers.it_currentCRL.getId());
         KNOWN_GENMSG_IDS.add(ObjectIdentifiers.id_xipki_cmp_cmpGenmsg.getId());
+        KNOWN_GENMSG_IDS.add(ObjectIdentifiers.id_xipki_cmp_cacerts.getId());
     }
 
     public X509CaCmpResponder(final CaManagerImpl caManager, final String caName) {
@@ -1569,6 +1570,10 @@ public class X509CaCmpResponder extends CmpResponder {
                     vec.add(respValue);
                 }
                 itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
+            } else if (ObjectIdentifiers.id_xipki_cmp_cacerts.equals(infoType)) {
+                event.addEventType(CaAuditConstants.TYPE_CMP_genm_cacerts);
+                CMPCertificate caCert = ca.caInfo().certInCmpFormat();
+                itvResp = new InfoTypeAndValue(infoType, new DERSequence(caCert));
             }
 
             GenRepContent genRepContent = new GenRepContent(itvResp);

@@ -168,6 +168,8 @@ public class CaAuditConstants {
 
     public static final String TYPE_CMP_genm_crlForNumber = "genm_crlForNumber";
 
+    public static final String TYPE_CMP_genm_cacerts = "genm_cacerts";
+
     public static final String TYPE_CMP_genm_cainfo = "genm_cainfo";
 
 }

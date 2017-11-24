@@ -469,9 +469,7 @@ abstract class CmpRequestor {
                 new DERSequence(vec));
         GenMsgContent genMsgContent = new GenMsgContent(itv);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
-
-        PKIMessage pkiMessage = new PKIMessage(header, body);
-        return pkiMessage;
+        return new PKIMessage(header, body);
     }
 
     protected PKIMessage buildMessageWithGeneralMsgContent(final ASN1ObjectIdentifier type,
@@ -483,9 +481,7 @@ abstract class CmpRequestor {
                 : new InfoTypeAndValue(type);
         GenMsgContent genMsgContent = new GenMsgContent(itv);
         PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
-
-        PKIMessage pkiMessage = new PKIMessage(header, body);
-        return pkiMessage;
+        return new PKIMessage(header, body);
     }
 
     protected void checkProtection(final PkiResponse response) throws PkiErrorException {
