@@ -46,9 +46,6 @@ import java.util.Date;
 
 import javax.net.ssl.SSLSession;
 
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.cmp.PKIHeader;
-import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +57,6 @@ import org.xipki.audit.AuditStatus;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.server.impl.CaAuditConstants;
 import org.xipki.ca.server.impl.HttpRespAuditException;
-import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.http.servlet.AbstractHttpServlet;
 import org.xipki.http.servlet.ServletURI;
@@ -100,10 +96,10 @@ public class HttpCmpServlet extends AbstractHttpServlet {
     public FullHttpResponse service(FullHttpRequest request, ServletURI servletUri,
             SSLSession sslSession, SslReverseProxyMode sslReverseProxyMode)
             throws Exception {
-        HttpVersion version = request.protocolVersion();
+        HttpVersion httpVersion = request.protocolVersion();
         HttpMethod method = request.method();
         if (method != HttpMethod.POST) {
-            return createErrorResponse(version, METHOD_NOT_ALLOWED);
+            return createErrorResponse(httpVersion, METHOD_NOT_ALLOWED);
         }
 
         X509Certificate clientCert = getClientCert(request, sslSession, sslReverseProxyMode);
@@ -169,24 +165,14 @@ public class HttpCmpServlet extends AbstractHttpServlet {
                         "bad request", AuditLevel.INFO, AuditStatus.FAILED);
             }
 
-            PKIHeader reqHeader = pkiReq.getHeader();
-            ASN1OctetString tid = reqHeader.getTransactionID();
-            String tidStr = Base64.encodeToString(tid.getOctets());
-            event.addEventData(CaAuditConstants.NAME_tid, tidStr);
-
-            PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
-                    reqHeader.getPvno().getValue().intValue(), reqHeader.getRecipient(),
-                    reqHeader.getSender());
-            respHeader.setTransactionID(tid);
-
-            PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, tidStr, event);
+            PKIMessage pkiResp = responder.processPkiMessage(pkiReq, clientCert, event);
             byte[] encodedPkiResp = pkiResp.getEncoded();
-            return createOKResponse(version, CT_RESPONSE, encodedPkiResp);
+            return createOKResponse(httpVersion, CT_RESPONSE, encodedPkiResp);
         } catch (HttpRespAuditException ex) {
             auditStatus = ex.auditStatus();
             auditLevel = ex.auditLevel();
             auditMessage = ex.auditMessage();
-            return createErrorResponse(version, ex.httpStatus());
+            return createErrorResponse(httpVersion, ex.httpStatus());
         } catch (Throwable th) {
             if (th instanceof EOFException) {
                 LogUtil.warn(LOG, th, "connection reset by peer");
@@ -196,7 +182,7 @@ public class HttpCmpServlet extends AbstractHttpServlet {
             auditLevel = AuditLevel.ERROR;
             auditStatus = AuditStatus.FAILED;
             auditMessage = "internal error";
-            return createErrorResponse(version, INTERNAL_SERVER_ERROR);
+            return createErrorResponse(httpVersion, INTERNAL_SERVER_ERROR);
         } finally {
             audit(auditService, event, auditLevel, auditStatus, auditMessage);
         }

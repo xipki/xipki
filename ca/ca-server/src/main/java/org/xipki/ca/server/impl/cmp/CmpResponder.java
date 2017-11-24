@@ -71,6 +71,7 @@ import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.ca.server.impl.CaAuditConstants;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
+import org.xipki.common.util.Base64;
 import org.xipki.common.util.LogUtil;
 import org.xipki.common.util.ParamUtil;
 import org.xipki.common.util.RandomUtil;
@@ -86,6 +87,8 @@ import org.xipki.security.util.X509Util;
 abstract class CmpResponder {
 
     private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
+
+    private static final int PVNO_CMP2000 = 2;
 
     protected final SecurityFactory securityFactory;
 
@@ -149,7 +152,7 @@ abstract class CmpResponder {
             GeneralPKIMessage pkiMessage, String msgId, AuditEvent event);
 
     public PKIMessage processPkiMessage(final PKIMessage pkiMessage,
-            final X509Certificate tlsClientCert, final String tidStr, final AuditEvent event) {
+            final X509Certificate tlsClientCert, final AuditEvent event) {
         ParamUtil.requireNonNull("pkiMessage", pkiMessage);
         ParamUtil.requireNonNull("event", event);
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
@@ -166,6 +169,18 @@ abstract class CmpResponder {
         if (tid == null) {
             byte[] randomBytes = randomTransactionId();
             tid = new DEROctetString(randomBytes);
+        }
+        String tidStr = Base64.encodeToString(tid.getOctets());
+        event.addEventData(CaAuditConstants.NAME_tid, tidStr);
+
+        int reqPvno = reqHeader.getPvno().getValue().intValue();
+        if (reqPvno != PVNO_CMP2000) {
+            if (event != null) {
+                event.setLevel(AuditLevel.INFO);
+                event.setStatus(AuditStatus.FAILED);
+                event.addEventData(CaAuditConstants.NAME_message, "unsupproted version " + reqPvno);
+            }
+            return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.unsupportedVersion, null);
         }
 
         CmpControl cmpControl = getCmpControl();
