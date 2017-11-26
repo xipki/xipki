@@ -124,14 +124,10 @@ public abstract class XipkiCommandSupport implements Action {
             }
         } // end if(saveTo.exists())
 
-        File parent = file.getParentFile();
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs();
-        }
-
         try {
             save(saveTo, encoded);
         } catch (IOException ex) {
+            System.out.println("ERROR: " + ex.getMessage());
             if (!randomSaveTo) {
                 saveTo = new File("tmp-" + randomHex(6));
                 save(saveTo, encoded);
@@ -149,8 +145,14 @@ public abstract class XipkiCommandSupport implements Action {
     protected void save(final File file, final byte[] encoded) throws IOException {
         File tmpFile = expandFilepath(file);
         File parent = tmpFile.getParentFile();
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs();
+        if (parent != null) {
+            if (parent.exists()) {
+                if (!parent.isDirectory()) {
+                    throw new IOException("The path " + parent.getPath() + " is not a directory.");
+                }
+            } else {
+                parent.mkdirs();
+            }
         }
 
         FileOutputStream out = new FileOutputStream(tmpFile);
