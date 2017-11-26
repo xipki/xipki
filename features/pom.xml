@@ -14,7 +14,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>pki</module>
-    <module>pkiqa</module>
+    <module>qa</module>
     <module>pkcs11proxy</module>
   </modules>
   <profiles>

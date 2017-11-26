@@ -21,7 +21,7 @@
     <dependency>
       <!-- project base features -->
       <groupId>org.xipki.features</groupId>
-      <artifactId>pki</artifactId>
+      <artifactId>qa</artifactId>
       <version>${project.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -242,7 +242,7 @@
             <configuration>
               <repository>${output.directory}/system</repository>
               <descriptors>
-                <descriptor>mvn:org.xipki.features/pkiqa/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.features/qa/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
