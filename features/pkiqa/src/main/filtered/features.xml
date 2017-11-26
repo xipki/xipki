@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pki-${project.version}"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
+  <repository>mvn:org.xipki.features/pki/${project.version}/xml/features</repository>
+  <feature name="xipki-camgmt-qa-shell" version="${project.version}"
+      description="CA management QA shell">
+    <feature prerequisite="true">xipki-camgmt-shell</feature>
+    <bundle start-level="80">mvn:org.xipki.ca/ca-mgmt-qa-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-caqa-shell" version="${project.version}" description="CA QA shell">
+    <feature prerequisite="true">xipki-caclient-shell</feature>
+    <bundle start-level="70">mvn:org.xipki.ca/ca-certprofile-xml/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.ca/ca-qa/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.ca/ca-qa-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-jscepclient-shell" version="${project.version}"
+      description="SCEP client shell using JSCEP">
+    <feature prerequisite="true">xipki-shell-base</feature>
+    <bundle start-level="80"><![CDATA[wrap:mvn:com.google.code.jscep/jscep/${jscep.version}/$Bundle-SymbolicName=jscep&Bundle-Version=2.4.0]]></bundle>
+    <bundle start-level="80"><![CDATA[wrap:mvn:net.jcip/jcip-annotations/1.0/$Bundle-SymbolicName=jcip-annotations&Bundle-Version=1.0]]></bundle>
+    <bundle start-level="80">mvn:commons-codec/commons-codec/1.7</bundle>
+    <bundle start-level="80">mvn:commons-io/commons-io/2.4</bundle>
+    <bundle start-level="80">mvn:commons-lang/commons-lang/2.6</bundle>
+    <bundle start-level="80">mvn:org.xipki/jscep-client-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-ocspqa-shell" version="${project.version}" description="OCSP QA shell">
+    <feature prerequisite="true">xipki-ocspclient-shell</feature>
+    <bundle>mvn:io.netty/netty-codec/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-codec-http/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-resolver/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-transport/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-common/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-buffer/${netty.version}</bundle>
+    <bundle>mvn:io.netty/netty-handler/${netty.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.ocsp/ocsp-qa/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.ocsp/ocsp-qa-shell/${project.version}</bundle>
+  </feature>
+</features>

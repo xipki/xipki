@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+  <id>main</id>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  <fileSets>
+    <!-- Copy TLS keys -->
+    <fileSet>
+      <directory>${project.basedir}/../demo-tlskeys</directory>
+      <outputDirectory>xipki/security/tlskeys</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+  </fileSets>
+  <files>
+    <file>
+      <source>${output.directory}/xipki/ca-config/example/ca-db.properties-h2</source>
+      <outputDirectory>xipki/ca-config</outputDirectory>
+      <destName>ca-db.properties</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${output.directory}/xipki/ca-config/example/ocsp-db.properties-h2</source>
+      <outputDirectory>xipki/ca-config</outputDirectory>
+      <destName>ocsp-db.properties</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${output.directory}/xipki/ocsp-config/example/ocsp-cache-db.properties-h2</source>
+      <outputDirectory>xipki/ocsp-config</outputDirectory>
+      <destName>ocsp-cache-db.properties</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>${output.directory}/xipki/ocsp-config/example/ocsp-crl-db.properties-h2</source>
+      <outputDirectory>xipki/ocsp-config</outputDirectory>
+      <destName>ocsp-crl-db.properties</destName>
+      <fileMode>0644</fileMode>
+    </file>
+  </files>
+  <componentDescriptors>
+    <componentDescriptor>${shared.dir}/descriptors/component-common.xml</componentDescriptor>
+  </componentDescriptors>
+</assembly>

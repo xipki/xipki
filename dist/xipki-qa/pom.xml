@@ -8,11 +8,11 @@
     <artifactId>dist-parent</artifactId>
     <version>2.2.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xipki-pki</artifactId>
+  <artifactId>xipki-qa</artifactId>
   <packaging>pom</packaging>
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
-    <app.name>PKI</app.name>
+    <app.name>PKI QA</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
     <shared.dir>${project.basedir}/../shared</shared.dir>
     <jdbc.h2.version>1.4.196</jdbc.h2.version>
@@ -42,6 +42,27 @@
         <includes>
           <include>**/*</include>
         </includes>
+      </resource>
+      <resource>
+        <directory>../xipki-pki/src/main/filtered</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+        <excludes>
+          <exclude>etc/org.apache.karaf.features.cfg</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>../xipki-pki/src/main/unfiltered</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+        <excludes>
+          <exclude>xipki/client-config/**</exclude>
+          <exclude>xipki/ocsp-config/ocsp-responder.xml*</exclude>
+        </excludes>
       </resource>
       <resource>
         <directory>${shared.dir}/filtered</directory>
@@ -221,7 +242,7 @@
             <configuration>
               <repository>${output.directory}/system</repository>
               <descriptors>
-                <descriptor>mvn:org.xipki.features/pki/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.features/pkiqa/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
@@ -235,10 +256,14 @@
                 <feature>xipki-security-shell</feature>
                 <feature>xipki-ocspserver</feature>
                 <feature>xipki-ocspclient-shell</feature>
-                <!-- optional features -->
                 <feature>xipki-database-tool</feature>
                 <feature>xipki-audit-syslog</feature>
                 <feature>xipki-scepclient-shell</feature>
+                <!-- QA features -->
+                <feature>xipki-jscepclient-shell</feature>
+                <feature>xipki-camgmt-qa-shell</feature>
+                <feature>xipki-caqa-shell</feature>
+                <feature>xipki-ocspqa-shell</feature>
               </features>
             </configuration>
           </execution>

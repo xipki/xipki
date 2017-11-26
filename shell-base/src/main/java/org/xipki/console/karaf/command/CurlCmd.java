@@ -226,7 +226,7 @@ public class CurlCmd extends XipkiCommandSupport {
 
             if (outFile != null) {
                 String fn = (errorStream != null) ? "error-" + outFile : outFile;
-                saveVerbose("saved response to", new File(fn), respContentBytes);
+                saveVerbose("saved response to file", new File(fn), respContentBytes);
             } else {
                 String ct = httpConn.getHeaderField("Content-Type");
                 String charset = getCharset(ct);

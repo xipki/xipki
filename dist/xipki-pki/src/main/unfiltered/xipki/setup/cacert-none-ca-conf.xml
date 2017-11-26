@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CAConf xmlns="http://xipki.org/ca/conf/v2" version="1">
+  <properties>
+    <property name="profiles.dir">xipki/setup/certprofile</property>
+    <property name="security.dir">xipki/security</property>
+     <!-- Valid algo within ca.signerConf
+       - For RSA key: SHA*withRSA and SHA*withRSAandMGF1,
+       - For EC key: SHA*withECDSA,
+       - For DSA key: SHA*withDSA
+       
+       Where * is 1, 224, 256, 384, 512 and 3-224, 3-256, 3-384 and 3-512 -->
+    <!-- PKCS#12 CA key -->
+    <property name="token.type">PKCS12</property>
+    <property name="ca.signerConf">algo=SHA256withRSA,password=1234,keystore=file:xipki/setup/keycerts/MYCA1.p12</property>
+    <!-- PKCS#11 CA key -->
+    <!--
+    <property name="token.type">PKCS11</property>
+    <property name="ca.signerConf">algo=SHA256withRSA,slot=0,key-label=RCA1</property>
+    -->
+  </properties>
+  <cmpcontrols>
+    <cmpcontrol name="cmpcontrol1">
+      <conf>
+        <value>send.ca=true,messageTime.bias=300,rr.aki.required=true,group.enroll=true,protection.sigalgo=SHA256withRSA,popo.sigalgo=SHA256withRSA:SHA256withRSA:SHA256withECDSA:SHA256withDSA</value>
+       </conf>
+    </cmpcontrol>
+  </cmpcontrols>
+  <responders>
+    <responder name="responder1">
+      <type>PKCS12</type>
+      <conf>
+        <value>password=1234,keystore=file:${security.dir}/tlskeys/tls-server-keystore.p12,algo=SHA256withRSA</value>
+      </conf>
+    </responder>
+  </responders>
+  <crlsigners>
+    <crlsigner name="CASIGN.CRLSIGNER">
+      <signerType>CA</signerType>
+      <!-- create CRL at 02:00 UTC, one per day, with overlapping time 90 minutes -->
+      <crlControl>updateMode=interval,fullCRL.intervals=1,overlap.minutes=90,interval.time=02:00</crlControl>
+    </crlsigner>
+  </crlsigners>
+  <requestors>
+    <requestor name="requestor1">
+      <cert>
+        <file>${security.dir}/tlskeys/tls-client.der</file>
+      </cert>
+    </requestor>
+  </requestors>
+  <publishers>
+    <publisher name="OCSP.PUBLISHER">
+      <type>OCSP</type>
+      <conf>
+        <value>datasource=ocsp,publish.goodcerts=true</value>
+      </conf>
+    </publisher>
+  </publishers>
+  <profiles>
+    <profile name="RCA">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_RootCA.xml</file>
+      </conf>
+    </profile>
+    <profile name="SubCA">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_SubCA.xml</file>
+      </conf>
+    </profile>
+    <profile name="OCSP">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_OCSP.xml</file>
+      </conf>
+    </profile>
+    <profile name="TLS">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_TLS.xml</file>
+      </conf>
+    </profile>
+    <profile name="TLS_C">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_TLS_C.xml</file>
+      </conf>
+    </profile>
+  </profiles>
+  <cas>
+    <ca name="MYCA1">
+      <caInfo>
+        <x509Ca>
+          <genSelfIssued>
+            <csr>
+              <file>xipki/setup/keycerts/MYCA1.csr</file>
+            </csr>
+            <profile>RCA</profile>
+            <serialNumber>1</serialNumber>
+          </genSelfIssued>
+          <cert>
+            <file>xipki/setup/keycerts/MYCA1.der</file>
+          </cert>
+          <cmpcontrolName>cmpcontrol1</cmpcontrolName>
+          <crlsignerName>CASIGN.CRLSIGNER</crlsignerName>
+          <duplicateKey>true</duplicateKey>
+          <duplicateSubject>true</duplicateSubject>
+          <expirationPeriod>365</expirationPeriod>
+          <keepExpiredCertDays>-1</keepExpiredCertDays>
+          <permission>255</permission>
+          <maxValidity>10y</maxValidity>
+          <responderName>responder1</responderName>
+          <saveReq>false</saveReq>
+          <signerType>${token.type}</signerType>
+          <signerConf>
+            <value>${ca.signerConf}</value>
+          </signerConf>
+          <status>active</status>
+          <validityMode>CUTOFF</validityMode>
+          <crlUris>
+            <str>http://ca.example.org/crl</str>
+          </crlUris>
+          <ocspUris>
+            <str>http://localhost:8080/ocsp/responder1</str>
+          </ocspUris>
+          <nextCrlNo>2</nextCrlNo>
+          <snSize>63</snSize>
+        </x509Ca>
+      </caInfo>
+      <aliases>
+        <str>MYCA</str>
+      </aliases>
+      <profiles>
+        <str>SubCA</str>
+        <str>OCSP</str>
+        <str>TLS</str>
+        <str>TLS_C</str>
+      </profiles>
+      <requestors>
+        <requestor>
+          <requestorName>requestor1</requestorName>
+          <ra>true</ra>
+          <permission>255</permission>
+          <profiles>
+            <str>ALL</str>
+          </profiles>
+        </requestor>
+      </requestors>
+      <publishers>
+        <str>OCSP.PUBLISHER</str>
+      </publishers>
+    </ca>
+  </cas>
+</CAConf>
