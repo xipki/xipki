@@ -18,24 +18,10 @@ Just drop me an email.
 
 ## Tested Platforms
 
-| Name |
-----|------
-Database  | DB2
-| H2
-| HSQLDB
-| MariaDB
-| MySQL
-| Oracle
-| PostgreSQL
-HSM | [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
-| [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
-| Thales nCipher Connect (network)
-| Thales nCipher Solo (PCI Card)
-| Utimaco Se
-JVM | OpenJDK 8
-| Oracle JDK 8
-| Oracle JRE 8
-OS | Linux (CentOS, Fedora, Redhat, SLES, Ubuntu, Raspbian)
+- Database: DB2, H2, HSQLDB, MariaDB, MySQL, Oracle, PostgreSQL
+- HSM: [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/), [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick), Thales nCipher Connect, Thales nCipher Solo, Utimaco Se
+- JVM: OpenJDK 8, Oracle JDK 8, Oracle JRE 8
+- OS: Linux (CentOS, Fedora, Redhat, SLES, Ubuntu, Raspbian)
 
 ## Get Binary Package
 
