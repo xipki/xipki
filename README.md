@@ -1,8 +1,7 @@
 XiPKI
 =========
-eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
-
-Highly scalable and high-performance open source PKI (CA and OCSP responder), especially suitable for IoT, M2M and V2X.
+XiPKI (eXtensible sImple Public Key Infrastructure) is
+Highly scalable and high-performance open source PKI (CA and OCSP responder).
 
 License
 -----------
@@ -48,8 +47,6 @@ Tested Platforms
 
 * OS
   * Linux (CentOS, Fedora, Redhat, SLES, Ubuntu)
-  * Windows
-  * Mac OS
   * Raspbian (tested on Raspberry Pi 2 Model B)
 
 Alternative: Download the Released Binary Package
@@ -101,7 +98,7 @@ Alternative: Build and Assembly from Source Code
 Install
 -------
 
-* Unpack the assembled file
+1. Unpack the assembled file
 
     In destination folder of the installation
     ```sh
@@ -109,14 +106,13 @@ Install
     ```
     The following steps use `$XIPKI_HOME` to point to the unpacked root folder
 
-* Adapt the database configuration (access rights read & write of database are required)
+2. Adapt the database configuration (access rights read & write of database are required)
 
   In the folder `$XIPKI_HOME/xipki/ca-config`, copy the CA database configuration template file `example/ca-db.properties-<type>` to `ca-db.properties`, and the OCSP database configuration file `example/ocsp-db.properties-<type>` to `ocsp-db.properties`, and then adapt them.
 
-* Add JDBC drivers (optional)
+3. Add JDBC drivers (optional)
 
   This step is only required if you want to use database other than H2.
-
 
   * Get the JDBC drivers
 
@@ -136,11 +132,11 @@ Install
     * MariaDB
       * Driver: mariadb-java-client-`<version>`.jar
       * Download URL: https://downloads.mariadb.org/connector-java/
-    
+
     * PostgreSQL
       * Driver: postgresql-`<version>`.jar
       * Download URL: https://jdbc.postgresql.org/download.html
-    
+
     * HSQLDB
       * Driver: hsqldb-`<version>`.jar
       * Download URL: hsqldb.org
@@ -164,7 +160,9 @@ Install
     </feature>
     ```
 
-* In case if the real PKCS#11 device instead of the emulator is used:
+4. Configure PKCS#11 device (optional)
+
+   This step is only required if the real PKCS#11 device instead of the emulator is used.
 
   * In file etc/org.xipki.security.pkcs11.cfg, change the pkcs11.confFile as follows:
 
@@ -175,7 +173,9 @@ Install
     ```
   * In file xipki/security/pkcs11-conf-hsm.xml, change the PKCS#11 configuration.
 
-* If the CA is behind a reverse proxy apache httpd:
+5. Configure how to handle SSL client certificate (optional)
+
+  This step is only required if the CA is behind a reverse proxy apache httpd.
 
   * In file etc/org.xipki.ca.server.cfg, change the sslCertInHttpHeader as follows:
 
@@ -196,12 +196,29 @@ Install
       * [Jetty: Tricks to do client certificate authentications behind a reverse proxy](http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start)
       * [Apache Module mod_ssl](http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#envvars)
 
-Run Demo
+Setup CA and OCSP Responder
 -----
 
-* Delete folders `$XIPKI_HOME/data` and `$XIPKI_HOME/output`
+1. Prepare the configuration and scripts
 
-* Start XiPKI
+  This step is not required if you setup a new root CA (self-signed) using
+  RSA keys which will be generated during the installation process, and the keys
+  are saved in PKCS#12 keystore.
+
+ * If you use the existing CA certificate and OCSP Responder certificate
+
+   1. Copy the CA certificate and the OCSP responder certificate to the directory
+      `$XIPKI_HOME/xipki/setup/keycerts`.
+
+   2. In case of the key and certificate are saved in PKCS#12 keystore file,
+      copy the PKCS#12 files to the directory `$XIPKI_HOME/xipki/setup/keycerts`.
+      Note that the key and certificate must be under the same alias in keystore.
+
+   3. Adapt the CA configuration file `$XIPKI_HOME/xipki/setup/cacert-present-ca-conf.xml` and the client scripts in `$XIPKI_HOME/xipki/client-script`
+
+ * If you use non-RSA keys (e.g. EC and DSA) or PKCS#11 device, adapt the CA configuration file `$XIPKI_HOME/xipki/setup/cacert-none-ca-conf.xml` and the client scripts in `$XIPKI_HOME/xipki/setup/cacert-none-setup.script`
+
+2. Start XiPKI
 
     In folder `$XIPKI_HOME`
     ```sh
@@ -215,9 +232,21 @@ Run Demo
 
     If you have changed the content within folder `$XIPKI_HOME/etc` or `$XIPKI_HOME/system`, please delete the folder `$XIPKI_HOME/data` before starting XiPKI.
 
-* Run the pre-configured OSGi-commands in OSGi console
+3. Setup the CA and OCSP responder
 
-  In the OSGi console, call `source file:./xipki/demo/demo.script` to demonstrate the whole life-cycle (key generation, database initialization, CA installation, certificate enrollment, OCSP server installation, OCSP status, etc.). The generated keys, certificates and CRLs are saved in the folder `output`, and the log files are located in the folder data/log.
+ * In case of using new keys and certificates, in OSGi console:  
+   `source file:./xipki/setup/cacert-none-setup.script`
+
+ * In case of using existing keys and certificates, in OSGi console:  
+    `source file:./xipki/setup/cacert-present-setup.script`
+
+ * Verify the installation, execute the OSGi command  
+   `ca-info MYCA1`
+
+4. Test the installation (otpional)  
+  To verify that the CA and OCSP responder, execute the following commands in the OSGi console: 
+  - `source file:./xipki/client-script/cmp-client.script` 
+  - `source file:./xipki/client-script/rest-client.script`
 
 Enroll/Revoke Certificate
 -----
@@ -226,6 +255,7 @@ Enroll/Revoke Certificate
   The karaf feature xipki-caclient-shell contains commands to to enroll/revoke
   certificates via CMP, and xipki-scepclient-shell contains commands to enroll
   certificates via SCEP. Please refer to [commands.md](commands.md) for more details.
+
 * SCEP  
   Any SCEP client. XiPKI provides also a SCEP client in ([xipki/xipki-sdk](https://github.com/xipki/xipki-sdk)).
 * XiPKI SDK  
