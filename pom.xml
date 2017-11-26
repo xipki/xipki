@@ -33,7 +33,7 @@
     </developer>
   </developers>
   <properties>
-    <xipki-sdk.version>1.0.0-SNAPSHOT</xipki-sdk.version>
+    <xipki-sdk.version>1.0.0</xipki-sdk.version>
     <karaf.version>4.1.3</karaf.version>
     <karaf-plugin.version>4.1.3</karaf-plugin.version>
     <netty.version>4.1.16.Final</netty.version>
