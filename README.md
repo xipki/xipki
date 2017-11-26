@@ -1,62 +1,49 @@
-XiPKI
-=========
-XiPKI (eXtensible sImple Public Key Infrastructure) is
-Highly scalable and high-performance open source PKI (CA and OCSP responder).
+# XiPKI
+XiPKI (e**X**tensible s**I**mple **P**ublic **K**ey **I**nfrastructure) is
+a highly scalable and high-performance open source PKI (CA and OCSP responder).
 
-License
------------
-
+## License
 * XiPKI Commercial License
 * GNU AFFERO GENERAL PUBLIC LICENSE (AGPL) version 3
 
-Owner
------------
+## Owner
 Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com), [LinkedIn](https://www.linkedin.com/in/lijun-liao-644696b8)
 
-Community Support
------------
+## Support
 Just drop me an email.
 
-Prerequisite
-------------
+## Prerequisite
 * JRE / JDK 8
   * OpenJDK/Oracle: [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
-Tested Platforms
-----------------
-* Database
-  * DB2
-  * H2
-  * HSQLDB
-  * MariaDB
-  * MySQL
-  * Oracle
-  * PostgreSQL
+## Tested Platforms
 
-* HSM
-  * [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
-  * [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
-  * Thales nCipher Connect (network)
-  * Thales nCipher Solo (PCI Card)
-  * Utimaco Se
+| Name |
+----|------
+Database  | DB2
+| H2
+| HSQLDB
+| MariaDB
+| MySQL
+| Oracle
+| PostgreSQL
+HSM | [Softhsm v1 & v2](https://www.opendnssec.org/download/packages/)
+| [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
+| Thales nCipher Connect (network)
+| Thales nCipher Solo (PCI Card)
+| Utimaco Se
+JVM | OpenJDK 8
+| Oracle JDK 8
+| Oracle JRE 8
+OS | Linux (CentOS, Fedora, Redhat, SLES, Ubuntu, Raspbian)
 
-* JVM
-  * OpenJDK 8
-  * Oracle JDK 8
-  * Oracle JRE 8
+## Get Binary Package
 
-* OS
-  * Linux (CentOS, Fedora, Redhat, SLES, Ubuntu)
-  * Raspbian (tested on Raspberry Pi 2 Model B)
+Download the binary package `xipki-pki-<version>.tar.gz` from https://github.com/xipki/xipki/releases.
 
-Alternative: Download the Released Binary Package
-------
+Only if you want to use the development version, build it from source code as follows.
 
-Download the released binary package `xipki-pki-<version>.tar.gz` from the URL https://github.com/xipki/xipki/releases
-
-Alternative: Build and Assembly from Source Code
-------------------
-* Get a copy of XiPKI-SDK code
+1. Get a copy of XiPKI-SDK code
   ```sh
   git clone https://github.com/xipki/xipki-sdk
   ```
@@ -66,101 +53,51 @@ Alternative: Build and Assembly from Source Code
   git clone https://github.com/xipki/xipki
   ```
 
-* Build
-  * Install the XiPKI-SDK artifacts (you may need to switch to the version used by the XiPKI project)
+* Install the XiPKI-SDK artifacts (you may need to switch to the version used by the XiPKI project)
 
-    In folder `xipki-sdk`
-    ```sh
-    mvn clean install -DskipTests
-    ```
+  In folder `xipki-sdk`
+  ```sh
+  mvn clean install -DskipTests
+  ```
 
-  * Install the third party artifacts that are not availablle in maven repositories
+* Install the third party artifacts that are not availablle in maven repositories
 
-    In folder `xipki/ext`
-    ```sh
-    ./install.sh
-    ```
+  In folder `xipki/ext`
+  ```sh
+  ./install.sh
+  ```
 
-  * Compile and install the artifacts
+* Compile and install the artifacts
 
-    In folder `xipki`
-    ```sh
-    mvn clean install
-    ```
+  In folder `xipki`
+  ```sh
+  mvn clean install
+  ```
 
-  * Assembly
+* Assembly
 
-    In folder `xipki/dist/xipki-pki`
-    ```sh
-    mvn clean package
-    ```
+  In folder `xipki/dist/xipki-pki`
+  ```sh
+  mvn clean package
+  ```
 
-Install
--------
+## Install
+1. Unpack the binary tar.gz file
 
-1. Unpack the assembled file
-
-    In destination folder of the installation
     ```sh
     tar xvf xipki-pki-<version>.tar.gz
     ```
     The following steps use `$XIPKI_HOME` to point to the unpacked root folder
 
-2. Adapt the database configuration (access rights read & write of database are required)
+2. Adapt the database configuration (optional)
+
+  This step may be skipped if you just want to try out XiPKI.
 
   In the folder `$XIPKI_HOME/xipki/ca-config`, copy the CA database configuration template file `example/ca-db.properties-<type>` to `ca-db.properties`, and the OCSP database configuration file `example/ocsp-db.properties-<type>` to `ocsp-db.properties`, and then adapt them.
 
-3. Add JDBC drivers (optional)
+  The database users must have both the read and right permissions.
 
-  This step is only required if you want to use database other than H2.
-
-  * Get the JDBC drivers
-
-    * Oracle
-      * Driver: `ojdbc7.jar`
-      * Download URL: http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html
-
-    * DB2
-      * Driver: `db2jcc4.jar`
-
-    * MySQL
-      * Driver: mysql-connector-java.jar
-      * Download URL: https://dev.mysql.com/downloads/connector/j
-      * In debian, use the `mysql-connector-java.jar` from the package `libmysql-java` (e.g.
-      under /usr/share/java/mysql-connector-java.jar)
-
-    * MariaDB
-      * Driver: mariadb-java-client-`<version>`.jar
-      * Download URL: https://downloads.mariadb.org/connector-java/
-
-    * PostgreSQL
-      * Driver: postgresql-`<version>`.jar
-      * Download URL: https://jdbc.postgresql.org/download.html
-
-    * HSQLDB
-      * Driver: hsqldb-`<version>`.jar
-      * Download URL: hsqldb.org
-
-  * Copy the jar file to the folder `lib/jdbc`.
-
-  * Append the bundle URL to the feature `xipki-jdbc` in the file `lib/jdbc/features.xml`.
-
-    ```sh
-    <feature name="xipki-jdbc" description="JDBC drivers">
-      ...
-      <bundle start-level="75">file:lib/jdbc/....jar</bundle>
-    </feature>
-    ```
-    Note that if the bundle is not an OSGi-bundle, the URL must be prepended by the prefix "wrap:". In general, a bundle contains the header Export-Package in the manifest file META-INF/MANIFEST.MF.
-
-    ```sh
-    <feature name="xipki-jdbc" description="JDBC drivers">
-      ...
-      <bundle start-level="75">wrap:file:..</bundle>
-    </feature>
-    ```
-
-4. Configure PKCS#11 device (optional)
+3. Configure PKCS#11 device (optional)
 
    This step is only required if the real PKCS#11 device instead of the emulator is used.
 
@@ -173,7 +110,7 @@ Install
     ```
   * In file xipki/security/pkcs11-conf-hsm.xml, change the PKCS#11 configuration.
 
-5. Configure how to handle SSL client certificate (optional)
+4. Configure how to handle SSL client certificate (optional)
 
   This step is only required if the CA is behind a reverse proxy apache httpd.
 
@@ -196,8 +133,39 @@ Install
       * [Jetty: Tricks to do client certificate authentications behind a reverse proxy](http://www.zeitoun.net/articles/client-certificate-x509-authentication-behind-reverse-proxy/start)
       * [Apache Module mod_ssl](http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#envvars)
 
-Setup CA and OCSP Responder
------
+5. Add JDBC drivers (optional)
+
+  This step is only required if you want to use database other than H2.
+
+Database Software | Driver | Download URL
+------------------|--------|-------------
+Oracle | ojdbc7.jar | http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html
+DB2 | db2jcc4.jar |
+MySQL | mysql-connector-java.jar | https://dev.mysql.com/downloads/connector/j, In debian, use the `mysql-connector-java.jar` from the package `libmysql-java` (e.g. under /usr/share/java/mysql-connector-java.jar)
+MariaDB | mariadb-java-client-`<version>`.jar | https://downloads.mariadb.org/connector-java/
+PostgreSQL | postgresql-`<version>`.jar | https://jdbc.postgresql.org/download.html
+HSQLDB | hsqldb-`<version>`.jar | hsqldb.org
+
+  * Copy the jar file to the folder `lib/jdbc`.
+
+  * Append the bundle URL to the feature `xipki-jdbc` in the file `lib/jdbc/features.xml`, And comment the unneeded jdbc drivers.
+
+    ```sh
+    <feature name="xipki-jdbc" description="JDBC drivers">
+      ...
+      <bundle start-level="75">file:lib/jdbc/....jar</bundle>
+    </feature>
+    ```
+    Note that if the bundle is not an OSGi-bundle, the URL must be prepended by the prefix "wrap:". In general, a bundle contains the header Export-Package in the manifest file META-INF/MANIFEST.MF.
+
+    ```sh
+    <feature name="xipki-jdbc" description="JDBC drivers">
+      ...
+      <bundle start-level="75">wrap:file:..</bundle>
+    </feature>
+    ```
+
+## Setup CA and OCSP Responder
 
 1. Prepare the configuration and scripts
 
@@ -205,18 +173,18 @@ Setup CA and OCSP Responder
   RSA keys which will be generated during the installation process, and the keys
   are saved in PKCS#12 keystore.
 
- * If you use the existing CA certificate and OCSP Responder certificate
+  - If you use the existing CA certificate and OCSP Responder certificate
 
-   1. Copy the CA certificate and the OCSP responder certificate to the directory
+     - Copy the CA certificate and the OCSP responder certificate to the directory
       `$XIPKI_HOME/xipki/setup/keycerts`.
 
-   2. In case of the key and certificate are saved in PKCS#12 keystore file,
+     - In case of the key and certificate are saved in PKCS#12 keystore file,
       copy the PKCS#12 files to the directory `$XIPKI_HOME/xipki/setup/keycerts`.
       Note that the key and certificate must be under the same alias in keystore.
 
-   3. Adapt the CA configuration file `$XIPKI_HOME/xipki/setup/cacert-present-ca-conf.xml` and the client scripts in `$XIPKI_HOME/xipki/client-script`
+     - Adapt the CA configuration file `$XIPKI_HOME/xipki/setup/cacert-present-ca-conf.xml` and the client scripts in `$XIPKI_HOME/xipki/client-script`
 
- * If you use non-RSA keys (e.g. EC and DSA) or PKCS#11 device, adapt the CA configuration file `$XIPKI_HOME/xipki/setup/cacert-none-ca-conf.xml` and the client scripts in `$XIPKI_HOME/xipki/setup/cacert-none-setup.script`
+ - If you use non-RSA keys (e.g. EC and DSA) or PKCS#11 device, adapt the CA configuration file `$XIPKI_HOME/xipki/setup/cacert-none-ca-conf.xml` and the scripts in `$XIPKI_HOME/xipki/setup/cacert-none-setup.script`
 
 2. Start XiPKI
 
@@ -244,12 +212,11 @@ Setup CA and OCSP Responder
    `ca-info MYCA1`
 
 4. Test the installation (otpional)  
-  To verify that the CA and OCSP responder, execute the following commands in the OSGi console: 
-  - `source file:./xipki/client-script/cmp-client.script` 
+  To verify that the CA and OCSP responder, execute the following commands in the OSGi console:
+  - `source file:./xipki/client-script/cmp-client.script`
   - `source file:./xipki/client-script/rest-client.script`
 
-Enroll/Revoke Certificate
------
+## Enroll/Revoke Certificate
 
 * Embedded karaf commands  
   The karaf feature xipki-caclient-shell contains commands to to enroll/revoke
@@ -258,6 +225,7 @@ Enroll/Revoke Certificate
 
 * SCEP  
   Any SCEP client. XiPKI provides also a SCEP client in ([xipki/xipki-sdk](https://github.com/xipki/xipki-sdk)).
+
 * XiPKI SDK  
   The stand-alone SDK ([xipki/xipki-sdk](https://github.com/xipki/xipki-sdk))
   can be used to enroll and revoke certificates via CMP and RESTFUL API.
