@@ -159,10 +159,9 @@ HSQLDB | hsqldb-`<version>`.jar | hsqldb.org
   RSA keys which will be generated during the installation process, and the keys
   are saved in PKCS#12 keystore.
 
-  - If you use the existing CA certificate and OCSP Responder certificate
+  - If you use the existing CA certificate, OCSP Responder certificate, and SCEP certificate
 
-     - Copy the CA certificate and the OCSP responder certificate to the directory
-      `$XIPKI_HOME/xipki/setup/keycerts`.
+     - Copy the certificates to the directory to `$XIPKI_HOME/xipki/setup/keycerts`.
 
      - In case of the key and certificate are saved in PKCS#12 keystore file,
       copy the PKCS#12 files to the directory `$XIPKI_HOME/xipki/setup/keycerts`.
