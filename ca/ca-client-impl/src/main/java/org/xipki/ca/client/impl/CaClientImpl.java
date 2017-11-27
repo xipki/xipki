@@ -442,8 +442,8 @@ public final class CaClientImpl implements CaClient {
             X509CmpRequestor cmpRequestor;
             if (requestorSigners.containsKey(requestorName)) {
                 cmpRequestor = new DefaultHttpX509CmpRequestor(requestorSigners.get(requestorName),
-                        ca.responder(), ca.url(), securityFactory,
-                        requestorSignRequests.get(requestorName));
+                        ca.responder(), ca.url(), securityFactory);
+                cmpRequestor.setSignRequest(requestorSignRequests.get(requestorName));
             } else if (requestorCerts.containsKey(requestorName)) {
                 cmpRequestor = new DefaultHttpX509CmpRequestor(requestorCerts.get(requestorName),
                         ca.responder(), ca.url(), securityFactory);

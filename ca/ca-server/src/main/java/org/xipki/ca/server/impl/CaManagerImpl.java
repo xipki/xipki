@@ -2926,16 +2926,26 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
         asssertMasterMode();
 
         String name = scepEntry.name();
+        NameId caId = scepEntry.caIdent();
         Boolean active = scepEntry.isActive();
         String type = scepEntry.responderType();
         String conf = scepEntry.responderConf();
         String base64Cert = scepEntry.base64Cert();
         String control = scepEntry.control();
-        if (type == null && conf == null && base64Cert == null && control == null) {
+
+        if (caId == null && type == null && conf == null && base64Cert == null && control == null) {
             return false;
         }
 
-        Scep scep = queryExecutor.changeScep(name, scepEntry.caIdent(), active,
+        if (caId != null && caId.id() == null) {
+            String caName = caId.name();
+            caId = idNameMap.ca(caName);
+            if (caId == null) {
+                throw new CaMgmtException("Unknown CA '" + caName);
+            }
+        }
+
+        Scep scep = queryExecutor.changeScep(name, caId, active,
                 type, conf, base64Cert, scepEntry.certProfiles(), control, this);
         if (scep == null) {
             return false;
@@ -3739,17 +3749,21 @@ public class CaManagerImpl implements CaManager, CmpResponderManager, ScepManage
             if (CollectionUtil.isNonEmpty(scepDbEntries)) {
                 List<ScepType> list = new LinkedList<>();
                 for (String name : scepDbEntries.keySet()) {
-                    if (!includeCaNames.contains(name)) {
+                    ScepEntry entry = scepDbEntries.get(name);
+                    String caName = entry.caIdent().name();
+                    if (!includeCaNames.contains(caName)) {
                         continue;
                     }
-                    ScepEntry entry = scepDbEntries.get(name);
+
                     ScepType jaxb = new ScepType();
-                    jaxb.setCaName(name);
+                    jaxb.setName(name);
+                    jaxb.setCaName(caName);
                     jaxb.setResponderType(entry.responderType());
                     jaxb.setResponderConf(createFileOrValue(zipStream, entry.responderConf(),
                             "files/scep-" + name + ".conf"));
                     jaxb.setResponderCert(createFileOrBase64Value(zipStream, entry.base64Cert(),
                             "files/scep-" + name + ".der"));
+                    jaxb.setProfiles(createStrings(entry.certProfiles()));
                     jaxb.setControl(entry.control());
 
                     list.add(jaxb);

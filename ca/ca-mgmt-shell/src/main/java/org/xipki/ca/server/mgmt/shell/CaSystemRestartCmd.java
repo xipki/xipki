@@ -59,13 +59,13 @@ public class CaSystemRestartCmd extends CaCommandSupport {
 
         sb.append("  successful CAs:\n");
         String prefix = "    ";
-        printCaNams(sb, caManager.getSuccessfulCaNames(), prefix);
+        printCaNames(sb, caManager.getSuccessfulCaNames(), prefix);
 
         sb.append("  failed CAs:\n");
-        printCaNams(sb, caManager.getFailedCaNames(), prefix);
+        printCaNames(sb, caManager.getFailedCaNames(), prefix);
 
         sb.append("  inactive CAs:\n");
-        printCaNams(sb, caManager.getInactiveCaNames(), prefix);
+        printCaNames(sb, caManager.getInactiveCaNames(), prefix);
 
         println(sb.toString());
         return null;

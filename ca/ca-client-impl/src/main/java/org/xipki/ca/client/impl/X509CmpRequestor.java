@@ -163,8 +163,8 @@ abstract class X509CmpRequestor extends CmpRequestor {
     }
 
     X509CmpRequestor(final ConcurrentContentSigner requestor, final CmpResponder responder,
-            final SecurityFactory securityFactory, final boolean signRequest) {
-        super(requestor, responder, securityFactory, signRequest);
+            final SecurityFactory securityFactory) {
+        super(requestor, responder, securityFactory);
         xmlDocBuilder = newDocumentBuilder();
     }
 

@@ -1945,7 +1945,12 @@ class CaManagerQueryExecutor {
                 ps.setString(idxControl, txt);
             }
 
-            ps.setInt(index.get(), caIdent.id());
+            if (idxCa != null) {
+                sb.append("ca: ").append(caIdent);
+                ps.setInt(idxCa, caIdent.id());
+            }
+
+            ps.setString(index.get(), name);
             ps.executeUpdate();
 
             final int sbLen = sb.length();

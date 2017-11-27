@@ -389,6 +389,11 @@ abstract class CmpResponder {
             respHeader.setTransactionID(tid);
         }
 
+        ASN1OctetString senderNonce = requestHeader.getSenderNonce();
+        if (senderNonce != null) {
+            respHeader.setRecipNonce(senderNonce);
+        }
+
         PKIStatusInfo status = generateRejectionStatus(failureCode, statusText);
         ErrorMsgContent error = new ErrorMsgContent(status);
         PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, error);

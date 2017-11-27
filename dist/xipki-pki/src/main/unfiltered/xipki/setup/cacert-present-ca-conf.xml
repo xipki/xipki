@@ -61,6 +61,12 @@
         <file>${profiles.dir}/Certprofile_OCSP.xml</file>
       </conf>
     </profile>
+    <profile name="SCEP">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_SCEP.xml</file>
+      </conf>
+    </profile>
     <profile name="TLS">
       <type>XML</type>
       <conf>
@@ -108,8 +114,9 @@
         <str>MYCA</str>
       </aliases>
       <profiles>
-        <str>SubCA</str>
+        <!--str>SubCA</str-->
         <str>OCSP</str>
+        <str>SCEP</str>
         <str>TLS</str>
         <str>TLS_C</str>
       </profiles>
@@ -128,4 +135,18 @@
       </publishers>
     </ca>
   </cas>
+  <sceps>
+    <scep>
+      <name>SCEP1</name>
+      <caName>MYCA1</caName>
+      <responderType>PKCS12</responderType>
+      <responderConf>
+        <value>password=1234,keystore=file:xipki/setup/keycerts/SCEP1.p12</value>
+      </responderConf>
+      <profiles>
+        <str>ALL</str>
+      </profiles>
+      <control>caCert.included=false,signerCert.included=true,support.getcrl=true</control>
+    </scep>
+  </sceps>
 </CAConf>

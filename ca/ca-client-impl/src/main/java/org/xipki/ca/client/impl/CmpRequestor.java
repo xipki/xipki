@@ -101,8 +101,6 @@ abstract class CmpRequestor {
 
     protected final SecurityFactory securityFactory;
 
-    protected boolean signRequest;
-
     private final Random random = new Random();
 
     private final ConcurrentContentSigner requestor;
@@ -115,6 +113,8 @@ abstract class CmpRequestor {
 
     private final X500Name recipientName;
 
+    private boolean signRequest;
+
     private boolean sendRequestorCert;
 
     public CmpRequestor(final X509Certificate requestorCert, final CmpResponder responder,
@@ -123,7 +123,6 @@ abstract class CmpRequestor {
         this.responder = ParamUtil.requireNonNull("responder", responder);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
         this.requestor = null;
-        this.signRequest = false;
 
         X500Name x500Name = X500Name.getInstance(
                 requestorCert.getSubjectX500Principal().getEncoded());
@@ -137,18 +136,12 @@ abstract class CmpRequestor {
 
     public CmpRequestor(final ConcurrentContentSigner requestor,
             final CmpResponder responder, final SecurityFactory securityFactory) {
-        this(requestor, responder, securityFactory, true);
-    }
-
-    public CmpRequestor(ConcurrentContentSigner requestor, final CmpResponder responder,
-            final SecurityFactory securityFactory, final boolean signRequest) {
         this.requestor = ParamUtil.requireNonNull("requestor", requestor);
         if (requestor.getCertificate() == null) {
             throw new IllegalArgumentException("requestor without certificate is not allowed");
         }
         this.responder = ParamUtil.requireNonNull("responder", responder);
         this.securityFactory = ParamUtil.requireNonNull("securityFactory", securityFactory);
-        this.signRequest = signRequest;
 
         X500Name x500Name = X500Name.getInstance(
                 requestor.getCertificate().getSubjectX500Principal().getEncoded());
@@ -217,8 +210,24 @@ abstract class CmpRequestor {
             throw new CmpRequestorException(ex.getMessage(), ex);
         }
 
+        PKIHeader reqHeader = request.getHeader();
         PKIHeader respHeader = response.getHeader();
-        ASN1OctetString tid = respHeader.getTransactionID();
+
+        ASN1OctetString tid = reqHeader.getTransactionID();
+        ASN1OctetString respTid = respHeader.getTransactionID();
+        if (!tid.equals(respTid)) {
+            LOG.warn("Response contains different tid ({}) than requested {}", respTid, tid);
+            throw new CmpRequestorException("Response contains differnt tid than the request");
+        }
+
+        ASN1OctetString senderNonce = reqHeader.getSenderNonce();
+        ASN1OctetString respRecipientNonce = respHeader.getRecipNonce();
+        if (!senderNonce.equals(respRecipientNonce)) {
+            LOG.warn("tid {}: response.recipientNonce ({}) != request.senderNonce ({})",
+                    tid, respRecipientNonce, senderNonce);
+            throw new CmpRequestorException("Response contains differnt tid than the request");
+        }
+
         GeneralName rec = respHeader.getRecipient();
         if (!sender.equals(rec)) {
             LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
@@ -362,6 +371,8 @@ abstract class CmpRequestor {
         ASN1OctetString tmpTid = (tid == null) ? new DEROctetString(randomTransactionId()) : tid;
         hdrBuilder.setTransactionID(tmpTid);
 
+        hdrBuilder.setSenderNonce(randomSenderNonce());
+
         List<InfoTypeAndValue> itvs = new ArrayList<>(2);
         if (addImplictConfirm) {
             itvs.add(CmpUtil.getImplictConfirmGeneralInfo());
@@ -399,6 +410,12 @@ abstract class CmpRequestor {
         byte[] tid = new byte[20];
         random.nextBytes(tid);
         return tid;
+    }
+
+    private byte[] randomSenderNonce() {
+        byte[] bytes = new byte[16];
+        random.nextBytes(bytes);
+        return bytes;
     }
 
     private ProtectionVerificationResult verifyProtection(final String tid,
@@ -507,6 +524,14 @@ abstract class CmpRequestor {
 
     public void setSendRequestorCert(final boolean sendRequestorCert) {
         this.sendRequestorCert = sendRequestorCert;
+    }
+
+    public boolean isSignRequest() {
+        return signRequest;
+    }
+
+    public void setSignRequest(boolean signRequest) {
+        this.signRequest = signRequest;
     }
 
 }

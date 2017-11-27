@@ -59,9 +59,13 @@ public class ScepControl {
 
     public static final String KEY_SIGNERCERT_INCLUDED = "signerCert.included";
 
+    public static final String KEY_SUPPORT_GETCRL = "support.getcrl";
+
     private boolean includeCaCert = true;
 
     private boolean includeSignerCert = true;
+
+    private boolean supportGetCrl = false;
 
     public ScepControl(final String conf) throws InvalidConfException {
         if (StringUtil.isBlank(conf)) {
@@ -77,6 +81,7 @@ public class ScepControl {
 
         this.includeCaCert = getBoolean(props, KEY_CACERT_INCLUDED, true);
         this.includeSignerCert = getBoolean(props, KEY_SIGNERCERT_INCLUDED, true);
+        this.supportGetCrl = getBoolean(props, KEY_SUPPORT_GETCRL, false);
     }
 
     public String conf() {
@@ -87,7 +92,7 @@ public class ScepControl {
         return pairs.getEncoded();
     }
 
-    public boolean isIncludeCaCert() {
+    public boolean includeCaCert() {
         return includeCaCert;
     }
 
@@ -95,12 +100,20 @@ public class ScepControl {
         this.includeCaCert = includeCaCert;
     }
 
-    public boolean isIncludeSignerCert() {
+    public boolean includeSignerCert() {
         return includeSignerCert;
     }
 
     public void setIncludeSignerCert(final boolean includeSignerCert) {
         this.includeSignerCert = includeSignerCert;
+    }
+
+    public boolean supportGetCrl() {
+        return supportGetCrl;
+    }
+
+    public void setSupportGetCrl(final boolean supportGetCrl) {
+        this.supportGetCrl = supportGetCrl;
     }
 
     @Override

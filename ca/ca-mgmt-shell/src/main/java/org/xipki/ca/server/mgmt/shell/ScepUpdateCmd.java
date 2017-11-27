@@ -76,9 +76,7 @@ public class ScepUpdateCmd extends CaCommandSupport {
     private String name;
 
     @Option(name = "--ca",
-            required = true,
-            description = "CA name\n"
-                    + "(required)")
+            description = "CA name")
     @Completion(CaNameCompleter.class)
     private String caName;
 
@@ -124,7 +122,7 @@ public class ScepUpdateCmd extends CaCommandSupport {
         }
         String tmpRespType = responderType;
         if (tmpRespType == null) {
-            ScepEntry entry = caManager.getScepEntry(caName);
+            ScepEntry entry = caManager.getScepEntry(name);
             if (entry == null) {
                 throw new IllegalCmdParamException("please specify the responderType");
             }
@@ -192,7 +190,7 @@ public class ScepUpdateCmd extends CaCommandSupport {
         }
 
         boolean bo = caManager.changeScep(entry);
-        output(bo, "updated", "could not update", "SCEP responder " + caName);
+        output(bo, "updated", "could not update", "SCEP responder " + name);
         return null;
     } // method execute0
 

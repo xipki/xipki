@@ -5,6 +5,9 @@ CA_SUBJECT="CN=MYCA1,O=xipki,C=DE"
 OCSP_SUBJECT="CN=OCSP1,O=xipki,C=DE"
 
 # Please adapt me
+SCEP_SUBJECT="CN=SCEP1,O=xipki,C=DE"
+
+# Please adapt me
 HASH = SHA256
 
 KEYCERTS_DIR = xipki/setup/keycerts
@@ -25,13 +28,14 @@ xipki-ca:restart
 ## Choice: PKCS#12 CA Key
 
 # comment in for PKCS12.RSA
-xipki-tk:rsa-p12 --password 1234 --out $KEYCERTS_DIR/MYCA1.p12 --key-size 2048
+xipki-tk:rsa-p12 --password 1234 --out ${KEYCERTS_DIR}/MYCA1.p12 --key-size 2048
 
 # comment in for PKCS12.EC
-#xipki-tk:ec-p12 --password 1234 --out $KEYCERTS_DIR/MYCA1.p12 --curve secp256r1
+#xipki-tk:ec-p12 --password 1234 --out ${KEYCERTS_DIR}/MYCA1.p12 --curve secp256r1
 
 # comment in for PKCS12
-xipki-tk:req-p12 --hash $HASH --p12 $KEYCERTS_DIR/MYCA1.p12 --password 1234 --out $KEYCERTS_DIR/MYCA1.csr --subject "${CA_SUBJECT}"
+xipki-tk:req-p12 --hash $HASH --p12 ${KEYCERTS_DIR}/MYCA1.p12 --password 1234 \
+  --out ${KEYCERTS_DIR}/MYCA1.csr --subject "${CA_SUBJECT}"
 
 ## Choice : PKCS#11 CA Key
 # comment in for PKCS11.RSA
@@ -41,7 +45,8 @@ xipki-tk:req-p12 --hash $HASH --p12 $KEYCERTS_DIR/MYCA1.p12 --password 1234 --ou
 #xipki-tk:ec  --slot 0 --label MYCA1 --curve secp256r1
 
 # comment in for PKCS11
-#xipki-tk:req --hash $HASH --slot 0 --label MYCA1 --out $KEYCERTS_DIR/MYCA1.csr --subject "${CA_SUBJECT}"
+#xipki-tk:req --hash $HASH --slot 0 --label MYCA1 \
+#  --out ${KEYCERTS_DIR}/MYCA1.csr --subject "${CA_SUBJECT}"
 
 echo "#################################################################"
 echo "#                   Load cacert-none-ca-conf.xml                #"
@@ -49,25 +54,53 @@ echo "#################################################################"
 
 xipki-ca:load-conf --conf-file xipki/setup/cacert-none-ca-conf.xml
 
-## Update the certificate in the device
-xipki-tk:update-cert-p12 --p12 $KEYCERTS_DIR/MYCA1.p12 --password 1234 --cert $KEYCERTS_DIR/MYCA1.der
+echo "# Update the certificate in the device"
+xipki-tk:update-cert-p12 --p12 ${KEYCERTS_DIR}/MYCA1.p12 --password 1234 \
+  --cert ${KEYCERTS_DIR}/MYCA1.der
 
-## Generate keys and CSR for OCSPResponder
-
-xipki-tk:rsa-p12 --key-size 2048 --password 1234 --out $KEYCERTS_DIR/OCSP1.p12 --subject "CN=Dummy"
-
-xipki-tk:req-p12 --hash $HASH --p12 $KEYCERTS_DIR/OCSP1.p12 --password 1234 --out $KEYCERTS_DIR/OCSP1.csr --subject "${OCSP_SUBJECT}"
-
-xipki-ca:enroll-cert --ca MYCA1 --csr $KEYCERTS_DIR/OCSP1.csr --out $KEYCERTS_DIR/OCSP1.der --profile OCSP
-
-xipki-tk:update-cert-p12 --p12 $KEYCERTS_DIR/OCSP1.p12 --password 1234 --cert $KEYCERTS_DIR/OCSP1.der --ca-cert $KEYCERTS_DIR/MYCA1.der
-
-## add user
+echo "# add user"
 xipki-ca:user-add --name user1 --password password1
   
 xipki-ca:causer-add --user user1 --ca MYCA1 --profile ALL --permission ALL
 
-## Restart OCSP server
+echo "# Generate key and certificate for SCEP"
+
+xipki-tk:rsa-p12 --key-size 2048 --password 1234 \
+  --out ${KEYCERTS_DIR}/SCEP1.p12 --subject "CN=Dummy"
+
+xipki-tk:req-p12 --hash $HASH --p12 ${KEYCERTS_DIR}/SCEP1.p12 --password 1234 \
+  --out ${KEYCERTS_DIR}/SCEP1.csr --subject "${SCEP_SUBJECT}"
+
+xipki-ca:enroll-cert --ca MYCA1 --csr ${KEYCERTS_DIR}/SCEP1.csr \
+  --out ${KEYCERTS_DIR}/SCEP1.der --profile SCEP
+
+xipki-tk:update-cert-p12 --p12 ${KEYCERTS_DIR}/SCEP1.p12 --password 1234 \
+  --cert ${KEYCERTS_DIR}/SCEP1.der --ca-cert ${KEYCERTS_DIR}/MYCA1.der
+
+echo "# add SCEP"
+xipki-ca:scep-add --name SCEP1 --ca MYCA1 --profile ALL --resp-type PKCS12 \
+  --resp-conf password=1234,keystore=file:${KEYCERTS_DIR}/SCEP1.p12 \
+  --control caCert.included=false,signerCert.included=true,support.getcrl=true
+
+echo "# Generate key and certificate for OCSPResponder"
+
+xipki-tk:rsa-p12 --key-size 2048 --password 1234 \
+  --out ${KEYCERTS_DIR}/OCSP1.p12 --subject "CN=Dummy"
+
+xipki-tk:req-p12 --hash $HASH --p12 ${KEYCERTS_DIR}/OCSP1.p12 --password 1234 \
+  --out ${KEYCERTS_DIR}/OCSP1.csr --subject "${OCSP_SUBJECT}"
+
+xipki-ca:enroll-cert --ca MYCA1 --csr ${KEYCERTS_DIR}/OCSP1.csr \
+  --out ${KEYCERTS_DIR}/OCSP1.der --profile OCSP
+
+xipki-tk:update-cert-p12 --p12 ${KEYCERTS_DIR}/OCSP1.p12 --password 1234 \
+  --cert ${KEYCERTS_DIR}/OCSP1.der --ca-cert ${KEYCERTS_DIR}/MYCA1.der
+
+echo "create initial CRL"
+xipki-ca:gencrl --ca MYCA1
+
+echo "# Restart OCSP server"
+
 feature:uninstall xipki-ocspserver
 
 feature:install xipki-ocspserver

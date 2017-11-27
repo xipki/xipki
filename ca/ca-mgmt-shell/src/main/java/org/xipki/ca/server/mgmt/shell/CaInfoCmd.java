@@ -58,7 +58,7 @@ public class CaInfoCmd extends CaCommandSupport {
 
     @Argument(index = 0, name = "name", description = "CA name")
     @Completion(CaNameCompleter.class)
-    private String caName;
+    private String name;
 
     @Option(name = "--verbose", aliases = "-v",
             description = "show CA information verbosely")
@@ -67,27 +67,27 @@ public class CaInfoCmd extends CaCommandSupport {
     @Override
     protected Object execute0() throws Exception {
         StringBuilder sb = new StringBuilder();
-        if (caName == null) {
+        if (name == null) {
             sb.append("successful CAs:\n");
             String prefix = "  ";
-            printCaNams(sb, caManager.getSuccessfulCaNames(), prefix);
+            printCaNames(sb, caManager.getSuccessfulCaNames(), prefix);
 
             sb.append("failed CAs:\n");
-            printCaNams(sb, caManager.getFailedCaNames(), prefix);
+            printCaNames(sb, caManager.getFailedCaNames(), prefix);
 
             sb.append("inactive CAs:\n");
-            printCaNams(sb, caManager.getInactiveCaNames(), prefix);
+            printCaNames(sb, caManager.getInactiveCaNames(), prefix);
         } else {
-            CaEntry entry = caManager.getCa(caName);
+            CaEntry entry = caManager.getCa(name);
             if (entry == null) {
-                throw new CmdFailure("could not find CA '" + caName + "'");
+                throw new CmdFailure("could not find CA '" + name + "'");
             } else {
                 if (CaStatus.ACTIVE == entry.status()) {
                     boolean started = caManager.getSuccessfulCaNames().contains(
                             entry.ident().name());
                     sb.append("started: ").append(started).append("\n");
                 }
-                Set<String> aliases = caManager.getAliasesForCa(caName);
+                Set<String> aliases = caManager.getAliasesForCa(name);
                 sb.append("aliases: ").append(toString(aliases)).append("\n");
                 sb.append(entry.toString(verbose.booleanValue()));
             }

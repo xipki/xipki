@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Please adapt the URL
-BASE_URL="https://localhost:8443/rest/SubCAwithCRL"
+BASE_URL="https://localhost:8443/rest/subcawithcrl"
 CACERT="output/SubCAwithCRL1.der"
 
 echo "base url: ${BASE_URL}"

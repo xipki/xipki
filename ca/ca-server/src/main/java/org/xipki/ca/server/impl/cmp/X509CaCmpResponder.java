@@ -270,6 +270,10 @@ public class X509CaCmpResponder extends CmpResponder {
         PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
                 reqHeader.getPvno().getValue().intValue(), getSender(), reqHeader.getSender());
         respHeader.setTransactionID(tid);
+        ASN1OctetString senderNonce = reqHeader.getSenderNonce();
+        if (senderNonce != null) {
+            respHeader.setRecipNonce(senderNonce);
+        }
 
         PKIBody respBody;
         PKIBody reqBody = message.getBody();

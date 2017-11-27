@@ -178,8 +178,9 @@ public class Scep {
         } catch (InvalidConfException ex) {
             throw new CaMgmtException(ex);
         }
-        LOG.info("SCEP {}: caCert.included={}, signerCert.included={}", this.caIdent,
-                this.control.isIncludeCaCert(), this.control.isIncludeSignerCert());
+        LOG.info("SCEP {}: caCert.included={}, signerCert.included={},support.getcrl={}",
+                this.caIdent, this.control.includeCaCert(), this.control.includeSignerCert(),
+                this.control.supportGetCrl());
 
         String type = dbEntry.responderType();
         if (!"PKCS12".equalsIgnoreCase(type) && !"JKS".equalsIgnoreCase(type)) {
@@ -637,7 +638,7 @@ public class Scep {
         try {
             X509CertificateHolder certHolder = new X509CertificateHolder(cert.getEncoded());
             cmsSignedDataGen.addCertificate(certHolder);
-            if (control.isIncludeCaCert()) {
+            if (control.includeCaCert()) {
                 refreshCa();
                 cmsSignedDataGen.addCertificate(caCert.certHolder());
             }
@@ -651,6 +652,10 @@ public class Scep {
 
     private SignedData getCrl(final X509Ca ca, final BigInteger serialNumber)
             throws FailInfoException, OperationException {
+        if (!control.supportGetCrl()) {
+            throw FailInfoException.BAD_REQUEST;
+        }
+
         CertificateList crl = ca.getBcCurrentCrl();
         if (crl == null) {
             throw FailInfoException.BAD_REQUEST;
@@ -677,7 +682,7 @@ public class Scep {
                 request.digestAlgorithm());
         ContentInfo ci;
         try {
-            X509Certificate[] cmsCertSet = control.isIncludeSignerCert()
+            X509Certificate[] cmsCertSet = control.includeSignerCert()
                     ? new X509Certificate[]{responderCert} : null;
 
             ci = response.encode(responderKey, signatureAlgorithm, responderCert, cmsCertSet,

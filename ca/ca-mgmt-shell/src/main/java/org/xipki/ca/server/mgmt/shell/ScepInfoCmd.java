@@ -34,9 +34,9 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
-import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
 import org.xipki.ca.server.mgmt.shell.completer.ScepNameCompleter;
@@ -52,22 +52,26 @@ import org.xipki.console.karaf.CmdFailure;
 @Service
 public class ScepInfoCmd extends CaCommandSupport {
 
-    @Option(name = "--ca",
-            required = true,
-            description = "SCEP CA name\n"
-                    + "(required)")
+    @Argument(index = 0, name = "name", description = "SCEP name")
     @Completion(ScepNameCompleter.class)
     private String name;
 
     @Override
     protected Object execute0() throws Exception {
-        ScepEntry scep = caManager.getScepEntry(name);
-        if (scep == null) {
-            throw new CmdFailure("could not find SCEP '" + name + "'");
+        StringBuilder sb = new StringBuilder();
+        if (name == null) {
+            sb.append("SCEPs: ");
+            sb.append(caManager.getScepNames());
+            println(sb.toString());
+        } else {
+            ScepEntry scep = caManager.getScepEntry(name);
+            if (scep == null) {
+                throw new CmdFailure("could not find SCEP '" + name + "'");
+            }
+            System.out.println(scep.toString());
         }
 
-        System.out.println(scep.toString());
         return null;
-    }
+    } // method execute0
 
 }

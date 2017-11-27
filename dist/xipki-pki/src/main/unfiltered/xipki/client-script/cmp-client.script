@@ -2,7 +2,7 @@ HASH = SHA256
 CACERT = xipki/setup/keycerts/MYCA1.der
 
 echo "#################################################################"
-echo "#              Manage certificate with CA Client                #"
+echo "#                 Manage certificate via CMP                    #"
 echo "#################################################################"
 
 feature:install xipki-caclient-shell
@@ -22,17 +22,10 @@ CN = CMPCRMF-TLS-$(date '+%Y%m%d-%H%M%S')
 
 xipki-tk:rsa-p12 --password 1234 --out "output/${CN}.p12" --subject "CN=${CN}"
 
-xipki-cli:enroll-p12 \
-  --hash $HASH \
-  --p12 output/${CN}.p12 \
-  --password 1234 \
-  --out output/${CN}.der \
-  --profile TLS \
-  --subject "CN=${CN}.xipki.org,O=xipki,C=DE" \
+xipki-cli:enroll-p12 --hash $HASH --p12 output/${CN}.p12 --password 1234 \
+  --out output/${CN}.der --profile TLS --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
 
-xipki-tk:update-cert-p12 \
-  --p12 output/${CN}.p12 \
-  --password 1234 \
+xipki-tk:update-cert-p12 --p12 output/${CN}.p12 --password 1234 \
   --cert output/${CN}.der
 
 echo "=====CMP: Enroll via CSR====="
@@ -41,21 +34,12 @@ CN = CMPCSR-TLS-$(date '+%Y%m%d-%H%M%S')
 
 xipki-tk:rsa-p12 --password 1234 --out output/${CN}.p12 --subject "CN=${CN}"
 
-xipki-tk:req-p12 \
-  --hash $HASH \
-  --p12 output/${CN}.p12 \
-  --password 1234 \
-  --subject "CN=${CN}.xipki.org,O=xipki,C=DE" \
-  --out output/${CN}.csr \
+xipki-tk:req-p12 --hash $HASH --p12 output/${CN}.p12 --password 1234 \
+  --subject "CN=${CN}.xipki.org,O=xipki,C=DE" --out output/${CN}.csr
 
-xipki-cli:csr-enroll \
-  --csr output/${CN}.csr \
-  --out output/${CN}.der \
-  --profile TLS
+xipki-cli:csr-enroll --csr output/${CN}.csr --out output/${CN}.der --profile TLS
 
-xipki-tk:update-cert-p12 \
-  --p12 output/${CN}.p12 \
-  --password 1234 \
+xipki-tk:update-cert-p12 --p12 output/${CN}.p12 --password 1234 \
   --cert output/${CN}.der
 
 echo "Current OCSP Status"
@@ -63,43 +47,31 @@ xipki-ocsp:status --issuer ${CACERT} --cert output/${CN}.der
 
 echo "=====CMP: Suspend certificate====="
 
-xipki-cli:revoke \
-  --ca MYCA \
-  --cert output/${CN}.der \
-  --reason certificateHold
+xipki-cli:revoke --ca MYCA --cert output/${CN}.der --reason certificateHold
 
 echo "Current OCSP Status"
 xipki-ocsp:status --issuer ${CACERT} --cert output/${CN}.der
 
 echo "=====CMP: Unsuspend certificate====="
 
-xipki-cli:unrevoke \
-  --ca MYCA \
-  --cert output/${CN}.der \
+xipki-cli:unrevoke --ca MYCA --cert output/${CN}.der
 
 echo "Current OCSP Status"
 xipki-ocsp:status --issuer ${CACERT} --cert output/${CN}.der
 
 echo "=====CMP: Revocate certificate====="
 
-xipki-cli:revoke \
-  --ca MYCA \
-  --cert output/${CN}.der \
-  --reason affiliationChanged
+xipki-cli:revoke --ca MYCA --cert output/${CN}.der --reason affiliationChanged
 
 echo "Current OCSP Status"
 xipki-ocsp:status --issuer ${CACERT} --cert output/${CN}.der
 
 echo "=====CMP: Generate CRL====="
 
-xipki-cli:gencrl \
-  --ca MYCA \
-  --out output/CMP-MYCA-GEN-$(date '+%Y%m%d-%H%M%S').crl
+xipki-cli:gencrl --ca MYCA --out output/CMP-MYCA-GEN-$(date '+%Y%m%d-%H%M%S').crl
 
 echo "=====CMP: Get CRL===="
-xipki-cli:getcrl \
-  --ca MYCA \
-  --out output/CMP-MYCA-GET-$(date '+%Y%m%d-%H%M%S').crl
+xipki-cli:getcrl --ca MYCA --out output/CMP-MYCA-GET-$(date '+%Y%m%d-%H%M%S').crl
 
 
 echo "#################################################################"

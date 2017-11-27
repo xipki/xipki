@@ -62,10 +62,16 @@
         <file>${profiles.dir}/Certprofile_RootCA.xml</file>
       </conf>
     </profile>
-    <profile name="SubCA">
+    <!--profile name="SubCA">
       <type>XML</type>
       <conf>
         <file>${profiles.dir}/Certprofile_SubCA.xml</file>
+      </conf>
+    </profile-->
+    <profile name="SCEP">
+      <type>XML</type>
+      <conf>
+        <file>${profiles.dir}/Certprofile_SCEP.xml</file>
       </conf>
     </profile>
     <profile name="OCSP">
@@ -131,8 +137,9 @@
         <str>MYCA</str>
       </aliases>
       <profiles>
-        <str>SubCA</str>
+        <!--str>SubCA</str-->
         <str>OCSP</str>
+        <str>SCEP</str>
         <str>TLS</str>
         <str>TLS_C</str>
       </profiles>

@@ -89,6 +89,7 @@ import org.xipki.ca.server.mgmt.api.conf.jaxb.ProfileType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.PublisherType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.RequestorType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.ResponderType;
+import org.xipki.ca.server.mgmt.api.conf.jaxb.ScepType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.StringsType;
 import org.xipki.ca.server.mgmt.api.conf.jaxb.X509CaInfoType;
 import org.xipki.ca.server.mgmt.api.x509.ScepEntry;
@@ -440,6 +441,20 @@ public class CaConf {
                 addSingleCa(singleCa);
             }
         }
+
+        // SCEPs
+        if (jaxb.getSceps() != null) {
+            for (ScepType m : jaxb.getSceps().getScep()) {
+                String name = m.getName();
+                NameId caIdent = new NameId(null, m.getCaName());
+                String responderConf = getValue(m.getResponderConf(), zipFile);
+                List<String> certProfiles = getStrings(m.getProfiles());
+                ScepEntry dbEntry = new ScepEntry(name, caIdent, true, m.getResponderType(),
+                        responderConf, null, new HashSet<>(certProfiles), m.getControl());
+                sceps.put(name, dbEntry);
+            }
+        }
+
     }
 
     public void addCmpControl(final CmpControlEntry cmpControl) {
@@ -549,7 +564,7 @@ public class CaConf {
 
     public void addScep(final ScepEntry scep) {
         ParamUtil.requireNonNull("scep", scep);
-        this.sceps.put(scep.caIdent().name(), scep);
+        this.sceps.put(scep.name(), scep);
     }
 
     public Set<String> getScepNames() {

@@ -130,7 +130,7 @@ public class ScepAddCmd extends CaCommandSupport {
         }
 
         boolean bo = caManager.addScep(entry);
-        output(bo, "added", "could not add", "SCEP responder " + caName);
+        output(bo, "added", "could not add", "SCEP responder " + name);
         return null;
     }
 

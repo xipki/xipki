@@ -1,9 +1,9 @@
 HASH = SHA256
-BASE_URL = https://localhost:8443/rest/MYCA
+BASE_URL = https://localhost:8443/rest/myca
 CACERT = xipki/setup/keycerts/MYCA1.der
 
 echo "#################################################################"
-echo "#              Manage certificate with CA Client                #"
+echo "#             Manage certificate via RESTFUL API                #"
 echo "#################################################################"
 
 # For command xipki-ocsp:status
@@ -18,16 +18,11 @@ CN = RESTFUL-TLS-$(date '+%Y%m%d-%H%M%S')
 
 xipki-tk:rsa-p12 --password 1234 --out output/${CN}.p12 --subject "CN=${CN}"
 
-xipki-tk:req-p12 \
-  --hash $HASH \
-  --p12 output/${CN}.p12 \
-  --password 1234 \
+xipki-tk:req-p12 --hash $HASH --p12 output/${CN}.p12 --password 1234 \
   --subject "CN=${CN}.xipki.org,O=xipki,C=DE" \
   --out output/${CN}.csr
 
-xipki-cmd:curl \
-  --out output/${CN}.der \
-  --data-file output/${CN}.csr \
+xipki-cmd:curl --out output/${CN}.der --data-file output/${CN}.csr \
   --header "Content-Type: application/pkcs10" \
   "$BASE_URL/enroll-cert?profile=TLS"
 
@@ -63,12 +58,10 @@ xipki-ocsp:status --issuer ${CACERT} --cert output/${CN}.der --verbose
 echo "=====CMP: Generate CRL====="
 
 xipki-cmd:curl \
-  --out output/RESTFUL-MYCA-GEN-$(date '+%Y%m%d-%H%M%S').crl \
-  $BASE_URL/new-crl
+  --out output/RESTFUL-MYCA-GEN-$(date '+%Y%m%d-%H%M%S').crl $BASE_URL/new-crl
 
 xipki-cmd:curl \
-  --out output/RESTFUL-MYCA-GET-$(date '+%Y%m%d-%H%M%S').crl \
-  $BASE_URL/crl
+  --out output/RESTFUL-MYCA-GET-$(date '+%Y%m%d-%H%M%S').crl $BASE_URL/crl
 
 echo "#################################################################"
 echo "#              Uninstall unneeded features                      #"

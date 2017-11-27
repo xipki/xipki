@@ -1,0 +1,83 @@
+HASH = SHA256
+
+URL = http://localhost:8080/scep/scep1/tls/pkiclient.exe
+	
+CACERT = xipki/setup/keycerts/MYCA1.der
+
+echo "#################################################################"
+echo "#               Enroll Certificate via SCEP                     #"
+echo "#################################################################"
+
+feature:install xipki-scepclient-shell
+
+echo "=====SCEP: Enroll (self-signed identity cert) ====="
+
+CN = SCEP-TLS-$(date '+%Y%m%d-%H%M%S')
+
+# Must use the same CN as in the CSR
+xipki-tk:rsa-p12 --password 1234 --out "output/${CN}.p12" \
+  --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
+
+xipki-tk:req-p12  --hash ${HASH} --p12 output/${CN}.p12 --password 1234 \
+  --challenge-password user1:password1 \
+  --subject "CN=${CN}.xipki.org,O=xipki,C=DE" --out output/${CN}.csr
+
+echo "# Enroll certificate via PKCSReq"
+xipki-scep:pkcs-req --url ${URL} --ca-cert ${CACERT} \
+  --p12 output/${CN}.p12 --password 1234 \
+  --csr output/${CN}.csr --out output/${CN}.der
+
+echo "# Poll Cert"
+xipki-scep:certpoll --url ${URL} --ca-cert ${CACERT} \
+  --p12 output/${CN}.p12 --password 1234 --csr output/${CN}.csr \
+  --out output/${CN}-certpoll.der
+  
+echo "# Get Cert"
+
+SERIAL = $(xipki-tk:cert-info --serial --hex --in output/${CN}-certpoll.der)
+
+xipki-scep:getcert --url ${URL} --ca-cert ${CACERT} \
+  --p12 output/${CN}.p12 --password 1234 --out output/${CN}-getcert.der \
+  --serial ${SERIAL}
+
+echo "# Update the certificate in PKCS#12 file"
+xipki-tk:update-cert-p12 --p12 output/${CN}.p12 --password 1234 \
+  --cert output/${CN}.der --ca-cert ${CACERT}
+
+echo "# Get CRL"
+xipki-scep:getcrl --url ${URL} --ca-cert ${CACERT} --cert output/${CN}.der \
+  --p12 output/${CN}.p12 --password 1234 --out output/MYCA1-scep-$(date '+%Y%m%d-%H%M%S').crl
+ 
+echo "# Renewal"
+xipki-tk:rsa-p12 --password 1234 --out "output/${CN}-2.p12" --subject "CN=Dummy"
+
+xipki-tk:req-p12 --hash ${HASH} --p12 output/${CN}-2.p12 --password 1234 \
+  --subject "CN=${CN}-2.xipki.org,O=xipki,C=DE" --out output/${CN}-2.csr
+
+echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
+xipki-scep:renewal-req --url ${URL} --ca-cert ${CACERT} \
+  --p12 output/${CN}.p12 --password 1234 \
+  --csr output/${CN}-2.csr --out output/${CN}-2.der
+
+echo "# Update the certificate in PKCS#12 file"
+xipki-tk:update-cert-p12 --p12 output/${CN}-2.p12 --password 1234 \
+  --cert output/${CN}-2.der --ca-cert ${CACERT}
+
+echo "# Renewal with different CommonName"
+xipki-tk:rsa-p12 --password 1234 --out "output/${CN}-3.p12" --subject "CN=Dummy"
+
+xipki-tk:req-p12 --hash ${HASH} --p12 output/${CN}-3.p12 --password 1234 \
+  --subject "CN=${CN}-3.xipki.org,O=xipki,C=DE" --out output/${CN}-3.csr
+
+echo "# Enroll certificate via Renewal, hence signed by the old key ${CN}.p12"
+xipki-scep:renewal-req --url ${URL} --ca-cert ${CACERT} --p12 output/${CN}.p12 \
+  --password 1234 --csr output/${CN}-3.csr --out output/${CN}-3.der
+
+echo "# Update the certificate in PKCS#12 file"
+xipki-tk:update-cert-p12 --p12 output/${CN}-3.p12 --password 1234 \
+  --cert output/${CN}-3.der --ca-cert ${CACERT}
+
+#################################################################
+#              Uninstall unneeded features                      #
+#################################################################
+feature:uninstall xipki-scepclient-shell

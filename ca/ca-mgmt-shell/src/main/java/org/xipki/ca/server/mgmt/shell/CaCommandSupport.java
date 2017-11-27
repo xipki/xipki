@@ -91,7 +91,7 @@ public abstract class CaCommandSupport extends XipkiCommandSupport {
         }
     }
 
-    protected void printCaNams(StringBuilder sb, Set<String> caNames, String prefix) {
+    protected void printCaNames(StringBuilder sb, Set<String> caNames, String prefix) {
         if (caNames.isEmpty()) {
             sb.append(prefix).append("-\n");
             return;

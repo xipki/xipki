@@ -60,9 +60,7 @@ public abstract class CrlCommandSupport extends CaCommandSupport {
     protected String caName;
 
     @Option(name = "--out", aliases = "-o",
-            required = true,
-            description = "where to save the CRL\n"
-                    + "(required)")
+            description = "where to save the CRL (optional)")
     @Completion(FilePathCompleter.class)
     protected String outFile;
 
@@ -86,7 +84,9 @@ public abstract class CrlCommandSupport extends CaCommandSupport {
             throw new CmdFailure("received no CRL from server");
         }
 
-        saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
+        if (outFile != null) {
+            saveVerbose("saved CRL to file", new File(outFile), crl.getEncoded());
+        }
         return null;
     }
 
