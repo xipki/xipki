@@ -200,6 +200,7 @@ HSQLDB | hsqldb-`<version>`.jar | hsqldb.org
   To verify that the CA and OCSP responder, execute the following commands in the OSGi console:
   - `source file:./xipki/client-script/cmp-client.script`
   - `source file:./xipki/client-script/rest-client.script`
+  - `source file:./xipki/client-script/scep-client.script`
 
 ## Enroll/Revoke Certificate
 
