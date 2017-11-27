@@ -75,8 +75,8 @@ class DefaultHttpX509CmpRequestor extends X509CmpRequestor {
 
     DefaultHttpX509CmpRequestor(final ConcurrentContentSigner requestor,
             final CmpResponder responder, final String serverUrl,
-            final SecurityFactory securityFactory, final boolean signRequest) {
-        super(requestor, responder, securityFactory, signRequest);
+            final SecurityFactory securityFactory) {
+        super(requestor, responder, securityFactory);
         ParamUtil.requireNonBlank("serverUrl", serverUrl);
 
         try {
