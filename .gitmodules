@@ -1,3 +1,6 @@
 [submodule "pkcs11wrapper"]
 	path = pkcs11wrapper
 	url = https://github.com/xipki/pkcs11wrapper
+[submodule "xipki-sdk"]
+	path = xipki-sdk
+	url = https://github.com/xipki/xipki-sdk
