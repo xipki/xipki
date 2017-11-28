@@ -200,9 +200,7 @@ HSQLDB | hsqldb-`<version>`.jar | hsqldb.org
   Note that it is licensed under Apache License 2, which is different from this project.
 
 * RESTFUL API  
-  The shell script `xipki/demo/rest.sh` under Linux or `xipki/demo/rest-mac.sh`
-  under Mac OS demonstrate the use of RESTFUL API. The script will create multiple
-  files, so please run this script within a new directory.
+  The shell script `xipki/client-script/rest.sh` demonstrates the use of RESTFUL API.
 
 Karaf Features
 -----
