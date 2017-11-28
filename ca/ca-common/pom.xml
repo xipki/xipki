@@ -15,7 +15,12 @@
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>security</artifactId>
-      <version>${project.version}</version>
+      <version>${xitk.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
