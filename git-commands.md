@@ -1,5 +1,8 @@
 # Submodule
 
+- Undo a local commit
+  `git reset HEAD~`
+
 - Add submodule rock to my project
   `git submodule add https://github.com/<user>/rock rock`
   
@@ -11,6 +14,17 @@
 
 
   Or `git clone <project url>` then `git submodule update --init --recursive`
+
+- Remove a submodule
+
+ 1. git submodule deinit -f -- a/submodule  
+ 2. rm -rf .git/modules/a/submodule
+ 3. git rm -f a/submodule
+  # Note: a/submodule (no trailing slash)
+  # or, if you want to leave it in your working tree and have done step 0
+ 3. git rm --cached a/submodule
+3bis mv a/submodule_tmp a/submodule
+
 
 # Remove remote tag
 
