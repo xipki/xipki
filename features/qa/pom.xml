@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.features</groupId>
     <artifactId>features-parent</artifactId>
-    <version>2.2.2-SNAPSHOT</version>
+    <version>2.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>qa</artifactId>
   <packaging>pom</packaging>
