@@ -155,7 +155,7 @@
                 <artifactItem>
                   <groupId>org.xipki</groupId>
                   <artifactId>security</artifactId>
-                  <version>${project.version}</version>
+                  <version>${xitk.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
                 </artifactItem>

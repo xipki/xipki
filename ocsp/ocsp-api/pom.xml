@@ -15,12 +15,12 @@
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>datasource</artifactId>
-      <version>${project.version}</version>
+      <version>${xitk.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>security</artifactId>
-      <version>${project.version}</version>
+      <version>${xitk.version}</version>
     </dependency>
   </dependencies>
 </project>

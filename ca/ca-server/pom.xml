@@ -23,14 +23,19 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.sdk</groupId>
+      <groupId>org.xipki</groupId>
       <artifactId>scep-common</artifactId>
-      <version>${xipki-sdk.version}</version>
+      <version>${xiscep.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>servlet-api</artifactId>
-      <version>${project.version}</version>
+      <version>${xitk.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

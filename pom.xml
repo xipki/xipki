@@ -33,7 +33,8 @@
     </developer>
   </developers>
   <properties>
-    <xipki-sdk.version>1.0.0</xipki-sdk.version>
+    <xiscep.version>2.3.0-SNAPSHOT</xiscep.version>
+    <xitk.version>2.3.0-SNAPSHOT</xitk.version>
     <karaf.version>4.1.3</karaf.version>
     <karaf-plugin.version>4.1.3</karaf-plugin.version>
     <netty.version>4.1.16.Final</netty.version>
@@ -63,22 +64,9 @@
   </repositories-->
   <modules>
     <!-- external submodules-->
-    <module>pkcs11wrapper</module>
-    <module>xipki-sdk</module>
+    <module>xiscep</module>
+    <module>xitk</module>
     <!-- project sub-modules -->
-    <module>common</module>
-    <module>audit</module>
-    <module>audit-syslog</module>
-    <module>datasource</module>
-    <module>database-tool</module>
-    <module>shell-base</module>
-    <module>password</module>
-    <module>security</module>
-    <module>security-shell</module>
-    <module>security-speed-shell</module>
-    <module>servlet-api</module>
-    <module>http-server</module>
-    <module>pkcs11-proxy-server</module>
     <module>ca</module>
     <module>ocsp</module>
     <module>scep-client-shell</module>
@@ -90,81 +78,6 @@
     <developerConnection>scm:git:git@github.com:xipki/xipki.git</developerConnection>
     <url>git@github.com:xipki/xipki.git</url>
   </scm>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-handler</artifactId>
-        <version>${netty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-codec-http</artifactId>
-        <version>${netty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-transport-native-epoll</artifactId>
-        <version>${netty.version}</version>
-        <classifier>linux-x86_64</classifier>
-      </dependency>
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-tcnative-boringssl-static</artifactId>
-        <version>${netty-tcnative.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>${bc.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xipki.iaik</groupId>
-        <artifactId>sunpkcs11-wrapper</artifactId>
-        <version>${pkcs11-wrapper.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpkix-jdk15on</artifactId>
-        <version>${bc.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.zaxxer</groupId>
-        <artifactId>HikariCP</artifactId>
-        <version>${hikaricp.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.cloudbees</groupId>
-        <artifactId>syslog-java-client</artifactId>
-        <version>${syslog-java-client.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.karaf.shell</groupId>
-        <artifactId>org.apache.karaf.shell.core</artifactId>
-        <version>${karaf.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.liquibase</groupId>
-        <artifactId>liquibase-core</artifactId>
-        <version>${liquibase.version}</version>
-      </dependency>
-      <!--dependency>
-        <groupId>com.unboundid</groupId>
-        <artifactId>unboundid-ldapsdk</artifactId>
-        <version>${ldapsdk.version}</version>
-      </dependency-->
-    </dependencies>
-  </dependencyManagement>
   <build>
     <plugins>
       <plugin>
@@ -309,19 +222,27 @@
       </plugins>
     </pluginManagement>
   </build>
-  <dependencies>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpkix-jdk15on</artifactId>
+        <version>${bc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${slf4j.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <profiles>
     <profile>
       <id>dist</id>

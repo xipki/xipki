@@ -16,14 +16,14 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.sdk</groupId>
+      <groupId>org.xipki</groupId>
       <artifactId>scep-client</artifactId>
-      <version>${xipki-sdk.version}</version>
+      <version>${xiscep.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>shell-base</artifactId>
-      <version>${project.version}</version>
+      <version>${xitk.version}</version>
     </dependency>
   </dependencies>
 </project>

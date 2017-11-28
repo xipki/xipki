@@ -20,7 +20,7 @@
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>security</artifactId>
-      <version>${project.version}</version>
+      <version>${xitk.version}</version>
     </dependency>
   </dependencies>
 </project>

@@ -18,7 +18,7 @@
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>shell-base</artifactId>
-      <version>${project.version}</version>
+      <version>${xitk.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

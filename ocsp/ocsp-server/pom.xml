@@ -20,7 +20,7 @@
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>servlet-api</artifactId>
-      <version>${project.version}</version>
+      <version>${xitk.version}</version>
     </dependency>
   </dependencies>
   <build>
