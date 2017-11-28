@@ -9,6 +9,7 @@
 - Clone the project with submodule
   `git clone --recursive <project url>`
 
+
   Or `git clone <project url>` then `git submodule update --init --recursive`
 
 # Remove remote tag
