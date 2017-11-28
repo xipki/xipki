@@ -29,20 +29,20 @@ Download the binary package `xipki-pki-<version>.tar.gz` from https://github.com
 
 Only if you want to use the development version, build it from source code as follows.
 
-1 Get a copy of XiPKI code
+1. Get a copy of XiPKI code
   ```sh
   git clone --recursive https://github.com/xipki/xipki
   ```
   The option `--recursive` is required to checkout the submodules.
 
-* Compile and install the artifacts
+2. Compile and install the artifacts
 
   In folder `xipki`
   ```sh
   mvn clean install
   ```
 
-* Assembly
+3. Assembly
 
   In folder `xipki/dist/xipki-pki`
   ```sh
