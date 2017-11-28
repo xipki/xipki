@@ -77,10 +77,17 @@ public class CanonicalizeCode {
     }
 
     private void canonicalize() throws Exception {
-        canonicalizeDir(new File(baseDir));
+        canonicalizeDir(new File(baseDir), true);
     }
 
-    private void canonicalizeDir(final File dir) throws Exception {
+    private void canonicalizeDir(final File dir, boolean root) throws Exception {
+        if (!root) {
+            // skip git submodules
+            if (new File(dir, ".git").exists()) {
+                return;
+            }
+        }
+
         File[] files = dir.listFiles();
         if (files == null) {
             return;
@@ -90,7 +97,7 @@ public class CanonicalizeCode {
             String filename = file.getName();
             if (file.isDirectory()) {
                 if (!"target".equals(filename) && !"tbd".equals(filename)) {
-                    canonicalizeDir(file);
+                    canonicalizeDir(file, false);
                 }
             } else {
                 int idx = filename.lastIndexOf('.');
@@ -172,10 +179,17 @@ public class CanonicalizeCode {
     } // method canonicalizeFile
 
     private void checkWarnings() throws Exception {
-        checkWarningsInDir(new File(baseDir));
+        checkWarningsInDir(new File(baseDir), true);
     }
 
-    private void checkWarningsInDir(final File dir) throws Exception {
+    private void checkWarningsInDir(final File dir, boolean root) throws Exception {
+        if (!root) {
+            // skip git submodules
+            if (new File(dir, ".git").exists()) {
+                return;
+            }
+        }
+
         File[] files = dir.listFiles();
         if (files == null) {
             return;
@@ -185,7 +199,7 @@ public class CanonicalizeCode {
             if (file.isDirectory()) {
                 if (!file.getName().equals("target")
                         && !file.getName().equals("tbd")) {
-                    checkWarningsInDir(file);
+                    checkWarningsInDir(file, false);
                 }
 
                 continue;
