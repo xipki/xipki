@@ -192,10 +192,10 @@ HSQLDB | hsqldb-`<version>`.jar | hsqldb.org
   certificates via SCEP. Please refer to [commands.md](commands.md) for more details.
 
 * SCEP  
-  Any SCEP client. XiPKI provides also a SCEP client in ([xipki/xipki-sdk](https://github.com/xipki/xipki-sdk)).
+  Any SCEP client. XiPKI provides also a SCEP client in [xipki/xisdk](https://github.com/xipki/xisdk).
 
 * XiPKI SDK  
-  The stand-alone SDK ([xipki/xipki-sdk](https://github.com/xipki/xipki-sdk))
+  The stand-alone SDK ([xipki/xisdk](https://github.com/xipki/xisdk))
   can be used to enroll and revoke certificates via CMP and RESTFUL API.
   Note that it is licensed under Apache License 2, which is different from this project.
 
