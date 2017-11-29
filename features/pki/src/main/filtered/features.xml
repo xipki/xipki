@@ -16,102 +16,102 @@
   </feature>
   <feature name="xipki-httpserver" version="${xitk.version}" description="HTTP server">
     <feature>netty</feature>
-    <bundle start-level="80">mvn:org.xipki/common/${xitk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/password/${xitk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/servlet-api/${xitk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/http-server/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/common/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/password/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/servlet-api/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/http-server/${xitk.version}</bundle>
   </feature>
   <feature name="xipki-security" version="${xitk.version}" description="security">
-    <bundle start-level="80">mvn:org.xipki/common/${xitk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/password/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/common/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/password/${xitk.version}</bundle>
     <bundle start-level="80">mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle start-level="80">mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/security/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/security/${xitk.version}</bundle>
   </feature>
   <feature name="xipki-shell-base" version="${xitk.version}" description="shall base">
     <feature>xipki-security</feature>
-    <bundle start-level="80">mvn:org.xipki/shell-base/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/shell-base/${xitk.version}</bundle>
   </feature>
   <feature name="xipki-datasource" version="${xitk.version}" description="datasource">
-    <bundle start-level="80">mvn:org.xipki/common/${xitk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/password/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/common/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/password/${xitk.version}</bundle>
     <bundle start-level="80">mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/datasource/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/datasource/${xitk.version}</bundle>
   </feature>
   <feature name="xipki-cabase" version="${project.version}"
       description="common feature for CA server and client">
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
-    <bundle start-level="80">mvn:org.xipki.ca/ca-common/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.ca/ca-api/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/cmp/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-caserver" version="${project.version}" description="CA server">
     <feature>xipki-cabase</feature>
-    <bundle start-level="80">mvn:org.xipki.ca/ca-certprofile-xml/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.ca/ca-mgmt-api/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/scep-common/${xiscep.version}</bundle>
-    <bundle start-level="75">mvn:org.xipki.ca/ca-server/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-mgmt-api/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.scep/scep-common/${xiscep.version}</bundle>
+    <bundle start-level="75">mvn:org.xipki.pki/ca-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}" description="CA management shell">
     <feature>xipki-caserver</feature>
     <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.ca/ca-mgmt-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-mgmt-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-caclient" version="${project.version}" description="CA client">
+  <feature name="xipki-caclient" version="${xisdk.version}" description="CA client">
     <feature>xipki-cabase</feature>
-    <bundle start-level="80">mvn:org.xipki.ca/ca-client-api/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.ca/ca-client-impl/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/ca-client-api/${xisdk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/ca-client-impl/${xisdk.version}</bundle>
   </feature>
-  <feature name="xipki-caclient-shell" version="${project.version}" description="CA client shell">
+  <feature name="xipki-caclient-shell" version="${xisdk.version}" description="CA client shell">
     <feature>xipki-caclient</feature>
     <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.ca/ca-client-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/ca-client-shell/${xisdk.version}</bundle>
   </feature>
   <feature name="xipki-security-shell" version="${xitk.version}" description="CA security shell">
     <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki/security-shell/${xitk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/security-speed-shell/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/security-shell/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/security-speed-shell/${xitk.version}</bundle>
   </feature>
-  <feature name="xipki-scepclient-shell" version="${project.version}"
+  <feature name="xipki-scepclient-shell" version="${xisdk.version}"
       description="SCEP client shell">
     <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki/scep-common/${xiscep.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/scep-client/${xiscep.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/scep-client-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.scep/scep-common/${xiscep.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.scep/scep-client/${xiscep.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/scep-client-shell/${xisdk.version}</bundle>
   </feature>
   <feature name="xipki-ocspserver" version="${project.version}" description="OCSP server">
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
-    <bundle start-level="80">mvn:org.xipki.ocsp/ocsp-api/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.ocsp/ocsp-server/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ocsp-api/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ocsp-server/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ocspclient" version="${project.version}" description="OCSP client">
+  <feature name="xipki-ocspclient" version="${xisdk.version}" description="OCSP client">
     <feature>xipki-security</feature>
-    <bundle start-level="80">mvn:org.xipki.ocsp/ocsp-client-api/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.ocsp/ocsp-client-impl/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-client-api/${xisdk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-client-impl/${xisdk.version}</bundle>
   </feature>
-  <feature name="xipki-ocspclient-shell" version="${project.version}"
+  <feature name="xipki-ocspclient-shell" version="${xisdk.version}"
       description="OCSP client shell">
     <feature>xipki-ocspclient</feature>
     <feature>xipki-shell-base</feature>
-    <bundle start-level="80">mvn:org.xipki.ocsp/ocsp-client-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/ocsp-client-shell/${xisdk.version}</bundle>
   </feature>
   <feature name="xipki-database-tool" version="${project.version}" description="Database tool">
     <feature>xipki-datasource</feature>
     <feature>xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.yaml/snakeyaml/${snakeyaml.version}</bundle>
     <bundle start-level="80">mvn:org.liquibase/liquibase-core/${liquibase.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki/database-tool/${xitk.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.ca/ca-dbtool/${project.version}</bundle>
-    <bundle start-level="80">mvn:org.xipki.ca/ca-dbtool-shell/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/database-tool/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool/${project.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.pki/ca-dbtool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit" version="${xitk.version}" description="Audit">
-    <bundle start-level="80">mvn:org.xipki/audit/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/audit/${xitk.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${xitk.version}" description="Syslog audit">
     <feature>xipki-audit</feature>
     <bundle start-level="80"><![CDATA[wrap:mvn:com.cloudbees/syslog-java-client/${syslog-java-client.version}/$Bundle-SymbolicName=syslog-java-client&Bundle-Version=${syslog-java-client.version}]]></bundle>
-    <bundle start-level="80">mvn:org.xipki/audit-syslog/${xitk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.tk/audit-syslog/${xitk.version}</bundle>
   </feature>
 </features>

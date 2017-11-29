@@ -8,7 +8,7 @@
     <artifactId>oss-parent</artifactId>
     <version>7</version>
   </parent>
-  <groupId>org.xipki</groupId>
+  <groupId>org.xipki.pki</groupId>
   <artifactId>xipki-parent</artifactId>
   <packaging>pom</packaging>
   <version>2.3.0-SNAPSHOT</version>
@@ -36,6 +36,7 @@
     <xiscep.notest>true</xiscep.notest>
     <xiscep.version>2.3.0-SNAPSHOT</xiscep.version>
     <xitk.version>2.3.0-SNAPSHOT</xitk.version>
+    <xisdk.version>2.3.0-SNAPSHOT</xisdk.version>
     <karaf.version>4.1.3</karaf.version>
     <karaf-plugin.version>4.1.3</karaf-plugin.version>
     <netty.version>4.1.16.Final</netty.version>
@@ -50,28 +51,19 @@
     <hikaricp.version>2.7.2</hikaricp.version>
     <syslog-java-client.version>1.1.2</syslog-java-client.version>
   </properties>
-  <!--repositories>
-    <repository>
-      <id>apache-snapshots</id>
-      <name>Apache Snapshots Repository</name>
-      <url>http://repository.apache.org/content/groups/snapshots-group</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories-->
   <modules>
-    <!-- external submodules-->
-    <module>xiscep</module>
-    <module>xitk</module>
-    <!-- project sub-modules -->
-    <module>ca</module>
-    <module>ocsp</module>
-    <module>scep-client-shell</module>
-    <module>jscep-client-shell</module>
+    <module>ca-certprofile-xml</module>
+    <module>ca-qa</module>
+    <module>ca-qa-shell</module>
+    <module>ca-api</module>
+    <module>ca-mgmt-api</module>
+    <module>ca-server</module>
+    <module>ca-mgmt-shell</module>
+    <module>ca-mgmt-qa-shell</module>
+    <module>ca-dbtool</module>
+    <module>ca-dbtool-shell</module>
+    <module>ocsp-api</module>
+    <module>ocsp-server</module>
     <module>features</module>
   </modules>
   <scm>

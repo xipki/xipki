@@ -4,28 +4,31 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki.ca</groupId>
-    <artifactId>ca-parent</artifactId>
+    <groupId>org.xipki.pki</groupId>
+    <artifactId>xipki-parent</artifactId>
     <version>2.3.0-SNAPSHOT</version>
   </parent>
-  <artifactId>ca-api</artifactId>
-  <name>XiPKI :: ${project.artifactId}</name>
+  <artifactId>ca-dbtool</artifactId>
   <packaging>bundle</packaging>
+  <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>cmp</artifactId>
+      <groupId>org.xipki.tk</groupId>
+      <artifactId>database-tool</artifactId>
       <version>${xitk.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>datasource</artifactId>
-      <version>${xitk.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>audit</artifactId>
+      <groupId>org.xipki.tk</groupId>
+      <artifactId>security</artifactId>
       <version>${xitk.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>
