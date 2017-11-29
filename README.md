@@ -18,6 +18,8 @@ Just drop me an email.
     ```sh
     git clone https://github.com/xipki/xiscep.git
     ```
+  - Switch to the tag version v2.3.0 (TODO)
+    `git checkout v2.3.0`
   - Build and install maven artifacts
     In the folder xiscep, call `mvn install -DskipTests`
 
@@ -28,6 +30,8 @@ Just drop me an email.
     git clone https://github.com/xipki/xitk.git
     ```
     The option `--recursive` is required to checkout the submodules.
+  - Switch to the tag version v2.3.0 (TODO)
+    `git checkout v2.3.0`
   - Build and install maven artifacts
     In the folder xitk, call `mvn install -DskipTests`
 
