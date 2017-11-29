@@ -36,7 +36,7 @@ package org.xipki.ca.client.api;
 
 import java.security.cert.Certificate;
 
-import org.xipki.ca.common.cmp.PkiStatusInfo;
+import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.common.util.ParamUtil;
 
 /**
