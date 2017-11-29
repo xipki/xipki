@@ -18,7 +18,5 @@
     <module>ocsp-client-shell</module>
     <module>ocsp-qa</module>
     <module>ocsp-qa-shell</module>
-    <module>ocsp-api</module>
-    <module>ocsp-server</module>
   </modules>
 </project>

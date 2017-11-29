@@ -64,15 +64,11 @@
     </repository>
   </repositories-->
   <modules>
-    <!-- external submodules-->
-    <module>xiscep</module>
-    <module>xitk</module>
     <!-- project sub-modules -->
     <module>ca</module>
     <module>ocsp</module>
     <module>scep-client-shell</module>
     <module>jscep-client-shell</module>
-    <module>features</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>
