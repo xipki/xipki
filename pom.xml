@@ -47,6 +47,7 @@
     <module>pkcs11wrapper</module>
     <!-- project sub-modules -->
     <module>common</module>
+    <module>cmp</module>
     <module>audit</module>
     <module>audit-syslog</module>
     <module>datasource</module>
