@@ -4,13 +4,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki</groupId>
+    <groupId>org.xipki.sdk</groupId>
     <artifactId>xisdk-parent</artifactId>
     <version>2.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>lite-caclient-example</artifactId>
   <packaging>bundle</packaging>
-  <name>XiPKI-SDK :: ${project.artifactId}</name>
+  <name>XiSDK :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
       <groupId>org.bouncycastle</groupId>
