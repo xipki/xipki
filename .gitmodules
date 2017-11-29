@@ -1,6 +1,0 @@
-[submodule "xiscep"]
-	path = xiscep
-	url = https://github.com/xipki/xiscep
-[submodule "xitk"]
-	path = xitk
-	url = https://github.com/xipki/xitk
