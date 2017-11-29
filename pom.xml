@@ -33,6 +33,7 @@
     </developer>
   </developers>
   <properties>
+    <xiscep.notest>true</xiscep.notest>
     <xiscep.version>2.3.0-SNAPSHOT</xiscep.version>
     <xitk.version>2.3.0-SNAPSHOT</xitk.version>
     <karaf.version>4.1.3</karaf.version>

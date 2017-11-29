@@ -74,11 +74,11 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.PkiErrorException;
-import org.xipki.ca.common.cmp.CmpUtf8Pairs;
-import org.xipki.ca.common.cmp.CmpUtil;
-import org.xipki.ca.common.cmp.PkiResponse;
-import org.xipki.ca.common.cmp.ProtectionResult;
-import org.xipki.ca.common.cmp.ProtectionVerificationResult;
+import org.xipki.cmp.CmpUtf8Pairs;
+import org.xipki.cmp.CmpUtil;
+import org.xipki.cmp.PkiResponse;
+import org.xipki.cmp.ProtectionResult;
+import org.xipki.cmp.ProtectionVerificationResult;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.RequestResponsePair;
 import org.xipki.common.util.CollectionUtil;
@@ -400,8 +400,8 @@ abstract class CmpRequestor {
     protected PkiErrorException buildErrorResult(final ErrorMsgContent bodyContent) {
         ParamUtil.requireNonNull("bodyContent", bodyContent);
 
-        org.xipki.ca.common.cmp.PkiStatusInfo statusInfo =
-                new org.xipki.ca.common.cmp.PkiStatusInfo(bodyContent.getPKIStatusInfo());
+        org.xipki.cmp.PkiStatusInfo statusInfo =
+                new org.xipki.cmp.PkiStatusInfo(bodyContent.getPKIStatusInfo());
         return new PkiErrorException(statusInfo.status(), statusInfo.pkiFailureInfo(),
                 statusInfo.statusMessage());
     }

@@ -13,9 +13,9 @@
   <packaging>bundle</packaging>
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>ca-common</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xipki</groupId>
+      <artifactId>cmp</artifactId>
+      <version>${xitk.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>

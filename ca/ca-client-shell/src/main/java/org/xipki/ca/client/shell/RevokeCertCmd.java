@@ -42,7 +42,7 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.api.CertIdOrError;
-import org.xipki.ca.common.cmp.PkiStatusInfo;
+import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.util.DateUtil;
 import org.xipki.console.karaf.CmdFailure;

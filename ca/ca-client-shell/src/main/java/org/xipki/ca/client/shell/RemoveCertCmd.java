@@ -39,7 +39,7 @@ import java.security.cert.X509Certificate;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.api.CertIdOrError;
-import org.xipki.ca.common.cmp.PkiStatusInfo;
+import org.xipki.cmp.PkiStatusInfo;
 import org.xipki.common.RequestResponseDebug;
 import org.xipki.console.karaf.CmdFailure;
 import org.xipki.console.karaf.IllegalCmdParamException;

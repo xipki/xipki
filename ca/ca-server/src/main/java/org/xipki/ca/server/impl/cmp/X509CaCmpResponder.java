@@ -120,8 +120,6 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestType;
 import org.xipki.ca.api.X509CertWithDbId;
 import org.xipki.ca.api.publisher.x509.X509CertificateInfo;
-import org.xipki.ca.common.cmp.CmpUtf8Pairs;
-import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.server.impl.CaAuditConstants;
 import org.xipki.ca.server.impl.CaManagerImpl;
 import org.xipki.ca.server.impl.CertTemplateData;
@@ -134,6 +132,8 @@ import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.PermissionConstants;
 import org.xipki.ca.server.mgmt.api.RequestorInfo;
+import org.xipki.cmp.CmpUtf8Pairs;
+import org.xipki.cmp.CmpUtil;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.util.Base64;
 import org.xipki.common.util.CollectionUtil;
@@ -344,8 +344,8 @@ public class X509CaCmpResponder extends CmpResponder {
             ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
 
             AuditStatus auditStatus = AuditStatus.FAILED;
-            org.xipki.ca.common.cmp.PkiStatusInfo pkiStatus =
-                    new org.xipki.ca.common.cmp.PkiStatusInfo(
+            org.xipki.cmp.PkiStatusInfo pkiStatus =
+                    new org.xipki.cmp.PkiStatusInfo(
                             errorMsgContent.getPKIStatusInfo());
 
             if (pkiStatus.pkiFailureInfo() == PKIFailureInfo.systemFailure) {
