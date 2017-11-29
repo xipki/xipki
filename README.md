@@ -1,4 +1,4 @@
-# XiPKI Toolkits
+# XiPKI SDK
 XiPKI (e**X**tensible s**I**mple **P**ublic **K**ey **I**nfrastructure) SDK
 
 ## License
