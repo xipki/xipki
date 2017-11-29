@@ -9,20 +9,16 @@
     <version>7</version>
   </parent>
   <groupId>org.xipki</groupId>
-  <artifactId>xipki-parent</artifactId>
+  <artifactId>xisdk-parent</artifactId>
   <packaging>pom</packaging>
   <version>2.3.0-SNAPSHOT</version>
   <name>XiPKI :: ${project.artifactId}</name>
-  <description>XiPKI CA and OCSP responder</description>
+  <description>XiPKI SDK</description>
   <url>http://xipki.org</url>
   <licenses>
     <license>
-      <name>XiPKI commercial licensing</name>
-      <url>mailto:lijun.liao@gmail.com</url>
-    </license>
-    <license>
-      <name>AGPL</name>
-      <url>http://www.gnu.org/licenses/agpl-3.0.html</url>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
   <developers>
@@ -45,35 +41,24 @@
     <jscep.version>2.4.0</jscep.version>
     <junit.version>4.8.2</junit.version>
     <pkcs11-wrapper.version>1.4.0</pkcs11-wrapper.version>
-    <liquibase.version>3.5.3</liquibase.version>
-    <snakeyaml.version>1.17</snakeyaml.version>
-    <hikaricp.version>2.7.2</hikaricp.version>
-    <syslog-java-client.version>1.1.2</syslog-java-client.version>
   </properties>
-  <!--repositories>
-    <repository>
-      <id>apache-snapshots</id>
-      <name>Apache Snapshots Repository</name>
-      <url>http://repository.apache.org/content/groups/snapshots-group</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories-->
   <modules>
     <!-- project sub-modules -->
-    <module>ca</module>
-    <module>ocsp</module>
+    <module>ca-client-api</module>
+    <module>ca-client-impl</module>
+    <module>ca-client-shell</module>
+    <module>ocsp-client-api</module>
+    <module>ocsp-client-impl</module>
+    <module>ocsp-client-shell</module>
+    <module>ocsp-qa</module>
+    <module>ocsp-qa-shell</module>
     <module>scep-client-shell</module>
     <module>jscep-client-shell</module>
   </modules>
   <scm>
-    <connection>scm:git:git@github.com:xipki/xipki.git</connection>
-    <developerConnection>scm:git:git@github.com:xipki/xipki.git</developerConnection>
-    <url>git@github.com:xipki/xipki.git</url>
+    <connection>scm:git:git@github.com:xipki/xisdk.git</connection>
+    <developerConnection>scm:git:git@github.com:xipki/xisdk.git</developerConnection>
+    <url>git@github.com:xipki/xisdk.git</url>
   </scm>
   <build>
     <plugins>

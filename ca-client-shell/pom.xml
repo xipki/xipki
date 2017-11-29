@@ -8,7 +8,7 @@
     <artifactId>xisdk-parent</artifactId>
     <version>2.3.0-SNAPSHOT</version>
   </parent>
-  <artifactId>jscep-client-shell</artifactId>
+  <artifactId>ca-client-shell</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
@@ -16,9 +16,19 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>com.google.code.jscep</groupId>
-      <artifactId>jscep</artifactId>
-      <version>${jscep.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ca-client-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>datasource</artifactId>
+      <version>${xitk.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>security</artifactId>
+      <version>${xitk.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
@@ -26,4 +36,12 @@
       <version>${xitk.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>
