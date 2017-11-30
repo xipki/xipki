@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pki-${project.version}"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
+  <feature name="xipki-security" version="${xitk.version}" description="security">
+    <bundle>mvn:org.xipki.tk/common/${xitk.version}</bundle>
+    <bundle>mvn:org.xipki.tk/password/${xitk.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
+    <bundle>mvn:org.xipki.iaik/sunpkcs11-wrapper/${pkcs11-wrapper.version}</bundle>
+    <bundle>mvn:org.xipki.tk/security/${xitk.version}</bundle>
+    <bundle>mvn:org.xipki.tk/shell-base/${xitk.version}</bundle>
+    <bundle>mvn:org.xipki.tk/security-shell/${xitk.version}</bundle>
+    <bundle>mvn:org.xipki.tk/security-speed-shell/${xitk.version}</bundle>
+  </feature>
+  <feature name="xipki-caclient" version="${project.version}" description="CA client">
+    <feature>xipki-security</feature>
+    <bundle>mvn:org.xipki.tk/cmp/${xitk.version}</bundle>
+    <bundle>mvn:org.xipki.sdk/ca-client-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.sdk/ca-client-impl/${project.version}</bundle>
+    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
+    <bundle>mvn:org.xipki.tk/datasource/${xitk.version}</bundle>
+    <bundle>mvn:org.xipki.sdk/ca-client-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-scepclient" version="${project.version}"
+      description="SCEP client shell">
+    <feature>xipki-security</feature>
+    <bundle>mvn:org.xipki.scep/scep-common/${xiscep.version}</bundle>
+    <bundle>mvn:org.xipki.scep/scep-client/${xiscep.version}</bundle>
+    <bundle>mvn:org.xipki.sdk/scep-client-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-ocspclient" version="${project.version}" description="OCSP client">
+    <feature>xipki-security</feature>
+    <bundle>mvn:org.xipki.sdk/ocsp-client-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki.sdk/ocsp-client-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.sdk/ocsp-client-shell/${project.version}</bundle>
+  </feature>
+</features>

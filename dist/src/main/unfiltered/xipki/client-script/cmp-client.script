@@ -1,0 +1,77 @@
+HASH = SHA256
+
+echo "#################################################################"
+echo "#                 Manage certificate via CMP                    #"
+echo "#################################################################"
+
+CUR_TIME = $(date '+%Y%m%d-%H%M%S')
+
+OUT_DIR=output/cmp-${CUR_TIME}
+
+CACERT = ${OUT_DIR}/cacert.der
+
+echo "# Get CA certificate"
+
+xipki-cli:cacert \
+  --out ${CACERT}
+
+## Enroll certificates
+# Certificate OCSP1
+
+echo "=====CMP: Enroll via CRMF====="
+
+CN = CMPCRMF-TLS-${CUR_TIME}
+
+xipki-tk:rsa-p12 --password 1234 --out "${OUT_DIR}/${CN}.p12" --subject "CN=${CN}"
+
+xipki-cli:enroll-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --out ${OUT_DIR}/${CN}.der --profile TLS --subject "CN=${CN}.xipki.org,O=xipki,C=DE"
+
+xipki-tk:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert ${OUT_DIR}/${CN}.der
+
+echo "=====CMP: Enroll via CSR====="
+
+CN = CMPCSR-TLS-${CUR_TIME}
+
+xipki-tk:rsa-p12 --password 1234 --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
+
+xipki-tk:req-p12 --hash $HASH --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --subject "CN=${CN}.xipki.org,O=xipki,C=DE" --out ${OUT_DIR}/${CN}.csr
+
+xipki-cli:csr-enroll --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der --profile TLS
+
+xipki-tk:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password 1234 \
+  --cert ${OUT_DIR}/${CN}.der
+
+echo "Current OCSP Status"
+xipki-ocsp:status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+
+echo "=====CMP: Suspend certificate====="
+
+xipki-cli:revoke --ca MYCA --cert ${OUT_DIR}/${CN}.der --reason certificateHold
+
+echo "Current OCSP Status"
+xipki-ocsp:status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+
+echo "=====CMP: Unsuspend certificate====="
+
+xipki-cli:unrevoke --ca MYCA --cert ${OUT_DIR}/${CN}.der
+
+echo "Current OCSP Status"
+xipki-ocsp:status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+
+echo "=====CMP: Revocate certificate====="
+
+xipki-cli:revoke --ca MYCA --cert ${OUT_DIR}/${CN}.der --reason affiliationChanged
+
+echo "Current OCSP Status"
+xipki-ocsp:status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der
+
+echo "=====CMP: Generate CRL====="
+
+xipki-cli:gencrl --ca MYCA --out ${OUT_DIR}/CMP-MYCA-GEN.crl
+
+echo "=====CMP: Get CRL===="
+xipki-cli:getcrl --ca MYCA --out ${OUT_DIR}/CMP-MYCA-GET.crl
+

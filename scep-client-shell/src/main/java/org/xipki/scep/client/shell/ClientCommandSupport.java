@@ -47,11 +47,11 @@ public abstract class ClientCommandSupport extends XipkiCommandSupport {
             required = true,
             description = "URL of the SCEP server\n"
                     + "(required)")
-    private String url;
+    protected String url;
 
     @Option(name = "--ca-id",
             description = "CA identifier")
-    private String caId;
+    protected String caId;
 
     @Option(name = "--ca-cert",
             required = true,

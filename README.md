@@ -50,6 +50,6 @@ Just drop me an email.
   - Build and install maven artifacts
     In folder `xisdk`
     ```sh
-    mvn clean install
+    mvn clean install -Pdist
     ```
 

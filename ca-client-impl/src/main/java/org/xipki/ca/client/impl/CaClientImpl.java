@@ -1311,4 +1311,10 @@ public final class CaClientImpl implements CaClient {
             throw new CaClientException("the given certificate is not issued by the CA");
         }
     }
+
+    @Override
+    public java.security.cert.Certificate getCaCert(String caName) throws CaClientException {
+        CaConf ca = casMap.get(caName.toUpperCase());
+        return ca == null ? null : ca.cert();
+    }
 }

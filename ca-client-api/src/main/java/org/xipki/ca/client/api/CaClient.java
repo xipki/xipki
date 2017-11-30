@@ -18,6 +18,7 @@
 package org.xipki.ca.client.api;
 
 import java.math.BigInteger;
+import java.security.cert.Certificate;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -33,6 +34,7 @@ import org.xipki.ca.client.api.dto.RevokeCertRequest;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequest;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.RequestResponseDebug;
+import org.xipki.security.X509Cert;
 
 /**
  * @author Lijun Liao
@@ -278,5 +280,13 @@ public interface CaClient {
      *          CA name. Must not be {@code null}.
      */
     HealthCheckResult getHealthCheckResult(String caName) throws CaClientException;
+
+    /**
+     *
+     * @param caName
+     * @return the CA certificate
+     * @throws CaClientException
+     */
+    Certificate getCaCert(String caName) throws CaClientException;
 
 }
