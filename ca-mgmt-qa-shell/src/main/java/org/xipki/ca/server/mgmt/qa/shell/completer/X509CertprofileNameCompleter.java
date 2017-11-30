@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (c) 2013 - 2017 Lijun Liao
+* Copyright (c) 2013 - 2017 Lijun Liao
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License version 3
@@ -32,7 +32,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.server.mgmt.qa.shell.completer;
 
 import java.util.Set;
 

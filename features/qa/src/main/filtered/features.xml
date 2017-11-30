@@ -3,13 +3,8 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
   <repository>mvn:org.xipki.features/pki/${project.version}/xml/features</repository>
-  <feature name="xipki-camgmt-qa-shell" version="${project.version}"
-      description="CA management QA shell">
-    <feature prerequisite="true">xipki-camgmt-shell</feature>
-    <bundle start-level="80">mvn:org.xipki.pki/ca-mgmt-qa-shell/${project.version}</bundle>
-  </feature>
   <feature name="xipki-caqa-shell" version="${project.version}" description="CA QA shell">
-    <feature prerequisite="true">xipki-caclient-shell</feature>
+    <feature prerequisite="true">xipki-camgmt-shell</feature>
     <bundle start-level="70">mvn:org.xipki.pki/ca-certprofile-xml/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-qa/${project.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-qa-shell/${project.version}</bundle>

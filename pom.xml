@@ -36,7 +36,6 @@
     <xiscep.notest>true</xiscep.notest>
     <xiscep.version>2.3.0-SNAPSHOT</xiscep.version>
     <xitk.version>2.3.0-SNAPSHOT</xitk.version>
-    <xisdk.version>2.3.0-SNAPSHOT</xisdk.version>
     <karaf.version>4.1.3</karaf.version>
     <karaf-plugin.version>4.1.3</karaf-plugin.version>
     <netty.version>4.1.16.Final</netty.version>
@@ -54,7 +53,6 @@
   <modules>
     <module>ca-certprofile-xml</module>
     <module>ca-qa</module>
-    <module>ca-qa-shell</module>
     <module>ca-api</module>
     <module>ca-mgmt-api</module>
     <module>ca-server</module>

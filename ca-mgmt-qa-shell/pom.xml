@@ -17,6 +17,11 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>ca-qa</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>ca-mgmt-shell</artifactId>
       <version>${project.version}</version>
     </dependency>

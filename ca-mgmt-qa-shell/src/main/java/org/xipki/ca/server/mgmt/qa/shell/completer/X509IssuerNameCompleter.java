@@ -32,34 +32,29 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell;
+package org.xipki.ca.server.mgmt.qa.shell.completer;
 
-import java.security.cert.X509CRL;
+import java.util.Set;
 
-import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.ca.client.api.CaClientException;
-import org.xipki.ca.client.api.PkiErrorException;
-import org.xipki.common.RequestResponseDebug;
+import org.xipki.ca.qa.QaSystemManager;
+import org.xipki.console.karaf.AbstractDynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
  * @since 2.0.0
  */
 
-@Command(scope = "xipki-qa", name = "neg-getcrl",
-        description = "download CRL (negative, for QA)")
 @Service
-public class NegGetCrlCmd extends NegCrlCommandSupport {
+public class X509IssuerNameCompleter extends AbstractDynamicEnumCompleter {
+
+    @Reference
+    private QaSystemManager qaSystemManager;
 
     @Override
-    protected X509CRL retrieveCrl() throws CaClientException, PkiErrorException {
-        RequestResponseDebug debug = getRequestResponseDebug();
-        try {
-            return caClient.downloadCrl(caName, debug);
-        } finally {
-            saveRequestResponse(debug);
-        }
+    protected Set<String> getEnums() {
+        return qaSystemManager.issuerNames();
     }
 
 }

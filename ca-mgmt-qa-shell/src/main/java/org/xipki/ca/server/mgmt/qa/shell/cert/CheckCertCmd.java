@@ -32,7 +32,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell;
+package org.xipki.ca.server.mgmt.qa.shell.cert;
 
 import java.util.Set;
 
@@ -50,7 +50,8 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.qa.QaSystemManager;
 import org.xipki.ca.qa.X509CertprofileQa;
 import org.xipki.ca.qa.X509IssuerInfo;
-import org.xipki.ca.qa.shell.completer.X509IssuerNameCompleter;
+import org.xipki.ca.server.mgmt.qa.shell.completer.X509CertprofileNameCompleter;
+import org.xipki.ca.server.mgmt.qa.shell.completer.X509IssuerNameCompleter;
 import org.xipki.common.qa.ValidationIssue;
 import org.xipki.common.qa.ValidationResult;
 import org.xipki.common.util.IoUtil;
@@ -93,7 +94,7 @@ public class CheckCertCmd extends XipkiCommandSupport {
             required = true,
             description = "certificate profile\n"
                     + "(required)")
-    @Completion(X509IssuerNameCompleter.class)
+    @Completion(X509CertprofileNameCompleter.class)
     private String profileName;
 
     @Option(name = "--verbose", aliases = "-v",

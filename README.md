@@ -52,20 +52,6 @@ Only if you want to use the development version, build it from source code as fo
   - Build and install maven artifacts
     In the folder xitk, call `mvn install -DskipTests`
 
-- Prepare dependency XiSDK (optional, required if not done before)
-
-  - Get a copy of XiSDK code
-    ```sh
-    git clone https://github.com/xipki/xisdk.git
-    ```
-  - Switch to the tag v2.3.0 (TODO)  
-    `git checkout v2.3.0`
-  - Build and install maven artifacts
-    In folder `xisdk`
-    ```sh
-    mvn clean install
-    ```
-
 - Get a copy of project code
   ```sh
   git clone https://github.com/xipki/xipki
