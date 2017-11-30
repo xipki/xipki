@@ -167,20 +167,6 @@
                   <includes>xsd/**</includes>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.sdk</groupId>
-                  <artifactId>ca-client-impl</artifactId>
-                  <version>${xisdk.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.sdk</groupId>
-                  <artifactId>ca-client-shell</artifactId>
-                  <version>${xisdk.version}</version>
-                  <type>jar</type>
-                  <includes>xsd/**</includes>
-                </artifactItem>
-                <artifactItem>
                   <groupId>org.xipki.pki</groupId>
                   <artifactId>ca-dbtool</artifactId>
                   <version>${project.version}</version>
@@ -200,6 +186,26 @@
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Extract the TLS keys -->
+            <id>unpack-tlskeys</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${output.directory}/xipki/security/tlskeys</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.tk</groupId>
+                  <artifactId>demo-tlskeys</artifactId>
+                  <version>${xitk.version}</version>
+                  <type>jar</type>
+                  <excludes>META-INF/**</excludes>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -231,14 +237,10 @@
                 <feature>xipki-httpserver</feature>
                 <feature>xipki-caserver</feature>
                 <feature>xipki-camgmt-shell</feature>
-                <feature>xipki-caclient-shell</feature>
                 <feature>xipki-security-shell</feature>
                 <feature>xipki-ocspserver</feature>
-                <feature>xipki-ocspclient-shell</feature>
-                <!-- optional features -->
                 <feature>xipki-database-tool</feature>
                 <feature>xipki-audit-syslog</feature>
-                <feature>xipki-scepclient-shell</feature>
               </features>
             </configuration>
           </execution>

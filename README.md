@@ -25,6 +25,8 @@ Just drop me an email.
 
 ## Get Binary Package
 
+### CA and OCSP Responder
+
 Download the binary package `xipki-pki-<version>.tar.gz` from https://github.com/xipki/xipki/releases.
 
 Only if you want to use the development version, build it from source code as follows.
@@ -70,8 +72,29 @@ Only if you want to use the development version, build it from source code as fo
   mvn clean package
   ```
 
-## Install
-1. Unpack the binary tar.gz file
+### CA and OCSP Client
+
+Download the binary package `xipki-sdk-<version>.tar.gz` from https://github.com/xipki/xitk/releases.
+
+Only if you want to use the development version, build it from source code as follows.
+
+- Prepare dependency XiSCEP (optional, required if not done before)
+
+- Get a copy of project code
+  ```sh
+  git clone https://github.com/xipki/xitk
+  ```
+- Compile and install the artifacts
+
+  In folder `xitk`
+  ```sh
+  mvn clean install -Pdist
+  ```
+  Make sure that the option `-Pdist` is used.
+
+## Configure the CA and OCSP Responder
+
+1. Unpack the binary `xipki-pki-<version>.tar.gz` file
 
     ```sh
     tar xvf xipki-pki-<version>.tar.gz
@@ -164,19 +187,19 @@ HSQLDB | hsqldb-`<version>`.jar | hsqldb.org
 
   - If you use the existing CA certificate, OCSP Responder certificate, and SCEP certificate
 
-     - Copy the certificates to the directory to `$XIPKI_HOME/xipki/setup/keycerts`.
+     - Copy the certificates to the directory to `xipki/setup/keycerts`.
 
      - In case of the key and certificate are saved in PKCS#12 keystore file,
-      copy the PKCS#12 files to the directory `$XIPKI_HOME/xipki/setup/keycerts`.
+      copy the PKCS#12 files to the directory `xipki/setup/keycerts`.
       Note that the key and certificate must be under the same alias in keystore.
 
-     - Adapt the CA configuration file `$XIPKI_HOME/xipki/setup/cacert-present-ca-conf.xml` and the client scripts in `$XIPKI_HOME/xipki/client-script`
+     - Adapt the CA configuration file `xipki/setup/cacert-present-ca-conf.xml`
 
- - If you use non-RSA keys (e.g. EC and DSA) or PKCS#11 device, adapt the CA configuration file `$XIPKI_HOME/xipki/setup/cacert-none-ca-conf.xml` and the scripts in `$XIPKI_HOME/xipki/setup/cacert-none-setup.script`
+ - If you use non-RSA keys (e.g. EC and DSA) or PKCS#11 device, adapt the CA configuration file `xipki/setup/cacert-none-ca-conf.xml` and the scripts in `xipki/setup/cacert-none-setup.script`
 
 2. Start XiPKI
 
-    In folder `$XIPKI_HOME`
+    In folder `xipki-pki-version`
     ```sh
     bin/karaf
     ```
@@ -186,7 +209,7 @@ HSQLDB | hsqldb-`<version>`.jar | hsqldb.org
     preload bin/karaf
     ```
 
-    If you have changed the content within folder `$XIPKI_HOME/etc` or `$XIPKI_HOME/system`, please delete the folder `$XIPKI_HOME/data` before starting XiPKI.
+    If you have changed the content within folder `etc` or `system`, please delete the folder `data` before starting XiPKI.
 
 3. Setup the CA and OCSP responder
 
@@ -199,11 +222,19 @@ HSQLDB | hsqldb-`<version>`.jar | hsqldb.org
  * Verify the installation, execute the OSGi command  
    `ca-info MYCA1`
 
-4. Test the installation (otpional)  
+### Test the Installation
+
+1. Unpack the binary `xipki-sdk-<version>.tar.gz` file
+
+    ```sh
+    tar xvf xipki-sdk-<version>.tar.gz
+    ```
+2. Verify the installation
+
   To verify that the CA and OCSP responder, execute the following commands in the OSGi console:
-  - `source file:./xipki/client-script/cmp-client.script`
-  - `source file:./xipki/client-script/rest-client.script`
-  - `source file:./xipki/client-script/scep-client.script`
+    - `source file:./xipki/client-script/cmp-client.script`
+    - `source file:./xipki/client-script/rest-client.script`
+    - `source file:./xipki/client-script/scep-client.script`
 
 ## Enroll/Revoke Certificate
 
@@ -213,15 +244,15 @@ HSQLDB | hsqldb-`<version>`.jar | hsqldb.org
   certificates via SCEP. Please refer to [commands.md](commands.md) for more details.
 
 * SCEP  
-  Any SCEP client. XiPKI provides also a SCEP client in [xipki/xisdk](https://github.com/xipki/xisdk).
+  Any SCEP client. XiPKI provides also a SCEP client in [xipki/xiscep](https://github.com/xipki/xiscep).
 
 * XiPKI SDK  
-  The stand-alone SDK ([xipki/xisdk](https://github.com/xipki/xisdk))
-  can be used to enroll and revoke certificates via CMP and RESTFUL API.
-  Note that it is licensed under Apache License 2, which is different from this project.
+  The SDK ([xipki/xisdk](https://github.com/xipki/xisdk))
+  provides both the full-featured CA client and the lite version to enroll and revoke certificates
+  via CMP.
 
 * RESTFUL API  
-  The shell script `xipki/client-script/rest.sh` demonstrates the use of RESTFUL API.
+  The shell script `xipki/client-script/rest.sh` of the `xipki-sdk` demonstrates the use of RESTFUL API.
 
 Karaf Features
 -----

@@ -225,6 +225,26 @@
               </artifactItems>
             </configuration>
           </execution>
+          <execution>
+            <!-- Extract the TLS keys -->
+            <id>unpack-tlskeys</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${output.directory}/xipki/security/tlskeys</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.tk</groupId>
+                  <artifactId>demo-tlskeys</artifactId>
+                  <version>${xitk.version}</version>
+                  <type>jar</type>
+                  <excludes>META-INF/**</excludes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -259,9 +279,7 @@
                 <feature>xipki-database-tool</feature>
                 <feature>xipki-audit-syslog</feature>
                 <feature>xipki-scepclient-shell</feature>
-                <!-- QA features -->
                 <feature>xipki-jscepclient-shell</feature>
-                <feature>xipki-camgmt-qa-shell</feature>
                 <feature>xipki-caqa-shell</feature>
                 <feature>xipki-ocspqa-shell</feature>
               </features>
