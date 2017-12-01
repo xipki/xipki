@@ -2,34 +2,17 @@
  *
  * Copyright (c) 2013 - 2017 Lijun Liao
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License version 3
- * as published by the Free Software Foundation with the addition of the
- * following permission added to Section 15 as permitted in Section 7(a):
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
- * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
- * OF THIRD PARTY RIGHTS.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License.
- *
- * You can be released from the requirements of the license by purchasing
- * a commercial license. Buying such a license is mandatory as soon as you
- * develop commercial activities involving the XiPKI software without
- * disclosing the source code of your own applications.
- *
- * For more information, please contact Lijun Liao at this
- * address: lijun.liao@gmail.com
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.xipki.scep.util;
@@ -40,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CRLException;
@@ -57,6 +39,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -94,13 +77,11 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.scep.crypto.KeyUsage;
 import org.xipki.scep.crypto.ScepHashAlgoType;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 public class ScepUtil {
@@ -117,7 +98,7 @@ public class ScepUtil {
 
     public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(final PublicKey publicKey)
             throws IOException {
-        ParamUtil.requireNonNull("publicKey", publicKey);
+        requireNonNull("publicKey", publicKey);
         if (publicKey instanceof java.security.interfaces.RSAPublicKey) {
             java.security.interfaces.RSAPublicKey rsaPubKey =
                     (java.security.interfaces.RSAPublicKey) publicKey;
@@ -133,9 +114,9 @@ public class ScepUtil {
             final SubjectPublicKeyInfo subjectPublicKeyInfo, final X500Name subjectDn,
             final Map<ASN1ObjectIdentifier, ASN1Encodable> attributes)
             throws OperatorCreationException {
-        ParamUtil.requireNonNull("privatekey", privatekey);
-        ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
-        ParamUtil.requireNonNull("subjectDn", subjectDn);
+        requireNonNull("privatekey", privatekey);
+        requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
+        requireNonNull("subjectDn", subjectDn);
 
         PKCS10CertificationRequestBuilder csrBuilder =
                 new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
@@ -155,9 +136,9 @@ public class ScepUtil {
             final SubjectPublicKeyInfo subjectPublicKeyInfo, final X500Name subjectDn,
             final String challengePassword, final List<Extension> extensions)
             throws OperatorCreationException {
-        ParamUtil.requireNonNull("privatekey", privatekey);
-        ParamUtil.requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
-        ParamUtil.requireNonNull("subjectDn", subjectDn);
+        requireNonNull("privatekey", privatekey);
+        requireNonNull("subjectPublicKeyInfo", subjectPublicKeyInfo);
+        requireNonNull("subjectDn", subjectDn);
 
         Map<ASN1ObjectIdentifier, ASN1Encodable> attributes =
                 new HashMap<ASN1ObjectIdentifier, ASN1Encodable>();
@@ -177,7 +158,7 @@ public class ScepUtil {
 
     public static X509Certificate generateSelfsignedCert(final CertificationRequest csr,
             final PrivateKey identityKey) throws CertificateException {
-        ParamUtil.requireNonNull("csr", csr);
+        requireNonNull("csr", csr);
         return generateSelfsignedCert(csr.getCertificationRequestInfo().getSubject(),
                 csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), identityKey);
     }
@@ -196,9 +177,9 @@ public class ScepUtil {
     public static X509Certificate generateSelfsignedCert(final X500Name subjectDn,
             final SubjectPublicKeyInfo pubKeyInfo, final PrivateKey identityKey)
             throws CertificateException {
-        ParamUtil.requireNonNull("subjectDn", subjectDn);
-        ParamUtil.requireNonNull("pubKeyInfo", pubKeyInfo);
-        ParamUtil.requireNonNull("identityKey", identityKey);
+        requireNonNull("subjectDn", subjectDn);
+        requireNonNull("pubKeyInfo", pubKeyInfo);
+        requireNonNull("identityKey", identityKey);
 
         Date notBefore = new Date(System.currentTimeMillis() - 5 * MIN_IN_MS);
         Date notAfter = new Date(notBefore.getTime() + 30 * DAY_IN_MS);
@@ -233,7 +214,7 @@ public class ScepUtil {
      */
     public static List<X509Certificate> getCertsFromSignedData(final SignedData signedData)
             throws CertificateException {
-        ParamUtil.requireNonNull("signedData", signedData);
+        requireNonNull("signedData", signedData);
         ASN1Set set = signedData.getCertificates();
         if (set == null) {
             return Collections.emptyList();
@@ -270,7 +251,7 @@ public class ScepUtil {
     } // method getCertsFromSignedData
 
     public static X509CRL getCrlFromPkiMessage(final SignedData signedData) throws CRLException {
-        ParamUtil.requireNonNull("signedData", signedData);
+        requireNonNull("signedData", signedData);
         ASN1Set set = signedData.getCRLs();
         if (set == null || set.size() == 0) {
             return null;
@@ -286,8 +267,8 @@ public class ScepUtil {
 
     public static String getSignatureAlgorithm(final PrivateKey key,
             final ScepHashAlgoType hashAlgo) {
-        ParamUtil.requireNonNull("key", key);
-        ParamUtil.requireNonNull("hashAlgo", hashAlgo);
+        requireNonNull("key", key);
+        requireNonNull("hashAlgo", hashAlgo);
         String algorithm = key.getAlgorithm();
         if ("RSA".equalsIgnoreCase(algorithm)) {
             return hashAlgo.getName() + "withRSA";
@@ -322,13 +303,13 @@ public class ScepUtil {
 
     public static X509CRL parseCrl(final byte[] encodedCrl)
             throws CertificateException, CRLException {
-        ParamUtil.requireNonNull("encodedCrl", encodedCrl);
+        requireNonNull("encodedCrl", encodedCrl);
         return parseCrl(new ByteArrayInputStream(encodedCrl));
     }
 
     public static X509CRL parseCrl(final InputStream crlStream)
             throws CertificateException, CRLException {
-        ParamUtil.requireNonNull("crlStream", crlStream);
+        requireNonNull("crlStream", crlStream);
         X509CRL crl = (X509CRL) getCertFactory().generateCRL(crlStream);
         if (crl == null) {
             throw new CRLException(
@@ -339,13 +320,13 @@ public class ScepUtil {
 
     public static X509Certificate parseCert(final byte[] certBytes)
             throws CertificateException {
-        ParamUtil.requireNonNull("certBytes", certBytes);
+        requireNonNull("certBytes", certBytes);
         return parseCert(new ByteArrayInputStream(certBytes));
     }
 
     private static X509Certificate parseCert(final InputStream certStream)
             throws CertificateException {
-        ParamUtil.requireNonNull("certStream", certStream);
+        requireNonNull("certStream", certStream);
         return (X509Certificate) getCertFactory().generateCertificate(certStream);
     }
 
@@ -389,8 +370,8 @@ public class ScepUtil {
 
     private static byte[] getCoreExtValue(final X509Certificate cert,
             final ASN1ObjectIdentifier type) throws CertificateEncodingException {
-        ParamUtil.requireNonNull("cert", cert);
-        ParamUtil.requireNonNull("type", type);
+        requireNonNull("cert", cert);
+        requireNonNull("type", type);
         byte[] fullExtValue = cert.getExtensionValue(type.getId());
         if (fullExtValue == null) {
             return null;
@@ -404,7 +385,7 @@ public class ScepUtil {
     }
 
     public static boolean isSelfSigned(final X509Certificate cert) {
-        ParamUtil.requireNonNull("cert", cert);
+        requireNonNull("cert", cert);
         boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
         if (!equals) {
             return false;
@@ -422,8 +403,8 @@ public class ScepUtil {
 
     public static boolean issues(final X509Certificate issuerCert, final X509Certificate cert)
             throws CertificateEncodingException {
-        ParamUtil.requireNonNull("issuerCert", issuerCert);
-        ParamUtil.requireNonNull("cert", cert);
+        requireNonNull("issuerCert", issuerCert);
+        requireNonNull("cert", cert);
         boolean isCa = issuerCert.getBasicConstraints() >= 0;
         if (!isCa) {
             return false;
@@ -450,7 +431,7 @@ public class ScepUtil {
 
     public static ASN1ObjectIdentifier extractDigesetAlgorithmIdentifier(final String sigOid,
             final byte[] sigParams) throws NoSuchAlgorithmException {
-        ParamUtil.requireNonBlank("sigOid", sigOid);
+        requireNonBlank("sigOid", sigOid);
 
         ASN1ObjectIdentifier algOid = new ASN1ObjectIdentifier(sigOid);
 
@@ -479,8 +460,8 @@ public class ScepUtil {
 
     public static ASN1Encodable getFirstAttrValue(final AttributeTable attrs,
             final ASN1ObjectIdentifier type) {
-        ParamUtil.requireNonNull("attrs", attrs);
-        ParamUtil.requireNonNull("type", type);
+        requireNonNull("attrs", attrs);
+        requireNonNull("type", type);
         Attribute attr = attrs.get(type);
         if (attr == null) {
             return null;
@@ -490,7 +471,7 @@ public class ScepUtil {
     }
 
     public static byte[] read(final InputStream in) throws IOException {
-        ParamUtil.requireNonNull("in", in);
+        requireNonNull("in", in);
         try {
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             int readed = 0;
@@ -514,7 +495,7 @@ public class ScepUtil {
         if (cmsCertSet == null || cmsCertSet.length == 0) {
             return;
         }
-        ParamUtil.requireNonNull("geneator", generator);
+        requireNonNull("geneator", generator);
         Collection<X509Certificate> certColl = new LinkedList<X509Certificate>();
         for (X509Certificate m : cmsCertSet) {
             certColl.add(m);
@@ -527,14 +508,31 @@ public class ScepUtil {
     private static CertificateFactory getCertFactory() throws CertificateException {
         synchronized (certFactLock) {
             if (certFact == null) {
-                try {
-                    certFact = CertificateFactory.getInstance("X.509", "BC");
-                } catch (NoSuchProviderException ex) {
-                    throw new CertificateException("NoSuchProviderException: " + ex.getMessage());
-                }
+                certFact = CertificateFactory.getInstance("X.509");
             }
             return certFact;
         }
+    }
+
+    public static <T> T requireNonNull(final String objName, final T obj) {
+        return Objects.requireNonNull(obj, objName + " must not be null");
+    }
+
+    public static String requireNonBlank(final String objName, final String obj) {
+        Objects.requireNonNull(obj, objName + " must not be null");
+        if (obj.isEmpty()) {
+            throw new IllegalArgumentException(objName + " must not be blank");
+        }
+        return obj;
+    }
+
+    public static <T> Collection<T> requireNonEmpty(final String objName,
+            final Collection<T> obj) {
+        Objects.requireNonNull(obj, objName + " must not be null");
+        if (obj.isEmpty()) {
+            throw new IllegalArgumentException(objName + " must not be empty");
+        }
+        return obj;
     }
 
 }

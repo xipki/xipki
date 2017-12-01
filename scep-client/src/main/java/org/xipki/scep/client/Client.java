@@ -2,34 +2,17 @@
  *
  * Copyright (c) 2013 - 2017 Lijun Liao
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License version 3
- * as published by the Free Software Foundation with the addition of the
- * following permission added to Section 15 as permitted in Section 7(a):
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
- * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
- * OF THIRD PARTY RIGHTS.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License.
- *
- * You can be released from the requirements of the license by purchasing
- * a commercial license. Buying such a license is mandatory as soon as you
- * develop commercial activities involving the XiPKI software without
- * disclosing the source code of your own applications.
- *
- * For more information, please contact Lijun Liao at this
- * address: lijun.liao@gmail.com
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.xipki.scep.client;
@@ -60,8 +43,7 @@ import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.util.CollectionStore;
-import org.xipki.common.util.Base64;
-import org.xipki.common.util.ParamUtil;
+import org.bouncycastle.util.encoders.Base64;
 import org.xipki.scep.client.exception.OperationNotSupportedException;
 import org.xipki.scep.client.exception.ScepClientException;
 import org.xipki.scep.crypto.ScepHashAlgoType;
@@ -76,13 +58,13 @@ import org.xipki.scep.message.PkiMessage;
 import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.transaction.MessageType;
 import org.xipki.scep.transaction.Operation;
+import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepConstants;
 import org.xipki.scep.util.ScepUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 public abstract class Client {
@@ -110,8 +92,8 @@ public abstract class Client {
 
     public Client(final CaIdentifier caId, final CaCertValidator caCertValidator)
             throws MalformedURLException {
-        this.caId = ParamUtil.requireNonNull("caId", caId);
-        this.caCertValidator = ParamUtil.requireNonNull("caCertValidator", caCertValidator);
+        this.caId = ScepUtil.requireNonNull("caId", caId);
+        this.caCertValidator = ScepUtil.requireNonNull("caCertValidator", caCertValidator);
     }
 
     /**
@@ -186,7 +168,7 @@ public abstract class Client {
                 return httpPost(url, REQ_CONTENT_TYPE, request);
             } else {
                 String url = caId.buildGetUrl(operation,
-                        (request == null) ? null : Base64.encodeToString(request));
+                        (request == null) ? null : new String(Base64.encode(request)));
                 return httpGet(url);
             }
         } // end if
@@ -227,6 +209,10 @@ public abstract class Client {
         return caCaps;
     }
 
+    public X509Certificate getCaCert() {
+        return authorityCertStore == null ? null : authorityCertStore.caCert();
+    }
+
     public CaIdentifier caId() throws ScepClientException {
         initIfNotInited();
         return caId;
@@ -244,10 +230,10 @@ public abstract class Client {
 
     public X509CRL scepGetCrl(final PrivateKey identityKey, final X509Certificate identityCert,
             final X500Name issuer, final BigInteger serialNumber) throws ScepClientException {
-        ParamUtil.requireNonNull("identityKey", identityKey);
-        ParamUtil.requireNonNull("identityCert", identityCert);
-        ParamUtil.requireNonNull("issuer", issuer);
-        ParamUtil.requireNonNull("serialNumber", serialNumber);
+        ScepUtil.requireNonNull("identityKey", identityKey);
+        ScepUtil.requireNonNull("identityCert", identityCert);
+        ScepUtil.requireNonNull("issuer", issuer);
+        ScepUtil.requireNonNull("serialNumber", serialNumber);
 
         initIfNotInited();
 
@@ -259,7 +245,12 @@ public abstract class Client {
         ScepHttpResponse httpResp = httpSend(Operation.PKIOperation, request);
         CMSSignedData cmsSignedData = parsePkiMessage(httpResp.getContentBytes());
         PkiMessage response = decode(cmsSignedData, identityKey, identityCert);
+        if (response.pkiStatus() != PkiStatus.SUCCESS) {
+            throw new ScepClientException("server returned " + response.pkiStatus());
+        }
+
         ContentInfo messageData = ContentInfo.getInstance(response.messageData());
+
         try {
             return ScepUtil.getCrlFromPkiMessage(SignedData.getInstance(messageData.getContent()));
         } catch (CRLException ex) {
@@ -270,10 +261,10 @@ public abstract class Client {
     public List<X509Certificate> scepGetCert(final PrivateKey identityKey,
             final X509Certificate identityCert, final X500Name issuer,
             final BigInteger serialNumber) throws ScepClientException {
-        ParamUtil.requireNonNull("identityKey", identityKey);
-        ParamUtil.requireNonNull("identityCert", identityCert);
-        ParamUtil.requireNonNull("issuer", issuer);
-        ParamUtil.requireNonNull("serialNumber", serialNumber);
+        ScepUtil.requireNonNull("identityKey", identityKey);
+        ScepUtil.requireNonNull("identityCert", identityCert);
+        ScepUtil.requireNonNull("issuer", issuer);
+        ScepUtil.requireNonNull("serialNumber", serialNumber);
 
         initIfNotInited();
 
@@ -287,6 +278,10 @@ public abstract class Client {
 
         CMSSignedData cmsSignedData = parsePkiMessage(httpResp.getContentBytes());
         DecodedPkiMessage response = decode(cmsSignedData, identityKey, identityCert);
+        if (response.pkiStatus() != PkiStatus.SUCCESS) {
+            throw new ScepClientException("server returned " + response.pkiStatus());
+        }
+
         ContentInfo messageData = ContentInfo.getInstance(response.messageData());
         try {
             return ScepUtil.getCertsFromSignedData(
@@ -299,7 +294,7 @@ public abstract class Client {
     public EnrolmentResponse scepCertPoll(final PrivateKey identityKey,
             final X509Certificate identityCert, final CertificationRequest csr,
             final X500Name issuer) throws ScepClientException {
-        ParamUtil.requireNonNull("csr", csr);
+        ScepUtil.requireNonNull("csr", csr);
 
         TransactionId tid;
         try {
@@ -316,10 +311,10 @@ public abstract class Client {
     public EnrolmentResponse scepCertPoll(final PrivateKey identityKey,
             final X509Certificate identityCert, final TransactionId transactionId,
             final X500Name issuer, final X500Name subject) throws ScepClientException {
-        ParamUtil.requireNonNull("identityKey", identityKey);
-        ParamUtil.requireNonNull("identityCert", identityCert);
-        ParamUtil.requireNonNull("issuer", issuer);
-        ParamUtil.requireNonNull("transactionId", transactionId);
+        ScepUtil.requireNonNull("identityKey", identityKey);
+        ScepUtil.requireNonNull("identityCert", identityCert);
+        ScepUtil.requireNonNull("issuer", issuer);
+        ScepUtil.requireNonNull("transactionId", transactionId);
 
         initIfNotInited();
 
@@ -337,9 +332,9 @@ public abstract class Client {
 
     public EnrolmentResponse scepEnrol(final CertificationRequest csr, final PrivateKey identityKey,
             final X509Certificate identityCert) throws ScepClientException {
-        ParamUtil.requireNonNull("csr", csr);
-        ParamUtil.requireNonNull("identityKey", identityKey);
-        ParamUtil.requireNonNull("identityCert", identityCert);
+        ScepUtil.requireNonNull("csr", csr);
+        ScepUtil.requireNonNull("identityKey", identityKey);
+        ScepUtil.requireNonNull("identityCert", identityCert);
 
         initIfNotInited();
 
@@ -368,9 +363,9 @@ public abstract class Client {
     public EnrolmentResponse scepPkcsReq(final CertificationRequest csr,
             final PrivateKey identityKey, final X509Certificate identityCert)
             throws ScepClientException {
-        ParamUtil.requireNonNull("csr", csr);
-        ParamUtil.requireNonNull("identityKey", identityKey);
-        ParamUtil.requireNonNull("identityCert", identityCert);
+        ScepUtil.requireNonNull("csr", csr);
+        ScepUtil.requireNonNull("identityKey", identityKey);
+        ScepUtil.requireNonNull("identityCert", identityCert);
 
         initIfNotInited();
 

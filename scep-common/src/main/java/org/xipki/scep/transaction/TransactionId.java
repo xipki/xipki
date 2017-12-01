@@ -2,34 +2,17 @@
  *
  * Copyright (c) 2013 - 2017 Lijun Liao
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License version 3
- * as published by the Free Software Foundation with the addition of the
- * following permission added to Section 15 as permitted in Section 7(a):
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
- * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
- * OF THIRD PARTY RIGHTS.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License.
- *
- * You can be released from the requirements of the license by purchasing
- * a commercial license. Buying such a license is mandatory as soon as you
- * develop commercial activities involving the XiPKI software without
- * disclosing the source code of your own applications.
- *
- * For more information, please contact Lijun Liao at this
- * address: lijun.liao@gmail.com
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.xipki.scep.transaction;
@@ -41,11 +24,10 @@ import java.security.spec.InvalidKeySpecException;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.common.util.ParamUtil;
+import org.xipki.scep.util.ScepUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 public class TransactionId {
@@ -55,12 +37,13 @@ public class TransactionId {
     private final String id;
 
     public TransactionId(final String id) {
-        this.id = ParamUtil.requireNonBlank("id", id);
+        this.id = ScepUtil.requireNonBlank("id", id);
     }
 
     private TransactionId(final byte[] bytes) {
-        ParamUtil.requireNonNull("bytes", bytes);
-        ParamUtil.requireMin("bytes.length", bytes.length, 1);
+        if (bytes == null || bytes.length == 0) {
+            throw new IllegalArgumentException("bytes must not be empty");
+        }
         this.id = Hex.toHexString(bytes);
     }
 
@@ -76,7 +59,7 @@ public class TransactionId {
 
     public static TransactionId sha1TransactionId(final SubjectPublicKeyInfo spki)
             throws InvalidKeySpecException {
-        ParamUtil.requireNonNull("spki", spki);
+        ScepUtil.requireNonNull("spki", spki);
 
         byte[] encoded;
         try {
@@ -89,7 +72,7 @@ public class TransactionId {
     }
 
     public static TransactionId sha1TransactionId(final byte[] content) {
-        ParamUtil.requireNonNull("content", content);
+        ScepUtil.requireNonNull("content", content);
 
         SHA1Digest dgst = new SHA1Digest();
         dgst.update(content, 0, content.length);

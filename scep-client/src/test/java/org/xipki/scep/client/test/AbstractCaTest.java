@@ -2,34 +2,17 @@
  *
  * Copyright (c) 2013 - 2017 Lijun Liao
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License version 3
- * as published by the Free Software Foundation with the addition of the
- * following permission added to Section 15 as permitted in Section 7(a):
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
- * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
- * OF THIRD PARTY RIGHTS.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License.
- *
- * You can be released from the requirements of the license by purchasing
- * a commercial license. Buying such a license is mandatory as soon as you
- * develop commercial activities involving the XiPKI software without
- * disclosing the source code of your own applications.
- *
- * For more information, please contact Lijun Liao at this
- * address: lijun.liao@gmail.com
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.xipki.scep.client.test;
@@ -38,7 +21,6 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
-import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -49,9 +31,9 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xipki.scep.client.CaCertValidator;
@@ -67,18 +49,16 @@ import org.xipki.scep.serveremulator.ScepServerContainer;
 import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.util.ScepUtil;
-import org.xipki.security.util.X509Util;
-
-import junit.framework.Assert;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 public abstract class AbstractCaTest {
 
     private final String secret = "preshared-secret";
+
+    private final int port = 8081;
 
     private ScepServerContainer scepServerContainer;
 
@@ -116,9 +96,6 @@ public abstract class AbstractCaTest {
 
     @Before
     public void init() {
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
     }
 
     protected CaCaps getDefaultCaCaps() {
@@ -141,7 +118,7 @@ public abstract class AbstractCaTest {
 
             this.scepServer = new ScepServer("scep", caCaps, isWithRa(), isWithNextCa(),
                     isGenerateCrl(), control);
-            this.scepServerContainer = new ScepServerContainer(8080, scepServer);
+            this.scepServerContainer = new ScepServerContainer(port, scepServer);
         }
 
         this.scepServerContainer.start();
@@ -156,9 +133,10 @@ public abstract class AbstractCaTest {
 
     @Test
     public void test() throws Exception {
-        CaIdentifier caId = new CaIdentifier("http://localhost:8080/scep/pkiclient.exe", null);
+        CaIdentifier caId = new CaIdentifier(
+                "http://localhost:" + port + "/scep/pkiclient.exe", null);
         CaCertValidator caCertValidator = new PreprovisionedCaCertValidator(
-                X509Util.toX509Cert(scepServer.caCert()));
+                ScepUtil.toX509Cert(scepServer.caCert()));
         ScepClient client = new ScepClient(caId, caCertValidator);
         client.setUseInsecureAlgorithms(useInsecureAlgorithms());
 
@@ -212,7 +190,7 @@ public abstract class AbstractCaTest {
             }
         }
 
-        // enrol
+        // enroll
         CertificationRequest csr;
 
         X509Certificate selfSignedCert;
@@ -238,7 +216,7 @@ public abstract class AbstractCaTest {
             PkiStatus status = enrolResp.pkcsRep().pkiStatus();
             Assert.assertEquals("PkiStatus without secret", PkiStatus.FAILURE, status);
 
-            // first try invalid secret
+            // then try invalid secret
             p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject,
                     "invalid-" + secret, null);
             csr = p10Req.toASN1Structure();
@@ -249,6 +227,7 @@ public abstract class AbstractCaTest {
             status = enrolResp.pkcsRep().pkiStatus();
             Assert.assertEquals("PkiStatus with invalid secret", PkiStatus.FAILURE, status);
 
+            // try with valid secret
             p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
             csr = p10Req.toASN1Structure();
 
@@ -260,6 +239,16 @@ public abstract class AbstractCaTest {
             X509Certificate cert = certs.get(0);
             Assert.assertNotNull("enroled certificate", cert);
             enroledCert = cert;
+
+            // try :: self-signed certificate's subject different from the one of CSR
+            p10Req = ScepUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
+            csr = p10Req.toASN1Structure();
+
+            selfSignedCert = ScepUtil.generateSelfsignedCert(new X500Name("CN=dummy"),
+                    csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), privKey);
+            enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
+            status = enrolResp.pkcsRep().pkiStatus();
+            Assert.assertEquals("PkiStatus with invalid secret", PkiStatus.FAILURE, status);
         }
 
         // certPoll

@@ -2,34 +2,17 @@
  *
  * Copyright (c) 2013 - 2017 Lijun Liao
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License version 3
- * as published by the Free Software Foundation with the addition of the
- * following permission added to Section 15 as permitted in Section 7(a):
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
- * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
- * OF THIRD PARTY RIGHTS.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License.
- *
- * You can be released from the requirements of the license by purchasing
- * a commercial license. Buying such a license is mandatory as soon as you
- * develop commercial activities involving the XiPKI software without
- * disclosing the source code of your own applications.
- *
- * For more information, please contact Lijun Liao at this
- * address: lijun.liao@gmail.com
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.xipki.scep.serveremulator;
@@ -50,6 +33,7 @@ import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.cert.X509CRLHolder;
@@ -61,9 +45,6 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.AuditEvent;
-import org.xipki.audit.AuditStatus;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.scep.crypto.ScepHashAlgoType;
 import org.xipki.scep.exception.MessageDecodingException;
 import org.xipki.scep.message.CaCaps;
@@ -73,6 +54,7 @@ import org.xipki.scep.message.EnvelopedDataDecryptorInstance;
 import org.xipki.scep.message.IssuerAndSubject;
 import org.xipki.scep.message.NextCaMessage;
 import org.xipki.scep.message.PkiMessage;
+import org.xipki.scep.serveremulator.AuditEvent.AuditLevel;
 import org.xipki.scep.transaction.CaCapability;
 import org.xipki.scep.transaction.FailInfo;
 import org.xipki.scep.transaction.MessageType;
@@ -80,11 +62,9 @@ import org.xipki.scep.transaction.Nonce;
 import org.xipki.scep.transaction.PkiStatus;
 import org.xipki.scep.transaction.TransactionId;
 import org.xipki.scep.util.ScepUtil;
-import org.xipki.security.util.X509Util;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 public class ScepResponder {
@@ -123,9 +103,9 @@ public class ScepResponder {
     public ScepResponder(final CaCaps caCaps, final CaEmulator caEmulator,
             final RaEmulator raEmulator, final NextCaAndRa nextCaAndRa, final ScepControl control)
             throws Exception {
-        this.caCaps = ParamUtil.requireNonNull("caCaps", caCaps);
-        this.caEmulator = ParamUtil.requireNonNull("caEmulator", caEmulator);
-        this.control = ParamUtil.requireNonNull("control", control);
+        this.caCaps = ScepUtil.requireNonNull("caCaps", caCaps);
+        this.caEmulator = ScepUtil.requireNonNull("caEmulator", caEmulator);
+        this.control = ScepUtil.requireNonNull("control", control);
 
         this.raEmulator = raEmulator;
         this.nextCaAndRa = nextCaAndRa;
@@ -148,14 +128,14 @@ public class ScepResponder {
 
     public ContentInfo servicePkiOperation(final CMSSignedData requestContent,
             final AuditEvent event) throws MessageDecodingException, CaException {
-        ParamUtil.requireNonNull("requestContent", requestContent);
+        ScepUtil.requireNonNull("requestContent", requestContent);
         PrivateKey recipientKey = (raEmulator != null) ? raEmulator.raKey()
                 : caEmulator.caKey();
         Certificate recipientCert = (raEmulator != null) ? raEmulator.raCert()
                 : caEmulator.caCert();
         X509Certificate recipientX509Obj;
         try {
-            recipientX509Obj = X509Util.toX509Cert(recipientCert);
+            recipientX509Obj = ScepUtil.toX509Cert(recipientCert);
         } catch (CertificateException ex) {
             throw new MessageDecodingException("could not parse recipientCert "
                     + recipientCert.getTBSCertificate().getSubject());
@@ -168,19 +148,19 @@ public class ScepResponder {
         DecodedPkiMessage req = DecodedPkiMessage.decode(requestContent, recipient, null);
 
         PkiMessage rep = servicePkiOperation0(req, event);
-        event.addEventData(ScepAuditConstants.NAME_pkiStatus, rep.pkiStatus());
+        event.putEventData(ScepAuditConstants.NAME_pkiStatus, rep.pkiStatus());
         if (rep.pkiStatus() == PkiStatus.FAILURE) {
-            event.setStatus(AuditStatus.FAILED);
+            event.setLevel(AuditLevel.ERROR);
         }
         if (rep.failInfo() != null) {
-            event.addEventData(ScepAuditConstants.NAME_failInfo, rep.failInfo());
+            event.putEventData(ScepAuditConstants.NAME_failInfo, rep.failInfo());
         }
 
         String signatureAlgorithm = ScepUtil.getSignatureAlgorithm(signingKey(),
                 ScepHashAlgoType.forNameOrOid(req.digestAlgorithm().getId()));
 
         try {
-            X509Certificate jceSignerCert = X509Util.toX509Cert(signingCert());
+            X509Certificate jceSignerCert = ScepUtil.toX509Cert(signingCert());
             X509Certificate[] certs = control.isSendSignerCert()
                     ? new X509Certificate[]{jceSignerCert} : null;
 
@@ -192,9 +172,9 @@ public class ScepResponder {
     } // method servicePkiOperation
 
     public ContentInfo encode(final NextCaMessage nextCaMsg) throws CaException {
-        ParamUtil.requireNonNull("nextCAMsg", nextCaMsg);
+        ScepUtil.requireNonNull("nextCAMsg", nextCaMsg);
         try {
-            X509Certificate jceSignerCert = X509Util.toX509Cert(signingCert());
+            X509Certificate jceSignerCert = ScepUtil.toX509Cert(signingCert());
             X509Certificate[] certs = control.isSendSignerCert()
                     ? new X509Certificate[]{jceSignerCert} : null;
             return nextCaMsg.encode(signingKey(), jceSignerCert, certs);
@@ -215,18 +195,21 @@ public class ScepResponder {
         if (req.failureMessage() != null) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
+            return rep;
         }
 
         Boolean bo = req.isSignatureValid();
         if (bo != null && !bo.booleanValue()) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badMessageCheck);
+            return rep;
         }
 
         bo = req.isDecryptionSuccessful();
         if (bo != null && !bo.booleanValue()) {
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badRequest);
+            return rep;
         }
 
         Date signingTime = req.signingTime();
@@ -246,6 +229,7 @@ public class ScepResponder {
             if (isTimeBad) {
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badTime);
+                return rep;
             }
         }
 
@@ -256,31 +240,33 @@ public class ScepResponder {
             LOG.warn("tid={}: unknown digest algorithm {}", tid, oid);
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badAlg);
-        } else {
-            boolean supported = false;
-            if (hashAlgoType == ScepHashAlgoType.SHA1) {
-                if (caCaps.containsCapability(CaCapability.SHA1)) {
-                    supported = true;
-                }
-            } else if (hashAlgoType == ScepHashAlgoType.SHA256) {
-                if (caCaps.containsCapability(CaCapability.SHA256)) {
-                    supported = true;
-                }
-            } else if (hashAlgoType == ScepHashAlgoType.SHA512) {
-                if (caCaps.containsCapability(CaCapability.SHA512)) {
-                    supported = true;
-                }
-            } else if (hashAlgoType == ScepHashAlgoType.MD5) {
-                if (control.isUseInsecureAlg()) {
-                    supported = true;
-                }
-            }
+            return rep;
+        } // end if
 
-            if (!supported) {
-                LOG.warn("tid={}: unsupported digest algorithm {}", tid, oid);
-                rep.setPkiStatus(PkiStatus.FAILURE);
-                rep.setFailInfo(FailInfo.badAlg);
-            } // end if
+        boolean supported = false;
+        if (hashAlgoType == ScepHashAlgoType.SHA1) {
+            if (caCaps.containsCapability(CaCapability.SHA1)) {
+                supported = true;
+            }
+        } else if (hashAlgoType == ScepHashAlgoType.SHA256) {
+            if (caCaps.containsCapability(CaCapability.SHA256)) {
+                supported = true;
+            }
+        } else if (hashAlgoType == ScepHashAlgoType.SHA512) {
+            if (caCaps.containsCapability(CaCapability.SHA512)) {
+                supported = true;
+            }
+        } else if (hashAlgoType == ScepHashAlgoType.MD5) {
+            if (control.isUseInsecureAlg()) {
+                supported = true;
+            }
+        }
+
+        if (!supported) {
+            LOG.warn("tid={}: unsupported digest algorithm {}", tid, oid);
+            rep.setPkiStatus(PkiStatus.FAILURE);
+            rep.setFailInfo(FailInfo.badAlg);
+            return rep;
         } // end if
 
         // check the content encryption algorithm
@@ -290,23 +276,27 @@ public class ScepResponder {
                 LOG.warn("tid={}: encryption with DES3 algorithm is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
+                return rep;
             }
         } else if (AES_ENC_ALGS.contains(encOid)) {
             if (!caCaps.containsCapability(CaCapability.AES)) {
                 LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
+                return rep;
             }
         } else if (CMSAlgorithm.DES_CBC.equals(encOid)) {
             if (!control.isUseInsecureAlg()) {
                 LOG.warn("tid={}: encryption with DES algorithm {} is not permitted", tid, encOid);
                 rep.setPkiStatus(PkiStatus.FAILURE);
                 rep.setFailInfo(FailInfo.badAlg);
+                return rep;
             }
         } else {
             LOG.warn("tid={}: encryption with algorithm {} is not permitted", tid, encOid);
             rep.setPkiStatus(PkiStatus.FAILURE);
             rep.setFailInfo(FailInfo.badAlg);
+            return rep;
         }
 
         if (rep.pkiStatus() == PkiStatus.FAILURE) {
@@ -317,7 +307,21 @@ public class ScepResponder {
 
         switch (messageType) {
         case PKCSReq:
+            boolean selfSigned = req.signatureCert().getIssuerX500Principal()
+                .equals(req.signatureCert().getIssuerX500Principal());
+
             CertificationRequest csr = CertificationRequest.getInstance(req.messageData());
+
+            if (selfSigned) {
+                X500Name name = X500Name.getInstance(
+                        req.signatureCert().getSubjectX500Principal().getEncoded());
+                if (!name.equals(csr.getCertificationRequestInfo().getSubject())) {
+                    LOG.warn("tid={}: self-signed cert.subject != CSR.subject", tid);
+                    rep.setPkiStatus(PkiStatus.FAILURE);
+                    rep.setFailInfo(FailInfo.badRequest);
+                    return rep;
+                }
+            }
 
             String challengePwd = getChallengePassword(csr.getCertificationRequestInfo());
             if (challengePwd == null || !control.secret().equals(challengePwd)) {

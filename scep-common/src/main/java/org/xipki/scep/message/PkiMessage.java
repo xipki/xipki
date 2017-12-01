@@ -2,34 +2,17 @@
  *
  * Copyright (c) 2013 - 2017 Lijun Liao
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License version 3
- * as published by the Free Software Foundation with the addition of the
- * following permission added to Section 15 as permitted in Section 7(a):
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
- * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
- * OF THIRD PARTY RIGHTS.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License.
- *
- * You can be released from the requirements of the license by purchasing
- * a commercial license. Buying such a license is mandatory as soon as you
- * develop commercial activities involving the XiPKI software without
- * disclosing the source code of your own applications.
- *
- * For more information, please contact Lijun Liao at this
- * address: lijun.liao@gmail.com
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.xipki.scep.message;
@@ -74,7 +57,6 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.xipki.common.util.ParamUtil;
 import org.xipki.scep.exception.MessageEncodingException;
 import org.xipki.scep.transaction.FailInfo;
 import org.xipki.scep.transaction.MessageType;
@@ -85,7 +67,6 @@ import org.xipki.scep.util.ScepUtil;
 
 /**
  * @author Lijun Liao
- * @since 2.0.0
  */
 
 public class PkiMessage {
@@ -129,9 +110,9 @@ public class PkiMessage {
 
     public PkiMessage(final TransactionId transactionId, final MessageType messageType,
             final Nonce senderNonce) {
-        this.transactionId = ParamUtil.requireNonNull("transactionId", transactionId);
-        this.messageType = ParamUtil.requireNonNull("messageType", messageType);
-        this.senderNonce = ParamUtil.requireNonNull("senderNonce", senderNonce);
+        this.transactionId = ScepUtil.requireNonNull("transactionId", transactionId);
+        this.messageType = ScepUtil.requireNonNull("messageType", messageType);
+        this.senderNonce = ScepUtil.requireNonNull("senderNonce", senderNonce);
     }
 
     public TransactionId transactionId() {
@@ -262,7 +243,7 @@ public class PkiMessage {
             final X509Certificate signerCert, final X509Certificate[] signerCertSet,
             final X509Certificate recipientCert, final ASN1ObjectIdentifier encAlgId)
             throws MessageEncodingException {
-        ParamUtil.requireNonNull("signerKey", signerKey);
+        ScepUtil.requireNonNull("signerKey", signerKey);
         ContentSigner signer;
         try {
             signer = new JcaContentSignerBuilder(signatureAlgorithm).build(signerKey);
@@ -275,10 +256,12 @@ public class PkiMessage {
     public ContentInfo encode(final ContentSigner signer, final X509Certificate signerCert,
             final X509Certificate[] cmsCertSet, final X509Certificate recipientCert,
             final ASN1ObjectIdentifier encAlgId) throws MessageEncodingException {
-        ParamUtil.requireNonNull("signer", signer);
-        ParamUtil.requireNonNull("signerCert", signerCert);
-        ParamUtil.requireNonNull("recipientCert", recipientCert);
-        ParamUtil.requireNonNull("encAlgId", encAlgId);
+        ScepUtil.requireNonNull("signer", signer);
+        ScepUtil.requireNonNull("signerCert", signerCert);
+        if (messageData != null) {
+            ScepUtil.requireNonNull("recipientCert", recipientCert);
+            ScepUtil.requireNonNull("encAlgId", encAlgId);
+        }
 
         CMSTypedData content;
         if (messageData == null) {
@@ -333,8 +316,8 @@ public class PkiMessage {
 
     private CMSEnvelopedData encrypt(final X509Certificate recipient,
             final ASN1ObjectIdentifier encAlgId) throws MessageEncodingException {
-        ParamUtil.requireNonNull("recipient", recipient);
-        ParamUtil.requireNonNull("encAlgId", encAlgId);
+        ScepUtil.requireNonNull("recipient", recipient);
+        ScepUtil.requireNonNull("encAlgId", encAlgId);
 
         byte[] messageDataBytes;
         try {

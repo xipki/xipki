@@ -1,6 +1,10 @@
-SCEP4J
-=========
+License
+----
+
+* The Apache Software License, Version 2.0
+
 SCEP JAVA Client
+-----
 
 - Supported SCEP versions
 

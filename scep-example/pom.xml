@@ -8,18 +8,18 @@
     <artifactId>scep-parent</artifactId>
     <version>2.3.0-SNAPSHOT</version>
   </parent>
-  <artifactId>scep-common</artifactId>
-  <name>XiSCEP :: ${project.artifactId}</name>
+  <artifactId>scep-example</artifactId>
   <packaging>bundle</packaging>
+  <name>XiSCEP :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk15on</artifactId>
-      <version>${bc.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>scep-client</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <artifactId>slf4j-simple</artifactId>
       <version>${slf4j.version}</version>
     </dependency>
   </dependencies>
