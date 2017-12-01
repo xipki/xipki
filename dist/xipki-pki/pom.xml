@@ -14,7 +14,6 @@
   <properties>
     <app.name>PKI</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
-    <shared.dir>${project.basedir}/../shared</shared.dir>
     <jdbc.h2.version>1.4.196</jdbc.h2.version>
   </properties>
   <dependencies>
@@ -38,20 +37,6 @@
       </resource>
       <resource>
         <directory>src/main/unfiltered</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>${shared.dir}/filtered</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>${shared.dir}/unfiltered</directory>
         <filtering>false</filtering>
         <includes>
           <include>**/*</include>

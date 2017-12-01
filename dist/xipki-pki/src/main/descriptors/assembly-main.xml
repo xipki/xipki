@@ -31,6 +31,6 @@
     </file>
   </files>
   <componentDescriptors>
-    <componentDescriptor>${shared.dir}/descriptors/component-common.xml</componentDescriptor>
+    <componentDescriptor>src/main/descriptors/component-common.xml</componentDescriptor>
   </componentDescriptors>
 </assembly>

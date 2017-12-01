@@ -14,7 +14,6 @@
   <properties>
     <app.name>PKI QA</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
-    <shared.dir>${project.basedir}/../shared</shared.dir>
     <jdbc.h2.version>1.4.196</jdbc.h2.version>
   </properties>
   <dependencies>
@@ -60,23 +59,9 @@
           <include>**/*</include>
         </includes>
         <excludes>
-          <exclude>xipki/client-config/**</exclude>
           <exclude>xipki/ocsp-config/ocsp-responder.xml*</exclude>
+          <exclude>src/main/unfiltered/etc/system.properties</exclude>
         </excludes>
-      </resource>
-      <resource>
-        <directory>${shared.dir}/filtered</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>${shared.dir}/unfiltered</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*</include>
-        </includes>
       </resource>
     </resources>
     <plugins>
