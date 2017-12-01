@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xipki.sdk</groupId>
-    <artifactId>xisdk-parent</artifactId>
+    <artifactId>shells</artifactId>
     <version>2.3.0-SNAPSHOT</version>
   </parent>
-  <artifactId>jscep-client-shell</artifactId>
+  <artifactId>ocsp-qa-shell</artifactId>
   <packaging>bundle</packaging>
   <name>XiSDK :: ${project.artifactId}</name>
   <properties>
@@ -16,14 +16,14 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>com.google.code.jscep</groupId>
-      <artifactId>jscep</artifactId>
-      <version>${jscep.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ocsp-qa</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.tk</groupId>
-      <artifactId>shell-base</artifactId>
-      <version>${xitk.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ocsp-client-shell</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>
