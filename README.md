@@ -19,8 +19,10 @@ Just drop me an email.
     git clone https://github.com/xipki/xitk.git
     ```
     The option `--recursive` is required to checkout the submodules.
+<!---
   - Switch to the tag v2.3.0 (TODO)  
     `git checkout v2.3.0`
+-->
   - Build and install maven artifacts
     In the folder xitk, call `mvn install -DskipTests`
 
@@ -36,4 +38,5 @@ Just drop me an email.
     ```sh
     mvn clean install -Pdist
     ```
+    The you will find the xipki-p11proxy-*.tar.gz in the directory dist/target.
 
