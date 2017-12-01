@@ -10,7 +10,7 @@
   </parent>
   <artifactId>xipki-pkcs11proxy</artifactId>
   <packaging>pom</packaging>
-  <name>${project.groupId}.${project.artifactId}</name>
+  <name>XiP11Proxy :: dist :: ${project.artifactId}</name>
   <properties>
     <app.name>PKCS#11 proxy</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
@@ -126,7 +126,7 @@
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
-        <version>${karaf-plugin.version}</version>
+        <version>${karaf.version}</version>
         <extensions>true</extensions>
         <executions>
           <execution>
