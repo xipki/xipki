@@ -56,12 +56,10 @@
     <module>ca-api</module>
     <module>ca-mgmt-api</module>
     <module>ca-server</module>
-    <module>ca-mgmt-shell</module>
-    <module>ca-qa-shell</module>
     <module>ca-dbtool</module>
-    <module>ca-dbtool-shell</module>
     <module>ocsp-api</module>
     <module>ocsp-server</module>
+    <module>shells</module>
     <module>features</module>
   </modules>
   <scm>
