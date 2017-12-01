@@ -16,7 +16,7 @@ Just drop me an email.
   ```sh
   git clone --recursive https://github.com/xipki/xitk.git
   ```
-  The option `--recursive` is required to checkout the submodules.
+  The option `--recursive` is required to checkout the submodule pkcs11wrapper.
 
 2. Compile and install the artifacts
 
