@@ -2,9 +2,8 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="pki-${project.version}"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
-  <repository>mvn:org.xipki.features/pki/${project.version}/xml/features</repository>
+  <repository>mvn:org.xipki.pki.features/pki/${project.version}/xml/features</repository>
   <feature name="xipki-caclient" version="${xisdk.version}" description="CA client">
-    <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
     <bundle start-level="80">mvn:org.xipki.tk/cmp/${xitk.version}</bundle>
     <bundle start-level="80">mvn:org.xipki.pki/ca-api/${project.version}</bundle>
@@ -13,8 +12,10 @@
   </feature>
   <feature name="xipki-caclient-shell" version="${xisdk.version}" description="CA client shell">
     <feature>xipki-caclient</feature>
+    <feature>xipki-datasource</feature>
     <feature>xipki-shell-base</feature>
     <bundle start-level="80">mvn:org.xipki.sdk/ca-client-shell/${xisdk.version}</bundle>
+    <bundle start-level="80">mvn:org.xipki.sdk/ca-client-benchmark-shell/${xisdk.version}</bundle>
   </feature>
   <feature name="xipki-scepclient-shell" version="${xisdk.version}"
       description="SCEP client shell">
