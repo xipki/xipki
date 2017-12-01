@@ -34,7 +34,6 @@ import org.xipki.ca.client.api.dto.RevokeCertRequest;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequest;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.RequestResponseDebug;
-import org.xipki.security.X509Cert;
 
 /**
  * @author Lijun Liao

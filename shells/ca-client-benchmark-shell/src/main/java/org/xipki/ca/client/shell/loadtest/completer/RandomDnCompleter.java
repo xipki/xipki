@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.ca.client.shell.completer;
+package org.xipki.ca.client.shell.loadtest.completer;
 
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.ca.client.shell.loadtest.LoadTestEntry.RandomDn;

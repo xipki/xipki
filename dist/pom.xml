@@ -149,6 +149,7 @@
                 <feature>xipki-caclient</feature>
                 <feature>xipki-ocspclient</feature>
                 <feature>xipki-scepclient</feature>
+                <feature>xipki-caclient-benchmark</feature>
               </features>
             </configuration>
           </execution>

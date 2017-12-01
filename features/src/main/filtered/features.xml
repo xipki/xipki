@@ -18,9 +18,13 @@
     <bundle>mvn:org.xipki.tk/cmp/${xitk.version}</bundle>
     <bundle>mvn:org.xipki.sdk/ca-client-api/${project.version}</bundle>
     <bundle>mvn:org.xipki.sdk/ca-client-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki.sdk/ca-client-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-caclient-benchmark" version="${project.version}" description="CA client">
+    <feature>xipki-caclient</feature>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.xipki.tk/datasource/${xitk.version}</bundle>
-    <bundle>mvn:org.xipki.sdk/ca-client-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.sdk/ca-client-benchmark-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-scepclient" version="${project.version}"
       description="SCEP client shell">
