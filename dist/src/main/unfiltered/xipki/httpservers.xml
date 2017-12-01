@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<httpservers xmlns="http://xipki.org/httpserver/v1">
+  <httpserver enabled="true">
+    <description>HTTPS server</description>
+    <port>9443</port>
+    <threads>0</threads>
+    <!--reverseProxy>NONE</reverseProxy-->
+    <tls>
+      <!--provider>JDK</provider-->
+      <clientauth>require</clientauth>
+      <protocols>
+        <protocol>TLSv1.2</protocol>
+      </protocols>
+      <ciphersuites>
+        <ciphersuite>TLS_DHE_RSA_WITH_AES_256_CBC_SHA256</ciphersuite>
+        <ciphersuite>TLS_DHE_RSA_WITH_AES_128_CBC_SHA256</ciphersuite>
+      </ciphersuites>
+      <keystore>
+        <store>
+          <file>xipki/security/tlskeys/tls-server-keystore.jks</file>
+        </store>
+        <type>JKS</type>
+        <password>1234</password>
+      </keystore>
+      <truststore>
+        <store>
+          <file>xipki/security/tlskeys/tls-server-truststore.jks</file>
+        </store>
+        <type>JKS</type>
+        <password>1234</password>
+      </truststore>
+    </tls>
+  </httpserver>
+</httpservers>
