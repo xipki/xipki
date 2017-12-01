@@ -10,7 +10,7 @@
   </parent>
   <artifactId>xipki-pki</artifactId>
   <packaging>pom</packaging>
-  <name>${project.groupId}.${project.artifactId}</name>
+  <name>XiPKI :: dist :: ${project.artifactId}</name>
   <properties>
     <app.name>PKI</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
@@ -201,7 +201,7 @@
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
-        <version>${karaf-plugin.version}</version>
+        <version>${karaf.version}</version>
         <extensions>true</extensions>
         <executions>
           <execution>
