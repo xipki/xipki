@@ -38,5 +38,5 @@ Just drop me an email.
     ```sh
     mvn clean install -Pdist
     ```
-    The you will find the xipki-p11proxy-*.tar.gz in the directory dist/target.
+    The you will find the `xipki-p11proxy-*.tar.gz` in the directory `dist/target`.
 
