@@ -116,6 +116,7 @@
                   <artifactId>demo-tlskeys</artifactId>
                   <version>${xitk.version}</version>
                   <type>jar</type>
+                  <includes>tls-client*,tls-server.der</includes>
                   <excludes>META-INF/**</excludes>
                 </artifactItem>
               </artifactItems>

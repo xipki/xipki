@@ -1,5 +1,8 @@
 .gitignore
 
+# log files
+*.log
+
 # CheckStyle #
 .checkstyle
 
