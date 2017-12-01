@@ -19,7 +19,7 @@
   <dependencies>
     <dependency>
       <!-- project base features -->
-      <groupId>org.xipki.features</groupId>
+      <groupId>org.xipki.pki.features</groupId>
       <artifactId>pki</artifactId>
       <version>${project.version}</version>
       <classifier>features</classifier>
@@ -190,6 +190,7 @@
                   <artifactId>demo-tlskeys</artifactId>
                   <version>${xitk.version}</version>
                   <type>jar</type>
+                  <includes>tls-server*,tls-client.der</includes>
                   <excludes>META-INF/**</excludes>
                 </artifactItem>
               </artifactItems>
@@ -212,7 +213,7 @@
             <configuration>
               <repository>${output.directory}/system</repository>
               <descriptors>
-                <descriptor>mvn:org.xipki.features/pki/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki.pki.features/pki/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
               </descriptors>
               <features>
