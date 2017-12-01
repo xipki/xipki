@@ -37,8 +37,10 @@ Only if you want to use the development version, build it from source code as fo
     ```sh
     git clone https://github.com/xipki/xiscep.git
     ```
+<!---
   - Switch to the tag v2.3.0 (TODO)
     `git checkout v2.3.0`
+-->
   - Build and install maven artifacts
     In the folder xiscep, call `mvn install -DskipTests`
 
@@ -49,8 +51,10 @@ Only if you want to use the development version, build it from source code as fo
     git clone https://github.com/xipki/xitk.git
     ```
     The option `--recursive` is required to checkout the submodules.
+!---
   - Switch to the tag v2.3.0 (TODO)
     `git checkout v2.3.0`
+-->
   - Build and install maven artifacts
     In the folder xitk, call `mvn install -DskipTests`
 
@@ -67,10 +71,12 @@ Only if you want to use the development version, build it from source code as fo
 
 - Assembly
 
-  In folder `xipki/dist/xipki-pki`
+  In folder `xipki/dist`
   ```sh
   mvn clean package
   ```
+
+  Then you will find the `xipki-pki-*.tar.gz` in the directory `dist/target`.
 
 ### CA and OCSP Client
 
