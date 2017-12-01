@@ -10,7 +10,7 @@
   </parent>
   <artifactId>xipki-sdk</artifactId>
   <packaging>pom</packaging>
-  <name>XiSDK :: ${project.artifactId}</name>
+  <name>XiSDK :: dist :: ${project.artifactId}</name>
   <properties>
     <app.name>SDK</app.name>
     <output.directory>${project.build.directory}/classes</output.directory>
