@@ -51,7 +51,7 @@ Only if you want to use the development version, build it from source code as fo
     git clone https://github.com/xipki/xitk.git
     ```
     The option `--recursive` is required to checkout the submodules.
-!---
+<!---
   - Switch to the tag v2.3.0 (TODO)
     `git checkout v2.3.0`
 -->
