@@ -40,7 +40,7 @@
     <pkcs11-wrapper.version>1.4.0</pkcs11-wrapper.version>
   </properties>
   <modules>
-    <module>pkcs11-proxy-server</module>
+    <module>p11proxy-server</module>
     <module>features</module>
   </modules>
   <scm>

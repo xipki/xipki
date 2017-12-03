@@ -9,13 +9,13 @@
       interface="org.xipki.security.pkcs11.P11CryptServiceFactory"/>
 
   <bean id="localP11CryptServicePool"
-      class="org.xipki.remotep11.server.LocalP11CryptServicePool"
+      class="org.xipki.p11proxy.server.LocalP11CryptServicePool"
       init-method="init">
     <property name="p11CryptServiceFactory" ref="p11CryptServiceFactory"/>
   </bean>
 
   <!-- create the servlet and inject our own app factory -->
-  <bean id="serverServlet" class="org.xipki.remotep11.server.HttpProxyServlet">
+  <bean id="serverServlet" class="org.xipki.p11proxy.server.HttpProxyServlet">
     <property name="localP11CryptServicePool" ref="localP11CryptServicePool"/>
   </bean>
 

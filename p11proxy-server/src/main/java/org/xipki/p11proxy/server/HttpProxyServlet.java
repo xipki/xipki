@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.xipki.remotep11.server;
+package org.xipki.p11proxy.server;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_ALLOWED;
 

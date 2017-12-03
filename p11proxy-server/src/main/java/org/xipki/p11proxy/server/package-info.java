@@ -15,4 +15,4 @@
  * limitations under the License.
  */
 
-package org.xipki.remotep11.server;
+package org.xipki.p11proxy.server;
