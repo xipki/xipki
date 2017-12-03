@@ -31,33 +31,6 @@ Download the binary package `xipki-pki-<version>.tar.gz` from https://github.com
 
 Only if you want to use the development version, build it from source code as follows.
 
-- Prepare dependency XiSCEP (optional, required if not done before)
-
-  - Get a copy of XiSCEP code
-    ```sh
-    git clone https://github.com/xipki/xiscep.git
-    ```
-<!---
-  - Switch to the tag v2.3.0 (TODO)
-    `git checkout v2.3.0`
--->
-  - Build and install maven artifacts
-    In the folder xiscep, call `mvn install -DskipTests`
-
-- Prepare dependency XiTK (optional, required if not done before)
-
-  - Get a copy of XiSCEP code
-    ```sh
-    git clone https://github.com/xipki/xitk.git
-    ```
-    The option `--recursive` is required to checkout the submodules.
-<!---
-  - Switch to the tag v2.3.0 (TODO)
-    `git checkout v2.3.0`
--->
-  - Build and install maven artifacts
-    In the folder xitk, call `mvn install -DskipTests`
-
 - Get a copy of project code
   ```sh
   git clone https://github.com/xipki/xipki
@@ -80,23 +53,7 @@ Only if you want to use the development version, build it from source code as fo
 
 ### CA and OCSP Client
 
-Download the binary package `xipki-sdk-<version>.tar.gz` from https://github.com/xipki/xitk/releases.
-
-Only if you want to use the development version, build it from source code as follows.
-
-- Prepare dependency XiSCEP (optional, required if not done before)
-
-- Get a copy of project code
-  ```sh
-  git clone https://github.com/xipki/xitk
-  ```
-- Compile and install the artifacts
-
-  In folder `xitk`
-  ```sh
-  mvn clean install -Pdist
-  ```
-  Make sure that the option `-Pdist` is used.
+Download the binary package `xipki-sdk-<version>.tar.gz` from https://github.com/xipki/xisdk/releases.
 
 ## Configure the CA and OCSP Responder
 
@@ -162,7 +119,7 @@ DB2 | db2jcc4.jar |
 MySQL | mysql-connector-java.jar | https://dev.mysql.com/downloads/connector/j, In debian, use the `mysql-connector-java.jar` from the package `libmysql-java` (e.g. under /usr/share/java/mysql-connector-java.jar)
 MariaDB | mariadb-java-client-`<version>`.jar | https://downloads.mariadb.org/connector-java/
 PostgreSQL | postgresql-`<version>`.jar | https://jdbc.postgresql.org/download.html
-HSQLDB | hsqldb-`<version>`.jar | hsqldb.org
+HSQLDB | hsqldb-`<version>`.jar | http://hsqldb.org
 
   * Copy the jar file to the folder `lib/jdbc`.
 
