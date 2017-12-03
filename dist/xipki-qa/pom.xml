@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.pki.dist</groupId>
     <artifactId>dist-parent</artifactId>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.3.0</version>
   </parent>
   <artifactId>xipki-qa</artifactId>
   <packaging>pom</packaging>
@@ -224,8 +224,7 @@
                   <groupId>org.xipki.tk</groupId>
                   <artifactId>demo-tlskeys</artifactId>
                   <version>${xitk.version}</version>
-                  <type>jar</type>
-                  <excludes>META-INF/**</excludes>
+                  <type>zip</type>
                 </artifactItem>
               </artifactItems>
             </configuration>
