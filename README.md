@@ -10,21 +10,11 @@ Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com), [LinkedIn](https://www.linkedin
 ## Support
 Just drop me an email.
 
-## Build
+## Get Binary Package
 
-- Prepare dependency XiTK (optional, required if not done before)
+Download the binary package `xipki-p11proxy-<version>.tar.gz` from https://github.com/xipki/xip11proxy/releases.
 
-  - Get a copy of XiSCEP code
-    ```sh
-    git clone https://github.com/xipki/xitk.git
-    ```
-    The option `--recursive` is required to checkout the submodules.
-<!---
-  - Switch to the tag v2.3.0 (TODO)  
-    `git checkout v2.3.0`
--->
-  - Build and install maven artifacts
-    In the folder xitk, call `mvn install -DskipTests`
+Only if you want to use the development version, build it from source code as follows.
 
 - Build the project
 
