@@ -15,36 +15,11 @@ Just drop me an email.
    Example to communicate with the CA via CMP and RESTFUL API. Only dependencies BouncyCastle and
    slf4j-api are required.
 
-## Build
+## Get Binary Package
 
-- Prepare dependency XiSCEP (optional, required if not done before)
+Download the binary package `xipki-sdk-<version>.tar.gz` from https://github.com/xipki/xisdk/releases.
 
-  - Get a copy of XiSCEP code
-    ```sh
-    git clone https://github.com/xipki/xiscep.git
-    ```
-<!---
-  - Switch to the tag v2.3.0 (TODO)
-    `git checkout v2.3.0`
--->
-  - Build and install maven artifacts
-    In the folder xiscep, call `mvn install -DskipTests`
-
-- Prepare dependency XiTK (optional, required if not done before)
-
-  - Get a copy of XiSCEP code
-    ```sh
-    git clone https://github.com/xipki/xitk.git
-    ```
-    The option `--recursive` is required to checkout the submodules.
-<!---
-  - Switch to the tag v2.3.0 (TODO)  
-    `git checkout v2.3.0`
--->
-  - Build and install maven artifacts
-    In the folder xitk, call `mvn install -DskipTests`
-
-- Build the project
+Only if you want to use the development version, build it from source code as follows.
 
   - Get a copy of project code
     ```sh
