@@ -14,9 +14,8 @@ Just drop me an email.
 
 1. Get a copy of XiTK code
   ```sh
-  git clone --recursive https://github.com/xipki/xitk.git
+  git clone https://github.com/xipki/xitk.git
   ```
-  The option `--recursive` is required to checkout the submodule pkcs11wrapper.
 
 2. Compile and install the artifacts
 

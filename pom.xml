@@ -42,9 +42,6 @@
     <syslog-java-client.version>1.1.2</syslog-java-client.version>
   </properties>
   <modules>
-    <!-- external submodules-->
-    <module>pkcs11wrapper</module>
-    <!-- project sub-modules -->
     <module>common</module>
     <module>cmp</module>
     <module>audit</module>
