@@ -41,7 +41,8 @@ public class PasswordBasedEncryption {
     /**
      *
      * @return iv and the cipher text in form of
-     *           len(iv) of 1 byte | iv of len(iv) bytes | cipher text.
+     *         len(iv) of 1 byte | iv of len(iv) bytes | cipher text.
+     * @throws GeneralSecurityException
      */
     public static byte[] encrypt(final PBEAlgo algo, byte[] plaintext, final char[] password,
             final int iterationCount, final byte[] salt) throws GeneralSecurityException {

@@ -30,7 +30,6 @@ package org.xipki.datasource.springframework.dao;
  * @author Thomas Risberg
  * @see could notAcquireLockException
  * @see DeadlockLoserDataAccessException
- * @see OptimisticLockingFailureException
  */
 @SuppressWarnings("serial")
 public class PessimisticLockingFailureException extends ConcurrencyFailureException {

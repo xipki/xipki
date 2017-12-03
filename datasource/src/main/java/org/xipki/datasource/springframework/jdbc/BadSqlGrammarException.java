@@ -41,7 +41,6 @@ public class BadSqlGrammarException extends InvalidDataAccessResourceUsageExcept
 
     /**
      * Constructor for BadSqlGrammarException.
-     * @param task name of current task
      * @param sql the offending SQL statement
      * @param ex the root cause
      */
@@ -51,14 +50,14 @@ public class BadSqlGrammarException extends InvalidDataAccessResourceUsageExcept
     }
 
     /**
-     * Return the wrapped SQLException.
+     * @return the wrapped SQLException.
      */
     public SQLException cause() {
         return (SQLException) getCause();
     }
 
     /**
-     * Return the SQL that caused the problem.
+     * @return the SQL that caused the problem.
      */
     public String sql() {
         return this.sql;

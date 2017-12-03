@@ -114,6 +114,7 @@ public abstract class P11Identity implements Comparable<P11Identity> {
      *          Parameters. Could be {@code null}.
      * @param content
      *          Content to be signed. Must not be {@code null}.
+     * @throws P11TokenException
      */
     protected abstract byte[] sign0(final long mechanism, final P11Params parameters,
             final byte[] content) throws P11TokenException;

@@ -53,6 +53,7 @@ public class FpIdCalculator {
 
     /**
      * Hash the data.getBytes("UTF-8") and returns the first 8 bytes of the hash value.
+     * @param data data over which the hash value is calculated.
      * @return long represented of the first 8 bytes
      */
     public static long hash(final String data) {
@@ -68,6 +69,7 @@ public class FpIdCalculator {
 
     /**
      * Hash the data and returns the first 8 bytes of the hash value.
+     * @param data data over which the hash value is calculated.
      * @return long represented of the first 8 bytes
      */
     public static long hash(final byte[] data) {

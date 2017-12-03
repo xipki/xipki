@@ -64,6 +64,7 @@ public interface SecurityFactory {
      *          Certificate of the signer. If not {@code null}, it will be used; otherwise
      *          the certificates contained in the token will be used.
      * @return the new signer
+     * @throws ObjectCreationException
      */
     ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate cert)
             throws ObjectCreationException;
@@ -78,6 +79,7 @@ public interface SecurityFactory {
      *          Certificates of the signer. If not {@code null}, it will be used; otherwise
      *          the certificates contained in the token will be used.
      * @return the new signer
+     * @throws ObjectCreationException
      */
     ConcurrentContentSigner createSigner(String type, SignerConf conf, X509Certificate[] certs)
             throws ObjectCreationException;
@@ -86,6 +88,7 @@ public interface SecurityFactory {
      *
      * @param publicKey
      *          Signature verification key. Must not be {@code null}.
+     * @throws InvalidKeyException
      */
     ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
             throws InvalidKeyException;
@@ -94,6 +97,7 @@ public interface SecurityFactory {
      *
      * @param cert
      *          Certificate that contains the signature verification key. Must not be {@code null}.
+     * @throws InvalidKeyException
      */
     ContentVerifierProvider getContentVerifierProvider(X509Certificate cert)
             throws InvalidKeyException;
@@ -102,6 +106,7 @@ public interface SecurityFactory {
      *
      * @param cert
      *          Certificate that contains the signature verification key. Must not be {@code null}.
+     * @throws InvalidKeyException
      */
     ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert)
             throws InvalidKeyException;
@@ -111,7 +116,7 @@ public interface SecurityFactory {
      * @param csr
      *          CSR to be verified. Must not be {@code null}.
      * @param algoValidator
-     *          Signature algorithms validator. <code>null</null> to accept all algorithms
+     *          Signature algorithms validator. <code>null</code> to accept all algorithms
      * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
      *         <code>false</code> otherwise.
      */
@@ -122,7 +127,7 @@ public interface SecurityFactory {
      * @param csr
      *          CSR to be verified. Must not be {@code null}.
      * @param algoValidator
-     *          Signature algorithms validator. <code>null</null> to accept all algorithms
+     *          Signature algorithms validator. <code>null</code> to accept all algorithms
      * @return <code>true</code> if the signature is valid and the signature algorithm is accepted,
      *         <code>false</code> otherwise.
      */
@@ -132,6 +137,7 @@ public interface SecurityFactory {
      *
      * @param subjectPublicKeyInfo
      *          From which the public key will be created. Must not be {@code null}.
+     * @throws InvalidKeyException
      */
     PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
             throws InvalidKeyException;
@@ -149,6 +155,7 @@ public interface SecurityFactory {
      * @param newCertChain
      *          New certificates. If not {@code null}, the certificates in the keystore will be
      *          replaced.
+     * @throws KeyStoreException
      */
     byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes, String keyname,
             char[] password, X509Certificate[] newCertChain)

@@ -84,6 +84,7 @@ public interface ConcurrentContentSigner {
      *          Configuration. Could be {@code null}.
      * @param passwordResolver
      *          Password resolver. Could be {@code null}.
+     * @throws XiSecurityException
      */
     void initialize(String conf, PasswordResolver passwordResolver)
             throws XiSecurityException;
@@ -92,17 +93,21 @@ public interface ConcurrentContentSigner {
      *
      * @param data
      *          Data to be signed. Must not be {@code null}.
+     * @throws IOException
+     * @throws NoIdleSignerException
      */
     byte[] sign(byte[] data) throws NoIdleSignerException, IOException;
 
     /**
      * borrow a ContentSigner with implementation-dependent default timeout.
+     * @throws NoIdleSignerException
      */
     ConcurrentBagEntrySigner borrowContentSigner()
             throws NoIdleSignerException;
 
     /**
      * @param timeout timeout in milliseconds, 0 for infinitely.
+     * @throws NoIdleSignerException
      */
     ConcurrentBagEntrySigner borrowContentSigner(final int soTimeout)
             throws NoIdleSignerException;

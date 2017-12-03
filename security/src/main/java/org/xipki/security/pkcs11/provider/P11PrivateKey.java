@@ -99,6 +99,8 @@ public class P11PrivateKey implements PrivateKey {
      *
      * @param parameters
      *          Parameters. Could be {@code null}.
+     * @throws XiSecurityException
+     * @throws P11TokenException
      */
     public byte[] sign(final long mechanism, final P11Params parameters,
             final byte[] content) throws XiSecurityException, P11TokenException {

@@ -151,7 +151,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     /**
-     * @param timeout timeout in milliseconds, 0 for infinitely.
+     * @param soTimeout timeout in milliseconds, 0 for infinitely.
      */
     @Override
     public ConcurrentBagEntrySigner borrowContentSigner(final int soTimeout)

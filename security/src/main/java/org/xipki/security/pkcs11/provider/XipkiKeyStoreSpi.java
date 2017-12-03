@@ -55,10 +55,10 @@ import org.xipki.security.pkcs11.P11SlotIdentifier;
 /**
  * construction of alias:
  * <ul>
- *   <li><code>&lt;module name>#slotid-&lt;slot id>#keyid-&lt;key id></code></li>
- *   <li><code>&lt;module name>#slotid-&lt;slot id>#keylabel-&lt;key label></code></li>
- *   <li><code>&lt;module name>#slotindex-&lt;slot index>#keyid-&lt;key id></code></li>
- *   <li><code>&lt;module name>#slotindex-&lt;slot index>#keylabel-&lt;key label></code></li>
+ *   <li><code>&lt;module name&gt;#slotid-&lt;slot id&gt;#keyid-&lt;key id&gt;</code></li>
+ *   <li><code>&lt;module name&gt;#slotid-&lt;slot id&gt;#keylabel-&lt;key label&gt;</code></li>
+ *   <li><code>&lt;module name&gt;#slotindex-&lt;slot index&gt;#keyid-&lt;key id&gt;</code></li>
+ *   <li><code>&lt;module name&gt;#slotindex-&lt;slot index&gt;#keylabel-&lt;key label&gt;</code></li>
  * </ul>
  *
  * @author Lijun Liao

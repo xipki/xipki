@@ -74,7 +74,7 @@ public class FileUtils {
      * only if the specific file is.
      * <p>
      * <b>Note:</b> the current implementation always returns {@code false} if the system
-     * is detected as Windows using {@link FilenameUtils#isSystemWindows()}
+     * is detected as Windows using {@link Configuration#isWindows()}
      * <p>
      * For code that runs on Java 1.7 or later, use the following method instead:
      * <br>

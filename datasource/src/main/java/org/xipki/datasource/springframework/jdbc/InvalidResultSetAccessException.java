@@ -32,7 +32,6 @@ import org.xipki.datasource.springframework.dao.InvalidDataAccessResourceUsageEx
  *
  * @author Juergen Hoeller
  * @see BadSqlGrammarException
- * @see org.springframework.jdbc.support.rowset.SqlRowSet
  */
 @SuppressWarnings("serial")
 public class InvalidResultSetAccessException extends InvalidDataAccessResourceUsageException {
@@ -41,7 +40,6 @@ public class InvalidResultSetAccessException extends InvalidDataAccessResourceUs
 
     /**
      * Constructor for InvalidResultSetAccessException.
-     * @param task name of current task
      * @param sql the offending SQL statement
      * @param ex the root cause
      */
@@ -59,7 +57,7 @@ public class InvalidResultSetAccessException extends InvalidDataAccessResourceUs
     }
 
     /**
-     * Return the wrapped SQLException.
+     * @return the wrapped SQLException.
      */
     public SQLException cause() {
         return (SQLException) getCause();

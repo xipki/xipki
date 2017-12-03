@@ -100,7 +100,6 @@ public class ConcurrentBag<T extends IConcurrentBagEntry> implements AutoCloseab
     /**
      * Construct a ConcurrentBag with the NOP listener.
      *
-     * @param listener the IBagStateListener to attach to this bag
      */
     public ConcurrentBag() {
         this(new NopBagStateListener());

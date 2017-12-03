@@ -27,9 +27,8 @@ package org.xipki.datasource.springframework.dao;
  *
  * @author Thomas Risberg
  * @since 1.1
- * @see OptimisticLockingFailureException
  * @see PessimisticLockingFailureException
- * @see could notAcquireLockException
+ * @see CannotAcquireLockException
  * @see DeadlockLoserDataAccessException
  */
 @SuppressWarnings("serial")

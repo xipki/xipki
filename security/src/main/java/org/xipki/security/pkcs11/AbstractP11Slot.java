@@ -117,6 +117,8 @@ public abstract class AbstractP11Slot implements P11Slot {
      *          Object identifier. Must not be {@code null}.
      * @param cert
      *          Certificate to be added. Must not be {@code null}.
+     * @throws P11TokenException
+     * @throws CertificateException
      */
     protected abstract void updateCertificate0(final P11ObjectIdentifier objectId,
             final X509Certificate newCert) throws P11TokenException, CertificateException;
@@ -125,6 +127,7 @@ public abstract class AbstractP11Slot implements P11Slot {
      *
      * @param objectId
      *          Object identifier. Must not be {@code null}.
+     * @throws P11TokenException
      */
     protected abstract void removeIdentity0(P11ObjectIdentifier objectId) throws P11TokenException;
 
@@ -134,6 +137,8 @@ public abstract class AbstractP11Slot implements P11Slot {
      *          Object identifier. Must not be {@code null}.
      * @param cert
      *          Certificate to be added. Must not be {@code null}.
+     * @throws P11TokenException
+     * @throws CertificateException
      */
     protected abstract void addCert0(final P11ObjectIdentifier objectId,
             final X509Certificate cert) throws P11TokenException, CertificateException;
@@ -144,6 +149,7 @@ public abstract class AbstractP11Slot implements P11Slot {
      *          Label of the generated key. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @throws P11TokenException
      */
     protected abstract P11Identity generateSecretKey0(long keyType, int keysize,
             String label, P11NewKeyControl control) throws P11TokenException;
@@ -156,6 +162,7 @@ public abstract class AbstractP11Slot implements P11Slot {
      *          Label of the created key. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @throws P11TokenException
      */
     protected abstract P11Identity createSecretKey0(long keyType, byte[] keyValue,
             String label, P11NewKeyControl control) throws P11TokenException;
@@ -172,6 +179,7 @@ public abstract class AbstractP11Slot implements P11Slot {
      *          Label of the generated keys. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @throws P11TokenException
      */
     // CHECKSTYLE:OFF
     protected abstract P11Identity generateDSAKeypair0(final BigInteger p, final BigInteger q,
@@ -187,6 +195,7 @@ public abstract class AbstractP11Slot implements P11Slot {
      *          Label of the generated keys. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @throws P11TokenException
      */
     // CHECKSTYLE:SKIP
     protected abstract P11Identity generateECKeypair0(ASN1ObjectIdentifier curveId,
@@ -200,6 +209,7 @@ public abstract class AbstractP11Slot implements P11Slot {
      *          Label of the generated keys. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @throws P11TokenException
      */
     // CHECKSTYLE:SKIP
     protected abstract P11Identity generateRSAKeypair0(int keysize,

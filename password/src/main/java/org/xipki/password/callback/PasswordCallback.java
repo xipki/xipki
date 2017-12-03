@@ -30,6 +30,7 @@ public interface PasswordCallback {
      *
      * @param conf
      *          Configuration. Could be {@code null}.
+     * @throws PasswordResolverException
      */
     void init(String conf) throws PasswordResolverException;
 
@@ -39,6 +40,7 @@ public interface PasswordCallback {
      *          Prompt shown to use while asking password. Could be {@code null}.
      * @param testToken
      *          Token used to test whether the retrieved password is correct. Could be {@code null}.
+     * @throws PasswordResolverException
      */
     char[] getPassword(String prompt, String testToken) throws PasswordResolverException;
 

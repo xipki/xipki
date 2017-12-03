@@ -23,17 +23,6 @@ import java.util.Map;
 
 import org.xipki.common.util.ParamUtil;
 
-/**
- * Static library version of {@link android.util.LruCache}. Used to write apps
- * that run on API levels prior to 12. When running on API level 12 or above,
- * this implementation is still used; it does not try to switch to the
- * framework's implementation. See the framework SDK documentation for a class
- * overview.
- *
- * @author Lijun Liao
- * @since 2.0.0
- */
-
 public class LruCache<K, V> {
 
     private final LinkedHashMap<K, V> map;
@@ -66,7 +55,7 @@ public class LruCache<K, V> {
     /**
      * Sets the size of the cache.
      *
-     * @param maxSize The new maximum size.
+     * @param maxSize the new maximum size.
      */
     public void resize(final int maxSize) {
         synchronized (this) {
@@ -80,6 +69,10 @@ public class LruCache<K, V> {
      * created by {@code #create}. If a value was returned, it is moved to the
      * head of the queue. This returns null if a value is not cached and could not
      * be created.
+     * 
+     * @param key: the key the value for {@code key} if it exists in the cache or can be
+     * created by {@code #create}.
+     * @return the
      */
     public final V get(final K key) {
         if (key == null) {
@@ -132,7 +125,8 @@ public class LruCache<K, V> {
     /**
      * Caches {@code value} for {@code key}. The value is moved to the head of
      * the queue.
-     *
+     * @param key the key.
+     * @param value the value.
      * @return the previous value mapped by {@code key}.
      */
     public final V put(final K key, final V value) {
@@ -162,7 +156,7 @@ public class LruCache<K, V> {
      * Remove the eldest entries until the total of remaining entries is at or
      * below the requested size.
      *
-     * @param pMaxSize the maximum size of the cache before returning. Could be -1
+     * @param maxSize the maximum size of the cache before returning. Could be -1
      *            to evict even 0-sized elements.
      */
     public void trimToSize(final int maxSize) {
@@ -193,7 +187,7 @@ public class LruCache<K, V> {
 
     /**
      * Removes the entry for {@code key} if it exists.
-     *
+     * @param key the key
      * @return the previous value mapped by {@code key}.
      */
     public final V remove(final K key) {
@@ -227,6 +221,8 @@ public class LruCache<K, V> {
      *
      * @param evicted true if the entry is being removed to make space, false
      *     if the removal was caused by a {@link #put} or {@link #remove}.
+     * @param key the key
+     * @param oldValue the old value of the {@code key}
      * @param newValue the new value for {@code key}, if it exists. If non-null,
      *     this removal was caused by a {@link #put}. Otherwise it was caused by
      *     an eviction or a {@link #remove}.
@@ -249,6 +245,9 @@ public class LruCache<K, V> {
      * at the same time (causing multiple values to be created), or when one
      * thread calls {@link #put} while another is creating a value for the same
      * key.
+     * 
+     * @param key the key
+     * @return the created computed value or null if no value can be computed
      */
     protected V create(final K key) {
         return null;
@@ -268,6 +267,10 @@ public class LruCache<K, V> {
      * is the number of entries and max size is the maximum number of entries.
      *
      * <p>An entry's size must not change while it is in the cache.
+     * @param key the key
+     * @param value the value
+     * @return he size of the entry for {@code key} and {@code value} in
+     *   user-defined units
      */
     protected int sizeOf(final K key, final V value) {
         return 1;
@@ -284,6 +287,7 @@ public class LruCache<K, V> {
      * For caches that do not override {@link #sizeOf}, this returns the number
      * of entries in the cache. For all other caches, this returns the sum of
      * the sizes of the entries in this cache.
+     * @return the size
      */
     public final synchronized int size() {
         return size;
@@ -293,6 +297,7 @@ public class LruCache<K, V> {
      * For caches that do not override {@link #sizeOf}, this returns the maximum
      * number of entries in the cache. For all other caches, this returns the
      * maximum sum of the sizes of the entries in this cache.
+     * @return the maximal size
      */
     public final synchronized int maxSize() {
         return maxSize;
@@ -301,6 +306,7 @@ public class LruCache<K, V> {
     /**
      * Returns the number of times {@link #get} returned a value that was
      * already present in the cache.
+     * @return the number of times
      */
     public final synchronized int hitCount() {
         return hitCount;
@@ -309,34 +315,36 @@ public class LruCache<K, V> {
     /**
      * Returns the number of times {@link #get} returned null or required a new
      * value to be created.
+     * @return the number of times returned null or required a new value to be
+     *         created
      */
     public final synchronized int missCount() {
         return missCount;
     }
 
     /**
-     * Returns the number of times {@link #create(Object)} returned a value.
+     * @return the number of times {@link #create(Object)} returned a value.
      */
     public final synchronized int createCount() {
         return createCount;
     }
 
     /**
-     * Returns the number of times {@link #put} was called.
+     * @return the number of times {@link #put} was called.
      */
     public final synchronized int putCount() {
         return putCount;
     }
 
     /**
-     * Returns the number of values that have been evicted.
+     * @return the number of values that have been evicted.
      */
     public final synchronized int evictionCount() {
         return evictionCount;
     }
 
     /**
-     * Returns a copy of the current contents of the cache, ordered from least
+     * @return a copy of the current contents of the cache, ordered from least
      * recently accessed to most recently accessed.
      */
     public final synchronized Map<K, V> snapshot() {

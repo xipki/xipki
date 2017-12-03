@@ -258,6 +258,8 @@ public class X509Util {
     /**
      * First canonicalized the name, and then compute the SHA-1 finger-print over the
      * canonicalized subject string.
+     * @param prin The name
+     * @return the fingerprint of the canonicalized name
      */
     public static long fpCanonicalizedName(final X500Principal prin) {
         ParamUtil.requireNonNull("prin", prin);
@@ -502,7 +504,9 @@ public class X509Util {
     }
 
     /**
-     * Cross certificate will not be considered.
+     * Build the certificate path. Cross certificate will not be considered.
+     * @param cert certificate for which the certificate path will be built
+     * @param certs collection of certificates.
      */
     public static X509Certificate[] buildCertPath(final X509Certificate cert,
             final Set<? extends Certificate> certs) {
@@ -784,6 +788,7 @@ public class X509Util {
     *
     * @param taggedValue [tag]value, and the value for tags otherName and ediPartyName is
     *     type=value.
+    * @throws BadInputException
     */
     public static GeneralName createGeneralName(final String taggedValue) throws BadInputException {
         ParamUtil.requireNonBlank("taggedValue", taggedValue);

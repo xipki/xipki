@@ -35,7 +35,8 @@ public interface P11CryptServiceFactory {
      *
      * @param moduleName
      *          Module name. Must not be {@code null}.
-
+     * @throws P11TokenException
+     * @throws XiSecurityException
      */
     P11CryptService getP11CryptService(String moduleName)
             throws P11TokenException, XiSecurityException;

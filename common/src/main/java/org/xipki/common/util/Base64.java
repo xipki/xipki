@@ -13,7 +13,8 @@ import java.util.Arrays;
  *
  * On byte arrays the encoder is about 20% faster than Jakarta Commons Base64
  * Codec for encode and about 50% faster for decoding large arrays. This
- * implementation is about twice as fast on very small arrays (&lt 30 bytes).
+ * implementation is about twice as fast on very small arrays (less than 30
+ * bytes).
  * If source/destination is a <code>String</code> this version is about three
  * times as fast due to the fact that the Commons Codec result has to be recoded
  * to a <code>String</code> from <code>byte[]</code>, which is very expensive.
@@ -101,7 +102,11 @@ public class Base64 {
 
     /**
      *
-     * the same as {@link #encodeToChar(byte[], false)}.
+     * The same as encodeToChar(byte[], false)
+     * 
+     * @param sArr The bytes to convert. If <code>null</code> or length 0, an empty array will be
+     *        returned.
+     * @return A BASE64 encoded array without line separator.
      */
     public static final char[] encodeToChar(byte[] sArr) {
         return encodeToChar(sArr, false);
@@ -313,7 +318,11 @@ public class Base64 {
 
     /**
      *
-     * the same as {@link #encodeToByte(byte[], false)}.
+     * The same #encodeToByte(byte[], false)}.
+     * @param sArr
+     *          The bytes to convert. If <code>null</code> or length 0 an empty array will be
+     *          returned.
+     * @return A BASE64 encoded array without line separator. Never <code>null</code>.
      */
     public static final byte[] encodeToByte(byte[] sArr) {
         return encodeToByte(sArr, false);
@@ -523,7 +532,12 @@ public class Base64 {
 
     /**
      *
-     * the same as {@link #encodeToString(byte[], false)}.
+     * The same as encodeToString(byte[], false).
+     * 
+     * @param sArr
+     *          The bytes to convert. If <code>null</code> or length 0 an empty array will be
+     *          returned.
+     * @return A BASE64 encoded array without line separator. Never <code>null</code>.
      */
     public static final String encodeToString(byte[] sArr) {
         return encodeToString(sArr, false);

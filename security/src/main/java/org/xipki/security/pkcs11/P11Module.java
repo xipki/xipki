@@ -41,7 +41,7 @@ public interface P11Module {
      *
      * @param slotId
      *          Slot identifier. Must not be {@code null}.
-
+     * @throws P11TokenException
      */
     P11Slot getSlot(P11SlotIdentifier slotId) throws P11TokenException;
 

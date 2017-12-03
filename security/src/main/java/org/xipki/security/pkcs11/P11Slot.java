@@ -67,8 +67,10 @@ public interface P11Slot {
      *
      * @param objectId
      *          Object identifier. Must not be {@code null}.
-     * @param cert
+     * @param newCert
      *          Certificate to be added. Must not be {@code null}.
+     * @throws P11TokenException
+     * @throws CertificateException
      */
     void updateCertificate(P11ObjectIdentifier objectId, X509Certificate newCert)
             throws P11TokenException, CertificateException;
@@ -83,6 +85,7 @@ public interface P11Slot {
      * @return how many objects have been deleted
      * @throws P11TokenException
      *           If PKCS#11 error happens.
+     * @throws P11TokenException
      */
     int removeObjects(byte[] id, String label) throws P11TokenException;
 
@@ -90,6 +93,7 @@ public interface P11Slot {
      *
      * @param objectId
      *          Object identifier. Must not be {@code null}.
+     * @throws P11TokenException
      */
     void removeIdentity(P11ObjectIdentifier objectId) throws P11TokenException;
 
@@ -97,6 +101,7 @@ public interface P11Slot {
      *
      * @param objectId
      *          Object identifier. Must not be {@code null}.
+     * @throws P11TokenException
      */
     void removeCerts(P11ObjectIdentifier objectId) throws P11TokenException;
 
@@ -104,6 +109,8 @@ public interface P11Slot {
      *
      * @param cert
      *          Certificate to be added. Must not be {@code null}.
+     * @throws P11TokenException
+     * @throws CertificateException
      */
     P11ObjectIdentifier addCert(X509Certificate cert)
             throws P11TokenException, CertificateException;
@@ -114,6 +121,8 @@ public interface P11Slot {
      *          Object identifier. Must not be {@code null}.
      * @param cert
      *          Certificate to be added. Must not be {@code null}.
+     * @throws P11TokenException
+     * @throws CertificateException
      */
     void addCert(P11ObjectIdentifier objectId, X509Certificate cert)
             throws P11TokenException, CertificateException;
@@ -126,6 +135,7 @@ public interface P11Slot {
      *          Label of the generated keys. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @throws P11TokenException
      */
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateRSAKeypair(int keysize, BigInteger publicExponent,
@@ -138,6 +148,7 @@ public interface P11Slot {
      *          Label of the generated keys. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @throws P11TokenException
      */
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateDSAKeypair(int plength, int qlength, String label,
@@ -156,6 +167,7 @@ public interface P11Slot {
      *          Label of the generated keys. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @throws P11TokenException
      */
     // CHECKSTYLE:OFF
     P11ObjectIdentifier generateDSAKeypair(BigInteger p, BigInteger q, BigInteger g,
@@ -165,12 +177,13 @@ public interface P11Slot {
 
     /**
      *
-     * @param curveId
-     *         Object identifier of the EC curve. Must not be {@code null}.
+     * @param curveNameOrOid
+     *         Object identifier or name of the EC curve. Must not be {@code null}.
      * @param label
      *          Label of the generated keys. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @throws P11TokenException
      */
     // CHECKSTYLE:SKIP
     P11ObjectIdentifier generateECKeypair(String curveNameOrOid, String label,
@@ -196,6 +209,7 @@ public interface P11Slot {
      *          Label of the generated key. Must not be {@code null}.
      * @param control
      *          Control of the key generation process. Must not be {@code null}.
+     * @throws P11TokenException
      */
     P11ObjectIdentifier createSecretKey(long keyType, byte[] keyValue, String label,
             P11NewKeyControl control)
@@ -205,6 +219,8 @@ public interface P11Slot {
      *
      * @param objectId
      *          Object identifier. Must not be {@code null}.
+     * @throws P11TokenException
+     * @throws CertificateException
      */
     X509Certificate exportCert(P11ObjectIdentifier objectId)
             throws P11TokenException, CertificateException;
@@ -213,6 +229,8 @@ public interface P11Slot {
      *
      * @param stream
      *          Output stream. Must not be {@code null}.
+     * @throws P11TokenException
+     * @throws IOException
      */
     void showDetails(OutputStream stream, boolean verbose)
             throws P11TokenException, IOException;

@@ -267,7 +267,7 @@ public class ProxyP11Module extends AbstractP11Module {
      * 0 - - - 1 - - - 2 - - - 3 - - - 4 - - - 5 - - - 6 - - - 7 - - - 8
      * |    Version    |        Transaction ID         |   Body ...    |
      * |   ... Length  |     Action    |   Module ID   |   Content...  |
-     * |   .Content               | <-- 10 + Length (offset).
+     * |   .Content               | &lt;-- 10 + Length (offset).
      *
      * </pre>
      * @param action action

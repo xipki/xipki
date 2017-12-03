@@ -40,7 +40,6 @@ public class UncategorizedSqlException extends UncategorizedDataAccessException 
 
     /**
      * Constructor for UncategorizedSQLException.
-     * @param task name of current task
      * @param sql the offending SQL statement
      * @param ex the root cause
      */
@@ -52,14 +51,14 @@ public class UncategorizedSqlException extends UncategorizedDataAccessException 
     }
 
     /**
-     * Return the underlying SQLException.
+     * @return the underlying SQLException.
      */
     public SQLException cause() {
         return (SQLException) getCause();
     }
 
     /**
-     * Return the SQL that led to the problem.
+     * @return the SQL that led to the problem.
      */
     public String sql() {
         return this.sql;
