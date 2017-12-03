@@ -115,9 +115,8 @@
                   <groupId>org.xipki.tk</groupId>
                   <artifactId>demo-tlskeys</artifactId>
                   <version>${xitk.version}</version>
-                  <type>jar</type>
+                  <type>zip</type>
                   <includes>tls-client*,tls-server.der</includes>
-                  <excludes>META-INF/**</excludes>
                 </artifactItem>
               </artifactItems>
             </configuration>
