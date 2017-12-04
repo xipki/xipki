@@ -54,6 +54,7 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
     private String outputFile;
 
     /**
+     * Enrolls certificate.
      *
      * @param client
      *          Client. Must not be {@code null}.
@@ -63,10 +64,15 @@ public abstract class EnrollCertCommandSupport extends ClientCommandSupport {
      *          Identity key. Must not be {@code null}.
      * @param identityCert
      *          Identity certificate. Must not be {@code null}.
+     * @return the enrollment response
+     * @throws ClientException
+     *             if any client error occurs.
+     * @throws TransactionException
+     *             if there is a problem with the SCEP transaction.
      */
     protected abstract EnrollmentResponse requestCertificate(Client client,
             PKCS10CertificationRequest csr, PrivateKey identityKey,
-            X509Certificate identityCertÔ) throws ClientException, TransactionException;
+            X509Certificate identityCert) throws ClientException, TransactionException;
 
     @Override
     protected Object execute0() throws Exception {

@@ -98,15 +98,16 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     }
 
     /**
-     *
+     * Sends the request to the OCSP responder
      * @param request
      *          Request. Must not be {@code null}.
      * @param responderUrl
      *          Responder URL. Must not be {@code null}.
      * @param requestOptions
      *           Request options. Must not be {@code null}.
-     * @return
+     * @return received response
      * @throws IOException
+     *           if the transmission failed.
      */
     protected abstract byte[] send(byte[] request, URL responderUrl,
             RequestOptions requestOptions) throws IOException;

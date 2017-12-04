@@ -51,6 +51,7 @@ public class XipkiOCSPReqBuilder {
      * Add a request for the given CertificateID.
      *
      * @param certId certificate ID of interest
+     * @return a reference to this object.
      */
     public XipkiOCSPReqBuilder addRequest(
         CertID   certId) {
@@ -64,6 +65,7 @@ public class XipkiOCSPReqBuilder {
      *
      * @param certId certificate ID of interest
      * @param singleRequestExtensions the extensions to attach to the request
+     * @return a reference to this object.
      */
     public XipkiOCSPReqBuilder addRequest(
         CertID   certId,
@@ -77,6 +79,7 @@ public class XipkiOCSPReqBuilder {
      * Set the requestor name to the passed in X500Name
      *
      * @param requestorName an X500Name representing the requestor name.
+     * @return a reference to this object.
      */
     public XipkiOCSPReqBuilder setRequestorName(
         X500Name requestorName) {

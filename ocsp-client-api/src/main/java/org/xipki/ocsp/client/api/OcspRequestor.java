@@ -32,6 +32,7 @@ import org.xipki.common.RequestResponseDebug;
 public interface OcspRequestor {
 
     /**
+     * Asks for the status of the given certificate.
      *
      * @param issuerCert
      *          Issuer certificate. Must not be {@code null}.
@@ -43,6 +44,12 @@ public interface OcspRequestor {
      *          Request options. Must not be {@code null}.
      * @param debug
      *          Request/response debug control. Could be {@code null}.
+     * @return the OCSP response.
+     * @throws OcspRequestorException
+     *         if cannot build the OCSP request
+     * @throws OcspResponseException
+     *         if the OCSP responder cannot be reached or the response does not match the requested
+     *         certificate.
      */
     OCSPResp ask(X509Certificate issuerCert, X509Certificate cert,
             URL responderUrl, RequestOptions requestOptions,
@@ -50,6 +57,7 @@ public interface OcspRequestor {
             throws OcspResponseException, OcspRequestorException;
 
     /**
+     * Asks for the status of the given certificate.
      *
      * @param issuerCert
      *          Issuer certificate. Must not be {@code null}.
@@ -61,6 +69,12 @@ public interface OcspRequestor {
      *          Request options. Must not be {@code null}.
      * @param debug
      *          Request/response debug control. Could be {@code null}.
+     * @return the OCSP response.
+     * @throws OcspRequestorException
+     *         if cannot build the OCSP request
+     * @throws OcspResponseException
+     *         if the OCSP responder cannot be reached or the response does not match the requested
+     *         certificate.
      */
     OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs,
             URL responderUrl, RequestOptions requestOptions,
@@ -68,6 +82,8 @@ public interface OcspRequestor {
             throws OcspResponseException, OcspRequestorException;
 
     /**
+     *
+     * Asks for the status of the given certificate.
      *
      * @param issuerCert
      *          Issuer certificate. Must not be {@code null}.
@@ -79,6 +95,12 @@ public interface OcspRequestor {
      *          Request options. Must not be {@code null}.
      * @param debug
      *          Request/response debug control. Could be {@code null}.
+     * @return the OCSP response.
+     * @throws OcspRequestorException
+     *         if cannot build the OCSP request
+     * @throws OcspResponseException
+     *         if the OCSP responder cannot be reached or the response does not match the requested
+     *         certificate.
      */
     OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber,
             URL responderUrl, RequestOptions requestOptions,
@@ -86,6 +108,7 @@ public interface OcspRequestor {
             throws OcspResponseException, OcspRequestorException;
 
     /**
+     * Asks for the status of the given certificates.
      *
      * @param issuerCert
      *          Issuer certificate. Must not be {@code null}.
@@ -97,6 +120,12 @@ public interface OcspRequestor {
      *          Request options. Must not be {@code null}.
      * @param debug
      *          Request/response debug control. Could be {@code null}.
+     * @return the OCSP response.
+     * @throws OcspRequestorException
+     *         if cannot build the OCSP request
+     * @throws OcspResponseException
+     *         if the OCSP responder cannot be reached or the response does not match the requested
+     *         certificates.
      */
     OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers,
             URL responderUrl, RequestOptions requestOptions,
